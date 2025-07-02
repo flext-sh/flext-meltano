@@ -199,7 +199,11 @@ class FlextMeltanoJobManager:
             raise
 
     async def update_job_state(
-        self, project: Project, job_id: str, new_state: State, reason: str | None = None,
+        self,
+        project: Project,
+        job_id: str,
+        new_state: State,
+        reason: str | None = None,
     ) -> bool:
         """Update job state.
 
@@ -277,7 +281,9 @@ class FlextMeltanoJobManager:
             raise
 
     async def get_job_statistics(
-        self, project: Project, days: int = 7,
+        self,
+        project: Project,
+        days: int = 7,
     ) -> dict[str, Any]:
         """Get job statistics for the specified time period.
 
@@ -362,7 +368,9 @@ class FlextMeltanoJobManager:
             raise
 
     async def get_running_jobs(
-        self, project: Project, heartbeat_timeout_minutes: int = 5,
+        self,
+        project: Project,
+        heartbeat_timeout_minutes: int = 5,
     ) -> list[Job]:
         """Get all currently running jobs.
 
@@ -419,7 +427,9 @@ class FlextMeltanoJobManager:
             raise
 
     async def get_stale_jobs(
-        self, project: Project, heartbeat_timeout_minutes: int = 5,
+        self,
+        project: Project,
+        heartbeat_timeout_minutes: int = 5,
     ) -> list[Job]:
         """Get jobs that appear to be stale (running but no recent heartbeat).
 
@@ -582,7 +592,9 @@ class FlextMeltanoJobManager:
             return result
 
     async def get_job_performance_metrics(
-        self, project: Project, days: int = 30,
+        self,
+        project: Project,
+        days: int = 30,
     ) -> dict[str, Any]:
         """Get job performance metrics.
 

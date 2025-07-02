@@ -21,9 +21,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 # Python 3.13 type aliases - with strict validation
-type ExtensionConfig = dict[str, str | int | bool | None]
-type ExtensionCommand = dict[str, str | list[str]]
-type ExtensionResult = dict[str, str | int | bool | list]
+ExtensionConfig = dict[str, str | int | bool | None]
+ExtensionCommand = dict[str, str | list[str]]
+ExtensionResult = dict[str, str | int | bool | list]
 
 logger = structlog.get_logger()
 
@@ -118,7 +118,9 @@ class FlxMeltanoExtensions(DomainBaseModel):
 
         self.logger.info("Registered built-in extensions", count=len(self.extensions))
 
-    async def invoke_extension(self, extension_name: str, command_name: str, *args: str) -> ExtensionResult:
+    async def invoke_extension(
+        self, extension_name: str, command_name: str, *args: str
+    ) -> ExtensionResult:
         """Invoke extension command with enterprise error handling."""
         if extension_name not in self.extensions:
             return {
@@ -178,7 +180,9 @@ class FlxMeltanoExtensions(DomainBaseModel):
         """List all registered extensions with their definitions."""
         return [ext.describe() for ext in self.extensions.values()]
 
-    def get_extension_commands(self, extension_name: str) -> dict[str, ExtensionCommand]:
+    def get_extension_commands(
+        self, extension_name: str
+    ) -> dict[str, ExtensionCommand]:
         """Get available commands for an extension."""
         if extension_name not in self.extensions:
             return {}

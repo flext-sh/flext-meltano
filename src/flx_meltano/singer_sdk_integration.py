@@ -33,11 +33,11 @@ if TYPE_CHECKING:
     from singer_sdk import Tap, Target
 
 # Python 3.13 type aliases - with strict validation
-type StreamSchema = dict[str, PropertiesList]
-type TapConfig = dict[str, str | int | bool | None]
-type TargetConfig = dict[str, str | int | bool | None]
-type SingerRecord = dict[str, str | int | float | bool | None]
-type SingerMessage = dict[str, str | SingerRecord | StreamSchema]
+StreamSchema = dict[str, PropertiesList]
+TapConfig = dict[str, str | int | bool | None]
+TargetConfig = dict[str, str | int | bool | None]
+SingerRecord = dict[str, str | int | float | bool | None]
+SingerMessage = dict[str, str | SingerRecord | StreamSchema]
 
 logger = structlog.get_logger()
 

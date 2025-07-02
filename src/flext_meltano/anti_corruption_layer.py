@@ -152,7 +152,9 @@ class MeltanoAdapter(ABC):
 
     @abstractmethod
     async def set_plugin_config(
-        self, plugin_name: str, config: ConfigurationDict,
+        self,
+        plugin_name: str,
+        config: ConfigurationDict,
     ) -> bool:
         """Update configuration for a plugin.
 
@@ -250,7 +252,9 @@ class MeltanoAntiCorruptionLayer:
             return result
 
     async def translate_and_run_pipeline(
-        self, domain_pipeline: Pipeline, execution: PipelineExecution,
+        self,
+        domain_pipeline: Pipeline,
+        execution: PipelineExecution,
     ) -> MeltanoRunResult:
         """Execute a pipeline by translating from domain model to Meltano commands.
 
@@ -376,7 +380,8 @@ class MeltanoAntiCorruptionLayer:
             return domain_plugins
 
     def _translate_plugin_to_meltano(
-        self, domain_plugin: Plugin,
+        self,
+        domain_plugin: Plugin,
     ) -> MeltanoPluginDescriptor:
         """Convert domain Plugin to Meltano plugin descriptor.
 
@@ -392,7 +397,8 @@ class MeltanoAntiCorruptionLayer:
         )
 
     def _translate_meltano_to_plugin(
-        self, meltano_plugin: MeltanoPluginDescriptor,
+        self,
+        meltano_plugin: MeltanoPluginDescriptor,
     ) -> Plugin:
         """Convert Meltano plugin descriptor to domain Plugin.
 
@@ -435,7 +441,9 @@ class MeltanoAntiCorruptionLayer:
         raise ValueError(msg)
 
     def _translate_pipeline_config(
-        self, pipeline: Pipeline, execution: PipelineExecution,
+        self,
+        pipeline: Pipeline,
+        execution: PipelineExecution,
     ) -> ConfigurationDict:
         """Build Meltano configuration from pipeline and execution context.
 
@@ -662,7 +670,9 @@ class MeltanoEngineAdapter(MeltanoAdapter):
             return {}
 
     async def set_plugin_config(
-        self, _plugin_name: str, _config: ConfigurationDict,
+        self,
+        _plugin_name: str,
+        _config: ConfigurationDict,
     ) -> bool:
         """Update plugin configuration in Meltano project.
 

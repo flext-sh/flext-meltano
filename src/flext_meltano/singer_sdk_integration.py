@@ -33,11 +33,11 @@ if TYPE_CHECKING:
     from singer_sdk import Tap, Target
 
 # Python 3.13 type aliases - with strict validation
-type StreamSchema = dict[str, PropertiesList]
-type TapConfig = dict[str, str | int | bool | None]
-type TargetConfig = dict[str, str | int | bool | None]
-type SingerRecord = dict[str, str | int | float | bool | None]
-type SingerMessage = dict[str, str | SingerRecord | StreamSchema]
+StreamSchema = dict[str, PropertiesList]
+TapConfig = dict[str, str | int | bool | None]
+TargetConfig = dict[str, str | int | bool | None]
+SingerRecord = dict[str, str | int | float | bool | None]
+SingerMessage = dict[str, str | SingerRecord | StreamSchema]
 
 logger = structlog.get_logger()
 
@@ -93,7 +93,8 @@ class FlextTapProtocol:
         """
 
     async def sync_stream(
-        self, stream: SingerStreamDefinition,
+        self,
+        stream: SingerStreamDefinition,
     ) -> AsyncIterator[SingerRecord]:
         """Synchronize stream data.
 
@@ -302,7 +303,8 @@ class FlextSingerSDKIntegration(DomainBaseModel):
                 return streams
 
             async def sync_stream(
-                self, stream: SingerStreamDefinition,
+                self,
+                stream: SingerStreamDefinition,
             ) -> AsyncIterator[SingerRecord]:
                 """Sync Oracle OIC stream with real data extraction."""
                 self.logger.info("Syncing Oracle OIC stream", stream_name=stream.name)
@@ -426,7 +428,8 @@ class FlextSingerSDKIntegration(DomainBaseModel):
                 return streams
 
             async def sync_stream(
-                self, stream: SingerStreamDefinition,
+                self,
+                stream: SingerStreamDefinition,
             ) -> AsyncIterator[SingerRecord]:
                 """Sync LDAP stream with real directory data extraction."""
                 self.logger.info("Syncing LDAP stream", stream_name=stream.name)
@@ -474,7 +477,8 @@ class FlextSingerSDKIntegration(DomainBaseModel):
         return FlextLDAPTap(config)
 
     async def create_postgres_target(
-        self, config: TargetConfig,
+        self,
+        config: TargetConfig,
     ) -> FlextTargetProtocol | None:
         """Create PostgreSQL target using Singer SDK patterns."""
         # Singer SDK is now guaranteed to be available
@@ -499,7 +503,9 @@ class FlextSingerSDKIntegration(DomainBaseModel):
                 # This would use asyncpg or SQLAlchemy async
 
             async def write_batch(
-                self, stream: str, records: list[SingerRecord],
+                self,
+                stream: str,
+                records: list[SingerRecord],
             ) -> None:
                 """Write batch of records to PostgreSQL with optimized performance."""
                 self.logger.info(
@@ -525,7 +531,9 @@ class FlextSingerSDKIntegration(DomainBaseModel):
         return FlextPostgreSQLTarget(config)
 
     async def _create_tap_instance(
-        self, tap_name: str, tap_config: TapConfig,
+        self,
+        tap_name: str,
+        tap_config: TapConfig,
     ) -> object | None:
         """Create tap instance based on tap name and configuration.
 
@@ -549,7 +557,9 @@ class FlextSingerSDKIntegration(DomainBaseModel):
         return None
 
     async def _create_target_instance(
-        self, target_name: str, target_config: TargetConfig,
+        self,
+        target_name: str,
+        target_config: TargetConfig,
     ) -> object | None:
         """Create target instance based on target name and configuration.
 
@@ -592,7 +602,9 @@ class FlextSingerSDKIntegration(DomainBaseModel):
         }
 
     async def _process_streams(
-        self, tap_instance: object, target_instance: object,
+        self,
+        tap_instance: object,
+        target_instance: object,
     ) -> dict[str, int]:
         """Process all selected streams from tap to target.
 
