@@ -11,7 +11,7 @@ import asyncio
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import structlog
 from flx_core.domain.pydantic_base import DomainBaseModel
@@ -37,7 +37,7 @@ logger = structlog.get_logger()
 class FlxJob(DomainBaseModel):
     """Internal representation of a job being orchestrated."""
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     job_id: str = Field(description="Unique job identifier")
     run_id: str = Field(description="Unique run identifier")
@@ -139,7 +139,9 @@ class PipelineStatus(Enum):
 
     See Also:
     --------
-        - [Orchestration Architecture](../../docs/architecture/004-orchestration-layer.md)
+        - [Orchestration Architecture](
+            ../../docs/architecture/004-orchestration-layer.md
+        )
         - [Pipeline State Management](../../docs/architecture/state-management.md)
 
     Note:
@@ -488,7 +490,8 @@ class FlxMeltanoOrchestrator:
             ConnectionError,
             ImportError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for pipeline task execution failures
+            # ZERO TOLERANCE - Specific exception types for pipeline task
+            # execution failures
             self.logger.exception(
                 "Unhandled error during pipeline task execution",
                 run_id=flx_job.run_id,

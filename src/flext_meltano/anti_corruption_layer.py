@@ -1,8 +1,8 @@
 """Anti-Corruption Layer for Meltano integration following DDD principles.
 
-This module implements the Anti-Corruption Layer (ACL) pattern to protect the FLEXT domain
-model from Meltano's external API and data structures. It provides a clean translation
-boundary between FLEXT domain concepts and Meltano-specific implementations.
+This module implements the Anti-Corruption Layer (ACL) pattern to protect the FLEXT
+domain model from Meltano's external API and data structures. It provides a clean
+translation boundary between FLEXT domain concepts and Meltano-specific implementations.
 
 The ACL ensures that:
 - Domain model remains pure and independent of Meltano changes
@@ -437,7 +437,10 @@ class MeltanoAntiCorruptionLayer:
 
         # No fallbacks - proper error handling
         supported_types = ", ".join(namespace_mapping.keys())
-        msg = f"Unsupported Meltano namespace '{meltano_namespace}'. Supported: {supported_types}"
+        msg = (
+            f"Unsupported Meltano namespace '{meltano_namespace}'. "
+            f"Supported: {supported_types}"
+        )
         raise ValueError(msg)
 
     def _translate_pipeline_config(

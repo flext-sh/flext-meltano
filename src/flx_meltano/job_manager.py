@@ -1,7 +1,8 @@
 """FLX Meltano Job Manager.
 
 This module provides comprehensive job management capabilities integrated with
-Meltano's job system, enabling enterprise-grade job tracking, scheduling, and monitoring.
+Meltano's job system, enabling enterprise-grade job tracking, scheduling,
+and monitoring.
 """
 
 from __future__ import annotations
@@ -353,7 +354,8 @@ class FlxMeltanoJobManager:
             LookupError,
             AttributeError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for job statistics retrieval failures
+            # ZERO TOLERANCE - Specific exception types for job statistics
+            # retrieval failures
             self.logger.exception(
                 "Failed to get job statistics",
                 days=days,
@@ -411,7 +413,8 @@ class FlxMeltanoJobManager:
             LookupError,
             AttributeError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for running jobs retrieval failures
+            # ZERO TOLERANCE - Specific exception types for running jobs
+            # retrieval failures
             self.logger.exception(
                 "Failed to get running jobs",
                 error=str(e),
@@ -469,7 +472,8 @@ class FlxMeltanoJobManager:
             AttributeError,
             TimeoutError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for stale jobs retrieval failures
+            # ZERO TOLERANCE - Specific exception types for stale jobs
+            # retrieval failures
             self.logger.exception(
                 "Failed to get stale jobs",
                 error=str(e),
@@ -514,7 +518,10 @@ class FlxMeltanoJobManager:
                         project,
                         job.job_id,
                         State.FAIL,
-                        reason=f"Marked as failed due to stale heartbeat (timeout: {heartbeat_timeout_minutes}m)",
+                        reason=(
+                            f"Marked as failed due to stale heartbeat "
+                            f"(timeout: {heartbeat_timeout_minutes}m)"
+                        ),
                     )
 
                     if success:
@@ -618,7 +625,8 @@ class FlxMeltanoJobManager:
                         "message": "No completed jobs found in the specified period",
                     }
 
-                # Calculate durations (mock calculation - would need actual duration tracking)
+                # Calculate durations (mock calculation - would need actual
+                # duration tracking)
                 durations = []
                 for job in completed_jobs:
                     if job.started_at and job.last_heartbeat_at:
@@ -680,7 +688,8 @@ class FlxMeltanoJobManager:
             LookupError,
             AttributeError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for performance metrics retrieval failures
+            # ZERO TOLERANCE - Specific exception types for performance
+            # metrics retrieval failures
             self.logger.exception(
                 "Failed to get performance metrics",
                 days=days,

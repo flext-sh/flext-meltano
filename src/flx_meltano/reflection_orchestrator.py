@@ -7,11 +7,12 @@ eliminating ALL boilerplate code while maintaining complete type safety.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import inspect
 import sys
 from enum import Enum, auto
 from functools import wraps
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, ClassVar, TypeVar
 
 from flx_core.domain.pydantic_base import DomainBaseModel, DomainValueObject
 from pydantic import Field
@@ -63,7 +64,7 @@ class StepProtocol:
 class ReflectionStep(DomainValueObject):
     """Zero-boilerplate step implementation using reflection."""
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     name: str = Field(description="Step name for identification")
     func: StepFunction = Field(description="Step function to execute")
@@ -147,11 +148,10 @@ def pipeline_step(
             # Execute through reflection step
             context = {**kwargs}
             if args:
-                try:
-                    arg_dict = args[0].__dict__
-                    context.update(arg_dict)
-                except AttributeError:
-                    pass  # args[0] doesn't have __dict__
+                # Safely extract context from first argument if it has __dict__
+                with contextlib.suppress(AttributeError):
+                    if hasattr(args[0], "__dict__"):
+                        context.update(args[0].__dict__)
 
             return await step.execute(context)
 
@@ -163,7 +163,7 @@ def pipeline_step(
 class ReflectionOrchestrator(DomainBaseModel):
     """Automatic pipeline orchestrator using reflection patterns."""
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     meltano_engine: MeltanoEngine = Field(description="Meltano execution engine")
     event_bus: DomainEventBus = Field(description="Event bus for orchestration events")
@@ -181,24 +181,38 @@ class ReflectionOrchestrator(DomainBaseModel):
     def discover_steps(self, module: ModuleType) -> None:
         """Automatically discover pipeline steps in a module."""
         for _name, obj in inspect.getmembers(module):
-            try:
-                pipeline_step = obj._pipeline_step
-                self.step_registry[pipeline_step.name] = pipeline_step
-            except AttributeError:
-                # obj doesn't have _pipeline_step attribute
+            # Check if object has pipeline step metadata
+            if hasattr(obj, "_pipeline_step"):
+                try:
+                    pipeline_step = obj._pipeline_step
+                    self.step_registry[pipeline_step.name] = pipeline_step
+                except (AttributeError, TypeError) as e:
+                    # Log the error instead of silently ignoring
+                    if hasattr(self, "logger"):
+                        self.logger.warning(f"Failed to register pipeline step {_name}: {e}")
+                    continue
 
-                # Register by type (using obj instead of undefined step)
-                if hasattr(obj, "step_type"):
+            # Register by type for objects with step_type
+            elif hasattr(obj, "step_type"):
+                try:
                     if obj.step_type not in self.type_registry:
                         self.type_registry[obj.step_type] = []
                     self.type_registry[obj.step_type].append(obj)
+                except (AttributeError, TypeError) as e:
+                    # Log the error instead of silently ignoring
+                    if hasattr(self, "logger"):
+                        self.logger.warning(f"Failed to register step by type {_name}: {e}")
+                    continue
 
     def _extract_pipeline_id_safe(self, pipeline: Pipeline) -> str:
-        """Extract pipeline ID safely with try/except pattern - ZERO TOLERANCE MODERNIZATION.
+        """Extract pipeline ID safely with try/except pattern.
+        
+        ZERO TOLERANCE MODERNIZATION.
 
         Args:
         ----
-            pipeline: The pipeline object that may or may not have a 'value' attribute on id
+            pipeline: The pipeline object that may or may not have a
+                'value' attribute on id
 
         Returns:
         -------
@@ -215,7 +229,10 @@ class ReflectionOrchestrator(DomainBaseModel):
     async def execute_pipeline(
         self, pipeline: Pipeline, execution: PipelineExecution
     ) -> ExecutionContext:
-        """Execute pipeline using UNIFIED EXECUTION ARCHITECTURE with reflection orchestration."""
+        """Execute pipeline using UNIFIED EXECUTION ARCHITECTURE.
+        
+        With reflection orchestration.
+        """
         try:
             # ZERO TOLERANCE - Runtime import to avoid circular dependencies
             from flx_core.universe import get_universe
@@ -260,7 +277,8 @@ class ReflectionOrchestrator(DomainBaseModel):
             AttributeError,
             LookupError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for reflection orchestrator failures
+            # ZERO TOLERANCE - Specific exception types for reflection
+            # orchestrator failures
             self.logger.exception(
                 "Reflection orchestrator execution failed through unified interface",
             )

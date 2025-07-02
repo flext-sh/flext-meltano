@@ -3,17 +3,24 @@
 from __future__ import annotations
 
 import argparse
+import shlex
+import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+
+import yaml
+from loguru import logger
 
 
-def info_command(args: Any) -> int:
+def info_command(_args: argparse.Namespace) -> int:
     """Show FLEXT Meltano information."""
+    logger.info("FLEXT Meltano - Enterprise ETL/ELT Pipeline Engine")
+    logger.info("Version: 0.2.0")
+    logger.info("Singer Protocol Support: Yes")
     return 0
 
 
-def init_command(args: Any) -> int:
+def init_command(args: argparse.Namespace) -> int:
     """Initialize a new Meltano project."""
     try:
         project_name = args.name
@@ -45,9 +52,7 @@ def init_command(args: Any) -> int:
         }
 
         meltano_file = project_dir / "meltano.yml"
-        with open(meltano_file, "w") as f:
-            import yaml
-
+        with meltano_file.open("w", encoding="utf-8") as f:
             yaml.dump(meltano_config, f, default_flow_style=False)
 
         # Create .gitignore
@@ -95,7 +100,7 @@ Thumbs.db
         """.strip()
 
         gitignore_file = project_dir / ".gitignore"
-        with open(gitignore_file, "w") as f:
+        with gitignore_file.open("w", encoding="utf-8") as f:
             f.write(gitignore_content)
 
         # Create README
@@ -142,16 +147,17 @@ FLEXT Meltano ETL Project
 """
 
         readme_file = project_dir / "README.md"
-        with open(readme_file, "w") as f:
+        with readme_file.open("w", encoding="utf-8") as f:
             f.write(readme_content)
 
+    except (OSError, ValueError, yaml.YAMLError) as e:
+        logger.error(f"Failed to initialize project: {e}")
+        return 1
+    else:
         return 0
 
-    except Exception:
-        return 1
 
-
-def list_plugins_command(args: Any) -> int:
+def list_plugins_command(_args: argparse.Namespace) -> int:
     """List available Meltano plugins."""
     try:
         plugins = {
@@ -176,9 +182,10 @@ def list_plugins_command(args: Any) -> int:
             "transformers": ["dbt-ldap", "dbt-postgres", "dbt-oracle"],
         }
 
-        for _plugin_type, plugin_list in plugins.items():
+        for plugin_type, plugin_list in plugins.items():
+            logger.info(f"\n{plugin_type.capitalize()}:")
             for plugin in plugin_list:
-                if plugin.startswith(
+                status = "✅ Available" if plugin.startswith(
                     (
                         "tap-oracle",
                         "target-oracle",
@@ -186,18 +193,51 @@ def list_plugins_command(args: Any) -> int:
                         "target-ldap",
                         "dbt-ldap",
                     )
-                ):
-                    pass
-                else:
-                    pass
+                ) else "📦 Standard"
+                logger.info(f"  {plugin}: {status}")
 
+    except (ImportError, AttributeError) as e:
+        logger.error(f"Failed to list plugins: {e}")
+        return 1
+    else:
         return 0
 
-    except Exception:
-        return 1
+
+def _validate_meltano_args(extractor: str, loader: str, environment: str | None = None) -> list[str]:
+    """Validate and sanitize Meltano command arguments.
+    
+    Args:
+        extractor: The extractor (tap) name to validate
+        loader: The loader (target) name to validate  
+        environment: Optional environment name to validate
+        
+    Returns:
+        List of validated command arguments
+        
+    Raises:
+        ValueError: If any argument contains invalid characters
+
+    """
+    # Validate plugin names - only allow alphanumeric, hyphens, underscores
+    import re
+    plugin_pattern = re.compile(r"^[a-zA-Z0-9_-]+$")
+
+    if not plugin_pattern.match(extractor):
+        raise ValueError(f"Invalid extractor name: {extractor}")
+    if not plugin_pattern.match(loader):
+        raise ValueError(f"Invalid loader name: {loader}")
+    if environment and not plugin_pattern.match(environment):
+        raise ValueError(f"Invalid environment name: {environment}")
+
+    # Build command with validated arguments
+    cmd = ["meltano", "run", extractor, loader]
+    if environment:
+        cmd.extend(["--environment", environment])
+
+    return cmd
 
 
-def run_pipeline_command(args: Any) -> int:
+def run_pipeline_command(args: argparse.Namespace) -> int:
     """Run an ETL pipeline."""
     try:
         extractor = args.extractor
@@ -206,33 +246,49 @@ def run_pipeline_command(args: Any) -> int:
 
         # Check if meltano.yml exists
         if not Path("meltano.yml").exists():
+            logger.error("meltano.yml not found in current directory")
             return 1
 
-        # Try to run meltano command
-        import subprocess
+        # Validate and build meltano command with security checks
+        try:
+            cmd = _validate_meltano_args(extractor, loader, environment)
+        except ValueError as e:
+            logger.error(f"Invalid command arguments: {e}")
+            return 1
 
-        cmd = ["meltano", "run", extractor, loader]
-        if environment:
-            cmd.extend(["--environment", environment])
+        # Log command being executed (for debugging)
+        logger.info(f"Executing command: {shlex.join(cmd)}")
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=300  # 5 minute timeout
+        )
 
         if result.returncode == 0:
             if result.stdout:
-                pass
-        else:
-            if result.stderr:
-                pass
+                logger.info("Pipeline execution output:")
+                logger.info(result.stdout)
+        elif result.stderr:
+            logger.error("Pipeline execution failed:")
+            logger.error(result.stderr)
 
         return result.returncode
 
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        logger.error(f"Meltano not found: {e}")
         return 1
-    except Exception:
+    except subprocess.TimeoutExpired:
+        logger.error("Pipeline execution timed out")
+        return 1
+    except (subprocess.SubprocessError, OSError) as e:
+        logger.error(f"Failed to run pipeline: {e}")
         return 1
 
 
-def validate_command(args: Any) -> int:
+def validate_command(args: argparse.Namespace) -> int:
     """Validate Meltano configuration."""
     try:
         errors = 0
@@ -244,17 +300,14 @@ def validate_command(args: Any) -> int:
         else:
             # Try to parse meltano.yml
             try:
-                import yaml
-
-                with open(meltano_file) as f:
+                with meltano_file.open(encoding="utf-8") as f:
                     config = yaml.safe_load(f)
 
                 # Check required fields
                 required_fields = ["version", "project_id"]
                 for field in required_fields:
-                    if field in config:
-                        pass
-                    else:
+                    if field not in config:
+                        logger.error(f"Missing required field in meltano.yml: {field}")
                         errors += 1
 
             except yaml.YAMLError:
@@ -262,24 +315,32 @@ def validate_command(args: Any) -> int:
 
         # Check meltano installation
         try:
-            import subprocess
-
             result = subprocess.run(
-                ["meltano", "--version"], capture_output=True, text=True
+                ["meltano", "--version"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=30  # 30 second timeout
             )
             if result.returncode == 0:
-                result.stdout.strip()
+                version = result.stdout.strip()
+                logger.info(f"Meltano version: {version}")
             else:
+                logger.error("Meltano version check failed")
                 errors += 1
         except FileNotFoundError:
+            logger.error("Meltano executable not found")
+            errors += 1
+        except subprocess.TimeoutExpired:
+            logger.error("Meltano version check timed out")
             errors += 1
 
         if errors == 0:
             return 0
-        else:
-            return 1
+        return 1
 
-    except Exception:
+    except (OSError, yaml.YAMLError) as e:
+        logger.error(f"Validation failed: {e}")
         return 1
 
 
@@ -334,10 +395,10 @@ Examples:
 
     # Execute command
     if hasattr(args, "func"):
-        return args.func(args)
-    else:
-        parser.print_help()
-        return 1
+        result = args.func(args)
+        return int(result) if result is not None else 0
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":

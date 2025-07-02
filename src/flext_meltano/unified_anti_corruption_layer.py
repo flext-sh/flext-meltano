@@ -4,7 +4,8 @@ ARCHITECTURAL REVOLUTION: Single source of truth for ALL Meltano integration pat
 Eliminates scattered ACL implementations with unified, modern architecture.
 
 CONSOLIDATES:
-- infrastructure/meltano/acl.py (537 LOC) - Infrastructure ACL with ServiceResult patterns
+- infrastructure/meltano/acl.py (537 LOC) - Infrastructure ACL with
+  ServiceResult patterns
 - meltano/anti_corruption_layer.py (592 LOC) - Domain ACL with adapter patterns
 
 ZERO TOLERANCE PRINCIPLES:
@@ -299,7 +300,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
         """Build comprehensive execution environment variables."""
         execution_env: ExecutionEnvironment = {}
 
-        # Add pipeline environment variables (convert ConfigurationDict to ExecutionEnvironment)
+        # Add pipeline environment variables (convert ConfigurationDict to
+        # ExecutionEnvironment)
         for key, value in pipeline.environment_variables.items():
             execution_env[key] = str(value) if value is not None else ""
 
@@ -560,7 +562,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
                         return ServiceResult.fail(
                             ServiceError(
                                 code="PLUGIN_CONFIG_ERROR",
-                                message=f"Failed to set configuration {key} for plugin {plugin.name}",
+                                message=(
+                                    f"Failed to set configuration {key} for "
+                                    f"plugin {plugin.name}"
+                                ),
                             ),
                         )
 
@@ -705,7 +710,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
             return ServiceResult.fail(
                 ServiceError(
                     code="STATE_RETRIEVAL_ERROR",
-                    message=f"Failed to get state for pipeline {pipeline.name.value}: {e}",
+                    message=(
+                        f"Failed to get state for pipeline "
+                        f"{pipeline.name.value}: {e}"
+                    ),
                     details={"pipeline_id": str(pipeline.pipeline_id.value)},
                 ),
             )
@@ -734,7 +742,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
             return ServiceResult.fail(
                 ServiceError(
                     code="STATE_UPDATE_ERROR",
-                    message=f"Failed to set state for pipeline {pipeline.name.value}: {e}",
+                    message=(
+                        f"Failed to set state for pipeline "
+                        f"{pipeline.name.value}: {e}"
+                    ),
                     details={"pipeline_id": str(pipeline.pipeline_id.value)},
                 ),
             )
@@ -762,7 +773,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
             return ServiceResult.fail(
                 ServiceError(
                     code="STATE_CLEAR_ERROR",
-                    message=f"Failed to clear state for pipeline {pipeline.name.value}: {e}",
+                    message=(
+                        f"Failed to clear state for pipeline "
+                        f"{pipeline.name.value}: {e}"
+                    ),
                     details={"pipeline_id": str(pipeline.pipeline_id.value)},
                 ),
             )

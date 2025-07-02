@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import Enum, auto
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import structlog
 from flx_core.domain.pydantic_base import DomainBaseModel, DomainValueObject
@@ -195,7 +195,7 @@ class FlxSingerSDKIntegration(DomainBaseModel):
     - Zero-boilerplate configuration management
     """
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     project_root: Path = Field(description="Root path of the project")
     logger: structlog.BoundLogger = Field(
@@ -213,7 +213,7 @@ class FlxSingerSDKIntegration(DomainBaseModel):
         description="Registry of available targets",
     )
 
-    def model_post_init(self, __context: object) -> None:
+    def model_post_init(self, __context: object, /) -> None:
         """Initialize SDK integration with discovery."""
         self.logger.info("Initializing FLX Singer SDK integration")
         self._discover_plugins()
@@ -316,7 +316,9 @@ class FlxSingerSDKIntegration(DomainBaseModel):
                         "status": "ACTIVE",
                         "created_at": datetime.now(UTC).isoformat(),
                         "updated_at": datetime.now(UTC).isoformat(),
-                        "configuration": '{"source": "salesforce", "target": "database"}',
+                        "configuration": (
+                            '{"source": "salesforce", "target": "database"}'
+                        ),
                     }
                 elif stream.name == "connections":
                     yield {
@@ -363,8 +365,10 @@ class FlxSingerSDKIntegration(DomainBaseModel):
         class FlxLDAPTap:
             """FLX LDAP Tap implementation with enterprise directory integration.
 
-            Provides comprehensive LDAP directory integration capabilities using Singer SDK
-            patterns, supporting user and group synchronization with enterprise-grade features.
+            Provides comprehensive LDAP directory integration capabilities
+            using Singer SDK
+            patterns, supporting user and group synchronization with
+            enterprise-grade features.
 
             Features:
                 - Real-time LDAP directory stream processing
@@ -374,7 +378,8 @@ class FlxSingerSDKIntegration(DomainBaseModel):
 
             Note:
             ----
-                Provides LDAP directory integration with schema detection and batch processing
+                Provides LDAP directory integration with schema detection
+                and batch processing
                 for enterprise authentication systems.
 
             """
@@ -713,7 +718,8 @@ class FlxSingerSDKIntegration(DomainBaseModel):
             AttributeError,
             LookupError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for Singer SDK ELT pipeline failures
+            # ZERO TOLERANCE - Specific exception types for Singer SDK
+            # ELT pipeline failures
             self.logger.exception("ELT pipeline failed", error=str(e))
             return self._create_error_result(str(e))
 

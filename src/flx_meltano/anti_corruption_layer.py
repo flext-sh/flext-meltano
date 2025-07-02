@@ -431,7 +431,10 @@ class MeltanoAntiCorruptionLayer:
 
         # No fallbacks - proper error handling
         supported_types = ", ".join(namespace_mapping.keys())
-        msg = f"Unsupported Meltano namespace '{meltano_namespace}'. Supported: {supported_types}"
+        msg = (
+            f"Unsupported Meltano namespace '{meltano_namespace}'. "
+            f"Supported: {supported_types}"
+        )
         raise ValueError(msg)
 
     def _translate_pipeline_config(

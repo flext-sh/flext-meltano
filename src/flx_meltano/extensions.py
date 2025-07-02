@@ -1,14 +1,15 @@
 """Meltano Extensions Development Kit (EDK) Integration with ZERO boilerplate.
 
 This module implements complete Meltano EDK integration for FLX enterprise extensions,
-providing automatic extension discovery, registration, and advanced orchestration capabilities.
+providing automatic extension discovery, registration, and advanced
+orchestration capabilities.
 """
 
 from __future__ import annotations
 
 import asyncio
 from enum import Enum, auto
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import structlog
 from flx_core.config.domain_config import get_config
@@ -79,7 +80,7 @@ class FlxMeltanoExtensions(DomainBaseModel):
     - Zero-boilerplate extension creation
     """
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     project_root: Path = Field(description="Root path of the Meltano project")
     logger: structlog.BoundLogger = Field(
@@ -93,7 +94,7 @@ class FlxMeltanoExtensions(DomainBaseModel):
         description="Registry of available extensions",
     )
 
-    def model_post_init(self, __context: object) -> None:
+    def model_post_init(self, __context: object, /) -> None:
         """Initialize extensions manager with discovery."""
         self.logger.info("Initializing FLX Meltano Extensions manager")
         self._register_builtin_extensions()
@@ -860,7 +861,8 @@ class FlxOrchestrationExtension:
             AttributeError,
             LookupError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for orchestration command failures
+            # ZERO TOLERANCE - Specific exception types for orchestration
+            # command failures
             self.logger.exception(
                 "Orchestration command failed",
                 command=command_name,
