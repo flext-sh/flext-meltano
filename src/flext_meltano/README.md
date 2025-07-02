@@ -394,10 +394,10 @@ graph TD
 
 ### 🌐 Service Integration Points
 
-| External System      | Integration Pattern    | Purpose                      |
-| -------------------- | ---------------------- | ---------------------------- |
-| **Meltano Core**     | SDK wrapper with ACL   | ETL/ELT pipeline execution   |
-| **Singer Ecosystem** | Singer SDK integration | Data connector ecosystem     |
+| External System        | Integration Pattern    | Purpose                      |
+| ---------------------- | ---------------------- | ---------------------------- |
+| **Meltano Core**       | SDK wrapper with ACL   | ETL/ELT pipeline execution   |
+| **Singer Ecosystem**   | Singer SDK integration | Data connector ecosystem     |
 | **FLEXT Event System** | Event bridge pattern   | Enterprise event integration |
 | **FLEXT Domain Layer** | Anti-corruption layer  | Domain model protection      |
 

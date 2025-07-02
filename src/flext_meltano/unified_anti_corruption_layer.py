@@ -44,11 +44,11 @@ from flext_core.engine.meltano_wrapper import MeltanoEngine, MeltanoExecutionRes
 from pydantic import Field, model_validator
 
 # Python 3.13 type aliases - ZERO TOLERANCE modern syntax
-type MeltanoOperationResult = dict[str, Any]
-type PluginConfiguration = ConfigurationDict
-type PipelineConfiguration = ConfigurationDict
-type ExecutionEnvironment = dict[str, str]
-type StateData = ConfigurationDict
+MeltanoOperationResult = dict[str, Any]
+PluginConfiguration = ConfigurationDict
+PipelineConfiguration = ConfigurationDict
+ExecutionEnvironment = dict[str, str]
+StateData = ConfigurationDict
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -132,7 +132,8 @@ class MeltanoRunResult(DomainValueObject):
 
     @classmethod
     def from_meltano_execution_result(
-        cls, result: MeltanoExecutionResult,
+        cls,
+        result: MeltanoExecutionResult,
     ) -> MeltanoRunResult:
         """Create MeltanoRunResult from MeltanoExecutionResult."""
         return cls(
@@ -161,7 +162,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
     """
 
     def __init__(
-        self, engine: MeltanoEngine, event_bus: EventBusProtocol | None = None,
+        self,
+        engine: MeltanoEngine,
+        event_bus: EventBusProtocol | None = None,
     ) -> None:
         """Initialize the unified ACL with dependencies.
 
@@ -322,7 +325,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
         return execution_env
 
     async def _execute_pipeline_by_complexity(
-        self, pipeline: Pipeline, execution_env: ExecutionEnvironment,
+        self,
+        pipeline: Pipeline,
+        execution_env: ExecutionEnvironment,
     ) -> MeltanoExecutionResult | MeltanoOperationResult:
         """Execute pipeline based on complexity (number of steps)."""
         step_count = len(pipeline.steps)
@@ -335,7 +340,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
         return await self._execute_complex_pipeline(pipeline, execution_env)
 
     async def _execute_single_step_pipeline(
-        self, pipeline: Pipeline, execution_env: ExecutionEnvironment,
+        self,
+        pipeline: Pipeline,
+        execution_env: ExecutionEnvironment,
     ) -> MeltanoExecutionResult:
         """Execute single-step pipeline using plugin invocation."""
         step = pipeline.steps[0]
@@ -351,7 +358,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
         )
 
     async def _execute_two_step_pipeline(
-        self, pipeline: Pipeline, execution_env: ExecutionEnvironment,
+        self,
+        pipeline: Pipeline,
+        execution_env: ExecutionEnvironment,
     ) -> MeltanoExecutionResult:
         """Execute two-step ELT pipeline using run_pipeline."""
         extractor_step = None
@@ -421,7 +430,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
         return await self._execute_complex_pipeline(pipeline, execution_env)
 
     async def _execute_complex_pipeline(
-        self, pipeline: Pipeline, execution_env: ExecutionEnvironment,
+        self,
+        pipeline: Pipeline,
+        execution_env: ExecutionEnvironment,
     ) -> MeltanoExecutionResult:
         """Execute complex multi-step pipeline as a job."""
         job_name = f"flext_pipeline_{pipeline.name.value}"
@@ -436,7 +447,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
         )
 
     async def _create_meltano_job_from_pipeline(
-        self, pipeline: Pipeline,
+        self,
+        pipeline: Pipeline,
     ) -> ServiceResult[dict[str, Any]]:
         """Create Meltano job configuration from domain pipeline."""
         try:
@@ -473,7 +485,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def _publish_execution_events(
-        self, pipeline: Pipeline, execution: PipelineExecution, result: MeltanoRunResult,
+        self,
+        pipeline: Pipeline,
+        execution: PipelineExecution,
+        result: MeltanoRunResult,
     ) -> None:
         """Publish domain events for pipeline execution."""
         if not self.event_bus:
@@ -505,7 +520,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
     # ========================================================================
 
     async def install_plugin_from_domain(
-        self, plugin: Plugin,
+        self,
+        plugin: Plugin,
     ) -> ServiceResult[MeltanoExecutionResult]:
         """Install a domain plugin in Meltano with proper translation."""
         try:
@@ -579,7 +595,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def test_plugin_from_domain(
-        self, plugin: Plugin,
+        self,
+        plugin: Plugin,
     ) -> ServiceResult[MeltanoExecutionResult]:
         """Test a domain plugin in Meltano."""
         try:
@@ -605,7 +622,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def remove_plugin_from_domain(
-        self, plugin: Plugin,
+        self,
+        plugin: Plugin,
     ) -> ServiceResult[MeltanoExecutionResult]:
         """Remove a domain plugin from Meltano."""
         try:
@@ -693,7 +711,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def set_pipeline_state(
-        self, pipeline: Pipeline, state_data: StateData,
+        self,
+        pipeline: Pipeline,
+        state_data: StateData,
     ) -> ServiceResult[MeltanoExecutionResult]:
         """Set pipeline state in Meltano with comprehensive validation."""
         try:
@@ -720,7 +740,8 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def clear_pipeline_state(
-        self, pipeline: Pipeline,
+        self,
+        pipeline: Pipeline,
     ) -> ServiceResult[MeltanoExecutionResult]:
         """Clear pipeline state in Meltano with validation."""
         try:
@@ -765,7 +786,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
             )
 
     async def get_meltano_logs(
-        self, execution_id: str | None = None, limit: int = 100,
+        self,
+        execution_id: str | None = None,
+        limit: int = 100,
     ) -> ServiceResult[list[str]]:
         """Get Meltano execution logs for monitoring and debugging.
 

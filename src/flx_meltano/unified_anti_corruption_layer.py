@@ -44,11 +44,11 @@ from flx_core.engine.meltano_wrapper import MeltanoEngine, MeltanoExecutionResul
 from pydantic import Field, model_validator
 
 # Python 3.13 type aliases - ZERO TOLERANCE modern syntax
-type MeltanoOperationResult = dict[str, Any]
-type PluginConfiguration = ConfigurationDict
-type PipelineConfiguration = ConfigurationDict
-type ExecutionEnvironment = dict[str, str]
-type StateData = ConfigurationDict
+MeltanoOperationResult = dict[str, Any]
+PluginConfiguration = ConfigurationDict
+PipelineConfiguration = ConfigurationDict
+ExecutionEnvironment = dict[str, str]
+StateData = ConfigurationDict
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

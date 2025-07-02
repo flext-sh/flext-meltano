@@ -31,34 +31,23 @@ def init_command(args: Any) -> int:
                 {
                     "name": "dev",
                     "config": {
-                        "plugins": {
-                            "extractors": [],
-                            "loaders": [],
-                            "transformers": []
-                        }
-                    }
+                        "plugins": {"extractors": [], "loaders": [], "transformers": []}
+                    },
                 },
                 {
                     "name": "prod",
                     "config": {
-                        "plugins": {
-                            "extractors": [],
-                            "loaders": [],
-                            "transformers": []
-                        }
-                    }
-                }
+                        "plugins": {"extractors": [], "loaders": [], "transformers": []}
+                    },
+                },
             ],
-            "plugins": {
-                "extractors": [],
-                "loaders": [],
-                "transformers": []
-            }
+            "plugins": {"extractors": [], "loaders": [], "transformers": []},
         }
 
         meltano_file = project_dir / "meltano.yml"
         with open(meltano_file, "w") as f:
             import yaml
+
             yaml.dump(meltano_config, f, default_flow_style=False)
 
         # Create .gitignore
@@ -165,7 +154,6 @@ FLEXT Meltano ETL Project
 def list_plugins_command(args: Any) -> int:
     """List available Meltano plugins."""
     try:
-
         plugins = {
             "extractors": [
                 "tap-oracle-oic",
@@ -174,7 +162,7 @@ def list_plugins_command(args: Any) -> int:
                 "tap-csv",
                 "tap-postgres",
                 "tap-mysql",
-                "tap-sqlite"
+                "tap-sqlite",
             ],
             "loaders": [
                 "target-oracle-oic",
@@ -183,18 +171,22 @@ def list_plugins_command(args: Any) -> int:
                 "target-csv",
                 "target-postgres",
                 "target-mysql",
-                "target-sqlite"
+                "target-sqlite",
             ],
-            "transformers": [
-                "dbt-ldap",
-                "dbt-postgres",
-                "dbt-oracle"
-            ]
+            "transformers": ["dbt-ldap", "dbt-postgres", "dbt-oracle"],
         }
 
         for _plugin_type, plugin_list in plugins.items():
             for plugin in plugin_list:
-                if plugin.startswith(("tap-oracle", "target-oracle", "tap-ldap", "target-ldap", "dbt-ldap")):
+                if plugin.startswith(
+                    (
+                        "tap-oracle",
+                        "target-oracle",
+                        "tap-ldap",
+                        "target-ldap",
+                        "dbt-ldap",
+                    )
+                ):
                     pass
                 else:
                     pass
@@ -243,7 +235,6 @@ def run_pipeline_command(args: Any) -> int:
 def validate_command(args: Any) -> int:
     """Validate Meltano configuration."""
     try:
-
         errors = 0
 
         # Check if meltano.yml exists
@@ -251,10 +242,10 @@ def validate_command(args: Any) -> int:
         if not meltano_file.exists():
             errors += 1
         else:
-
             # Try to parse meltano.yml
             try:
                 import yaml
+
                 with open(meltano_file) as f:
                     config = yaml.safe_load(f)
 
@@ -272,10 +263,9 @@ def validate_command(args: Any) -> int:
         # Check meltano installation
         try:
             import subprocess
+
             result = subprocess.run(
-                ["meltano", "--version"],
-                capture_output=True,
-                text=True
+                ["meltano", "--version"], capture_output=True, text=True
             )
             if result.returncode == 0:
                 result.stdout.strip()
@@ -317,11 +307,15 @@ Examples:
     # Init command
     init_parser = subparsers.add_parser("init", help="Initialize new Meltano project")
     init_parser.add_argument("name", help="Project name")
-    init_parser.add_argument("--directory", help="Project directory (default: project name)")
+    init_parser.add_argument(
+        "--directory", help="Project directory (default: project name)"
+    )
     init_parser.set_defaults(func=init_command)
 
     # List plugins command
-    list_plugins_parser = subparsers.add_parser("list-plugins", help="List available plugins")
+    list_plugins_parser = subparsers.add_parser(
+        "list-plugins", help="List available plugins"
+    )
     list_plugins_parser.set_defaults(func=list_plugins_command)
 
     # Run pipeline command

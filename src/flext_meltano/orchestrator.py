@@ -200,7 +200,10 @@ class FlextMeltanoOrchestrator:
         self.logger.info("Initialized FLEXT Meltano Orchestrator with event bridge")
 
     async def _emit_pipeline_event(
-        self, event_type: str, flext_job: FlextJob, payload: dict[str, Any] | None = None,
+        self,
+        event_type: str,
+        flext_job: FlextJob,
+        payload: dict[str, Any] | None = None,
     ) -> None:
         """Emit a pipeline domain event."""
         await self.event_bus.publish(
@@ -407,7 +410,9 @@ class FlextMeltanoOrchestrator:
         )
 
     async def _execute_pipeline_sync(
-        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> dict[str, Any]:
         """Execute a pipeline synchronously."""
         project = await self.project_manager.load_project(
@@ -442,7 +447,9 @@ class FlextMeltanoOrchestrator:
         }
 
     async def _execute_pipeline_async(
-        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> dict[str, Any]:
         """Execute a pipeline asynchronously."""
         project = await self.project_manager.load_project(
@@ -451,7 +458,9 @@ class FlextMeltanoOrchestrator:
         )
         flext_job.meltano_job = await self._create_meltano_job(project, flext_job)
 
-        task = asyncio.create_task(self._run_pipeline_task(project, flext_job, run_mode))
+        task = asyncio.create_task(
+            self._run_pipeline_task(project, flext_job, run_mode)
+        )
 
         async with self._lock:
             flext_job.task = task
@@ -464,7 +473,10 @@ class FlextMeltanoOrchestrator:
         }
 
     async def _run_pipeline_task(
-        self, project: Project, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> None:
         """Run the pipeline task."""
         try:
@@ -508,7 +520,10 @@ class FlextMeltanoOrchestrator:
                 self._running_jobs.pop(flext_job.run_id, None)
 
     async def _run_meltano_blocks(
-        self, project: Project, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> dict[str, Any]:
         """Run a series of Meltano blocks (e.g., `run`, `invoke`)."""
         pipeline_def = flext_job.pipeline_definition
@@ -570,7 +585,10 @@ class FlextMeltanoOrchestrator:
         return result
 
     async def _execute_meltano_block(
-        self, project: Project, flext_job: FlextJob, block: dict[str, Any],
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        block: dict[str, Any],
     ) -> dict[str, Any]:
         """Execute a Meltano ELT block."""
         engine = MeltanoEngine(project.root)
@@ -589,7 +607,10 @@ class FlextMeltanoOrchestrator:
         )
 
     async def _execute_run_block(
-        self, _project: Project, flext_job: FlextJob, commands: list[str],
+        self,
+        _project: Project,
+        flext_job: FlextJob,
+        commands: list[str],
     ) -> dict[str, Any]:
         """Execute a `meltano run` command block."""
         from flext_core.config.domain_config import get_config
@@ -643,7 +664,10 @@ class FlextMeltanoOrchestrator:
             }
 
     async def _execute_invoke_block(
-        self, project: Project, flext_job: FlextJob, commands: list[str],
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        commands: list[str],
     ) -> dict[str, Any]:
         """Execute a `meltano invoke` command block.
 

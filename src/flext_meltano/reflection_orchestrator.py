@@ -213,7 +213,9 @@ class ReflectionOrchestrator(DomainBaseModel):
             return str(pipeline.id)
 
     async def execute_pipeline(
-        self, pipeline: Pipeline, execution: PipelineExecution,
+        self,
+        pipeline: Pipeline,
+        execution: PipelineExecution,
     ) -> ExecutionContext:
         """Execute pipeline using UNIFIED EXECUTION ARCHITECTURE with reflection orchestration."""
         try:
@@ -282,7 +284,8 @@ class ReflectionOrchestrator(DomainBaseModel):
             }
 
     def _build_execution_graph(
-        self, steps: list[PipelineStep],
+        self,
+        steps: list[PipelineStep],
     ) -> list[list[PipelineStep]]:
         """Build execution graph with dependency resolution."""
         # Topological sort for dependency ordering
@@ -381,7 +384,10 @@ class ReflectionOrchestrator(DomainBaseModel):
         raise last_error
 
     async def _handle_step_failure(
-        self, step: PipelineStep, error: Exception, execution: PipelineExecution,
+        self,
+        step: PipelineStep,
+        error: Exception,
+        execution: PipelineExecution,
     ) -> None:
         """Handle step failure with automatic recovery."""
         # Publish failure event
@@ -403,7 +409,9 @@ class ReflectionOrchestrator(DomainBaseModel):
 
 @pipeline_step(StepType.EXTRACT, name="meltano-tap")
 async def extract_with_meltano(
-    tap_name: str, config: ExecutionContext, meltano: MeltanoEngine,
+    tap_name: str,
+    config: ExecutionContext,
+    meltano: MeltanoEngine,
 ) -> ExecutionContext:
     """Extract data using Meltano tap with zero boilerplate."""
     result = await meltano.run_pipeline(
@@ -416,7 +424,9 @@ async def extract_with_meltano(
 
 @pipeline_step(StepType.TRANSFORM, name="dbt-transform")
 async def transform_with_dbt(
-    models: list[str], config: ExecutionContext, meltano: MeltanoEngine,
+    models: list[str],
+    config: ExecutionContext,
+    meltano: MeltanoEngine,
 ) -> ExecutionContext:
     """Transform data using dbt with zero boilerplate."""
     # Run dbt through Meltano
@@ -458,7 +468,9 @@ async def load_with_meltano(
 
 @pipeline_step(StepType.QUALITY, name="great-expectations")
 async def validate_data_quality(
-    expectations_suite: str, _config: ExecutionContext, event_bus: DomainEventBus,
+    expectations_suite: str,
+    _config: ExecutionContext,
+    event_bus: DomainEventBus,
 ) -> ExecutionContext:
     """Validate data quality with zero boilerplate."""
     # This would integrate with Great Expectations
@@ -486,7 +498,10 @@ async def validate_data_quality(
 
 @pipeline_step(StepType.NOTIFY, name="notification")
 async def send_notification(
-    channel: str, message: str, config: ExecutionContext, execution: PipelineExecution,
+    channel: str,
+    message: str,
+    config: ExecutionContext,
+    execution: PipelineExecution,
 ) -> ExecutionContext:
     """Send notification using REAL NotificationService."""
     # ZERO TOLERANCE - Runtime import for notification dependencies
@@ -581,7 +596,8 @@ async def send_notification(
 
 
 def create_orchestrator(
-    meltano_engine: MeltanoEngine, event_bus: DomainEventBus,
+    meltano_engine: MeltanoEngine,
+    event_bus: DomainEventBus,
 ) -> ReflectionOrchestrator:
     """Create orchestrator with automatic step discovery."""
     orchestrator = ReflectionOrchestrator(

@@ -45,14 +45,26 @@ class EventConfig:
 class DomainEvent:
     """Placeholder domain event class."""
 
-    def __init__(self, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> None:
+    def __init__(
+        self,
+        event_type: str,
+        data: dict[str, Any],
+        correlation_id: str | None = None,
+        source: str = "meltano",
+    ) -> None:
         self.type = event_type
         self.data = data
         self.correlation_id = correlation_id
         self.source = source
 
     @classmethod
-    def create(cls, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> DomainEvent:
+    def create(
+        cls,
+        event_type: str,
+        data: dict[str, Any],
+        correlation_id: str | None = None,
+        source: str = "meltano",
+    ) -> DomainEvent:
         """Create a new domain event."""
         return cls(event_type, data, correlation_id, source)
 
@@ -84,6 +96,7 @@ class MeltanoEventBridge:
 
     def _create_mock_event_bus(self) -> Any:
         """Create a mock event bus for testing."""
+
         class MockEventBus:
             async def publish(self, event: DomainEvent) -> None:
                 logger.info("Mock event published", event_type=event.type)
@@ -115,11 +128,17 @@ class MeltanoEventBridge:
 
             # Add project information if available
             if config.project:
-                event_data.update({
-                    "project_name": getattr(config.project, "name", "unknown"),
-                    "project_root": str(getattr(config.project, "root", "")),
-                    "environment": getattr(config.project, "active_environment", {}).get("name") if hasattr(config.project, "active_environment") else None,
-                })
+                event_data.update(
+                    {
+                        "project_name": getattr(config.project, "name", "unknown"),
+                        "project_root": str(getattr(config.project, "root", "")),
+                        "environment": getattr(
+                            config.project, "active_environment", {}
+                        ).get("name")
+                        if hasattr(config.project, "active_environment")
+                        else None,
+                    }
+                )
 
             # Add job information
             if config.job_id:
@@ -131,10 +150,12 @@ class MeltanoEventBridge:
 
             # Add state information
             if config.state:
-                event_data.update({
-                    "state": getattr(config.state, "value", str(config.state)),
-                    "state_name": getattr(config.state, "name", str(config.state)),
-                })
+                event_data.update(
+                    {
+                        "state": getattr(config.state, "value", str(config.state)),
+                        "state_name": getattr(config.state, "name", str(config.state)),
+                    }
+                )
 
             # Add metadata
             if config.metadata:

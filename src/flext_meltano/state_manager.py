@@ -254,7 +254,10 @@ class FlextMeltanoStateManager:
             raise
 
     async def merge_state(
-        self, project: Project, state_id: str, partial_state: dict[str, Any],
+        self,
+        project: Project,
+        state_id: str,
+        partial_state: dict[str, Any],
     ) -> MeltanoState:
         """Merge partial state with existing state.
 
@@ -409,7 +412,10 @@ class FlextMeltanoStateManager:
             return state_ids
 
     async def get_state_history(
-        self, _project: Project, state_id: str, limit: int = 10,
+        self,
+        _project: Project,
+        state_id: str,
+        limit: int = 10,
     ) -> list[dict[str, Any]]:
         """Get state history for a specific state ID.
 
@@ -491,7 +497,9 @@ class FlextMeltanoStateManager:
             return history
 
     async def backup_all_states(
-        self, project: Project, backup_name: str | None = None,
+        self,
+        project: Project,
+        backup_name: str | None = None,
     ) -> dict[str, Any]:
         """Create a backup of all states for a project.
 
@@ -653,7 +661,10 @@ class FlextMeltanoStateManager:
             raise
 
     async def _create_state_backup(
-        self, project: Project, state_id: str, backup_name: str | None = None,
+        self,
+        project: Project,
+        state_id: str,
+        backup_name: str | None = None,
     ) -> None:
         """Create a backup of a specific state.
 
@@ -722,7 +733,10 @@ class FlextMeltanoStateManager:
             # Don't re-raise backup errors unless critical
 
     async def _load_state_backup(
-        self, project: Project, state_id: str, backup_name: str,
+        self,
+        project: Project,
+        state_id: str,
+        backup_name: str,
     ) -> MeltanoState | None:
         """Load state from a backup file.
 

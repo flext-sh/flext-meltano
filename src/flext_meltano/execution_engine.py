@@ -200,7 +200,9 @@ class MeltanoPipelineExecutor:
             )
 
     async def get_execution_status(
-        self, execution_id: str, user_id: str,
+        self,
+        execution_id: str,
+        user_id: str,
     ) -> ServiceResult[PipelineExecutionResponse]:
         """Get execution status and progress information.
 
@@ -304,7 +306,9 @@ class MeltanoPipelineExecutor:
             )
 
     async def cancel_execution(
-        self, execution_id: str, user_id: str,
+        self,
+        execution_id: str,
+        user_id: str,
     ) -> ServiceResult[dict[str, str]]:
         """Cancel a running pipeline execution.
 
@@ -384,7 +388,11 @@ class MeltanoPipelineExecutor:
             )
 
     async def get_execution_logs(
-        self, execution_id: str, user_id: str, offset: int = 0, limit: int = 1000,
+        self,
+        execution_id: str,
+        user_id: str,
+        offset: int = 0,
+        limit: int = 1000,
     ) -> ServiceResult[dict[str, Any]]:
         """Get execution logs with pagination.
 
@@ -624,7 +632,8 @@ class MeltanoPipelineExecutor:
             )
 
     async def _get_pipeline_config(
-        self, pipeline_id: str,
+        self,
+        pipeline_id: str,
     ) -> ServiceResult[dict[str, Any]]:
         """Get pipeline configuration from database."""
         try:
@@ -650,7 +659,10 @@ class MeltanoPipelineExecutor:
             )
 
     async def _validate_execution_permissions(
-        self, pipeline_id: str, user_id: str, environment: str,
+        self,
+        pipeline_id: str,
+        user_id: str,
+        environment: str,
     ) -> ServiceResult[bool]:
         """Validate user permissions for pipeline execution."""
         try:
@@ -719,13 +731,18 @@ class MeltanoPipelineExecutor:
         return base_args
 
     async def _log_execution_output(
-        self, execution_id: str, stream: str, line: str,
+        self,
+        execution_id: str,
+        stream: str,
+        line: str,
     ) -> None:
         """Log execution output for streaming and storage."""
         # TODO: Implement log storage and streaming
 
     async def _validate_execution_access(
-        self, execution_id: str, user_id: str,
+        self,
+        execution_id: str,
+        user_id: str,
     ) -> ServiceResult[bool]:
         """Validate user access to execution."""
         # Check active executions
@@ -744,7 +761,9 @@ class MeltanoPipelineExecutor:
         )
 
     async def _get_execution_from_database(
-        self, execution_id: str, user_id: str,
+        self,
+        execution_id: str,
+        user_id: str,
     ) -> ServiceResult[PipelineExecutionResponse]:
         """Get execution information from database."""
         # TODO: Implement database query for completed executions

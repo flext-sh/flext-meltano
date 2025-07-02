@@ -308,7 +308,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
     """
 
     def __init__(
-        self, project_root: Path | str, event_bus: EventBusProtocol | None = None,
+        self,
+        project_root: Path | str,
+        event_bus: EventBusProtocol | None = None,
     ) -> None:
         """Initialize the FLEXT Meltano project manager with enterprise capabilities."""
         super().__init__(project_root)
@@ -391,7 +393,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             return project
 
     async def load_project(
-        self, project_name: str, environment: str = "dev",
+        self,
+        project_name: str,
+        environment: str = "dev",
     ) -> Project:
         """Load an existing Meltano project."""
         self.logger.info(
@@ -632,7 +636,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             )
 
     def add_plugin_to_config(
-        self, plugin: MeltanoPlugin, plugin_type: str,
+        self,
+        plugin: MeltanoPlugin,
+        plugin_type: str,
     ) -> ServiceResult[None]:
         """Add plugin to meltano.yml configuration."""
         try:
@@ -659,7 +665,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             )
 
     def remove_plugin_from_config(
-        self, plugin_name: str, plugin_type: str,
+        self,
+        plugin_name: str,
+        plugin_type: str,
     ) -> ServiceResult[None]:
         """Remove plugin from meltano.yml configuration."""
         try:
@@ -733,7 +741,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
         return self.save_project_config(config)
 
     def get_installed_plugins(
-        self, plugin_type: str | None = None,
+        self,
+        plugin_type: str | None = None,
     ) -> ServiceResult[list[MeltanoPlugin]]:
         """Get all installed plugins, optionally filtered by type."""
         config_result = self.load_project_config()
@@ -856,7 +865,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             )
 
     def create_environment_config(
-        self, environment: str, config_overrides: ConfigurationDict | None = None,
+        self,
+        environment: str,
+        config_overrides: ConfigurationDict | None = None,
     ) -> ServiceResult[dict[str, str]]:
         """Create environment-specific configuration."""
         try:
