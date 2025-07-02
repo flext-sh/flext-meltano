@@ -1,6 +1,7 @@
 """UNIFIED MELTANO PROJECT MANAGER - ZERO TOLERANCE CONSOLIDATION COMPLETE.
 
-This module provides the SINGLE, UNIFIED project management system for all Meltano operations,
+This module provides the SINGLE, UNIFIED project management system for all
+Meltano operations,
 consolidating functionality from ALL previous implementations into one
 enterprise-grade manager with complete feature coverage.
 
@@ -13,7 +14,8 @@ CONSOLIDATED FEATURES (859+ lines unified):
 - SERVICERESULT PATTERNS: Enterprise error handling and validation (from infrastructure)
 - EVENT BUS INTEGRATION: Async event publishing for monitoring (from meltano)
 - BACKUP/RESTORE: Project backup and restoration capabilities (from infrastructure)
-- CONFIG MANAGEMENT: Advanced configuration loading/saving with validation (from infrastructure)
+- CONFIG MANAGEMENT: Advanced configuration loading/saving with validation
+  (from infrastructure)
 - PROJECT LIFECYCLE: Complete project creation, loading, and management (from both)
 - PLUGIN MANAGEMENT: Full plugin lifecycle with config integration (from both)
 - ENTERPRISE VALIDATION: Comprehensive project structure validation (enhanced)
@@ -70,7 +72,7 @@ class ProjectInitializationMode(Enum):
 
     CREATE_NEW = "create_new"
     FORCE_RECREATE = "force_recreate"
-    OVERWRITE_EXISTING = "force_recreate"  # Backward compatibility alias
+    OVERWRITE_EXISTING = "overwrite_existing"  # Separate value for compatibility
 
 
 if TYPE_CHECKING:
@@ -103,8 +105,8 @@ if "PYTEST_CURRENT_TEST" in os.environ:
         try:
             project_engine.clear()
         except AttributeError:
-            # Engine doesn't have either cache_clear or clear methods
-            pass
+            # Engine doesn't have either cache_clear or clear methods - expected
+            logger.debug("Project engine does not support cache clearing")
 
 
 logger = structlog.get_logger()
@@ -138,7 +140,8 @@ class MeltanoProjectManager:
 
         Note:
         ----
-            Manages Meltano project initialization with proper event publishing and error handling.
+            Manages Meltano project initialization with proper event
+            publishing and error handling.
 
         """
         project_path = self.project_root / project_name
@@ -149,10 +152,12 @@ class MeltanoProjectManager:
             raise MeltanoProjectError(msg)
 
         try:
-            Project.init(project_name, project_path.parent)  # type: ignore[attr-defined]
+            # type: ignore[attr-defined]
+            Project.init(project_name, project_path.parent)
             return Project.find(project_path)  # type: ignore[no-any-return]
         except (ValueError, TypeError, RuntimeError, OSError, ImportError) as e:
-            # ZERO TOLERANCE - Specific exception types for Meltano project initialization failures
+            # ZERO TOLERANCE - Specific exception types for Meltano project
+            # initialization failures
             msg = f"Failed to initialize Meltano project: {e}"
             raise MeltanoProjectError(msg) from e
 
@@ -220,7 +225,8 @@ class MeltanoProjectManager:
 
         Note:
         ----
-            Manages Meltano project initialization with proper event publishing and error handling.
+            Manages Meltano project initialization with proper event
+            publishing and error handling.
 
         """
         project = Project.find(self.project_root)
@@ -261,7 +267,8 @@ class MeltanoProjectManager:
         """Create a new Meltano schedule with enterprise configuration.
 
         Creates a new scheduled pipeline execution with the specified extractor,
-        loader, and optional transformer configuration with validation and error handling.
+        loader, and optional transformer configuration with validation and
+        error handling.
 
         Args:
         ----
@@ -277,7 +284,8 @@ class MeltanoProjectManager:
 
         Note:
         ----
-            Manages Meltano project initialization with proper event publishing and error handling.
+            Manages Meltano project initialization with proper event
+            publishing and error handling.
 
         """
         project = Project.find(self.project_root)
@@ -324,7 +332,9 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
         self,
         project_name: str,
         environment: str = "dev",
-        initialization_mode: ProjectInitializationMode = ProjectInitializationMode.CREATE_NEW,
+        initialization_mode: ProjectInitializationMode = (
+            ProjectInitializationMode.CREATE_NEW
+        ),
     ) -> Project:
         """Initialize a new Meltano project with FLEXT enterprise configuration."""
         self.logger.info(
@@ -341,7 +351,10 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
                 project_path.exists()
                 and initialization_mode == ProjectInitializationMode.CREATE_NEW
             ):
-                msg = f"Project already exists at {project_path}. Use FORCE_RECREATE mode to override."
+                msg = (
+                    f"Project already exists at {project_path}. "
+                    "Use FORCE_RECREATE mode to override."
+                )
                 raise MeltanoProjectError(msg)
 
             # Create project if it doesn't exist or force recreate is True
@@ -382,7 +395,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             MeltanoProjectError,
             MeltanoExecutionError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano project initialization failures
+            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano
+            # project initialization failures
             self.logger.exception(
                 "Failed to initialize FLEXT Meltano project",
                 project_name=project_name,
@@ -438,7 +452,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             ImportError,
             MeltanoProjectError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano project loading failures
+            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano
+            # project loading failures
             self.logger.exception(
                 "Failed to load FLEXT Meltano project",
                 project_name=project_name,
@@ -457,7 +472,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
         *args: str,
     ) -> dict[str, Any]:
         """Run a Meltano command with enhanced error handling and event publishing."""
-        # Support both new-style (with project parameter) and old-style (positional args) calls
+        # Support both new-style (with project parameter) and old-style
+        # (positional args) calls
         if command_args is None:
             command_args = list(args)
 
@@ -549,7 +565,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             ImportError,
             MeltanoExecutionError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano command execution failures
+            # ZERO TOLERANCE - Specific exception types for FLEXT Meltano
+            # command execution failures
             self.logger.exception(
                 "Failed to run FLEXT Meltano command",
                 command_args=command_args,
@@ -630,7 +647,10 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             return ServiceResult.fail(
                 ServiceError(
                     code="CONFIG_SAVE_ERROR",
-                    message=f"Failed to save project configuration: {type(e).__name__}: {e}",
+                    message=(
+                        f"Failed to save project configuration: "
+                        f"{type(e).__name__}: {e}"
+                    ),
                     details={"error_type": type(e).__name__},
                 ),
             )
@@ -713,7 +733,10 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             return ServiceResult.fail(
                 ServiceError(
                     code="PLUGIN_REMOVAL_ERROR",
-                    message=f"Failed to remove plugin from configuration: {type(e).__name__}: {e}",
+                    message=(
+                        f"Failed to remove plugin from configuration: "
+                        f"{type(e).__name__}: {e}"
+                    ),
                     details={"error_type": type(e).__name__},
                 ),
             )
@@ -757,8 +780,8 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
                 plugin_list = getattr(config.plugins, plugin_type)
                 all_plugins.extend(plugin_list)
             except AttributeError:
-                # Plugin type does not exist in config, skip
-                pass
+                # Plugin type does not exist in config, skip - expected for optional plugin types
+                logger.debug(f"Plugin type {plugin_type} not found in config")
         else:
             all_plugins.extend(config.plugins.extractors)
             all_plugins.extend(config.plugins.loaders)
@@ -859,7 +882,10 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             return ServiceResult.fail(
                 ServiceError(
                     code="PROJECT_VALIDATION_ERROR",
-                    message=f"Failed to validate project structure: {type(e).__name__}: {e}",
+                    message=(
+                        f"Failed to validate project structure: "
+                        f"{type(e).__name__}: {e}"
+                    ),
                     details={"error_type": type(e).__name__},
                 ),
             )
@@ -892,7 +918,10 @@ class FlextMeltanoProjectManager(MeltanoProjectManager):
             return ServiceResult.fail(
                 ServiceError(
                     code="ENVIRONMENT_CONFIG_ERROR",
-                    message=f"Failed to create environment configuration: {type(e).__name__}: {e}",
+                    message=(
+                        f"Failed to create environment configuration: "
+                        f"{type(e).__name__}: {e}"
+                    ),
                     details={"error_type": type(e).__name__},
                 ),
             )

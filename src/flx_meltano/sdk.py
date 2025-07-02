@@ -10,7 +10,8 @@ from __future__ import annotations
 class MeltanoError(Exception):
     r"""MeltanoError - Custom Exception.
 
-    Implementa exceção customizada para casos específicos do domínio. Fornece informações detalhadas sobre erros.
+    Implementa exceção customizada para casos específicos do domínio.
+    Fornece informações detalhadas sobre erros.
 
     Arquitetura: Enterprise Patterns
     Padrões: SOLID principles, clean code

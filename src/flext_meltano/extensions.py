@@ -1,14 +1,16 @@
 """Meltano Extensions Development Kit (EDK) Integration with ZERO boilerplate.
 
-This module implements complete Meltano EDK integration for FLEXT enterprise extensions,
-providing automatic extension discovery, registration, and advanced orchestration capabilities.
+This module implements complete Meltano EDK integration for FLEXT enterprise
+extensions,
+providing automatic extension discovery, registration, and advanced
+orchestration capabilities.
 """
 
 from __future__ import annotations
 
 import asyncio
 from enum import Enum, auto
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import structlog
 from flext_core.config.domain_config import get_config
@@ -79,7 +81,7 @@ class FlextMeltanoExtensions(DomainBaseModel):
     - Zero-boilerplate extension creation
     """
 
-    model_config = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     project_root: Path = Field(description="Root path of the Meltano project")
     logger: structlog.BoundLogger = Field(
@@ -93,7 +95,7 @@ class FlextMeltanoExtensions(DomainBaseModel):
         description="Registry of available extensions",
     )
 
-    def model_post_init(self, __context: object) -> None:
+    def model_post_init(self, __context: object, /) -> None:
         """Initialize extensions manager with discovery."""
         self.logger.info("Initializing FLEXT Meltano Extensions manager")
         self._register_builtin_extensions()
@@ -202,7 +204,9 @@ class FlextOracleOICExtension:
         """Describe Oracle OIC extension capabilities."""
         return FlextExtensionDefinition(
             name="flext-oracle-oic",
-            description="Enterprise Oracle OIC integration extension for FLEXT platform",
+            description=(
+                "Enterprise Oracle OIC integration extension for FLEXT platform"
+            ),
             extension_type=ExtensionType.INTEGRATION,
             commands={
                 "test-connection": {
@@ -860,7 +864,8 @@ class FlextOrchestrationExtension:
             AttributeError,
             LookupError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for orchestration command failures
+            # ZERO TOLERANCE - Specific exception types for orchestration
+            # command failures
             self.logger.exception(
                 "Orchestration command failed",
                 command=command_name,

@@ -103,7 +103,8 @@ class FlextMeltanoStateManager:
         self._state_cache: dict[str, MeltanoState] = {}
         self._lock = asyncio.Lock()
 
-        # Initialize backup directory based on MELTANO_PROJECT_ROOT or current working directory
+        # Initialize backup directory based on MELTANO_PROJECT_ROOT or
+        # current working directory
         project_root = Path(os.getenv("MELTANO_PROJECT_ROOT", "."))
         self.backup_dir = project_root / ".meltano" / "state_backups"
         self.backup_dir.mkdir(parents=True, exist_ok=True)
@@ -401,7 +402,8 @@ class FlextMeltanoStateManager:
             )
 
         except (OSError, ValueError, TypeError, RuntimeError, ConnectionError) as e:
-            # ZERO TOLERANCE - Specific exception types for state ID enumeration failures
+            # ZERO TOLERANCE - Specific exception types for state ID
+            # enumeration failures
             self.logger.exception(
                 "Failed to list state IDs",
                 project_root=str(project.root),
@@ -473,7 +475,10 @@ class FlextMeltanoStateManager:
                                 "action": "backup_saved",
                                 "size_bytes": state_size,
                                 "file_path": str(state_file),
-                                "message": f"State backup version {len(state_files) - i} with {len(state_data)} keys",
+                                "message": (
+                                    f"State backup version {len(state_files) - i} "
+                                    f"with {len(state_data)} keys"
+                                ),
                             },
                         )
                     except (orjson.JSONDecodeError, OSError) as e:
@@ -486,7 +491,8 @@ class FlextMeltanoStateManager:
                         continue
 
         except (OSError, PermissionError, ValueError, TypeError) as e:
-            # ZERO TOLERANCE - Specific exception types for state history retrieval failures
+            # ZERO TOLERANCE - Specific exception types for state history
+            # retrieval failures
             self.logger.exception(
                 "Failed to get state history",
                 state_id=state_id,
@@ -608,7 +614,10 @@ class FlextMeltanoStateManager:
                     cache_policy=CachePolicy.FORCE_REFRESH,
                 )
                 if current_state is not None:
-                    msg = f"State '{state_id}' exists and overwrite policy is PROTECT_EXISTING"
+                    msg = (
+                        f"State '{state_id}' exists and overwrite policy is "
+                        "PROTECT_EXISTING"
+                    )
                     raise ValueError(msg)
 
             # Load backup
@@ -723,7 +732,8 @@ class FlextMeltanoStateManager:
             TypeError,
             orjson.JSONEncodeError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for state backup creation failures
+            # ZERO TOLERANCE - Specific exception types for state backup
+            # creation failures
             self.logger.exception(
                 "Failed to create state backup",
                 state_id=state_id,
@@ -795,7 +805,8 @@ class FlextMeltanoStateManager:
             TypeError,
             orjson.JSONDecodeError,
         ) as e:
-            # ZERO TOLERANCE - Specific exception types for state backup loading failures
+            # ZERO TOLERANCE - Specific exception types for state backup
+            # loading failures
             self.logger.exception(
                 "Failed to load state backup",
                 state_id=state_id,
@@ -824,7 +835,9 @@ class FlextMeltanoStateManager:
             self.logger.info("Cleared state cache", cleared_count=cleared_count)
 
     def _serialize_state_safe(self, state: object) -> str:
-        """Serialize state object safely with try/except pattern - ZERO TOLERANCE MODERNIZATION.
+        """Serialize state object safely with try/except pattern.
+        
+        ZERO TOLERANCE MODERNIZATION.
 
         Args:
         ----
