@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Security validation script for S603 and S110 fixes.
 
-This script validates that S603 (subprocess security) and S110 (try-except-pass) 
+This script validates that S603 (subprocess security) and S110 (try-except-pass)
 security issues have been properly addressed in the flext-meltano codebase.
 """
 

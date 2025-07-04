@@ -206,7 +206,7 @@ class ReflectionOrchestrator(DomainBaseModel):
 
     def _extract_pipeline_id_safe(self, pipeline: Pipeline) -> str:
         """Extract pipeline ID safely with try/except pattern.
-        
+
         ZERO TOLERANCE MODERNIZATION.
 
         Args:
@@ -232,7 +232,7 @@ class ReflectionOrchestrator(DomainBaseModel):
         execution: PipelineExecution,
     ) -> ExecutionContext:
         """Execute pipeline using UNIFIED EXECUTION ARCHITECTURE.
-        
+
         With reflection orchestration.
         """
         try:

@@ -836,7 +836,7 @@ class FlextMeltanoStateManager:
 
     def _serialize_state_safe(self, state: object) -> str:
         """Serialize state object safely with try/except pattern.
-        
+
         ZERO TOLERANCE MODERNIZATION.
 
         Args:

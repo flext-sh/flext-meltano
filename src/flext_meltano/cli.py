@@ -205,15 +205,15 @@ def list_plugins_command(_args: argparse.Namespace) -> int:
 
 def _validate_meltano_args(extractor: str, loader: str, environment: str | None = None) -> list[str]:
     """Validate and sanitize Meltano command arguments.
-    
+
     Args:
         extractor: The extractor (tap) name to validate
-        loader: The loader (target) name to validate  
+        loader: The loader (target) name to validate
         environment: Optional environment name to validate
-        
+
     Returns:
         List of validated command arguments
-        
+
     Raises:
         ValueError: If any argument contains invalid characters
 
@@ -223,11 +223,14 @@ def _validate_meltano_args(extractor: str, loader: str, environment: str | None 
     plugin_pattern = re.compile(r"^[a-zA-Z0-9_-]+$")
 
     if not plugin_pattern.match(extractor):
-        raise ValueError(f"Invalid extractor name: {extractor}")
+        msg = f"Invalid extractor name: {extractor}"
+        raise ValueError(msg)
     if not plugin_pattern.match(loader):
-        raise ValueError(f"Invalid loader name: {loader}")
+        msg = f"Invalid loader name: {loader}"
+        raise ValueError(msg)
     if environment and not plugin_pattern.match(environment):
-        raise ValueError(f"Invalid environment name: {environment}")
+        msg = f"Invalid environment name: {environment}"
+        raise ValueError(msg)
 
     # Build command with validated arguments
     cmd = ["meltano", "run", extractor, loader]
