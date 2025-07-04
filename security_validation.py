@@ -66,15 +66,11 @@ class SecurityIssueValidator:
                             node.func.value.id == "subprocess"):
 
                             method = node.func.attr
-                            if method in ["run", "call", "check_call", "check_output", "Popen"]:
+                            if method in {"run", "call", "check_call", "check_output", "Popen"}:
                                 # Check if shell=True is used (dangerous)
-                                for keyword in node.keywords:
-                                    if (keyword.arg == "shell" and
+                                issues.extend(f"{py_file}:{node.lineno} - subprocess.{method} with shell=True" for keyword in node.keywords if keyword.arg == "shell" and
                                         isinstance(keyword.value, ast.Constant) and
-                                        keyword.value.value is True):
-                                        issues.append(
-                                            f"{py_file}:{node.lineno} - subprocess.{method} with shell=True"
-                                        )
+                                        keyword.value.value is True)
 
                                 # Check if the first argument is a string (potentially dangerous)
                                 if (node.args and
