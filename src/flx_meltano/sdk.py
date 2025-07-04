@@ -26,7 +26,7 @@ class MeltanoError(Exception):
     instance = MeltanoError()\n    result = instance.method()
     ```
 
-    See Also
+    See Also:
     --------
     - [Documentação da Arquitetura](../../docs/architecture/index.md)
     - [Padrões de Design](../../docs/architecture/001-clean-architecture-ddd.md)

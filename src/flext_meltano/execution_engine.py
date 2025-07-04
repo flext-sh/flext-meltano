@@ -28,7 +28,6 @@ from uuid import uuid4
 
 from flext_api.models.pipeline import (
     ExecutionStatus,
-    PipelineExecutionRequest,
     PipelineExecutionResponse,
 )
 from flext_core.config.domain_config import get_config, get_domain_constants
@@ -39,6 +38,9 @@ from flext_meltano.job_manager import FlextMeltanoJobManager
 from flext_meltano.state_manager import FlextMeltanoStateManager
 
 if TYPE_CHECKING:
+    from flext_api.models.pipeline import (
+        PipelineExecutionRequest,
+    )
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -59,7 +61,7 @@ class MeltanoPipelineExecutor:
     - Plugin management integration
     - Enterprise audit logging and security
 
-    Examples
+    Examples:
     --------
     ```python
     async with get_db_session() as session:

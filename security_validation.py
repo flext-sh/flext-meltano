@@ -13,7 +13,7 @@ from pathlib import Path
 class SecurityIssueValidator:
     """Validates that security issues have been properly fixed."""
 
-    def __init__(self, base_path: Path):
+    def __init__(self, base_path: Path) -> None:
         self.base_path = base_path
         self.issues_found = []
 
@@ -163,7 +163,7 @@ class SecurityIssueValidator:
         return has_contextlib, has_shlex
 
 
-def main():
+def main() -> int:
     """Main validation function."""
     # Get the base path for flext-meltano
     base_path = Path(__file__).parent
