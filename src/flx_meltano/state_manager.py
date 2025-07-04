@@ -33,7 +33,7 @@ class CachePolicy(Enum):
     Defines whether to use cached state or force retrieval from backend,
     replacing boolean parameters with explicit cache policies.
 
-    Attributes
+    Attributes:
     ----------
         USE_CACHE: Use cached state if available.
         FORCE_REFRESH: Always fetch from backend, ignore cache.
@@ -50,7 +50,7 @@ class BackupPolicy(Enum):
     Defines whether to create backups during state modifications,
     replacing boolean parameters with explicit backup policies.
 
-    Attributes
+    Attributes:
     ----------
         CREATE_BACKUP: Create backup before state modifications.
         SKIP_BACKUP: Skip backup creation for faster operations.
@@ -67,7 +67,7 @@ class OverwritePolicy(Enum):
     Defines whether to overwrite existing state during restoration,
     replacing boolean parameters with explicit overwrite policies.
 
-    Attributes
+    Attributes:
     ----------
         ALLOW_OVERWRITE: Allow overwriting existing state.
         PROTECT_EXISTING: Prevent overwriting existing state.

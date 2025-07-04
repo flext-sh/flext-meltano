@@ -39,9 +39,9 @@ from flx_core.domain.advanced_types import (
     ServiceError,
     ServiceResult,
 )
-from flx_core.domain.entities import Pipeline, PipelineExecution, Plugin, PluginType
+from flx_core.domain.entities import PluginType
 from flx_core.domain.pydantic_base import DomainValueObject
-from flx_core.engine.meltano_wrapper import MeltanoEngine, MeltanoExecutionResult
+from flx_core.engine.meltano_wrapper import MeltanoExecutionResult
 from pydantic import Field, model_validator
 
 # Python 3.13 type aliases - ZERO TOLERANCE modern syntax
@@ -54,6 +54,8 @@ StateData = ConfigurationDict
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from flx_core.domain.entities import Pipeline, PipelineExecution, Plugin
+    from flx_core.engine.meltano_wrapper import MeltanoEngine
     from flx_core.events.event_bus import EventBusProtocol
 
 logger = structlog.get_logger()

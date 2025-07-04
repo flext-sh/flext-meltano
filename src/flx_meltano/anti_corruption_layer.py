@@ -26,8 +26,6 @@ from typing import TYPE_CHECKING
 import structlog
 from flx_core.config.domain_config import get_config
 from flx_core.domain.entities import (
-    Pipeline,
-    PipelineExecution,
     Plugin,
     PluginConfiguration,
     PluginType,
@@ -44,6 +42,10 @@ from flx_meltano.unified_anti_corruption_layer import (
 
 if TYPE_CHECKING:
     from flx_core.domain.advanced_types import ConfigurationDict
+    from flx_core.domain.entities import (
+        Pipeline,
+        PipelineExecution,
+    )
     from flx_core.engine.meltano_wrapper import MeltanoEngine
 
 logger = structlog.get_logger()
@@ -127,7 +129,7 @@ class MeltanoAdapter(ABC):
         Queries the Meltano plugin hub to retrieve a list of available plugins
         that can be installed. This includes official and community plugins.
 
-        Returns
+        Returns:
         -------
             List of available plugin descriptors
 
@@ -339,7 +341,7 @@ class MeltanoAntiCorruptionLayer:
         FLX domain Plugin entities, handling type mapping and configuration
         translation.
 
-        Returns
+        Returns:
         -------
             List of domain model plugins available for installation
 

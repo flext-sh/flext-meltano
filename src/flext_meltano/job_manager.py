@@ -36,7 +36,7 @@ class JobExecutionMode(Enum):
     Defines whether operations should be executed in simulation mode or
     with actual changes, replacing boolean dry_run parameters.
 
-    Attributes
+    Attributes:
     ----------
         DRY_RUN: Simulation mode - report what would be done without changes.
         EXECUTE: Production mode - perform actual operations with changes.

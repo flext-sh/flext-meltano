@@ -21,10 +21,11 @@ from __future__ import annotations
 # Import ConfigurationDict at runtime for Pydantic model validation
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, Field, SkipValidation
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from flext_core.domain.advanced_types import ConfigurationDict
+    from pydantic import SkipValidation
 
 
 class MeltanoPlugin(BaseModel):

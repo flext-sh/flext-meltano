@@ -82,11 +82,11 @@ class FlextTapProtocol:
         Discovers and returns all available streams from the data source
         with their schema definitions and configuration settings.
 
-        Returns
+        Returns:
         -------
             list[SingerStreamDefinition]: List of available stream definitions
 
-        Raises
+        Raises:
         ------
             DiscoveryError: If stream discovery fails
 

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import structlog
 from flext_core.domain.pydantic_base import DomainBaseModel
 from flext_core.engine.meltano_wrapper import MeltanoEngine
-from flext_core.events.event_bus import DomainEvent, EventBusProtocol
+from flext_core.events.event_bus import DomainEvent
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.job.job import Job, Payload, State
@@ -26,6 +26,7 @@ from flext_meltano.event_bridge import MeltanoEventBridge
 from flext_meltano.job_manager import FlextMeltanoJobManager
 
 if TYPE_CHECKING:
+    from flext_core.events.event_bus import EventBusProtocol
     from meltano.core.project import Project
 
     from flext_meltano.project_manager import FlextMeltanoProjectManager
@@ -80,7 +81,7 @@ class OrchestrationMode(Enum):
     Defines different modes for executing Meltano operations, allowing
     for flexible pipeline execution strategies based on requirements.
 
-    Attributes
+    Attributes:
     ----------
         SEQUENTIAL: Execute operations one after another.
         PARALLEL: Execute operations concurrently when possible.
@@ -100,7 +101,7 @@ class RunMode(Enum):
     Defines whether pipeline execution should be a dry run (validation only)
     or a full execution with actual data processing.
 
-    Attributes
+    Attributes:
     ----------
         DRY_RUN: Validation mode - check pipeline without executing.
         FULL_RUN: Production mode - execute pipeline with actual data processing.

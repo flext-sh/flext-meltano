@@ -45,7 +45,7 @@ from typing import TYPE_CHECKING, Any
 import structlog
 import yaml
 from flx_core.domain.advanced_types import ServiceError, ServiceResult
-from flx_core.events.event_bus import DomainEvent, EventBusProtocol
+from flx_core.events.event_bus import DomainEvent
 
 # ZERO TOLERANCE - Meltano is REQUIRED for FLX Meltano Enterprise
 from meltano.core.project import Project
@@ -62,7 +62,7 @@ class ProjectInitializationMode(Enum):
     replacing boolean force parameters with explicit mode enum values for
     better type safety and clearer operational intent.
 
-    Attributes
+    Attributes:
     ----------
         CREATE_NEW: Create new project, fail if directory already exists.
         FORCE_RECREATE: Remove existing project directory and create new one.
@@ -77,6 +77,7 @@ class ProjectInitializationMode(Enum):
 
 if TYPE_CHECKING:
     from flx_core.domain.advanced_types import ConfigurationDict, MeltanoCommandResult
+    from flx_core.events.event_bus import EventBusProtocol
     from meltano.core.plugin import PluginType
 
     # Unified model imports (consolidated)
