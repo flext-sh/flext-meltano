@@ -5,7 +5,6 @@
 meltano[s3,gcs]==3.2.0
 
 # Singer Protocol
-singer-python==5.13.0
 target-jsonl==0.1.4
 target-csv==2.0.0
 

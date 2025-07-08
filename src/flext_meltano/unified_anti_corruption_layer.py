@@ -39,8 +39,8 @@ from flext_core.domain.advanced_types import (
     ServiceError,
     ServiceResult,
 )
-from flext_core.domain.entities import PluginType
 from flext_core.domain.pydantic_base import DomainValueObject
+from flext_core.domain.value_objects import PluginType
 from flext_core.engine.meltano_wrapper import MeltanoExecutionResult
 from pydantic import Field, model_validator
 

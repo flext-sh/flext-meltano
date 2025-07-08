@@ -41,7 +41,6 @@ repos:
             types-PyYAML,
             pydantic,
             meltano,
-            singer-python,
             pyyaml,
             jsonschema,
             click,
