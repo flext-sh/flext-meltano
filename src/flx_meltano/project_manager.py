@@ -54,6 +54,9 @@ from meltano.core.schedule_service import ScheduleService
 
 from flx_meltano.sdk import MeltanoExecutionError, MeltanoProjectError
 
+# Initialize logger early to avoid undefined errors
+logger = structlog.get_logger()
+
 
 class ProjectInitializationMode(Enum):
     """Project initialization mode for Meltano project creation operations.
@@ -108,9 +111,6 @@ if "PYTEST_CURRENT_TEST" in os.environ:
         except AttributeError:
             # Engine doesn't have either cache_clear or clear methods - expected
             logger.debug("Project engine does not support cache clearing")
-
-
-logger = structlog.get_logger()
 
 
 class MeltanoProjectManager:
