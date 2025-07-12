@@ -10,30 +10,32 @@ import asyncio
 import contextlib
 import inspect
 import sys
-from enum import Enum, auto
+from collections.abc import Callable
+from enum import Enum
+from enum import auto
 from functools import wraps
-from typing import TYPE_CHECKING, ClassVar, TypeVar
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import ClassVar
+from typing import Protocol
+from typing import TypeVar
 
-from flext_core.domain.pydantic_base import DomainBaseModel, DomainValueObject
-from pydantic import Field
-
-# ZERO TOLERANCE - Use TYPE_CHECKING and runtime imports for dependencies
-# All modules should be available in properly configured system
+from flext_core.domain.pydantic_base import BaseModel
+from flext_core.domain.pydantic_base import DomainValueObject
+from flext_core.domain.pydantic_base import Field
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from flext_core.domain.entities import Pipeline, PipelineExecution, PipelineStep
-    from flext_core.engine.meltano_wrapper import MeltanoEngine
-    from flext_core.events.event_bus import DomainEventBus
+    from flext_core.domain.entities import Pipeline
+    from flext_core.domain.entities import PipelineExecution
 
-# Python 3.13 type aliases - with strict validation
-from collections.abc import Callable
 
-StepFunction = Callable[..., object]
-StepResult = dict[str, object]
-PipelineConfig = dict[str, object]
-ExecutionContext = dict[str, object]  # Pipeline execution context
+# Type aliases for clean interface
+StepFunction = Callable[..., Any]
+StepResult = dict[str, Any]
+PipelineConfig = dict[str, Any]
+ExecutionContext = dict[str, Any]
 
 T = TypeVar("T")
 P = TypeVar("P")
@@ -49,16 +51,22 @@ class StepType(Enum):
     NOTIFY = auto()
 
 
-class StepProtocol:
+class StepProtocol(Protocol):
     """Protocol for pipeline steps with reflection support."""
 
-    async def execute(self, context: dict[str, object]) -> StepResult: ...
+    async def execute(self, context: dict[str, Any]) -> StepResult:
+        """Execute the step with the given context."""
+        ...
 
     @property
-    def step_type(self) -> StepType: ...
+    def step_type(self) -> StepType:
+        """Return the step type."""
+        ...
 
     @property
-    def dependencies(self) -> list[str]: ...
+    def dependencies(self) -> list[str]:
+        """Return the list of step dependencies."""
+        ...
 
 
 class ReflectionStep(DomainValueObject):
@@ -82,8 +90,8 @@ class ReflectionStep(DomainValueObject):
         description="Timeout in seconds for step execution",
     )
 
-    async def execute(self, context: dict[str, object]) -> StepResult:
-        """Execute step with automatic parameter injection."""
+    async def execute(self, context: dict[str, Any]) -> StepResult:
+        """Execute the step function with dependency injection from context."""
         # Get function signature
         sig = inspect.signature(self.func)
 
@@ -97,7 +105,6 @@ class ReflectionStep(DomainValueObject):
             elif param_name != "self" and param.annotation != inspect.Parameter.empty:
                 # Try to inject based on type annotation
                 type_hint = param.annotation
-                # Look for matching type in context
                 for value in context.values():
                     if isinstance(value, type_hint):
                         kwargs[param_name] = value
@@ -121,8 +128,8 @@ def pipeline_step(
     dependencies: list[str] | None = None,
     retry: int = 3,
     timeout: int = 300,
-) -> callable[[T], T]:
-    """Decorate zero-boilerplate pipeline steps."""
+) -> Callable[[T], T]:
+    """Decorator to mark a function as a pipeline step."""
 
     def decorator(func: T) -> T:
         # Extract name from function if not provided
@@ -144,7 +151,7 @@ def pipeline_step(
         func._dependencies = dependencies or []
 
         @wraps(func)
-        async def wrapper(*args: object, **kwargs) -> object:
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
             # Execute through reflection step
             context = {**kwargs}
             if args:
@@ -160,13 +167,10 @@ def pipeline_step(
     return decorator
 
 
-class ReflectionOrchestrator(DomainBaseModel):
+class ReflectionOrchestrator(BaseModel):
     """Automatic pipeline orchestrator using reflection patterns."""
 
     model_config: ClassVar = {"arbitrary_types_allowed": True}
-
-    meltano_engine: MeltanoEngine = Field(description="Meltano execution engine")
-    event_bus: DomainEventBus = Field(description="Event bus for orchestration events")
 
     # Registry of steps discovered through reflection
     step_registry: dict[str, ReflectionStep] = Field(
@@ -179,17 +183,14 @@ class ReflectionOrchestrator(DomainBaseModel):
     )
 
     def discover_steps(self, module: ModuleType) -> None:
-        """Automatically discover pipeline steps in a module."""
+        """Discover pipeline steps in a module through reflection."""
         for _name, obj in inspect.getmembers(module):
             # Check if object has pipeline step metadata
             if hasattr(obj, "_pipeline_step"):
                 try:
                     pipeline_step = obj._pipeline_step
                     self.step_registry[pipeline_step.name] = pipeline_step
-                except (AttributeError, TypeError) as e:
-                    # Log the error instead of silently ignoring
-                    if hasattr(self, "logger"):
-                        self.logger.warning(f"Failed to register pipeline step {_name}: {e}")
+                except (AttributeError, TypeError):
                     continue
 
             # Register by type for objects with step_type
@@ -198,93 +199,44 @@ class ReflectionOrchestrator(DomainBaseModel):
                     if obj.step_type not in self.type_registry:
                         self.type_registry[obj.step_type] = []
                     self.type_registry[obj.step_type].append(obj)
-                except (AttributeError, TypeError) as e:
-                    # Log the error instead of silently ignoring
-                    if hasattr(self, "logger"):
-                        self.logger.warning(f"Failed to register step by type {_name}: {e}")
+                except (AttributeError, TypeError):
                     continue
-
-    def _extract_pipeline_id_safe(self, pipeline: Pipeline) -> str:
-        """Extract pipeline ID safely with try/except pattern.
-
-        ZERO TOLERANCE MODERNIZATION.
-
-        Args:
-        ----
-            pipeline: The pipeline object that may or may not have a
-                'value' attribute on id
-
-        Returns:
-        -------
-            String representation of the pipeline ID
-
-        """
-        try:
-            # Try to access pipeline.id.value attribute for value objects
-            return str(pipeline.id.value)
-        except AttributeError:
-            # Fallback to string representation if no value attribute
-            return str(pipeline.id)
 
     async def execute_pipeline(
         self,
         pipeline: Pipeline,
         execution: PipelineExecution,
     ) -> ExecutionContext:
-        """Execute pipeline using UNIFIED EXECUTION ARCHITECTURE.
-
-        With reflection orchestration.
-        """
+        """Execute a pipeline using reflection orchestration."""
         try:
-            # ZERO TOLERANCE - Runtime import to avoid circular dependencies
-            from flext_core.universe import get_universe
+            # Build execution context
+            context = {
+                "pipeline": pipeline,
+                "execution": execution,
+                "orchestrator": self,
+            }
 
-            # Use UNIFIED COMMAND UNIVERSE for orchestrated execution - ZERO TOLERANCE
-            universe = await get_universe()
+            # Execute all steps
+            results = {}
+            for step in pipeline.steps:
+                if step.step_id in self.step_registry:
+                    reflection_step = self.step_registry[step.step_id]
+                    step_result = await self._execute_step_with_retry(
+                        reflection_step,
+                        context,
+                        step.configuration,
+                    )
+                    results[step.step_id] = step_result
 
-            # Delegate to unified execution with reflection orchestration parameters
-            result = await universe.execute(
-                command_name="execute_pipeline",
-                parameters={
-                    "pipeline_id": self._extract_pipeline_id_safe(pipeline),
-                    "execution_id": str(execution.id),
-                    "orchestration_mode": "reflection",
-                    "steps": [
-                        {
-                            "step_id": step.step_id,
-                            "configuration": step.configuration,
-                            "dependencies": getattr(step, "dependencies", []),
-                        }
-                        for step in pipeline.steps
-                    ],
-                },
-                context={
-                    "service": "reflection_orchestrator",
-                    "caller": self.__class__.__name__,
-                    "meltano_engine": self.meltano_engine,
-                    "event_bus": self.event_bus,
-                },
-            )
+            return {
+                "pipeline": pipeline,
+                "execution": execution,
+                "results": results,
+                "success": True,
+                "error": None,
+            }
 
-            # Return execution context with results
-
-        except (
-            ValueError,
-            TypeError,
-            RuntimeError,
-            OSError,
-            ImportError,
-            ConnectionError,
-            TimeoutError,
-            AttributeError,
-            LookupError,
-        ) as e:
-            # ZERO TOLERANCE - Specific exception types for reflection
-            # orchestrator failures
-            self.logger.exception(
-                "Reflection orchestrator execution failed through unified interface",
-            )
-            # Return error context
+        except Exception as e:
             return {
                 "pipeline": pipeline,
                 "execution": execution,
@@ -292,69 +244,14 @@ class ReflectionOrchestrator(DomainBaseModel):
                 "success": False,
                 "error": str(e),
             }
-        else:
-            return {
-                "pipeline": pipeline,
-                "execution": execution,
-                "results": result.data if result.success else {},
-                "success": result.success,
-                "error": result.error if not result.success else None,
-            }
-
-    def _build_execution_graph(
-        self,
-        steps: list[PipelineStep],
-    ) -> list[list[PipelineStep]]:
-        """Build execution graph with dependency resolution."""
-        # Topological sort for dependency ordering
-        graph: dict[str, set[str]] = {}
-        in_degree: dict[str, int] = {}
-
-        # Initialize graph
-        for step in steps:
-            graph[step.step_id] = set()
-            in_degree[step.step_id] = 0
-
-        # Build dependency graph
-        for step in steps:
-            for dep in step.depends_on:
-                if dep in graph:
-                    graph[dep].add(step.step_id)
-                    in_degree[step.step_id] += 1
-
-            # Find execution order
-            execution_order = []
-            queue = [step_id for step_id, degree in in_degree.items() if degree == 0]
-
-            while queue:
-                # Process all steps with no dependencies in parallel
-                current_group = []
-                next_queue = []
-
-                for step_id in queue:
-                    current_group.append(
-                        next(s for s in steps if s.step_id == step_id),
-                    )
-
-                    # Update dependencies
-                    for dependent in graph[step_id]:
-                        in_degree[dependent] -= 1
-                        if in_degree[dependent] == 0:
-                            next_queue.append(dependent)
-
-                execution_order.append(current_group)
-                queue = next_queue
-
-            return execution_order
-        return None
 
     async def _execute_step_with_retry(
         self,
         step: ReflectionStep,
         context: ExecutionContext,
-        configuration: ExecutionContext,
+        configuration: dict[str, Any],
     ) -> StepResult:
-        """Execute step with automatic retry logic."""
+        """Execute a step with retry logic."""
         last_error = None
 
         for attempt in range(step.retry_count):
@@ -363,267 +260,48 @@ class ReflectionOrchestrator(DomainBaseModel):
                 step_context = {**context, "config": configuration}
 
                 # Execute with timeout
-                result = await asyncio.wait_for(
+                return await asyncio.wait_for(
                     step.execute(step_context),
                     timeout=step.timeout_seconds,
                 )
 
-                # Publish success event
-                await self.event_bus.publish(
-                    {
-                        "type": "step_completed",
-                        "step": step.name,
-                        "attempt": attempt + 1,
-                        "result": result,
-                    },
-                )
-
-            except TimeoutError:
-                last_error = TimeoutError(
-                    f"Step {step.name} timed out after {step.timeout_seconds}s",
-                )
-            except (ValueError, TypeError, RuntimeError, OSError) as e:
+            except (TimeoutError, ValueError, TypeError, RuntimeError, OSError) as e:
                 last_error = e
 
-            # Publish retry event
-            if attempt < step.retry_count - 1:
-                await self.event_bus.publish(
-                    {
-                        "type": "step_retry",
-                        "step": step.name,
-                        "attempt": attempt + 1,
-                        "error": str(last_error),
-                    },
-                )
+                # Exponential backoff if retrying
+                if attempt < step.retry_count - 1:
+                    await asyncio.sleep(2**attempt)
 
-                # Exponential backoff
-                await asyncio.sleep(2**attempt)
-
-        raise last_error
-
-    async def _handle_step_failure(
-        self,
-        step: PipelineStep,
-        error: Exception,
-        execution: PipelineExecution,
-    ) -> None:
-        """Handle step failure with automatic recovery."""
-        # Publish failure event
-        await self.event_bus.publish(
-            {
-                "type": "step_failed",
-                "step": step.step_id,
-                "error": str(error),
-                "execution_id": str(execution.execution_id),
-            },
-        )
-
-        # Update execution status
-        execution.fail(f"Step {step.step_id} failed: {error}")
+        if last_error:
+            raise last_error
+        msg = f"Step {step.name} failed after {step.retry_count} attempts"
+        raise RuntimeError(msg)
 
 
-# === REFLECTION-BASED STEP IMPLEMENTATIONS ===
+# Example step implementations using the decorator
+@pipeline_step(StepType.EXTRACT, name="simple-extract")
+async def extract_data(source: str, config: dict[str, Any]) -> dict[str, Any]:
+    """Simple data extraction step."""
+    return {"source": source, "data": f"extracted from {source}"}
 
 
-@pipeline_step(StepType.EXTRACT, name="meltano-tap")
-async def extract_with_meltano(
-    tap_name: str,
-    config: ExecutionContext,
-    meltano: MeltanoEngine,
-) -> ExecutionContext:
-    """Extract data using Meltano tap with zero boilerplate."""
-    result = await meltano.run_pipeline(
-        extractor=tap_name,
-        loader="target-jsonl",  # Standard target for data extraction
-        env=config,
-    )
-    return {"tap": tap_name, "records": result.get("stdout", "")}
+@pipeline_step(StepType.TRANSFORM, name="simple-transform")
+async def transform_data(data: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+    """Simple data transformation step."""
+    return {"transformed": True, "original": data}
 
 
-@pipeline_step(StepType.TRANSFORM, name="dbt-transform")
-async def transform_with_dbt(
-    models: list[str],
-    config: ExecutionContext,
-    meltano: MeltanoEngine,
-) -> ExecutionContext:
-    """Transform data using dbt with zero boilerplate."""
-    # Run dbt through Meltano
-    dbt_args = ["run", "--models", *models]
-    result = await meltano.run_pipeline(
-        extractor="dbt",
-        loader=None,
-        env={"DBT_ARGS": " ".join(dbt_args), **config},
-    )
-    return {"models": models, "result": result}
+@pipeline_step(StepType.LOAD, name="simple-load")
+async def load_data(data: dict[str, Any], target: str, config: dict[str, Any]) -> dict[str, Any]:
+    """Simple data loading step."""
+    return {"target": target, "loaded": True, "data": data}
 
 
-@pipeline_step(StepType.LOAD, name="meltano-target")
-async def load_with_meltano(
-    target_name: str,
-    config: ExecutionContext,
-    meltano: MeltanoEngine,
-    results: ExecutionContext,
-) -> ExecutionContext:
-    """Load data using Meltano target with zero boilerplate."""
-    # Get data from previous extract step
-    extract_result = next(
-        (r for r in results.values() if r.get("tap")),
-        None,
-    )
+def create_orchestrator() -> ReflectionOrchestrator:
+    """Create a reflection orchestrator with discovered steps."""
+    orchestrator = ReflectionOrchestrator()
 
-    if not extract_result:
-        msg = "No extract result found for load step"
-        raise ValueError(msg)
-
-    # Run target
-    result = await meltano.run_pipeline(
-        extractor="tap-replay",  # Replay extracted data
-        loader=target_name,
-        env={"REPLAY_DATA": extract_result["records"], **config},
-    )
-    return {"target": target_name, "result": result}
-
-
-@pipeline_step(StepType.QUALITY, name="great-expectations")
-async def validate_data_quality(
-    expectations_suite: str,
-    _config: ExecutionContext,
-    event_bus: DomainEventBus,
-) -> ExecutionContext:
-    """Validate data quality with zero boilerplate."""
-    # This would integrate with Great Expectations
-    # For now, simulate validation
-    validation_results = {
-        "suite": expectations_suite,
-        "passed": True,
-        "statistics": {
-            "evaluated_expectations": 10,
-            "successful_expectations": 10,
-            "unsuccessful_expectations": 0,
-        },
-    }
-
-    await event_bus.publish(
-        {
-            "type": "data_quality_validated",
-            "suite": expectations_suite,
-            "results": validation_results,
-        },
-    )
-
-    return validation_results
-
-
-@pipeline_step(StepType.NOTIFY, name="notification")
-async def send_notification(
-    channel: str,
-    message: str,
-    config: ExecutionContext,
-    execution: PipelineExecution,
-) -> ExecutionContext:
-    """Send notification using REAL NotificationService."""
-    # ZERO TOLERANCE - Runtime import for notification dependencies
-    from flext_core.config import settings
-    from flext_core.services.notification_service import NotificationService
-
-    notification_service = NotificationService()
-
-    # Format message with execution context
-    formatted_message = message.format(
-        pipeline_id=execution.pipeline_id,
-        execution_id=execution.execution_id,
-        status=execution.status,
-        started_at=execution.started_at,
-        completed_at=execution.completed_at,
-    )
-
-    # Send notification through specified channel
-    try:
-        if channel == "email" and settings.notification_email:
-            await notification_service.send_email_notification(
-                recipient=config.get("recipient", settings.notification_email),
-                subject=config.get(
-                    "subject",
-                    f"Pipeline Notification: {execution.pipeline_id}",
-                ),
-                message=formatted_message,
-            )
-
-        elif channel == "slack":
-            webhook_url = config.get(
-                "webhook_url",
-                settings.notification_slack_webhook_url,
-            )
-            if webhook_url:
-                await notification_service.send_slack_notification(
-                    webhook_url=webhook_url,
-                    message=formatted_message,
-                    channel=config.get("channel", "#flext-pipelines"),
-                )
-            else:
-                return {
-                    "channel": channel,
-                    "sent": False,
-                    "error": "No Slack webhook URL configured",
-                }
-
-        elif channel == "webhook":
-            webhook_url = config.get("webhook_url", settings.notification_webhook_url)
-            if webhook_url:
-                webhook_payload = {
-                    "pipeline_id": execution.pipeline_id,
-                    "execution_id": execution.execution_id,
-                    "status": execution.status,
-                    "message": formatted_message,
-                    "started_at": (
-                        execution.started_at.isoformat()
-                        if execution.started_at
-                        else None
-                    ),
-                    "completed_at": (
-                        execution.completed_at.isoformat()
-                        if execution.completed_at
-                        else None
-                    ),
-                    **config.get("extra_data", {}),
-                }
-                await notification_service.send_webhook_notification(
-                    webhook_url=webhook_url,
-                    payload=webhook_payload,
-                )
-            else:
-                return {
-                    "channel": channel,
-                    "sent": False,
-                    "error": "No webhook URL configured",
-                }
-        else:
-            return {
-                "channel": channel,
-                "sent": False,
-                "error": f"Unsupported channel: {channel}",
-            }
-
-    except (ValueError, TypeError, RuntimeError, OSError, ConnectionError) as e:
-        return {
-            "channel": channel,
-            "message": formatted_message,
-            "sent": False,
-            "error": str(e),
-        }
-
-
-def create_orchestrator(
-    meltano_engine: MeltanoEngine,
-    event_bus: DomainEventBus,
-) -> ReflectionOrchestrator:
-    """Create orchestrator with automatic step discovery."""
-    orchestrator = ReflectionOrchestrator(
-        meltano_engine=meltano_engine,
-        event_bus=event_bus,
-    )
-
-    # Discover steps in current module - ZERO TOLERANCE to late imports
+    # Discover steps in current module
     orchestrator.discover_steps(sys.modules[__name__])
 
     return orchestrator

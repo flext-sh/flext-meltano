@@ -7,33 +7,28 @@ allowing seamless event propagation and handling across both platforms.
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
+from datetime import UTC
+from datetime import datetime
+from typing import TYPE_CHECKING
+from typing import Any
 
-import structlog
+from structlog import get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+            from collections.abc import Callable
 
 # Placeholder imports - these would need to be implemented
 # from flext_core.events.event_bus import EventBusProtocol, DomainEvent
 # from flext_core.domain.base import DomainValueObject
 
-logger = structlog.get_logger(__name__)
+logger = get_logger(__name__)
 
 
 class EventConfig:
     """Configuration for Meltano events."""
 
-    def __init__(
-        self,
-        event_type: str,
-        project: Any = None,
-        job_id: str | None = None,
-        pipeline_name: str | None = None,
-        state: Any = None,
-        metadata: dict[str, Any] | None = None,
-    ) -> None:
+    def __init__(self, event_type: str, project: Any = None, job_id: str | None = None, pipeline_name: str | None = None, state: Any = None, metadata: dict[str, Any] | None = None) -> None:
         self.event_type = event_type
         self.project = project
         self.job_id = job_id
@@ -45,27 +40,26 @@ class EventConfig:
 class DomainEvent:
     """Placeholder domain event class."""
 
-    def __init__(
-        self,
-        event_type: str,
-        data: dict[str, Any],
-        correlation_id: str | None = None,
-        source: str = "meltano",
-    ) -> None:
+    def __init__(self, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> None:
         self.type = event_type
         self.data = data
         self.correlation_id = correlation_id
         self.source = source
 
     @classmethod
-    def create(
-        cls,
-        event_type: str,
-        data: dict[str, Any],
-        correlation_id: str | None = None,
-        source: str = "meltano",
-    ) -> DomainEvent:
-        """Create a new domain event."""
+    def create(cls, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> DomainEvent:
+        """Create a new domain event.
+
+        Args:
+            event_type: Type of the event.
+            data: Event data payload.
+            correlation_id: Optional correlation ID for tracking.
+            source: Source system generating the event.
+
+        Returns:
+            DomainEvent instance.
+
+        """
         return cls(event_type, data, correlation_id, source)
 
 
@@ -74,7 +68,9 @@ class MeltanoEventBridge:
 
     def __init__(self, flext_event_bus: Any = None) -> None:
         self.flext_event_bus = flext_event_bus or self._create_mock_event_bus()
-        self._active_subscriptions: dict[str, Any] = {}
+        self._active_subscriptions: dict[str, Any] = (
+            None  # TODO: Initialize in __post_init__
+        )
 
         # Event mapping between Meltano and FLEXT events
         self._meltano_to_flext_mapping = {
@@ -95,10 +91,14 @@ class MeltanoEventBridge:
         logger.info("Initialized Meltano Event Bridge")
 
     def _create_mock_event_bus(self) -> Any:
-        """Create a mock event bus for testing."""
-
         class MockEventBus:
             async def publish(self, event: DomainEvent) -> None:
+                """Publish event to mock bus.
+
+                Args:
+                    event: Domain event to publish.
+
+                """
                 logger.info("Mock event published", event_type=event.type)
 
             async def subscribe(self, pattern: str, handler: Callable) -> None:
@@ -110,7 +110,16 @@ class MeltanoEventBridge:
         return MockEventBus()
 
     async def publish_meltano_event(self, config: EventConfig, **kwargs: Any) -> None:
-        """Publish a Meltano event to the FLEXT event system."""
+        """Publish Meltano event to FLEXT event bus.
+
+        Args:
+            config: Event configuration with project and job details.
+            **kwargs: Additional event data payload.
+
+        Raises:
+            Exception: If event publishing fails.
+
+        """
         try:
             # Map Meltano event type to FLEXT event type
             flext_event_type = self._meltano_to_flext_mapping.get(
@@ -126,18 +135,22 @@ class MeltanoEventBridge:
                 **kwargs,
             }
 
-            # Add project information if available
+            # Add project information if available:
             if config.project:
                 event_data.update(
                     {
                         "project_name": getattr(config.project, "name", "unknown"),
                         "project_root": str(getattr(config.project, "root", "")),
-                        "environment": getattr(
-                            config.project, "active_environment", {}
-                        ).get("name")
-                        if hasattr(config.project, "active_environment")
-                        else None,
-                    }
+                        "environment": (
+                            getattr(
+                                config.project,
+                                "active_environment",
+                                {},
+                            ).get("name")
+                            if hasattr(config.project, "active_environment")
+                            else None
+                        ),
+                    },
                 )
 
             # Add job information
@@ -154,7 +167,7 @@ class MeltanoEventBridge:
                     {
                         "state": getattr(config.state, "value", str(config.state)),
                         "state_name": getattr(config.state, "name", str(config.state)),
-                    }
+                    },
                 )
 
             # Add metadata
@@ -189,7 +202,12 @@ class MeltanoEventBridge:
             raise
 
     async def get_event_statistics(self) -> dict[str, Any]:
-        """Get event bridge statistics."""
+        """Get event bridge statistics.
+
+        Returns:
+            Dictionary containing event bridge metrics.
+
+        """
         return {
             "active_subscriptions": len(self._active_subscriptions),
             "event_mappings": len(self._meltano_to_flext_mapping),
@@ -197,7 +215,10 @@ class MeltanoEventBridge:
         }
 
     async def cleanup(self) -> None:
-        """Cleanup event bridge resources."""
+        """Clean up event bridge resources.
+
+        Closes connections and clears subscriptions.
+        """
         logger.info("Cleaning up Meltano Event Bridge")
         self._active_subscriptions.clear()
         logger.info("Meltano Event Bridge cleanup completed")

@@ -8,34 +8,30 @@ from __future__ import annotations
 
 
 class MeltanoError(Exception):
-    r"""MeltanoError - Custom Exception.
+    """MeltanoError - Custom Exception for Meltano operations.
 
-    Implementa exceção customizada para casos específicos do domínio.
-    Fornece informações detalhadas sobre erros.
+    Base exception class for Meltano-related errors.
+    Implements custom exception for domain-specific cases.
+    Provides detailed error information.
 
-    Arquitetura: Enterprise Patterns
-    Padrões: SOLID principles, clean code
+    Attributes
+    ----------
+    message : str
+        Error message describing the issue.
 
-    Attributes: Sem atributos públicos documentados.
-
-    Methods: Sem métodos públicos.
-
-    Examples: Uso típico da classe:
+    Examples
+    --------
+    Typical usage:
 
     ```python
-    instance = MeltanoError()\n    result = instance.method()
+    raise MeltanoError("Meltano project not found")
     ```
 
-    See Also:
+    See Also
     --------
-    - [Documentação da Arquitetura](../../docs/architecture/index.md)
-    - [Padrões de Design](../../docs/architecture/001-clean-architecture-ddd.md)
-
-    Note: Esta classe segue os padrões Enterprise Patterns estabelecidos no projeto.
+    Exception : Base exception class.
 
     """
-
-    """Base exception class for Meltano-related errors."""
 
 
 class MeltanoProjectError(MeltanoError):
@@ -53,26 +49,21 @@ class MeltanoExecutionError(MeltanoError):
         stdout: str | None = None,
         stderr: str | None = None,
     ) -> None:
-        """Initialize the Meltano execution exception.
-
-        Creates a detailed exception for Meltano command execution failures,
-        capturing command details, return codes, and output for debugging.
-
-        Args:
-        ----
-            message: Description of the execution error.
-            command: The Meltano command that failed.
-            returncode: Process exit code if available.
-            stdout: Standard output from the failed command.
-            stderr: Standard error output from the failed command.
-
-        Note:
-        ----
-            Provides comprehensive error context for debugging.
-
-        """
+        """Initialize MeltanoExecutionError with execution details."""
         super().__init__(message)
         self.command = command
         self.returncode = returncode
         self.stdout = stdout
         self.stderr = stderr
+
+
+class MeltanoPluginError(MeltanoError):
+    """Raised for errors related to Meltano plugin operations."""
+
+
+class MeltanoStateError(MeltanoError):
+    """Raised for errors related to Meltano state management."""
+
+
+class MeltanoConfigError(MeltanoError):
+    """Raised for errors related to Meltano configuration."""
