@@ -1,11 +1,18 @@
 # FLX Meltano - Enterprise Meltano Integration
 
-**Status**: ✅ Production Ready (100% Complete)
-**Based on**: Real implementation from `flx-meltano-enterprise/src/flx_core/meltano/`
+> **Regras do Projeto**: Consulte `../../.github/instructions/regras.instructions.md` para padrões obrigatórios
+>
+> **Padrão de documentação**: Veja [../../docs/HOW_TO_DOCUMENT.md](../../docs/HOW_TO_DOCUMENT.md)
+
+## 🧭 Navegação
+
+**🏠 Root**: [Documentação Principal](../../docs/index.md) → **📄 Projeto**: flext-meltano
 
 ## Overview
 
-FLX Meltano provides enterprise-grade integration with the Meltano data platform, enabling advanced orchestration, state management, and Singer protocol support. This module is extracted from the fully functional implementation with 0 NotImplementedError.
+FLX Meltano provides enterprise-grade integration with the Meltano data platform, enabling
+advanced orchestration, state management, and Singer protocol support. This module is
+extracted from the fully functional implementation with 0 NotImplementedError.
 
 ## Real Implementation Status
 
@@ -32,6 +39,13 @@ FLX Meltano provides enterprise-grade integration with the Meltano data platform
 - **Job Orchestration**: Async job execution with monitoring
 - **Event Translation**: Bidirectional FLX ↔ Meltano events
 
+### Go Integration (NEW)
+
+- **MeltanoBridge**: Go-Python bridge for Meltano operations
+- **GoPy Bindings**: Type-safe Go bindings using gopy
+- **Zero Subprocess**: Direct integration with FLEXT architecture
+- **Enterprise Ready**: Production-grade Go-Meltano integration
+
 ### Enterprise Extensions
 
 1. **Oracle OIC Extension**: Oracle Integration Cloud connectivity
@@ -49,6 +63,8 @@ FLX Meltano provides enterprise-grade integration with the Meltano data platform
 - **Health Checks**: Component and system health monitoring
 
 ## Quick Start
+
+### Python Integration
 
 ```bash
 # Install dependencies
@@ -68,9 +84,35 @@ flx-meltano run tap-postgres target-snowflake
 flx-meltano status
 ```
 
+### Go Integration
+
+```python
+# Generate Go bindings
+from flext_meltano.integrations import GopyIntegration
+integration = GopyIntegration()
+await integration.generate_go_bindings()
+```
+
+```go
+// Use in Go application
+package main
+
+import "github.com/your-org/flext-meltano-gopy"
+
+func main() {
+    // Initialize project
+    result := meltano.InitProjectSync("my-project", "./projects")
+    
+    // Run pipeline
+    pipeline := meltano.RunPipelineSync("my-project", "tap-csv", "target-jsonl", "")
+}
+```
+
+For complete Go integration guide, see [GO_INTEGRATION_GUIDE.md](./GO_INTEGRATION_GUIDE.md)
+
 ## Architecture
 
-```
+```ascii
 flx_meltano/
 ├── core/
 │   ├── project_manager.py      # Project lifecycle management
@@ -81,6 +123,9 @@ flx_meltano/
 │   ├── event_bridge.py         # Event translation layer
 │   ├── anti_corruption_layer.py # Clean boundaries
 │   └── unified_anti_corruption_layer.py # Unified interface
+├── integrations/               # NEW: Go-Python Integration
+│   ├── bridge.py              # Go-Python bridge for Meltano
+│   └── gopy_integration.py    # GoPy bindings generation
 ├── extensions/
 │   ├── oracle_oic.py          # Oracle Integration Cloud
 │   ├── ldap.py                # LDAP directory services
@@ -242,6 +287,23 @@ flx-meltano extensions configure oracle-oic
 - RBAC for project access
 - Audit logging for all operations
 
-## License
+## 🔗 Cross-References
 
-Part of the FLX Platform - Enterprise License
+### Prerequisites
+
+- [../../docs/HOW_TO_DOCUMENT.md](../../docs/HOW_TO_DOCUMENT.md) — Guia de padronização de documentação
+- [../../.github/instructions/regras.instructions.md](../../.github/instructions/regras.instructions.md) — Regras obrigatórias do projeto
+
+### Next Steps
+
+- [../../docs/architecture/index.md](../../docs/architecture/index.md) — Detalhes da arquitetura
+- [../../docs/development/index.md](../../docs/development/index.md) — Padrões de desenvolvimento
+
+### Related Topics
+
+- [../../docs/STANDARDIZATION_MASTER_PLAN.md](../../docs/STANDARDIZATION_MASTER_PLAN.md) — Estratégia de padronização
+- [../../docs/INCOMPLETE_CODE_REPORT.md](../../docs/INCOMPLETE_CODE_REPORT.md) — Relatório de código incompleto
+
+---
+
+**📂 Projeto**: flext-meltano | **🏠 Root**: [Documentação Principal](../../docs/index.md) | **Framework**: FLEXT 0.6.0+ | **Updated**: 2025-07-08

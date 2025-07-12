@@ -1,9 +1,12 @@
-"""Command-line interface for FLEXT Meltano."""
+"""Command-line interface for FLEXT Meltano.
+
+This module provides CLI commands for Meltano operations.
+Uses flext-cli patterns for consistency.
+"""
 
 from __future__ import annotations
 
 import argparse
-import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -15,7 +18,7 @@ from loguru import logger
 def info_command(_args: argparse.Namespace) -> int:
     """Show FLEXT Meltano information."""
     logger.info("FLEXT Meltano - Enterprise ETL/ELT Pipeline Engine")
-    logger.info("Version: 0.2.0")
+    logger.info("Version: 0.7.0")
     logger.info("Singer Protocol Support: Yes")
     return 0
 
@@ -33,373 +36,151 @@ def init_command(args: argparse.Namespace) -> int:
         meltano_config = {
             "version": 1,
             "default_environment": "dev",
-            "project_id": project_name,
+            "project_id": f"flext-{project_name}",
             "environments": [
-                {
-                    "name": "dev",
-                    "config": {
-                        "plugins": {"extractors": [], "loaders": [], "transformers": []}
-                    },
-                },
-                {
-                    "name": "prod",
-                    "config": {
-                        "plugins": {"extractors": [], "loaders": [], "transformers": []}
-                    },
-                },
+                {"name": "dev"},
+                {"name": "staging"},
+                {"name": "prod"},
             ],
-            "plugins": {"extractors": [], "loaders": [], "transformers": []},
+            "plugins": {
+                "extractors": [],
+                "loaders": [],
+                "transformers": [],
+            },
         }
 
-        meltano_file = project_dir / "meltano.yml"
-        with meltano_file.open("w", encoding="utf-8") as f:
-            yaml.dump(meltano_config, f, default_flow_style=False)
+        meltano_yml = project_dir / "meltano.yml"
+        with meltano_yml.open("w") as f:
+            yaml.safe_dump(meltano_config, f, default_flow_style=False, indent=2)
 
-        # Create .gitignore
-        gitignore_content = """
-# Meltano
-.meltano/
-meltano.db
+        logger.success(f"Initialized Meltano project: {project_name}")
+        logger.info(f"Project directory: {project_dir}")
+        return 0
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-env/
-ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-        """.strip()
-
-        gitignore_file = project_dir / ".gitignore"
-        with gitignore_file.open("w", encoding="utf-8") as f:
-            f.write(gitignore_content)
-
-        # Create README
-        readme_content = f"""# {project_name}
-
-FLEXT Meltano ETL Project
-
-## Setup
-
-1. Install Meltano:
-   ```bash
-   pip install meltano
-   ```
-
-2. Initialize the project:
-   ```bash
-   cd {project_name}
-   meltano install
-   ```
-
-3. Add extractors and loaders:
-   ```bash
-   meltano add extractor tap-csv
-   meltano add loader target-postgres
-   ```
-
-4. Run ETL pipeline:
-   ```bash
-   meltano run tap-csv target-postgres
-   ```
-
-## Configuration
-
-- `meltano.yml`: Main configuration file
-- `.env`: Environment variables
-- `transform/`: dbt transformations
-
-## Commands
-
-- `meltano run <extractor> <loader>`: Run ETL pipeline
-- `meltano invoke <plugin> <command>`: Invoke plugin command
-- `meltano test <plugin>`: Test plugin configuration
-
-"""
-
-        readme_file = project_dir / "README.md"
-        with readme_file.open("w", encoding="utf-8") as f:
-            f.write(readme_content)
-
-    except (OSError, ValueError, yaml.YAMLError) as e:
+    except Exception as e:
         logger.error(f"Failed to initialize project: {e}")
         return 1
-    else:
-        return 0
 
 
-def list_plugins_command(_args: argparse.Namespace) -> int:
-    """List available Meltano plugins."""
+def run_command(args: argparse.Namespace) -> int:
+    """Run a Meltano command."""
     try:
-        plugins = {
-            "extractors": [
-                "tap-oracle-oic",
-                "tap-oracle-wms",
-                "tap-ldap",
-                "tap-csv",
-                "tap-postgres",
-                "tap-mysql",
-                "tap-sqlite",
-            ],
-            "loaders": [
-                "target-oracle-oic",
-                "target-oracle-wms",
-                "target-ldap",
-                "target-csv",
-                "target-postgres",
-                "target-mysql",
-                "target-sqlite",
-            ],
-            "transformers": ["dbt-ldap", "dbt-postgres", "dbt-oracle"],
-        }
+        # Build meltano command
+        cmd = ["meltano"]
 
-        for plugin_type, plugin_list in plugins.items():
-            logger.info(f"\n{plugin_type.capitalize()}:")
-            for plugin in plugin_list:
-                status = "✅ Available" if plugin.startswith(
-                    (
-                        "tap-oracle",
-                        "target-oracle",
-                        "tap-ldap",
-                        "target-ldap",
-                        "dbt-ldap",
-                    )
-                ) else "📦 Standard"
-                logger.info(f"  {plugin}: {status}")
+        if hasattr(args, "environment") and args.environment:
+            cmd.extend(["--environment", args.environment])
 
-    except (ImportError, AttributeError) as e:
-        logger.error(f"Failed to list plugins: {e}")
-        return 1
-    else:
-        return 0
+        cmd.extend(args.command)
 
+        logger.info(f"Running: {' '.join(cmd)}")
 
-def _validate_meltano_args(extractor: str, loader: str, environment: str | None = None) -> list[str]:
-    """Validate and sanitize Meltano command arguments.
-
-    Args:
-        extractor: The extractor (tap) name to validate
-        loader: The loader (target) name to validate
-        environment: Optional environment name to validate
-
-    Returns:
-        List of validated command arguments
-
-    Raises:
-        ValueError: If any argument contains invalid characters
-
-    """
-    # Validate plugin names - only allow alphanumeric, hyphens, underscores
-    import re
-    plugin_pattern = re.compile(r"^[a-zA-Z0-9_-]+$")
-
-    if not plugin_pattern.match(extractor):
-        msg = f"Invalid extractor name: {extractor}"
-        raise ValueError(msg)
-    if not plugin_pattern.match(loader):
-        msg = f"Invalid loader name: {loader}"
-        raise ValueError(msg)
-    if environment and not plugin_pattern.match(environment):
-        msg = f"Invalid environment name: {environment}"
-        raise ValueError(msg)
-
-    # Build command with validated arguments
-    cmd = ["meltano", "run", extractor, loader]
-    if environment:
-        cmd.extend(["--environment", environment])
-
-    return cmd
-
-
-def run_pipeline_command(args: argparse.Namespace) -> int:
-    """Run an ETL pipeline."""
-    try:
-        extractor = args.extractor
-        loader = args.loader
-        environment = args.environment
-
-        # Check if meltano.yml exists
-        if not Path("meltano.yml").exists():
-            logger.error("meltano.yml not found in current directory")
-            return 1
-
-        # Validate and build meltano command with security checks
-        try:
-            cmd = _validate_meltano_args(extractor, loader, environment)
-        except ValueError as e:
-            logger.error(f"Invalid command arguments: {e}")
-            return 1
-
-        # Log command being executed (for debugging)
-        logger.info(f"Executing command: {shlex.join(cmd)}")
-
+        # Execute command
         result = subprocess.run(
             cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=300  # 5 minute timeout
+            cwd=args.project_dir if hasattr(args, "project_dir") else None,
+            capture_output=False, check=False,
         )
-
-        if result.returncode == 0:
-            if result.stdout:
-                logger.info("Pipeline execution output:")
-                logger.info(result.stdout)
-        elif result.stderr:
-            logger.error("Pipeline execution failed:")
-            logger.error(result.stderr)
 
         return result.returncode
 
-    except FileNotFoundError as e:
-        logger.error(f"Meltano not found: {e}")
-        return 1
-    except subprocess.TimeoutExpired:
-        logger.error("Pipeline execution timed out")
-        return 1
-    except (subprocess.SubprocessError, OSError) as e:
-        logger.error(f"Failed to run pipeline: {e}")
+    except Exception as e:
+        logger.error(f"Failed to run command: {e}")
         return 1
 
 
-def validate_command(args: argparse.Namespace) -> int:
-    """Validate Meltano configuration."""
+def install_command(args: argparse.Namespace) -> int:
+    """Install a Meltano plugin."""
     try:
-        errors = 0
+        cmd = ["meltano", "add", args.plugin_type, args.plugin_name]
 
-        # Check if meltano.yml exists
-        meltano_file = Path("meltano.yml")
-        if not meltano_file.exists():
-            errors += 1
+        if hasattr(args, "variant") and args.variant:
+            cmd.extend(["--variant", args.variant])
+
+        logger.info(f"Installing {args.plugin_type}: {args.plugin_name}")
+
+        result = subprocess.run(
+            cmd,
+            cwd=args.project_dir if hasattr(args, "project_dir") else None, check=False,
+        )
+
+        if result.returncode == 0:
+            logger.success(f"Installed {args.plugin_name}")
         else:
-            # Try to parse meltano.yml
-            try:
-                with meltano_file.open(encoding="utf-8") as f:
-                    config = yaml.safe_load(f)
+            logger.error(f"Failed to install {args.plugin_name}")
 
-                # Check required fields
-                required_fields = ["version", "project_id"]
-                for field in required_fields:
-                    if field not in config:
-                        logger.error(f"Missing required field in meltano.yml: {field}")
-                        errors += 1
+        return result.returncode
 
-            except yaml.YAMLError:
-                errors += 1
-
-        # Check meltano installation
-        try:
-            result = subprocess.run(
-                ["meltano", "--version"],
-                capture_output=True,
-                text=True,
-                check=False,
-                timeout=30  # 30 second timeout
-            )
-            if result.returncode == 0:
-                version = result.stdout.strip()
-                logger.info(f"Meltano version: {version}")
-            else:
-                logger.error("Meltano version check failed")
-                errors += 1
-        except FileNotFoundError:
-            logger.error("Meltano executable not found")
-            errors += 1
-        except subprocess.TimeoutExpired:
-            logger.error("Meltano version check timed out")
-            errors += 1
-
-        if errors == 0:
-            return 0
-        return 1
-
-    except (OSError, yaml.YAMLError) as e:
-        logger.error(f"Validation failed: {e}")
+    except Exception as e:
+        logger.error(f"Failed to install plugin: {e}")
         return 1
 
 
-def main() -> int:
-    """Main CLI entry point."""
+def create_parser() -> argparse.ArgumentParser:
+    """Create the argument parser."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Meltano - ETL Integration CLI",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  flext-meltano info                           # Show Meltano information
-  flext-meltano init my-project                # Initialize new project
-  flext-meltano list-plugins                   # List available plugins
-  flext-meltano run tap-csv target-postgres    # Run ETL pipeline
-  flext-meltano validate                       # Validate configuration
-        """,
+        prog="flext-meltano",
+        description="FLEXT Meltano CLI - Enterprise ETL/ELT Pipeline Engine",
+    )
+
+    parser.add_argument(
+        "--project-dir",
+        type=Path,
+        help="Meltano project directory",
+    )
+
+    parser.add_argument(
+        "--environment", "-e",
+        help="Meltano environment",
+    )
+
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Verbose output",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Info command
-    info_parser = subparsers.add_parser("info", help="Show Meltano information")
+    info_parser = subparsers.add_parser("info", help="Show FLEXT Meltano information")
     info_parser.set_defaults(func=info_command)
 
     # Init command
     init_parser = subparsers.add_parser("init", help="Initialize new Meltano project")
     init_parser.add_argument("name", help="Project name")
-    init_parser.add_argument(
-        "--directory", help="Project directory (default: project name)"
-    )
+    init_parser.add_argument("--directory", help="Project directory")
     init_parser.set_defaults(func=init_command)
 
-    # List plugins command
-    list_plugins_parser = subparsers.add_parser(
-        "list-plugins", help="List available plugins"
-    )
-    list_plugins_parser.set_defaults(func=list_plugins_command)
+    # Run command
+    run_parser = subparsers.add_parser("run", help="Run Meltano command")
+    run_parser.add_argument("command", nargs="+", help="Meltano command to run")
+    run_parser.set_defaults(func=run_command)
 
-    # Run pipeline command
-    run_parser = subparsers.add_parser("run", help="Run ETL pipeline")
-    run_parser.add_argument("extractor", help="Extractor (tap) to use")
-    run_parser.add_argument("loader", help="Loader (target) to use")
-    run_parser.add_argument("--environment", "-e", help="Environment to use")
-    run_parser.set_defaults(func=run_pipeline_command)
+    # Install command
+    install_parser = subparsers.add_parser("install", help="Install plugin")
+    install_parser.add_argument("plugin_type", choices=["extractor", "loader", "transformer"])
+    install_parser.add_argument("plugin_name", help="Plugin name")
+    install_parser.add_argument("--variant", help="Plugin variant")
+    install_parser.set_defaults(func=install_command)
 
-    # Validate command
-    validate_parser = subparsers.add_parser("validate", help="Validate configuration")
-    validate_parser.set_defaults(func=validate_command)
+    return parser
 
-    # Parse arguments
+
+def main() -> int:
+    """Main CLI entry point."""
+    parser = create_parser()
     args = parser.parse_args()
+
+    # Set up logging
+    if args.verbose:
+        logger.add(sys.stderr, level="DEBUG")
+    else:
+        logger.add(sys.stderr, level="INFO")
 
     # Execute command
     if hasattr(args, "func"):
-        result = args.func(args)
-        return int(result) if result is not None else 0
+        return args.func(args)
     parser.print_help()
     return 1
 
