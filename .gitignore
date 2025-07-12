@@ -232,3 +232,99 @@ Thumbs.db
 runtime/
 cache/
 .cache/
+
+# Ruff
+.ruff_cache/
+
+# Editor directories
+.cursor/
+.claude/
+
+# Meltano specific
+.meltano/
+meltano.db
+meltano_catalog.json
+.meltano.yml.lock
+
+# Singer/ETL specific
+tap-config.json
+target-config.json
+properties.json
+.singer/
+
+# Data files
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.json.gz
+*.jsonl
+raw_data/
+processed_data/
+staging/
+temp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*~
+.dev_deps_backup_*
+
+# Migration and report files
+CONFIG_MIGRATION*.md
+FLEXT_*_MIGRATION*.md
+*_REPORT*.md
+DEVELOPMENT*.md
+DUPLICATION*.md
+
+# Validation and fix scripts
+fix_*.py
+*_fix.py
+*_validation.*
+validate_*.*
+
+# Test directories (keep test code, ignore test output)
+test_output/
+test_results/
+*/test_project/
+*/test_*/
+config_test/
+pipeline_test/
+test-go-project/
+test-warnings/
+test_csv_pipeline/
+test_doc_example/
+test_docs_validation/
+my-go-project/
+my_first_pipeline/
+
+# Archive directories
+.archive/
+archive/
+backups/
+
+# Security
+security_validation.py
+.secrets/
+*.pem
+*.key
+*.crt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Reports directory
+reports/
+
+# Requirements files (use pyproject.toml instead)
+requirements.txt
+requirements-dev.txt
+requirements-test.txt
