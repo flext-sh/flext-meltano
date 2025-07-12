@@ -93,6 +93,33 @@ select = [
 ]
 ignore = [
     "E501",    # line too long (handled by formatter)
+    # Import and module organization
+    "PLC0415", # import-outside-top-level - Meltano requires dynamic imports
+    "E402",    # module-import-not-at-top-of-file - CLI imports after config
+    # Method arguments - Meltano API compatibility
+    "ARG002",  # unused-method-argument - Required for Meltano plugin interface
+    "PLR0913", # too-many-arguments - Meltano commands need many options
+    # Boolean arguments - CLI design pattern
+    "FBT003",  # boolean-positional-value-in-call - CLI flags are boolean
+    # Documentation - focus on implementation first
+    "D107",    # undocumented-public-init - Most __init__ are simple
+    "D103",    # undocumented-public-function - Some are self-explanatory
+    "D401",    # non-imperative-mood - Natural language preferred
+    # Error handling - Meltano compatibility
+    "BLE001",  # blind-except - Meltano plugins can raise any exception
+    "B904",    # raise-without-from-inside-except - Legacy compatibility
+    "TRY300",  # try-consider-else - Existing patterns work well
+    # Logging - structured logging with context
+    "G004",    # logging-f-string - f-strings more readable than %
+    # Type annotations - gradual typing
+    "ANN202",  # missing-return-type-private-function - Private functions evolving
+    "ANN401",  # any-type - Meltano returns Any in many cases
+    # Time handling - Meltano uses naive datetime
+    "DTZ005",  # call-datetime-now-without-tzinfo - Meltano compatibility
+    # Private access - plugin introspection
+    "SLF001",  # private-member-access - Needed for Meltano internals
+    # Security - controlled environment
+    "S603",    # subprocess-without-shell-equals-true - Meltano subprocess control
 ]
 
 [tool.ruff.lint.per-file-ignores]
