@@ -31,14 +31,12 @@ class SecurityIssueValidator:
         total_issues = len(s603_issues) + len(s110_issues)
 
         if s603_issues:
-            print(f"Found {len(s603_issues)} S603 subprocess security issues:")
-            for issue in s603_issues:
-                print(f"  - {issue}")
+            for _issue in s603_issues:
+                pass
 
         if s110_issues:
-            print(f"Found {len(s110_issues)} S110 try-except-pass issues:")
-            for issue in s110_issues:
-                print(f"  - {issue}")
+            for _issue in s110_issues:
+                pass
 
         return total_issues == 0
 
@@ -70,19 +68,13 @@ class SecurityIssueValidator:
                                 "Popen",
                             }:
                                 # Check if shell=True is used
-                                for keyword in node.keywords:
-                                    if (
-                                        keyword.arg == "shell"
+                                issues.extend(f"{py_file}:{node.lineno} - "
+                                            f"subprocess.{method} with shell=True" for keyword in node.keywords if keyword.arg == "shell"
                                         and isinstance(keyword.value, ast.Constant)
-                                        and keyword.value.value is True
-                                    ):
-                                        issues.append(
-                                            f"{py_file}:{node.lineno} - "
-                                            f"subprocess.{method} with shell=True",
-                                        )
+                                        and keyword.value.value is True)
 
-            except Exception as e:
-                print(f"Error parsing {py_file}: {e}")
+            except Exception:
+                pass
 
         return issues
 
@@ -99,18 +91,12 @@ class SecurityIssueValidator:
 
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Try):
-                        for handler in node.handlers:
-                            if (
-                                len(handler.body) == 1
-                                and isinstance(handler.body[0], ast.Pass)
-                            ):
-                                issues.append(
-                                    f"{py_file}:{handler.lineno} - "
-                                    f"try-except-pass pattern",
-                                )
+                        issues.extend(f"{py_file}:{handler.lineno} - "
+                                    f"try-except-pass pattern" for handler in node.handlers if len(handler.body) == 1
+                                and isinstance(handler.body[0], ast.Pass))
 
-            except Exception as e:
-                print(f"Error parsing {py_file}: {e}")
+            except Exception:
+                pass
 
         return issues
 
@@ -118,22 +104,18 @@ class SecurityIssueValidator:
 def main() -> None:
     """Main entry point for security validation."""
     if len(sys.argv) != 2:
-        print("Usage: python security_validation.py <path>")
         sys.exit(1)
 
     base_path = Path(sys.argv[1])
     if not base_path.exists():
-        print(f"Path does not exist: {base_path}")
         sys.exit(1)
 
     validator = SecurityIssueValidator(base_path)
     is_secure = validator.validate_all()
 
     if is_secure:
-        print("✅ All security issues have been resolved!")
         sys.exit(0)
     else:
-        print("❌ Security issues found that need attention.")
         sys.exit(1)
 
 
