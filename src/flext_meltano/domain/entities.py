@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 from typing import Any
-from uuid import UUID
 
 from flext_core.domain.pydantic_base import DomainEntity
 from flext_core.domain.pydantic_base import DomainEvent
@@ -18,6 +18,9 @@ from flext_core.domain.pydantic_base import Field
 
 # Import enum types from flext-core - NO duplication
 from flext_core.domain.types import Status as PipelineStatus
+
+if TYPE_CHECKING:
+    from uuid import UUID
 
 
 class JobType(StrEnum):
@@ -191,7 +194,9 @@ class MeltanoJob(DomainEntity):
         self.status = PipelineStatus.PROCESSING
         self.started_at = datetime.now()
 
-    def complete_execution(self, exit_code: int, stdout: str | None = None, stderr: str | None = None) -> None:
+    def complete_execution(
+        self, exit_code: int, stdout: str | None = None, stderr: str | None = None,
+    ) -> None:
         """Complete Meltano job execution with results.
 
         Args:
@@ -352,7 +357,7 @@ class PluginInstalledEvent(DomainEvent):
     project_id: UUID
     plugin_id: UUID
     plugin_name: str
-    plugin_type: PluginType
+    plugin_type: MeltanoPluginType
 
 
 class JobStartedEvent(DomainEvent):

@@ -6,7 +6,6 @@ Provides a simple interface for setting up the FLEXT Meltano system.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core.config import get_container
 from flext_core.domain.result import ServiceResult
@@ -35,13 +34,15 @@ def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool
         # Register settings with container
         container.register(MeltanoSettings, settings)
 
-        return ServiceResult.ok(True)
+        return ServiceResult.ok(data=True)
 
-    except Exception as e:
+    except (ValueError, TypeError, RuntimeError, OSError) as e:
         return ServiceResult.fail(f"Failed to setup meltano: {e}")
 
 
-def create_development_meltano_config(**overrides: Any) -> MeltanoSettings:
+def create_development_meltano_config(
+    **overrides: str | int | bool | dict[str, object],
+) -> MeltanoSettings:
     """Create development-friendly Meltano configuration.
 
     Args:
@@ -83,6 +84,6 @@ def get_meltano_settings() -> MeltanoSettings:
     try:
         container = get_container()
         return container.resolve(MeltanoSettings)
-    except Exception as e:
+    except (ValueError, TypeError, RuntimeError, OSError) as e:
         msg = f"Meltano settings not configured. Call setup_meltano() first: {e}"
         raise RuntimeError(msg) from e

@@ -7,6 +7,7 @@ enabling enterprise-grade state persistence, backup, and recovery capabilities.
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import UTC
 from datetime import datetime
 from enum import Enum
@@ -15,13 +16,12 @@ from typing import Any
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.state_service import StateService
-from meltano.core.state_store import MeltanoState
 from structlog import get_logger
 
 if TYPE_CHECKING:
     from meltano.core.project import Project
 
-    from flext_core.events.event_bus import EventBusProtocol
+    from flext_meltano.event_bus_protocol import EventBusProtocol
 
 logger = get_logger(__name__)
 
@@ -38,6 +38,7 @@ class FlextMeltanoStateManager:
     """Enterprise Meltano state manager with advanced features."""
 
     def __init__(self, event_bus: EventBusProtocol) -> None:
+        """Initialize FLEXT Meltano State Manager."""
         self.event_bus = event_bus
         self.logger = logger.bind(component="flext_meltano_state_manager")
         self._lock = asyncio.Lock()
@@ -48,7 +49,7 @@ class FlextMeltanoStateManager:
         self,
         project: Project,
         job_id: str,
-        cache_policy: CachePolicy = CachePolicy.USE_CACHE,
+        _cache_policy: CachePolicy = CachePolicy.USE_CACHE,
     ) -> dict[str, Any] | None:
         """Get state for a specific job."""
         try:
@@ -58,14 +59,14 @@ class FlextMeltanoStateManager:
             if state:
                 return {
                     "job_id": job_id,
-                    "state_data": state.json(),
+                    "state_data": state if isinstance(state, dict) else str(state),
                     "retrieved_at": datetime.now(UTC).isoformat(),
                 }
             return None
 
         except Exception as e:
             self.logger.exception("Failed to get state", job_id=job_id, error=str(e))
-            return None
+            raise
 
     async def set_state(
         self,
@@ -77,8 +78,13 @@ class FlextMeltanoStateManager:
         try:
             async with self._lock:
                 state_service = StateService(project)
-                state = MeltanoState(state_data)
-                state_service.set_state(job_id, state)
+                # Convert state_data to appropriate format for Meltano
+                state_json = (
+                    json.dumps(state_data)
+                    if isinstance(state_data, dict)
+                    else str(state_data)
+                )
+                state_service.set_state(job_id, state_json)
 
                 self.logger.info(
                     "State updated successfully",
@@ -89,7 +95,7 @@ class FlextMeltanoStateManager:
 
         except Exception as e:
             self.logger.exception("Failed to set state", job_id=job_id, error=str(e))
-            return False
+            raise
 
     async def clear_state(self, project: Project, job_id: str) -> bool:
         """Clear state for a specific job."""

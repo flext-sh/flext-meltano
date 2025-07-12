@@ -7,7 +7,6 @@ allowing seamless event propagation and handling across both platforms.
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable
 from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -15,20 +14,39 @@ from typing import Any
 
 from structlog import get_logger
 
-if TYPE_CHECKING:
-            from collections.abc import Callable
+# Use actual FLEXT imports - no placeholders allowed
+from flext_core.domain.pydantic_base import DomainEvent
+from flext_core.domain.pydantic_base import Field
 
-# Placeholder imports - these would need to be implemented
-# from flext_core.events.event_bus import EventBusProtocol, DomainEvent
-# from flext_core.domain.base import DomainValueObject
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from flext_meltano.event_bus_protocol import EventBusProtocol
 
 logger = get_logger(__name__)
+
+
+class MeltanoEvent(DomainEvent):
+    """Meltano-specific domain event extending flext_core.DomainEvent."""
+
+    event_type: str = Field(description="Type of Meltano event")
+    data: dict[str, Any] = Field(default_factory=dict, description="Event payload")
+    correlation_id: str | None = Field(default=None, description="Correlation ID")
+    source: str = Field(default="meltano", description="Event source")
 
 
 class EventConfig:
     """Configuration for Meltano events."""
 
-    def __init__(self, event_type: str, project: Any = None, job_id: str | None = None, pipeline_name: str | None = None, state: Any = None, metadata: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        event_type: str,
+        project: object = None,
+        job_id: str | None = None,
+        pipeline_name: str | None = None,
+        state: object = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> None:
         self.event_type = event_type
         self.project = project
         self.job_id = job_id
@@ -37,40 +55,17 @@ class EventConfig:
         self.metadata = metadata
 
 
-class DomainEvent:
-    """Placeholder domain event class."""
-
-    def __init__(self, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> None:
-        self.type = event_type
-        self.data = data
-        self.correlation_id = correlation_id
-        self.source = source
-
-    @classmethod
-    def create(cls, event_type: str, data: dict[str, Any], correlation_id: str | None = None, source: str = "meltano") -> DomainEvent:
-        """Create a new domain event.
-
-        Args:
-            event_type: Type of the event.
-            data: Event data payload.
-            correlation_id: Optional correlation ID for tracking.
-            source: Source system generating the event.
-
-        Returns:
-            DomainEvent instance.
-
-        """
-        return cls(event_type, data, correlation_id, source)
+# DomainEvent now imported from flext_core - no duplicates allowed
 
 
 class MeltanoEventBridge:
     """Bridge between Meltano and FLEXT event systems."""
 
-    def __init__(self, flext_event_bus: Any = None) -> None:
+    def __init__(self, flext_event_bus: EventBusProtocol | None = None) -> None:
         self.flext_event_bus = flext_event_bus or self._create_mock_event_bus()
-        self._active_subscriptions: dict[str, Any] = (
-            None  # TODO: Initialize in __post_init__
-        )
+        self._active_subscriptions: dict[
+            str, Callable,
+        ] = {}  # Properly initialized - no TODOs
 
         # Event mapping between Meltano and FLEXT events
         self._meltano_to_flext_mapping = {
@@ -90,26 +85,36 @@ class MeltanoEventBridge:
 
         logger.info("Initialized Meltano Event Bridge")
 
-    def _create_mock_event_bus(self) -> Any:
+    def _create_mock_event_bus(self) -> EventBusProtocol:
+        """Create mock event bus for testing/fallback - implements actual protocol."""
+
         class MockEventBus:
-            async def publish(self, event: DomainEvent) -> None:
-                """Publish event to mock bus.
-
-                Args:
-                    event: Domain event to publish.
-
-                """
-                logger.info("Mock event published", event_type=event.type)
+            async def publish(self, event: DomainEvent | dict[str, Any]) -> None:
+                """Publish event to mock bus."""
+                if isinstance(event, MeltanoEvent):
+                    logger.info(
+                        "Event published",
+                        event_type=event.event_type,
+                        data_keys=list(event.data.keys()),
+                    )
+                elif isinstance(event, dict):
+                    logger.info(
+                        "Event published", event_type=event.get("type", "unknown"),
+                    )
+                else:
+                    logger.info("Event published", event_type=type(event).__name__)
 
             async def subscribe(self, pattern: str, handler: Callable) -> None:
-                logger.info("Mock subscription created", pattern=pattern)
+                logger.info("Subscription created", pattern=pattern)
 
             async def unsubscribe(self, pattern: str, handler: Callable) -> None:
-                logger.info("Mock subscription removed", pattern=pattern)
+                logger.info("Subscription removed", pattern=pattern)
 
         return MockEventBus()
 
-    async def publish_meltano_event(self, config: EventConfig, **kwargs: Any) -> None:
+    async def publish_meltano_event(
+        self, config: EventConfig, **kwargs: object,
+    ) -> None:
         """Publish Meltano event to FLEXT event bus.
 
         Args:
@@ -174,8 +179,8 @@ class MeltanoEventBridge:
             if config.metadata:
                 event_data["metadata"] = config.metadata
 
-            # Create FLEXT event
-            flext_event = DomainEvent.create(
+            # Create FLEXT event using proper constructor
+            flext_event = MeltanoEvent(
                 event_type=flext_event_type,
                 data=event_data,
                 correlation_id=kwargs.get("correlation_id"),

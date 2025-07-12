@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
-from flext_core.domain.types import ServiceResult
+from flext_core import ServiceResult
 
 
 class MeltanoPipelineExecutor:
@@ -49,13 +49,15 @@ class MeltanoPipelineExecutor:
 
             self._active_executions[execution_id] = execution_info
 
-            return ServiceResult.ok({
-                "execution_id": execution_id,
-                "status": "started",
-                "message": "Pipeline execution started successfully",
-            })
+            return ServiceResult.ok(
+                {
+                    "execution_id": execution_id,
+                    "status": "started",
+                    "message": "Pipeline execution started successfully",
+                },
+            )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to execute pipeline: {e}")
 
     async def get_execution_status(
@@ -68,14 +70,16 @@ class MeltanoPipelineExecutor:
                 return ServiceResult.fail("Execution not found")
 
             execution_info = self._active_executions[execution_id]
-            return ServiceResult.ok({
-                "execution_id": execution_id,
-                "status": execution_info["status"],
-                "started_at": execution_info["started_at"].isoformat(),
-                "pipeline_id": execution_info["pipeline_id"],
-            })
+            return ServiceResult.ok(
+                {
+                    "execution_id": execution_id,
+                    "status": execution_info["status"],
+                    "started_at": execution_info["started_at"].isoformat(),
+                    "pipeline_id": execution_info["pipeline_id"],
+                },
+            )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get execution status: {e}")
 
     async def cancel_execution(
@@ -90,12 +94,14 @@ class MeltanoPipelineExecutor:
             # Update status to cancelled
             self._active_executions[execution_id]["status"] = "cancelled"
 
-            return ServiceResult.ok({
-                "execution_id": execution_id,
-                "message": "Pipeline execution cancelled successfully",
-            })
+            return ServiceResult.ok(
+                {
+                    "execution_id": execution_id,
+                    "message": "Pipeline execution cancelled successfully",
+                },
+            )
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to cancel execution: {e}")
 
     async def list_executions(
@@ -112,15 +118,17 @@ class MeltanoPipelineExecutor:
                 if user_id and exec_info["user_id"] != user_id:
                     continue
 
-                executions.append({
-                    "execution_id": exec_id,
-                    "pipeline_id": exec_info["pipeline_id"],
-                    "status": exec_info["status"],
-                    "started_at": exec_info["started_at"].isoformat(),
-                    "user_id": exec_info["user_id"],
-                })
+                executions.append(
+                    {
+                        "execution_id": exec_id,
+                        "pipeline_id": exec_info["pipeline_id"],
+                        "status": exec_info["status"],
+                        "started_at": exec_info["started_at"].isoformat(),
+                        "user_id": exec_info["user_id"],
+                    },
+                )
 
             return ServiceResult.ok(executions)
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list executions: {e}")

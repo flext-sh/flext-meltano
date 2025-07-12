@@ -2,52 +2,6 @@
 requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
 
-[project]
-name = "flext-meltano"
-version = "0.7.0"
-description = "FLEXT Meltano - Enterprise Data Integration Platform"
-authors = [{ name = "FLEXT Team", email = "team@flext.sh" }]
-maintainers = [{ name = "FLEXT Team", email = "team@flext.sh" }]
-license = { text = "MIT" }
-readme = "README.md"
-requires-python = ">=3.13,<3.14"
-dependencies = [
-    # Meltano specific dependencies
-    "meltano>=3.5.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.13.0",
-    "psycopg2-binary>=2.9.0",
-    # Note: Core workspace dependencies (pydantic, structlog, etc.) are inherited
-]
-keywords = [
-    "flext",
-    "meltano",
-    "data-integration",
-    "etl",
-    "singer",
-    "sqlalchemy",
-]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3 :: Only",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Database",
-    "Topic :: Scientific/Engineering :: Information Analysis",
-    "Typing :: Typed",
-]
-
-[project.urls]
-Homepage = "https://github.com/flext-sh/flext"
-Repository = "https://github.com/flext-sh/flext"
-Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
-
-[project.scripts]
-flext-meltano = "flext_meltano.cli:main"
-
 [tool.poetry]
 name = "flext-meltano"
 version = "0.7.0"
@@ -96,7 +50,7 @@ mkdocs-material = ">=9.5.0"
 mkdocs-mermaid2-plugin = ">=1.1.0"
 
 [tool.poetry.scripts]
-flext-meltano = "flext_meltano.cli:main"
+flext-meltano = "flext_meltano.cli:cli"
 
 # Project-specific tool configurations
 [tool.pytest.ini_options]
@@ -119,6 +73,7 @@ markers = [
     "integration: Integration tests",
     "slow: Slow tests",
     "smoke: Smoke tests",
+    "performance: Performance tests",
     "meltano: marks tests as Meltano tests",
     "extract: marks tests as extraction tests",
     "load: marks tests as loading tests",

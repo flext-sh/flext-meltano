@@ -151,7 +151,7 @@ def pipeline_step(
         func._dependencies = dependencies or []
 
         @wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+        async def wrapper(*args: object, **kwargs: object) -> Any:
             # Execute through reflection step
             context = {**kwargs}
             if args:
@@ -236,7 +236,7 @@ class ReflectionOrchestrator(BaseModel):
                 "error": None,
             }
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return {
                 "pipeline": pipeline,
                 "execution": execution,
@@ -286,13 +286,17 @@ async def extract_data(source: str, config: dict[str, Any]) -> dict[str, Any]:
 
 
 @pipeline_step(StepType.TRANSFORM, name="simple-transform")
-async def transform_data(data: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+async def transform_data(
+    data: dict[str, Any], config: dict[str, Any],
+) -> dict[str, Any]:
     """Simple data transformation step."""
     return {"transformed": True, "original": data}
 
 
 @pipeline_step(StepType.LOAD, name="simple-load")
-async def load_data(data: dict[str, Any], target: str, config: dict[str, Any]) -> dict[str, Any]:
+async def load_data(
+    data: dict[str, Any], target: str, config: dict[str, Any],
+) -> dict[str, Any]:
     """Simple data loading step."""
     return {"target": target, "loaded": True, "data": data}
 

@@ -1,309 +1,212 @@
-# FLX Meltano - Enterprise Meltano Integration
+# FLEXT-Meltano
 
-> **Regras do Projeto**: Consulte `../../.github/instructions/regras.instructions.md` para padrões obrigatórios
->
-> **Padrão de documentação**: Veja [../../docs/HOW_TO_DOCUMENT.md](../../docs/HOW_TO_DOCUMENT.md)
+Meltano integration for the FLEXT platform providing project management, pipeline orchestration, and Go-Python bridge functionality.
 
-## 🧭 Navegação
-
-**🏠 Root**: [Documentação Principal](../../docs/index.md) → **📄 Projeto**: flext-meltano
+**Part of the FLEXT Ecosystem**: This module integrates with the FLEXT platform, using flext-core for foundation patterns and flext-observability for monitoring.
 
 ## Overview
 
-FLX Meltano provides enterprise-grade integration with the Meltano data platform, enabling
-advanced orchestration, state management, and Singer protocol support. This module is
-extracted from the fully functional implementation with 0 NotImplementedError.
+FLEXT-Meltano is a modern wrapper around Meltano that integrates with the FLEXT ecosystem. It provides:
 
-## Real Implementation Status
+- **Project Management**: Create, configure and manage Meltano projects
+- **Pipeline Orchestration**: Execute and monitor data pipelines  
+- **Go Integration**: HTTP API bridge for Go applications
+- **FLEXT Integration**: Uses FLEXT patterns (ServiceResult, domain events, etc.)
 
-| Component                            | Size         | Status      | Details                     |
-| ------------------------------------ | ------------ | ----------- | --------------------------- |
-| **project_manager.py**               | 35,756 bytes | ✅ Complete | Full project lifecycle      |
-| **extensions.py**                    | 34,128 bytes | ✅ Complete | 4 enterprise extensions     |
-| **unified_anti_corruption_layer.py** | 31,486 bytes | ✅ Complete | Clean architecture boundary |
-| **execution_engine.py**              | 27,672 bytes | ✅ Complete | Async execution engine      |
-| **state_manager.py**                 | 26,740 bytes | ✅ Complete | Enterprise state management |
-| **job_manager.py**                   | 23,797 bytes | ✅ Complete | Job tracking & cleanup      |
-| **orchestrator.py**                  | 23,772 bytes | ✅ Complete | Pipeline orchestration      |
-| **event_bridge.py**                  | 15,497 bytes | ✅ Complete | Event translation           |
+## Status
 
-**Total**: 241,572 bytes of production code with 0 NotImplementedError
-
-## Features
-
-### Core Meltano Integration
-
-- **Project Management**: Create, load, validate Meltano projects
-- **Singer Protocol**: Full tap/target orchestration
-- **State Management**: Enterprise backup/restore with versioning
-- **Job Orchestration**: Async job execution with monitoring
-- **Event Translation**: Bidirectional FLX ↔ Meltano events
-
-### Go Integration (NEW)
-
-- **MeltanoBridge**: Go-Python bridge for Meltano operations
-- **GoPy Bindings**: Type-safe Go bindings using gopy
-- **Zero Subprocess**: Direct integration with FLEXT architecture
-- **Enterprise Ready**: Production-grade Go-Meltano integration
-
-### Enterprise Extensions
-
-1. **Oracle OIC Extension**: Oracle Integration Cloud connectivity
-2. **LDAP Extension**: Enterprise directory integration
-3. **Monitoring Extension**: OpenTelemetry and Prometheus
-4. **Orchestration Extension**: Advanced pipeline control
-
-### Production Features
-
-- **Anti-Corruption Layer**: Clean architecture boundary
-- **Async Everything**: Full async/await implementation
-- **Resource Management**: CPU/memory limits and monitoring
-- **Caching**: Multi-level caching for performance
-- **Error Handling**: ServiceResult pattern throughout
-- **Health Checks**: Component and system health monitoring
+| Component | Status | Notes |
+|-----------|--------|--------|
+| **Core APIs** | ✅ Working | Project creation, plugin management |
+| **Go Bridge** | ✅ Working | HTTP API approach using JSON responses |
+| **Pipeline Execution** | ✅ Working | Basic tap-target pipelines via Meltano CLI |
+| **FLEXT Integration** | ✅ Working | ServiceResult patterns, observability |
 
 ## Quick Start
 
-### Python Integration
+### Installation
+
+**Installation**:
 
 ```bash
-# Install dependencies
-poetry install
+# Install in development mode
+cd flext-meltano
+pip install -e .
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your settings
+# Install Meltano CLI
+pip install meltano
 
-# Initialize Meltano project
-flx-meltano init my-project
+# Verify installation
+python -c "
+from flext_meltano import MeltanoBridge
+bridge = MeltanoBridge('.')
+print('✅ Available:', bridge.is_available())
+"
+```
 
-# Run a pipeline
-flx-meltano run tap-postgres target-snowflake
+### Basic Usage
 
-# Check status
-flx-meltano status
+```python
+import asyncio
+from flext_meltano import MeltanoBridge
+
+async def basic_pipeline():
+    bridge = MeltanoBridge('.')
+    
+    # Create project
+    await bridge.init_project('my_project', '.')
+    
+    # Add plugins
+    await bridge.add_plugin('my_project', 'extractor', 'tap-csv')
+    await bridge.add_plugin('my_project', 'loader', 'target-csv')
+    
+    # Run pipeline
+    result = await bridge.run_pipeline('my_project', 'tap-csv', 'target-csv')
+    print(result)
+
+asyncio.run(basic_pipeline())
 ```
 
 ### Go Integration
 
+The Go integration uses HTTP API communication:
+
 ```python
-# Generate Go bindings
-from flext_meltano.integrations import GopyIntegration
-integration = GopyIntegration()
-await integration.generate_go_bindings()
+from flext_meltano.integrations import GoIntegration
+
+integration = GoIntegration()
+components = integration.generate_http_api_components()
+# Generates: FastAPI server, Go HTTP client, documentation
 ```
-
-```go
-// Use in Go application
-package main
-
-import "github.com/your-org/flext-meltano-gopy"
-
-func main() {
-    // Initialize project
-    result := meltano.InitProjectSync("my-project", "./projects")
-    
-    // Run pipeline
-    pipeline := meltano.RunPipelineSync("my-project", "tap-csv", "target-jsonl", "")
-}
-```
-
-For complete Go integration guide, see [GO_INTEGRATION_GUIDE.md](./GO_INTEGRATION_GUIDE.md)
 
 ## Architecture
 
-```ascii
-flx_meltano/
-├── core/
-│   ├── project_manager.py      # Project lifecycle management
-│   ├── execution_engine.py     # Async subprocess execution
-│   ├── orchestrator.py         # Pipeline orchestration
-│   └── state_manager.py        # State persistence
-├── integration/
-│   ├── event_bridge.py         # Event translation layer
-│   ├── anti_corruption_layer.py # Clean boundaries
-│   └── unified_anti_corruption_layer.py # Unified interface
-├── integrations/               # NEW: Go-Python Integration
-│   ├── bridge.py              # Go-Python bridge for Meltano
-│   └── gopy_integration.py    # GoPy bindings generation
-├── extensions/
-│   ├── oracle_oic.py          # Oracle Integration Cloud
-│   ├── ldap.py                # LDAP directory services
-│   ├── monitoring.py          # Observability extension
-│   └── orchestration.py       # Advanced orchestration
-└── models/
-    ├── project.py             # Project models
-    ├── job.py                 # Job tracking models
-    └── state.py               # State management models
+```
+flext_meltano/
+├── integrations/
+│   ├── bridge.py              # Main Go-Python bridge
+│   └── gopy_integration.py    # HTTP API generation
+├── project_manager.py         # Meltano project operations
+├── orchestrator.py           # Pipeline orchestration  
+├── models.py                 # Data models
+├── event_bridge.py           # Event handling
+└── unified_anti_corruption_layer.py  # Clean boundaries
 ```
 
-## Enterprise Features
+**Key Components**:
 
-### State Management
-
-```python
-# Enterprise backup/restore with versioning
-state_manager = StateManager()
-
-# Create backup
-backup = await state_manager.create_backup(
-    "production",
-    include_secrets=False,
-    compress=True
-)
-
-# Restore from backup
-await state_manager.restore_backup(
-    backup_id,
-    target_env="staging",
-    validate=True
-)
-```
-
-### Job Orchestration
-
-```python
-# Advanced job control
-job_manager = JobManager()
-
-# Execute with resource limits
-job = await job_manager.execute_job(
-    "tap-postgres target-snowflake",
-    cpu_limit="2.0",
-    memory_limit="4Gi",
-    timeout_seconds=3600
-)
-
-# Monitor execution
-async for event in job_manager.stream_events(job.id):
-    print(f"{event.level}: {event.message}")
-```
-
-### Extensions System
-
-```python
-# Load enterprise extensions
-extension_manager = ExtensionManager()
-
-# Oracle OIC extension
-oic_ext = extension_manager.get_extension("oracle-oic")
-await oic_ext.configure({
-    "endpoint": "https://oic.example.com",
-    "credentials": "vault://oracle/oic"
-})
-
-# Use in pipeline
-await orchestrator.run_pipeline(
-    "oracle-to-warehouse",
-    extensions=["oracle-oic", "monitoring"]
-)
-```
+- **MeltanoBridge**: Main API for external integration
+- **MeltanoProjectManager**: Project lifecycle management
+- **FlextMeltanoOrchestrator**: Pipeline execution and monitoring
+- **UnifiedMeltanoAntiCorruptionLayer**: Clean architecture boundary
 
 ## Configuration
 
-```python
-# Required environment variables
-MELTANO_PROJECT_ROOT=/path/to/projects
-MELTANO_ENVIRONMENT=production
-MELTANO_STATE_BACKEND=postgresql://user:pass@localhost/meltano_state
+**Environment Configuration**:
 
-# Performance
-MELTANO_MAX_WORKERS=4
-MELTANO_MEMORY_LIMIT=8Gi
-MELTANO_JOB_TIMEOUT=7200
+```bash
+# .env
+# Basic configuration
+MELTANO_PROJECT_ROOT=./projects
+MELTANO_ENVIRONMENT=dev
 
-# Extensions
-MELTANO_EXTENSIONS_PATH=/path/to/extensions
-ORACLE_OIC_ENDPOINT=https://oic.example.com
-LDAP_SERVER=ldap://directory.example.com
+# FLEXT integration
+FLEXT_LOG_LEVEL=INFO
+FLEXT_OBSERVABILITY_ENABLED=true
 
-# Monitoring
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
-PROMETHEUS_PUSHGATEWAY=http://localhost:9091
+# Singer protocol (suppress warnings)
+SINGER_SDK_LOG_LEVEL=ERROR
+SINGER_SDK_DISABLE_WARNINGS=true
+PYTHONWARNINGS=ignore::DeprecationWarning
 ```
-
-## Performance
-
-- Project initialization: < 5 seconds
-- Job startup time: < 2 seconds
-- State backup/restore: < 1 second for 1GB
-- Event processing: 10,000+ events/second
-- Memory efficiency: < 500MB for orchestrator
 
 ## Testing
 
-```bash
-# Unit tests
-poetry run pytest tests/unit/
-
-# Integration tests (requires Meltano)
-poetry run pytest tests/integration/
-
-# Performance tests
-poetry run pytest tests/performance/
-```
-
-## CLI Commands
+The project includes comprehensive testing setup:
 
 ```bash
-# Project management
-flx-meltano init <project>
-flx-meltano list projects
-flx-meltano validate <project>
+# Run tests
+pytest
 
-# Execution
-flx-meltano run <pipeline>
-flx-meltano schedule <pipeline> --cron "0 * * * *"
-flx-meltano logs <job-id>
+# With coverage
+pytest --cov=flext_meltano
 
-# State management
-flx-meltano state backup --env production
-flx-meltano state restore --backup-id <id>
-flx-meltano state list
-
-# Extensions
-flx-meltano extensions list
-flx-meltano extensions install oracle-oic
-flx-meltano extensions configure oracle-oic
+# Specific test categories
+pytest -m unit
+pytest -m integration
+pytest -m "requires_meltano"
 ```
 
-## Production Deployment
+## Development
 
-### High Availability
+### Code Quality
 
-- State backend: PostgreSQL with replication
-- Job distribution: Multiple orchestrator instances
-- Failover: Automatic job reassignment
+The project uses modern Python tooling:
 
-### Monitoring
+- **ruff**: Linting and formatting
+- **mypy**: Static type checking  
+- **pytest**: Testing framework
+- **pre-commit**: Git hooks
 
-- Prometheus metrics exported
-- OpenTelemetry traces for all operations
-- Health endpoints for load balancers
+```bash
+# Run quality checks
+ruff check src/
+mypy src/
+```
 
-### Security
+### Dependencies
 
-- Vault integration for secrets
-- RBAC for project access
-- Audit logging for all operations
+**FLEXT Integration**:
+- **flext-core**: Foundation framework (ServiceResult, domain patterns)
+- **flext-observability**: Logging and monitoring
+- **meltano**: Data platform integration
+- **sqlalchemy**: Database operations
 
-## 🔗 Cross-References
+**Key Features**:
+- ServiceResult pattern for consistent error handling
+- HTTP API bridge for Go integration
+- Async/await support throughout
+- Clean architecture with anti-corruption layers
 
-### Prerequisites
+## Documentation
 
-- [../../docs/HOW_TO_DOCUMENT.md](../../docs/HOW_TO_DOCUMENT.md) — Guia de padronização de documentação
-- [../../.github/instructions/regras.instructions.md](../../.github/instructions/regras.instructions.md) — Regras obrigatórias do projeto
+- **[Getting Started](./docs/guides/getting-started.md)** - Setup and first pipeline
+- **[API Reference](./docs/api/core.md)** - Complete API documentation
+- **[Examples](./docs/examples/basic-pipeline.md)** - Working code examples
+- **[Production Guide](./docs/deployment/production.md)** - Deployment patterns
 
-### Next Steps
+## Limitations
 
-- [../../docs/architecture/index.md](../../docs/architecture/index.md) — Detalhes da arquitetura
-- [../../docs/development/index.md](../../docs/development/index.md) — Padrões de desenvolvimento
+**Known Limitations**:
 
-### Related Topics
+- **Go Integration**: HTTP API only, not native Go bindings
+- **Testing**: Basic operations tested, complex scenarios need more validation
+- **Production**: Deployment patterns provided but not production-validated
+- **Extensions**: Oracle/LDAP integration code present but minimally tested
 
-- [../../docs/STANDARDIZATION_MASTER_PLAN.md](../../docs/STANDARDIZATION_MASTER_PLAN.md) — Estratégia de padronização
-- [../../docs/INCOMPLETE_CODE_REPORT.md](../../docs/INCOMPLETE_CODE_REPORT.md) — Relatório de código incompleto
+## Contributing
+
+**Development Standards**:
+
+1. **Type Safety**: Python 3.13+ with comprehensive type hints
+2. **Testing**: Maintain 90%+ test coverage
+3. **Architecture**: Clean Architecture and DDD patterns
+4. **Error Handling**: Use ServiceResult pattern for consistent error handling
+5. **Code Quality**: Ruff linting, MyPy type checking
+6. **Documentation**: Keep docs updated with API changes
+
+## CLI
+
+The project provides a CLI interface:
+
+```bash
+# Available through poetry scripts
+flext-meltano --help
+
+# Or direct module execution
+python -m flext_meltano.cli --help
+```
 
 ---
 
-**📂 Projeto**: flext-meltano | **🏠 Root**: [Documentação Principal](../../docs/index.md) | **Framework**: FLEXT 0.6.0+ | **Updated**: 2025-07-08
+**Project**: flext-meltano | **Framework**: FLEXT 0.7.0 | **Python**: 3.13+ | **Status**: Development

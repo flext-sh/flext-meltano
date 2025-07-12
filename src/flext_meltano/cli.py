@@ -1,42 +1,66 @@
-"""Command-line interface for FLEXT Meltano.
+"""Command-line interface for FLEXT Meltano using centralized CLI framework.
 
-This module provides CLI commands for Meltano operations.
-Uses flext-cli patterns for consistency.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
 """
 
 from __future__ import annotations
 
-import argparse
 import subprocess
-import sys
 from pathlib import Path
 
+import click
 import yaml
-from loguru import logger
 
 
-def info_command(_args: argparse.Namespace) -> int:
+@click.group()
+@click.version_option(version="0.7.0")
+def cli() -> None:
+    """FLEXT Meltano - Enterprise ETL/ELT Pipeline Engine."""
+
+
+@cli.command()
+@click.option("--format", "output_format", default="table", help="Output format")
+@click.option("--quiet", is_flag=True, help="Quiet mode")
+def info(output_format: str, quiet: bool) -> None:
     """Show FLEXT Meltano information."""
-    logger.info("FLEXT Meltano - Enterprise ETL/ELT Pipeline Engine")
-    logger.info("Version: 0.7.0")
-    logger.info("Singer Protocol Support: Yes")
-    return 0
+    info_data = {
+        "name": "FLEXT Meltano",
+        "version": "0.7.0",
+        "description": "Enterprise ETL/ELT Pipeline Engine",
+        "singer_protocol": True,
+        "features": [
+            "Singer Protocol Support",
+            "State Management",
+            "Pipeline Execution",
+            "Plugin Management",
+        ],
+    }
+
+    if not quiet:
+        click.echo(f"Name: {info_data['name']}")
+        click.echo(f"Version: {info_data['version']}")
+        click.echo(f"Description: {info_data['description']}")
+        click.echo(f"Singer Protocol: {info_data['singer_protocol']}")
+        click.echo("Features:")
+        for feature in info_data["features"]:
+            click.echo(f"  - {feature}")
 
 
-def init_command(args: argparse.Namespace) -> int:
+@cli.command()
+@click.argument("name")
+@click.option("--directory", help="Project directory")
+@click.option("--template", default="default", help="Project template")
+def init(name: str, directory: str | None, template: str) -> None:
     """Initialize a new Meltano project."""
     try:
-        project_name = args.name
-        project_dir = Path(args.directory) if args.directory else Path(project_name)
-
-        # Create project directory
+        project_dir = Path(directory) if directory else Path(name)
         project_dir.mkdir(parents=True, exist_ok=True)
 
         # Create meltano.yml
         meltano_config = {
             "version": 1,
             "default_environment": "dev",
-            "project_id": f"flext-{project_name}",
+            "project_id": f"flext-{name}",
             "environments": [
                 {"name": "dev"},
                 {"name": "staging"},
@@ -53,137 +77,86 @@ def init_command(args: argparse.Namespace) -> int:
         with meltano_yml.open("w") as f:
             yaml.safe_dump(meltano_config, f, default_flow_style=False, indent=2)
 
-        logger.success(f"Initialized Meltano project: {project_name}")
-        logger.info(f"Project directory: {project_dir}")
-        return 0
+        click.echo(f"✅ Initialized Meltano project: {name}")
+        click.echo(f"📁 Project directory: {project_dir}")
 
     except Exception as e:
-        logger.error(f"Failed to initialize project: {e}")
-        return 1
+        click.echo(f"❌ Failed to initialize project: {e}", err=True)
+        raise click.Abort
 
 
-def run_command(args: argparse.Namespace) -> int:
+@cli.command()
+@click.argument("command", nargs=-1, required=True)
+@click.option("--environment", "-e", help="Meltano environment")
+@click.option("--project-dir", type=click.Path(exists=True), help="Project directory")
+def run(
+    command: tuple[str, ...], environment: str | None, project_dir: str | None,
+) -> None:
     """Run a Meltano command."""
     try:
-        # Build meltano command
         cmd = ["meltano"]
 
-        if hasattr(args, "environment") and args.environment:
-            cmd.extend(["--environment", args.environment])
+        if environment:
+            cmd.extend(["--environment", environment])
 
-        cmd.extend(args.command)
+        cmd.extend(command)
 
-        logger.info(f"Running: {' '.join(cmd)}")
+        click.echo(f"🚀 Running: {' '.join(cmd)}")
 
-        # Execute command
         result = subprocess.run(
             cmd,
-            cwd=args.project_dir if hasattr(args, "project_dir") else None,
-            capture_output=False, check=False,
+            cwd=project_dir,
+            capture_output=False,
+            check=False,
         )
 
-        return result.returncode
+        if result.returncode != 0:
+            click.echo(
+                f"❌ Command failed with exit code {result.returncode}", err=True,
+            )
+            raise click.Abort
+        click.echo("✅ Command completed successfully")
 
     except Exception as e:
-        logger.error(f"Failed to run command: {e}")
-        return 1
+        click.echo(f"❌ Failed to run command: {e}", err=True)
+        raise click.Abort
 
 
-def install_command(args: argparse.Namespace) -> int:
+@cli.command()
+@click.argument(
+    "plugin_type", type=click.Choice(["extractor", "loader", "transformer"]),
+)
+@click.argument("plugin_name")
+@click.option("--variant", help="Plugin variant")
+@click.option("--project-dir", type=click.Path(exists=True), help="Project directory")
+def install(
+    plugin_type: str, plugin_name: str, variant: str | None, project_dir: str | None,
+) -> None:
     """Install a Meltano plugin."""
     try:
-        cmd = ["meltano", "add", args.plugin_type, args.plugin_name]
+        cmd = ["meltano", "add", plugin_type, plugin_name]
 
-        if hasattr(args, "variant") and args.variant:
-            cmd.extend(["--variant", args.variant])
+        if variant:
+            cmd.extend(["--variant", variant])
 
-        logger.info(f"Installing {args.plugin_type}: {args.plugin_name}")
+        click.echo(f"📦 Installing {plugin_type}: {plugin_name}")
 
         result = subprocess.run(
             cmd,
-            cwd=args.project_dir if hasattr(args, "project_dir") else None, check=False,
+            cwd=project_dir,
+            check=False,
         )
 
         if result.returncode == 0:
-            logger.success(f"Installed {args.plugin_name}")
+            click.echo(f"✅ Installed {plugin_name}")
         else:
-            logger.error(f"Failed to install {args.plugin_name}")
-
-        return result.returncode
+            click.echo(f"❌ Failed to install {plugin_name}", err=True)
+            raise click.Abort
 
     except Exception as e:
-        logger.error(f"Failed to install plugin: {e}")
-        return 1
-
-
-def create_parser() -> argparse.ArgumentParser:
-    """Create the argument parser."""
-    parser = argparse.ArgumentParser(
-        prog="flext-meltano",
-        description="FLEXT Meltano CLI - Enterprise ETL/ELT Pipeline Engine",
-    )
-
-    parser.add_argument(
-        "--project-dir",
-        type=Path,
-        help="Meltano project directory",
-    )
-
-    parser.add_argument(
-        "--environment", "-e",
-        help="Meltano environment",
-    )
-
-    parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Verbose output",
-    )
-
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # Info command
-    info_parser = subparsers.add_parser("info", help="Show FLEXT Meltano information")
-    info_parser.set_defaults(func=info_command)
-
-    # Init command
-    init_parser = subparsers.add_parser("init", help="Initialize new Meltano project")
-    init_parser.add_argument("name", help="Project name")
-    init_parser.add_argument("--directory", help="Project directory")
-    init_parser.set_defaults(func=init_command)
-
-    # Run command
-    run_parser = subparsers.add_parser("run", help="Run Meltano command")
-    run_parser.add_argument("command", nargs="+", help="Meltano command to run")
-    run_parser.set_defaults(func=run_command)
-
-    # Install command
-    install_parser = subparsers.add_parser("install", help="Install plugin")
-    install_parser.add_argument("plugin_type", choices=["extractor", "loader", "transformer"])
-    install_parser.add_argument("plugin_name", help="Plugin name")
-    install_parser.add_argument("--variant", help="Plugin variant")
-    install_parser.set_defaults(func=install_command)
-
-    return parser
-
-
-def main() -> int:
-    """Main CLI entry point."""
-    parser = create_parser()
-    args = parser.parse_args()
-
-    # Set up logging
-    if args.verbose:
-        logger.add(sys.stderr, level="DEBUG")
-    else:
-        logger.add(sys.stderr, level="INFO")
-
-    # Execute command
-    if hasattr(args, "func"):
-        return args.func(args)
-    parser.print_help()
-    return 1
+        click.echo(f"❌ Failed to install plugin: {e}", err=True)
+        raise click.Abort
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    cli()

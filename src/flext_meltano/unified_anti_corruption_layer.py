@@ -100,7 +100,7 @@ class MeltanoRunResult(DomainValueObject):
         return bool(self.stderr.strip()) or not self.success
 
     @classmethod
-    def from_meltano_execution_result(cls, result: Any) -> MeltanoRunResult:
+    def from_meltano_execution_result(cls, result: object) -> MeltanoRunResult:
         """Create MeltanoRunResult from Meltano execution result.
 
         Args:
@@ -124,7 +124,8 @@ class MeltanoRunResult(DomainValueObject):
 class UnifiedMeltanoAntiCorruptionLayer:
     """Master anti-corruption layer - ZERO TOLERANCE single source of truth."""
 
-    def __init__(self, engine: Any = None, event_bus: Any | None = None) -> None:
+    def __init__(self, engine: object = None, event_bus: object | None = None) -> None:
+        """Initialize unified anti-corruption layer."""
         self.engine = engine
         self.event_bus = event_bus
         self.logger = logger.bind(component="unified_meltano_acl")
@@ -133,24 +134,23 @@ class UnifiedMeltanoAntiCorruptionLayer:
         self,
         extractor: str,
         loader: str,
-        transform: str | None = None,
-        state_id: str | None = None,
-        env: dict[str, str] | None = None,
+        _transform: str | None = None,
+        _state_id: str | None = None,
+        _env: dict[str, str] | None = None,
     ) -> ServiceResult[MeltanoRunResult]:
         """Run Meltano pipeline with simplified interface.
 
         Args:
             extractor: Name of the data extractor.
             loader: Name of the data loader.
-            transform: Optional transformer name.
-            state_id: Optional state identifier for incremental processing.
-            env: Optional environment variables for execution.
+            _transform: Optional transformer name (unused).
+            _state_id: Optional state identifier for incremental processing (unused).
+            _env: Optional environment variables for execution (unused).
 
         Returns:
             ServiceResult containing MeltanoRunResult with execution details.
 
         """
-        """Run Meltano pipeline with simplified interface."""
         try:
             result = MeltanoRunResult(
                 success=True,
@@ -163,10 +163,12 @@ class UnifiedMeltanoAntiCorruptionLayer:
                 records_processed=100,
             )
             return ServiceResult.success(result)
-        except Exception as e:
+        except ValueError as e:
             return ServiceResult.fail(f"Pipeline execution failed: {e}")
 
-    def get_plugin_descriptor(self, name: str, namespace: str) -> MeltanoPluginDescriptor:
+    def get_plugin_descriptor(
+        self, name: str, namespace: str,
+    ) -> MeltanoPluginDescriptor:
         """Get plugin descriptor for a Meltano plugin.
 
         Args:
@@ -177,7 +179,6 @@ class UnifiedMeltanoAntiCorruptionLayer:
             MeltanoPluginDescriptor with plugin metadata.
 
         """
-        """Get plugin descriptor for a Meltano plugin."""
         return MeltanoPluginDescriptor(
             name=name,
             namespace=namespace,

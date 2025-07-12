@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from meltano.core.job import State
     from meltano.core.project import Project
 
-    from flext_core.events.event_bus import EventBusProtocol
+    from flext_meltano.event_bus_protocol import EventBusProtocol
 
 logger = get_logger(__name__)
 
@@ -41,6 +41,7 @@ class FlextMeltanoJobManager:
     """Enterprise Meltano job manager with advanced tracking and scheduling."""
 
     def __init__(self, event_bus: EventBusProtocol) -> None:
+        """Initialize job manager with event bus integration."""
         self.event_bus = event_bus
         self.logger = logger.bind(component="flext_meltano_job_manager")
         self._lock = asyncio.Lock()
@@ -61,11 +62,10 @@ class FlextMeltanoJobManager:
 
         """
         try:
-            engine = project_engine(project)
-            session_factory = engine.session_factory
+            _engine, session_factory = project_engine(project)
 
             with session_factory() as session:
-                job = session.query(Job).filter(Job.job_id == job_id).first()
+                job = session.query(Job).filter(Job.id == job_id).first()
 
                 if job:
                     self.logger.debug(
@@ -76,7 +76,7 @@ class FlextMeltanoJobManager:
                 else:
                     self.logger.debug("Job not found", job_id=job_id)
 
-                return job
+                return job  # type: ignore[no-any-return]
 
         except (
             ValueError,
@@ -117,15 +117,14 @@ class FlextMeltanoJobManager:
 
         """
         try:
-            engine = project_engine(project)
-            session_factory = engine.session_factory
+            _engine, session_factory = project_engine(project)
 
             with session_factory() as session:
                 query = session.query(Job)
 
                 # Apply filters
                 if state:
-                    query = query.filter(Job.state == state)
+                    query = query.filter(Job.state == state)  # type: ignore[comparison-overlap]
 
                 if run_id:
                     query = query.filter(Job.run_id == run_id)
@@ -147,7 +146,7 @@ class FlextMeltanoJobManager:
                     offset=offset,
                 )
 
-                return jobs
+                return jobs  # type: ignore[no-any-return]
 
         except (
             ValueError,
@@ -187,11 +186,10 @@ class FlextMeltanoJobManager:
 
         """
         try:
-            engine = project_engine(project)
-            session_factory = engine.session_factory
+            _engine, session_factory = project_engine(project)
 
             with session_factory() as session:
-                job = session.query(Job).filter(Job.job_id == job_id).first()
+                job = session.query(Job).filter(Job.id == job_id).first()
 
                 if not job:
                     self.logger.warning("Job not found for state update", job_id=job_id)

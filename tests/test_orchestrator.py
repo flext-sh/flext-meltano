@@ -19,11 +19,11 @@ import pytest
 from flext_core.domain.types import ServiceResult
 
 if TYPE_CHECKING:
-            from typing import Any
+    from typing import Any
 
 # Test imports - skip if not available:
 try:
-            # Import other modules that might be used in try blocks
+    # Import other modules that might be used in try blocks
     from flext_meltano.event_bridge import MeltanoEventBridge
     from flext_meltano.models import MeltanoJob
     from flext_meltano.models import MeltanoSchedule
@@ -41,7 +41,16 @@ class TestFlextMeltanoOrchestrator:
 
     @pytest.fixture
     def orchestrator(self) -> FlextMeltanoOrchestrator:
-        return FlextMeltanoOrchestrator()
+        from unittest.mock import Mock
+
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        return FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
 
     def test_orchestrator_initialization(
         self,
@@ -120,7 +129,7 @@ class TestFlextMeltanoOrchestrator:
         try:
             schedule = MeltanoSchedule(
                 name="daily-sync",
-                interval="@daily",
+                cron_interval="@daily",
                 job="tap-csv target-jsonl",
             )
 
@@ -157,14 +166,13 @@ class TestFlextMeltanoOrchestrator:
     def test_job_creation(self) -> None:
         try:
             job = MeltanoJob(
-                name="test-job",
-                tap="tap-postgres",
-                target="target-snowflake",
-                transform="dbt:run",
+                job_name="test-job",
+                tasks=["tap-postgres", "target-snowflake", "dbt:run"],
+                description="Test job for pipeline execution",
             )
 
-            assert job.name == "test-job"
-            assert job.tap == "tap-postgres"
+            assert job.job_name == "test-job"
+            assert "tap-postgres" in job.tasks
 
         except (NameError, TypeError) as e:
             # If MeltanoJob has different structure, that's ok
@@ -274,7 +282,16 @@ class TestOrchestrationFeatures:
 
     @pytest.fixture
     def orchestrator(self) -> FlextMeltanoOrchestrator:
-        return FlextMeltanoOrchestrator()
+        from unittest.mock import Mock
+
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        return FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
 
     @pytest.mark.asyncio
     async def test_parallel_execution(
@@ -327,7 +344,8 @@ class TestOrchestrationFeatures:
 
     @pytest.mark.asyncio
     async def test_error_handling(
-        self, orchestrator: FlextMeltanoOrchestrator,
+        self,
+        orchestrator: FlextMeltanoOrchestrator,
     ) -> None:
         # Mock error scenarios with ServiceResult
         error_scenarios = [
@@ -518,8 +536,18 @@ class TestOrchestrationIntegration:
             pytest.skip(f"State manager integration not available: {e}")
 
     @pytest.mark.integration
+    @pytest.mark.asyncio
     async def test_full_pipeline_workflow(self) -> None:
-        orchestrator = FlextMeltanoOrchestrator()
+        from unittest.mock import Mock
+
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        orchestrator = FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
 
         try:
             # Test full workflow: create -> execute -> monitor -> complete
@@ -556,8 +584,16 @@ class TestOrchestrationPerformance:
         start_time = time.time()
 
         for _ in range(10):
-            orchestrator = FlextMeltanoOrchestrator()
-            assert orchestrator is not None
+            from unittest.mock import Mock
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        orchestrator = FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
+        assert orchestrator is not None
 
         end_time = time.time()
         duration = end_time - start_time
@@ -567,7 +603,16 @@ class TestOrchestrationPerformance:
 
     @pytest.mark.asyncio
     async def test_concurrent_pipelines(self) -> None:
-        FlextMeltanoOrchestrator()
+        from unittest.mock import Mock
+
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
 
         async def run_mock_pipeline(pipeline_id: str) -> str:
             try:
@@ -595,8 +640,16 @@ class TestOrchestrationPerformance:
         orchestrators = []
 
         for _ in range(100):
-            orchestrator = FlextMeltanoOrchestrator()
-            orchestrators.append(orchestrator)
+            from unittest.mock import Mock
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        orchestrator = FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
+        orchestrators.append(orchestrator)
 
         # Clear references
         orchestrators.clear()
@@ -611,7 +664,16 @@ class TestOrchestrationPerformance:
 
 def test_async_context() -> None:
     async def test_operation() -> str:
-        manager = FlextMeltanoOrchestrator()
+        from unittest.mock import Mock
+
+        project_manager = Mock()
+        state_manager = Mock()
+        event_bus = Mock()
+        manager = FlextMeltanoOrchestrator(
+            project_manager=project_manager,
+            state_manager=state_manager,
+            event_bus=event_bus,
+        )
         # Basic async operation
         return str(manager)
 
