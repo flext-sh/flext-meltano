@@ -52,7 +52,7 @@ class MeltanoEngine:
 if TYPE_CHECKING:
     from meltano.core.project import Project
 
-    from flext_core.events.event_bus import EventBusProtocol
+    from flext_meltano.event_bus_protocol import EventBusProtocol
     from flext_meltano.project_manager import FlextMeltanoProjectManager
     from flext_meltano.state_manager import FlextMeltanoStateManager
 
@@ -199,7 +199,12 @@ class FlextMeltanoOrchestrator:
     - Integration with FLEXT monitoring and alerting
     """
 
-    def __init__(self, project_manager: FlextMeltanoProjectManager, state_manager: FlextMeltanoStateManager, event_bus: EventBusProtocol) -> None:
+    def __init__(
+        self,
+        project_manager: FlextMeltanoProjectManager,
+        state_manager: FlextMeltanoStateManager,
+        event_bus: EventBusProtocol,
+    ) -> None:
         self.project_manager = project_manager
         self.state_manager = state_manager
         self.job_manager = FlextMeltanoJobManager(event_bus)
@@ -215,7 +220,12 @@ class FlextMeltanoOrchestrator:
 
         self.logger.info("Initialized FLEXT Meltano Orchestrator with event bridge")
 
-    async def _emit_pipeline_event(self, event_type: str, flext_job: FlextJob, payload: dict[str, Any] | None = None) -> None:
+    async def _emit_pipeline_event(
+        self,
+        event_type: str,
+        flext_job: FlextJob,
+        payload: dict[str, Any] | None = None,
+    ) -> None:
         await self.event_bus.publish(
             DomainEvent.create(
                 event_type,
@@ -230,7 +240,15 @@ class FlextMeltanoOrchestrator:
             ),
         )
 
-    async def run_pipeline(self, project_name: str, pipeline_definition: dict[str, Any], environment: str = "dev", execution_mode: OrchestrationMode = OrchestrationMode.ASYNC, run_id: str | None = None, run_mode: RunMode = RunMode.FULL_RUN) -> dict[str, Any]:
+    async def run_pipeline(
+        self,
+        project_name: str,
+        pipeline_definition: dict[str, Any],
+        environment: str = "dev",
+        execution_mode: OrchestrationMode = OrchestrationMode.ASYNC,
+        run_id: str | None = None,
+        run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> dict[str, Any]:
         """Run a Meltano pipeline with orchestration.
 
         Args:
@@ -408,7 +426,9 @@ class FlextMeltanoOrchestrator:
                         job.started_at.isoformat() if job.started_at else None
                     ),
                     "last_heartbeat_at": (
-                        job.last_heartbeat_at.isoformat() if job.last_heartbeat_at else None
+                        job.last_heartbeat_at.isoformat()
+                        if job.last_heartbeat_at
+                        else None
                     ),
                 }
                 for job in self._running_jobs.values()
@@ -427,7 +447,9 @@ class FlextMeltanoOrchestrator:
             },
         )
 
-    async def _execute_pipeline_sync(self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN) -> dict[str, Any]:
+    async def _execute_pipeline_sync(
+        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> dict[str, Any]:
         project = await self.project_manager.load_project(
             flext_job.project_name,
             flext_job.environment,
@@ -454,11 +476,14 @@ class FlextMeltanoOrchestrator:
             "completed_at": finished_at.isoformat() if finished_at else None,
             "duration_seconds": (
                 (finished_at - flext_job.started_at).total_seconds()
-                if finished_at and flext_job.started_at else None
+                if finished_at and flext_job.started_at
+                else None
             ),
         }
 
-    async def _execute_pipeline_async(self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN) -> dict[str, Any]:
+    async def _execute_pipeline_async(
+        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> dict[str, Any]:
         project = await self.project_manager.load_project(
             flext_job.project_name,
             flext_job.environment,
@@ -479,7 +504,12 @@ class FlextMeltanoOrchestrator:
             "message": "Pipeline execution started in the background.",
         }
 
-    async def _run_pipeline_task(self, project: Project, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN) -> None:
+    async def _run_pipeline_task(
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> None:
         try:
             # Emit pipeline started event
             await self._emit_pipeline_event("pipeline.running", flext_job)
@@ -521,7 +551,12 @@ class FlextMeltanoOrchestrator:
             async with self._lock:
                 self._running_jobs.pop(flext_job.run_id, None)
 
-    async def _run_meltano_blocks(self, project: Project, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN) -> dict[str, Any]:
+    async def _run_meltano_blocks(
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> dict[str, Any]:
         pipeline_def = flext_job.pipeline_definition
 
         # This will be replaced by a more robust block execution engine
@@ -544,7 +579,14 @@ class FlextMeltanoOrchestrator:
 
         return {"success": True}
 
-    async def _execute_block(self, project: Project, flext_job: FlextJob, block: dict[str, Any], block_index: int, _run_mode: RunMode = RunMode.FULL_RUN) -> dict[str, Any]:
+    async def _execute_block(
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        block: dict[str, Any],
+        block_index: int,
+        _run_mode: RunMode = RunMode.FULL_RUN,
+    ) -> dict[str, Any]:
         self.logger.info(
             "Executing pipeline block",
             block_index=block_index,
@@ -572,7 +614,9 @@ class FlextMeltanoOrchestrator:
 
         return result
 
-    async def _execute_meltano_block(self, project: Project, flext_job: FlextJob, block: dict[str, Any]) -> dict[str, Any]:
+    async def _execute_meltano_block(
+        self, project: Project, flext_job: FlextJob, block: dict[str, Any],
+    ) -> dict[str, Any]:
         engine = MeltanoEngine(project.root)
         extractor = block.get("extractor")
         loader = block.get("loader")
@@ -588,7 +632,9 @@ class FlextMeltanoOrchestrator:
             env={"MELTANO_ENVIRONMENT": flext_job.environment},
         )
 
-    async def _execute_run_block(self, _project: Project, flext_job: FlextJob, commands: list[str]) -> dict[str, Any]:
+    async def _execute_run_block(
+        self, _project: Project, flext_job: FlextJob, commands: list[str],
+    ) -> dict[str, Any]:
         config = get_config()
         min_commands = config.business.MINIMUM_MELTANO_COMMAND_COUNT
 
@@ -638,7 +684,9 @@ class FlextMeltanoOrchestrator:
                 "result": result,
             }
 
-    async def _execute_invoke_block(self, project: Project, flext_job: FlextJob, commands: list[str]) -> dict[str, Any]:
+    async def _execute_invoke_block(
+        self, project: Project, flext_job: FlextJob, commands: list[str],
+    ) -> dict[str, Any]:
         try:
             self.logger.info(
                 "Executing Meltano invoke commands",
@@ -679,10 +727,18 @@ class FlextMeltanoOrchestrator:
 
     async def _get_historical_job_status(self, run_id: str) -> dict[str, Any] | None:
         """Get historical job status from persistent storage."""
-        # TODO: Implement historical job status retrieval from state manager
-        return None
+        try:
+            # Use state manager to retrieve job history
+            state_manager = self._get_state_manager()
+            return await state_manager.get_job_status(run_id)
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
+            self.logger.warning(
+                f"Failed to retrieve historical job status for {run_id}: {e}",
+            )
+            return None
 
     def _update_job_state(self, job: Job, state: State) -> None:
-        # This method is now a placeholder as state is managed within FlextJob
-        # and via the Meltano state backend.
-        pass
+        """Update job state using proper Meltano state backend integration."""
+        if hasattr(job, "state"):
+            job.state = state
+            self.logger.debug("Job state updated", job_id=job.job_id, state=state.value)

@@ -10,6 +10,7 @@ from datetime import UTC
 from datetime import datetime
 from enum import Enum
 from enum import auto
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
@@ -20,12 +21,8 @@ from flext_core.domain.pydantic_base import Field
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
-    from pathlib import Path
 
-    # These imports would be conditional on singer-sdk being available
-    # For now, we'll define placeholder types
-    Tap = Any
-    Target = Any
+# Singer SDK is REQUIRED - zero tolerance for fallbacks
 
 
 # Type aliases for clean interface
@@ -94,7 +91,13 @@ class FlextSingerSDKIntegration(BaseModel):
         description="Registry of available targets",
     )
 
-    def model_post_init(self, __context: Any) -> None:
+    def __init__(self, project_root: str | Path, **kwargs: Any) -> None:
+        """Initialize with proper constructor pattern."""
+        if isinstance(project_root, str):
+            project_root = Path(project_root)
+        super().__init__(project_root=project_root, **kwargs)
+
+    def model_post_init(self, /, **context: Any) -> None:
         """Initialize the Singer SDK integration."""
         self._discover_plugins()
 
@@ -120,7 +123,7 @@ class FlextSingerSDKIntegration(BaseModel):
         target_name: str,
         tap_config: TapConfig,
         target_config: TargetConfig,
-        stream_maps: dict[str, dict[str, str]] | None = None,
+        _stream_maps: dict[str, dict[str, str]] | None = None,
     ) -> dict[str, Any]:
         """Run an ELT pipeline with the specified tap and target."""
         try:
@@ -166,7 +169,7 @@ class FlextSingerSDKIntegration(BaseModel):
                 "streams_processed": len([s for s in streams if s.selected]),
             }
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return {"success": False, "error": str(e), "records_processed": 0}
 
 
@@ -174,6 +177,7 @@ class OracleOICTap:
     """FLEXT Oracle OIC Tap implementation."""
 
     def __init__(self, config: TapConfig) -> None:
+        """Initialize Oracle OIC Tap."""
         self.config = config
 
     def discover_streams(self) -> list[SingerStreamDefinition]:
@@ -210,7 +214,9 @@ class OracleOICTap:
             ),
         ]
 
-    async def sync_stream(self, stream: SingerStreamDefinition) -> AsyncIterator[SingerRecord]:
+    async def sync_stream(
+        self, stream: SingerStreamDefinition,
+    ) -> AsyncIterator[SingerRecord]:
         """Sync data from Oracle OIC stream."""
         if stream.name == "integrations":
             yield {
@@ -249,6 +255,7 @@ class LDAPTap:
     """FLEXT LDAP Tap implementation."""
 
     def __init__(self, config: TapConfig) -> None:
+        """Initialize LDAP Tap."""
         self.config = config
 
     def discover_streams(self) -> list[SingerStreamDefinition]:
@@ -290,7 +297,9 @@ class LDAPTap:
             ),
         ]
 
-    async def sync_stream(self, stream: SingerStreamDefinition) -> AsyncIterator[SingerRecord]:
+    async def sync_stream(
+        self, stream: SingerStreamDefinition,
+    ) -> AsyncIterator[SingerRecord]:
         """Sync data from LDAP stream."""
         if stream.name == "users":
             yield {
@@ -336,6 +345,7 @@ class PostgreSQLTarget:
     """FLEXT PostgreSQL Target implementation."""
 
     def __init__(self, config: TargetConfig) -> None:
+        """Initialize PostgreSQL Target."""
         self.config = config
 
     async def write_record(self, stream: str, record: SingerRecord) -> None:
@@ -360,5 +370,5 @@ class PostgreSQLTarget:
 
 
 def create_singer_sdk_integration(project_root: Path) -> FlextSingerSDKIntegration:
-    """Factory function for creating Singer SDK integration."""
+    """Create Singer SDK integration."""
     return FlextSingerSDKIntegration(project_root=project_root)

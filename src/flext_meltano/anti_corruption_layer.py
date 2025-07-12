@@ -19,7 +19,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Any
 
-from flext_core.domain.types import ServiceResult
+from flext_core import ServiceResult
 
 
 class MeltanoAdapter(ABC):
@@ -89,7 +89,7 @@ class MeltanoAntiCorruptionLayer:
                 return ServiceResult.ok(domain_result)
             return result
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to execute pipeline: {e}")
 
     async def manage_plugin(
@@ -97,7 +97,7 @@ class MeltanoAntiCorruptionLayer:
         action: str,
         plugin_type: str,
         plugin_name: str,
-        **kwargs: Any,
+        **kwargs: str | int | bool | None,
     ) -> ServiceResult[dict[str, Any]]:
         """Manage plugins through the Meltano adapter."""
         try:
@@ -113,16 +113,13 @@ class MeltanoAntiCorruptionLayer:
                 return await self.adapter.get_plugin_config(plugin_name=plugin_name)
             return ServiceResult.fail(f"Unknown plugin action: {action}")
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to manage plugin: {e}")
 
     def _translate_config(self, config: dict[str, Any]) -> dict[str, Any]:
         """Translate domain configuration to Meltano configuration."""
         # Simple translation for now - can be extended as needed
-        return {
-            key.replace("_", "-"): value
-            for key, value in config.items()
-        }
+        return {key.replace("_", "-"): value for key, value in config.items()}
 
     def _translate_result(self, result: dict[str, Any]) -> dict[str, Any]:
         """Translate Meltano results to domain concepts."""
@@ -161,7 +158,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
 
             return ServiceResult.ok(result)
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to run pipeline: {e}")
 
     async def install_plugin(
@@ -184,7 +181,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
 
             return ServiceResult.ok(result)
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to install plugin: {e}")
 
     async def list_plugins(
@@ -214,7 +211,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
 
             return ServiceResult.ok(plugins)
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list plugins: {e}")
 
     async def get_plugin_config(
@@ -238,5 +235,5 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
 
             return ServiceResult.ok(config)
 
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get plugin config: {e}")

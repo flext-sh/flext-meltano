@@ -44,9 +44,9 @@ class TestMeltanoProjectManager:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield Path(temp_dir)
 
-    def test_project_manager_initialization(self,
-        project_manager:
-        MeltanoProjectManager,
+    def test_project_manager_initialization(
+        self,
+        project_manager: MeltanoProjectManager,
     ) -> None:
         assert project_manager is not None
         assert hasattr(project_manager, "create_project")
@@ -54,12 +54,11 @@ class TestMeltanoProjectManager:
     @pytest.mark.asyncio
     async def test_create_project_basic(
         self,
-        project_manager:
-        MeltanoProjectManager,
-        temp_project_dir: Path,
+        project_manager: MeltanoProjectManager,
+        _temp_project_dir: Path,
     ) -> None:
         project_name = "test-project"
-        project_path = temp_project_dir / project_name
+        project_path = _temp_project_dir / project_name
 
         try:
             result = await project_manager.create_project(
@@ -111,18 +110,17 @@ class TestFlextMeltanoProjectManager:
     def flext_manager(self) -> FlextMeltanoProjectManager:
         return FlextMeltanoProjectManager()
 
-    def test_flext_manager_initialization(self,
-        flext_manager:
-        FlextMeltanoProjectManager,
+    def test_flext_manager_initialization(
+        self,
+        flext_manager: FlextMeltanoProjectManager,
     ) -> None:
         assert flext_manager is not None
 
     @pytest.mark.asyncio
     async def test_enterprise_project_creation(
         self,
-        flext_manager:
-        FlextMeltanoProjectManager,
-        temp_project_dir: Path,
+        flext_manager: FlextMeltanoProjectManager,
+        _temp_project_dir: Path,
     ) -> None:
         project_name = "enterprise-project"
 
@@ -139,9 +137,9 @@ class TestFlextMeltanoProjectManager:
             pytest.skip(f"Enterprise create_project has different interface: {e}")
 
     @patch("subprocess.run")
-    def test_meltano_command_execution(self,
-        mock_subprocess:
-        Mock,
+    def test_meltano_command_execution(
+        self,
+        mock_subprocess: Mock,
         flext_manager: FlextMeltanoProjectManager,
     ) -> None:
         mock_subprocess.return_value = Mock(
@@ -158,8 +156,7 @@ class TestFlextMeltanoProjectManager:
             # If run_meltano_command doesn't exist, that's ok
             pytest.skip("run_meltano_command method not available")
 
-    def test_plugin_management(self, flext_manager:
-        FlextMeltanoProjectManager) -> None:
+    def test_plugin_management(self, flext_manager: FlextMeltanoProjectManager) -> None:
         try:
             # Test plugin listing
             if hasattr(flext_manager, "list_plugins"):
@@ -180,8 +177,7 @@ class TestMeltanoIntegration:
     """Integration tests for Meltano functionality."""
 
     @pytest.mark.integration
-    def test_meltano_project_structure(self, temp_project_dir:
-            Path) -> None:
+    def test_meltano_project_structure(self, temp_project_dir: Path) -> None:
         # Test that we can create a basic meltano.yml structure
         meltano_yml = temp_project_dir / "meltano.yml"
 
@@ -254,8 +250,7 @@ plugins:
 class TestMeltanoPerformance:
     """Performance tests for Meltano operations."""
 
-    def test_project_creation_performance(self, temp_project_dir:
-            Path) -> None:
+    def test_project_creation_performance(self, temp_project_dir: Path) -> None:
         manager = MeltanoProjectManager()
 
         start_time = time.time()

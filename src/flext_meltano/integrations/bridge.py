@@ -11,9 +11,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from flext_core import ServiceResult
-from flext_observability.logging import get_logger
 from flext_meltano.project_manager import MeltanoProjectManager
+from flext_meltano.singer_direct import SingerDirectRunner
+from flext_observability.logging import get_logger
+
 # Orchestrator will be initialized when needed
 
 # Type alias for better readability
@@ -30,7 +31,7 @@ class MeltanoResult:
     """Result wrapper for Meltano operations."""
 
     success: bool
-    data: Any = None
+    data: object = None
     error: str | None = None
     metadata: dict[str, Any] = None
 
@@ -55,11 +56,14 @@ class MeltanoBridge:
         """Initialize the Meltano bridge with a project root."""
         self.project_root = Path(project_root).resolve()
         self.logger = logger
-        
-        # Use FLEXT MeltanoProjectManager instead of direct subprocess calls
+
+        # Use FLEXT integrations for zero warnings
         self.project_manager = MeltanoProjectManager(project_root=self.project_root)
-        
-        self.logger.info("Meltano bridge initialized with FLEXT project manager")
+        self.singer_direct = SingerDirectRunner(self.project_root)
+
+        self.logger.info(
+            "Meltano bridge initialized with zero-warning Singer direct runner",
+        )
 
     def is_available(self) -> bool:
         """Check if Meltano is available and working."""
@@ -67,7 +71,9 @@ class MeltanoBridge:
         return True  # FLEXT MeltanoProjectManager handles availability internally
 
     async def init_project(
-        self, project_name: str, project_dir: str | None = None,
+        self,
+        project_name: str,
+        project_dir: str | None = None,
     ) -> JSONStr:
         """Initialize a new Meltano project.
 
@@ -77,6 +83,7 @@ class MeltanoBridge:
 
         Returns:
             JSON string with operation result
+
         """
         try:
             # Use project_dir if provided, otherwise use current directory
@@ -97,14 +104,13 @@ class MeltanoBridge:
                         metadata={"flext_result": "success"},
                     ).to_dict(),
                 )
-            else:
-                return json.dumps(
-                    MeltanoResult(
-                        success=False,
-                        error=result.error,
-                        metadata={"flext_result": "failure"},
-                    ).to_dict(),
-                )
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error=result.error,
+                    metadata={"flext_result": "failure"},
+                ).to_dict(),
+            )
 
         except Exception as e:
             return json.dumps(
@@ -112,7 +118,11 @@ class MeltanoBridge:
             )
 
     async def add_plugin(
-        self, project_name: str, plugin_type: str, plugin_name: str, plugin_variant: str = "",
+        self,
+        project_name: str,
+        plugin_type: str,
+        plugin_name: str,
+        plugin_variant: str = "",
     ) -> JSONStr:
         """Add a plugin to the Meltano project.
 
@@ -124,18 +134,15 @@ class MeltanoBridge:
 
         Returns:
             JSON string with operation result
+
         """
         try:
-            # Use FLEXT project manager
-            plugin_config = {}
-            if plugin_variant:
-                plugin_config["variant"] = plugin_variant
-
+            # Use FLEXT project manager with proper variant parameter
             result = await self.project_manager.add_plugin(
                 project_name=project_name,
                 plugin_type=plugin_type,
                 plugin_name=plugin_name,
-                **plugin_config,
+                variant=plugin_variant,
             )
 
             if result.is_success:
@@ -150,14 +157,13 @@ class MeltanoBridge:
                         metadata={"flext_result": "success"},
                     ).to_dict(),
                 )
-            else:
-                return json.dumps(
-                    MeltanoResult(
-                        success=False,
-                        error=result.error,
-                        metadata={"flext_result": "failure"},
-                    ).to_dict(),
-                )
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error=result.error,
+                    metadata={"flext_result": "failure"},
+                ).to_dict(),
+            )
 
         except Exception as e:
             return json.dumps(
@@ -165,9 +171,16 @@ class MeltanoBridge:
             )
 
     async def run_pipeline(
-        self, project_name: str, extractor: str, loader: str, transformer: str = "",
+        self,
+        project_name: str,
+        extractor: str,
+        loader: str,
+        transformer: str = "",
     ) -> JSONStr:
-        """Run a Meltano pipeline using FLEXT project manager.
+        """Run a Meltano pipeline using FLEXT project manager with zero Singer SDK warnings.
+
+        Uses official meltano el command for extract-load pipelines to eliminate
+        Singer SDK deprecation warnings about catalog/config file paths.
 
         Args:
             project_name: Name of the Meltano project
@@ -177,15 +190,18 @@ class MeltanoBridge:
 
         Returns:
             JSON string with operation result
+
         """
         try:
-            # Build run command
-            run_args = ["run", extractor]
+            # Use official Meltano el command (the correct way)
             if transformer:
-                run_args.append(transformer)
-            run_args.append(loader)
+                # For transformers, use run command
+                run_args = ["run", extractor, transformer, loader]
+            else:
+                # Use el command for extract-load pipelines (official Meltano way)
+                run_args = ["el", extractor, loader]
 
-            # Use FLEXT project manager to run the pipeline
+            # Use FLEXT project manager with official Meltano approach
             result = await self.project_manager.run_command(
                 project_name=project_name,
                 command_args=run_args,
@@ -205,14 +221,13 @@ class MeltanoBridge:
                         metadata={"flext_result": result.value},
                     ).to_dict(),
                 )
-            else:
-                return json.dumps(
-                    MeltanoResult(
-                        success=False,
-                        error=result.error,
-                        metadata={"flext_result": "failure"},
-                    ).to_dict(),
-                )
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error=result.error,
+                    metadata={"flext_result": "failure"},
+                ).to_dict(),
+            )
 
         except Exception as e:
             return json.dumps(
@@ -227,6 +242,7 @@ class MeltanoBridge:
 
         Returns:
             JSON string with project information
+
         """
         try:
             # Use FLEXT project manager to load project config
@@ -244,21 +260,22 @@ class MeltanoBridge:
                         metadata={"flext_result": "success"},
                     ).to_dict(),
                 )
-            else:
-                return json.dumps(
-                    MeltanoResult(
-                        success=False,
-                        error=result.error,
-                        metadata={"flext_result": "failure"},
-                    ).to_dict(),
-                )
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error=result.error,
+                    metadata={"flext_result": "failure"},
+                ).to_dict(),
+            )
 
         except Exception as e:
             return json.dumps(
                 MeltanoResult(success=False, error=str(e)).to_dict(),
             )
 
-    async def execute_command(self, project_name: str, command_args: list[str]) -> JSONStr:
+    async def execute_command(
+        self, project_name: str, command_args: list[str],
+    ) -> JSONStr:
         """Execute a Meltano command using FLEXT project manager.
 
         Args:
@@ -267,6 +284,7 @@ class MeltanoBridge:
 
         Returns:
             JSON string with operation result
+
         """
         try:
             # Use FLEXT project manager instead of subprocess
@@ -284,14 +302,13 @@ class MeltanoBridge:
                         metadata={"flext_result": "success", "command": command_args},
                     ).to_dict(),
                 )
-            else:
-                return json.dumps(
-                    MeltanoResult(
-                        success=False,
-                        error=result.error,
-                        metadata={"flext_result": "failure", "command": command_args},
-                    ).to_dict(),
-                )
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error=result.error,
+                    metadata={"flext_result": "failure", "command": command_args},
+                ).to_dict(),
+            )
 
         except Exception as e:
             return json.dumps(
@@ -312,44 +329,113 @@ def get_bridge() -> MeltanoBridge:
 def init_project_sync(project_name: str, project_dir: str = "") -> str:
     """Initialize a new Meltano project (synchronous wrapper)."""
     import asyncio
-    bridge = get_bridge()
-    return asyncio.run(bridge.init_project(project_name, project_dir or None))
+
+    def run_in_thread():
+        return asyncio.run(get_bridge().init_project(project_name, project_dir or None))
+
+    # Check if we're in an event loop
+    try:
+        asyncio.get_running_loop()
+        # We're in an event loop, run in thread
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_thread)
+            return future.result()
+    except RuntimeError:
+        # No event loop, safe to use asyncio.run
+        return run_in_thread()
 
 
-def add_plugin_sync(project_name: str, plugin_type: str, plugin_name: str, plugin_variant: str = "") -> str:
+def add_plugin_sync(
+    project_name: str, plugin_type: str, plugin_name: str, plugin_variant: str = "",
+) -> str:
     """Add a plugin to the Meltano project (synchronous wrapper)."""
     import asyncio
-    bridge = get_bridge()
-    return asyncio.run(bridge.add_plugin(project_name, plugin_type, plugin_name, plugin_variant))
+
+    def run_in_thread():
+        return asyncio.run(
+            get_bridge().add_plugin(
+                project_name, plugin_type, plugin_name, plugin_variant,
+            ),
+        )
+
+    try:
+        asyncio.get_running_loop()
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_thread)
+            return future.result()
+    except RuntimeError:
+        return run_in_thread()
 
 
-def run_pipeline_sync(project_name: str, extractor: str, loader: str, transformer: str = "") -> str:
+def run_pipeline_sync(
+    project_name: str, extractor: str, loader: str, transformer: str = "",
+) -> str:
     """Run a Meltano pipeline (synchronous wrapper)."""
     import asyncio
-    bridge = get_bridge()
-    return asyncio.run(bridge.run_pipeline(project_name, extractor, loader, transformer))
+
+    def run_in_thread():
+        return asyncio.run(
+            get_bridge().run_pipeline(project_name, extractor, loader, transformer),
+        )
+
+    try:
+        asyncio.get_running_loop()
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_thread)
+            return future.result()
+    except RuntimeError:
+        return run_in_thread()
 
 
 def get_project_info_sync(project_name: str) -> str:
     """Get information about the current project (synchronous wrapper)."""
     import asyncio
-    bridge = get_bridge()
-    return asyncio.run(bridge.get_project_info(project_name))
+
+    def run_in_thread():
+        return asyncio.run(get_bridge().get_project_info(project_name))
+
+    try:
+        asyncio.get_running_loop()
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_thread)
+            return future.result()
+    except RuntimeError:
+        return run_in_thread()
 
 
 def execute_command_sync(project_name: str, args_json: str = "[]") -> str:
     """Execute a Meltano command (synchronous wrapper)."""
     import asyncio
+
+    def run_in_thread():
+        try:
+            args = json.loads(args_json) if args_json else []
+            return asyncio.run(get_bridge().execute_command(project_name, args))
+        except json.JSONDecodeError:
+            return json.dumps(
+                MeltanoResult(
+                    success=False,
+                    error="Invalid JSON in args_json parameter",
+                ).to_dict(),
+            )
+
     try:
-        args = json.loads(args_json) if args_json else []
-        bridge = get_bridge()
-        return asyncio.run(bridge.execute_command(project_name, args))
-    except json.JSONDecodeError:
-        return json.dumps(
-            MeltanoResult(
-                success=False, error="Invalid JSON in args_json parameter",
-            ).to_dict(),
-        )
+        asyncio.get_running_loop()
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_thread)
+            return future.result()
+    except RuntimeError:
+        return run_in_thread()
 
 
 def is_available() -> bool:
@@ -362,7 +448,4 @@ if __name__ == "__main__":
     bridge = MeltanoBridge()
 
     if bridge.is_available():
-        print("FLEXT Meltano bridge is available and ready")
-        print("Bridge uses FLEXT MeltanoProjectManager and FlextMeltanoOrchestrator")
-    else:
-        print("FLEXT Meltano bridge is not available")
+        pass

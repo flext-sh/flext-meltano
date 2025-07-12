@@ -8,12 +8,12 @@ REFACTORED:
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import Any
 
+from flext_core import ServiceResult
 from flext_core.config import injectable
-from flext_core.domain.types import ServiceResult
 
 if TYPE_CHECKING:
-    from typing import Any
     from uuid import UUID
 
     from flext_meltano.domain.entities import MeltanoJob
@@ -27,6 +27,7 @@ class MeltanoProjectService:
     """Service for managing Meltano projects."""
 
     def __init__(self) -> None:
+        """Initialize Meltano project service."""
         self._projects: dict[UUID, MeltanoProject] = {}
 
     async def create_project(
@@ -41,6 +42,7 @@ class MeltanoProjectService:
     ) -> ServiceResult[MeltanoProject]:
         """Create a new Meltano project."""
         try:
+            # Importing inside TYPE_CHECKING avoids circular imports
             from flext_meltano.domain.entities import MeltanoProject
 
             project = MeltanoProject(
@@ -56,15 +58,17 @@ class MeltanoProjectService:
 
             self._projects[project.id] = project
             return ServiceResult.ok(project)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to create project: {e}")
 
-    async def get_project(self, project_id: UUID) -> ServiceResult[MeltanoProject | None]:
+    async def get_project(
+        self, project_id: UUID,
+    ) -> ServiceResult[MeltanoProject | None]:
         """Get a project by ID."""
         try:
             project = self._projects.get(project_id)
             return ServiceResult.ok(project)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get project: {e}")
 
     async def list_projects(self) -> ServiceResult[list[MeltanoProject]]:
@@ -72,7 +76,7 @@ class MeltanoProjectService:
         try:
             projects = list(self._projects.values())
             return ServiceResult.ok(projects)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list projects: {e}")
 
     async def update_project(
@@ -92,7 +96,7 @@ class MeltanoProjectService:
 
             project.touch()
             return ServiceResult.ok(project)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to update project: {e}")
 
     async def delete_project(self, project_id: UUID) -> ServiceResult[bool]:
@@ -100,9 +104,9 @@ class MeltanoProjectService:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
-                return ServiceResult.ok(True)
+                return ServiceResult.ok(data=True)
             return ServiceResult.fail("Project not found")
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to delete project: {e}")
 
 
@@ -111,6 +115,7 @@ class MeltanoPluginService:
     """Service for managing Meltano plugins."""
 
     def __init__(self) -> None:
+        """Initialize Meltano plugin service."""
         self._plugins: dict[UUID, MeltanoPlugin] = {}
 
     async def install_plugin(
@@ -125,6 +130,7 @@ class MeltanoPluginService:
     ) -> ServiceResult[MeltanoPlugin]:
         """Install a plugin."""
         try:
+            # Using local import to avoid circular dependencies
             from flext_meltano.domain.entities import MeltanoPlugin
             from flext_meltano.domain.entities import MeltanoPluginType
 
@@ -142,7 +148,7 @@ class MeltanoPluginService:
             plugin.install()
             self._plugins[plugin.id] = plugin
             return ServiceResult.ok(plugin)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to install plugin: {e}")
 
     async def get_plugin(self, plugin_id: UUID) -> ServiceResult[MeltanoPlugin | None]:
@@ -150,10 +156,12 @@ class MeltanoPluginService:
         try:
             plugin = self._plugins.get(plugin_id)
             return ServiceResult.ok(plugin)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get plugin: {e}")
 
-    async def list_plugins(self, project_id: UUID) -> ServiceResult[list[MeltanoPlugin]]:
+    async def list_plugins(
+        self, project_id: UUID,
+    ) -> ServiceResult[list[MeltanoPlugin]]:
         """List plugins for a project."""
         try:
             plugins = [
@@ -162,7 +170,7 @@ class MeltanoPluginService:
                 if plugin.project_id == project_id
             ]
             return ServiceResult.ok(plugins)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list plugins: {e}")
 
     async def configure_plugin(
@@ -179,7 +187,7 @@ class MeltanoPluginService:
             plugin.update_plugin_config(config)
             plugin.touch()
             return ServiceResult.ok(plugin)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to configure plugin: {e}")
 
     async def uninstall_plugin(self, plugin_id: UUID) -> ServiceResult[bool]:
@@ -191,8 +199,8 @@ class MeltanoPluginService:
 
             plugin.uninstall()
             del self._plugins[plugin_id]
-            return ServiceResult.ok(True)
-        except Exception as e:
+            return ServiceResult.ok(data=True)
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to uninstall plugin: {e}")
 
 
@@ -201,6 +209,7 @@ class MeltanoJobService:
     """Service for managing Meltano jobs."""
 
     def __init__(self) -> None:
+        """Initialize Meltano job service."""
         self._jobs: dict[UUID, MeltanoJob] = {}
 
     async def create_job(
@@ -235,7 +244,7 @@ class MeltanoJobService:
 
             self._jobs[job.id] = job
             return ServiceResult.ok(job)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to create job: {e}")
 
     async def start_job(self, job_id: UUID) -> ServiceResult[MeltanoJob]:
@@ -247,7 +256,7 @@ class MeltanoJobService:
 
             job.start_execution()
             return ServiceResult.ok(job)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to start job: {e}")
 
     async def complete_job(
@@ -265,7 +274,7 @@ class MeltanoJobService:
 
             job.complete_execution(exit_code, stdout, stderr)
             return ServiceResult.ok(job)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to complete job: {e}")
 
     async def cancel_job(self, job_id: UUID) -> ServiceResult[MeltanoJob]:
@@ -277,7 +286,7 @@ class MeltanoJobService:
 
             job.cancel_execution()
             return ServiceResult.ok(job)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to cancel job: {e}")
 
     async def get_job(self, job_id: UUID) -> ServiceResult[MeltanoJob | None]:
@@ -285,7 +294,7 @@ class MeltanoJobService:
         try:
             job = self._jobs.get(job_id)
             return ServiceResult.ok(job)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get job: {e}")
 
     async def list_jobs(self, project_id: UUID) -> ServiceResult[list[MeltanoJob]]:
@@ -293,7 +302,7 @@ class MeltanoJobService:
         try:
             jobs = [job for job in self._jobs.values() if job.project_id == project_id]
             return ServiceResult.ok(jobs)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list jobs: {e}")
 
 
@@ -302,6 +311,7 @@ class MeltanoStateService:
     """Service for managing Meltano state."""
 
     def __init__(self) -> None:
+        """Initialize Meltano state service."""
         self._states: dict[UUID, MeltanoState] = {}
 
     async def create_state(
@@ -328,7 +338,7 @@ class MeltanoStateService:
 
             self._states[state.id] = state
             return ServiceResult.ok(state)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to create state: {e}")
 
     async def update_state(
@@ -344,7 +354,7 @@ class MeltanoStateService:
 
             state.update_state(state_data)
             return ServiceResult.ok(state)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to update state: {e}")
 
     async def merge_state(
@@ -360,7 +370,7 @@ class MeltanoStateService:
 
             state.merge_state(partial_state)
             return ServiceResult.ok(state)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to merge state: {e}")
 
     async def get_state(self, state_id: UUID) -> ServiceResult[MeltanoState | None]:
@@ -368,7 +378,7 @@ class MeltanoStateService:
         try:
             state = self._states.get(state_id)
             return ServiceResult.ok(state)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to get state: {e}")
 
     async def list_states(self, project_id: UUID) -> ServiceResult[list[MeltanoState]]:
@@ -380,7 +390,7 @@ class MeltanoStateService:
                 if state.project_id == project_id
             ]
             return ServiceResult.ok(states)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list states: {e}")
 
     async def delete_state(self, state_id: UUID) -> ServiceResult[bool]:
@@ -388,7 +398,7 @@ class MeltanoStateService:
         try:
             if state_id in self._states:
                 del self._states[state_id]
-                return ServiceResult.ok(True)
+                return ServiceResult.ok(data=True)
             return ServiceResult.fail("State not found")
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to delete state: {e}")

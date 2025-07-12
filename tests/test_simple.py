@@ -13,6 +13,7 @@ def test_flext_meltano_imports() -> None:
     """Test that flext-meltano can be imported."""
     try:
         import flext_meltano
+
         assert flext_meltano is not None
     except ImportError:
         pytest.skip("flext-meltano not available")
@@ -23,6 +24,7 @@ def test_flext_meltano_has_core_dependencies() -> None:
     try:
         from flext_core import APIResponse
         from flext_core import ServiceResult
+
         assert ServiceResult is not None
         assert APIResponse is not None
     except ImportError:
@@ -65,6 +67,7 @@ class TestFlextMeltanoIntegration:
         """Test that project manager can be imported."""
         try:
             from flext_meltano import MeltanoProjectManager
+
             assert MeltanoProjectManager is not None
         except ImportError:
             pytest.skip("MeltanoProjectManager not available")
@@ -73,6 +76,7 @@ class TestFlextMeltanoIntegration:
         """Test that unified anti-corruption layer can be imported."""
         try:
             from flext_meltano import UnifiedMeltanoAntiCorruptionLayer
+
             assert UnifiedMeltanoAntiCorruptionLayer is not None
         except ImportError:
             pytest.skip("UnifiedMeltanoAntiCorruptionLayer not available")

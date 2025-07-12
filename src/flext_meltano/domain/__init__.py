@@ -1,0 +1,1 @@
+"""FLEXT Meltano domain layer."""
