@@ -274,7 +274,9 @@ class MeltanoBridge:
             )
 
     async def execute_command(
-        self, project_name: str, command_args: list[str],
+        self,
+        project_name: str,
+        command_args: list[str],
     ) -> JSONStr:
         """Execute a Meltano command using FLEXT project manager.
 
@@ -348,7 +350,10 @@ def init_project_sync(project_name: str, project_dir: str = "") -> str:
 
 
 def add_plugin_sync(
-    project_name: str, plugin_type: str, plugin_name: str, plugin_variant: str = "",
+    project_name: str,
+    plugin_type: str,
+    plugin_name: str,
+    plugin_variant: str = "",
 ) -> str:
     """Add a plugin to the Meltano project (synchronous wrapper)."""
     import asyncio
@@ -356,7 +361,10 @@ def add_plugin_sync(
     def run_in_thread():
         return asyncio.run(
             get_bridge().add_plugin(
-                project_name, plugin_type, plugin_name, plugin_variant,
+                project_name,
+                plugin_type,
+                plugin_name,
+                plugin_variant,
             ),
         )
 
@@ -372,7 +380,10 @@ def add_plugin_sync(
 
 
 def run_pipeline_sync(
-    project_name: str, extractor: str, loader: str, transformer: str = "",
+    project_name: str,
+    extractor: str,
+    loader: str,
+    transformer: str = "",
 ) -> str:
     """Run a Meltano pipeline (synchronous wrapper)."""
     import asyncio

@@ -328,3 +328,9 @@ reports/
 requirements.txt
 requirements-dev.txt
 requirements-test.txt
+
+# AI Assistant Files
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.cursor/

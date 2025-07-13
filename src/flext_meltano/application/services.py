@@ -62,7 +62,8 @@ class MeltanoProjectService:
             return ServiceResult.fail(f"Failed to create project: {e}")
 
     async def get_project(
-        self, project_id: UUID,
+        self,
+        project_id: UUID,
     ) -> ServiceResult[MeltanoProject | None]:
         """Get a project by ID."""
         try:
@@ -160,7 +161,8 @@ class MeltanoPluginService:
             return ServiceResult.fail(f"Failed to get plugin: {e}")
 
     async def list_plugins(
-        self, project_id: UUID,
+        self,
+        project_id: UUID,
     ) -> ServiceResult[list[MeltanoPlugin]]:
         """List plugins for a project."""
         try:

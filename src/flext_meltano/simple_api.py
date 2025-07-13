@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from flext_core import ServiceResult
 from flext_core.config import get_container
-from flext_core.domain.result import ServiceResult
 from flext_meltano.config import MeltanoSettings
 
 

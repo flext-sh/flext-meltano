@@ -215,7 +215,8 @@ class OracleOICTap:
         ]
 
     async def sync_stream(
-        self, stream: SingerStreamDefinition,
+        self,
+        stream: SingerStreamDefinition,
     ) -> AsyncIterator[SingerRecord]:
         """Sync data from Oracle OIC stream."""
         if stream.name == "integrations":
@@ -298,7 +299,8 @@ class LDAPTap:
         ]
 
     async def sync_stream(
-        self, stream: SingerStreamDefinition,
+        self,
+        stream: SingerStreamDefinition,
     ) -> AsyncIterator[SingerRecord]:
         """Sync data from LDAP stream."""
         if stream.name == "users":
