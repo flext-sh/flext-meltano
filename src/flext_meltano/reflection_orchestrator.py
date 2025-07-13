@@ -27,8 +27,8 @@ from flext_core.domain.pydantic_base import Field
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from flext_core.domain.entities import Pipeline
-    from flext_core.domain.entities import PipelineExecution
+    from flext_core.domain.pipeline import Pipeline
+    from flext_core.domain.pipeline import PipelineExecution
 
 
 # Type aliases for clean interface
@@ -287,7 +287,8 @@ async def extract_data(source: str, config: dict[str, Any]) -> dict[str, Any]:
 
 @pipeline_step(StepType.TRANSFORM, name="simple-transform")
 async def transform_data(
-    data: dict[str, Any], config: dict[str, Any],
+    data: dict[str, Any],
+    config: dict[str, Any],
 ) -> dict[str, Any]:
     """Simple data transformation step."""
     return {"transformed": True, "original": data}
@@ -295,7 +296,9 @@ async def transform_data(
 
 @pipeline_step(StepType.LOAD, name="simple-load")
 async def load_data(
-    data: dict[str, Any], target: str, config: dict[str, Any],
+    data: dict[str, Any],
+    target: str,
+    config: dict[str, Any],
 ) -> dict[str, Any]:
     """Simple data loading step."""
     return {"target": target, "loaded": True, "data": data}

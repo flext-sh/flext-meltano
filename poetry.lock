@@ -575,7 +575,7 @@ version = "8.2.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["main", "dev", "typings"]
 files = [
     {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
     {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
@@ -623,12 +623,12 @@ version = "0.4.6"
 description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-groups = ["main", "dev"]
+groups = ["main", "dev", "typings"]
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {main = "platform_system == \"Windows\" or sys_platform == \"win32\""}
+markers = {main = "platform_system == \"Windows\" or sys_platform == \"win32\"", typings = "platform_system == \"Windows\""}
 
 [[package]]
 name = "coverage"
@@ -4131,6 +4131,57 @@ files = [
 tests = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "types-click-default-group"
+version = "1.2.0.20250513"
+description = "Typing stubs for click-default-group"
+optional = false
+python-versions = ">=3.9"
+groups = ["typings"]
+files = [
+    {file = "types_click_default_group-1.2.0.20250513-py3-none-any.whl", hash = "sha256:3a7af7f84356af7ea9a1d57b0574f1db938a4f40ec501f9d230500dc8aeb56bb"},
+    {file = "types_click_default_group-1.2.0.20250513.tar.gz", hash = "sha256:44804c5de725699e029ee87a3ce8b25b183708681649aa16223b190d926e9c50"},
+]
+
+[package.dependencies]
+click = ">=8.0.0"
+
+[[package]]
+name = "types-croniter"
+version = "6.0.0.20250626"
+description = "Typing stubs for croniter"
+optional = false
+python-versions = ">=3.9"
+groups = ["typings"]
+files = [
+    {file = "types_croniter-6.0.0.20250626-py3-none-any.whl", hash = "sha256:3e8c37b54b541f323b2c487f3a1c9dcb27a7092333a2d5c09fff0c4d41c68380"},
+    {file = "types_croniter-6.0.0.20250626.tar.gz", hash = "sha256:c32243b16d4dfa7c9989a5eadc6762459d093dded023f3c363fdee6b96578a77"},
+]
+
+[[package]]
+name = "types-dateparser"
+version = "1.2.2.20250627"
+description = "Typing stubs for dateparser"
+optional = false
+python-versions = ">=3.9"
+groups = ["typings"]
+files = [
+    {file = "types_dateparser-1.2.2.20250627-py3-none-any.whl", hash = "sha256:47fa841640e9e2d96ea69b7debf90423f9506429eb75035d50e3e58b898b71fc"},
+    {file = "types_dateparser-1.2.2.20250627.tar.gz", hash = "sha256:4435d920755c00176d60ed18d44aefa3501d0219b6caff3ea4a26c928c7df0e0"},
+]
+
+[[package]]
+name = "types-pymysql"
+version = "1.1.0.20250711"
+description = "Typing stubs for PyMySQL"
+optional = false
+python-versions = ">=3.9"
+groups = ["typings"]
+files = [
+    {file = "types_pymysql-1.1.0.20250711-py3-none-any.whl", hash = "sha256:29c8dbaeb38c005ea0b81fd2e1fbe58f1774d58105f41812fbf1dfc4701ae392"},
+    {file = "types_pymysql-1.1.0.20250711.tar.gz", hash = "sha256:38690d5e6d290eb56b9a451c79643c86663e1993344b818c69128977867a5ab9"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.14.1"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -4540,4 +4591,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "f853cda7696ff8f1207a6f84b0a9f3f65ca3538d3b017e7b02df51cf0797b365"
+content-hash = "6ae426a0165a0274b15096f7b7d8fac0a910fb648f9674a96a425ca229771eaf"

@@ -64,7 +64,8 @@ class MeltanoEventBridge:
     def __init__(self, flext_event_bus: EventBusProtocol | None = None) -> None:
         self.flext_event_bus = flext_event_bus or self._create_mock_event_bus()
         self._active_subscriptions: dict[
-            str, Callable,
+            str,
+            Callable,
         ] = {}  # Properly initialized - no TODOs
 
         # Event mapping between Meltano and FLEXT events
@@ -99,7 +100,8 @@ class MeltanoEventBridge:
                     )
                 elif isinstance(event, dict):
                     logger.info(
-                        "Event published", event_type=event.get("type", "unknown"),
+                        "Event published",
+                        event_type=event.get("type", "unknown"),
                     )
                 else:
                     logger.info("Event published", event_type=type(event).__name__)
@@ -113,7 +115,9 @@ class MeltanoEventBridge:
         return MockEventBus()
 
     async def publish_meltano_event(
-        self, config: EventConfig, **kwargs: object,
+        self,
+        config: EventConfig,
+        **kwargs: object,
     ) -> None:
         """Publish Meltano event to FLEXT event bus.
 

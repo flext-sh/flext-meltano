@@ -195,7 +195,10 @@ class MeltanoJob(DomainEntity):
         self.started_at = datetime.now()
 
     def complete_execution(
-        self, exit_code: int, stdout: str | None = None, stderr: str | None = None,
+        self,
+        exit_code: int,
+        stdout: str | None = None,
+        stderr: str | None = None,
     ) -> None:
         """Complete Meltano job execution with results.
 

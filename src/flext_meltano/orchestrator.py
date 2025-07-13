@@ -448,7 +448,9 @@ class FlextMeltanoOrchestrator:
         )
 
     async def _execute_pipeline_sync(
-        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> dict[str, Any]:
         project = await self.project_manager.load_project(
             flext_job.project_name,
@@ -482,7 +484,9 @@ class FlextMeltanoOrchestrator:
         }
 
     async def _execute_pipeline_async(
-        self, flext_job: FlextJob, run_mode: RunMode = RunMode.FULL_RUN,
+        self,
+        flext_job: FlextJob,
+        run_mode: RunMode = RunMode.FULL_RUN,
     ) -> dict[str, Any]:
         project = await self.project_manager.load_project(
             flext_job.project_name,
@@ -615,7 +619,10 @@ class FlextMeltanoOrchestrator:
         return result
 
     async def _execute_meltano_block(
-        self, project: Project, flext_job: FlextJob, block: dict[str, Any],
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        block: dict[str, Any],
     ) -> dict[str, Any]:
         engine = MeltanoEngine(project.root)
         extractor = block.get("extractor")
@@ -633,7 +640,10 @@ class FlextMeltanoOrchestrator:
         )
 
     async def _execute_run_block(
-        self, _project: Project, flext_job: FlextJob, commands: list[str],
+        self,
+        _project: Project,
+        flext_job: FlextJob,
+        commands: list[str],
     ) -> dict[str, Any]:
         config = get_config()
         min_commands = config.business.MINIMUM_MELTANO_COMMAND_COUNT
@@ -685,7 +695,10 @@ class FlextMeltanoOrchestrator:
             }
 
     async def _execute_invoke_block(
-        self, project: Project, flext_job: FlextJob, commands: list[str],
+        self,
+        project: Project,
+        flext_job: FlextJob,
+        commands: list[str],
     ) -> dict[str, Any]:
         try:
             self.logger.info(

@@ -167,7 +167,9 @@ class UnifiedMeltanoAntiCorruptionLayer:
             return ServiceResult.fail(f"Pipeline execution failed: {e}")
 
     def get_plugin_descriptor(
-        self, name: str, namespace: str,
+        self,
+        name: str,
+        namespace: str,
     ) -> MeltanoPluginDescriptor:
         """Get plugin descriptor for a Meltano plugin.
 

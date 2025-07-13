@@ -90,7 +90,9 @@ def init(name: str, directory: str | None, template: str) -> None:
 @click.option("--environment", "-e", help="Meltano environment")
 @click.option("--project-dir", type=click.Path(exists=True), help="Project directory")
 def run(
-    command: tuple[str, ...], environment: str | None, project_dir: str | None,
+    command: tuple[str, ...],
+    environment: str | None,
+    project_dir: str | None,
 ) -> None:
     """Run a Meltano command."""
     try:
@@ -112,7 +114,8 @@ def run(
 
         if result.returncode != 0:
             click.echo(
-                f"❌ Command failed with exit code {result.returncode}", err=True,
+                f"❌ Command failed with exit code {result.returncode}",
+                err=True,
             )
             raise click.Abort
         click.echo("✅ Command completed successfully")
@@ -124,13 +127,17 @@ def run(
 
 @cli.command()
 @click.argument(
-    "plugin_type", type=click.Choice(["extractor", "loader", "transformer"]),
+    "plugin_type",
+    type=click.Choice(["extractor", "loader", "transformer"]),
 )
 @click.argument("plugin_name")
 @click.option("--variant", help="Plugin variant")
 @click.option("--project-dir", type=click.Path(exists=True), help="Project directory")
 def install(
-    plugin_type: str, plugin_name: str, variant: str | None, project_dir: str | None,
+    plugin_type: str,
+    plugin_name: str,
+    variant: str | None,
+    project_dir: str | None,
 ) -> None:
     """Install a Meltano plugin."""
     try:

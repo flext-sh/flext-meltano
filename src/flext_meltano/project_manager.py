@@ -92,7 +92,9 @@ class MeltanoProjectManager:
         return "\n".join(filtered_lines)
 
     async def create_project(
-        self, project_name: str, environment: str = "dev",
+        self,
+        project_name: str,
+        environment: str = "dev",
     ) -> ServiceResult[dict[str, Any]]:
         """Create new Meltano project with enterprise configuration."""
         self.logger.info(
@@ -131,7 +133,10 @@ class MeltanoProjectManager:
             meltano_yml_path = project_path / "meltano.yml"
             with meltano_yml_path.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(
-                    meltano_yml_content, f, default_flow_style=False, indent=2,
+                    meltano_yml_content,
+                    f,
+                    default_flow_style=False,
+                    indent=2,
                 )
 
             # Create .meltano directory
@@ -153,7 +158,8 @@ class MeltanoProjectManager:
             return ServiceResult.fail(error_msg)
 
     async def load_project_config(
-        self, project_name: str,
+        self,
+        project_name: str,
     ) -> ServiceResult[dict[str, Any]]:
         """Load Meltano project configuration."""
         try:
@@ -177,7 +183,9 @@ class MeltanoProjectManager:
             return ServiceResult.fail(error_msg)
 
     async def save_project_config(
-        self, project_name: str, config: dict[str, Any],
+        self,
+        project_name: str,
+        config: dict[str, Any],
     ) -> ServiceResult[None]:
         """Save Meltano project configuration."""
         try:
@@ -236,7 +244,10 @@ class MeltanoProjectManager:
             return ServiceResult.fail(error_msg)
 
     async def run_command(
-        self, project_name: str, command_args: list[str], environment: str = "dev",
+        self,
+        project_name: str,
+        command_args: list[str],
+        environment: str = "dev",
     ) -> ServiceResult[dict[str, Any]]:
         """Execute Meltano command in project context with Singer SDK warning suppression."""
         try:
@@ -252,7 +263,9 @@ class MeltanoProjectManager:
             cmd.extend(command_args)
 
             self.logger.info(
-                "Executing Meltano command", command=cmd, project_path=str(project_path),
+                "Executing Meltano command",
+                command=cmd,
+                project_path=str(project_path),
             )
 
             # Set environment variables to eliminate Singer SDK deprecation warnings at source
@@ -344,7 +357,8 @@ class MeltanoProjectManager:
             # Run lock to ensure plugin is properly installed
             self.logger.info("Locking plugin dependencies")
             lock_result = await self.run_command(
-                project_name, ["lock", "--update", plugin_name],
+                project_name,
+                ["lock", "--update", plugin_name],
             )
             if not lock_result.is_success:
                 self.logger.warning(
@@ -357,9 +371,11 @@ class MeltanoProjectManager:
                 "plugin_name": plugin_name,
                 "plugin_variant": variant,
                 "add_output": add_result.value.get("stdout", ""),
-                "lock_output": lock_result.value.get("stdout", "")
-                if lock_result.is_success
-                else "Lock failed",
+                "lock_output": (
+                    lock_result.value.get("stdout", "")
+                    if lock_result.is_success
+                    else "Lock failed"
+                ),
             }
 
             self.logger.info("Plugin added successfully", **result)
@@ -371,7 +387,8 @@ class MeltanoProjectManager:
             return ServiceResult.fail(error_msg)
 
     async def validate_project(
-        self, project_name: str,
+        self,
+        project_name: str,
     ) -> ServiceResult[dict[str, Any]]:
         """Validate Meltano project structure and configuration."""
         try:
@@ -437,7 +454,9 @@ class FlextProjectManager(MeltanoProjectManager):
         self.event_bus = event_bus
 
     async def create_project_with_events(
-        self, project_name: str, environment: str = "dev",
+        self,
+        project_name: str,
+        environment: str = "dev",
     ) -> ServiceResult[dict[str, Any]]:
         """Create project and publish domain events."""
         result = await self.create_project(project_name, environment)
@@ -457,7 +476,9 @@ class FlextProjectManager(MeltanoProjectManager):
         return result
 
     async def backup_project(
-        self, project_name: str, backup_path: Path,
+        self,
+        project_name: str,
+        backup_path: Path,
     ) -> ServiceResult[Path]:
         """Create project backup archive."""
         try:
