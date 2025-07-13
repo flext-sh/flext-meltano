@@ -21,7 +21,7 @@ flext-observability = { path = "../flext-observability", develop = true }
 meltano = ">=3.5.0"
 sqlalchemy = ">=2.0.0"
 alembic = ">=1.13.0"
-psycopg2-binary = ">=2.9.0"
+psycopg-binary = ">=3.2.0"
 
 # Core dependencies are managed by flext-core - no duplication
 # pydantic, pydantic-settings, click, structlog, etc. come from flext-core
@@ -171,7 +171,7 @@ show_error_context = true
 pretty = true
 
 [[tool.mypy.overrides]]
-module = ["meltano.*", "sqlalchemy.*", "alembic.*", "psycopg2.*"]
+module = ["meltano.*", "sqlalchemy.*", "alembic.*", "psycopg.*"]
 ignore_missing_imports = true
 
 [tool.coverage.run]
