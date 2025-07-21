@@ -14,7 +14,6 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from flext_core.config import get_settings
 from flext_core.domain.pydantic_base import DomainBaseModel, DomainEvent, Field
 from flext_core.domain.shared_models import PipelineExecutionStatus
 from flext_observability.logging import get_logger
@@ -449,8 +448,6 @@ class FlextMeltanoOrchestrator:
         if not project_result.is_success:
             msg = "Project config load failed"
             raise ValueError(msg)
-            msg = "Project config load failed"
-            raise RuntimeError(msg)
 
         # Mock project object - in real implementation would parse from project_result.value
         # Use a temporary directory for the project root in tests
@@ -494,8 +491,6 @@ class FlextMeltanoOrchestrator:
         if not project_result.is_success:
             msg = "Project config load failed"
             raise ValueError(msg)
-            msg = "Project config load failed"
-            raise RuntimeError(msg)
 
         # Mock project object - in real implementation would parse from project_result.value
         # Use a temporary directory for the project root in tests
@@ -655,7 +650,8 @@ class FlextMeltanoOrchestrator:
         commands: list[str],
     ) -> dict[str, Any]:
         try:
-            config = get_settings(MeltanoSettings)
+            # Use MeltanoSettings directly instead of get_settings
+            config = MeltanoSettings()
             min_commands = config.business.MINIMUM_MELTANO_COMMAND_COUNT
 
             if len(commands) < min_commands:

@@ -12,7 +12,6 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.types import ServiceResult
 from flext_observability.logging import get_logger
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
@@ -65,7 +64,7 @@ class FlextMeltanoStateManager:
             return None
         except Exception as e:
             self.logger.exception("Failed to get state", job_id=job_id, error=str(e))
-            return ServiceResult.fail(f"Error in operation: {e}")
+            return None
 
     async def set_state(
         self,
@@ -93,7 +92,7 @@ class FlextMeltanoStateManager:
                 return True
         except Exception as e:
             self.logger.exception("Failed to set state", job_id=job_id, error=str(e))
-            return ServiceResult.fail(f"Error in operation: {e}")
+            return False
 
     async def clear_state(self, project: Project, job_id: str) -> bool:
         try:

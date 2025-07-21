@@ -7,6 +7,7 @@ REFACTORED:
 from __future__ import annotations
 
 from flext_core.config import get_container, singleton
+from flext_core.domain.shared_types import Environment
 
 from flext_meltano.config import MeltanoSettings
 
@@ -41,7 +42,7 @@ def setup_meltano_container(
         settings = MeltanoSettings(
             project_name="flext-infrastructure.plugins.flext-meltano",
             project_version="0.7.0",
-            environment="development",
+            environment=Environment.DEVELOPMENT,
             debug=False,
         )
 

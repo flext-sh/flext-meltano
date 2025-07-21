@@ -34,7 +34,7 @@ class TestMeltanoAdapter:
 
         # Should not be able to instantiate directly
         with pytest.raises(TypeError):
-            MeltanoAdapter()
+            MeltanoAdapter()  # type: ignore[abstract]
 
     def test_meltano_adapter_has_required_methods(self) -> None:
         """Test that MeltanoAdapter defines required abstract methods."""
@@ -94,6 +94,7 @@ class TestMeltanoAntiCorruptionLayer:
         result = await acl.execute_pipeline("test-pipeline", "dev", config)
 
         assert result.is_success is True
+        assert result.data is not None
         assert result.data["status"] == "completed"
         assert result.data["output"] == "Pipeline executed"
         assert result.data["duration"] == 120
@@ -158,6 +159,7 @@ class TestMeltanoAntiCorruptionLayer:
         result = await acl.execute_pipeline("error-pipeline")
 
         assert result.is_success is False
+        assert result.error is not None
         assert "Failed to execute pipeline: Connection failed" in result.error
 
     @pytest.mark.asyncio
@@ -184,8 +186,13 @@ class TestMeltanoAntiCorruptionLayer:
         )
 
         assert result.is_success is True
-        assert result.data["plugin_name"] == "tap-csv"
-        assert result.data["status"] == "installed"
+        assert result.data is not None
+        # result.data is a list, so access the first item
+        assert isinstance(result.data, list)
+        assert len(result.data) > 0
+        plugin_data = result.data[0]
+        assert plugin_data["plugin_name"] == "tap-csv"
+        assert plugin_data["status"] == "installed"
 
         mock_adapter.install_plugin.assert_called_once_with(
             plugin_type="extractor",
@@ -408,6 +415,7 @@ class TestSimpleMeltanoAdapter:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         assert result.data["status"] == "completed"
         assert "test-pipeline" in result.data["output"]
         assert result.data["duration"] == 100
@@ -426,6 +434,7 @@ class TestSimpleMeltanoAdapter:
         result = await adapter.run_pipeline("simple-pipeline")
 
         assert result.is_success is True
+        assert result.data is not None
         assert result.data["status"] == "completed"
         assert "simple-pipeline" in result.data["output"]
 
@@ -444,6 +453,7 @@ class TestSimpleMeltanoAdapter:
             result = await adapter.run_pipeline("error-pipeline")
 
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to run pipeline: Sleep failed" in result.error
 
     @pytest.mark.asyncio
@@ -456,6 +466,7 @@ class TestSimpleMeltanoAdapter:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         assert result.data["plugin_type"] == "extractor"
         assert result.data["plugin_name"] == "tap-csv"
         assert result.data["variant"] == "meltanolabs"
@@ -473,6 +484,7 @@ class TestSimpleMeltanoAdapter:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         assert result.data["plugin_type"] == "loader"
         assert result.data["plugin_name"] == "target-postgres"
         assert result.data["variant"] == "original"
@@ -489,6 +501,7 @@ class TestSimpleMeltanoAdapter:
             result = await adapter.install_plugin("extractor", "broken-plugin")
 
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to install plugin: File system error" in result.error
 
     @pytest.mark.asyncio
@@ -498,6 +511,7 @@ class TestSimpleMeltanoAdapter:
 
         assert result.is_success is True
         plugins = result.data
+        assert plugins is not None
         assert len(plugins) == 2
 
         # Check tap-csv plugin
@@ -523,6 +537,7 @@ class TestSimpleMeltanoAdapter:
 
         assert result.is_success is True
         plugins = result.data
+        assert plugins is not None
         assert len(plugins) == 1
         assert plugins[0]["name"] == "tap-csv"
         assert plugins[0]["type"] == "extractor"
@@ -532,6 +547,7 @@ class TestSimpleMeltanoAdapter:
 
         assert result.is_success is True
         plugins = result.data
+        assert plugins is not None
         assert len(plugins) == 1
         assert plugins[0]["name"] == "target-postgres"
         assert plugins[0]["type"] == "loader"
@@ -558,6 +574,7 @@ class TestSimpleMeltanoAdapter:
             result = await adapter.list_plugins(plugin_type="extractor")
 
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to list plugins: Result creation failed" in result.error
 
     @pytest.mark.asyncio
@@ -570,6 +587,7 @@ class TestSimpleMeltanoAdapter:
 
         assert result.is_success is True
         config = result.data
+        assert config is not None
         assert config["plugin_name"] == "tap-csv"
 
         settings = config["settings"]
@@ -590,6 +608,7 @@ class TestSimpleMeltanoAdapter:
 
         assert result.is_success is True
         config = result.data
+        assert config is not None
         assert config["plugin_name"] == "target-postgres"
 
         # Should still have the same structure

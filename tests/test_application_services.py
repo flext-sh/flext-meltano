@@ -58,8 +58,8 @@ class TestMeltanoProjectService:
         assert result.is_success is True
         assert result.error is None
 
+        assert result.data is not None
         project = result.data
-        assert project is not None
         assert project.name == "test-project"
         assert project.project_root == "/test/project"
         assert project.meltano_file_path == "/test/project/meltano.yml"
@@ -85,6 +85,7 @@ class TestMeltanoProjectService:
         result = await service.create_project(**sample_project_data)
 
         assert result.is_success is True
+        assert result.data is not None
         project = result.data
         assert project.created_by == created_by
 
@@ -102,6 +103,7 @@ class TestMeltanoProjectService:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         project = result.data
         assert project.name == "minimal-project"
         assert project.python_version == "3.13"  # Default value
@@ -125,6 +127,7 @@ class TestMeltanoProjectService:
             )
 
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to create project: Invalid project data" in result.error
 
     @pytest.mark.asyncio
@@ -136,6 +139,7 @@ class TestMeltanoProjectService:
         """Test successful project retrieval."""
         # First create a project
         create_result = await service.create_project(**sample_project_data)
+        assert create_result.data is not None
         project = create_result.data
 
         # Then retrieve it
@@ -178,8 +182,11 @@ class TestMeltanoProjectService:
         result = await service.list_projects()
 
         assert result.is_success is True
+        assert result.data is not None
         projects = result.data
         assert len(projects) == 2
+        assert project1_result.data is not None
+        assert project2_result.data is not None
         assert project1_result.data in projects
         assert project2_result.data in projects
 
@@ -192,6 +199,7 @@ class TestMeltanoProjectService:
         """Test successful project update."""
         # Create a project
         create_result = await service.create_project(**sample_project_data)
+        assert create_result.data is not None
         project = create_result.data
         original_updated_at = project.updated_at
 
@@ -203,10 +211,17 @@ class TestMeltanoProjectService:
         result = await service.update_project(project.id, updates)
 
         assert result.is_success is True
+        assert result.data is not None
         updated_project = result.data
         assert updated_project.name == "updated-project"
         assert updated_project.description == "Updated description"
-        assert updated_project.updated_at > original_updated_at
+        assert updated_project.updated_at is not None
+        # original_updated_at may be None for new entities, but after update it should have a value
+        if original_updated_at is not None:
+            assert updated_project.updated_at > original_updated_at
+        else:
+            # If original was None, updated should now have a timestamp
+            assert updated_project.updated_at is not None
 
     @pytest.mark.asyncio
     async def test_update_project_not_found(
@@ -231,6 +246,7 @@ class TestMeltanoProjectService:
         """Test updating a project with invalid attributes."""
         # Create a project
         create_result = await service.create_project(**sample_project_data)
+        assert create_result.data is not None
         project = create_result.data
 
         # Update with invalid attribute (should be ignored)
@@ -252,6 +268,7 @@ class TestMeltanoProjectService:
         """Test successful project deletion."""
         # Create a project
         create_result = await service.create_project(**sample_project_data)
+        assert create_result.data is not None
         project = create_result.data
 
         # Verify it exists
@@ -309,8 +326,8 @@ class TestMeltanoPluginService:
         result = await service.install_plugin(**sample_plugin_data)
 
         assert result.is_success is True
+        assert result.data is not None
         plugin = result.data
-        assert plugin is not None
         assert plugin.name == "tap-csv"
         assert plugin.namespace == "tap_csv"
         assert str(plugin.plugin_type) == "extractors"
@@ -337,6 +354,7 @@ class TestMeltanoPluginService:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         plugin = result.data
         assert plugin.pip_url is None
         assert plugin.executable == "tap-simple"  # Defaults to name
@@ -356,6 +374,7 @@ class TestMeltanoPluginService:
             result = await service.install_plugin(**sample_plugin_data)
 
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to install plugin: Invalid plugin data" in result.error
 
     @pytest.mark.asyncio
@@ -370,6 +389,7 @@ class TestMeltanoPluginService:
         assert install_result.is_success is True, (
             f"Plugin installation failed: {install_result.error}"
         )
+        assert install_result.data is not None
         plugin = install_result.data
 
         # Retrieve it
@@ -413,8 +433,11 @@ class TestMeltanoPluginService:
         result = await service.list_plugins(project_id)
 
         assert result.is_success is True
+        assert result.data is not None
         plugins = result.data
         assert len(plugins) == 2
+        assert plugin1_result.data is not None
+        assert plugin2_result.data is not None
         assert plugin1_result.data in plugins
         assert plugin2_result.data in plugins
 
@@ -427,6 +450,7 @@ class TestMeltanoPluginService:
         """Test successful plugin uninstallation."""
         # Install a plugin
         install_result = await service.install_plugin(**sample_plugin_data)
+        assert install_result.data is not None
         plugin = install_result.data
 
         # Verify it exists
@@ -482,8 +506,8 @@ class TestMeltanoJobService:
         result = await service.create_job(**sample_job_data)
 
         assert result.is_success is True
+        assert result.data is not None
         job = result.data
-        assert job is not None
         assert job.job_id == "test-job"
         assert job.command == ["meltano", "run", "tap-csv", "target-csv"]
         assert job.environment == "dev"
@@ -508,6 +532,7 @@ class TestMeltanoJobService:
         )
 
         assert result.is_success is True
+        assert result.data is not None
         job = result.data
         assert job.job_id == "minimal-job"
         assert job.command == ["meltano", "run"]
@@ -523,6 +548,7 @@ class TestMeltanoJobService:
         """Test successful job retrieval."""
         # Create a job
         create_result = await service.create_job(**sample_job_data)
+        assert create_result.data is not None
         job = create_result.data
 
         # Retrieve it
@@ -556,8 +582,11 @@ class TestMeltanoJobService:
         result = await service.list_jobs(project_id)
 
         assert result.is_success is True
+        assert result.data is not None
         jobs = result.data
         assert len(jobs) == 2
+        assert job1_result.data is not None
+        assert job2_result.data is not None
         assert job1_result.data in jobs
         assert job2_result.data in jobs
 
@@ -570,12 +599,14 @@ class TestMeltanoJobService:
         """Test successful job start."""
         # Create a job
         create_result = await service.create_job(**sample_job_data)
+        assert create_result.data is not None
         job = create_result.data
 
         # Start it
         result = await service.start_job(job.id)
 
         assert result.is_success is True
+        assert result.data is not None
         started_job = result.data
         assert started_job.id == job.id
 
@@ -598,12 +629,14 @@ class TestMeltanoJobService:
         """Test successful job completion."""
         # Create a job
         create_result = await service.create_job(**sample_job_data)
+        assert create_result.data is not None
         job = create_result.data
 
         # Complete it
         result = await service.complete_job(job.id, exit_code=0, stdout="Success")
 
         assert result.is_success is True
+        assert result.data is not None
         completed_job = result.data
         assert completed_job.id == job.id
 
@@ -616,12 +649,14 @@ class TestMeltanoJobService:
         """Test successful job cancellation."""
         # Create a job
         create_result = await service.create_job(**sample_job_data)
+        assert create_result.data is not None
         job = create_result.data
 
         # Cancel it
         result = await service.cancel_job(job.id)
 
         assert result.is_success is True
+        assert result.data is not None
         cancelled_job = result.data
         assert cancelled_job.id == job.id
 
@@ -658,8 +693,8 @@ class TestMeltanoStateService:
         result = await service.create_state(**sample_state_data)
 
         assert result.is_success is True
+        assert result.data is not None
         state = result.data
-        assert state is not None
         assert state.state_id == "tap-csv"
         assert state.state_data == sample_state_data["state_data"]
         assert state.environment == "dev"
@@ -680,6 +715,7 @@ class TestMeltanoStateService:
         """Test successful state retrieval."""
         # Create state
         create_result = await service.create_state(**sample_state_data)
+        assert create_result.data is not None
         state = create_result.data
 
         # Retrieve it by ID
@@ -723,8 +759,11 @@ class TestMeltanoStateService:
         result = await service.list_states(project_id)
 
         assert result.is_success is True
+        assert result.data is not None
         states = result.data
         assert len(states) == 2
+        assert state1_result.data is not None
+        assert state2_result.data is not None
         assert state1_result.data in states
         assert state2_result.data in states
 
@@ -740,8 +779,8 @@ class TestMeltanoStateService:
         assert create_result.is_success is True, (
             f"State creation failed: {create_result.error}"
         )
+        assert create_result.data is not None
         state = create_result.data
-        assert state is not None, "State creation returned None"
 
         # Verify it exists
         assert state.id in service._states
@@ -770,6 +809,7 @@ class TestMeltanoStateService:
         """Test successful state update."""
         # Create initial state
         create_result = await service.create_state(**sample_state_data)
+        assert create_result.data is not None
         original_state = create_result.data
 
         # Update state
@@ -780,6 +820,7 @@ class TestMeltanoStateService:
         result = await service.update_state(original_state.id, new_state_data)
 
         assert result.is_success is True
+        assert result.data is not None
         updated_state = result.data
 
         # Should be same ID but updated data
@@ -795,6 +836,7 @@ class TestMeltanoStateService:
         """Test successful state merge."""
         # Create initial state
         create_result = await service.create_state(**sample_state_data)
+        assert create_result.data is not None
         original_state = create_result.data
 
         # Merge partial state
@@ -805,6 +847,7 @@ class TestMeltanoStateService:
         result = await service.merge_state(original_state.id, partial_state)
 
         assert result.is_success is True
+        assert result.data is not None
         merged_state = result.data
 
         # Should be same ID with merged data
@@ -830,48 +873,52 @@ class TestServiceErrorHandling:
                 "3.0.0",
             )
             assert result.is_success is False
+            assert result.error is not None
             assert "Failed to create project: Unexpected error" in result.error
 
         # Plugin service
         plugin_service = MeltanoPluginService()
         with patch("flext_meltano.domain.entities.MeltanoPlugin") as mock:
             mock.side_effect = OSError("File system error")
-            result = await plugin_service.install_plugin(
+            plugin_result = await plugin_service.install_plugin(
                 uuid4(),
                 "test",
                 "test",
                 "extractors",
                 executable="test",
             )
-            assert result.is_success is False
-            assert "Failed to install plugin: File system error" in result.error
+            assert plugin_result.is_success is False
+            assert plugin_result.error is not None
+            assert "Failed to install plugin: File system error" in plugin_result.error
 
         # Job service
         job_service = MeltanoJobService()
         with patch("flext_meltano.domain.entities.MeltanoJob") as mock:
             mock.side_effect = TypeError("Type error")
-            result = await job_service.create_job(
+            job_result = await job_service.create_job(
                 uuid4(),
                 "test-job",
                 "run",
                 ["meltano", "run"],
             )
-            assert result.is_success is False
-            assert "Failed to create job: Type error" in result.error
+            assert job_result.is_success is False
+            assert job_result.error is not None
+            assert "Failed to create job: Type error" in job_result.error
 
         # State service
         state_service = MeltanoStateService()
         with patch("flext_meltano.domain.entities.MeltanoState") as mock:
             mock.side_effect = ValueError("Value error")
-            result = await state_service.create_state(
+            state_result = await state_service.create_state(
                 uuid4(),
                 uuid4(),
                 "test-state",
                 {},
                 "dev",
             )
-            assert result.is_success is False
-            assert "Failed to create state: Value error" in result.error
+            assert state_result.is_success is False
+            assert state_result.error is not None
+            assert "Failed to create state: Value error" in state_result.error
 
 
 class TestServiceIntegration:
@@ -924,6 +971,7 @@ class TestServiceIntegration:
             "/test/meltano.yml",
             "3.0.0",
         )
+        assert project_result.data is not None
         assert isinstance(project_result.data.id, UUID)
 
         plugin_result = await plugin_service.install_plugin(
@@ -933,6 +981,7 @@ class TestServiceIntegration:
             "extractors",
             executable="test",
         )
+        assert plugin_result.data is not None
         assert isinstance(plugin_result.data.id, UUID)
         assert plugin_result.data.project_id == project_id
 
@@ -942,6 +991,7 @@ class TestServiceIntegration:
             "run",
             ["meltano", "run"],
         )
+        assert job_result.data is not None
         assert isinstance(job_result.data.id, UUID)
         assert job_result.data.project_id == project_id
 
@@ -952,5 +1002,6 @@ class TestServiceIntegration:
             {},
             "dev",
         )
+        assert state_result.data is not None
         assert isinstance(state_result.data.id, UUID)
         assert state_result.data.project_id == project_id

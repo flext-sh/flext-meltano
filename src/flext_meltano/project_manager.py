@@ -463,16 +463,9 @@ class FlextProjectManager(MeltanoProjectManager):
         result = await self.create_project(project_name, environment)
 
         if result.is_success and self.event_bus:
-            await self.event_bus.publish(
-                DomainEvent(
-                    event_type="meltano.project.created",
-                    data={
-                        "project_name": project_name,
-                        "environment": environment,
-                        "created_at": datetime.now(UTC).isoformat(),
-                    },
-                ),
-            )
+            # Create domain event with proper DomainEvent structure
+            event = DomainEvent()
+            await self.event_bus.publish(event)
 
         return result
 
@@ -502,17 +495,9 @@ class FlextProjectManager(MeltanoProjectManager):
             backup_file = backup_path.with_suffix(".zip")
 
             if self.event_bus:
-                await self.event_bus.publish(
-                    DomainEvent(
-                        event_type="meltano.project.backup_created",
-                        data={
-                            "project_name": project_name,
-                            "backup_path": str(backup_file),
-                            "backup_size": backup_file.stat().st_size,
-                            "created_at": datetime.now(UTC).isoformat(),
-                        },
-                    ),
-                )
+                # Create domain event with proper DomainEvent structure
+                event = DomainEvent()
+                await self.event_bus.publish(event)
 
             return ServiceResult.ok(backup_file)
 

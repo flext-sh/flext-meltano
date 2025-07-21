@@ -9,8 +9,11 @@ from __future__ import annotations
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Never
+from typing import TYPE_CHECKING, Any, Never
 from unittest.mock import MagicMock, patch
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 import pytest
 
@@ -119,9 +122,7 @@ class TestStreamType:
         assert StreamType.FULL_TABLE
 
         # Verify they are different values
-        assert StreamType.TABLE != StreamType.INCREMENTAL
-        assert StreamType.INCREMENTAL != StreamType.FULL_TABLE
-        assert StreamType.TABLE != StreamType.FULL_TABLE
+        assert len(set(StreamType)) == 3  # All values are unique
 
 
 class TestOracleOICTap:
@@ -688,7 +689,7 @@ class TestFlextSingerSDKIntegration:
         integration = FlextSingerSDKIntegration(project_root)
 
         # Mock large dataset by patching sync_stream to yield many records
-        async def mock_sync_stream(stream: object) -> None:
+        async def mock_sync_stream(stream: object) -> AsyncGenerator[dict[str, Any]]:
             for i in range(SINGER_BATCH_SIZE_LIMIT + 100):  # More than batch limit
                 yield {
                     "id": f"record_{i:04d}",
@@ -731,10 +732,11 @@ class TestFlextSingerSDKIntegration:
             ]
 
         # Mock sync_stream to yield one record per stream
-        async def mock_sync_stream(stream: object) -> None:
+        async def mock_sync_stream(stream: Any) -> AsyncGenerator[dict[str, Any]]:
+            stream_name = getattr(stream, "name", "unknown_stream")
             yield {
-                "id": f"record_from_{stream.name}",
-                "data": f"test data from {stream.name}",
+                "id": f"record_from_{stream_name}",
+                "data": f"test data from {stream_name}",
             }
 
         with (

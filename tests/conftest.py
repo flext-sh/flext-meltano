@@ -106,18 +106,23 @@ def meltano_yml_config() -> dict[str, Any]:
 def meltano_project(
     test_meltano_project_dir: Path,
     meltano_yml_config: dict[str, Any],
-) -> Generator[Any]:
+) -> Any:
     """Meltano project for testing."""
     # Create meltano.yml
     import yaml
 
-    from flext_meltano.project import MeltanoProject
+    from flext_meltano.domain.entities import MeltanoProject
 
     meltano_yml = test_meltano_project_dir / "meltano.yml"
     with open(meltano_yml, "w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
 
-    return MeltanoProject(test_meltano_project_dir)
+    return MeltanoProject(
+        name="test-project",
+        project_root=str(test_meltano_project_dir),
+        meltano_file_path=str(test_meltano_project_dir / "meltano.yml"),
+        meltano_version="3.0.0",
+    )
 
 
 # Plugin fixtures

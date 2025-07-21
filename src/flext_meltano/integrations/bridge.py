@@ -503,11 +503,13 @@ def execute_command_sync(command: str, **kwargs: Any) -> str:
             finally:
                 loop.close()
         except json.JSONDecodeError:
-            return json.dumps({
-                "success": False,
-                "message": "Invalid JSON in command arguments",
-                "error": "Could not parse command arguments as JSON",
-            })
+            return json.dumps(
+                {
+                    "success": False,
+                    "message": "Invalid JSON in command arguments",
+                    "error": "Could not parse command arguments as JSON",
+                },
+            )
         except Exception as e:
             return f"Error: {e}"
 

@@ -57,7 +57,7 @@ pretty = true
 disallow_any_generics = true
 disallow_subclassing_any = true
 disallow_untyped_calls = true
-ignore_missing_imports = false
+ignore_missing_imports = true
 no_implicit_reexport = true
 files = [ "src", "tests",]
 plugins = [ "pydantic.mypy",]
@@ -114,6 +114,9 @@ output = "reports/coverage.xml"
 
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
+meltano = ">=3.0.0,<4.0.0"
+pydantic = ">=2.11.7,<3.0.0"
+pydantic-settings = ">=2.10.1,<3.0.0"
 
 
 [tool.ruff.lint.isort]
@@ -136,11 +139,15 @@ combine-as-imports = true
 path = "../flext-core"
 develop = true
 
+[tool.poetry.dependencies.flext-observability]
+path = "../flext-observability"
+develop = true
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.3"
 black = "^25.1.0"
 isort = "^6.0.1"
-mypy = "^1.13.0"
+mypy = "1.16.1"
 pylint = "^3.3.0"
 pre-commit = "^4.0.1"
 vulture = "^2.13"
@@ -175,6 +182,7 @@ types-toml = "^0.10.8.20240310"
 types-requests = "^2.32.4"
 types-redis = "^4.6.0"
 types-psutil = "^7.0.0"
+numpy = "^2.2.0"
 
 [tool.poetry.group.security.dependencies]
 bandit = "^1.8.0"

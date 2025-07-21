@@ -19,6 +19,7 @@ from flext_core.config.unified_config import (
 )
 from flext_core.domain.constants import ConfigDefaults
 from flext_core.domain.pydantic_base import DomainValueObject, Field
+from flext_core.domain.shared_types import Environment
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -305,15 +306,6 @@ class MeltanoSettings(
         """
         return self.plugins.auto_install
 
-    @property
-    def metrics_enabled(self) -> bool:
-        """Check if metrics collection is enabled.
-
-        Returns:
-            True if metrics are enabled, False otherwise.
-
-        """
-        return self.monitoring.metrics_enabled
 
     def configure_dependencies(self, container: Any | None = None) -> None:
         """Configure dependency injection container.
@@ -328,8 +320,8 @@ class MeltanoSettings(
         # Register this settings instance
         container.register(MeltanoSettings, self)
 
-        # Call parent configuration
-        super().configure_dependencies(container)
+        # Configure any other dependencies if needed
+        # Note: mixins don't provide configure_dependencies method
 
 
 # Convenience functions for getting settings
@@ -337,7 +329,7 @@ def get_meltano_settings() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment="development",
+        environment=Environment.DEVELOPMENT,
         debug=False,
     )
 
@@ -346,7 +338,7 @@ def create_development_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment="development",
+        environment=Environment.DEVELOPMENT,
         debug=True,
         project=MeltanoProjectConfig(
             default_environment="dev",
@@ -364,15 +356,11 @@ def create_production_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment="production",
+        environment=Environment.PRODUCTION,
         debug=False,
         project=MeltanoProjectConfig(
             default_environment="prod",
             database_uri="postgresql://user:pass@localhost/meltano",
         ),
         execution=MeltanoExecutionConfig(),
-        monitoring=MeltanoMonitoringConfig(
-            metrics_enabled=True,
-            log_level="INFO",
-        ),
     )
