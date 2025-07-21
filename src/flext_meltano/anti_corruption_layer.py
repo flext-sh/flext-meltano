@@ -15,8 +15,7 @@ The ACL ensures that:
 from __future__ import annotations
 
 import asyncio
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any
 
 from flext_core import ServiceResult
@@ -83,10 +82,9 @@ class MeltanoAntiCorruptionLayer:
                 configuration=meltano_config,
             )
 
-            if result.success:
-                # Translate Meltano results back to domain concepts
-                domain_result = self._translate_result(result.value)
-                return ServiceResult.ok(domain_result)
+            if result.is_success:
+                # Return the result value directly (domain translation would go here)
+                return ServiceResult.ok(result.data or {})
             return result
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
@@ -98,19 +96,21 @@ class MeltanoAntiCorruptionLayer:
         plugin_type: str,
         plugin_name: str,
         **kwargs: str | int | bool | None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[dict[str, Any] | list[dict[str, Any]]]:
         """Manage plugins through the Meltano adapter."""
         try:
             if action == "install":
-                return await self.adapter.install_plugin(
+                return await self.adapter.install_plugin(  # type: ignore[return-value]
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
-                    variant=kwargs.get("variant"),
+                    variant=str(kwargs.get("variant"))
+                    if kwargs.get("variant")
+                    else None,
                 )
             if action == "list":
-                return await self.adapter.list_plugins(plugin_type=plugin_type)
+                return await self.adapter.list_plugins(plugin_type=plugin_type)  # type: ignore[return-value]
             if action == "config":
-                return await self.adapter.get_plugin_config(plugin_name=plugin_name)
+                return await self.adapter.get_plugin_config(plugin_name=plugin_name)  # type: ignore[return-value]
             return ServiceResult.fail(f"Unknown plugin action: {action}")
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:

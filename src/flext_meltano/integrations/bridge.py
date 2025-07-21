@@ -11,9 +11,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from flext_observability.logging import get_logger
+
 from flext_meltano.project_manager import MeltanoProjectManager
 from flext_meltano.singer_direct import SingerDirectRunner
-from flext_observability.logging import get_logger
 
 # Orchestrator will be initialized when needed
 
@@ -28,20 +29,22 @@ _bridge_instance: MeltanoBridge | None = None
 
 @dataclass
 class MeltanoResult:
-    """Result wrapper for Meltano operations."""
+    """Result wrapper for Meltano operations with flext-core integration."""
 
     success: bool
-    data: object = None
-    error: str | None = None
-    metadata: dict[str, Any] = None
+    message: str = ""
+    data: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
+    error: str | None = None  # Keeping for backwards compatibility
 
     def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary for JSON serialization."""
         return {
             "success": self.success,
+            "message": self.message,
             "data": self.data,
+            "metadata": self.metadata,
             "error": self.error,
-            "metadata": self.metadata or {},
         }
 
 
@@ -88,7 +91,7 @@ class MeltanoBridge:
         try:
             # Use project_dir if provided, otherwise use current directory
             target_dir = Path(project_dir) if project_dir else self.project_root
-            project_path = target_dir / project_name
+            target_dir / project_name
 
             # Use FLEXT project manager instead of subprocess
             result = await self.project_manager.create_project(
@@ -100,21 +103,24 @@ class MeltanoBridge:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
-                        data={"project_path": str(project_path)},
-                        metadata={"flext_result": "success"},
+                        message="Project initialized successfully",
+                        data={"project_name": project_name, "project_dir": project_dir},
                     ).to_dict(),
                 )
             return json.dumps(
                 MeltanoResult(
                     success=False,
+                    message="Failed to initialize",
                     error=result.error,
-                    metadata={"flext_result": "failure"},
                 ).to_dict(),
             )
-
         except Exception as e:
             return json.dumps(
-                MeltanoResult(success=False, error=str(e)).to_dict(),
+                MeltanoResult(
+                    success=False,
+                    message="Failed to initialize",
+                    error=str(e),
+                ).to_dict(),
             )
 
     async def add_plugin(
@@ -149,6 +155,7 @@ class MeltanoBridge:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
+                        message="Plugin added successfully",
                         data={
                             "plugin_type": plugin_type,
                             "plugin_name": plugin_name,
@@ -160,14 +167,18 @@ class MeltanoBridge:
             return json.dumps(
                 MeltanoResult(
                     success=False,
+                    message="Failed to add plugin",
                     error=result.error,
                     metadata={"flext_result": "failure"},
                 ).to_dict(),
             )
-
         except Exception as e:
             return json.dumps(
-                MeltanoResult(success=False, error=str(e)).to_dict(),
+                MeltanoResult(
+                    success=False,
+                    message="Plugin addition failed",
+                    error=str(e),
+                ).to_dict(),
             )
 
     async def run_pipeline(
@@ -212,26 +223,30 @@ class MeltanoBridge:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
+                        message="Pipeline executed successfully",
                         data={
+                            "project_name": project_name,
                             "extractor": extractor,
                             "loader": loader,
                             "transformer": transformer,
-                            "message": "Pipeline executed using FLEXT project manager",
+                            "result": result.data,
                         },
-                        metadata={"flext_result": result.value},
                     ).to_dict(),
                 )
             return json.dumps(
                 MeltanoResult(
                     success=False,
+                    message="Pipeline execution failed",
                     error=result.error,
-                    metadata={"flext_result": "failure"},
                 ).to_dict(),
             )
-
         except Exception as e:
             return json.dumps(
-                MeltanoResult(success=False, error=str(e)).to_dict(),
+                MeltanoResult(
+                    success=False,
+                    message="Pipeline execution error",
+                    error=str(e),
+                ).to_dict(),
             )
 
     async def get_project_info(self, project_name: str) -> JSONStr:
@@ -252,25 +267,27 @@ class MeltanoBridge:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
+                        message="Project info retrieved successfully",
                         data={
                             "project_name": project_name,
-                            "project_root": str(self.project_root),
-                            "config": result.value,
+                            "project_info": result.data,
                         },
-                        metadata={"flext_result": "success"},
                     ).to_dict(),
                 )
             return json.dumps(
                 MeltanoResult(
                     success=False,
+                    message="Failed to get project info",
                     error=result.error,
-                    metadata={"flext_result": "failure"},
                 ).to_dict(),
             )
-
         except Exception as e:
             return json.dumps(
-                MeltanoResult(success=False, error=str(e)).to_dict(),
+                MeltanoResult(
+                    success=False,
+                    message="Project info retrieval error",
+                    error=str(e),
+                ).to_dict(),
             )
 
     async def execute_command(
@@ -300,21 +317,28 @@ class MeltanoBridge:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
-                        data=result.value,
-                        metadata={"flext_result": "success", "command": command_args},
+                        message="Command executed successfully",
+                        data={
+                            "project_name": project_name,
+                            "args": command_args,
+                            "result": result.data,
+                        },
                     ).to_dict(),
                 )
             return json.dumps(
                 MeltanoResult(
                     success=False,
+                    message="Command execution failed",
                     error=result.error,
-                    metadata={"flext_result": "failure", "command": command_args},
                 ).to_dict(),
             )
-
         except Exception as e:
             return json.dumps(
-                MeltanoResult(success=False, error=str(e)).to_dict(),
+                MeltanoResult(
+                    success=False,
+                    message="Command execution error",
+                    error=str(e),
+                ).to_dict(),
             )
 
 
@@ -328,125 +352,170 @@ def get_bridge() -> MeltanoBridge:
 
 
 # Sync wrapper functions for Go compatibility (Go doesn't handle async well)
-def init_project_sync(project_name: str, project_dir: str = "") -> str:
-    """Initialize a new Meltano project (synchronous wrapper)."""
+def init_project_sync(
+    project_root: str | Path,
+    **kwargs: Any,
+) -> str:
+    """Synchronous wrapper for project initialization."""
     import asyncio
+    from concurrent.futures import ThreadPoolExecutor
 
-    def run_in_thread():
-        return asyncio.run(get_bridge().init_project(project_name, project_dir or None))
+    async def run_async() -> str:
+        """Async project initialization."""
+        bridge = get_bridge()
+        result = await bridge.init_project(
+            project_name=str(kwargs.get("project_name", "")),
+            project_dir=kwargs.get("project_dir"),
+        )
+        return str(result)
 
-    # Check if we're in an event loop
-    try:
-        asyncio.get_running_loop()
-        # We're in an event loop, run in thread
-        import concurrent.futures
+    def run_in_thread() -> str:
+        try:
+            loop = asyncio.new_event_loop()
+            try:
+                return loop.run_until_complete(run_async())
+            finally:
+                loop.close()
+        except Exception as e:
+            return f"Error: {e}"
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_in_thread)
-            return future.result()
-    except RuntimeError:
-        # No event loop, safe to use asyncio.run
-        return run_in_thread()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        try:
+            return executor.submit(run_in_thread).result()
+        except Exception as e:
+            return f"Error: {e}"
 
 
 def add_plugin_sync(
-    project_name: str,
     plugin_type: str,
     plugin_name: str,
-    plugin_variant: str = "",
+    **kwargs: Any,
 ) -> str:
-    """Add a plugin to the Meltano project (synchronous wrapper)."""
+    """Synchronous wrapper for plugin installation."""
     import asyncio
+    from concurrent.futures import ThreadPoolExecutor
 
-    def run_in_thread():
-        return asyncio.run(
-            get_bridge().add_plugin(
-                project_name,
-                plugin_type,
-                plugin_name,
-                plugin_variant,
-            ),
+    async def run_async() -> str:
+        """Async plugin installation."""
+        bridge = get_bridge()
+        result = await bridge.add_plugin(
+            project_name=str(kwargs.get("project_name", "")),
+            plugin_type=plugin_type,
+            plugin_name=plugin_name,
+            plugin_variant=str(kwargs.get("plugin_variant", "")),
         )
+        return str(result)
 
-    try:
-        asyncio.get_running_loop()
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_in_thread)
-            return future.result()
-    except RuntimeError:
-        return run_in_thread()
-
-
-def run_pipeline_sync(
-    project_name: str,
-    extractor: str,
-    loader: str,
-    transformer: str = "",
-) -> str:
-    """Run a Meltano pipeline (synchronous wrapper)."""
-    import asyncio
-
-    def run_in_thread():
-        return asyncio.run(
-            get_bridge().run_pipeline(project_name, extractor, loader, transformer),
-        )
-
-    try:
-        asyncio.get_running_loop()
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_in_thread)
-            return future.result()
-    except RuntimeError:
-        return run_in_thread()
-
-
-def get_project_info_sync(project_name: str) -> str:
-    """Get information about the current project (synchronous wrapper)."""
-    import asyncio
-
-    def run_in_thread():
-        return asyncio.run(get_bridge().get_project_info(project_name))
-
-    try:
-        asyncio.get_running_loop()
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_in_thread)
-            return future.result()
-    except RuntimeError:
-        return run_in_thread()
-
-
-def execute_command_sync(project_name: str, args_json: str = "[]") -> str:
-    """Execute a Meltano command (synchronous wrapper)."""
-    import asyncio
-
-    def run_in_thread():
+    def run_in_thread() -> str:
         try:
-            args = json.loads(args_json) if args_json else []
-            return asyncio.run(get_bridge().execute_command(project_name, args))
+            loop = asyncio.new_event_loop()
+            try:
+                return loop.run_until_complete(run_async())
+            finally:
+                loop.close()
+        except Exception as e:
+            return f"Error: {e}"
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        try:
+            return executor.submit(run_in_thread).result()
+        except Exception as e:
+            return f"Error: {e}"
+
+
+def run_pipeline_sync(pipeline_name: str, **kwargs: Any) -> str:
+    """Synchronous wrapper for pipeline execution."""
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+
+    async def run_async() -> str:
+        """Async pipeline execution."""
+        bridge = get_bridge()
+        result = await bridge.run_pipeline(
+            project_name=str(kwargs.get("project_name", "")),
+            extractor=str(kwargs.get("extractor", "")),
+            loader=str(kwargs.get("loader", "")),
+            transformer=str(kwargs.get("transformer", "")),
+        )
+        return str(result)
+
+    def run_in_thread() -> str:
+        try:
+            loop = asyncio.new_event_loop()
+            try:
+                return loop.run_until_complete(run_async())
+            finally:
+                loop.close()
+        except Exception as e:
+            return f"Error: {e}"
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        try:
+            return executor.submit(run_in_thread).result()
+        except Exception as e:
+            return f"Error: {e}"
+
+
+def get_project_info_sync(**kwargs: Any) -> str:
+    """Synchronous wrapper for project info retrieval."""
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+
+    async def run_async() -> str:
+        bridge = get_bridge()
+        result = await bridge.get_project_info(str(kwargs.get("project_name", "")))
+        return str(result)
+
+    def run_in_thread() -> str:
+        try:
+            loop = asyncio.new_event_loop()
+            try:
+                return loop.run_until_complete(run_async())
+            finally:
+                loop.close()
+        except Exception as e:
+            return f"Error: {e}"
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        try:
+            return executor.submit(run_in_thread).result()
+        except Exception as e:
+            return f"Error: {e}"
+
+
+def execute_command_sync(command: str, **kwargs: Any) -> str:
+    """Synchronous wrapper for command execution."""
+    import asyncio
+    import json
+    from concurrent.futures import ThreadPoolExecutor
+
+    async def run_async() -> str:
+        bridge = get_bridge()
+        args = json.loads(command) if command else []
+        result = await bridge.execute_command(str(kwargs.get("project_name", "")), args)
+        return str(result)
+
+    def run_in_thread() -> str:
+        try:
+            loop = asyncio.new_event_loop()
+            try:
+                return loop.run_until_complete(run_async())
+            finally:
+                loop.close()
         except json.JSONDecodeError:
-            return json.dumps(
-                MeltanoResult(
-                    success=False,
-                    error="Invalid JSON in args_json parameter",
-                ).to_dict(),
-            )
+            return json.dumps({
+                "success": False,
+                "message": "Invalid JSON in command arguments",
+                "error": "Could not parse command arguments as JSON",
+            })
+        except Exception as e:
+            return f"Error: {e}"
 
-    try:
-        asyncio.get_running_loop()
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_in_thread)
-            return future.result()
-    except RuntimeError:
-        return run_in_thread()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        try:
+            return executor.submit(run_in_thread).result()
+        except Exception as e:
+            return f"Error: {e}"
 
 
 def is_available() -> bool:

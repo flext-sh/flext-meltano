@@ -7,16 +7,12 @@ allowing seamless event propagation and handling across both platforms.
 from __future__ import annotations
 
 import uuid
-from datetime import UTC
-from datetime import datetime
-from typing import TYPE_CHECKING
-from typing import Any
-
-from structlog import get_logger
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 # Use actual FLEXT imports - no placeholders allowed
-from flext_core.domain.pydantic_base import DomainEvent
-from flext_core.domain.pydantic_base import Field
+from flext_core.domain.pydantic_base import DomainEvent, Field
+from flext_observability.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -65,7 +61,7 @@ class MeltanoEventBridge:
         self.flext_event_bus = flext_event_bus or self._create_mock_event_bus()
         self._active_subscriptions: dict[
             str,
-            Callable,
+            Callable[..., Any],
         ] = {}  # Properly initialized - no TODOs
 
         # Event mapping between Meltano and FLEXT events
@@ -106,10 +102,18 @@ class MeltanoEventBridge:
                 else:
                     logger.info("Event published", event_type=type(event).__name__)
 
-            async def subscribe(self, pattern: str, handler: Callable) -> None:
+            async def subscribe(
+                self,
+                pattern: str,
+                handler: object,
+            ) -> None:
                 logger.info("Subscription created", pattern=pattern)
 
-            async def unsubscribe(self, pattern: str, handler: Callable) -> None:
+            async def unsubscribe(
+                self,
+                pattern: str,
+                handler: object,
+            ) -> None:
                 logger.info("Subscription removed", pattern=pattern)
 
         return MockEventBus()
@@ -201,7 +205,6 @@ class MeltanoEventBridge:
                 job_id=config.job_id,
                 pipeline_name=config.pipeline_name,
             )
-
         except Exception as e:
             logger.exception(
                 "Failed to publish Meltano event",

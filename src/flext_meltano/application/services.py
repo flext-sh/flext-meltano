@@ -7,8 +7,8 @@ REFACTORED:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
+from datetime import UTC
+from typing import TYPE_CHECKING, Any
 
 from flext_core import ServiceResult
 from flext_core.config import injectable
@@ -16,10 +16,12 @@ from flext_core.config import injectable
 if TYPE_CHECKING:
     from uuid import UUID
 
-    from flext_meltano.domain.entities import MeltanoJob
-    from flext_meltano.domain.entities import MeltanoPlugin
-    from flext_meltano.domain.entities import MeltanoProject
-    from flext_meltano.domain.entities import MeltanoState
+    from flext_meltano.domain.entities import (
+        MeltanoJob,
+        MeltanoPlugin,
+        MeltanoProject,
+        MeltanoState,
+    )
 
 
 @injectable()
@@ -95,7 +97,10 @@ class MeltanoProjectService:
                 if hasattr(project, key):
                     setattr(project, key, value)
 
-            project.touch()
+            # Update timestamp
+            from datetime import datetime
+
+            project.updated_at = datetime.now(UTC)
             return ServiceResult.ok(project)
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to update project: {e}")
@@ -132,8 +137,7 @@ class MeltanoPluginService:
         """Install a plugin."""
         try:
             # Using local import to avoid circular dependencies
-            from flext_meltano.domain.entities import MeltanoPlugin
-            from flext_meltano.domain.entities import MeltanoPluginType
+            from flext_meltano.domain.entities import MeltanoPlugin, MeltanoPluginType
 
             plugin = MeltanoPlugin(
                 project_id=project_id,
@@ -187,7 +191,10 @@ class MeltanoPluginService:
                 return ServiceResult.fail("Plugin not found")
 
             plugin.update_plugin_config(config)
-            plugin.touch()
+            # Update timestamp
+            from datetime import datetime
+
+            plugin.updated_at = datetime.now(UTC)
             return ServiceResult.ok(plugin)
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to configure plugin: {e}")
@@ -226,8 +233,7 @@ class MeltanoJobService:
     ) -> ServiceResult[MeltanoJob]:
         """Create a new job."""
         try:
-            from flext_meltano.domain.entities import JobType
-            from flext_meltano.domain.entities import MeltanoJob
+            from flext_meltano.domain.entities import JobType, MeltanoJob
 
             job = MeltanoJob(
                 project_id=project_id,
@@ -240,9 +246,15 @@ class MeltanoJobService:
                 description=f"Meltano job: {job_type}",
             )
 
-            if config:
-                for key, value in config.items():
-                    job.set_config(key, value)
+            # Use provided config or empty dict - config is for external use,
+            # not stored in job entity
+            job_config = config or {}
+
+            # Apply configuration to job
+            if hasattr(job, "configuration"):
+                job.configuration = job_config
+            elif hasattr(job, "config"):
+                job.config = job_config
 
             self._jobs[job.id] = job
             return ServiceResult.ok(job)

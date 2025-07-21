@@ -6,18 +6,16 @@ providing advanced tap/target creation, stream discovery, and pipeline orchestra
 
 from __future__ import annotations
 
-from datetime import UTC
-from datetime import datetime
-from enum import Enum
-from enum import auto
+from datetime import UTC, datetime
+from enum import Enum, auto
 from pathlib import Path
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
-from flext_core.domain.pydantic_base import BaseModel
-from flext_core.domain.pydantic_base import DomainValueObject
-from flext_core.domain.pydantic_base import Field
+from flext_core.domain.pydantic_base import (
+    DomainBaseModel as BaseModel,
+    DomainValueObject,
+    Field,
+)
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -97,7 +95,7 @@ class FlextSingerSDKIntegration(BaseModel):
             project_root = Path(project_root)
         super().__init__(project_root=project_root, **kwargs)
 
-    def model_post_init(self, /, **context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         """Initialize the Singer SDK integration."""
         self._discover_plugins()
 
@@ -125,9 +123,10 @@ class FlextSingerSDKIntegration(BaseModel):
         target_config: TargetConfig,
         _stream_maps: dict[str, dict[str, str]] | None = None,
     ) -> dict[str, Any]:
-        """Run an ELT pipeline with the specified tap and target."""
+        """Execute Singer tap and target integration."""
         try:
-            # Create tap instance
+            # Create tap instance - type will be determined at runtime
+            tap_instance: Any
             if tap_name == "tap-oracle-oic":
                 tap_instance = await self.create_oracle_oic_tap(tap_config)
             elif tap_name == "tap-ldap":
@@ -136,6 +135,7 @@ class FlextSingerSDKIntegration(BaseModel):
                 return {"success": False, "error": f"Unknown tap: {tap_name}"}
 
             # Create target instance
+            target_instance: Any
             if target_name == "target-postgres":
                 target_instance = await self.create_postgres_target(target_config)
             else:

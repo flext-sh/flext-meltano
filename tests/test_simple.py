@@ -1,4 +1,4 @@
-"""Simple tests for flext-meltano functionality.
+"""Simple tests for flext-infrastructure.plugins.flext-meltano functionality.
 
 Modern tests following flext-core standards.
 """
@@ -8,22 +8,20 @@ from __future__ import annotations
 import pytest
 
 
-# Test flext-meltano basic functionality
+# Test flext-infrastructure.plugins.flext-meltano basic functionality
 def test_flext_meltano_imports() -> None:
-    """Test that flext-meltano can be imported."""
-    try:
-        import flext_meltano
+    """Test that flext-infrastructure.plugins.flext-meltano can be imported."""
+    import flext_meltano
 
-        assert flext_meltano is not None
-    except ImportError:
-        pytest.skip("flext-meltano not available")
+    assert flext_meltano is not None
+    assert hasattr(flext_meltano, "__name__")
+    assert flext_meltano.__name__ == "flext_meltano"
 
 
 def test_flext_meltano_has_core_dependencies() -> None:
-    """Test that flext-meltano can import from flext-core."""
+    """Test that flext-infrastructure.plugins.flext-meltano can import from flext-core."""
     try:
-        from flext_core import APIResponse
-        from flext_core import ServiceResult
+        from flext_core import APIResponse, ServiceResult
 
         assert ServiceResult is not None
         assert APIResponse is not None
@@ -36,12 +34,12 @@ def test_service_result_pattern() -> None:
     from flext_core import ServiceResult
 
     # Test success case
-    success = ServiceResult.success({"test": "data"})
+    success = ServiceResult.ok({"test": "data"})
     assert success.is_success is True
     assert success.data == {"test": "data"}
 
     # Test failure case
-    failure = ServiceResult.failure("Test error")
+    failure = ServiceResult.fail("Test error")
     assert failure.is_success is False
     assert failure.error == "Test error"
 
@@ -61,22 +59,20 @@ def test_api_response_pattern() -> None:
 
 
 class TestFlextMeltanoIntegration:
-    """Test flext-meltano integration patterns."""
+    """Test flext-infrastructure.plugins.flext-meltano integration patterns."""
 
     def test_project_manager_available(self) -> None:
         """Test that project manager can be imported."""
-        try:
-            from flext_meltano import MeltanoProjectManager
+        from flext_meltano import MeltanoProjectManager
 
-            assert MeltanoProjectManager is not None
-        except ImportError:
-            pytest.skip("MeltanoProjectManager not available")
+        assert MeltanoProjectManager is not None
+        assert hasattr(MeltanoProjectManager, "__name__")
+        assert callable(MeltanoProjectManager)
 
     def test_unified_layer_available(self) -> None:
         """Test that unified anti-corruption layer can be imported."""
-        try:
-            from flext_meltano import UnifiedMeltanoAntiCorruptionLayer
+        from flext_meltano import UnifiedMeltanoAntiCorruptionLayer
 
-            assert UnifiedMeltanoAntiCorruptionLayer is not None
-        except ImportError:
-            pytest.skip("UnifiedMeltanoAntiCorruptionLayer not available")
+        assert UnifiedMeltanoAntiCorruptionLayer is not None
+        assert hasattr(UnifiedMeltanoAntiCorruptionLayer, "__name__")
+        assert callable(UnifiedMeltanoAntiCorruptionLayer)

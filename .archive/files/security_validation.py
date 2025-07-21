@@ -2,7 +2,7 @@
 """Security validation script for S603 and S110 fixes.
 
 This script validates that S603 (subprocess security) and S110 (try-except-pass)
-security issues have been properly addressed in the flext-meltano codebase.
+security issues have been properly addressed in the flext-infrastructure.plugins.flext-meltano codebase.
 """
 
 from __future__ import annotations
@@ -68,10 +68,14 @@ class SecurityIssueValidator:
                                 "Popen",
                             }:
                                 # Check if shell=True is used
-                                issues.extend(f"{py_file}:{node.lineno} - "
-                                            f"subprocess.{method} with shell=True" for keyword in node.keywords if keyword.arg == "shell"
-                                        and isinstance(keyword.value, ast.Constant)
-                                        and keyword.value.value is True)
+                                issues.extend(
+                                    f"{py_file}:{node.lineno} - "
+                                    f"subprocess.{method} with shell=True"
+                                    for keyword in node.keywords
+                                    if keyword.arg == "shell"
+                                    and isinstance(keyword.value, ast.Constant)
+                                    and keyword.value.value is True
+                                )
 
             except Exception:
                 pass
@@ -91,9 +95,12 @@ class SecurityIssueValidator:
 
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Try):
-                        issues.extend(f"{py_file}:{handler.lineno} - "
-                                    f"try-except-pass pattern" for handler in node.handlers if len(handler.body) == 1
-                                and isinstance(handler.body[0], ast.Pass))
+                        issues.extend(
+                            f"{py_file}:{handler.lineno} - try-except-pass pattern"
+                            for handler in node.handlers
+                            if len(handler.body) == 1
+                            and isinstance(handler.body[0], ast.Pass)
+                        )
 
             except Exception:
                 pass

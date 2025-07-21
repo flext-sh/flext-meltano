@@ -5,16 +5,13 @@ Simplified implementation using flext-core patterns.
 
 from __future__ import annotations
 
-from datetime import UTC
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import model_validator
-from structlog import get_logger
-
 from flext_core import ServiceResult
-from flext_core.domain.pydantic_base import DomainValueObject
-from flext_core.domain.pydantic_base import Field
+from flext_core.domain.pydantic_base import DomainValueObject, Field
+from flext_observability.logging import get_logger
+from pydantic import model_validator
 
 logger = get_logger(__name__)
 
@@ -162,7 +159,7 @@ class UnifiedMeltanoAntiCorruptionLayer:
                 completed_at=datetime.now(UTC),
                 records_processed=100,
             )
-            return ServiceResult.success(result)
+            return ServiceResult.ok(result)
         except ValueError as e:
             return ServiceResult.fail(f"Pipeline execution failed: {e}")
 

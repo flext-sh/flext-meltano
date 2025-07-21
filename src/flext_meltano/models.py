@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """FLEXT Meltano Models - Modern Python 3.13 + flext-core patterns.
 
 REFACTORED: Uses flext-core DomainValueObject and types.
@@ -10,10 +8,11 @@ These models provide strong typing and validation for the complex, nested
 data within a Meltano project configuration.
 """
 
-from typing import Any
+from __future__ import annotations
 
-from flext_core.domain.pydantic_base import DomainValueObject
-from flext_core.domain.pydantic_base import Field
+from typing import Any, ClassVar
+
+from flext_core.domain.pydantic_base import DomainValueObject, Field
 
 
 class MeltanoPlugin(DomainValueObject):
@@ -100,7 +99,10 @@ class MeltanoEnvironment(DomainValueObject):
 
 
 class MeltanoProjectConfig(DomainValueObject):
-    """The complete configuration of a meltano.yml file - REFACTORED to use flext-core."""
+    """The complete configuration of a meltano.yml file - REFACTORED to use flext-core.
+
+    This model represents the entire structure of a meltano.yml configuration file.
+    """
 
     version: int = Field(description="Meltano file version")
     send_anonymous_usage_stats: bool = Field(
@@ -128,7 +130,7 @@ class MeltanoProjectConfig(DomainValueObject):
     )
     project_root: str | None = Field(None, description="Project root directory")
 
-    model_config = {
+    model_config: ClassVar[dict[str, Any]] = {
         "populate_by_name": True,
         "validate_assignment": True,
         "extra": "forbid",

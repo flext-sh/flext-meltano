@@ -6,11 +6,9 @@ Does NOT duplicate code - extends flext_core functionality.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
-from structlog import get_logger
+from flext_observability.logging import get_logger
 
 if TYPE_CHECKING:
     from flext_core.domain.pydantic_base import DomainEvent
@@ -69,6 +67,7 @@ class SimpleEventBus:
 
         # Call handlers for this event type
         handlers = self._handlers.get(event_type, [])
+
         for handler in handlers:
             try:
                 if callable(handler):

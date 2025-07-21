@@ -4,10 +4,14 @@ REFACTORED:
             Using flext-core application patterns - NO duplication.
 """
 
-from flext_meltano.application.services import MeltanoJobService
-from flext_meltano.application.services import MeltanoPluginService
-from flext_meltano.application.services import MeltanoProjectService
-from flext_meltano.application.services import MeltanoStateService
+from __future__ import annotations
+
+from flext_meltano.application.services import (
+    MeltanoJobService,
+    MeltanoPluginService,
+    MeltanoProjectService,
+    MeltanoStateService,
+)
 
 __all__ = [
     "MeltanoJobService",
