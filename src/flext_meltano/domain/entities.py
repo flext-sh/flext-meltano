@@ -9,13 +9,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
-from uuid import UUID  # noqa: TC003 - Used in runtime for Pydantic fields
+from typing import TYPE_CHECKING, Any
 
 from flext_core.domain.pydantic_base import DomainEntity, DomainEvent, Field
 
 # Import enum types from flext-core - NO duplication
 from flext_core.domain.shared_models import PipelineExecutionStatus
+from flext_core.domain.shared_types import TimestampMixin
+
+if TYPE_CHECKING:
+    from uuid import UUID
 
 
 class JobType(StrEnum):
@@ -41,7 +44,7 @@ class MeltanoPluginType(StrEnum):
     UTILITIES = "utilities"
 
 
-class MeltanoProject(DomainEntity):
+class MeltanoProject(DomainEntity, TimestampMixin):
     """Meltano project domain entity."""
 
     # Project identification
@@ -88,7 +91,7 @@ class MeltanoProject(DomainEntity):
             self.environments.remove(environment)
 
 
-class MeltanoPlugin(DomainEntity):
+class MeltanoPlugin(DomainEntity, TimestampMixin):
     """Meltano plugin domain entity."""
 
     project_id: UUID = Field(..., description="Associated project ID")
@@ -214,7 +217,9 @@ class MeltanoJob(DomainEntity):
 
         """
         self.status = (
-            PipelineExecutionStatus.COMPLETED if exit_code == 0 else PipelineExecutionStatus.FAILED
+            PipelineExecutionStatus.COMPLETED
+            if exit_code == 0
+            else PipelineExecutionStatus.FAILED
         )
         self.exit_code = exit_code
         self.completed_at = datetime.now()

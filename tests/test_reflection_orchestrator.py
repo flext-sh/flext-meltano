@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
-from typing import Any, Never
+from typing import TYPE_CHECKING, Any, Never
 from unittest.mock import MagicMock
 
 import pytest
@@ -32,6 +32,9 @@ from flext_meltano.reflection_orchestrator import (  # noqa: E402
     transform_data,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
 
 class TestStepType:
     """Test StepType enum."""
@@ -45,16 +48,14 @@ class TestStepType:
         assert StepType.NOTIFY.value == 5
 
         # Verify they are different values
-        assert StepType.EXTRACT != StepType.TRANSFORM
-        assert StepType.LOAD != StepType.QUALITY
-        assert StepType.NOTIFY != StepType.EXTRACT
+        assert len(set(StepType)) == 5  # All values are unique
 
 
 class TestReflectionStep:
     """Test ReflectionStep class - comprehensive coverage."""
 
     @pytest.fixture
-    def sample_function(self) -> Any:
+    def sample_function(self) -> Callable[[str, int], Awaitable[str]]:
         """Sample function for testing."""
 
         async def sample_func(param1: str, param2: int = 10) -> str:
@@ -73,7 +74,7 @@ class TestReflectionStep:
 
     def test_reflection_step_initialization_minimal(
         self,
-        sample_function: object,
+        sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test ReflectionStep initialization with minimal parameters."""
         step = ReflectionStep(
@@ -84,12 +85,14 @@ class TestReflectionStep:
 
         assert step.name == "test-step"
         assert step.func == sample_function
-        assert step.step_type == StepType.EXTRACT.value
+        assert step.step_type == StepType.EXTRACT
         assert step.dependencies == []
         assert step.retry_count == 3  # Default
         assert step.timeout_seconds == 300  # Default
 
-    def test_reflection_step_initialization_full(self, sample_function: object) -> None:
+    def test_reflection_step_initialization_full(
+        self, sample_function: Callable[[str, int], Awaitable[str]],
+    ) -> None:
         """Test ReflectionStep initialization with all parameters."""
         dependencies = ["step1", "step2"]
 
@@ -104,7 +107,7 @@ class TestReflectionStep:
 
         assert step.name == "full-test-step"
         assert step.func == sample_function
-        assert step.step_type == StepType.TRANSFORM.value
+        assert step.step_type == StepType.TRANSFORM
         assert step.dependencies == dependencies
         assert step.retry_count == 5
         assert step.timeout_seconds == 600
@@ -112,7 +115,7 @@ class TestReflectionStep:
     @pytest.mark.asyncio
     async def test_execute_async_function_with_params(
         self,
-        sample_function: object,
+        sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test executing async function with parameters from context."""
         step = ReflectionStep(
@@ -131,7 +134,7 @@ class TestReflectionStep:
     @pytest.mark.asyncio
     async def test_execute_async_function_with_defaults(
         self,
-        sample_function: object,
+        sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test executing async function with default parameters."""
         step = ReflectionStep(
@@ -149,7 +152,9 @@ class TestReflectionStep:
         assert result["type"] == "TRANSFORM"
 
     @pytest.mark.asyncio
-    async def test_execute_sync_function(self, sync_function: object) -> None:
+    async def test_execute_sync_function(
+        self, sync_function: Callable[[str, int], str],
+    ) -> None:
         """Test executing sync function through executor."""
         step = ReflectionStep(
             name="sync-step",
@@ -229,7 +234,7 @@ class TestPipelineStepDecorator:
 
         step = decorated_func._pipeline_step
         assert step.name == "custom-extract"
-        assert step.step_type == StepType.EXTRACT.value
+        assert step.step_type == StepType.EXTRACT
         assert step.dependencies == []
         assert step.retry_count == 3
         assert step.timeout_seconds == 300
@@ -238,10 +243,10 @@ class TestPipelineStepDecorator:
         """Test automatic name generation from function name."""
 
         @pipeline_step(StepType.TRANSFORM)
-        async def my_transform_function(data: dict) -> dict:
+        async def my_transform_function(data: dict[str, Any]) -> dict[str, Any]:
             return data
 
-        step = my_transform_function._pipeline_step
+        step = my_transform_function._pipeline_step  # type: ignore[attr-defined]
         assert step.name == "my-transform-function"
 
     def test_decorator_with_all_params(self) -> None:
@@ -255,10 +260,10 @@ class TestPipelineStepDecorator:
             retry=5,
             timeout=600,
         )
-        async def complex_func(data: dict, target: str) -> dict:
+        async def complex_func(data: dict[str, Any], target: str) -> dict[str, Any]:
             return {"loaded": True}
 
-        step = complex_func._pipeline_step
+        step = complex_func._pipeline_step  # type: ignore[attr-defined]
         assert step.name == "complex-load"
         assert step.step_type == StepType.LOAD.value
         assert step.dependencies == dependencies
@@ -276,9 +281,10 @@ class TestPipelineStepDecorator:
         # Execute the decorated function
         result = await quality_func(data="test-data")
 
-        assert result["name"] == "test-quality"
-        assert result["result"] == "Quality: test-data"
-        assert result["type"] == "QUALITY"
+        # The decorator transforms the return value to a dict
+        assert result["name"] == "test-quality"  # type: ignore[index]
+        assert result["result"] == "Quality: test-data"  # type: ignore[index]
+        assert result["type"] == "QUALITY"  # type: ignore[index]
 
     @pytest.mark.asyncio
     async def test_decorated_function_with_object_context(self) -> None:
@@ -296,10 +302,10 @@ class TestPipelineStepDecorator:
         context_obj = ContextObject()
 
         # Execute with object as first argument
-        result = await context_func(context_obj)
+        result = await context_func(context_obj)  # type: ignore[arg-type]
 
-        assert result["name"] == "context-extract"
-        assert result["result"] == "Context: from-object"
+        assert result["name"] == "context-extract"  # type: ignore[index]
+        assert result["result"] == "Context: from-object"  # type: ignore[index]
 
 
 class TestReflectionOrchestrator:
@@ -323,10 +329,10 @@ class TestReflectionOrchestrator:
 
         # Add a decorated function to the module
         @pipeline_step(StepType.EXTRACT, name="discovered-extract")
-        async def extract_func(source: str) -> dict:
+        async def extract_func(source: str) -> dict[str, Any]:
             return {"extracted": source}
 
-        mock_module.extract_func = extract_func
+        mock_module.extract_func = extract_func  # type: ignore[attr-defined]
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -334,7 +340,7 @@ class TestReflectionOrchestrator:
         assert "discovered-extract" in orchestrator.step_registry
         step = orchestrator.step_registry["discovered-extract"]
         assert step.name == "discovered-extract"
-        assert step.step_type == StepType.EXTRACT.value
+        assert step.step_type == StepType.EXTRACT
 
     def test_discover_steps_with_step_type_objects(self) -> None:
         """Test discovering objects with step_type attribute."""
@@ -348,7 +354,7 @@ class TestReflectionOrchestrator:
         class MockStepObject:
             step_type = StepType.TRANSFORM
 
-        mock_module.mock_step = MockStepObject()
+        mock_module.mock_step = MockStepObject()  # type: ignore[attr-defined]
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -374,7 +380,7 @@ class TestReflectionOrchestrator:
                 msg = "Broken pipeline step"
                 raise AttributeError(msg)
 
-        mock_module.broken_obj = BrokenObject()
+        mock_module.broken_obj = BrokenObject()  # type: ignore[attr-defined]
 
         # Should not raise exception, just continue
         orchestrator.discover_steps(mock_module)
@@ -389,10 +395,10 @@ class TestReflectionOrchestrator:
 
         # Add a step to registry
         @pipeline_step(StepType.EXTRACT, name="test-extract")
-        async def test_extract(source: str) -> dict:
+        async def test_extract(source: str) -> dict[str, Any]:
             return {"data": f"extracted from {source}"}
 
-        orchestrator.step_registry["test-extract"] = test_extract._pipeline_step
+        orchestrator.step_registry["test-extract"] = test_extract._pipeline_step  # type: ignore[attr-defined]
 
         # Create mock pipeline and execution objects
         mock_pipeline = MagicMock()
@@ -502,7 +508,7 @@ class TestReflectionOrchestrator:
         )
 
         context = {"data": "test"}
-        configuration = {}
+        configuration: dict[str, Any] = {}
 
         with pytest.raises(asyncio.TimeoutError):
             await orchestrator._execute_step_with_retry(step, context, configuration)
@@ -531,7 +537,7 @@ class TestReflectionOrchestrator:
         )
 
         context = {"data": "test"}
-        configuration = {}
+        configuration: dict[str, Any] = {}
 
         # Should succeed on third attempt
         result = await orchestrator._execute_step_with_retry(
@@ -562,7 +568,7 @@ class TestReflectionOrchestrator:
         )
 
         context = {"data": "test"}
-        configuration = {}
+        configuration: dict[str, Any] = {}
 
         with pytest.raises(RuntimeError, match="Always fails"):
             await orchestrator._execute_step_with_retry(step, context, configuration)
@@ -659,7 +665,7 @@ class TestProtocols:
         assert hasattr(step, "dependencies")
         assert callable(step.execute)
         # Pydantic converts enum to value, so check the value
-        assert step.step_type == StepType.EXTRACT.value
+        assert step.step_type == StepType.EXTRACT
         assert step.dependencies == ["dep1", "dep2"]
 
 
@@ -675,7 +681,7 @@ class TestIntegrationWorkflow:
 
         # Step 2: Define custom steps
         @pipeline_step(StepType.EXTRACT, name="workflow-extract", dependencies=[])
-        async def workflow_extract(context: dict[str, Any]) -> dict:
+        async def workflow_extract(context: dict[str, Any]) -> dict[str, Any]:
             source = context.get("source", "default_source")
             return {"extracted": f"data from {source}"}
 
@@ -684,7 +690,7 @@ class TestIntegrationWorkflow:
             name="workflow-transform",
             dependencies=["workflow-extract"],
         )
-        async def workflow_transform(context: dict[str, Any]) -> dict:
+        async def workflow_transform(context: dict[str, Any]) -> dict[str, Any]:
             return {"transformed": True, "processed": True}
 
         @pipeline_step(
@@ -692,16 +698,16 @@ class TestIntegrationWorkflow:
             name="workflow-load",
             dependencies=["workflow-transform"],
         )
-        async def workflow_load(context: dict[str, Any]) -> dict:
+        async def workflow_load(context: dict[str, Any]) -> dict[str, Any]:
             target = context.get("target", "default_target")
             return {"loaded": True, "target": target}
 
         # Step 3: Register steps manually (simulate discovery)
-        orchestrator.step_registry["workflow-extract"] = workflow_extract._pipeline_step
+        orchestrator.step_registry["workflow-extract"] = workflow_extract._pipeline_step  # type: ignore[attr-defined]
         orchestrator.step_registry["workflow-transform"] = (
-            workflow_transform._pipeline_step
+            workflow_transform._pipeline_step  # type: ignore[attr-defined]
         )
-        orchestrator.step_registry["workflow-load"] = workflow_load._pipeline_step
+        orchestrator.step_registry["workflow-load"] = workflow_load._pipeline_step  # type: ignore[attr-defined]
 
         # Step 4: Create mock pipeline
         mock_steps = [

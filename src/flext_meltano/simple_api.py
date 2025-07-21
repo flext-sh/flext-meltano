@@ -9,6 +9,7 @@ from pathlib import Path
 
 from flext_core import ServiceResult
 from flext_core.config import get_container
+from flext_core.domain.shared_types import Environment
 
 from flext_meltano.config import MeltanoSettings
 
@@ -30,7 +31,7 @@ def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool
             settings = MeltanoSettings(
                 project_name="flext-infrastructure.plugins.flext-meltano",
                 project_version="0.7.0",
-                environment="development",
+                environment=Environment.DEVELOPMENT,
                 debug=False,
             )
 
@@ -78,7 +79,7 @@ def create_development_meltano_config(
     return MeltanoSettings(
         project_name=str(config.get("project_name")),
         project_version=str(config.get("project_version")),
-        environment=str(config.get("environment")),
+        environment=Environment(str(config.get("environment", "development"))),
         debug=bool(config.get("debug")),
     )
 

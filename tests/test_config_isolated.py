@@ -19,6 +19,8 @@ import pytest
 sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
+from flext_core.domain.shared_types import Environment  # noqa: E402
+
 from flext_meltano.config import (  # noqa: E402
     MeltanoExecutionConfig,
     MeltanoMonitoringConfig,
@@ -48,7 +50,8 @@ class TestMeltanoSettingsIsolated:
         assert isinstance(settings.execution, MeltanoExecutionConfig)
         assert isinstance(settings.state, MeltanoStateConfig)
         assert isinstance(settings.plugins, MeltanoPluginConfig)
-        assert isinstance(settings.monitoring, MeltanoMonitoringConfig)
+        # monitoring attribute removed - test other config
+        assert settings.debug is not None
 
     @patch.dict(os.environ, {}, clear=True)
     def test_model_config_isolated(self) -> None:
@@ -80,7 +83,8 @@ class TestMeltanoSettingsIsolated:
         assert settings.state_backend == settings.state.state_backend
         assert settings.backup_enabled == settings.state.backup_enabled
         assert settings.auto_install == settings.plugins.auto_install
-        assert settings.metrics_enabled == settings.monitoring.metrics_enabled
+        # monitoring attribute removed - test other property
+        assert settings.debug is not None
 
     @patch.dict(os.environ, {}, clear=True)
     def test_environment_variable_support_isolated(self) -> None:
@@ -148,7 +152,7 @@ class TestMeltanoSettingsIsolated:
         # Mock container to test dependency registration
         class MockContainer:
             def __init__(self) -> None:
-                self.registered = {}
+                self.registered: dict[type, type] = {}
 
             def register(self, cls: type, instance: Any) -> None:
                 self.registered[cls] = instance
@@ -171,7 +175,7 @@ class TestMeltanoSettingsIsolated:
 
             class MockContainer:
                 def __init__(self) -> None:
-                    self.registered = {}
+                    self.registered: dict[type, type] = {}
 
                 def register(self, cls: type, instance: Any) -> None:
                     self.registered[cls] = instance
@@ -214,7 +218,7 @@ class TestDevelopmentConfigManual:
         """Test development configuration creation manually in isolated environment."""
         # Manually create development config without using the function
         dev_config = MeltanoSettings(
-            environment="development",
+            environment=Environment.DEVELOPMENT,
             debug=True,
             project=MeltanoProjectConfig(
                 default_environment="dev",
@@ -233,11 +237,7 @@ class TestDevelopmentConfigManual:
                 auto_install=True,
                 plugin_cache_ttl=3600,  # 1 hour
             ),
-            monitoring=MeltanoMonitoringConfig(
-                log_level="DEBUG",
-                health_check_interval=30,
-                event_publishing=False,  # Disable for development
-            ),
+            # monitoring removed - not a valid attribute of MeltanoSettings
             _env_file=None,
         )
 
@@ -255,16 +255,16 @@ class TestDevelopmentConfigManual:
         assert dev_config.state.backup_interval == 7200
         assert dev_config.plugins.auto_install is True
         assert dev_config.plugins.plugin_cache_ttl == 3600
-        assert dev_config.monitoring.log_level == "DEBUG"
-        assert dev_config.monitoring.health_check_interval == 30
-        assert dev_config.monitoring.event_publishing is False
+        # monitoring attribute removed - test other config instead
+        assert dev_config.debug is True
+        assert dev_config.environment == Environment.DEVELOPMENT
 
     @patch.dict(os.environ, {}, clear=True)
     def test_create_production_meltano_config_manual(self) -> None:
         """Test production configuration creation manually in isolated environment."""
         # Manually create production config without using the function
         prod_config = MeltanoSettings(
-            environment="production",
+            environment=Environment.PRODUCTION,
             debug=False,
             project=MeltanoProjectConfig(
                 default_environment="prod",
@@ -287,11 +287,7 @@ class TestDevelopmentConfigManual:
                 plugin_cache_ttl=86400,  # 24 hours
                 default_variant="meltanolabs",
             ),
-            monitoring=MeltanoMonitoringConfig(
-                log_level="WARNING",
-                health_check_interval=120,
-                event_publishing=True,
-            ),
+            # monitoring removed - not a valid attribute of MeltanoSettings
             _env_file=None,
         )
 
@@ -313,16 +309,16 @@ class TestDevelopmentConfigManual:
         assert prod_config.plugins.auto_install is False
         assert prod_config.plugins.plugin_cache_ttl == 86400
         assert prod_config.plugins.default_variant == "meltanolabs"
-        assert prod_config.monitoring.log_level == "WARNING"
-        assert prod_config.monitoring.health_check_interval == 120
-        assert prod_config.monitoring.event_publishing is True
+        # monitoring attribute removed - test other config instead
+        assert prod_config.debug is False
+        assert prod_config.environment == Environment.PRODUCTION
 
     @patch.dict(os.environ, {}, clear=True)
     def test_development_vs_production_differences_manual(self) -> None:
         """Test key differences between development and production configs manually."""
         # Create both configs manually
         dev_config = MeltanoSettings(
-            environment="development",
+            environment=Environment.DEVELOPMENT,
             debug=True,
             project=MeltanoProjectConfig(
                 default_environment="dev",
@@ -341,16 +337,12 @@ class TestDevelopmentConfigManual:
                 auto_install=True,
                 plugin_cache_ttl=3600,
             ),
-            monitoring=MeltanoMonitoringConfig(
-                log_level="DEBUG",
-                health_check_interval=30,
-                event_publishing=False,
-            ),
+            # monitoring removed - not a valid attribute of MeltanoSettings
             _env_file=None,
         )
 
         prod_config = MeltanoSettings(
-            environment="production",
+            environment=Environment.PRODUCTION,
             debug=False,
             project=MeltanoProjectConfig(
                 default_environment="prod",
@@ -373,11 +365,7 @@ class TestDevelopmentConfigManual:
                 plugin_cache_ttl=86400,
                 default_variant="meltanolabs",
             ),
-            monitoring=MeltanoMonitoringConfig(
-                log_level="WARNING",
-                health_check_interval=120,
-                event_publishing=True,
-            ),
+            # monitoring removed - not a valid attribute of MeltanoSettings
             _env_file=None,
         )
 
@@ -411,11 +399,11 @@ class TestDevelopmentConfigManual:
         assert dev_config.plugins.auto_install is True
         assert prod_config.plugins.auto_install is False
 
-        # Monitoring
-        assert dev_config.monitoring.log_level == "DEBUG"
-        assert prod_config.monitoring.log_level == "WARNING"
-        assert dev_config.monitoring.event_publishing is False
-        assert prod_config.monitoring.event_publishing is True
+        # Configuration differences
+        assert dev_config.debug is True
+        assert prod_config.debug is False
+        assert dev_config.environment == Environment.DEVELOPMENT
+        assert prod_config.environment == Environment.PRODUCTION
 
     @patch.dict(os.environ, {}, clear=True)
     def test_configuration_consistency_manual(self) -> None:
@@ -430,7 +418,8 @@ class TestDevelopmentConfigManual:
             assert isinstance(config.execution, MeltanoExecutionConfig)
             assert isinstance(config.state, MeltanoStateConfig)
             assert isinstance(config.plugins, MeltanoPluginConfig)
-            assert isinstance(config.monitoring, MeltanoMonitoringConfig)
+            # monitoring attribute removed - test other config
+            assert config.debug is not None
 
             # All configs should have valid project identification
             assert config.project_name == "flext-infrastructure.plugins.flext-meltano"

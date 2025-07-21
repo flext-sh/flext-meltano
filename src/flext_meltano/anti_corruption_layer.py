@@ -96,11 +96,11 @@ class MeltanoAntiCorruptionLayer:
         plugin_type: str,
         plugin_name: str,
         **kwargs: str | int | bool | None,
-    ) -> ServiceResult[dict[str, Any] | list[dict[str, Any]]]:
+    ) -> ServiceResult[dict[str, Any]] | ServiceResult[list[dict[str, Any]]]:
         """Manage plugins through the Meltano adapter."""
         try:
             if action == "install":
-                return await self.adapter.install_plugin(  # type: ignore[return-value]
+                return await self.adapter.install_plugin(
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                     variant=str(kwargs.get("variant"))
@@ -108,9 +108,9 @@ class MeltanoAntiCorruptionLayer:
                     else None,
                 )
             if action == "list":
-                return await self.adapter.list_plugins(plugin_type=plugin_type)  # type: ignore[return-value]
+                return await self.adapter.list_plugins(plugin_type=plugin_type)
             if action == "config":
-                return await self.adapter.get_plugin_config(plugin_name=plugin_name)  # type: ignore[return-value]
+                return await self.adapter.get_plugin_config(plugin_name=plugin_name)
             return ServiceResult.fail(f"Unknown plugin action: {action}")
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:

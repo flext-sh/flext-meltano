@@ -10,9 +10,10 @@ data within a Meltano project configuration.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import Any
 
 from flext_core.domain.pydantic_base import DomainValueObject, Field
+from pydantic import ConfigDict
 
 
 class MeltanoPlugin(DomainValueObject):
@@ -130,11 +131,11 @@ class MeltanoProjectConfig(DomainValueObject):
     )
     project_root: str | None = Field(None, description="Project root directory")
 
-    model_config: ClassVar[dict[str, Any]] = {
-        "populate_by_name": True,
-        "validate_assignment": True,
-        "extra": "forbid",
-    }
+    model_config = ConfigDict(
+        populate_by_name=True,
+        validate_assignment=True,
+        extra="forbid",
+    )
 
 
 # Export unified interface

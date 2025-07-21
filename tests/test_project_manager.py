@@ -8,6 +8,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -19,6 +20,9 @@ from flext_meltano.orchestrator import FlextMeltanoOrchestrator
 from flext_meltano.project_manager import MeltanoProjectManager
 from flext_meltano.state_manager import FlextMeltanoStateManager
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 class TestMeltanoProjectManager:
     """Test Meltano project management functionality."""
@@ -28,7 +32,7 @@ class TestMeltanoProjectManager:
         return MeltanoProjectManager(str(tmp_path))
 
     @pytest.fixture
-    def temp_project_dir(self) -> Path:
+    def temp_project_dir(self) -> Generator[Path]:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield Path(temp_dir)
 
@@ -176,13 +180,13 @@ class TestFlextProjectManager:
         )
 
         try:
-            result = flext_manager.run_meltano_command(["version"])
+            result = flext_manager.run_meltano_command(["version"])  # type: ignore[attr-defined]
             assert result is not None
 
         except AttributeError:
             # If run_meltano_command doesn't exist, verify this is expected
             with pytest.raises(AttributeError) as exc_info:
-                flext_manager.run_meltano_command(["version"])
+                flext_manager.run_meltano_command(["version"])  # type: ignore[attr-defined]
 
             error_msg = str(exc_info.value)
             assert any(
@@ -215,7 +219,7 @@ class TestFlextProjectManager:
             else:
                 # Trigger an AttributeError for testing
                 with pytest.raises(AttributeError) as exc_info:
-                    flext_manager.nonexistent_method()
+                    flext_manager.nonexistent_method()  # type: ignore[attr-defined]
 
             error_msg = str(exc_info.value)
             assert any(

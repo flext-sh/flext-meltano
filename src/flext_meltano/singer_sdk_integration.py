@@ -93,7 +93,7 @@ class FlextSingerSDKIntegration(BaseModel):
         """Initialize with proper constructor pattern."""
         if isinstance(project_root, str):
             project_root = Path(project_root)
-        super().__init__(project_root=project_root, **kwargs)
+        super().__init__(**kwargs)
 
     def model_post_init(self, __context: Any, /) -> None:
         """Initialize the Singer SDK integration."""

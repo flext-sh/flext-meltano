@@ -188,10 +188,12 @@ class MeltanoEventBridge:
                 event_data["metadata"] = config.metadata
 
             # Create FLEXT event using proper constructor
+            correlation_id = kwargs.get("correlation_id")
+            correlation_id_str = str(correlation_id) if correlation_id is not None else None
             flext_event = MeltanoEvent(
                 event_type=flext_event_type,
                 data=event_data,
-                correlation_id=kwargs.get("correlation_id"),
+                correlation_id=correlation_id_str,
                 source="meltano",
             )
 

@@ -164,10 +164,10 @@ def pipeline_step(
     dependencies: list[str] | None = None,
     retry: int = 3,
     timeout: int = 300,
-) -> Callable[[T], Any]:
+) -> Callable[[T], T]:
     """Decorator to mark a function as a pipeline step."""
 
-    def decorator(func: T) -> Any:
+    def decorator(func: T) -> T:
         # Extract name from function if not provided
         step_name = name or getattr(func, "__name__", "unknown_step").replace("_", "-")
 
@@ -181,10 +181,10 @@ def pipeline_step(
             timeout_seconds=timeout,
         )
 
-        # Store step metadata on function - intentional dynamic attributes
-        func._pipeline_step = step  # noqa: SLF001
-        func._step_type = step_type  # noqa: SLF001
-        func._dependencies = dependencies or []  # noqa: SLF001
+        # Store step metadata on function - use Any to avoid attr-defined issues
+        func._pipeline_step = step  # type: ignore[attr-defined]  # noqa: SLF001
+        func._step_type = step_type  # type: ignore[attr-defined]  # noqa: SLF001
+        func._dependencies = dependencies or []  # type: ignore[attr-defined]  # noqa: SLF001
 
         @wraps(func)
         async def wrapper(*args: object, **kwargs: object) -> Any:
@@ -198,7 +198,7 @@ def pipeline_step(
 
             return await step.execute(context)
 
-        return wrapper
+        return wrapper  # type: ignore[return-value]
 
     return decorator
 
