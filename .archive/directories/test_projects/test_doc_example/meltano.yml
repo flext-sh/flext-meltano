@@ -1,0 +1,11 @@
+default_environment: dev
+environments:
+  - name: dev
+plugins:
+  extractors: []
+  loaders: []
+  orchestrators: []
+  transformers: []
+  utilities: []
+project_id: test_doc_example-20250712
+version: 1

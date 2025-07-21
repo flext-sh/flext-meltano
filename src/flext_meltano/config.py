@@ -1,7 +1,7 @@
-"""FLEXT Meltano Configuration - Modern Python 3.13 patterns.
+"""FLEXT Meltano Configuration - Modern Python 3.13 with unified patterns.
 
 REFACTORED:
-    Uses flext-core BaseSettings with structured value objects.
+    Uses flext-core unified configuration mixins with structured value objects.
 Zero tolerance for duplication.
 """
 
@@ -10,11 +10,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core.config import BaseSettings
 from flext_core.config import get_container
-from flext_core.config import singleton
-from flext_core.domain.pydantic_base import DomainValueObject
-from flext_core.domain.pydantic_base import Field
+from flext_core.config.unified_config import (
+    BaseConfigMixin,
+    LoggingConfigMixin,
+    MonitoringConfigMixin,
+    PerformanceConfigMixin,
+)
+from flext_core.domain.constants import ConfigDefaults
+from flext_core.domain.pydantic_base import DomainValueObject, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class MeltanoProjectConfig(DomainValueObject):
@@ -25,15 +30,15 @@ class MeltanoProjectConfig(DomainValueObject):
         description="Root directory for Meltano projects",
     )
     default_environment: str = Field(
-        "production",
+        default="production",
         description="Default Meltano environment",
     )
     database_uri: str = Field(
-        "sqlite:///meltano.db",
+        default="sqlite:///meltano.db",
         description="Meltano database URI",
     )
     python_version: str = Field(
-        "3.13",
+        default="3.13",
         description="Python version for Meltano projects",
     )
 
@@ -42,25 +47,25 @@ class MeltanoExecutionConfig(DomainValueObject):
     """Meltano execution configuration value object."""
 
     max_concurrent_jobs: int = Field(
-        5,
+        default=5,
         ge=1,
         le=50,
         description="Maximum concurrent job executions",
     )
     job_timeout: int = Field(
-        3600,
+        default=3600,
         ge=60,
         le=86400,
         description="Job execution timeout in seconds",
     )
     retry_attempts: int = Field(
-        3,
+        default=3,
         ge=0,
         le=10,
         description="Number of retry attempts for failed jobs",
     )
     retry_delay: int = Field(
-        30,
+        default=30,
         ge=1,
         le=300,
         description="Delay between retry attempts in seconds",
@@ -71,24 +76,35 @@ class MeltanoStateConfig(DomainValueObject):
     """Meltano state management configuration value object."""
 
     state_backend: str = Field(
-        "systemdb",
+        default="systemdb",
         description="State backend type (systemdb, filesystem, s3)",
     )
     backup_enabled: bool = Field(
-        True,
+        default=True,
         description="Enable automatic state backups",
     )
     backup_interval: int = Field(
-        3600,
+        default=3600,
         ge=300,
         le=86400,
         description="State backup interval in seconds",
     )
     max_backups: int = Field(
-        10,
+        default=10,
         ge=1,
         le=100,
         description="Maximum number of state backups to keep",
+    )
+
+
+class MeltanoBusinessConfig(DomainValueObject):
+    """Meltano business logic configuration value object."""
+
+    MINIMUM_MELTANO_COMMAND_COUNT: int = Field(
+        default=2,
+        ge=1,
+        le=10,
+        description="Minimum number of commands required for Meltano run blocks",
     )
 
 
@@ -96,21 +112,21 @@ class MeltanoPluginConfig(DomainValueObject):
     """Meltano plugin configuration value object."""
 
     auto_install: bool = Field(
-        True,
+        default=True,
         description="Automatically install missing plugins",
     )
     plugin_cache_ttl: int = Field(
-        86400,
+        default=86400,
         ge=300,
         le=604800,
         description="Plugin cache TTL in seconds",
     )
     discovery_url: str = Field(
-        "https://hub.meltano.com/meltano/discovery.yml",
+        default="https://hub.meltano.com/meltano/discovery.yml",
         description="Meltano Hub discovery URL",
     )
     default_variant: str = Field(
-        "original",
+        default="original",
         description="Default plugin variant to use",
     )
 
@@ -119,50 +135,60 @@ class MeltanoMonitoringConfig(DomainValueObject):
     """Meltano monitoring configuration value object."""
 
     metrics_enabled: bool = Field(
-        True,
+        default=True,
         description="Enable metrics collection",
     )
     health_check_interval: int = Field(
-        60,
+        default=60,
         ge=10,
         le=3600,
         description="Health check interval in seconds",
     )
     log_level: str = Field(
-        "INFO",
+        default="INFO",
         description="Logging level for Meltano operations",
     )
     event_publishing: bool = Field(
-        True,
+        default=True,
         description="Enable event publishing to FLEXT event bus",
     )
 
 
-@singleton()
-class MeltanoSettings(BaseSettings):
-    """FLEXT Meltano configuration settings with environment variable support.
+class MeltanoSettings(
+    BaseConfigMixin,
+    LoggingConfigMixin,
+    MonitoringConfigMixin,
+    PerformanceConfigMixin,
+    BaseSettings,
+):
+    """FLEXT Meltano configuration settings using unified configuration mixins.
 
     All settings can be overridden via environment variables with the
     prefix FLEXT_MELTANO_ (e.g., FLEXT_MELTANO_PROJECT__PROJECT_ROOT).
 
-    Uses flext-core BaseSettings foundation with DI support.
+    Uses flext-core unified configuration mixins with DI support.
     """
 
-    model_config = {
-        "env_prefix": "FLEXT_MELTANO_",
-        "env_file": ".env",
-        "env_file_encoding": "utf-8",
-        "env_nested_delimiter": "__",
-        "case_sensitive": False,
-        "extra": "forbid",
-        "validate_assignment": True,
-        "str_strip_whitespace": True,
-        "use_enum_values": True,
-    }
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        case_sensitive=False,
+        extra="ignore",
+        validate_assignment=True,
+        str_strip_whitespace=True,
+        use_enum_values=True,
+    )
 
-    # Project identification
-    project_name: str = Field("flext-meltano", description="Project name")
-    project_version: str = Field("0.7.0", description="Project version")
+    # Project identification (inherits from BaseConfigMixin but override with
+    # Meltano-specific values)
+    project_name: str = Field(
+        default="flext-infrastructure.plugins.flext-meltano",
+        max_length=ConfigDefaults.MAX_ENTITY_NAME_LENGTH,
+        description="Project name",
+    )
+    project_version: str = Field(default="0.7.0", description="Project version")
 
     # Configuration value objects
     project: MeltanoProjectConfig = Field(
@@ -181,14 +207,22 @@ class MeltanoSettings(BaseSettings):
         default_factory=MeltanoPluginConfig,
         description="Plugin configuration",
     )
-    monitoring: MeltanoMonitoringConfig = Field(
+    business: MeltanoBusinessConfig = Field(
+        default_factory=MeltanoBusinessConfig,
+        description="Business logic configuration",
+    )
+    # Note: monitoring inherited from MonitoringConfigMixin
+    # Additional Meltano-specific monitoring configuration
+    meltano_monitoring: MeltanoMonitoringConfig = Field(
         default_factory=MeltanoMonitoringConfig,
-        description="Monitoring configuration",
+        description="Meltano-specific monitoring configuration",
     )
 
-    # Environment and debugging
-    environment: str = Field("development", description="Environment name")
-    debug: bool = Field(False, description="Debug mode")
+    # Note: Most common settings now inherited from mixins:
+    # - BaseConfigMixin: project_name, project_version, environment, debug
+    # - LoggingConfigMixin: log_level, log_file, log_format, log_rotation
+    # - MonitoringConfigMixin: metrics_enabled, health_check_enabled, prometheus_port
+    # - PerformanceConfigMixin: batch_size, timeout_seconds, retry_count
 
     # Legacy properties for backward compatibility
     @property
@@ -300,11 +334,18 @@ class MeltanoSettings(BaseSettings):
 
 # Convenience functions for getting settings
 def get_meltano_settings() -> MeltanoSettings:
-    return MeltanoSettings()
+    return MeltanoSettings(
+        project_name="flext-infrastructure.plugins.flext-meltano",
+        project_version="0.7.0",
+        environment="development",
+        debug=False,
+    )
 
 
 def create_development_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
+        project_name="flext-infrastructure.plugins.flext-meltano",
+        project_version="0.7.0",
         environment="development",
         debug=True,
         project=MeltanoProjectConfig(
@@ -316,50 +357,22 @@ def create_development_meltano_config() -> MeltanoSettings:
             job_timeout=1800,  # 30 minutes for development
             retry_attempts=1,
         ),
-        state=MeltanoStateConfig(
-            backup_enabled=False,  # Disable for development
-            backup_interval=7200,  # 2 hours
-        ),
-        plugins=MeltanoPluginConfig(
-            auto_install=True,
-            plugin_cache_ttl=3600,  # 1 hour
-        ),
-        monitoring=MeltanoMonitoringConfig(
-            log_level="DEBUG",
-            health_check_interval=30,
-            event_publishing=False,  # Disable for development
-        ),
     )
 
 
 def create_production_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
+        project_name="flext-infrastructure.plugins.flext-meltano",
+        project_version="0.7.0",
         environment="production",
         debug=False,
         project=MeltanoProjectConfig(
             default_environment="prod",
-            database_uri="postgresql://localhost/meltano_prod",
+            database_uri="postgresql://user:pass@localhost/meltano",
         ),
-        execution=MeltanoExecutionConfig(
-            max_concurrent_jobs=10,
-            job_timeout=7200,  # 2 hours for production
-            retry_attempts=3,
-            retry_delay=60,
-        ),
-        state=MeltanoStateConfig(
-            state_backend="s3",
-            backup_enabled=True,
-            backup_interval=1800,  # 30 minutes
-            max_backups=50,
-        ),
-        plugins=MeltanoPluginConfig(
-            auto_install=False,  # Manual control in production
-            plugin_cache_ttl=86400,  # 24 hours
-            default_variant="meltanolabs",
-        ),
+        execution=MeltanoExecutionConfig(),
         monitoring=MeltanoMonitoringConfig(
-            log_level="WARNING",
-            health_check_interval=120,
-            event_publishing=True,
+            metrics_enabled=True,
+            log_level="INFO",
         ),
     )

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from flext_core import ServiceResult
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 # Python 3.13 type aliases - with strict validation
 ExtensionConfig = dict[str, str | int | bool | None]
 ExtensionCommand = dict[str, str | list[str]]
-ExtensionResult = dict[str, str | int | bool | list]
+ExtensionResult = dict[str, str | int | bool | list[Any]]
 
 
 class ExtensionType(Enum):
@@ -47,21 +47,21 @@ class ExtensionStatus(Enum):
 class MeltanoExtension:
     """Represents a Meltano extension."""
 
-    def __init__(
-        self,
-        name: str,
-        extension_type: ExtensionType,
-        description: str = "",
-        version: str = "latest",
-        **kwargs: object,
-    ) -> None:
-        """Initialize a Meltano extension."""
-        self.name = name
-        self.extension_type = extension_type
-        self.description = description
-        self.version = version
-        self.config: ExtensionConfig = kwargs.get("config", {})
-        self.commands: dict[str, ExtensionCommand] = kwargs.get("commands", {})
+    def __init__(self, **kwargs: Any) -> None:
+        """Initialize MeltanoExtension."""
+        super().__init__()
+        # Required attributes
+        self.name: str = kwargs.get("name", "unknown")
+        self.extension_type: ExtensionType = kwargs.get(
+            "extension_type",
+            ExtensionType.UTILITY,
+        )
+        self.description: str = kwargs.get("description", "")
+        self.version: str = kwargs.get("version", "latest")
+
+        # Configuration and commands
+        self.config: ExtensionConfig = kwargs.get("config") or {}
+        self.commands: dict[str, ExtensionCommand] = kwargs.get("commands") or {}
         self.status = ExtensionStatus.AVAILABLE
 
     def configure(self, config: ExtensionConfig) -> None:
@@ -91,27 +91,34 @@ class MeltanoExtension:
         self,
         command_name: str,
         args: list[str] | None = None,
-    ) -> ServiceResult[ExtensionResult]:
-        """Execute an extension command."""
+    ) -> ServiceResult[dict[str, Any]]:
+        """Execute a command on this extension."""
         try:
+            # Check if command exists
             if command_name not in self.commands:
                 return ServiceResult.fail(f"Command {command_name} not found")
 
-            # Simulate command execution
-            await asyncio.sleep(0.1)
+            # Simulate command execution with brief delay
+            import asyncio
 
-            result: ExtensionResult = {
+            await asyncio.sleep(0.001)  # Brief simulation delay
+
+            result = {
                 "command": command_name,
+                "args": args or [],
                 "status": "completed",
-                "output": f"Command {command_name} executed successfully",
+                "output": f"Executed {command_name} successfully",
+                "extension": self.name,
                 "exit_code": 0,
                 "duration": 100,
             }
 
             return ServiceResult.ok(result)
 
-        except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to execute command: {e}")
+        except Exception as e:
+            return ServiceResult.fail(
+                f"Failed to execute command: {e}",
+            )
 
 
 class MeltanoExtensionManager:
@@ -158,18 +165,28 @@ class MeltanoExtensionManager:
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to list extensions: {e}")
 
-    async def install_extension(self, name: str) -> ServiceResult[bool]:
+    async def install_extension(
+        self,
+        name: str,
+    ) -> ServiceResult[bool]:
         """Install an extension."""
         try:
             extension_result = self.get_extension(name)
-            if not extension_result.success:
-                return extension_result
+            if not extension_result.is_success:
+                return ServiceResult.fail(
+                    extension_result.error or "Extension not found",
+                )
 
-            extension = extension_result.value
+            extension = extension_result.data
             if not extension:
                 return ServiceResult.fail("Extension not found")
 
-            return extension.install()
+            # Call install on extension and return True for success
+            install_result = extension.install()
+            if install_result.is_success:
+                return ServiceResult.ok(True)
+            return ServiceResult.fail(f"Installation failed: {install_result.error}")
+
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to install extension: {e}")
 
@@ -178,18 +195,37 @@ class MeltanoExtensionManager:
         extension_name: str,
         command_name: str,
         args: list[str] | None = None,
-    ) -> ServiceResult[ExtensionResult]:
+    ) -> ServiceResult[dict[str, str | int | bool | list[Any]]]:
         """Execute a command on an extension."""
         try:
             extension_result = self.get_extension(extension_name)
-            if not extension_result.success:
-                return extension_result
+            if not extension_result.is_success:
+                return ServiceResult.fail(
+                    extension_result.error or "Extension not found",
+                )
 
-            extension = extension_result.value
+            extension = extension_result.data
             if not extension:
                 return ServiceResult.fail("Extension not found")
 
-            return await extension.execute_command(command_name, args)
+            # Execute command and return result as dict
+            command_result = await extension.execute_command(command_name, args)
+            if command_result.is_success:
+                return ServiceResult.ok(
+                    {
+                        "extension_name": extension_name,
+                        "command": command_name,
+                        "args": args or [],
+                        "status": "completed",
+                        "result": str(command_result.data)
+                        if command_result.data is not None
+                        else "",
+                    },
+                )
+            return ServiceResult.fail(
+                f"Command execution failed: {command_result.error}",
+            )
+
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to execute extension command: {e}")
 
@@ -232,7 +268,7 @@ class FlextMeltanoExtensionDiscovery:
             count = 0
             for extension in default_extensions:
                 result = self.manager.register_extension(extension)
-                if result.success:
+                if result.is_success:
                     count += 1
 
             return ServiceResult.ok(count)

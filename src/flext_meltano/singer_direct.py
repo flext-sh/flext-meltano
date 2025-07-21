@@ -11,9 +11,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from structlog import get_logger
-
 from flext_core import ServiceResult
+from flext_observability.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -70,7 +69,7 @@ class SingerDirectRunner:
                 cwd=project_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                stdin=tap_process.stdout,
+                stdin=tap_process.stdout,  # type: ignore[arg-type]
             )
 
             # Wait for completion
@@ -89,7 +88,7 @@ class SingerDirectRunner:
 
             if result["success"]:
                 self.logger.info("Singer direct pipeline completed successfully")
-                return ServiceResult.success(result)
+                return ServiceResult.ok(result)
             error_msg = f"Pipeline failed: tap={tap_process.returncode}, target={target_process.returncode}"
             self.logger.error(error_msg, **result)
             return ServiceResult.fail(error_msg)
@@ -131,7 +130,7 @@ class SingerDirectRunner:
                         "Schema discovered successfully",
                         streams=len(catalog.get("streams", [])),
                     )
-                    return ServiceResult.success({"catalog": catalog})
+                    return ServiceResult.ok({"catalog": catalog})
                 except json.JSONDecodeError as e:
                     return ServiceResult.fail(f"Invalid catalog JSON: {e}")
             else:

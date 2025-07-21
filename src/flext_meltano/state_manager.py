@@ -8,15 +8,15 @@ from __future__ import annotations
 
 import asyncio
 import json
-from datetime import UTC
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+from flext_core.domain.types import ServiceResult
+from flext_observability.logging import get_logger
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.state_service import StateService
-from structlog import get_logger
 
 if TYPE_CHECKING:
     from meltano.core.project import Project
@@ -51,7 +51,7 @@ class FlextMeltanoStateManager:
         job_id: str,
         _cache_policy: CachePolicy = CachePolicy.USE_CACHE,
     ) -> dict[str, Any] | None:
-        """Get state for a specific job."""
+        """Get job state by ID."""
         try:
             state_service = StateService(project)
             state = state_service.get_state(job_id)
@@ -63,10 +63,9 @@ class FlextMeltanoStateManager:
                     "retrieved_at": datetime.now(UTC).isoformat(),
                 }
             return None
-
         except Exception as e:
             self.logger.exception("Failed to get state", job_id=job_id, error=str(e))
-            raise
+            return ServiceResult.fail(f"Error in operation: {e}")
 
     async def set_state(
         self,
@@ -74,7 +73,7 @@ class FlextMeltanoStateManager:
         job_id: str,
         state_data: dict[str, Any],
     ) -> bool:
-        """Set state for a specific job."""
+        """Update job state with provided data."""
         try:
             async with self._lock:
                 state_service = StateService(project)
@@ -92,13 +91,11 @@ class FlextMeltanoStateManager:
                     state_size=len(str(state_data)),
                 )
                 return True
-
         except Exception as e:
             self.logger.exception("Failed to set state", job_id=job_id, error=str(e))
-            raise
+            return ServiceResult.fail(f"Error in operation: {e}")
 
     async def clear_state(self, project: Project, job_id: str) -> bool:
-        """Clear state for a specific job."""
         try:
             async with self._lock:
                 state_service = StateService(project)
@@ -106,7 +103,6 @@ class FlextMeltanoStateManager:
 
                 self.logger.info("State cleared successfully", job_id=job_id)
                 return True
-
         except Exception as e:
             self.logger.exception("Failed to clear state", job_id=job_id, error=str(e))
             return False

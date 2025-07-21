@@ -1,0 +1,12 @@
+default_environment: dev
+environments:
+  - name: dev
+plugins:
+  extractors:
+    - name: tap-csv
+  loaders: []
+  orchestrators: []
+  transformers: []
+  utilities: []
+project_id: test-go-project-20250712
+version: 1

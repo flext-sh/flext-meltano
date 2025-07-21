@@ -8,21 +8,21 @@ and monitoring.
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
+
+from flext_observability.logging import get_logger
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.db import project_engine
 from meltano.core.job.job import Job
-from structlog import get_logger
 
 # Meltano core availability is guaranteed by dependency constraints
 MELTANO_CORE_AVAILABLE = True
 
 if TYPE_CHECKING:
-    from meltano.core.job import State
+    from meltano.core.job.job import State
     from meltano.core.project import Project
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
@@ -95,7 +95,7 @@ class FlextMeltanoJobManager:
             )
             raise
 
-    async def list_jobs(
+    def list_jobs(
         self,
         project: Project,
         state: State | None = None,
@@ -124,7 +124,9 @@ class FlextMeltanoJobManager:
 
                 # Apply filters
                 if state:
-                    query = query.filter(Job.state == state)  # type: ignore[comparison-overlap]
+                    query = query.filter(
+                        Job.state == state.value if hasattr(state, "value") else state,
+                    )
 
                 if run_id:
                     query = query.filter(Job.run_id == run_id)

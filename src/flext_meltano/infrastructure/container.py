@@ -6,12 +6,12 @@ REFACTORED:
 
 from __future__ import annotations
 
-from flext_core.config import get_container
-from flext_core.config import singleton
+from flext_core.config import get_container, singleton
+
 from flext_meltano.config import MeltanoSettings
 
 
-@singleton()
+@singleton
 class MeltanoContainerConfig:
     """Meltano container configuration using flext-core patterns."""
 
@@ -38,7 +38,12 @@ def setup_meltano_container(
 ) -> MeltanoContainerConfig:
     """Set up Meltano dependency injection container."""
     if settings is None:
-        settings = MeltanoSettings()
+        settings = MeltanoSettings(
+            project_name="flext-infrastructure.plugins.flext-meltano",
+            project_version="0.7.0",
+            environment="development",
+            debug=False,
+        )
 
     config = MeltanoContainerConfig(settings)
     config.configure_dependencies()

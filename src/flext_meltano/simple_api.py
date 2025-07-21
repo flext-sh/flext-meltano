@@ -9,6 +9,7 @@ from pathlib import Path
 
 from flext_core import ServiceResult
 from flext_core.config import get_container
+
 from flext_meltano.config import MeltanoSettings
 
 
@@ -26,7 +27,12 @@ def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool
     """
     try:
         if settings is None:
-            settings = MeltanoSettings()
+            settings = MeltanoSettings(
+                project_name="flext-infrastructure.plugins.flext-meltano",
+                project_version="0.7.0",
+                environment="development",
+                debug=False,
+            )
 
         # Configure DI container
         container = get_container()
@@ -56,6 +62,8 @@ def create_development_meltano_config(
     """
     # Development defaults
     defaults = {
+        "project_name": "flext-infrastructure.plugins.flext-meltano",
+        "project_version": "0.7.0",
         "project_root": Path.cwd() / "meltano_projects_dev",
         "log_level": "DEBUG",
         "log_structured": False,
@@ -66,7 +74,13 @@ def create_development_meltano_config(
     # Merge defaults with overrides
     config = {**defaults, **overrides}
 
-    return MeltanoSettings(**config)
+    # Create settings with proper types, casting to avoid union type issues
+    return MeltanoSettings(
+        project_name=str(config.get("project_name")),
+        project_version=str(config.get("project_version")),
+        environment=str(config.get("environment")),
+        debug=bool(config.get("debug")),
+    )
 
 
 def get_meltano_settings() -> MeltanoSettings:
@@ -86,4 +100,4 @@ def get_meltano_settings() -> MeltanoSettings:
         return container.resolve(MeltanoSettings)
     except (ValueError, TypeError, RuntimeError, OSError) as e:
         msg = f"Meltano settings not configured. Call setup_meltano() first: {e}"
-        raise RuntimeError(msg) from e
+        raise ValueError(msg) from e

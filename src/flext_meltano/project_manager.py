@@ -8,17 +8,15 @@ from __future__ import annotations
 
 import asyncio
 import shutil
-from datetime import UTC
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 import yaml
-from structlog import get_logger
-
 from flext_core import ServiceResult
 from flext_core.domain.pydantic_base import DomainEvent
+from flext_observability.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -150,7 +148,7 @@ class MeltanoProjectManager:
             }
 
             self.logger.info("Meltano project created successfully", **result)
-            return ServiceResult.success(result)
+            return ServiceResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to create Meltano project: {e}"
@@ -175,7 +173,7 @@ class MeltanoProjectManager:
             if not config:
                 return ServiceResult.fail("Invalid or empty meltano.yml")
 
-            return ServiceResult.success(config)
+            return ServiceResult.ok(config)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to load project config: {e}"
@@ -201,7 +199,7 @@ class MeltanoProjectManager:
             with meltano_yml.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False, indent=2)
 
-            return ServiceResult.success(None)
+            return ServiceResult.ok(None)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to save project config: {e}"
@@ -236,7 +234,7 @@ class MeltanoProjectManager:
                 "success": True,
             }
 
-            return ServiceResult.success(result)
+            return ServiceResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to run direct pipeline: {e}"
@@ -315,7 +313,7 @@ class MeltanoProjectManager:
                 return ServiceResult.fail(f"Command failed: {result['stderr']}")
 
             self.logger.info("Meltano command completed successfully", **result)
-            return ServiceResult.success(result)
+            return ServiceResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to execute command: {e}"
@@ -370,16 +368,16 @@ class MeltanoProjectManager:
                 "plugin_type": plugin_type,
                 "plugin_name": plugin_name,
                 "plugin_variant": variant,
-                "add_output": add_result.value.get("stdout", ""),
+                "add_output": (add_result.data or {}).get("stdout", ""),
                 "lock_output": (
-                    lock_result.value.get("stdout", "")
+                    (lock_result.data or {}).get("stdout", "")
                     if lock_result.is_success
                     else "Lock failed"
                 ),
             }
 
             self.logger.info("Plugin added successfully", **result)
-            return ServiceResult.success(result)
+            return ServiceResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"
@@ -393,35 +391,38 @@ class MeltanoProjectManager:
         """Validate Meltano project structure and configuration."""
         try:
             project_path = self.project_root / project_name
+            errors: list[str] = []
 
-            validation_results = {
+            validation_results: dict[str, Any] = {
                 "project_exists": project_path.exists(),
                 "config_exists": (project_path / "meltano.yml").exists(),
                 "meltano_dir_exists": (project_path / ".meltano").exists(),
                 "config_valid": False,
-                "errors": [],
+                "errors": errors,
             }
 
             if not validation_results["project_exists"]:
-                validation_results["errors"].append("Project directory does not exist")
-                return ServiceResult.success(validation_results)
+                errors.append("Project directory does not exist")
+                return ServiceResult.ok(validation_results)
 
             if not validation_results["config_exists"]:
-                validation_results["errors"].append("meltano.yml not found")
-                return ServiceResult.success(validation_results)
+                errors.append("meltano.yml not found")
+                return ServiceResult.ok(validation_results)
 
             # Validate config structure
             config_result = await self.load_project_config(project_name)
             if config_result.is_success:
-                config = config_result.value
+                config = config_result.data
 
                 required_fields = ["version", "project_id", "plugins"]
                 missing_fields = [
-                    field for field in required_fields if field not in config
+                    field
+                    for field in required_fields
+                    if not config or field not in config
                 ]
 
                 if missing_fields:
-                    validation_results["errors"].extend(
+                    errors.extend(
                         [f"Missing field: {field}" for field in missing_fields],
                     )
                 else:
@@ -438,7 +439,7 @@ class MeltanoProjectManager:
                 and not validation_results["errors"]
             )
 
-            return ServiceResult.success(validation_results)
+            return ServiceResult.ok(validation_results)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to validate project: {e}"
@@ -513,7 +514,7 @@ class FlextProjectManager(MeltanoProjectManager):
                     ),
                 )
 
-            return ServiceResult.success(backup_file)
+            return ServiceResult.ok(backup_file)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to backup project: {e}"

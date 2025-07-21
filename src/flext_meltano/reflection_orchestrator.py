@@ -11,24 +11,20 @@ import contextlib
 import inspect
 import sys
 from collections.abc import Callable
-from enum import Enum
-from enum import auto
+from enum import Enum, auto
 from functools import wraps
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import ClassVar
-from typing import Protocol
-from typing import TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar
 
-from flext_core.domain.pydantic_base import BaseModel
-from flext_core.domain.pydantic_base import DomainValueObject
-from flext_core.domain.pydantic_base import Field
+from flext_core.domain.pydantic_base import (
+    DomainBaseModel as BaseModel,
+    DomainValueObject,
+    Field,
+)
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from flext_core.domain.pipeline import Pipeline
-    from flext_core.domain.pipeline import PipelineExecution
+    from flext_core.domain.pipeline import Pipeline, PipelineExecution
 
 
 # Type aliases for clean interface
@@ -37,7 +33,7 @@ StepResult = dict[str, Any]
 PipelineConfig = dict[str, Any]
 ExecutionContext = dict[str, Any]
 
-T = TypeVar("T")
+T = TypeVar("T", bound=Callable[..., Any])
 P = TypeVar("P")
 
 
@@ -92,11 +88,20 @@ class ReflectionStep(DomainValueObject):
 
     async def execute(self, context: dict[str, Any]) -> StepResult:
         """Execute the step function with dependency injection from context."""
-        # Get function signature
-        sig = inspect.signature(self.func)
+        # Build kwargs from context based on function signature
+        kwargs = self._build_kwargs_from_context(context)
 
-        # Build kwargs from context based on signature
+        # Execute function
+        result = await self._execute_function(kwargs)
+
+        # Build and return result
+        return self._build_step_result(result)
+
+    def _build_kwargs_from_context(self, context: dict[str, Any]) -> dict[str, Any]:
+        """Build kwargs from context based on function signature."""
+        sig = inspect.signature(self.func)
         kwargs = {}
+
         for param_name, param in sig.parameters.items():
             if param_name in context:
                 kwargs[param_name] = context[param_name]
@@ -104,22 +109,53 @@ class ReflectionStep(DomainValueObject):
                 kwargs[param_name] = param.default
             elif param_name != "self" and param.annotation != inspect.Parameter.empty:
                 # Try to inject based on type annotation
-                type_hint = param.annotation
-                for value in context.values():
-                    if isinstance(value, type_hint):
+                self._inject_by_type(param_name, param.annotation, context, kwargs)
+
+        return kwargs
+
+    def _inject_by_type(
+        self,
+        param_name: str,
+        type_hint: Any,
+        context: dict[str, Any],
+        kwargs: dict[str, Any],
+    ) -> None:
+        """Inject parameter value based on type annotation."""
+        try:
+            # Handle both regular types and parameterized generics
+            for value in context.values():
+                if hasattr(type_hint, "__origin__"):
+                    # Parameterized generic like dict[str, Any]
+                    origin_type = type_hint.__origin__
+                    if isinstance(value, origin_type):
                         kwargs[param_name] = value
                         break
+                # Regular type
+                elif isinstance(value, type_hint):
+                    kwargs[param_name] = value
+                    break
+        except TypeError:
+            # Skip problematic type annotations
+            pass
 
-        # Execute function
+    async def _execute_function(self, kwargs: dict[str, Any]) -> Any:
+        """Execute the function with provided kwargs."""
         if asyncio.iscoroutinefunction(self.func):
-            result = await self.func(**kwargs)
-        else:
-            result = await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: self.func(**kwargs),
-            )
+            return await self.func(**kwargs)
+        return await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: self.func(**kwargs),
+        )
 
-        return {"name": self.name, "result": result, "type": self.step_type.name}
+    def _build_step_result(self, result: Any) -> StepResult:
+        """Build step result with proper type name handling."""
+        # Handle both enum and value cases
+        step_type_name = (
+            self.step_type.name
+            if hasattr(self.step_type, "name")
+            else StepType(self.step_type).name
+        )
+        return {"name": self.name, "result": result, "type": step_type_name}
 
 
 def pipeline_step(
@@ -128,12 +164,12 @@ def pipeline_step(
     dependencies: list[str] | None = None,
     retry: int = 3,
     timeout: int = 300,
-) -> Callable[[T], T]:
+) -> Callable[[T], Any]:
     """Decorator to mark a function as a pipeline step."""
 
-    def decorator(func: T) -> T:
+    def decorator(func: T) -> Any:
         # Extract name from function if not provided
-        step_name = name or func.__name__.replace("_", "-")
+        step_name = name or getattr(func, "__name__", "unknown_step").replace("_", "-")
 
         # Create reflection step
         step = ReflectionStep(
@@ -145,10 +181,10 @@ def pipeline_step(
             timeout_seconds=timeout,
         )
 
-        # Store step metadata on function
-        func._pipeline_step = step
-        func._step_type = step_type
-        func._dependencies = dependencies or []
+        # Store step metadata on function - intentional dynamic attributes
+        func._pipeline_step = step  # noqa: SLF001
+        func._step_type = step_type  # noqa: SLF001
+        func._dependencies = dependencies or []  # noqa: SLF001
 
         @wraps(func)
         async def wrapper(*args: object, **kwargs: object) -> Any:
@@ -186,28 +222,25 @@ class ReflectionOrchestrator(BaseModel):
         """Discover pipeline steps in a module through reflection."""
         for _name, obj in inspect.getmembers(module):
             # Check if object has pipeline step metadata
-            if hasattr(obj, "_pipeline_step"):
-                try:
-                    pipeline_step = obj._pipeline_step
-                    self.step_registry[pipeline_step.name] = pipeline_step
-                except (AttributeError, TypeError):
-                    continue
+            try:
+                pipeline_step = obj._pipeline_step  # noqa: SLF001
+                self.step_registry[pipeline_step.name] = pipeline_step
+            except (AttributeError, TypeError):
+                continue
 
             # Register by type for objects with step_type
-            elif hasattr(obj, "step_type"):
-                try:
-                    if obj.step_type not in self.type_registry:
-                        self.type_registry[obj.step_type] = []
-                    self.type_registry[obj.step_type].append(obj)
-                except (AttributeError, TypeError):
-                    continue
+            try:
+                if obj.step_type not in self.type_registry:
+                    self.type_registry[obj.step_type] = []
+                self.type_registry[obj.step_type].append(obj)
+            except (AttributeError, TypeError):
+                continue
 
     async def execute_pipeline(
         self,
         pipeline: Pipeline,
         execution: PipelineExecution,
     ) -> ExecutionContext:
-        """Execute a pipeline using reflection orchestration."""
         try:
             # Build execution context
             context = {
@@ -216,17 +249,33 @@ class ReflectionOrchestrator(BaseModel):
                 "orchestrator": self,
             }
 
-            # Execute all steps
+            # Execute steps based on pipeline configuration
             results = {}
-            for step in pipeline.steps:
-                if step.step_id in self.step_registry:
-                    reflection_step = self.step_registry[step.step_id]
+
+            # Check if pipeline has steps defined
+            if hasattr(pipeline, "steps") and pipeline.steps:
+                # Execute pipeline steps with their configurations
+                for step_config in pipeline.steps:
+                    step_id = step_config.step_id
+                    configuration = step_config.configuration
+
+                    if step_id in self.step_registry:
+                        reflection_step = self.step_registry[step_id]
+                        step_result = await self._execute_step_with_retry(
+                            reflection_step,
+                            context,
+                            configuration,
+                        )
+                        results[step_id] = step_result
+            else:
+                # Fallback: Execute all steps from step registry with empty config
+                for step_name, reflection_step in self.step_registry.items():
                     step_result = await self._execute_step_with_retry(
                         reflection_step,
                         context,
-                        step.configuration,
+                        {},  # Default empty configuration
                     )
-                    results[step.step_id] = step_result
+                    results[step_name] = step_result
 
             return {
                 "pipeline": pipeline,
@@ -256,8 +305,8 @@ class ReflectionOrchestrator(BaseModel):
 
         for attempt in range(step.retry_count):
             try:
-                # Add configuration to context
-                step_context = {**context, "config": configuration}
+                # Add configuration to context (both as config and spread individual keys)
+                step_context = {**context, "config": configuration, **configuration}
 
                 # Execute with timeout
                 return await asyncio.wait_for(
@@ -274,7 +323,7 @@ class ReflectionOrchestrator(BaseModel):
 
         if last_error:
             raise last_error
-        msg = f"Step {step.name} failed after {step.retry_count} attempts"
+        msg = "Step execution failed"
         raise RuntimeError(msg)
 
 

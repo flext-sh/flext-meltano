@@ -9,18 +9,13 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING
 from typing import Any
+from uuid import UUID  # noqa: TC003 - Used in runtime for Pydantic fields
 
-from flext_core.domain.pydantic_base import DomainEntity
-from flext_core.domain.pydantic_base import DomainEvent
-from flext_core.domain.pydantic_base import Field
+from flext_core.domain.pydantic_base import DomainEntity, DomainEvent, Field
 
 # Import enum types from flext-core - NO duplication
-from flext_core.domain.types import Status as PipelineStatus
-
-if TYPE_CHECKING:
-    from uuid import UUID
+from flext_core.domain.shared_models import PipelineExecutionStatus
 
 
 class JobType(StrEnum):
@@ -49,6 +44,10 @@ class MeltanoPluginType(StrEnum):
 class MeltanoProject(DomainEntity):
     """Meltano project domain entity."""
 
+    # Project identification
+    name: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(default="", max_length=1000)
+
     # Project paths
     project_root: str = Field(..., min_length=1)
     meltano_file_path: str = Field(..., min_length=1)
@@ -65,7 +64,7 @@ class MeltanoProject(DomainEntity):
     state_backend: str = Field(default="systemdb")
 
     # Status and metadata
-    status: PipelineStatus = Field(default=PipelineStatus.ACTIVE)
+    status: PipelineExecutionStatus = Field(default=PipelineExecutionStatus.PENDING)
     created_by: UUID | None = None
 
     def add_environment(self, environment: str) -> None:
@@ -97,16 +96,20 @@ class MeltanoPlugin(DomainEntity):
     # Plugin identification
     namespace: str = Field(..., min_length=1, max_length=255)
     plugin_type: MeltanoPluginType = Field(...)
+    name: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(default="", max_length=1000)
 
     # Plugin details
     pip_url: str | None = None
+    executable: str = Field(..., min_length=1, max_length=255)
+    version: str = Field(default="latest", max_length=100)
 
     # Configuration
     select: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     # Status
-    status: PipelineStatus = Field(default=PipelineStatus.ACTIVE)
+    status: PipelineExecutionStatus = Field(default=PipelineExecutionStatus.PENDING)
     installed: bool = Field(default=False)
     enabled: bool = Field(default=True)
 
@@ -145,6 +148,8 @@ class MeltanoJob(DomainEntity):
     # Job identification
     job_id: str = Field(..., min_length=1, max_length=255)
     job_type: JobType = Field(...)
+    name: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(default="", max_length=1000)
 
     # Command details
     command: list[str] = Field(default_factory=list)
@@ -161,7 +166,7 @@ class MeltanoJob(DomainEntity):
     stderr: str | None = None
 
     # Status and context
-    status: PipelineStatus = Field(default=PipelineStatus.PENDING)
+    status: PipelineExecutionStatus = Field(default=PipelineExecutionStatus.PENDING)
     run_id: str | None = None
     triggered_by: UUID | None = None
 
@@ -174,9 +179,9 @@ class MeltanoJob(DomainEntity):
 
         """
         return self.status in {
-            PipelineStatus.COMPLETED,
-            PipelineStatus.FAILED,
-            PipelineStatus.CANCELLED,
+            PipelineExecutionStatus.COMPLETED,
+            PipelineExecutionStatus.FAILED,
+            PipelineExecutionStatus.CANCELLED,
         }
 
     @property
@@ -187,11 +192,11 @@ class MeltanoJob(DomainEntity):
             True if job completed with exit code 0.
 
         """
-        return self.status == PipelineStatus.COMPLETED and self.exit_code == 0
+        return self.status == PipelineExecutionStatus.COMPLETED and self.exit_code == 0
 
     def start_execution(self) -> None:
         """Start Meltano job execution and update status."""
-        self.status = PipelineStatus.PROCESSING
+        self.status = PipelineExecutionStatus.RUNNING
         self.started_at = datetime.now()
 
     def complete_execution(
@@ -209,7 +214,7 @@ class MeltanoJob(DomainEntity):
 
         """
         self.status = (
-            PipelineStatus.COMPLETED if exit_code == 0 else PipelineStatus.FAILED
+            PipelineExecutionStatus.COMPLETED if exit_code == 0 else PipelineExecutionStatus.FAILED
         )
         self.exit_code = exit_code
         self.completed_at = datetime.now()
@@ -222,7 +227,7 @@ class MeltanoJob(DomainEntity):
 
     def cancel_execution(self) -> None:
         """Cancel ongoing Meltano job execution."""
-        self.status = PipelineStatus.CANCELLED
+        self.status = PipelineExecutionStatus.CANCELLED
         self.completed_at = datetime.now()
 
         if self.started_at:
@@ -238,6 +243,8 @@ class MeltanoState(DomainEntity):
 
     # State identification
     state_id: str = Field(..., min_length=1, max_length=255)
+    name: str = Field(..., min_length=1, max_length=255)
+    description: str = Field(default="", max_length=1000)
 
     # State data
     state_data: dict[str, Any] = Field(default_factory=dict)

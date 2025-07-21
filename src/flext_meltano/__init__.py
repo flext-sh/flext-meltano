@@ -6,7 +6,8 @@ ARCHITECTURAL REVOLUTION: Single source of truth for ALL Meltano integration.
 Eliminates scattered meltano implementations with unified, modern architecture.
 
 CONSOLIDATES:
-            - infrastructure/meltano/ (ENTIRE DIRECTORY) - Infrastructure-level meltano support
+            - infrastructure/meltano/ (ENTIRE DIRECTORY) - Infrastructure-level
+            meltano support
 - meltano/ (ENHANCED) - Domain-level meltano integration with enterprise patterns
 
 ZERO TOLERANCE PRINCIPLES:
@@ -27,29 +28,33 @@ FEATURES:
 7. Job management with enterprise patterns
 """
 
+from __future__ import annotations
+
+from flext_core.domain.types import ServiceResult
+
 # FLEXT-Meltano: Core imports and version management
 from flext_meltano.event_bridge import MeltanoEventBridge
 
 # Integration modules
-from flext_meltano.integrations import GopyIntegration
-from flext_meltano.integrations import MeltanoBridge
+from flext_meltano.integrations import GopyIntegration, MeltanoBridge
 from flext_meltano.job_manager import FlextMeltanoJobManager
-from flext_meltano.models import MeltanoEnvironment
-from flext_meltano.models import MeltanoJob
-from flext_meltano.models import MeltanoPlugin
-from flext_meltano.models import MeltanoPlugins
-from flext_meltano.models import MeltanoProjectConfig
-from flext_meltano.models import MeltanoSchedule
+from flext_meltano.models import (
+    MeltanoEnvironment,
+    MeltanoJob,
+    MeltanoPlugin,
+    MeltanoPlugins,
+    MeltanoProjectConfig,
+    MeltanoSchedule,
+)
 from flext_meltano.orchestrator import FlextMeltanoOrchestrator
 from flext_meltano.project_manager import MeltanoProjectManager
 from flext_meltano.state_manager import FlextMeltanoStateManager
-from flext_meltano.unified_anti_corruption_layer import MeltanoPluginDescriptor
-from flext_meltano.unified_anti_corruption_layer import MeltanoRunResult
 from flext_meltano.unified_anti_corruption_layer import (
+    MeltanoPluginDescriptor,
+    MeltanoRunResult,
     UnifiedMeltanoAntiCorruptionLayer,
 )
 
-# Version management
 try:
     from flext_core.domain.constants import FlextFramework
 
