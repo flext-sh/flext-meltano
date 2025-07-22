@@ -5,15 +5,15 @@ Simplified implementation using flext-core patterns.
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from flext_core import ServiceResult
 from flext_core.domain.pydantic_base import DomainValueObject, Field
-from flext_observability.logging import get_logger
+from flext_core.domain.shared_types import ServiceResult
 from pydantic import model_validator
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MeltanoPluginDescriptor(DomainValueObject):
@@ -134,7 +134,7 @@ class UnifiedMeltanoAntiCorruptionLayer:
         _transform: str | None = None,
         _state_id: str | None = None,
         _env: dict[str, str] | None = None,
-    ) -> ServiceResult[MeltanoRunResult]:
+    ) -> ServiceResult[Any]:
         """Run Meltano pipeline with simplified interface.
 
         Args:

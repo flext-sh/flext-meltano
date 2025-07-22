@@ -7,14 +7,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import ServiceResult
-from flext_core.config import get_container
-from flext_core.domain.shared_types import Environment
+from flext_core import get_container
+from flext_core.domain.shared_types import Any, EnvironmentLiteral, ServiceResult
 
 from flext_meltano.config import MeltanoSettings
 
 
-def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool]:
+def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[Any]:
     """Set up FLEXT Meltano system with configuration and logging.
 
     Args:
@@ -31,7 +30,7 @@ def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool
             settings = MeltanoSettings(
                 project_name="flext-infrastructure.plugins.flext-meltano",
                 project_version="0.7.0",
-                environment=Environment.DEVELOPMENT,
+                environment="development",
                 debug=False,
             )
 
@@ -41,7 +40,7 @@ def setup_meltano(settings: MeltanoSettings | None = None) -> ServiceResult[bool
         # Register settings with container
         container.register(MeltanoSettings, settings)
 
-        return ServiceResult.ok(data=True)
+        return ServiceResult.ok(True)
 
     except (ValueError, TypeError, RuntimeError, OSError) as e:
         return ServiceResult.fail(f"Failed to setup meltano: {e}")
@@ -79,7 +78,7 @@ def create_development_meltano_config(
     return MeltanoSettings(
         project_name=str(config.get("project_name")),
         project_version=str(config.get("project_version")),
-        environment=Environment(str(config.get("environment", "development"))),
+        environment=str(config.get("environment", "development")),
         debug=bool(config.get("debug")),
     )
 

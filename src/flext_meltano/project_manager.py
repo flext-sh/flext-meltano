@@ -7,6 +7,7 @@ Zero tolerance for legacy code or duplicated implementations.
 from __future__ import annotations
 
 import asyncio
+import logging
 import shutil
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -14,11 +15,10 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from flext_core import ServiceResult
 from flext_core.domain.pydantic_base import DomainEvent
-from flext_observability.logging import get_logger
+from flext_core.domain.shared_types import ServiceResult
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class ProjectInitializationMode(StrEnum):
@@ -54,7 +54,7 @@ class MeltanoProjectManager:
 
     def __init__(self, project_root: Path | str) -> None:
         self.project_root = Path(project_root)
-        self.logger = logger.bind(project_root=str(self.project_root))
+        logger.info("flext_meltano_project_manager %s", {str(self.project_root)})
 
     def _filter_singer_warnings(self, stderr_text: str) -> str:
         """Filter out Singer SDK deprecation warnings from stderr to achieve zero warnings."""
@@ -93,9 +93,9 @@ class MeltanoProjectManager:
         self,
         project_name: str,
         environment: str = "dev",
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Create new Meltano project with enterprise configuration."""
-        self.logger.info(
+        logger.info(
             "Creating Meltano project",
             project_name=project_name,
             environment=environment,
@@ -105,7 +105,8 @@ class MeltanoProjectManager:
             project_path = self.project_root / project_name
 
             if project_path.exists():
-                return ServiceResult.fail(f"Project already exists at {project_path}")
+                return ServiceResult.fail(f"Project already exists at {project_path}",
+                )
 
             # Create project directory
             project_path.mkdir(parents=True, exist_ok=True)
@@ -147,44 +148,48 @@ class MeltanoProjectManager:
                 "created_at": datetime.now(UTC).isoformat(),
             }
 
-            self.logger.info("Meltano project created successfully", **result)
-            return ServiceResult.ok(result)
+            logger.info(
+                "Meltano project created successfully", extra={"result": result},
+            )
+            return ServiceResult.ok({"result": result})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to create Meltano project: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def load_project_config(
         self,
         project_name: str,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Load Meltano project configuration."""
         try:
             project_path = self.project_root / project_name
             meltano_yml = project_path / "meltano.yml"
 
             if not meltano_yml.exists():
-                return ServiceResult.fail(f"Project config not found: {meltano_yml}")
+                return ServiceResult.fail(f"Project config not found: {meltano_yml}",
+                )
 
             with meltano_yml.open("r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
             if not config:
-                return ServiceResult.fail("Invalid or empty meltano.yml")
+                return ServiceResult.fail("Invalid or empty meltano.yml",
+                )
 
-            return ServiceResult.ok(config)
+            return ServiceResult.ok({"result": config})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to load project config: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def save_project_config(
         self,
         project_name: str,
         config: dict[str, Any],
-    ) -> ServiceResult[None]:
+    ) -> ServiceResult[Any]:
         """Save Meltano project configuration."""
         try:
             project_path = self.project_root / project_name
@@ -199,11 +204,11 @@ class MeltanoProjectManager:
             with meltano_yml.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False, indent=2)
 
-            return ServiceResult.ok(None)
+            return ServiceResult.ok({"result": None})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to save project config: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def run_pipeline_direct(
@@ -212,15 +217,16 @@ class MeltanoProjectManager:
         tap_name: str,
         target_name: str,
         environment: str = "dev",
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Run pipeline using Singer SDK directly to eliminate warnings at source."""
         try:
             project_path = self.project_root / project_name
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}")
+                return ServiceResult.fail(f"Project not found: {project_path}",
+                )
 
             # Use Singer SDK directly instead of Meltano CLI to eliminate warnings
-            self.logger.info(
+            logger.info(
                 "Running pipeline with Singer SDK directly",
                 tap=tap_name,
                 target=target_name,
@@ -234,11 +240,11 @@ class MeltanoProjectManager:
                 "success": True,
             }
 
-            return ServiceResult.ok(result)
+            return ServiceResult.ok({"result": result})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to run direct pipeline: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def run_command(
@@ -246,13 +252,14 @@ class MeltanoProjectManager:
         project_name: str,
         command_args: list[str],
         environment: str = "dev",
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Execute Meltano command in project context with Singer SDK warning suppression."""
         try:
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}")
+                return ServiceResult.fail(f"Project not found: {project_path}",
+                )
 
             # Build command
             cmd = ["meltano"]
@@ -260,7 +267,7 @@ class MeltanoProjectManager:
                 cmd.extend(["--environment", environment])
             cmd.extend(command_args)
 
-            self.logger.info(
+            logger.info(
                 "Executing Meltano command",
                 command=cmd,
                 project_path=str(project_path),
@@ -309,15 +316,16 @@ class MeltanoProjectManager:
             }
 
             if process.returncode != 0:
-                self.logger.error("Meltano command failed", **result)
-                return ServiceResult.fail(f"Command failed: {result['stderr']}")
+                logger.error("Meltano command failed", **result)
+                return ServiceResult.fail(f"Command failed: {result['stderr']}",
+                )
 
-            self.logger.info("Meltano command completed successfully", **result)
-            return ServiceResult.ok(result)
+            logger.info("Meltano command completed successfully", **result)
+            return ServiceResult.ok({"result": result})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to execute command: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def add_plugin(
@@ -327,20 +335,21 @@ class MeltanoProjectManager:
         plugin_name: str,
         variant: str = "",
         **plugin_config: object,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Add and install plugin to Meltano project using proper Meltano CLI."""
         try:
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}")
+                return ServiceResult.fail(f"Project not found: {project_path}",
+                )
 
             # Build meltano add command
             cmd = ["add", plugin_type, plugin_name]
             if variant:
                 cmd.extend(["--variant", variant])
 
-            self.logger.info(
+            logger.info(
                 "Adding plugin with Meltano CLI",
                 plugin_type=plugin_type,
                 plugin_name=plugin_name,
@@ -349,17 +358,18 @@ class MeltanoProjectManager:
 
             # Execute meltano add command
             add_result = await self.run_command(project_name, cmd)
-            if not add_result.is_success:
-                return ServiceResult.fail(f"Failed to add plugin: {add_result.error}")
+            if not add_result.success:
+                return ServiceResult.fail(f"Failed to add plugin: {add_result.error}",
+                )
 
             # Run lock to ensure plugin is properly installed
-            self.logger.info("Locking plugin dependencies")
+            logger.info("Locking plugin dependencies")
             lock_result = await self.run_command(
                 project_name,
                 ["lock", "--update", plugin_name],
             )
-            if not lock_result.is_success:
-                self.logger.warning(
+            if not lock_result.success:
+                logger.warning(
                     "Plugin lock failed, but plugin may still work",
                     error=lock_result.error,
                 )
@@ -371,23 +381,23 @@ class MeltanoProjectManager:
                 "add_output": (add_result.data or {}).get("stdout", ""),
                 "lock_output": (
                     (lock_result.data or {}).get("stdout", "")
-                    if lock_result.is_success
+                    if lock_result.success
                     else "Lock failed"
                 ),
             }
 
-            self.logger.info("Plugin added successfully", **result)
-            return ServiceResult.ok(result)
+            logger.info("Plugin added successfully", extra={"result": result})
+            return ServiceResult.ok({"result": result})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
     async def validate_project(
         self,
         project_name: str,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Validate Meltano project structure and configuration."""
         try:
             project_path = self.project_root / project_name
@@ -403,15 +413,15 @@ class MeltanoProjectManager:
 
             if not validation_results["project_exists"]:
                 errors.append("Project directory does not exist")
-                return ServiceResult.ok(validation_results)
+                return ServiceResult.ok({"result": validation_results})
 
             if not validation_results["config_exists"]:
                 errors.append("meltano.yml not found")
-                return ServiceResult.ok(validation_results)
+                return ServiceResult.ok({"result": validation_results})
 
             # Validate config structure
             config_result = await self.load_project_config(project_name)
-            if config_result.is_success:
+            if config_result.success:
                 config = config_result.data
 
                 required_fields = ["version", "project_id", "plugins"]
@@ -439,11 +449,11 @@ class MeltanoProjectManager:
                 and not validation_results["errors"]
             )
 
-            return ServiceResult.ok(validation_results)
+            return ServiceResult.ok({"result": validation_results})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to validate project: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)
 
 
@@ -458,11 +468,11 @@ class FlextProjectManager(MeltanoProjectManager):
         self,
         project_name: str,
         environment: str = "dev",
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Create project and publish domain events."""
         result = await self.create_project(project_name, environment)
 
-        if result.is_success and self.event_bus:
+        if result.success and self.event_bus:
             # Create domain event with proper DomainEvent structure
             event = DomainEvent()
             await self.event_bus.publish(event)
@@ -473,13 +483,14 @@ class FlextProjectManager(MeltanoProjectManager):
         self,
         project_name: str,
         backup_path: Path,
-    ) -> ServiceResult[Path]:
+    ) -> ServiceResult[Any]:
         """Create project backup archive."""
         try:
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}")
+                return ServiceResult.fail(f"Project not found: {project_path}",
+                )
 
             # Ensure backup directory exists
             backup_path.parent.mkdir(parents=True, exist_ok=True)
@@ -499,9 +510,9 @@ class FlextProjectManager(MeltanoProjectManager):
                 event = DomainEvent()
                 await self.event_bus.publish(event)
 
-            return ServiceResult.ok(backup_file)
+            return ServiceResult.ok({"result": str(backup_file)})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             error_msg = f"Failed to backup project: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            logger.exception(error_msg, error=str(e))
             return ServiceResult.fail(error_msg)

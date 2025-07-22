@@ -119,9 +119,10 @@ def meltano_project(
 
     return MeltanoProject(
         name="test-project",
-        project_root=str(test_meltano_project_dir),
-        meltano_file_path=str(test_meltano_project_dir / "meltano.yml"),
-        meltano_version="3.0.0",
+        directory=test_meltano_project_dir,
+        config_path=test_meltano_project_dir / "meltano.yml",
+        description="Test project for flext-meltano",
+        version="1",
     )
 
 

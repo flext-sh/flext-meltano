@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from flext_core import ServiceResult
+from flext_core.domain.shared_types import ServiceResult
 
 
 class MeltanoPipelineExecutor:
@@ -31,7 +31,7 @@ class MeltanoPipelineExecutor:
         environment: str = "dev",
         config: dict[str, Any] | None = None,
         user_id: str | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Execute a Meltano pipeline."""
         try:
             execution_id = str(uuid4())
@@ -62,7 +62,7 @@ class MeltanoPipelineExecutor:
     async def get_execution_status(
         self,
         execution_id: str,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Get the status of a pipeline execution."""
         try:
             if execution_id not in self._active_executions:
@@ -84,7 +84,7 @@ class MeltanoPipelineExecutor:
     async def cancel_execution(
         self,
         execution_id: str,
-    ) -> ServiceResult[dict[str, str]]:
+    ) -> ServiceResult[Any]:
         """Cancel a running pipeline execution."""
         try:
             if execution_id not in self._active_executions:
@@ -107,7 +107,7 @@ class MeltanoPipelineExecutor:
         self,
         pipeline_id: str | None = None,
         user_id: str | None = None,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """List pipeline executions."""
         try:
             executions = []

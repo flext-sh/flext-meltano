@@ -13,7 +13,7 @@ import sys
 from collections.abc import Callable
 from enum import Enum, auto
 from functools import wraps
-from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
 
 from flext_core.domain.pydantic_base import (
     DomainBaseModel as BaseModel,
@@ -35,6 +35,7 @@ ExecutionContext = dict[str, Any]
 
 T = TypeVar("T", bound=Callable[..., Any])
 P = TypeVar("P")
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 class StepType(Enum):
@@ -68,7 +69,7 @@ class StepProtocol(Protocol):
 class ReflectionStep(DomainValueObject):
     """Zero-boilerplate step implementation using reflection."""
 
-    model_config: ClassVar = {"arbitrary_types_allowed": True}
+    model_config: ClassVar = {"arbitrary_types_allowed": True, "use_enum_values": False}
 
     name: str = Field(description="Step name for identification")
     func: StepFunction = Field(description="Step function to execute")
@@ -104,12 +105,16 @@ class ReflectionStep(DomainValueObject):
 
         for param_name, param in sig.parameters.items():
             if param_name in context:
+                # Direct match by parameter name
                 kwargs[param_name] = context[param_name]
             elif param.default != inspect.Parameter.empty:
+                # Use default value
                 kwargs[param_name] = param.default
             elif param_name != "self" and param.annotation != inspect.Parameter.empty:
                 # Try to inject based on type annotation
-                self._inject_by_type(param_name, param.annotation, context, kwargs)
+                injected = self._inject_by_type(param_name, param.annotation, context)
+                if injected is not None:
+                    kwargs[param_name] = injected
 
         return kwargs
 
@@ -118,25 +123,28 @@ class ReflectionStep(DomainValueObject):
         param_name: str,
         type_hint: Any,
         context: dict[str, Any],
-        kwargs: dict[str, Any],
-    ) -> None:
+    ) -> Any | None:
         """Inject parameter value based on type annotation."""
         try:
             # Handle both regular types and parameterized generics
-            for value in context.values():
+            for key, value in context.items():
+                # Skip if key name matches parameter name (should be handled by direct lookup)
+                if key == param_name:
+                    continue
+
                 if hasattr(type_hint, "__origin__"):
                     # Parameterized generic like dict[str, Any]
                     origin_type = type_hint.__origin__
                     if isinstance(value, origin_type):
-                        kwargs[param_name] = value
-                        break
+                        return value
                 # Regular type
                 elif isinstance(value, type_hint):
-                    kwargs[param_name] = value
-                    break
+                    return value
         except TypeError:
             # Skip problematic type annotations
             pass
+
+        return None
 
     async def _execute_function(self, kwargs: dict[str, Any]) -> Any:
         """Execute the function with provided kwargs."""
@@ -164,10 +172,10 @@ def pipeline_step(
     dependencies: list[str] | None = None,
     retry: int = 3,
     timeout: int = 300,
-) -> Callable[[T], T]:
+) -> Callable[[F], F]:
     """Decorator to mark a function as a pipeline step."""
 
-    def decorator(func: T) -> T:
+    def decorator(func: F) -> F:
         # Extract name from function if not provided
         step_name = name or getattr(func, "__name__", "unknown_step").replace("_", "-")
 
@@ -181,10 +189,10 @@ def pipeline_step(
             timeout_seconds=timeout,
         )
 
-        # Store step metadata on function - use Any to avoid attr-defined issues
-        func._pipeline_step = step  # type: ignore[attr-defined]  # noqa: SLF001
-        func._step_type = step_type  # type: ignore[attr-defined]  # noqa: SLF001
-        func._dependencies = dependencies or []  # type: ignore[attr-defined]  # noqa: SLF001
+        # Store step metadata on function using setattr for type safety
+        func.pipeline_step = step
+        func.step_type = step_type
+        func.dependencies = dependencies or []
 
         @wraps(func)
         async def wrapper(*args: object, **kwargs: object) -> Any:
@@ -198,7 +206,8 @@ def pipeline_step(
 
             return await step.execute(context)
 
-        return wrapper  # type: ignore[return-value]
+        # Use proper typing for decorator return
+        return cast("F", wrapper)
 
     return decorator
 
@@ -223,18 +232,21 @@ class ReflectionOrchestrator(BaseModel):
         for _name, obj in inspect.getmembers(module):
             # Check if object has pipeline step metadata
             try:
-                pipeline_step = obj._pipeline_step  # noqa: SLF001
-                self.step_registry[pipeline_step.name] = pipeline_step
+                pipeline_step = getattr(obj, "pipeline_step", None)
+                if pipeline_step is not None:
+                    self.step_registry[pipeline_step.name] = pipeline_step
             except (AttributeError, TypeError):
-                continue
+                pass  # Continue to check for step_type
 
             # Register by type for objects with step_type
             try:
-                if obj.step_type not in self.type_registry:
-                    self.type_registry[obj.step_type] = []
-                self.type_registry[obj.step_type].append(obj)
+                step_type = getattr(obj, "step_type", None)
+                if step_type is not None:
+                    if step_type not in self.type_registry:
+                        self.type_registry[step_type] = []
+                    self.type_registry[step_type].append(obj)
             except (AttributeError, TypeError):
-                continue
+                pass  # Object doesn't have step_type, skip
 
     async def execute_pipeline(
         self,

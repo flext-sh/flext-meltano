@@ -8,11 +8,10 @@ and monitoring.
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
-
-from flext_observability.logging import get_logger
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.db import project_engine
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class JobExecutionMode(Enum):
@@ -43,7 +42,7 @@ class FlextMeltanoJobManager:
     def __init__(self, event_bus: EventBusProtocol) -> None:
         """Initialize job manager with event bus integration."""
         self.event_bus = event_bus
-        self.logger = logger.bind(component="flext_meltano_job_manager")
+        self.logger = logger.info("flext_meltano_job_manager")
         self._lock = asyncio.Lock()
 
         self.logger.info(
@@ -76,7 +75,7 @@ class FlextMeltanoJobManager:
                 else:
                     self.logger.debug("Job not found", job_id=job_id)
 
-                return job  # type: ignore[no-any-return]
+                return job
 
         except (
             ValueError,
@@ -148,7 +147,7 @@ class FlextMeltanoJobManager:
                     offset=offset,
                 )
 
-                return jobs  # type: ignore[no-any-return]
+                return jobs
 
         except (
             ValueError,

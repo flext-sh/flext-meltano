@@ -16,6 +16,7 @@ from flext_core.domain.pydantic_base import (
     DomainValueObject,
     Field,
 )
+from pydantic import field_validator
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -77,7 +78,7 @@ class FlextSingerSDKIntegration(BaseModel):
 
     model_config: ClassVar = {"arbitrary_types_allowed": True}
 
-    project_root: Path = Field(description="Root path of the project")
+    project_root: str | Path = Field(description="Root path of the project")
 
     # Registry of taps and targets
     taps: dict[str, Any] = Field(
@@ -89,11 +90,16 @@ class FlextSingerSDKIntegration(BaseModel):
         description="Registry of available targets",
     )
 
-    def __init__(self, project_root: str | Path, **kwargs: Any) -> None:
-        """Initialize with proper constructor pattern."""
-        if isinstance(project_root, str):
-            project_root = Path(project_root)
-        super().__init__(**kwargs)
+    @field_validator("project_root", mode="before")
+    @classmethod
+    def validate_project_root(cls, v: Any) -> Path:
+        """Convert string to Path if needed."""
+        if isinstance(v, str):
+            return Path(v)
+        if isinstance(v, Path):
+            return v
+        # If it's something else, try to convert it
+        return Path(str(v))
 
     def model_post_init(self, __context: Any, /) -> None:
         """Initialize the Singer SDK integration."""

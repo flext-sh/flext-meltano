@@ -7,11 +7,10 @@ integrated into the FLEXT ecosystem with modern async patterns and type safety.
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-
-from flext_observability.logging import get_logger
 
 from flext_meltano.project_manager import MeltanoProjectManager
 from flext_meltano.singer_direct import SingerDirectRunner
@@ -21,7 +20,7 @@ from flext_meltano.singer_direct import SingerDirectRunner
 # Type alias for better readability
 JSONStr = str
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Global variable to hold the bridge instance
 _bridge_instance: MeltanoBridge | None = None
@@ -99,7 +98,7 @@ class MeltanoBridge:
                 environment="dev",
             )
 
-            if result.is_success:
+            if result.success:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
@@ -151,7 +150,7 @@ class MeltanoBridge:
                 variant=plugin_variant,
             )
 
-            if result.is_success:
+            if result.success:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
@@ -219,7 +218,7 @@ class MeltanoBridge:
                 environment="dev",
             )
 
-            if result.is_success:
+            if result.success:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
@@ -263,7 +262,7 @@ class MeltanoBridge:
             # Use FLEXT project manager to load project config
             result = await self.project_manager.load_project_config(project_name)
 
-            if result.is_success:
+            if result.success:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
@@ -313,7 +312,7 @@ class MeltanoBridge:
                 environment="dev",
             )
 
-            if result.is_success:
+            if result.success:
                 return json.dumps(
                     MeltanoResult(
                         success=True,
