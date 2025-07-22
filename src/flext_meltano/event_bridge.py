@@ -6,20 +6,20 @@ allowing seamless event propagation and handling across both platforms.
 
 from __future__ import annotations
 
+import logging
 import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 # Use actual FLEXT imports - no placeholders allowed
 from flext_core.domain.pydantic_base import DomainEvent, Field
-from flext_observability.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MeltanoEvent(DomainEvent):
@@ -189,7 +189,9 @@ class MeltanoEventBridge:
 
             # Create FLEXT event using proper constructor
             correlation_id = kwargs.get("correlation_id")
-            correlation_id_str = str(correlation_id) if correlation_id is not None else None
+            correlation_id_str = (
+                str(correlation_id) if correlation_id is not None else None
+            )
             flext_event = MeltanoEvent(
                 event_type=flext_event_type,
                 data=event_data,

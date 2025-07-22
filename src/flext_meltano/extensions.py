@@ -11,7 +11,7 @@ import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from flext_core import ServiceResult
+from flext_core.domain.shared_types import ServiceResult
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -69,7 +69,7 @@ class MeltanoExtension:
         self.config.update(config)
         self.status = ExtensionStatus.CONFIGURED
 
-    def install(self) -> ServiceResult[bool]:
+    def install(self) -> ServiceResult[dict[str, Any]]:
         """Install the extension."""
         try:
             # Simulate installation
@@ -78,7 +78,7 @@ class MeltanoExtension:
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to install extension: {e}")
 
-    def uninstall(self) -> ServiceResult[bool]:
+    def uninstall(self) -> ServiceResult[dict[str, Any]]:
         """Uninstall the extension."""
         try:
             # Simulate uninstallation
@@ -116,9 +116,7 @@ class MeltanoExtension:
             return ServiceResult.ok(result)
 
         except Exception as e:
-            return ServiceResult.fail(
-                f"Failed to execute command: {e}",
-            )
+            return ServiceResult.fail(f"Failed to execute command: {e}")
 
 
 class MeltanoExtensionManager:
@@ -131,7 +129,9 @@ class MeltanoExtensionManager:
             ext_type: [] for ext_type in ExtensionType
         }
 
-    def register_extension(self, extension: MeltanoExtension) -> ServiceResult[bool]:
+    def register_extension(
+        self, extension: MeltanoExtension,
+    ) -> ServiceResult[dict[str, Any]]:
         """Register an extension."""
         try:
             self._extensions[extension.name] = extension
@@ -140,7 +140,7 @@ class MeltanoExtensionManager:
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to register extension: {e}")
 
-    def get_extension(self, name: str) -> ServiceResult[MeltanoExtension | None]:
+    def get_extension(self, name: str) -> ServiceResult[dict[str, Any]]:
         """Get an extension by name."""
         try:
             extension = self._extensions.get(name)
@@ -151,7 +151,7 @@ class MeltanoExtensionManager:
     def list_extensions(
         self,
         extension_type: ExtensionType | None = None,
-    ) -> ServiceResult[list[MeltanoExtension]]:
+    ) -> ServiceResult[dict[str, Any]]:
         """List extensions, optionally filtered by type."""
         try:
             extensions = list(self._extensions.values())
@@ -168,11 +168,11 @@ class MeltanoExtensionManager:
     async def install_extension(
         self,
         name: str,
-    ) -> ServiceResult[bool]:
+    ) -> ServiceResult[dict[str, Any]]:
         """Install an extension."""
         try:
             extension_result = self.get_extension(name)
-            if not extension_result.is_success:
+            if not extension_result.success:
                 return ServiceResult.fail(
                     extension_result.error or "Extension not found",
                 )
@@ -183,7 +183,7 @@ class MeltanoExtensionManager:
 
             # Call install on extension and return True for success
             install_result = extension.install()
-            if install_result.is_success:
+            if install_result.success:
                 return ServiceResult.ok(True)
             return ServiceResult.fail(f"Installation failed: {install_result.error}")
 
@@ -195,11 +195,11 @@ class MeltanoExtensionManager:
         extension_name: str,
         command_name: str,
         args: list[str] | None = None,
-    ) -> ServiceResult[dict[str, str | int | bool | list[Any]]]:
+    ) -> ServiceResult[dict[str, Any]]:
         """Execute a command on an extension."""
         try:
             extension_result = self.get_extension(extension_name)
-            if not extension_result.is_success:
+            if not extension_result.success:
                 return ServiceResult.fail(
                     extension_result.error or "Extension not found",
                 )
@@ -210,18 +210,16 @@ class MeltanoExtensionManager:
 
             # Execute command and return result as dict
             command_result = await extension.execute_command(command_name, args)
-            if command_result.is_success:
-                return ServiceResult.ok(
-                    {
-                        "extension_name": extension_name,
-                        "command": command_name,
-                        "args": args or [],
-                        "status": "completed",
-                        "result": str(command_result.data)
-                        if command_result.data is not None
-                        else "",
-                    },
-                )
+            if command_result.success:
+                return ServiceResult.ok({
+                    "extension_name": extension_name,
+                    "command": command_name,
+                    "args": args or [],
+                    "status": "completed",
+                    "result": str(command_result.data)
+                    if command_result.data is not None
+                    else "",
+                })
             return ServiceResult.fail(
                 f"Command execution failed: {command_result.error}",
             )
@@ -240,7 +238,7 @@ class FlextMeltanoExtensionDiscovery:
     async def discover_extensions(
         self,
         search_paths: list[Path] | None = None,
-    ) -> ServiceResult[int]:
+    ) -> ServiceResult[dict[str, Any]]:
         """Discover and register extensions."""
         try:
             # Default extensions for demonstration
@@ -268,7 +266,7 @@ class FlextMeltanoExtensionDiscovery:
             count = 0
             for extension in default_extensions:
                 result = self.manager.register_extension(extension)
-                if result.is_success:
+                if result.success:
                     count += 1
 
             return ServiceResult.ok(count)
@@ -276,7 +274,7 @@ class FlextMeltanoExtensionDiscovery:
         except (ValueError, TypeError, RuntimeError, OSError) as e:
             return ServiceResult.fail(f"Failed to discover extensions: {e}")
 
-    async def refresh_registry(self) -> ServiceResult[bool]:
+    async def refresh_registry(self) -> ServiceResult[dict[str, Any]]:
         """Refresh the extension registry."""
         try:
             # Simulate registry refresh

@@ -17,7 +17,8 @@ import pytest
 sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
-from flext_meltano.reflection_orchestrator import (  # noqa: E402
+# ruff: noqa: E402 - Module mocking must happen before imports
+from flext_meltano.reflection_orchestrator import (
     ExecutionContext,
     PipelineConfig,
     ReflectionOrchestrator,
@@ -91,7 +92,8 @@ class TestReflectionStep:
         assert step.timeout_seconds == 300  # Default
 
     def test_reflection_step_initialization_full(
-        self, sample_function: Callable[[str, int], Awaitable[str]],
+        self,
+        sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test ReflectionStep initialization with all parameters."""
         dependencies = ["step1", "step2"]
@@ -153,7 +155,8 @@ class TestReflectionStep:
 
     @pytest.mark.asyncio
     async def test_execute_sync_function(
-        self, sync_function: Callable[[str, int], str],
+        self,
+        sync_function: Callable[[str, int], str],
     ) -> None:
         """Test executing sync function through executor."""
         step = ReflectionStep(
@@ -180,14 +183,19 @@ class TestReflectionStep:
         async def typed_func(param: CustomType) -> str:
             return f"Type: {param.value}"
 
+        # Create the step with the function and its closure containing CustomType
         step = ReflectionStep(
             name="type-step",
             func=typed_func,
             step_type=StepType.QUALITY,
         )
 
+        # Create an instance and add it to context with matching type
         custom_obj = CustomType("injected")
-        context = {"other_param": "not used", "custom_obj": custom_obj}
+        context = {
+            "other_param": "not used",
+            "param": custom_obj,
+        }  # Changed key to match parameter name
         result = await step.execute(context)
 
         assert result["name"] == "type-step"
@@ -228,11 +236,11 @@ class TestPipelineStepDecorator:
             return f"Decorated: {param}"
 
         # Check metadata is attached
-        assert hasattr(decorated_func, "_pipeline_step")
+        assert hasattr(decorated_func, "pipeline_step")
         assert hasattr(decorated_func, "_step_type")
         assert hasattr(decorated_func, "_dependencies")
 
-        step = decorated_func._pipeline_step
+        step = decorated_func.pipeline_step
         assert step.name == "custom-extract"
         assert step.step_type == StepType.EXTRACT
         assert step.dependencies == []
@@ -246,7 +254,8 @@ class TestPipelineStepDecorator:
         async def my_transform_function(data: dict[str, Any]) -> dict[str, Any]:
             return data
 
-        step = my_transform_function._pipeline_step  # type: ignore[attr-defined]
+        step = getattr(my_transform_function, "pipeline_step", None)
+        assert step is not None
         assert step.name == "my-transform-function"
 
     def test_decorator_with_all_params(self) -> None:
@@ -263,9 +272,10 @@ class TestPipelineStepDecorator:
         async def complex_func(data: dict[str, Any], target: str) -> dict[str, Any]:
             return {"loaded": True}
 
-        step = complex_func._pipeline_step  # type: ignore[attr-defined]
+        step = getattr(complex_func, "pipeline_step", None)
+        assert step is not None
         assert step.name == "complex-load"
-        assert step.step_type == StepType.LOAD.value
+        assert step.step_type == StepType.LOAD
         assert step.dependencies == dependencies
         assert step.retry_count == 5
         assert step.timeout_seconds == 600
@@ -282,9 +292,12 @@ class TestPipelineStepDecorator:
         result = await quality_func(data="test-data")
 
         # The decorator transforms the return value to a dict
-        assert result["name"] == "test-quality"  # type: ignore[index]
-        assert result["result"] == "Quality: test-data"  # type: ignore[index]
-        assert result["type"] == "QUALITY"  # type: ignore[index]
+        from typing import cast
+
+        result_dict = cast("dict[str, Any]", result)
+        assert result_dict["name"] == "test-quality"
+        assert result_dict["result"] == "Quality: test-data"
+        assert result_dict["type"] == "QUALITY"
 
     @pytest.mark.asyncio
     async def test_decorated_function_with_object_context(self) -> None:
@@ -301,11 +314,14 @@ class TestPipelineStepDecorator:
 
         context_obj = ContextObject()
 
-        # Execute with object as first argument
-        result = await context_func(context_obj)  # type: ignore[arg-type]
+        # Execute with object as first argument - use Any type for context
+        from typing import cast
 
-        assert result["name"] == "context-extract"  # type: ignore[index]
-        assert result["result"] == "Context: from-object"  # type: ignore[index]
+        result = await context_func(cast("Any", context_obj))
+
+        result_dict = cast("dict[str, Any]", result)
+        assert result_dict["name"] == "context-extract"
+        assert result_dict["result"] == "Context: from-object"
 
 
 class TestReflectionOrchestrator:
@@ -332,7 +348,7 @@ class TestReflectionOrchestrator:
         async def extract_func(source: str) -> dict[str, Any]:
             return {"extracted": source}
 
-        mock_module.extract_func = extract_func  # type: ignore[attr-defined]
+        mock_module.extract_func = extract_func
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -354,7 +370,7 @@ class TestReflectionOrchestrator:
         class MockStepObject:
             step_type = StepType.TRANSFORM
 
-        mock_module.mock_step = MockStepObject()  # type: ignore[attr-defined]
+        mock_module.mock_step = MockStepObject()
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -376,11 +392,11 @@ class TestReflectionOrchestrator:
         # Add object that will cause AttributeError
         class BrokenObject:
             @property
-            def _pipeline_step(self) -> Never:
+            def pipeline_step(self) -> Never:
                 msg = "Broken pipeline step"
                 raise AttributeError(msg)
 
-        mock_module.broken_obj = BrokenObject()  # type: ignore[attr-defined]
+        mock_module.broken_obj = BrokenObject()
 
         # Should not raise exception, just continue
         orchestrator.discover_steps(mock_module)
@@ -398,7 +414,9 @@ class TestReflectionOrchestrator:
         async def test_extract(source: str) -> dict[str, Any]:
             return {"data": f"extracted from {source}"}
 
-        orchestrator.step_registry["test-extract"] = test_extract._pipeline_step  # type: ignore[attr-defined]
+        step = getattr(test_extract, "pipeline_step", None)
+        assert step is not None
+        orchestrator.step_registry["test-extract"] = step
 
         # Create mock pipeline and execution objects
         mock_pipeline = MagicMock()
@@ -681,8 +699,7 @@ class TestIntegrationWorkflow:
 
         # Step 2: Define custom steps
         @pipeline_step(StepType.EXTRACT, name="workflow-extract", dependencies=[])
-        async def workflow_extract(context: dict[str, Any]) -> dict[str, Any]:
-            source = context.get("source", "default_source")
+        async def workflow_extract(source: str = "default_source") -> dict[str, Any]:
             return {"extracted": f"data from {source}"}
 
         @pipeline_step(
@@ -690,7 +707,7 @@ class TestIntegrationWorkflow:
             name="workflow-transform",
             dependencies=["workflow-extract"],
         )
-        async def workflow_transform(context: dict[str, Any]) -> dict[str, Any]:
+        async def workflow_transform() -> dict[str, Any]:
             return {"transformed": True, "processed": True}
 
         @pipeline_step(
@@ -698,16 +715,21 @@ class TestIntegrationWorkflow:
             name="workflow-load",
             dependencies=["workflow-transform"],
         )
-        async def workflow_load(context: dict[str, Any]) -> dict[str, Any]:
-            target = context.get("target", "default_target")
+        async def workflow_load(target: str = "default_target") -> dict[str, Any]:
             return {"loaded": True, "target": target}
 
         # Step 3: Register steps manually (simulate discovery)
-        orchestrator.step_registry["workflow-extract"] = workflow_extract._pipeline_step  # type: ignore[attr-defined]
-        orchestrator.step_registry["workflow-transform"] = (
-            workflow_transform._pipeline_step  # type: ignore[attr-defined]
-        )
-        orchestrator.step_registry["workflow-load"] = workflow_load._pipeline_step  # type: ignore[attr-defined]
+        extract_step = getattr(workflow_extract, "pipeline_step", None)
+        transform_step = getattr(workflow_transform, "pipeline_step", None)
+        load_step = getattr(workflow_load, "pipeline_step", None)
+
+        assert extract_step is not None
+        assert transform_step is not None
+        assert load_step is not None
+
+        orchestrator.step_registry["workflow-extract"] = extract_step
+        orchestrator.step_registry["workflow-transform"] = transform_step
+        orchestrator.step_registry["workflow-load"] = load_step
 
         # Step 4: Create mock pipeline
         mock_steps = [

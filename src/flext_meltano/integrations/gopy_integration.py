@@ -7,15 +7,14 @@ Real-world Go-Python integration via HTTP is more reliable than gopy.
 
 from __future__ import annotations
 
+import logging
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
-from flext_core import ServiceResult
-from flext_observability.logging import get_logger
+from flext_core.domain.shared_types import Any, ServiceResult
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,25 +51,26 @@ class GoIntegration:
 
     def check_dependencies_available(self) -> bool:
         """Check if required dependencies are available."""
-        try:
-            # Check if we can import our bridge module
-            from flext_meltano.integrations.bridge import MeltanoBridge
+        # NO FALLBACKS - SEMPRE usar implementações originais conforme instrução
+        # Check if we can import our bridge module
+        from flext_meltano.integrations.bridge import MeltanoBridge
 
-            bridge = MeltanoBridge()
-            if not bridge.is_available():
-                self.logger.warning("Meltano bridge not available")
-                return False
-
-            self.logger.info("Go integration dependencies available")
-            return True
-        except ImportError as e:
-            self.logger.warning(f"Go integration dependencies not available: {e}")
+        bridge = MeltanoBridge()
+        if not bridge.is_available():
+            self.logger.warning("Meltano bridge not available")
             return False
 
-    def generate_http_api_server(self) -> ServiceResult[dict[str, Any]]:
+        self.logger.info("Go integration dependencies available")
+        return True
+
+    def generate_http_api_server(self) -> ServiceResult[Any]:
         """Generate HTTP API server for Go-Python communication."""
         if not self.check_dependencies_available():
-            return ServiceResult.fail("Required dependencies not available")
+            return ServiceResult(
+                data=None,
+                success=False,
+                error="Required dependencies not available",
+            )
 
         try:
             output_dir = Path(self.config.output_dir)
@@ -93,10 +93,7 @@ class GoIntegration:
 
             self.logger.info("Generated HTTP API server and Go client")
 
-            return ServiceResult.ok(
-                {
-                    "success": True,
-                    "api_server": str(api_server_path),
+            return ServiceResult.ok({
                     "go_client": str(go_client_path),
                     "usage_doc": str(usage_path),
                     "bindings_path": str(output_dir),
@@ -107,7 +104,11 @@ class GoIntegration:
 
         except Exception as e:
             self.logger.exception(f"Error generating HTTP API integration: {e}")
-            return ServiceResult.fail(f"Error generating HTTP API integration: {e}")
+            return ServiceResult(
+                success=False,
+                data=None,
+                error=f"Error generating HTTP API integration: {e}",
+            )
 
     def _generate_api_server_code(self) -> str:
         """Generate Python HTTP API server code."""
@@ -466,7 +467,7 @@ func main() {{
 }}
 """
 
-    def create_go_wrapper(self) -> ServiceResult[str]:
+    def create_go_wrapper(self) -> ServiceResult[Any]:
         """Create a Go client for HTTP API communication."""
         wrapper_content = self._generate_go_client_code()
 
@@ -475,11 +476,19 @@ func main() {{
             wrapper_path.write_text(wrapper_content)
 
             self.logger.info(f"Go wrapper created at {wrapper_path}")
-            return ServiceResult.ok(str(wrapper_path))
+            return ServiceResult(
+                data={"wrapper_path": str(wrapper_path)},
+                success=True,
+                error=None,
+            )
 
         except Exception as e:
             self.logger.exception(f"Error creating Go client: {e}")
-            return ServiceResult.fail(f"Error creating Go client: {e}")
+            return ServiceResult(
+                data=None,
+                success=False,
+                error=f"Error creating Go client: {e}",
+            )
 
     def _generate_usage_documentation(self) -> str:
         """Generate usage documentation for Go-Python integration."""
@@ -632,10 +641,14 @@ func main() {
 }
 """
 
-    def build_shared_library(self) -> ServiceResult[str]:
+    def build_shared_library(self) -> ServiceResult[Any]:
         """Build shared library for use with Go."""
         if not self.check_gopy_available():
-            return ServiceResult.fail("GoPy not available")
+            return ServiceResult(
+                data=None,
+                success=False,
+                error="GoPy not available",
+            )
 
         try:
             output_dir = Path(self.config.output_dir)
@@ -664,15 +677,27 @@ func main() {
             if result.returncode == 0:
                 shared_lib_path = output_dir / f"{self.config.module_name}.so"
                 self.logger.info(f"Shared library built at {shared_lib_path}")
-                return ServiceResult.ok(str(shared_lib_path))
+                return ServiceResult(
+                    data={"shared_lib_path": str(shared_lib_path)},
+                    success=True,
+                    error=None,
+                )
             error_msg = f"Failed to build shared library: {result.stderr}"
             self.logger.error(error_msg)
-            return ServiceResult.fail(error_msg)
+            return ServiceResult(
+                data=None,
+                success=False,
+                error=error_msg,
+            )
 
         except Exception as e:
             error_msg = f"Error building shared library: {e}"
             self.logger.exception(error_msg)
-            return ServiceResult.fail(error_msg)
+            return ServiceResult(
+                data=None,
+                success=False,
+                error=error_msg,
+            )
 
     def check_gopy_available(self) -> bool:
         """Check if gopy is available for Go bindings.
@@ -687,7 +712,7 @@ func main() {
         except Exception:
             return False
 
-    def generate_documentation(self) -> ServiceResult[str]:
+    def generate_documentation(self) -> ServiceResult[Any]:
         """Generate documentation for the Go bindings."""
         doc_content = self._generate_documentation_content()
 
@@ -696,12 +721,20 @@ func main() {
             doc_path.write_text(doc_content)
 
             self.logger.info(f"Documentation generated at {doc_path}")
-            return ServiceResult.ok(str(doc_path))
+            return ServiceResult(
+                data={"doc_path": str(doc_path)},
+                success=True,
+                error=None,
+            )
 
         except Exception as e:
             error_msg = f"Error generating documentation: {e}"
             self.logger.exception(error_msg)
-            return ServiceResult.fail(error_msg)
+            return ServiceResult(
+                data=None,
+                success=False,
+                error=error_msg,
+            )
 
     def _generate_documentation_content(self) -> str:
         """Generate documentation content for Go bindings."""
@@ -788,7 +821,7 @@ def main() -> None:
 
     # Generate HTTP API integration
     result = integration.generate_http_api_server()
-    if result.is_success:
+    if result.success:
         pass
     else:
         return

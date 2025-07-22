@@ -8,11 +8,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
-
-from flext_observability.logging import get_logger
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.state_service import StateService
@@ -22,7 +21,7 @@ if TYPE_CHECKING:
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CachePolicy(Enum):

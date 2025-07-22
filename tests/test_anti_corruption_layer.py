@@ -34,7 +34,7 @@ class TestMeltanoAdapter:
 
         # Should not be able to instantiate directly
         with pytest.raises(TypeError):
-            MeltanoAdapter()  # type: ignore[abstract]
+            MeltanoAdapter()  # Cannot instantiate abstract class
 
     def test_meltano_adapter_has_required_methods(self) -> None:
         """Test that MeltanoAdapter defines required abstract methods."""
@@ -79,8 +79,7 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: AsyncMock,
     ) -> None:
         """Test successful pipeline execution."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         # Mock adapter to return success
         mock_result_data = {
             "status": "completed",
@@ -88,12 +87,13 @@ class TestMeltanoAntiCorruptionLayer:
             "duration": 120,
             "metadata": {"env": "dev"},
         }
-        mock_adapter.run_pipeline.return_value = ServiceResult.ok(mock_result_data)
+        mock_adapter.run_pipeline.return_value = ServiceResult.ok(mock_result_data,
+        )
 
         config = {"database_url": "postgres://test", "batch_size": 1000}
         result = await acl.execute_pipeline("test-pipeline", "dev", config)
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
         assert result.data["status"] == "completed"
         assert result.data["output"] == "Pipeline executed"
@@ -114,15 +114,14 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: AsyncMock,
     ) -> None:
         """Test pipeline execution with default parameters."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         mock_adapter.run_pipeline.return_value = ServiceResult.ok(
             {"status": "completed", "output": "Success"},
         )
 
         result = await acl.execute_pipeline("simple-pipeline")
 
-        assert result.is_success is True
+        assert result.success is True
 
         # Should use default environment and empty config
         mock_adapter.run_pipeline.assert_called_once_with(
@@ -138,13 +137,13 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: AsyncMock,
     ) -> None:
         """Test pipeline execution when adapter fails."""
-        from flext_core import ServiceResult
-
-        mock_adapter.run_pipeline.return_value = ServiceResult.fail("Adapter error")
+        from flext_core.domain.shared_types import ServiceResult
+        mock_adapter.run_pipeline.return_value = ServiceResult.fail("Adapter error",
+        )
 
         result = await acl.execute_pipeline("failing-pipeline")
 
-        assert result.is_success is False
+        assert result.success is False
         assert result.error == "Adapter error"
 
     @pytest.mark.asyncio
@@ -158,7 +157,7 @@ class TestMeltanoAntiCorruptionLayer:
 
         result = await acl.execute_pipeline("error-pipeline")
 
-        assert result.is_success is False
+        assert result.success is False
         assert result.error is not None
         assert "Failed to execute pipeline: Connection failed" in result.error
 
@@ -169,14 +168,14 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: AsyncMock,
     ) -> None:
         """Test successful plugin installation."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         mock_result_data = {
             "plugin_type": "extractor",
             "plugin_name": "tap-csv",
             "status": "installed",
         }
-        mock_adapter.install_plugin.return_value = ServiceResult.ok(mock_result_data)
+        mock_adapter.install_plugin.return_value = ServiceResult.ok(mock_result_data,
+        )
 
         result = await acl.manage_plugin(
             action="install",
@@ -185,14 +184,12 @@ class TestMeltanoAntiCorruptionLayer:
             variant="meltanolabs",
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
-        # result.data is a list, so access the first item
-        assert isinstance(result.data, list)
-        assert len(result.data) > 0
-        plugin_data = result.data[0]
-        assert plugin_data["plugin_name"] == "tap-csv"
-        assert plugin_data["status"] == "installed"
+        # result.data is a dictionary with plugin details
+        assert isinstance(result.data, dict)
+        assert result.data["plugin_name"] == "tap-csv"
+        assert result.data["status"] == "installed"
 
         mock_adapter.install_plugin.assert_called_once_with(
             plugin_type="extractor",
@@ -207,8 +204,7 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: AsyncMock,
     ) -> None:
         """Test plugin installation without variant."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         mock_adapter.install_plugin.return_value = ServiceResult.ok(
             {"status": "installed"},
         )
@@ -219,7 +215,7 @@ class TestMeltanoAntiCorruptionLayer:
             plugin_name="target-postgres",
         )
 
-        assert result.is_success is True
+        assert result.success is True
 
         mock_adapter.install_plugin.assert_called_once_with(
             plugin_type="loader",
@@ -234,13 +230,13 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: Any,
     ) -> None:
         """Test successful plugin listing."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         mock_result_data = [
             {"name": "tap-csv", "type": "extractor"},
             {"name": "target-postgres", "type": "loader"},
         ]
-        mock_adapter.list_plugins.return_value = ServiceResult.ok(mock_result_data)
+        mock_adapter.list_plugins.return_value = ServiceResult.ok(mock_result_data,
+        )
 
         result = await acl.manage_plugin(
             action="list",
@@ -248,7 +244,7 @@ class TestMeltanoAntiCorruptionLayer:
             plugin_name="dummy",
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert len(result.data) == 2
 
         mock_adapter.list_plugins.assert_called_once_with(plugin_type="extractor")
@@ -260,13 +256,13 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: Any,
     ) -> None:
         """Test successful plugin config retrieval."""
-        from flext_core import ServiceResult
-
+        from flext_core.domain.shared_types import ServiceResult
         mock_result_data = {
             "plugin_name": "tap-csv",
             "settings": {"file_path": "required"},
         }
-        mock_adapter.get_plugin_config.return_value = ServiceResult.ok(mock_result_data)
+        mock_adapter.get_plugin_config.return_value = ServiceResult.ok(mock_result_data,
+        )
 
         result = await acl.manage_plugin(
             action="config",
@@ -274,7 +270,7 @@ class TestMeltanoAntiCorruptionLayer:
             plugin_name="tap-csv",
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data["plugin_name"] == "tap-csv"
 
         mock_adapter.get_plugin_config.assert_called_once_with(plugin_name="tap-csv")
@@ -292,7 +288,7 @@ class TestMeltanoAntiCorruptionLayer:
             plugin_name="tap-csv",
         )
 
-        assert result.is_success is False
+        assert result.success is False
         assert "Unknown plugin action: unknown" in result.error
 
         # No adapter methods should be called
@@ -315,7 +311,7 @@ class TestMeltanoAntiCorruptionLayer:
             plugin_name="invalid-plugin",
         )
 
-        assert result.is_success is False
+        assert result.success is False
         assert "Failed to manage plugin: Invalid plugin" in result.error
 
     def test_translate_config(self, acl: Any) -> None:
@@ -414,7 +410,7 @@ class TestSimpleMeltanoAdapter:
             configuration={"setting1": "value1", "setting2": 42},
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
         assert result.data["status"] == "completed"
         assert "test-pipeline" in result.data["output"]
@@ -433,7 +429,7 @@ class TestSimpleMeltanoAdapter:
         """Test pipeline execution with default parameters."""
         result = await adapter.run_pipeline("simple-pipeline")
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
         assert result.data["status"] == "completed"
         assert "simple-pipeline" in result.data["output"]
@@ -452,7 +448,7 @@ class TestSimpleMeltanoAdapter:
         with patch("asyncio.sleep", side_effect=RuntimeError("Sleep failed")):
             result = await adapter.run_pipeline("error-pipeline")
 
-            assert result.is_success is False
+            assert result.success is False
             assert result.error is not None
             assert "Failed to run pipeline: Sleep failed" in result.error
 
@@ -465,7 +461,7 @@ class TestSimpleMeltanoAdapter:
             variant="meltanolabs",
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
         assert result.data["plugin_type"] == "extractor"
         assert result.data["plugin_name"] == "tap-csv"
@@ -483,7 +479,7 @@ class TestSimpleMeltanoAdapter:
             plugin_name="target-postgres",
         )
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data is not None
         assert result.data["plugin_type"] == "loader"
         assert result.data["plugin_name"] == "target-postgres"
@@ -500,7 +496,7 @@ class TestSimpleMeltanoAdapter:
         with patch("asyncio.sleep", side_effect=OSError("File system error")):
             result = await adapter.install_plugin("extractor", "broken-plugin")
 
-            assert result.is_success is False
+            assert result.success is False
             assert result.error is not None
             assert "Failed to install plugin: File system error" in result.error
 
@@ -509,7 +505,7 @@ class TestSimpleMeltanoAdapter:
         """Test listing all plugins."""
         result = await adapter.list_plugins()
 
-        assert result.is_success is True
+        assert result.success is True
         plugins = result.data
         assert plugins is not None
         assert len(plugins) == 2
@@ -535,7 +531,7 @@ class TestSimpleMeltanoAdapter:
         # Test extractor filter
         result = await adapter.list_plugins(plugin_type="extractor")
 
-        assert result.is_success is True
+        assert result.success is True
         plugins = result.data
         assert plugins is not None
         assert len(plugins) == 1
@@ -545,7 +541,7 @@ class TestSimpleMeltanoAdapter:
         # Test loader filter
         result = await adapter.list_plugins(plugin_type="loader")
 
-        assert result.is_success is True
+        assert result.success is True
         plugins = result.data
         assert plugins is not None
         assert len(plugins) == 1
@@ -557,7 +553,7 @@ class TestSimpleMeltanoAdapter:
         """Test listing plugins with no matches."""
         result = await adapter.list_plugins(plugin_type="orchestrator")
 
-        assert result.is_success is True
+        assert result.success is True
         assert result.data == []
 
     @pytest.mark.asyncio
@@ -573,7 +569,7 @@ class TestSimpleMeltanoAdapter:
         ):
             result = await adapter.list_plugins(plugin_type="extractor")
 
-            assert result.is_success is False
+            assert result.success is False
             assert result.error is not None
             assert "Failed to list plugins: Result creation failed" in result.error
 
@@ -585,7 +581,7 @@ class TestSimpleMeltanoAdapter:
         """Test successful plugin config retrieval."""
         result = await adapter.get_plugin_config("tap-csv")
 
-        assert result.is_success is True
+        assert result.success is True
         config = result.data
         assert config is not None
         assert config["plugin_name"] == "tap-csv"
@@ -606,7 +602,7 @@ class TestSimpleMeltanoAdapter:
         """Test plugin config retrieval for different plugin."""
         result = await adapter.get_plugin_config("target-postgres")
 
-        assert result.is_success is True
+        assert result.success is True
         config = result.data
         assert config is not None
         assert config["plugin_name"] == "target-postgres"
@@ -628,7 +624,8 @@ class TestSimpleMeltanoAdapter:
         ):
             result = await adapter.get_plugin_config("broken-plugin")
 
-            assert result.is_success is False
+            assert result.success is False
+            assert result.error is not None
             assert "Failed to get plugin config: Config error" in result.error
 
 
@@ -649,7 +646,9 @@ class TestIntegrationWorkflow:
             config={"source_path": "/data/source", "batch_size": 500},
         )
 
-        assert pipeline_result.is_success is True
+        assert pipeline_result.success is True
+        assert pipeline_result.data is not None
+        assert isinstance(pipeline_result.data, dict)
         assert pipeline_result.data["status"] == "completed"
         assert "integration-test" in pipeline_result.data["output"]
 
@@ -661,7 +660,9 @@ class TestIntegrationWorkflow:
             variant="latest",
         )
 
-        assert install_result.is_success is True
+        assert install_result.success is True
+        assert install_result.data is not None
+        assert isinstance(install_result.data, dict)
         assert install_result.data["status"] == "installed"
 
         # Step 4: List plugins
@@ -671,8 +672,10 @@ class TestIntegrationWorkflow:
             plugin_name="dummy",
         )
 
-        assert list_result.is_success is True
+        assert list_result.success is True
         extractors = list_result.data
+        assert extractors is not None
+        assert isinstance(extractors, list)
         assert len(extractors) == 1
         assert extractors[0]["type"] == "extractor"
 
@@ -683,7 +686,9 @@ class TestIntegrationWorkflow:
             plugin_name="tap-integration",
         )
 
-        assert config_result.is_success is True
+        assert config_result.success is True
+        assert config_result.data is not None
+        assert isinstance(config_result.data, dict)
         assert config_result.data["plugin_name"] == "tap-integration"
 
     @pytest.mark.asyncio
@@ -698,7 +703,8 @@ class TestIntegrationWorkflow:
         # Test that errors are properly handled and propagated
         result = await acl.execute_pipeline("failing-pipeline")
 
-        assert result.is_success is False
+        assert result.success is False
+        assert result.error is not None
         assert "Failed to execute pipeline: Adapter failure" in result.error
 
     @pytest.mark.asyncio
@@ -722,9 +728,11 @@ class TestIntegrationWorkflow:
             config=domain_config,
         )
 
-        assert result.is_success is True
+        assert result.success is True
 
         # Verify that the result contains translated domain concepts
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         assert result.data["status"] == "completed"
         assert result.data["output"] != ""
         assert result.data["duration"] == 100

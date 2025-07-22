@@ -19,11 +19,11 @@ import pytest
 sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
-from flext_core.domain.shared_types import Environment  # noqa: E402
+# ruff: noqa: E402 - Module mocking must happen before imports
+from flext_core import Environment
 
-from flext_meltano.config import (  # noqa: E402
+from flext_meltano.config import (
     MeltanoExecutionConfig,
-    MeltanoMonitoringConfig,
     MeltanoPluginConfig,
     MeltanoProjectConfig,
     MeltanoSettings,
@@ -121,15 +121,15 @@ class TestMeltanoSettingsIsolated:
 
         settings = MeltanoSettings(
             project_name="custom-meltano",
-            environment="production",
             debug=True,
+            environment=Environment.STAGING,  # Use Environment enum properly
             project=custom_project,
             execution=custom_execution,
             _env_file=None,
         )
 
         assert settings.project_name == "custom-meltano"
-        assert settings.environment == "production"
+        assert settings.environment == "staging"
         assert settings.debug is True
         assert settings.project.project_root == Path("/custom/path")
         assert settings.execution.max_concurrent_jobs == 15
@@ -142,7 +142,7 @@ class TestMeltanoSettingsIsolated:
         # Test that invalid assignments raise validation errors
         with pytest.raises((ValueError, AttributeError)):
             # Try to modify a computed property (should fail)
-            settings.project_root = "invalid"
+            settings.project_root = "invalid"  # Should fail - computed property
 
     @patch.dict(os.environ, {}, clear=True)
     def test_configure_dependencies_isolated(self) -> None:

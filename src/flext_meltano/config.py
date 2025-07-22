@@ -10,16 +10,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core.config import get_container
+from flext_core import Field, get_container
 from flext_core.config.unified_config import (
     BaseConfigMixin,
+    DatabaseConfigMixin,
     LoggingConfigMixin,
     MonitoringConfigMixin,
     PerformanceConfigMixin,
 )
 from flext_core.domain.constants import ConfigDefaults
-from flext_core.domain.pydantic_base import DomainValueObject, Field
-from flext_core.domain.shared_types import Environment
+from flext_core.domain.pydantic_base import DomainValueObject
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -160,6 +160,7 @@ class MeltanoSettings(
     LoggingConfigMixin,
     MonitoringConfigMixin,
     PerformanceConfigMixin,
+    DatabaseConfigMixin,
     BaseSettings,
 ):
     """FLEXT Meltano configuration settings using unified configuration mixins.
@@ -176,7 +177,7 @@ class MeltanoSettings(
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
         case_sensitive=False,
-        extra="ignore",
+        extra="allow",
         validate_assignment=True,
         str_strip_whitespace=True,
         use_enum_values=True,
@@ -306,7 +307,6 @@ class MeltanoSettings(
         """
         return self.plugins.auto_install
 
-
     def configure_dependencies(self, container: Any | None = None) -> None:
         """Configure dependency injection container.
 
@@ -329,7 +329,7 @@ def get_meltano_settings() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment=Environment.DEVELOPMENT,
+        environment="development",
         debug=False,
     )
 
@@ -338,7 +338,7 @@ def create_development_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment=Environment.DEVELOPMENT,
+        environment="development",
         debug=True,
         project=MeltanoProjectConfig(
             default_environment="dev",
@@ -356,7 +356,7 @@ def create_production_meltano_config() -> MeltanoSettings:
     return MeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
-        environment=Environment.PRODUCTION,
+        environment="production",
         debug=False,
         project=MeltanoProjectConfig(
             default_environment="prod",

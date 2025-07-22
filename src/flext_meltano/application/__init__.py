@@ -11,6 +11,7 @@ from flext_meltano.application.services import (
     MeltanoPluginService,
     MeltanoProjectService,
     MeltanoStateService,
+    ProjectApplicationService,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "MeltanoPluginService",
     "MeltanoProjectService",
     "MeltanoStateService",
+    "ProjectApplicationService",
 ]

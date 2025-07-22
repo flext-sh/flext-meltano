@@ -6,14 +6,13 @@ Does NOT duplicate code - extends flext_core functionality.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any, Protocol
-
-from flext_observability.logging import get_logger
 
 if TYPE_CHECKING:
     from flext_core.domain.pydantic_base import DomainEvent
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class EventBusProtocol(Protocol):
@@ -63,7 +62,7 @@ class SimpleEventBus:
         else:
             event_type = getattr(event, "event_type", type(event).__name__)
 
-        logger.info("Publishing event", event_type=event_type)
+        logger.info("Publishing event %s", event_type)
 
         # Call handlers for this event type
         handlers = self._handlers.get(event_type, [])
@@ -73,17 +72,17 @@ class SimpleEventBus:
                 if callable(handler):
                     await handler(event)
             except Exception as e:
-                logger.exception("Handler failed", event_type=event_type, error=str(e))
+                logger.exception("Handler failed %s: %s", event_type, str(e))
 
     async def subscribe(self, pattern: str, handler: object) -> None:
         """Subscribe handler to event pattern."""
         if pattern not in self._handlers:
             self._handlers[pattern] = []
         self._handlers[pattern].append(handler)
-        logger.info("Handler subscribed", pattern=pattern)
+        logger.info("Handler subscribed %s", pattern)
 
     async def unsubscribe(self, pattern: str, handler: object) -> None:
         """Unsubscribe handler from pattern."""
         if pattern in self._handlers and handler in self._handlers[pattern]:
             self._handlers[pattern].remove(handler)
-            logger.info("Handler unsubscribed", pattern=pattern)
+            logger.info("Handler unsubscribed %s", pattern)

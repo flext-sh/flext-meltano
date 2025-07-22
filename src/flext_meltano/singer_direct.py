@@ -8,13 +8,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
-from flext_core import ServiceResult
-from flext_observability.logging import get_logger
+from flext_core.domain.shared_types import ServiceResult
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SingerDirectRunner:
@@ -23,7 +23,10 @@ class SingerDirectRunner:
     def __init__(self, project_root: Path) -> None:
         """Initialize Singer Direct integration."""
         self.project_root = Path(project_root)
-        self.logger = logger.bind(project_root=str(self.project_root))
+        self.logger = logger.info(
+            "flext_meltano_singer_direct %s",
+            {str(self.project_root)},
+        )
 
     async def run_tap_target_direct(
         self,
@@ -32,7 +35,7 @@ class SingerDirectRunner:
         target_executable: str,
         _tap_config: dict[str, Any] | None = None,
         _target_config: dict[str, Any] | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Run tap and target directly using Singer protocol without Meltano CLI.
 
         This eliminates warnings by not using deprecated Meltano CLI APIs.
@@ -64,12 +67,17 @@ class SingerDirectRunner:
                 stdin=asyncio.subprocess.PIPE,
             )
 
+            # Ensure tap stdout is available for piping
+            if tap_process.stdout is None:
+                return ServiceResult.fail("Tap process stdout not available for piping",
+                )
+
             target_process = await asyncio.create_subprocess_exec(
                 *target_cmd,
                 cwd=project_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                stdin=tap_process.stdout,  # type: ignore[arg-type]
+                stdin=tap_process.stdout,  # Now guaranteed to be non-None
             )
 
             # Wait for completion
@@ -88,7 +96,7 @@ class SingerDirectRunner:
 
             if result["success"]:
                 self.logger.info("Singer direct pipeline completed successfully")
-                return ServiceResult.ok(result)
+                return ServiceResult.ok({"result": result})
             error_msg = f"Pipeline failed: tap={tap_process.returncode}, target={target_process.returncode}"
             self.logger.error(error_msg, **result)
             return ServiceResult.fail(error_msg)
@@ -103,7 +111,7 @@ class SingerDirectRunner:
         project_name: str,
         tap_executable: str,
         _tap_config: dict[str, Any],
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Discover tap schema using Singer SDK directly."""
         try:
             project_path = self.project_root / project_name
@@ -130,9 +138,10 @@ class SingerDirectRunner:
                         "Schema discovered successfully",
                         streams=len(catalog.get("streams", [])),
                     )
-                    return ServiceResult.ok({"catalog": catalog})
+                    return ServiceResult.ok({"result": catalog})
                 except json.JSONDecodeError as e:
-                    return ServiceResult.fail(f"Invalid catalog JSON: {e}")
+                    return ServiceResult.fail(f"Invalid catalog JSON: {e}",
+                    )
             else:
                 error_msg = f"Schema discovery failed: {stderr.decode()}"
                 self.logger.error(error_msg)

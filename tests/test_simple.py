@@ -20,18 +20,14 @@ def test_flext_meltano_imports() -> None:
 
 def test_flext_meltano_has_core_dependencies() -> None:
     """Test that flext-infrastructure.plugins.flext-meltano can import from flext-core."""
-    try:
-        from flext_core import ServiceResult
-
-        assert ServiceResult is not None
-    except ImportError:
-        pytest.fail("flext-core dependencies not available")
+    # NO FALLBACKS - SEMPRE usar implementações originais conforme instrução
+    from flext_core.domain.shared_types import ServiceResult
+    assert ServiceResult is not None
 
 
 def test_service_result_pattern() -> None:
     """Test ServiceResult pattern works correctly."""
-    from flext_core import ServiceResult
-
+    from flext_core.domain.shared_types import ServiceResult
     # Test success case
     success = ServiceResult.ok({"test": "data"})
     assert success.is_success is True

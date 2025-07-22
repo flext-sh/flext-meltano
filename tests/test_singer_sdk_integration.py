@@ -21,7 +21,8 @@ import pytest
 sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
-from flext_meltano.singer_sdk_integration import (  # noqa: E402
+# ruff: noqa: E402 - Module mocking must happen before imports
+from flext_meltano.singer_sdk_integration import (
     SINGER_BATCH_SIZE_LIMIT,
     FlextSingerSDKIntegration,
     LDAPTap,
@@ -520,7 +521,7 @@ class TestFlextSingerSDKIntegration:
         """Test FlextSingerSDKIntegration initialization with string path."""
         project_root = "/test/project"
 
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         assert integration.project_root == Path(project_root)
         assert isinstance(integration.project_root, Path)
@@ -531,7 +532,7 @@ class TestFlextSingerSDKIntegration:
         """Test FlextSingerSDKIntegration initialization with Path object."""
         project_root = Path("/test/project")
 
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         assert integration.project_root == project_root
         assert isinstance(integration.project_root, Path)
@@ -547,13 +548,13 @@ class TestFlextSingerSDKIntegration:
             FlextSingerSDKIntegration,
             "_discover_plugins",
         ) as mock_discover:
-            FlextSingerSDKIntegration(project_root)
+            FlextSingerSDKIntegration(project_root=project_root)
             mock_discover.assert_called_once()
 
     def test_flext_singer_sdk_integration_discover_plugins(self) -> None:
         """Test FlextSingerSDKIntegration plugin discovery."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Call _discover_plugins directly to test implementation
         integration._discover_plugins()
@@ -565,7 +566,7 @@ class TestFlextSingerSDKIntegration:
     async def test_create_oracle_oic_tap(self) -> None:
         """Test Oracle OIC tap creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         config = {"api_url": "https://oracle-oic.example.com"}
 
@@ -578,7 +579,7 @@ class TestFlextSingerSDKIntegration:
     async def test_create_ldap_tap(self) -> None:
         """Test LDAP tap creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         config = {"ldap_url": "ldap://localhost:389"}
 
@@ -591,7 +592,7 @@ class TestFlextSingerSDKIntegration:
     async def test_create_postgres_target(self) -> None:
         """Test PostgreSQL target creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         config = {"host": "localhost", "database": "test_db"}
 
@@ -604,7 +605,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_oracle_oic_to_postgres_success(self) -> None:
         """Test successful ELT pipeline from Oracle OIC to PostgreSQL."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"api_url": "https://oracle-oic.example.com"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -626,7 +627,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_ldap_to_postgres_success(self) -> None:
         """Test successful ELT pipeline from LDAP to PostgreSQL."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"ldap_url": "ldap://localhost:389"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -648,7 +649,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_unknown_tap(self) -> None:
         """Test ELT pipeline with unknown tap."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"url": "https://unknown.com"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -667,7 +668,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_unknown_target(self) -> None:
         """Test ELT pipeline with unknown target."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"api_url": "https://oracle-oic.example.com"}
         target_config = {"url": "https://unknown.com"}
@@ -686,7 +687,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_with_batch_processing(self) -> None:
         """Test ELT pipeline batch processing with large datasets."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock large dataset by patching sync_stream to yield many records
         async def mock_sync_stream(stream: object) -> AsyncGenerator[dict[str, Any]]:
@@ -714,7 +715,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_with_unselected_streams(self) -> None:
         """Test ELT pipeline with unselected streams (should be skipped)."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock discover_streams to return unselected streams
         def mock_discover_streams() -> list[SingerStreamDefinition]:
@@ -762,7 +763,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_error_handling(self) -> None:
         """Test ELT pipeline error handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock discover_streams to raise an exception
         def mock_discover_streams_error() -> Never:
@@ -789,7 +790,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_type_error_handling(self) -> None:
         """Test ELT pipeline TypeError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock to raise TypeError
         def mock_discover_streams_type_error() -> Never:
@@ -815,7 +816,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_value_error_handling(self) -> None:
         """Test ELT pipeline ValueError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock to raise ValueError
         def mock_discover_streams_value_error() -> Never:
@@ -841,7 +842,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_os_error_handling(self) -> None:
         """Test ELT pipeline OSError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Mock to raise OSError
         def mock_discover_streams_os_error() -> Never:
@@ -867,7 +868,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_with_stream_maps(self) -> None:
         """Test ELT pipeline with stream maps parameter."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         stream_maps = {
             "integrations": {"id": "integration_id", "name": "integration_name"},
@@ -938,7 +939,7 @@ class TestIntegrationWorkflow:
     async def test_complete_oracle_oic_to_postgres_workflow(self) -> None:
         """Test complete workflow from Oracle OIC discovery to PostgreSQL load."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Step 1: Create Oracle OIC tap
         tap_config = {"api_url": "https://oracle-oic.example.com", "username": "test"}
@@ -970,7 +971,7 @@ class TestIntegrationWorkflow:
     async def test_complete_ldap_to_postgres_workflow(self) -> None:
         """Test complete workflow from LDAP discovery to PostgreSQL load."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root)
+        integration = FlextSingerSDKIntegration(project_root=project_root)
 
         # Step 1: Create LDAP tap
         tap_config = {

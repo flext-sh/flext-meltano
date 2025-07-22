@@ -8,6 +8,7 @@ core functionality to provide enterprise-grade data pipeline orchestration.
 from __future__ import annotations
 
 import asyncio
+import logging
 import tempfile
 import uuid
 from datetime import UTC, datetime
@@ -15,8 +16,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from flext_core.domain.pydantic_base import DomainBaseModel, DomainEvent, Field
-from flext_core.domain.shared_models import PipelineExecutionStatus
-from flext_observability.logging import get_logger
+from flext_core.domain.shared_types import ExecutionStatus
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
 from meltano.core.job.job import Job, Payload, State
@@ -72,7 +72,7 @@ if TYPE_CHECKING:
     from flext_meltano.project_manager import FlextProjectManager
     from flext_meltano.state_manager import FlextMeltanoStateManager
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class FlextJob(DomainBaseModel):
@@ -84,7 +84,7 @@ class FlextJob(DomainBaseModel):
     run_id: str = Field(description="Unique run identifier")
     project_name: str = Field(description="Name of the Meltano project")
     environment: str = Field(description="Execution environment")
-    status: PipelineExecutionStatus = Field(description="Current job status")
+    status: ExecutionStatus = Field(description="Current job status")
     pipeline_definition: dict[str, Any] = Field(
         description="Pipeline configuration and definition",
     )
@@ -154,7 +154,7 @@ class RunMode(Enum):
     FULL_RUN = "full_run"
 
 
-# PipelineStatus enum removed - using PipelineExecutionStatus from flext-core instead
+# PipelineStatus enum removed - using ExecutionStatus from flext-core instead
 
 
 class FlextMeltanoOrchestrator:
@@ -270,7 +270,7 @@ class FlextMeltanoOrchestrator:
                 run_id=run_id,
                 project_name=project_name,
                 environment=environment,
-                status=PipelineExecutionStatus.PENDING,
+                status=ExecutionStatus.PENDING,
                 pipeline_definition=pipeline_definition,
                 payload={"full_refresh": run_mode == RunMode.DRY_RUN},
             )
@@ -310,7 +310,7 @@ class FlextMeltanoOrchestrator:
                 async with self._lock:
                     if run_id in self._running_jobs:
                         job = self._running_jobs[run_id]
-                        job.status = PipelineExecutionStatus.FAILED
+                        job.status = ExecutionStatus.FAILED
                         job.error = str(e)
                         job.finished_at = datetime.now(UTC)
 
@@ -323,7 +323,7 @@ class FlextMeltanoOrchestrator:
 
                 return {
                     "run_id": run_id,
-                    "status": PipelineExecutionStatus.FAILED.value,
+                    "status": ExecutionStatus.FAILED.value,
                     "error": str(e),
                     "completed_at": datetime.now(UTC).isoformat(),
                 }
@@ -350,7 +350,7 @@ class FlextMeltanoOrchestrator:
         return {
             "run_id": job.run_id,
             "status": job.status.value
-            if isinstance(job.status, PipelineExecutionStatus)
+            if isinstance(job.status, ExecutionStatus)
             else job.status,
             "started_at": job.started_at.isoformat() if job.started_at else None,
             "finished_at": job.finished_at.isoformat() if job.finished_at else None,
@@ -375,11 +375,11 @@ class FlextMeltanoOrchestrator:
                 return False
 
             job = self._running_jobs[run_id]
-            if job.status != PipelineExecutionStatus.RUNNING or not job.task:
+            if job.status != ExecutionStatus.RUNNING or not job.task:
                 return False
 
             job.task.cancel()
-            job.status = PipelineExecutionStatus.CANCELLED
+            job.status = ExecutionStatus.CANCELLED
             job.finished_at = datetime.now(UTC)
             job.error = "Pipeline cancelled by user"
 
@@ -419,7 +419,7 @@ class FlextMeltanoOrchestrator:
         return running
 
     async def _create_meltano_job(self, _project: Project, flext_job: FlextJob) -> Job:
-        job = Job(
+        return Job(
             id=flext_job.job_id,
             run_id=flext_job.run_id,
             state=State.RUNNING,
@@ -429,13 +429,8 @@ class FlextMeltanoOrchestrator:
                 "environment": flext_job.environment,
             },
         )
-        try:
-            # Add job_id property for test compatibility (maps to id)
-            job.job_id = job.id  # type: ignore[attr-defined]
-        except (AttributeError, TypeError):
-            # If we can't set the attribute, log it but don't fail
-            self.logger.debug("Could not set job_id attribute on Job object")
-        return job
+        # Note: Job object already has an 'id' attribute which serves as job_id
+        # No need to set additional job_id attribute since Job.id is the canonical ID
 
     async def _execute_pipeline_sync(
         self,
@@ -445,7 +440,7 @@ class FlextMeltanoOrchestrator:
         project_result = await self.project_manager.load_project_config(
             flext_job.project_name,
         )
-        if not project_result.is_success:
+        if not project_result.success:
             msg = "Project config load failed"
             raise ValueError(msg)
 
@@ -456,7 +451,7 @@ class FlextMeltanoOrchestrator:
         flext_job.meltano_job = await self._create_meltano_job(project, flext_job)
 
         async with self._lock:
-            flext_job.status = PipelineExecutionStatus.RUNNING
+            flext_job.status = ExecutionStatus.RUNNING
 
         await self._run_pipeline_task(project, flext_job, run_mode)
 
@@ -488,7 +483,7 @@ class FlextMeltanoOrchestrator:
         project_result = await self.project_manager.load_project_config(
             flext_job.project_name,
         )
-        if not project_result.is_success:
+        if not project_result.success:
             msg = "Project config load failed"
             raise ValueError(msg)
 
@@ -504,11 +499,11 @@ class FlextMeltanoOrchestrator:
 
         async with self._lock:
             flext_job.task = task
-            flext_job.status = PipelineExecutionStatus.RUNNING
+            flext_job.status = ExecutionStatus.RUNNING
 
         return {
             "run_id": flext_job.run_id,
-            "status": PipelineExecutionStatus.RUNNING.value,
+            "status": ExecutionStatus.RUNNING.value,
             "message": "Pipeline execution started in the background.",
         }
 
@@ -527,7 +522,7 @@ class FlextMeltanoOrchestrator:
 
             # Update job status based on result
             if result.get("success"):
-                flext_job.status = PipelineExecutionStatus.COMPLETED
+                flext_job.status = ExecutionStatus.COMPLETED
                 await self._emit_pipeline_event("pipeline.success", flext_job, result)
 
         except (
@@ -546,7 +541,7 @@ class FlextMeltanoOrchestrator:
                 run_id=flext_job.run_id,
             )
             async with self._lock:
-                flext_job.status = PipelineExecutionStatus.FAILED
+                flext_job.status = ExecutionStatus.FAILED
                 flext_job.error = str(e)
                 flext_job.finished_at = datetime.now(UTC)
 
@@ -727,8 +722,12 @@ class FlextMeltanoOrchestrator:
                 if hasattr(cmd_result, "__await__"):
                     result = await cmd_result
                 else:
-                    # Type assertion for non-awaitable results (mocks)
-                    result = cmd_result  # type: ignore[assignment]
+                    # Handle non-awaitable results (mocks, direct returns)
+                    result = (
+                        await cmd_result
+                        if asyncio.iscoroutine(cmd_result)
+                        else cmd_result
+                    )
 
                 # Handle both real result objects and mock objects
                 success = getattr(result, "success", True)

@@ -18,7 +18,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any
 
-from flext_core import ServiceResult
+from flext_core.domain.shared_types import ServiceResult
 
 
 class MeltanoAdapter(ABC):
@@ -30,7 +30,7 @@ class MeltanoAdapter(ABC):
         pipeline_name: str,
         environment: str = "dev",
         configuration: dict[str, Any] | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Run a Meltano pipeline."""
 
     @abstractmethod
@@ -39,21 +39,21 @@ class MeltanoAdapter(ABC):
         plugin_type: str,
         plugin_name: str,
         variant: str | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Install a Meltano plugin."""
 
     @abstractmethod
     async def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """List available Meltano plugins."""
 
     @abstractmethod
     async def get_plugin_config(
         self,
         plugin_name: str,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Get plugin configuration."""
 
 
@@ -69,7 +69,7 @@ class MeltanoAntiCorruptionLayer:
         pipeline_id: str,
         environment: str = "dev",
         config: dict[str, Any] | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Execute a pipeline through the Meltano adapter."""
         try:
             # Translate domain concepts to Meltano concepts
@@ -82,7 +82,7 @@ class MeltanoAntiCorruptionLayer:
                 configuration=meltano_config,
             )
 
-            if result.is_success:
+            if result.success:
                 # Return the result value directly (domain translation would go here)
                 return ServiceResult.ok(result.data or {})
             return result
@@ -96,7 +96,7 @@ class MeltanoAntiCorruptionLayer:
         plugin_type: str,
         plugin_name: str,
         **kwargs: str | int | bool | None,
-    ) -> ServiceResult[dict[str, Any]] | ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Manage plugins through the Meltano adapter."""
         try:
             if action == "install":
@@ -140,7 +140,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
         pipeline_name: str,
         environment: str = "dev",
         configuration: dict[str, Any] | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Run a Meltano pipeline."""
         try:
             # Simulate pipeline execution
@@ -166,7 +166,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
         plugin_type: str,
         plugin_name: str,
         variant: str | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Install a Meltano plugin."""
         try:
             # Simulate plugin installation
@@ -187,7 +187,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
     async def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """List available Meltano plugins."""
         try:
             # Simulate plugin listing
@@ -217,7 +217,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
     async def get_plugin_config(
         self,
         plugin_name: str,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Get plugin configuration."""
         try:
             # Simulate plugin config retrieval
