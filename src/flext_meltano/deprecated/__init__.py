@@ -20,7 +20,9 @@ import warnings
 from typing import Any
 
 # Import new implementations
-from flext_meltano.application.services.project_service import ProjectApplicationService
+from flext_meltano.application.services.project_service import (
+    ProjectApplicationService,
+)
 
 
 # Deprecation warning helper
@@ -33,7 +35,6 @@ def _deprecation_warning(old_name: str, new_location: str) -> None:
         DeprecationWarning,
         stacklevel=3,
     )
-
 
 class FlextMeltanoProjectManager:
     """DEPRECATED: Use ProjectApplicationService instead."""
@@ -58,7 +59,6 @@ class FlextMeltanoProjectManager:
         msg = "Please migrate to new ProjectApplicationService"
         raise NotImplementedError(msg)
 
-
 class FlextMeltanoOrchestrator:
     """DEPRECATED: Use PipelineOrchestrator instead."""
 
@@ -77,7 +77,6 @@ class FlextMeltanoOrchestrator:
         msg = "Please migrate to new PipelineOrchestrator"
         raise NotImplementedError(msg)
 
-
 class MeltanoAntiCorruptionLayer:
     """DEPRECATED: Use MeltanoCLIAdapter instead."""
 
@@ -95,7 +94,6 @@ class MeltanoAntiCorruptionLayer:
         )
         msg = "Please migrate to new MeltanoCLIAdapter"
         raise NotImplementedError(msg)
-
 
 # Legacy exports for backward compatibility
 __all__ = [

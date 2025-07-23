@@ -13,9 +13,11 @@ from __future__ import annotations
 import warnings
 from typing import Any
 
-from flext_core.foundation import AbstractService
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import AbstractService
 
 
+# Initialize types via DI container
 class MeltanoStateService(AbstractService):
     """State application service placeholder."""
 

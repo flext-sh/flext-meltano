@@ -12,8 +12,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from flext_core.domain.pydantic_base import DomainValueObject, Field
-from pydantic import ConfigDict
+# Initialize types via DI container
+from pydantic import ConfigDict, Field
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import DomainEntity, Field
+
+# Use DomainValueObject for models (value objects, not entities)
+DomainValueObject = DomainEntity  # Can use DomainEntity as base for value objects
 
 
 class MeltanoPlugin(DomainValueObject):

@@ -14,10 +14,12 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
-from meltano.core.state_service import StateService
+from meltano.core.state_service import (
+    StateService,  # type: ignore[import-untyped]
+)
 
 if TYPE_CHECKING:
-    from meltano.core.project import Project
+    from meltano.core.project import Project  # type: ignore[import-untyped]
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
 
@@ -38,7 +40,7 @@ class FlextMeltanoStateManager:
     def __init__(self, event_bus: EventBusProtocol) -> None:
         """Initialize FLEXT Meltano State Manager."""
         self.event_bus = event_bus
-        self.logger = logger.bind(component="flext_meltano_state_manager")
+        self.logger = logger
         self._lock = asyncio.Lock()
 
         self.logger.info("Initialized FLEXT Meltano State Manager")
@@ -62,7 +64,7 @@ class FlextMeltanoStateManager:
                 }
             return None
         except Exception as e:
-            self.logger.exception("Failed to get state", job_id=job_id, error=str(e))
+            self.logger.exception(f"Failed to get state: job_id={job_id}, error={e}")
             return None
 
     async def set_state(
@@ -84,13 +86,11 @@ class FlextMeltanoStateManager:
                 state_service.set_state(job_id, state_json)
 
                 self.logger.info(
-                    "State updated successfully",
-                    job_id=job_id,
-                    state_size=len(str(state_data)),
+                    f"State updated successfully: job_id={job_id}, state_size={len(str(state_data))}"
                 )
                 return True
         except Exception as e:
-            self.logger.exception("Failed to set state", job_id=job_id, error=str(e))
+            self.logger.exception(f"Failed to set state: job_id={job_id}, error={e}")
             return False
 
     async def clear_state(self, project: Project, job_id: str) -> bool:
@@ -99,8 +99,8 @@ class FlextMeltanoStateManager:
                 state_service = StateService(project)
                 state_service.clear_state(job_id)
 
-                self.logger.info("State cleared successfully", job_id=job_id)
+                self.logger.info(f"State cleared successfully: job_id={job_id}")
                 return True
         except Exception as e:
-            self.logger.exception("Failed to clear state", job_id=job_id, error=str(e))
+            self.logger.exception(f"Failed to clear state: job_id={job_id}, error={e}")
             return False

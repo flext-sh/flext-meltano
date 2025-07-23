@@ -15,8 +15,10 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from flext_core.domain.pydantic_base import DomainEvent
-from flext_core.domain.shared_types import ServiceResult
+from flext_core import ServiceResult
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import DomainEvent
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +56,7 @@ class MeltanoProjectManager:
 
     def __init__(self, project_root: Path | str) -> None:
         self.project_root = Path(project_root)
-        logger.info("flext_meltano_project_manager %s", {str(self.project_root)})
+        logger.info(f"flext_meltano_project_manager {self.project_root}")
 
     def _filter_singer_warnings(self, stderr_text: str) -> str:
         """Filter out Singer SDK deprecation warnings from stderr to achieve zero warnings."""
@@ -105,7 +107,8 @@ class MeltanoProjectManager:
             project_path = self.project_root / project_name
 
             if project_path.exists():
-                return ServiceResult.fail(f"Project already exists at {project_path}",
+                return ServiceResult.fail(
+                    f"Project already exists at {project_path}",
                 )
 
             # Create project directory
@@ -149,7 +152,8 @@ class MeltanoProjectManager:
             }
 
             logger.info(
-                "Meltano project created successfully", extra={"result": result},
+                "Meltano project created successfully",
+                extra={"result": result},
             )
             return ServiceResult.ok({"result": result})
 
@@ -168,14 +172,16 @@ class MeltanoProjectManager:
             meltano_yml = project_path / "meltano.yml"
 
             if not meltano_yml.exists():
-                return ServiceResult.fail(f"Project config not found: {meltano_yml}",
+                return ServiceResult.fail(
+                    f"Project config not found: {meltano_yml}",
                 )
 
             with meltano_yml.open("r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
             if not config:
-                return ServiceResult.fail("Invalid or empty meltano.yml",
+                return ServiceResult.fail(
+                    "Invalid or empty meltano.yml",
                 )
 
             return ServiceResult.ok({"result": config})
@@ -222,7 +228,8 @@ class MeltanoProjectManager:
         try:
             project_path = self.project_root / project_name
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}",
+                return ServiceResult.fail(
+                    f"Project not found: {project_path}",
                 )
 
             # Use Singer SDK directly instead of Meltano CLI to eliminate warnings
@@ -258,7 +265,8 @@ class MeltanoProjectManager:
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}",
+                return ServiceResult.fail(
+                    f"Project not found: {project_path}",
                 )
 
             # Build command
@@ -317,7 +325,8 @@ class MeltanoProjectManager:
 
             if process.returncode != 0:
                 logger.error("Meltano command failed", **result)
-                return ServiceResult.fail(f"Command failed: {result['stderr']}",
+                return ServiceResult.fail(
+                    f"Command failed: {result['stderr']}",
                 )
 
             logger.info("Meltano command completed successfully", **result)
@@ -341,7 +350,8 @@ class MeltanoProjectManager:
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}",
+                return ServiceResult.fail(
+                    f"Project not found: {project_path}",
                 )
 
             # Build meltano add command
@@ -359,7 +369,8 @@ class MeltanoProjectManager:
             # Execute meltano add command
             add_result = await self.run_command(project_name, cmd)
             if not add_result.success:
-                return ServiceResult.fail(f"Failed to add plugin: {add_result.error}",
+                return ServiceResult.fail(
+                    f"Failed to add plugin: {add_result.error}",
                 )
 
             # Run lock to ensure plugin is properly installed
@@ -386,7 +397,7 @@ class MeltanoProjectManager:
                 ),
             }
 
-            logger.info("Plugin added successfully", extra={"result": result})
+            logger.info(f"Plugin added successfully: {result}")
             return ServiceResult.ok({"result": result})
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
@@ -489,7 +500,8 @@ class FlextProjectManager(MeltanoProjectManager):
             project_path = self.project_root / project_name
 
             if not project_path.exists():
-                return ServiceResult.fail(f"Project not found: {project_path}",
+                return ServiceResult.fail(
+                    f"Project not found: {project_path}",
                 )
 
             # Ensure backup directory exists

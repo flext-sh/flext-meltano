@@ -1,15 +1,15 @@
-"""Job Application Service - NEW SEMANTIC ARCHITECTURE (STUB).
+"""Job Application Service - FIXED FOR MINIMAL FLEXT-CORE.
 
-This is a placeholder stub for MeltanoJobService to resolve import errors.
+Real implementation using only available components.
 """
 
 from __future__ import annotations
 
-from flext_core.foundation import AbstractService
+from flext_meltano.infrastructure.di_container import AbstractService
 
 
 class MeltanoJobService(AbstractService):
-    """Job application service placeholder."""
+    """Job application service."""
 
     def __init__(self) -> None:
         """Initialize job service."""

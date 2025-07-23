@@ -1,5 +1,4 @@
 """Comprehensive tests for Meltano project management functionality."""
-
 from __future__ import annotations
 
 import asyncio

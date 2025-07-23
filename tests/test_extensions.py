@@ -6,7 +6,6 @@ Comprehensive tests for ALL extension classes and functionality.
 
 from __future__ import annotations
 
-import sys
 from collections import UserDict
 from pathlib import Path
 from typing import Any, Never
@@ -131,7 +130,7 @@ class TestMeltanoExtension:
 
         result = extension.install()
 
-        assert result.success is True
+        assert result.success
         assert result.data is True
         assert extension.status == ExtensionStatus.INSTALLED
 
@@ -151,7 +150,7 @@ class TestMeltanoExtension:
             result = extension.install()
 
             assert (
-                result.success is True
+                result.success
             )  # Current implementation doesn't actually fail
             assert result.data is True
 
@@ -168,7 +167,7 @@ class TestMeltanoExtension:
 
         result = extension.uninstall()
 
-        assert result.success is True
+        assert result.success
         assert result.data is True
         # Verify extension status after uninstall
         # Refresh the status check to help mypy understand the change
@@ -191,7 +190,7 @@ class TestMeltanoExtension:
 
         result = await extension.execute_command("extract")
 
-        assert result.success is True
+        assert result.success
         assert result.data is not None
 
         command_result = result.data
@@ -216,7 +215,7 @@ class TestMeltanoExtension:
 
         result = await extension.execute_command("extract", ["--debug", "--verbose"])
 
-        assert result.success is True
+        assert result.success
         command_result = result.data
         if command_result is not None:
             assert command_result["command"] == "extract"
@@ -232,7 +231,7 @@ class TestMeltanoExtension:
 
         result = await extension.execute_command("nonexistent")
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Command nonexistent not found" in result.error
 
@@ -250,7 +249,7 @@ class TestMeltanoExtension:
         with patch("asyncio.sleep", side_effect=RuntimeError("Execution failed")):
             result = await extension.execute_command("test")
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to execute command: Execution failed" in result.error
 
@@ -280,7 +279,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.register_extension(extension)
 
-        assert result.success is True
+        assert result.success
         assert result.data is True
         assert "test-ext" in manager._extensions
         assert manager._extensions["test-ext"] == extension
@@ -333,7 +332,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.register_extension(cast("MeltanoExtension", broken_extension))
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Failed to register extension: Registration failed" in result.error
 
@@ -348,7 +347,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.get_extension("test-ext")
 
-        assert result.success is True
+        assert result.success
         assert result.data == extension
 
     def test_get_extension_not_found(self) -> None:
@@ -357,7 +356,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.get_extension("nonexistent")
 
-        assert result.success is True
+        assert result.success
         assert result.data is None
 
     def test_get_extension_error_handling(self) -> None:
@@ -377,7 +376,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.get_extension("test")
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Failed to get extension: Get failed" in result.error
 
@@ -387,7 +386,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.list_extensions()
 
-        assert result.success is True
+        assert result.success
         assert result.data == []
 
     def test_list_extensions_all(self) -> None:
@@ -410,7 +409,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.list_extensions()
 
-        assert result.success is True
+        assert result.success
         extensions = result.data
         assert extensions is not None
         assert len(extensions) == 3
@@ -439,7 +438,7 @@ class TestMeltanoExtensionManager:
         # Test filtering by EXTRACTOR
         result = manager.list_extensions(ExtensionType.EXTRACTOR)
 
-        assert result.success is True
+        assert result.success
         extensions = result.data
         assert extensions is not None
         assert len(extensions) == 2
@@ -450,7 +449,7 @@ class TestMeltanoExtensionManager:
         # Test filtering by LOADER
         result = manager.list_extensions(ExtensionType.LOADER)
 
-        assert result.success is True
+        assert result.success
         extensions = result.data
         assert extensions is not None
         assert len(extensions) == 1
@@ -473,7 +472,7 @@ class TestMeltanoExtensionManager:
 
         result = manager.list_extensions()
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Failed to list extensions: List failed" in result.error
 
@@ -489,7 +488,7 @@ class TestMeltanoExtensionManager:
 
         result = await manager.install_extension("test-ext")
 
-        assert result.success is True
+        assert result.success
         assert result.data is True
         assert extension.status == ExtensionStatus.INSTALLED
 
@@ -500,7 +499,7 @@ class TestMeltanoExtensionManager:
 
         result = await manager.install_extension("nonexistent")
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Extension not found" in result.error
 
@@ -517,7 +516,7 @@ class TestMeltanoExtensionManager:
         ):
             result = await manager.install_extension("test")
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to install extension: Get failed" in result.error
 
@@ -539,7 +538,7 @@ class TestMeltanoExtensionManager:
         ):
             result = await manager.install_extension("test")
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to install extension: Install failed" in result.error
 
@@ -557,7 +556,7 @@ class TestMeltanoExtensionManager:
 
         result = await manager.execute_extension_command("test-ext", "test")
 
-        assert result.success is True
+        assert result.success
         command_result = result.data
         assert command_result is not None
         assert command_result["command"] == "test"
@@ -581,7 +580,7 @@ class TestMeltanoExtensionManager:
             ["--debug"],
         )
 
-        assert result.success is True
+        assert result.success
         command_result = result.data
         assert command_result is not None
         assert command_result["command"] == "extract"
@@ -593,7 +592,7 @@ class TestMeltanoExtensionManager:
 
         result = await manager.execute_extension_command("nonexistent", "test")
 
-        assert result.success is False
+        assert not result.success
         assert result.error is not None
         assert "Extension not found" in result.error
 
@@ -610,7 +609,7 @@ class TestMeltanoExtensionManager:
         ):
             result = await manager.execute_extension_command("test", "cmd")
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to execute extension command: Get failed" in result.error
 
@@ -632,7 +631,7 @@ class TestMeltanoExtensionManager:
         ):
             result = await manager.execute_extension_command("test", "cmd")
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to execute extension command: Command failed" in result.error
 
@@ -655,7 +654,7 @@ class TestFlextMeltanoExtensionDiscovery:
 
         result = await discovery.discover_extensions()
 
-        assert result.success is True
+        assert result.success
         assert result.data == 3  # Three default extensions
 
         # Verify extensions were registered
@@ -691,7 +690,7 @@ class TestFlextMeltanoExtensionDiscovery:
         search_paths = [Path("/custom/path1"), Path("/custom/path2")]
         result = await discovery.discover_extensions(search_paths)
 
-        assert result.success is True
+        assert result.success
         assert result.data == 3  # Still discovers default extensions
 
     @pytest.mark.asyncio
@@ -717,7 +716,7 @@ class TestFlextMeltanoExtensionDiscovery:
         with patch.object(manager, "register_extension", side_effect=mock_register):
             result = await discovery.discover_extensions()
 
-            assert result.success is True
+            assert result.success
             assert result.data == 2  # Only 2 successful registrations
 
     @pytest.mark.asyncio
@@ -734,7 +733,7 @@ class TestFlextMeltanoExtensionDiscovery:
         ):
             result = await discovery.discover_extensions()
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to discover extensions: Discovery failed" in result.error
 
@@ -746,7 +745,7 @@ class TestFlextMeltanoExtensionDiscovery:
 
         result = await discovery.refresh_registry()
 
-        assert result.success is True
+        assert result.success
         assert result.data is True
 
     @pytest.mark.asyncio
@@ -759,7 +758,7 @@ class TestFlextMeltanoExtensionDiscovery:
         with patch("asyncio.sleep", side_effect=RuntimeError("Refresh failed")):
             result = await discovery.refresh_registry()
 
-            assert result.success is False
+            assert not result.success
             assert result.error is not None
             assert "Failed to refresh registry: Refresh failed" in result.error
 
@@ -787,18 +786,18 @@ class TestIntegrationWorkflow:
 
         # Step 2: Discover extensions
         discover_result = await discovery.discover_extensions()
-        assert discover_result.success is True
+        assert discover_result.success
         assert discover_result.data == 3
 
         # Step 3: List all extensions
         list_result = manager.list_extensions()
-        assert list_result.success is True
+        assert list_result.success
         assert list_result.data is not None
         assert len(list_result.data) == 3
 
         # Step 4: Get specific extension
         get_result = manager.get_extension("flext-tap-csv")
-        assert get_result.success is True
+        assert get_result.success
         csv_extension = get_result.data
         assert csv_extension is not None
 
@@ -813,7 +812,7 @@ class TestIntegrationWorkflow:
 
         # Step 6: Install extension
         install_result = await manager.install_extension("flext-tap-csv")
-        assert install_result.success is True
+        assert install_result.success
 
         # Step 7: Add commands and execute (before checking status to avoid mypy unreachable code)
         csv_extension.commands = {
@@ -829,7 +828,7 @@ class TestIntegrationWorkflow:
             "flext-tap-csv",
             "extract",
         )
-        assert exec_result.success is True
+        assert exec_result.success
         assert exec_result.data is not None
         assert exec_result.data["command"] == "extract"
         assert exec_result.data["status"] == "completed"
@@ -844,7 +843,7 @@ class TestIntegrationWorkflow:
 
         # Filter by EXTRACTOR type
         extractor_result = manager.list_extensions(ExtensionType.EXTRACTOR)
-        assert extractor_result.success is True
+        assert extractor_result.success
         extractors = extractor_result.data
         assert extractors is not None
         assert len(extractors) == 1
@@ -852,7 +851,7 @@ class TestIntegrationWorkflow:
 
         # Filter by LOADER type
         loader_result = manager.list_extensions(ExtensionType.LOADER)
-        assert loader_result.success is True
+        assert loader_result.success
         loaders = loader_result.data
         assert loaders is not None
         assert len(loaders) == 1
@@ -860,7 +859,7 @@ class TestIntegrationWorkflow:
 
         # Filter by TRANSFORMER type
         transformer_result = manager.list_extensions(ExtensionType.TRANSFORMER)
-        assert transformer_result.success is True
+        assert transformer_result.success
         transformers = transformer_result.data
         assert transformers is not None
         assert len(transformers) == 1
@@ -868,7 +867,7 @@ class TestIntegrationWorkflow:
 
         # Filter by type with no matches
         orchestrator_result = manager.list_extensions(ExtensionType.ORCHESTRATOR)
-        assert orchestrator_result.success is True
+        assert orchestrator_result.success
         assert orchestrator_result.data is not None
         assert len(orchestrator_result.data) == 0
 
@@ -901,8 +900,8 @@ class TestIntegrationWorkflow:
         reg1_result = manager.register_extension(custom_ext1)
         reg2_result = manager.register_extension(custom_ext2)
 
-        assert reg1_result.success is True
-        assert reg2_result.success is True
+        assert reg1_result.success
+        assert reg2_result.success
 
         # Verify registration
         assert len(manager._extensions) == 2
@@ -911,12 +910,12 @@ class TestIntegrationWorkflow:
 
         # Test installation and command execution
         install_result = await manager.install_extension("custom-tap-api")
-        assert install_result.success is True
+        assert install_result.success
 
         exec_result = await manager.execute_extension_command(
             "custom-tap-api",
             "extract",
         )
-        assert exec_result.success is True
+        assert exec_result.success
         assert exec_result.data is not None
         assert exec_result.data["command"] == "extract"

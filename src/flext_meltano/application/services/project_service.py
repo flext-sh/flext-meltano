@@ -14,16 +14,25 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.shared_types import ServiceResult
-from flext_core.foundation import AbstractService
+from flext_core import FlextResult
+from flext_core.container import FlextContainer
 
 from flext_meltano.domain.entities import MeltanoProject
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using modern flext-core patterns
+from flext_meltano.infrastructure.di_container import (
+    AbstractService,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_meltano.application.interfaces.external_services import MeltanoCLIService
-    from flext_meltano.application.interfaces.repositories import ProjectRepository
+    from flext_meltano.application.interfaces.external_services import (
+        MeltanoCLIService,
+    )
+    from flext_meltano.application.interfaces.repositories import (
+        ProjectRepository,
+    )
 
 
 class ProjectApplicationService(AbstractService):
@@ -43,12 +52,13 @@ class ProjectApplicationService(AbstractService):
         name: str,
         directory: Path,
         description: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Create a new Meltano project."""
         # Check if project already exists
         existing = await self._project_repository.find_by_name(name)
         if existing:
-            return ServiceResult.fail(f"Project '{name}' already exists",
+            return FlextResult.fail(
+                f"Project '{name}' already exists",
             )
 
         # Create project entity with business rules
@@ -60,141 +70,153 @@ class ProjectApplicationService(AbstractService):
                 description=description,
             )
         except ValueError as e:
-            return ServiceResult.fail(f"Invalid project data: {e}")
+            return FlextResult.fail(f"Invalid project data: {e}")
 
         # Initialize project via Meltano CLI
         init_result = await self._meltano_cli_service.init_project(name, str(directory))
         if not init_result.success:
-            return ServiceResult.fail(f"Failed to initialize Meltano project: {init_result.error}",
+            return FlextResult.fail(
+                f"Failed to initialize Meltano project: {init_result.error}",
             )
 
         # Save project
         save_result = await self._project_repository.save(project)
         if not save_result.success:
-            return ServiceResult.fail(f"Failed to save project: {save_result.error}",
+            return FlextResult.fail(
+                f"Failed to save project: {save_result.error}",
             )
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def get_project(self, name: str) -> ServiceResult[Any]:
         """Get project by name."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def activate_project(self, name: str) -> ServiceResult[Any]:
         """Activate a project."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
         # Use domain method with business rules
         activate_result = project.activate()
         if not activate_result.success:
-            return ServiceResult.fail(activate_result.error or "Activation failed",
+            return FlextResult.fail(
+                activate_result.error or "Activation failed",
             )
 
         # Save updated project
         save_result = await self._project_repository.save(project)
         if not save_result.success:
-            return ServiceResult.fail(f"Failed to save project: {save_result.error}",
+            return FlextResult.fail(
+                f"Failed to save project: {save_result.error}",
             )
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def deactivate_project(self, name: str) -> ServiceResult[Any]:
         """Deactivate a project."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
         # Use domain method with business rules
         deactivate_result = project.deactivate()
         if not deactivate_result.success:
-            return ServiceResult.fail(deactivate_result.error or "Deactivation failed",
+            return FlextResult.fail(
+                deactivate_result.error or "Deactivation failed",
             )
 
         # Save updated project
         save_result = await self._project_repository.save(project)
         if not save_result.success:
-            return ServiceResult.fail(f"Failed to save project: {save_result.error}",
+            return FlextResult.fail(
+                f"Failed to save project: {save_result.error}",
             )
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def change_environment(
         self,
         name: str,
         environment: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Change project environment."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
         # Use domain method with business rules
         change_result = project.change_environment(environment)
         if not change_result.success:
-            return ServiceResult.fail(change_result.error or "Environment change failed",
+            return FlextResult.fail(
+                change_result.error or "Environment change failed",
             )
 
         # Save updated project
         save_result = await self._project_repository.save(project)
         if not save_result.success:
-            return ServiceResult.fail(f"Failed to save project: {save_result.error}",
+            return FlextResult.fail(
+                f"Failed to save project: {save_result.error}",
             )
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def update_project_status(
         self,
         name: str,
         status: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Update project status."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
         # Use domain method with business rules
         status_result = project.update_status(status)
         if not status_result.success:
-            return ServiceResult.fail(status_result.error or "Status update failed",
+            return FlextResult.fail(
+                status_result.error or "Status update failed",
             )
 
         # Save updated project
         save_result = await self._project_repository.save(project)
         if not save_result.success:
-            return ServiceResult.fail(f"Failed to save project: {save_result.error}",
+            return FlextResult.fail(
+                f"Failed to save project: {save_result.error}",
             )
 
-        return ServiceResult.ok({"project": project})
+        return FlextResult.ok({"project": project})
 
     async def list_projects(self) -> ServiceResult[Any]:
         """List all projects."""
         projects = await self._project_repository.find_all()
-        return ServiceResult.ok(projects)
+        return FlextResult.ok(projects)
 
     async def delete_project(self, name: str) -> ServiceResult[Any]:
         """Delete a project."""
         project = await self._project_repository.find_by_name(name)
         if not project:
-            return ServiceResult.fail(f"Project '{name}' not found")
+            return FlextResult.fail(f"Project '{name}' not found")
 
         # Business rule: cannot delete active projects
         if project.is_active:
-            return ServiceResult.fail("Cannot delete active project. Deactivate it first.",
+            return FlextResult.fail(
+                "Cannot delete active project. Deactivate it first.",
             )
 
         # Delete from repository
         delete_result = await self._project_repository.delete(str(project.id))
         if not delete_result.success:
-            return ServiceResult.fail(f"Failed to delete project: {delete_result.error}",
+            return FlextResult.fail(
+                f"Failed to delete project: {delete_result.error}",
             )
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def validate_invariants(self) -> bool:
         """Validate service invariants."""

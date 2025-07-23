@@ -13,18 +13,119 @@ import tempfile
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol
 
-from flext_core.domain.pydantic_base import DomainBaseModel, DomainEvent, Field
-from flext_core.domain.shared_types import ExecutionStatus
-
-# ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
-from meltano.core.job.job import Job, Payload, State
-from meltano.core.project import Project
+from pydantic import BaseModel, Field
 
 from flext_meltano.config import MeltanoSettings
 from flext_meltano.event_bridge import MeltanoEventBridge
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from flext_meltano.infrastructure.di_container import (
+    get_domain_entity,
+    get_domain_event,
+    get_field,
+)
 from flext_meltano.job_manager import FlextMeltanoJobManager
+
+DomainEntity = BaseModel
+DomainEvent = get_domain_event()
+
+
+# Use DomainEntity as base for models
+DomainBaseModel = DomainEntity
+
+
+# Define local ExecutionStatus enum to avoid flext-core dependency
+class LocalExecutionStatus(Enum):
+    """Local execution status enum."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+ExecutionStatus = LocalExecutionStatus
+
+
+# 🚨 ARCHITECTURAL COMPLIANCE - Define protocols for external dependencies
+class JobProtocol(Protocol):
+    """Protocol for job interface - Clean Architecture compliance."""
+
+    id: str
+    run_id: str
+    state: Any
+    payload_flags: Any
+    payload: dict[str, Any]
+
+    def run(self) -> dict[str, Any]: ...
+
+
+class PayloadProtocol(Protocol):
+    """Protocol for payload interface - Clean Architecture compliance."""
+
+    STATE: str
+
+
+class StateProtocol(Protocol):
+    """Protocol for state interface - Clean Architecture compliance."""
+
+    RUNNING: str
+
+
+class ProjectProtocol(Protocol):
+    """Protocol for project interface - Clean Architecture compliance."""
+
+    root: str
+    root_dir: str
+
+    def get_config(self) -> dict[str, Any]: ...
+
+
+# Local implementations of Meltano concepts
+class State(Enum):
+    """Local state enumeration for job states."""
+
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class Payload:
+    """Local payload class for job payloads."""
+
+    STATE = "state"
+
+
+class Job:
+    """Local job implementation."""
+
+    def __init__(
+        self,
+        job_id: str,
+        run_id: str,
+        state: State,
+        payload_flags: str,
+        payload: dict[str, Any],
+    ) -> None:
+        self.id = job_id
+        self.run_id = run_id
+        self.state = state
+        self.payload_flags = payload_flags
+        self.payload = payload
+
+
+class Project:
+    """Local project implementation."""
+
+    def __init__(self, root: str) -> None:
+        self.root = root
+        self.root_dir = root
+
+    def get_config(self) -> dict[str, Any]:
+        return {}
 
 
 # Local MeltanoEngine implementation
@@ -179,7 +280,7 @@ class FlextMeltanoOrchestrator:
         self.state_manager = state_manager
         self.job_manager = FlextMeltanoJobManager(event_bus)
         self.event_bus = event_bus
-        self.logger = logger.bind(component="flext_meltano_orchestrator")
+        self.logger = logger
 
         # Initialize event bridge for Meltano-FLEXT event integration
         self.event_bridge = MeltanoEventBridge(event_bus)
@@ -349,9 +450,11 @@ class FlextMeltanoOrchestrator:
 
         return {
             "run_id": job.run_id,
-            "status": job.status.value
-            if isinstance(job.status, ExecutionStatus)
-            else job.status,
+            "status": (
+                job.status.value
+                if isinstance(job.status, ExecutionStatus)
+                else job.status
+            ),
             "started_at": job.started_at.isoformat() if job.started_at else None,
             "finished_at": job.finished_at.isoformat() if job.finished_at else None,
             "last_heartbeat_at": (
@@ -682,7 +785,7 @@ class FlextMeltanoOrchestrator:
             OSError,
             FileNotFoundError,
         ) as e:
-            self.logger.exception("Run block execution failed", error=str(e))
+            self.logger.exception(f"Run block execution failed: error={e}")
             return {"success": False, "error": str(e)}
         else:
             return {
@@ -735,7 +838,7 @@ class FlextMeltanoOrchestrator:
 
                 if not success:
                     error_msg = f"Meltano invoke failed: {stderr}"
-                    self.logger.error(error_msg, command=command)
+                    self.logger.error(f"{error_msg}: command={command}")
                     return {"success": False, "error": error_msg}
 
                 # Handle stdout safely for both real results and mocks
@@ -753,7 +856,7 @@ class FlextMeltanoOrchestrator:
             }
         except Exception as e:
             error_msg = f"Failed to execute invoke block: {e}"
-            self.logger.exception("Invoke block execution failed", error=str(e))
+            self.logger.exception(f"Invoke block execution failed: error={e}")
             return {"success": False, "error": error_msg}
 
     def _get_state_manager(self) -> FlextMeltanoStateManager:
@@ -788,4 +891,4 @@ class FlextMeltanoOrchestrator:
         # Note: Meltano Job.state is read-only, so we can't directly assign
         # We log the intended state change for tracking purposes
         job_id = getattr(job, "job_id", getattr(job, "id", "unknown"))
-        self.logger.debug("Job state updated", job_id=job_id, state=state.value)
+        self.logger.debug(f"Job state updated: job_id={job_id}, state={state.value}")

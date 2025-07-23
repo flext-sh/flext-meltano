@@ -16,10 +16,6 @@ from __future__ import annotations
 import warnings
 from typing import Any
 
-# Foundation patterns from flext-core
-from flext_core.domain.pydantic_base import DomainEntity
-from flext_core.foundation import AbstractEntity
-
 # Domain entities
 from flext_meltano.domain.entities.environment_type import EnvironmentType
 from flext_meltano.domain.entities.job import MeltanoJob
@@ -28,6 +24,12 @@ from flext_meltano.domain.entities.plugin import MeltanoPlugin
 from flext_meltano.domain.entities.plugin_type import PluginType
 from flext_meltano.domain.entities.project import MeltanoProject
 from flext_meltano.domain.entities.state import MeltanoState
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Import from local DI container
+from flext_meltano.infrastructure.di_container import (
+    AbstractEntity,
+    DomainEntity,
+)
 
 
 def _entity_deprecation_warning(entity_name: str) -> None:

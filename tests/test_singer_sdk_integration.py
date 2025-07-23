@@ -15,13 +15,14 @@ from unittest.mock import MagicMock, patch
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
-import pytest
 
 # Mock missing dependencies to avoid import errors
 sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
 # ruff: noqa: E402 - Module mocking must happen before imports
+import pytest
+
 from flext_meltano.singer_sdk_integration import (
     SINGER_BATCH_SIZE_LIMIT,
     FlextSingerSDKIntegration,

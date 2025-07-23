@@ -20,8 +20,6 @@ sys.modules["flext_observability"] = MagicMock()
 sys.modules["flext_observability.logging"] = MagicMock()
 
 # ruff: noqa: E402 - Module mocking must happen before imports
-from flext_core import Environment
-
 from flext_meltano.config import (
     MeltanoExecutionConfig,
     MeltanoPluginConfig,
@@ -29,6 +27,7 @@ from flext_meltano.config import (
     MeltanoSettings,
     MeltanoStateConfig,
 )
+from flext_meltano.infrastructure.di_container import Environment
 
 
 class TestMeltanoSettingsIsolated:

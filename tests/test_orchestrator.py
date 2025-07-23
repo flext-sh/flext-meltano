@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """Test FLEXT Meltano Orchestrator - 757 lines of code, 27.44% coverage.
 
 ZERO TOLERANCE for fake code, mockups, or library fallbacks.
@@ -8,14 +10,14 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-import sys
 from datetime import UTC, datetime
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
-from flext_core.domain.shared_types import ExecutionStatus
 
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import ExecutionStatus
 from flext_meltano.orchestrator import (
     FlextJob,
     FlextMeltanoOrchestrator,
@@ -1371,7 +1373,7 @@ class TestIntegrationWorkflow:
         mock_project.root = "/test/project"
         mock_project.root_dir = "/test/project"
         # Configure mock for load_project_config method
-        from flext_core.domain.shared_types import ServiceResult
+        from flext_meltano.infrastructure.di_container import ServiceResult
 
         mock_project_config = {"config": "test"}
         mock_project_manager.load_project_config.return_value = ServiceResult.ok(
@@ -1501,7 +1503,9 @@ class TestIntegrationWorkflow:
             call_count += 1
             if call_count == 1:
                 # Return a failed ServiceResult instead of raising exception
-                from flext_core.domain.shared_types import ServiceResult
+                from flext_meltano.infrastructure.di_container import (
+                    ServiceResult,
+                )
                 return ServiceResult.fail("Initial failure")
             # Return a successful ServiceResult
             mock_config = {"version": 1, "project_id": "test-project"}

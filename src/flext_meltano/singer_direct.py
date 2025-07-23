@@ -10,10 +10,15 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.shared_types import ServiceResult
+from flext_core import ServiceResult
 
+# Direct import from flext-core for runtime and type safety
+
+    # Keep this section for any future type-only imports
+
+# Initialize types via DI container
 logger = logging.getLogger(__name__)
 
 
@@ -23,10 +28,7 @@ class SingerDirectRunner:
     def __init__(self, project_root: Path) -> None:
         """Initialize Singer Direct integration."""
         self.project_root = Path(project_root)
-        self.logger = logger.info(
-            "flext_meltano_singer_direct %s",
-            {str(self.project_root)},
-        )
+        self.logger = logger
 
     async def run_tap_target_direct(
         self,
@@ -51,12 +53,7 @@ class SingerDirectRunner:
             # Build target command
             target_cmd = [target_executable, "--config", "-"]
 
-            self.logger.info(
-                "Running Singer pipeline directly",
-                tap=tap_executable,
-                target=target_executable,
-                project=project_name,
-            )
+            self.logger.info(f"Running Singer pipeline directly: tap={tap_executable}, target={target_executable}, project={project_name}")
 
             # Execute tap | target pipeline directly
             tap_process = await asyncio.create_subprocess_exec(
@@ -69,7 +66,8 @@ class SingerDirectRunner:
 
             # Ensure tap stdout is available for piping
             if tap_process.stdout is None:
-                return ServiceResult.fail("Tap process stdout not available for piping",
+                return ServiceResult.fail(
+                    "Tap process stdout not available for piping",
                 )
 
             target_process = await asyncio.create_subprocess_exec(
@@ -77,7 +75,7 @@ class SingerDirectRunner:
                 cwd=project_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                stdin=tap_process.stdout,  # Now guaranteed to be non-None
+                stdin=tap_process.stdout,
             )
 
             # Wait for completion
@@ -98,12 +96,12 @@ class SingerDirectRunner:
                 self.logger.info("Singer direct pipeline completed successfully")
                 return ServiceResult.ok({"result": result})
             error_msg = f"Pipeline failed: tap={tap_process.returncode}, target={target_process.returncode}"
-            self.logger.error(error_msg, **result)
+            self.logger.error(f"{error_msg}: {result}")
             return ServiceResult.fail(error_msg)
 
         except Exception as e:
             error_msg = f"Failed to run Singer pipeline directly: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            self.logger.exception(f"{error_msg}: error={e}")
             return ServiceResult.fail(error_msg)
 
     async def discover_tap_schema(
@@ -119,7 +117,7 @@ class SingerDirectRunner:
             # Use Singer discover command directly
             cmd = [tap_executable, "--config", "-", "--discover"]
 
-            self.logger.info("Discovering tap schema directly", tap=tap_executable)
+            self.logger.info(f"Discovering tap schema directly: tap={tap_executable}")
 
             process = await asyncio.create_subprocess_exec(
                 *cmd,
@@ -134,13 +132,11 @@ class SingerDirectRunner:
             if process.returncode == 0:
                 try:
                     catalog = json.loads(stdout.decode())
-                    self.logger.info(
-                        "Schema discovered successfully",
-                        streams=len(catalog.get("streams", [])),
-                    )
+                    self.logger.info(f"Schema discovered successfully: streams={len(catalog.get('streams', []))}")
                     return ServiceResult.ok({"result": catalog})
                 except json.JSONDecodeError as e:
-                    return ServiceResult.fail(f"Invalid catalog JSON: {e}",
+                    return ServiceResult.fail(
+                        f"Invalid catalog JSON: {e}",
                     )
             else:
                 error_msg = f"Schema discovery failed: {stderr.decode()}"
@@ -149,5 +145,5 @@ class SingerDirectRunner:
 
         except Exception as e:
             error_msg = f"Failed to discover schema: {e}"
-            self.logger.exception(error_msg, error=str(e))
+            self.logger.exception(f"{error_msg}: error={e}")
             return ServiceResult.fail(error_msg)

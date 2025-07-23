@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """Meltano Extensions Development Kit (EDK) Integration with ZERO boilerplate.
 
 This module implements complete Meltano EDK integration for FLEXT enterprise
@@ -11,7 +13,9 @@ import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.shared_types import ServiceResult
+# 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -130,7 +134,8 @@ class MeltanoExtensionManager:
         }
 
     def register_extension(
-        self, extension: MeltanoExtension,
+        self,
+        extension: MeltanoExtension,
     ) -> ServiceResult[dict[str, Any]]:
         """Register an extension."""
         try:
@@ -211,15 +216,19 @@ class MeltanoExtensionManager:
             # Execute command and return result as dict
             command_result = await extension.execute_command(command_name, args)
             if command_result.success:
-                return ServiceResult.ok({
-                    "extension_name": extension_name,
-                    "command": command_name,
-                    "args": args or [],
-                    "status": "completed",
-                    "result": str(command_result.data)
-                    if command_result.data is not None
-                    else "",
-                })
+                return ServiceResult.ok(
+                    {
+                        "extension_name": extension_name,
+                        "command": command_name,
+                        "args": args or [],
+                        "status": "completed",
+                        "result": (
+                            str(command_result.data)
+                            if command_result.data is not None
+                            else ""
+                        ),
+                    }
+                )
             return ServiceResult.fail(
                 f"Command execution failed: {command_result.error}",
             )

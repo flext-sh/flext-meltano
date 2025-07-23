@@ -18,7 +18,11 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any
 
-from flext_core.domain.shared_types import ServiceResult
+from flext_core import ServiceResult
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
 
 
 class MeltanoAdapter(ABC):
@@ -103,9 +107,9 @@ class MeltanoAntiCorruptionLayer:
                 return await self.adapter.install_plugin(
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
-                    variant=str(kwargs.get("variant"))
-                    if kwargs.get("variant")
-                    else None,
+                    variant=(
+                        str(kwargs.get("variant")) if kwargs.get("variant") else None
+                    ),
                 )
             if action == "list":
                 return await self.adapter.list_plugins(plugin_type=plugin_type)

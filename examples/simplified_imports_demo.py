@@ -53,13 +53,19 @@ with contextlib.suppress(Exception):
 
 
 migration_examples = [
-    ("❌ OLD", "from flext_meltano.application.services.project_service import ProjectApplicationService"),
+    (
+        "❌ OLD",
+        "from flext_meltano.application.services.project_service import ProjectApplicationService",
+    ),
     ("✅ NEW", "from flext_meltano import ProjectService"),
     ("", ""),
     ("❌ OLD", "from flext_meltano.domain.entities.project import MeltanoProject"),
     ("✅ NEW", "from flext_meltano import MeltanoProject"),
     ("", ""),
-    ("❌ OLD", "from flext_meltano.application.services.state_service import MeltanoStateService"),
+    (
+        "❌ OLD",
+        "from flext_meltano.application.services.state_service import MeltanoStateService",
+    ),
     ("✅ NEW", "from flext_meltano import StateService"),
 ]
 

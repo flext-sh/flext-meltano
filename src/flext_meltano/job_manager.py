@@ -14,15 +14,15 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
-from meltano.core.db import project_engine
-from meltano.core.job.job import Job
+from meltano.core.db import project_engine  # type: ignore[import-untyped]
+from meltano.core.job.job import Job  # type: ignore[import-untyped]
 
 # Meltano core availability is guaranteed by dependency constraints
 MELTANO_CORE_AVAILABLE = True
 
 if TYPE_CHECKING:
-    from meltano.core.job.job import State
-    from meltano.core.project import Project
+    from meltano.core.job.job import State  # type: ignore[import-untyped]
+    from meltano.core.project import Project  # type: ignore[import-untyped]
 
     from flext_meltano.event_bus_protocol import EventBusProtocol
 
@@ -42,11 +42,11 @@ class FlextMeltanoJobManager:
     def __init__(self, event_bus: EventBusProtocol) -> None:
         """Initialize job manager with event bus integration."""
         self.event_bus = event_bus
-        self.logger = logger.info("flext_meltano_job_manager")
+        self.logger = logger
         self._lock = asyncio.Lock()
 
         self.logger.info(
-            "Initialized FLEXT Meltano Job Manager with full Meltano integration",
+            "Initialized FLEXT Meltano Job Manager with full Meltano integration"
         )
 
     async def get_job(self, project: Project, job_id: str) -> Job | None:
@@ -68,12 +68,10 @@ class FlextMeltanoJobManager:
 
                 if job:
                     self.logger.debug(
-                        "Retrieved job",
-                        job_id=job_id,
-                        state=job.state.value if job.state else None,
+                        f"Retrieved job: job_id={job_id}, state={job.state.value if job.state else None}"
                     )
                 else:
-                    self.logger.debug("Job not found", job_id=job_id)
+                    self.logger.debug(f"Job not found: job_id={job_id}")
 
                 return job
 
@@ -87,11 +85,7 @@ class FlextMeltanoJobManager:
             LookupError,
             KeyError,
         ) as e:
-            self.logger.exception(
-                "Failed to retrieve job",
-                job_id=job_id,
-                error=str(e),
-            )
+            self.logger.exception(f"Failed to retrieve job: job_id={job_id}, error={e}")
             raise
 
     def list_jobs(
@@ -139,12 +133,7 @@ class FlextMeltanoJobManager:
                 )
 
                 self.logger.debug(
-                    "Listed jobs",
-                    count=len(jobs),
-                    state=state.value if state else None,
-                    run_id=run_id,
-                    limit=limit,
-                    offset=offset,
+                    f"Listed jobs: count={len(jobs)}, state={state.value if state else None}, run_id={run_id}, limit={limit}, offset={offset}"
                 )
 
                 return jobs
@@ -160,10 +149,7 @@ class FlextMeltanoJobManager:
             AttributeError,
         ) as e:
             self.logger.exception(
-                "Failed to list jobs",
-                error=str(e),
-                state=state.value if state else None,
-                run_id=run_id,
+                f"Failed to list jobs: error={e}, state={state.value if state else None}, run_id={run_id}"
             )
             raise
 
@@ -193,7 +179,9 @@ class FlextMeltanoJobManager:
                 job = session.query(Job).filter(Job.id == job_id).first()
 
                 if not job:
-                    self.logger.warning("Job not found for state update", job_id=job_id)
+                    self.logger.warning(
+                        f"Job not found for state update: job_id={job_id}"
+                    )
                     return False
 
                 old_state = job.state
@@ -203,11 +191,7 @@ class FlextMeltanoJobManager:
                 session.commit()
 
                 self.logger.info(
-                    "Updated job state",
-                    job_id=job_id,
-                    old_state=old_state.value if old_state else None,
-                    new_state=new_state.value,
-                    reason=reason,
+                    f"Updated job state: job_id={job_id}, old_state={old_state.value if old_state else None}, new_state={new_state.value}, reason={reason}"
                 )
 
                 # Publish state change event
@@ -238,9 +222,6 @@ class FlextMeltanoJobManager:
             AttributeError,
         ) as e:
             self.logger.exception(
-                "Failed to update job state",
-                job_id=job_id,
-                new_state=new_state.value,
-                error=str(e),
+                f"Failed to update job state: job_id={job_id}, new_state={new_state.value}, error={e}"
             )
             raise

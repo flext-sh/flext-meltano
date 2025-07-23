@@ -15,17 +15,20 @@ from enum import Enum, auto
 from functools import wraps
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
 
-from flext_core.domain.pydantic_base import (
-    DomainBaseModel as BaseModel,
-    DomainValueObject,
-    Field,
-)
+from pydantic import BaseModel, Field
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import DomainEntity
+
+# Use DomainEntity as base for value objects
+DomainValueObject = DomainEntity
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    from flext_core.domain.pipeline import Pipeline, PipelineExecution
-
+    # Define local types without flext-core dependency
+    Pipeline = dict
+    PipelineExecution = dict
 
 # Type aliases for clean interface
 StepFunction = Callable[..., Any]

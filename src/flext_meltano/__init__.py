@@ -1,196 +1,138 @@
-"""FLEXT Meltano - Enterprise Meltano integration with simplified imports.
+"""FLEXT Meltano - Unified Data Integration Platform.
 
-🎯 SIMPLE IMPORTS - Use these for ALL new code:
+Modern enterprise-grade library that unifies:
+- Meltano (data integration orchestration)
+- Singer SDK (tap/target development)
+- dbt (data transformation)
+- Meltano EDK (extension development)
+- FlexCore Go runtime integration
 
-# Core entities (direct access)
-from flext_meltano import MeltanoProject, MeltanoState, MeltanoJob, MeltanoPlugin
-
-# Services (simplified names)
-from flext_meltano import ProjectService, StateService, JobService, PluginService
-
-# Configuration and types
-from flext_meltano import EnvironmentType, JobStatus, PluginType, ServiceResult
-
-🚨 DEPRECATED LONG PATHS (still work, but discouraged):
-❌ from flext_meltano.application.services.project_service import ProjectApplicationService
-✅ from flext_meltano import ProjectService
-
-❌ from flext_meltano.domain.entities.project import MeltanoProject
-✅ from flext_meltano import MeltanoProject
-
-❌ from flext_meltano.application.services.state_service import MeltanoStateService
-✅ from flext_meltano import StateService
-
-🔄 MIGRATION STRATEGY:
-All complex paths show warnings pointing to simple root-level imports.
-Use short, direct imports for maximum productivity and clarity.
-
-Copyright (c) 2025 Flext. All rights reserved.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-import warnings
-from typing import TYPE_CHECKING, Any
+# Core FlextCore patterns
+from flext_core import FlextResult
+from flext_core.constants import FlextConstants
+from flext_core.container import FlextContainer
 
-# Import deprecation warning from flext-core
-from flext_core import FlextDeprecationWarning
-from flext_core.domain.shared_types import ServiceResult
+from flext_meltano.config.loader import FlextMeltanoConfigLoader
 
-# Import all real implementations - NO FALLBACKS
-from flext_meltano.application.services.job_service import (
-    MeltanoJobService,
-)
-from flext_meltano.application.services.plugin_service import (
-    MeltanoPluginService,
-)
-from flext_meltano.application.services.project_service import (
-    ProjectApplicationService,
-)
-from flext_meltano.application.services.state_service import (
-    MeltanoStateService,
-)
-from flext_meltano.domain.entities import (
-    EnvironmentType,
-    JobStatus,
-    PluginType,
-)
-from flext_meltano.domain.entities.job import MeltanoJob
-from flext_meltano.domain.entities.plugin import MeltanoPlugin
-from flext_meltano.domain.entities.project import MeltanoProject
-from flext_meltano.domain.entities.state import MeltanoState
-from flext_meltano.unified_anti_corruption_layer import (
-    UnifiedMeltanoAntiCorruptionLayer,
-)
+# Configuration and settings
+from flext_meltano.config.settings import FlextMeltanoSettings
+
+# Unified Meltano platform classes
+from flext_meltano.core.platform import FlextMeltanoPlatform
+from flext_meltano.core.runtime import FlextMeltanoRuntime
+from flext_meltano.dbt.models import FlextMeltanoDbtModel
+
+# dbt integration
+from flext_meltano.dbt.project import FlextMeltanoDbtProject
+from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
+
+# Meltano EDK integration
+from flext_meltano.edk.extension import FlextMeltanoExtension
+from flext_meltano.edk.manager import FlextMeltanoExtensionManager
+from flext_meltano.environment.manager import FlextMeltanoEnvironmentManager
+from flext_meltano.environment.models import FlextMeltanoEnvironment
+
+# Helpers and utilities
+from flext_meltano.helpers.cli import flext_run_command
+from flext_meltano.helpers.config import flext_load_config
+from flext_meltano.helpers.discovery import flext_discover_plugins
+from flext_meltano.helpers.execution import flext_execute_job
+from flext_meltano.helpers.installation import flext_install_plugin
+from flext_meltano.helpers.validation import flext_validate_project
+from flext_meltano.jobs.executor import FlextMeltanoJobExecutor
+
+# Job and execution management
+from flext_meltano.jobs.manager import FlextMeltanoJobManager
+from flext_meltano.jobs.models import FlextMeltanoJob
+
+# Plugin management
+from flext_meltano.plugins.manager import FlextMeltanoPluginManager
+from flext_meltano.plugins.models import FlextMeltanoPlugin
+
+# Project and environment management
+from flext_meltano.project.manager import FlextMeltanoProjectManager
+from flext_meltano.project.models import FlextMeltanoProject
+from flext_meltano.singer.catalog import FlextMeltanoCatalog
+from flext_meltano.singer.stream import FlextMeltanoStream
+
+# Singer SDK integration
+from flext_meltano.singer.tap import FlextMeltanoTap
+from flext_meltano.singer.target import FlextMeltanoTarget
+
+# State management
+from flext_meltano.state.manager import FlextMeltanoStateManager
+from flext_meltano.state.models import FlextMeltanoState
 
 __version__ = "0.7.0"
 
-# ============================================================================
-# 🎯 SIMPLIFIED PUBLIC API - Direct imports without complex paths
-# ============================================================================
+# Main platform instance factory
+def create_flext_meltano_platform(
+    config: dict[str, object] | None = None,
+) -> FlextMeltanoPlatform:
+    """Create unified FLEXT Meltano platform instance.
 
-# Create simple aliases for direct access
-ProjectService = ProjectApplicationService
-StateService = MeltanoStateService
-JobService = MeltanoJobService
-PluginService = MeltanoPluginService
+    Args:
+        config: Optional configuration dictionary
 
+    Returns:
+        Configured FlextMeltanoPlatform instance
 
-def _warn_deprecated_import(
-    old_path: str,
-    new_import: str,
-    removal_version: str = "v0.8.0",
-) -> None:
-    """Issue comprehensive deprecation warning with clear migration path."""
-    warnings.warn(
-        f"\n\n🚨 DEPRECATED COMPLEX PATH:\n"
-        f"Using '{old_path}' is deprecated.\n\n"
-        f"🎯 SIMPLE IMPORT SOLUTION:\n"
-        f"Use: from flext_meltano import {new_import}\n\n"
-        f"💡 PRODUCTIVITY TIP:\n"
-        f"All FLEXT Meltano imports are now available at root level!\n"
-        f"No more complex nested paths - just import what you need directly.\n\n"
-        f"🔄 MIGRATION:\n"
-        f"Support for complex paths will be removed in {removal_version}.\n"
-        f"Use simple root-level imports for better developer experience.\n\n"
-        f"Examples:\n"
-        f"✅ from flext_meltano import ProjectService, StateService, JobService\n"
-        f"✅ from flext_meltano import MeltanoProject, MeltanoJob, MeltanoPlugin\n"
-        f"✅ from flext_meltano import JobStatus, PluginType, EnvironmentType",
-        category=FlextDeprecationWarning,
-        stacklevel=3,
-    )
-
-
-# ============================================================================
-# ⚠️ DEPRECATED COMPATIBILITY - Will show helpful warnings
-# ============================================================================
-
-
-def __getattr__(name: str) -> Any:
-    """Handle legacy imports with detailed deprecation guidance."""
-    # Legacy import mappings
-    legacy_mappings = {
-        # Core service classes
-        "ProjectApplicationService": {
-            "new_import": "ProjectService",
-            "component": ProjectService,
-            "reason": "Simplified to ProjectService at root level",
-        },
-        "MeltanoStateService": {
-            "new_import": "StateService",
-            "component": StateService,
-            "reason": "Simplified to StateService at root level",
-        },
-        "MeltanoJobService": {
-            "new_import": "JobService",
-            "component": JobService,
-            "reason": "Simplified to JobService at root level",
-        },
-        "MeltanoPluginService": {
-            "new_import": "PluginService",
-            "component": PluginService,
-            "reason": "Simplified to PluginService at root level",
-        },
-        # Legacy manager classes
-        "MeltanoProjectManager": {
-            "new_import": "ProjectService",
-            "component": ProjectService,
-            "reason": "Renamed to ProjectService following Clean Architecture",
-        },
-        "FlextMeltanoProjectManager": {
-            "new_import": "ProjectService",
-            "component": ProjectService,
-            "reason": "Renamed to ProjectService following Clean Architecture",
-        },
-    }
-
-    if name in legacy_mappings:
-        mapping = legacy_mappings[name]
-
-        # Show clear guidance for migration
-        _warn_deprecated_import(f"flext_meltano.{name}", str(mapping["new_import"]))
-
-        return mapping["component"]
-
-    msg = f"module 'flext_meltano' has no attribute '{name}'"
-    raise AttributeError(msg)
-
-
-# ============================================================================
-# 📦 PUBLIC API EXPORTS
-# ============================================================================
+    """
+    return FlextMeltanoPlatform(config or {})
 
 __all__ = [
-    # Enums and Value Objects (configuration types)
-    "EnvironmentType",  # from flext_meltano import EnvironmentType
-    "FlextMeltanoProjectManager",  # ⚠️ Deprecated → Use ProjectService
-    "JobService",  # from flext_meltano import JobService
-    "JobStatus",  # from flext_meltano import JobStatus
-    "MeltanoJob",  # from flext_meltano import MeltanoJob
-    "MeltanoJobService",  # ⚠️ Deprecated → Use JobService
-    "MeltanoPlugin",  # from flext_meltano import MeltanoPlugin
-    "MeltanoPluginService",  # ⚠️ Deprecated → Use PluginService
-    # ✅ RECOMMENDED - SIMPLE DIRECT IMPORTS
-    # Core Domain Entities (data models)
-    "MeltanoProject",  # from flext_meltano import MeltanoProject
-    # Legacy manager classes
-    "MeltanoProjectManager",  # ⚠️ Deprecated → Use ProjectService
-    "MeltanoState",  # from flext_meltano import MeltanoState
-    "MeltanoStateService",  # ⚠️ Deprecated → Use StateService
-    "PluginService",  # from flext_meltano import PluginService
-    "PluginType",  # from flext_meltano import PluginType
-    # ⚠️ DEPRECATED - LEGACY COMPATIBILITY (will show warnings)
-    # Legacy service names (redirect to simplified versions)
-    "ProjectApplicationService",  # ⚠️ Deprecated → Use ProjectService
-    # Application Services (business logic)
-    "ProjectService",  # from flext_meltano import ProjectService
-    # Shared Utilities (from flext-core)
-    "ServiceResult",  # from flext_meltano import ServiceResult
-    "StateService",  # from flext_meltano import StateService
-    # Anti-corruption layer
-    "UnifiedMeltanoAntiCorruptionLayer",  # from flext_meltano import UnifiedMeltanoAntiCorruptionLayer
+    "FlextConstants",
+    "FlextContainer",
+    "FlextMeltanoCatalog",
+    "FlextMeltanoConfigLoader",
+    "FlextMeltanoDbtModel",
+    # dbt integration
+    "FlextMeltanoDbtProject",
+    "FlextMeltanoDbtRunner",
+    # Environment management
+    "FlextMeltanoEnvironment",
+    "FlextMeltanoEnvironmentManager",
+    # EDK extensions
+    "FlextMeltanoExtension",
+    "FlextMeltanoExtensionManager",
+    # Job management
+    "FlextMeltanoJob",
+    "FlextMeltanoJobExecutor",
+    "FlextMeltanoJobManager",
+    # Core platform
+    "FlextMeltanoPlatform",
+    # Plugin management
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPluginManager",
+    # Project management
+    "FlextMeltanoProject",
+    "FlextMeltanoProjectManager",
+    "FlextMeltanoRuntime",
+    # Configuration
+    "FlextMeltanoSettings",
+    # State management
+    "FlextMeltanoState",
+    "FlextMeltanoStateManager",
+    "FlextMeltanoStream",
+    # Singer SDK
+    "FlextMeltanoTap",
+    "FlextMeltanoTarget",
+    # Core patterns (re-exported)
+    "FlextResult",
     # Metadata
-    "__version__",  # Package version
+    "__version__",
+    "create_flext_meltano_platform",
+    "flext_discover_plugins",
+    "flext_execute_job",
+    "flext_install_plugin",
+    "flext_load_config",
+    # Helpers
+    "flext_run_command",
+    "flext_validate_project",
 ]

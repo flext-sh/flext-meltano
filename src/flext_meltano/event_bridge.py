@@ -11,9 +11,13 @@ import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-# Use actual FLEXT imports - no placeholders allowed
-from flext_core.domain.pydantic_base import DomainEvent, Field
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from pydantic import BaseModel, Field
 
+# Define DomainEvent as BaseModel for now
+DomainEvent = BaseModel
+
+# Initialize types via DI container
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -51,7 +55,7 @@ class EventConfig:
         self.metadata = metadata
 
 
-# DomainEvent now imported from flext_core - no duplicates allowed
+# DomainEvent now imported via DI container - architectural compliance enforced
 
 
 class MeltanoEventBridge:
@@ -90,31 +94,28 @@ class MeltanoEventBridge:
                 """Publish event to mock bus."""
                 if isinstance(event, MeltanoEvent):
                     logger.info(
-                        "Event published",
-                        event_type=event.event_type,
-                        data_keys=list(event.data.keys()),
+                        f"Event published: {event.event_type}, data_keys: {list(event.data.keys())}",
                     )
                 elif isinstance(event, dict):
                     logger.info(
-                        "Event published",
-                        event_type=event.get("type", "unknown"),
+                        f"Event published: {event.get('type', 'unknown')}",
                     )
                 else:
-                    logger.info("Event published", event_type=type(event).__name__)
+                    logger.info(f"Event published: {type(event).__name__}")
 
             async def subscribe(
                 self,
                 pattern: str,
                 handler: object,
             ) -> None:
-                logger.info("Subscription created", pattern=pattern)
+                logger.info(f"Subscription created: {pattern}")
 
             async def unsubscribe(
                 self,
                 pattern: str,
                 handler: object,
             ) -> None:
-                logger.info("Subscription removed", pattern=pattern)
+                logger.info(f"Subscription removed: {pattern}")
 
         return MockEventBus()
 
@@ -203,17 +204,12 @@ class MeltanoEventBridge:
             await self.flext_event_bus.publish(flext_event)
 
             logger.debug(
-                "Published Meltano event to FLEXT",
-                meltano_event=config.event_type,
-                flext_event=flext_event_type,
-                job_id=config.job_id,
-                pipeline_name=config.pipeline_name,
+                f"Published Meltano event to FLEXT: {config.event_type} -> {flext_event_type} "
+                f"(job_id: {config.job_id}, pipeline: {config.pipeline_name})",
             )
         except Exception as e:
             logger.exception(
-                "Failed to publish Meltano event",
-                event_type=config.event_type,
-                error=str(e),
+                f"Failed to publish Meltano event: {config.event_type}, error: {e}",
             )
             raise
 

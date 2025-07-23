@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """Go Integration for FLEXT Meltano.
 
 This module provides Python-Go bridge functionality using HTTP API,
@@ -11,9 +13,13 @@ import logging
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-from flext_core.domain.shared_types import Any, ServiceResult
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
 
+# Initialize types via DI container
 logger = logging.getLogger(__name__)
 
 
@@ -93,7 +99,8 @@ class GoIntegration:
 
             self.logger.info("Generated HTTP API server and Go client")
 
-            return ServiceResult.ok({
+            return ServiceResult.ok(
+                {
                     "go_client": str(go_client_path),
                     "usage_doc": str(usage_path),
                     "bindings_path": str(output_dir),
@@ -177,12 +184,12 @@ class ProjectInfoRequest(BaseModel):
 
 # API endpoints
 @app.get("/health")
-async def health_check():
+async def health_check() -> None:
     """Health check endpoint."""
     return {"status": "healthy", "meltano_available": is_available()}
 
 @app.post("/init-project")
-async def init_project(request: InitProjectRequest):
+async def init_project(request: InitProjectRequest) -> None:
     """Initialize a new Meltano project."""
     try:
         result = init_project_sync(request.project_name, request.project_dir)
@@ -192,7 +199,7 @@ async def init_project(request: InitProjectRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.post("/add-plugin")
-async def add_plugin(request: AddPluginRequest):
+async def add_plugin(request: AddPluginRequest) -> None:
     """Add a plugin to Meltano project."""
     try:
         result = add_plugin_sync(
@@ -207,7 +214,7 @@ async def add_plugin(request: AddPluginRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.post("/run-pipeline")
-async def run_pipeline(request: RunPipelineRequest):
+async def run_pipeline(request: RunPipelineRequest) -> None:
     """Run a Meltano pipeline."""
     try:
         result = run_pipeline_sync(
@@ -222,7 +229,7 @@ async def run_pipeline(request: RunPipelineRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.post("/project-info")
-async def project_info(request: ProjectInfoRequest):
+async def project_info(request: ProjectInfoRequest) -> None:
     """Get project information."""
     try:
         result = get_project_info_sync(request.project_name)
@@ -232,7 +239,7 @@ async def project_info(request: ProjectInfoRequest):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.post("/execute-command")
-async def execute_command(request: ExecuteCommandRequest):
+async def execute_command(request: ExecuteCommandRequest) -> None:
     """Execute a Meltano command."""
     args_json = json.dumps(request.command_args)
     try:
@@ -848,7 +855,6 @@ class GopyIntegration(GoIntegration):
 
 # Backward compatibility alias
 GopyBuildConfig = GoIntegrationConfig
-
 
 if __name__ == "__main__":
     main()

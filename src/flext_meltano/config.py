@@ -10,17 +10,45 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core import Field, get_container
-from flext_core.config.unified_config import (
-    BaseConfigMixin,
-    DatabaseConfigMixin,
-    LoggingConfigMixin,
-    MonitoringConfigMixin,
-    PerformanceConfigMixin,
-)
-from flext_core.domain.constants import ConfigDefaults
-from flext_core.domain.pydantic_base import DomainValueObject
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from flext_meltano.infrastructure.di_container import (
+    get_config_defaults,
+    get_di_container,
+    get_domain_entity,
+)
+
+# Initialize types via DI container
+ConfigDefaults = get_config_defaults()
+DomainValueObject = get_domain_entity()  # DomainEntity can be used as value object
+
+
+# Define local base config mixins to avoid flext-core dependency
+class BaseConfigMixin:
+    """Local base config mixin."""
+
+
+class DatabaseConfigMixin:
+    """Local database config mixin."""
+
+
+class LoggingConfigMixin:
+    """Local logging config mixin."""
+
+
+class MonitoringConfigMixin:
+    """Local monitoring config mixin."""
+
+
+class PerformanceConfigMixin:
+    """Local performance config mixin."""
+
+
+def get_container() -> Any:
+    """Local container function."""
+    return get_di_container()
 
 
 class MeltanoProjectConfig(DomainValueObject):
@@ -316,7 +344,6 @@ class MeltanoSettings(
         """
         if container is None:
             container = get_container()
-
         # Register this settings instance
         container.register(MeltanoSettings, self)
 
