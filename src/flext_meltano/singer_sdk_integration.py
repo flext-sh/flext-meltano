@@ -6,23 +6,21 @@ providing advanced tap/target creation, stream discovery, and pipeline orchestra
 
 from __future__ import annotations
 
+import importlib
 from datetime import UTC, datetime
 from enum import Enum, auto
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from flext_core.domain.pydantic_base import (
-    DomainBaseModel as BaseModel,
-    DomainValueObject,
-    Field,
-)
-from pydantic import field_validator
+from pydantic import BaseModel, Field, field_validator
+
+# Use BaseModel directly for type safety
+DomainValueObject = BaseModel  # Value objects are immutable models
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
 # Singer SDK is REQUIRED - zero tolerance for fallbacks
-
 
 # Type aliases for clean interface
 StreamSchema = dict[str, Any]
@@ -90,6 +88,12 @@ class FlextSingerSDKIntegration(BaseModel):
         description="Registry of available targets",
     )
 
+    # Plugin discovery service
+    plugin_discovery: Any = Field(
+        default=None,
+        description="Plugin discovery service for dynamic plugin loading",
+    )
+
     @field_validator("project_root", mode="before")
     @classmethod
     def validate_project_root(cls, v: Any) -> Path:
@@ -109,17 +113,59 @@ class FlextSingerSDKIntegration(BaseModel):
         """Discover available Singer plugins."""
         # In a real implementation, this would scan for installed Singer packages
 
-    async def create_oracle_oic_tap(self, config: TapConfig) -> OracleOICTap:
-        """Create an Oracle OIC tap instance."""
-        return OracleOICTap(config)
+    async def create_tap_instance(self, tap_name: str, config: TapConfig) -> Any:
+        """Create tap instance via plugin discovery (architectural compliance)."""
+        try:
+            # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded implementations
+            # flext-meltano (Layer 4) should NOT contain concrete Singer implementations
+            # These should be discovered from their respective projects at runtime
 
-    async def create_ldap_tap(self, config: TapConfig) -> LDAPTap:
-        """Create an LDAP tap instance."""
-        return LDAPTap(config)
+            if self.plugin_discovery is None:
+                raise ValueError(f"Plugin discovery service not available. Cannot create tap: {tap_name}")
 
-    async def create_postgres_target(self, config: TargetConfig) -> PostgreSQLTarget:
-        """Create a PostgreSQL target instance."""
-        return PostgreSQLTarget(config)
+            plugin_info = await self.plugin_discovery.discover_tap_plugin(tap_name)
+            if not plugin_info:
+                raise ValueError(f"Unknown tap plugin: {tap_name}")
+
+            # Import plugin dynamically from its proper project
+            plugin_module = importlib.import_module(plugin_info.module_path)
+            plugin_class = getattr(plugin_module, plugin_info.class_name)
+
+            return plugin_class(config)
+
+        except ImportError as e:
+            # Fallback error for missing plugins
+            raise ValueError(
+                f"Tap plugin '{tap_name}' not available. "
+                f"Install the corresponding Singer tap project. Error: {e}"
+            ) from e
+
+    async def create_target_instance(
+        self, target_name: str, config: TargetConfig
+    ) -> Any:
+        """Create target instance via plugin discovery (architectural compliance)."""
+        try:
+            # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded implementations
+            if self.plugin_discovery is None:
+                raise ValueError(f"Plugin discovery service not available. Cannot create target: {target_name}")
+
+            plugin_info = await self.plugin_discovery.discover_target_plugin(
+                target_name
+            )
+            if not plugin_info:
+                raise ValueError(f"Unknown target plugin: {target_name}")
+
+            # Import plugin dynamically from its proper project
+            plugin_module = importlib.import_module(plugin_info.module_path)
+            plugin_class = getattr(plugin_module, plugin_info.class_name)
+
+            return plugin_class(config)
+
+        except ImportError as e:
+            raise ValueError(
+                f"Target plugin '{target_name}' not available. "
+                f"Install the corresponding Singer target project. Error: {e}"
+            ) from e
 
     async def run_elt_pipeline(
         self,
@@ -131,21 +177,14 @@ class FlextSingerSDKIntegration(BaseModel):
     ) -> dict[str, Any]:
         """Execute Singer tap and target integration."""
         try:
-            # Create tap instance - type will be determined at runtime
-            tap_instance: Any
-            if tap_name == "tap-oracle-oic":
-                tap_instance = await self.create_oracle_oic_tap(tap_config)
-            elif tap_name == "tap-ldap":
-                tap_instance = await self.create_ldap_tap(tap_config)
-            else:
-                return {"success": False, "error": f"Unknown tap: {tap_name}"}
+            # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded if/elif chains
+            # Create tap instance via plugin discovery
+            tap_instance = await self.create_tap_instance(tap_name, tap_config)
 
-            # Create target instance
-            target_instance: Any
-            if target_name == "target-postgres":
-                target_instance = await self.create_postgres_target(target_config)
-            else:
-                return {"success": False, "error": f"Unknown target: {target_name}"}
+            # Create target instance via plugin discovery
+            target_instance = await self.create_target_instance(
+                target_name, target_config
+            )
 
             # Process streams
             streams = tap_instance.discover_streams()

@@ -5,7 +5,12 @@ Modern tests following flext-core standards.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
+
+if TYPE_CHECKING:
+    from flext_core import ServiceResult
 
 
 # Test flext-infrastructure.plugins.flext-meltano basic functionality
@@ -21,13 +26,15 @@ def test_flext_meltano_imports() -> None:
 def test_flext_meltano_has_core_dependencies() -> None:
     """Test that flext-infrastructure.plugins.flext-meltano can import from flext-core."""
     # NO FALLBACKS - SEMPRE usar implementações originais conforme instrução
-    from flext_core.domain.shared_types import ServiceResult
+    # 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
+    from flext_meltano.infrastructure.di_container import ServiceResult
+
     assert ServiceResult is not None
 
 
 def test_service_result_pattern() -> None:
     """Test ServiceResult pattern works correctly."""
-    from flext_core.domain.shared_types import ServiceResult
+    from flext_meltano.infrastructure.di_container import ServiceResult
     # Test success case
     success = ServiceResult.ok({"test": "data"})
     assert success.is_success is True

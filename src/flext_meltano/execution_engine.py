@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """Enterprise Meltano Execution Engine with Pipeline Management.
 
 This module provides a production-ready execution engine for Meltano pipelines with
@@ -11,7 +13,9 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from flext_core.domain.shared_types import ServiceResult
+# 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
 
 
 class MeltanoPipelineExecutor:

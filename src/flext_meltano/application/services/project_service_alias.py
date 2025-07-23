@@ -5,7 +5,9 @@ Alias MeltanoProjectService to ProjectApplicationService for backward compatibil
 
 from __future__ import annotations
 
-from flext_meltano.application.services.project_service import ProjectApplicationService
+from flext_meltano.application.services.project_service import (
+    ProjectApplicationService,
+)
 
 # Alias for backward compatibility
 MeltanoProjectService = ProjectApplicationService

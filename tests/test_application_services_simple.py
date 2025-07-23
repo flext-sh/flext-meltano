@@ -1,5 +1,4 @@
 """Simple test for FLEXT Meltano application services - MyPy compliant."""
-
 from __future__ import annotations
 
 import sys
@@ -11,7 +10,12 @@ sys.modules["flext_observability.logging"] = MagicMock()
 
 # Import from simplified API - must be after mocking
 # ruff: noqa: E402
-from flext_meltano import JobService, PluginService, ProjectService, StateService
+from flext_meltano import (
+    JobService,
+    PluginService,
+    ProjectService,
+    StateService,
+)
 
 
 class TestServiceInitialization:

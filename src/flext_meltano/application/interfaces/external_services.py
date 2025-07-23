@@ -8,8 +8,16 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Protocol
 
+from flext_meltano.infrastructure.di_container import get_service_result
+
 if TYPE_CHECKING:
-    from flext_core.domain.shared_types import ServiceResult
+    from flext_core import ServiceResult
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Import via módulo raiz
+
+
+
+
 
 class MeltanoCLIService(Protocol):
     """Interface for Meltano CLI operations."""

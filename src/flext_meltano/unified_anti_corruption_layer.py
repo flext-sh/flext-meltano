@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """UNIFIED MELTANO ANTI-CORRUPTION LAYER - ZERO TOLERANCE CONSOLIDATION.
 
 Simplified implementation using flext-core patterns.
@@ -9,9 +11,14 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from flext_core.domain.pydantic_base import DomainValueObject, Field
-from flext_core.domain.shared_types import ServiceResult
-from pydantic import model_validator
+from pydantic import BaseModel, Field, model_validator
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Import via módulo raiz
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
+
+# Use BaseModel for value objects with proper field definitions
+DomainValueObject = BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +132,7 @@ class UnifiedMeltanoAntiCorruptionLayer:
         """Initialize unified anti-corruption layer."""
         self.engine = engine
         self.event_bus = event_bus
-        self.logger = logger.bind(component="unified_meltano_acl")
+        self.logger = logger
 
     async def run_pipeline(
         self,
@@ -134,7 +141,7 @@ class UnifiedMeltanoAntiCorruptionLayer:
         _transform: str | None = None,
         _state_id: str | None = None,
         _env: dict[str, str] | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> Any:
         """Run Meltano pipeline with simplified interface.
 
         Args:

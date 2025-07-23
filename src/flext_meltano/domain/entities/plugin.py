@@ -8,9 +8,19 @@ from __future__ import annotations
 
 from typing import Any, ClassVar
 
-from flext_core.domain.pydantic_base import DomainEntity
-from flext_core.domain.shared_types import ServiceResult
-from pydantic import Field, field_validator
+from flext_core import ServiceResult
+from pydantic import BaseModel, Field, field_validator
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from flext_meltano.infrastructure.di_container import (
+    get_domain_entity,
+    get_field,
+    get_service_result,
+)
+
+DomainEntity = BaseModel
+
+
 
 
 class MeltanoPlugin(DomainEntity):

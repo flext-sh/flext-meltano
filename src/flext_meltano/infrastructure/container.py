@@ -6,9 +6,17 @@ REFACTORED:
 
 from __future__ import annotations
 
-from flext_core import get_container, singleton
-
+# Initialize types via DI container
 from flext_meltano.config import MeltanoSettings
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container
+from flext_meltano.infrastructure.di_container import (
+    flext_container,
+    singleton_decorator,
+)
+
+# Use decorator from flext-core
+singleton = singleton_decorator
 
 
 @singleton
@@ -24,8 +32,8 @@ class MeltanoContainerConfig:
         Registers all Meltano-specific services and configurations with the
         flext-core dependency injection container.
         """
-        container = get_container()
-
+        # Get container
+        container = flext_container
         # Register settings
         container.register(MeltanoSettings, self.settings)
 
@@ -53,5 +61,5 @@ def setup_meltano_container(
 
 def get_meltano_container() -> MeltanoContainerConfig:
     """Get configured Meltano container."""
-    container = get_container()
+    container = flext_container
     return container.resolve(MeltanoContainerConfig)

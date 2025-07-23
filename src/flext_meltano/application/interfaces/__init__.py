@@ -6,9 +6,8 @@ Built on flext-core foundation patterns.
 
 from __future__ import annotations
 
-# Foundation patterns from flext-core
-from flext_core.foundation import AbstractRepository
-
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+# Initialize types via DI container
 # External service interfaces
 from flext_meltano.application.interfaces.external_services import (
     EventPublisher,

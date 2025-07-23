@@ -9,9 +9,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core.config import injectable
-from flext_core.domain.shared_types import ServiceResult
+from flext_core import ServiceResult
 
+# Import from local DI container
+from flext_meltano.infrastructure.di_container import injectable
+
+# Initialize types via DI container
 if TYPE_CHECKING:
     from uuid import UUID
 
@@ -44,7 +47,10 @@ class MeltanoProjectService:
         """Create a new Meltano project."""
         try:
             # Importing inside TYPE_CHECKING avoids circular imports
-            from flext_meltano.domain.entities import EnvironmentType, MeltanoProject
+            from flext_meltano.domain.entities import (
+                EnvironmentType,
+                MeltanoProject,
+            )
 
             # Convert string to enum
             env_type = EnvironmentType.DEVELOPMENT
@@ -248,7 +254,10 @@ class MeltanoJobService:
     ) -> ServiceResult[Any]:
         """Create a new job."""
         try:
-            from flext_meltano.domain.entities import EnvironmentType, MeltanoJob
+            from flext_meltano.domain.entities import (
+                EnvironmentType,
+                MeltanoJob,
+            )
 
             # Convert string to enum
             env_type = EnvironmentType.DEVELOPMENT
@@ -361,7 +370,10 @@ class MeltanoStateService:
     ) -> ServiceResult[Any]:
         """Create a new state."""
         try:
-            from flext_meltano.domain.entities import EnvironmentType, MeltanoState
+            from flext_meltano.domain.entities import (
+                EnvironmentType,
+                MeltanoState,
+            )
 
             # Convert string to enum
             env_type = EnvironmentType.DEVELOPMENT

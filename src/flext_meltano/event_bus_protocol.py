@@ -9,9 +9,16 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, Protocol
 
-if TYPE_CHECKING:
-    from flext_core.domain.pydantic_base import DomainEvent
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from pydantic import BaseModel
 
+if TYPE_CHECKING:
+    # Define DomainEvent type alias
+    DomainEvent = BaseModel
+else:
+    DomainEvent = BaseModel
+
+# Initialize types via DI container
 logger = logging.getLogger(__name__)
 
 

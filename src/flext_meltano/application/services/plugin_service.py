@@ -5,9 +5,11 @@ This is a placeholder stub for MeltanoPluginService to resolve import errors.
 
 from __future__ import annotations
 
-from flext_core.foundation import AbstractService
+# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
+from flext_meltano.infrastructure.di_container import AbstractService
 
 
+# Initialize types via DI container
 class MeltanoPluginService(AbstractService):
     """Plugin application service placeholder."""
 

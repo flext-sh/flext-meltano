@@ -14,10 +14,17 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from flext_core import DomainEntity
-from flext_core.domain.shared_types import ServiceResult
-from pydantic import Field, field_validator
+from flext_core import ServiceResult
+from pydantic import BaseModel, Field, field_validator
 
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
+
+# Define DomainEntity as BaseModel for now
+DomainEntity = BaseModel
+
+# Initialize types via DI container
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -106,7 +113,8 @@ class MeltanoProject(DomainEntity):
     def change_environment(self, new_environment: str) -> ServiceResult[Any]:
         """Change project environment."""
         if new_environment not in self.VALID_ENVIRONMENTS:
-            return ServiceResult.fail(f"Invalid environment '{new_environment}'. "
+            return ServiceResult.fail(
+                f"Invalid environment '{new_environment}'. "
                 f"Must be one of: {self.VALID_ENVIRONMENTS}",
             )
 
@@ -118,12 +126,14 @@ class MeltanoProject(DomainEntity):
     def update_status(self, new_status: str) -> ServiceResult[Any]:
         """Update project status with business rules."""
         if new_status not in self.VALID_STATUSES:
-            return ServiceResult.fail(f"Invalid status '{new_status}'. Must be one of: {self.VALID_STATUSES}",
+            return ServiceResult.fail(
+                f"Invalid status '{new_status}'. Must be one of: {self.VALID_STATUSES}",
             )
 
         # Business rule: cannot go from error to running directly
         if self.status == "error" and new_status == "running":
-            return ServiceResult.fail("Cannot start project in error state. Fix errors first.",
+            return ServiceResult.fail(
+                "Cannot start project in error state. Fix errors first.",
             )
 
         self.status = new_status

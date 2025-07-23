@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.13,<3.14"
 keywords = [ "flext", "enterprise", "async", "typed", "meltano", "etl", "data-integration",]
 classifiers = [ "Development Status :: 5 - Production/Stable", "Intended Audience :: Developers", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Programming Language :: Python :: 3.13", "Programming Language :: Python :: 3 :: Only", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed",]
-dependencies = []
+dependencies = ["dbt-core (==1.10.5)"]
 [[project.authors]]
 name = "FLEXT Team"
 email = "team@flext.sh"
@@ -29,7 +29,7 @@ Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 
 [tool.ruff]
 target-version = "py313"
-line-length = 88
+line-length = 79
 fix = true
 show-fixes = true
 respect-gitignore = true
@@ -114,9 +114,31 @@ output = "reports/coverage.xml"
 
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
+# Meltano ecosystem
 meltano = ">=3.0.0,<4.0.0"
+singer-sdk = ">=0.44.0,<1.0.0"
+dbt-core = ">=1.10.5,<2.0.0"
+meltano-edk = ">=0.10.0,<1.0.0"
+# Core enterprise patterns
 pydantic = ">=2.11.7,<3.0.0"
 pydantic-settings = ">=2.10.1,<3.0.0"
+# Data processing
+sqlalchemy = ">=2.0.0,<3.0.0"
+alembic = ">=1.15.0,<2.0.0"
+# Async and concurrency
+asyncio-pool = ">=0.5.0,<1.0.0"
+aiofiles = ">=25.0.0,<26.0.0"
+# HTTP and API
+httpx = ">=0.28.0,<1.0.0"
+fastapi = ">=0.115.0,<1.0.0"
+uvicorn = ">=0.34.0,<1.0.0"
+# Configuration and environment
+python-dotenv = ">=1.0.0,<2.0.0"
+typer = ">=0.15.0,<1.0.0"
+rich = ">=13.0.0,<14.0.0"
+# Monitoring and observability
+structlog = ">=25.1.0,<26.0.0"
+prometheus-client = ">=0.21.0,<1.0.0"
 
 
 [tool.ruff.lint.isort]
@@ -155,6 +177,8 @@ radon = "^6.0.1"
 codespell = "^2.3.0"
 pyupgrade = "^3.19.0"
 autoflake = "^2.3.1"
+detect-secrets = "^1.5.0"
+commitizen = "^4.8.3"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.0"
@@ -173,6 +197,7 @@ pytest-httpx = "^0.35.0"
 hypothesis = "^6.125.0"
 factory-boy = "^3.3.1"
 faker = "^37.4.0"
+python-ldap = "^3.4.4"
 
 [tool.poetry.group.typings.dependencies]
 types-python-dateutil = "^2.9.0"

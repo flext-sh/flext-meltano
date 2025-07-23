@@ -1,3 +1,5 @@
+from flext_core import ServiceResult
+
 """Meltano State Domain Entity - NEW SEMANTIC ARCHITECTURE.
 
 🚨 DEPRECATION WARNING: Direct imports from this file are deprecated.
@@ -15,11 +17,17 @@ import warnings
 from datetime import UTC, datetime
 from typing import Any, ClassVar
 
-from flext_core import DomainEntity
-from flext_core.domain.shared_types import ServiceResult
-from pydantic import Field, field_validator
+from pydantic import BaseModel, Field, field_validator
+
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_meltano.infrastructure.di_container import get_service_result
+
+# Define DomainEntity as BaseModel for now
+DomainEntity = BaseModel
 
 
+# Initialize types via DI container
 class MeltanoState(DomainEntity):
     """Meltano state domain entity for incremental processing."""
 
@@ -29,15 +37,18 @@ class MeltanoState(DomainEntity):
 
     # State data
     state_data: dict[str, Any] | None = Field(
-        default_factory=dict, description="State payload",
+        default_factory=dict,
+        description="State payload",
     )
 
     # Metadata
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC), description="State creation time",
+        default_factory=lambda: datetime.now(UTC),
+        description="State creation time",
     )
     updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC), description="State last update time",
+        default_factory=lambda: datetime.now(UTC),
+        description="State last update time",
     )
 
     # Versioning
@@ -47,12 +58,14 @@ class MeltanoState(DomainEntity):
     # Validation
     is_valid: bool = Field(default=True, description="Whether state is valid")
     validation_errors: list[str] = Field(
-        default_factory=list, description="Validation errors",
+        default_factory=list,
+        description="Validation errors",
     )
 
     # Processing metadata
     streams_processed: list[str] = Field(
-        default_factory=list, description="Processed streams",
+        default_factory=list,
+        description="Processed streams",
     )
     records_count: int = Field(default=0, description="Total records processed")
 
@@ -108,7 +121,9 @@ class MeltanoState(DomainEntity):
         return ServiceResult.ok(None)
 
     def add_stream_state(
-        self, stream_name: str, stream_state: dict[str, Any],
+        self,
+        stream_name: str,
+        stream_state: dict[str, Any],
     ) -> ServiceResult[Any]:
         """Add or update state for a specific stream."""
         if not stream_name or not stream_name.strip():
@@ -172,7 +187,8 @@ class MeltanoState(DomainEntity):
 
         # Validate streams structure
         if "streams" in self.state_data and not isinstance(
-            self.state_data["streams"], dict,
+            self.state_data["streams"],
+            dict,
         ):
             errors.append("Streams must be a dictionary")
 

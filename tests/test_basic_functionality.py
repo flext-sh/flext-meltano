@@ -1,9 +1,9 @@
+from flext_core import ServiceResult
+
 """Basic functionality tests for flext-meltano.
 
 These tests verify that the Meltano functionality works correctly.
 """
-
-from flext_core import get_container
 
 from flext_meltano import (
     EnvironmentType,
@@ -19,6 +19,7 @@ from flext_meltano import (
     ServiceResult,
     StateService,
 )
+from flext_meltano.infrastructure.di_container import get_container
 
 
 class TestMeltanoBasicFunctionality:
@@ -99,7 +100,7 @@ class TestMeltanoIntegration:
 
         # Test creating a ServiceResult
         result = ServiceResult.ok({"test": "value"})
-        assert result.success is True
+        assert result.success
         assert result.data == {"test": "value"}
 
 

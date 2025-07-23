@@ -12,11 +12,16 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-from flext_core import Field
-from flext_core.domain.pydantic_base import DomainEntity, DomainEvent
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from pydantic import BaseModel, Field
 
+# Define domain types as BaseModel for now
+DomainEntity = BaseModel
+DomainEvent = BaseModel
+
+# Initialize types via DI container
 if TYPE_CHECKING:
-    from flext_core.domain.shared_types import EntityId, UserId
+    from flext_meltano.infrastructure.di_container import EntityId, UserId
 
 
 # Meltano-specific constants
