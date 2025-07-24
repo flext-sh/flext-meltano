@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Test module."""
+
 from __future__ import annotations
 
 import pytest

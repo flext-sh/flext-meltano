@@ -1,7 +1,18 @@
-"""Core module for FLEXT Meltano integration."""
+"""FlextMeltano Core Module.
 
-from .config import MeltanoConfig
-from .executor import MeltanoExecutor
+Core platform components following Clean Architecture patterns.
+"""
 
-# Initialize after imports
-__all__ = ["MeltanoConfig", "MeltanoExecutor"]
+from flext_meltano.core.platform import FlextMeltanoPlatform
+from flext_meltano.core.runtime import FlextMeltanoRuntime
+
+# FlextMeltano prefixed classes
+from .config import FlextMeltanoConfig
+from .executor import FlextMeltanoExecutor
+
+__all__ = [
+    "FlextMeltanoConfig",
+    "FlextMeltanoExecutor",
+    "FlextMeltanoPlatform",
+    "FlextMeltanoRuntime",
+]

@@ -12,17 +12,16 @@ from __future__ import annotations
 
 from typing import Any
 
-# Initialize types via DI container
 from pydantic import ConfigDict, Field
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
-from flext_meltano.infrastructure.di_container import DomainEntity, Field
+from flext_meltano.infrastructure.di_container import DomainEntity
 
 # Use DomainValueObject for models (value objects, not entities)
 DomainValueObject = DomainEntity  # Can use DomainEntity as base for value objects
 
 
-class MeltanoPlugin(DomainValueObject):
+class FlextMeltanoPlugin(DomainValueObject):
     """A Meltano plugin definition - REFACTORED to use flext-core patterns."""
 
     name: str = Field(description="Plugin name")
@@ -42,33 +41,35 @@ class MeltanoPlugin(DomainValueObject):
     description: str | None = Field(None, description="Plugin description")
 
 
-class MeltanoPlugins(DomainValueObject):
+class FlextMeltanoPlugins(DomainValueObject):
     """All plugins in a Meltano project organized by type - REFACTORED."""
 
-    extractors: list[MeltanoPlugin] = Field(
+    extractors: list[FlextMeltanoPlugin] = Field(
         default_factory=list,
         description="Extractor plugins",
     )
-    loaders: list[MeltanoPlugin] = Field(
+    loaders: list[FlextMeltanoPlugin] = Field(
         default_factory=list,
         description="Loader plugins",
     )
-    transformers: list[MeltanoPlugin] = Field(
+    transformers: list[FlextMeltanoPlugin] = Field(
         default_factory=list,
         description="Transformer plugins",
     )
-    files: list[MeltanoPlugin] = Field(default_factory=list, description="File plugins")
-    utilities: list[MeltanoPlugin] = Field(
+    files: list[FlextMeltanoPlugin] = Field(
+        default_factory=list, description="File plugins",
+    )
+    utilities: list[FlextMeltanoPlugin] = Field(
         default_factory=list,
         description="Utility plugins",
     )
-    orchestrators: list[MeltanoPlugin] = Field(
+    orchestrators: list[FlextMeltanoPlugin] = Field(
         default_factory=list,
         description="Orchestrator plugins",
     )
 
 
-class MeltanoJob(DomainValueObject):
+class FlextMeltanoJob(DomainValueObject):
     """A Meltano job definition for multi-step pipeline execution - REFACTORED."""
 
     job_name: str = Field(description="Job name")
@@ -80,7 +81,7 @@ class MeltanoJob(DomainValueObject):
     )
 
 
-class MeltanoSchedule(DomainValueObject):
+class FlextMeltanoSchedule(DomainValueObject):
     """A Meltano schedule definition for automated execution - REFACTORED."""
 
     name: str = Field(description="Schedule name")
@@ -91,7 +92,7 @@ class MeltanoSchedule(DomainValueObject):
     enabled: bool = Field(True, description="Whether schedule is enabled")
 
 
-class MeltanoEnvironment(DomainValueObject):
+class FlextMeltanoEnvironment(DomainValueObject):
     """A Meltano environment definition for multi-stage deployment - REFACTORED."""
 
     name: str = Field(description="Environment name")
@@ -105,7 +106,7 @@ class MeltanoEnvironment(DomainValueObject):
     )
 
 
-class MeltanoProjectConfig(DomainValueObject):
+class FlextMeltanoProjectConfig(DomainValueObject):
     """The complete configuration of a meltano.yml file - REFACTORED to use flext-core.
 
     This model represents the entire structure of a meltano.yml configuration file.
@@ -118,16 +119,18 @@ class MeltanoProjectConfig(DomainValueObject):
         description="Send anonymous usage statistics",
     )
     project_id: str = Field(alias="project_id", description="Unique project identifier")
-    plugins: MeltanoPlugins = Field(
-        default_factory=MeltanoPlugins,
+    plugins: FlextMeltanoPlugins = Field(
+        default_factory=FlextMeltanoPlugins,
         description="Project plugins",
     )
-    schedules: list[MeltanoSchedule] = Field(
+    schedules: list[FlextMeltanoSchedule] = Field(
         default_factory=list,
         description="Scheduled jobs",
     )
-    jobs: list[MeltanoJob] = Field(default_factory=list, description="Job definitions")
-    environments: list[MeltanoEnvironment] = Field(
+    jobs: list[FlextMeltanoJob] = Field(
+        default_factory=list, description="Job definitions",
+    )
+    environments: list[FlextMeltanoEnvironment] = Field(
         default_factory=list,
         description="Environment configurations",
     )
@@ -146,6 +149,13 @@ class MeltanoProjectConfig(DomainValueObject):
 
 # Export unified interface
 __all__ = [
+    "FlextMeltanoEnvironment",
+    "FlextMeltanoJob",
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPlugins",
+    "FlextMeltanoProjectConfig",
+    "FlextMeltanoSchedule",
+    # Backward compatibility aliases
     "MeltanoEnvironment",
     "MeltanoJob",
     "MeltanoPlugin",
@@ -153,3 +163,11 @@ __all__ = [
     "MeltanoProjectConfig",
     "MeltanoSchedule",
 ]
+
+# Backward compatibility aliases
+MeltanoEnvironment = FlextMeltanoEnvironment
+MeltanoJob = FlextMeltanoJob
+MeltanoPlugin = FlextMeltanoPlugin
+MeltanoPlugins = FlextMeltanoPlugins
+MeltanoProjectConfig = FlextMeltanoProjectConfig
+MeltanoSchedule = FlextMeltanoSchedule

@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """Enterprise Meltano Execution Engine with Pipeline Management.
 
 This module provides a production-ready execution engine for Meltano pipelines with
@@ -13,12 +11,13 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
+from flext_core import FlextResult
+
 # 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
 
 
-class MeltanoPipelineExecutor:
+class FlextMeltanoPipelineExecutor:
     """Enterprise Meltano pipeline execution engine.
 
     Provides comprehensive pipeline execution capabilities with enterprise features
@@ -35,7 +34,7 @@ class MeltanoPipelineExecutor:
         environment: str = "dev",
         config: dict[str, Any] | None = None,
         user_id: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Execute a Meltano pipeline."""
         try:
             execution_id = str(uuid4())
@@ -52,7 +51,7 @@ class MeltanoPipelineExecutor:
 
             self._active_executions[execution_id] = execution_info
 
-            return ServiceResult.ok(
+            return FlextResult.ok(
                 {
                     "execution_id": execution_id,
                     "status": "started",
@@ -61,19 +60,19 @@ class MeltanoPipelineExecutor:
             )
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to execute pipeline: {e}")
+            return FlextResult.fail(f"Failed to execute pipeline: {e}")
 
     async def get_execution_status(
         self,
         execution_id: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Get the status of a pipeline execution."""
         try:
             if execution_id not in self._active_executions:
-                return ServiceResult.fail("Execution not found")
+                return FlextResult.fail("Execution not found")
 
             execution_info = self._active_executions[execution_id]
-            return ServiceResult.ok(
+            return FlextResult.ok(
                 {
                     "execution_id": execution_id,
                     "status": execution_info["status"],
@@ -83,21 +82,21 @@ class MeltanoPipelineExecutor:
             )
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to get execution status: {e}")
+            return FlextResult.fail(f"Failed to get execution status: {e}")
 
     async def cancel_execution(
         self,
         execution_id: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Cancel a running pipeline execution."""
         try:
             if execution_id not in self._active_executions:
-                return ServiceResult.fail("Execution not found")
+                return FlextResult.fail("Execution not found")
 
             # Update status to cancelled
             self._active_executions[execution_id]["status"] = "cancelled"
 
-            return ServiceResult.ok(
+            return FlextResult.ok(
                 {
                     "execution_id": execution_id,
                     "message": "Pipeline execution cancelled successfully",
@@ -105,13 +104,13 @@ class MeltanoPipelineExecutor:
             )
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to cancel execution: {e}")
+            return FlextResult.fail(f"Failed to cancel execution: {e}")
 
     async def list_executions(
         self,
         pipeline_id: str | None = None,
         user_id: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """List pipeline executions."""
         try:
             executions = []
@@ -131,7 +130,7 @@ class MeltanoPipelineExecutor:
                     },
                 )
 
-            return ServiceResult.ok(executions)
+            return FlextResult.ok(executions)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to list executions: {e}")
+            return FlextResult.fail(f"Failed to list executions: {e}")

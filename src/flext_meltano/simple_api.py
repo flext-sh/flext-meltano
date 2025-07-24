@@ -7,12 +7,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core import ServiceResult
-
-from flext_meltano.config import MeltanoSettings
+from flext_meltano.config.settings import FlextMeltanoSettings
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
-from flext_meltano.infrastructure.di_container import get_service_result
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -36,20 +33,32 @@ def setup_meltano_simple(
         Dictionary with setup results
 
     """
-    settings = MeltanoSettings(
-        project_root=project_root,
+    from pathlib import Path
+
+    from flext_meltano.config.settings import FlextMeltanoProjectConfig
+
+    # Ensure project_root is a Path object
+    project_path = Path(project_root) if isinstance(project_root, str) else project_root
+
+    project_config = FlextMeltanoProjectConfig(
+        project_root=project_path,
+        default_environment=environment,
+    )
+
+    settings = FlextMeltanoSettings(
         environment=environment,
+        project=project_config,
     )
 
     return {
         "success": True,
         "settings": settings,
-        "project_root": str(settings.project_root),
+        "project_root": str(settings.project.project_root),
         "environment": settings.environment,
     }
 
 
-def create_basic_config() -> dict[str, Any]:
+def flext_create_basic_config() -> dict[str, Any]:
     """Create basic Meltano configuration.
 
     Returns:

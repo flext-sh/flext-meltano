@@ -1,5 +1,16 @@
 """FLEXT Meltano State Manager.
 
+⚠️  DEPRECATION NOTICE: This implementation is being consolidated.
+    Main implementation: /state/manager.py (FlextMeltanoStateManager)
+
+    The consolidated implementation provides:
+    - File-based and Meltano StateService backend support
+    - Async compatibility methods for orchestrator
+    - FlextResult error handling patterns
+    - Comprehensive state models
+
+    TODO: Migrate remaining usage to main implementation and deprecate this file.
+
 This module provides deep integration with Meltano's state management system,
 enabling enterprise-grade state persistence, backup, and recovery capabilities.
 """
@@ -14,19 +25,17 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 # ZERO TOLERANCE - Meltano is REQUIRED and guaranteed in pyproject.toml
-from meltano.core.state_service import (
-    StateService,  # type: ignore[import-untyped]
-)
+from meltano.core.state_service import StateService
 
 if TYPE_CHECKING:
-    from meltano.core.project import Project  # type: ignore[import-untyped]
+    from meltano.core.project import Project
 
-    from flext_meltano.event_bus_protocol import EventBusProtocol
+    from flext_meltano.event_bus_protocol import FlextMeltanoEventBusProtocol
 
 logger = logging.getLogger(__name__)
 
 
-class CachePolicy(Enum):
+class FlextMeltanoCachePolicy(Enum):
     """Cache usage policy enumeration for state operations."""
 
     USE_CACHE = "use_cache"
@@ -37,7 +46,7 @@ class CachePolicy(Enum):
 class FlextMeltanoStateManager:
     """Enterprise Meltano state manager with advanced features."""
 
-    def __init__(self, event_bus: EventBusProtocol) -> None:
+    def __init__(self, event_bus: FlextMeltanoEventBusProtocol) -> None:
         """Initialize FLEXT Meltano State Manager."""
         self.event_bus = event_bus
         self.logger = logger
@@ -49,7 +58,7 @@ class FlextMeltanoStateManager:
         self,
         project: Project,
         job_id: str,
-        _cache_policy: CachePolicy = CachePolicy.USE_CACHE,
+        _cache_policy: FlextMeltanoCachePolicy = FlextMeltanoCachePolicy.USE_CACHE,
     ) -> dict[str, Any] | None:
         """Get job state by ID."""
         try:
@@ -86,7 +95,7 @@ class FlextMeltanoStateManager:
                 state_service.set_state(job_id, state_json)
 
                 self.logger.info(
-                    f"State updated successfully: job_id={job_id}, state_size={len(str(state_data))}"
+                    f"State updated successfully: job_id={job_id}, state_size={len(str(state_data))}",
                 )
                 return True
         except Exception as e:

@@ -7,10 +7,12 @@ This package contains integration modules for:
 
 from __future__ import annotations
 
-from flext_meltano.integrations.bridge import MeltanoBridge
-from flext_meltano.integrations.gopy_integration import GopyIntegration
+from flext_meltano.integrations.bridge import FlextMeltanoBridge
+from flext_meltano.integrations.gopy_integration import (
+    FlextMeltanoGopyIntegration,
+)
 
 __all__ = [
-    "GopyIntegration",
-    "MeltanoBridge",
+    "FlextMeltanoBridge",
+    "FlextMeltanoGopyIntegration",
 ]

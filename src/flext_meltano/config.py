@@ -26,23 +26,23 @@ DomainValueObject = get_domain_entity()  # DomainEntity can be used as value obj
 
 
 # Define local base config mixins to avoid flext-core dependency
-class BaseConfigMixin:
+class FlextMeltanoBaseConfigMixin:
     """Local base config mixin."""
 
 
-class DatabaseConfigMixin:
+class FlextMeltanoDatabaseConfigMixin:
     """Local database config mixin."""
 
 
-class LoggingConfigMixin:
+class FlextMeltanoLoggingConfigMixin:
     """Local logging config mixin."""
 
 
-class MonitoringConfigMixin:
+class FlextMeltanoMonitoringConfigMixin:
     """Local monitoring config mixin."""
 
 
-class PerformanceConfigMixin:
+class FlextMeltanoPerformanceConfigMixin:
     """Local performance config mixin."""
 
 
@@ -51,7 +51,7 @@ def get_container() -> Any:
     return get_di_container()
 
 
-class MeltanoProjectConfig(DomainValueObject):
+class FlextMeltanoProjectConfig(DomainValueObject):
     """Meltano project configuration value object."""
 
     project_root: Path = Field(
@@ -72,7 +72,7 @@ class MeltanoProjectConfig(DomainValueObject):
     )
 
 
-class MeltanoExecutionConfig(DomainValueObject):
+class FlextMeltanoExecutionConfig(DomainValueObject):
     """Meltano execution configuration value object."""
 
     max_concurrent_jobs: int = Field(
@@ -101,7 +101,7 @@ class MeltanoExecutionConfig(DomainValueObject):
     )
 
 
-class MeltanoStateConfig(DomainValueObject):
+class FlextMeltanoStateConfig(DomainValueObject):
     """Meltano state management configuration value object."""
 
     state_backend: str = Field(
@@ -126,7 +126,7 @@ class MeltanoStateConfig(DomainValueObject):
     )
 
 
-class MeltanoBusinessConfig(DomainValueObject):
+class FlextMeltanoBusinessConfig(DomainValueObject):
     """Meltano business logic configuration value object."""
 
     MINIMUM_MELTANO_COMMAND_COUNT: int = Field(
@@ -137,7 +137,7 @@ class MeltanoBusinessConfig(DomainValueObject):
     )
 
 
-class MeltanoPluginConfig(DomainValueObject):
+class FlextMeltanoPluginConfig(DomainValueObject):
     """Meltano plugin configuration value object."""
 
     auto_install: bool = Field(
@@ -160,7 +160,7 @@ class MeltanoPluginConfig(DomainValueObject):
     )
 
 
-class MeltanoMonitoringConfig(DomainValueObject):
+class FlextMeltanoMonitoringConfig(DomainValueObject):
     """Meltano monitoring configuration value object."""
 
     metrics_enabled: bool = Field(
@@ -183,12 +183,12 @@ class MeltanoMonitoringConfig(DomainValueObject):
     )
 
 
-class MeltanoSettings(
-    BaseConfigMixin,
-    LoggingConfigMixin,
-    MonitoringConfigMixin,
-    PerformanceConfigMixin,
-    DatabaseConfigMixin,
+class FlextMeltanoSettings(
+    FlextMeltanoBaseConfigMixin,
+    FlextMeltanoLoggingConfigMixin,
+    FlextMeltanoMonitoringConfigMixin,
+    FlextMeltanoPerformanceConfigMixin,
+    FlextMeltanoDatabaseConfigMixin,
     BaseSettings,
 ):
     """FLEXT Meltano configuration settings using unified configuration mixins.
@@ -221,38 +221,39 @@ class MeltanoSettings(
     project_version: str = Field(default="0.7.0", description="Project version")
 
     # Configuration value objects
-    project: MeltanoProjectConfig = Field(
-        default_factory=MeltanoProjectConfig,
+    project: FlextMeltanoProjectConfig = Field(
+        default_factory=FlextMeltanoProjectConfig,
         description="Project configuration",
     )
-    execution: MeltanoExecutionConfig = Field(
-        default_factory=MeltanoExecutionConfig,
+    execution: FlextMeltanoExecutionConfig = Field(
+        default_factory=FlextMeltanoExecutionConfig,
         description="Execution configuration",
     )
-    state: MeltanoStateConfig = Field(
-        default_factory=MeltanoStateConfig,
+    state: FlextMeltanoStateConfig = Field(
+        default_factory=FlextMeltanoStateConfig,
         description="State configuration",
     )
-    plugins: MeltanoPluginConfig = Field(
-        default_factory=MeltanoPluginConfig,
+    plugins: FlextMeltanoPluginConfig = Field(
+        default_factory=FlextMeltanoPluginConfig,
         description="Plugin configuration",
     )
-    business: MeltanoBusinessConfig = Field(
-        default_factory=MeltanoBusinessConfig,
+    business: FlextMeltanoBusinessConfig = Field(
+        default_factory=FlextMeltanoBusinessConfig,
         description="Business logic configuration",
     )
     # Note: monitoring inherited from MonitoringConfigMixin
     # Additional Meltano-specific monitoring configuration
-    meltano_monitoring: MeltanoMonitoringConfig = Field(
-        default_factory=MeltanoMonitoringConfig,
+    meltano_monitoring: FlextMeltanoMonitoringConfig = Field(
+        default_factory=FlextMeltanoMonitoringConfig,
         description="Meltano-specific monitoring configuration",
     )
 
-    # Note: Most common settings now inherited from mixins:
-    # - BaseConfigMixin: project_name, project_version, environment, debug
-    # - LoggingConfigMixin: log_level, log_file, log_format, log_rotation
-    # - MonitoringConfigMixin: metrics_enabled, health_check_enabled, prometheus_port
-    # - PerformanceConfigMixin: batch_size, timeout_seconds, retry_count
+    # Environment and debug settings
+    environment: str = Field(
+        default="development",
+        description="Current environment (development, testing, staging, production)",
+    )
+    debug: bool = Field(default=False, description="Enable debug mode")
 
     # Legacy properties for backward compatibility
     @property
@@ -345,15 +346,15 @@ class MeltanoSettings(
         if container is None:
             container = get_container()
         # Register this settings instance
-        container.register(MeltanoSettings, self)
+        container.register(FlextMeltanoSettings, self)
 
         # Configure any other dependencies if needed
         # Note: mixins don't provide configure_dependencies method
 
 
 # Convenience functions for getting settings
-def get_meltano_settings() -> MeltanoSettings:
-    return MeltanoSettings(
+def flext_get_meltano_settings() -> FlextMeltanoSettings:
+    return FlextMeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
         environment="development",
@@ -361,17 +362,17 @@ def get_meltano_settings() -> MeltanoSettings:
     )
 
 
-def create_development_meltano_config() -> MeltanoSettings:
-    return MeltanoSettings(
+def flext_create_development_meltano_config() -> FlextMeltanoSettings:
+    return FlextMeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
         environment="development",
         debug=True,
-        project=MeltanoProjectConfig(
+        project=FlextMeltanoProjectConfig(
             default_environment="dev",
             database_uri="sqlite:///dev_meltano.db",
         ),
-        execution=MeltanoExecutionConfig(
+        execution=FlextMeltanoExecutionConfig(
             max_concurrent_jobs=2,
             job_timeout=1800,  # 30 minutes for development
             retry_attempts=1,
@@ -379,15 +380,32 @@ def create_development_meltano_config() -> MeltanoSettings:
     )
 
 
-def create_production_meltano_config() -> MeltanoSettings:
-    return MeltanoSettings(
+def flext_create_production_meltano_config() -> FlextMeltanoSettings:
+    return FlextMeltanoSettings(
         project_name="flext-infrastructure.plugins.flext-meltano",
         project_version="0.7.0",
         environment="production",
         debug=False,
-        project=MeltanoProjectConfig(
+        project=FlextMeltanoProjectConfig(
             default_environment="prod",
             database_uri="postgresql://user:pass@localhost/meltano",
         ),
-        execution=MeltanoExecutionConfig(),
+        execution=FlextMeltanoExecutionConfig(),
     )
+
+
+__all__ = [
+    "FlextMeltanoBusinessConfig",
+    "FlextMeltanoExecutionConfig",
+    "FlextMeltanoMonitoringConfig",
+    "FlextMeltanoPluginConfig",
+    "FlextMeltanoProjectConfig",
+    "FlextMeltanoSettings",
+    "FlextMeltanoStateConfig",
+    "get_settings",
+]
+
+
+def get_settings() -> FlextMeltanoSettings:
+    """Get global settings instance."""
+    return FlextMeltanoSettings()

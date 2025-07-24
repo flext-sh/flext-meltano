@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-    from flext_core import ServiceResult
+    from flext_core import FlextResult
 
     from flext_meltano.domain.entities import (
         MeltanoJob,
@@ -21,13 +21,11 @@ if TYPE_CHECKING:
         MeltanoProject,
         MeltanoState,
     )
-    from flext_meltano.infrastructure.di_container import get_service_result
 
 # Import outside TYPE_CHECKING for runtime access
-from flext_meltano.infrastructure.di_container import get_service_result
 
 
-class ProjectRepository(Protocol):
+class FlextMeltanoProjectRepository(Protocol):
     """Repository interface for Meltano projects."""
 
     @abstractmethod
@@ -36,22 +34,22 @@ class ProjectRepository(Protocol):
         ...
 
     @abstractmethod
-    async def save(self, project: MeltanoProject) -> ServiceResult[MeltanoProject]:
+    async def save(self, project: MeltanoProject) -> FlextResult[MeltanoProject]:
         """Save a project."""
         ...
 
     @abstractmethod
-    async def delete(self, project_id: str) -> ServiceResult[bool]:
+    async def delete(self, project_id: str) -> FlextResult[bool]:
         """Delete a project."""
         ...
 
     @abstractmethod
-    async def list_projects(self) -> ServiceResult[list[MeltanoProject]]:
+    async def list_projects(self) -> FlextResult[list[MeltanoProject]]:
         """List all projects."""
         ...
 
 
-class StateRepository(Protocol):
+class FlextMeltanoStateRepository(Protocol):
     """Repository interface for Meltano state."""
 
     @abstractmethod
@@ -60,17 +58,17 @@ class StateRepository(Protocol):
         ...
 
     @abstractmethod
-    async def save(self, state: MeltanoState) -> ServiceResult[MeltanoState]:
+    async def save(self, state: MeltanoState) -> FlextResult[MeltanoState]:
         """Save a state."""
         ...
 
     @abstractmethod
-    async def delete(self, state_id: str) -> ServiceResult[bool]:
+    async def delete(self, state_id: str) -> FlextResult[bool]:
         """Delete a state."""
         ...
 
 
-class JobRepository(Protocol):
+class FlextMeltanoJobRepository(Protocol):
     """Repository interface for Meltano jobs."""
 
     @abstractmethod
@@ -79,22 +77,22 @@ class JobRepository(Protocol):
         ...
 
     @abstractmethod
-    async def save(self, job: MeltanoJob) -> ServiceResult[MeltanoJob]:
+    async def save(self, job: MeltanoJob) -> FlextResult[MeltanoJob]:
         """Save a job."""
         ...
 
     @abstractmethod
-    async def delete(self, job_id: str) -> ServiceResult[bool]:
+    async def delete(self, job_id: str) -> FlextResult[bool]:
         """Delete a job."""
         ...
 
     @abstractmethod
-    async def list_jobs(self) -> ServiceResult[list[MeltanoJob]]:
+    async def list_jobs(self) -> FlextResult[list[MeltanoJob]]:
         """List all jobs."""
         ...
 
 
-class PluginRepository(Protocol):
+class FlextMeltanoPluginRepository(Protocol):
     """Repository interface for Meltano plugins."""
 
     @abstractmethod
@@ -103,22 +101,33 @@ class PluginRepository(Protocol):
         ...
 
     @abstractmethod
-    async def save(self, plugin: MeltanoPlugin) -> ServiceResult[MeltanoPlugin]:
+    async def save(self, plugin: MeltanoPlugin) -> FlextResult[MeltanoPlugin]:
         """Save a plugin."""
         ...
 
     @abstractmethod
-    async def delete(self, plugin_id: str) -> ServiceResult[bool]:
+    async def delete(self, plugin_id: str) -> FlextResult[bool]:
         """Delete a plugin."""
         ...
 
     @abstractmethod
-    async def list_plugins(self) -> ServiceResult[list[MeltanoPlugin]]:
+    async def list_plugins(self) -> FlextResult[list[MeltanoPlugin]]:
         """List all plugins."""
         ...
 
 
+# Create aliases for the expected repository names
+JobRepository = FlextMeltanoJobRepository
+PluginRepository = FlextMeltanoPluginRepository
+ProjectRepository = FlextMeltanoProjectRepository
+StateRepository = FlextMeltanoStateRepository
+
+
 __all__ = [
+    "FlextMeltanoJobRepository",
+    "FlextMeltanoPluginRepository",
+    "FlextMeltanoProjectRepository",
+    "FlextMeltanoStateRepository",
     "JobRepository",
     "PluginRepository",
     "ProjectRepository",

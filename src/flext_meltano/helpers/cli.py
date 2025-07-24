@@ -9,18 +9,17 @@ import asyncio
 import subprocess
 from typing import TYPE_CHECKING, Any
 
-from flext_core import FlextResult
-from flext_core.constants import FlextConstants
+from flext_core import FlextConstants, FlextResult
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
-async def flext_run_command(
+async def flext_meltano_run_command(
     command: list[str],
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
-    timeout: int = FlextConstants.DEFAULT_TIMEOUT,
+    cmd_timeout: int = FlextConstants.DEFAULT_TIMEOUT,
 ) -> FlextResult[dict[str, Any]]:
     """Run command asynchronously with comprehensive error handling.
 
@@ -28,7 +27,7 @@ async def flext_run_command(
         command: Command and arguments to execute
         cwd: Working directory for command execution
         env: Environment variables
-        timeout: Command timeout in seconds
+        cmd_timeout: Command timeout in seconds
 
     Returns:
         FlextResult with command output or error information
@@ -46,13 +45,13 @@ async def flext_run_command(
         try:
             stdout, stderr = await asyncio.wait_for(
                 process.communicate(),
-                timeout=timeout,
+                timeout=cmd_timeout,
             )
         except TimeoutError:
             process.kill()
             await process.wait()
             return FlextResult.fail(
-                f"Command timed out after {timeout} seconds: {' '.join(command)}"
+                f"Command timed out after {cmd_timeout} seconds: {' '.join(command)}",
             )
 
         result = {
@@ -68,7 +67,6 @@ async def flext_run_command(
         return FlextResult.fail(
             f"Command failed with return code {process.returncode}: "
             f"{result['stderr'] or result['stdout']}",
-            data=result,
         )
 
     except Exception as e:
@@ -102,7 +100,8 @@ def flext_run_meltano_command(
 
         result = subprocess.run(
             command,
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             env=env,
             capture_output=True,
             text=True,
@@ -121,7 +120,6 @@ def flext_run_meltano_command(
             return FlextResult.ok(output)
         return FlextResult.fail(
             f"Meltano command failed: {result.stderr or result.stdout}",
-            data=output,
         )
 
     except subprocess.TimeoutExpired:
@@ -191,15 +189,15 @@ def flext_run_singer_command(
                 "target_stderr": target_stderr,
                 "tap_stderr": tap_stderr,
                 "success": (
-                    tap_process.returncode == 0
-                    and target_process.returncode == 0
+                    tap_process.returncode == 0 and target_process.returncode == 0
                 ),
             }
         else:
             # Run tap only
             tap_result = subprocess.run(
                 full_tap_command,
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=1800,  # 30 minutes
             )
@@ -214,10 +212,7 @@ def flext_run_singer_command(
 
         if result["success"]:
             return FlextResult.ok(result)
-        return FlextResult.fail(
-            "Singer pipeline failed",
-            data=result,
-        )
+        return FlextResult.fail("Singer pipeline failed")
 
     except Exception as e:
         return FlextResult.fail(f"Failed to run Singer pipeline: {e}")
@@ -251,7 +246,8 @@ def flext_run_dbt_command(
 
         result = subprocess.run(
             full_command,
-            check=False, cwd=project_dir,
+            check=False,
+            cwd=project_dir,
             capture_output=True,
             text=True,
             timeout=1800,  # 30 minutes
@@ -267,10 +263,7 @@ def flext_run_dbt_command(
 
         if result.returncode == 0:
             return FlextResult.ok(output)
-        return FlextResult.fail(
-            f"dbt command failed: {result.stderr or result.stdout}",
-            data=output,
-        )
+        return FlextResult.fail(f"dbt command failed: {result.stderr or result.stdout}")
 
     except subprocess.TimeoutExpired:
         return FlextResult.fail("dbt command timed out")

@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 
 
-class JobStatus(StrEnum):
+class FlextMeltanoJobStatus(StrEnum):
     """Meltano job execution status."""
 
     PENDING = "pending"

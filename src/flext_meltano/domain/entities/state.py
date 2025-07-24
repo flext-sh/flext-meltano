@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """Meltano State Domain Entity - NEW SEMANTIC ARCHITECTURE.
 
 🚨 DEPRECATION WARNING: Direct imports from this file are deprecated.
@@ -13,30 +11,37 @@ for incremental data processing.
 
 from __future__ import annotations
 
+import uuid
 import warnings
 from datetime import UTC, datetime
 from typing import Any, ClassVar
 
+from flext_core import FlextResult
 from pydantic import BaseModel, Field, field_validator
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
 
 # Define DomainEntity as BaseModel for now
 DomainEntity = BaseModel
 
 
 # Initialize types via DI container
-class MeltanoState(DomainEntity):
+class FlextMeltanoState(DomainEntity):
     """Meltano state domain entity for incremental processing."""
 
+    # Primary identifier
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, description="Unique state identifier")
+
     # Identity
-    state_id: str = Field(..., description="Unique state identifier")
+    state_id: str = Field(..., description="Business state identifier")
     job_id: str = Field(..., description="Associated job ID")
+    project_id: Any = Field(..., description="Associated project ID")
+    plugin_name: str = Field(..., description="Associated plugin name")
+    environment: Any = Field(default=None, description="Environment type")
 
     # State data
-    state_data: dict[str, Any] | None = Field(
+    state_data: dict[str, Any] = Field(
         default_factory=dict,
         description="State payload",
     )
@@ -99,17 +104,17 @@ class MeltanoState(DomainEntity):
             raise ValueError(msg)
         return v
 
-    def update_state(self, new_state_data: dict[str, Any]) -> ServiceResult[Any]:
+    def update_state(self, new_state_data: dict[str, Any]) -> FlextResult[Any]:
         """Update the state data."""
         if not self.is_valid:
-            return ServiceResult.fail("Cannot update invalid state")
+            return FlextResult.fail("Cannot update invalid state")
 
         # Business rule: validate state size
         import json
 
         state_size_mb = len(json.dumps(new_state_data).encode()) / (1024 * 1024)
         if state_size_mb > self.MAX_STATE_SIZE_MB:
-            return ServiceResult.fail(
+            return FlextResult.fail(
                 f"State size ({state_size_mb:.2f}MB) exceeds maximum allowed "
                 f"({self.MAX_STATE_SIZE_MB}MB)",
             )
@@ -118,20 +123,24 @@ class MeltanoState(DomainEntity):
         self.updated_at = datetime.now(UTC)
         self.version += 1
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
+
+    def merge_state(self, partial_state: dict[str, Any]) -> None:
+        """Merge partial state data into current state."""
+        self.state_data.update(partial_state)
+        self.updated_at = datetime.now(UTC)
+        self.version += 1
 
     def add_stream_state(
         self,
         stream_name: str,
         stream_state: dict[str, Any],
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Add or update state for a specific stream."""
         if not stream_name or not stream_name.strip():
-            return ServiceResult.fail("Stream name cannot be empty")
+            return FlextResult.fail("Stream name cannot be empty")
 
-        # Ensure state_data is initialized
-        if self.state_data is None:
-            self.state_data = {}
+        # Ensure state_data is initialized (already guaranteed by default_factory)
 
         if "streams" not in self.state_data:
             self.state_data["streams"] = {}
@@ -142,7 +151,7 @@ class MeltanoState(DomainEntity):
             self.streams_processed.append(stream_name)
 
         self.updated_at = datetime.now(UTC)
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def get_stream_state(self, stream_name: str) -> dict[str, Any] | None:
         """Get state for a specific stream."""
@@ -152,35 +161,22 @@ class MeltanoState(DomainEntity):
         stream_state = self.state_data["streams"].get(stream_name)
         return stream_state if isinstance(stream_state, dict) else None
 
-    def invalidate(self, errors: list[str]) -> ServiceResult[Any]:
+    def invalidate(self, errors: list[str]) -> FlextResult[Any]:
         """Mark state as invalid with errors."""
         if not errors:
-            return ServiceResult.fail("Must provide validation errors")
+            return FlextResult.fail("Must provide validation errors")
 
         self.is_valid = False
         self.validation_errors = errors
         self.updated_at = datetime.now(UTC)
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
-    def validate_and_fix(self) -> ServiceResult[Any]:
+    def validate_and_fix(self) -> FlextResult[Any]:
         """Validate and attempt to fix the state."""
         errors = []
 
-        # Validate state structure - fix if None or non-dict
-        if self.state_data is None:
-            # Fix by initializing empty dict
-            self.state_data = {}
-
-        # Check type after potential None fix
-        if not isinstance(self.state_data, dict):
-            # Cannot fix non-dict state_data
-            # state_data could be string, int, list, etc. after model validation
-            self.is_valid = False
-            self.validation_errors = ["State data must be a dictionary"]
-            return ServiceResult.fail(
-                "State validation failed: State data must be a dictionary",
-            )
+        # Validate state structure (already guaranteed by default_factory)
 
         # At this point, state_data is guaranteed to be a dict
         # Type narrowing for MyPy - state_data is Dict after validation above
@@ -208,27 +204,25 @@ class MeltanoState(DomainEntity):
         if errors:
             self.is_valid = False
             self.validation_errors = errors
-            return ServiceResult.fail(f"State validation failed: {'; '.join(errors)}")
+            return FlextResult.fail(f"State validation failed: {'; '.join(errors)}")
 
         self.is_valid = True
         self.validation_errors = []
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def get_bookmarks(self) -> dict[str, Any]:
         """Get bookmarks from state data."""
-        if self.state_data is None:
-            return {}
+        # state_data is never None due to default_factory=dict
         bookmarks = self.state_data.get("bookmarks", {})
         return bookmarks if isinstance(bookmarks, dict) else {}
 
-    def set_bookmarks(self, bookmarks: dict[str, Any]) -> ServiceResult[Any]:
+    def set_bookmarks(self, bookmarks: dict[str, Any]) -> FlextResult[Any]:
         """Set bookmarks in state data."""
-        if self.state_data is None:
-            self.state_data = {}
+        # state_data is never None due to default_factory=dict
 
         self.state_data["bookmarks"] = bookmarks
         self.updated_at = datetime.now(UTC)
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def increment_records_count(self, count: int) -> None:
         """Increment the processed records count."""
@@ -257,7 +251,7 @@ def __getattr__(name: str) -> Any:
             DeprecationWarning,
             stacklevel=2,
         )
-        return MeltanoState
+        return FlextMeltanoState
     msg = f"module 'flext_meltano.domain.entities.state' has no attribute '{name}'"
     raise AttributeError(
         msg,

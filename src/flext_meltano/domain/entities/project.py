@@ -11,15 +11,15 @@ with all its business rules and invariants.
 
 from __future__ import annotations
 
+import uuid
 import warnings
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from flext_core import ServiceResult
+from flext_core import FlextResult
 from pydantic import BaseModel, Field, field_validator
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
 
 # Define DomainEntity as BaseModel for now
 DomainEntity = BaseModel
@@ -29,15 +29,22 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-class MeltanoProject(DomainEntity):
+class FlextMeltanoProject(DomainEntity):
     """Meltano project domain entity with business rules."""
+
+    # Primary identifier
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, description="Unique project identifier")
 
     # Identity
     name: str = Field(..., description="Project name")
+    project_id: str = Field(..., description="Project business identifier")
     directory: Path = Field(..., description="Project directory")
 
     # Configuration
     config_path: Path = Field(..., description="Path to meltano.yml")
+    project_root: str = Field(..., description="Project root directory path")
+    meltano_yml_path: str = Field(..., description="Path to meltano.yml file")
+    meltano_version: str = Field(..., description="Meltano version")
     environment: str = Field(default="dev", description="Current environment")
 
     # Status
@@ -47,6 +54,11 @@ class MeltanoProject(DomainEntity):
     # Metadata
     description: str | None = Field(default=None, description="Project description")
     version: str = Field(default="1", description="Meltano config version")
+    python_version: str = Field(default="3.13", description="Python version")
+    created_by: Any | None = Field(default=None, description="User who created the project")
+
+    # Environment configuration
+    default_environment: Any = Field(default=None, description="Default environment type")
 
     # Business rules
     VALID_STATUSES: ClassVar[set[str]] = {
@@ -93,27 +105,27 @@ class MeltanoProject(DomainEntity):
 
         return v.strip()
 
-    def activate(self) -> ServiceResult[Any]:
+    def activate(self) -> FlextResult[Any]:
         """Activate the project."""
         if self.is_active:
-            return ServiceResult.fail("Project is already active")
+            return FlextResult.fail("Project is already active")
 
         self.is_active = True
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
-    def deactivate(self) -> ServiceResult[Any]:
+    def deactivate(self) -> FlextResult[Any]:
         """Deactivate the project."""
         if not self.is_active:
-            return ServiceResult.fail("Project is already inactive")
+            return FlextResult.fail("Project is already inactive")
 
         self.is_active = False
         self.status = "stopped"
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
-    def change_environment(self, new_environment: str) -> ServiceResult[Any]:
+    def change_environment(self, new_environment: str) -> FlextResult[Any]:
         """Change project environment."""
         if new_environment not in self.VALID_ENVIRONMENTS:
-            return ServiceResult.fail(
+            return FlextResult.fail(
                 f"Invalid environment '{new_environment}'. "
                 f"Must be one of: {self.VALID_ENVIRONMENTS}",
             )
@@ -121,23 +133,23 @@ class MeltanoProject(DomainEntity):
         self.environment = new_environment
 
         # Emit domain event would go here
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
-    def update_status(self, new_status: str) -> ServiceResult[Any]:
+    def update_status(self, new_status: str) -> FlextResult[Any]:
         """Update project status with business rules."""
         if new_status not in self.VALID_STATUSES:
-            return ServiceResult.fail(
+            return FlextResult.fail(
                 f"Invalid status '{new_status}'. Must be one of: {self.VALID_STATUSES}",
             )
 
         # Business rule: cannot go from error to running directly
         if self.status == "error" and new_status == "running":
-            return ServiceResult.fail(
+            return FlextResult.fail(
                 "Cannot start project in error state. Fix errors first.",
             )
 
         self.status = new_status
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def is_ready_for_execution(self) -> bool:
         """Check if project is ready for pipeline execution."""
@@ -164,7 +176,7 @@ def __getattr__(name: str) -> Any:
             DeprecationWarning,
             stacklevel=2,
         )
-        return MeltanoProject
+        return FlextMeltanoProject
     msg = f"module 'flext_meltano.domain.entities.project' has no attribute '{name}'"
     raise AttributeError(
         msg,

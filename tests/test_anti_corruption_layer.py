@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """Test FLEXT Meltano Anti-Corruption Layer - 64 lines of code, 0% coverage.
 
 ZERO TOLERANCE for fake code, mockups, or library fallbacks.
@@ -14,6 +12,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from flext_core import FlextResult
 
 # Mock missing dependencies to avoid import errors - must be before local imports
 sys.modules["flext_observability"] = MagicMock()
@@ -21,25 +20,25 @@ sys.modules["flext_observability.logging"] = MagicMock()
 
 # ruff: noqa: E402 - Module mocking must happen before imports
 from flext_meltano.anti_corruption_layer import (
-    MeltanoAdapter,
-    MeltanoAntiCorruptionLayer,
-    SimpleMeltanoAdapter,
+    FlextMeltanoAdapter,
+    FlextMeltanoAntiCorruptionLayer,
+    FlextMeltanoSimpleMeltanoAdapter,
 )
 
 
-class TestMeltanoAdapter:
-    """Test MeltanoAdapter abstract base class."""
+class TestFlextMeltanoAdapter:
+    """Test FlextMeltanoAdapter abstract base class."""
 
     def test_meltano_adapter_is_abstract(self) -> None:
-        """Test that MeltanoAdapter is an abstract base class."""
-        assert issubclass(MeltanoAdapter, ABC)
+        """Test that FlextMeltanoAdapter is an abstract base class."""
+        assert issubclass(FlextMeltanoAdapter, ABC)
 
         # Should not be able to instantiate directly
-        with pytest.raises(TypeError):
-            MeltanoAdapter()  # Cannot instantiate abstract class
+        with pytest.raises(TypeError, match="Can't instantiate abstract class"):
+            FlextMeltanoAdapter()  # type: ignore[abstract]  # Intentionally trying to instantiate abstract class
 
     def test_meltano_adapter_has_required_methods(self) -> None:
-        """Test that MeltanoAdapter defines required abstract methods."""
+        """Test that FlextMeltanoAdapter defines required abstract methods."""
         required_methods = [
             "run_pipeline",
             "install_plugin",
@@ -48,41 +47,40 @@ class TestMeltanoAdapter:
         ]
 
         for method_name in required_methods:
-            assert hasattr(MeltanoAdapter, method_name)
-            method = getattr(MeltanoAdapter, method_name)
-            assert getattr(method, "__isabstractmethod__", False), (
-                f"{method_name} should be abstract"
-            )
+            assert hasattr(FlextMeltanoAdapter, method_name)
+            method = getattr(FlextMeltanoAdapter, method_name)
+            assert getattr(
+                method, "__isabstractmethod__", False,
+            ), f"{method_name} should be abstract"
 
 
-class TestMeltanoAntiCorruptionLayer:
-    """Test MeltanoAntiCorruptionLayer - comprehensive coverage."""
+class TestFlextMeltanoAntiCorruptionLayer:
+    """Test FlextMeltanoAntiCorruptionLayer - comprehensive coverage."""
 
     @pytest.fixture
     def mock_adapter(self) -> AsyncMock:
         """Create a mock adapter for testing."""
-        return AsyncMock(spec=MeltanoAdapter)
+        return AsyncMock(spec=FlextMeltanoAdapter)
 
     @pytest.fixture
-    def acl(self, mock_adapter: AsyncMock) -> MeltanoAntiCorruptionLayer:
+    def acl(self, mock_adapter: AsyncMock) -> FlextMeltanoAntiCorruptionLayer:
         """Create an anti-corruption layer instance."""
-        return MeltanoAntiCorruptionLayer(mock_adapter)
+        return FlextMeltanoAntiCorruptionLayer(mock_adapter)
 
     def test_acl_initialization(self, mock_adapter: AsyncMock) -> None:
-        """Test MeltanoAntiCorruptionLayer initialization."""
-        acl = MeltanoAntiCorruptionLayer(mock_adapter)
+        """Test FlextMeltanoAntiCorruptionLayer initialization."""
+        acl = FlextMeltanoAntiCorruptionLayer(mock_adapter)
 
         assert acl.adapter == mock_adapter
 
     @pytest.mark.asyncio
     async def test_execute_pipeline_success(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test successful pipeline execution."""
         # 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
-        from flext_meltano.infrastructure.di_container import ServiceResult
 
         # Mock adapter to return success
         mock_result_data = {
@@ -91,7 +89,8 @@ class TestMeltanoAntiCorruptionLayer:
             "duration": 120,
             "metadata": {"env": "dev"},
         }
-        mock_adapter.run_pipeline.return_value = ServiceResult.ok(mock_result_data,
+        mock_adapter.run_pipeline.return_value = FlextResult.ok(
+            mock_result_data,
         )
 
         config = {"database_url": "postgres://test", "batch_size": 1000}
@@ -108,18 +107,20 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter.run_pipeline.assert_called_once_with(
             pipeline_name="test-pipeline",
             environment="dev",
-            configuration={"database-url": "postgres://test", "batch-size": 1000},
+            configuration={
+                "database-url": "postgres://test",
+                "batch-size": 1000,
+            },
         )
 
     @pytest.mark.asyncio
     async def test_execute_pipeline_with_defaults(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test pipeline execution with default parameters."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
-        mock_adapter.run_pipeline.return_value = ServiceResult.ok(
+        mock_adapter.run_pipeline.return_value = FlextResult.ok(
             {"status": "completed", "output": "Success"},
         )
 
@@ -137,12 +138,12 @@ class TestMeltanoAntiCorruptionLayer:
     @pytest.mark.asyncio
     async def test_execute_pipeline_adapter_failure(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test pipeline execution when adapter fails."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
-        mock_adapter.run_pipeline.return_value = ServiceResult.fail("Adapter error",
+        mock_adapter.run_pipeline.return_value = FlextResult.fail(
+            "Adapter error",
         )
 
         result = await acl.execute_pipeline("failing-pipeline")
@@ -153,7 +154,7 @@ class TestMeltanoAntiCorruptionLayer:
     @pytest.mark.asyncio
     async def test_execute_pipeline_exception_handling(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test pipeline execution exception handling."""
@@ -168,17 +169,17 @@ class TestMeltanoAntiCorruptionLayer:
     @pytest.mark.asyncio
     async def test_manage_plugin_install_success(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test successful plugin installation."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
         mock_result_data = {
             "plugin_type": "extractor",
             "plugin_name": "tap-csv",
             "status": "installed",
         }
-        mock_adapter.install_plugin.return_value = ServiceResult.ok(mock_result_data,
+        mock_adapter.install_plugin.return_value = FlextResult.ok(
+            mock_result_data,
         )
 
         result = await acl.manage_plugin(
@@ -204,12 +205,11 @@ class TestMeltanoAntiCorruptionLayer:
     @pytest.mark.asyncio
     async def test_manage_plugin_install_with_no_variant(
         self,
-        acl: MeltanoAntiCorruptionLayer,
+        acl: FlextMeltanoAntiCorruptionLayer,
         mock_adapter: AsyncMock,
     ) -> None:
         """Test plugin installation without variant."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
-        mock_adapter.install_plugin.return_value = ServiceResult.ok(
+        mock_adapter.install_plugin.return_value = FlextResult.ok(
             {"status": "installed"},
         )
 
@@ -234,12 +234,12 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: Any,
     ) -> None:
         """Test successful plugin listing."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
         mock_result_data = [
             {"name": "tap-csv", "type": "extractor"},
             {"name": "target-postgres", "type": "loader"},
         ]
-        mock_adapter.list_plugins.return_value = ServiceResult.ok(mock_result_data,
+        mock_adapter.list_plugins.return_value = FlextResult.ok(
+            mock_result_data,
         )
 
         result = await acl.manage_plugin(
@@ -260,12 +260,12 @@ class TestMeltanoAntiCorruptionLayer:
         mock_adapter: Any,
     ) -> None:
         """Test successful plugin config retrieval."""
-        from flext_meltano.infrastructure.di_container import ServiceResult
         mock_result_data = {
             "plugin_name": "tap-csv",
             "settings": {"file_path": "required"},
         }
-        mock_adapter.get_plugin_config.return_value = ServiceResult.ok(mock_result_data,
+        mock_adapter.get_plugin_config.return_value = FlextResult.ok(
+            mock_result_data,
         )
 
         result = await acl.manage_plugin(
@@ -393,20 +393,24 @@ class TestMeltanoAntiCorruptionLayer:
         assert domain_result == expected
 
 
-class TestSimpleMeltanoAdapter:
-    """Test SimpleMeltanoAdapter implementation - comprehensive coverage."""
+class TestFlextMeltanoSimpleMeltanoAdapter:
+    """Test FlextMeltanoSimpleMeltanoAdapter implementation - comprehensive coverage."""
 
     @pytest.fixture
-    def adapter(self) -> SimpleMeltanoAdapter:
-        """Create a SimpleMeltanoAdapter instance."""
-        return SimpleMeltanoAdapter()
+    def adapter(self) -> FlextMeltanoSimpleMeltanoAdapter:
+        """Create a FlextMeltanoSimpleMeltanoAdapter instance."""
+        return FlextMeltanoSimpleMeltanoAdapter()
 
-    def test_adapter_implements_interface(self, adapter: SimpleMeltanoAdapter) -> None:
-        """Test that SimpleMeltanoAdapter implements MeltanoAdapter."""
-        assert isinstance(adapter, MeltanoAdapter)
+    def test_adapter_implements_interface(
+        self, adapter: FlextMeltanoSimpleMeltanoAdapter,
+    ) -> None:
+        """Test that FlextMeltanoSimpleMeltanoAdapter implements FlextMeltanoAdapter."""
+        assert isinstance(adapter, FlextMeltanoAdapter)
 
     @pytest.mark.asyncio
-    async def test_run_pipeline_success(self, adapter: SimpleMeltanoAdapter) -> None:
+    async def test_run_pipeline_success(
+        self, adapter: FlextMeltanoSimpleMeltanoAdapter,
+    ) -> None:
         """Test successful pipeline execution."""
         result = await adapter.run_pipeline(
             pipeline_name="test-pipeline",
@@ -428,7 +432,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_run_pipeline_with_defaults(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test pipeline execution with default parameters."""
         result = await adapter.run_pipeline("simple-pipeline")
@@ -445,7 +449,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_run_pipeline_error_handling(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test pipeline execution error handling."""
         # Mock asyncio.sleep to raise an exception
@@ -457,7 +461,9 @@ class TestSimpleMeltanoAdapter:
             assert "Failed to run pipeline: Sleep failed" in result.error
 
     @pytest.mark.asyncio
-    async def test_install_plugin_success(self, adapter: SimpleMeltanoAdapter) -> None:
+    async def test_install_plugin_success(
+        self, adapter: FlextMeltanoSimpleMeltanoAdapter,
+    ) -> None:
         """Test successful plugin installation."""
         result = await adapter.install_plugin(
             plugin_type="extractor",
@@ -475,7 +481,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_install_plugin_no_variant(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test plugin installation without variant."""
         result = await adapter.install_plugin(
@@ -493,7 +499,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_install_plugin_error_handling(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test plugin installation error handling."""
         # Mock asyncio.sleep to raise an exception
@@ -505,7 +511,9 @@ class TestSimpleMeltanoAdapter:
             assert "Failed to install plugin: File system error" in result.error
 
     @pytest.mark.asyncio
-    async def test_list_plugins_all(self, adapter: SimpleMeltanoAdapter) -> None:
+    async def test_list_plugins_all(
+        self, adapter: FlextMeltanoSimpleMeltanoAdapter,
+    ) -> None:
         """Test listing all plugins."""
         result = await adapter.list_plugins()
 
@@ -529,7 +537,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_list_plugins_filtered_by_type(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test listing plugins filtered by type."""
         # Test extractor filter
@@ -553,7 +561,9 @@ class TestSimpleMeltanoAdapter:
         assert plugins[0]["type"] == "loader"
 
     @pytest.mark.asyncio
-    async def test_list_plugins_no_matches(self, adapter: SimpleMeltanoAdapter) -> None:
+    async def test_list_plugins_no_matches(
+        self, adapter: FlextMeltanoSimpleMeltanoAdapter,
+    ) -> None:
         """Test listing plugins with no matches."""
         result = await adapter.list_plugins(plugin_type="orchestrator")
 
@@ -563,12 +573,12 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_list_plugins_error_handling(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test plugin listing error handling."""
-        # Mock ServiceResult.ok to raise an exception during result creation
+        # Mock FlextResult.ok to raise an exception during result creation
         with patch(
-            "flext_meltano.anti_corruption_layer.ServiceResult.ok",
+            "flext_meltano.anti_corruption_layer.FlextResult.ok",
             side_effect=TypeError("Result creation failed"),
         ):
             result = await adapter.list_plugins(plugin_type="extractor")
@@ -580,7 +590,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_get_plugin_config_success(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test successful plugin config retrieval."""
         result = await adapter.get_plugin_config("tap-csv")
@@ -601,7 +611,7 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_get_plugin_config_different_plugin(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test plugin config retrieval for different plugin."""
         result = await adapter.get_plugin_config("target-postgres")
@@ -618,12 +628,12 @@ class TestSimpleMeltanoAdapter:
     @pytest.mark.asyncio
     async def test_get_plugin_config_error_handling(
         self,
-        adapter: SimpleMeltanoAdapter,
+        adapter: FlextMeltanoSimpleMeltanoAdapter,
     ) -> None:
         """Test plugin config retrieval error handling."""
-        # Mock ServiceResult.ok to raise an exception
+        # Mock FlextResult.ok to raise an exception
         with patch(
-            "flext_meltano.anti_corruption_layer.ServiceResult.ok",
+            "flext_meltano.anti_corruption_layer.FlextResult.ok",
             side_effect=ValueError("Config error"),
         ):
             result = await adapter.get_plugin_config("broken-plugin")
@@ -640,8 +650,8 @@ class TestIntegrationWorkflow:
     async def test_complete_acl_workflow(self) -> None:
         """Test complete workflow from adapter to ACL execution."""
         # Step 1: Create adapter and ACL
-        adapter = SimpleMeltanoAdapter()
-        acl = MeltanoAntiCorruptionLayer(adapter)
+        adapter = FlextMeltanoSimpleMeltanoAdapter()
+        acl = FlextMeltanoAntiCorruptionLayer(adapter)
 
         # Step 2: Execute pipeline
         pipeline_result = await acl.execute_pipeline(
@@ -699,10 +709,10 @@ class TestIntegrationWorkflow:
     async def test_error_propagation_workflow(self) -> None:
         """Test error propagation through the anti-corruption layer."""
         # Create a mock adapter that fails
-        failing_adapter = AsyncMock(spec=MeltanoAdapter)
+        failing_adapter = AsyncMock(spec=FlextMeltanoAdapter)
         failing_adapter.run_pipeline.side_effect = RuntimeError("Adapter failure")
 
-        acl = MeltanoAntiCorruptionLayer(failing_adapter)
+        acl = FlextMeltanoAntiCorruptionLayer(failing_adapter)
 
         # Test that errors are properly handled and propagated
         result = await acl.execute_pipeline("failing-pipeline")
@@ -714,8 +724,8 @@ class TestIntegrationWorkflow:
     @pytest.mark.asyncio
     async def test_config_translation_workflow(self) -> None:
         """Test configuration translation in a complete workflow."""
-        adapter = SimpleMeltanoAdapter()
-        acl = MeltanoAntiCorruptionLayer(adapter)
+        adapter = FlextMeltanoSimpleMeltanoAdapter()
+        acl = FlextMeltanoAntiCorruptionLayer(adapter)
 
         # Complex domain configuration
         domain_config = {

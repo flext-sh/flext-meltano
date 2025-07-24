@@ -7,14 +7,26 @@ REFACTORED:
 from __future__ import annotations
 
 from flext_meltano.application.services import (
-    MeltanoJobService,
-    MeltanoPluginService,
-    MeltanoProjectService,
-    MeltanoStateService,
-    ProjectApplicationService,
+    FlextMeltanoJobService,
+    FlextMeltanoPluginService,
+    FlextMeltanoProjectService,
+    FlextMeltanoStateService,
 )
 
+# Aliases for backward compatibility
+MeltanoJobService = FlextMeltanoJobService
+MeltanoPluginService = FlextMeltanoPluginService
+MeltanoProjectService = FlextMeltanoProjectService
+MeltanoStateService = FlextMeltanoStateService
+ProjectApplicationService = FlextMeltanoProjectService
+FlextMeltanoProjectApplicationService = FlextMeltanoProjectService  # Legacy compatibility
+
 __all__ = [
+    "FlextMeltanoJobService",
+    "FlextMeltanoPluginService",
+    "FlextMeltanoProjectApplicationService",  # Legacy compatibility
+    "FlextMeltanoProjectService",
+    "FlextMeltanoStateService",
     "MeltanoJobService",
     "MeltanoPluginService",
     "MeltanoProjectService",

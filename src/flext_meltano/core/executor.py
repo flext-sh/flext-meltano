@@ -7,13 +7,13 @@ import time
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from .config import MeltanoConfig
+    from .config import FlextMeltanoConfig
 
 
-class MeltanoExecutor:
+class FlextMeltanoExecutor:
     """Executes Meltano operations via FLEXT integration."""
 
-    def __init__(self, config: MeltanoConfig) -> None:
+    def __init__(self, config: FlextMeltanoConfig) -> None:
         """Initialize Meltano executor."""
         self.config = config
 
@@ -46,7 +46,7 @@ class MeltanoExecutor:
             env = {"MELTANO_ENVIRONMENT": environment}
             if variables:
                 env.update(
-                    {f"MELTANO_VAR_{k.upper()}": str(v) for k, v in variables.items()}
+                    {f"MELTANO_VAR_{k.upper()}": str(v) for k, v in variables.items()},
                 )
 
             if dry_run:
@@ -106,7 +106,12 @@ class MeltanoExecutor:
         start_time = time.time()
 
         try:
-            cmd_args = [self.config.meltano_path, "invoke", plugin_name, "--help"]
+            cmd_args = [
+                self.config.meltano_path,
+                "invoke",
+                plugin_name,
+                "--help",
+            ]
 
             result = subprocess.run(
                 [arg for arg in cmd_args if arg is not None],
