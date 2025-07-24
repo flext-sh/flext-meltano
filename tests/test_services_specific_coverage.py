@@ -169,14 +169,9 @@ def assert_error_message(result: Any, expected_message: str) -> None:
     """Helper to assert error messages robustly."""
     assert result.is_failure
     assert result.error is not None
-    # Handle both string error and mock error cases
-    error_str = str(result.error) if hasattr(result.error, '__str__') else result.error
-    if hasattr(result.error, '__contains__'):
-        # It's a string-like object
-        assert expected_message in result.error
-    else:
-        # It's probably a mock, check if it has the expected behavior
-        assert hasattr(result, 'error')
+    # Convert to string for comparison - works for both str and mock
+    error_str = str(result.error)
+    assert expected_message in error_str
 
 
 class TestSpecificCoverageTargets:
@@ -349,9 +344,7 @@ class TestSpecificCoverageTargets:
         service._plugins[plugin_id] = failing_plugin  # type: ignore[assignment]
 
         result = await service.configure_plugin(plugin_id, {"key": "value"})
-        assert result.is_failure
-        assert result.error is not None
-        assert "Failed to configure plugin: Invalid config format" in result.error
+        assert_error_message(result, "Failed to configure plugin: Invalid config format")
 
     async def test_uninstall_plugin_exception_lines_236_237(self) -> None:
         """Test uninstall_plugin exception handling lines 236-237."""
