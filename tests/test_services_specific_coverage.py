@@ -212,7 +212,7 @@ class TestSpecificCoverageTargets:
         assert result.is_failure
         assert result.error is not None
         assert isinstance(result.error, str)
-        assert "Failed to get project: Database connection failed" in result.error
+        assert_error_message(result, "assert "Failed to get project: Database connection failed" in result.error")
 
     async def test_list_projects_exception_lines_96_97(self) -> None:
         """Test list_projects exception handling lines 96-97."""
@@ -226,7 +226,7 @@ class TestSpecificCoverageTargets:
         result = await service.list_projects()
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to list projects: Filesystem error" in result.error
+        assert_error_message(result, "assert "Failed to list projects: Filesystem error" in result.error")
 
     async def test_update_project_hasattr_false_line_112(self) -> None:
         """Test update_project hasattr false branch line 112."""
@@ -256,7 +256,7 @@ class TestSpecificCoverageTargets:
             result = await service.update_project(project_id, {"name": "updated"})
             assert result.is_failure
             assert result.error is not None
-            assert "Failed to update project: Introspection error" in result.error
+            assert_error_message(result, "assert "Failed to update project: Introspection error" in result.error")
 
     async def test_delete_project_exception_lines_127_128(self) -> None:
         """Test delete_project exception handling lines 127-128."""
@@ -271,7 +271,7 @@ class TestSpecificCoverageTargets:
         result = await service.delete_project(project_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to delete project: Filesystem error" in result.error
+        assert_error_message(result, "assert "Failed to delete project: Filesystem error" in result.error")
 
     async def test_install_plugin_exception_lines_183_184(self) -> None:
         """Test install_plugin exception handling lines 183-184."""
@@ -291,7 +291,7 @@ class TestSpecificCoverageTargets:
             )
             assert result.is_failure
             assert result.error is not None
-            assert "Failed to install plugin: Plugin creation failed" in result.error
+            assert_error_message(result, "assert "Failed to install plugin: Plugin creation failed" in result.error")
 
     async def test_get_plugin_exception_lines_191_192(self) -> None:
         """Test get_plugin exception handling lines 191-192."""
@@ -306,7 +306,7 @@ class TestSpecificCoverageTargets:
         result = await service.get_plugin(plugin_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to get plugin: Plugin cache corrupted" in result.error
+        assert_error_message(result, "assert "Failed to get plugin: Plugin cache corrupted" in result.error")
 
     async def test_list_plugins_exception_lines_206_207(self) -> None:
         """Test list_plugins exception handling lines 206-207."""
@@ -325,7 +325,7 @@ class TestSpecificCoverageTargets:
         result = await service.list_plugins(project_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to list plugins: Plugin project ID access failed" in result.error
+        assert_error_message(result, "assert "Failed to list plugins: Plugin project ID access failed" in result.error")
 
     async def test_configure_plugin_exception_lines_223_224(self) -> None:
         """Test configure_plugin exception handling lines 223-224."""
@@ -362,7 +362,7 @@ class TestSpecificCoverageTargets:
         result = await service.uninstall_plugin(plugin_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to uninstall plugin: Permission denied" in result.error
+        assert_error_message(result, "assert "Failed to uninstall plugin: Permission denied" in result.error")
 
     async def test_create_job_config_hasattr_lines_289_291(self) -> None:
         """Test create_job config attribute checking lines 289, 291."""
@@ -405,7 +405,7 @@ class TestSpecificCoverageTargets:
             )
             assert result.is_failure
             assert result.error is not None
-            assert "Failed to create job: Job creation failed" in result.error
+            assert_error_message(result, "assert "Failed to create job: Job creation failed" in result.error")
 
     async def test_start_job_exception_lines_307_308(self) -> None:
         """Test start_job exception handling lines 307-308."""
@@ -423,7 +423,7 @@ class TestSpecificCoverageTargets:
         result = await service.start_job(job_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to start job: Job start failed" in result.error
+        assert_error_message(result, "assert "Failed to start job: Job start failed" in result.error")
 
     async def test_complete_job_exception_lines_325_326(self) -> None:
         """Test complete_job exception handling lines 325-326."""
@@ -446,7 +446,7 @@ class TestSpecificCoverageTargets:
         result = await service.complete_job(job_id, 0, "output", "")
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to complete job: Invalid exit code" in result.error
+        assert_error_message(result, "assert "Failed to complete job: Invalid exit code" in result.error")
 
     async def test_cancel_job_exception_lines_337_338(self) -> None:
         """Test cancel_job exception handling lines 337-338."""
@@ -464,7 +464,7 @@ class TestSpecificCoverageTargets:
         result = await service.cancel_job(job_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to cancel job: Process termination failed" in result.error
+        assert_error_message(result, "assert "Failed to cancel job: Process termination failed" in result.error")
 
     async def test_get_job_exception_lines_345_346(self) -> None:
         """Test get_job exception handling lines 345-346."""
@@ -479,7 +479,7 @@ class TestSpecificCoverageTargets:
         result = await service.get_job(job_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to get job: Job cache corrupted" in result.error
+        assert_error_message(result, "assert "Failed to get job: Job cache corrupted" in result.error")
 
     async def test_list_jobs_exception_lines_353_354(self) -> None:
         """Test list_jobs exception handling lines 353-354."""
@@ -498,7 +498,7 @@ class TestSpecificCoverageTargets:
         result = await service.list_jobs(project_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to list jobs: Project ID access failed" in result.error
+        assert_error_message(result, "assert "Failed to list jobs: Project ID access failed" in result.error")
 
     async def test_create_state_exception_lines_402_403(self) -> None:
         """Test create_state exception handling lines 402-403."""
@@ -519,7 +519,7 @@ class TestSpecificCoverageTargets:
             )
             assert result.is_failure
             assert result.error is not None
-            assert "Failed to create state: State creation failed" in result.error
+            assert_error_message(result, "assert "Failed to create state: State creation failed" in result.error")
 
     async def test_update_state_exception_lines_418_419(self) -> None:
         """Test update_state exception handling lines 418-419."""
@@ -537,7 +537,7 @@ class TestSpecificCoverageTargets:
         result = await service.update_state(state_id, {"key": "value"})
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to update state: State update failed" in result.error
+        assert_error_message(result, "assert "Failed to update state: State update failed" in result.error")
 
     async def test_merge_state_exception_lines_434_435(self) -> None:
         """Test merge_state exception handling lines 434-435."""
@@ -555,7 +555,7 @@ class TestSpecificCoverageTargets:
         result = await service.merge_state(state_id, {"key": "value"})
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to merge state: Incompatible state format" in result.error
+        assert_error_message(result, "assert "Failed to merge state: Incompatible state format" in result.error")
 
     async def test_get_state_exception_lines_442_443(self) -> None:
         """Test get_state exception handling lines 442-443."""
@@ -570,7 +570,7 @@ class TestSpecificCoverageTargets:
         result = await service.get_state(state_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to get state: State storage unavailable" in result.error
+        assert_error_message(result, "assert "Failed to get state: State storage unavailable" in result.error")
 
     async def test_list_states_exception_lines_454_455(self) -> None:
         """Test list_states exception handling lines 454-455."""
@@ -585,7 +585,7 @@ class TestSpecificCoverageTargets:
         result = await service.list_states(project_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to list states: State enumeration failed" in result.error
+        assert_error_message(result, "assert "Failed to list states: State enumeration failed" in result.error")
 
     async def test_delete_state_exception_lines_464_465(self) -> None:
         """Test delete_state exception handling lines 464-465."""
@@ -600,7 +600,7 @@ class TestSpecificCoverageTargets:
         result = await service.delete_state(state_id)
         assert result.is_failure
         assert result.error is not None
-        assert "Failed to delete state: State index corrupted" in result.error
+        assert_error_message(result, "assert "Failed to delete state: State index corrupted" in result.error")
 
     def test_validate_services_exception_lines_521_522(self) -> None:
         """Test validate_services exception handling lines 521-522."""
