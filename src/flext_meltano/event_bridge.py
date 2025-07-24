@@ -21,12 +21,12 @@ DomainEvent = BaseModel
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from flext_meltano.event_bus_protocol import EventBusProtocol
+    from flext_meltano.event_bus_protocol import FlextMeltanoEventBusProtocol
 
 logger = logging.getLogger(__name__)
 
 
-class MeltanoEvent(DomainEvent):
+class FlextMeltanoEvent(DomainEvent):
     """Meltano-specific domain event extending flext_core.DomainEvent."""
 
     event_type: str = Field(description="Type of Meltano event")
@@ -35,7 +35,7 @@ class MeltanoEvent(DomainEvent):
     source: str = Field(default="meltano", description="Event source")
 
 
-class EventConfig:
+class FlextMeltanoEventConfig:
     """Configuration for Meltano events."""
 
     def __init__(
@@ -58,10 +58,12 @@ class EventConfig:
 # DomainEvent now imported via DI container - architectural compliance enforced
 
 
-class MeltanoEventBridge:
+class FlextMeltanoEventBridge:
     """Bridge between Meltano and FLEXT event systems."""
 
-    def __init__(self, flext_event_bus: EventBusProtocol | None = None) -> None:
+    def __init__(
+        self, flext_event_bus: FlextMeltanoEventBusProtocol | None = None,
+    ) -> None:
         self.flext_event_bus = flext_event_bus or self._create_mock_event_bus()
         self._active_subscriptions: dict[
             str,
@@ -86,13 +88,13 @@ class MeltanoEventBridge:
 
         logger.info("Initialized Meltano Event Bridge")
 
-    def _create_mock_event_bus(self) -> EventBusProtocol:
+    def _create_mock_event_bus(self) -> FlextMeltanoEventBusProtocol:
         """Create mock event bus for testing/fallback - implements actual protocol."""
 
         class MockEventBus:
             async def publish(self, event: DomainEvent | dict[str, Any]) -> None:
                 """Publish event to mock bus."""
-                if isinstance(event, MeltanoEvent):
+                if isinstance(event, FlextMeltanoEvent):
                     logger.info(
                         f"Event published: {event.event_type}, data_keys: {list(event.data.keys())}",
                     )
@@ -121,7 +123,7 @@ class MeltanoEventBridge:
 
     async def publish_meltano_event(
         self,
-        config: EventConfig,
+        config: FlextMeltanoEventConfig,
         **kwargs: object,
     ) -> None:
         """Publish Meltano event to FLEXT event bus.
@@ -193,7 +195,7 @@ class MeltanoEventBridge:
             correlation_id_str = (
                 str(correlation_id) if correlation_id is not None else None
             )
-            flext_event = MeltanoEvent(
+            flext_event = FlextMeltanoEvent(
                 event_type=flext_event_type,
                 data=event_data,
                 correlation_id=correlation_id_str,

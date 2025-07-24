@@ -8,7 +8,7 @@ from __future__ import annotations
 from enum import StrEnum
 
 
-class EnvironmentType(StrEnum):
+class FlextMeltanoEnvironmentType(StrEnum):
     """Environment type enumeration."""
 
     DEVELOPMENT = "dev"
@@ -18,7 +18,7 @@ class EnvironmentType(StrEnum):
 
     # Aliases for backward compatibility
     @classmethod
-    def _missing_(cls, value: object) -> EnvironmentType | None:
+    def _missing_(cls, value: object) -> FlextMeltanoEnvironmentType | None:
         """Handle legacy values."""
         if value == "dev":
             return cls.DEVELOPMENT

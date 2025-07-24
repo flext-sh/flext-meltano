@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """Test FLEXT Meltano Orchestrator - 757 lines of code, 27.44% coverage.
 
 ZERO TOLERANCE for fake code, mockups, or library fallbacks.
@@ -12,18 +10,18 @@ import asyncio
 import contextlib
 from datetime import UTC, datetime
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
-from flext_meltano.infrastructure.di_container import ExecutionStatus
+# 🚨 ARCHITECTURAL COMPLIANCE: Using renamed orchestrator classes
 from flext_meltano.orchestrator import (
+    ExecutionStatus,
     FlextJob,
+    FlextMeltanoEngine,
+    FlextMeltanoOrchestrationMode,
     FlextMeltanoOrchestrator,
-    MeltanoEngine,
-    OrchestrationMode,
-    RunMode,
+    FlextMeltanoRunMode,
 )
 
 
@@ -32,18 +30,18 @@ class TestMeltanoEngine:
 
     def test_engine_initialization_default(self) -> None:
         """Test MeltanoEngine initialization with default parameters."""
-        engine = MeltanoEngine()
+        engine = FlextMeltanoEngine()
         assert engine.project_root is None
 
     def test_engine_initialization_with_project_root(self) -> None:
         """Test MeltanoEngine initialization with project root."""
-        engine = MeltanoEngine("/test/project")
+        engine = FlextMeltanoEngine("/test/project")
         assert engine.project_root == "/test/project"
 
     @pytest.mark.asyncio
     async def test_run_pipeline_success(self) -> None:
         """Test successful pipeline execution."""
-        engine = MeltanoEngine("/test/project")
+        engine = FlextMeltanoEngine("/test/project")
 
         result = await engine.run_pipeline(
             extractor="tap-csv",
@@ -59,7 +57,7 @@ class TestMeltanoEngine:
     @pytest.mark.asyncio
     async def test_run_pipeline_minimal_params(self) -> None:
         """Test pipeline execution with minimal parameters."""
-        engine = MeltanoEngine()
+        engine = FlextMeltanoEngine()
 
         result = await engine.run_pipeline(
             extractor="tap-simple",
@@ -72,7 +70,7 @@ class TestMeltanoEngine:
     @pytest.mark.asyncio
     async def test_run_pipeline_no_transform(self) -> None:
         """Test pipeline execution without transform."""
-        engine = MeltanoEngine("/project")
+        engine = FlextMeltanoEngine("/project")
 
         result = await engine.run_pipeline(
             extractor="tap-api",
@@ -85,38 +83,38 @@ class TestMeltanoEngine:
         assert result["message"] == "Pipeline executed successfully"
 
 
-class TestOrchestrationMode:
-    """Test OrchestrationMode enum."""
+class TestFlextMeltanoOrchestrationMode:
+    """Test FlextMeltanoOrchestrationMode enum."""
 
     def test_orchestration_mode_values(self) -> None:
-        """Test all OrchestrationMode enum values."""
-        assert OrchestrationMode.SYNC.value == "sync"
-        assert OrchestrationMode.ASYNC.value == "async"
-        assert OrchestrationMode.SCHEDULED.value == "scheduled"
-        assert OrchestrationMode.TRIGGERED.value == "triggered"
+        """Test all FlextMeltanoOrchestrationMode enum values."""
+        assert FlextMeltanoOrchestrationMode.SYNC.value == "sync"
+        assert FlextMeltanoOrchestrationMode.ASYNC.value == "async"
+        assert FlextMeltanoOrchestrationMode.SCHEDULED.value == "scheduled"
+        assert FlextMeltanoOrchestrationMode.TRIGGERED.value == "triggered"
 
         # Verify they are different values
-        assert OrchestrationMode.SYNC != OrchestrationMode.ASYNC
-        assert OrchestrationMode.SCHEDULED != OrchestrationMode.TRIGGERED
+        assert FlextMeltanoOrchestrationMode.SYNC != FlextMeltanoOrchestrationMode.ASYNC  # type: ignore[comparison-overlap]
+        assert FlextMeltanoOrchestrationMode.SCHEDULED != FlextMeltanoOrchestrationMode.TRIGGERED  # type: ignore[comparison-overlap]
 
 
-class TestRunMode:
-    """Test RunMode enum."""
+class TestFlextMeltanoRunMode:
+    """Test FlextMeltanoRunMode enum."""
 
     def test_run_mode_values(self) -> None:
-        """Test all RunMode enum values."""
-        assert RunMode.DRY_RUN.value == "dry_run"
-        assert RunMode.FULL_RUN.value == "full_run"
+        """Test all FlextMeltanoRunMode enum values."""
+        assert FlextMeltanoRunMode.DRY_RUN.value == "dry_run"
+        assert FlextMeltanoRunMode.FULL_RUN.value == "full_run"
 
         # Verify they are different values
-        assert RunMode.DRY_RUN != RunMode.FULL_RUN
+        assert FlextMeltanoRunMode.DRY_RUN != FlextMeltanoRunMode.FULL_RUN  # type: ignore[comparison-overlap]
 
 
 class TestPipelineStatus:
     """Test PipelineStatus enum."""
 
     def test_pipeline_status_values(self) -> None:
-        """Test all PipelineStatus enum values."""
+        """Test all ExecutionStatus enum values."""
         assert ExecutionStatus.PENDING.value == "pending"
         assert ExecutionStatus.RUNNING.value == "running"
         assert ExecutionStatus.COMPLETED.value == "completed"
@@ -124,9 +122,9 @@ class TestPipelineStatus:
         assert ExecutionStatus.CANCELLED.value == "cancelled"
 
         # Verify they are different values
-        assert ExecutionStatus.PENDING != ExecutionStatus.RUNNING
-        assert ExecutionStatus.COMPLETED != ExecutionStatus.FAILED
-        assert ExecutionStatus.CANCELLED != ExecutionStatus.FAILED
+        assert ExecutionStatus.RUNNING != ExecutionStatus.PENDING  # type: ignore[comparison-overlap]
+        assert ExecutionStatus.COMPLETED != ExecutionStatus.FAILED  # type: ignore[comparison-overlap]
+        assert ExecutionStatus.CANCELLED != ExecutionStatus.FAILED  # type: ignore[comparison-overlap]
 
 
 class TestFlextJob:
@@ -157,7 +155,7 @@ class TestFlextJob:
             run_id="test-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.PENDING,
+            status="pending",
             pipeline_definition=sample_pipeline_definition,
         )
 
@@ -165,7 +163,7 @@ class TestFlextJob:
         assert job.run_id == "test-run"
         assert job.project_name == "test-project"
         assert job.environment == "dev"
-        assert job.status == ExecutionStatus.PENDING.value
+        assert job.status.value == "pending" if hasattr(job.status, "value") else job.status == "pending"  # type: ignore[comparison-overlap]
         assert job.pipeline_definition == sample_pipeline_definition
         assert job.meltano_job is None
         assert job.task is None
@@ -192,7 +190,7 @@ class TestFlextJob:
             run_id="full-run",
             project_name="full-project",
             environment="production",
-            status=ExecutionStatus.COMPLETED,
+            status="completed",
             pipeline_definition=sample_pipeline_definition,
             started_at=start_time,
             finished_at=finish_time,
@@ -205,8 +203,8 @@ class TestFlextJob:
         assert job.run_id == "full-run"
         assert job.project_name == "full-project"
         assert job.environment == "production"
-        assert job.status == ExecutionStatus.COMPLETED.value
-        assert job.started_at == start_time
+        assert job.status == ExecutionStatus.COMPLETED.value  # type: ignore[comparison-overlap]
+        assert job.started_at == start_time  # type: ignore[unreachable]
         assert job.finished_at == finish_time
         assert job.last_heartbeat_at == heartbeat_time
         assert job.payload == {"key": "value", "config": {"setting": 123}}
@@ -224,11 +222,9 @@ class TestFlextJob:
 
         # Create real Meltano job
         meltano_job = Job()
-        # Cannot assign to state method, use mock instead
-        meltano_job.state = Mock(
-            return_value=State.RUNNING,
-        )  # Mock state method assignment
-        meltano_job.payload = {"test": "data"}
+        # Mock the state method properly
+        with patch.object(meltano_job, "state", return_value=State.RUNNING):
+            meltano_job.payload = {"test": "data"}
 
         # Create real asyncio task
         async def dummy_task() -> str:
@@ -242,18 +238,18 @@ class TestFlextJob:
             run_id="task-run",
             project_name="task-project",
             environment="test",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition=sample_pipeline_definition,
             meltano_job=meltano_job,
             task=task,
         )
 
-        assert job.meltano_job == meltano_job
+        assert job.meltano_job == meltano_job  # type: ignore[comparison-overlap]
         assert job.task == task
-        assert job.status == ExecutionStatus.RUNNING.value
+        assert job.status == ExecutionStatus.RUNNING.value  # type: ignore[comparison-overlap]
 
         # Clean up the task
-        task.cancel()
+        task.cancel()  # type: ignore[unreachable]
 
         # Wait for the task to be cancelled properly
         with contextlib.suppress(asyncio.CancelledError):
@@ -351,8 +347,8 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
-            run_mode=RunMode.FULL_RUN,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
+            run_mode=FlextMeltanoRunMode.FULL_RUN,
         )
 
         assert "run_id" in result
@@ -375,13 +371,16 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="staging",
-            execution_mode=OrchestrationMode.ASYNC,
-            run_mode=RunMode.FULL_RUN,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
+            run_mode=FlextMeltanoRunMode.FULL_RUN,
         )
 
         assert "run_id" in result
         assert result["status"] == ExecutionStatus.RUNNING.value
-        assert result["message"] == "Pipeline execution started in the background."
+        assert (
+            result["message"]
+            == "Pipeline execution started in the background."
+        )
 
         # Job should be in running jobs temporarily
         result["run_id"]
@@ -401,9 +400,9 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
             run_id=custom_run_id,
-            run_mode=RunMode.DRY_RUN,
+            run_mode=FlextMeltanoRunMode.DRY_RUN,
         )
 
         assert result["run_id"] == custom_run_id
@@ -422,7 +421,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
             run_id=run_id,
         )
 
@@ -433,7 +432,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
             run_id=run_id,
         )
 
@@ -457,7 +456,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="failing-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
         )
 
         assert result["status"] == ExecutionStatus.FAILED.value
@@ -476,7 +475,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         run_id = result["run_id"]
@@ -536,7 +535,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="test-project",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         run_id = result["run_id"]
@@ -555,7 +554,9 @@ class TestFlextMeltanoOrchestrator:
         assert cancelled is False
 
     @pytest.mark.asyncio
-    async def test_list_running_pipelines_empty(self, orchestrator: Any) -> None:
+    async def test_list_running_pipelines_empty(
+        self, orchestrator: Any,
+    ) -> None:
         """Test listing running pipelines when none are running."""
         running = await orchestrator.list_running_pipelines()
         assert running == []
@@ -572,7 +573,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="project-1",
             pipeline_definition=sample_pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         sample_pipeline_definition["name"] = "pipeline-2"
@@ -580,7 +581,7 @@ class TestFlextMeltanoOrchestrator:
             project_name="project-2",
             pipeline_definition=sample_pipeline_definition,
             environment="staging",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         # List running pipelines
@@ -615,11 +616,13 @@ class TestFlextMeltanoOrchestrator:
             run_id="test-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.PENDING,
+            status="pending",
             pipeline_definition=sample_pipeline_definition,
         )
 
-        meltano_job = await orchestrator._create_meltano_job(mock_project, flext_job)
+        meltano_job = await orchestrator._create_meltano_job(
+            mock_project, flext_job,
+        )
 
         assert isinstance(meltano_job, Job)
         # Job object doesn't have job_id or run_id attributes by default
@@ -641,11 +644,13 @@ class TestFlextMeltanoOrchestrator:
             run_id="sync-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.PENDING,
+            status="pending",
             pipeline_definition=sample_pipeline_definition,
         )
 
-        result = await orchestrator._execute_pipeline_sync(flext_job, RunMode.FULL_RUN)
+        result = await orchestrator._execute_pipeline_sync(
+            flext_job, FlextMeltanoRunMode.FULL_RUN,
+        )
 
         assert result["run_id"] == "sync-run"
         assert result["status"] == ExecutionStatus.COMPLETED.value
@@ -665,15 +670,20 @@ class TestFlextMeltanoOrchestrator:
             run_id="async-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.PENDING,
+            status="pending",
             pipeline_definition=sample_pipeline_definition,
         )
 
-        result = await orchestrator._execute_pipeline_async(flext_job, RunMode.FULL_RUN)
+        result = await orchestrator._execute_pipeline_async(
+            flext_job, FlextMeltanoRunMode.FULL_RUN,
+        )
 
         assert result["run_id"] == "async-run"
         assert result["status"] == ExecutionStatus.RUNNING.value
-        assert result["message"] == "Pipeline execution started in the background."
+        assert (
+            result["message"]
+            == "Pipeline execution started in the background."
+        )
 
     @pytest.mark.asyncio
     async def test_run_pipeline_task_success(
@@ -689,7 +699,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="task-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.PENDING,
+            status="pending",
             pipeline_definition=sample_pipeline_definition,
         )
 
@@ -702,10 +712,10 @@ class TestFlextMeltanoOrchestrator:
             await orchestrator._run_pipeline_task(
                 mock_project,
                 flext_job,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
-            assert flext_job.status == ExecutionStatus.COMPLETED.value
+            assert flext_job.status == ExecutionStatus.COMPLETED.value  # type: ignore[comparison-overlap]
 
     @pytest.mark.asyncio
     async def test_run_pipeline_task_exception_handling(
@@ -721,7 +731,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="error-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition=sample_pipeline_definition,
         )
 
@@ -734,11 +744,11 @@ class TestFlextMeltanoOrchestrator:
             await orchestrator._run_pipeline_task(
                 mock_project,
                 flext_job,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
-            assert flext_job.status == ExecutionStatus.FAILED.value
-            assert flext_job.error == "Block failed"
+            assert flext_job.status == ExecutionStatus.FAILED.value  # type: ignore[comparison-overlap]
+            assert flext_job.error == "Block failed"  # type: ignore[unreachable]
             assert flext_job.finished_at is not None
 
     @pytest.mark.asyncio
@@ -759,7 +769,12 @@ class TestFlextMeltanoOrchestrator:
                 },
                 {
                     "block_type": "run",
-                    "commands": ["meltano", "run", "tap-csv", "target-postgres"],
+                    "commands": [
+                        "meltano",
+                        "run",
+                        "tap-csv",
+                        "target-postgres",
+                    ],
                 },
             ],
         }
@@ -769,7 +784,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="blocks-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition=pipeline_definition,
         )
 
@@ -782,7 +797,7 @@ class TestFlextMeltanoOrchestrator:
             result = await orchestrator._run_meltano_blocks(
                 mock_project,
                 flext_job,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
             assert result["success"] is True
@@ -803,7 +818,10 @@ class TestFlextMeltanoOrchestrator:
                     "extractor": "tap-csv",
                     "loader": "target-postgres",
                 },
-                {"block_type": "run", "commands": ["meltano", "run", "failing-tap"]},
+                {
+                    "block_type": "run",
+                    "commands": ["meltano", "run", "failing-tap"],
+                },
             ],
         }
 
@@ -812,7 +830,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="blocks-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition=pipeline_definition,
         )
 
@@ -836,7 +854,7 @@ class TestFlextMeltanoOrchestrator:
             result = await orchestrator._run_meltano_blocks(
                 mock_project,
                 flext_job,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
             assert result["success"] is False
@@ -857,7 +875,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="meltano-block-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -873,7 +891,7 @@ class TestFlextMeltanoOrchestrator:
             flext_job,
             block,
             0,
-            RunMode.FULL_RUN,
+            FlextMeltanoRunMode.FULL_RUN,
         )
 
         assert result["success"] is True
@@ -893,7 +911,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="run-block-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -903,7 +921,9 @@ class TestFlextMeltanoOrchestrator:
         }
 
         # Mock config to return minimum command count
-        with patch("flext_meltano.orchestrator.get_settings") as mock_get_settings:
+        with patch(
+            "flext_meltano.orchestrator.get_settings",
+        ) as mock_get_settings:
             mock_config = MagicMock()
             mock_config.business.MINIMUM_MELTANO_COMMAND_COUNT = 2
             mock_get_settings.return_value = mock_config
@@ -913,7 +933,7 @@ class TestFlextMeltanoOrchestrator:
                 flext_job,
                 block,
                 0,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
             assert result["success"] is True
@@ -936,7 +956,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="invoke-block-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -958,7 +978,7 @@ class TestFlextMeltanoOrchestrator:
                 flext_job,
                 block,
                 0,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
             assert result["success"] is True
@@ -978,7 +998,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="unknown-block-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -993,7 +1013,7 @@ class TestFlextMeltanoOrchestrator:
                 flext_job,
                 block,
                 0,
-                RunMode.FULL_RUN,
+                FlextMeltanoRunMode.FULL_RUN,
             )
 
     @pytest.mark.asyncio
@@ -1011,7 +1031,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="meltano-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -1044,7 +1064,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="meltano-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -1075,14 +1095,16 @@ class TestFlextMeltanoOrchestrator:
             run_id="run-run",
             project_name="test-project",
             environment="production",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
         commands = ["tap-csv", "dbt", "target-postgres"]
 
         # Mock config
-        with patch("flext_meltano.orchestrator.get_settings") as mock_get_settings:
+        with patch(
+            "flext_meltano.orchestrator.get_settings",
+        ) as mock_get_settings:
             mock_config = MagicMock()
             mock_config.business.MINIMUM_MELTANO_COMMAND_COUNT = 2
             mock_get_settings.return_value = mock_config
@@ -1112,14 +1134,16 @@ class TestFlextMeltanoOrchestrator:
             run_id="run-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
         commands = ["tap-csv"]  # Only one command
 
         # Mock config to require at least 2 commands
-        with patch("flext_meltano.orchestrator.get_settings") as mock_get_settings:
+        with patch(
+            "flext_meltano.orchestrator.get_settings",
+        ) as mock_get_settings:
             mock_config = MagicMock()
             mock_config.business.MINIMUM_MELTANO_COMMAND_COUNT = 2
             mock_get_settings.return_value = mock_config
@@ -1132,7 +1156,8 @@ class TestFlextMeltanoOrchestrator:
 
             assert result["success"] is False
             assert (
-                result["error"] == "Run command requires at least extractor and loader"
+                result["error"]
+                == "Run command requires at least extractor and loader"
             )
 
     @pytest.mark.asyncio
@@ -1149,7 +1174,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="run-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -1184,7 +1209,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="invoke-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -1195,7 +1220,9 @@ class TestFlextMeltanoOrchestrator:
         mock_result.success = True
         mock_result.stdout = "Success output"
 
-        with patch("flext_meltano.orchestrator.MeltanoEngine") as mock_engine_class:
+        with patch(
+            "flext_meltano.orchestrator.MeltanoEngine",
+        ) as mock_engine_class:
             mock_engine = AsyncMock()
             mock_engine.run_command.return_value = mock_result
             mock_engine_class.return_value = mock_engine
@@ -1208,7 +1235,10 @@ class TestFlextMeltanoOrchestrator:
 
             assert result["success"] is True
             assert result["commands_executed"] == 2
-            assert "All invoke commands completed successfully" in result["output"]
+            assert (
+                "All invoke commands completed successfully"
+                in result["output"]
+            )
 
     @pytest.mark.asyncio
     async def test_execute_invoke_block_command_failure(
@@ -1225,7 +1255,7 @@ class TestFlextMeltanoOrchestrator:
             run_id="invoke-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
@@ -1236,7 +1266,9 @@ class TestFlextMeltanoOrchestrator:
         mock_result.success = False
         mock_result.stderr = "Command failed"
 
-        with patch("flext_meltano.orchestrator.MeltanoEngine") as mock_engine_class:
+        with patch(
+            "flext_meltano.orchestrator.MeltanoEngine",
+        ) as mock_engine_class:
             mock_engine = AsyncMock()
             mock_engine.run_command.return_value = mock_result
             mock_engine_class.return_value = mock_engine
@@ -1265,14 +1297,16 @@ class TestFlextMeltanoOrchestrator:
             run_id="invoke-run",
             project_name="test-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={},
         )
 
         commands = ["test-command"]
 
         # Mock MeltanoEngine to raise exception
-        with patch("flext_meltano.orchestrator.MeltanoEngine") as mock_engine_class:
+        with patch(
+            "flext_meltano.orchestrator.MeltanoEngine",
+        ) as mock_engine_class:
             mock_engine = AsyncMock()
             mock_engine.run_command.side_effect = Exception("Engine error")
             mock_engine_class.return_value = mock_engine
@@ -1284,7 +1318,10 @@ class TestFlextMeltanoOrchestrator:
             )
 
             assert result["success"] is False
-            assert "Failed to execute invoke block: Engine error" in result["error"]
+            assert (
+                "Failed to execute invoke block: Engine error"
+                in result["error"]
+            )
 
     @pytest.mark.asyncio
     async def test_get_historical_job_status_success(
@@ -1306,7 +1343,9 @@ class TestFlextMeltanoOrchestrator:
             "_get_state_manager",
             return_value=mock_state_manager,
         ):
-            result = await orchestrator._get_historical_job_status("historical-123")
+            result = await orchestrator._get_historical_job_status(
+                "historical-123",
+            )
 
             assert result == historical_data
 
@@ -1317,7 +1356,9 @@ class TestFlextMeltanoOrchestrator:
         mock_state_manager: Any,
     ) -> None:
         """Test historical job status retrieval with error."""
-        mock_state_manager.get_job_status.side_effect = ValueError("State error")
+        mock_state_manager.get_job_status.side_effect = ValueError(
+            "State error",
+        )
 
         # Mock _get_state_manager to return our mock
         with patch.object(
@@ -1351,7 +1392,9 @@ class TestFlextMeltanoOrchestrator:
         # State should remain unchanged (read-only)
         assert mock_job.state == original_state
 
-    def test_update_job_state_no_state_attribute(self, orchestrator: Any) -> None:
+    def test_update_job_state_no_state_attribute(
+        self, orchestrator: Any,
+    ) -> None:
         """Test job state update when job has no state attribute."""
         from meltano.core.job.job import State
 
@@ -1376,8 +1419,10 @@ class TestIntegrationWorkflow:
         from flext_meltano.infrastructure.di_container import ServiceResult
 
         mock_project_config = {"config": "test"}
-        mock_project_manager.load_project_config.return_value = ServiceResult.ok(
-            mock_project_config,
+        mock_project_manager.load_project_config.return_value = (
+            ServiceResult.ok(
+                mock_project_config,
+            )
         )
         mock_project_manager.load_project.return_value = mock_project
 
@@ -1398,7 +1443,9 @@ class TestIntegrationWorkflow:
         }
 
     @pytest.mark.asyncio
-    async def test_complete_pipeline_lifecycle(self, orchestrator_setup: Any) -> None:
+    async def test_complete_pipeline_lifecycle(
+        self, orchestrator_setup: Any,
+    ) -> None:
         """Test complete pipeline lifecycle from creation to completion."""
         orchestrator = orchestrator_setup["orchestrator"]
         mock_state_manager = orchestrator_setup["state_manager"]
@@ -1414,7 +1461,10 @@ class TestIntegrationWorkflow:
                     "extractor": "tap-csv",
                     "loader": "target-postgres",
                 },
-                {"block_type": "run", "commands": ["meltano", "invoke", "dbt:run"]},
+                {
+                    "block_type": "run",
+                    "commands": ["meltano", "invoke", "dbt:run"],
+                },
             ],
         }
 
@@ -1423,8 +1473,8 @@ class TestIntegrationWorkflow:
             project_name="lifecycle-project",
             pipeline_definition=pipeline_definition,
             environment="production",
-            execution_mode=OrchestrationMode.SYNC,
-            run_mode=RunMode.FULL_RUN,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
+            run_mode=FlextMeltanoRunMode.FULL_RUN,
         )
 
         assert result["status"] == ExecutionStatus.COMPLETED.value
@@ -1442,7 +1492,9 @@ class TestIntegrationWorkflow:
         assert isinstance(running, list)
 
     @pytest.mark.asyncio
-    async def test_concurrent_pipeline_execution(self, orchestrator_setup: Any) -> None:
+    async def test_concurrent_pipeline_execution(
+        self, orchestrator_setup: Any,
+    ) -> None:
         """Test concurrent pipeline execution."""
         orchestrator = orchestrator_setup["orchestrator"]
 
@@ -1473,14 +1525,14 @@ class TestIntegrationWorkflow:
             project_name="project-1",
             pipeline_definition=pipeline_def1,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         task2 = orchestrator.run_pipeline(
             project_name="project-2",
             pipeline_definition=pipeline_def2,
             environment="dev",
-            execution_mode=OrchestrationMode.ASYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.ASYNC,
         )
 
         result1, result2 = await asyncio.gather(task1, task2)
@@ -1490,7 +1542,9 @@ class TestIntegrationWorkflow:
         assert result1["run_id"] != result2["run_id"]
 
     @pytest.mark.asyncio
-    async def test_pipeline_error_recovery(self, orchestrator_setup: Any) -> None:
+    async def test_pipeline_error_recovery(
+        self, orchestrator_setup: Any,
+    ) -> None:
         """Test pipeline error handling and recovery."""
         orchestrator = orchestrator_setup["orchestrator"]
         project_manager = orchestrator_setup["project_manager"]
@@ -1506,12 +1560,15 @@ class TestIntegrationWorkflow:
                 from flext_meltano.infrastructure.di_container import (
                     ServiceResult,
                 )
+
                 return ServiceResult.fail("Initial failure")
             # Return a successful ServiceResult
             mock_config = {"version": 1, "project_id": "test-project"}
             return ServiceResult.ok(mock_config)
 
-        project_manager.load_project_config.side_effect = load_project_side_effect
+        project_manager.load_project_config.side_effect = (
+            load_project_side_effect
+        )
 
         pipeline_definition = {
             "name": "error-recovery",
@@ -1529,7 +1586,7 @@ class TestIntegrationWorkflow:
             project_name="error-project",
             pipeline_definition=pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
         )
 
         assert result1["status"] == ExecutionStatus.FAILED.value
@@ -1540,7 +1597,7 @@ class TestIntegrationWorkflow:
             project_name="error-project",
             pipeline_definition=pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
         )
 
         assert result2["status"] == ExecutionStatus.COMPLETED.value
@@ -1554,7 +1611,9 @@ class TestIntegrationWorkflow:
         orchestrator = orchestrator_setup["orchestrator"]
 
         # Mock config for run block
-        with patch("flext_meltano.orchestrator.get_settings") as mock_get_settings:
+        with patch(
+            "flext_meltano.orchestrator.get_settings",
+        ) as mock_get_settings:
             mock_config = MagicMock()
             mock_config.business.MINIMUM_MELTANO_COMMAND_COUNT = 2
             mock_get_settings.return_value = mock_config
@@ -1564,7 +1623,9 @@ class TestIntegrationWorkflow:
             mock_result.success = True
             mock_result.stdout = "Invoke success"
 
-            with patch("flext_meltano.orchestrator.MeltanoEngine") as mock_engine_class:
+            with patch(
+                "flext_meltano.orchestrator.MeltanoEngine",
+            ) as mock_engine_class:
                 mock_engine = mock_engine_class.return_value
                 mock_engine.run_command.return_value = mock_result
                 mock_engine.run_pipeline.return_value = {
@@ -1583,7 +1644,12 @@ class TestIntegrationWorkflow:
                         },
                         {
                             "block_type": "run",
-                            "commands": ["meltano", "run", "tap-api", "target-jsonl"],
+                            "commands": [
+                                "meltano",
+                                "run",
+                                "tap-api",
+                                "target-jsonl",
+                            ],
                         },
                         {
                             "block_type": "invoke",
@@ -1596,8 +1662,8 @@ class TestIntegrationWorkflow:
                     project_name="complex-project",
                     pipeline_definition=complex_pipeline,
                     environment="production",
-                    execution_mode=OrchestrationMode.SYNC,
-                    run_mode=RunMode.FULL_RUN,
+                    execution_mode=FlextMeltanoOrchestrationMode.SYNC,
+                    run_mode=FlextMeltanoRunMode.FULL_RUN,
                 )
 
                 assert result["status"] == ExecutionStatus.COMPLETED.value
@@ -1624,7 +1690,9 @@ class TestEventHandling:
         return orchestrator, mock_event_bus
 
     @pytest.mark.asyncio
-    async def test_pipeline_event_emission(self, orchestrator_with_mocks: Any) -> None:
+    async def test_pipeline_event_emission(
+        self, orchestrator_with_mocks: Any,
+    ) -> None:
         """Test that pipeline events are properly emitted."""
         orchestrator, mock_event_bus = orchestrator_with_mocks
 
@@ -1633,7 +1701,7 @@ class TestEventHandling:
             run_id="event-run",
             project_name="event-project",
             environment="dev",
-            status=ExecutionStatus.RUNNING,
+            status="running",
             pipeline_definition={"name": "test"},
         )
 
@@ -1686,7 +1754,7 @@ class TestEventHandling:
             project_name="event-project",
             pipeline_definition=pipeline_definition,
             environment="dev",
-            execution_mode=OrchestrationMode.SYNC,
+            execution_mode=FlextMeltanoOrchestrationMode.SYNC,
         )
 
         # Verify multiple events were published (at least pipeline.running and pipeline.success)

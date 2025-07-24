@@ -14,7 +14,7 @@ from pathlib import Path
 # ===== ✅ IMPORTS RECOMENDADOS (Nova Arquitetura) =====
 # Imports simplificados - SEM warnings
 from flext_meltano import (
-    MeltanoProject,
+    FlextMeltanoProject,
 )
 
 # ===== ⚠️ DEMOS DE WARNINGS DE DEPRECIAÇÃO =====
@@ -42,10 +42,10 @@ with contextlib.suppress(Exception):
 # Criar um projeto Meltano com a nova arquitetura
 
 with contextlib.suppress(Exception):
-    project = MeltanoProject(
+    project = FlextMeltanoProject(
         name="demo-project",
-        directory=Path("/tmp/demo"),
-        config_path=Path("/tmp/demo/meltano.yml"),
+        directory=Path("/var/tmp/demo"),  # noqa: S108
+        config_path=Path("/var/tmp/demo/meltano.yml"),  # noqa: S108
         description="Demo project",
     )
 

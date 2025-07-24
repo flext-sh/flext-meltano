@@ -15,6 +15,13 @@ from typing import TYPE_CHECKING, Any
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
 from pydantic import BaseModel, Field
 
+# Import constants
+from flext_meltano.constants import (
+    FlextMeltanoEnvironmentType,
+    FlextMeltanoJobStatus,
+    FlextMeltanoPluginType,
+)
+
 # Define domain types as BaseModel for now
 DomainEntity = BaseModel
 DomainEvent = BaseModel
@@ -25,7 +32,7 @@ if TYPE_CHECKING:
 
 
 # Meltano-specific constants
-class MeltanoConstants:
+class FlextMeltanoConstants:
     """Constants for Meltano domain."""
 
     MAX_PROJECT_NAME_LENGTH = 255
@@ -35,7 +42,7 @@ class MeltanoConstants:
     FRAMEWORK_VERSION = "0.7.0"
 
 
-class PluginType(StrEnum):
+class FlextMeltanoFlextMeltanoPluginType(StrEnum):
     """Meltano plugin types."""
 
     EXTRACTOR = "extractors"
@@ -46,7 +53,7 @@ class PluginType(StrEnum):
     FILE = "files"
 
 
-class JobStatus(StrEnum):
+class FlextMeltanoFlextMeltanoJobStatus(StrEnum):
     """Meltano job execution status."""
 
     PENDING = "pending"
@@ -56,22 +63,13 @@ class JobStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
-class EnvironmentType(StrEnum):
-    """Meltano environment types."""
-
-    DEVELOPMENT = "dev"
-    STAGING = "staging"
-    PRODUCTION = "prod"
-    TEST = "test"
-
-
-class MeltanoProject(DomainEntity):
+class FlextMeltanoProject(DomainEntity):
     """Meltano project domain entity."""
 
     name: str = Field(
         ...,
         min_length=1,
-        max_length=MeltanoConstants.MAX_PROJECT_NAME_LENGTH,
+        max_length=FlextMeltanoConstants.MAX_PROJECT_NAME_LENGTH,
     )
     description: str | None = Field(None, max_length=1000)
 
@@ -84,7 +82,9 @@ class MeltanoProject(DomainEntity):
     project_id: str = Field(..., min_length=1)
 
     # Environment management
-    default_environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    default_environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
     environments: list[str] = Field(default_factory=list)
 
     # State management
@@ -111,7 +111,7 @@ class MeltanoProject(DomainEntity):
         return bool(self.project_root and self.meltano_yml_path)
 
 
-class MeltanoPlugin(DomainEntity):
+class FlextMeltanoPlugin(DomainEntity):
     """Meltano plugin domain entity."""
 
     project_id: EntityId = Field(..., description="Associated project ID")
@@ -120,10 +120,10 @@ class MeltanoPlugin(DomainEntity):
     name: str = Field(
         ...,
         min_length=1,
-        max_length=MeltanoConstants.MAX_PLUGIN_NAME_LENGTH,
+        max_length=FlextMeltanoConstants.MAX_PLUGIN_NAME_LENGTH,
     )
     namespace: str = Field(..., min_length=1)
-    plugin_type: PluginType = Field(...)
+    plugin_type: FlextMeltanoFlextMeltanoPluginType = Field(...)
     variant: str = Field(default="original")
 
     # Installation details
@@ -171,7 +171,7 @@ class MeltanoPlugin(DomainEntity):
         self.settings.update(settings)
 
 
-class MeltanoJob(DomainEntity):
+class FlextMeltanoJob(DomainEntity):
     """Meltano job domain entity."""
 
     project_id: EntityId = Field(..., description="Associated project ID")
@@ -180,16 +180,20 @@ class MeltanoJob(DomainEntity):
     name: str = Field(
         ...,
         min_length=1,
-        max_length=MeltanoConstants.MAX_JOB_NAME_LENGTH,
+        max_length=FlextMeltanoConstants.MAX_JOB_NAME_LENGTH,
     )
     description: str | None = Field(None, max_length=1000)
 
     # Job configuration
     tasks: list[str] = Field(default_factory=list)
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
     # Execution tracking
-    status: JobStatus = Field(default=JobStatus.PENDING)
+    status: FlextMeltanoFlextMeltanoJobStatus = Field(
+        default=FlextMeltanoFlextMeltanoJobStatus.PENDING,
+    )
     run_id: str | None = None
     started_at: datetime | None = None
     completed_at: datetime | None = None
@@ -208,25 +212,28 @@ class MeltanoJob(DomainEntity):
     @property
     def is_running(self) -> bool:
         """Check if job is currently running."""
-        return self.status == JobStatus.RUNNING
+        return self.status == FlextMeltanoFlextMeltanoJobStatus.RUNNING
 
     @property
     def is_completed(self) -> bool:
         """Check if job execution is completed."""
         return self.status in {
-            JobStatus.COMPLETED,
-            JobStatus.FAILED,
-            JobStatus.CANCELLED,
+            FlextMeltanoFlextMeltanoJobStatus.COMPLETED,
+            FlextMeltanoFlextMeltanoJobStatus.FAILED,
+            FlextMeltanoFlextMeltanoJobStatus.CANCELLED,
         }
 
     @property
     def is_successful(self) -> bool:
         """Check if job completed successfully."""
-        return self.status == JobStatus.COMPLETED and self.exit_code == 0
+        return (
+            self.status == FlextMeltanoFlextMeltanoJobStatus.COMPLETED
+            and self.exit_code == 0
+        )
 
     def start_execution(self) -> None:
         """Start job execution."""
-        self.status = JobStatus.RUNNING
+        self.status = FlextMeltanoFlextMeltanoJobStatus.RUNNING
         self.started_at = datetime.now()
 
     def complete_execution(
@@ -237,7 +244,11 @@ class MeltanoJob(DomainEntity):
         state: dict[str, Any] | None = None,
     ) -> None:
         """Complete job execution."""
-        self.status = JobStatus.COMPLETED if exit_code == 0 else JobStatus.FAILED
+        self.status = (
+            FlextMeltanoFlextMeltanoJobStatus.COMPLETED
+            if exit_code == 0
+            else FlextMeltanoFlextMeltanoJobStatus.FAILED
+        )
         self.exit_code = exit_code
         self.completed_at = datetime.now()
         self.stdout = stdout
@@ -252,7 +263,7 @@ class MeltanoJob(DomainEntity):
 
     def cancel_execution(self) -> None:
         """Cancel job execution."""
-        self.status = JobStatus.CANCELLED
+        self.status = FlextMeltanoJobStatus.CANCELLED
         self.completed_at = datetime.now()
 
         if self.started_at:
@@ -260,7 +271,7 @@ class MeltanoJob(DomainEntity):
             self.duration_seconds = duration.total_seconds()
 
 
-class MeltanoSchedule(DomainEntity):
+class FlextMeltanoSchedule(DomainEntity):
     """Meltano schedule domain entity."""
 
     project_id: EntityId = Field(..., description="Associated project ID")
@@ -275,7 +286,9 @@ class MeltanoSchedule(DomainEntity):
     end_date: datetime | None = None
 
     # Environment
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
     # Status
     enabled: bool = Field(default=True)
@@ -283,7 +296,7 @@ class MeltanoSchedule(DomainEntity):
     # Execution tracking
     last_run_at: datetime | None = None
     next_run_at: datetime | None = None
-    last_run_status: JobStatus | None = None
+    last_run_status: FlextMeltanoJobStatus | None = None
 
     def enable(self) -> None:
         """Enable schedule."""
@@ -296,7 +309,7 @@ class MeltanoSchedule(DomainEntity):
     def update_last_run(
         self,
         run_time: datetime,
-        status: JobStatus,
+        status: FlextMeltanoJobStatus,
     ) -> None:
         """Update last run information."""
         self.last_run_at = run_time
@@ -307,14 +320,14 @@ class MeltanoSchedule(DomainEntity):
         self.next_run_at = next_run
 
 
-class MeltanoEnvironment(DomainEntity):
+class FlextMeltanoEnvironment(DomainEntity):
     """Meltano environment domain entity."""
 
     project_id: EntityId = Field(..., description="Associated project ID")
 
     # Environment identification
     name: str = Field(..., min_length=1, max_length=255)
-    env_type: EnvironmentType = Field(...)
+    env_type: FlextMeltanoEnvironmentType = Field(...)
 
     # Configuration
     config: dict[str, Any] = Field(default_factory=dict)
@@ -342,7 +355,7 @@ class MeltanoEnvironment(DomainEntity):
         self.plugin_configs[plugin_name].update(config)
 
 
-class MeltanoState(DomainEntity):
+class FlextMeltanoState(DomainEntity):
     """Meltano state domain entity."""
 
     project_id: EntityId = Field(..., description="Associated project ID")
@@ -357,7 +370,9 @@ class MeltanoState(DomainEntity):
     version: int = Field(default=1)
 
     # Environment context
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
     # Timestamps
     state_updated_at: datetime = Field(default_factory=datetime.now)
@@ -376,24 +391,26 @@ class MeltanoState(DomainEntity):
 
 
 # Domain Events
-class ProjectCreatedEvent(DomainEvent):
+class FlextMeltanoProjectCreatedEvent(DomainEvent):
     """Event raised when Meltano project is created."""
 
     project_id: EntityId = Field(..., description="Project ID")
     project_name: str | None = Field(None, description="Project name")
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
 
-class PluginInstalledEvent(DomainEvent):
+class FlextMeltanoPluginInstalledEvent(DomainEvent):
     """Event raised when plugin is installed."""
 
     project_id: EntityId = Field(..., description="Project ID")
     plugin_id: EntityId = Field(..., description="Plugin ID")
     plugin_name: str = Field(..., description="Plugin name")
-    plugin_type: PluginType = Field(..., description="Plugin type")
+    plugin_type: FlextMeltanoPluginType = Field(..., description="Plugin type")
 
 
-class PluginUninstalledEvent(DomainEvent):
+class FlextMeltanoPluginUninstalledEvent(DomainEvent):
     """Event raised when plugin is uninstalled."""
 
     project_id: EntityId = Field(..., description="Project ID")
@@ -401,17 +418,19 @@ class PluginUninstalledEvent(DomainEvent):
     plugin_name: str = Field(..., description="Plugin name")
 
 
-class JobStartedEvent(DomainEvent):
+class FlextMeltanoJobStartedEvent(DomainEvent):
     """Event raised when job starts execution."""
 
     project_id: EntityId = Field(..., description="Project ID")
     job_id: EntityId = Field(..., description="Job ID")
     job_name: str = Field(..., description="Job name")
     run_id: str | None = Field(None, description="Run ID")
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
 
-class JobCompletedEvent(DomainEvent):
+class FlextMeltanoJobCompletedEvent(DomainEvent):
     """Event raised when job completes execution."""
 
     project_id: EntityId = Field(..., description="Project ID")
@@ -421,7 +440,7 @@ class JobCompletedEvent(DomainEvent):
     duration_seconds: float | None = Field(None, description="Execution duration")
 
 
-class JobFailedEvent(DomainEvent):
+class FlextMeltanoJobFailedEvent(DomainEvent):
     """Event raised when job fails."""
 
     project_id: EntityId = Field(..., description="Project ID")
@@ -430,7 +449,7 @@ class JobFailedEvent(DomainEvent):
     error_message: str | None = Field(None, description="Error message")
 
 
-class ScheduleTriggeredEvent(DomainEvent):
+class FlextMeltanoScheduleTriggeredEvent(DomainEvent):
     """Event raised when schedule triggers job execution."""
 
     project_id: EntityId = Field(..., description="Project ID")
@@ -440,7 +459,7 @@ class ScheduleTriggeredEvent(DomainEvent):
     triggered_at: datetime = Field(default_factory=datetime.now)
 
 
-class StateUpdatedEvent(DomainEvent):
+class FlextMeltanoStateUpdatedEvent(DomainEvent):
     """Event raised when plugin state is updated."""
 
     project_id: EntityId = Field(..., description="Project ID")
@@ -448,13 +467,15 @@ class StateUpdatedEvent(DomainEvent):
     state_id: str = Field(..., description="State ID")
     plugin_name: str = Field(..., description="Plugin name")
     version: int = Field(..., description="State version")
-    environment: EnvironmentType = Field(default=EnvironmentType.DEVELOPMENT)
+    environment: FlextMeltanoEnvironmentType = Field(
+        default=FlextMeltanoEnvironmentType.DEVELOPMENT,
+    )
 
 
-class EnvironmentCreatedEvent(DomainEvent):
+class FlextMeltanoEnvironmentCreatedEvent(DomainEvent):
     """Event raised when environment is created."""
 
     project_id: EntityId = Field(..., description="Project ID")
     environment_id: EntityId = Field(..., description="Environment ID")
     environment_name: str = Field(..., description="Environment name")
-    env_type: EnvironmentType = Field(..., description="Environment type")
+    env_type: FlextMeltanoEnvironmentType = Field(..., description="Environment type")

@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 @dataclass
-class MeltanoConfig:
+class FlextMeltanoConfig:
     """Configuration for Meltano executor."""
 
     project_dir: str = "."

@@ -5,11 +5,11 @@ Project domain models following Clean Architecture and DDD patterns.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from flext_core import FlextResult
-from flext_core.constants import FlextConstants
 from pydantic import BaseModel, Field, model_validator
 
 from flext_meltano.constants import (
@@ -19,6 +19,16 @@ from flext_meltano.constants import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+def _get_current_timestamp() -> str:
+    """Get current timestamp in ISO format.
+
+    Returns:
+        Current timestamp in ISO format with UTC timezone
+
+    """
+    return datetime.now(UTC).isoformat()
 
 
 class FlextMeltanoProject(BaseModel):
@@ -82,11 +92,11 @@ class FlextMeltanoProject(BaseModel):
 
     # Timestamps
     created_at: str = Field(
-        default_factory=lambda: FlextConstants.get_current_timestamp(),
+        default_factory=lambda: _get_current_timestamp(),
         description="Project creation timestamp",
     )
     updated_at: str = Field(
-        default_factory=lambda: FlextConstants.get_current_timestamp(),
+        default_factory=lambda: _get_current_timestamp(),
         description="Last update timestamp",
     )
 
@@ -121,9 +131,7 @@ class FlextMeltanoProject(BaseModel):
 
         # Ensure config path is within project directory
         try:
-            self.config_path.resolve().relative_to(
-                self.directory.resolve()
-            )
+            self.config_path.resolve().relative_to(self.directory.resolve())
         except ValueError as e:
             msg = "Config path must be within project directory"
             raise ValueError(msg) from e
@@ -140,12 +148,10 @@ class FlextMeltanoProject(BaseModel):
 
         """
         if not self.is_initialized:
-            return FlextResult.fail(
-                "Cannot activate uninitialized project"
-            )
+            return FlextResult.fail("Cannot activate uninitialized project")
 
         self.is_active = True
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -157,7 +163,7 @@ class FlextMeltanoProject(BaseModel):
 
         """
         self.is_active = False
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -178,11 +184,11 @@ class FlextMeltanoProject(BaseModel):
         """
         if environment not in self.available_environments:
             return FlextResult.fail(
-                f"Environment '{environment}' not available for project"
+                f"Environment '{environment}' not available for project",
             )
 
         self.current_environment = environment
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -200,12 +206,10 @@ class FlextMeltanoProject(BaseModel):
 
         """
         if environment in self.available_environments:
-            return FlextResult.fail(
-                f"Environment '{environment}' already exists"
-            )
+            return FlextResult.fail(f"Environment '{environment}' already exists")
 
         self.available_environments.append(environment)
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -226,22 +230,16 @@ class FlextMeltanoProject(BaseModel):
 
         """
         if environment == self.current_environment:
-            return FlextResult.fail(
-                "Cannot remove current active environment"
-            )
+            return FlextResult.fail("Cannot remove current active environment")
 
         if len(self.available_environments) <= 1:
-            return FlextResult.fail(
-                "Project must have at least one environment"
-            )
+            return FlextResult.fail("Project must have at least one environment")
 
         if environment not in self.available_environments:
-            return FlextResult.fail(
-                f"Environment '{environment}' not found"
-            )
+            return FlextResult.fail(f"Environment '{environment}' not found")
 
         self.available_environments.remove(environment)
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -256,7 +254,7 @@ class FlextMeltanoProject(BaseModel):
             return FlextResult.fail("Project already initialized")
 
         self.is_initialized = True
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 
@@ -277,9 +275,7 @@ class FlextMeltanoProject(BaseModel):
         """
         if description is not None:
             if len(description) > 500:
-                return FlextResult.fail(
-                    "Description must be 500 characters or less"
-                )
+                return FlextResult.fail("Description must be 500 characters or less")
             self.description = description
 
         if version is not None:
@@ -287,7 +283,7 @@ class FlextMeltanoProject(BaseModel):
                 return FlextResult.fail("Version cannot be empty")
             self.version = version
 
-        self.updated_at = FlextConstants.get_current_timestamp()
+        self.updated_at = _get_current_timestamp()
 
         return FlextResult.ok(None)
 

@@ -22,7 +22,7 @@ else:
 logger = logging.getLogger(__name__)
 
 
-class EventBusProtocol(Protocol):
+class FlextMeltanoEventBusProtocol(Protocol):
     """Protocol for event bus implementations compatible with flext_core."""
 
     async def publish(self, event: DomainEvent | dict[str, Any]) -> None:
@@ -55,7 +55,7 @@ class EventBusProtocol(Protocol):
         ...
 
 
-class SimpleEventBus:
+class FlextMeltanoSimpleEventBus:
     """Simple in-memory event bus implementation for development/testing."""
 
     def __init__(self) -> None:

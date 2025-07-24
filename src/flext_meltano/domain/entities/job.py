@@ -5,30 +5,28 @@ MeltanoJob represents a Meltano job execution with its state and business rules.
 
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime
 from typing import Any, ClassVar
 
-from flext_core import ServiceResult
+from flext_core import FlextResult
 from pydantic import BaseModel, Field, field_validator
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
-from flext_meltano.infrastructure.di_container import (
-    get_domain_entity,
-    get_field,
-    get_service_result,
-)
 
 DomainEntity = BaseModel
 
 
-
-
-class MeltanoJob(DomainEntity):
+class FlextMeltanoJob(DomainEntity):
     """Meltano job domain entity with execution semantics."""
 
+    # Primary identifier
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, description="Unique job identifier")
+
     # Identity
-    job_id: str = Field(..., description="Unique job identifier")
+    job_id: str = Field(..., description="Business job identifier")
     name: str = Field(..., description="Job name")
+    project_id: Any = Field(..., description="Associated project ID")
 
     # Job definition
     tasks: list[str] = Field(default_factory=list, description="Job tasks")
@@ -58,7 +56,8 @@ class MeltanoJob(DomainEntity):
     )
 
     # Metadata
-    project_id: str | None = Field(default=None, description="Associated project ID")
+    description: str | None = Field(default=None, description="Job description")
+    triggered_by: Any | None = Field(default=None, description="Who/what triggered the job")
     created_by: str | None = Field(default=None, description="Job creator")
 
     # Business rules
@@ -112,10 +111,10 @@ class MeltanoJob(DomainEntity):
 
         return cleaned_tasks
 
-    def start(self) -> ServiceResult[None]:
+    def start(self) -> FlextResult[None]:
         """Start job execution."""
         if self.status != "pending":
-            return ServiceResult.fail(f"Cannot start job in '{self.status}' status")
+            return FlextResult.fail(f"Cannot start job in '{self.status}' status")
 
         self.status = "running"
         self.started_at = datetime.now(UTC)
@@ -123,16 +122,16 @@ class MeltanoJob(DomainEntity):
         self.exit_code = None
         self.error_message = None
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def complete(
         self,
         exit_code: int = 0,
         output: str | None = None,
-    ) -> ServiceResult[None]:
+    ) -> FlextResult[None]:
         """Mark job as completed."""
         if self.status != "running":
-            return ServiceResult.fail(f"Cannot complete job in '{self.status}' status")
+            return FlextResult.fail(f"Cannot complete job in '{self.status}' status")
 
         self.status = "completed"
         self.finished_at = datetime.now(UTC)
@@ -140,46 +139,53 @@ class MeltanoJob(DomainEntity):
         self.output = output
         self.error_message = None
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def fail(
         self,
         exit_code: int = 1,
         error_message: str | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, Any]]:
         """Mark job as failed."""
         if self.status not in {"running", "pending"}:
-            return ServiceResult.fail(f"Cannot fail job in '{self.status}' status")
+            return FlextResult.fail(f"Cannot fail job in '{self.status}' status")
 
         self.status = "failed"
         self.finished_at = datetime.now(UTC)
         self.exit_code = exit_code
         self.error_message = error_message
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(
+            {
+                "job_id": self.job_id,
+                "status": self.status,
+                "exit_code": exit_code,
+                "error_message": error_message,
+            },
+        )
 
-    def cancel(self) -> ServiceResult[None]:
+    def cancel(self) -> FlextResult[None]:
         """Cancel job execution."""
         if self.status in self.TERMINAL_STATUSES:
-            return ServiceResult.fail(
+            return FlextResult.fail(
                 f"Cannot cancel job in terminal status '{self.status}'",
             )
 
         self.status = "cancelled"
         self.finished_at = datetime.now(UTC)
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
-    def timeout(self) -> ServiceResult[None]:
+    def timeout(self) -> FlextResult[None]:
         """Mark job as timed out."""
         if self.status != "running":
-            return ServiceResult.fail(f"Cannot timeout job in '{self.status}' status")
+            return FlextResult.fail(f"Cannot timeout job in '{self.status}' status")
 
         self.status = "timeout"
         self.finished_at = datetime.now(UTC)
         self.error_message = "Job execution timed out"
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
 
     def is_terminal(self) -> bool:
         """Check if job is in a terminal state."""
@@ -203,10 +209,10 @@ class MeltanoJob(DomainEntity):
         """Check if job can be retried."""
         return self.status in {"failed", "timeout", "cancelled"}
 
-    def reset_for_retry(self) -> ServiceResult[None]:
+    def reset_for_retry(self) -> FlextResult[None]:
         """Reset job state for retry."""
         if not self.can_be_retried():
-            return ServiceResult.fail(f"Cannot retry job in '{self.status}' status")
+            return FlextResult.fail(f"Cannot retry job in '{self.status}' status")
 
         self.status = "pending"
         self.started_at = None
@@ -215,4 +221,24 @@ class MeltanoJob(DomainEntity):
         self.output = None
         self.error_message = None
 
-        return ServiceResult.ok(None)
+        return FlextResult.ok(None)
+
+    def start_execution(self) -> None:
+        """Start job execution."""
+        self.status = "running"
+        self.started_at = datetime.now(UTC)
+
+    def complete_execution(self, exit_code: int, stdout: str | None = None, stderr: str | None = None) -> None:
+        """Complete job execution."""
+        self.status = "completed" if exit_code == 0 else "failed"
+        self.exit_code = exit_code
+        self.finished_at = datetime.now(UTC)
+        if stdout:
+            self.output = stdout
+        if stderr:
+            self.error_message = stderr
+
+    def cancel_execution(self) -> None:
+        """Cancel job execution."""
+        self.status = "cancelled"
+        self.finished_at = datetime.now(UTC)

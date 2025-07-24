@@ -18,17 +18,17 @@ from typing import TYPE_CHECKING, Any, ClassVar, Protocol, TypeVar, cast
 from pydantic import BaseModel, Field
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container imports
-from flext_meltano.infrastructure.di_container import DomainEntity
+from flext_meltano.infrastructure.di_container import get_domain_entity
 
-# Use DomainEntity as base for value objects
-DomainValueObject = DomainEntity
+# Initialize types via DI container
+DomainValueObject = get_domain_entity()
 
 if TYPE_CHECKING:
     from types import ModuleType
 
-    # Define local types without flext-core dependency
-    Pipeline = dict
-    PipelineExecution = dict
+# Define local types without flext-core dependency
+Pipeline = dict[str, Any]
+PipelineExecution = dict[str, Any]
 
 # Type aliases for clean interface
 StepFunction = Callable[..., Any]
@@ -41,7 +41,7 @@ P = TypeVar("P")
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-class StepType(Enum):
+class FlextMeltanoStepType(Enum):
     """Pipeline step types with automatic behavior."""
 
     EXTRACT = auto()
@@ -51,7 +51,7 @@ class StepType(Enum):
     NOTIFY = auto()
 
 
-class StepProtocol(Protocol):
+class FlextMeltanoStepProtocol(Protocol):
     """Protocol for pipeline steps with reflection support."""
 
     async def execute(self, context: dict[str, Any]) -> StepResult:
@@ -59,7 +59,7 @@ class StepProtocol(Protocol):
         ...
 
     @property
-    def step_type(self) -> StepType:
+    def step_type(self) -> FlextMeltanoStepType:
         """Return the step type."""
         ...
 
@@ -69,14 +69,19 @@ class StepProtocol(Protocol):
         ...
 
 
-class ReflectionStep(DomainValueObject):
+class FlextMeltanoReflectionStep(BaseModel):
     """Zero-boilerplate step implementation using reflection."""
 
-    model_config: ClassVar = {"arbitrary_types_allowed": True, "use_enum_values": False}
+    model_config: ClassVar = {
+        "arbitrary_types_allowed": True,
+        "use_enum_values": False,
+    }
 
     name: str = Field(description="Step name for identification")
     func: StepFunction = Field(description="Step function to execute")
-    step_type: StepType = Field(description="Type of step for orchestration")
+    step_type: FlextMeltanoStepType = Field(
+        description="Type of step for orchestration",
+    )
     dependencies: list[str] = Field(
         default_factory=list,
         description="List of step dependencies",
@@ -164,13 +169,13 @@ class ReflectionStep(DomainValueObject):
         step_type_name = (
             self.step_type.name
             if hasattr(self.step_type, "name")
-            else StepType(self.step_type).name
+            else FlextMeltanoStepType(self.step_type).name
         )
         return {"name": self.name, "result": result, "type": step_type_name}
 
 
 def pipeline_step(
-    step_type: StepType,
+    step_type: FlextMeltanoStepType,
     name: str | None = None,
     dependencies: list[str] | None = None,
     retry: int = 3,
@@ -183,7 +188,7 @@ def pipeline_step(
         step_name = name or getattr(func, "__name__", "unknown_step").replace("_", "-")
 
         # Create reflection step
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name=step_name,
             func=func,
             step_type=step_type,
@@ -192,10 +197,10 @@ def pipeline_step(
             timeout_seconds=timeout,
         )
 
-        # Store step metadata on function using setattr for type safety
-        func.pipeline_step = step
-        func.step_type = step_type
-        func.dependencies = dependencies or []
+        # Store step metadata on function (dynamic attributes for reflection)
+        func.pipeline_step = step  # type: ignore[attr-defined]
+        func.step_type = step_type  # type: ignore[attr-defined]
+        func.dependencies = dependencies or []  # type: ignore[attr-defined]
 
         @wraps(func)
         async def wrapper(*args: object, **kwargs: object) -> Any:
@@ -215,17 +220,17 @@ def pipeline_step(
     return decorator
 
 
-class ReflectionOrchestrator(BaseModel):
+class FlextMeltanoReflectionOrchestrator(BaseModel):
     """Automatic pipeline orchestrator using reflection patterns."""
 
     model_config: ClassVar = {"arbitrary_types_allowed": True}
 
     # Registry of steps discovered through reflection
-    step_registry: dict[str, ReflectionStep] = Field(
+    step_registry: dict[str, FlextMeltanoReflectionStep] = Field(
         default_factory=dict,
         description="Step registry by name",
     )
-    type_registry: dict[StepType, list[ReflectionStep]] = Field(
+    type_registry: dict[FlextMeltanoStepType, list[FlextMeltanoReflectionStep]] = Field(
         default_factory=dict,
         description="Step registry by type",
     )
@@ -311,7 +316,7 @@ class ReflectionOrchestrator(BaseModel):
 
     async def _execute_step_with_retry(
         self,
-        step: ReflectionStep,
+        step: FlextMeltanoReflectionStep,
         context: ExecutionContext,
         configuration: dict[str, Any],
     ) -> StepResult:
@@ -321,7 +326,11 @@ class ReflectionOrchestrator(BaseModel):
         for attempt in range(step.retry_count):
             try:
                 # Add configuration to context (both as config and spread individual keys)
-                step_context = {**context, "config": configuration, **configuration}
+                step_context = {
+                    **context,
+                    "config": configuration,
+                    **configuration,
+                }
 
                 # Execute with timeout
                 return await asyncio.wait_for(
@@ -329,7 +338,13 @@ class ReflectionOrchestrator(BaseModel):
                     timeout=step.timeout_seconds,
                 )
 
-            except (TimeoutError, ValueError, TypeError, RuntimeError, OSError) as e:
+            except (
+                TimeoutError,
+                ValueError,
+                TypeError,
+                RuntimeError,
+                OSError,
+            ) as e:
                 last_error = e
 
                 # Exponential backoff if retrying
@@ -343,13 +358,13 @@ class ReflectionOrchestrator(BaseModel):
 
 
 # Example step implementations using the decorator
-@pipeline_step(StepType.EXTRACT, name="simple-extract")
+@pipeline_step(FlextMeltanoStepType.EXTRACT, name="simple-extract")
 async def extract_data(source: str, config: dict[str, Any]) -> dict[str, Any]:
     """Simple data extraction step."""
     return {"source": source, "data": f"extracted from {source}"}
 
 
-@pipeline_step(StepType.TRANSFORM, name="simple-transform")
+@pipeline_step(FlextMeltanoStepType.TRANSFORM, name="simple-transform")
 async def transform_data(
     data: dict[str, Any],
     config: dict[str, Any],
@@ -358,7 +373,7 @@ async def transform_data(
     return {"transformed": True, "original": data}
 
 
-@pipeline_step(StepType.LOAD, name="simple-load")
+@pipeline_step(FlextMeltanoStepType.LOAD, name="simple-load")
 async def load_data(
     data: dict[str, Any],
     target: str,
@@ -368,9 +383,9 @@ async def load_data(
     return {"target": target, "loaded": True, "data": data}
 
 
-def create_orchestrator() -> ReflectionOrchestrator:
+def flext_create_orchestrator() -> FlextMeltanoReflectionOrchestrator:
     """Create a reflection orchestrator with discovered steps."""
-    orchestrator = ReflectionOrchestrator()
+    orchestrator = FlextMeltanoReflectionOrchestrator()
 
     # Discover steps in current module
     orchestrator.discover_steps(sys.modules[__name__])

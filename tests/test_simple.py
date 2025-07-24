@@ -5,12 +5,7 @@ Modern tests following flext-core standards.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
-
-if TYPE_CHECKING:
-    from flext_core import ServiceResult
 
 
 # Test flext-infrastructure.plugins.flext-meltano basic functionality
@@ -35,6 +30,7 @@ def test_flext_meltano_has_core_dependencies() -> None:
 def test_service_result_pattern() -> None:
     """Test ServiceResult pattern works correctly."""
     from flext_meltano.infrastructure.di_container import ServiceResult
+
     # Test success case
     success = ServiceResult.ok({"test": "data"})
     assert success.is_success is True

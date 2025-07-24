@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """Go Integration for FLEXT Meltano.
 
 This module provides Python-Go bridge functionality using HTTP API,
@@ -15,16 +13,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
+from flext_core import FlextResult
 
 # Initialize types via DI container
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class GoIntegrationConfig:
+class FlextMeltanoGoIntegrationConfig:
     """Configuration for Go-Python integration via HTTP API."""
 
     module_name: str = "flext_meltano_go"
@@ -45,12 +41,12 @@ class GoIntegrationConfig:
             ]
 
 
-class GoIntegration:
+class FlextMeltanoGoIntegration:
     """Go integration for exposing Python Meltano functionality via HTTP API."""
 
-    def __init__(self, config: GoIntegrationConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoGoIntegrationConfig | None = None) -> None:
         """Initialize Go integration."""
-        self.config = config or GoIntegrationConfig()
+        self.config = config or FlextMeltanoGoIntegrationConfig()
         self.logger = logger
         self.project_root = Path.cwd()
         self._api_server_process = None
@@ -59,9 +55,9 @@ class GoIntegration:
         """Check if required dependencies are available."""
         # NO FALLBACKS - SEMPRE usar implementações originais conforme instrução
         # Check if we can import our bridge module
-        from flext_meltano.integrations.bridge import MeltanoBridge
+        from flext_meltano.integrations.bridge import FlextMeltanoBridge
 
-        bridge = MeltanoBridge()
+        bridge = FlextMeltanoBridge()
         if not bridge.is_available():
             self.logger.warning("Meltano bridge not available")
             return False
@@ -69,12 +65,10 @@ class GoIntegration:
         self.logger.info("Go integration dependencies available")
         return True
 
-    def generate_http_api_server(self) -> ServiceResult[Any]:
+    def generate_http_api_server(self) -> FlextResult[Any]:
         """Generate HTTP API server for Go-Python communication."""
         if not self.check_dependencies_available():
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error="Required dependencies not available",
             )
 
@@ -99,7 +93,7 @@ class GoIntegration:
 
             self.logger.info("Generated HTTP API server and Go client")
 
-            return ServiceResult.ok(
+            return FlextResult.ok(
                 {
                     "go_client": str(go_client_path),
                     "usage_doc": str(usage_path),
@@ -111,11 +105,7 @@ class GoIntegration:
 
         except Exception as e:
             self.logger.exception(f"Error generating HTTP API integration: {e}")
-            return ServiceResult(
-                success=False,
-                data=None,
-                error=f"Error generating HTTP API integration: {e}",
-            )
+            return FlextResult.fail(f"Error generating HTTP API integration: {e}")
 
     def _generate_api_server_code(self) -> str:
         """Generate Python HTTP API server code."""
@@ -159,27 +149,27 @@ app = FastAPI(
 )
 
 # Request models
-class InitProjectRequest(BaseModel):
+class FlextMeltanoInitProjectRequest(BaseModel):
     project_name: str
     project_dir: str = ""
 
-class AddPluginRequest(BaseModel):
+class FlextMeltanoAddPluginRequest(BaseModel):
     project_name: str
     plugin_type: str
     plugin_name: str
     plugin_variant: str = ""
 
-class RunPipelineRequest(BaseModel):
+class FlextMeltanoRunPipelineRequest(BaseModel):
     project_name: str
     extractor: str
     loader: str
     transformer: str = ""
 
-class ExecuteCommandRequest(BaseModel):
+class FlextMeltanoExecuteCommandRequest(BaseModel):
     project_name: str
     command_args: list[str]
 
-class ProjectInfoRequest(BaseModel):
+class FlextMeltanoProjectInfoRequest(BaseModel):
     project_name: str
 
 # API endpoints
@@ -474,7 +464,7 @@ func main() {{
 }}
 """
 
-    def create_go_wrapper(self) -> ServiceResult[Any]:
+    def create_go_wrapper(self) -> FlextResult[Any]:
         """Create a Go client for HTTP API communication."""
         wrapper_content = self._generate_go_client_code()
 
@@ -483,17 +473,11 @@ func main() {{
             wrapper_path.write_text(wrapper_content)
 
             self.logger.info(f"Go wrapper created at {wrapper_path}")
-            return ServiceResult(
-                data={"wrapper_path": str(wrapper_path)},
-                success=True,
-                error=None,
-            )
+            return FlextResult.ok({"wrapper_path": str(wrapper_path)})
 
         except Exception as e:
             self.logger.exception(f"Error creating Go client: {e}")
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error=f"Error creating Go client: {e}",
             )
 
@@ -648,12 +632,10 @@ func main() {
 }
 """
 
-    def build_shared_library(self) -> ServiceResult[Any]:
+    def build_shared_library(self) -> FlextResult[Any]:
         """Build shared library for use with Go."""
         if not self.check_gopy_available():
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error="GoPy not available",
             )
 
@@ -684,25 +666,17 @@ func main() {
             if result.returncode == 0:
                 shared_lib_path = output_dir / f"{self.config.module_name}.so"
                 self.logger.info(f"Shared library built at {shared_lib_path}")
-                return ServiceResult(
-                    data={"shared_lib_path": str(shared_lib_path)},
-                    success=True,
-                    error=None,
-                )
+                return FlextResult.ok({"shared_lib_path": str(shared_lib_path)})
             error_msg = f"Failed to build shared library: {result.stderr}"
             self.logger.error(error_msg)
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error=error_msg,
             )
 
         except Exception as e:
             error_msg = f"Error building shared library: {e}"
             self.logger.exception(error_msg)
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error=error_msg,
             )
 
@@ -719,7 +693,7 @@ func main() {
         except Exception:
             return False
 
-    def generate_documentation(self) -> ServiceResult[Any]:
+    def generate_documentation(self) -> FlextResult[Any]:
         """Generate documentation for the Go bindings."""
         doc_content = self._generate_documentation_content()
 
@@ -728,18 +702,12 @@ func main() {
             doc_path.write_text(doc_content)
 
             self.logger.info(f"Documentation generated at {doc_path}")
-            return ServiceResult(
-                data={"doc_path": str(doc_path)},
-                success=True,
-                error=None,
-            )
+            return FlextResult.ok({"doc_path": str(doc_path)})
 
         except Exception as e:
             error_msg = f"Error generating documentation: {e}"
             self.logger.exception(error_msg)
-            return ServiceResult(
-                data=None,
-                success=False,
+            return FlextResult.fail(
                 error=error_msg,
             )
 
@@ -824,7 +792,7 @@ The bindings are configured with:
 
 def main() -> None:
     """Main function for CLI usage."""
-    integration = GoIntegration()
+    integration = FlextMeltanoGoIntegration()
 
     # Generate HTTP API integration
     result = integration.generate_http_api_server()
@@ -835,10 +803,10 @@ def main() -> None:
 
 
 # Maintain backward compatibility
-class GopyIntegration(GoIntegration):
+class FlextMeltanoGopyIntegration(FlextMeltanoGoIntegration):
     """Backward compatibility alias."""
 
-    def __init__(self, config: GoIntegrationConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoGoIntegrationConfig | None = None) -> None:
         """Initialize GoPy integration with optional configuration."""
         super().__init__(config)
 
@@ -854,7 +822,7 @@ class GopyIntegration(GoIntegration):
 
 
 # Backward compatibility alias
-GopyBuildConfig = GoIntegrationConfig
+GopyBuildConfig = FlextMeltanoGoIntegrationConfig
 
 if __name__ == "__main__":
     main()

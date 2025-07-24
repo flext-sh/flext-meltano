@@ -21,23 +21,34 @@ sys.modules["flext_observability.logging"] = MagicMock()
 
 # ruff: noqa: E402 - Module mocking must happen before imports
 from flext_meltano.config import (
-    MeltanoExecutionConfig,
-    MeltanoPluginConfig,
-    MeltanoProjectConfig,
-    MeltanoSettings,
-    MeltanoStateConfig,
+    FlextMeltanoExecutionConfig,
+    FlextMeltanoPluginConfig,
+    FlextMeltanoProjectConfig,
+    FlextMeltanoSettings,
+    FlextMeltanoStateConfig,
 )
-from flext_meltano.infrastructure.di_container import Environment
+
+# Create aliases to match the test expectations
+MeltanoProjectConfig = FlextMeltanoProjectConfig
+MeltanoExecutionConfig = FlextMeltanoExecutionConfig
+MeltanoStateConfig = FlextMeltanoStateConfig
+MeltanoPluginConfig = FlextMeltanoPluginConfig
+
+# Import environment constants
+from flext_meltano.constants import FlextMeltanoEnvironmentType
+
+# Create Environment alias
+Environment = FlextMeltanoEnvironmentType
 
 
-class TestMeltanoSettingsIsolated:
-    """Test MeltanoSettings in completely isolated environment."""
+class TestFlextMeltanoSettingsIsolated:
+    """Test FlextMeltanoSettings in completely isolated environment."""
 
     @patch.dict(os.environ, {}, clear=True)
     def test_default_values_isolated(self) -> None:
         """Test default settings values in isolated environment."""
         # Create settings with explicit _env_file=None to avoid loading .env
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
 
         assert settings.project_name == "flext-infrastructure.plugins.flext-meltano"
         assert settings.project_version == "0.7.0"
@@ -55,7 +66,7 @@ class TestMeltanoSettingsIsolated:
     @patch.dict(os.environ, {}, clear=True)
     def test_model_config_isolated(self) -> None:
         """Test model configuration settings in isolated environment."""
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
         config = settings.model_config
 
         assert config["env_prefix"] == "FLEXT_MELTANO_"
@@ -71,7 +82,7 @@ class TestMeltanoSettingsIsolated:
     @patch.dict(os.environ, {}, clear=True)
     def test_legacy_properties_isolated(self) -> None:
         """Test legacy property accessors in isolated environment."""
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
 
         # Test all legacy properties
         assert settings.project_root == settings.project.project_root
@@ -98,7 +109,7 @@ class TestMeltanoSettingsIsolated:
         }
 
         with patch.dict(os.environ, env_vars):
-            settings = MeltanoSettings(_env_file=None)
+            settings = FlextMeltanoSettings(_env_file=None)
 
             assert settings.project_name == "test-project"
             assert settings.environment == "test"
@@ -118,7 +129,7 @@ class TestMeltanoSettingsIsolated:
             job_timeout=5400,
         )
 
-        settings = MeltanoSettings(
+        settings = FlextMeltanoSettings(
             project_name="custom-meltano",
             debug=True,
             environment=Environment.STAGING,  # Use Environment enum properly
@@ -136,48 +147,48 @@ class TestMeltanoSettingsIsolated:
     @patch.dict(os.environ, {}, clear=True)
     def test_validation_assignment_isolated(self) -> None:
         """Test validate_assignment functionality in isolated environment."""
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
 
         # Test that invalid assignments raise validation errors
         with pytest.raises((ValueError, AttributeError)):
             # Try to modify a computed property (should fail)
-            settings.project_root = "invalid"  # Should fail - computed property
+            settings.project_root = "invalid"  # type: ignore[misc,assignment]  # Should fail - computed property
 
     @patch.dict(os.environ, {}, clear=True)
     def test_configure_dependencies_isolated(self) -> None:
         """Test dependency injection configuration in isolated environment."""
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
 
         # Mock container to test dependency registration
         class MockContainer:
             def __init__(self) -> None:
-                self.registered: dict[type, type] = {}
+                self.registered: dict[str, Any] = {}
 
-            def register(self, cls: type, instance: Any) -> None:
-                self.registered[cls] = instance
+            def register(self, name: str, instance: Any) -> None:
+                self.registered[name] = instance
 
         mock_container = MockContainer()
 
         # Configure dependencies should register the settings instance
         settings.configure_dependencies(mock_container)
 
-        assert MeltanoSettings in mock_container.registered
-        assert mock_container.registered[MeltanoSettings] is settings
+        assert "flext_meltano_settings" in mock_container.registered
+        assert mock_container.registered["flext_meltano_settings"] is settings
 
     @patch.dict(os.environ, {}, clear=True)
     def test_configure_dependencies_with_get_container_isolated(self) -> None:
         """Test dependency configuration with default container in isolated environment."""
-        settings = MeltanoSettings(_env_file=None)
+        settings = FlextMeltanoSettings(_env_file=None)
 
         # Test with None container (should use get_container)
-        with patch("flext_meltano.config.get_container") as mock_get_container:
+        with patch("flext_meltano.config.settings.get_container") as mock_get_container:
 
             class MockContainer:
                 def __init__(self) -> None:
-                    self.registered: dict[type, type] = {}
+                    self.registered: dict[str, Any] = {}
 
-                def register(self, cls: type, instance: Any) -> None:
-                    self.registered[cls] = instance
+                def register(self, name: str, instance: Any) -> None:
+                    self.registered[name] = instance
 
             mock_container = MockContainer()
             mock_get_container.return_value = mock_container
@@ -191,22 +202,22 @@ class TestMeltanoSettingsIsolated:
         """Test singleton decorator behavior in isolated environment."""
 
         # Create function that returns settings with _env_file=None
-        def mock_get_meltano_settings() -> MeltanoSettings:
-            return MeltanoSettings(_env_file=None)
+        def mock_get_meltano_settings() -> FlextMeltanoSettings:
+            return FlextMeltanoSettings(_env_file=None)
 
         with patch(
             "flext_meltano.config.get_meltano_settings",
             side_effect=mock_get_meltano_settings,
         ):
-            # The MeltanoSettings class is decorated with @singleton()
+            # The FlextMeltanoSettings class is decorated with @singleton()
             # Multiple calls to get_meltano_settings() should return the same instance
             settings1 = mock_get_meltano_settings()
             settings2 = mock_get_meltano_settings()
 
             # Note: This test depends on the singleton implementation
             # If singleton is properly implemented, these should be the same instance
-            assert type(settings1) is MeltanoSettings
-            assert type(settings2) is MeltanoSettings
+            assert type(settings1) is FlextMeltanoSettings
+            assert type(settings2) is FlextMeltanoSettings
 
 
 class TestDevelopmentConfigManual:
@@ -216,7 +227,7 @@ class TestDevelopmentConfigManual:
     def test_create_development_meltano_config_manual(self) -> None:
         """Test development configuration creation manually in isolated environment."""
         # Manually create development config without using the function
-        dev_config = MeltanoSettings(
+        dev_config = FlextMeltanoSettings(
             environment=Environment.DEVELOPMENT,
             debug=True,
             project=MeltanoProjectConfig(
@@ -236,11 +247,11 @@ class TestDevelopmentConfigManual:
                 auto_install=True,
                 plugin_cache_ttl=3600,  # 1 hour
             ),
-            # monitoring removed - not a valid attribute of MeltanoSettings
+            # monitoring removed - not a valid attribute of FlextMeltanoSettings
             _env_file=None,
         )
 
-        assert isinstance(dev_config, MeltanoSettings)
+        assert isinstance(dev_config, FlextMeltanoSettings)
         assert dev_config.environment == "development"
         assert dev_config.debug is True
 
@@ -262,7 +273,7 @@ class TestDevelopmentConfigManual:
     def test_create_production_meltano_config_manual(self) -> None:
         """Test production configuration creation manually in isolated environment."""
         # Manually create production config without using the function
-        prod_config = MeltanoSettings(
+        prod_config = FlextMeltanoSettings(
             environment=Environment.PRODUCTION,
             debug=False,
             project=MeltanoProjectConfig(
@@ -286,11 +297,11 @@ class TestDevelopmentConfigManual:
                 plugin_cache_ttl=86400,  # 24 hours
                 default_variant="meltanolabs",
             ),
-            # monitoring removed - not a valid attribute of MeltanoSettings
+            # monitoring removed - not a valid attribute of FlextMeltanoSettings
             _env_file=None,
         )
 
-        assert isinstance(prod_config, MeltanoSettings)
+        assert isinstance(prod_config, FlextMeltanoSettings)
         assert prod_config.environment == "production"
         assert prod_config.debug is False
 
@@ -310,13 +321,13 @@ class TestDevelopmentConfigManual:
         assert prod_config.plugins.default_variant == "meltanolabs"
         # monitoring attribute removed - test other config instead
         assert prod_config.debug is False
-        assert prod_config.environment == Environment.PRODUCTION
+        assert prod_config.environment == Environment.PRODUCTION.value
 
     @patch.dict(os.environ, {}, clear=True)
     def test_development_vs_production_differences_manual(self) -> None:
         """Test key differences between development and production configs manually."""
         # Create both configs manually
-        dev_config = MeltanoSettings(
+        dev_config = FlextMeltanoSettings(
             environment=Environment.DEVELOPMENT,
             debug=True,
             project=MeltanoProjectConfig(
@@ -329,6 +340,7 @@ class TestDevelopmentConfigManual:
                 retry_attempts=1,
             ),
             state=MeltanoStateConfig(
+                state_backend="systemdb",
                 backup_enabled=False,
                 backup_interval=7200,
             ),
@@ -336,11 +348,11 @@ class TestDevelopmentConfigManual:
                 auto_install=True,
                 plugin_cache_ttl=3600,
             ),
-            # monitoring removed - not a valid attribute of MeltanoSettings
+            # monitoring removed - not a valid attribute of FlextMeltanoSettings
             _env_file=None,
         )
 
-        prod_config = MeltanoSettings(
+        prod_config = FlextMeltanoSettings(
             environment=Environment.PRODUCTION,
             debug=False,
             project=MeltanoProjectConfig(
@@ -364,7 +376,7 @@ class TestDevelopmentConfigManual:
                 plugin_cache_ttl=86400,
                 default_variant="meltanolabs",
             ),
-            # monitoring removed - not a valid attribute of MeltanoSettings
+            # monitoring removed - not a valid attribute of FlextMeltanoSettings
             _env_file=None,
         )
 
@@ -401,14 +413,14 @@ class TestDevelopmentConfigManual:
         # Configuration differences
         assert dev_config.debug is True
         assert prod_config.debug is False
-        assert dev_config.environment == Environment.DEVELOPMENT
-        assert prod_config.environment == Environment.PRODUCTION
+        assert dev_config.environment == "development"
+        assert prod_config.environment == "production"
 
     @patch.dict(os.environ, {}, clear=True)
     def test_configuration_consistency_manual(self) -> None:
         """Test that all configurations are internally consistent."""
         configs = [
-            MeltanoSettings(_env_file=None),
+            FlextMeltanoSettings(_env_file=None),
         ]
 
         for config in configs:
@@ -438,11 +450,11 @@ class TestConvenienceFunctionsIsolated:
         """Test get_meltano_settings function in isolated environment."""
         # Mock the function to avoid loading .env file
         with patch("flext_meltano.config.get_meltano_settings") as mock_get_settings:
-            mock_settings = MeltanoSettings(_env_file=None)
+            mock_settings = FlextMeltanoSettings(_env_file=None)
             mock_get_settings.return_value = mock_settings
 
             settings = mock_get_settings()
 
-            assert isinstance(settings, MeltanoSettings)
+            assert isinstance(settings, FlextMeltanoSettings)
             assert settings.project_name == "flext-infrastructure.plugins.flext-meltano"
             assert settings.project_version == "0.7.0"

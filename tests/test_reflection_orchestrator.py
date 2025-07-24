@@ -20,14 +20,14 @@ sys.modules["flext_observability.logging"] = MagicMock()
 # ruff: noqa: E402 - Module mocking must happen before imports
 from flext_meltano.reflection_orchestrator import (
     ExecutionContext,
+    FlextMeltanoReflectionOrchestrator,
+    FlextMeltanoReflectionStep,
+    FlextMeltanoStepType,
     PipelineConfig,
-    ReflectionOrchestrator,
-    ReflectionStep,
     StepFunction,
     StepResult,
-    StepType,
-    create_orchestrator,
     extract_data,
+    flext_create_orchestrator,
     load_data,
     pipeline_step,
     transform_data,
@@ -42,14 +42,14 @@ class TestStepType:
 
     def test_step_type_values(self) -> None:
         """Test all StepType enum values."""
-        assert StepType.EXTRACT.value == 1
-        assert StepType.TRANSFORM.value == 2
-        assert StepType.LOAD.value == 3
-        assert StepType.QUALITY.value == 4
-        assert StepType.NOTIFY.value == 5
+        assert FlextMeltanoStepType.EXTRACT.value == 1
+        assert FlextMeltanoStepType.TRANSFORM.value == 2
+        assert FlextMeltanoStepType.LOAD.value == 3
+        assert FlextMeltanoStepType.QUALITY.value == 4
+        assert FlextMeltanoStepType.NOTIFY.value == 5
 
         # Verify they are different values
-        assert len(set(StepType)) == 5  # All values are unique
+        assert len(set(FlextMeltanoStepType)) == 5  # All values are unique
 
 
 class TestReflectionStep:
@@ -78,15 +78,15 @@ class TestReflectionStep:
         sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test ReflectionStep initialization with minimal parameters."""
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="test-step",
             func=sample_function,
-            step_type=StepType.EXTRACT,
+            step_type=FlextMeltanoStepType.EXTRACT,
         )
 
         assert step.name == "test-step"
         assert step.func == sample_function
-        assert step.step_type == StepType.EXTRACT
+        assert step.step_type == FlextMeltanoStepType.EXTRACT
         assert step.dependencies == []
         assert step.retry_count == 3  # Default
         assert step.timeout_seconds == 300  # Default
@@ -98,10 +98,10 @@ class TestReflectionStep:
         """Test ReflectionStep initialization with all parameters."""
         dependencies = ["step1", "step2"]
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="full-test-step",
             func=sample_function,
-            step_type=StepType.TRANSFORM,
+            step_type=FlextMeltanoStepType.TRANSFORM,
             dependencies=dependencies,
             retry_count=5,
             timeout_seconds=600,
@@ -109,7 +109,7 @@ class TestReflectionStep:
 
         assert step.name == "full-test-step"
         assert step.func == sample_function
-        assert step.step_type == StepType.TRANSFORM
+        assert step.step_type == FlextMeltanoStepType.TRANSFORM
         assert step.dependencies == dependencies
         assert step.retry_count == 5
         assert step.timeout_seconds == 600
@@ -120,10 +120,10 @@ class TestReflectionStep:
         sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test executing async function with parameters from context."""
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="test-step",
             func=sample_function,
-            step_type=StepType.EXTRACT,
+            step_type=FlextMeltanoStepType.EXTRACT,
         )
 
         context = {"param1": "hello", "param2": 20}
@@ -139,10 +139,10 @@ class TestReflectionStep:
         sample_function: Callable[[str, int], Awaitable[str]],
     ) -> None:
         """Test executing async function with default parameters."""
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="test-step",
             func=sample_function,
-            step_type=StepType.TRANSFORM,
+            step_type=FlextMeltanoStepType.TRANSFORM,
         )
 
         # Only provide param1, param2 should use default
@@ -159,10 +159,10 @@ class TestReflectionStep:
         sync_function: Callable[[str, int], str],
     ) -> None:
         """Test executing sync function through executor."""
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="sync-step",
             func=sync_function,
-            step_type=StepType.LOAD,
+            step_type=FlextMeltanoStepType.LOAD,
         )
 
         context = {"param1": "sync-test", "param2": 30}
@@ -184,10 +184,10 @@ class TestReflectionStep:
             return f"Type: {param.value}"
 
         # Create the step with the function and its closure containing CustomType
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="type-step",
             func=typed_func,
-            step_type=StepType.QUALITY,
+            step_type=FlextMeltanoStepType.QUALITY,
         )
 
         # Create an instance and add it to context with matching type
@@ -212,10 +212,10 @@ class TestReflectionStep:
         async def strict_func(required_param: CustomType) -> str:
             return f"Required: {required_param}"
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="strict-step",
             func=strict_func,
-            step_type=StepType.NOTIFY,
+            step_type=FlextMeltanoStepType.NOTIFY,
         )
 
         # Missing required_param with no matching type should cause TypeError
@@ -231,18 +231,18 @@ class TestPipelineStepDecorator:
     def test_decorator_basic_usage(self) -> None:
         """Test basic decorator usage."""
 
-        @pipeline_step(StepType.EXTRACT, name="custom-extract")
+        @pipeline_step(FlextMeltanoStepType.EXTRACT, name="custom-extract")
         async def decorated_func(param: str) -> str:
             return f"Decorated: {param}"
 
         # Check metadata is attached
         assert hasattr(decorated_func, "pipeline_step")
-        assert hasattr(decorated_func, "_step_type")
-        assert hasattr(decorated_func, "_dependencies")
+        assert hasattr(decorated_func, "step_type")
+        assert hasattr(decorated_func, "dependencies")
 
         step = decorated_func.pipeline_step
         assert step.name == "custom-extract"
-        assert step.step_type == StepType.EXTRACT
+        assert step.step_type == FlextMeltanoStepType.EXTRACT
         assert step.dependencies == []
         assert step.retry_count == 3
         assert step.timeout_seconds == 300
@@ -250,8 +250,10 @@ class TestPipelineStepDecorator:
     def test_decorator_auto_naming(self) -> None:
         """Test automatic name generation from function name."""
 
-        @pipeline_step(StepType.TRANSFORM)
-        async def my_transform_function(data: dict[str, Any]) -> dict[str, Any]:
+        @pipeline_step(FlextMeltanoStepType.TRANSFORM)
+        async def my_transform_function(
+            data: dict[str, Any],
+        ) -> dict[str, Any]:
             return data
 
         step = getattr(my_transform_function, "pipeline_step", None)
@@ -263,7 +265,7 @@ class TestPipelineStepDecorator:
         dependencies = ["extract-step", "validate-step"]
 
         @pipeline_step(
-            StepType.LOAD,
+            FlextMeltanoStepType.LOAD,
             name="complex-load",
             dependencies=dependencies,
             retry=5,
@@ -275,7 +277,7 @@ class TestPipelineStepDecorator:
         step = getattr(complex_func, "pipeline_step", None)
         assert step is not None
         assert step.name == "complex-load"
-        assert step.step_type == StepType.LOAD
+        assert step.step_type == FlextMeltanoStepType.LOAD
         assert step.dependencies == dependencies
         assert step.retry_count == 5
         assert step.timeout_seconds == 600
@@ -284,7 +286,7 @@ class TestPipelineStepDecorator:
     async def test_decorated_function_execution(self) -> None:
         """Test executing decorated function."""
 
-        @pipeline_step(StepType.QUALITY, name="test-quality")
+        @pipeline_step(FlextMeltanoStepType.QUALITY, name="test-quality")
         async def quality_func(data: str) -> str:
             return f"Quality: {data}"
 
@@ -303,7 +305,7 @@ class TestPipelineStepDecorator:
     async def test_decorated_function_with_object_context(self) -> None:
         """Test decorated function with object context extraction."""
 
-        @pipeline_step(StepType.EXTRACT, name="context-extract")
+        @pipeline_step(FlextMeltanoStepType.EXTRACT, name="context-extract")
         async def context_func(value: str) -> str:
             return f"Context: {value}"
 
@@ -329,14 +331,14 @@ class TestReflectionOrchestrator:
 
     def test_orchestrator_initialization(self) -> None:
         """Test ReflectionOrchestrator initialization."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         assert orchestrator.step_registry == {}
         assert orchestrator.type_registry == {}
 
     def test_discover_steps_with_pipeline_metadata(self) -> None:
         """Test discovering steps with pipeline metadata."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         # Create a mock module with decorated functions
         import types
@@ -344,11 +346,11 @@ class TestReflectionOrchestrator:
         mock_module = types.ModuleType("mock_module")
 
         # Add a decorated function to the module
-        @pipeline_step(StepType.EXTRACT, name="discovered-extract")
+        @pipeline_step(FlextMeltanoStepType.EXTRACT, name="discovered-extract")
         async def extract_func(source: str) -> dict[str, Any]:
             return {"extracted": source}
 
-        mock_module.extract_func = extract_func
+        mock_module.extract_func = extract_func  # type: ignore[attr-defined]
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -356,11 +358,11 @@ class TestReflectionOrchestrator:
         assert "discovered-extract" in orchestrator.step_registry
         step = orchestrator.step_registry["discovered-extract"]
         assert step.name == "discovered-extract"
-        assert step.step_type == StepType.EXTRACT
+        assert step.step_type == FlextMeltanoStepType.EXTRACT
 
     def test_discover_steps_with_step_type_objects(self) -> None:
         """Test discovering objects with step_type attribute."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         import types
 
@@ -368,22 +370,23 @@ class TestReflectionOrchestrator:
 
         # Create object with step_type
         class MockStepObject:
-            step_type = StepType.TRANSFORM
+            step_type = FlextMeltanoStepType.TRANSFORM
 
-        mock_module.mock_step = MockStepObject()
+        mock_module.mock_step = MockStepObject()  # type: ignore[attr-defined]
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
 
-        assert StepType.TRANSFORM in orchestrator.type_registry
-        assert len(orchestrator.type_registry[StepType.TRANSFORM]) == 1
+        assert FlextMeltanoStepType.TRANSFORM in orchestrator.type_registry
+        assert len(orchestrator.type_registry[FlextMeltanoStepType.TRANSFORM]) == 1
         assert (
-            orchestrator.type_registry[StepType.TRANSFORM][0] == mock_module.mock_step
+            orchestrator.type_registry[FlextMeltanoStepType.TRANSFORM][0]
+            == mock_module.mock_step
         )
 
     def test_discover_steps_error_handling(self) -> None:
         """Test error handling in step discovery."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         import types
 
@@ -396,7 +399,7 @@ class TestReflectionOrchestrator:
                 msg = "Broken pipeline step"
                 raise AttributeError(msg)
 
-        mock_module.broken_obj = BrokenObject()
+        mock_module.broken_obj = BrokenObject()  # type: ignore[attr-defined]
 
         # Should not raise exception, just continue
         orchestrator.discover_steps(mock_module)
@@ -407,10 +410,10 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_pipeline_success(self) -> None:
         """Test successful pipeline execution."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         # Add a step to registry
-        @pipeline_step(StepType.EXTRACT, name="test-extract")
+        @pipeline_step(FlextMeltanoStepType.EXTRACT, name="test-extract")
         async def test_extract(source: str) -> dict[str, Any]:
             return {"data": f"extracted from {source}"}
 
@@ -436,7 +439,7 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_pipeline_with_unknown_step(self) -> None:
         """Test pipeline execution with unknown step."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         # Create mock pipeline with unknown step
         mock_pipeline = MagicMock()
@@ -453,17 +456,17 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_pipeline_error_handling(self) -> None:
         """Test pipeline execution error handling."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         # Add a broken step that will fail during execution
         async def broken_func() -> str:
             msg = "Pipeline error"
             raise RuntimeError(msg)
 
-        broken_step = ReflectionStep(
+        broken_step = FlextMeltanoReflectionStep(
             name="broken-step",
             func=broken_func,
-            step_type=StepType.EXTRACT,
+            step_type=FlextMeltanoStepType.EXTRACT,
         )
 
         orchestrator.step_registry["broken-step"] = broken_step
@@ -483,15 +486,15 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_step_with_retry_success(self) -> None:
         """Test step execution with retry success on first attempt."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         async def success_func(data: str) -> str:
             return f"Success: {data}"
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="success-step",
             func=success_func,
-            step_type=StepType.TRANSFORM,
+            step_type=FlextMeltanoStepType.TRANSFORM,
             retry_count=3,
             timeout_seconds=10,
         )
@@ -511,16 +514,16 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_step_with_retry_timeout(self) -> None:
         """Test step execution timeout."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         async def slow_func(data: str) -> str:
             await asyncio.sleep(2)  # Longer than timeout
             return f"Slow: {data}"
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="slow-step",
             func=slow_func,
-            step_type=StepType.LOAD,
+            step_type=FlextMeltanoStepType.LOAD,
             retry_count=2,
             timeout_seconds=1,  # Very short timeout (1 second)
         )
@@ -534,7 +537,7 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_step_with_retry_eventual_success(self) -> None:
         """Test step execution that succeeds after retries."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         call_count = 0
 
@@ -546,10 +549,10 @@ class TestReflectionOrchestrator:
                 raise ValueError(msg)
             return f"Eventually: {data}"
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="flaky-step",
             func=flaky_func,
-            step_type=StepType.QUALITY,
+            step_type=FlextMeltanoStepType.QUALITY,
             retry_count=5,
             timeout_seconds=10,
         )
@@ -571,16 +574,16 @@ class TestReflectionOrchestrator:
     @pytest.mark.asyncio
     async def test_execute_step_with_retry_all_failures(self) -> None:
         """Test step execution that fails all retry attempts."""
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
 
         async def always_fail_func(data: str) -> str:
             msg = "Always fails"
             raise RuntimeError(msg)
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="fail-step",
             func=always_fail_func,
-            step_type=StepType.NOTIFY,
+            step_type=FlextMeltanoStepType.NOTIFY,
             retry_count=2,
             timeout_seconds=10,
         )
@@ -640,10 +643,10 @@ class TestCreateOrchestrator:
 
     def test_create_orchestrator_with_discovery(self) -> None:
         """Test creating orchestrator with automatic step discovery."""
-        orchestrator = create_orchestrator()
+        orchestrator = flext_create_orchestrator()
 
         # Should discover the built-in steps
-        assert isinstance(orchestrator, ReflectionOrchestrator)
+        assert isinstance(orchestrator, FlextMeltanoReflectionOrchestrator)
         assert "simple-extract" in orchestrator.step_registry
         assert "simple-transform" in orchestrator.step_registry
         assert "simple-load" in orchestrator.step_registry
@@ -670,10 +673,10 @@ class TestProtocols:
         async def test_func() -> str:
             return "test"
 
-        step = ReflectionStep(
+        step = FlextMeltanoReflectionStep(
             name="protocol-test",
             func=test_func,
-            step_type=StepType.EXTRACT,
+            step_type=FlextMeltanoStepType.EXTRACT,
             dependencies=["dep1", "dep2"],
         )
 
@@ -683,7 +686,7 @@ class TestProtocols:
         assert hasattr(step, "dependencies")
         assert callable(step.execute)
         # Pydantic converts enum to value, so check the value
-        assert step.step_type == StepType.EXTRACT
+        assert step.step_type == FlextMeltanoStepType.EXTRACT
         assert step.dependencies == ["dep1", "dep2"]
 
 
@@ -694,16 +697,20 @@ class TestIntegrationWorkflow:
     async def test_complete_reflection_workflow(self) -> None:
         """Test complete workflow from step creation to execution."""
         # Step 1: Create orchestrator with empty registry
-        orchestrator = ReflectionOrchestrator()
+        orchestrator = FlextMeltanoReflectionOrchestrator()
         orchestrator.step_registry.clear()  # Clear default steps
 
         # Step 2: Define custom steps
-        @pipeline_step(StepType.EXTRACT, name="workflow-extract", dependencies=[])
-        async def workflow_extract(source: str = "default_source") -> dict[str, Any]:
+        @pipeline_step(
+            FlextMeltanoStepType.EXTRACT, name="workflow-extract", dependencies=[],
+        )
+        async def workflow_extract(
+            source: str = "default_source",
+        ) -> dict[str, Any]:
             return {"extracted": f"data from {source}"}
 
         @pipeline_step(
-            StepType.TRANSFORM,
+            FlextMeltanoStepType.TRANSFORM,
             name="workflow-transform",
             dependencies=["workflow-extract"],
         )
@@ -711,11 +718,13 @@ class TestIntegrationWorkflow:
             return {"transformed": True, "processed": True}
 
         @pipeline_step(
-            StepType.LOAD,
+            FlextMeltanoStepType.LOAD,
             name="workflow-load",
             dependencies=["workflow-transform"],
         )
-        async def workflow_load(target: str = "default_target") -> dict[str, Any]:
+        async def workflow_load(
+            target: str = "default_target",
+        ) -> dict[str, Any]:
             return {"loaded": True, "target": target}
 
         # Step 3: Register steps manually (simulate discovery)

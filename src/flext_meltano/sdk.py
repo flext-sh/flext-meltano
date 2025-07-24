@@ -7,7 +7,7 @@ including custom exception classes for better error handling.
 from __future__ import annotations
 
 
-class MeltanoError(Exception):
+class FlextMeltanoError(Exception):
     """MeltanoError - Custom Exception for Meltano operations.
 
     Base exception class for Meltano-related errors.
@@ -34,11 +34,11 @@ class MeltanoError(Exception):
     """
 
 
-class MeltanoProjectError(MeltanoError):
+class FlextMeltanoProjectError(FlextMeltanoError):
     """Raised for errors related to Meltano project management."""
 
 
-class MeltanoExecutionError(MeltanoError):
+class FlextMeltanoExecutionError(FlextMeltanoError):
     """Raised for errors during Meltano command execution."""
 
     def __init__(
@@ -57,13 +57,13 @@ class MeltanoExecutionError(MeltanoError):
         self.stderr = stderr
 
 
-class MeltanoPluginError(MeltanoError):
+class FlextMeltanoPluginError(FlextMeltanoError):
     """Raised for errors related to Meltano plugin operations."""
 
 
-class MeltanoStateError(MeltanoError):
+class FlextMeltanoStateError(FlextMeltanoError):
     """Raised for errors related to Meltano state management."""
 
 
-class MeltanoConfigError(MeltanoError):
+class FlextMeltanoConfigError(FlextMeltanoError):
     """Raised for errors related to Meltano configuration."""

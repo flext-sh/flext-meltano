@@ -17,14 +17,12 @@ from typing import TYPE_CHECKING, Any, ClassVar, Protocol
 
 from pydantic import BaseModel, Field
 
-from flext_meltano.config import MeltanoSettings
-from flext_meltano.event_bridge import MeltanoEventBridge
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.event_bridge import FlextMeltanoEventBridge
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
 from flext_meltano.infrastructure.di_container import (
-    get_domain_entity,
     get_domain_event,
-    get_field,
 )
 from flext_meltano.job_manager import FlextMeltanoJobManager
 
@@ -37,7 +35,7 @@ DomainBaseModel = DomainEntity
 
 
 # Define local ExecutionStatus enum to avoid flext-core dependency
-class LocalExecutionStatus(Enum):
+class FlextMeltanoLocalExecutionStatus(Enum):
     """Local execution status enum."""
 
     PENDING = "pending"
@@ -47,11 +45,11 @@ class LocalExecutionStatus(Enum):
     CANCELLED = "cancelled"
 
 
-ExecutionStatus = LocalExecutionStatus
+ExecutionStatus = FlextMeltanoLocalExecutionStatus
 
 
 # 🚨 ARCHITECTURAL COMPLIANCE - Define protocols for external dependencies
-class JobProtocol(Protocol):
+class FlextMeltanoJobProtocol(Protocol):
     """Protocol for job interface - Clean Architecture compliance."""
 
     id: str
@@ -63,19 +61,19 @@ class JobProtocol(Protocol):
     def run(self) -> dict[str, Any]: ...
 
 
-class PayloadProtocol(Protocol):
+class FlextMeltanoPayloadProtocol(Protocol):
     """Protocol for payload interface - Clean Architecture compliance."""
 
     STATE: str
 
 
-class StateProtocol(Protocol):
+class FlextMeltanoStateProtocol(Protocol):
     """Protocol for state interface - Clean Architecture compliance."""
 
     RUNNING: str
 
 
-class ProjectProtocol(Protocol):
+class FlextMeltanoProjectProtocol(Protocol):
     """Protocol for project interface - Clean Architecture compliance."""
 
     root: str
@@ -85,7 +83,7 @@ class ProjectProtocol(Protocol):
 
 
 # Local implementations of Meltano concepts
-class State(Enum):
+class FlextMeltanoState(Enum):
     """Local state enumeration for job states."""
 
     RUNNING = "running"
@@ -93,20 +91,20 @@ class State(Enum):
     FAILED = "failed"
 
 
-class Payload:
+class FlextMeltanoPayload:
     """Local payload class for job payloads."""
 
     STATE = "state"
 
 
-class Job:
+class FlextMeltanoJob:
     """Local job implementation."""
 
     def __init__(
         self,
         job_id: str,
         run_id: str,
-        state: State,
+        state: FlextMeltanoState,
         payload_flags: str,
         payload: dict[str, Any],
     ) -> None:
@@ -117,7 +115,7 @@ class Job:
         self.payload = payload
 
 
-class Project:
+class FlextMeltanoProject:
     """Local project implementation."""
 
     def __init__(self, root: str) -> None:
@@ -129,7 +127,7 @@ class Project:
 
 
 # Local MeltanoEngine implementation
-class MeltanoEngine:
+class FlextMeltanoEngine:
     """Local Meltano engine wrapper."""
 
     def __init__(self, project_root: str | None = None) -> None:
@@ -169,9 +167,9 @@ class MeltanoEngine:
 
 
 if TYPE_CHECKING:
-    from flext_meltano.event_bus_protocol import EventBusProtocol
-    from flext_meltano.project_manager import FlextProjectManager
-    from flext_meltano.state_manager import FlextMeltanoStateManager
+    from flext_meltano.event_bus_protocol import FlextMeltanoEventBusProtocol
+    from flext_meltano.project.manager import FlextMeltanoProjectManager
+    from flext_meltano.state.manager import FlextMeltanoStateManager
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +187,7 @@ class FlextJob(DomainBaseModel):
     pipeline_definition: dict[str, Any] = Field(
         description="Pipeline configuration and definition",
     )
-    meltano_job: Job | None = Field(
+    meltano_job: FlextMeltanoJob | None = Field(
         default=None,
         description="Underlying Meltano job instance",
     )
@@ -216,7 +214,7 @@ class FlextJob(DomainBaseModel):
     error: str | None = Field(default=None, description="Error message if job failed")
 
 
-class OrchestrationMode(Enum):
+class FlextMeltanoOrchestrationMode(Enum):
     """Execution modes for Meltano orchestration.
 
     Defines different modes for executing Meltano operations, allowing
@@ -236,7 +234,7 @@ class OrchestrationMode(Enum):
     TRIGGERED = "triggered"
 
 
-class RunMode(Enum):
+class FlextMeltanoRunMode(Enum):
     """Pipeline run mode enumeration for execution behavior.
 
     Defines whether pipeline execution should be a dry run (validation only)
@@ -272,9 +270,9 @@ class FlextMeltanoOrchestrator:
 
     def __init__(
         self,
-        project_manager: FlextProjectManager,
+        project_manager: FlextMeltanoProjectManager,
         state_manager: FlextMeltanoStateManager,
-        event_bus: EventBusProtocol,
+        event_bus: FlextMeltanoEventBusProtocol,
     ) -> None:
         self.project_manager = project_manager
         self.state_manager = state_manager
@@ -283,22 +281,22 @@ class FlextMeltanoOrchestrator:
         self.logger = logger
 
         # Initialize event bridge for Meltano-FLEXT event integration
-        self.event_bridge = MeltanoEventBridge(event_bus)
+        self.event_bridge = FlextMeltanoEventBridge(event_bus)
 
         # Track running jobs
         self._running_jobs: dict[str, FlextJob] = {}
         self._lock = asyncio.Lock()
 
         # Initialize Meltano engine for invoke operations
-        self.meltano_engine = MeltanoEngine()
+        self.meltano_engine = FlextMeltanoEngine()
 
         self.logger.info("Initialized FLEXT Meltano Orchestrator with event bridge")
 
-    def _create_secure_test_project(self) -> Project:
+    def _create_secure_test_project(self) -> FlextMeltanoProject:
         """Create a Project with secure temporary directory for testing."""
         # Use secure temporary directory instead of hardcoded /tmp/test-project
         temp_dir = tempfile.mkdtemp(prefix="flext_test_")
-        return Project(root=temp_dir)
+        return FlextMeltanoProject(root=temp_dir)
 
     async def _emit_pipeline_event(
         self,
@@ -328,9 +326,9 @@ class FlextMeltanoOrchestrator:
         project_name: str,
         pipeline_definition: dict[str, Any],
         environment: str = "dev",
-        execution_mode: OrchestrationMode = OrchestrationMode.ASYNC,
+        execution_mode: FlextMeltanoOrchestrationMode = FlextMeltanoOrchestrationMode.ASYNC,
         run_id: str | None = None,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> dict[str, Any]:
         """Run a Meltano pipeline with orchestration.
 
@@ -349,12 +347,9 @@ class FlextMeltanoOrchestrator:
         run_id = run_id or str(uuid.uuid4())
 
         self.logger.info(
-            "Starting pipeline execution",
-            project_name=project_name,
-            run_id=run_id,
-            environment=environment,
-            execution_mode=execution_mode.value,
-            run_mode=run_mode,
+            f"Starting pipeline execution - project: {project_name}, run_id: {run_id}, "
+            f"environment: {environment}, execution_mode: {execution_mode.value}, "
+            f"run_mode: {run_mode}",
         )
 
         async with self._lock:
@@ -373,7 +368,7 @@ class FlextMeltanoOrchestrator:
                 environment=environment,
                 status=ExecutionStatus.PENDING,
                 pipeline_definition=pipeline_definition,
-                payload={"full_refresh": run_mode == RunMode.DRY_RUN},
+                payload={"full_refresh": run_mode == FlextMeltanoRunMode.DRY_RUN},
             )
             self._running_jobs[run_id] = flext_job
 
@@ -382,16 +377,14 @@ class FlextMeltanoOrchestrator:
                 await self._emit_pipeline_event("pipeline.running", flext_job)
 
                 # Execute based on mode
-                if execution_mode == OrchestrationMode.SYNC:
+                if execution_mode == FlextMeltanoOrchestrationMode.SYNC:
                     result = await self._execute_pipeline_sync(flext_job, run_mode)
                 else:
                     result = await self._execute_pipeline_async(flext_job, run_mode)
 
                 self.logger.info(
-                    "Pipeline execution completed",
-                    run_id=run_id,
-                    status=result["status"],
-                    duration=result.get("duration_seconds"),
+                    f"Pipeline execution completed - run_id: {run_id}, "
+                    f"status: {result['status']}, duration: {result.get('duration_seconds')}",
                 )
             except (
                 ValueError,
@@ -404,9 +397,7 @@ class FlextMeltanoOrchestrator:
             ) as e:
                 # ZERO TOLERANCE - Specific exception types for pipeline execution failures
                 self.logger.exception(
-                    "Pipeline execution failed",
-                    run_id=run_id,
-                    error=str(e),
+                    f"Pipeline execution failed - run_id: {run_id}, error: {e!s}",
                 )
                 async with self._lock:
                     if run_id in self._running_jobs:
@@ -521,12 +512,14 @@ class FlextMeltanoOrchestrator:
             ]
         return running
 
-    async def _create_meltano_job(self, _project: Project, flext_job: FlextJob) -> Job:
-        return Job(
-            id=flext_job.job_id,
+    async def _create_meltano_job(
+        self, _project: FlextMeltanoProject, flext_job: FlextJob,
+    ) -> FlextMeltanoJob:
+        return FlextMeltanoJob(
+            job_id=flext_job.job_id,
             run_id=flext_job.run_id,
-            state=State.RUNNING,
-            payload_flags=Payload.STATE,
+            state=FlextMeltanoState.RUNNING,
+            payload_flags=FlextMeltanoPayload.STATE,
             payload={
                 "pipeline_definition": flext_job.pipeline_definition,
                 "environment": flext_job.environment,
@@ -538,7 +531,7 @@ class FlextMeltanoOrchestrator:
     async def _execute_pipeline_sync(
         self,
         flext_job: FlextJob,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> dict[str, Any]:
         project_result = await self.project_manager.load_project_config(
             flext_job.project_name,
@@ -581,7 +574,7 @@ class FlextMeltanoOrchestrator:
     async def _execute_pipeline_async(
         self,
         flext_job: FlextJob,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> dict[str, Any]:
         project_result = await self.project_manager.load_project_config(
             flext_job.project_name,
@@ -612,9 +605,9 @@ class FlextMeltanoOrchestrator:
 
     async def _run_pipeline_task(
         self,
-        project: Project,
+        project: FlextMeltanoProject,
         flext_job: FlextJob,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> None:
         try:
             # Emit pipeline started event
@@ -640,8 +633,7 @@ class FlextMeltanoOrchestrator:
             # ZERO TOLERANCE - Specific exception types for pipeline task
             # execution failures
             self.logger.exception(
-                "Unhandled error during pipeline task execution",
-                run_id=flext_job.run_id,
+                f"Unhandled error during pipeline task execution - run_id: {flext_job.run_id}",
             )
             async with self._lock:
                 flext_job.status = ExecutionStatus.FAILED
@@ -659,9 +651,9 @@ class FlextMeltanoOrchestrator:
 
     async def _run_meltano_blocks(
         self,
-        project: Project,
+        project: FlextMeltanoProject,
         flext_job: FlextJob,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> dict[str, Any]:
         pipeline_def = flext_job.pipeline_definition
 
@@ -687,16 +679,14 @@ class FlextMeltanoOrchestrator:
 
     async def _execute_block(
         self,
-        project: Project,
+        project: FlextMeltanoProject,
         flext_job: FlextJob,
         block: dict[str, Any],
         block_index: int,
-        run_mode: RunMode = RunMode.FULL_RUN,
+        run_mode: FlextMeltanoRunMode = FlextMeltanoRunMode.FULL_RUN,
     ) -> dict[str, Any]:
         self.logger.info(
-            "Executing pipeline block",
-            block_index=block_index,
-            block_type=block.get("block_type"),
+            f"Executing pipeline block - block_index: {block_index}, block_type: {block.get('block_type')}",
         )
 
         block_type = block.get("block_type")
@@ -722,7 +712,7 @@ class FlextMeltanoOrchestrator:
 
     async def _execute_meltano_block(
         self,
-        project: Project,
+        project: FlextMeltanoProject,
         flext_job: FlextJob,
         block: dict[str, Any],
     ) -> dict[str, Any]:
@@ -731,7 +721,10 @@ class FlextMeltanoOrchestrator:
         loader = block.get("loader")
 
         if not extractor or not loader:
-            return {"success": False, "error": "Extractor and loader are required"}
+            return {
+                "success": False,
+                "error": "Extractor and loader are required",
+            }
 
         return await engine.run_pipeline(
             extractor=extractor,
@@ -743,13 +736,13 @@ class FlextMeltanoOrchestrator:
 
     async def _execute_run_block(
         self,
-        _project: Project,
+        _project: FlextMeltanoProject,
         flext_job: FlextJob,
         commands: list[str],
     ) -> dict[str, Any]:
         try:
-            # Use MeltanoSettings directly instead of get_settings
-            config = MeltanoSettings()
+            # Use FlextMeltanoSettings directly instead of get_settings
+            config = FlextMeltanoSettings()
             min_commands = config.business.MINIMUM_MELTANO_COMMAND_COUNT
 
             if len(commands) < min_commands:
@@ -798,19 +791,17 @@ class FlextMeltanoOrchestrator:
 
     async def _execute_invoke_block(
         self,
-        project: Project,
+        project: FlextMeltanoProject,
         flext_job: FlextJob,
         commands: list[str],
     ) -> dict[str, Any]:
         try:
             self.logger.info(
-                "Executing Meltano invoke commands",
-                job_id=flext_job.job_id,
-                commands=commands,
+                f"Executing Meltano invoke commands - job_id: {flext_job.job_id}, commands: {commands}",
             )
 
             # Create engine instance for this specific project to maintain test compatibility
-            engine = MeltanoEngine(str(project.root))
+            engine = FlextMeltanoEngine(str(project.root))
 
             # Build the full meltano invoke command
             for command in commands:
@@ -844,9 +835,7 @@ class FlextMeltanoOrchestrator:
                 # Handle stdout safely for both real results and mocks
                 stdout = getattr(result, "stdout", "Command completed")
                 self.logger.info(
-                    "Meltano invoke command completed successfully",
-                    command=command,
-                    output=stdout,
+                    f"Meltano invoke command completed successfully - command: {command}, output: {stdout}",
                 )
 
             return {
@@ -886,7 +875,7 @@ class FlextMeltanoOrchestrator:
             )
             return None
 
-    def _update_job_state(self, job: Job, state: State) -> None:
+    def _update_job_state(self, job: FlextMeltanoJob, state: FlextMeltanoState) -> None:
         """Update job state using proper Meltano state backend integration."""
         # Note: Meltano Job.state is read-only, so we can't directly assign
         # We log the intended state change for tracking purposes

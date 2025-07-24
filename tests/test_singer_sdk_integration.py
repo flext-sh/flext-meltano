@@ -25,22 +25,22 @@ import pytest
 
 from flext_meltano.singer_sdk_integration import (
     SINGER_BATCH_SIZE_LIMIT,
-    FlextSingerSDKIntegration,
-    LDAPTap,
-    OracleOICTap,
-    PostgreSQLTarget,
-    SingerStreamDefinition,
-    StreamType,
+    FlextMeltanoLDAPTap,
+    FlextMeltanoOracleOICTap,
+    FlextMeltanoPostgreSQLTarget,
+    FlextMeltanoSingerSDKIntegration,
+    FlextMeltanoSingerStreamDefinition,
+    FlextMeltanoStreamType,
     create_singer_sdk_integration,
 )
 
 
-class TestSingerStreamDefinition:
-    """Test SingerStreamDefinition value object - comprehensive coverage."""
+class TestFlextMeltanoSingerStreamDefinition:
+    """Test FlextMeltanoSingerStreamDefinition value object - comprehensive coverage."""
 
     def test_stream_definition_minimal(self) -> None:
-        """Test SingerStreamDefinition with minimal required parameters."""
-        stream = SingerStreamDefinition(
+        """Test FlextMeltanoSingerStreamDefinition with minimal required parameters."""
+        stream = FlextMeltanoSingerStreamDefinition(
             name="test_stream",
             stream_schema={"properties": {"id": {"type": "string"}}},
         )
@@ -48,15 +48,15 @@ class TestSingerStreamDefinition:
         assert stream.name == "test_stream"
         assert stream.stream_schema == {"properties": {"id": {"type": "string"}}}
         assert stream.stream_type in {
-            StreamType.INCREMENTAL,
-            StreamType.INCREMENTAL.value,
+            FlextMeltanoStreamType.INCREMENTAL,
+            FlextMeltanoStreamType.INCREMENTAL.value,
         }  # Default
         assert stream.key_properties == []  # Default
         assert stream.replication_key is None  # Default
         assert stream.selected is True  # Default
 
     def test_stream_definition_full_configuration(self) -> None:
-        """Test SingerStreamDefinition with all parameters."""
+        """Test FlextMeltanoSingerStreamDefinition with all parameters."""
         schema = {
             "properties": {
                 "id": {"type": "string"},
@@ -65,10 +65,10 @@ class TestSingerStreamDefinition:
             },
         }
 
-        stream = SingerStreamDefinition(
+        stream = FlextMeltanoSingerStreamDefinition(
             name="full_stream",
             stream_schema=schema,
-            stream_type=StreamType.FULL_TABLE,
+            stream_type=FlextMeltanoStreamType.TABLE,
             key_properties=["id"],
             replication_key="created_at",
             selected=False,
@@ -77,28 +77,31 @@ class TestSingerStreamDefinition:
         assert stream.name == "full_stream"
         assert stream.stream_schema == schema
         assert stream.stream_type in {
-            StreamType.FULL_TABLE,
-            StreamType.FULL_TABLE.value,
+            FlextMeltanoStreamType.TABLE,
+            FlextMeltanoStreamType.TABLE.value,
         }
         assert stream.key_properties == ["id"]
         assert stream.replication_key == "created_at"
         assert stream.selected is False
 
     def test_stream_definition_table_type(self) -> None:
-        """Test SingerStreamDefinition with TABLE stream type."""
-        stream = SingerStreamDefinition(
+        """Test FlextMeltanoSingerStreamDefinition with TABLE stream type."""
+        stream = FlextMeltanoSingerStreamDefinition(
             name="table_stream",
             stream_schema={"properties": {"col1": {"type": "string"}}},
-            stream_type=StreamType.TABLE,
+            stream_type=FlextMeltanoStreamType.TABLE,
         )
 
         # Check that the stream type is stored correctly (might be serialized as integer)
-        assert stream.stream_type in {StreamType.TABLE, StreamType.TABLE.value}
+        assert stream.stream_type in {
+            FlextMeltanoStreamType.TABLE,
+            FlextMeltanoStreamType.TABLE.value,
+        }
         assert stream.name == "table_stream"
 
     def test_stream_definition_multiple_key_properties(self) -> None:
-        """Test SingerStreamDefinition with multiple key properties."""
-        stream = SingerStreamDefinition(
+        """Test FlextMeltanoSingerStreamDefinition with multiple key properties."""
+        stream = FlextMeltanoSingerStreamDefinition(
             name="composite_key_stream",
             stream_schema={
                 "properties": {
@@ -119,26 +122,26 @@ class TestStreamType:
 
     def test_stream_type_values(self) -> None:
         """Test all StreamType enum values."""
-        assert StreamType.TABLE
-        assert StreamType.INCREMENTAL
-        assert StreamType.FULL_TABLE
+        assert FlextMeltanoStreamType.TABLE
+        assert FlextMeltanoStreamType.INCREMENTAL
+        # All enum values should exist
 
         # Verify they are different values
-        assert len(set(StreamType)) == 3  # All values are unique
+        assert len(set(FlextMeltanoStreamType)) == 3  # All values are unique
 
 
-class TestOracleOICTap:
-    """Test OracleOICTap implementation - comprehensive coverage."""
+class TestFlextMeltanoOracleOICTap:
+    """Test FlextMeltanoOracleOICTap implementation - comprehensive coverage."""
 
     def test_oracle_oic_tap_initialization(self) -> None:
-        """Test OracleOICTap initialization."""
+        """Test FlextMeltanoOracleOICTap initialization."""
         config = {
             "api_url": "https://oracle-oic.example.com",
             "username": "test_user",
             "password": "test_pass",
         }
 
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         assert tap.config == config
         assert tap.config["api_url"] == "https://oracle-oic.example.com"
@@ -147,7 +150,7 @@ class TestOracleOICTap:
     def test_oracle_oic_discover_streams(self) -> None:
         """Test Oracle OIC stream discovery."""
         config = {"api_url": "https://test.com"}
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         streams = tap.discover_streams()
 
@@ -180,7 +183,7 @@ class TestOracleOICTap:
     async def test_oracle_oic_sync_integrations_stream(self) -> None:
         """Test Oracle OIC integrations stream synchronization."""
         config = {"api_url": "https://test.com"}
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         # Get integrations stream
         streams = tap.discover_streams()
@@ -211,7 +214,7 @@ class TestOracleOICTap:
     async def test_oracle_oic_sync_connections_stream(self) -> None:
         """Test Oracle OIC connections stream synchronization."""
         config = {"api_url": "https://test.com"}
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         # Get connections stream
         streams = tap.discover_streams()
@@ -237,10 +240,10 @@ class TestOracleOICTap:
     async def test_oracle_oic_sync_unknown_stream(self) -> None:
         """Test Oracle OIC sync with unknown stream (should yield nothing)."""
         config = {"api_url": "https://test.com"}
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         # Create unknown stream
-        unknown_stream = SingerStreamDefinition(
+        unknown_stream = FlextMeltanoSingerStreamDefinition(
             name="unknown_stream",
             stream_schema={"properties": {"id": {"type": "string"}}},
         )
@@ -253,7 +256,7 @@ class TestOracleOICTap:
     def test_oracle_oic_get_stream_maps(self) -> None:
         """Test Oracle OIC stream field mappings."""
         config = {"api_url": "https://test.com"}
-        tap = OracleOICTap(config)
+        tap = FlextMeltanoOracleOICTap(config)
 
         stream_maps = tap.get_stream_maps()
 
@@ -270,11 +273,11 @@ class TestOracleOICTap:
         assert connections_map["display_name"] == "name"
 
 
-class TestLDAPTap:
-    """Test LDAPTap implementation - comprehensive coverage."""
+class TestFlextMeltanoLDAPTap:
+    """Test FlextMeltanoLDAPTap implementation - comprehensive coverage."""
 
     def test_ldap_tap_initialization(self) -> None:
-        """Test LDAPTap initialization."""
+        """Test FlextMeltanoLDAPTap initialization."""
         config = {
             "ldap_url": "ldap://localhost:389",
             "bind_dn": "cn=REDACTED_LDAP_BIND_PASSWORD,dc=example,dc=com",
@@ -282,7 +285,7 @@ class TestLDAPTap:
             "base_dn": "dc=example,dc=com",
         }
 
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         assert tap.config == config
         assert tap.config["ldap_url"] == "ldap://localhost:389"
@@ -291,7 +294,7 @@ class TestLDAPTap:
     def test_ldap_discover_streams(self) -> None:
         """Test LDAP stream discovery."""
         config = {"ldap_url": "ldap://test.com"}
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         streams = tap.discover_streams()
 
@@ -333,7 +336,7 @@ class TestLDAPTap:
     async def test_ldap_sync_users_stream(self) -> None:
         """Test LDAP users stream synchronization."""
         config = {"ldap_url": "ldap://test.com"}
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         # Get users stream
         streams = tap.discover_streams()
@@ -366,7 +369,7 @@ class TestLDAPTap:
     async def test_ldap_sync_groups_stream(self) -> None:
         """Test LDAP groups stream synchronization."""
         config = {"ldap_url": "ldap://test.com"}
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         # Get groups stream
         streams = tap.discover_streams()
@@ -395,10 +398,10 @@ class TestLDAPTap:
     async def test_ldap_sync_unknown_stream(self) -> None:
         """Test LDAP sync with unknown stream (should yield nothing)."""
         config = {"ldap_url": "ldap://test.com"}
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         # Create unknown stream
-        unknown_stream = SingerStreamDefinition(
+        unknown_stream = FlextMeltanoSingerStreamDefinition(
             name="unknown_stream",
             stream_schema={"properties": {"id": {"type": "string"}}},
         )
@@ -411,7 +414,7 @@ class TestLDAPTap:
     def test_ldap_get_stream_maps(self) -> None:
         """Test LDAP stream field mappings."""
         config = {"ldap_url": "ldap://test.com"}
-        tap = LDAPTap(config)
+        tap = FlextMeltanoLDAPTap(config)
 
         stream_maps = tap.get_stream_maps()
 
@@ -430,11 +433,11 @@ class TestLDAPTap:
         assert groups_map["member"] == "members"
 
 
-class TestPostgreSQLTarget:
-    """Test PostgreSQLTarget implementation - comprehensive coverage."""
+class TestFlextMeltanoPostgreSQLTarget:
+    """Test FlextMeltanoPostgreSQLTarget implementation - comprehensive coverage."""
 
     def test_postgresql_target_initialization(self) -> None:
-        """Test PostgreSQLTarget initialization."""
+        """Test FlextMeltanoPostgreSQLTarget initialization."""
         config = {
             "host": "localhost",
             "port": 5432,
@@ -443,7 +446,7 @@ class TestPostgreSQLTarget:
             "password": "test_pass",
         }
 
-        target = PostgreSQLTarget(config)
+        target = FlextMeltanoPostgreSQLTarget(config)
 
         assert target.config == config
         assert target.config["host"] == "localhost"
@@ -453,7 +456,7 @@ class TestPostgreSQLTarget:
     async def test_postgresql_write_record(self) -> None:
         """Test PostgreSQL single record write."""
         config = {"database": "test_db"}
-        target = PostgreSQLTarget(config)
+        target = FlextMeltanoPostgreSQLTarget(config)
 
         record = {
             "id": "test_001",
@@ -468,7 +471,7 @@ class TestPostgreSQLTarget:
     async def test_postgresql_write_batch(self) -> None:
         """Test PostgreSQL batch record write."""
         config = {"database": "test_db"}
-        target = PostgreSQLTarget(config)
+        target = FlextMeltanoPostgreSQLTarget(config)
 
         records = [
             {
@@ -495,7 +498,7 @@ class TestPostgreSQLTarget:
     async def test_postgresql_write_empty_batch(self) -> None:
         """Test PostgreSQL write with empty batch."""
         config = {"database": "test_db"}
-        target = PostgreSQLTarget(config)
+        target = FlextMeltanoPostgreSQLTarget(config)
 
         # Should handle empty batch gracefully
         await target.write_batch("test_stream", [])
@@ -503,7 +506,7 @@ class TestPostgreSQLTarget:
     def test_postgresql_get_stream_maps(self) -> None:
         """Test PostgreSQL stream field mappings."""
         config = {"database": "test_db"}
-        target = PostgreSQLTarget(config)
+        target = FlextMeltanoPostgreSQLTarget(config)
 
         stream_maps = target.get_stream_maps()
 
@@ -515,25 +518,29 @@ class TestPostgreSQLTarget:
         assert default_map["numeric_fields"] == "numeric_columns"
 
 
-class TestFlextSingerSDKIntegration:
-    """Test FlextSingerSDKIntegration main class - comprehensive coverage."""
+class TestFlextMeltanoSingerSDKIntegration:
+    """Test FlextMeltanoSingerSDKIntegration main class - comprehensive coverage."""
 
-    def test_flext_singer_sdk_integration_initialization_with_string_path(self) -> None:
-        """Test FlextSingerSDKIntegration initialization with string path."""
+    def test_flext_singer_sdk_integration_initialization_with_string_path(
+        self,
+    ) -> None:
+        """Test FlextMeltanoSingerSDKIntegration initialization with string path."""
         project_root = "/test/project"
 
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         assert integration.project_root == Path(project_root)
         assert isinstance(integration.project_root, Path)
         assert integration.taps == {}
         assert integration.targets == {}
 
-    def test_flext_singer_sdk_integration_initialization_with_path_object(self) -> None:
-        """Test FlextSingerSDKIntegration initialization with Path object."""
+    def test_flext_singer_sdk_integration_initialization_with_path_object(
+        self,
+    ) -> None:
+        """Test FlextMeltanoSingerSDKIntegration initialization with Path object."""
         project_root = Path("/test/project")
 
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         assert integration.project_root == project_root
         assert isinstance(integration.project_root, Path)
@@ -541,21 +548,21 @@ class TestFlextSingerSDKIntegration:
         assert integration.targets == {}
 
     def test_flext_singer_sdk_integration_model_post_init(self) -> None:
-        """Test FlextSingerSDKIntegration model_post_init hook."""
+        """Test FlextMeltanoSingerSDKIntegration model_post_init hook."""
         project_root = "/test/project"
 
         # Mock the _discover_plugins method to test it's called
         with patch.object(
-            FlextSingerSDKIntegration,
+            FlextMeltanoSingerSDKIntegration,
             "_discover_plugins",
         ) as mock_discover:
-            FlextSingerSDKIntegration(project_root=project_root)
+            FlextMeltanoSingerSDKIntegration(project_root=project_root)
             mock_discover.assert_called_once()
 
     def test_flext_singer_sdk_integration_discover_plugins(self) -> None:
-        """Test FlextSingerSDKIntegration plugin discovery."""
+        """Test FlextMeltanoSingerSDKIntegration plugin discovery."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Call _discover_plugins directly to test implementation
         integration._discover_plugins()
@@ -567,46 +574,48 @@ class TestFlextSingerSDKIntegration:
     async def test_create_oracle_oic_tap(self) -> None:
         """Test Oracle OIC tap creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         config = {"api_url": "https://oracle-oic.example.com"}
 
         tap = await integration.create_oracle_oic_tap(config)
 
-        assert isinstance(tap, OracleOICTap)
+        assert isinstance(tap, FlextMeltanoOracleOICTap)
         assert tap.config == config
 
     @pytest.mark.asyncio
     async def test_create_ldap_tap(self) -> None:
         """Test LDAP tap creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         config = {"ldap_url": "ldap://localhost:389"}
 
         tap = await integration.create_ldap_tap(config)
 
-        assert isinstance(tap, LDAPTap)
+        assert isinstance(tap, FlextMeltanoLDAPTap)
         assert tap.config == config
 
     @pytest.mark.asyncio
     async def test_create_postgres_target(self) -> None:
         """Test PostgreSQL target creation."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         config = {"host": "localhost", "database": "test_db"}
 
         target = await integration.create_postgres_target(config)
 
-        assert isinstance(target, PostgreSQLTarget)
+        assert isinstance(target, FlextMeltanoPostgreSQLTarget)
         assert target.config == config
 
     @pytest.mark.asyncio
-    async def test_run_elt_pipeline_oracle_oic_to_postgres_success(self) -> None:
+    async def test_run_elt_pipeline_oracle_oic_to_postgres_success(
+        self,
+    ) -> None:
         """Test successful ELT pipeline from Oracle OIC to PostgreSQL."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"api_url": "https://oracle-oic.example.com"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -628,7 +637,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_ldap_to_postgres_success(self) -> None:
         """Test successful ELT pipeline from LDAP to PostgreSQL."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"ldap_url": "ldap://localhost:389"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -650,7 +659,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_unknown_tap(self) -> None:
         """Test ELT pipeline with unknown tap."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"url": "https://unknown.com"}
         target_config = {"host": "localhost", "database": "test_db"}
@@ -663,13 +672,13 @@ class TestFlextSingerSDKIntegration:
         )
 
         assert result["success"] is False
-        assert result["error"] == "Unknown tap: tap-unknown"
+        assert "Cannot create tap: tap-unknown" in result["error"]
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_unknown_target(self) -> None:
         """Test ELT pipeline with unknown target."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         tap_config = {"api_url": "https://oracle-oic.example.com"}
         target_config = {"url": "https://unknown.com"}
@@ -682,16 +691,21 @@ class TestFlextSingerSDKIntegration:
         )
 
         assert result["success"] is False
-        assert result["error"] == "Unknown target: target-unknown"
+        assert (
+            result["error"]
+            == "Plugin discovery service not available. Cannot create target: target-unknown"
+        )
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_with_batch_processing(self) -> None:
         """Test ELT pipeline batch processing with large datasets."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Mock large dataset by patching sync_stream to yield many records
-        async def mock_sync_stream(stream: object) -> AsyncGenerator[dict[str, Any]]:
+        async def mock_sync_stream(
+            stream: object,
+        ) -> AsyncGenerator[dict[str, Any]]:
             for i in range(SINGER_BATCH_SIZE_LIMIT + 100):  # More than batch limit
                 yield {
                     "id": f"record_{i:04d}",
@@ -699,7 +713,9 @@ class TestFlextSingerSDKIntegration:
                     "created_at": datetime.now(UTC).isoformat(),
                 }
 
-        with patch.object(OracleOICTap, "sync_stream", side_effect=mock_sync_stream):
+        with patch.object(
+            FlextMeltanoOracleOICTap, "sync_stream", side_effect=mock_sync_stream,
+        ):
             result = await integration.run_elt_pipeline(
                 tap_name="tap-oracle-oic",
                 target_name="target-postgres",
@@ -716,17 +732,17 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_with_unselected_streams(self) -> None:
         """Test ELT pipeline with unselected streams (should be skipped)."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Mock discover_streams to return unselected streams
-        def mock_discover_streams() -> list[SingerStreamDefinition]:
+        def mock_discover_streams() -> list[FlextMeltanoSingerStreamDefinition]:
             return [
-                SingerStreamDefinition(
+                FlextMeltanoSingerStreamDefinition(
                     name="selected_stream",
                     stream_schema={"properties": {"id": {"type": "string"}}},
                     selected=True,
                 ),
-                SingerStreamDefinition(
+                FlextMeltanoSingerStreamDefinition(
                     name="unselected_stream",
                     stream_schema={"properties": {"id": {"type": "string"}}},
                     selected=False,
@@ -734,7 +750,9 @@ class TestFlextSingerSDKIntegration:
             ]
 
         # Mock sync_stream to yield one record per stream
-        async def mock_sync_stream(stream: Any) -> AsyncGenerator[dict[str, Any]]:
+        async def mock_sync_stream(
+            stream: Any,
+        ) -> AsyncGenerator[dict[str, Any]]:
             stream_name = getattr(stream, "name", "unknown_stream")
             yield {
                 "id": f"record_from_{stream_name}",
@@ -743,11 +761,13 @@ class TestFlextSingerSDKIntegration:
 
         with (
             patch.object(
-                OracleOICTap,
+                FlextMeltanoOracleOICTap,
                 "discover_streams",
                 side_effect=mock_discover_streams,
             ),
-            patch.object(OracleOICTap, "sync_stream", side_effect=mock_sync_stream),
+            patch.object(
+                FlextMeltanoOracleOICTap, "sync_stream", side_effect=mock_sync_stream,
+            ),
         ):
             result = await integration.run_elt_pipeline(
                 tap_name="tap-oracle-oic",
@@ -764,7 +784,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_error_handling(self) -> None:
         """Test ELT pipeline error handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Mock discover_streams to raise an exception
         def mock_discover_streams_error() -> Never:
@@ -772,7 +792,7 @@ class TestFlextSingerSDKIntegration:
             raise RuntimeError(msg)
 
         with patch.object(
-            OracleOICTap,
+            FlextMeltanoOracleOICTap,
             "discover_streams",
             side_effect=mock_discover_streams_error,
         ):
@@ -791,7 +811,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_type_error_handling(self) -> None:
         """Test ELT pipeline TypeError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Mock to raise TypeError
         def mock_discover_streams_type_error() -> Never:
@@ -799,7 +819,7 @@ class TestFlextSingerSDKIntegration:
             raise TypeError(msg)
 
         with patch.object(
-            OracleOICTap,
+            FlextMeltanoOracleOICTap,
             "discover_streams",
             side_effect=mock_discover_streams_type_error,
         ):
@@ -817,7 +837,7 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_value_error_handling(self) -> None:
         """Test ELT pipeline ValueError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Mock to raise ValueError
         def mock_discover_streams_value_error() -> Never:
@@ -825,7 +845,7 @@ class TestFlextSingerSDKIntegration:
             raise ValueError(msg)
 
         with patch.object(
-            OracleOICTap,
+            FlextMeltanoOracleOICTap,
             "discover_streams",
             side_effect=mock_discover_streams_value_error,
         ):
@@ -843,17 +863,17 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_os_error_handling(self) -> None:
         """Test ELT pipeline OSError handling."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
-        # Mock to raise OSError
-        def mock_discover_streams_os_error() -> Never:
+        # Mock create_tap_instance to raise OSError
+        async def mock_create_tap_instance(*args: Any, **kwargs: Any) -> Never:
             msg = "File system error"
             raise OSError(msg)
 
         with patch.object(
-            OracleOICTap,
-            "discover_streams",
-            side_effect=mock_discover_streams_os_error,
+            FlextMeltanoSingerSDKIntegration,
+            "create_tap_instance",
+            side_effect=mock_create_tap_instance,
         ):
             result = await integration.run_elt_pipeline(
                 tap_name="tap-oracle-oic",
@@ -869,10 +889,13 @@ class TestFlextSingerSDKIntegration:
     async def test_run_elt_pipeline_with_stream_maps(self) -> None:
         """Test ELT pipeline with stream maps parameter."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         stream_maps = {
-            "integrations": {"id": "integration_id", "name": "integration_name"},
+            "integrations": {
+                "id": "integration_id",
+                "name": "integration_name",
+            },
             "connections": {"connection_id": "id", "display_name": "name"},
         }
 
@@ -898,7 +921,7 @@ class TestConvenienceFunctions:
 
         integration = create_singer_sdk_integration(project_root)
 
-        assert isinstance(integration, FlextSingerSDKIntegration)
+        assert isinstance(integration, FlextMeltanoSingerSDKIntegration)
         assert integration.project_root == project_root
 
 
@@ -940,12 +963,15 @@ class TestIntegrationWorkflow:
     async def test_complete_oracle_oic_to_postgres_workflow(self) -> None:
         """Test complete workflow from Oracle OIC discovery to PostgreSQL load."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Step 1: Create Oracle OIC tap
-        tap_config = {"api_url": "https://oracle-oic.example.com", "username": "test"}
+        tap_config = {
+            "api_url": "https://oracle-oic.example.com",
+            "username": "test",
+        }
         tap = await integration.create_oracle_oic_tap(tap_config)
-        assert isinstance(tap, OracleOICTap)
+        assert isinstance(tap, FlextMeltanoOracleOICTap)
 
         # Step 2: Discover streams
         streams = tap.discover_streams()
@@ -954,7 +980,7 @@ class TestIntegrationWorkflow:
         # Step 3: Create PostgreSQL target
         target_config = {"host": "localhost", "database": "test_db"}
         target = await integration.create_postgres_target(target_config)
-        assert isinstance(target, PostgreSQLTarget)
+        assert isinstance(target, FlextMeltanoPostgreSQLTarget)
 
         # Step 4: Run complete pipeline
         result = await integration.run_elt_pipeline(
@@ -972,7 +998,7 @@ class TestIntegrationWorkflow:
     async def test_complete_ldap_to_postgres_workflow(self) -> None:
         """Test complete workflow from LDAP discovery to PostgreSQL load."""
         project_root = "/test/project"
-        integration = FlextSingerSDKIntegration(project_root=project_root)
+        integration = FlextMeltanoSingerSDKIntegration(project_root=project_root)
 
         # Step 1: Create LDAP tap
         tap_config = {
@@ -980,7 +1006,7 @@ class TestIntegrationWorkflow:
             "bind_dn": "cn=REDACTED_LDAP_BIND_PASSWORD,dc=test,dc=com",
         }
         tap = await integration.create_ldap_tap(tap_config)
-        assert isinstance(tap, LDAPTap)
+        assert isinstance(tap, FlextMeltanoLDAPTap)
 
         # Step 2: Discover streams
         streams = tap.discover_streams()
@@ -989,7 +1015,7 @@ class TestIntegrationWorkflow:
         # Step 3: Create PostgreSQL target
         target_config = {"host": "localhost", "database": "test_db"}
         target = await integration.create_postgres_target(target_config)
-        assert isinstance(target, PostgreSQLTarget)
+        assert isinstance(target, FlextMeltanoPostgreSQLTarget)
 
         # Step 4: Run complete pipeline
         result = await integration.run_elt_pipeline(

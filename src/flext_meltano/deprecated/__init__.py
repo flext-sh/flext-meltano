@@ -7,9 +7,9 @@ All components here issue deprecation warnings and redirect to the new semantic 
 
 🚨 MIGRATION GUIDE:
 Old Import → New Import
-- from flext_meltano import FlextMeltanoProjectManager → from flext_meltano.application.services import ProjectApplicationService
-- from flext_meltano import FlextMeltanoOrchestrator → from flext_meltano.application.orchestrators import PipelineOrchestrator
-- from flext_meltano import MeltanoAntiCorruptionLayer → from flext_meltano.infrastructure.meltano import MeltanoCLIAdapter
+- from flext_meltano import FlextMeltanoProjectManager → from flext_meltano.application.services import FlextMeltanoProjectService
+- from flext_meltano import FlextMeltanoOrchestrator → from flext_meltano.application.services import FlextMeltanoJobService
+- from flext_meltano import MeltanoAntiCorruptionLayer → from flext_meltano.application.services import FlextMeltanoProjectService
 
 Built on flext-core foundation patterns.
 """
@@ -19,9 +19,12 @@ from __future__ import annotations
 import warnings
 from typing import Any
 
-# Import new implementations
-from flext_meltano.application.services.project_service import (
-    ProjectApplicationService,
+# Import available new implementations
+from flext_meltano.application.services import (
+    FlextMeltanoJobService,
+    FlextMeltanoPluginService,
+    FlextMeltanoProjectService,
+    FlextMeltanoStateService,
 )
 
 
@@ -29,75 +32,81 @@ from flext_meltano.application.services.project_service import (
 def _deprecation_warning(old_name: str, new_location: str) -> None:
     """Issue deprecation warning."""
     warnings.warn(
-        f"{old_name} is deprecated and will be removed in version 1.0.0. "
-        f"Use {new_location} instead. "
-        f"See SEMANTIC_ARCHITECTURE_REDESIGN.md for migration guide.",
+        f"{old_name} is deprecated. Use {new_location} instead.",
         DeprecationWarning,
-        stacklevel=3,
+        stacklevel=3
     )
 
+
+# Deprecated class aliases with warnings
 class FlextMeltanoProjectManager:
-    """DEPRECATED: Use ProjectApplicationService instead."""
+    """Deprecated project manager - use FlextMeltanoProjectService instead."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         _deprecation_warning(
             "FlextMeltanoProjectManager",
-            "flext_meltano.application.services.ProjectApplicationService",
+            "flext_meltano.application.services.FlextMeltanoProjectService"
         )
+        self._service = FlextMeltanoProjectService()
 
-        # For now, redirect to ProjectApplicationService
-        # In a real implementation, you'd inject the dependencies properly
-        self._new_service = None  # Would be injected
+    def create_project(self, *args: Any, **kwargs: Any) -> None:
+        """Deprecated method - raises NotImplementedError."""
+        _deprecation_warning("create_project", "ProjectApplicationService.create_project")
+        raise NotImplementedError("Please migrate to new ProjectApplicationService")
 
-    def create_project(self, *args: Any, **kwargs: Any) -> Any:
-        """DEPRECATED: Use ProjectApplicationService.create_project instead."""
-        _deprecation_warning(
-            "FlextMeltanoProjectManager.create_project",
-            "ProjectApplicationService.create_project",
-        )
-        # Redirect to new implementation
-        msg = "Please migrate to new ProjectApplicationService"
-        raise NotImplementedError(msg)
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._service, name)
+
 
 class FlextMeltanoOrchestrator:
-    """DEPRECATED: Use PipelineOrchestrator instead."""
+    """Deprecated orchestrator - use FlextMeltanoJobService instead."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         _deprecation_warning(
             "FlextMeltanoOrchestrator",
-            "flext_meltano.application.orchestrators.PipelineOrchestrator",
+            "flext_meltano.application.services.FlextMeltanoJobService"
         )
+        self._service = FlextMeltanoJobService()
 
-    def execute_pipeline(self, *args: Any, **kwargs: Any) -> Any:
-        """DEPRECATED: Use PipelineOrchestrator.execute_pipeline instead."""
-        _deprecation_warning(
-            "FlextMeltanoOrchestrator.execute_pipeline",
-            "PipelineOrchestrator.execute_pipeline",
-        )
-        msg = "Please migrate to new PipelineOrchestrator"
-        raise NotImplementedError(msg)
+    def execute_pipeline(self, *args: Any, **kwargs: Any) -> None:
+        """Deprecated method - raises NotImplementedError."""
+        _deprecation_warning("execute_pipeline", "PipelineOrchestrator.execute_pipeline")
+        raise NotImplementedError("Please migrate to new PipelineOrchestrator")
 
-class MeltanoAntiCorruptionLayer:
-    """DEPRECATED: Use MeltanoCLIAdapter instead."""
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._service, name)
+
+
+class FlextMeltanoAntiCorruptionLayer:
+    """Deprecated anti-corruption layer - use services directly."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         _deprecation_warning(
-            "MeltanoAntiCorruptionLayer",
-            "flext_meltano.infrastructure.meltano.MeltanoCLIAdapter",
+            "FlextMeltanoAntiCorruptionLayer",
+            "flext_meltano.application.services (direct service usage)"
         )
+        self.project_service = FlextMeltanoProjectService()
+        self.job_service = FlextMeltanoJobService()
+        self.plugin_service = FlextMeltanoPluginService()
+        self.state_service = FlextMeltanoStateService()
 
-    def run_meltano_command(self, *args: Any, **kwargs: Any) -> Any:
-        """DEPRECATED: Use MeltanoCLIAdapter methods instead."""
-        _deprecation_warning(
-            "MeltanoAntiCorruptionLayer.run_meltano_command",
-            "MeltanoCLIAdapter.run_job or MeltanoCLIAdapter.install_plugin",
-        )
-        msg = "Please migrate to new MeltanoCLIAdapter"
-        raise NotImplementedError(msg)
+    def run_meltano_command(self, *args: Any, **kwargs: Any) -> None:
+        """Deprecated method - raises NotImplementedError."""
+        _deprecation_warning("run_meltano_command", "MeltanoCLIAdapter")
+        raise NotImplementedError("Please migrate to new MeltanoCLIAdapter")
 
-# Legacy exports for backward compatibility
+    def __getattr__(self, name: str) -> Any:
+        # Try to find the attribute in available services
+        for service in [self.project_service, self.job_service, self.plugin_service, self.state_service]:
+            if hasattr(service, name):
+                return getattr(service, name)
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+
+# Export deprecated classes
 __all__ = [
+    "FlextMeltanoAntiCorruptionLayer",
     "FlextMeltanoOrchestrator",
     "FlextMeltanoProjectManager",
-    "MeltanoAntiCorruptionLayer",
+    "_deprecation_warning",
 ]

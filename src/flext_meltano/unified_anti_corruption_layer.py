@@ -1,5 +1,3 @@
-from flext_core import ServiceResult
-
 """UNIFIED MELTANO ANTI-CORRUPTION LAYER - ZERO TOLERANCE CONSOLIDATION.
 
 Simplified implementation using flext-core patterns.
@@ -11,11 +9,11 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from flext_core import FlextResult
 from pydantic import BaseModel, Field, model_validator
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Import via módulo raiz
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
 
 # Use BaseModel for value objects with proper field definitions
 DomainValueObject = BaseModel
@@ -23,7 +21,7 @@ DomainValueObject = BaseModel
 logger = logging.getLogger(__name__)
 
 
-class MeltanoPluginDescriptor(DomainValueObject):
+class FlextMeltanoPluginDescriptor(DomainValueObject):
     """External representation of a Meltano plugin with enterprise validation."""
 
     name: str = Field(description="Plugin name in Meltano ecosystem")
@@ -45,7 +43,7 @@ class MeltanoPluginDescriptor(DomainValueObject):
     description: str | None = Field(default=None, description="Plugin description text")
 
     @model_validator(mode="after")
-    def validate_required_fields(self) -> MeltanoPluginDescriptor:
+    def validate_required_fields(self) -> FlextMeltanoPluginDescriptor:
         """Validate required fields after model initialization.
 
         Returns:
@@ -61,7 +59,7 @@ class MeltanoPluginDescriptor(DomainValueObject):
         return self
 
 
-class MeltanoRunResult(DomainValueObject):
+class FlextMeltanoRunResult(DomainValueObject):
     """Result of a Meltano pipeline execution with comprehensive metrics."""
 
     success: bool = Field(description="Whether pipeline execution was successful")
@@ -104,14 +102,14 @@ class MeltanoRunResult(DomainValueObject):
         return bool(self.stderr.strip()) or not self.success
 
     @classmethod
-    def from_meltano_execution_result(cls, result: object) -> MeltanoRunResult:
-        """Create MeltanoRunResult from Meltano execution result.
+    def from_meltano_execution_result(cls, result: object) -> FlextMeltanoRunResult:
+        """Create FlextMeltanoRunResult from Meltano execution result.
 
         Args:
             result: Meltano execution result object.
 
         Returns:
-            MeltanoRunResult instance with extracted attributes.
+            FlextMeltanoRunResult instance with extracted attributes.
 
         """
         return cls(
@@ -125,7 +123,7 @@ class MeltanoRunResult(DomainValueObject):
         )
 
 
-class UnifiedMeltanoAntiCorruptionLayer:
+class FlextMeltanoUnifiedAntiCorruptionLayer:
     """Master anti-corruption layer - ZERO TOLERANCE single source of truth."""
 
     def __init__(self, engine: object = None, event_bus: object | None = None) -> None:
@@ -152,11 +150,11 @@ class UnifiedMeltanoAntiCorruptionLayer:
             _env: Optional environment variables for execution (unused).
 
         Returns:
-            ServiceResult containing MeltanoRunResult with execution details.
+            ServiceResult containing FlextMeltanoRunResult with execution details.
 
         """
         try:
-            result = MeltanoRunResult(
+            result = FlextMeltanoRunResult(
                 success=True,
                 exit_code=0,
                 stdout=f"Pipeline executed: {extractor} -> {loader}",
@@ -166,15 +164,15 @@ class UnifiedMeltanoAntiCorruptionLayer:
                 completed_at=datetime.now(UTC),
                 records_processed=100,
             )
-            return ServiceResult.ok(result)
+            return FlextResult.ok(result)
         except ValueError as e:
-            return ServiceResult.fail(f"Pipeline execution failed: {e}")
+            return FlextResult.fail(f"Pipeline execution failed: {e}")
 
     def get_plugin_descriptor(
         self,
         name: str,
         namespace: str,
-    ) -> MeltanoPluginDescriptor:
+    ) -> FlextMeltanoPluginDescriptor:
         """Get plugin descriptor for a Meltano plugin.
 
         Args:
@@ -182,10 +180,10 @@ class UnifiedMeltanoAntiCorruptionLayer:
             namespace: Plugin namespace for organization.
 
         Returns:
-            MeltanoPluginDescriptor with plugin metadata.
+            FlextMeltanoPluginDescriptor with plugin metadata.
 
         """
-        return MeltanoPluginDescriptor(
+        return FlextMeltanoPluginDescriptor(
             name=name,
             namespace=namespace,
             plugin_type="extractor",

@@ -18,14 +18,13 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any
 
-from flext_core import ServiceResult
+from flext_core import FlextResult
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_meltano.infrastructure.di_container import get_service_result
 
 
-class MeltanoAdapter(ABC):
+class FlextMeltanoAdapter(ABC):
     """Abstract interface for Meltano operations."""
 
     @abstractmethod
@@ -34,7 +33,7 @@ class MeltanoAdapter(ABC):
         pipeline_name: str,
         environment: str = "dev",
         configuration: dict[str, Any] | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Run a Meltano pipeline."""
 
     @abstractmethod
@@ -43,28 +42,28 @@ class MeltanoAdapter(ABC):
         plugin_type: str,
         plugin_name: str,
         variant: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Install a Meltano plugin."""
 
     @abstractmethod
     async def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """List available Meltano plugins."""
 
     @abstractmethod
     async def get_plugin_config(
         self,
         plugin_name: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Get plugin configuration."""
 
 
-class MeltanoAntiCorruptionLayer:
+class FlextMeltanoAntiCorruptionLayer:
     """Translation layer between domain and Meltano."""
 
-    def __init__(self, adapter: MeltanoAdapter) -> None:
+    def __init__(self, adapter: FlextMeltanoAdapter) -> None:
         """Initialize the anti-corruption layer."""
         self.adapter = adapter
 
@@ -73,7 +72,7 @@ class MeltanoAntiCorruptionLayer:
         pipeline_id: str,
         environment: str = "dev",
         config: dict[str, Any] | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Execute a pipeline through the Meltano adapter."""
         try:
             # Translate domain concepts to Meltano concepts
@@ -88,11 +87,11 @@ class MeltanoAntiCorruptionLayer:
 
             if result.success:
                 # Return the result value directly (domain translation would go here)
-                return ServiceResult.ok(result.data or {})
+                return FlextResult.ok(result.data or {})
             return result
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to execute pipeline: {e}")
+            return FlextResult.fail(f"Failed to execute pipeline: {e}")
 
     async def manage_plugin(
         self,
@@ -100,7 +99,7 @@ class MeltanoAntiCorruptionLayer:
         plugin_type: str,
         plugin_name: str,
         **kwargs: str | int | bool | None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Manage plugins through the Meltano adapter."""
         try:
             if action == "install":
@@ -115,10 +114,10 @@ class MeltanoAntiCorruptionLayer:
                 return await self.adapter.list_plugins(plugin_type=plugin_type)
             if action == "config":
                 return await self.adapter.get_plugin_config(plugin_name=plugin_name)
-            return ServiceResult.fail(f"Unknown plugin action: {action}")
+            return FlextResult.fail(f"Unknown plugin action: {action}")
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to manage plugin: {e}")
+            return FlextResult.fail(f"Failed to manage plugin: {e}")
 
     def _translate_config(self, config: dict[str, Any]) -> dict[str, Any]:
         """Translate domain configuration to Meltano configuration."""
@@ -136,7 +135,7 @@ class MeltanoAntiCorruptionLayer:
         }
 
 
-class SimpleMeltanoAdapter(MeltanoAdapter):
+class FlextMeltanoSimpleMeltanoAdapter(FlextMeltanoAdapter):
     """Simple implementation of Meltano adapter for testing."""
 
     async def run_pipeline(
@@ -144,7 +143,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
         pipeline_name: str,
         environment: str = "dev",
         configuration: dict[str, Any] | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Run a Meltano pipeline."""
         try:
             # Simulate pipeline execution
@@ -160,17 +159,17 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
                 },
             }
 
-            return ServiceResult.ok(result)
+            return FlextResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to run pipeline: {e}")
+            return FlextResult.fail(f"Failed to run pipeline: {e}")
 
     async def install_plugin(
         self,
         plugin_type: str,
         plugin_name: str,
         variant: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Install a Meltano plugin."""
         try:
             # Simulate plugin installation
@@ -183,15 +182,15 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
                 "status": "installed",
             }
 
-            return ServiceResult.ok(result)
+            return FlextResult.ok(result)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to install plugin: {e}")
+            return FlextResult.fail(f"Failed to install plugin: {e}")
 
     async def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """List available Meltano plugins."""
         try:
             # Simulate plugin listing
@@ -213,15 +212,15 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
             if plugin_type:
                 plugins = [p for p in plugins if p["type"] == plugin_type]
 
-            return ServiceResult.ok(plugins)
+            return FlextResult.ok(plugins)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to list plugins: {e}")
+            return FlextResult.fail(f"Failed to list plugins: {e}")
 
     async def get_plugin_config(
         self,
         plugin_name: str,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Get plugin configuration."""
         try:
             # Simulate plugin config retrieval
@@ -237,7 +236,7 @@ class SimpleMeltanoAdapter(MeltanoAdapter):
                 },
             }
 
-            return ServiceResult.ok(config)
+            return FlextResult.ok(config)
 
         except (ValueError, TypeError, RuntimeError, OSError) as e:
-            return ServiceResult.fail(f"Failed to get plugin config: {e}")
+            return FlextResult.fail(f"Failed to get plugin config: {e}")

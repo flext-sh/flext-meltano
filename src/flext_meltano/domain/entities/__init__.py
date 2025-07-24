@@ -17,13 +17,15 @@ import warnings
 from typing import Any
 
 # Domain entities
-from flext_meltano.domain.entities.environment_type import EnvironmentType
-from flext_meltano.domain.entities.job import MeltanoJob
-from flext_meltano.domain.entities.job_status import JobStatus
-from flext_meltano.domain.entities.plugin import MeltanoPlugin
-from flext_meltano.domain.entities.plugin_type import PluginType
-from flext_meltano.domain.entities.project import MeltanoProject
-from flext_meltano.domain.entities.state import MeltanoState
+from flext_meltano.domain.entities.environment_type import (
+    FlextMeltanoEnvironmentType,
+)
+from flext_meltano.domain.entities.job import FlextMeltanoJob
+from flext_meltano.domain.entities.job_status import FlextMeltanoJobStatus
+from flext_meltano.domain.entities.plugin import FlextMeltanoPlugin
+from flext_meltano.domain.entities.plugin_type import FlextMeltanoPluginType
+from flext_meltano.domain.entities.project import FlextMeltanoProject
+from flext_meltano.domain.entities.state import FlextMeltanoState
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Import from local DI container
 from flext_meltano.infrastructure.di_container import (
@@ -47,13 +49,20 @@ def _entity_deprecation_warning(entity_name: str) -> None:
 def __getattr__(name: str) -> Any:
     """Handle imports com warnings de depreciação."""
     entity_mapping = {
-        "MeltanoProject": MeltanoProject,
-        "MeltanoState": MeltanoState,
-        "MeltanoJob": MeltanoJob,
-        "MeltanoPlugin": MeltanoPlugin,
-        "EnvironmentType": EnvironmentType,
-        "JobStatus": JobStatus,
-        "PluginType": PluginType,
+        "MeltanoProject": FlextMeltanoProject,
+        "MeltanoState": FlextMeltanoState,
+        "MeltanoJob": FlextMeltanoJob,
+        "MeltanoPlugin": FlextMeltanoPlugin,
+        "FlextMeltanoProject": FlextMeltanoProject,
+        "FlextMeltanoState": FlextMeltanoState,
+        "FlextMeltanoJob": FlextMeltanoJob,
+        "FlextMeltanoPlugin": FlextMeltanoPlugin,
+        "EnvironmentType": FlextMeltanoEnvironmentType,
+        "FlextMeltanoEnvironmentType": FlextMeltanoEnvironmentType,
+        "JobStatus": FlextMeltanoJobStatus,
+        "FlextMeltanoJobStatus": FlextMeltanoJobStatus,
+        "PluginType": FlextMeltanoPluginType,
+        "FlextMeltanoPluginType": FlextMeltanoPluginType,
     }
 
     if name in entity_mapping:
@@ -74,11 +83,18 @@ def __getattr__(name: str) -> Any:
 __all__ = [
     "AbstractEntity",
     "DomainEntity",
-    "EnvironmentType",
-    "JobStatus",
-    "MeltanoJob",
-    "MeltanoPlugin",
-    "MeltanoProject",
-    "MeltanoState",
-    "PluginType",
+    "EnvironmentType",  # Backward compatibility
+    "FlextMeltanoEnvironmentType",
+    "FlextMeltanoJob",
+    "FlextMeltanoJobStatus",
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPluginType",
+    "FlextMeltanoProject",
+    "FlextMeltanoState",
+    "JobStatus",  # Backward compatibility
+    "MeltanoJob",  # Backward compatibility
+    "MeltanoPlugin",  # Backward compatibility
+    "MeltanoProject",  # Backward compatibility
+    "MeltanoState",  # Backward compatibility
+    "PluginType",  # Backward compatibility
 ]

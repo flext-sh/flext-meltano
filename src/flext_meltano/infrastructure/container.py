@@ -6,24 +6,35 @@ REFACTORED:
 
 from __future__ import annotations
 
-# Initialize types via DI container
-from flext_meltano.config import MeltanoSettings
+from typing import TYPE_CHECKING, Any, TypeVar
 
-# 🚨 ARCHITECTURAL COMPLIANCE: Using local DI container
-from flext_meltano.infrastructure.di_container import (
-    flext_container,
-    singleton_decorator,
-)
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.infrastructure.di_container import get_container
 
-# Use decorator from flext-core
-singleton = singleton_decorator
+T = TypeVar("T")
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+
+# Simple singleton implementation since not available from di_container
+def singleton[T](cls: type[T]) -> Callable[..., T]:
+    """Simple singleton decorator."""
+    instances: dict[type, Any] = {}
+
+    def get_instance(*args: Any, **kwargs: Any) -> T:
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]  # type: ignore[no-any-return]
+
+    return get_instance
 
 
 @singleton
-class MeltanoContainerConfig:
+class FlextMeltanoContainerConfig:
     """Meltano container configuration using flext-core patterns."""
 
-    def __init__(self, settings: MeltanoSettings) -> None:
+    def __init__(self, settings: FlextMeltanoSettings) -> None:
         self.settings = settings
 
     def configure_dependencies(self) -> None:
@@ -33,33 +44,32 @@ class MeltanoContainerConfig:
         flext-core dependency injection container.
         """
         # Get container
-        container = flext_container
+        container = get_container()
         # Register settings
-        container.register(MeltanoSettings, self.settings)
+        container.register(FlextMeltanoSettings, self.settings)
 
         # Register this config instance
-        container.register(MeltanoContainerConfig, self)
+        container.register(FlextMeltanoContainerConfig, self)
 
 
 def setup_meltano_container(
-    settings: MeltanoSettings | None = None,
-) -> MeltanoContainerConfig:
+    settings: FlextMeltanoSettings | None = None,
+) -> FlextMeltanoContainerConfig:
     """Set up Meltano dependency injection container."""
     if settings is None:
-        settings = MeltanoSettings(
+        settings = FlextMeltanoSettings(
             project_name="flext-infrastructure.plugins.flext-meltano",
             project_version="0.7.0",
             environment="development",
-            debug=False,
         )
 
-    config = MeltanoContainerConfig(settings)
+    config = FlextMeltanoContainerConfig(settings)
     config.configure_dependencies()
 
     return config
 
 
-def get_meltano_container() -> MeltanoContainerConfig:
+def get_meltano_container() -> FlextMeltanoContainerConfig:
     """Get configured Meltano container."""
-    container = flext_container
-    return container.resolve(MeltanoContainerConfig)
+    container = get_container()
+    return container.resolve(FlextMeltanoContainerConfig)  # type: ignore[no-any-return]

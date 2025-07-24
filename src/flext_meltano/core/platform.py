@@ -12,9 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flext_core import FlextResult
-from flext_core.constants import FlextConstants
-from flext_core.container import FlextContainer
+from flext_core import FlextContainer, FlextResult
 
 from flext_meltano.config.settings import FlextMeltanoSettings
 
@@ -56,23 +54,23 @@ class FlextMeltanoPlatform:
 
         self._container.register(
             "project_manager",
-            FlextMeltanoProjectManager(self._config),
+            FlextMeltanoProjectManager(self._config, self._container),
         )
         self._container.register(
             "environment_manager",
-            FlextMeltanoEnvironmentManager(self._config),
+            FlextMeltanoEnvironmentManager(),
         )
         self._container.register(
             "job_manager",
-            FlextMeltanoJobManager(self._config),
+            FlextMeltanoJobManager(),
         )
         self._container.register(
             "plugin_manager",
-            FlextMeltanoPluginManager(self._config),
+            FlextMeltanoPluginManager(),
         )
         self._container.register(
             "state_manager",
-            FlextMeltanoStateManager(self._config),
+            FlextMeltanoStateManager(),
         )
 
         # Register Singer SDK services
@@ -98,7 +96,7 @@ class FlextMeltanoPlatform:
 
         self._container.register(
             "extension_manager",
-            FlextMeltanoExtensionManager(self._config),
+            FlextMeltanoExtensionManager(self._config, self._container),
         )
 
     @property
@@ -147,12 +145,11 @@ class FlextMeltanoPlatform:
                 manager_result = self.get_service(manager_name)
                 if manager_result.is_failure:
                     return FlextResult.fail(
-                        f"Failed to get {manager_name}: "
-                        f"{manager_result.error}",
+                        f"Failed to get {manager_name}: {manager_result.error}",
                     )
 
                 manager = manager_result.data
-                if hasattr(manager, "initialize"):
+                if manager is not None and hasattr(manager, "initialize"):
                     init_result = await manager.initialize()
                     if init_result.is_failure:
                         return FlextResult.fail(
@@ -189,7 +186,7 @@ class FlextMeltanoPlatform:
                 manager_result = self.get_service(manager_name)
                 if manager_result.is_success:
                     manager = manager_result.data
-                    if hasattr(manager, "shutdown"):
+                    if manager is not None and hasattr(manager, "shutdown"):
                         await manager.shutdown()
 
             return FlextResult.ok(None)
@@ -205,7 +202,7 @@ class FlextMeltanoPlatform:
 
         """
         try:
-            health_status = {
+            health_status: dict[str, Any] = {
                 "platform": "healthy",
                 "version": "0.7.0",
                 "services": {},
@@ -227,7 +224,7 @@ class FlextMeltanoPlatform:
                 service_result = self.get_service(service_name)
                 if service_result.is_success:
                     service = service_result.data
-                    if hasattr(service, "health_check"):
+                    if service is not None and hasattr(service, "health_check"):
                         service_health = service.health_check()
                         health_status["services"][service_name] = (
                             service_health.data
@@ -235,13 +232,9 @@ class FlextMeltanoPlatform:
                             else {"status": "unhealthy"}
                         )
                     else:
-                        health_status["services"][service_name] = {
-                            "status": "healthy"
-                        }
+                        health_status["services"][service_name] = {"status": "healthy"}
                 else:
-                    health_status["services"][service_name] = {
-                        "status": "unavailable"
-                    }
+                    health_status["services"][service_name] = {"status": "unavailable"}
 
             return FlextResult.ok(health_status)
 

@@ -1,4 +1,5 @@
 """Comprehensive tests for Meltano project management functionality."""
+
 from __future__ import annotations
 
 import asyncio
@@ -16,19 +17,25 @@ import pytest
 from flext_meltano.job_manager import FlextMeltanoJobManager
 from flext_meltano.models import MeltanoPlugin, MeltanoProjectConfig
 from flext_meltano.orchestrator import FlextMeltanoOrchestrator
-from flext_meltano.project_manager import MeltanoProjectManager
+from flext_meltano.project.manager import FlextMeltanoProjectManager
 from flext_meltano.state_manager import FlextMeltanoStateManager
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
 
-class TestMeltanoProjectManager:
+class TestFlextMeltanoProjectManager:
     """Test Meltano project management functionality."""
 
     @pytest.fixture
-    def project_manager(self, tmp_path: Path) -> MeltanoProjectManager:
-        return MeltanoProjectManager(str(tmp_path))
+    def project_manager(self, tmp_path: Path) -> FlextMeltanoProjectManager:
+        from flext_core import FlextContainer
+
+        from flext_meltano.config.settings import FlextMeltanoSettings
+
+        settings = FlextMeltanoSettings()
+        container = FlextContainer()
+        return FlextMeltanoProjectManager(settings, container)
 
     @pytest.fixture
     def temp_project_dir(self) -> Generator[Path]:
@@ -37,7 +44,7 @@ class TestMeltanoProjectManager:
 
     def test_project_manager_initialization(
         self,
-        project_manager: MeltanoProjectManager,
+        project_manager: FlextMeltanoProjectManager,
     ) -> None:
         assert project_manager is not None
         assert hasattr(project_manager, "create_project")
@@ -45,7 +52,7 @@ class TestMeltanoProjectManager:
     @pytest.mark.asyncio
     async def test_create_project_basic(
         self,
-        project_manager: MeltanoProjectManager,
+        project_manager: FlextMeltanoProjectManager,
         tmp_path: Path,
     ) -> None:
         """Test basic project creation functionality."""
@@ -53,15 +60,18 @@ class TestMeltanoProjectManager:
 
         # Test with expected signature
         try:
-            result = await project_manager.create_project(
-                project_name=project_name,
+            result = project_manager.create_project(
+                name=project_name,
+                directory=tmp_path / project_name,
             )
             # Should not raise exception and should return some result
             assert result is not None
         except (AttributeError, TypeError, ValueError):
             # If create_project has different signature, use pytest.raises for proper testing
-            with pytest.raises((AttributeError, TypeError, ValueError)) as exc_info:
-                await project_manager.create_project(project_name=project_name)
+            with pytest.raises(
+                (AttributeError, TypeError, ValueError),
+            ) as exc_info:
+                project_manager.create_project(name=project_name, directory=tmp_path / project_name)
 
             # Verify the error is expected for method signature mismatch
             error_msg = str(exc_info.value)
@@ -72,92 +82,68 @@ class TestMeltanoProjectManager:
 
     def test_project_config_creation(self) -> None:
         """Test MeltanoProjectConfig creation and validation."""
-        try:
-            config = MeltanoProjectConfig(
-                version=1,
-                project_id="test-project-123",
-            )
+        config = MeltanoProjectConfig.model_validate({
+            "version": 1,
+            "project_id": "test-project-123",
+        })
 
-            assert config.version == 1
-            assert config.project_id == "test-project-123"
-
-        except (NameError, TypeError):
-            # If MeltanoProjectConfig has different structure, use pytest.raises for proper testing
-            with pytest.raises((NameError, TypeError)) as exc_info:
-                MeltanoProjectConfig(
-                    version=1,
-                    project_id="test-project-123",
-                )
-
-            # Verify the error is expected for class structure mismatch
-            error_msg = str(exc_info.value)
-            assert any(
-                keyword in error_msg
-                for keyword in ["MeltanoProjectConfig", "not defined", "name"]
-            ), f"Unexpected error: {error_msg}"
+        assert config.version == 1
+        assert config.project_id == "test-project-123"
 
     def test_meltano_plugin_creation(self) -> None:
         """Test MeltanoPlugin creation and validation."""
-        try:
-            plugin = MeltanoPlugin(
-                name="tap-postgres",
-                namespace="tap_postgres",
-                pip_url="pipelinewise-tap-postgres",
-            )
+        plugin = MeltanoPlugin.model_validate({
+            "name": "tap-postgres",
+            "namespace": "tap_postgres",
+            "pip_url": "pipelinewise-tap-postgres",
+        })
 
-            assert plugin.name == "tap-postgres"
-            assert plugin.namespace == "tap_postgres"
-
-        except (NameError, TypeError):
-            # If MeltanoPlugin has different structure, use pytest.raises for proper testing
-            with pytest.raises((NameError, TypeError)) as exc_info:
-                MeltanoPlugin(
-                    name="tap-postgres",
-                    namespace="tap_postgres",
-                    pip_url="pipelinewise-tap-postgres",
-                )
-
-            # Verify the error is expected for class structure mismatch
-            error_msg = str(exc_info.value)
-            assert any(
-                keyword in error_msg
-                for keyword in ["MeltanoPlugin", "not defined", "name"]
-            ), f"Unexpected error: {error_msg}"
+        assert plugin.name == "tap-postgres"
+        assert plugin.namespace == "tap_postgres"
 
 
 class TestFlextProjectManager:
     """Test FLEXT-specific Meltano project manager."""
 
     @pytest.fixture
-    def flext_manager(self, tmp_path: Path) -> MeltanoProjectManager:
-        return MeltanoProjectManager(str(tmp_path))
+    def flext_manager(self, tmp_path: Path) -> FlextMeltanoProjectManager:
+        from flext_core import FlextContainer
+
+        from flext_meltano.config.settings import FlextMeltanoSettings
+
+        settings = FlextMeltanoSettings()
+        container = FlextContainer()
+        return FlextMeltanoProjectManager(settings, container)
 
     def test_flext_manager_initialization(
         self,
-        flext_manager: MeltanoProjectManager,
+        flext_manager: FlextMeltanoProjectManager,
     ) -> None:
         assert flext_manager is not None
 
     @pytest.mark.asyncio
     async def test_enterprise_project_creation(
         self,
-        flext_manager: MeltanoProjectManager,
+        flext_manager: FlextMeltanoProjectManager,
         tmp_path: Path,
     ) -> None:
         """Test enterprise project creation functionality."""
         project_name = "enterprise-project"
 
-        # Test with expected signature
+        # Test with expected signature - create_project is not async
         try:
-            result = await flext_manager.create_project(
+            # Use the bridge method which is async
+            result = await flext_manager.create_project_bridge(
                 project_name=project_name,
             )
             assert result is not None
 
         except (AttributeError, TypeError, ValueError):
             # If method signature is different, use pytest.raises for proper testing
-            with pytest.raises((AttributeError, TypeError, ValueError)) as exc_info:
-                await flext_manager.create_project(project_name=project_name)
+            with pytest.raises(
+                (AttributeError, TypeError, ValueError),
+            ) as exc_info:
+                await flext_manager.create_project_bridge(project_name=project_name)
 
             # Verify the error is expected for method signature mismatch
             error_msg = str(exc_info.value)
@@ -170,7 +156,7 @@ class TestFlextProjectManager:
     def test_meltano_command_execution(
         self,
         mock_subprocess: Mock,
-        flext_manager: MeltanoProjectManager,
+        flext_manager: FlextMeltanoProjectManager,
     ) -> None:
         mock_subprocess.return_value = Mock(
             returncode=0,
@@ -186,7 +172,7 @@ class TestFlextProjectManager:
         except AttributeError:
             # If run_meltano_command doesn't exist, verify this is expected
             with pytest.raises(AttributeError) as exc_info:
-                flext_manager.nonexistent_method()  # Test nonexistent method
+                flext_manager.nonexistent_method()  # type: ignore[attr-defined]  # Test nonexistent method
 
             error_msg = str(exc_info.value)
             assert any(
@@ -195,7 +181,9 @@ class TestFlextProjectManager:
             ), f"Unexpected error: {error_msg}"
             # This confirms the method is not implemented yet - acceptable
 
-    def test_plugin_management(self, flext_manager: MeltanoProjectManager) -> None:
+    def test_plugin_management(
+        self, flext_manager: FlextMeltanoProjectManager,
+    ) -> None:
         try:
             # Test plugin listing
             if hasattr(flext_manager, "list_plugins"):
@@ -211,15 +199,19 @@ class TestFlextProjectManager:
             # If plugin management has different interface, verify the error is expected
             # Re-execute the problematic code to capture the exception properly
             if hasattr(flext_manager, "list_plugins"):
-                with pytest.raises((AttributeError, TypeError, ValueError)) as exc_info:
+                with pytest.raises(
+                    (AttributeError, TypeError, ValueError),
+                ) as exc_info:
                     flext_manager.list_plugins()
             elif hasattr(flext_manager, "install_plugin"):
-                with pytest.raises((AttributeError, TypeError, ValueError)) as exc_info:
+                with pytest.raises(
+                    (AttributeError, TypeError, ValueError),
+                ) as exc_info:
                     flext_manager.install_plugin("tap-csv")
             else:
                 # Trigger an AttributeError for testing
                 with pytest.raises(AttributeError) as exc_info:
-                    flext_manager.undefined_method()  # Should raise AttributeError
+                    flext_manager.undefined_method()  # type: ignore[attr-defined]  # Should raise AttributeError
 
             error_msg = str(exc_info.value)
             assert any(
@@ -323,14 +315,20 @@ class TestMeltanoPerformance:
     """Performance tests for Meltano operations."""
 
     def test_project_creation_performance(self, tmp_path: Path) -> None:
-        manager = MeltanoProjectManager(str(tmp_path))
+        from flext_core import FlextContainer
+
+        from flext_meltano.config.settings import FlextMeltanoSettings
+
+        settings = FlextMeltanoSettings()
+        container = FlextContainer()
+        manager = FlextMeltanoProjectManager(settings, container)
 
         start_time = time.time()
 
         with contextlib.suppress(Exception):
             # Attempt to create project (may not work without proper Meltano setup)
             asyncio.run(
-                manager.create_project(
+                manager.create_project_bridge(
                     project_name="perf-test",
                 ),
             )
@@ -342,7 +340,13 @@ class TestMeltanoPerformance:
         assert duration < 5.0, f"Project creation took too long: {duration}s"
 
     def test_concurrent_operations(self, tmp_path: Path) -> None:
-        manager = MeltanoProjectManager(str(tmp_path))
+        from flext_core import FlextContainer
+
+        from flext_meltano.config.settings import FlextMeltanoSettings
+
+        settings = FlextMeltanoSettings()
+        container = FlextContainer()
+        manager = FlextMeltanoProjectManager(settings, container)
         results: list[str] = []
 
         def run_operation() -> None:
@@ -373,7 +377,13 @@ class TestMeltanoPerformance:
 
 def test_async_context(tmp_path: Path) -> None:
     async def test_operation() -> str:
-        manager = MeltanoProjectManager(str(tmp_path))
+        from flext_core import FlextContainer
+
+        from flext_meltano.config.settings import FlextMeltanoSettings
+
+        settings = FlextMeltanoSettings()
+        container = FlextContainer()
+        manager = FlextMeltanoProjectManager(settings, container)
         # Basic async operation
         return str(manager)
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 
 
-class PluginType(StrEnum):
+class FlextMeltanoPluginType(StrEnum):
     """Meltano plugin types."""
 
     EXTRACTOR = "extractors"
