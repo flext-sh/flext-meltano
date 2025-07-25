@@ -5,14 +5,15 @@ Provides a simple interface for setting up the FLEXT Meltano system.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
-from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.config.settings import (
+    FlextMeltanoProjectConfig,
+    FlextMeltanoSettings,
+)
 
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 # Initialize types via DI container
 # Define local types to avoid flext-core dependency
@@ -33,10 +34,6 @@ def setup_meltano_simple(
         Dictionary with setup results
 
     """
-    from pathlib import Path
-
-    from flext_meltano.config.settings import FlextMeltanoProjectConfig
-
     # Ensure project_root is a Path object
     project_path = Path(project_root) if isinstance(project_root, str) else project_root
 
@@ -50,10 +47,13 @@ def setup_meltano_simple(
         project=project_config,
     )
 
+    # Safe access to project_root with None check
+    project_root_str = str(project_path) if settings.project is None else str(settings.project.project_root)
+
     return {
         "success": True,
         "settings": settings,
-        "project_root": str(settings.project.project_root),
+        "project_root": project_root_str,
         "environment": settings.environment,
     }
 

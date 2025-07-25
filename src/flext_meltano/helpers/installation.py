@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any
 
 from flext_core import FlextResult
 
+from flext_meltano.helpers.cli import flext_run_meltano_command
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -32,8 +34,6 @@ def flext_meltano_install_plugin(
 
     """
     try:
-        from flext_meltano.helpers.cli import flext_run_meltano_command
-
         # Build installation command
         args = ["add", plugin_type, plugin_name]
         if variant:
@@ -44,7 +44,7 @@ def flext_meltano_install_plugin(
             project_root=project_root,
         )
 
-        if not result.is_success:
+        if not result.success:
             return FlextResult.fail(
                 f"Failed to install plugin {plugin_name}: {result.error}",
             )
@@ -59,5 +59,5 @@ def flext_meltano_install_plugin(
             },
         )
 
-    except Exception as e:
+    except (ValueError, TypeError, RuntimeError, OSError) as e:
         return FlextResult.fail(f"Plugin installation failed: {e}")

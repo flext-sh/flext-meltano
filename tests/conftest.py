@@ -106,24 +106,24 @@ def meltano_yml_config() -> dict[str, Any]:
 def meltano_project(
     test_meltano_project_dir: Path,
     meltano_yml_config: dict[str, Any],
-) -> Any:
+) -> dict[str, Any]:
     """Meltano project for testing."""
     # Create meltano.yml
     import yaml
 
-    from flext_meltano.domain.entities import MeltanoProject
-
     meltano_yml = test_meltano_project_dir / "meltano.yml"
-    with open(meltano_yml, "w", encoding="utf-8") as f:
+    with meltano_yml.open("w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
 
-    return MeltanoProject(
-        name="test-project",
-        directory=test_meltano_project_dir,
-        config_path=test_meltano_project_dir / "meltano.yml",
-        description="Test project for flext-meltano",
-        version="1",
-    )
+    # Return simple dict instead of missing MeltanoProject class
+    return {
+        "name": "test-project",
+        "directory": test_meltano_project_dir,
+        "config_path": test_meltano_project_dir / "meltano.yml",
+        "description": "Test project for flext-meltano",
+        "version": "1",
+        "config": meltano_yml_config,
+    }
 
 
 # Plugin fixtures
@@ -315,7 +315,10 @@ def mock_meltano_service() -> object:
     """Mock Meltano service for testing."""
 
     class MockMeltanoService:
-        async def create_project(self, config: dict[str, Any]) -> dict[str, Any]:
+        async def create_project(
+            self,
+            config: dict[str, Any],
+        ) -> dict[str, Any]:
             return {"project_id": "test-project", "status": "created"}
 
         async def install_plugin(
@@ -325,7 +328,11 @@ def mock_meltano_service() -> object:
         ) -> dict[str, Any]:
             return {"plugin": plugin_name, "status": "installed"}
 
-        async def run_pipeline(self, extractor: str, loader: str) -> dict[str, Any]:
+        async def run_pipeline(
+            self,
+            extractor: str,
+            loader: str,
+        ) -> dict[str, Any]:
             return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()

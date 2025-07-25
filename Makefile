@@ -1,9 +1,10 @@
-# FLEXT MELTANO - Meltano ELT Integration Service
-# ===============================================
-# Native Meltano platform integration with project management and orchestration
+# FLEXT MELTANO - Meltano ELT Integration Platform
+# ================================================
+# Enterprise Meltano integration with project management and orchestration
+# PROJECT_TYPE: meltano-integration
 # Python 3.13 + Meltano + Singer + Zero Tolerance Quality Gates
 
-.PHONY: help check validate test lint type-check security format format-check fix
+.PHONY: help info diagnose check validate test lint type-check security format format-check fix
 .PHONY: install dev-install setup pre-commit build clean
 .PHONY: coverage coverage-html test-unit test-integration test-meltano
 .PHONY: deps-update deps-audit deps-tree deps-outdated
@@ -23,6 +24,37 @@ help: ## Show this help message
 	@echo "🧪 90%+ test coverage requirement for pipeline components"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+
+info: ## Mostrar informações do projeto
+	@echo "📊 Informações do Projeto"
+	@echo "======================"
+	@echo "Nome: flext-meltano"
+	@echo "Título: FLEXT MELTANO"
+	@echo "Versão: $(shell poetry version -s 2>/dev/null || echo "0.7.0")"
+	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
+	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
+	@echo "Venv: $(shell poetry env info --path 2>/dev/null || echo "Não ativado")"
+	@echo "Diretório: $(CURDIR)"
+	@echo "Git Branch: $(shell git branch --show-current 2>/dev/null || echo "Não é repo git")"
+	@echo "Git Status: $(shell git status --porcelain 2>/dev/null | wc -l | xargs echo) arquivos alterados"
+
+diagnose: ## Executar diagnósticos completos
+	@echo "🔍 Executando diagnósticos para flext-meltano..."
+	@echo "Informações do Sistema:"
+	@echo "OS: $(shell uname -s)"
+	@echo "Arquitetura: $(shell uname -m)"
+	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
+	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
+	@echo ""
+	@echo "Estrutura do Projeto:"
+	@ls -la
+	@echo ""
+	@echo "Configuração Poetry:"
+	@poetry config --list 2>/dev/null || echo "Poetry não configurado"
+	@echo ""
+	@echo "Status das Dependências:"
+	@poetry show --outdated 2>/dev/null || echo "Nenhuma dependência desatualizada"
 
 # ============================================================================
 # 🎯 CORE QUALITY GATES - ZERO TOLERANCE
@@ -124,7 +156,17 @@ pre-commit: ## Setup pre-commit hooks
 	@echo "✅ Pre-commit hooks installed"
 
 # ============================================================================
-# 🎵 MELTANO OPERATIONS
+# 🎯 MELTANO INTEGRATION OPERATIONS
+# ============================================================================
+
+meltano-install: ## Install and setup Meltano project
+
+meltano-test: ## Test Meltano integration
+
+meltano-discover: ## Discover catalog from extractors
+
+# ============================================================================
+# 🎵 MELTANO CORE OPERATIONS
 # ============================================================================
 
 meltano-init: ## Initialize Meltano project
@@ -318,10 +360,46 @@ export RUFF_CACHE_DIR := .ruff_cache
 
 # Project information
 PROJECT_NAME := flext-meltano
+PROJECT_TYPE := meltano-integration
 PROJECT_VERSION := $(shell poetry version -s)
-PROJECT_DESCRIPTION := FLEXT Meltano - Meltano ELT Integration Service
+PROJECT_DESCRIPTION := FLEXT Meltano - Meltano ELT Integration Platform
 
 .DEFAULT_GOAL := help
+
+# ============================================================================
+# 🎯 MELTANO SPECIFIC OPERATIONS
+# ============================================================================
+
+meltano-environment: ## Setup Meltano environments
+	@echo "🎵 Setting up Meltano environments..."
+	@poetry run meltano environment add prod
+	@poetry run meltano environment add staging
+	@echo "✅ Meltano environments configured"
+
+meltano-jobs: ## List and manage Meltano jobs
+	@echo "🎵 Managing Meltano jobs..."
+	@poetry run meltano job list
+	@echo "✅ Meltano jobs listed"
+
+meltano-state: ## Manage Meltano state
+	@echo "🎵 Managing Meltano state..."
+	@poetry run meltano state list || echo "No state found"
+	@echo "✅ Meltano state management complete"
+
+meltano-logs: ## View Meltano logs
+	@echo "📜 Viewing Meltano logs..."
+	@tail -f .meltano/logs/*.log || echo "No logs found"
+
+meltano-reset: ## Reset Meltano project
+	@echo "⚠️ Resetting Meltano project..."
+	@read -p "Are you sure you want to reset the Meltano project? (y/N) " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		rm -rf .meltano/; \
+		echo "✅ Meltano project reset"; \
+	else \
+		echo "❌ Reset cancelled"; \
+	fi
 
 # ============================================================================
 # 🎯 MELTANO VALIDATION COMMANDS

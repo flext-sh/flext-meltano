@@ -9,13 +9,9 @@ from __future__ import annotations
 
 import contextlib
 import warnings
-from pathlib import Path
 
 # ===== ✅ IMPORTS RECOMENDADOS (Nova Arquitetura) =====
 # Imports simplificados - SEM warnings
-from flext_meltano import (
-    FlextMeltanoProject,
-)
 
 # ===== ⚠️ DEMOS DE WARNINGS DE DEPRECIAÇÃO =====
 
@@ -38,16 +34,12 @@ with contextlib.suppress(Exception):
 
 # ===== 🎯 EXEMPLO PRÁTICO DE USO =====
 
+# Usando bibliotecas consolidadas em flext-meltano
+from flext_meltano import FlextMeltanoBridge
 
-# Criar um projeto Meltano com a nova arquitetura
-
-with contextlib.suppress(Exception):
-    project = FlextMeltanoProject(
-        name="demo-project",
-        directory=Path("/var/tmp/demo"),  # noqa: S108
-        config_path=Path("/var/tmp/demo/meltano.yml"),  # noqa: S108
-        description="Demo project",
-    )
+# Exemplo: Bridge para integração Go
+bridge = FlextMeltanoBridge(project_root="/home/marlonsc/flext")
+version_info = bridge.get_version()
 
 # ===== 📖 GUIA DE MIGRAÇÃO =====
 
@@ -59,7 +51,10 @@ migration_examples = [
     ),
     ("✅ NEW", "from flext_meltano import ProjectService"),
     ("", ""),
-    ("❌ OLD", "from flext_meltano.domain.entities.project import MeltanoProject"),
+    (
+        "❌ OLD",
+        "from flext_meltano.domain.entities.project import MeltanoProject",
+    ),
     ("✅ NEW", "from flext_meltano import MeltanoProject"),
     ("", ""),
     (

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Never
 from unittest.mock import MagicMock
 
 import pytest
+from flext_core import FlextServiceError
 
 # Mock missing dependencies to avoid import errors
 sys.modules["flext_observability"] = MagicMock()
@@ -271,7 +272,10 @@ class TestPipelineStepDecorator:
             retry=5,
             timeout=600,
         )
-        async def complex_func(data: dict[str, Any], target: str) -> dict[str, Any]:
+        async def complex_func(
+            data: dict[str, Any],
+            target: str,
+        ) -> dict[str, Any]:
             return {"loaded": True}
 
         step = getattr(complex_func, "pipeline_step", None)
@@ -350,7 +354,7 @@ class TestReflectionOrchestrator:
         async def extract_func(source: str) -> dict[str, Any]:
             return {"extracted": source}
 
-        mock_module.extract_func = extract_func  # type: ignore[attr-defined]
+        mock_module.extract_func = extract_func
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -372,7 +376,7 @@ class TestReflectionOrchestrator:
         class MockStepObject:
             step_type = FlextMeltanoStepType.TRANSFORM
 
-        mock_module.mock_step = MockStepObject()  # type: ignore[attr-defined]
+        mock_module.mock_step = MockStepObject()
 
         # Discover steps
         orchestrator.discover_steps(mock_module)
@@ -399,7 +403,7 @@ class TestReflectionOrchestrator:
                 msg = "Broken pipeline step"
                 raise AttributeError(msg)
 
-        mock_module.broken_obj = BrokenObject()  # type: ignore[attr-defined]
+        mock_module.broken_obj = BrokenObject()
 
         # Should not raise exception, just continue
         orchestrator.discover_steps(mock_module)
@@ -424,12 +428,18 @@ class TestReflectionOrchestrator:
         # Create mock pipeline and execution objects
         mock_pipeline = MagicMock()
         mock_pipeline.steps = [
-            MagicMock(step_id="test-extract", configuration={"source": "database"}),
+            MagicMock(
+                step_id="test-extract",
+                configuration={"source": "database"},
+            ),
         ]
 
         mock_execution = MagicMock()
 
-        result = await orchestrator.execute_pipeline(mock_pipeline, mock_execution)
+        result = await orchestrator.execute_pipeline(
+            mock_pipeline,
+            mock_execution,
+        )
 
         assert result["success"] is True
         assert result["error"] is None
@@ -443,11 +453,16 @@ class TestReflectionOrchestrator:
 
         # Create mock pipeline with unknown step
         mock_pipeline = MagicMock()
-        mock_pipeline.steps = [MagicMock(step_id="unknown-step", configuration={})]
+        mock_pipeline.steps = [
+            MagicMock(step_id="unknown-step", configuration={}),
+        ]
 
         mock_execution = MagicMock()
 
-        result = await orchestrator.execute_pipeline(mock_pipeline, mock_execution)
+        result = await orchestrator.execute_pipeline(
+            mock_pipeline,
+            mock_execution,
+        )
 
         assert result["success"] is True
         assert result["error"] is None
@@ -461,7 +476,7 @@ class TestReflectionOrchestrator:
         # Add a broken step that will fail during execution
         async def broken_func() -> str:
             msg = "Pipeline error"
-            raise RuntimeError(msg)
+            raise FlextServiceError(msg)
 
         broken_step = FlextMeltanoReflectionStep(
             name="broken-step",
@@ -473,11 +488,16 @@ class TestReflectionOrchestrator:
 
         # Create mock pipeline with the broken step
         mock_pipeline = MagicMock()
-        mock_pipeline.steps = [MagicMock(step_id="broken-step", configuration={})]
+        mock_pipeline.steps = [
+            MagicMock(step_id="broken-step", configuration={}),
+        ]
 
         mock_execution = MagicMock()
 
-        result = await orchestrator.execute_pipeline(mock_pipeline, mock_execution)
+        result = await orchestrator.execute_pipeline(
+            mock_pipeline,
+            mock_execution,
+        )
 
         assert result["success"] is False
         assert "Pipeline error" in result["error"]
@@ -532,7 +552,11 @@ class TestReflectionOrchestrator:
         configuration: dict[str, Any] = {}
 
         with pytest.raises(asyncio.TimeoutError):
-            await orchestrator._execute_step_with_retry(step, context, configuration)
+            await orchestrator._execute_step_with_retry(
+                step,
+                context,
+                configuration,
+            )
 
     @pytest.mark.asyncio
     async def test_execute_step_with_retry_eventual_success(self) -> None:
@@ -578,7 +602,7 @@ class TestReflectionOrchestrator:
 
         async def always_fail_func(data: str) -> str:
             msg = "Always fails"
-            raise RuntimeError(msg)
+            raise FlextServiceError(msg)
 
         step = FlextMeltanoReflectionStep(
             name="fail-step",
@@ -592,7 +616,11 @@ class TestReflectionOrchestrator:
         configuration: dict[str, Any] = {}
 
         with pytest.raises(RuntimeError, match="Always fails"):
-            await orchestrator._execute_step_with_retry(step, context, configuration)
+            await orchestrator._execute_step_with_retry(
+                step,
+                context,
+                configuration,
+            )
 
 
 class TestBuiltInSteps:
@@ -602,7 +630,10 @@ class TestBuiltInSteps:
     async def test_extract_data_step(self) -> None:
         """Test extract_data step function."""
         # The function is decorated, so we test through the wrapper
-        result = await extract_data(source="database", config={"table": "users"})
+        result = await extract_data(
+            source="database",
+            config={"table": "users"},
+        )
 
         assert result["name"] == "simple-extract"
         assert result["type"] == "EXTRACT"
@@ -702,7 +733,9 @@ class TestIntegrationWorkflow:
 
         # Step 2: Define custom steps
         @pipeline_step(
-            FlextMeltanoStepType.EXTRACT, name="workflow-extract", dependencies=[],
+            FlextMeltanoStepType.EXTRACT,
+            name="workflow-extract",
+            dependencies=[],
         )
         async def workflow_extract(
             source: str = "default_source",
@@ -742,15 +775,24 @@ class TestIntegrationWorkflow:
 
         # Step 4: Create mock pipeline
         mock_steps = [
-            MagicMock(step_id="workflow-extract", configuration={"source": "api"}),
+            MagicMock(
+                step_id="workflow-extract",
+                configuration={"source": "api"},
+            ),
             MagicMock(step_id="workflow-transform", configuration={}),
-            MagicMock(step_id="workflow-load", configuration={"target": "warehouse"}),
+            MagicMock(
+                step_id="workflow-load",
+                configuration={"target": "warehouse"},
+            ),
         ]
         mock_pipeline = MagicMock(steps=mock_steps)
         mock_execution = MagicMock()
 
         # Step 5: Execute pipeline
-        result = await orchestrator.execute_pipeline(mock_pipeline, mock_execution)
+        result = await orchestrator.execute_pipeline(
+            mock_pipeline,
+            mock_execution,
+        )
 
         # Step 6: Verify results
         if not result["success"]:

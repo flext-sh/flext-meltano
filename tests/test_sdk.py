@@ -40,14 +40,16 @@ class TestFlextMeltanoError:
 
     def test_meltano_error_raising(self) -> None:
         """Test raising FlextMeltanoError."""
+        msg = "Test exception"
         with pytest.raises(FlextMeltanoError) as exc_info:
-            raise FlextMeltanoError("Test exception")
+            raise FlextMeltanoError(msg)
         assert str(exc_info.value) == "Test exception"
 
     def test_meltano_error_catching(self) -> None:
         """Test catching FlextMeltanoError."""
+        msg = "Catch test"
         with pytest.raises(FlextMeltanoError, match="Catch test"):
-            raise FlextMeltanoError("Catch test")
+            raise FlextMeltanoError(msg)
 
 
 class TestFlextMeltanoProjectError:
@@ -67,13 +69,15 @@ class TestFlextMeltanoProjectError:
 
     def test_project_error_raising(self) -> None:
         """Test raising FlextMeltanoProjectError."""
+        msg = "Project not found"
         with pytest.raises(FlextMeltanoProjectError):
-            raise FlextMeltanoProjectError("Project not found")
+            raise FlextMeltanoProjectError(msg)
 
     def test_project_error_catching_as_base(self) -> None:
         """Test catching FlextMeltanoProjectError as base FlextMeltanoError."""
+        msg = "Project error"
         with pytest.raises(FlextMeltanoError):
-            raise FlextMeltanoProjectError("Project error")
+            raise FlextMeltanoProjectError(msg)
 
 
 class TestFlextMeltanoExecutionError:
@@ -132,9 +136,10 @@ class TestFlextMeltanoExecutionError:
 
     def test_execution_error_raising_with_details(self) -> None:
         """Test raising FlextMeltanoExecutionError with full details."""
+        msg = "Command execution failed"
         with pytest.raises(FlextMeltanoExecutionError) as exc_info:
             raise FlextMeltanoExecutionError(
-                "Command execution failed",
+                msg,
                 command=["meltano", "run"],
                 returncode=1,
                 stdout="Output text",
@@ -182,8 +187,9 @@ class TestFlextMeltanoPluginError:
 
     def test_plugin_error_raising(self) -> None:
         """Test raising FlextMeltanoPluginError."""
+        msg = "Plugin installation failed"
         with pytest.raises(FlextMeltanoPluginError):
-            raise FlextMeltanoPluginError("Plugin installation failed")
+            raise FlextMeltanoPluginError(msg)
 
 
 class TestFlextMeltanoStateError:
@@ -203,8 +209,9 @@ class TestFlextMeltanoStateError:
 
     def test_state_error_raising(self) -> None:
         """Test raising FlextMeltanoStateError."""
+        msg = "State management failed"
         with pytest.raises(FlextMeltanoStateError):
-            raise FlextMeltanoStateError("State management failed")
+            raise FlextMeltanoStateError(msg)
 
 
 class TestFlextMeltanoConfigError:
@@ -224,8 +231,9 @@ class TestFlextMeltanoConfigError:
 
     def test_config_error_raising(self) -> None:
         """Test raising FlextMeltanoConfigError."""
+        msg = "Configuration invalid"
         with pytest.raises(FlextMeltanoConfigError):
-            raise FlextMeltanoConfigError("Configuration invalid")
+            raise FlextMeltanoConfigError(msg)
 
 
 class TestExceptionHierarchy:
@@ -278,17 +286,23 @@ class TestExceptionHierarchy:
 
     def test_mixed_exception_handling(self) -> None:
         """Test handling multiple exception types in a single try block."""
+
         def raise_random_exception(exc_type: str) -> None:
             if exc_type == "project":
-                raise FlextMeltanoProjectError("Project error")
+                msg = "Project error"
+                raise FlextMeltanoProjectError(msg)
             if exc_type == "execution":
-                raise FlextMeltanoExecutionError("Execution error")
+                msg = "Execution error"
+                raise FlextMeltanoExecutionError(msg)
             if exc_type == "plugin":
-                raise FlextMeltanoPluginError("Plugin error")
+                msg = "Plugin error"
+                raise FlextMeltanoPluginError(msg)
             if exc_type == "state":
-                raise FlextMeltanoStateError("State error")
+                msg = "State error"
+                raise FlextMeltanoStateError(msg)
             if exc_type == "config":
-                raise FlextMeltanoConfigError("Config error")
+                msg = "Config error"
+                raise FlextMeltanoConfigError(msg)
 
         # Test catching all as base exception
         for exc_type in ["project", "execution", "plugin", "state", "config"]:

@@ -41,5 +41,5 @@ def flext_meltano_discover_plugins(
 
         return FlextResult.ok(plugins)
 
-    except Exception as e:
+    except (ValueError, TypeError, RuntimeError, OSError) as e:
         return FlextResult.fail(f"Failed to discover plugins: {e}")

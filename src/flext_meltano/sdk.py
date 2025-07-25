@@ -14,12 +14,12 @@ class FlextMeltanoError(Exception):
     Implements custom exception for domain-specific cases.
     Provides detailed error information.
 
-    Attributes
+    Attributes:
     ----------
     message : str
         Error message describing the issue.
 
-    Examples
+    Examples:
     --------
     Typical usage:
 
@@ -27,7 +27,7 @@ class FlextMeltanoError(Exception):
     raise MeltanoError("Meltano project not found")
     ```
 
-    See Also
+    See Also:
     --------
     Exception : Base exception class.
 

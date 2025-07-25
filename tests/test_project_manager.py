@@ -18,7 +18,7 @@ from flext_meltano.job_manager import FlextMeltanoJobManager
 from flext_meltano.models import MeltanoPlugin, MeltanoProjectConfig
 from flext_meltano.orchestrator import FlextMeltanoOrchestrator
 from flext_meltano.project.manager import FlextMeltanoProjectManager
-from flext_meltano.state_manager import FlextMeltanoStateManager
+from flext_meltano.state.manager import FlextMeltanoStateManager
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -71,7 +71,10 @@ class TestFlextMeltanoProjectManager:
             with pytest.raises(
                 (AttributeError, TypeError, ValueError),
             ) as exc_info:
-                project_manager.create_project(name=project_name, directory=tmp_path / project_name)
+                project_manager.create_project(
+                    name=project_name,
+                    directory=tmp_path / project_name,
+                )
 
             # Verify the error is expected for method signature mismatch
             error_msg = str(exc_info.value)
@@ -82,21 +85,25 @@ class TestFlextMeltanoProjectManager:
 
     def test_project_config_creation(self) -> None:
         """Test MeltanoProjectConfig creation and validation."""
-        config = MeltanoProjectConfig.model_validate({
-            "version": 1,
-            "project_id": "test-project-123",
-        })
+        config = MeltanoProjectConfig.model_validate(
+            {
+                "version": 1,
+                "project_id": "test-project-123",
+            },
+        )
 
         assert config.version == 1
         assert config.project_id == "test-project-123"
 
     def test_meltano_plugin_creation(self) -> None:
         """Test MeltanoPlugin creation and validation."""
-        plugin = MeltanoPlugin.model_validate({
-            "name": "tap-postgres",
-            "namespace": "tap_postgres",
-            "pip_url": "pipelinewise-tap-postgres",
-        })
+        plugin = MeltanoPlugin.model_validate(
+            {
+                "name": "tap-postgres",
+                "namespace": "tap_postgres",
+                "pip_url": "pipelinewise-tap-postgres",
+            },
+        )
 
         assert plugin.name == "tap-postgres"
         assert plugin.namespace == "tap_postgres"
@@ -143,7 +150,9 @@ class TestFlextProjectManager:
             with pytest.raises(
                 (AttributeError, TypeError, ValueError),
             ) as exc_info:
-                await flext_manager.create_project_bridge(project_name=project_name)
+                await flext_manager.create_project_bridge(
+                    project_name=project_name,
+                )
 
             # Verify the error is expected for method signature mismatch
             error_msg = str(exc_info.value)
@@ -172,7 +181,7 @@ class TestFlextProjectManager:
         except AttributeError:
             # If run_meltano_command doesn't exist, verify this is expected
             with pytest.raises(AttributeError) as exc_info:
-                flext_manager.nonexistent_method()  # type: ignore[attr-defined]  # Test nonexistent method
+                flext_manager.nonexistent_method()  # Test nonexistent method
 
             error_msg = str(exc_info.value)
             assert any(
@@ -182,7 +191,8 @@ class TestFlextProjectManager:
             # This confirms the method is not implemented yet - acceptable
 
     def test_plugin_management(
-        self, flext_manager: FlextMeltanoProjectManager,
+        self,
+        flext_manager: FlextMeltanoProjectManager,
     ) -> None:
         try:
             # Test plugin listing
@@ -211,7 +221,7 @@ class TestFlextProjectManager:
             else:
                 # Trigger an AttributeError for testing
                 with pytest.raises(AttributeError) as exc_info:
-                    flext_manager.undefined_method()  # type: ignore[attr-defined]  # Should raise AttributeError
+                    flext_manager.undefined_method()  # Should raise AttributeError
 
             error_msg = str(exc_info.value)
             assert any(
