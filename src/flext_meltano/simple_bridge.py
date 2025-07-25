@@ -22,6 +22,7 @@ class FlextMeltanoBridge:
 
         Args:
             project_root: Path to the flext project root directory
+
         """
         self.project_root = Path(project_root)
 

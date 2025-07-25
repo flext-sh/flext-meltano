@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Never
 from unittest.mock import MagicMock, patch
 
-from flext_core import FlextServiceError
+from flext_meltano import FlextServiceError
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -908,7 +908,7 @@ class TestFlextMeltanoSingerSDKIntegration:
         )
 
         # Mock create_tap_instance to raise OSError
-        async def mock_create_tap_instance(*args: Any, **kwargs: Any) -> Never:
+        async def mock_create_tap_instance(*args: Any, **kwargs: object) -> Never:
             msg = "File system error"
             raise OSError(msg)
 

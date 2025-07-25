@@ -10,6 +10,8 @@ from __future__ import annotations
 import contextlib
 import warnings
 
+from flext_meltano import FlextMeltanoBridge
+
 # ===== ✅ IMPORTS RECOMENDADOS (Nova Arquitetura) =====
 # Imports simplificados - SEM warnings
 
@@ -35,7 +37,6 @@ with contextlib.suppress(Exception):
 # ===== 🎯 EXEMPLO PRÁTICO DE USO =====
 
 # Usando bibliotecas consolidadas em flext-meltano
-from flext_meltano import FlextMeltanoBridge
 
 # Exemplo: Bridge para integração Go
 bridge = FlextMeltanoBridge(project_root="/home/marlonsc/flext")

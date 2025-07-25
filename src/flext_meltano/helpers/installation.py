@@ -5,11 +5,10 @@ Plugin installation utilities following Clean Architecture patterns.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-from flext_core import FlextResult
+from typing import TYPE_CHECKING
 
 from flext_meltano.helpers.cli import flext_run_meltano_command
+from flext_meltano.helpers.execution import FlextMeltanoResult
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -20,7 +19,7 @@ def flext_meltano_install_plugin(
     plugin_name: str,
     variant: str | None = None,
     project_root: Path | None = None,
-) -> FlextResult[dict[str, Any]]:
+) -> FlextMeltanoResult:
     """Install a Meltano plugin with comprehensive validation.
 
     Args:
@@ -30,7 +29,7 @@ def flext_meltano_install_plugin(
         project_root: Meltano project root directory
 
     Returns:
-        FlextResult with installation status
+        FlextMeltanoResult with installation status
 
     """
     try:
@@ -41,15 +40,15 @@ def flext_meltano_install_plugin(
 
         result = flext_run_meltano_command(
             args=args,
-            project_root=project_root,
+            project_root=project_root or ".",
         )
 
         if not result.success:
-            return FlextResult.fail(
+            return FlextMeltanoResult.fail(
                 f"Failed to install plugin {plugin_name}: {result.error}",
             )
 
-        return FlextResult.ok(
+        return FlextMeltanoResult.ok(
             {
                 "plugin_type": plugin_type,
                 "plugin_name": plugin_name,
@@ -60,4 +59,4 @@ def flext_meltano_install_plugin(
         )
 
     except (ValueError, TypeError, RuntimeError, OSError) as e:
-        return FlextResult.fail(f"Plugin installation failed: {e}")
+        return FlextMeltanoResult.fail(f"Plugin installation failed: {e}")

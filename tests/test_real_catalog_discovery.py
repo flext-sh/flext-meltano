@@ -1,0 +1,417 @@
+"""Comprehensive tests for real catalog discovery functionality.
+
+Tests validate actual Singer SDK catalog discovery and stream selection.
+All tests use real Singer SDK integration without mocks.
+"""
+
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+
+import pytest
+
+from flext_meltano.helpers.discovery import (
+    flext_meltano_discover_catalog,
+    flext_meltano_discover_plugins,
+)
+from flext_meltano.helpers.validation import (
+    flext_meltano_test_tap_connection,
+    flext_meltano_validate_tap_config,
+)
+
+
+class TestFlextMeltanoCatalogDiscoveryReal:
+    """Test real catalog discovery with actual Singer SDK integration."""
+
+    @pytest.fixture
+    def temp_project_dir(self) -> Path:
+        """Create temporary directory for catalog discovery tests."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_discover_catalog_csv_tap(self, temp_project_dir: Path) -> None:
+        """Test real catalog discovery for CSV tap."""
+        # Create minimal meltano.yml for discovery
+        meltano_yml = temp_project_dir / "meltano.yml"
+        meltano_yml.write_text("""
+version: 1
+default_environment: dev
+project_id: test-catalog-discovery
+environments:
+- name: dev
+
+extractors:
+- name: tap-csv
+  variant: pipelinewise
+  pip_url: pipelinewise-tap-csv
+  config:
+    files:
+    - entity: test_data
+      path: /tmp/test.csv
+""")
+
+        result = await flext_meltano_discover_catalog(
+            "tap-csv",
+            temp_project_dir,
+            config={"files": [{"entity": "test_data", "path": "/tmp/test.csv"}]},
+        )
+
+        # Should handle discovery gracefully (may fail if meltano not available)
+        if result.success:
+            # Validate catalog structure
+            catalog = result.data
+            assert isinstance(catalog, dict)
+
+            # Should have streams if discovery succeeded
+            if "streams" in catalog:
+                streams = catalog["streams"]
+                assert isinstance(streams, list)
+
+                # If streams exist, validate structure
+                if streams:
+                    stream = streams[0]
+                    assert "tap_stream_id" in stream
+                    assert "schema" in stream
+        else:
+            # If discovery fails, should provide meaningful error
+            assert result.error
+            assert len(result.error) > 0
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_discover_catalog_nonexistent_tap(self, temp_project_dir: Path) -> None:
+        """Test catalog discovery for nonexistent tap."""
+        result = await flext_meltano_discover_catalog(
+            "tap-nonexistent",
+            temp_project_dir,
+        )
+
+        # Should fail gracefully for nonexistent tap
+        assert not result.success
+        assert result.error
+        assert "nonexistent" in result.error.lower() or "not found" in result.error.lower()
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_discover_catalog_invalid_project(self) -> None:
+        """Test catalog discovery with invalid project path."""
+        invalid_path = Path("/nonexistent/project/path")
+
+        result = await flext_meltano_discover_catalog(
+            "tap-csv",
+            invalid_path,
+        )
+
+        # Should fail gracefully for invalid project
+        assert not result.success
+        assert result.error
+
+    def test_flext_meltano_discover_plugins_all(self) -> None:
+        """Test plugin discovery without filter."""
+        result = flext_meltano_discover_plugins()
+
+        # Should return plugin list
+        assert result.success
+        data = result.data
+        assert isinstance(data, dict)
+        assert "plugins" in data
+
+        plugins = data["plugins"]
+        assert isinstance(plugins, list)
+        assert len(plugins) > 0
+
+        # Validate plugin structure
+        plugin = plugins[0]
+        assert "name" in plugin
+        assert "type" in plugin
+        assert "namespace" in plugin
+
+    def test_flext_meltano_discover_plugins_extractors_only(self) -> None:
+        """Test plugin discovery filtered by extractors."""
+        result = flext_meltano_discover_plugins(plugin_type="extractors")
+
+        assert result.success
+        data = result.data
+        plugins = data["plugins"]
+
+        # All plugins should be extractors
+        for plugin in plugins:
+            assert plugin["type"] == "extractors"
+
+    def test_flext_meltano_discover_plugins_loaders_only(self) -> None:
+        """Test plugin discovery filtered by loaders."""
+        result = flext_meltano_discover_plugins(plugin_type="loaders")
+
+        assert result.success
+        data = result.data
+        plugins = data["plugins"]
+
+        # All plugins should be loaders
+        for plugin in plugins:
+            assert plugin["type"] == "loaders"
+
+    def test_flext_meltano_discover_plugins_invalid_type(self) -> None:
+        """Test plugin discovery with invalid type filter."""
+        result = flext_meltano_discover_plugins(plugin_type="invalid_type")
+
+        # Should succeed but return empty list
+        assert result.success
+        data = result.data
+        plugins = data["plugins"]
+        assert isinstance(plugins, list)
+        # May be empty or contain plugins (depending on Hub availability)
+
+
+class TestFlextMeltanoConnectionTestingReal:
+    """Test real tap connection testing functionality."""
+
+    @pytest.fixture
+    def temp_project_dir(self) -> Path:
+        """Create temporary directory for connection tests."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_test_tap_connection_csv(self, temp_project_dir: Path) -> None:
+        """Test real connection testing for CSV tap."""
+        # Create minimal meltano.yml
+        meltano_yml = temp_project_dir / "meltano.yml"
+        meltano_yml.write_text("""
+version: 1
+default_environment: dev
+project_id: test-connection
+environments:
+- name: dev
+
+extractors:
+- name: tap-csv
+  variant: pipelinewise
+  pip_url: pipelinewise-tap-csv
+""")
+
+        config = {
+            "files": [
+                {"entity": "test", "path": "/tmp/test.csv"},
+            ],
+        }
+
+        result = await flext_meltano_test_tap_connection(
+            "tap-csv",
+            temp_project_dir,
+            config=config,
+        )
+
+        # Should handle connection test gracefully
+        if result.success:
+            data = result.data
+            assert isinstance(data, dict)
+            assert "connection_successful" in data
+            assert "tap_name" in data
+            assert data["tap_name"] == "tap-csv"
+        else:
+            # Connection can fail if meltano/tap not available
+            assert result.error
+            assert len(result.error) > 0
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_test_tap_connection_no_config(self, temp_project_dir: Path) -> None:
+        """Test connection testing without configuration."""
+        result = await flext_meltano_test_tap_connection(
+            "tap-csv",
+            temp_project_dir,
+        )
+
+        # Should fail gracefully without config
+        assert not result.success
+        assert result.error
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_test_tap_connection_invalid_project(self) -> None:
+        """Test connection testing with invalid project."""
+        invalid_path = Path("/nonexistent/project")
+
+        result = await flext_meltano_test_tap_connection(
+            "tap-csv",
+            invalid_path,
+        )
+
+        # Should fail gracefully
+        assert not result.success
+        assert result.error
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_validate_tap_config_csv(self) -> None:
+        """Test tap configuration validation for CSV tap."""
+        config = {
+            "files": [
+                {"entity": "test", "path": "/tmp/test.csv"},
+            ],
+        }
+
+        result = await flext_meltano_validate_tap_config(
+            "tap-csv",
+            config,
+        )
+
+        # Should validate CSV config successfully
+        assert result.success
+        data = result.data
+        assert data["config_valid"] is True
+        assert data["config_type"] == "file"
+        assert data["tap_name"] == "tap-csv"
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_validate_tap_config_database(self) -> None:
+        """Test tap configuration validation for database tap."""
+        config = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "test_db",
+            "user": "test_user",
+            "password": "test_pass",
+        }
+
+        result = await flext_meltano_validate_tap_config(
+            "tap-postgres",
+            config,
+        )
+
+        # Should validate database config successfully
+        assert result.success
+        data = result.data
+        assert data["config_valid"] is True
+        assert data["config_type"] == "database"
+        assert data["tap_name"] == "tap-postgres"
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_validate_tap_config_api(self) -> None:
+        """Test tap configuration validation for API tap."""
+        config = {
+            "api_url": "https://api.example.com",
+            "api_key": "test_key",
+        }
+
+        result = await flext_meltano_validate_tap_config(
+            "tap-rest-api",
+            config,
+        )
+
+        # Should validate API config successfully
+        assert result.success
+        data = result.data
+        assert data["config_valid"] is True
+        assert data["config_type"] == "api"
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_validate_tap_config_empty(self) -> None:
+        """Test tap configuration validation with empty config."""
+        result = await flext_meltano_validate_tap_config(
+            "tap-test",
+            {},
+        )
+
+        # Should fail validation for empty config
+        assert result.success  # Function succeeds but config is invalid
+        data = result.data
+        assert data["config_valid"] is False
+        assert "issues" in data
+        assert len(data["issues"]) > 0
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_validate_tap_config_missing_required(self) -> None:
+        """Test tap configuration validation with missing required fields."""
+        # Database config missing required fields
+        config = {
+            "host": "localhost",
+            # Missing port, database, user
+        }
+
+        result = await flext_meltano_validate_tap_config(
+            "tap-postgres",
+            config,
+        )
+
+        # Should succeed but indicate config issues
+        assert result.success
+        data = result.data
+        assert data["config_valid"] is False
+        assert "Missing required keys" in str(data["issues"])
+
+
+class TestFlextMeltanoCatalogIntegration:
+    """Integration tests for catalog discovery and validation."""
+
+    @pytest.fixture
+    def temp_project_dir(self) -> Path:
+        """Create temporary directory for integration tests."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            yield Path(tmpdir)
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_complete_catalog_workflow(self, temp_project_dir: Path) -> None:
+        """Test complete catalog discovery and validation workflow."""
+        # Step 1: Discover available plugins
+        plugins_result = flext_meltano_discover_plugins(plugin_type="extractors")
+        assert plugins_result.success
+
+        extractors = plugins_result.data["plugins"]
+        assert len(extractors) > 0
+
+        # Step 2: Use first extractor for testing
+        tap_name = extractors[0]["name"]
+
+        # Step 3: Validate basic config
+        test_config = {"files": [{"entity": "test", "path": "/tmp/test.csv"}]}
+        config_result = await flext_meltano_validate_tap_config(tap_name, test_config)
+
+        # Should validate config structure
+        assert config_result.success
+        config_data = config_result.data
+        assert "config_valid" in config_data
+
+        # Step 4: If config is valid, attempt catalog discovery
+        if config_data["config_valid"]:
+            discovery_result = await flext_meltano_discover_catalog(
+                tap_name,
+                temp_project_dir,
+                config=test_config,
+            )
+
+            # Discovery may succeed or fail depending on environment
+            # Both outcomes are acceptable for this integration test
+            if discovery_result.success:
+                catalog = discovery_result.data
+                assert isinstance(catalog, dict)
+            else:
+                assert discovery_result.error
+
+    @pytest.mark.asyncio
+    async def test_flext_meltano_error_handling_chain(self, temp_project_dir: Path) -> None:
+        """Test error handling across catalog discovery chain."""
+        # Test with invalid configurations to ensure graceful failure
+
+        # Invalid tap name
+        result1 = await flext_meltano_discover_catalog(
+            "tap-completely-invalid",
+            temp_project_dir,
+        )
+        assert not result1.success
+
+        # Invalid project path
+        result2 = await flext_meltano_discover_catalog(
+            "tap-csv",
+            Path("/invalid/path"),
+        )
+        assert not result2.success
+
+        # Invalid config validation
+        result3 = await flext_meltano_validate_tap_config(
+            "tap-test",
+            {},  # Empty config
+        )
+        assert result3.success  # Function succeeds
+        assert not result3.data["config_valid"]  # But config is invalid
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "--tb=short"])

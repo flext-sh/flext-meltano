@@ -41,6 +41,7 @@ class FlextMeltanoBaseTap(FlextMeltanoTap):
 
         Args:
             config: Tap configuration
+
         """
         super().__init__(config)
         self.validator = FlextMeltanoConfigValidator()
@@ -55,6 +56,7 @@ class FlextMeltanoBaseTap(FlextMeltanoTap):
 
         Raises:
             FlextMeltanoCommonConfigurationError: If validation fails
+
         """
         if not self.config:
             msg = "Configuration is required"
@@ -81,6 +83,7 @@ class FlextMeltanoBaseTap(FlextMeltanoTap):
 
         Raises:
             FlextMeltanoCommonError: If connection validation fails
+
         """
         # Default implementation - can be overridden by specific taps
         if not self.config:
@@ -96,6 +99,7 @@ class FlextMeltanoBaseTap(FlextMeltanoTap):
 
         Returns:
             List of discovered stream definitions
+
         """
         # Default implementation - should be overridden by specific taps
         return []
@@ -113,6 +117,7 @@ class FlextMeltanoBaseTarget(FlextMeltanoTarget):
 
         Args:
             config: Target configuration
+
         """
         super().__init__(config)
         self.validator = FlextMeltanoConfigValidator()
@@ -127,6 +132,7 @@ class FlextMeltanoBaseTarget(FlextMeltanoTarget):
 
         Raises:
             FlextMeltanoCommonConfigurationError: If validation fails
+
         """
         if not self.config:
             msg = "Configuration is required"
@@ -153,6 +159,7 @@ class FlextMeltanoBaseTarget(FlextMeltanoTarget):
 
         Raises:
             FlextMeltanoCommonError: If connection validation fails
+
         """
         # Default implementation - can be overridden by specific targets
         if not self.config:
@@ -171,6 +178,7 @@ class FlextMeltanoBaseTarget(FlextMeltanoTarget):
 
         Returns:
             List of validation errors (empty if valid)
+
         """
         return self.validator.validate_record(record)
 
@@ -184,6 +192,7 @@ class FlextMeltanoBaseTarget(FlextMeltanoTarget):
 
         Returns:
             Validation results dictionary
+
         """
         return self.validator.validate_batch(records)
 
@@ -208,6 +217,7 @@ class FlextMeltanoBaseStream(FlextMeltanoStream):
             name: Stream name
             schema: Stream schema
             **kwargs: Additional stream configuration
+
         """
         super().__init__(tap, name, schema, **kwargs)
         self.validator = FlextMeltanoConfigValidator()
@@ -222,6 +232,7 @@ class FlextMeltanoBaseStream(FlextMeltanoStream):
 
         Raises:
             FlextMeltanoCommonError: If performance is below threshold
+
         """
         # Default implementation - can be enhanced by specific streams
         # This consolidates the performance validation pattern found in Oracle tap
@@ -236,6 +247,7 @@ class FlextMeltanoBaseStream(FlextMeltanoStream):
 
         Returns:
             True if schemas are compatible
+
         """
         # Default implementation - can be overridden by specific streams
         return True

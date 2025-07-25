@@ -37,6 +37,7 @@ def validate_connection_config(config: dict[str, Any]) -> dict[str, Any]:
 
     Raises:
         FlextMeltanoValidationError: If validation fails
+
     """
     try:
         connection_config = FlextMeltanoConnectionConfig(**config)
@@ -59,6 +60,7 @@ def validate_auth_config(config: dict[str, Any]) -> dict[str, Any]:
 
     Raises:
         FlextMeltanoValidationError: If validation fails
+
     """
     try:
         auth_config = FlextMeltanoAuthConfig(**config)
@@ -81,6 +83,7 @@ def validate_stream_config(config: dict[str, Any]) -> dict[str, Any]:
 
     Raises:
         FlextMeltanoValidationError: If validation fails
+
     """
     try:
         stream_config = FlextMeltanoStreamConfig(**config)
@@ -102,6 +105,7 @@ class FlextMeltanoConfigValidator:
 
         Args:
             strict_mode: Enable strict validation mode
+
         """
         self.strict_mode = strict_mode
         self.errors: list[str] = []
@@ -114,6 +118,7 @@ class FlextMeltanoConfigValidator:
 
         Returns:
             True if validation passes, False otherwise
+
         """
         self.errors = []
 
@@ -152,6 +157,7 @@ class FlextMeltanoConfigValidator:
 
         Returns:
             List of validation error messages
+
         """
         return self.errors.copy()
 
@@ -165,6 +171,7 @@ class FlextMeltanoConfigValidator:
 
         Returns:
             List of validation errors (empty if valid)
+
         """
         errors = []
 
@@ -199,6 +206,7 @@ class FlextMeltanoConfigValidator:
 
         Returns:
             Validation results dictionary with statistics
+
         """
         if not records:
             return {
@@ -246,6 +254,7 @@ def validate_base_url(url: str) -> str:
 
     Raises:
         ValueError: If URL format is invalid
+
     """
     if not url.startswith(("http://", "https://")):
         msg = f"Invalid base_url: {url}. Must start with http:// or https://"
@@ -269,6 +278,7 @@ def validate_log_level(level: str) -> str:
 
     Raises:
         ValueError: If log level is invalid
+
     """
     allowed = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
     if level.upper() not in allowed:
@@ -293,6 +303,7 @@ def validate_file_path(path: str | None) -> str | None:
 
     Raises:
         ValueError: If path doesn't exist or isn't a file
+
     """
     if path is None:
         return None
@@ -319,6 +330,7 @@ def validate_directory_path(path: str | None) -> str | None:
 
     Raises:
         ValueError: If path doesn't exist or isn't a directory
+
     """
     if path is None:
         return None

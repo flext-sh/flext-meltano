@@ -18,26 +18,25 @@ def test_flext_meltano_imports() -> None:
     assert flext_meltano.__name__ == "flext_meltano"
 
 
-def test_flext_meltano_has_core_dependencies() -> None:
-    """Test that flext-infrastructure.plugins.flext-meltano can import from flext-core."""
-    # NO FALLBACKS - SEMPRE usar implementações originais conforme instrução
-    # 🚨 ARCHITECTURAL COMPLIANCE: Using módulo raiz imports
-    from flext_meltano.infrastructure.di_container import FlextResult
+def test_flext_meltano_has_isolated_result() -> None:
+    """Test that flext-meltano has isolated result implementation."""
+    # ISOLATED IMPLEMENTATION - No flext_core dependency
+    from flext_meltano.helpers.execution import FlextMeltanoResult
 
-    assert FlextResult is not None
+    assert FlextMeltanoResult is not None
 
 
 def test_service_result_pattern() -> None:
-    """Test FlextResult pattern works correctly."""
-    from flext_meltano.infrastructure.di_container import FlextResult
+    """Test FlextMeltanoResult pattern works correctly."""
+    from flext_meltano.helpers.execution import FlextMeltanoResult
 
     # Test success case
-    success = FlextResult.ok({"test": "data"})
+    success = FlextMeltanoResult.ok({"test": "data"})
     assert success.success is True
     assert success.data == {"test": "data"}
 
     # Test failure case
-    failure: FlextResult[str] = FlextResult.fail("Test error")
+    failure: FlextMeltanoResult[str] = FlextMeltanoResult.fail("Test error")
     assert failure.success is False
     assert failure.error == "Test error"
 
@@ -49,20 +48,21 @@ def test_api_response_pattern() -> None:
 
 
 class TestFlextMeltanoIntegration:
-    """Test flext-infrastructure.plugins.flext-meltano integration patterns."""
+    """Test flext-meltano isolated integration patterns."""
 
-    def test_project_manager_available(self) -> None:
-        """Test that project manager can be imported."""
-        from flext_meltano import MeltanoProjectManager
+    def test_bridge_available(self) -> None:
+        """Test that bridge can be imported."""
+        from flext_meltano import FlextMeltanoBridge
 
-        assert MeltanoProjectManager is not None
-        assert hasattr(MeltanoProjectManager, "__name__")
-        assert callable(MeltanoProjectManager)
+        assert FlextMeltanoBridge is not None
+        assert hasattr(FlextMeltanoBridge, "__name__")
+        assert callable(FlextMeltanoBridge)
 
-    def test_unified_layer_available(self) -> None:
-        """Test that unified anti-corruption layer can be imported."""
-        from flext_meltano import UnifiedMeltanoAntiCorruptionLayer
+    def test_execution_helpers_available(self) -> None:
+        """Test that execution helpers can be imported."""
+        from flext_meltano import flext_meltano_execute_job, flext_meltano_run_command
 
-        assert UnifiedMeltanoAntiCorruptionLayer is not None
-        assert hasattr(UnifiedMeltanoAntiCorruptionLayer, "__name__")
-        assert callable(UnifiedMeltanoAntiCorruptionLayer)
+        assert flext_meltano_execute_job is not None
+        assert flext_meltano_run_command is not None
+        assert callable(flext_meltano_execute_job)
+        assert callable(flext_meltano_run_command)

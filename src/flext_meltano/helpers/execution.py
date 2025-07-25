@@ -23,6 +23,7 @@ class FlextMeltanoResult:
             success: Whether the operation was successful
             data: Operation result data
             error: Error message if operation failed
+
         """
         self.success = success
         self.data = data
@@ -55,6 +56,7 @@ def flext_meltano_execute_job(
 
     Returns:
         Result with execution status and output
+
     """
     try:
         project_path = Path(project_root)
@@ -120,6 +122,7 @@ def flext_meltano_run_command(
 
     Returns:
         Result with command output
+
     """
     try:
         project_path = Path(project_root)

@@ -5,19 +5,24 @@ Settings model for configuring FLEXT Meltano projects.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import Any
 
-if TYPE_CHECKING:
-    from pathlib import Path
-    from typing import Any
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class FlextMeltanoProjectConfig(BaseModel):
     """Project configuration for FLEXT Meltano."""
 
-    project_root: Path = Field(description="Root directory of the project")
+    project_root: str = Field(description="Root directory of the project")
+
+    @field_validator("project_root")
+    @classmethod
+    def validate_project_root(cls, v: str | Path) -> str:
+        """Validate and convert project_root to string."""
+        if isinstance(v, Path):
+            return str(v.resolve())
+        return str(Path(v).resolve())
     default_environment: str = Field(default="dev", description="Default environment")
 
 
@@ -63,7 +68,9 @@ class FlextMeltanoSettings(BaseModel):
             project_root = data.pop("project_root")
             environment = data.get("environment", "dev")
             data["project"] = FlextMeltanoProjectConfig(
-                project_root=project_root,
+                project_root=str(project_root),
                 default_environment=environment,
             )
         super().__init__(**data)
+
+
