@@ -41,7 +41,6 @@ from flext_meltano.core_patterns import (
     FlextMeltanoExecutionResult,
     # Core mixin and pipeline classes
     FlextMeltanoOperationsMixin,
-    FlextMeltanoPipelineConfig,
     FlextMeltanoPluginConfig,
     FlextMeltanoProjectConfig,
     FlextMeltanoProjectPath,
@@ -89,13 +88,8 @@ from flext_meltano.helpers.validation import (
     flext_meltano_validate_tap_config,
 )
 
-# ADVANCED PATTERNS - Zero-boilerplate pipeline development
+# LEGACY PATTERNS - Backwards compatibility aliases (consolidated from patterns.py)
 from flext_meltano.patterns import (
-    CSV_TAP_CONFIG_TEMPLATE,
-    CSV_TARGET_CONFIG_TEMPLATE,
-    JSONL_TARGET_CONFIG_TEMPLATE,
-    ORACLE_TAP_CONFIG_TEMPLATE,
-    POSTGRES_TAP_CONFIG_TEMPLATE,
     FlextMeltanoConfigDict,
     FlextMeltanoMixin,
     FlextMeltanoPipeline,
@@ -111,6 +105,13 @@ from flext_meltano.patterns import (
     flext_meltano_postgres_to_csv,
     flext_meltano_quick_pipeline,
 )
+
+# Configuration template aliases for backwards compatibility
+CSV_TAP_CONFIG_TEMPLATE = FLEXT_MELTANO_CSV_TAP_TEMPLATE
+CSV_TARGET_CONFIG_TEMPLATE = FLEXT_MELTANO_CSV_TARGET_TEMPLATE
+JSONL_TARGET_CONFIG_TEMPLATE = FLEXT_MELTANO_JSONL_TARGET_TEMPLATE
+ORACLE_TAP_CONFIG_TEMPLATE = FLEXT_MELTANO_ORACLE_TAP_TEMPLATE
+POSTGRES_TAP_CONFIG_TEMPLATE = FLEXT_MELTANO_POSTGRES_TAP_TEMPLATE
 
 # PRODUCTION DECORATORS CONSOLIDADOS - Eliminam 50+ linhas por função
 from flext_meltano.production_decorators import (
@@ -292,7 +293,7 @@ __version__ = "2.0.0-enterprise"
 
 # PUBLIC API - Root namespace access only (as required)
 __all__ = [
-    # Configuration templates
+    # Legacy configuration templates (backwards compatibility)
     "CSV_TAP_CONFIG_TEMPLATE",
     "CSV_TARGET_CONFIG_TEMPLATE",
     # =============================================================================
@@ -300,6 +301,17 @@ __all__ = [
     # =============================================================================
     # Availability flags
     "DBT_AVAILABLE",
+    # =============================================================================
+    # CONSOLIDATED CORE PATTERNS - Primary ABI for massive code reduction
+    # =============================================================================
+    # Configuration templates (consolidated)
+    "FLEXT_MELTANO_CSV_TAP_TEMPLATE",
+    "FLEXT_MELTANO_CSV_TARGET_TEMPLATE",
+    "FLEXT_MELTANO_JSONL_TARGET_TEMPLATE",
+    "FLEXT_MELTANO_MYSQL_TAP_TEMPLATE",
+    "FLEXT_MELTANO_ORACLE_TAP_TEMPLATE",
+    "FLEXT_MELTANO_PARQUET_TARGET_TEMPLATE",
+    "FLEXT_MELTANO_POSTGRES_TAP_TEMPLATE",
     "JSONL_TARGET_CONFIG_TEMPLATE",
     "MELTANO_AVAILABLE",
     "ORACLE_TAP_CONFIG_TEMPLATE",
@@ -325,8 +337,12 @@ __all__ = [
     "FlextMeltano",  # DEPRECATED
     # Bridge integration
     "FlextMeltanoBridge",
+    "FlextMeltanoCatalogData",
+    # Core type aliases
+    "FlextMeltanoConfig",
     "FlextMeltanoConfigDict",  # Fluent config building
     "FlextMeltanoDbtService",  # DBT integration
+    "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutionState",  # Pipeline states
     # EXTENSIONS using Meltano EDK
     "FlextMeltanoExtension",  # Meltano extension
@@ -335,20 +351,31 @@ __all__ = [
     # =============================================================================
     # Core pattern classes
     "FlextMeltanoMixin",  # Mixin for zero-boilerplate operations
+    # Core mixin and pipeline classes
+    "FlextMeltanoOperationsMixin",
     # =============================================================================
     # PRIMARY API - Real integration with enterprise frameworks
     # =============================================================================
     # CORE SERVICES using flext-core patterns
     "FlextMeltanoOrchestrationService",  # Main service class
     "FlextMeltanoPipeline",  # Complete pipeline class eliminating 100+ lines
+    "FlextMeltanoPipelineConfig",
     # CORE TYPES using flext-core patterns
     "FlextMeltanoPipelineConfig",  # Immutable configuration
     "FlextMeltanoPipelineEvent",  # Domain events
     "FlextMeltanoPipelineResult",  # Execution result
+    "FlextMeltanoPluginConfig",
+    "FlextMeltanoProjectConfig",
+    "FlextMeltanoProjectPath",
     "FlextMeltanoRepository",  # Data persistence
     # Helper functions (ISOLATED)
     "FlextMeltanoResult",
     "FlextMeltanoSingerService",  # Singer SDK integration
+    "FlextMeltanoSmartConfigDict",
+    "FlextMeltanoSmartPipeline",
+    "FlextMeltanoStreamData",
+    "FlextMeltanoTapConfig",
+    "FlextMeltanoTargetConfig",
     # =============================================================================
     # ULTRA HELPERS - Massive code reduction (80-98%)
     # =============================================================================
@@ -390,6 +417,8 @@ __all__ = [
     # =============================================================================
     # Core decorators for production features
     "flext_meltano_auto_retry",  # Automatic retry with backoff
+    # Production decorators (consolidated)
+    "flext_meltano_auto_retry_smart",
     "flext_meltano_batch_execute_ultra",  # Batch execution - replaces 100+ lines
     "flext_meltano_batch_operation",  # Automatic batch processing
     "flext_meltano_cache_result",  # Result caching
@@ -399,15 +428,21 @@ __all__ = [
     # Helper functions for discovery and validation
     "flext_meltano_discover_catalog",
     "flext_meltano_discover_plugins",
+    "flext_meltano_discovery_optimized",
+    "flext_meltano_error_recovery",
     "flext_meltano_error_recovery",  # Intelligent error recovery
     "flext_meltano_execute_job",
+    "flext_meltano_execution_metrics",
+    "flext_meltano_execution_optimized",
     # Monitoring and metrics ultra helpers
     "flext_meltano_get_pipeline_metrics_ultra",  # Complete metrics - replaces 40+ lines
     "flext_meltano_manage_project_ultra",  # Project management - real meltano-core integration
     "flext_meltano_metrics_collection",  # Automatic metrics collection
     "flext_meltano_postgres_to_csv",  # PostgreSQL to CSV in one call
     "flext_meltano_production_ready",  # Combined production decorator
+    "flext_meltano_production_ready_complete",
     "flext_meltano_project_context",  # Project validation context
+    "flext_meltano_project_validation",
     "flext_meltano_quick_pipeline",  # Single-call pipeline execution
     "flext_meltano_run_command",
     "flext_meltano_run_pipeline_sync",  # Sync ultra pipeline - replaces 50+ lines
@@ -415,11 +450,19 @@ __all__ = [
     "flext_meltano_run_pipeline_ultra",  # Async ultra pipeline - replaces 50+ lines
     # Project management ultra helpers
     "flext_meltano_setup_project_ultra",  # Complete project setup - replaces 100+ lines
+    "flext_meltano_smart_cache",
+    # Smart configuration functions
+    "flext_meltano_smart_config",
+    "flext_meltano_smart_config_builder",
     "flext_meltano_test_tap_connection",
     "flext_meltano_timing",  # Execution timing
+    "flext_meltano_ultra_csv_to_jsonl",
+    "flext_meltano_ultra_database_to_warehouse",
+    "flext_meltano_ultra_pipeline",
     "flext_meltano_validate_config",  # Config validation decorator
     "flext_meltano_validate_project",
     "flext_meltano_validate_tap_config",
+    "flext_meltano_validation_optimized",
     "get_tap_test_class",
     # OLD API functions (deprecated)
     "run_pipeline",  # DEPRECATED

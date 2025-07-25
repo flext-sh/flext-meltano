@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any, ParamSpec, TypeVar, Union
+from typing import Any, ParamSpec, TypeVar
 
 from flext_meltano.helpers.discovery import (
     flext_meltano_discover_catalog,
@@ -41,7 +41,7 @@ FlextMeltanoPipelineConfig = dict[str, Any]
 FlextMeltanoCatalogData = dict[str, Any]
 FlextMeltanoStreamData = dict[str, Any]
 FlextMeltanoExecutionResult = FlextMeltanoResult
-FlextMeltanoProjectPath = Union[str, Path]
+FlextMeltanoProjectPath = str | Path
 
 # Configuration templates consolidados - elimina configuração manual repetitiva
 FLEXT_MELTANO_CSV_TAP_TEMPLATE: FlextMeltanoTapConfig = {
@@ -98,7 +98,7 @@ FLEXT_MELTANO_PARQUET_TARGET_TEMPLATE: FlextMeltanoTargetConfig = {
 def flext_meltano_smart_config(
     tap_name: str,
     target_name: str = "target-jsonl",
-    **overrides: Any,
+    **overrides: str | int | bool | None,
 ) -> FlextMeltanoPipelineConfig:
     """Create smart pipeline config with zero boilerplate.
 
@@ -197,6 +197,7 @@ class FlextMeltanoOperationsMixin:
     def flext_meltano_discover_plugins_smart(
         self,
         plugin_type: str | None = None,
+        *,
         use_cache: bool = True,
     ) -> FlextMeltanoExecutionResult:
         """Discover plugins with smart caching and filtering."""
