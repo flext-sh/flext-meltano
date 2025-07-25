@@ -1,0 +1,124 @@
+name: "flext_meltano_dbt"
+version: "0.8.0" 
+config-version: 2
+
+# Profile for consolidated FLEXT DBT transformations
+profile: "flext_meltano"
+
+# Standard DBT directory structure
+model-paths: ["dbt/models"]
+analysis-paths: ["dbt/analyses"] 
+test-paths: ["dbt/tests"]
+seed-paths: ["dbt/seeds"]
+macro-paths: ["dbt/macros"]
+snapshot-paths: ["dbt/snapshots"]
+
+target-path: "dbt/target"
+clean-targets:
+  - "dbt/target"
+  - "dbt/dbt_packages"
+
+# Consolidated model configurations for all FLEXT data sources
+models:
+  flext_meltano_dbt:
+    # Common staging layer for all sources
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags: ["staging"]
+    
+    # Intermediate processing layer
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+      +tags: ["intermediate"]
+    
+    # Data marts for analytics
+    marts:
+      +materialized: table
+      +schema: marts
+      +tags: ["marts", "analytics"]
+    
+    # Source-specific configurations
+    ldap:
+      +schema: ldap
+      +tags: ["ldap"]
+    
+    ldif:
+      +schema: ldif
+      +tags: ["ldif"]
+    
+    oracle:
+      +schema: oracle
+      +tags: ["oracle"]
+    
+    oracle_wms:
+      +schema: oracle_wms
+      +tags: ["oracle_wms"]
+
+# Test configurations
+tests:
+  flext_meltano_dbt:
+    +store_failures: true
+    +severity: error
+
+# Source configurations
+sources:
+  flext_meltano_dbt:
+    +meta:
+      owner: "flext-team"
+
+# Consolidated variables for all data sources
+vars:
+  # LDAP configurations
+  ldap_base_dn: "dc=example,dc=com"
+  ldap_user_base: "ou=users"
+  ldap_group_base: "ou=groups"
+  ldap_ou_base: "ou=departments"
+  
+  # LDIF configurations
+  ldif_schema: 'raw'
+  staging_schema: '{{ target.schema }}'
+  marts_schema: '{{ target.schema }}_marts'
+  
+  # Oracle configurations
+  oracle_schema: 'oracle'
+  oracle_wms_schema: 'oracle_wms'
+  
+  # Common configurations
+  start_date: '2024-01-01'
+  analytics_version: '0.8.0'
+  database_name: 'flext_analytics'
+
+# Documentation
+docs-paths: ["dbt/docs"]
+
+# Snapshots
+snapshots:
+  flext_meltano_dbt:
+    +target_schema: snapshots
+
+# Seeds
+seeds:
+  flext_meltano_dbt:
+    +schema: seeds
+
+# Macro dispatch
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['dbt_utils']
+  - macro_namespace: codegen
+    search_order: ['codegen']
+
+# Hooks
+on-run-start:
+  - "{{ log('Starting FLEXT consolidated DBT transformations...', info=true) }}"
+
+on-run-end:
+  - "{{ log('Completed FLEXT consolidated DBT transformations.', info=true) }}"
+
+# Project flags
+flags:
+  send_anonymous_usage_stats: false
+  warn_error: false
+  use_colors: true

@@ -101,10 +101,7 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
         """Convert string to Path if needed."""
         if isinstance(v, str):
             return Path(v)
-        if isinstance(v, Path):
-            return v
-        # If it's something else, try to convert it
-        return Path(str(v))
+        return v  # v is already a Path
 
     def model_post_init(self, __context: Any, /) -> None:  # noqa: ANN401
         """Initialize the Singer SDK integration."""
@@ -118,7 +115,7 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
         self,
         tap_name: str,
         config: TapConfig,
-    ) -> object:
+    ) -> Any:  # noqa: ANN401
         """Create tap instance via plugin discovery (architectural compliance)."""
         try:
             # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded implementations

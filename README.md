@@ -9,6 +9,7 @@ Biblioteca Python **simplificada** que unifica Singer, Meltano e DBT em uma inte
 ## ✅ Funcionalidades TESTADAS e FUNCIONAIS
 
 ### 1. **Pipeline CSV Completo**
+
 ```bash
 # TESTADO E FUNCIONANDO
 python flext_meltano_bridge.py run_pipeline tap-csv target-csv
@@ -19,6 +20,7 @@ python flext_meltano_bridge.py run_pipeline tap-csv target-csv
 ```
 
 ### 2. **Bridge Go→Python**
+
 ```bash
 # TESTADO E FUNCIONANDO  
 python flext_meltano_bridge.py version
@@ -27,6 +29,7 @@ python flext_meltano_bridge.py version
 ```
 
 ### 3. **Interface Biblioteca Minimalista**
+
 ```python
 import flext_meltano
 
@@ -49,6 +52,7 @@ flext-meltano/
 ```
 
 **ELIMINADO** (over-engineering):
+
 - ❌ domain/ layer
 - ❌ application/ layer  
 - ❌ infrastructure/ layer
@@ -58,21 +62,23 @@ flext-meltano/
 
 ## 📊 Métricas Reais
 
-- **Antes**: 102 arquivos Python, 396 linhas __init__.py
-- **Depois**: 67 arquivos Python, 86 linhas __init__.py  
-- **Redução**: ~35% arquivos, ~78% __init__.py
+- **Antes**: 102 arquivos Python, 396 linhas **init**.py
+- **Depois**: 67 arquivos Python, 86 linhas **init**.py  
+- **Redução**: ~35% arquivos, ~78% **init**.py
 - **Funcionalidade**: 100% mantida
 
 ## 🧪 Evidências de Funcionamento
 
-### Pipeline Success Log:
+### Pipeline Success Log
+
 ```
 2025-07-25T11:28:45.430507Z [info] Run completed 
 duration_seconds=5.073 status=success
 record_count: 5 (confirmed)
 ```
 
-### Bridge Response:
+### Bridge Response
+
 ```json
 {
   "success": true,
@@ -85,17 +91,20 @@ record_count: 5 (confirmed)
 ## 🔧 Como Usar
 
 1. **Import simplificado**:
+
 ```python
 import flext_meltano
 # Disponível: helpers para Meltano/Singer/DBT
 ```
 
 2. **Via Bridge (Go integration)**:
+
 ```bash
 python flext_meltano_bridge.py [operation] [args...]
 ```
 
 3. **Operações disponíveis**:
+
 - `version` - ✅ Testado
 - `run_pipeline tap target` - ✅ Testado
 - `add_plugin type name` - ✅ Testado

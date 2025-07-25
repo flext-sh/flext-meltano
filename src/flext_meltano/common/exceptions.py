@@ -54,6 +54,7 @@ class FlextMeltanoCommonConnectionError(FlextMeltanoCommonError):
             message: Error message
             host: Optional host that failed to connect
             port: Optional port that failed to connect
+
         """
         if host and port:
             message = f"{message} (host: {host}, port: {port})"

@@ -1,0 +1,400 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "flext-tap-oracle-rules",
+  "title": "FLEXT Oracle Tap Rules",
+  "description": "Comprehensive rules and validation schema for Oracle tap operations using flext-core and Singer standards",
+  "version": "1.0.0",
+  "metadata": {
+    "project": "flext-tap-oracle",
+    "version": "0.7.0",
+    "framework": "FLEXT",
+    "domain": "Oracle Database Tap",
+    "singer_spec_version": "1.5.0",
+    "meltano_sdk_version": "0.47.0",
+    "last_updated": "2025-07-15",
+    "flext_core_version": "0.7.0",
+    "python_version": "3.13"
+  },
+  "flext_core_integration": {
+    "typedefs": {
+      "use_flext_core_typedefs": "flext_core.domain.typedefs",
+      "core_types": [
+        "NonEmptyStr",
+        "Port",
+        "PositiveInt",
+        "TimeoutSeconds",
+        "TableName",
+        "SchemaName"
+      ],
+      "local_typedefs": "flext_tap_oracle.domain.typedefs",
+      "oracle_specific_types": [
+        "OracleHost",
+        "OraclePort",
+        "OracleServiceName",
+        "OracleSID",
+        "OracleSchema",
+        "OracleFetchSize",
+        "OracleArraySize",
+        "OracleConnectionTimeout"
+      ]
+    },
+    "constants": {
+      "use_flext_core_constants": "flext_core.domain.constants",
+      "core_constants": [
+        "ConfigDefaults",
+        "FlextFramework",
+        "Environments",
+        "LogLevels"
+      ],
+      "local_constants": "flext_tap_oracle.domain.constants",
+      "oracle_constants": "OracleTapConstants"
+    },
+    "configuration": {
+      "base_class": "flext_core.config.base.BaseConfig",
+      "settings_class": "flext_core.config.base.BaseSettings",
+      "validation": "pydantic_v2",
+      "environment_prefix": "FLEXT_TAP_ORACLE_",
+      "config_manager": "flext_core.config.ConfigManager",
+      "inherit_base_config": true,
+      "inherit_base_settings": true,
+      "use_dependency_injection": true,
+      "use_service_result": true
+    }
+  },
+  "configuration_rules": {
+    "connection": {
+      "required_fields": ["host", "username", "password"],
+      "conditional_required": {
+        "service_name_or_sid": {
+          "description": "Either service_name or sid must be provided",
+          "validation": "at_least_one_of",
+          "fields": ["service_name", "sid"]
+        }
+      },
+      "default_values": {
+        "connection_type": "database",
+        "port": 1521,
+        "batch_size": 1000,
+        "max_parallel_streams": 4,
+        "connection_pool_size": 5,
+        "query_timeout": 300,
+        "enable_circuit_breaker": true,
+        "circuit_breaker_failures": 5,
+        "circuit_breaker_timeout": 60,
+        "enable_async": true,
+        "enable_metrics": true,
+        "enable_flattening": false,
+        "flattening_max_depth": 5,
+        "flattening_separator": "__",
+        "log_level": "INFO",
+        "enable_sql_logging": false,
+        "ssl_mode": "prefer"
+      },
+      "validation_constraints": {
+        "connection_type": {
+          "type": "string",
+          "enum": ["database"],
+          "description": "Only database connections supported"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "batch_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50000,
+          "warning_thresholds": {
+            "small": 100,
+            "large": 10000
+          }
+        },
+        "max_parallel_streams": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "constraint": "must_not_exceed_connection_pool_size"
+        },
+        "connection_pool_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "query_timeout": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 7200
+        },
+        "circuit_breaker_failures": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "circuit_breaker_timeout": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "flattening_max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "flattening_separator": {
+          "type": "string",
+          "min_length": 1,
+          "max_length": 10,
+          "pattern": "^[_\\-\\.]+$"
+        },
+        "ssl_mode": {
+          "type": "string",
+          "enum": ["disable", "allow", "prefer", "require"]
+        },
+        "log_level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        }
+      }
+    },
+    "streams": {
+      "table_selection": {
+        "default_discovery": true,
+        "table_pattern_supported": true,
+        "exclude_tables_supported": true
+      },
+      "replication_methods": {
+        "supported": ["FULL_TABLE", "INCREMENTAL"],
+        "default": "FULL_TABLE"
+      }
+    }
+  },
+  "singer_rules": {
+    "protocol_version": "1.5.0",
+    "message_types": {
+      "supported": ["RECORD", "SCHEMA", "STATE", "ACTIVATEVERSION"],
+      "required": ["RECORD", "SCHEMA"]
+    },
+    "schema_requirements": {
+      "primary_keys_required": true,
+      "replication_key_for_incremental": true,
+      "type_detection": "automatic"
+    },
+    "state_management": {
+      "bookmark_strategy": "incremental_key",
+      "full_table_replication": "no_state_required",
+      "state_persistence": "per_stream"
+    },
+    "record_format": {
+      "timestamp_format": "RFC3339",
+      "decimal_handling": "string",
+      "null_handling": "explicit"
+    }
+  },
+  "stream_rules": {
+    "discovery": {
+      "auto_discover_tables": true,
+      "include_views": false,
+      "include_system_tables": false,
+      "schema_inference": "from_database_metadata"
+    },
+    "selection": {
+      "default_selected": false,
+      "selection_patterns": {
+        "include": [],
+        "exclude": []
+      }
+    },
+    "replication": {
+      "full_table": {
+        "supported": true,
+        "truncate_before_load": false
+      },
+      "incremental": {
+        "supported": true,
+        "require_replication_key": true,
+        "supported_key_types": ["datetime", "timestamp", "number"]
+      }
+    }
+  },
+  "performance_rules": {
+    "extraction": {
+      "batch_size_recommendations": {
+        "small_tables": 100,
+        "medium_tables": 1000,
+        "large_tables": 5000,
+        "max_recommended": 10000
+      },
+      "parallel_streams": {
+        "recommended_max": 4,
+        "per_connection_limit": 1
+      }
+    },
+    "memory_management": {
+      "cursor_array_size": 100,
+      "fetch_size": 1000,
+      "result_set_caching": false
+    },
+    "connection_management": {
+      "pool_size_recommendations": {
+        "development": 3,
+        "staging": 5,
+        "production": 10
+      }
+    }
+  },
+  "data_type_mapping": {
+    "oracle_to_singer": {
+      "VARCHAR2": "string",
+      "NVARCHAR2": "string",
+      "CHAR": "string",
+      "NCHAR": "string",
+      "CLOB": "string",
+      "NCLOB": "string",
+      "NUMBER": "number",
+      "BINARY_FLOAT": "number",
+      "BINARY_DOUBLE": "number",
+      "DATE": "string",
+      "TIMESTAMP": "string",
+      "TIMESTAMP WITH TIME ZONE": "string",
+      "TIMESTAMP WITH LOCAL TIME ZONE": "string",
+      "INTERVAL YEAR TO MONTH": "string",
+      "INTERVAL DAY TO SECOND": "string",
+      "RAW": "string",
+      "LONG RAW": "string",
+      "BLOB": "string",
+      "BFILE": "string",
+      "ROWID": "string",
+      "UROWID": "string",
+      "XMLType": "string",
+      "JSON": "object"
+    },
+    "type_conversion_rules": {
+      "date_format": "YYYY-MM-DD",
+      "datetime_format": "YYYY-MM-DDTHH:MI:SS.FFFTZ",
+      "number_precision": "preserve",
+      "boolean_conversion": "1/0_to_true/false",
+      "null_representation": null
+    }
+  },
+  "error_handling_rules": {
+    "retry_strategy": {
+      "connection_errors": {
+        "max_attempts": 3,
+        "backoff_strategy": "exponential",
+        "base_delay": 1.0
+      },
+      "query_errors": {
+        "max_attempts": 2,
+        "backoff_strategy": "linear",
+        "base_delay": 0.5
+      }
+    },
+    "circuit_breaker": {
+      "enabled_by_default": true,
+      "failure_threshold": 5,
+      "timeout_seconds": 60,
+      "half_open_max_calls": 3
+    },
+    "error_categories": {
+      "retryable": ["connection_lost", "timeout", "temporary_unavailable"],
+      "non_retryable": [
+        "authentication_failed",
+        "permission_denied",
+        "invalid_query",
+        "table_not_found"
+      ]
+    }
+  },
+  "security_rules": {
+    "connection_security": {
+      "ssl_recommended": true,
+      "credential_handling": {
+        "mask_in_logs": true,
+        "environment_variables_preferred": true
+      }
+    },
+    "data_privacy": {
+      "pii_detection": false,
+      "field_masking": false,
+      "audit_logging": true
+    }
+  },
+  "logging_rules": {
+    "default_log_level": "INFO",
+    "sql_logging": {
+      "enabled_by_default": false,
+      "mask_sensitive_parameters": true,
+      "include_execution_time": true
+    },
+    "metrics_collection": {
+      "enabled_by_default": true,
+      "include_extraction_stats": true,
+      "include_connection_stats": true,
+      "include_error_counts": true
+    },
+    "audit_trail": {
+      "log_table_selections": true,
+      "log_replication_progress": true,
+      "log_configuration_changes": true
+    }
+  },
+  "environment_specific_rules": {
+    "development": {
+      "sql_logging_enabled": true,
+      "detailed_metrics": true,
+      "smaller_batch_sizes": true,
+      "connection_validation": "relaxed"
+    },
+    "staging": {
+      "sql_logging_enabled": false,
+      "detailed_metrics": true,
+      "production_like_settings": true,
+      "connection_validation": "strict"
+    },
+    "production": {
+      "sql_logging_enabled": false,
+      "detailed_metrics": false,
+      "optimized_batch_sizes": true,
+      "connection_validation": "strict",
+      "require_ssl": true,
+      "max_parallel_streams": 4
+    }
+  },
+  "flattening_rules": {
+    "schema_flattening": {
+      "enabled_by_default": false,
+      "max_depth": 5,
+      "separator": "__",
+      "preserve_arrays": true,
+      "flatten_objects": true
+    },
+    "field_naming": {
+      "case_handling": "preserve",
+      "special_character_replacement": "_",
+      "max_field_name_length": 128
+    }
+  },
+  "compliance_rules": {
+    "data_governance": {
+      "metadata_collection": true,
+      "lineage_tracking": true,
+      "schema_versioning": true
+    },
+    "regulatory": {
+      "gdpr_compliance": false,
+      "data_residency": "not_enforced",
+      "audit_requirements": "basic"
+    }
+  },
+  "validation_functions": {
+    "at_least_one_of": {
+      "description": "Validates that at least one of the specified fields has a value",
+      "implementation": "custom_validator"
+    },
+    "must_not_exceed_connection_pool_size": {
+      "description": "Validates that max_parallel_streams <= connection_pool_size",
+      "implementation": "comparison_validator"
+    }
+  }
+}
