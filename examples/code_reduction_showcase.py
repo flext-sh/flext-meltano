@@ -11,6 +11,7 @@ import asyncio
 import json
 import os
 import subprocess
+import tempfile
 from pathlib import Path
 
 from flext_meltano.api import (
@@ -335,7 +336,7 @@ def example_4_old_way() -> None:
 def example_4_new_way() -> None:
     """DEPOIS: Descoberta ultra-simplificada - 1 linha + análise opcional."""
     # 1 LINHA para teste + 1 LINHA para descoberta
-    if test_tap_connection("tap-postgres", project_root="/tmp/discovery_project"):
+    if test_tap_connection("tap-postgres", project_root=tempfile.mkdtemp(prefix="discovery_project_")):
         catalog = discover_catalog("tap-postgres", project_root=tempfile.mkdtemp(prefix="discovery_project_"))
         [s["tap_stream_id"] for s in catalog.get("streams", [])]
     else:

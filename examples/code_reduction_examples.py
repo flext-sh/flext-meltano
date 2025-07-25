@@ -219,7 +219,7 @@ def example_3_before():
     os.chdir(project_path)
 
     # 2. Run meltano init
-    subprocess.run(["meltano", "init", ".", "--no_usage_stats"], check=True)
+    subprocess.run([shutil.which("meltano") or "meltano", "init", ".", "--no_usage_stats"], check=True)
 
     # 3. Load project
     Project.find(project_path)
