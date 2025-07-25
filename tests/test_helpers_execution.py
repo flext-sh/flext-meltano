@@ -33,7 +33,10 @@ class TestFlextMeltanoExecuteJob:
 
     def test_execute_job_with_environment(self) -> None:
         """Test job execution with custom environment."""
-        result = flext_meltano_execute_job("prod-job", environment="production")
+        result = flext_meltano_execute_job(
+            "prod-job",
+            environment="production",
+        )
 
         assert result.is_success
         assert result.data is not None
@@ -44,10 +47,16 @@ class TestFlextMeltanoExecuteJob:
 
     def test_execute_job_with_kwargs(self) -> None:
         """Test job execution with additional parameters."""
-        kwargs = {"batch_size": 500, "debug": True, "custom_config": {"timeout": 300}}
+        kwargs = {
+            "batch_size": 500,
+            "debug": True,
+            "custom_config": {"timeout": 300},
+        }
 
         result = flext_meltano_execute_job(
-            "complex-job", environment="staging", **kwargs,
+            "complex-job",
+            environment="staging",
+            **kwargs,
         )
 
         assert result.is_success
@@ -122,7 +131,9 @@ class TestFlextMeltanoExecuteJob:
     def test_execute_job_none_kwargs(self) -> None:
         """Test job execution with None values in kwargs."""
         result = flext_meltano_execute_job(
-            "null-job", optional_param=None, another_param=None,
+            "null-job",
+            optional_param=None,
+            another_param=None,
         )
 
         assert result.is_success
@@ -149,7 +160,9 @@ class TestFlextMeltanoExecuteJob:
         }
 
         result = flext_meltano_execute_job(
-            "complex-data-job", environment="dev", **complex_kwargs,
+            "complex-data-job",
+            environment="dev",
+            **complex_kwargs,
         )
 
         assert result.is_success
@@ -202,7 +215,10 @@ class TestFlextMeltanoExecuteJob:
         assert data["records_processed"] == 1000
 
     @patch("flext_meltano.helpers.execution.FlextResult.ok")
-    def test_execute_job_error_handling_in_result_creation(self, mock_ok: Any) -> None:
+    def test_execute_job_error_handling_in_result_creation(
+        self,
+        mock_ok: Any,
+    ) -> None:
         """Test error handling when FlextResult.ok fails."""
         mock_ok.side_effect = Exception("FlextResult creation failed")
 
@@ -245,7 +261,7 @@ class TestFlextMeltanoExecuteJob:
 
         for env in environments:
             result = flext_meltano_execute_job(f"job-{env}", environment=env)
-            assert result.is_success
+            assert result.success
             data = result.data
             assert data is not None
             assert data["environment"] == env

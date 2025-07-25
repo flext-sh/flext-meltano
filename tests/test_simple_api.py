@@ -80,7 +80,12 @@ class TestSetupMeltanoSimple:
             result = setup_meltano_simple(temp_dir)
 
             # Check all expected keys are present
-            expected_keys = {"success", "settings", "project_root", "environment"}
+            expected_keys = {
+                "success",
+                "settings",
+                "project_root",
+                "environment",
+            }
             assert set(result.keys()) == expected_keys
 
             # Check data types
@@ -115,9 +120,9 @@ class TestSetupMeltanoSimple:
         assert result["success"] is True
         assert "test_project" in result["project_root"]
 
-    def test_setup_with_nonexistent_path(self) -> None:
+    def test_setup_with_nonexistent_path(self, tmp_path: Path) -> None:
         """Test setup with nonexistent path."""
-        nonexistent_path = "/tmp/nonexistent/path/12345"  # noqa: S108
+        nonexistent_path = str(tmp_path / "nonexistent" / "path" / "12345")
         result = setup_meltano_simple(nonexistent_path)
 
         # Should still work, as we're just configuring
@@ -158,7 +163,14 @@ class TestSetupMeltanoSimple:
 
     def test_setup_environment_variations(self) -> None:
         """Test various environment string formats."""
-        environments = ["dev", "development", "prod", "production", "test", "staging"]
+        environments = [
+            "dev",
+            "development",
+            "prod",
+            "production",
+            "test",
+            "staging",
+        ]
 
         with tempfile.TemporaryDirectory() as temp_dir:
             for env in environments:
@@ -175,7 +187,12 @@ class TestFlextCreateBasicConfig:
         config = flext_create_basic_config()
 
         # Check all expected keys are present
-        expected_keys = {"version", "default_environment", "environments", "plugins"}
+        expected_keys = {
+            "version",
+            "default_environment",
+            "environments",
+            "plugins",
+        }
         assert set(config.keys()) == expected_keys
 
     def test_create_basic_config_values(self) -> None:
@@ -295,7 +312,8 @@ class TestSimpleApiIntegration:
 
         with tempfile.TemporaryDirectory() as temp_dir:
             setup_result = setup_meltano_simple(
-                temp_dir, environment=basic_config["default_environment"],
+                temp_dir,
+                environment=basic_config["default_environment"],
             )
 
             assert setup_result["environment"] == basic_config["default_environment"]

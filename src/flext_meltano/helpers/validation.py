@@ -5,12 +5,10 @@ Project validation utilities following Clean Architecture patterns.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 from flext_core import FlextResult
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 def flext_meltano_validate_project(
@@ -26,8 +24,6 @@ def flext_meltano_validate_project(
 
     """
     try:
-        from pathlib import Path
-
         # Default to current directory if no project root specified
         root = project_root or Path.cwd()
 
@@ -59,5 +55,5 @@ def flext_meltano_validate_project(
 
         return FlextResult.ok(validation_results)
 
-    except Exception as e:
+    except (ValueError, TypeError, RuntimeError, OSError) as e:
         return FlextResult.fail(f"Project validation failed: {e}")

@@ -15,10 +15,11 @@ from typing import TYPE_CHECKING, Any, ClassVar
 from pydantic import BaseModel, Field, field_validator
 
 # Use BaseModel directly for type safety
-DomainValueObject = BaseModel  # Value objects are immutable models
+FlextValueObject = BaseModel  # Value objects are immutable models
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+
 
 # Singer SDK is REQUIRED - zero tolerance for fallbacks
 
@@ -41,7 +42,7 @@ class FlextMeltanoStreamType(Enum):
     FULL_TABLE = auto()
 
 
-class FlextMeltanoSingerStreamDefinition(DomainValueObject):
+class FlextMeltanoSingerStreamDefinition(FlextValueObject):
     """Definition of a Singer stream with advanced configuration."""
 
     name: str = Field(description="Stream name identifier")
@@ -96,7 +97,7 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
 
     @field_validator("project_root", mode="before")
     @classmethod
-    def validate_project_root(cls, v: Any) -> Path:
+    def validate_project_root(cls, v: str | Path) -> Path:
         """Convert string to Path if needed."""
         if isinstance(v, str):
             return Path(v)
@@ -105,7 +106,7 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
         # If it's something else, try to convert it
         return Path(str(v))
 
-    def model_post_init(self, __context: Any, /) -> None:
+    def model_post_init(self, __context: Any, /) -> None:  # noqa: ANN401
         """Initialize the Singer SDK integration."""
         self._discover_plugins()
 
@@ -113,7 +114,11 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
         """Discover available Singer plugins."""
         # In a real implementation, this would scan for installed Singer packages
 
-    async def create_tap_instance(self, tap_name: str, config: TapConfig) -> Any:
+    async def create_tap_instance(
+        self,
+        tap_name: str,
+        config: TapConfig,
+    ) -> object:
         """Create tap instance via plugin discovery (architectural compliance)."""
         try:
             # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded implementations
@@ -127,13 +132,17 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
                 return await self.create_oracle_oic_tap(config)
 
             if self.plugin_discovery is None:
+                msg = f"Plugin discovery service not available. Cannot create tap: {tap_name}"
                 raise ValueError(
-                    f"Plugin discovery service not available. Cannot create tap: {tap_name}",
+                    msg,
                 )
 
-            plugin_info = await self.plugin_discovery.discover_tap_plugin(tap_name)
+            plugin_info = await self.plugin_discovery.discover_tap_plugin(
+                tap_name,
+            )
             if not plugin_info:
-                raise ValueError(f"Unknown tap plugin: {tap_name}")
+                msg = f"Unknown tap plugin: {tap_name}"
+                raise ValueError(msg)
 
             # Import plugin dynamically from its proper project
             plugin_module = importlib.import_module(plugin_info.module_path)
@@ -143,14 +152,19 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
 
         except ImportError as e:
             # Fallback error for missing plugins
-            raise ValueError(
+            msg = (
                 f"Tap plugin '{tap_name}' not available. "
-                f"Install the corresponding Singer tap project. Error: {e}",
+                f"Install the corresponding Singer tap project. Error: {e}"
+            )
+            raise ValueError(
+                msg,
             ) from e
 
     async def create_target_instance(
-        self, target_name: str, config: TargetConfig,
-    ) -> Any:
+        self,
+        target_name: str,
+        config: TargetConfig,
+    ) -> object:
         """Create target instance via plugin discovery (architectural compliance)."""
         try:
             # 🚨 ARCHITECTURAL FIX: Use dynamic plugin discovery instead of hardcoded implementations
@@ -160,15 +174,17 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
                 return await self.create_postgres_target(config)
 
             if self.plugin_discovery is None:
+                msg = f"Plugin discovery service not available. Cannot create target: {target_name}"
                 raise ValueError(
-                    f"Plugin discovery service not available. Cannot create target: {target_name}",
+                    msg,
                 )
 
             plugin_info = await self.plugin_discovery.discover_target_plugin(
                 target_name,
             )
             if not plugin_info:
-                raise ValueError(f"Unknown target plugin: {target_name}")
+                msg = f"Unknown target plugin: {target_name}"
+                raise ValueError(msg)
 
             # Import plugin dynamically from its proper project
             plugin_module = importlib.import_module(plugin_info.module_path)
@@ -177,9 +193,12 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
             return plugin_class(config)
 
         except ImportError as e:
-            raise ValueError(
+            msg = (
                 f"Target plugin '{target_name}' not available. "
-                f"Install the corresponding Singer target project. Error: {e}",
+                f"Install the corresponding Singer target project. Error: {e}"
+            )
+            raise ValueError(
+                msg,
             ) from e
 
     async def run_elt_pipeline(
@@ -198,7 +217,8 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
 
             # Create target instance via plugin discovery
             target_instance = await self.create_target_instance(
-                target_name, target_config,
+                target_name,
+                target_config,
             )
 
             # Process streams
@@ -216,12 +236,18 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
 
                     # Write in batches for performance
                     if len(records_batch) >= SINGER_BATCH_SIZE_LIMIT:
-                        await target_instance.write_batch(stream.name, records_batch)
+                        await target_instance.write_batch(
+                            stream.name,
+                            records_batch,
+                        )
                         records_batch = []
 
                 # Write remaining records
                 if records_batch:
-                    await target_instance.write_batch(stream.name, records_batch)
+                    await target_instance.write_batch(
+                        stream.name,
+                        records_batch,
+                    )
 
             return {
                 "success": True,
@@ -233,7 +259,8 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
             return {"success": False, "error": str(e), "records_processed": 0}
 
     async def create_oracle_oic_tap(
-        self, config: TapConfig,
+        self,
+        config: TapConfig,
     ) -> FlextMeltanoOracleOICTap:
         """Create Oracle OIC tap instance.
 
@@ -259,7 +286,8 @@ class FlextMeltanoSingerSDKIntegration(BaseModel):
         return FlextMeltanoLDAPTap(config)
 
     async def create_postgres_target(
-        self, config: TargetConfig,
+        self,
+        config: TargetConfig,
     ) -> FlextMeltanoPostgreSQLTarget:
         """Create PostgreSQL target instance.
 
@@ -475,7 +503,11 @@ class FlextMeltanoPostgreSQLTarget:
         """Write a single record to PostgreSQL."""
         # Real PostgreSQL integration would go here
 
-    async def write_batch(self, stream: str, records: list[SingerRecord]) -> None:
+    async def write_batch(
+        self,
+        stream: str,
+        records: list[SingerRecord],
+    ) -> None:
         """Write a batch of records to PostgreSQL."""
         # Real batch insert optimization would go here
         for record in records:

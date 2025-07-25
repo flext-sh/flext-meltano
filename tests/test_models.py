@@ -63,7 +63,9 @@ class TestFlextMeltanoPlugin:
         assert plugin.namespace == "tap_csv"
         assert plugin.pip_url == "pipelinewise-tap-csv"
         assert plugin.executable == "tap-csv"
-        assert plugin.config == {"files": [{"entity": "test", "path": "test.csv"}]}
+        assert plugin.config == {
+            "files": [{"entity": "test", "path": "test.csv"}],
+        }
         assert plugin.settings == [{"name": "files", "kind": "array"}]
         assert plugin.variant == "original"
         assert plugin.docs == "https://hub.meltano.com/extractors/tap-csv"
@@ -72,7 +74,9 @@ class TestFlextMeltanoPlugin:
     def test_plugin_validation_error(self) -> None:
         """Test plugin validation with missing required fields."""
         with pytest.raises(ValidationError):
-            FlextMeltanoPlugin.model_validate({})  # Missing required 'name' field
+            FlextMeltanoPlugin.model_validate(
+                {},
+            )  # Missing required 'name' field
 
 
 class TestFlextMeltanoPlugins:
@@ -95,7 +99,10 @@ class TestFlextMeltanoPlugins:
         loader = FlextMeltanoPlugin.model_validate({"name": "target-jsonl"})
 
         plugins = FlextMeltanoPlugins.model_validate(
-            {"extractors": [extractor.model_dump()], "loaders": [loader.model_dump()]},
+            {
+                "extractors": [extractor.model_dump()],
+                "loaders": [loader.model_dump()],
+            },
         )
 
         assert len(plugins.extractors) == 1
