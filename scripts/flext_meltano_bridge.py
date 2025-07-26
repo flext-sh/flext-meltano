@@ -16,7 +16,7 @@ def main() -> None:
     if len(sys.argv) < 2:
         sys.exit(1)
 
-    operation = sys.argv[1]
+    operation = sys.argv[1,]
     bridge = FlextMeltanoBridge()
 
     try:
@@ -25,13 +25,13 @@ def main() -> None:
         elif operation == "list_plugins":
             bridge.list_plugins()
         elif operation == "add_plugin" and len(sys.argv) >= 4:
-            bridge.add_plugin(sys.argv[2], sys.argv[3])
+            bridge.add_plugin(sys.argv[2], sys.argv[3,])
         elif operation == "discover" and len(sys.argv) >= 3:
-            bridge.discover_catalog(sys.argv[2])
+            bridge.discover_catalog(sys.argv[2,])
         elif operation == "run_pipeline" and len(sys.argv) >= 4:
-            bridge.run_pipeline(sys.argv[2], sys.argv[3])
+            bridge.run_pipeline(sys.argv[2], sys.argv[3,])
         elif operation == "invoke_dbt" and len(sys.argv) >= 3:
-            bridge.invoke_dbt(sys.argv[2], *sys.argv[3:])
+            bridge.invoke_dbt(sys.argv[2], *sys.argv[3:,])
         else:
             pass
 

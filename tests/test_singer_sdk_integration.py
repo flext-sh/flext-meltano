@@ -148,8 +148,8 @@ class TestFlextMeltanoOracleOICTap:
         tap = FlextMeltanoOracleOICTap(config)
 
         assert tap.config == config
-        assert tap.config["api_url"] == "https://oracle-oic.example.com"
-        assert tap.config["username"] == "test_user"
+        assert tap.config["api_url",] == "https://oracle-oic.example.com"
+        assert tap.config["username",] == "test_user"
 
     def test_oracle_oic_discover_streams(self) -> None:
         """Test Oracle OIC stream discovery."""
@@ -199,18 +199,19 @@ class TestFlextMeltanoOracleOICTap:
         assert len(records) == 1
         record = records[0]
 
-        assert record["id"] == "integration_001"
-        assert record["name"] == "Customer Data Sync"
-        assert record["status"] == "ACTIVE"
+        assert record["id",] == "integration_001"
+        assert record["name",] == "Customer Data Sync"
+        assert record["status",] == "ACTIVE"
         assert "created_at" in record
         assert "updated_at" in record
         assert (
-            record["configuration"] == '{"source": "salesforce", "target": "database"}'
+            record["configuration",]
+            == '{"source": "salesforce", "target": "database",}'
         )
 
         # Verify timestamp format
-        created_at = datetime.fromisoformat(record["created_at"])
-        updated_at = datetime.fromisoformat(record["updated_at"])
+        created_at = datetime.fromisoformat(record["created_at",])
+        updated_at = datetime.fromisoformat(record["updated_at",])
         assert isinstance(created_at, datetime)
         assert isinstance(updated_at, datetime)
 
@@ -230,14 +231,14 @@ class TestFlextMeltanoOracleOICTap:
         assert len(records) == 1
         record = records[0]
 
-        assert record["connection_id"] == "conn_001"
-        assert record["display_name"] == "Production Database"
-        assert record["connection_type"] == "DATABASE"
-        assert record["status"] == "ACTIVE"
+        assert record["connection_id",] == "conn_001"
+        assert record["display_name",] == "Production Database"
+        assert record["connection_type",] == "DATABASE"
+        assert record["status",] == "ACTIVE"
         assert "last_modified" in record
 
         # Verify timestamp format
-        last_modified = datetime.fromisoformat(record["last_modified"])
+        last_modified = datetime.fromisoformat(record["last_modified",])
         assert isinstance(last_modified, datetime)
 
     @pytest.mark.asyncio
@@ -267,14 +268,14 @@ class TestFlextMeltanoOracleOICTap:
         assert "integrations" in stream_maps
         assert "connections" in stream_maps
 
-        integrations_map = stream_maps["integrations"]
-        assert integrations_map["id"] == "integration_id"
-        assert integrations_map["name"] == "integration_name"
-        assert integrations_map["status"] == "current_status"
+        integrations_map = stream_maps["integrations",]
+        assert integrations_map["id",] == "integration_id"
+        assert integrations_map["name",] == "integration_name"
+        assert integrations_map["status",] == "current_status"
 
-        connections_map = stream_maps["connections"]
-        assert connections_map["connection_id"] == "id"
-        assert connections_map["display_name"] == "name"
+        connections_map = stream_maps["connections",]
+        assert connections_map["connection_id",] == "id"
+        assert connections_map["display_name",] == "name"
 
 
 class TestFlextMeltanoLDAPTap:
@@ -352,14 +353,14 @@ class TestFlextMeltanoLDAPTap:
         assert len(records) == 1
         record = records[0]
 
-        assert record["dn"] == "cn=john.doe,ou=users,dc=company,dc=com"
-        assert record["cn"] == "john.doe"
-        assert record["sn"] == "Doe"
-        assert record["givenName"] == "John"
-        assert record["mail"] == "john.doe@company.com"
-        assert record["employeeNumber"] == "12345"
-        assert record["department"] == "Engineering"
-        assert record["title"] == "Senior Developer"
+        assert record["dn",] == "cn=john.doe,ou=users,dc=company,dc=com"
+        assert record["cn",] == "john.doe"
+        assert record["sn",] == "Doe"
+        assert record["givenName",] == "John"
+        assert record["mail",] == "john.doe@company.com"
+        assert record["employeeNumber",] == "12345"
+        assert record["department",] == "Engineering"
+        assert record["title",] == "Senior Developer"
         assert "whenCreated" in record
         assert "whenChanged" in record
 
@@ -385,10 +386,10 @@ class TestFlextMeltanoLDAPTap:
         assert len(records) == 1
         record = records[0]
 
-        assert record["dn"] == "cn=developers,ou=groups,dc=company,dc=com"
-        assert record["cn"] == "developers"
-        assert record["description"] == "Development team members"
-        assert record["member"] == "cn=john.doe,ou=users,dc=company,dc=com"
+        assert record["dn",] == "cn=developers,ou=groups,dc=company,dc=com"
+        assert record["cn",] == "developers"
+        assert record["description",] == "Development team members"
+        assert record["member",] == "cn=john.doe,ou=users,dc=company,dc=com"
         assert "whenCreated" in record
         assert "whenChanged" in record
 
@@ -426,15 +427,15 @@ class TestFlextMeltanoLDAPTap:
         assert "groups" in stream_maps
 
         users_map = stream_maps["users"]
-        assert users_map["dn"] == "user_id"
-        assert users_map["cn"] == "username"
-        assert users_map["mail"] == "email"
-        assert users_map["employeeNumber"] == "employee_id"
+        assert users_map["dn",] == "user_id"
+        assert users_map["cn",] == "username"
+        assert users_map["mail",] == "email"
+        assert users_map["employeeNumber",] == "employee_id"
 
-        groups_map = stream_maps["groups"]
-        assert groups_map["dn"] == "group_id"
-        assert groups_map["cn"] == "group_name"
-        assert groups_map["member"] == "members"
+        groups_map = stream_maps["groups",]
+        assert groups_map["dn",] == "group_id"
+        assert groups_map["cn",] == "group_name"
+        assert groups_map["member",] == "members"
 
 
 class TestFlextMeltanoPostgreSQLTarget:
@@ -453,8 +454,8 @@ class TestFlextMeltanoPostgreSQLTarget:
         target = FlextMeltanoPostgreSQLTarget(config)
 
         assert target.config == config
-        assert target.config["host"] == "localhost"
-        assert target.config["port"] == 5432
+        assert target.config["host",] == "localhost"
+        assert target.config["port",] == 5432
 
     @pytest.mark.asyncio
     async def test_postgresql_write_record(self) -> None:
@@ -516,10 +517,10 @@ class TestFlextMeltanoPostgreSQLTarget:
 
         assert "default" in stream_maps
 
-        default_map = stream_maps["default"]
-        assert default_map["datetime_fields"] == "timestamp_columns"
-        assert default_map["string_fields"] == "text_columns"
-        assert default_map["numeric_fields"] == "numeric_columns"
+        default_map = stream_maps["default",]
+        assert default_map["datetime_fields",] == "timestamp_columns"
+        assert default_map["string_fields",] == "text_columns"
+        assert default_map["numeric_fields",] == "numeric_columns"
 
 
 class TestFlextMeltanoSingerSDKIntegration:
@@ -648,8 +649,8 @@ class TestFlextMeltanoSingerSDKIntegration:
         assert result["success"] is True
         assert "records_processed" in result
         assert "streams_processed" in result
-        assert result["records_processed"] >= 0
-        assert result["streams_processed"] >= 0
+        assert result["records_processed",] >= 0
+        assert result["streams_processed",] >= 0
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_ldap_to_postgres_success(self) -> None:
@@ -672,8 +673,8 @@ class TestFlextMeltanoSingerSDKIntegration:
         assert result["success"] is True
         assert "records_processed" in result
         assert "streams_processed" in result
-        assert result["records_processed"] >= 0
-        assert result["streams_processed"] >= 0
+        assert result["records_processed",] >= 0
+        assert result["streams_processed",] >= 0
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_unknown_tap(self) -> None:
@@ -694,7 +695,7 @@ class TestFlextMeltanoSingerSDKIntegration:
         )
 
         assert result["success"] is False
-        assert "Cannot create tap: tap-unknown" in result["error"]
+        assert "Cannot create tap: tap-unknown" in result["error",]
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_unknown_target(self) -> None:
@@ -716,7 +717,7 @@ class TestFlextMeltanoSingerSDKIntegration:
 
         assert result["success"] is False
         assert (
-            result["error"]
+            result["error",]
             == "Plugin discovery service not available. Cannot create target: target-unknown"
         )
 
@@ -756,7 +757,7 @@ class TestFlextMeltanoSingerSDKIntegration:
         assert result["success"] is True
         # Oracle OIC has 2 streams, each yields SINGER_BATCH_SIZE_LIMIT + 100 records
         expected_records = 2 * (SINGER_BATCH_SIZE_LIMIT + 100)
-        assert result["records_processed"] == expected_records
+        assert result["records_processed",] == expected_records
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_with_unselected_streams(self) -> None:
@@ -811,8 +812,8 @@ class TestFlextMeltanoSingerSDKIntegration:
             )
 
         assert result["success"] is True
-        assert result["records_processed"] == 1  # Only selected stream
-        assert result["streams_processed"] == 1  # Only selected stream
+        assert result["records_processed",] == 1  # Only selected stream
+        assert result["streams_processed",] == 1  # Only selected stream
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_error_handling(self) -> None:
@@ -840,8 +841,8 @@ class TestFlextMeltanoSingerSDKIntegration:
             )
 
         assert result["success"] is False
-        assert "Database connection failed" in result["error"]
-        assert result["records_processed"] == 0
+        assert "Database connection failed" in result["error",]
+        assert result["records_processed",] == 0
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_type_error_handling(self) -> None:
@@ -869,7 +870,7 @@ class TestFlextMeltanoSingerSDKIntegration:
             )
 
         assert result["success"] is False
-        assert "Invalid configuration type" in result["error"]
+        assert "Invalid configuration type" in result["error",]
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_value_error_handling(self) -> None:
@@ -897,7 +898,7 @@ class TestFlextMeltanoSingerSDKIntegration:
             )
 
         assert result["success"] is False
-        assert "Invalid configuration value" in result["error"]
+        assert "Invalid configuration value" in result["error",]
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_os_error_handling(self) -> None:
@@ -925,7 +926,7 @@ class TestFlextMeltanoSingerSDKIntegration:
             )
 
         assert result["success"] is False
-        assert "File system error" in result["error"]
+        assert "File system error" in result["error",]
 
     @pytest.mark.asyncio
     async def test_run_elt_pipeline_with_stream_maps(self) -> None:
@@ -984,7 +985,7 @@ class TestTypeAliases:
 
     def test_type_aliases_importable(self) -> None:
         """Test that type aliases are properly imported and usable."""
-        from flext_meltano.singer_sdk_integration import (
+        from flext_meltano import (
             SingerMessage,
             SingerRecord,
             StreamSchema,
@@ -1037,8 +1038,8 @@ class TestIntegrationWorkflow:
         )
 
         assert result["success"] is True
-        assert result["records_processed"] >= 0
-        assert result["streams_processed"] >= 0
+        assert result["records_processed",] >= 0
+        assert result["streams_processed",] >= 0
 
     @pytest.mark.asyncio
     async def test_complete_ldap_to_postgres_workflow(self) -> None:
@@ -1074,5 +1075,5 @@ class TestIntegrationWorkflow:
         )
 
         assert result["success"] is True
-        assert result["records_processed"] >= 0
-        assert result["streams_processed"] >= 0
+        assert result["records_processed",] >= 0
+        assert result["streams_processed",] >= 0

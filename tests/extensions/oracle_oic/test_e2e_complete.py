@@ -9,6 +9,7 @@ Tests all functionalities including:
 - Error handling
 """
 
+
 from __future__ import annotations
 
 import json
@@ -17,6 +18,11 @@ import subprocess
 from pathlib import Path
 from typing import Any
 from unittest.mock import Mock, patch
+from unittest.mock import Mock
+from flext_oracle_oic_ext.config import OracleOICExtensionSettings
+from unittest.mock import Mock
+from unittest.mock import Mock
+from unittest.mock import Mock
 
 import pytest
 from flext_oracle_oic_ext.extension import OracleOICExtension
@@ -36,17 +42,17 @@ class TestOracleOICExtE2E:
         if not config_file.exists():
             # Generate config if it doesn't exist
             subprocess.run(
-                ["python", "generate_config.py"],
+                ["python", "generate_config.py",],
                 cwd=Path(__file__).parent.parent,
                 check=False,
             )
         return str(config_file)
 
     @pytest.fixture
-    def config(self, config_path: str) -> dict[str, Any]:
+    def config(self, config_path: str) -> dict[str, Any,]:
         """Load configuration from file."""
         with open(config_path, encoding="utf-8") as f:
-            loaded_config: dict[str, Any] = json.load(f)
+            loaded_config: dict[str, Any,] = json.load(f)
             return loaded_config
 
     @pytest.fixture
@@ -67,7 +73,7 @@ class TestOracleOICExtE2E:
         assert len(description.commands) > 0
 
         # Check command categories
-        command_names = [cmd.name for cmd in description.commands]
+        command_names = [cmd.name for cmd in description.commands,]
 
         # Lifecycle commands
         assert "lifecycle:activate" in command_names
@@ -94,7 +100,7 @@ class TestOracleOICExtE2E:
     def test_command_routing(self, extension: OracleOICExtension) -> None:
         """Test command routing to appropriate handlers."""
         # Mock environment config
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
         # Create a valid config for the test
         test_config = {
@@ -124,19 +130,17 @@ class TestOracleOICExtE2E:
                 "integration123",
             )
 
-    def test_lifecycle_manager_operations(self, config: dict[str, Any]) -> None:
+    def test_lifecycle_manager_operations(self, config: dict[str, Any,]) -> None:
         """Test lifecycle manager functionality."""
-        from unittest.mock import Mock
 
-        from flext_oracle_oic_ext.config import OracleOICExtensionSettings
 
         settings = OracleOICExtensionSettings.from_dict(config)
         manager = LifecycleManager(settings)
 
         # Test initialization
         assert manager.settings.connection is not None
-        assert manager.settings.connection.base_url == config["base_url"]
-        assert manager.settings.connection.oauth_client_id == config["oauth_client_id"]
+        assert manager.settings.connection.base_url == config["base_url",]
+        assert manager.settings.connection.oauth_client_id == config["oauth_client_id",]
 
         # Test status check with mocked authentication
         with patch.object(manager, "_client") as mock_client:
@@ -151,17 +155,16 @@ class TestOracleOICExtE2E:
             mock_client.get.return_value = mock_response
 
             # Mock the access token to avoid authentication
-            with patch.object(manager, "_access_token", "mock_token"):
+            with patch.object(manager, "_access_token", "mock_token",):
                 status_result = manager.get_integration_status("TEST_INTEGRATION")
                 assert status_result.success
                 status = status_result.unwrap()
                 assert status.status == "ACTIVATED"
                 assert status.integration_id == "TEST_INTEGRATION"
 
-    def test_monitoring_service_operations(self, config: dict[str, Any]) -> None:
+    def test_monitoring_service_operations(self, config: dict[str, Any,]) -> None:
         """Test monitoring service functionality."""
         # Create a mock HTTP client for MonitoringService
-        from unittest.mock import Mock
 
         mock_client = Mock()
         service = MonitoringService(client=mock_client)
@@ -170,11 +173,11 @@ class TestOracleOICExtE2E:
         mock_client.get.return_value.status_code = 200
         mock_client.get.return_value.json.return_value = {
             "status": "healthy",
-            "components": {"database": "healthy", "messaging": "healthy"},
+            "components": {"database": "healthy", "messaging": "healthy",},
         }
 
         health = service.get_health_status()
-        assert health["status"] == "healthy"
+        assert health["status",] == "healthy"
 
     def test_artifact_extraction(
         self,
@@ -182,7 +185,7 @@ class TestOracleOICExtE2E:
         tmp_path: Path,
     ) -> None:
         """Test artifact extraction functionality."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
         # Create a valid config for the test
         test_config = {
@@ -227,7 +230,7 @@ class TestOracleOICExtE2E:
 
         # Test missing config
         os.environ.pop("MELTANO_PROJECT_ROOT", None)
-        with pytest.raises(Exception, match=".*config.*"):
+        with pytest.raises(Exception, match=".*config.*",):
             extension.invoke("lifecycle:status")
 
     def test_config_loading(
@@ -236,7 +239,7 @@ class TestOracleOICExtE2E:
         config_path: str,
     ) -> None:
         """Test configuration loading from file."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path(config_path).parent)
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path(config_path).parent)
 
         # Test that config can be set and accessed
         test_config = {
@@ -249,16 +252,16 @@ class TestOracleOICExtE2E:
 
         assert "base_url" in extension.config
         assert "oauth_client_id" in extension.config
-        assert extension.config["base_url"].startswith("https://")
+        assert extension.config["base_url",].startswith("https://")
 
     # Live API test - handle gracefully if credentials not available
     def test_live_integration_status(
         self,
         extension: OracleOICExtension,
-        config: dict[str, Any],
+        config: dict[str, Any,],
     ) -> None:
         """Test live integration status check."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
         # Set the config directly instead of patching _load_config
         extension.config = config
@@ -267,21 +270,21 @@ class TestOracleOICExtE2E:
             # This will make actual API call
             extension.invoke("lifecycle:status", "TEST_INTEGRATION")
         except (ConnectionError, TimeoutError, ValueError, OSError, RuntimeError) as e:
-            if "401" in str(e) or "403" in str(e):
+            if "401" in str(e) or "403" in str(e,):
                 # Authentication failed - verify this is expected in test environment
                 # This confirms authentication failure is expected without live credentials
                 pass
-            elif "404" in str(e):
+            elif "404" in str(e,):
                 # Integration not found is OK for test
                 pass
             else:
-                pytest.fail(f"Unexpected error: {e}")
+                pytest.fail(f"Unexpected error: {e,}")
 
     def test_batch_operations(self, extension: OracleOICExtension) -> None:
         """Test batch operations on multiple integrations."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
-        integrations = ["INT1", "INT2", "INT3"]
+        integrations = ["INT1", "INT2", "INT3",]
 
         # Create a valid config for the test
         test_config = {
@@ -296,7 +299,7 @@ class TestOracleOICExtE2E:
         extension.config = test_config
 
         with patch.object(LifecycleManager, "activate_integration") as mock_activate:
-            mock_activate.return_value = {"status": "ACTIVATED"}
+            mock_activate.return_value = {"status": "ACTIVATED",}
 
             # Activate multiple integrations
             for integration in integrations:
@@ -304,9 +307,8 @@ class TestOracleOICExtE2E:
 
             assert mock_activate.call_count == len(integrations)
 
-    def test_monitoring_alerts(self, config: dict[str, Any]) -> None:
+    def test_monitoring_alerts(self, config: dict[str, Any,]) -> None:
         """Test monitoring alert functionality."""
-        from unittest.mock import Mock
 
         mock_client = Mock()
         service = MonitoringService(client=mock_client)
@@ -326,9 +328,8 @@ class TestOracleOICExtE2E:
         assert "patterns" in analysis
         assert "recommendations" in analysis
 
-    def test_performance_metrics(self, config: dict[str, Any]) -> None:
+    def test_performance_metrics(self, config: dict[str, Any,]) -> None:
         """Test performance metrics collection."""
-        from unittest.mock import Mock
 
         mock_client = Mock()
         service = MonitoringService(client=mock_client)
@@ -356,11 +357,11 @@ class TestOracleOICExtE2E:
     def test_log_extraction(
         self,
         extension: OracleOICExtension,
-        config: dict[str, Any],
+        config: dict[str, Any,],
         tmp_path: Path,
     ) -> None:
         """Test log extraction functionality."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
         # Set config directly on extension instead of patching non-existent method
         extension.config = config
@@ -378,17 +379,17 @@ class TestOracleOICExtE2E:
     def test_full_workflow(
         self,
         extension: OracleOICExtension,
-        config: dict[str, Any],
+        config: dict[str, Any,],
         tmp_path: Path,
     ) -> None:
         """Test complete integration workflow."""
-        os.environ["MELTANO_PROJECT_ROOT"] = str(Path.cwd())
+        os.environ["MELTANO_PROJECT_ROOT",] = str(Path.cwd())
 
         # Set config directly instead of patching _load_config
         extension.config = config
 
         # Mock the initialization to avoid real service creation
-        with patch.object(extension, "_initialize_services"):
+        with patch.object(extension, "_initialize_services",):
             # Set up mock lifecycle manager
             mock_manager = Mock()
             extension.lifecycle_manager = mock_manager
@@ -414,7 +415,7 @@ class TestOracleOICExtE2E:
             extension.invoke("lifecycle:activate", "TEST_INT")
 
             # Note: Use extract:logs which doesn't require lifecycle manager methods
-            with patch("builtins.open", create=True):
+            with patch("builtins.open", create=True,):
                 extension.invoke(
                     "extract:logs",
                     "TEST_INT",
@@ -433,7 +434,7 @@ class TestOracleOICExtE2E:
         # If config doesn't exist, it should be generated
         if not config_path.exists():
             result = subprocess.run(
-                ["python", "generate_config.py"],
+                ["python", "generate_config.py",],
                 capture_output=True,
                 text=True,
                 cwd=Path(__file__).parent.parent,

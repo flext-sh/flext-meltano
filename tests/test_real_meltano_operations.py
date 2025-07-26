@@ -55,9 +55,9 @@ class TestFlextMeltanoProjectOperationsReal:
 
         result = await flext_meltano_setup_project_ultra(
             project_path,
-            taps=["tap-csv"],
-            targets=["target-jsonl"],
-            environments=["dev", "test"],
+            taps=["tap-csv",],
+            targets=["target-jsonl",],
+            environments=["dev", "test",],
         )
 
         # Should handle plugin installation
@@ -68,7 +68,7 @@ class TestFlextMeltanoProjectOperationsReal:
 
             # Should contain information about installed plugins
             if "plugins" in data:
-                plugins = data["plugins"]
+                plugins = data["plugins",]
                 assert isinstance(plugins, dict)
         else:
             # Should provide meaningful error for why setup failed
@@ -118,8 +118,8 @@ class TestFlextMeltanoProjectOperationsReal:
                 assert isinstance(data, dict)
                 # Should have extractors and loaders structure
                 if "extractors" in data and "loaders" in data:
-                    assert isinstance(data["extractors"], list)
-                    assert isinstance(data["loaders"], list)
+                    assert isinstance(data["extractors",], list)
+                    assert isinstance(data["loaders",], list)
             else:
                 # Plugin listing can fail if project is not properly initialized
                 assert plugins_result.error
@@ -169,9 +169,9 @@ class TestFlextMeltanoProjectOperationsIntegration:
         # Step 1: Create project
         setup_result = await flext_meltano_setup_project_ultra(
             project_path,
-            taps=["tap-csv"],
-            targets=["target-csv"],
-            environments=["dev"],
+            taps=["tap-csv",],
+            targets=["target-csv",],
+            environments=["dev",],
         )
 
         # Step 2: If creation succeeded, test management operations
@@ -208,7 +208,7 @@ class TestFlextMeltanoProjectOperationsIntegration:
 
         result = await flext_meltano_setup_project_ultra(
             project_path,
-            environments=["dev", "staging", "prod"],
+            environments=["dev", "staging", "prod",],
         )
 
         # Should handle multiple environments
@@ -218,15 +218,15 @@ class TestFlextMeltanoProjectOperationsIntegration:
 
             # Should contain environment information
             if "environments" in data:
-                environments = data["environments"]
+                environments = data["environments",]
                 assert isinstance(environments, list)
                 # Should contain at least the environments we specified
-                env_names = [env.get("name") if isinstance(env, dict) else str(env) for env in environments]
-                expected_envs = {"dev", "staging", "prod"}
+                env_names = [env.get("name") if isinstance(env, dict) else str(env) for env in environments,]
+                expected_envs = {"dev", "staging", "prod",}
                 created_envs = set(env_names)
                 # At least some of the environments should be created
                 assert len(expected_envs.intersection(created_envs)) > 0
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--tb=short"])
+    pytest.main([__file__, "-v", "--tb=short",])

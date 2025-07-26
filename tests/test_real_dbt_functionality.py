@@ -31,12 +31,12 @@ config-version: 2
 
 profile: 'test_profile'
 
-model-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
+model-paths: ["models",]
+analysis-paths: ["analyses",]
+test-paths: ["tests",]
+seed-paths: ["seeds",]
+macro-paths: ["macros",]
+snapshot-paths: ["snapshots",]
 
 target-path: "target"
 clean-targets:
@@ -69,7 +69,7 @@ test_profile:
 
             # Simple test model
             test_model = """
-{{ config(materialized='table') }}
+{{ config(materialized='table') },}
 
 select
     1 as id,
@@ -84,7 +84,7 @@ select
 
             test_sql = """
 select count(*) as failures
-from {{ ref('test_model') }}
+from {{ ref('test_model') },}
 where id is null
 """
             (tests_dir / "test_model_not_null.sql").write_text(test_sql.strip())
@@ -97,12 +97,15 @@ where id is null
         return FlextMeltanoDbtService(temp_dbt_project)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_run_models_real(self, dbt_service: FlextMeltanoDbtService) -> None:
+    async def test_flext_meltano_dbt_run_models_real(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test real DBT model execution with dbt-core."""
         result = await dbt_service.run_models()
 
         # Should succeed with real DBT project
-        assert result.is_success, f"DBT run failed: {result.error}"
+        assert result.is_success, f"DBT run failed: {(result.error,)}"
 
         # Should return actual run results
         run_results = result.data
@@ -116,28 +119,34 @@ where id is null
                 assert hasattr(run_result, "execution_time")
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_run_specific_models(self, dbt_service: FlextMeltanoDbtService) -> None:
+    async def test_flext_meltano_dbt_run_specific_models(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test running specific DBT models."""
         result = await dbt_service.run_models(models=["test_model"])
 
         # Should succeed with specific model
-        assert result.is_success, f"DBT run failed: {result.error}"
+        assert result.is_success, f"DBT run failed: {(result.error,)}"
 
         run_results = result.data
         assert isinstance(run_results, list)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_test_models_real(self, dbt_service: FlextMeltanoDbtService) -> None:
+    async def test_flext_meltano_dbt_test_models_real(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test real DBT model testing with dbt-core."""
         # First run models to create tables
         run_result = await dbt_service.run_models()
-        assert run_result.is_success, f"Model run failed: {run_result.error}"
+        assert run_result.is_success, f"Model run failed: {(run_result.error,)}"
 
         # Then test models
         test_result = await dbt_service.test_models()
 
         # Should succeed with real DBT project
-        assert test_result.is_success, f"DBT test failed: {test_result.error}"
+        assert test_result.is_success, f"DBT test failed: {(test_result.error,)}"
 
         # Should return actual test results
         test_results = test_result.data
@@ -156,14 +165,20 @@ where id is null
         assert "DBT project not found" in result.error
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_run_with_exclude(self, dbt_service: FlextMeltanoDbtService) -> None:
+    async def test_flext_meltano_dbt_run_with_exclude(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test DBT run with exclude parameter."""
         result = await dbt_service.run_models(exclude=["nonexistent_model"])
 
         # Should succeed even with exclude
-        assert result.is_success, f"DBT run with exclude failed: {result.error}"
+        assert result.is_success, f"DBT run with exclude failed: {(result.error,)}"
 
-    def test_flext_meltano_dbt_get_version(self, dbt_service: FlextMeltanoDbtService) -> None:
+    def test_flext_meltano_dbt_get_version(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test getting DBT version."""
         version = dbt_service.get_dbt_version()
 
@@ -172,7 +187,10 @@ where id is null
         assert len(version) > 0
         assert "." in version  # Version should contain dots
 
-    def test_flext_meltano_dbt_service_execute(self, dbt_service: FlextMeltanoDbtService) -> None:
+    def test_flext_meltano_dbt_service_execute(
+        self,
+        dbt_service: FlextMeltanoDbtService,
+    ) -> None:
         """Test DBT service execute method."""
         result = dbt_service.execute()
 
@@ -180,7 +198,7 @@ where id is null
         assert result.is_success
         data = result.data
         assert isinstance(data, dict)
-        assert data["service"] == "dbt"
+        assert data["service",] == "dbt"
         assert "project_dir" in data
 
 
@@ -201,9 +219,9 @@ config-version: 2
 
 profile: 'complex_profile'
 
-model-paths: ["models"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
+model-paths: ["models",]
+test-paths: ["tests",]
+seed-paths: ["seeds",]
 
 target-path: "target"
 
@@ -235,7 +253,7 @@ complex_profile:
             staging_dir.mkdir(parents=True)
 
             staging_model = """
-{{ config(materialized='view') }}
+{{ config(materialized='view') },}
 
 select
     1 as raw_id,
@@ -249,41 +267,50 @@ select
             marts_dir.mkdir()
 
             marts_model = """
-{{ config(materialized='table') }}
+{{ config(materialized='table') },}
 
 select
     raw_id as id,
     upper(raw_name) as clean_name,
     loaded_at
-from {{ ref('stg_raw_data') }}
+from {{ ref('stg_raw_data') },}
 """
             (marts_dir / "dim_data.sql").write_text(marts_model.strip())
 
             yield project_dir
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_complex_project_run(self, complex_dbt_project: Path) -> None:
+    async def test_flext_meltano_dbt_complex_project_run(
+        self,
+        complex_dbt_project: Path,
+    ) -> None:
         """Test DBT with complex project structure."""
         service = FlextMeltanoDbtService(complex_dbt_project)
 
         # Run all models
         result = await service.run_models()
-        assert result.is_success, f"Complex DBT run failed: {result.error}"
+        assert result.is_success, f"Complex DBT run failed: {(result.error,)}"
 
         # Should have run multiple models
         run_results = result.data
         assert isinstance(run_results, list)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_run_staging_only(self, complex_dbt_project: Path) -> None:
+    async def test_flext_meltano_dbt_run_staging_only(
+        self,
+        complex_dbt_project: Path,
+    ) -> None:
         """Test running only staging models."""
         service = FlextMeltanoDbtService(complex_dbt_project)
 
         result = await service.run_models(models=["staging"])
-        assert result.is_success, f"Staging models run failed: {result.error}"
+        assert result.is_success, f"Staging models run failed: {(result.error,)}"
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_dbt_run_marts_only(self, complex_dbt_project: Path) -> None:
+    async def test_flext_meltano_dbt_run_marts_only(
+        self,
+        complex_dbt_project: Path,
+    ) -> None:
         """Test running only marts models."""
         service = FlextMeltanoDbtService(complex_dbt_project)
 
@@ -293,7 +320,9 @@ from {{ ref('stg_raw_data') }}
 
         # Then run marts
         marts_result = await service.run_models(models=["marts"])
-        assert marts_result.is_success, f"Marts models run failed: {marts_result.error}"
+        assert marts_result.is_success, (
+            f"Marts models run failed: {(marts_result.error,)}"
+        )
 
 
 if __name__ == "__main__":

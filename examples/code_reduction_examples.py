@@ -28,6 +28,7 @@ from flext_meltano import (
 # EXAMPLE 1: Basic Pipeline Execution
 # =============================================================================
 
+
 def example_1_before():
     """Traditional Meltano pipeline execution - 52 lines."""
     # Original implementation with standard Meltano
@@ -83,7 +84,8 @@ def example_1_before():
     # 10. Run with state management
     result = subprocess.run(
         f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
-        check=False, shell=True,
+        check=False,
+        shell=True,
         capture_output=True,
         text=True,
     )
@@ -112,6 +114,7 @@ async def example_1_after():
 # =============================================================================
 # EXAMPLE 2: Batch Processing Multiple Tables
 # =============================================================================
+
 
 def example_2_before():
     """Traditional batch processing - 87 lines."""
@@ -162,7 +165,8 @@ def example_2_before():
 
             result = subprocess.run(
                 f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
-                check=False, shell=True,
+                check=False,
+                shell=True,
                 capture_output=True,
                 text=True,
             )
@@ -198,14 +202,17 @@ def example_2_before():
 
 async def example_2_after():
     """FlextMeltano batch processing - 4 lines."""
-    pipelines = [("tap-postgres", "target-csv") for _ in ["users", "orders", "products", "categories"]]
+    pipelines = [
+        ("tap-postgres", "target-csv")
+        for _ in ["users", "orders", "products", "categories"]
+    ]
     return await flext_meltano_batch_execute_ultra(pipelines)
-
 
 
 # =============================================================================
 # EXAMPLE 3: Project Setup with Multiple Environments
 # =============================================================================
+
 
 def example_3_before():
     """Traditional project setup - 143 lines."""
@@ -219,7 +226,10 @@ def example_3_before():
     os.chdir(project_path)
 
     # 2. Run meltano init
-    subprocess.run([shutil.which("meltano") or "meltano", "init", ".", "--no_usage_stats"], check=True)
+    subprocess.run(
+        [shutil.which("meltano") or "meltano", "init", ".", "--no_usage_stats"],
+        check=True,
+    )
 
     # 3. Load project
     Project.find(project_path)
@@ -229,14 +239,14 @@ def example_3_before():
     for extractor in extractors:
         try:
             subprocess.run(
-                ["meltano", "add", "extractor", extractor],
+                ["meltano", "add", "extractor", extractor],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
         except subprocess.CalledProcessError:
             # Try alternative variant
             subprocess.run(
-                ["meltano", "add", "extractor", extractor, "--variant", "meltanolabs"],
+                ["meltano", "add", "extractor", extractor, "--variant", "meltanolabs"],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
@@ -246,21 +256,21 @@ def example_3_before():
     for loader in loaders:
         try:
             subprocess.run(
-                ["meltano", "add", "loader", loader],
+                ["meltano", "add", "loader", loader],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
         except subprocess.CalledProcessError:
             # Try alternative variant
             subprocess.run(
-                ["meltano", "add", "loader", loader, "--variant", "meltanolabs"],
+                ["meltano", "add", "loader", loader, "--variant", "meltanolabs"],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
 
     # 6. Add transformers
     subprocess.run(
-        ["meltano", "add", "transformer", "dbt-postgres"],
+        ["meltano", "add", "transformer", "dbt-postgres"],  # noqa: S607
         check=True,
         cwd=project_path,
     )
@@ -269,7 +279,7 @@ def example_3_before():
     environments = ["dev", "staging", "prod"]
     for env_name in environments:
         subprocess.run(
-            ["meltano", "environment", "add", env_name],
+            ["meltano", "environment", "add", env_name],  # noqa: S607
             check=True,
             cwd=project_path,
         )
@@ -284,7 +294,7 @@ def example_3_before():
 
     for key, value in dev_config.items():
         subprocess.run(
-            ["meltano", "config", "tap-postgres", "set", key, str(value)],
+            ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
             env={**os.environ, "MELTANO_ENVIRONMENT": "dev"},
@@ -300,7 +310,7 @@ def example_3_before():
 
     for key, value in staging_config.items():
         subprocess.run(
-            ["meltano", "config", "tap-postgres", "set", key, str(value)],
+            ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
             env={**os.environ, "MELTANO_ENVIRONMENT": "staging"},
@@ -316,7 +326,7 @@ def example_3_before():
 
     for key, value in prod_config.items():
         subprocess.run(
-            ["meltano", "config", "tap-postgres", "set", key, str(value)],
+            ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
             env={**os.environ, "MELTANO_ENVIRONMENT": "prod"},
@@ -330,14 +340,22 @@ def example_3_before():
 
     for schedule_name, tasks, interval in schedules:
         subprocess.run(
-            ["meltano", "schedule", "add", schedule_name, tasks, "--interval", interval],
+            [
+                "meltano",
+                "schedule",
+                "add",
+                schedule_name,
+                tasks,
+                "--interval",
+                interval,
+            ],
             check=True,
             cwd=project_path,
         )
 
     # 12. Test installation
     subprocess.run(
-        ["meltano", "install"],
+        ["meltano", "install"],  # noqa: S607
         check=True,
         cwd=project_path,
     )
@@ -368,6 +386,7 @@ async def example_3_after():
 # EXAMPLE 4: Discovery and Automatic Pipeline Execution
 # =============================================================================
 
+
 def example_4_before():
     """Traditional discovery + execution - 78 lines."""
     project = Project.find()
@@ -377,7 +396,7 @@ def example_4_before():
     job = Job(
         project=project,
         session=project.start_session(),
-        run_id=f"discovery_{int(time.time())}",
+        run_id=f"discovery_{(int(time.time()),)}",
     )
 
     # 2. Get tap
@@ -390,13 +409,14 @@ def example_4_before():
 
     discover_result = subprocess.run(
         discover_cmd,
-        check=False, stdout=open(catalog_path, "w"),
+        check=False,
+        stdout=open(catalog_path, "w"),
         stderr=subprocess.PIPE,
         text=True,
     )
 
     if discover_result.returncode != 0:
-        msg = f"Discovery failed: {discover_result.stderr}"
+        msg = f"Discovery failed: {(discover_result.stderr,)}"
         raise RuntimeError(msg)
 
     # 4. Load and analyze catalog
@@ -410,8 +430,8 @@ def example_4_before():
     for stream in streams:
         if "metadata" not in stream:
             stream["metadata"] = [{"breadcrumb": [], "metadata": {}}]
-        stream["metadata"][0]["metadata"]["selected"] = True
-        stream["metadata"][0]["metadata"]["replication-method"] = "FULL_TABLE"
+        stream["metadata"][0]["metadata"]["selected",] = True
+        stream["metadata"][0]["metadata"]["replication-method",] = "FULL_TABLE"
 
     # 6. Save modified catalog
     with open(catalog_path, "w") as f:
@@ -419,7 +439,7 @@ def example_4_before():
 
     # 7. Configure job with catalog
     tap_config = job.plugin_config_for_plugin(tap)
-    tap_config["catalog"] = catalog_path
+    tap_config["catalog",] = catalog_path
 
     # 8. Execute pipeline
     start_time = time.time()
@@ -428,7 +448,8 @@ def example_4_before():
 
     result = subprocess.run(
         f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
-        check=False, shell=True,
+        check=False,
+        shell=True,
         capture_output=True,
         text=True,
     )
@@ -456,7 +477,9 @@ def example_4_before():
 
 async def example_4_after():
     """FlextMeltano discovery + execution - 1 line."""
-    catalog, result = await flext_meltano_discover_and_run_ultra("tap-postgres", "target-csv")
+    catalog, result = await flext_meltano_discover_and_run_ultra(
+        "tap-postgres", "target-csv",
+    )
     return catalog, result
 
 
@@ -464,13 +487,29 @@ async def example_4_after():
 # DEMONSTRATION SCRIPT
 # =============================================================================
 
+
 async def demonstrate_code_reduction() -> None:
     """Demonstrate code reduction examples."""
     examples = [
-        ("Basic Pipeline Execution", "52 lines → 1 line", example_1_before, example_1_after),
-        ("Batch Table Processing", "87 lines → 4 lines", example_2_before, example_2_after),
+        (
+            "Basic Pipeline Execution",
+            "52 lines → 1 line",
+            example_1_before,
+            example_1_after,
+        ),
+        (
+            "Batch Table Processing",
+            "87 lines → 4 lines",
+            example_2_before,
+            example_2_after,
+        ),
         ("Project Setup", "143 lines → 6 lines", example_3_before, example_3_after),
-        ("Discovery + Execution", "78 lines → 1 line", example_4_before, example_4_after),
+        (
+            "Discovery + Execution",
+            "78 lines → 1 line",
+            example_4_before,
+            example_4_after,
+        ),
     ]
 
     for _name, _reduction, _before_func, _after_func in examples:

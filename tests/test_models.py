@@ -106,9 +106,9 @@ class TestFlextMeltanoPlugins:
         )
 
         assert len(plugins.extractors) == 1
-        assert plugins.extractors[0].name == "tap-csv"
+        assert plugins.extractors[0,].name == "tap-csv"
         assert len(plugins.loaders) == 1
-        assert plugins.loaders[0].name == "target-jsonl"
+        assert plugins.loaders[0,].name == "target-jsonl"
 
 
 class TestFlextMeltanoJob:
@@ -238,8 +238,8 @@ class TestModelIntegration:
 
         # Test dict conversion
         plugin_dict = original.model_dump()
-        assert plugin_dict["name"] == "test-plugin"
-        assert plugin_dict["config"] == {"setting": "value"}
+        assert plugin_dict["name",] == "test-plugin"
+        assert plugin_dict["config",] == {"setting": "value"}
 
         # Test reconstruction from dict
         reconstructed = FlextMeltanoPlugin.model_validate(plugin_dict)

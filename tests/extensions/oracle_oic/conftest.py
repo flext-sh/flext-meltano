@@ -10,6 +10,7 @@ import os
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from flext_oracle_oic_ext.extension import OracleOICExtension
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -17,11 +18,11 @@ if TYPE_CHECKING:
 
 # Test environment setup
 @pytest.fixture(autouse=True)
-def set_test_environment() -> Generator[None]:
+def set_test_environment() -> Generator[None,]:
     """Set test environment variables."""
-    os.environ["FLEXT_ENV"] = "test"
-    os.environ["FLEXT_LOG_LEVEL"] = "debug"
-    os.environ["OIC_TEST_MODE"] = "true"
+    os.environ["FLEXT_ENV",] = "test"
+    os.environ["FLEXT_LOG_LEVEL",] = "debug"
+    os.environ["OIC_TEST_MODE",] = "true"
     yield
     # Cleanup
     os.environ.pop("FLEXT_ENV", None)
@@ -47,7 +48,6 @@ def oic_connection_config() -> dict[str, Any]:
 @pytest.fixture
 def oic_client(oic_connection_config: dict[str, Any]) -> Any:
     """Oracle OIC extension for testing."""
-    from flext_oracle_oic_ext.extension import OracleOICExtension
 
     extension = OracleOICExtension()
     extension.config = oic_connection_config
@@ -279,7 +279,7 @@ def integration_instance_data() -> dict[str, Any]:
 
 # Error handling fixtures
 @pytest.fixture
-def error_scenarios() -> list[dict[str, Any]]:
+def error_scenarios() -> list[dict[str, Any],]:
     """Error scenarios for testing."""
     return [
         {
@@ -393,49 +393,49 @@ def mock_oic_service() -> Any:
             self,
             integration_def: dict[str, Any],
         ) -> dict[str, Any]:
-            integration_id = integration_def["id"]
+            integration_id = integration_def["id",]
             integration = {
                 **integration_def,
                 "created_at": "2023-01-01T12:00:00Z",
                 "status": "draft",
                 "version": integration_def.get("version", "1.0.0"),
             }
-            self.integrations[integration_id] = integration
+            self.integrations[integration_id,] = integration
             return integration
 
         async def deploy_integration(self, integration_id: str) -> dict[str, Any]:
             if integration_id not in self.integrations:
-                msg = f"Integration {integration_id} not found"
+                msg = f"Integration {(integration_id,)} not found"
                 raise ValueError(msg)
 
-            self.integrations[integration_id]["status"] = "active"
+            self.integrations[integration_id]["status",] = "active"
 
             instance = {
-                "instance_id": f"INST_{len(self.instances) + 1:03d}",
+                "instance_id": f"INST_{len(self.instances) + 1:03d,}",
                 "integration_id": integration_id,
                 "status": "running",
                 "deployed_at": "2023-01-01T12:05:00Z",
             }
 
-            self.instances[instance["instance_id"]] = instance
+            self.instances[instance["instance_id"],] = instance
             return instance
 
         async def create_connection(
             self,
             connection_def: dict[str, Any],
         ) -> dict[str, Any]:
-            connection_id = connection_def["id"]
+            connection_id = connection_def["id",]
             connection = {
                 **connection_def,
                 "created_at": "2023-01-01T12:00:00Z",
                 "status": "configured",
             }
-            self.connections[connection_id] = connection
+            self.connections[connection_id,] = connection
             return connection
 
         async def test_connection(self, connection_id: str) -> dict[str, Any]:
             if connection_id not in self.connections:
-                msg = f"Connection {connection_id} not found"
+                msg = f"Connection {(connection_id,)} not found"
                 raise ValueError(msg)
 
             return {
