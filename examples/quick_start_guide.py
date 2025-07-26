@@ -5,12 +5,24 @@ Guia completo para começar rapidamente com a nova API ultra-simplificada.
 Cada exemplo é funcional e pode ser executado independentemente.
 """
 
+from flext_meltano.helpers.boilerplate_reducers import with_error_handling
+
 from __future__ import annotations
 
 import asyncio
 import datetime
 
 from flext_meltano import (
+
+# Timeout constants to avoid magic numbers
+DEFAULT_TIMEOUT = 300
+DISCOVERY_TIMEOUT = 60
+DEFAULT_POSTGRES_PORT = 5432
+DEFAULT_ORACLE_PORT = 1521
+DEFAULT_MYSQL_PORT = 3306
+BACKOFF_BASE = 2
+
+
     BatchProcessor,
     FlextMeltano,
     MeltanoProject,
@@ -48,7 +60,7 @@ def quick_start_with_configuration() -> None:
     result = fm.run(
         "tap-postgres",
         "target-csv",
-        select=["users", "orders"],  # Apenas tabelas específicas
+        select=["users", "orders",],  # Apenas tabelas específicas
         full_refresh=True,           # Ignorar estado anterior
     )
 
@@ -90,14 +102,14 @@ def enterprise_project_setup() -> None:
                 "target-postgres",
                 transform="dbt-postgres:run",
                 schedule="@daily",
-                select=["users", "orders", "products"],
+                select=["users", "orders", "products",],
             ),
             PipelineSpec(
                 "hourly_incremental",
                 "tap-postgres",
                 "target-postgres",
                 schedule="0 * * * *",
-                select=["events", "user_sessions"],
+                select=["events", "user_sessions",],
             ),
         ],
     )
@@ -131,7 +143,7 @@ def batch_processing_example() -> None:
     # 📊 Análise de resultados
     sum(results.values())
     len(results)
-    failed_tables = [table for table, success in results.items() if not success]
+    failed_tables = [table for table, success in results.items() if not success,]
 
     if failed_tables:
         pass
@@ -146,9 +158,9 @@ def advanced_batch_processing() -> None:
     )
 
     # 📋 Diferentes grupos de tabelas
-    critical_tables = ["users", "orders", "payments"]
-    audit_tables = ["user_sessions", "events", "logs"]
-    reference_tables = ["products", "categories", "suppliers"]
+    critical_tables = ["users", "orders", "payments",]
+    audit_tables = ["user_sessions", "events", "logs",]
+    reference_tables = ["products", "categories", "suppliers",]
 
     # 🔄 Processamento sequencial para tabelas críticas
     critical_results = processor.process_tables(
@@ -171,7 +183,7 @@ def advanced_batch_processing() -> None:
     )
 
     # 📈 Consolidação de resultados
-    all_results = {**critical_results, **audit_results, **ref_results}
+    all_results = {**critical_results, **audit_results, **ref_results,}
     sum(r.success for r in all_results.values()) / len(all_results)
 
 
@@ -185,7 +197,7 @@ def data_discovery_workflow() -> None:
     project_root = "/tmp/discovery_project"
 
     # 🔌 Teste de conectividade - 1 linha
-    if not test_tap_connection("tap-postgres", project_root=project_root):
+    if not test_tap_connection("tap-postgres", project_root=project_root,):
         return
 
 
@@ -196,27 +208,27 @@ def data_discovery_workflow() -> None:
     streams = catalog.get("streams", [])
 
     # 🔍 Detalhes das tabelas principais
-    for stream in streams[:10]:  # Primeiras 10 tabelas
+    for stream in streams[:10,]:  # Primeiras 10 tabelas
         stream.get("tap_stream_id", "unknown")
         schema = stream.get("schema", {})
         properties = schema.get("properties", {})
         len(properties)
 
         # Identificar tipos de campos principais
-        field_types = [prop.get("type", "unknown") for prop in properties.values()]
-        {t: field_types.count(t) for t in set(field_types)}
+        field_types = [prop.get("type", "unknown") for prop in properties.values(),]
+        {t: field_types.count(t) for t in set(field_types),}
 
 
     # 🎯 Setup automático baseado na descoberta
     fm = FlextMeltano(project_root=project_root)
 
     # 📈 Teste de extração com tabelas pequenas primeiro
-    small_tables = [s["tap_stream_id"] for s in streams[:3]]  # Primeiras 3 tabelas
+    small_tables = [s["tap_stream_id"] for s in streams[:3],]  # Primeiras 3 tabelas
 
     for table in small_tables:
         result = fm.run(
             "tap-postgres", "target-csv",
-            select=[table],
+            select=[table,],
             dry_run=True,  # Apenas validação
         )
 
@@ -245,12 +257,12 @@ async def async_pipeline_workflow() -> None:
     try:
         results = await asyncio.wait_for(
             asyncio.gather(*tasks, return_exceptions=True),
-            timeout=300,  # 5 minutos máximo
+            timeout=DEFAULT_TIMEOUT,  # 5 minutos máximo
         )
 
         # 📊 Análise de resultados paralelos
-        for _i, result in enumerate(results):
-            if isinstance(result, Exception):
+        for _i, result in enumerate(results,):
+            if isinstance(result, Exception,):
                 pass
             else:
                 pass
@@ -272,7 +284,7 @@ def health_monitoring_example() -> None:
 
     # 📊 Dashboard de saúde
 
-    if health["healthy"]:
+    if health["healthy",]:
         pass
     else:
         pass
@@ -288,8 +300,8 @@ def health_monitoring_example() -> None:
     "✅ Configurado" if database.get("configured") else "❌ Não configurado"
 
     # 🔔 Alertas automáticos
-    if not health["healthy"]:
-        for issue in health["issues"]:
+    if not health["healthy",]:
+        for issue in health["issues",]:
             if "CLI" in issue or "Database" in issue or "plugins" in issue:
                 pass
 
@@ -313,7 +325,7 @@ def backup_and_recovery_example() -> None:
 
     # 📅 Backup com timestamp
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = f"/backups/meltano_project_{timestamp}"
+    backup_path = f"/backups/meltano_project_{timestamp,}"
 
     # 💾 BACKUP COMPLETO - 1 linha vs 30+ manuais
     backup_result = project.backup_project(backup_path)
@@ -328,7 +340,7 @@ def backup_and_recovery_example() -> None:
 
     # 🏥 Backup com verificação de saúde
     health = project.health_check()
-    if health["healthy"]:
+    if health["healthy",]:
         pass
     else:
         pass
@@ -345,12 +357,12 @@ def real_world_etl_workflow() -> None:
     fm = FlextMeltano("/tmp/ecommerce_project", environment="prod")
 
     # 1️⃣ DADOS CRÍTICOS (sequencial para garantir consistência)
-    critical_tables = ["customers", "orders", "payments"]
+    critical_tables = ["customers", "orders", "payments",]
 
     for table in critical_tables:
         fm.run(
             "tap-postgres-prod", "target-warehouse",
-            select=[table],
+            select=[table,],
             full_refresh=False,  # Incremental para performance
         )
 
@@ -385,7 +397,7 @@ def real_world_etl_workflow() -> None:
     # 4️⃣ TRANSFORMAÇÕES DBT
     fm.run(
         "dbt-warehouse", "dbt-warehouse",  # DBT plugin especial
-        select=["marts", "staging"],
+        select=["marts", "staging",],
     )
 
     # 📊 RESUMO FINAL

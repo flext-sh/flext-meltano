@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import flext_oracle_oic_ext.__version__ as version_module
 from flext_oracle_oic_ext import __version__
 
 
@@ -22,7 +23,6 @@ def test_version_module_functions() -> None:
 
 def test_version_attributes_exist() -> None:
     """Test that version attributes exist and have expected types."""
-    import flext_oracle_oic_ext.__version__ as version_module
 
     # Test __version__ exists and is string
     assert hasattr(version_module, "__version__")

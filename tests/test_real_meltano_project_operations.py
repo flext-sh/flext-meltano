@@ -27,7 +27,10 @@ class TestRealMeltanoProjectOperations:
             yield Path(tmpdir)
 
     @pytest.mark.asyncio
-    async def test_real_project_setup_with_meltano_core(self, temp_project_dir: Path) -> None:
+    async def test_real_project_setup_with_meltano_core(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test real project setup using meltano-core integration."""
         project_path = temp_project_dir / "test_project"
 
@@ -40,13 +43,13 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate setup result
-        assert result.is_success, f"Project setup failed: {result.error}"
+        assert result.is_success, f"Project setup failed: {(result.error,)}"
         setup_data = result.data
 
         # Validate project was created
-        assert setup_data["project_path"] == str(project_path)
-        assert setup_data["ready"] is True
-        assert len(setup_data["environments_created"]) >= 1  # At least one environment
+        assert setup_data["project_path",] == str(project_path)
+        assert setup_data["ready",] is True
+        assert len(setup_data["environments_created",]) >= 1  # At least one environment
 
         # Validate project directory exists
         assert project_path.exists()
@@ -81,13 +84,17 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate status result
-        assert status_result.is_success, f"Status retrieval failed: {status_result.error}"
+        assert status_result.is_success, (
+            f"Status retrieval failed: {(status_result.error,)}"
+        )
         status_data = status_result.data
 
         # Validate status contains expected fields
         assert "project_path" in status_data or "project_name" in status_data
         assert "meltano_version" in status_data
-        assert status_data["meltano_version"] != "not_available"  # Should detect version
+        assert (
+            status_data["meltano_version",] != "not_available"
+        )  # Should detect version
 
     @pytest.mark.asyncio
     async def test_real_project_plugins_listing(self, temp_project_dir: Path) -> None:
@@ -119,11 +126,11 @@ class TestRealMeltanoProjectOperations:
 
             # Validate at least some plugins were installed
             total_plugins = (
-                len(plugins_data.get("extractors", [])) +
-                len(plugins_data.get("loaders", [])) +
-                len(plugins_data.get("transforms", [])) +
-                len(plugins_data.get("orchestrators", [])) +
-                len(plugins_data.get("utilities", []))
+                len(plugins_data.get("extractors", []))
+                + len(plugins_data.get("loaders", []))
+                + len(plugins_data.get("transforms", []))
+                + len(plugins_data.get("orchestrators", []))
+                + len(plugins_data.get("utilities", []))
             )
 
             # Should have at least 1 plugin (even if installation partially failed)
@@ -131,10 +138,16 @@ class TestRealMeltanoProjectOperations:
         else:
             # Plugin listing may fail if meltano-core is not available
             # This is acceptable for testing
-            assert "not found" in plugins_result.error.lower() or "import" in plugins_result.error.lower()
+            assert (
+                "not found" in plugins_result.error.lower()
+                or "import" in plugins_result.error.lower()
+            )
 
     @pytest.mark.asyncio
-    async def test_real_project_environments_listing(self, temp_project_dir: Path) -> None:
+    async def test_real_project_environments_listing(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test real project environments listing using meltano-core."""
         project_path = temp_project_dir / "env_test_project"
 
@@ -159,16 +172,22 @@ class TestRealMeltanoProjectOperations:
 
             # Should have environments structure
             assert "environments" in env_data
-            assert isinstance(env_data["environments"], list)
+            assert isinstance(env_data["environments",], list)
 
             # Should have at least one environment
-            assert len(env_data["environments"]) >= 0  # Basic validation
+            assert len(env_data["environments",]) >= 0  # Basic validation
         else:
             # Environment listing may fail if meltano-core is not available
-            assert "not found" in env_result.error.lower() or "import" in env_result.error.lower()
+            assert (
+                "not found" in env_result.error.lower()
+                or "import" in env_result.error.lower()
+            )
 
     @pytest.mark.asyncio
-    async def test_real_project_pipeline_execution(self, temp_project_dir: Path) -> None:
+    async def test_real_project_pipeline_execution(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test real pipeline execution using meltano-core."""
         project_path = temp_project_dir / "pipeline_test_project"
 
@@ -197,9 +216,9 @@ class TestRealMeltanoProjectOperations:
             assert "tap" in run_data
             assert "target" in run_data
             assert "duration_seconds" in run_data
-            assert run_data["tap"] == "tap-csv"
-            assert run_data["target"] == "target-csv"
-            assert run_data["duration_seconds"] >= 0
+            assert run_data["tap",] == "tap-csv"
+            assert run_data["target",] == "target-csv"
+            assert run_data["duration_seconds",] >= 0
 
             # Success or failure is both acceptable (plugins may not be fully installed)
             assert "success" in run_data
@@ -213,7 +232,9 @@ class TestRealMeltanoProjectOperations:
                 "command not found",
                 "executable not found",
             ]
-            assert any(failure in run_result.error.lower() for failure in expected_failures)
+            assert any(
+                failure in run_result.error.lower() for failure in expected_failures
+            )
 
     @pytest.mark.asyncio
     async def test_real_fallback_project_creation(self, temp_project_dir: Path) -> None:
@@ -229,21 +250,25 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Should succeed with either real or fallback setup
-        assert result.is_success, f"Fallback project setup failed: {result.error}"
+        assert result.is_success, f"Fallback project setup failed: {(result.error,)}"
         setup_data = result.data
 
         # Basic validation
-        assert setup_data["project_path"] == str(project_path)
-        assert setup_data["ready"] is True
+        assert setup_data["project_path",] == str(project_path)
+        assert setup_data["ready",] is True
         assert project_path.exists()
 
         # Should have either real meltano.yml or fallback structure
         meltano_yml = project_path / "meltano.yml"
         meltano_json = project_path / "meltano.json"
 
-        assert meltano_yml.exists() or meltano_json.exists() or any(
-            (project_path / dirname).exists()
-            for dirname in ["extract", "load", "transform", "analyze"]
+        assert (
+            meltano_yml.exists()
+            or meltano_json.exists()
+            or any(
+                (project_path / dirname).exists()
+                for dirname in ["extract", "load", "transform", "analyze"]
+            )
         )
 
     @pytest.mark.asyncio
@@ -274,7 +299,7 @@ class TestRealMeltanoProjectOperations:
 
             # Should contain plugin config info
             assert "plugin" in config_data
-            assert config_data["plugin"] == "tap-csv"
+            assert config_data["plugin",] == "tap-csv"
             assert "config" in config_data
         else:
             # Config management may fail if plugin doesn't exist or meltano-core unavailable
@@ -284,7 +309,9 @@ class TestRealMeltanoProjectOperations:
                 "import",
                 "not found",
             ]
-            assert any(failure in config_result.error.lower() for failure in expected_failures)
+            assert any(
+                failure in config_result.error.lower() for failure in expected_failures
+            )
 
     @pytest.mark.asyncio
     async def test_real_error_handling_invalid_project_path(self) -> None:
@@ -298,10 +325,16 @@ class TestRealMeltanoProjectOperations:
         )
 
         assert result.is_failure
-        assert "does not exist" in result.error.lower() or "not found" in result.error.lower()
+        assert (
+            "does not exist" in result.error.lower()
+            or "not found" in result.error.lower()
+        )
 
     @pytest.mark.asyncio
-    async def test_real_error_handling_invalid_action(self, temp_project_dir: Path) -> None:
+    async def test_real_error_handling_invalid_action(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test error handling with invalid action."""
         project_path = temp_project_dir / "invalid_action_test"
         project_path.mkdir(parents=True, exist_ok=True)
@@ -316,7 +349,9 @@ class TestRealMeltanoProjectOperations:
         )
 
         assert result.is_failure
-        assert "unsupported" in result.error.lower() or "not found" in result.error.lower()
+        assert (
+            "unsupported" in result.error.lower() or "not found" in result.error.lower()
+        )
 
 
 class TestRealMeltanoProjectIntegration:
@@ -329,7 +364,10 @@ class TestRealMeltanoProjectIntegration:
             yield Path(tmpdir)
 
     @pytest.mark.asyncio
-    async def test_real_end_to_end_project_workflow(self, temp_project_dir: Path) -> None:
+    async def test_real_end_to_end_project_workflow(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test complete end-to-end project workflow."""
         project_path = temp_project_dir / "e2e_test_project"
 

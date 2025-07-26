@@ -38,13 +38,19 @@ class TestFlextMeltanoCore:
         return FlextMeltanoCore(temp_project_dir)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_run_real_pipeline(self, core: FlextMeltanoCore) -> None:
+    async def test_flext_meltano_run_real_pipeline(
+        self,
+        core: FlextMeltanoCore,
+    ) -> None:
         """Test real pipeline execution using core API."""
         result = await core.flext_meltano_run("tap-csv", "target-csv")
 
         # Validate real execution
         assert isinstance(result.pipeline_id, str)
-        assert result.state in [FlextMeltanoExecutionState.COMPLETED, FlextMeltanoExecutionState.FAILED]
+        assert result.state in [
+            FlextMeltanoExecutionState.COMPLETED,
+            FlextMeltanoExecutionState.FAILED,
+        ]
         assert result.duration_seconds >= 0
 
         if result.state == FlextMeltanoExecutionState.COMPLETED:
@@ -53,7 +59,10 @@ class TestFlextMeltanoCore:
             assert result.error_message is not None
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_discover_real_catalog(self, core: FlextMeltanoCore) -> None:
+    async def test_flext_meltano_discover_real_catalog(
+        self,
+        core: FlextMeltanoCore,
+    ) -> None:
         """Test real catalog discovery using core API."""
         catalog = await core.flext_meltano_discover("tap-csv")
 
@@ -61,7 +70,10 @@ class TestFlextMeltanoCore:
         assert isinstance(catalog, dict)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_test_connection_real(self, core: FlextMeltanoCore) -> None:
+    async def test_flext_meltano_test_connection_real(
+        self,
+        core: FlextMeltanoCore,
+    ) -> None:
         """Test real tap connection testing."""
         is_connected = await core.flext_meltano_test_connection("tap-csv")
 
@@ -126,7 +138,10 @@ class TestFlextMeltanoProject:
         return FlextMeltanoProject(temp_project_dir / "test_project")
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_create_real_project(self, project: FlextMeltanoProject) -> None:
+    async def test_flext_meltano_create_real_project(
+        self,
+        project: FlextMeltanoProject,
+    ) -> None:
         """Test real project creation."""
         success = await project.flext_meltano_create(
             taps=["tap-csv"],
@@ -142,7 +157,10 @@ class TestFlextMeltanoProject:
             assert project.project_path.exists()
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_status_real_project(self, project: FlextMeltanoProject) -> None:
+    async def test_flext_meltano_status_real_project(
+        self,
+        project: FlextMeltanoProject,
+    ) -> None:
         """Test real project status retrieval."""
         # First create project
         await project.flext_meltano_create()
@@ -153,7 +171,10 @@ class TestFlextMeltanoProject:
         assert isinstance(status, dict)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_list_plugins_real(self, project: FlextMeltanoProject) -> None:
+    async def test_flext_meltano_list_plugins_real(
+        self,
+        project: FlextMeltanoProject,
+    ) -> None:
         """Test real plugin listing."""
         # First create project
         await project.flext_meltano_create()
@@ -164,11 +185,14 @@ class TestFlextMeltanoProject:
         assert isinstance(plugins, dict)
         assert "extractors" in plugins
         assert "loaders" in plugins
-        assert isinstance(plugins["extractors"], list)
-        assert isinstance(plugins["loaders"], list)
+        assert isinstance(plugins["extractors",], list)
+        assert isinstance(plugins["loaders",], list)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_run_pipeline_project(self, project: FlextMeltanoProject) -> None:
+    async def test_flext_meltano_run_pipeline_project(
+        self,
+        project: FlextMeltanoProject,
+    ) -> None:
         """Test real pipeline execution in project."""
         # First create project
         created = await project.flext_meltano_create(
@@ -199,7 +223,10 @@ class TestFlextMeltanoBatch:
         return FlextMeltanoBatch(temp_project_dir)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_run_parallel_real(self, batch: FlextMeltanoBatch) -> None:
+    async def test_flext_meltano_run_parallel_real(
+        self,
+        batch: FlextMeltanoBatch,
+    ) -> None:
         """Test real parallel pipeline execution."""
         pipelines = [
             ("tap-csv", "target-csv"),
@@ -218,7 +245,10 @@ class TestFlextMeltanoBatch:
             assert hasattr(result, "state")
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_run_sequential_real(self, batch: FlextMeltanoBatch) -> None:
+    async def test_flext_meltano_run_sequential_real(
+        self,
+        batch: FlextMeltanoBatch,
+    ) -> None:
         """Test real sequential pipeline execution."""
         pipelines = [
             ("tap-csv", "target-csv"),
@@ -232,9 +262,15 @@ class TestFlextMeltanoBatch:
         assert len(results) == len(pipelines)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_discover_and_run_real(self, batch: FlextMeltanoBatch) -> None:
+    async def test_flext_meltano_discover_and_run_real(
+        self,
+        batch: FlextMeltanoBatch,
+    ) -> None:
         """Test real discover and run functionality."""
-        catalog, result = await batch.flext_meltano_discover_and_run("tap-csv", "target-csv")
+        catalog, result = await batch.flext_meltano_discover_and_run(
+            "tap-csv",
+            "target-csv",
+        )
 
         # Should return catalog and result
         assert isinstance(catalog, dict)
@@ -255,7 +291,9 @@ class TestOneLinerFunctions:
     async def test_flext_meltano_pipeline_async(self, temp_project_dir: Path) -> None:
         """Test async one-liner pipeline function."""
         result = await flext_meltano_pipeline(
-            "tap-csv", "target-csv", project_root=temp_project_dir,
+            "tap-csv",
+            "target-csv",
+            project_root=temp_project_dir,
         )
 
         # Should return pipeline result
@@ -266,7 +304,9 @@ class TestOneLinerFunctions:
     def test_flext_meltano_pipeline_sync(self, temp_project_dir: Path) -> None:
         """Test synchronous one-liner pipeline function."""
         result = flext_meltano_pipeline_sync(
-            "tap-csv", "target-csv", project_root=temp_project_dir,
+            "tap-csv",
+            "target-csv",
+            project_root=temp_project_dir,
         )
 
         # Should return pipeline result
@@ -275,7 +315,10 @@ class TestOneLinerFunctions:
         assert result.state in list(FlextMeltanoExecutionState)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_create_project_oneliner(self, temp_project_dir: Path) -> None:
+    async def test_flext_meltano_create_project_oneliner(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test one-liner project creation."""
         project_path = temp_project_dir / "oneliner_project"
 
@@ -289,7 +332,10 @@ class TestOneLinerFunctions:
         assert isinstance(success, bool)
 
     @pytest.mark.asyncio
-    async def test_flext_meltano_batch_run_oneliner(self, temp_project_dir: Path) -> None:
+    async def test_flext_meltano_batch_run_oneliner(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test one-liner batch execution."""
         pipelines = [
             ("tap-csv", "target-csv"),
@@ -328,7 +374,11 @@ class TestCodeReductionValidation:
         # Total: 50+ lines
 
         # New approach: 1 line
-        result = await flext_meltano_pipeline("tap-csv", "target-csv", project_root=temp_project_dir)
+        result = await flext_meltano_pipeline(
+            "tap-csv",
+            "target-csv",
+            project_root=temp_project_dir,
+        )
 
         # Validate it works exactly like traditional approach
         assert result.pipeline_id
@@ -360,7 +410,10 @@ class TestCodeReductionValidation:
         assert isinstance(success, bool)
 
     @pytest.mark.asyncio
-    async def test_batch_processing_code_reduction(self, temp_project_dir: Path) -> None:
+    async def test_batch_processing_code_reduction(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Validate batch processing code reduction."""
         pipelines = [
             ("tap-csv", "target-csv"),
@@ -375,7 +428,10 @@ class TestCodeReductionValidation:
         # Total: 100+ lines for 2 pipelines
 
         # New approach: 1 line
-        results = await flext_meltano_batch_run(pipelines, project_root=temp_project_dir)
+        results = await flext_meltano_batch_run(
+            pipelines,
+            project_root=temp_project_dir,
+        )
 
         # Validate it works exactly like traditional approach
         assert isinstance(results, dict)

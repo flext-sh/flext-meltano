@@ -40,11 +40,11 @@ class TestConsolidatedTemplates:
         """Test CSV tap template structure."""
         assert isinstance(FLEXT_MELTANO_CSV_TAP_TEMPLATE, dict)
         assert "files" in FLEXT_MELTANO_CSV_TAP_TEMPLATE
-        files = FLEXT_MELTANO_CSV_TAP_TEMPLATE["files"]
+        files = FLEXT_MELTANO_CSV_TAP_TEMPLATE["files",]
         assert isinstance(files, list)
         assert len(files) > 0
-        assert "entity" in files[0]
-        assert "path" in files[0]
+        assert "entity" in files[0,]
+        assert "path" in files[0,]
 
     def test_flext_meltano_postgres_tap_template(self) -> None:
         """Test PostgreSQL tap template structure."""
@@ -54,9 +54,9 @@ class TestConsolidatedTemplates:
         for field in required_fields:
             assert field in template
 
-        assert template["host"] == "localhost"
-        assert template["port"] == 5432
-        assert template["database"] == "postgres"
+        assert template["host",] == "localhost"
+        assert template["port",] == 5432
+        assert template["database",] == "postgres"
 
     def test_flext_meltano_oracle_tap_template(self) -> None:
         """Test Oracle tap template structure."""
@@ -66,15 +66,15 @@ class TestConsolidatedTemplates:
         for field in required_fields:
             assert field in template
 
-        assert template["port"] == 1521
-        assert template["sid"] == "xe"
+        assert template["port",] == 1521
+        assert template["sid",] == "xe"
 
     def test_flext_meltano_jsonl_target_template(self) -> None:
         """Test JSONL target template structure."""
         template = FLEXT_MELTANO_JSONL_TARGET_TEMPLATE
         assert "destination_path" in template
         assert "file_naming_scheme" in template
-        assert "{stream_name}.jsonl" in template["file_naming_scheme"]
+        assert "{stream_name,}.jsonl" in template["file_naming_scheme",]
 
 
 class TestFlextMeltanoSmartConfig:
@@ -84,16 +84,16 @@ class TestFlextMeltanoSmartConfig:
         """Test automatic CSV template selection."""
         config = flext_meltano_smart_config("tap-csv", "target-jsonl")
 
-        assert config["tap_name"] == "tap-csv"
-        assert config["target_name"] == "target-jsonl"
+        assert config["tap_name",] == "tap-csv"
+        assert config["target_name",] == "target-jsonl"
 
         # Should auto-select CSV template
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "files" in tap_config
-        assert isinstance(tap_config["files"], list)
+        assert isinstance(tap_config["files",], list)
 
         # Should auto-select JSONL template
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "destination_path" in target_config
         assert "file_naming_scheme" in target_config
 
@@ -102,16 +102,16 @@ class TestFlextMeltanoSmartConfig:
         config = flext_meltano_smart_config("tap-postgres", "target-csv")
 
         # Should auto-select PostgreSQL template
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "host" in tap_config
         assert "port" in tap_config
         assert "database" in tap_config
-        assert tap_config["port"] == 5432
+        assert tap_config["port",] == 5432
 
         # Should auto-select CSV target template
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "delimiter" in target_config
-        assert target_config["delimiter"] == ","
+        assert target_config["delimiter",] == ","
 
     def test_flext_meltano_smart_config_with_overrides(self) -> None:
         """Test smart config with user overrides."""
@@ -124,17 +124,17 @@ class TestFlextMeltanoSmartConfig:
         config = flext_meltano_smart_config("tap-oracle", "target-jsonl", **overrides)
 
         # Should merge template with overrides
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "host" in tap_config  # From template
         assert "port" in tap_config  # From template
-        assert tap_config["host"] == "custom.db.com"  # Override
-        assert tap_config["custom_field"] == "value"  # Override
+        assert tap_config["host",] == "custom.db.com"  # Override
+        assert tap_config["custom_field",] == "value"  # Override
 
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "destination_path" in target_config  # From template
-        assert target_config["custom_output"] == "/custom/path"  # Override
+        assert target_config["custom_output",] == "/custom/path"  # Override
 
-        assert config["environment"] == "production"
+        assert config["environment",] == "production"
 
 
 class TestFlextMeltanoSmartConfigDict:
@@ -142,51 +142,55 @@ class TestFlextMeltanoSmartConfigDict:
 
     def test_fluent_config_building_with_auto_templates(self) -> None:
         """Test fluent config building with automatic template selection."""
-        config = (FlextMeltanoSmartConfigDict()
-                 .flext_meltano_tap("tap-postgres")
-                 .flext_meltano_target("target-csv")
-                 .flext_meltano_tap_config(host="db.example.com", port=5433)
-                 .flext_meltano_target_config(output_dir="/custom/output")
-                 .flext_meltano_project("/project/path")
-                 .flext_meltano_environment("production"))
+        config = (
+            FlextMeltanoSmartConfigDict()
+            .flext_meltano_tap("tap-postgres")
+            .flext_meltano_target("target-csv")
+            .flext_meltano_tap_config(host="db.example.com", port=5433)
+            .flext_meltano_target_config(output_dir="/custom/output")
+            .flext_meltano_project("/project/path")
+            .flext_meltano_environment("production")
+        )
 
         # Verify fluent building worked
-        assert config["tap_name"] == "tap-postgres"
-        assert config["target_name"] == "target-csv"
-        assert config["project_root"] == "/project/path"
-        assert config["environment"] == "production"
+        assert config["tap_name",] == "tap-postgres"
+        assert config["target_name",] == "target-csv"
+        assert config["project_root",] == "/project/path"
+        assert config["environment",] == "production"
 
         # Verify auto-selected template + user config merge
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "database" in tap_config  # From PostgreSQL template
-        assert tap_config["host"] == "db.example.com"  # User override
-        assert tap_config["port"] == 5433  # User override
+        assert tap_config["host",] == "db.example.com"  # User override
+        assert tap_config["port",] == 5433  # User override
 
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "delimiter" in target_config  # From CSV template
-        assert target_config["output_dir"] == "/custom/output"  # User config
+        assert target_config["output_dir",] == "/custom/output"  # User config
 
     def test_smart_config_builder_function(self) -> None:
         """Test smart config builder convenience function."""
-        config = (flext_meltano_smart_config_builder()
-                 .flext_meltano_tap("tap-mysql")
-                 .flext_meltano_target("target-parquet")
-                 .flext_meltano_tap_config(database="analytics")
-                 .flext_meltano_target_config(compression="gzip"))
+        config = (
+            flext_meltano_smart_config_builder()
+            .flext_meltano_tap("tap-mysql")
+            .flext_meltano_target("target-parquet")
+            .flext_meltano_tap_config(database="analytics")
+            .flext_meltano_target_config(compression="gzip")
+        )
 
         assert isinstance(config, FlextMeltanoSmartConfigDict)
-        assert config["tap_name"] == "tap-mysql"
-        assert config["target_name"] == "target-parquet"
+        assert config["tap_name",] == "tap-mysql"
+        assert config["target_name",] == "target-parquet"
 
         # Verify auto-templates applied
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "host" in tap_config  # From MySQL template
         assert "port" in tap_config  # From MySQL template
-        assert tap_config["database"] == "analytics"  # User override
+        assert tap_config["database",] == "analytics"  # User override
 
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "file_naming_scheme" in target_config  # From Parquet template
-        assert target_config["compression"] == "gzip"  # User config
+        assert target_config["compression",] == "gzip"  # User config
 
 
 class TestFlextMeltanoOperationsMixin:
@@ -211,7 +215,10 @@ class TestFlextMeltanoOperationsMixin:
         assert "postgres" in mixin._config_templates
         assert "oracle" in mixin._config_templates
 
-    def test_operations_mixin_smart_config_retrieval(self, temp_project_dir: Path) -> None:
+    def test_operations_mixin_smart_config_retrieval(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test smart configuration template retrieval."""
         mixin = FlextMeltanoOperationsMixin(temp_project_dir)
 
@@ -278,7 +285,11 @@ class TestFlextMeltanoSmartPipeline:
 
     def test_smart_pipeline_configuration(self, temp_project_dir: Path) -> None:
         """Test smart pipeline configuration with auto-templates."""
-        pipeline = FlextMeltanoSmartPipeline("tap-csv", "target-parquet", temp_project_dir)
+        pipeline = FlextMeltanoSmartPipeline(
+            "tap-csv",
+            "target-parquet",
+            temp_project_dir,
+        )
 
         # Configure with custom overrides
         configured = pipeline.flext_meltano_configure_smart(
@@ -291,17 +302,17 @@ class TestFlextMeltanoSmartPipeline:
         assert pipeline._smart_config is not None
 
         config = pipeline._smart_config
-        assert config["tap_name"] == "tap-csv"
-        assert config["target_name"] == "target-parquet"
+        assert config["tap_name",] == "tap-csv"
+        assert config["target_name",] == "target-parquet"
 
         # Verify template auto-selection + override merge
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "files" in tap_config
-        assert tap_config["files"][0]["entity"] == "sales"
+        assert tap_config["files"][0]["entity",] == "sales"
 
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "file_naming_scheme" in target_config  # From template
-        assert target_config["compression"] == "lz4"  # User override
+        assert target_config["compression",] == "lz4"  # User override
 
 
 class TestProductionDecorators:
@@ -318,7 +329,7 @@ class TestProductionDecorators:
             call_count += 1
 
             if call_count < 3:  # Fail first 2 attempts
-                return FlextMeltanoResult.fail(f"Attempt {call_count} failed")
+                return FlextMeltanoResult.fail(f"Attempt {(call_count,)} failed")
 
             return FlextMeltanoResult.ok({"success": True, "attempts": call_count})
 
@@ -326,9 +337,9 @@ class TestProductionDecorators:
 
         assert result.success
         assert call_count == 3
-        assert result.data["attempts"] == 3
+        assert result.data["attempts",] == 3
         assert "retry_info" in result.data
-        assert result.data["retry_info"]["succeeded_on_retry"] is True
+        assert result.data["retry_info"]["succeeded_on_retry",] is True
 
     @pytest.mark.asyncio
     async def test_flext_meltano_smart_cache(self) -> None:
@@ -344,26 +355,29 @@ class TestProductionDecorators:
         # First call - should execute and cache
         result1 = await test_function("test")
         assert result1.success
-        assert result1.data["call_count"] == 1
+        assert result1.data["call_count",] == 1
         assert "from_cache" not in result1.data
 
         # Second call with same args - should return cached result
         result2 = await test_function("test")
         assert result2.success
-        assert result2.data["call_count"] == 1  # Same as cached
-        assert result2.data["from_cache"] is True
+        assert result2.data["call_count",] == 1  # Same as cached
+        assert result2.data["from_cache",] is True
 
         # Third call with different args - should execute again
         result3 = await test_function("different")
         assert result3.success
-        assert result3.data["call_count"] == 2  # New execution
+        assert result3.data["call_count",] == 2  # New execution
         assert "from_cache" not in result3.data
 
     @pytest.mark.asyncio
     async def test_flext_meltano_execution_metrics(self) -> None:
         """Test execution metrics decorator."""
 
-        @flext_meltano_execution_metrics(include_performance=True, include_detailed_timing=True)
+        @flext_meltano_execution_metrics(
+            include_performance=True,
+            include_detailed_timing=True,
+        )
         async def test_function() -> FlextMeltanoResult:
             return FlextMeltanoResult.ok({"operation": "test"})
 
@@ -372,14 +386,14 @@ class TestProductionDecorators:
         assert result.success
         assert "execution_metrics" in result.data
 
-        metrics = result.data["execution_metrics"]
+        metrics = result.data["execution_metrics",]
         assert "function_name" in metrics
         assert "execution_time_seconds" in metrics
         assert "start_timestamp" in metrics
         assert "end_timestamp" in metrics
-        assert metrics["function_name"] == "test_function"
-        assert isinstance(metrics["execution_time_seconds"], float)
-        assert metrics["execution_time_seconds"] >= 0
+        assert metrics["function_name",] == "test_function"
+        assert isinstance(metrics["execution_time_seconds",], float)
+        assert metrics["execution_time_seconds",] >= 0
 
 
 class TestConvenienceFunctions:
@@ -418,34 +432,43 @@ class TestIntegrationWorkflows:
         with tempfile.TemporaryDirectory() as tmpdir:
             yield Path(tmpdir)
 
-    def test_complete_workflow_old_vs_new_approach(self, temp_project_dir: Path) -> None:
+    def test_complete_workflow_old_vs_new_approach(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Demonstrate code reduction: OLD (50+ lines) vs NEW (5 lines)."""
 
         # NEW APPROACH (5 lines) - uses consolidated patterns
-        pipeline = (FlextMeltanoSmartPipeline("tap-postgres", "target-csv", temp_project_dir)
-                   .flext_meltano_configure_smart(
-                       tap_config={"host": "prod.db.com", "database": "analytics"},
-                       target_config={"destination_path": "exports"},
-                   ))
+        pipeline = FlextMeltanoSmartPipeline(
+            "tap-postgres",
+            "target-csv",
+            temp_project_dir,
+        ).flext_meltano_configure_smart(
+            tap_config={"host": "prod.db.com", "database": "analytics"},
+            target_config={"destination_path": "exports"},
+        )
 
         # Verify the 5-line setup achieved what would take 50+ lines manually
         assert pipeline._smart_config is not None
         config = pipeline._smart_config
 
         # Auto-selected PostgreSQL template + user overrides
-        tap_config = config["tap_config"]
+        tap_config = config["tap_config",]
         assert "port" in tap_config  # From template
         assert "schema" in tap_config  # From template
-        assert tap_config["host"] == "prod.db.com"  # User override
-        assert tap_config["database"] == "analytics"  # User override
+        assert tap_config["host",] == "prod.db.com"  # User override
+        assert tap_config["database",] == "analytics"  # User override
 
         # Auto-selected CSV target template + user overrides
-        target_config = config["target_config"]
+        target_config = config["target_config",]
         assert "delimiter" in target_config  # From template
         assert "quotechar" in target_config  # From template
-        assert target_config["destination_path"] == "exports"  # User override
+        assert target_config["destination_path",] == "exports"  # User override
 
-    def test_production_ready_decorator_integration(self, temp_project_dir: Path) -> None:
+    def test_production_ready_decorator_integration(
+        self,
+        temp_project_dir: Path,
+    ) -> None:
         """Test production-ready decorator integration."""
 
         class TestPipeline(FlextMeltanoOperationsMixin):

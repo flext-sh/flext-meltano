@@ -98,13 +98,17 @@ class TestMeltanoProject:
     @pytest.fixture
     def mock_commands(self) -> tuple[Mock, ...]:
         """Mock all Meltano command executions."""
-        with patch("flext_meltano.helpers.advanced.flext_meltano_run_command") as mock_cmd:
+        with patch(
+            "flext_meltano.helpers.advanced.flext_meltano_run_command",
+        ) as mock_cmd:
             # Default successful response
-            mock_cmd.return_value = FlextMeltanoResult.ok({
-                "stdout": "Success",
-                "stderr": "",
-                "returncode": 0,
-            })
+            mock_cmd.return_value = FlextMeltanoResult.ok(
+                {
+                    "stdout": "Success",
+                    "stderr": "",
+                    "returncode": 0,
+                },
+            )
             yield (mock_cmd,)
 
     def test_project_initialization(self, temp_project: Path) -> None:
@@ -129,7 +133,11 @@ class TestMeltanoProject:
         mock_cmd.assert_called()
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_setup_complete_custom_environments(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_setup_complete_custom_environments(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test setup with custom environments."""
         mock_cmd.return_value = FlextMeltanoResult.ok({})
 
@@ -154,14 +162,18 @@ class TestMeltanoProject:
         result = project.install_plugins(plugins)
 
         assert result.success is True
-        assert result.data["count"] == 3
+        assert result.data["count",] == 3
         assert result.data["installed"] == ["tap-csv", "target-csv", "tap-postgres"]
 
         # Should be called for each plugin + config calls
         assert mock_cmd.call_count >= 3
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_install_plugins_partial_failure(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_install_plugins_partial_failure(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test plugin installation with partial failures."""
         # First plugin succeeds, second fails
         mock_cmd.side_effect = [
@@ -187,7 +199,12 @@ class TestMeltanoProject:
         mock_cmd.return_value = FlextMeltanoResult.ok({})
 
         pipelines = [
-            PipelineSpec("daily_users", "tap-postgres", "target-csv", schedule="@daily"),
+            PipelineSpec(
+                "daily_users",
+                "tap-postgres",
+                "target-csv",
+                schedule="@daily",
+            ),
             PipelineSpec("hourly_orders", "tap-postgres", "target-postgres"),
         ]
 
@@ -195,7 +212,7 @@ class TestMeltanoProject:
         result = project.create_pipelines(pipelines)
 
         assert result.success is True
-        assert result.data["count"] == 2
+        assert result.data["count",] == 2
         assert result.data["created"] == ["daily_users", "hourly_orders"]
 
         # Should call job add for each pipeline + schedule for first one
@@ -206,11 +223,13 @@ class TestMeltanoProject:
         """Test running all configured pipelines."""
         # Mock job list response
         mock_cmd.side_effect = [
-            FlextMeltanoResult.ok({
-                "stdout": "pipeline1\npipeline2\npipeline3",
-                "stderr": "",
-                "returncode": 0,
-            }),
+            FlextMeltanoResult.ok(
+                {
+                    "stdout": "pipeline1\npipeline2\npipeline3",
+                    "stderr": "",
+                    "returncode": 0,
+                },
+            ),
             # Mock individual pipeline runs
             FlextMeltanoResult.ok({}),  # pipeline1
             FlextMeltanoResult.ok({}),  # pipeline2
@@ -221,17 +240,21 @@ class TestMeltanoProject:
         results = project.run_all_pipelines()
 
         assert len(results) == 3
-        assert results["pipeline1"].success is True
-        assert results["pipeline2"].success is True
-        assert results["pipeline3"].success is False
+        assert results["pipeline1",].success is True
+        assert results["pipeline2",].success is True
+        assert results["pipeline3",].success is False
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
     def test_health_check(self, mock_cmd: Mock, temp_project: Path) -> None:
         """Test comprehensive health check."""
         # Mock various health check commands
         mock_cmd.side_effect = [
-            FlextMeltanoResult.ok({"stdout": "meltano, version 3.8.0"}),  # version check
-            FlextMeltanoResult.ok({"stdout": "extractors.tap-csv\nloaders.target-csv"}),  # config list
+            FlextMeltanoResult.ok(
+                {"stdout": "meltano, version 3.8.0"},
+            ),  # version check
+            FlextMeltanoResult.ok(
+                {"stdout": "extractors.tap-csv\nloaders.target-csv"},
+            ),  # config list
             FlextMeltanoResult.ok({"stdout": "dev\nstaging\nprod"}),  # environment list
             FlextMeltanoResult.ok({}),  # database check
         ]
@@ -239,12 +262,12 @@ class TestMeltanoProject:
         project = MeltanoProject(temp_project)
         health = project.health_check()
 
-        assert health["healthy"] is True
-        assert len(health["issues"]) == 0
-        assert health["plugins"]["extractors"] == 1
-        assert health["plugins"]["loaders"] == 1
+        assert health["healthy",] is True
+        assert len(health["issues",]) == 0
+        assert health["plugins"]["extractors",] == 1
+        assert health["plugins"]["loaders",] == 1
         assert health["environments"] == ["dev", "staging", "prod"]
-        assert health["database"]["configured"] is True
+        assert health["database"]["configured",] is True
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
     def test_health_check_with_issues(self, mock_cmd: Mock, temp_project: Path) -> None:
@@ -259,10 +282,10 @@ class TestMeltanoProject:
         project = MeltanoProject(temp_project)
         health = project.health_check()
 
-        assert health["healthy"] is False
-        assert len(health["issues"]) >= 2
-        assert "Meltano CLI not accessible" in health["issues"]
-        assert "Database not configured" in health["issues"]
+        assert health["healthy",] is False
+        assert len(health["issues",]) >= 2
+        assert "Meltano CLI not accessible" in health["issues",]
+        assert "Database not configured" in health["issues",]
 
     def test_environment_context_manager(self, temp_project: Path) -> None:
         """Test environment context manager."""
@@ -290,7 +313,7 @@ class TestMeltanoProject:
             result = project.backup_project(backup_path)
 
         assert result.success is True
-        assert result.data["backup_path"] == str(backup_path)
+        assert result.data["backup_path",] == str(backup_path)
         mock_copytree.assert_called_once()
 
 
@@ -311,7 +334,11 @@ class TestBatchProcessor:
         assert processor.environment == "staging"
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_process_tables_sequential(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_process_tables_sequential(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test sequential table processing."""
         # Mock successful responses for config and run commands
         mock_cmd.return_value = FlextMeltanoResult.ok({})
@@ -329,7 +356,11 @@ class TestBatchProcessor:
         assert mock_cmd.call_count == len(tables) * 2
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_process_tables_with_failures(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_process_tables_with_failures(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test table processing with some failures."""
         # Mock mixed success/failure responses
         mock_cmd.side_effect = [
@@ -346,19 +377,26 @@ class TestBatchProcessor:
         results = processor.process_tables("tap-postgres", "target-csv", tables)
 
         assert len(results) == 3
-        assert results["users"].success is True
-        assert results["orders"].success is False  # Config failed
-        assert results["products"].success is False  # Run failed
+        assert results["users",].success is True
+        assert results["orders",].success is False  # Config failed
+        assert results["products",].success is False  # Run failed
 
     @patch("concurrent.futures.ThreadPoolExecutor")
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_process_tables_parallel(self, mock_cmd: Mock, mock_executor: Mock, temp_project: Path) -> None:
+    def test_process_tables_parallel(
+        self,
+        mock_cmd: Mock,
+        mock_executor: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test parallel table processing."""
         mock_cmd.return_value = FlextMeltanoResult.ok({})
 
         # Mock executor behavior
         mock_future = Mock()
-        mock_executor.return_value.__enter__.return_value.submit.return_value = mock_future
+        mock_executor.return_value.__enter__.return_value.submit.return_value = (
+            mock_future
+        )
         mock_executor.return_value.__enter__.return_value.wait.return_value = None
 
         processor = BatchProcessor(temp_project)
@@ -366,7 +404,11 @@ class TestBatchProcessor:
 
         # This will use the mocked parallel path
         processor.process_tables(
-            "tap-postgres", "target-csv", tables, parallel=True, max_workers=2,
+            "tap-postgres",
+            "target-csv",
+            tables,
+            parallel=True,
+            max_workers=2,
         )
 
         # Should have attempted to create executor
@@ -397,7 +439,11 @@ class TestFactoryFunctions:
             yield Path(tmpdir)
 
     @patch("flext_meltano.helpers.advanced.MeltanoProject")
-    def test_setup_project_factory(self, mock_project_class: Mock, temp_project: Path) -> None:
+    def test_setup_project_factory(
+        self,
+        mock_project_class: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test one-liner project setup."""
         # Mock project instance and its methods
         mock_project = Mock()
@@ -412,7 +458,7 @@ class TestFactoryFunctions:
         result = setup_project(temp_project, plugins=plugins, pipelines=pipelines)
 
         assert result.success is True
-        assert result.data["project_ready"] is True
+        assert result.data["project_ready",] is True
 
         # Should call all setup methods
         mock_project.setup_complete.assert_called_once()
@@ -420,11 +466,17 @@ class TestFactoryFunctions:
         mock_project.create_pipelines.assert_called_once_with(pipelines)
 
     @patch("flext_meltano.helpers.advanced.MeltanoProject")
-    def test_setup_project_plugin_failure(self, mock_project_class: Mock, temp_project: Path) -> None:
+    def test_setup_project_plugin_failure(
+        self,
+        mock_project_class: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test project setup with plugin installation failure."""
         mock_project = Mock()
         mock_project.setup_complete.return_value = FlextMeltanoResult.ok({})
-        mock_project.install_plugins.return_value = FlextMeltanoResult.fail("Plugin installation failed")
+        mock_project.install_plugins.return_value = FlextMeltanoResult.fail(
+            "Plugin installation failed",
+        )
         mock_project_class.return_value = mock_project
 
         plugins = [PluginSpec("tap-invalid", "extractor")]
@@ -435,7 +487,11 @@ class TestFactoryFunctions:
         assert "Plugin installation failed" in result.error
 
     @patch("flext_meltano.helpers.advanced.BatchProcessor")
-    def test_batch_process_tables_factory(self, mock_processor_class: Mock, temp_project: Path) -> None:
+    def test_batch_process_tables_factory(
+        self,
+        mock_processor_class: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test one-liner batch table processing."""
         # Mock processor instance
         mock_processor = Mock()
@@ -447,14 +503,23 @@ class TestFactoryFunctions:
         mock_processor_class.return_value = mock_processor
 
         tables = ["users", "orders", "products"]
-        results = batch_process_tables(temp_project, "tap-postgres", "target-csv", tables)
+        results = batch_process_tables(
+            temp_project,
+            "tap-postgres",
+            "target-csv",
+            tables,
+        )
 
         assert len(results) == 3
-        assert results["users"] is True
-        assert results["orders"] is False
-        assert results["products"] is True
+        assert results["users",] is True
+        assert results["orders",] is False
+        assert results["products",] is True
 
-        mock_processor.process_tables.assert_called_once_with("tap-postgres", "target-csv", tables)
+        mock_processor.process_tables.assert_called_once_with(
+            "tap-postgres",
+            "target-csv",
+            tables,
+        )
 
 
 class TestIntegrationScenarios:
@@ -467,7 +532,11 @@ class TestIntegrationScenarios:
             yield Path(tmpdir)
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_complete_data_pipeline_setup(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_complete_data_pipeline_setup(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test complete data pipeline setup scenario."""
         mock_cmd.return_value = FlextMeltanoResult.ok({})
 
@@ -478,16 +547,24 @@ class TestIntegrationScenarios:
 
         # Step 2: Install plugins
         plugins = [
-            PluginSpec("tap-postgres", "extractor", config={
-                "host": "localhost",
-                "port": 5432,
-                "database": "source_db",
-            }),
-            PluginSpec("target-postgres", "loader", config={
-                "host": "warehouse",
-                "port": 5432,
-                "database": "warehouse_db",
-            }),
+            PluginSpec(
+                "tap-postgres",
+                "extractor",
+                config={
+                    "host": "localhost",
+                    "port": 5432,
+                    "database": "source_db",
+                },
+            ),
+            PluginSpec(
+                "target-postgres",
+                "loader",
+                config={
+                    "host": "warehouse",
+                    "port": 5432,
+                    "database": "warehouse_db",
+                },
+            ),
             PluginSpec("dbt-postgres", "transformer"),
         ]
         plugin_result = project.install_plugins(plugins)
@@ -515,12 +592,20 @@ class TestIntegrationScenarios:
         assert pipeline_result.success is True
 
         # Step 4: Health check
-        with patch.object(project, "health_check", return_value={"healthy": True, "issues": []}):
+        with patch.object(
+            project,
+            "health_check",
+            return_value={"healthy": True, "issues": []},
+        ):
             health = project.health_check()
-            assert health["healthy"] is True
+            assert health["healthy",] is True
 
     @patch("flext_meltano.helpers.advanced.flext_meltano_run_command")
-    def test_batch_processing_workflow(self, mock_cmd: Mock, temp_project: Path) -> None:
+    def test_batch_processing_workflow(
+        self,
+        mock_cmd: Mock,
+        temp_project: Path,
+    ) -> None:
         """Test realistic batch processing workflow."""
         # Mock successful responses
         mock_cmd.return_value = FlextMeltanoResult.ok({})
@@ -530,14 +615,23 @@ class TestIntegrationScenarios:
 
         # Process large table set
         large_table_set = [
-            "customers", "orders", "order_items", "products",
-            "categories", "suppliers", "inventory", "transactions",
-            "user_sessions", "event_logs",
+            "customers",
+            "orders",
+            "order_items",
+            "products",
+            "categories",
+            "suppliers",
+            "inventory",
+            "transactions",
+            "user_sessions",
+            "event_logs",
         ]
 
         # Process tables sequentially first
         results = processor.process_tables(
-            "tap-postgres", "target-warehouse", large_table_set,
+            "tap-postgres",
+            "target-warehouse",
+            large_table_set,
         )
 
         assert len(results) == len(large_table_set)
@@ -558,7 +652,9 @@ class TestIntegrationScenarios:
         assert setup_result.success is False
 
         # Simulate recovery with successful retry
-        mock_cmd.side_effect = [FlextMeltanoResult.ok({})] * 10  # Multiple successful calls
+        mock_cmd.side_effect = [
+            FlextMeltanoResult.ok({}),
+        ] * 10  # Multiple successful calls
         setup_result_retry = project.setup_complete()
         assert setup_result_retry.success is True
 

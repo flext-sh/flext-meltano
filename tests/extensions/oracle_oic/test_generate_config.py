@@ -9,8 +9,10 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import flext_oracle_oic_ext
 import pytest
 from flext_oracle_oic_ext.config import OracleOICExtensionSettings
+from flext_oracle_oic_ext.simple_api import setup_oic_extension
 
 
 def test_module_imports() -> None:
@@ -21,8 +23,6 @@ def test_module_imports() -> None:
 def test_basic_functionality() -> None:
     """Test basic module functionality."""
     try:
-        import flext_oracle_oic_ext
-
         # Basic smoke test
         assert hasattr(flext_oracle_oic_ext, "__file__")
     except (ImportError, AttributeError):
@@ -49,8 +49,8 @@ class TestConfigGeneration:
         settings = OracleOICExtensionSettings.from_dict(config_dict)
 
         assert settings.connection is not None
-        assert settings.connection.base_url == config_dict["base_url"]
-        assert settings.connection.oauth_client_id == config_dict["oauth_client_id"]
+        assert settings.connection.base_url == config_dict["base_url",]
+        assert settings.connection.oauth_client_id == config_dict["oauth_client_id",]
         assert settings.environment == "test"
         assert settings.log_level == "DEBUG"
         assert settings.debug is True
@@ -67,8 +67,8 @@ class TestConfigGeneration:
         settings = OracleOICExtensionSettings.from_dict(config_dict)
         result_dict = settings.to_dict()
 
-        assert result_dict["base_url"] == config_dict["base_url"]
-        assert result_dict["oauth_client_id"] == config_dict["oauth_client_id"]
+        assert result_dict["base_url"] == config_dict["base_url",]
+        assert result_dict["oauth_client_id"] == config_dict["oauth_client_id",]
         assert "environment" in result_dict
 
     def test_config_validation(self) -> None:
@@ -102,10 +102,10 @@ class TestConfigGeneration:
         settings = OracleOICExtensionSettings.from_dict(config_dict)
         auth_config = settings.get_auth_config()
 
-        assert auth_config["oauth_client_id"] == "test_client_id"
-        assert auth_config["oauth_client_secret"] == "test_client_secret"
-        assert auth_config["oauth_token_url"] == config_dict["oauth_token_url"]
-        assert auth_config["oauth_scope"] == "test_scope"
+        assert auth_config["oauth_client_id",] == "test_client_id"
+        assert auth_config["oauth_client_secret",] == "test_client_secret"
+        assert auth_config["oauth_token_url"] == config_dict["oauth_token_url",]
+        assert auth_config["oauth_scope",] == "test_scope"
 
     def test_default_configuration_values(self) -> None:
         """Test default configuration values."""
@@ -222,7 +222,7 @@ class TestConfigGeneration:
     def _create_invalid_config(self, valid_config: dict[str, Any]) -> None:
         """Helper function to create invalid configuration for testing."""
         invalid_config = valid_config.copy()
-        invalid_config["base_url"] = "invalid-url"
+        invalid_config["base_url",] = "invalid-url"
         OracleOICExtensionSettings.from_dict(invalid_config)
 
 
@@ -232,8 +232,6 @@ class TestBasicCoverage:
     def test_module_attributes(self) -> None:
         """Test module has expected attributes."""
         try:
-            import flext_oracle_oic_ext
-
             assert flext_oracle_oic_ext
         except ImportError:
             # If module import fails, verify this is expected
@@ -243,8 +241,6 @@ class TestBasicCoverage:
     def test_config_module_imports(self) -> None:
         """Test configuration module imports correctly."""
         try:
-            from flext_oracle_oic_ext.config import OracleOICExtensionSettings
-
             assert OracleOICExtensionSettings is not None
         except ImportError:
             # If config module import fails, verify this is expected
@@ -254,8 +250,6 @@ class TestBasicCoverage:
     def test_simple_api_imports(self) -> None:
         """Test simple API module imports correctly."""
         try:
-            from flext_oracle_oic_ext.simple_api import setup_oic_extension
-
             assert setup_oic_extension is not None
         except ImportError:
             # If simple API import fails, verify this is expected

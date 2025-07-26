@@ -7,6 +7,7 @@ not mocks or stubs.
 from __future__ import annotations
 
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -40,19 +41,19 @@ class TestRealSingerSDKIntegration:
         )
 
         # Validate real execution results
-        assert result.is_success, f"Pipeline failed: {result.error}"
+        assert result.is_success, f"Pipeline failed: {(result.error,)}"
         pipeline_result = result.data
 
         # Validate pipeline completed successfully
         assert pipeline_result.state == FlextMeltanoExecutionState.COMPLETED
         assert pipeline_result.records_processed > 0  # Real records were processed
-        assert pipeline_result.duration_seconds > 0   # Real time was measured
-        assert pipeline_result.pipeline_id           # Real ID was generated
+        assert pipeline_result.duration_seconds > 0  # Real time was measured
+        assert pipeline_result.pipeline_id  # Real ID was generated
 
         # Validate metadata contains real information
-        assert pipeline_result.metadata["tap_name"] == "tap-csv"
-        assert pipeline_result.metadata["target_name"] == "target-csv"
-        assert pipeline_result.metadata["environment"] == "dev"
+        assert pipeline_result.metadata["tap_name",] == "tap-csv"
+        assert pipeline_result.metadata["target_name",] == "target-csv"
+        assert pipeline_result.metadata["environment",] == "dev"
 
     @pytest.mark.asyncio
     async def test_real_json_pipeline_execution(self, temp_project_dir: Path) -> None:
@@ -159,7 +160,10 @@ class TestRealUltraHelperFunctions:
         result = await flext_meltano_run_pipeline_ultra("tap-csv", "target-csv")
 
         # Validate it actually executed
-        assert result.state in [FlextMeltanoExecutionState.COMPLETED, FlextMeltanoExecutionState.FAILED]
+        assert result.state in [
+            FlextMeltanoExecutionState.COMPLETED,
+            FlextMeltanoExecutionState.FAILED,
+        ]
         assert result.pipeline_id  # Real ID generated
         assert result.duration_seconds >= 0  # Real time measured
 
@@ -171,7 +175,6 @@ class TestRealUltraHelperFunctions:
     @pytest.mark.asyncio
     async def test_real_code_reduction_validation(self) -> None:
         """Validate that ultra helpers actually reduce code vs manual implementation."""
-        import time
 
         # Manual implementation (what users would have to write)
         start_time = time.time()
@@ -210,7 +213,9 @@ class TestRealSingerSDKCompatibility:
 
         # Validate it's a real Singer SDK Tap instance
         assert hasattr(tap_instance, "sync_all"), "Missing Singer SDK sync_all method"
-        assert hasattr(tap_instance, "discover_streams"), "Missing Singer SDK discover_streams method"
+        assert hasattr(tap_instance, "discover_streams"), (
+            "Missing Singer SDK discover_streams method"
+        )
         assert hasattr(tap_instance, "name"), "Missing Singer SDK name attribute"
         assert tap_instance.name == "tap-csv"
 
@@ -219,7 +224,7 @@ class TestRealSingerSDKCompatibility:
         assert len(streams) > 0, "Real tap should discover streams"
 
         # Validate stream is real Singer SDK Stream object
-        stream = streams[0]
+        stream = streams[0,]
         assert hasattr(stream, "schema"), "Missing Singer SDK stream schema"
         assert hasattr(stream, "name"), "Missing Singer SDK stream name"
 
@@ -232,7 +237,9 @@ class TestRealSingerSDKCompatibility:
         target_instance = await executor._create_real_target_instance("target-csv", ".")
 
         # Validate it's a real Singer SDK Target instance
-        assert hasattr(target_instance, "get_sink"), "Missing Singer SDK get_sink method"
+        assert hasattr(target_instance, "get_sink"), (
+            "Missing Singer SDK get_sink method"
+        )
         assert hasattr(target_instance, "name"), "Missing Singer SDK name attribute"
         assert target_instance.name == "target-csv"
 
@@ -241,7 +248,9 @@ class TestRealSingerSDKCompatibility:
         assert sink is not None, "Real target should create sink"
 
         # Validate sink is real Singer SDK Sink object
-        assert hasattr(sink, "process_record"), "Missing Singer SDK process_record method"
+        assert hasattr(sink, "process_record"), (
+            "Missing Singer SDK process_record method"
+        )
 
     @pytest.mark.asyncio
     async def test_real_data_flow_execution(self) -> None:
@@ -254,7 +263,8 @@ class TestRealSingerSDKCompatibility:
 
         # Execute real data flow
         records_processed = await executor._execute_real_singer_pipeline(
-            tap_instance, target_instance,
+            tap_instance,
+            target_instance,
         )
 
         # Validate data actually flowed

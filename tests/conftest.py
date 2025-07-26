@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from click.testing import CliRunner
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -33,7 +34,7 @@ def set_test_environment() -> Generator[None]:
 
 # Meltano project fixtures
 @pytest.fixture
-def test_meltano_project_dir() -> Generator[Path]:
+def test_meltano_project_dir() -> Generator[Path,]:
     """Temporary Meltano project directory for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         project_dir = Path(temp_dir) / "test_meltano_project"
@@ -165,13 +166,12 @@ def sample_csv_data() -> str:
 @pytest.fixture
 def meltano_cli_runner() -> Any:
     """Meltano CLI runner for testing."""
-    from click.testing import CliRunner
 
     return CliRunner()
 
 
 @pytest.fixture
-def meltano_invoke_args() -> list[str]:
+def meltano_invoke_args() -> list[str,]:
     """Common Meltano invoke arguments."""
     return ["--log-level", "debug", "--environment", "test"]
 
@@ -197,7 +197,7 @@ def singer_schema() -> dict[str, Any]:
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, Any]]:
+def singer_records() -> list[dict[str, Any],]:
     """Sample Singer records for testing."""
     return [
         {
@@ -339,7 +339,7 @@ def mock_meltano_service() -> object:
 
 
 @pytest.fixture
-def mock_singer_tap() -> type[object]:
+def mock_singer_tap() -> type[object,]:
     """Mock Singer tap for testing."""
 
     class MockSingerTap:
@@ -349,7 +349,7 @@ def mock_singer_tap() -> type[object]:
         async def discover(self) -> dict[str, Any]:
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-        async def extract(self) -> list[dict[str, Any]]:
+        async def extract(self) -> list[dict[str, Any],]:
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap

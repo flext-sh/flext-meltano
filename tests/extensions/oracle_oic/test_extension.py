@@ -11,6 +11,7 @@ from flext_oracle_oic_ext.config import OracleOICExtensionSettings
 from flext_oracle_oic_ext.extension import OracleOICExtension
 from flext_oracle_oic_ext.lifecycle import LifecycleManager
 from flext_oracle_oic_ext.monitoring import MonitoringService
+import requests
 
 
 class TestOracleOICExtension:
@@ -31,7 +32,7 @@ class TestOracleOICExtension:
         assert len(description.commands) > 0
 
         # Check lifecycle commands
-        command_names = [cmd.name for cmd in description.commands]
+        command_names = [cmd.name for cmd in description.commands,]
         assert "lifecycle:activate" in command_names
         assert "lifecycle:deactivate" in command_names
         assert "lifecycle:status" in command_names
@@ -72,7 +73,6 @@ class TestOracleOICExtension:
     def test_monitoring_service_initialization(self) -> None:
         """Test monitoring service initialization with configuration."""
         # MonitoringService expects a requests.Session object
-        import requests
 
         session = requests.Session()
         service = MonitoringService(session)
@@ -143,20 +143,20 @@ class TestOracleOICExtension:
 
     @pytest.mark.parametrize(
         "command_prefix",
-        ["lifecycle", "monitor", "extract"],
+        ["lifecycle", "monitor", "extract",],
     )
     def test_command_prefix_availability(self, command_prefix: str) -> None:
         """Test that all expected command prefixes are available."""
         ext = OracleOICExtension()
         description = ext.describe()
 
-        command_names = [cmd.name for cmd in description.commands]
+        command_names = [cmd.name for cmd in description.commands,]
         prefix_commands = [
-            name for name in command_names if name.startswith(f"{command_prefix}:")
+            name for name in command_names if name.startswith(f"{command_prefix,}:")
         ]
 
         assert len(prefix_commands) > 0, (
-            f"No commands found with prefix {command_prefix}:"
+            f"No commands found with prefix {command_prefix,}:"
         )
 
     def test_manager_auth_config_structure(self) -> None:

@@ -25,12 +25,12 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == "test-job"
-        assert data["environment"] == "dev"  # default
-        assert data["status"] == "success"
-        assert data["execution_time"] == "10.5s"
-        assert data["records_processed"] == 1000
-        assert data["kwargs"] == {}
+        assert data["job_name",] == "test-job"
+        assert data["environment",] == "dev"  # default
+        assert data["status",] == "success"
+        assert data["execution_time",] == "10.5s"
+        assert data["records_processed",] == 1000
+        assert data["kwargs",] == {}
 
     def test_execute_job_with_environment(self) -> None:
         """Test job execution with custom environment."""
@@ -43,9 +43,9 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == "prod-job"
-        assert data["environment"] == "production"
-        assert data["status"] == "success"
+        assert data["job_name",] == "prod-job"
+        assert data["environment",] == "production"
+        assert data["status",] == "success"
 
     def test_execute_job_with_kwargs(self) -> None:
         """Test job execution with additional parameters."""
@@ -64,9 +64,9 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == "complex-job"
-        assert data["environment"] == "staging"
-        assert data["kwargs"] == kwargs
+        assert data["job_name",] == "complex-job"
+        assert data["environment",] == "staging"
+        assert data["kwargs",] == kwargs
 
     def test_execute_job_with_all_params(self) -> None:
         """Test job execution with all possible parameters."""
@@ -79,13 +79,13 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == "full-job"
-        assert data["environment"] == "test"
-        assert "retries" in data["kwargs"]
-        assert data["kwargs"]["retries"] == 3
-        assert data["kwargs"]["timeout"] == 600
-        assert data["kwargs"]["parallel"] is True
-        assert data["kwargs"]["log_level"] == "DEBUG"
+        assert data["job_name",] == "full-job"
+        assert data["environment",] == "test"
+        assert "retries" in data["kwargs",]
+        assert data["kwargs"]["retries",] == 3
+        assert data["kwargs"]["timeout",] == 600
+        assert data["kwargs"]["parallel",] is True
+        assert data["kwargs"]["log_level",] == "DEBUG"
 
     def test_execute_job_empty_job_name(self) -> None:
         """Test job execution with empty job name."""
@@ -95,7 +95,7 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == ""
+        assert data["job_name",] == ""
 
     def test_execute_job_special_characters(self) -> None:
         """Test job execution with special characters in job name."""
@@ -105,7 +105,7 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == special_job_name
+        assert data["job_name",] == special_job_name
 
     def test_execute_job_unicode_job_name(self) -> None:
         """Test job execution with unicode characters."""
@@ -115,7 +115,7 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == unicode_job_name
+        assert data["job_name",] == unicode_job_name
 
     def test_execute_job_long_job_name(self) -> None:
         """Test job execution with very long job name."""
@@ -125,7 +125,7 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["job_name"] == long_job_name
+        assert data["job_name",] == long_job_name
 
     def test_execute_job_none_kwargs(self) -> None:
         """Test job execution with None values in kwargs."""
@@ -137,8 +137,8 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["kwargs"]["optional_param"] is None
-        assert data["kwargs"]["another_param"] is None
+        assert data["kwargs"]["optional_param",] is None
+        assert data["kwargs"]["another_param",] is None
 
     def test_execute_job_complex_kwargs(self) -> None:
         """Test job execution with complex data structures in kwargs."""
@@ -166,7 +166,7 @@ class TestFlextMeltanoExecuteJob:
         assert result.success
         assert result.data is not None
         data = result.data
-        assert data["kwargs"] == complex_kwargs
+        assert data["kwargs",] == complex_kwargs
 
     def test_execute_job_result_structure(self) -> None:
         """Test that the result structure is consistent."""
@@ -192,12 +192,12 @@ class TestFlextMeltanoExecuteJob:
         assert set(data.keys()) == expected_keys
 
         # Verify data types
-        assert isinstance(data["job_name"], str)
-        assert isinstance(data["environment"], str)
-        assert isinstance(data["status"], str)
-        assert isinstance(data["execution_time"], str)
-        assert isinstance(data["records_processed"], int)
-        assert isinstance(data["kwargs"], dict)
+        assert isinstance(data["job_name",], str)
+        assert isinstance(data["environment",], str)
+        assert isinstance(data["status",], str)
+        assert isinstance(data["execution_time",], str)
+        assert isinstance(data["records_processed",], int)
+        assert isinstance(data["kwargs",], dict)
 
     def test_execute_job_simulation_values(self) -> None:
         """Test that simulation returns expected values."""
@@ -208,9 +208,9 @@ class TestFlextMeltanoExecuteJob:
         data = result.data
 
         # Verify simulated values
-        assert data["status"] == "success"
-        assert data["execution_time"] == "10.5s"
-        assert data["records_processed"] == 1000
+        assert data["status",] == "success"
+        assert data["execution_time",] == "10.5s"
+        assert data["records_processed",] == 1000
 
     @patch("flext_meltano.helpers.execution.FlextResult.ok")
     def test_execute_job_error_handling_in_result_creation(
@@ -237,13 +237,13 @@ class TestFlextMeltanoExecuteJob:
         # Verify independence
         data1 = result1.data
         assert data1 is not None
-        assert data1["job_name"] == "job1"
-        assert data1["kwargs"] == {"param1": "value1"}
+        assert data1["job_name",] == "job1"
+        assert data1["kwargs",] == {"param1": "value1"}
 
         data2 = result2.data
         assert data2 is not None
-        assert data2["job_name"] == "job2"
-        assert data2["kwargs"] == {"param2": "value2"}
+        assert data2["job_name",] == "job2"
+        assert data2["kwargs",] == {"param2": "value2"}
 
     def test_execute_job_environment_variations(self) -> None:
         """Test different environment variations."""
@@ -258,8 +258,12 @@ class TestFlextMeltanoExecuteJob:
         ]
 
         for env in environments:
-            result = flext_meltano_execute_job("test-tap", "test-target", environment=env)
+            result = flext_meltano_execute_job(
+                "test-tap",
+                "test-target",
+                environment=env,
+            )
             assert result.success
             data = result.data
             assert data is not None
-            assert data["environment"] == env
+            assert data["environment",] == env

@@ -4,6 +4,7 @@ NOTA: Tests desabilitados - módulos removidos na arquitetura ISOLADA.
 FlextContainer e project managers foram removidos em favor da abordagem ISOLADA.
 """
 
+
 from __future__ import annotations
 
 import asyncio
@@ -14,6 +15,11 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, Mock, patch
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.config.settings import FlextMeltanoSettings
+from flext_meltano.config.settings import FlextMeltanoSettings
 
 import pytest
 
@@ -28,11 +34,11 @@ if TYPE_CHECKING:
 
     class MeltanoProjectConfig:
         @classmethod
-        def model_validate(cls, data): pass
+        def model_validate(cls, data,): pass
 
     class MeltanoPlugin:
         @classmethod
-        def model_validate(cls, data): pass
+        def model_validate(cls, data,): pass
 
     class FlextMeltanoStateManager:
         pass
@@ -53,14 +59,13 @@ class TestFlextMeltanoProjectManager:
 
     @pytest.fixture
     def project_manager(self, tmp_path: Path) -> FlextMeltanoProjectManager:
-        from flext_meltano.config.settings import FlextMeltanoSettings
 
         settings = FlextMeltanoSettings()
         # Using None for container since we're isolated from flext_core
         return FlextMeltanoProjectManager(settings, None)
 
     @pytest.fixture
-    def temp_project_dir(self) -> Generator[Path]:
+    def temp_project_dir(self) -> Generator[Path,]:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield Path(temp_dir)
 
@@ -102,8 +107,8 @@ class TestFlextMeltanoProjectManager:
             error_msg = str(exc_info.value)
             assert any(
                 keyword in error_msg
-                for keyword in ["signature", "argument", "parameter"]
-            ), f"Unexpected error: {error_msg}"
+                for keyword in ["signature", "argument", "parameter",]
+            ), f"Unexpected error: {error_msg,}"
 
     def test_project_config_creation(self) -> None:
         """Test MeltanoProjectConfig creation and validation."""
@@ -137,7 +142,6 @@ class TestFlextProjectManager:
 
     @pytest.fixture
     def flext_manager(self, tmp_path: Path) -> FlextMeltanoProjectManager:
-        from flext_meltano.config.settings import FlextMeltanoSettings
 
         settings = FlextMeltanoSettings()
         # Using None for container since we're isolated from flext_core
@@ -179,8 +183,8 @@ class TestFlextProjectManager:
             error_msg = str(exc_info.value)
             assert any(
                 keyword in error_msg
-                for keyword in ["signature", "argument", "parameter"]
-            ), f"Unexpected error: {error_msg}"
+                for keyword in ["signature", "argument", "parameter",]
+            ), f"Unexpected error: {error_msg,}"
 
     @patch("subprocess.run")
     def test_meltano_command_execution(
@@ -196,7 +200,7 @@ class TestFlextProjectManager:
 
         try:
             # Test would use run_command method instead
-            result = {"success": True, "output": "Meltano version test"}
+            result = {"success": True, "output": "Meltano version test",}
             assert result is not None
 
         except AttributeError:
@@ -207,8 +211,8 @@ class TestFlextProjectManager:
             error_msg = str(exc_info.value)
             assert any(
                 keyword in error_msg
-                for keyword in ["run_meltano_command", "has no attribute"]
-            ), f"Unexpected error: {error_msg}"
+                for keyword in ["run_meltano_command", "has no attribute",]
+            ), f"Unexpected error: {error_msg,}"
             # This confirms the method is not implemented yet - acceptable
 
     def test_plugin_management(
@@ -217,24 +221,24 @@ class TestFlextProjectManager:
     ) -> None:
         try:
             # Test plugin listing
-            if hasattr(flext_manager, "list_plugins"):
+            if hasattr(flext_manager, "list_plugins",):
                 plugins = flext_manager.list_plugins()
                 assert isinstance(plugins, (list, dict))
 
             # Test plugin installation
-            if hasattr(flext_manager, "install_plugin"):
+            if hasattr(flext_manager, "install_plugin",):
                 flext_manager.install_plugin("tap-csv")
                 # Should not raise exception
 
         except (AttributeError, TypeError, ValueError):
             # If plugin management has different interface, verify the error is expected
             # Re-execute the problematic code to capture the exception properly
-            if hasattr(flext_manager, "list_plugins"):
+            if hasattr(flext_manager, "list_plugins",):
                 with pytest.raises(
                     (AttributeError, TypeError, ValueError),
                 ) as exc_info:
                     flext_manager.list_plugins()
-            elif hasattr(flext_manager, "install_plugin"):
+            elif hasattr(flext_manager, "install_plugin",):
                 with pytest.raises(
                     (AttributeError, TypeError, ValueError),
                 ) as exc_info:
@@ -247,8 +251,8 @@ class TestFlextProjectManager:
             error_msg = str(exc_info.value)
             assert any(
                 keyword in error_msg.lower()
-                for keyword in ["plugin", "method", "attribute"]
-            ), f"Unexpected error: {error_msg}"
+                for keyword in ["plugin", "method", "attribute",]
+            ), f"Unexpected error: {error_msg,}"
             # This confirms plugin management interface is different - acceptable
 
 
@@ -287,7 +291,7 @@ plugins:
         assert state_manager is not None
 
         # Test basic state operations
-        if hasattr(state_manager, "get_state"):
+        if hasattr(state_manager, "get_state",):
             # This would require a complete Meltano project setup
             # We'll test the manager initialization instead
             assert state_manager is not None
@@ -301,7 +305,7 @@ plugins:
         assert job_manager is not None
 
         # Test basic job operations
-        if hasattr(job_manager, "create_job"):
+        if hasattr(job_manager, "create_job",):
             job = job_manager.create_job(
                 name="test-job",
                 tap="tap-csv",
@@ -337,8 +341,8 @@ plugins:
             error_msg = str(exc_info.value)
             assert any(
                 keyword in error_msg.lower()
-                for keyword in ["orchestrator", "module", "import"]
-            ), f"Unexpected error: {error_msg}"
+                for keyword in ["orchestrator", "module", "import",]
+            ), f"Unexpected error: {error_msg,}"
             # This confirms orchestrator module is not available - acceptable in development
 
 
@@ -350,7 +354,6 @@ class TestMeltanoPerformance:
     def test_project_creation_performance(self, tmp_path: Path) -> None:
         # FlextContainer removed for isolation
 
-        from flext_meltano.config.settings import FlextMeltanoSettings
 
         settings = FlextMeltanoSettings()
         container = FlextContainer()
@@ -358,7 +361,7 @@ class TestMeltanoPerformance:
 
         start_time = time.time()
 
-        with contextlib.suppress(Exception):
+        with contextlib.suppress(Exception,):
             # Attempt to create project (may not work without proper Meltano setup)
             asyncio.run(
                 manager.create_project_bridge(
@@ -370,17 +373,16 @@ class TestMeltanoPerformance:
         duration = end_time - start_time
 
         # Should complete in reasonable time (< 5 seconds for basic operations)
-        assert duration < 5.0, f"Project creation took too long: {duration}s"
+        assert duration < 5.0, f"Project creation took too long: {duration,}s"
 
     def test_concurrent_operations(self, tmp_path: Path) -> None:
         # FlextContainer removed for isolation
 
-        from flext_meltano.config.settings import FlextMeltanoSettings
 
         settings = FlextMeltanoSettings()
         container = FlextContainer()
         manager = FlextMeltanoProjectManager(settings, container)
-        results: list[str] = []
+        results: list[str] = [,]
 
         def run_operation() -> None:
             try:
@@ -388,11 +390,11 @@ class TestMeltanoPerformance:
                 result = str(manager)  # Basic operation
                 results.append(result)
             except (AttributeError, TypeError, RuntimeError) as e:
-                results.append(f"Error: {e}")
+                results.append(f"Error: {e,}")
 
         # Start multiple threads
         threads = []
-        for _ in range(3):
+        for _ in range(3,):
             thread = threading.Thread(target=run_operation)
             threads.append(thread)
             thread.start()
@@ -412,7 +414,6 @@ def test_async_context(tmp_path: Path) -> None:
     async def test_operation() -> str:
         # FlextContainer removed for isolation
 
-        from flext_meltano.config.settings import FlextMeltanoSettings
 
         settings = FlextMeltanoSettings()
         container = FlextContainer()
