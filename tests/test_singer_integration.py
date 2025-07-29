@@ -1,7 +1,7 @@
 """Test Singer SDK integration.
 
-# Constants
-EXPECTED_DATA_COUNT = 3
+Copyright (c) 2025 Flext. All rights reserved.
+SPDX-License-Identifier: MIT
 
 Tests for Singer SDK integration including:
 - Tap and Target creation
@@ -31,6 +31,9 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+
+# Constants
+EXPECTED_DATA_COUNT = 3
 
 
 class TestSingerSDKReExports:
@@ -76,7 +79,7 @@ class TestTapServiceIntegration:
         assert not validation_result.is_success
         assert validation_result.error is not None
         if "Tap class not configured" not in validation_result.error:
-            msg = f"Expected {"Tap class not configured"} in {validation_result.error}"
+            msg = f"Expected {'Tap class not configured'} in {validation_result.error}"
             raise AssertionError(msg)
 
     def test_tap_service_health(self) -> None:
@@ -88,10 +91,10 @@ class TestTapServiceIntegration:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "tap":
-            msg = f"Expected {"tap"}, got {health_result.data["service"]}"
+            msg = f"Expected {'tap'}, got {health_result.data['service']}"
             raise AssertionError(msg)
         if health_result.data["tap_configured"]:
-            msg = f"Expected False, got {health_result.data["tap_configured"]}"
+            msg = f"Expected False, got {health_result.data['tap_configured']}"
             raise AssertionError(msg)
 
     def test_tap_class_setting(self) -> None:
@@ -142,7 +145,9 @@ class TestTargetServiceIntegration:
         assert not validation_result.is_success
         assert validation_result.error is not None
         if "Target class not configured" not in validation_result.error:
-            msg = f"Expected {"Target class not configured"} in {validation_result.error}"
+            msg = (
+                f"Expected {'Target class not configured'} in {validation_result.error}"
+            )
             raise AssertionError(msg)
 
     def test_target_service_health(self) -> None:
@@ -154,10 +159,10 @@ class TestTargetServiceIntegration:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "target":
-            msg = f"Expected {"target"}, got {health_result.data["service"]}"
+            msg = f"Expected {'target'}, got {health_result.data['service']}"
             raise AssertionError(msg)
         if health_result.data["target_configured"]:
-            msg = f"Expected False, got {health_result.data["target_configured"]}"
+            msg = f"Expected False, got {health_result.data['target_configured']}"
             raise AssertionError(msg)
 
     def test_target_class_setting(self) -> None:
@@ -220,6 +225,7 @@ class TestTapTestingUtilities:
 
     def test_get_tap_test_class(self) -> None:
         """Test get_tap_test_class utility."""
+
         # Create a mock tap class
         class MockTap(Tap):
             name = "tap-test"
@@ -243,7 +249,9 @@ class TestTapTestingUtilities:
         # Test class should be a test case class
         # Check for any test methods (Singer SDK interface may vary)
         test_methods = [attr for attr in dir(test_class) if attr.startswith("test_")]
-        assert len(test_methods) > 0, f"No test methods found. Available methods: {test_methods}"
+        assert len(test_methods) > 0, (
+            f"No test methods found. Available methods: {test_methods}"
+        )
 
 
 class TestStreamProcessing:
@@ -251,6 +259,7 @@ class TestStreamProcessing:
 
     def test_stream_creation(self) -> None:
         """Test stream creation."""
+
         # Create a mock tap
         class MockTap(Tap):
             name = "tap-mock"
@@ -278,7 +287,6 @@ class TestStreamProcessing:
         streams = tap.discover_streams()
 
         if len(streams) != 1:
-
             msg = f"Expected {1}, got {len(streams)}"
             raise AssertionError(msg)
         assert streams[0].name == "test_stream"

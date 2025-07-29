@@ -25,10 +25,7 @@ from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
 
 # Project import for hub initialization
-try:
-    from meltano.core.project import Project
-except ImportError:
-    Project = None  # type: ignore[assignment,misc]
+from meltano.core.project import Project
 from pydantic import BaseModel, Field
 
 # Singer SDK integration - MANDATORY for catalog discovery

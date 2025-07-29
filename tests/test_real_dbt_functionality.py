@@ -4,9 +4,6 @@ Tests validate actual DBT model execution, testing, and project operations.
 All tests use real dbt-core integration without mocks.
 """
 
-import tempfile
-
-
 from __future__ import annotations
 
 import tempfile
@@ -177,7 +174,10 @@ where id is null
         assert result.error is not None
         assert result.error is not None
         if "DBT project not found" not in result.error:
-            raise AssertionError(f"Expected {"DBT project not found"} in {result.error}")
+            msg = f"Expected {'DBT project not found'} in {result.error}"
+            raise AssertionError(
+                msg,
+            )
 
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_run_with_exclude(
@@ -200,8 +200,9 @@ where id is null
         # Should return actual version string
         assert isinstance(version, str)
         assert len(version) > 0
-        if "." not in version  # Version should contain dots:
-            raise AssertionError(f"Expected {"."} in {version  # Version should contain dots}")
+        if "." not in version:  # Version should contain dots
+            msg = f"Expected {'.'} in {version}"
+            raise AssertionError(msg)
 
     def test_flext_meltano_dbt_service_execute(
         self,
@@ -215,9 +216,11 @@ where id is null
         data = result.data
         assert isinstance(data, dict)
         if data["service"] != "dbt":
-            raise AssertionError(f"Expected {"dbt"}, got {data["service"]}")
+            msg = f"Expected {'dbt'}, got {data['service']}"
+            raise AssertionError(msg)
         if "project_dir" not in data:
-            raise AssertionError(f"Expected {"project_dir"} in {data}")
+            msg = f"Expected {'project_dir'} in {data}"
+            raise AssertionError(msg)
 
 
 class TestFlextMeltanoDbtServiceIntegration:

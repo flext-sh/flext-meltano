@@ -7,12 +7,6 @@ Tests for Meltano integration including:
 - Configuration validation
 """
 
-from flext_meltano import flext_meltano_execute_job, flext_meltano_run_command
-from flext_meltano import flext_meltano_discover_plugins
-from flext_meltano import flext_meltano_validate_project
-from flext_meltano import flext_meltano_install_plugin
-
-
 import shutil
 import tempfile
 from pathlib import Path
@@ -26,6 +20,11 @@ from flext_meltano import (
     FlextMeltanoInstaller,
     FlextMeltanoValidationService,
     MeltanoCoreProject,
+    flext_meltano_discover_plugins,
+    flext_meltano_execute_job,
+    flext_meltano_install_plugin,
+    flext_meltano_run_command,
+    flext_meltano_validate_project,
 )
 
 
@@ -51,8 +50,13 @@ class TestMeltanoProjectOperations:
         validation_result = result.data
         assert validation_result is not None
         assert not validation_result.is_valid
-        if any("meltano.yml file not found" in issue for issue not in validation_result.issues):
-            raise AssertionError(f"Expected {any("meltano.yml file not found" in issue for issue} in {validation_result.issues)}")
+        if not any(
+            "meltano.yml file not found" in issue for issue in validation_result.issues
+        ):
+            msg = f"Expected {'meltano.yml file not found'} in {validation_result.issues}"
+            raise AssertionError(
+                msg,
+            )
 
     def test_project_validation_with_meltano_yml(self) -> None:
         """Test project validation with meltano.yml."""
@@ -74,7 +78,10 @@ environments:
         assert validation_result is not None
         assert validation_result.is_valid
         if not (validation_result.details["meltano_yml_exists"]):
-            raise AssertionError(f"Expected True, got {validation_result.details["meltano_yml_exists"]}")
+            msg = f"Expected True, got {validation_result.details['meltano_yml_exists']}"
+            raise AssertionError(
+                msg,
+            )
 
     def test_installer_validation_no_project(self) -> None:
         """Test installer validation without project."""
@@ -85,7 +92,8 @@ environments:
         assert result.error is not None
         assert result.error is not None
         if "No meltano.yml found" not in result.error:
-            raise AssertionError(f"Expected {"No meltano.yml found"} in {result.error}")
+            msg = f"Expected {'No meltano.yml found'} in {result.error}"
+            raise AssertionError(msg)
 
     def test_installer_validation_with_project(self) -> None:
         """Test installer validation with project."""
@@ -124,7 +132,10 @@ class TestMeltanoCommandExecution:
         assert result.is_success
         assert result.data is not None
         if result.data["service"] != "execution":
-            raise AssertionError(f"Expected {"execution"}, got {result.data["service"]}")
+            msg = f"Expected {'execution'}, got {result.data['service']}"
+            raise AssertionError(
+                msg,
+            )
 
     def test_executor_validation(self) -> None:
         """Test executor validation."""
@@ -157,7 +168,10 @@ class TestMeltanoPluginDiscovery:
         assert result.is_success
         assert result.data is not None
         if result.data["service"] != "discovery":
-            raise AssertionError(f"Expected {"discovery"}, got {result.data["service"]}")
+            msg = f"Expected {'discovery'}, got {result.data['service']}"
+            raise AssertionError(
+                msg,
+            )
 
     def test_plugin_discovery_fallback(self) -> None:
         """Test plugin discovery fallback functionality."""
@@ -175,7 +189,8 @@ class TestMeltanoPluginDiscovery:
         # Check default plugins are present
         plugin_names = [p.name for p in plugins]
         if "tap-csv" not in plugin_names:
-            raise AssertionError(f"Expected {"tap-csv"} in {plugin_names}")
+            msg = f"Expected {'tap-csv'} in {plugin_names}"
+            raise AssertionError(msg)
         assert "target-csv" in plugin_names
 
     def test_plugin_discovery_by_type(self) -> None:
@@ -193,7 +208,8 @@ class TestMeltanoPluginDiscovery:
         # All plugins should be extractors
         for plugin in plugins:
             if plugin.type != "extractors":
-                raise AssertionError(f"Expected {"extractors"}, got {plugin.type}")
+                msg = f"Expected {'extractors'}, got {plugin.type}"
+                raise AssertionError(msg)
 
 
 class TestMeltanoCoreIntegration:
@@ -228,11 +244,12 @@ class TestMeltanoConfiguration:
         )
 
         if config.environment != "test":
-
-            raise AssertionError(f"Expected {"test"}, got {config.environment}")
+            msg = f"Expected {'test'}, got {config.environment}"
+            raise AssertionError(msg)
         assert config.meltano_database_uri == "sqlite:///test.db"
         if config.meltano_ui_bind_port != 5001:
-            raise AssertionError(f"Expected {5001}, got {config.meltano_ui_bind_port}")
+            msg = f"Expected {5001}, got {config.meltano_ui_bind_port}"
+            raise AssertionError(msg)
 
     def test_config_validation(self) -> None:
         """Test configuration validation."""
@@ -254,14 +271,12 @@ class TestMeltanoLegacyCompatibility:
     def test_legacy_execution_functions(self) -> None:
         """Test legacy execution functions."""
 
-
         # Functions should be available
         assert callable(flext_meltano_execute_job)
         assert callable(flext_meltano_run_command)
 
     def test_legacy_discovery_functions(self) -> None:
         """Test legacy discovery functions."""
-
 
         # Should work and return plugins
         result = flext_meltano_discover_plugins()
@@ -270,11 +285,11 @@ class TestMeltanoLegacyCompatibility:
             assert result.data is not None
         assert result.data is not None
         if "plugins" not in result.data:
-            raise AssertionError(f"Expected {"plugins"} in {result.data}")
+            msg = f"Expected {'plugins'} in {result.data}"
+            raise AssertionError(msg)
 
     def test_legacy_validation_functions(self) -> None:
         """Test legacy validation functions."""
-
 
         # Should work with default project
         result = flext_meltano_validate_project()
@@ -282,7 +297,6 @@ class TestMeltanoLegacyCompatibility:
 
     def test_legacy_installation_functions(self) -> None:
         """Test legacy installation functions."""
-
 
         # Function should be available
         assert callable(flext_meltano_install_plugin)

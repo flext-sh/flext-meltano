@@ -32,6 +32,12 @@ from dbt.adapters.contracts.connection import (
 )
 from dbt.adapters.sql import SQLAdapter  # type: ignore[attr-defined]
 
+# DBT exceptions - using available modules
+from dbt_common.exceptions import (
+    DbtDatabaseError,
+    DbtRuntimeError,
+)
+
 # Meltano Core integration - required dependency
 from meltano.core.project import Project as MeltanoCoreProject
 
@@ -102,25 +108,8 @@ from flext_meltano.validation import (
     flext_meltano_validate_tap_config,
 )
 
-# DBT exceptions - try modern first, fallback to legacy
-try:
-    from dbt_common.exceptions import (
-        DbtDatabaseError,
-        DbtRuntimeError,
-    )
-except ImportError:
-    from dbt.exceptions import (  # type: ignore[attr-defined]
-        DatabaseException as DbtDatabaseError,
-        RuntimeException as DbtRuntimeError,
-    )
-
-# DBT run result - try modern first, fallback to legacy
-try:
-    import dbt_common.contracts.results  # type: ignore[import-not-found]
-    DbtRunResult = dbt_common.contracts.results.RunResult
-except ImportError:
-    # Fallback to legacy dbt.contracts.results
-    DbtRunResult = dbt.contracts.results.RunResult
+# DBT run result - using available module
+DbtRunResult = dbt.contracts.results.RunResult
 
 
 # === LEGACY COMPATIBILITY ===
