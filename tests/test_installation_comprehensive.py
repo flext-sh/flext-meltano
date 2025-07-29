@@ -37,10 +37,12 @@ class TestFlextMeltanoInstallationContext:
             plugin_type="extractors",
         )
         if context.plugin_name != "tap-csv":
-            raise AssertionError(f"Expected {"tap-csv"}, got {context.plugin_name}")
+            msg = f"Expected {'tap-csv'}, got {context.plugin_name}"
+            raise AssertionError(msg)
         assert context.plugin_type == "extractors"
         if context.timeout_seconds != DEFAULT_TTL:
-            raise AssertionError(f"Expected {600}, got {context.timeout_seconds}")
+            msg = f"Expected {600}, got {context.timeout_seconds}"
+            raise AssertionError(msg)
         assert context.metadata == {}
         assert isinstance(context.installation_id, str)
         assert isinstance(context.started_at, datetime)
@@ -57,13 +59,22 @@ class TestFlextMeltanoInstallationContext:
                 metadata={"test": "value"},
             )
             if context.plugin_name != "tap-postgres":
-                raise AssertionError(f"Expected {"tap-postgres"}, got {context.plugin_name}")
+                msg = f"Expected {'tap-postgres'}, got {context.plugin_name}"
+                raise AssertionError(
+                    msg,
+                )
             assert context.plugin_type == "extractors"
             if context.project_root != custom_path:
-                raise AssertionError(f"Expected {custom_path}, got {context.project_root}")
+                msg = f"Expected {custom_path}, got {context.project_root}"
+                raise AssertionError(
+                    msg,
+                )
             assert context.timeout_seconds == 300
             if context.metadata != {"test": "value"}:
-                raise AssertionError(f"Expected {{\"test\": \"value\"}}, got {context.metadata}")
+                msg = f'Expected {{"test": "value"}}, got {context.metadata}'
+                raise AssertionError(
+                    msg,
+                )
 
 
 class TestFlextMeltanoPluginInfo:
@@ -77,17 +88,22 @@ class TestFlextMeltanoPluginInfo:
             namespace="tap_csv",
         )
         if plugin.name != "tap-csv":
-            raise AssertionError(f"Expected {"tap-csv"}, got {plugin.name}")
+            msg = f"Expected {'tap-csv'}, got {plugin.name}"
+            raise AssertionError(msg)
         assert plugin.type == "extractors"
         if plugin.namespace != "tap_csv":
-            raise AssertionError(f"Expected {"tap_csv"}, got {plugin.namespace}")
+            msg = f"Expected {'tap_csv'}, got {plugin.namespace}"
+            raise AssertionError(msg)
         assert plugin.pip_url is None
         assert plugin.executable is None
         if plugin.description != "":
-            raise AssertionError(f"Expected {""}, got {plugin.description}")
+            msg = f"Expected {''}, got {plugin.description}"
+            raise AssertionError(msg)
         assert plugin.version is None
         if plugin.installed:
-            raise AssertionError(f"Expected False, got {plugin.installed}")
+            msg = f"Expected False, got {plugin.installed}"
+            raise AssertionError(msg)
+
     def test_plugin_info_complete(self) -> None:
         """Test plugin info with all fields."""
         plugin = FlextMeltanoPluginInfo(
@@ -101,18 +117,23 @@ class TestFlextMeltanoPluginInfo:
             installed=True,
         )
         if plugin.name != "tap-postgres":
-            raise AssertionError(f"Expected {"tap-postgres"}, got {plugin.name}")
+            msg = f"Expected {'tap-postgres'}, got {plugin.name}"
+            raise AssertionError(msg)
         assert plugin.type == "extractors"
         if plugin.namespace != "tap_postgres":
-            raise AssertionError(f"Expected {"tap_postgres"}, got {plugin.namespace}")
+            msg = f"Expected {'tap_postgres'}, got {plugin.namespace}"
+            raise AssertionError(msg)
         assert plugin.pip_url == "pipelinewise-tap-postgres"
         if plugin.executable != "tap-postgres":
-            raise AssertionError(f"Expected {"tap-postgres"}, got {plugin.executable}")
+            msg = f"Expected {'tap-postgres'}, got {plugin.executable}"
+            raise AssertionError(msg)
         assert plugin.description == "PostgreSQL tap"
         if plugin.version != "1.0.0":
-            raise AssertionError(f"Expected {"1.0.0"}, got {plugin.version}")
+            msg = f"Expected {'1.0.0'}, got {plugin.version}"
+            raise AssertionError(msg)
         if not (plugin.installed):
-            raise AssertionError(f"Expected True, got {plugin.installed}")
+            msg = f"Expected True, got {plugin.installed}"
+            raise AssertionError(msg)
 
     def test_plugin_info_frozen(self) -> None:
         """Test that plugin info is frozen."""
@@ -141,7 +162,8 @@ class TestFlextMeltanoInstallerValidation:
             result = installer.validate()
             assert result.is_success
             if not (result.data):
-                raise AssertionError(f"Expected True, got {result.data}")
+                msg = f"Expected True, got {result.data}"
+                raise AssertionError(msg)
 
     def test_validation_failure_missing_project_root(self) -> None:
         """Test validation failure when project root doesn't exist."""
@@ -152,7 +174,10 @@ class TestFlextMeltanoInstallerValidation:
         assert not result.is_success
         assert result.error is not None
         if "Project root does not exist" not in result.error:
-            raise AssertionError(f"Expected {"Project root does not exist"} in {result.error}")
+            msg = f"Expected {'Project root does not exist'} in {result.error}"
+            raise AssertionError(
+                msg,
+            )
 
     def test_validation_failure_missing_meltano_yml(self) -> None:
         """Test validation failure when meltano.yml doesn't exist."""
@@ -164,7 +189,10 @@ class TestFlextMeltanoInstallerValidation:
             assert not result.is_success
             assert result.error is not None
             if "No meltano.yml found" not in result.error:
-                raise AssertionError(f"Expected {"No meltano.yml found"} in {result.error}")
+                msg = f"Expected {'No meltano.yml found'} in {result.error}"
+                raise AssertionError(
+                    msg,
+                )
 
     def test_validation_exception_handling(self) -> None:
         """Test validation exception handling."""
@@ -202,9 +230,13 @@ class TestFlextMeltanoInstallerOperations:
             assert result.is_success
             assert result.data is not None
             if not (result.data["success"]):
-                raise AssertionError(f"Expected True, got {result.data["success"]}")
+                msg = f"Expected True, got {result.data['success']}"
+                raise AssertionError(msg)
             if result.data["plugin_name"] != "tap-csv":
-                raise AssertionError(f"Expected {"tap-csv"}, got {result.data["plugin_name"]}")
+                msg = f"Expected {'tap-csv'}, got {result.data['plugin_name']}"
+                raise AssertionError(
+                    msg,
+                )
             assert result.data["plugin_type"] == "extractor"
 
     @patch("subprocess.run")
@@ -223,17 +255,34 @@ class TestFlextMeltanoInstallerOperations:
             config = FlextMeltanoConfig(project_root=temp_dir)
             installer = FlextMeltanoInstaller(config)
 
-            result = installer.add_plugin("extractor", "tap-csv", "pipelinewise-tap-csv")
+            result = installer.add_plugin(
+                "extractor",
+                "tap-csv",
+                "pipelinewise-tap-csv",
+            )
             assert result.is_success
             assert result.data is not None
             if result.data["pip_url"] != "pipelinewise-tap-csv":
-                raise AssertionError(f"Expected {"pipelinewise-tap-csv"}, got {result.data["pip_url"]}")
+                msg = f"Expected {'pipelinewise-tap-csv'}, got {result.data['pip_url']}"
+                raise AssertionError(
+                    msg,
+                )
 
             # Verify command construction
             mock_run.assert_called_once()
             args = mock_run.call_args[0][0]
-            if args != ["meltano", "add", "extractor", "tap-csv", "--custom", "pipelinewise-tap-csv"]:
-                raise AssertionError(f"Expected {["meltano", "add", "extractor", "tap-csv", "--custom", "pipelinewise-tap-csv"]}, got {args}")
+            if args != [
+                "meltano",
+                "add",
+                "extractor",
+                "tap-csv",
+                "--custom",
+                "pipelinewise-tap-csv",
+            ]:
+                msg = f"Expected {['meltano', 'add', 'extractor', 'tap-csv', '--custom', 'pipelinewise-tap-csv']}, got {args}"
+                raise AssertionError(
+                    msg,
+                )
 
     @patch("subprocess.run")
     def test_add_plugin_failure(self, mock_run: Mock) -> None:
@@ -255,7 +304,10 @@ class TestFlextMeltanoInstallerOperations:
             assert not result.is_success
             assert result.error is not None
             if "Plugin add failed" not in result.error:
-                raise AssertionError(f"Expected {"Plugin add failed"} in {result.error}")
+                msg = f"Expected {'Plugin add failed'} in {result.error}"
+                raise AssertionError(
+                    msg,
+                )
 
     @patch("subprocess.run")
     def test_add_plugin_timeout(self, mock_run: Mock) -> None:
@@ -273,7 +325,10 @@ class TestFlextMeltanoInstallerOperations:
             assert not result.is_success
             assert result.error is not None
             if "Plugin add timed out" not in result.error:
-                raise AssertionError(f"Expected {"Plugin add timed out"} in {result.error}")
+                msg = f"Expected {'Plugin add timed out'} in {result.error}"
+                raise AssertionError(
+                    msg,
+                )
 
     @patch("subprocess.run")
     def test_install_plugins_success(self, mock_run: Mock) -> None:
@@ -295,9 +350,13 @@ class TestFlextMeltanoInstallerOperations:
             assert result.is_success
             assert result.data is not None
             if result.data["operation"] != "install_all":
-                raise AssertionError(f"Expected {"install_all"}, got {result.data["operation"]}")
+                msg = f"Expected {'install_all'}, got {result.data['operation']}"
+                raise AssertionError(
+                    msg,
+                )
             if not (result.data["success"]):
-                raise AssertionError(f"Expected True, got {result.data["success"]}")
+                msg = f"Expected True, got {result.data['success']}"
+                raise AssertionError(msg)
 
     @patch("subprocess.run")
     def test_remove_plugin_success(self, mock_run: Mock) -> None:
@@ -319,7 +378,10 @@ class TestFlextMeltanoInstallerOperations:
             assert result.is_success
             assert result.data is not None
             if result.data["operation"] != "remove":
-                raise AssertionError(f"Expected {"remove"}, got {result.data["operation"]}")
+                msg = f"Expected {'remove'}, got {result.data['operation']}"
+                raise AssertionError(
+                    msg,
+                )
             assert result.data["plugin_name"] == "tap-csv"
 
     @patch("subprocess.run")
@@ -361,17 +423,20 @@ class TestFlextMeltanoInstallerOperations:
             result = installer.list_plugins()
             assert result.is_success
             assert result.data is not None
-            if len(result.data) != EXPECTED_BULK_SIZE  # 2 plugins total:
-                raise AssertionError(f"Expected {2  # 2 plugins total}, got {len(result.data)}")
+            if len(result.data) != EXPECTED_BULK_SIZE:  # 2 plugins total
+                msg = f"Expected {2}, got {len(result.data)}"
+                raise AssertionError(msg)
 
             # Check first plugin
             assert result.data is not None
             plugin = result.data[0]
             if plugin.name != "tap-csv":
-                raise AssertionError(f"Expected {"tap-csv"}, got {plugin.name}")
+                msg = f"Expected {'tap-csv'}, got {plugin.name}"
+                raise AssertionError(msg)
             assert plugin.type == "extractors"
             if not (plugin.installed):
-                raise AssertionError(f"Expected True, got {plugin.installed}")
+                msg = f"Expected True, got {plugin.installed}"
+                raise AssertionError(msg)
 
     @patch("subprocess.run")
     def test_list_plugins_json_decode_error(self, mock_run: Mock) -> None:
@@ -393,7 +458,10 @@ class TestFlextMeltanoInstallerOperations:
             assert not result.is_success
             assert result.error is not None
             if "Failed to parse plugin list JSON" not in result.error:
-                raise AssertionError(f"Expected {"Failed to parse plugin list JSON"} in {result.error}")
+                msg = f"Expected {'Failed to parse plugin list JSON'} in {result.error}"
+                raise AssertionError(
+                    msg,
+                )
 
     def test_convert_plugin_list(self) -> None:
         """Test _convert_plugin_list method."""
@@ -417,19 +485,23 @@ class TestFlextMeltanoInstallerOperations:
 
         plugins = installer._convert_plugin_list("extractors", plugin_list)
         if len(plugins) != EXPECTED_BULK_SIZE:
-            raise AssertionError(f"Expected {2}, got {len(plugins)}")
+            msg = f"Expected {2}, got {len(plugins)}"
+            raise AssertionError(msg)
 
         # First plugin
         if plugins[0].name != "tap-csv":
-            raise AssertionError(f"Expected {"tap-csv"}, got {plugins[0].name}")
+            msg = f"Expected {'tap-csv'}, got {plugins[0].name}"
+            raise AssertionError(msg)
         assert plugins[0].type == "extractors"
         if plugins[0].namespace != "tap_csv":
-            raise AssertionError(f"Expected {"tap_csv"}, got {plugins[0].namespace}")
+            msg = f"Expected {'tap_csv'}, got {plugins[0].namespace}"
+            raise AssertionError(msg)
         assert plugins[0].version == "1.0.0"
 
         # Second plugin with generated namespace
         if plugins[1].name != "tap-postgres":
-            raise AssertionError(f"Expected {"tap-postgres"}, got {plugins[1].name}")
+            msg = f"Expected {'tap-postgres'}, got {plugins[1].name}"
+            raise AssertionError(msg)
         assert plugins[1].namespace == "tap_postgres"  # Generated from name
 
     def test_convert_plugin_list_edge_cases(self) -> None:
@@ -440,20 +512,24 @@ class TestFlextMeltanoInstallerOperations:
         # Test with non-list input
         plugins = installer._convert_plugin_list("extractors", "not a list")
         if plugins != []:
-            raise AssertionError(f"Expected {[]}, got {plugins}")
+            msg = f"Expected {[]}, got {plugins}"
+            raise AssertionError(msg)
 
         # Test with list containing non-dict items
         plugins = installer._convert_plugin_list("extractors", ["not a dict", 123])
         if plugins != []:
-            raise AssertionError(f"Expected {[]}, got {plugins}")
+            msg = f"Expected {[]}, got {plugins}"
+            raise AssertionError(msg)
 
         # Test with empty dict
         plugins = installer._convert_plugin_list("extractors", [{}])
         if len(plugins) != 1:
-            raise AssertionError(f"Expected {1}, got {len(plugins)}")
+            msg = f"Expected {1}, got {len(plugins)}"
+            raise AssertionError(msg)
         assert plugins[0].name == ""
         if plugins[0].namespace != "":
-            raise AssertionError(f"Expected {""}, got {plugins[0].namespace}")
+            msg = f"Expected {''}, got {plugins[0].namespace}"
+            raise AssertionError(msg)
 
 
 class TestFlextMeltanoInstallerPrivateMethods:
@@ -474,7 +550,8 @@ class TestFlextMeltanoInstallerPrivateMethods:
         result = installer._execute_meltano_list()
         assert result.is_success
         if result.data != '{"extractors": []}':
-            raise AssertionError(f"Expected {'{"extractors": []}'}, got {result.data}")
+            msg = f"Expected {'{"extractors": []}'}, got {result.data}"
+            raise AssertionError(msg)
 
     @patch("subprocess.run")
     def test_execute_meltano_list_failure(self, mock_run: Mock) -> None:
@@ -492,7 +569,8 @@ class TestFlextMeltanoInstallerPrivateMethods:
         assert not result.is_success
         assert result.error is not None
         if "Plugin list failed" not in result.error:
-            raise AssertionError(f"Expected {"Plugin list failed"} in {result.error}")
+            msg = f"Expected {'Plugin list failed'} in {result.error}"
+            raise AssertionError(msg)
 
     def test_parse_plugin_list_success(self) -> None:
         """Test _parse_plugin_list success."""
@@ -505,7 +583,8 @@ class TestFlextMeltanoInstallerPrivateMethods:
         assert result.is_success
         assert result.data is not None
         if len(result.data) != 1:
-            raise AssertionError(f"Expected {1}, got {len(result.data)}")
+            msg = f"Expected {1}, got {len(result.data)}"
+            raise AssertionError(msg)
         assert result.data[0].name == "tap-csv"
 
     def test_parse_plugin_list_invalid_json(self) -> None:
@@ -517,7 +596,10 @@ class TestFlextMeltanoInstallerPrivateMethods:
         assert not result.is_success
         assert result.error is not None
         if "Failed to parse plugin list JSON" not in result.error:
-            raise AssertionError(f"Expected {"Failed to parse plugin list JSON"} in {result.error}")
+            msg = f"Expected {'Failed to parse plugin list JSON'} in {result.error}"
+            raise AssertionError(
+                msg,
+            )
 
 
 class TestFlextMeltanoInstallerContexts:
@@ -549,7 +631,10 @@ class TestFlextMeltanoInstallerContexts:
             assert result.is_success
             assert result.data is not None
             if result.data["installation_id"] != context.installation_id:
-                raise AssertionError(f"Expected {context.installation_id}, got {result.data["installation_id"]}")
+                msg = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+                raise AssertionError(
+                    msg,
+                )
 
     @patch("subprocess.run")
     def test_install_plugins_with_custom_context(self, mock_run: Mock) -> None:
@@ -577,7 +662,10 @@ class TestFlextMeltanoInstallerContexts:
             assert result.is_success
             assert result.data is not None
             if result.data["installation_id"] != context.installation_id:
-                raise AssertionError(f"Expected {context.installation_id}, got {result.data["installation_id"]}")
+                msg = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+                raise AssertionError(
+                    msg,
+                )
 
     @patch("subprocess.run")
     def test_remove_plugin_with_custom_context(self, mock_run: Mock) -> None:
@@ -605,7 +693,10 @@ class TestFlextMeltanoInstallerContexts:
             assert result.is_success
             assert result.data is not None
             if result.data["installation_id"] != context.installation_id:
-                raise AssertionError(f"Expected {context.installation_id}, got {result.data["installation_id"]}")
+                msg = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+                raise AssertionError(
+                    msg,
+                )
 
 
 class TestFactoryAndLegacyFunctions:
@@ -635,7 +726,8 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_install_plugin("extractor", "tap-csv", Path.cwd())
         if not (result.success):
-            raise AssertionError(f"Expected True, got {result.success}")
+            msg = f"Expected True, got {result.success}"
+            raise AssertionError(msg)
 
         # Verify deprecation warning
         with pytest.warns(DeprecationWarning, match=".*"):
@@ -648,13 +740,18 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_install_plugin("extractor", "tap-csv", Path.cwd())
         if result.success:
-            raise AssertionError(f"Expected False, got {result.success}")\ n        assert result.error is not None
+            msg = f"Expected False, got {result.success}"
+            raise AssertionError(msg)
+        assert result.error is not None
         if "Installation failed" not in result.error:
-            raise AssertionError(f"Expected {"Installation failed"} in {result.error}")
+            msg = f"Expected {'Installation failed'} in {result.error}"
+            raise AssertionError(msg)
 
     def test_flext_meltano_install_plugin_with_pip_url(self) -> None:
         """Test legacy install plugin function with pip URL."""
-        with patch("flext_meltano.installation.FlextMeltanoInstaller.add_plugin") as mock_add_plugin:
+        with patch(
+            "flext_meltano.installation.FlextMeltanoInstaller.add_plugin",
+        ) as mock_add_plugin:
             mock_add_plugin.return_value = FlextResult(data={"success": True})
 
             result = flext_meltano_install_plugin(
@@ -664,10 +761,15 @@ class TestFactoryAndLegacyFunctions:
                 "pipelinewise-tap-csv",
             )
             if not (result.success):
-                raise AssertionError(f"Expected True, got {result.success}")
+                msg = f"Expected True, got {result.success}"
+                raise AssertionError(msg)
 
             # Verify pip_url was passed correctly
-            mock_add_plugin.assert_called_once_with("extractor", "tap-csv", "pipelinewise-tap-csv")
+            mock_add_plugin.assert_called_once_with(
+                "extractor",
+                "tap-csv",
+                "pipelinewise-tap-csv",
+            )
 
 
 if __name__ == "__main__":
