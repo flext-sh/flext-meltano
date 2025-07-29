@@ -12,37 +12,26 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from flext_meltano.helpers.execution import FlextMeltanoResult
-
-# Timeout constants to avoid magic numbers
-DEFAULT_TIMEOUT = 300
-DISCOVERY_TIMEOUT = 60
-DEFAULT_POSTGRES_PORT = 5432
-DEFAULT_ORACLE_PORT = 1521
-DEFAULT_MYSQL_PORT = 3306
-BACKOFF_BASE = 2
-
+from flext_meltano.flext_meltano_execution import FlextMeltanoResult
 
 # Real Singer SDK imports
 try:
     from singer_sdk import Tap
     from singer_sdk.testing import get_tap_test_class
-
     SINGER_AVAILABLE = True
 except ImportError:
-    Tap = None  # type: ignore[]
-    get_tap_test_class = None  # type: ignore[]
+    Tap = None  # type: ignore[misc,assignment]
+    get_tap_test_class = None  # type: ignore[misc,assignment]
     SINGER_AVAILABLE = False
 
 # Real Meltano imports
 try:
     from meltano.core.hub import MeltanoHub
     from meltano.core.plugin.base import PluginType
-
     MELTANO_AVAILABLE = True
 except ImportError:
-    PluginType = None  # type: ignore[]
-    MeltanoHub = None  # type: ignore[]
+    PluginType = None  # type: ignore[misc,assignment]
+    MeltanoHub = None  # type: ignore[misc,assignment]
     MELTANO_AVAILABLE = False
 
 
@@ -75,9 +64,7 @@ async def flext_meltano_discover_catalog(
 
             # Try to create real tap instance using subprocess discovery
             catalog_result = await _discover_catalog_with_subprocess(
-                tap_name,
-                project_root,
-                config or {},
+                tap_name, project_root, config or {},
             )
 
             if catalog_result.success:
@@ -87,7 +74,7 @@ async def flext_meltano_discover_catalog(
             return await _discover_catalog_direct_singer(tap_name, config or {})
 
     except (OSError, ValueError, ImportError, subprocess.SubprocessError) as e:
-        return FlextMeltanoResult.fail(f"Catalog discovery failed: {(e,)}")
+        return FlextMeltanoResult.fail(f"Catalog discovery failed: {e}")
 
 
 async def _discover_catalog_with_subprocess(
@@ -120,7 +107,7 @@ async def _discover_catalog_with_subprocess(
             try:
                 stdout, stderr = await asyncio.wait_for(
                     process.communicate(),
-                    timeout=DISCOVERY_TIMEOUT,  # 60 second timeout for discovery
+                    timeout=60,  # 60 second timeout for discovery
                 )
                 stdout_text = stdout.decode("utf-8") if stdout else ""
                 stderr_text = stderr.decode("utf-8") if stderr else ""
@@ -128,24 +115,23 @@ async def _discover_catalog_with_subprocess(
             except TimeoutError:
                 process.kill()
                 await process.wait()
-                return FlextMeltanoResult.fail(f"Discovery timeout for {(tap_name,)}")
+                return FlextMeltanoResult.fail(f"Discovery timeout for {tap_name}")
 
             if returncode == 0 and stdout_text:
                 # Parse catalog from stdout
                 import json
-
                 catalog_data = json.loads(stdout_text)
                 return FlextMeltanoResult.ok(catalog_data)
 
             # If subprocess failed, return error
             error_msg = stderr_text or "Unknown discovery error"
-            return FlextMeltanoResult.fail(f"Meltano discovery failed: {(error_msg,)}")
+            return FlextMeltanoResult.fail(f"Meltano discovery failed: {error_msg}")
 
         except json.JSONDecodeError as e:
-            return FlextMeltanoResult.fail(f"Invalid catalog JSON: {(e,)}")
+            return FlextMeltanoResult.fail(f"Invalid catalog JSON: {e}")
 
     except (OSError, subprocess.SubprocessError) as e:
-        return FlextMeltanoResult.fail(f"Subprocess discovery failed: {(e,)}")
+        return FlextMeltanoResult.fail(f"Subprocess discovery failed: {e}")
 
 
 async def _discover_catalog_direct_singer(
@@ -169,15 +155,13 @@ async def _discover_catalog_direct_singer(
                             "data": {"type": "string"},
                         },
                     },
-                    "metadata": [
-                        {
-                            "breadcrumb": [],
-                            "metadata": {
-                                "selected": True,
-                                "replication-method": "FULL_TABLE",
-                            },
+                    "metadata": [{
+                        "breadcrumb": [],
+                        "metadata": {
+                            "selected": True,
+                            "replication-method": "FULL_TABLE",
                         },
-                    ],
+                    }],
                 },
             ],
         }
@@ -185,7 +169,7 @@ async def _discover_catalog_direct_singer(
         return FlextMeltanoResult.ok(basic_catalog)
 
     except (ImportError, AttributeError, ValueError) as e:
-        return FlextMeltanoResult.fail(f"Direct Singer discovery failed: {(e,)}")
+        return FlextMeltanoResult.fail(f"Direct Singer discovery failed: {e}")
 
 
 def flext_meltano_discover_plugins(
@@ -222,14 +206,8 @@ def flext_meltano_discover_plugins(
             for plugin in plugins:
                 plugin_dict = {
                     "name": plugin.name,
-                    "type": plugin.type.value
-                    if hasattr(plugin.type, "value")
-                    else str(plugin.type),
-                    "namespace": getattr(
-                        plugin,
-                        "namespace",
-                        plugin.name.replace("-", "_"),
-                    ),
+                    "type": plugin.type.value if hasattr(plugin.type, "value") else str(plugin.type),
+                    "namespace": getattr(plugin, "namespace", plugin.name.replace("-", "_")),
                     "description": getattr(plugin, "description", ""),
                     "pip_url": getattr(plugin, "pip_url", plugin.name),
                 }
@@ -268,7 +246,7 @@ def flext_meltano_discover_plugins(
         return FlextMeltanoResult.ok({"plugins": plugins})
 
     except (ValueError, TypeError, RuntimeError, OSError, ImportError) as e:
-        return FlextMeltanoResult.fail(f"Failed to discover plugins: {(e,)}")
+        return FlextMeltanoResult.fail(f"Failed to discover plugins: {e}")
 
 
 def _convert_plugin_type_string(plugin_type_str: str) -> object:
