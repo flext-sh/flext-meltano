@@ -5,7 +5,11 @@ Singer SDK, Meltano EDK, and DBT approaches.
 """
 
 import asyncio
+import json
 import pathlib
+import subprocess
+import tempfile
+from typing import Any
 
 from flext_meltano.helpers import (
     FlextMeltanoSingerUtils,
@@ -29,9 +33,6 @@ from flext_meltano.patterns import (
 def example_postgres_to_jsonl_traditional():
     """Traditional approach - 50+ lines of boilerplate code."""
     # Traditional Singer SDK approach (simplified example)
-    import json
-    import subprocess
-    import tempfile
 
     # Step 1: Create tap configuration (manual JSON creation)
     tap_config = {
@@ -218,9 +219,6 @@ def example_enterprise_config_flext_meltano():
 
 def example_singer_processing_traditional():
     """Traditional Singer message processing - manual validation and creation."""
-    import json
-    from typing import Any
-
     def create_schema_message(stream_name: str, schema: dict[str, Any], key_properties: list[str]):
         return {
             "type": "SCHEMA",

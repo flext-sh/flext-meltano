@@ -85,7 +85,8 @@ BACKOFF_BASE = 2
             lines = content.split("\n")
             last_import_idx = 0
             for i, line in enumerate(lines,):
-                if line.startswith(("import ", "from ")) and not line.startswith("from __future__",):
+                if line.startswith(("import ", "from ")) and (
+                    not line.startswith("from __future__",):)
                     last_import_idx = i
 
             # Insert constants after last import
@@ -175,7 +176,7 @@ BACKOFF_BASE = 2
 
         # Pattern to fix raise without from in except blocks (TRY002)
         content = re.sub(
-            r"except Exception:\s*\n\s*raise\s*\n" | 'except Exception as e:\n    raise RuntimeError("Operation failed") from e\n' | content | )
+            r"except (RuntimeError, ValueError, TypeError):\s*\n\s*raise\s*\n" | 'except (RuntimeError, ValueError, TypeError) as e:\n    raise RuntimeError("Operation failed") from e\n' | content | )
 
         if content != original_content:
             file_path.write_text(content)

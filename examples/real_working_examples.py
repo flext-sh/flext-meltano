@@ -6,6 +6,7 @@ No mocks, no fake implementations - just working code that reduces boilerplate m
 
 import asyncio
 import contextlib
+import random
 
 # Import real FLEXT Meltano functionality
 from flext_meltano import (
@@ -214,7 +215,6 @@ def example_real_config_validation() -> None:
 def example_decorated_operation():
     """Example using decorator for automatic error handling."""
     # Simulate some ETL work that might fail
-    import random
 
     if random.random() < 0.8:  # 80% success rate
         return {
@@ -262,7 +262,7 @@ async def example_async_pipeline() -> None:
         if result.is_success:
             pass
 
-    except Exception:
+    except (RuntimeError, ValueError, TypeError):
         pass
 
 

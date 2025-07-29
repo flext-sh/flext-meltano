@@ -1,177 +1,179 @@
 """FLEXT Meltano - Enterprise ELT orchestration platform.
 
-REAL integration with flext-core, singer-sdk, meltano-edk, and dbt-core.
-ALL classes use FlextMeltano*, TMeltano, flext_meltano_ prefixes.
-ZERO fallbacks, ZERO mocks, ZERO incomplete implementations.
+Core Meltano/Singer/DBT integration library for the FLEXT ecosystem.
+Provides execution, discovery, installation, and validation services.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
+import warnings
+from typing import TYPE_CHECKING
 
-from flext_core import FlextResult
+if TYPE_CHECKING:
+    from pathlib import Path
 
-# === UNIFIED BASE CLASSES ===
+    from flext_core import FlextResult
+
+# === CORE BASE CLASSES ===
+# DBT integration - required dependency
+import dbt.contracts.results
+from dbt.adapters.base import BaseRelation  # type: ignore[attr-defined]
+from dbt.adapters.base.connections import (  # type: ignore[attr-defined]
+    BaseConnectionManager,
+    ConnectionState,
+)
+from dbt.adapters.contracts.connection import (
+    AdapterRequiredConfig,
+    AdapterResponse,
+    Connection,
+    Credentials,
+)
+from dbt.adapters.sql import SQLAdapter  # type: ignore[attr-defined]
+
+# Meltano Core integration - required dependency
+from meltano.core.project import Project as MeltanoCoreProject
+
+# === OPTIONAL IMPORTS ===
+# Singer SDK integration - required dependency
+from singer_sdk import Stream, Tap, Target, typing as singer_typing
+from singer_sdk.authenticators import OAuthAuthenticator
+from singer_sdk.sinks import BatchSink, Sink, SQLSink
+from singer_sdk.testing import get_tap_test_class
+from singer_sdk.typing import PropertiesList, Property
+
 from flext_meltano.base import (
-    DBT_AVAILABLE as BASE_DBT_AVAILABLE,
-    SINGER_AVAILABLE as BASE_SINGER_AVAILABLE,
     FlextMeltanoBaseService,
     FlextMeltanoConfig,
-    FlextMeltanoDbt,
-    FlextMeltanoTap,
-    FlextMeltanoTapLdap,
-    FlextMeltanoTapOracle,
-    FlextMeltanoTarget,
-    FlextMeltanoTargetCsv,
-    FlextMeltanoTargetLdap,
-    FlextMeltanoTargetOracle,
-    create_dbt_service,
-    create_tap,
-    create_target,
+    FlextMeltanoDbtService,
+    FlextMeltanoEvent,
+    FlextMeltanoExtensionService,
+    FlextMeltanoTapService,
+    FlextMeltanoTargetService,
+    create_meltano_dbt_service,
+    create_meltano_extension_service,
+    create_meltano_tap_service,
+    create_meltano_target_service,
 )
 
-# === CORE ENTERPRISE FUNCTIONALITY ===
-from flext_meltano.core import (
-    FlextMeltanoDbtService,
-    FlextMeltanoExecutionState,
-    FlextMeltanoExtension,
-    FlextMeltanoOrchestrationService,
-    FlextMeltanoPipelineConfig,
-    FlextMeltanoPipelineEvent,
-    FlextMeltanoPipelineResult,
-    FlextMeltanoRepository,
-    FlextMeltanoSingerService,
-    _deprecated_api_warning,
+# === CLI INTERFACE ===
+from flext_meltano.cli import (
+    FlextMeltanoCli,
+    flext_meltano_run_cli,
+)
+
+# === DISCOVERY & CATALOG MANAGEMENT ===
+from flext_meltano.discovery import (
+    FlextMeltanoDiscoverer,
+    FlextMeltanoPlugin,
+    create_discoverer,
+    flext_meltano_discover_catalog,
+    flext_meltano_discover_plugins,
 )
 
 # === EXECUTION HELPERS ===
-from flext_meltano.flext_meltano_execution import (
+from flext_meltano.execution import (
+    FlextMeltanoExecutionCommand,
+    FlextMeltanoExecutionContext,
+    FlextMeltanoExecutor,
     FlextMeltanoResult,
+    create_executor,
     flext_meltano_execute_job,
     flext_meltano_run_command,
 )
 
-# === LEGACY COMPATIBILITY (deprecated) ===
-# Create aliases for backward compatibility using new unified base
-try:
-    from flext_meltano.flext_meltano_dbt_base import (
-        DBT_AVAILABLE,
-        FlextMeltanoDbtProject,
-        FlextMeltanoDbtRunner,
-        flext_meltano_create_dbt_project,
-        flext_meltano_create_dbt_runner,
-    )
-except ImportError:
-    # Use new base implementation
-    from flext_meltano.base import DBT_AVAILABLE, create_dbt_service
-
-    def flext_meltano_create_dbt_project(project_dir: Path) -> FlextResult[FlextMeltanoDbt]:
-        """Create DBT project using new base implementation."""
-        return create_dbt_service(project_dir)
-
-    def flext_meltano_create_dbt_runner(project_dir: Path) -> FlextResult[FlextMeltanoDbt]:
-        """Create DBT runner using new base implementation."""
-        return create_dbt_service(project_dir)
-
-    FlextMeltanoDbtRunner = FlextMeltanoDbt
-    FlextMeltanoDbtProject = FlextMeltanoDbt
-
-# Type aliases for backward compatibility
-TMeltanoTapConfig = FlextMeltanoConfig
-TMeltanoTargetConfig = FlextMeltanoConfig
-TMeltanoDbtConfig = FlextMeltanoConfig
-FlextMeltanoTapBase = FlextMeltanoTap
-FlextMeltanoTargetBase = FlextMeltanoTarget
-FlextMeltanoDbtBase = FlextMeltanoDbt
-
-# === UTILITIES ===
-from flext_meltano.flext_meltano_cli import (
-    FlextMeltanoCli,
-    flext_meltano_run_cli,
-)
-from flext_meltano.flext_meltano_discovery import (
-    flext_meltano_discover_catalog,
-    flext_meltano_discover_plugins,
-)
-from flext_meltano.flext_meltano_installation import (
+# === INSTALLATION & PLUGIN MANAGEMENT ===
+from flext_meltano.installation import (
+    FlextMeltanoInstallationContext,
     FlextMeltanoInstaller,
+    FlextMeltanoPluginInfo,
+    create_installer_service,
     flext_meltano_install_plugin,
 )
-from flext_meltano.flext_meltano_validation import (
+
+# === VALIDATION & TESTING ===
+from flext_meltano.validation import (
+    FlextMeltanoValidationResult,
+    FlextMeltanoValidationService,
+    create_validation_service,
     flext_meltano_test_tap_connection,
     flext_meltano_validate_project,
     flext_meltano_validate_tap_config,
 )
 
-# === EXTERNAL SDK RE-EXPORTS ===
+# DBT exceptions - try modern first, fallback to legacy
 try:
-    from singer_sdk import Stream, Tap, Target, typing as th
-    from singer_sdk.authenticators import OAuthAuthenticator
-    from singer_sdk.sinks import BatchSink, Sink, SQLSink
-    from singer_sdk.testing import get_tap_test_class
-    from singer_sdk.typing import PropertiesList, Property
-    SINGER_AVAILABLE = True
-except ImportError:
-    Stream = Tap = Target = Sink = SQLSink = PropertiesList = Property = th = (
-        get_tap_test_class
-    ) = OAuthAuthenticator = BatchSink = None  # type: ignore[assignment,misc]
-    SINGER_AVAILABLE = False
-
-try:
-    from meltano.core.project import Project as MeltanoCoreProject
-    MELTANO_AVAILABLE = True
-except ImportError:
-    MeltanoCoreProject = None  # type: ignore[assignment,misc]
-    MELTANO_AVAILABLE = False
-
-try:
-    import dbt.contracts.results
-    from dbt.adapters.base import BaseRelation
-    from dbt.adapters.base.connections import BaseConnectionManager, ConnectionState
-    from dbt.adapters.contracts.connection import (
-        AdapterRequiredConfig,
-        AdapterResponse,
-        Connection,
-        Credentials,
+    from dbt_common.exceptions import (
+        DbtDatabaseError,
+        DbtRuntimeError,
     )
-    from dbt.adapters.sql import SQLAdapter
-
-    try:
-        from dbt_common.exceptions import DbtDatabaseError, DbtRuntimeError
-    except ImportError:
-        from dbt.exceptions import (
-            DatabaseException as DbtDatabaseError,
-            RuntimeException as DbtRuntimeError,
-        )
-
-    DbtRunResult = getattr(dbt.contracts.results, "RunResult", None)
 except ImportError:
-    DbtRunResult = None
-    BaseConnectionManager = None
-    BaseRelation = None
-    ConnectionState = None
-    AdapterRequiredConfig = None
-    AdapterResponse = None
-    Connection = None
-    Credentials = None
-    DbtDatabaseError = None
-    DbtRuntimeError = None
-    SQLAdapter = None
+    from dbt.exceptions import (  # type: ignore[attr-defined]
+        DatabaseException as DbtDatabaseError,
+        RuntimeException as DbtRuntimeError,
+    )
 
-# Version
+# DBT run result - try modern first, fallback to legacy
+try:
+    import dbt_common.contracts.results  # type: ignore[import-not-found]
+    DbtRunResult = dbt_common.contracts.results.RunResult
+except ImportError:
+    # Fallback to legacy dbt.contracts.results
+    DbtRunResult = dbt.contracts.results.RunResult
+
+
+# === LEGACY COMPATIBILITY ===
+def _deprecated_api_warning(old_name: str, new_name: str) -> None:
+    """Issue deprecation warning for old API usage."""
+    warnings.warn(
+        f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+
+# Type aliases for backward compatibility
+TMeltanoTapConfig = FlextMeltanoConfig
+TMeltanoTargetConfig = FlextMeltanoConfig
+TMeltanoDbtConfig = FlextMeltanoConfig
+FlextMeltanoTapBase = FlextMeltanoTapService
+FlextMeltanoTargetBase = FlextMeltanoTargetService
+FlextMeltanoDbtBase = FlextMeltanoDbtService
+
+# Legacy aliases
+FlextMeltanoTap = FlextMeltanoTapService
+FlextMeltanoTarget = FlextMeltanoTargetService
+FlextMeltanoDbt = FlextMeltanoDbtService
+create_tap = create_meltano_tap_service
+create_target = create_meltano_target_service
+create_dbt_service = create_meltano_dbt_service
+
+
+# Legacy factory functions
+def flext_meltano_create_dbt_project(project_dir: Path) -> FlextResult[FlextMeltanoDbtService]:
+    """Create DBT project using new base implementation."""
+    _deprecated_api_warning("flext_meltano_create_dbt_project", "create_dbt_service")
+    config = FlextMeltanoConfig(project_root=str(project_dir))
+    return create_dbt_service(config)
+
+
+def flext_meltano_create_dbt_runner(project_dir: Path) -> FlextResult[FlextMeltanoDbtService]:
+    """Create DBT runner using new base implementation."""
+    _deprecated_api_warning("flext_meltano_create_dbt_runner", "create_dbt_service")
+    config = FlextMeltanoConfig(project_root=str(project_dir))
+    return create_dbt_service(config)
+
+
+# Version information
 __version__ = "2.0.0-enterprise"
 
 # === PUBLIC API ===
 __all__ = [
-    # === FLAGS ===
-    "DBT_AVAILABLE",
-    "MELTANO_AVAILABLE",
-    "SINGER_AVAILABLE",
     "AdapterRequiredConfig",
     "AdapterResponse",
     "BaseConnectionManager",
+    # DBT Integration
     "BaseRelation",
     "BatchSink",
     "Connection",
@@ -180,38 +182,38 @@ __all__ = [
     "DbtDatabaseError",
     "DbtRunResult",
     "DbtRuntimeError",
+    # Core Services
     "FlextMeltanoBaseService",
-    # === UTILITIES ===
+    # CLI Interface
     "FlextMeltanoCli",
-    # === UNIFIED BASE CLASSES ===
     "FlextMeltanoConfig",
     "FlextMeltanoDbt",
     "FlextMeltanoDbtBase",
-    "FlextMeltanoDbtProject",
-    "FlextMeltanoDbtRunner",
-    # === CORE SERVICES ===
     "FlextMeltanoDbtService",
-    "FlextMeltanoExecutionState",
-    "FlextMeltanoExtension",
+    # Discovery
+    "FlextMeltanoDiscoverer",
+    "FlextMeltanoEvent",
+    "FlextMeltanoExecutionCommand",
+    "FlextMeltanoExecutionContext",
+    # Execution
+    "FlextMeltanoExecutor",
+    "FlextMeltanoExtensionService",
+    "FlextMeltanoInstallationContext",
+    # Installation
     "FlextMeltanoInstaller",
-    "FlextMeltanoOrchestrationService",
-    "FlextMeltanoPipelineConfig",
-    "FlextMeltanoPipelineEvent",
-    "FlextMeltanoPipelineResult",
-    "FlextMeltanoRepository",
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPluginInfo",
     "FlextMeltanoResult",
-    "FlextMeltanoSingerService",
     "FlextMeltanoTap",
-    # === LEGACY COMPATIBILITY (deprecated) ===
     "FlextMeltanoTapBase",
-    "FlextMeltanoTapLdap",
-    # === SPECIFIC IMPLEMENTATIONS ===
-    "FlextMeltanoTapOracle",
+    "FlextMeltanoTapService",
     "FlextMeltanoTarget",
     "FlextMeltanoTargetBase",
-    "FlextMeltanoTargetCsv",
-    "FlextMeltanoTargetLdap",
-    "FlextMeltanoTargetOracle",
+    "FlextMeltanoTargetService",
+    "FlextMeltanoValidationResult",
+    # Validation
+    "FlextMeltanoValidationService",
+    # Meltano Core
     "MeltanoCoreProject",
     "OAuthAuthenticator",
     "PropertiesList",
@@ -219,24 +221,32 @@ __all__ = [
     "SQLAdapter",
     "SQLSink",
     "Sink",
-    # === EXTERNAL SDK RE-EXPORTS ===
+    # Singer SDK re-exports
     "Stream",
     "TMeltanoDbtConfig",
+    # Legacy Compatibility
     "TMeltanoTapConfig",
     "TMeltanoTargetConfig",
     "Tap",
     "Target",
-    # === VERSION ===
+    # Version
     "__version__",
     "create_dbt_service",
-    # === FACTORY FUNCTIONS ===
+    "create_discoverer",
+    "create_executor",
+    "create_installer_service",
+    "create_meltano_dbt_service",
+    "create_meltano_extension_service",
+    # Factory Functions
+    "create_meltano_tap_service",
+    "create_meltano_target_service",
     "create_tap",
     "create_target",
+    "create_validation_service",
     "flext_meltano_create_dbt_project",
     "flext_meltano_create_dbt_runner",
     "flext_meltano_discover_catalog",
     "flext_meltano_discover_plugins",
-    # === EXECUTION FUNCTIONS ===
     "flext_meltano_execute_job",
     "flext_meltano_install_plugin",
     "flext_meltano_run_cli",
@@ -245,5 +255,5 @@ __all__ = [
     "flext_meltano_validate_project",
     "flext_meltano_validate_tap_config",
     "get_tap_test_class",
-    "th",
+    "singer_typing",
 ]

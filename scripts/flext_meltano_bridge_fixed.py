@@ -32,10 +32,8 @@ def main() -> None:
             bridge.run_pipeline(sys.argv[2], sys.argv[3,])
         elif operation == "invoke_dbt" and len(sys.argv) >= 3:
             bridge.invoke_dbt(sys.argv[2], *sys.argv[3:,])
-        else:
-            pass
 
-    except Exception:
+    except (RuntimeError, ValueError, TypeError):
         sys.exit(1)
 
 

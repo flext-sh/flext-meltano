@@ -4,21 +4,28 @@ Tests validate actual DBT model execution, testing, and project operations.
 All tests use real dbt-core integration without mocks.
 """
 
+import tempfile
+
+
 from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from flext_meltano.core import FlextMeltanoDbtService
+from flext_meltano.base import FlextMeltanoConfig, FlextMeltanoDbtService
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 class TestFlextMeltanoDbtServiceReal:
     """Test real DBT service functionality with actual dbt-core."""
 
     @pytest.fixture
-    def temp_dbt_project(self) -> Path:
+    def temp_dbt_project(self) -> Generator[Path]:
         """Create temporary DBT project with basic structure."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = Path(tmpdir)
@@ -31,12 +38,12 @@ config-version: 2
 
 profile: 'test_profile'
 
-model-paths: ["models",]
-analysis-paths: ["analyses",]
-test-paths: ["tests",]
-seed-paths: ["seeds",]
-macro-paths: ["macros",]
-snapshot-paths: ["snapshots",]
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
 
 target-path: "target"
 clean-targets:
@@ -69,7 +76,7 @@ test_profile:
 
             # Simple test model
             test_model = """
-{{ config(materialized='table') },}
+{{ config(materialized='table') }}
 
 select
     1 as id,
@@ -84,7 +91,7 @@ select
 
             test_sql = """
 select count(*) as failures
-from {{ ref('test_model') },}
+from {{ ref('test_model') }}
 where id is null
 """
             (tests_dir / "test_model_not_null.sql").write_text(test_sql.strip())
@@ -94,7 +101,8 @@ where id is null
     @pytest.fixture
     def dbt_service(self, temp_dbt_project: Path) -> FlextMeltanoDbtService:
         """Create DBT service with test project."""
-        return FlextMeltanoDbtService(temp_dbt_project)
+        config = FlextMeltanoConfig(dbt_project_dir=str(temp_dbt_project))
+        return FlextMeltanoDbtService(config)
 
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_run_models_real(
@@ -155,14 +163,21 @@ where id is null
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_nonexistent_project(self) -> None:
         """Test DBT service with nonexistent project."""
-        nonexistent_dir = Path("/tmp/nonexistent_dbt_project")
-        service = FlextMeltanoDbtService(nonexistent_dir)
 
-        result = await service.run_models()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            nonexistent_dir = Path(temp_dir) / "nonexistent_dbt_project"
+            config = FlextMeltanoConfig(dbt_project_dir=str(nonexistent_dir))
+            service = FlextMeltanoDbtService(config)
+
+            result = await service.run_models()
 
         # Should fail gracefully
         assert not result.is_success
-        assert "DBT project not found" in result.error
+        assert result.error is not None
+        assert result.error is not None
+        assert result.error is not None
+        if "DBT project not found" not in result.error:
+            raise AssertionError(f"Expected {"DBT project not found"} in {result.error}")
 
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_run_with_exclude(
@@ -185,7 +200,8 @@ where id is null
         # Should return actual version string
         assert isinstance(version, str)
         assert len(version) > 0
-        assert "." in version  # Version should contain dots
+        if "." not in version  # Version should contain dots:
+            raise AssertionError(f"Expected {"."} in {version  # Version should contain dots}")
 
     def test_flext_meltano_dbt_service_execute(
         self,
@@ -198,15 +214,17 @@ where id is null
         assert result.is_success
         data = result.data
         assert isinstance(data, dict)
-        assert data["service",] == "dbt"
-        assert "project_dir" in data
+        if data["service"] != "dbt":
+            raise AssertionError(f"Expected {"dbt"}, got {data["service"]}")
+        if "project_dir" not in data:
+            raise AssertionError(f"Expected {"project_dir"} in {data}")
 
 
 class TestFlextMeltanoDbtServiceIntegration:
     """Integration tests for DBT service with various scenarios."""
 
     @pytest.fixture
-    def complex_dbt_project(self) -> Path:
+    def complex_dbt_project(self) -> Generator[Path]:
         """Create complex DBT project for integration testing."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_dir = Path(tmpdir)
@@ -219,9 +237,9 @@ config-version: 2
 
 profile: 'complex_profile'
 
-model-paths: ["models",]
-test-paths: ["tests",]
-seed-paths: ["seeds",]
+model-paths: ["models"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
 
 target-path: "target"
 
@@ -253,7 +271,7 @@ complex_profile:
             staging_dir.mkdir(parents=True)
 
             staging_model = """
-{{ config(materialized='view') },}
+{{ config(materialized='view') }}
 
 select
     1 as raw_id,
@@ -267,13 +285,13 @@ select
             marts_dir.mkdir()
 
             marts_model = """
-{{ config(materialized='table') },}
+{{ config(materialized='table') }}
 
 select
     raw_id as id,
     upper(raw_name) as clean_name,
     loaded_at
-from {{ ref('stg_raw_data') },}
+from {{ ref('stg_raw_data') }}
 """
             (marts_dir / "dim_data.sql").write_text(marts_model.strip())
 
@@ -285,13 +303,14 @@ from {{ ref('stg_raw_data') },}
         complex_dbt_project: Path,
     ) -> None:
         """Test DBT with complex project structure."""
-        service = FlextMeltanoDbtService(complex_dbt_project)
+        config = FlextMeltanoConfig(dbt_project_dir=str(complex_dbt_project))
+        service = FlextMeltanoDbtService(config)
 
         # Run all models
         result = await service.run_models()
-        assert result.is_success, f"Complex DBT run failed: {(result.error,)}"
+        assert result.is_success, f"Complex DBT run failed: {result.error}"
 
-        # Should have run multiple models
+        # Should have run successfully
         run_results = result.data
         assert isinstance(run_results, list)
 
@@ -301,7 +320,8 @@ from {{ ref('stg_raw_data') },}
         complex_dbt_project: Path,
     ) -> None:
         """Test running only staging models."""
-        service = FlextMeltanoDbtService(complex_dbt_project)
+        config = FlextMeltanoConfig(dbt_project_dir=str(complex_dbt_project))
+        service = FlextMeltanoDbtService(config)
 
         result = await service.run_models(models=["staging"])
         assert result.is_success, f"Staging models run failed: {(result.error,)}"
@@ -312,7 +332,8 @@ from {{ ref('stg_raw_data') },}
         complex_dbt_project: Path,
     ) -> None:
         """Test running only marts models."""
-        service = FlextMeltanoDbtService(complex_dbt_project)
+        config = FlextMeltanoConfig(dbt_project_dir=str(complex_dbt_project))
+        service = FlextMeltanoDbtService(config)
 
         # First run staging (dependency)
         staging_result = await service.run_models(models=["staging"])
