@@ -237,7 +237,7 @@ class RobustLintFixer:
         # Replace bare except with specific exception handling
         content = re.sub(
             r"except:\s*\n",
-            "except Exception:  # noqa: BLE001\n",
+            "except (RuntimeError, ValueError, TypeError):  # noqa: BLE001\n",
             content,
         )
 

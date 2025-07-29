@@ -67,9 +67,9 @@ def example_1_before():
     # 7. Configure streams
     catalog_path = tempfile.mktemp(suffix=".json")
     discover_cmd = job.singer_command_for_plugin(tap, "discover")
-    subprocess.run(discover_cmd, stdout=open(catalog_path, "w"), check=True)
+    subprocess.run(discover_cmd, stdout=open(catalog_path, "w", encoding="utf-8"), check=True)
 
-    with open(catalog_path) as f:
+    with open(catalog_path, encoding="utf-8") as f:
         catalog = json.load(f)
 
     # 8. Select streams
@@ -140,9 +140,9 @@ def example_2_before():
             # Discover catalog
             catalog_path = tempfile.mktemp(suffix=".json")
             discover_cmd = job.singer_command_for_plugin(tap, "discover")
-            subprocess.run(discover_cmd, stdout=open(catalog_path, "w"), check=True)
+            subprocess.run(discover_cmd, stdout=open(catalog_path, "w", encoding="utf-8"), check=True)
 
-            with open(catalog_path) as f:
+            with open(catalog_path, encoding="utf-8") as f:
                 catalog = json.load(f)
 
             # Select only current table
@@ -151,7 +151,7 @@ def example_2_before():
                 stream["metadata"][0]["metadata"]["selected"] = selected
 
             # Save modified catalog
-            with open(catalog_path, "w") as f:
+            with open(catalog_path, "w", encoding="utf-8") as f:
                 json.dump(catalog, f)
 
             # Configure job with catalog
@@ -187,9 +187,9 @@ def example_2_before():
             }
 
             # Clean up
-            os.unlink(catalog_path)
+            Path(catalog_path).unlink()
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             results[table] = {
                 "success": False,
                 "duration": 0,
@@ -410,7 +410,7 @@ def example_4_before():
     discover_result = subprocess.run(
         discover_cmd,
         check=False,
-        stdout=open(catalog_path, "w"),
+        stdout=open(catalog_path, "w", encoding="utf-8"),
         stderr=subprocess.PIPE,
         text=True,
     )
@@ -420,7 +420,7 @@ def example_4_before():
         raise RuntimeError(msg)
 
     # 4. Load and analyze catalog
-    with open(catalog_path) as f:
+    with open(catalog_path, encoding="utf-8") as f:
         catalog = json.load(f)
 
     streams = catalog.get("streams", [])
@@ -434,7 +434,7 @@ def example_4_before():
         stream["metadata"][0]["metadata"]["replication-method",] = "FULL_TABLE"
 
     # 6. Save modified catalog
-    with open(catalog_path, "w") as f:
+    with open(catalog_path, "w", encoding="utf-8") as f:
         json.dump(catalog, f)
 
     # 7. Configure job with catalog
@@ -463,7 +463,7 @@ def example_4_before():
             records_processed += 1
 
     # 10. Clean up
-    os.unlink(catalog_path)
+    Path(catalog_path).unlink()
 
     pipeline_result = {
         "success": result.returncode == 0,

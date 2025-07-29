@@ -8,14 +8,18 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from flext_meltano.helpers.discovery import (
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+from flext_meltano.discovery import (
     flext_meltano_discover_catalog,
     flext_meltano_discover_plugins,
 )
-from flext_meltano.helpers.validation import (
+from flext_meltano.validation import (
     flext_meltano_test_tap_connection,
     flext_meltano_validate_tap_config,
 )
@@ -25,7 +29,7 @@ class TestFlextMeltanoCatalogDiscoveryReal:
     """Test real catalog discovery with actual Singer SDK integration."""
 
     @pytest.fixture
-    def temp_project_dir(self) -> Path:
+    def temp_project_dir(self) -> Generator[Path]:
         """Create temporary directory for catalog discovery tests."""
         with tempfile.TemporaryDirectory() as tmpdir:
             yield Path(tmpdir)
@@ -52,13 +56,13 @@ extractors:
   config:
     files:
     - entity: test_data
-      path: /tmp/test.csv
+      path: test.csv
 """)
 
         result = await flext_meltano_discover_catalog(
             "tap-csv",
             temp_project_dir,
-            config={"files": [{"entity": "test_data", "path": "/tmp/test.csv"}]},
+            config={"files": [{"entity": "test_data", "path": "test.csv"}]},
         )
 
         # Should handle discovery gracefully (may fail if meltano not available)
@@ -69,13 +73,14 @@ extractors:
 
             # Should have streams if discovery succeeded
             if "streams" in catalog:
-                streams = catalog["streams",]
+                streams = catalog["streams"]
                 assert isinstance(streams, list)
 
                 # If streams exist, validate structure
                 if streams:
-                    stream = streams[0,]
-                    assert "tap_stream_id" in stream
+                    stream = streams[0]
+                    if "tap_stream_id" not in stream:
+                        raise AssertionError(f"Expected {"tap_stream_id"} in {stream}")
                     assert "schema" in stream
         else:
             # If discovery fails, should provide meaningful error
@@ -122,17 +127,21 @@ extractors:
         assert result.success
         data = result.data
         assert isinstance(data, dict)
-        assert "plugins" in data
+        if "plugins" not in data:
+            raise AssertionError(f"Expected {"plugins"} in {data}")
 
-        plugins = data["plugins",]
+        assert data is not None
+        plugins = data["plugins"]
         assert isinstance(plugins, list)
         assert len(plugins) > 0
 
         # Validate plugin structure
-        plugin = plugins[0,]
-        assert "name" in plugin
+        plugin = plugins[0]
+        if "name" not in plugin:
+            raise AssertionError(f"Expected {"name"} in {plugin}")
         assert "type" in plugin
-        assert "namespace" in plugin
+        if "namespace" not in plugin:
+            raise AssertionError(f"Expected {"namespace"} in {plugin}")
 
     def test_flext_meltano_discover_plugins_extractors_only(self) -> None:
         """Test plugin discovery filtered by extractors."""
@@ -140,11 +149,13 @@ extractors:
 
         assert result.success
         data = result.data
-        plugins = data["plugins",]
+        assert data is not None
+        plugins = data["plugins"]
 
         # All plugins should be extractors
         for plugin in plugins:
-            assert plugin["type",] == "extractors"
+            if plugin["type"] != "extractors":
+                raise AssertionError(f"Expected {"extractors"}, got {plugin["type"]}")
 
     def test_flext_meltano_discover_plugins_loaders_only(self) -> None:
         """Test plugin discovery filtered by loaders."""
@@ -152,11 +163,13 @@ extractors:
 
         assert result.success
         data = result.data
-        plugins = data["plugins",]
+        assert data is not None
+        plugins = data["plugins"]
 
         # All plugins should be loaders
         for plugin in plugins:
-            assert plugin["type",] == "loaders"
+            if plugin["type"] != "loaders":
+                raise AssertionError(f"Expected {"loaders"}, got {plugin["type"]}")
 
     def test_flext_meltano_discover_plugins_invalid_type(self) -> None:
         """Test plugin discovery with invalid type filter."""
@@ -165,7 +178,8 @@ extractors:
         # Should succeed but return empty list
         assert result.success
         data = result.data
-        plugins = data["plugins",]
+        assert data is not None
+        plugins = data["plugins"]
         assert isinstance(plugins, list)
         # May be empty or contain plugins (depending on Hub availability)
 
@@ -174,7 +188,7 @@ class TestFlextMeltanoConnectionTestingReal:
     """Test real tap connection testing functionality."""
 
     @pytest.fixture
-    def temp_project_dir(self) -> Path:
+    def temp_project_dir(self) -> Generator[Path]:
         """Create temporary directory for connection tests."""
         with tempfile.TemporaryDirectory() as tmpdir:
             yield Path(tmpdir)
@@ -202,7 +216,7 @@ extractors:
 
         config = {
             "files": [
-                {"entity": "test", "path": "/tmp/test.csv"},
+                {"entity": "test", "path": "test.csv"},
             ],
         }
 
@@ -216,9 +230,12 @@ extractors:
         if result.success:
             data = result.data
             assert isinstance(data, dict)
-            assert "connection_successful" in data
+            if "connection_successful" not in data:
+                raise AssertionError(f"Expected {"connection_successful"} in {data}")
             assert "tap_name" in data
-            assert data["tap_name",] == "tap-csv"
+            assert data is not None
+            if data["tap_name"] != "tap-csv":
+                raise AssertionError(f"Expected {"tap-csv"}, got {data["tap_name"]}")
         else:
             # Connection can fail if meltano/tap not available
             assert result.error
@@ -258,7 +275,7 @@ extractors:
         """Test tap configuration validation for CSV tap."""
         config = {
             "files": [
-                {"entity": "test", "path": "/tmp/test.csv"},
+                {"entity": "test", "path": "test.csv"},
             ],
         }
 
@@ -270,9 +287,15 @@ extractors:
         # Should validate CSV config successfully
         assert result.success
         data = result.data
-        assert data["config_valid",] is True
-        assert data["config_type",] == "file"
-        assert data["tap_name",] == "tap-csv"
+        assert data is not None
+        if not (data["config_valid"]):
+            raise AssertionError(f"Expected True, got {data["config_valid"]}")
+        assert data is not None
+        if data["config_type"] != "file":
+            raise AssertionError(f"Expected {"file"}, got {data["config_type"]}")
+        assert data is not None
+        if data["tap_name"] != "tap-csv":
+            raise AssertionError(f"Expected {"tap-csv"}, got {data["tap_name"]}")
 
     @pytest.mark.asyncio
     async def test_flext_meltano_validate_tap_config_database(self) -> None:
@@ -293,9 +316,15 @@ extractors:
         # Should validate database config successfully
         assert result.success
         data = result.data
-        assert data["config_valid",] is True
-        assert data["config_type",] == "database"
-        assert data["tap_name",] == "tap-postgres"
+        assert data is not None
+        if not (data["config_valid"]):
+            raise AssertionError(f"Expected True, got {data["config_valid"]}")
+        assert data is not None
+        if data["config_type"] != "database":
+            raise AssertionError(f"Expected {"database"}, got {data["config_type"]}")
+        assert data is not None
+        if data["tap_name"] != "tap-postgres":
+            raise AssertionError(f"Expected {"tap-postgres"}, got {data["tap_name"]}")
 
     @pytest.mark.asyncio
     async def test_flext_meltano_validate_tap_config_api(self) -> None:
@@ -313,8 +342,12 @@ extractors:
         # Should validate API config successfully
         assert result.success
         data = result.data
-        assert data["config_valid",] is True
-        assert data["config_type",] == "api"
+        assert data is not None
+        if not (data["config_valid"]):
+            raise AssertionError(f"Expected True, got {data["config_valid"]}")
+        assert data is not None
+        if data["config_type"] != "api":
+            raise AssertionError(f"Expected {"api"}, got {data["config_type"]}")
 
     @pytest.mark.asyncio
     async def test_flext_meltano_validate_tap_config_empty(self) -> None:
@@ -327,9 +360,10 @@ extractors:
         # Should fail validation for empty config
         assert result.success  # Function succeeds but config is invalid
         data = result.data
-        assert data["config_valid",] is False
-        assert "issues" in data
-        assert len(data["issues",]) > 0
+        assert data is not None
+        if data["config_valid"]:
+            raise AssertionError(f"Expected False, got {data["config_valid"]}")\ n        assert "issues" in data
+        assert len(data["issues"]) > 0
 
     @pytest.mark.asyncio
     async def test_flext_meltano_validate_tap_config_missing_required(self) -> None:
@@ -348,15 +382,16 @@ extractors:
         # Should succeed but indicate config issues
         assert result.success
         data = result.data
-        assert data["config_valid",] is False
-        assert "Missing required keys" in str(data["issues",])
+        assert data is not None
+        if data["config_valid"]:
+            raise AssertionError(f"Expected False, got {data["config_valid"]}")\ n        assert "Missing required database keys" in str(data["issues"])
 
 
 class TestFlextMeltanoCatalogIntegration:
     """Integration tests for catalog discovery and validation."""
 
     @pytest.fixture
-    def temp_project_dir(self) -> Path:
+    def temp_project_dir(self) -> Generator[Path]:
         """Create temporary directory for integration tests."""
         with tempfile.TemporaryDirectory() as tmpdir:
             yield Path(tmpdir)
@@ -371,23 +406,26 @@ class TestFlextMeltanoCatalogIntegration:
         plugins_result = flext_meltano_discover_plugins(plugin_type="extractors")
         assert plugins_result.success
 
-        extractors = plugins_result.data["plugins",]
+        assert plugins_result.data is not None
+        extractors = plugins_result.data["plugins"]
         assert len(extractors) > 0
 
         # Step 2: Use first extractor for testing
-        tap_name = extractors[0]["name",]
+        tap_name = extractors[0]["name"]
 
         # Step 3: Validate basic config
-        test_config = {"files": [{"entity": "test", "path": "/tmp/test.csv"}]}
+        test_config = {"files": [{"entity": "test", "path": "test.csv"}]}
         config_result = await flext_meltano_validate_tap_config(tap_name, test_config)
 
         # Should validate config structure
         assert config_result.success
         config_data = config_result.data
-        assert "config_valid" in config_data
+        assert config_data is not None
+        if "config_valid" not in config_data:
+            raise AssertionError(f"Expected {"config_valid"} in {config_data}")
 
         # Step 4: If config is valid, attempt catalog discovery
-        if config_data["config_valid",]:
+        if config_data["config_valid"]:
             discovery_result = await flext_meltano_discover_catalog(
                 tap_name,
                 temp_project_dir,
@@ -430,7 +468,8 @@ class TestFlextMeltanoCatalogIntegration:
             {},  # Empty config
         )
         assert result3.success  # Function succeeds
-        assert not result3.data["config_valid",]  # But config is invalid
+        assert result3.data is not None
+        assert not result3.data["config_valid"]  # But config is invalid
 
 
 if __name__ == "__main__":
