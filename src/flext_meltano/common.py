@@ -5,6 +5,7 @@ Provides common validation functions and utilities for FLEXT Meltano projects.
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 
@@ -27,8 +28,36 @@ def validate_directory_path(directory_path: str | None) -> str | None:
     if path.exists() and path.is_dir():
         return str(path.absolute())
 
-    # For test environments, allow non-existent paths
-    if str(path).startswith(("/tmp", "/test", "test_")):
+    # For test environments, allow non-existent paths in secure temp directory
+    temp_dir = Path(tempfile.gettempdir())
+    if path.is_relative_to(temp_dir) or str(path).startswith(("/test", "test_")):
+        return str(path)
+
+    return None
+
+
+def validate_file_path(file_path: str | None) -> str | None:
+    """Validate file path exists and is accessible.
+
+    Args:
+        file_path: Path to file to validate
+
+    Returns:
+        Validated file path or None if invalid
+
+    """
+    if not file_path:
+        return None
+
+    path = Path(file_path)
+
+    # Check if path exists and is a file
+    if path.exists() and path.is_file():
+        return str(path.absolute())
+
+    # For test environments, allow non-existent paths in secure temp directory
+    temp_dir = Path(tempfile.gettempdir())
+    if path.is_relative_to(temp_dir) or str(path).startswith(("/test", "test_")):
         return str(path)
 
     return None
@@ -66,4 +95,5 @@ def validate_config_value(
 __all__ = [
     "validate_config_value",
     "validate_directory_path",
+    "validate_file_path",
 ]

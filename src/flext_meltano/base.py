@@ -11,35 +11,22 @@ import uuid
 from abc import abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, cast
 
-# DBT integration - MANDATORY for transformations
-from dbt.cli.main import dbtRunner  # External library naming
-
-# FlextResult is the MANDATORY pattern for all operations
+from dbt.cli.main import dbtRunner
 from flext_core import (
     FlextEntity,
     FlextLogger,
     FlextResult,
 )
-from injectable import injectable  # type: ignore[import-untyped]
-
-# Meltano EDK integration - MANDATORY for extensions
+from injectable import injectable
 from pydantic import BaseModel, Field, field_validator
-
-# Singer SDK integration - MANDATORY for taps/targets
 
 if TYPE_CHECKING:
     from logging import Logger
 
-    from meltano.edk import ExtensionBase  # type: ignore[attr-defined]
+    from meltano.edk import ExtensionBase
     from singer_sdk import Tap, Target
-
-# Type variable for generic operations
-T = TypeVar("T")
-
-
-# === FLEXT-CORE MANDATORY VALUE OBJECTS ===
 
 
 class FlextMeltanoConfig(BaseModel):
