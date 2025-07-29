@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from flext_core import FlextResult
 
 if TYPE_CHECKING:
-    from flext_core.types import TData
+    from flext_core.flext_types import TData
 
 
 # Simple stub implementations for Singer project compatibility
@@ -63,7 +63,9 @@ class FlextMeltanoDbtRunner:
 
     def run(self, command: str, args: list[str] | None = None) -> FlextResult[TData]:
         """Run DBT command."""
-        return FlextResult.ok({"command": command, "args": args or [], "status": "success"})
+        return FlextResult.ok(
+            {"command": command, "args": args or [], "status": "success"},
+        )
 
     def run_models(self, models: list[str] | None = None) -> FlextResult[TData]:
         """Run specific DBT models."""

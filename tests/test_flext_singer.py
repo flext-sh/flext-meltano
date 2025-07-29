@@ -43,7 +43,7 @@ class TestFlextSingerBridge:
         assert result.data is not None
         data = result.data
         if data["type"] != "RECORD":
-            msg = f"Expected {"RECORD"}, got {data["type"]}"
+            msg = f"Expected {'RECORD'}, got {data['type']}"
             raise AssertionError(msg)
         assert data["stream"] == "test_stream"
         if data["record"] != {"id": 1, "name": "test"}:
@@ -52,7 +52,10 @@ class TestFlextSingerBridge:
             raise AssertionError(msg)
         assert data["time_extracted"] == "2023-01-01T00:00:00Z"
 
-    def test_create_record_message_without_time(self, bridge: FlextSingerBridge) -> None:
+    def test_create_record_message_without_time(
+        self,
+        bridge: FlextSingerBridge,
+    ) -> None:
         """Test record message creation without time_extracted."""
         result = bridge.flext_singer_create_message(
             "RECORD",
@@ -64,7 +67,7 @@ class TestFlextSingerBridge:
         assert result.data is not None
         data = result.data
         if data["type"] != "RECORD":
-            msg = f"Expected {"RECORD"}, got {data["type"]}"
+            msg = f"Expected {'RECORD'}, got {data['type']}"
             raise AssertionError(msg)
         assert data["stream"] == "test_stream"
         if data["record"] != {"id": 1, "name": "test"}:
@@ -75,7 +78,10 @@ class TestFlextSingerBridge:
             msg = f"Expected time_extracted not to be in {data}"
             raise AssertionError(msg)
 
-    def test_create_record_message_invalid_stream(self, bridge: FlextSingerBridge) -> None:
+    def test_create_record_message_invalid_stream(
+        self,
+        bridge: FlextSingerBridge,
+    ) -> None:
         """Test record message creation with invalid stream."""
         result = bridge.flext_singer_create_message(
             "RECORD",
@@ -88,10 +94,13 @@ class TestFlextSingerBridge:
         assert result.error is not None
         assert result.error is not None
         if "Invalid stream name" not in result.error:
-            msg = f"Expected {"Invalid stream name"} in {result.error}"
+            msg = f"Expected {'Invalid stream name'} in {result.error}"
             raise AssertionError(msg)
 
-    def test_create_record_message_invalid_record(self, bridge: FlextSingerBridge) -> None:
+    def test_create_record_message_invalid_record(
+        self,
+        bridge: FlextSingerBridge,
+    ) -> None:
         """Test record message creation with invalid record."""
         result = bridge.flext_singer_create_message(
             "RECORD",
@@ -104,7 +113,7 @@ class TestFlextSingerBridge:
         assert result.error is not None
         assert result.error is not None
         if "Invalid stream name or record format" not in result.error:
-            msg = f"Expected {"Invalid stream name or record format"} in {result.error}"
+            msg = f"Expected {'Invalid stream name or record format'} in {result.error}"
             raise AssertionError(msg)
 
     def test_create_schema_message_success(self, bridge: FlextSingerBridge) -> None:
@@ -128,15 +137,18 @@ class TestFlextSingerBridge:
         assert result.data is not None
         data = result.data
         if data["type"] != "SCHEMA":
-            msg = f"Expected {"SCHEMA"}, got {data["type"]}"
+            msg = f"Expected {'SCHEMA'}, got {data['type']}"
             raise AssertionError(msg)
         assert data["stream"] == "test_stream"
         if data["schema"] != schema:
-            msg = f"Expected {schema}, got {data["schema"]}"
+            msg = f"Expected {schema}, got {data['schema']}"
             raise AssertionError(msg)
         assert data["key_properties"] == ["id"]
 
-    def test_create_schema_message_without_keys(self, bridge: FlextSingerBridge) -> None:
+    def test_create_schema_message_without_keys(
+        self,
+        bridge: FlextSingerBridge,
+    ) -> None:
         """Test schema message creation without key properties."""
         schema = {"type": "object", "properties": {"id": {"type": "integer"}}}
 
@@ -150,11 +162,14 @@ class TestFlextSingerBridge:
         assert result.data is not None
         data = result.data
         if data["type"] != "SCHEMA":
-            msg = f"Expected {"SCHEMA"}, got {data["type"]}"
+            msg = f"Expected {'SCHEMA'}, got {data['type']}"
             raise AssertionError(msg)
         assert data["key_properties"] == []
 
-    def test_create_schema_message_invalid_stream(self, bridge: FlextSingerBridge) -> None:
+    def test_create_schema_message_invalid_stream(
+        self,
+        bridge: FlextSingerBridge,
+    ) -> None:
         """Test schema message creation with invalid stream."""
         result = bridge.flext_singer_create_message(
             "SCHEMA",
@@ -167,12 +182,14 @@ class TestFlextSingerBridge:
         assert result.error is not None
         assert result.error is not None
         if "Invalid stream name" not in result.error:
-            msg = f"Expected {"Invalid stream name"} in {result.error}"
+            msg = f"Expected {'Invalid stream name'} in {result.error}"
             raise AssertionError(msg)
 
     def test_create_state_message_success(self, bridge: FlextSingerBridge) -> None:
         """Test successful state message creation."""
-        state_value = {"bookmarks": {"test_stream": {"timestamp": "2023-01-01T00:00:00Z"}}}
+        state_value = {
+            "bookmarks": {"test_stream": {"timestamp": "2023-01-01T00:00:00Z"}},
+        }
 
         result = bridge.flext_singer_create_message(
             "STATE",
@@ -183,7 +200,7 @@ class TestFlextSingerBridge:
         assert result.data is not None
         data = result.data
         if data["type"] != "STATE":
-            msg = f"Expected {"STATE"}, got {data["type"]}"
+            msg = f"Expected {'STATE'}, got {data['type']}"
             raise AssertionError(msg)
         assert data["value"] == state_value
 
@@ -199,7 +216,7 @@ class TestFlextSingerBridge:
         assert result.error is not None
         assert result.error is not None
         if "Unknown message type: UNKNOWN_TYPE" not in result.error:
-            msg = f"Expected {"Unknown message type: UNKNOWN_TYPE"} in {result.error}"
+            msg = f"Expected {'Unknown message type: UNKNOWN_TYPE'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -218,11 +235,17 @@ class TestFlextSingerCatalog:
             "streams": [
                 {
                     "tap_stream_id": "existing_stream",
-                    "schema": {"type": "object", "properties": {"id": {"type": "integer"}}},
+                    "schema": {
+                        "type": "object",
+                        "properties": {"id": {"type": "integer"}},
+                    },
                     "metadata": [
                         {
                             "breadcrumb": [],
-                            "metadata": {"selected": True, "replication-method": "FULL_TABLE"},
+                            "metadata": {
+                                "selected": True,
+                                "replication-method": "FULL_TABLE",
+                            },
                         },
                     ],
                 },
@@ -236,12 +259,15 @@ class TestFlextSingerCatalog:
 
         result = catalog.flext_singer_get_catalog()
         assert result.is_success
-        if result.data != {"streams": []}:
-            expected_data = {"streams": []}
+        expected_data: dict[str, list[dict[str, object]]] = {"streams": []}
+        if result.data != expected_data:
             msg = f"Expected {expected_data}, got {result.data}"
             raise AssertionError(msg)
 
-    def test_catalog_initialization_with_data(self, catalog_with_data: FlextSingerCatalog) -> None:
+    def test_catalog_initialization_with_data(
+        self,
+        catalog_with_data: FlextSingerCatalog,
+    ) -> None:
         """Test catalog initialization with data."""
         result = catalog_with_data.flext_singer_get_catalog()
         assert result.is_success
@@ -249,10 +275,10 @@ class TestFlextSingerCatalog:
         assert result.data is not None
         data = result.data
         if "streams" not in data:
-            msg = f"Expected {"streams"} in {data}"
+            msg = f"Expected {'streams'} in {data}"
             raise AssertionError(msg)
         if len(data["streams"]) != 1:
-            msg = f"Expected {1}, got {len(data["streams"])}"
+            msg = f"Expected {1}, got {len(data['streams'])}"
             raise AssertionError(msg)
         assert data["streams"][0]["tap_stream_id"] == "existing_stream"
 
@@ -285,11 +311,14 @@ class TestFlextSingerCatalog:
             raise AssertionError(msg)
         assert streams[0]["tap_stream_id"] == "test_stream"
         if streams[0]["schema"] != schema:
-            msg = f"Expected {schema}, got {streams[0]["schema"]}"
+            msg = f"Expected {schema}, got {streams[0]['schema']}"
             raise AssertionError(msg)
         assert streams[0]["key_properties"] == ["id"]
 
-    def test_add_stream_without_key_properties(self, catalog: FlextSingerCatalog) -> None:
+    def test_add_stream_without_key_properties(
+        self,
+        catalog: FlextSingerCatalog,
+    ) -> None:
         """Test stream addition without key properties."""
         schema = {"type": "object", "properties": {"name": {"type": "string"}}}
 
@@ -316,10 +345,13 @@ class TestFlextSingerCatalog:
         selected_streams = result.data
         assert isinstance(selected_streams, list)
         if "existing_stream" not in selected_streams:
-            msg = f"Expected {"existing_stream"} in {selected_streams}"
+            msg = f"Expected {'existing_stream'} in {selected_streams}"
             raise AssertionError(msg)
 
-    def test_get_selected_streams_empty_catalog(self, catalog: FlextSingerCatalog) -> None:
+    def test_get_selected_streams_empty_catalog(
+        self,
+        catalog: FlextSingerCatalog,
+    ) -> None:
         """Test getting selected streams from empty catalog."""
         result = catalog.flext_singer_get_selected_streams()
         assert result.is_success
@@ -348,8 +380,8 @@ class TestFlextSingerFactoryFunctions:
 
         result = catalog.flext_singer_get_catalog()
         assert result.is_success
-        if result.data != {"streams": []}:
-            expected_data = {"streams": []}
+        expected_data: dict[str, list[dict[str, object]]] = {"streams": []}
+        if result.data != expected_data:
             msg = f"Expected {expected_data}, got {result.data}"
             raise AssertionError(msg)
 
