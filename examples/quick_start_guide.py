@@ -5,24 +5,12 @@ Guia completo para começar rapidamente com a nova API ultra-simplificada.
 Cada exemplo é funcional e pode ser executado independentemente.
 """
 
-from flext_meltano.helpers.boilerplate_reducers import with_error_handling
-
 from __future__ import annotations
 
 import asyncio
 import datetime
 
 from flext_meltano import (
-
-# Timeout constants to avoid magic numbers
-DEFAULT_TIMEOUT = 300
-DISCOVERY_TIMEOUT = 60
-DEFAULT_POSTGRES_PORT = 5432
-DEFAULT_ORACLE_PORT = 1521
-DEFAULT_MYSQL_PORT = 3306
-BACKOFF_BASE = 2
-
-
     BatchProcessor,
     FlextMeltano,
     MeltanoProject,
@@ -36,15 +24,22 @@ BACKOFF_BASE = 2
     test_tap_connection,
 )
 
+# Timeout constants to avoid magic numbers
+DEFAULT_TIMEOUT = 300
+DISCOVERY_TIMEOUT = 60
+DEFAULT_POSTGRES_PORT = 5432
+DEFAULT_ORACLE_PORT = 1521
+DEFAULT_MYSQL_PORT = 3306
+BACKOFF_BASE = 2
 # ============================================================================
 # 🚀 QUICK START - Primeiros Passos
 # ============================================================================
+
 
 def quick_start_basic() -> None:
     """Quick Start - Pipeline básico em 1 linha."""
     # ✨ UMA LINHA substitui 50+ linhas de código manual
     run_pipeline("tap-csv", "target-csv")
-
 
 
 def quick_start_with_configuration() -> None:
@@ -60,8 +55,8 @@ def quick_start_with_configuration() -> None:
     result = fm.run(
         "tap-postgres",
         "target-csv",
-        select=["users", "orders",],  # Apenas tabelas específicas
-        full_refresh=True,           # Ignorar estado anterior
+        select=["users", "orders"],  # Apenas tabelas específicas
+        full_refresh=True,  # Ignorar estado anterior
     )
 
     if result.success:
@@ -74,6 +69,7 @@ def quick_start_with_configuration() -> None:
 # 📋 SETUP COMPLETO - Projeto Enterprise
 # ============================================================================
 
+
 def enterprise_project_setup() -> None:
     """Setup completo de projeto enterprise em 3 linhas."""
     # 🏢 SETUP ENTERPRISE COMPLETO - 3 linhas vs 100+ manuais
@@ -81,16 +77,24 @@ def enterprise_project_setup() -> None:
         "/tmp/enterprise_project",
         # 🔌 Plugins com configuração
         plugins=[
-            PluginSpec("tap-postgres", "extractor", config={
-                "host": "prod-db.company.com",
-                "port": 5432,
-                "database": "production",
-                "username": "etl_user",
-            }),
-            PluginSpec("target-postgres", "loader", config={
-                "host": "warehouse.company.com",
-                "database": "warehouse",
-            }),
+            PluginSpec(
+                "tap-postgres",
+                "extractor",
+                config={
+                    "host": "prod-db.company.com",
+                    "port": 5432,
+                    "database": "production",
+                    "username": "etl_user",
+                },
+            ),
+            PluginSpec(
+                "target-postgres",
+                "loader",
+                config={
+                    "host": "warehouse.company.com",
+                    "database": "warehouse",
+                },
+            ),
             PluginSpec("dbt-postgres", "transformer"),
             PluginSpec("tap-csv", "extractor"),  # Para dados auxiliares
         ],
@@ -102,14 +106,14 @@ def enterprise_project_setup() -> None:
                 "target-postgres",
                 transform="dbt-postgres:run",
                 schedule="@daily",
-                select=["users", "orders", "products",],
+                select=["users", "orders", "products"],
             ),
             PipelineSpec(
                 "hourly_incremental",
                 "tap-postgres",
                 "target-postgres",
                 schedule="0 * * * *",
-                select=["events", "user_sessions",],
+                select=["events", "user_sessions"],
             ),
         ],
     )
@@ -124,12 +128,19 @@ def enterprise_project_setup() -> None:
 # 🔄 PROCESSAMENTO EM LOTE - Múltiplas Tabelas
 # ============================================================================
 
+
 def batch_processing_example() -> None:
     """Processamento batch ultra-simplificado."""
     # 📋 Lista de tabelas para processar
     tables = [
-        "customers", "orders", "order_items", "products",
-        "categories", "suppliers", "inventory", "shipments",
+        "customers",
+        "orders",
+        "order_items",
+        "products",
+        "categories",
+        "suppliers",
+        "inventory",
+        "shipments",
     ]
 
     # 🔄 PROCESSAMENTO BATCH - 1 linha vs 60+ linhas manuais
@@ -143,7 +154,7 @@ def batch_processing_example() -> None:
     # 📊 Análise de resultados
     sum(results.values())
     len(results)
-    failed_tables = [table for table, success in results.items() if not success,]
+    failed_tables = [table for table, success in results.items() if not success]
 
     if failed_tables:
         pass
@@ -158,20 +169,25 @@ def advanced_batch_processing() -> None:
     )
 
     # 📋 Diferentes grupos de tabelas
-    critical_tables = ["users", "orders", "payments",]
-    audit_tables = ["user_sessions", "events", "logs",]
-    reference_tables = ["products", "categories", "suppliers",]
+    critical_tables = ["users", "orders", "payments"]
+    audit_tables = ["user_sessions", "events", "logs"]
+    reference_tables = ["products", "categories", "suppliers"]
 
     # 🔄 Processamento sequencial para tabelas críticas
     critical_results = processor.process_tables(
-        "tap-postgres", "target-warehouse", critical_tables,
+        "tap-postgres",
+        "target-warehouse",
+        critical_tables,
         parallel=False,  # Sequencial para garantir ordem
     )
 
     # ⚡ Processamento paralelo para tabelas de auditoria
     audit_results = processor.process_tables(
-        "tap-postgres", "target-warehouse", audit_tables,
-        parallel=True, max_workers=3,
+        "tap-postgres",
+        "target-warehouse",
+        audit_tables,
+        parallel=True,
+        max_workers=3,
     )
 
     # 🧹 Limpeza de estados antes de reprocessar referências
@@ -179,27 +195,28 @@ def advanced_batch_processing() -> None:
 
     # 📊 Processamento de referências
     ref_results = processor.process_tables(
-        "tap-postgres", "target-warehouse", reference_tables,
+        "tap-postgres",
+        "target-warehouse",
+        reference_tables,
     )
 
     # 📈 Consolidação de resultados
-    all_results = {**critical_results, **audit_results, **ref_results,}
+    all_results = {**critical_results, **audit_results, **ref_results}
     sum(r.success for r in all_results.values()) / len(all_results)
-
 
 
 # ============================================================================
 # 🔍 DESCOBERTA E VALIDAÇÃO - Exploração de Dados
 # ============================================================================
 
+
 def data_discovery_workflow() -> None:
     """Workflow completo de descoberta de dados."""
     project_root = "/tmp/discovery_project"
 
     # 🔌 Teste de conectividade - 1 linha
-    if not test_tap_connection("tap-postgres", project_root=project_root,):
+    if not test_tap_connection("tap-postgres", project_root=project_root):
         return
-
 
     # 🗂️ Descoberta de catálogo - 1 linha
     catalog = discover_catalog("tap-postgres", project_root=project_root)
@@ -215,20 +232,20 @@ def data_discovery_workflow() -> None:
         len(properties)
 
         # Identificar tipos de campos principais
-        field_types = [prop.get("type", "unknown") for prop in properties.values(),]
-        {t: field_types.count(t) for t in set(field_types),}
-
+        field_types = [prop.get("type", "unknown") for prop in properties.values()]
+        {t: field_types.count(t) for t in set(field_types)}
 
     # 🎯 Setup automático baseado na descoberta
     fm = FlextMeltano(project_root=project_root)
 
     # 📈 Teste de extração com tabelas pequenas primeiro
-    small_tables = [s["tap_stream_id"] for s in streams[:3],]  # Primeiras 3 tabelas
+    small_tables = [s["tap_stream_id"] for s in streams[:3]]  # Primeiras 3 tabelas
 
     for table in small_tables:
         result = fm.run(
-            "tap-postgres", "target-csv",
-            select=[table,],
+            "tap-postgres",
+            "target-csv",
+            select=[table],
             dry_run=True,  # Apenas validação
         )
 
@@ -241,6 +258,7 @@ def data_discovery_workflow() -> None:
 # ============================================================================
 # ⚡ PIPELINES ASSÍNCRONOS - Alta Performance
 # ============================================================================
+
 
 async def async_pipeline_workflow() -> None:
     """Workflow assíncrono para máxima performance."""
@@ -261,8 +279,8 @@ async def async_pipeline_workflow() -> None:
         )
 
         # 📊 Análise de resultados paralelos
-        for _i, result in enumerate(results,):
-            if isinstance(result, Exception,):
+        for _i, result in enumerate(results):
+            if isinstance(result, Exception):
                 pass
             else:
                 pass
@@ -274,6 +292,7 @@ async def async_pipeline_workflow() -> None:
 # ============================================================================
 # 🏥 MONITORAMENTO E DIAGNÓSTICO - Health Checks
 # ============================================================================
+
 
 def health_monitoring_example() -> None:
     """Sistema completo de monitoramento de saúde."""
@@ -319,19 +338,19 @@ def health_monitoring_example() -> None:
 # 💾 BACKUP E RECUPERAÇÃO - Gestão de Projeto
 # ============================================================================
 
+
 def backup_and_recovery_example() -> None:
     """Sistema completo de backup e recuperação."""
     project = MeltanoProject("/tmp/critical_project")
 
     # 📅 Backup com timestamp
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = f"/backups/meltano_project_{timestamp,}"
+    backup_path = f"/backups/meltano_project_{(timestamp,)}"
 
     # 💾 BACKUP COMPLETO - 1 linha vs 30+ manuais
     backup_result = project.backup_project(backup_path)
 
     if backup_result.success:
-
         # 📊 Informações do backup
         pass
 
@@ -350,6 +369,7 @@ def backup_and_recovery_example() -> None:
 # 🎯 WORKFLOWS ESPECÍFICOS - Casos de Uso Reais
 # ============================================================================
 
+
 def real_world_etl_workflow() -> None:
     """Workflow ETL real - E-commerce para Data Warehouse."""
     # 🏪 Cenário: E-commerce pipeline
@@ -357,12 +377,13 @@ def real_world_etl_workflow() -> None:
     fm = FlextMeltano("/tmp/ecommerce_project", environment="prod")
 
     # 1️⃣ DADOS CRÍTICOS (sequencial para garantir consistência)
-    critical_tables = ["customers", "orders", "payments",]
+    critical_tables = ["customers", "orders", "payments"]
 
     for table in critical_tables:
         fm.run(
-            "tap-postgres-prod", "target-warehouse",
-            select=[table,],
+            "tap-postgres-prod",
+            "target-warehouse",
+            select=[table],
             full_refresh=False,  # Incremental para performance
         )
 
@@ -370,41 +391,56 @@ def real_world_etl_workflow() -> None:
     processor = BatchProcessor("/tmp/ecommerce_project", environment="prod")
 
     auxiliary_tables = [
-        "products", "categories", "suppliers", "inventory",
-        "shipping_zones", "tax_rules", "promotions",
+        "products",
+        "categories",
+        "suppliers",
+        "inventory",
+        "shipping_zones",
+        "tax_rules",
+        "promotions",
     ]
 
     aux_results = processor.process_tables(
-        "tap-postgres-prod", "target-warehouse", auxiliary_tables,
-        parallel=True, max_workers=3,
+        "tap-postgres-prod",
+        "target-warehouse",
+        auxiliary_tables,
+        parallel=True,
+        max_workers=3,
     )
 
     aux_success = sum(aux_results.values())
 
     # 3️⃣ DADOS DE ANALYTICS (batch otimizado)
     analytics_tables = [
-        "user_sessions", "page_views", "search_queries",
-        "cart_events", "conversion_events", "email_opens",
+        "user_sessions",
+        "page_views",
+        "search_queries",
+        "cart_events",
+        "conversion_events",
+        "email_opens",
     ]
 
     analytics_results = processor.process_tables(
-        "tap-analytics", "target-warehouse", analytics_tables,
-        parallel=True, max_workers=2,  # Menos workers para não sobrecarregar
+        "tap-analytics",
+        "target-warehouse",
+        analytics_tables,
+        parallel=True,
+        max_workers=2,  # Menos workers para não sobrecarregar
     )
 
     analytics_success = sum(analytics_results.values())
 
     # 4️⃣ TRANSFORMAÇÕES DBT
     fm.run(
-        "dbt-warehouse", "dbt-warehouse",  # DBT plugin especial
-        select=["marts", "staging",],
+        "dbt-warehouse",
+        "dbt-warehouse",  # DBT plugin especial
+        select=["marts", "staging"],
     )
 
     # 📊 RESUMO FINAL
     total_tables = len(critical_tables) + len(auxiliary_tables) + len(analytics_tables)
     total_success = 3 + aux_success + analytics_success  # Critical + aux + analytics
     success_rate = (total_success / total_tables) * 100
-
 
     if success_rate >= 95 or success_rate >= 80:
         pass
@@ -415,6 +451,7 @@ def real_world_etl_workflow() -> None:
 # ============================================================================
 # 🎮 DEMO INTERATIVO - Teste das Funcionalidades
 # ============================================================================
+
 
 def interactive_demo() -> None:
     """Demo interativo para testar funcionalidades."""
@@ -431,7 +468,6 @@ def interactive_demo() -> None:
         pass
 
 
-
 # ============================================================================
 # 🚀 EXECUÇÃO DOS EXEMPLOS
 # ============================================================================
@@ -439,7 +475,6 @@ def interactive_demo() -> None:
 if __name__ == "__main__":
     # 🎮 Demo interativo
     interactive_demo()
-
 
     # Descomente os exemplos que quiser testar:
 
@@ -469,4 +504,3 @@ if __name__ == "__main__":
 
     # 🏪 Real World ETL
     # real_world_etl_workflow()
-

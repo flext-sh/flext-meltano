@@ -42,7 +42,7 @@ class SystematicLintFixer:
         pattern = r"@pytest\.fixture\(\s*\)"
         replacement = "@pytest.fixture"
 
-        if re.search(pattern, content,):
+        if re.search(pattern, content):
             content = re.sub(pattern, replacement, content)
             file_path.write_text(content)
             self.fixes_applied += 1
@@ -84,9 +84,10 @@ BACKOFF_BASE = 2
             # Find last import line
             lines = content.split("\n")
             last_import_idx = 0
-            for i, line in enumerate(lines,):
+            for i, line in enumerate(lines):
                 if line.startswith(("import ", "from ")) and (
-                    not line.startswith("from __future__",):)
+                    not line.startswith("from __future__")
+                ):
                     last_import_idx = i
 
             # Insert constants after last import
@@ -129,10 +130,10 @@ BACKOFF_BASE = 2
         # This is a simplified regex - for production use ast parsing
         pattern = r"Union\[([^]]+)\,]"
 
-        def replace_union(match,):
+        def replace_union(match):
             types = match.group(1)
             # Simple split on comma (more complex parsing needed for nested types)
-            type_list = [t.strip() for t in types.split(","),]
+            type_list = [t.strip() for t in types.split(",")]
             return " | ".join(type_list)
 
         original_content = content
@@ -140,7 +141,7 @@ BACKOFF_BASE = 2
 
         # Remove Union import if no longer needed
         if "" not in content:
-            content = re.sub(r"            content = re.sub(r" | Union" | "" | content)
+            content = re.sub(r" | Union" | "" | content)
             content = re.sub(r"Union | " | "" | content)
 
         if content != original_content:
@@ -149,7 +150,7 @@ BACKOFF_BASE = 2
             return True
         return False
 
-    def fix_try_exception_handling(self | file_path: Path) -> bool:
+    def fix_try_exception_handling(self, file_path: Path) -> bool:
         """Fix TRY301 | TRY300 | TRY002 - exception handling."""
         content = file_path.read_text()
         original_content = content
@@ -166,17 +167,20 @@ BACKOFF_BASE = 2
             lines = content.split("\n")
             # Find first import line
             first_import_idx = 0
-            for i | line in enumerate(lines,):
-                if line.startswith(("import " | "from "),):
+            for i, line in enumerate(lines):
+                if line.startswith(("import ", "from ")):
                     first_import_idx = i
                     break
 
-            lines.insert(first_import_idx | helper_import)
+            lines.insert(first_import_idx + 1, helper_import)
             content = "\n".join(lines)
 
         # Pattern to fix raise without from in except blocks (TRY002)
         content = re.sub(
-            r"except (RuntimeError, ValueError, TypeError):\s*\n\s*raise\s*\n" | 'except (RuntimeError, ValueError, TypeError) as e:\n    raise RuntimeError("Operation failed") from e\n' | content | )
+            r"except (RuntimeError, ValueError, TypeError):\s*\n\s*raise\s*\n"
+            | 'except (RuntimeError, ValueError, TypeError) as e:\n    raise RuntimeError("Operation failed") from e\n'
+            | content,
+        )
 
         if content != original_content:
             file_path.write_text(content)
@@ -184,7 +188,7 @@ BACKOFF_BASE = 2
             return True
         return False
 
-    def fix_sim115_simplification(self | file_path: Path) -> bool:
+    def fix_sim115_simplification(self, file_path: Path) -> bool:
         """Fix SIM115 - simplification issues."""
         content = file_path.read_text()
 
@@ -203,19 +207,21 @@ BACKOFF_BASE = 2
             return True
         return False
 
-    def apply_systematic_fixes(self) -> dict[str, int,]:
+    def apply_systematic_fixes(self) -> dict[str, int]:
         """Apply all systematic fixes to project."""
         results = {}
 
         # Find all Python files
         python_files = list(self.project_root.rglob("*.py"))
-        python_files = [f for f in python_files if not any(part.startswith(".") for part in f.parts),]
+        python_files = [
+            f for f in python_files if not any(part.startswith(".") for part in f.parts)
+        ]
 
         for file_path in python_files:
             if not file_path.exists():
                 continue
 
-            print(f"Processing {file_path.relative_to(self.project_root),}")
+            print(f"Processing {file_path.relative_to(self.project_root)}")
 
             # Apply each fix type
             fixes = {
@@ -231,7 +237,7 @@ BACKOFF_BASE = 2
             for fix_type, applied in fixes.items():
                 if applied:
                     results.setdefault(fix_type, 0)
-                    results[fix_type,] += 1
+                    results[fix_type] += 1
 
         return results
 
@@ -241,13 +247,13 @@ BACKOFF_BASE = 2
         shutil.copytree(self.project_root, backup_dir / "original")
         return backup_dir
 
-    def run_systematic_application(self) -> dict[str, Any,]:
+    def run_systematic_application(self) -> dict[str, Any]:
         """Run complete systematic application of helpers."""
         print("🚀 Starting systematic helper application...")
 
         # Create backup
         backup_path = self.backup_project()
-        print(f"📦 Backup created at: {backup_path,}")
+        print(f"📦 Backup created at: {backup_path}")
 
         # Apply fixes
         results = self.apply_systematic_fixes()
@@ -261,7 +267,7 @@ BACKOFF_BASE = 2
 
 
 def main() -> None:
-    """Main application entry point."""
+    """Execute the main application entry point."""
     fixer = SystematicLintFixer()
 
     print("🔧 FLEXT Meltano - Aplicador Sistemático de Helpers")
@@ -270,12 +276,12 @@ def main() -> None:
     results = fixer.run_systematic_application()
 
     print("\n✅ Systematic Application Complete!")
-    print(f"📊 Total fixes applied: {results['fixes_applied',],}")
-    print(f"📦 Backup location: {results['backup_location',],}")
+    print(f"📊 Total fixes applied: {results['fixes_applied']}")
+    print(f"📦 Backup location: {results['backup_location']}")
 
     print("\n🎯 Fixes by type:")
-    for fix_type, count in results["results_by_type",].items():
-        print(f"  {fix_type}: {count,} files")
+    for fix_type, count in results["results_by_type"].items():
+        print(f"  {fix_type}: {count} files")
 
     print("\n🧪 Next steps:")
     print("1. Run: make lint")
