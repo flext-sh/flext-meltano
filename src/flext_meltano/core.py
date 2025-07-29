@@ -62,6 +62,7 @@ class PipelineEventType(Enum):
 
 # === DOMAIN VALUE OBJECTS ===
 
+
 @dataclass(frozen=True)
 class FlextMeltanoPipelineConfig:
     """Pipeline configuration value object - immutable."""
@@ -81,6 +82,7 @@ class FlextMeltanoPipelineConfig:
 
 
 # === DOMAIN ENTITIES ===
+
 
 class FlextMeltanoPipelineResult(FlextEntity):
     """Pipeline execution result entity."""
@@ -106,7 +108,11 @@ class FlextMeltanoPipelineResult(FlextEntity):
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "records_processed", records_processed)
         if self.started_at and self.completed_at:
-            object.__setattr__(self, "duration_seconds", (self.completed_at - self.started_at).total_seconds())
+            object.__setattr__(
+                self,
+                "duration_seconds",
+                (self.completed_at - self.started_at).total_seconds(),
+            )
 
     def fail_execution(self, error_message: str) -> None:
         """Mark pipeline execution as failed."""
@@ -114,7 +120,11 @@ class FlextMeltanoPipelineResult(FlextEntity):
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "error_message", error_message)
         if self.started_at and self.completed_at:
-            object.__setattr__(self, "duration_seconds", (self.completed_at - self.started_at).total_seconds())
+            object.__setattr__(
+                self,
+                "duration_seconds",
+                (self.completed_at - self.started_at).total_seconds(),
+            )
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate pipeline result domain rules."""
@@ -141,6 +151,7 @@ class FlextMeltanoPipelineEvent(FlextEntity):
 
 
 # === AGGREGATE ROOT ===
+
 
 class FlextMeltanoRepository(FlextAggregateRoot):
     """Pipeline repository aggregate root managing pipeline lifecycle."""
@@ -186,23 +197,28 @@ class FlextMeltanoRepository(FlextAggregateRoot):
 
 # === DOMAIN SERVICES ===
 
+
 @injectable
 class FlextMeltanoSingerService(FlextDomainService):
     """Singer protocol domain service using MANDATORY patterns."""
 
-    def __init__(self,
-                 config: FlextMeltanoConfig,
-                 tap_service: FlextMeltanoTapService,
-                 target_service: FlextMeltanoTargetService) -> None:
+    def __init__(
+        self,
+        config: FlextMeltanoConfig,
+        tap_service: FlextMeltanoTapService,
+        target_service: FlextMeltanoTargetService,
+    ) -> None:
         """Initialize with dependency injection."""
         super().__init__()
         self.config = config
         self.tap_service = tap_service
         self.target_service = target_service
 
-    def execute_singer_pipeline(self,
-                               extractor: str,
-                               loader: str) -> FlextResult[FlextMeltanoPipelineResult]:
+    def execute_singer_pipeline(
+        self,
+        extractor: str,
+        loader: str,
+    ) -> FlextResult[FlextMeltanoPipelineResult]:
         """Execute Singer pipeline using tap and target services."""
         result = FlextMeltanoPipelineResult(
             pipeline_name=f"{extractor}-{loader}",
@@ -218,13 +234,17 @@ class FlextMeltanoSingerService(FlextDomainService):
 
             target_validation = self.target_service.validate_service()
             if not target_validation.is_success:
-                result.fail_execution(f"Target validation failed: {target_validation.error}")
+                result.fail_execution(
+                    f"Target validation failed: {target_validation.error}",
+                )
                 return FlextResult(error=target_validation.error)
 
             # Execute discovery
             catalog_result = self.tap_service.discover_catalog()
             if not catalog_result.is_success:
-                result.fail_execution(f"Catalog discovery failed: {catalog_result.error}")
+                result.fail_execution(
+                    f"Catalog discovery failed: {catalog_result.error}",
+                )
                 return FlextResult(error=catalog_result.error)
 
             # For real implementation, this would execute the actual Singer pipeline
@@ -242,11 +262,13 @@ class FlextMeltanoSingerService(FlextDomainService):
 class FlextMeltanoOrchestrationService(FlextDomainService):
     """Pipeline orchestration domain service using MANDATORY patterns."""
 
-    def __init__(self,
-                 config: FlextMeltanoConfig,
-                 singer_service: FlextMeltanoSingerService,
-                 dbt_service: FlextMeltanoDbtService,
-                 repository: FlextMeltanoRepository) -> None:
+    def __init__(
+        self,
+        config: FlextMeltanoConfig,
+        singer_service: FlextMeltanoSingerService,
+        dbt_service: FlextMeltanoDbtService,
+        repository: FlextMeltanoRepository,
+    ) -> None:
         """Initialize with dependency injection."""
         super().__init__()
         self.config = config
@@ -264,12 +286,14 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
         """Get orchestration service health status."""
-        return FlextResult(data={
-            "service": "orchestration",
-            "meltano_available": True,
-            "initialized": self._initialized,
-            "pipelines_count": len(self.repository.pipelines),
-        })
+        return FlextResult(
+            data={
+                "service": "orchestration",
+                "meltano_available": True,
+                "initialized": self._initialized,
+                "pipelines_count": len(self.repository.pipelines),
+            },
+        )
 
     def create_pipeline(self, config: FlextMeltanoPipelineConfig) -> FlextResult[None]:
         """Create new pipeline using domain patterns."""
@@ -283,7 +307,10 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Failed to create pipeline: {e}")
 
-    def execute_pipeline(self, pipeline_name: str) -> FlextResult[FlextMeltanoPipelineResult]:
+    def execute_pipeline(
+        self,
+        pipeline_name: str,
+    ) -> FlextResult[FlextMeltanoPipelineResult]:
         """Execute pipeline using orchestration patterns."""
         try:
             # Get pipeline configuration from repository
@@ -332,9 +359,11 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
 class FlextMeltanoExtension(FlextDomainService):
     """Meltano extension using MANDATORY Meltano EDK patterns."""
 
-    def __init__(self,
-                 config: FlextMeltanoConfig,
-                 extension_service: FlextMeltanoExtensionService) -> None:
+    def __init__(
+        self,
+        config: FlextMeltanoConfig,
+        extension_service: FlextMeltanoExtensionService,
+    ) -> None:
         """Initialize with dependency injection."""
         super().__init__()
         self.config = config
@@ -350,6 +379,7 @@ class FlextMeltanoExtension(FlextDomainService):
 
 
 # === EXECUTION STATE MANAGEMENT ===
+
 
 class FlextMeltanoExecutionState(BaseModel):
     """Execution state management using domain patterns."""
@@ -381,6 +411,7 @@ class FlextMeltanoExecutionState(BaseModel):
 
 
 # === BACKWARDS COMPATIBILITY ===
+
 
 # Legacy function to maintain compatibility
 def _deprecated_api_warning(message: str) -> None:

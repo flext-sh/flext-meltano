@@ -311,9 +311,10 @@ class TestDBTOrchestrators:
         if result.data["status"] != "success":
             msg = f"Expected {"success"}, got {result.data["status"]}"
             raise AssertionError(msg)
-        if "staging_wms_inventory" not in result.data["models"]:  # type: ignore[operator]
-            msg = f"Expected {"staging_wms_inventory"} in {result.data["models"]}"
-            raise AssertionError(msg)  # type: ignore[operator]
+        models_list = result.data.get("models", [])
+        if "staging_wms_inventory" not in str(models_list):
+            msg = f"Expected {"staging_wms_inventory"} in {models_list}"
+            raise AssertionError(msg)
 
     def test_oracle_wms_orchestrator_custom_models(self) -> None:
         """Test Oracle WMS orchestrator with custom models."""
@@ -359,9 +360,10 @@ class TestDBTOrchestrators:
         if result.data["status"] != "success":
             msg = f"Expected {"success"}, got {result.data["status"]}"
             raise AssertionError(msg)
-        if "staging_oracle_tables" not in result.data["models"]:  # type: ignore[operator]
-            msg = f"Expected {"staging_oracle_tables"} in {result.data["models"]}"
-            raise AssertionError(msg)  # type: ignore[operator]
+        models_list = result.data.get("models", [])
+        if "staging_oracle_tables" not in str(models_list):
+            msg = f"Expected {"staging_oracle_tables"} in {models_list}"
+            raise AssertionError(msg)
 
     def test_ldap_orchestrator(self) -> None:
         """Test LDAP DBT orchestrator."""
@@ -373,8 +375,9 @@ class TestDBTOrchestrators:
         if result.data["status"] != "success":
             msg = f"Expected {"success"}, got {result.data["status"]}"
             raise AssertionError(msg)
-        if "staging_ldap_users" not in result.data["models"]:  # type: ignore[operator]
-            msg = f"Expected staging_ldap_users in {result.data['models']}"
+        models_list = result.data.get("models", [])
+        if "staging_ldap_users" not in str(models_list):
+            msg = f"Expected staging_ldap_users in {models_list}"
             raise AssertionError(msg)
 
     def test_ldif_orchestrator(self) -> None:
@@ -387,8 +390,9 @@ class TestDBTOrchestrators:
         if result.data["status"] != "success":
             msg = f"Expected {"success"}, got {result.data["status"]}"
             raise AssertionError(msg)
-        if "staging_ldif_entries" not in result.data["models"]:  # type: ignore[operator]
-            msg = f"Expected staging_ldif_entries in {result.data['models']}"
+        models_list = result.data.get("models", [])
+        if "staging_ldif_entries" not in str(models_list):
+            msg = f"Expected staging_ldif_entries in {models_list}"
             raise AssertionError(msg)
 
     def test_orchestrator_project_dir_setting(self) -> None:

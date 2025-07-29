@@ -19,14 +19,20 @@ class FlextMeltanoCli:
         """Initialize CLI with project root."""
         self.project_root = project_root or Path.cwd()
 
-    def execute(self, command: str = "", options: list[str] | None = None) -> FlextResult[dict[str, Any]]:
+    def execute(
+        self,
+        command: str = "",
+        options: list[str] | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Execute CLI operations using flext-core patterns."""
         if not command or command.strip() == "":
             # Return basic CLI info for empty commands
-            return FlextResult(data={
-                "cli_type": "flext_meltano",
-                "project_root": str(self.project_root),
-            })
+            return FlextResult(
+                data={
+                    "cli_type": "flext_meltano",
+                    "project_root": str(self.project_root),
+                },
+            )
 
         # Handle specific commands
         options = options or []
@@ -39,37 +45,47 @@ class FlextMeltanoCli:
             return self.health()
         if command in {"discover", "install", "run"}:
             # Mock successful execution for these commands
-            return FlextResult(data={
-                "command": command,
-                "options": options,
-                "status": "success",
-            })
+            return FlextResult(
+                data={
+                    "command": command,
+                    "options": options,
+                    "status": "success",
+                },
+            )
         # For unknown commands, return graceful response
-        return FlextResult(data={
-            "command": command,
-            "status": "unknown_command",
-        })
+        return FlextResult(
+            data={
+                "command": command,
+                "status": "unknown_command",
+            },
+        )
 
     def health(self) -> FlextResult[dict[str, Any]]:
         """Get CLI health status."""
-        return FlextResult(data={
-            "status": "healthy",
-            "project_root": str(self.project_root),
-        })
+        return FlextResult(
+            data={
+                "status": "healthy",
+                "project_root": str(self.project_root),
+            },
+        )
 
     def version(self) -> FlextResult[dict[str, Any]]:
         """Get version information."""
-        return FlextResult(data={
-            "version": "3.8.0",
-            "cli_type": "flext_meltano",
-        })
+        return FlextResult(
+            data={
+                "version": "3.8.0",
+                "cli_type": "flext_meltano",
+            },
+        )
 
     def help(self) -> FlextResult[dict[str, Any]]:
         """Get help information."""
-        return FlextResult(data={
-            "commands": ["version", "help", "health", "run", "discover", "install"],
-            "cli_type": "flext_meltano",
-        })
+        return FlextResult(
+            data={
+                "commands": ["version", "help", "health", "run", "discover", "install"],
+                "cli_type": "flext_meltano",
+            },
+        )
 
     def run(self, args: list[str]) -> FlextResult[dict[str, Any]]:
         """Run CLI with arguments."""
@@ -84,16 +100,20 @@ class FlextMeltanoCli:
         if args == ["version"]:
             return self.version()
         # Mock successful execution for other arguments
-        return FlextResult(data={
-            "status": "success",
-            "args": args,
-        })
+        return FlextResult(
+            data={
+                "status": "success",
+                "args": args,
+            },
+        )
 
     def list_commands(self) -> FlextResult[dict[str, Any]]:
         """List available commands."""
-        return FlextResult(data={
-            "commands": ["version", "help", "health", "run", "discover", "install"],
-        })
+        return FlextResult(
+            data={
+                "commands": ["version", "help", "health", "run", "discover", "install"],
+            },
+        )
 
     def flext_meltano_run_command(self, args: list[str]) -> FlextResult[dict[str, Any]]:
         """Run meltano command with arguments."""
@@ -144,7 +164,11 @@ class FlextMeltanoCli:
         result = self.flext_meltano_run_command(["install"])
         return FlextResult(data=result.is_success)
 
-    def flext_meltano_invoke(self, plugin_name: str, *args: str) -> FlextResult[dict[str, Any]]:
+    def flext_meltano_invoke(
+        self,
+        plugin_name: str,
+        *args: str,
+    ) -> FlextResult[dict[str, Any]]:
         """Invoke specific plugin with arguments."""
         cmd_args = ["invoke", plugin_name, *args]
         return self.flext_meltano_run_command(cmd_args)

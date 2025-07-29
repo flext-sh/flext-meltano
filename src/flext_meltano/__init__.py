@@ -11,6 +11,8 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
+from flext_meltano import singer
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -69,6 +71,13 @@ from flext_meltano.cli import (
     flext_meltano_run_cli,
 )
 
+# === COMMON UTILITIES ===
+from flext_meltano.common import (
+    validate_config_value,
+    validate_directory_path,
+    validate_file_path,
+)
+
 # === DISCOVERY & CATALOG MANAGEMENT ===
 from flext_meltano.discovery import (
     FlextMeltanoDiscoverer,
@@ -109,7 +118,7 @@ from flext_meltano.validation import (
 )
 
 # DBT run result - using available module
-DbtRunResult = dbt.contracts.results.RunResult
+DbtRunResult = dbt.contracts.results.RunResult  # type: ignore[attr-defined]
 
 
 # === LEGACY COMPATIBILITY ===
@@ -140,14 +149,18 @@ create_dbt_service = create_meltano_dbt_service
 
 
 # Legacy factory functions
-def flext_meltano_create_dbt_project(project_dir: Path) -> FlextResult[FlextMeltanoDbtService]:
+def flext_meltano_create_dbt_project(
+    project_dir: Path,
+) -> FlextResult[FlextMeltanoDbtService]:
     """Create DBT project using new base implementation."""
     _deprecated_api_warning("flext_meltano_create_dbt_project", "create_dbt_service")
     config = FlextMeltanoConfig(project_root=str(project_dir))
     return create_dbt_service(config)
 
 
-def flext_meltano_create_dbt_runner(project_dir: Path) -> FlextResult[FlextMeltanoDbtService]:
+def flext_meltano_create_dbt_runner(
+    project_dir: Path,
+) -> FlextResult[FlextMeltanoDbtService]:
     """Create DBT runner using new base implementation."""
     _deprecated_api_warning("flext_meltano_create_dbt_runner", "create_dbt_service")
     config = FlextMeltanoConfig(project_root=str(project_dir))
@@ -244,5 +257,11 @@ __all__ = [
     "flext_meltano_validate_project",
     "flext_meltano_validate_tap_config",
     "get_tap_test_class",
+    "singer",
     "singer_typing",
+    "validate_config_value",
+    "validate_directory_path",
+    "validate_file_path",
 ]
+
+# Ensure singer module is available

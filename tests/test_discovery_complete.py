@@ -145,18 +145,34 @@ class TestFlextMeltanoDiscoverer:
 
     def test_discover_plugins(self) -> None:
         """Test discover plugins method."""
-        config = FlextMeltanoConfig()
-        service = FlextMeltanoDiscoverer(config)
-        result = service.discover_plugins()
-        # May fail if Meltano Hub not accessible, but should not crash
-        assert result.is_success or not result.is_success
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a mock meltano.yml file
+            meltano_yml = Path(temp_dir) / "meltano.yml"
+            meltano_yml.write_text("project_id: test-project\nversion: 1\n")
+
+            config = FlextMeltanoConfig(project_root=temp_dir)
+            service = FlextMeltanoDiscoverer(config)
+            result = service.discover_plugins()
+            # May fail if Meltano Hub not accessible, but should not crash
+            assert isinstance(result.is_success, bool)
 
     def test_discover_plugins_with_type(self) -> None:
         """Test discover plugins with specific type."""
-        config = FlextMeltanoConfig()
-        service = FlextMeltanoDiscoverer(config)
-        result = service.discover_plugins("extractors")
-        # May fail if Meltano Hub not accessible, but should not crash
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a mock meltano.yml file
+            meltano_yml = Path(temp_dir) / "meltano.yml"
+            meltano_yml.write_text("project_id: test-project\nversion: 1\n")
+
+            config = FlextMeltanoConfig(project_root=temp_dir)
+            service = FlextMeltanoDiscoverer(config)
+            result = service.discover_plugins("extractors")
+            # May fail if Meltano Hub not accessible, but should not crash
         assert result.is_success or not result.is_success
 
     def test_get_default_plugins(self) -> None:

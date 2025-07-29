@@ -349,9 +349,9 @@ class TestFlextMeltanoTapService:
 
         result = service.set_tap_class(MockTap)  # type: ignore[arg-type]
         assert result.is_success
-        if service.tap_class != MockTap:  # type: ignore[comparison-overlap]
+        if service.tap_class is not MockTap:  # type: ignore[comparison-overlap]
             msg = f"Expected {MockTap}, got {service.tap_class}"
-            raise AssertionError(msg)  # type: ignore[comparison-overlap]
+            raise AssertionError(msg)
 
     def test_tap_service_validate_ready_for_use(self) -> None:
         """Test tap service validate ready for use."""
@@ -487,9 +487,9 @@ class TestFlextMeltanoTargetService:
 
         result = service.set_target_class(MockTarget)  # type: ignore[arg-type]
         assert result.is_success
-        if service.target_class != MockTarget:  # type: ignore[comparison-overlap]
+        if service.target_class is not MockTarget:  # type: ignore[comparison-overlap]
             msg = f"Expected {MockTarget}, got {service.target_class}"
-            raise AssertionError(msg)  # type: ignore[comparison-overlap]
+            raise AssertionError(msg)
 
     def test_target_service_validate_ready_for_use(self) -> None:
         """Test target service validate ready for use."""
