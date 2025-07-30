@@ -138,7 +138,11 @@ class FlextMeltanoPluginError(FlextMeltanoError):
         if plugin_type is not None:
             context["plugin_type"] = plugin_type
 
-        super().__init__(f"Meltano plugin: {message}", plugin_name=plugin_name, **context)
+        super().__init__(
+            f"Meltano plugin: {message}",
+            plugin_name=plugin_name,
+            **context,
+        )
 
 
 class FlextMeltanoExecutionError(FlextMeltanoError):

@@ -98,7 +98,8 @@ class FlextMeltanoValidationService:
         )
 
     def validate_project(
-        self, context: FlextMeltanoValidationContext | None = None,
+        self,
+        context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Validate Meltano project configuration using enterprise patterns."""
         if not context:
@@ -170,7 +171,9 @@ class FlextMeltanoValidationService:
         try:
             # Try subprocess connection test first
             result = await self._test_connection_subprocess(
-                tap_name, config or {}, context,
+                tap_name,
+                config or {},
+                context,
             )
             if result.is_success:
                 return result
@@ -355,14 +358,19 @@ class FlextMeltanoValidationService:
             return FlextResult(error=f"Config validation failed: {e}")
 
     def _validate_empty_config(
-        self, issues: list[str], details: dict[str, Any],
+        self,
+        issues: list[str],
+        details: dict[str, Any],
     ) -> None:
         """Validate empty configuration."""
         issues.append("No configuration provided")
         details["config_type"] = "empty"
 
     def _validate_file_config(
-        self, config: dict[str, Any], issues: list[str], details: dict[str, Any],
+        self,
+        config: dict[str, Any],
+        issues: list[str],
+        details: dict[str, Any],
     ) -> None:
         """Validate file-based configuration."""
         details["config_type"] = "file"
@@ -419,7 +427,10 @@ class FlextMeltanoValidationService:
             )
 
     def _validate_custom_config(
-        self, config: dict[str, Any], issues: list[str], details: dict[str, Any],
+        self,
+        config: dict[str, Any],
+        issues: list[str],
+        details: dict[str, Any],
     ) -> None:
         """Validate custom configuration."""
         details["config_type"] = "custom"
@@ -463,10 +474,12 @@ def flext_meltano_validate_project(
         legacy_data = {
             "project_valid": validation_result.is_valid,
             "meltano_yml_exists": validation_result.details.get(
-                "meltano_yml_exists", False,
+                "meltano_yml_exists",
+                False,
             ),
             "plugins_installed": validation_result.details.get(
-                "plugins_installed", False,
+                "plugins_installed",
+                False,
             ),
             "issues": validation_result.issues,
         }

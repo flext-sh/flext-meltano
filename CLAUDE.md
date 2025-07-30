@@ -47,7 +47,7 @@ flext_meltano/
 
 ### Essential Makefile Commands
 
-```bash
+````bash
 
 ## TODO: GAPS DE ARQUITETURA IDENTIFICADOS - PRIORIDADE CRÍTICA
 
@@ -86,7 +86,7 @@ flext_meltano/
 
 **TODO**:
 - [ ] Integrar Meltano commands com flext-cli
-- [ ] Criar meltano command group em flext-cli  
+- [ ] Criar meltano command group em flext-cli
 - [ ] Implement pipeline management via CLI
 - [ ] Document Meltano CLI usage patterns
 
@@ -113,7 +113,7 @@ make test-pipeline           # Run basic CSV test pipeline
 # Build & Distribution
 make build                   # Build distribution packages
 make clean                   # Remove all artifacts
-```
+````
 
 ### Testing Commands
 
@@ -209,29 +209,34 @@ python scripts/flext_meltano_bridge.py add_plugin extractor tap-csv
 ### Core Module Organization
 
 **Base Classes (`base.py`)**:
+
 - `FlextMeltanoConfig`: Configuration management
 - `FlextMeltanoTap`, `FlextMeltanoTarget`, `FlextMeltanoDbt`: Base Singer/DBT classes
 - Factory functions: `create_tap()`, `create_target()`, `create_dbt_service()`
 
 **Core Services (`core.py`)**:
+
 - `FlextMeltanoOrchestrationService`: Pipeline orchestration
 - `FlextMeltanoDbtService`: DBT operations
 - `FlextMeltanoSingerService`: Singer protocol handling
 - Enterprise patterns with flext-core integration
 
 **Execution Layer**:
+
 - `execution.py`: Subprocess-based Meltano CLI execution with FlextResult patterns
-- `cli.py`: CLI interface for direct commands and user interactions  
+- `cli.py`: CLI interface for direct commands and user interactions
 - Bridge scripts for Go integration via `scripts/flext_meltano_bridge.py`
 
 ### Singer/Meltano Integration
 
 **Tap/Target Development**:
+
 - Use base classes from `flext_meltano.base`
 - Follow Singer SDK patterns with FLEXT result handling
 - Examples: `FlextMeltanoTapOracle`, `FlextMeltanoTargetCsv`
 
 **DBT Integration**:
+
 - `FlextMeltanoDbtService` for project management
 - Integration with Meltano's DBT execution
 - `dbt/` directory contains project configurations
@@ -242,7 +247,7 @@ python scripts/flext_meltano_bridge.py add_plugin extractor tap-csv
 
 ```
 tests/
-├── test_*.py                    # Main functionality tests  
+├── test_*.py                    # Main functionality tests
 ├── unit/                        # Unit tests
 ├── integration/                 # Integration tests
 ├── e2e/                         # End-to-end tests
@@ -265,7 +270,7 @@ pytest tests/test_flext_meltano_*.py -v
 pytest tests/test_basic.py -v
 pytest tests/test_models.py -v
 
-# Test specific modules  
+# Test specific modules
 pytest tests/test_execution_comprehensive.py -v
 pytest tests/test_real_dbt_functionality.py -v
 pytest tests/test_meltano_integration.py -v
@@ -315,7 +320,7 @@ PYTHONPATH=$(PWD)/src:$(PYTHONPATH)  # Python path setup
 ## Known Limitations & Status
 
 1. **target-jsonl**: Incompatible with Python 3.13 (pytz syntax error)
-2. **DBT Integration**: Core functionality available with `dbt.py` module but not fully tested end-to-end  
+2. **DBT Integration**: Core functionality available with `dbt.py` module but not fully tested end-to-end
 3. **Testing Scope**: Primarily tested with CSV pipelines (other formats require validation)
 4. **Meltano Project**: No `meltano.yml` in repository (initialized on demand via `make meltano-init`)
 5. **Architecture Migration**: Recently consolidated from complex structure - some legacy imports may exist
@@ -386,7 +391,7 @@ PYTHONPATH=$(PWD)/src:$(PYTHONPATH)  # Python path setup
 ### Integration Guidelines
 
 10. **Bridge pattern**: Maintain Go integration via scripts/flext_meltano_bridge.py
-11. **Singer compliance**: Follow Singer SDK patterns for tap/target development  
+11. **Singer compliance**: Follow Singer SDK patterns for tap/target development
 12. **DBT integration**: Use FlextMeltanoDbtService for project management
 13. **Configuration management**: Document environment variables and Meltano settings
 14. **Error handling**: Use FlextResult pattern from flext-core for consistent error handling

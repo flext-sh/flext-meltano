@@ -167,7 +167,8 @@ class FlextMeltanoInstaller:
             return FlextResult(error=f"Plugin add error: {e}")
 
     def install_plugins(
-        self, context: FlextMeltanoInstallationContext | None = None,
+        self,
+        context: FlextMeltanoInstallationContext | None = None,
     ) -> FlextResult[dict[str, Any]]:
         """Install all plugins in meltano project."""
         if not context:
@@ -324,7 +325,8 @@ class FlextMeltanoInstaller:
         )
 
     def _parse_plugin_list(
-        self, stdout: str,
+        self,
+        stdout: str,
     ) -> FlextResult[list[FlextMeltanoPluginInfo]]:
         """Parse plugin list JSON response."""
         try:
@@ -340,7 +342,9 @@ class FlextMeltanoInstaller:
             return FlextResult(error="Failed to parse plugin list JSON")
 
     def _convert_plugin_list(
-        self, plugin_type: str, plugin_list: object,
+        self,
+        plugin_type: str,
+        plugin_list: object,
     ) -> list[FlextMeltanoPluginInfo]:
         """Convert plugin list to FlextMeltanoPluginInfo entities."""
         plugins = []
@@ -351,7 +355,8 @@ class FlextMeltanoInstaller:
                         name=plugin.get("name", ""),
                         type=plugin_type,
                         namespace=plugin.get(
-                            "namespace", plugin.get("name", "").replace("-", "_"),
+                            "namespace",
+                            plugin.get("name", "").replace("-", "_"),
                         ),
                         pip_url=plugin.get("pip_url"),
                         executable=plugin.get("executable"),

@@ -24,14 +24,19 @@ class TestFlextMeltanoInstallerExceptionPaths:
     def test_validation_os_error(self) -> None:
         """Test validation with OSError."""
         # Use a path that causes OSError during validation, not config creation
-        config = FlextMeltanoConfig(project_root="/nonexistent/path/that/will/cause/error")
+        config = FlextMeltanoConfig(
+            project_root="/nonexistent/path/that/will/cause/error",
+        )
         installer = FlextMeltanoInstaller(config)
 
         result = installer.validate()
         # Should handle OSError gracefully
         assert not result.is_success
         assert result.error is not None
-        if ("Validation failed" in result.error or "Project root does not exist" not in result.error):
+        if (
+            "Validation failed" in result.error
+            or "Project root does not exist" not in result.error
+        ):
             msg = f"Expected {'Project root does not exist'} in {result.error}"
             raise AssertionError(msg)
 
@@ -59,12 +64,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin add error" not in result.error:
-            msg = f"Expected {"Plugin add error"} in {result.error}"
+            msg = f"Expected {'Plugin add error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_add_plugin_called_process_error(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_add_plugin_called_process_error(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test add_plugin with CalledProcessError."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.CalledProcessError(1, "meltano")
@@ -76,12 +85,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin add error" not in result.error:
-            msg = f"Expected {"Plugin add error"} in {result.error}"
+            msg = f"Expected {'Plugin add error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_install_plugins_timeout_expired(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_install_plugins_timeout_expired(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test install_plugins with TimeoutExpired."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.TimeoutExpired("meltano install", 600)
@@ -93,12 +106,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin install timed out" not in result.error:
-            msg = f"Expected {"Plugin install timed out"} in {result.error}"
+            msg = f"Expected {'Plugin install timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_install_plugins_os_error(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_install_plugins_os_error(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test install_plugins with OSError."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = OSError("Command not found")
@@ -110,12 +127,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin install error" not in result.error:
-            msg = f"Expected {"Plugin install error"} in {result.error}"
+            msg = f"Expected {'Plugin install error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_install_plugins_called_process_error(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_install_plugins_called_process_error(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test install_plugins with CalledProcessError."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.CalledProcessError(2, "meltano install")
@@ -127,12 +148,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin install error" not in result.error:
-            msg = f"Expected {"Plugin install error"} in {result.error}"
+            msg = f"Expected {'Plugin install error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_install_plugins_failure_returncode(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_install_plugins_failure_returncode(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test install_plugins with non-zero return code."""
         mock_validate.return_value = FlextResult(data=True)
         mock_result = Mock()
@@ -148,12 +173,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin install failed" not in result.error:
-            msg = f"Expected {"Plugin install failed"} in {result.error}"
+            msg = f"Expected {'Plugin install failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_remove_plugin_timeout_expired(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_remove_plugin_timeout_expired(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test remove_plugin with TimeoutExpired."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.TimeoutExpired("meltano remove", 300)
@@ -165,7 +194,7 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin remove timed out" not in result.error:
-            msg = f"Expected {"Plugin remove timed out"} in {result.error}"
+            msg = f"Expected {'Plugin remove timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -182,12 +211,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin remove error" not in result.error:
-            msg = f"Expected {"Plugin remove error"} in {result.error}"
+            msg = f"Expected {'Plugin remove error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_remove_plugin_called_process_error(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_remove_plugin_called_process_error(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test remove_plugin with CalledProcessError."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.CalledProcessError(1, "meltano remove")
@@ -199,12 +232,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin remove error" not in result.error:
-            msg = f"Expected {"Plugin remove error"} in {result.error}"
+            msg = f"Expected {'Plugin remove error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_remove_plugin_failure_returncode(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_remove_plugin_failure_returncode(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test remove_plugin with non-zero return code."""
         mock_validate.return_value = FlextResult(data=True)
         mock_result = Mock()
@@ -220,12 +257,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin remove failed" not in result.error:
-            msg = f"Expected {"Plugin remove failed"} in {result.error}"
+            msg = f"Expected {'Plugin remove failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_list_plugins_timeout_expired(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_list_plugins_timeout_expired(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test list_plugins with TimeoutExpired."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.TimeoutExpired("meltano list", 60)
@@ -237,7 +278,7 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin list timed out" not in result.error:
-            msg = f"Expected {"Plugin list timed out"} in {result.error}"
+            msg = f"Expected {'Plugin list timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -254,12 +295,16 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin list error" not in result.error:
-            msg = f"Expected {"Plugin list error"} in {result.error}"
+            msg = f"Expected {'Plugin list error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
-    def test_list_plugins_called_process_error(self, mock_validate: Mock, mock_run: Mock) -> None:
+    def test_list_plugins_called_process_error(
+        self,
+        mock_validate: Mock,
+        mock_run: Mock,
+    ) -> None:
         """Test list_plugins with CalledProcessError."""
         mock_validate.return_value = FlextResult(data=True)
         mock_run.side_effect = subprocess.CalledProcessError(1, "meltano list")
@@ -271,7 +316,7 @@ class TestFlextMeltanoInstallerExceptionPaths:
         assert not result.is_success
         assert result.error is not None
         if "Plugin list error" not in result.error:
-            msg = f"Expected {"Plugin list error"} in {result.error}"
+            msg = f"Expected {'Plugin list error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
@@ -290,7 +335,7 @@ class TestFlextMeltanoInstallerExceptionPaths:
             assert not result.is_success
             assert result.error is not None
             if "No plugin data received" not in result.error:
-                msg = f"Expected {"No plugin data received"} in {result.error}"
+                msg = f"Expected {'No plugin data received'} in {result.error}"
                 raise AssertionError(msg)
 
     def test_convert_plugin_list_with_namespaces(self) -> None:
@@ -311,12 +356,12 @@ class TestFlextMeltanoInstallerExceptionPaths:
 
         # First plugin: namespace generated from name
         if plugins[0].namespace != "tap_postgres_with_dashes":
-            msg = f"Expected {"tap_postgres_with_dashes"}, got {plugins[0].namespace}"
+            msg = f"Expected {'tap_postgres_with_dashes'}, got {plugins[0].namespace}"
             raise AssertionError(msg)
 
         # Second plugin: uses provided namespace
         if plugins[1].namespace != "custom_namespace":
-            msg = f"Expected {"custom_namespace"}, got {plugins[1].namespace}"
+            msg = f"Expected {'custom_namespace'}, got {plugins[1].namespace}"
             raise AssertionError(msg)
 
 
@@ -334,7 +379,10 @@ class TestCreateInstallerServiceEdgeCases:
         assert isinstance(result.data, FlextMeltanoInstaller)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
-    def test_create_installer_service_initialization_exception(self, mock_init: Mock) -> None:
+    def test_create_installer_service_initialization_exception(
+        self,
+        mock_init: Mock,
+    ) -> None:
         """Test create_installer_service when FlextMeltanoInstaller.__init__ fails."""
         mock_init.side_effect = ValueError("Initialization failed")
 
@@ -344,7 +392,7 @@ class TestCreateInstallerServiceEdgeCases:
         assert not result.is_success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {"Failed to create installer service"} in {result.error}"
+            msg = f"Expected {'Failed to create installer service'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
@@ -358,7 +406,7 @@ class TestCreateInstallerServiceEdgeCases:
         assert not result.is_success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {"Failed to create installer service"} in {result.error}"
+            msg = f"Expected {'Failed to create installer service'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
@@ -372,7 +420,7 @@ class TestCreateInstallerServiceEdgeCases:
         assert not result.is_success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {"Failed to create installer service"} in {result.error}"
+            msg = f"Expected {'Failed to create installer service'} in {result.error}"
             raise AssertionError(msg)
 
 

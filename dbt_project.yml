@@ -1,5 +1,5 @@
 name: "flext_meltano_dbt"
-version: "0.8.0" 
+version: "0.8.0"
 config-version: 2
 
 # Profile for consolidated FLEXT DBT transformations
@@ -7,7 +7,7 @@ profile: "flext_meltano"
 
 # Standard DBT directory structure
 model-paths: ["dbt/models"]
-analysis-paths: ["dbt/analyses"] 
+analysis-paths: ["dbt/analyses"]
 test-paths: ["dbt/tests"]
 seed-paths: ["dbt/seeds"]
 macro-paths: ["dbt/macros"]
@@ -26,32 +26,32 @@ models:
       +materialized: view
       +schema: staging
       +tags: ["staging"]
-    
+
     # Intermediate processing layer
     intermediate:
       +materialized: view
       +schema: intermediate
       +tags: ["intermediate"]
-    
+
     # Data marts for analytics
     marts:
       +materialized: table
       +schema: marts
       +tags: ["marts", "analytics"]
-    
+
     # Source-specific configurations
     ldap:
       +schema: ldap
       +tags: ["ldap"]
-    
+
     ldif:
       +schema: ldif
       +tags: ["ldif"]
-    
+
     oracle:
       +schema: oracle
       +tags: ["oracle"]
-    
+
     oracle_wms:
       +schema: oracle_wms
       +tags: ["oracle_wms"]
@@ -75,20 +75,20 @@ vars:
   ldap_user_base: "ou=users"
   ldap_group_base: "ou=groups"
   ldap_ou_base: "ou=departments"
-  
+
   # LDIF configurations
-  ldif_schema: 'raw'
-  staging_schema: '{{ target.schema }}'
-  marts_schema: '{{ target.schema }}_marts'
-  
+  ldif_schema: "raw"
+  staging_schema: "{{ target.schema }}"
+  marts_schema: "{{ target.schema }}_marts"
+
   # Oracle configurations
-  oracle_schema: 'oracle'
-  oracle_wms_schema: 'oracle_wms'
-  
+  oracle_schema: "oracle"
+  oracle_wms_schema: "oracle_wms"
+
   # Common configurations
-  start_date: '2024-01-01'
-  analytics_version: '0.8.0'
-  database_name: 'flext_analytics'
+  start_date: "2024-01-01"
+  analytics_version: "0.8.0"
+  database_name: "flext_analytics"
 
 # Documentation
 docs-paths: ["dbt/docs"]
@@ -106,9 +106,9 @@ seeds:
 # Macro dispatch
 dispatch:
   - macro_namespace: dbt_utils
-    search_order: ['dbt_utils']
+    search_order: ["dbt_utils"]
   - macro_namespace: codegen
-    search_order: ['codegen']
+    search_order: ["codegen"]
 
 # Hooks
 on-run-start:

@@ -80,7 +80,10 @@ class FlextMeltanoConfig(BaseModel):
 class FlextMeltanoEvent(FlextEntity):
     """Event entity using MANDATORY flext-core patterns."""
 
-    id: str = Field(default_factory=FlextGenerators.generate_uuid, description="Event ID")
+    id: str = Field(
+        default_factory=FlextGenerators.generate_uuid,
+        description="Event ID",
+    )
     event_type: str = Field(..., description="Type of event")
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(UTC),

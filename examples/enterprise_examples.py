@@ -51,18 +51,36 @@ def example_postgres_to_jsonl_traditional():
     }
 
     # Step 3: Write configuration files manually
-    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as tap_config_file:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
+    ) as tap_config_file:
         json.dump(tap_config, tap_config_file)
         tap_config_path = tap_config_file.name
 
-    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as target_config_file:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
+    ) as target_config_file:
         json.dump(target_config, target_config_file)
         target_config_path = target_config_file.name
 
     # Step 4: Run discovery manually
-    discovery_result = subprocess.run([
-        "tap-postgres", "--config", tap_config_path, "--discover",
-    ], check=False, capture_output=True, text=True)
+    discovery_result = subprocess.run(
+        [
+            "tap-postgres",
+            "--config",
+            tap_config_path,
+            "--discover",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
     if discovery_result.returncode != 0:
         msg = f"Discovery failed: {discovery_result.stderr}"
@@ -78,18 +96,38 @@ def example_postgres_to_jsonl_traditional():
                 metadata_entry["metadata"]["selected"] = True
 
     # Step 7: Write catalog file manually
-    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as catalog_file:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
+    ) as catalog_file:
         json.dump(catalog, catalog_file)
         catalog_path = catalog_file.name
 
     # Step 8: Execute tap-to-target manually
-    tap_process = subprocess.Popen([
-        "tap-postgres", "--config", tap_config_path, "--catalog", catalog_path,
-    ], stdout=subprocess.PIPE, text=True)
+    tap_process = subprocess.Popen(
+        [
+            "tap-postgres",
+            "--config",
+            tap_config_path,
+            "--catalog",
+            catalog_path,
+        ],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
 
-    target_process = subprocess.Popen([
-        "target-jsonl", "--config", target_config_path,
-    ], stdin=tap_process.stdout, stdout=subprocess.PIPE, text=True)
+    target_process = subprocess.Popen(
+        [
+            "target-jsonl",
+            "--config",
+            target_config_path,
+        ],
+        stdin=tap_process.stdout,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
 
     # Step 9: Handle errors manually
     _output, error = target_process.communicate()
@@ -109,15 +147,18 @@ def example_postgres_to_jsonl_traditional():
 def example_postgres_to_jsonl_flext_meltano():
     """FLEXT Meltano approach - 3 lines of code (95% boilerplate reduction)."""
     # FLEXT Meltano: Zero boilerplate approach
-    return (create_flext_meltano_pipeline()
-             .from_postgres(host="localhost", database="analytics", user="postgres")
-             .to_jsonl(destination_path="./output")
-             .run_sync())
+    return (
+        create_flext_meltano_pipeline()
+        .from_postgres(host="localhost", database="analytics", user="postgres")
+        .to_jsonl(destination_path="./output")
+        .run_sync()
+    )
 
 
 # =============================================================================
 # EXAMPLE 2: Enterprise Configuration Management
 # =============================================================================
+
 
 def example_enterprise_config_traditional():
     """Traditional enterprise config management - manual validation and templates."""
@@ -166,11 +207,13 @@ def example_enterprise_config_traditional():
     # Usage requires manual orchestration
     try:
         postgres_template = get_postgres_template()
-        postgres_template.update({
-            "host": "production-db",
-            "database": "analytics",
-            "user": "readonly_user",
-        })
+        postgres_template.update(
+            {
+                "host": "production-db",
+                "database": "analytics",
+                "user": "readonly_user",
+            },
+        )
         postgres_config = validate_postgres_config(postgres_template)
 
         jsonl_template = get_jsonl_template()
@@ -217,9 +260,15 @@ def example_enterprise_config_flext_meltano():
 # EXAMPLE 3: Singer Message Processing
 # =============================================================================
 
+
 def example_singer_processing_traditional():
     """Traditional Singer message processing - manual validation and creation."""
-    def create_schema_message(stream_name: str, schema: dict[str, Any], key_properties: list[str]):
+
+    def create_schema_message(
+        stream_name: str,
+        schema: dict[str, Any],
+        key_properties: list[str],
+    ):
         return {
             "type": "SCHEMA",
             "stream": stream_name,
@@ -274,7 +323,10 @@ def example_singer_processing_traditional():
     }
 
     schema_msg = create_schema_message("users", schema, ["id"])
-    record_msg = create_record_message("users", {"id": 1, "name": "Alice", "email": "alice@example.com"})
+    record_msg = create_record_message(
+        "users",
+        {"id": 1, "name": "Alice", "email": "alice@example.com"},
+    )
 
     # Manual validation
     schema_valid = validate_singer_message(schema_msg)
@@ -299,7 +351,10 @@ def example_singer_processing_flext_meltano():
     }
 
     schema_msg = singer_utils.create_singer_schema("users", schema, ["id"])
-    record_msg = singer_utils.create_singer_record("users", {"id": 1, "name": "Alice", "email": "alice@example.com"})
+    record_msg = singer_utils.create_singer_record(
+        "users",
+        {"id": 1, "name": "Alice", "email": "alice@example.com"},
+    )
 
     # Automatic validation with professional error handling
     schema_validation = singer_utils.validate_singer_message(schema_msg)
@@ -315,29 +370,32 @@ def example_singer_processing_flext_meltano():
 # EXAMPLE 4: Enterprise Pipeline with Error Handling
 # =============================================================================
 
+
 @flext_meltano_safe_operation("enterprise_pipeline")
 def example_enterprise_pipeline_with_error_handling():
     """Enterprise pipeline with professional error handling and logging."""
     # Complex pipeline with multiple configurations
-    pipeline = (create_flext_meltano_pipeline()
-               .from_postgres(
-                   host="production-db.company.com",
-                   database="analytics",
-                   user="readonly_user",
-                   port=5432,
-                   filter_schemas=["public", "analytics"],
-               )
-               .to_parquet(
-                   destination_path="/data/warehouse/exports",
-                   compression="snappy",
-                   partition_keys=["date_created"],
-               )
-               .with_environment("production")
-               .with_custom_config(
-                   batch_size=10000,
-                   max_connections=5,
-                   timeout_seconds=3600,
-               ))
+    pipeline = (
+        create_flext_meltano_pipeline()
+        .from_postgres(
+            host="production-db.company.com",
+            database="analytics",
+            user="readonly_user",
+            port=5432,
+            filter_schemas=["public", "analytics"],
+        )
+        .to_parquet(
+            destination_path="/data/warehouse/exports",
+            compression="snappy",
+            partition_keys=["date_created"],
+        )
+        .with_environment("production")
+        .with_custom_config(
+            batch_size=10000,
+            max_connections=5,
+            timeout_seconds=3600,
+        )
+    )
 
     # Professional execution with automatic error handling
     return pipeline.run_sync()
@@ -346,6 +404,7 @@ def example_enterprise_pipeline_with_error_handling():
 # =============================================================================
 # EXAMPLE 5: Advanced Configuration Validation
 # =============================================================================
+
 
 def example_advanced_configuration_validation():
     """Advanced configuration validation with comprehensive error reporting."""
@@ -393,7 +452,9 @@ def example_advanced_configuration_validation():
         # Validate PostgreSQL tap configuration
         if "tap-postgres" in configs["taps"]:
             postgres_config = configs["taps"]["tap-postgres"]["config"]
-            postgres_validation = validator.validate_tap_postgres_config(postgres_config)
+            postgres_validation = validator.validate_tap_postgres_config(
+                postgres_config,
+            )
 
             if not postgres_validation.is_success:
                 pass
@@ -412,6 +473,7 @@ def example_advanced_configuration_validation():
 # =============================================================================
 # EXAMPLE 6: Async Pipeline Execution
 # =============================================================================
+
 
 @flext_meltano_pipeline(
     tap_name="tap-mysql",
@@ -442,6 +504,7 @@ async def example_async_pipeline_with_decorator():
 # EXAMPLE 7: Complete Enterprise Workflow
 # =============================================================================
 
+
 async def example_complete_enterprise_workflow():
     """Complete enterprise workflow demonstrating all FLEXT Meltano capabilities."""
     # Step 1: Configuration Management
@@ -464,10 +527,16 @@ async def example_complete_enterprise_workflow():
 
     return {
         "config_result": config_result,
-        "pipeline_result": pipeline_result.is_success if hasattr(pipeline_result, "is_success") else True,
+        "pipeline_result": pipeline_result.is_success
+        if hasattr(pipeline_result, "is_success")
+        else True,
         "singer_result": singer_result,
-        "validation_result": validation_result.is_success if hasattr(validation_result, "is_success") else True,
-        "enterprise_result": enterprise_result.is_success if hasattr(enterprise_result, "is_success") else True,
+        "validation_result": validation_result.is_success
+        if hasattr(validation_result, "is_success")
+        else True,
+        "enterprise_result": enterprise_result.is_success
+        if hasattr(enterprise_result, "is_success")
+        else True,
         "async_result": async_result,
         "summary": "Complete enterprise workflow executed successfully",
     }
@@ -476,6 +545,7 @@ async def example_complete_enterprise_workflow():
 # =============================================================================
 # BOILERPLATE REDUCTION COMPARISON
 # =============================================================================
+
 
 def compare_boilerplate_reduction():
     """Compare boilerplate reduction across different approaches."""
@@ -526,6 +596,7 @@ def compare_boilerplate_reduction():
 # =============================================================================
 # MAIN EXECUTION
 # =============================================================================
+
 
 async def main() -> None:
     """Run all examples to demonstrate FLEXT Meltano capabilities."""

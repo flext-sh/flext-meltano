@@ -5,30 +5,35 @@ This directory contains comprehensive documentation for the FLEXT Meltano enterp
 ## 📚 Documentation Structure
 
 ### [Architecture](architecture/)
+
 - **Overview**: Consolidated library architecture
 - **Module Organization**: Core module structure and responsibilities
 - **Integration Patterns**: Go bridge and enterprise integration
 - **Design Decisions**: Architectural choices and rationale
 
 ### [API Reference](api/)
+
 - **Core API**: Main library interface and exports
 - **Execution Layer**: Pipeline execution and command handling
 - **Discovery & Installation**: Plugin management
 - **Bridge Integration**: Go ↔ Python communication
 
 ### [Examples](examples/)
+
 - **Quick Start**: Basic usage patterns
 - **Pipeline Examples**: Complete ELT workflows
 - **Bridge Integration**: Go service integration
 - **Advanced Patterns**: Enterprise usage scenarios
 
 ### [Guides](guides/)
+
 - **Development Guide**: Setting up development environment
 - **Testing Guide**: Testing strategies and quality gates
 - **Deployment Guide**: Production deployment patterns
 - **Troubleshooting**: Common issues and solutions
 
 ### [Deployment](deployment/)
+
 - **Production Setup**: Enterprise deployment patterns
 - **Configuration**: Environment variables and settings
 - **Monitoring**: Observability and health checks
@@ -59,4 +64,4 @@ All documentation follows FLEXT enterprise standards:
 
 ---
 
-*Last updated: 2025-01-29 - Version 2.0.0-enterprise*
+_Last updated: 2025-01-29 - Version 2.0.0-enterprise_

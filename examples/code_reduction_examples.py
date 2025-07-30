@@ -65,7 +65,12 @@ def example_1_before() -> None:
     State(state_backend, state_id=f"{tap.name}-to-{target.name}")
 
     # 7. Configure streams
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
+    ) as temp_file:
         catalog_path = temp_file.name
         discover_cmd = job.singer_command_for_plugin(tap, "discover")
         subprocess.run(discover_cmd, stdout=temp_file, check=True)  # noqa: S603
@@ -139,7 +144,12 @@ def example_2_before() -> None:
             target = project.find_plugin("target-csv", plugin_type="loaders")
 
             # Discover catalog
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                encoding="utf-8",
+                mode="w",
+                suffix=".json",
+                delete=False,
+            ) as temp_file:
                 catalog_path = temp_file.name
                 discover_cmd = job.singer_command_for_plugin(tap, "discover")
                 subprocess.run(discover_cmd, stdout=temp_file, check=True)  # noqa: S603
@@ -406,7 +416,12 @@ def example_4_before() -> None:
     target = project.find_plugin("target-csv", plugin_type="loaders")
 
     # 3. Discover catalog
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
+    ) as temp_file:
         catalog_path = temp_file.name
         discover_cmd = job.singer_command_for_plugin(tap, "discover")
 
@@ -481,7 +496,8 @@ def example_4_before() -> None:
 async def example_4_after() -> None:
     """FlextMeltano discovery + execution - 1 line."""
     catalog, result = await flext_meltano_discover_and_run_ultra(
-        "tap-postgres", "target-csv",
+        "tap-postgres",
+        "target-csv",
     )
     return catalog, result
 

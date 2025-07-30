@@ -51,11 +51,14 @@ def example_1_old_way() -> None:
             check=False,
         )
         if result.returncode != 0:
-            msg = f"Failed to init: {result.stderr, }"
+            msg = f"Failed to init: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Add plugins (10+ lines each)
-    for plugin_type, plugin_name in [("extractor", "tap-csv"), ("loader", "target-csv")]:
+    for plugin_type, plugin_name in [
+        ("extractor", "tap-csv"),
+        ("loader", "target-csv"),
+    ]:
         result = subprocess.run(
             ["meltano", "add", plugin_type, plugin_name],  # noqa: S607
             cwd=project_root,
@@ -64,7 +67,7 @@ def example_1_old_way() -> None:
             check=False,
         )
         if result.returncode != 0:
-            msg = f"Failed to add {plugin_name}: {result.stderr, }"
+            msg = f"Failed to add {plugin_name}: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Run pipeline (10+ lines)
@@ -95,7 +98,11 @@ def example_1_old_way() -> None:
 def example_1_new_way() -> None:
     """DEPOIS: Nova API ultra-simplificada - 1 LINHA."""
     # 1 LINHA substitui 55+ linhas
-    run_pipeline("tap-csv", "target-csv", project_root=tempfile.mkdtemp(prefix="test_project_"))
+    run_pipeline(
+        "tap-csv",
+        "target-csv",
+        project_root=tempfile.mkdtemp(prefix="test_project_"),
+    )
 
     # TOTAL: 1 LINHA ÚTIL (redução de 98%)
 
@@ -103,6 +110,7 @@ def example_1_new_way() -> None:
 # ============================================================================
 # EXEMPLO 2: SETUP COMPLETO DE PROJETO - 3 LINHAS vs 100+ LINHAS
 # ============================================================================
+
 
 def example_2_old_way() -> None:
     """ANTES: Setup manual complexo com 100+ linhas."""
@@ -113,19 +121,21 @@ def example_2_old_way() -> None:
     if not (project_root / "meltano.yml").exists():
         result = subprocess.run(
             ["meltano", "init", "enterprise_project", "."],  # noqa: S607
-            check=False, cwd=project_root.parent,
+            check=False,
+            cwd=project_root.parent,
             capture_output=True,
             text=True,
         )
         if result.returncode != 0:
-            msg = f"Init failed: {result.stderr, }"
+            msg = f"Init failed: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Create environments (15 lines)
     for env in ["staging", "prod"]:
         result = subprocess.run(
             ["meltano", "environment", "add", env],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
         )
@@ -134,7 +144,11 @@ def example_2_old_way() -> None:
 
     # Add plugins with configuration (40+ lines)
     plugins_config = [
-        ("extractor", "tap-postgres", {"host": "localhost", "port": 5432, "database": "prod"}),
+        (
+            "extractor",
+            "tap-postgres",
+            {"host": "localhost", "port": 5432, "database": "prod"},
+        ),
         ("extractor", "tap-csv", {}),
         ("loader", "target-postgres", {"host": "warehouse", "port": 5432}),
         ("loader", "target-csv", {}),
@@ -145,7 +159,8 @@ def example_2_old_way() -> None:
         # Add plugin
         result = subprocess.run(
             ["meltano", "add", plugin_type, plugin_name],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
         )
@@ -155,8 +170,17 @@ def example_2_old_way() -> None:
         # Configure plugin
         for key, value in config.items():
             result = subprocess.run(
-                ["meltano", "config", f"{plugin_type, }s", plugin_name, "set", key, str(value)],  # noqa: S607
-                check=False, cwd=project_root,
+                [
+                    "meltano",
+                    "config",
+                    f"{(plugin_type,)}s",
+                    plugin_name,
+                    "set",
+                    key,
+                    str(value),
+                ],
+                check=False,
+                cwd=project_root,
                 capture_output=True,
                 text=True,
             )
@@ -171,8 +195,9 @@ def example_2_old_way() -> None:
 
     for job_name, tap, target in jobs:
         result = subprocess.run(
-            ["meltano", "job", "add", job_name, "--tasks", f"{tap} {target, }"],  # noqa: S607
-            check=False, cwd=project_root,
+            ["meltano", "job", "add", job_name, "--tasks", f"{tap} {(target,)}"],  # noqa: S607
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
         )
@@ -187,8 +212,17 @@ def example_2_old_way() -> None:
 
     for job_name, interval in schedules:
         result = subprocess.run(
-            ["meltano", "schedule", "add", f"{job_name, }-schedule", job_name, "--interval", interval],  # noqa: S607
-            check=False, cwd=project_root,
+            [
+                "meltano",
+                "schedule",
+                "add",
+                f"{(job_name,)}-schedule",
+                job_name,
+                "--interval",
+                interval,
+            ],
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
         )
@@ -204,15 +238,29 @@ def example_2_new_way() -> None:
     setup_project(
         tempfile.mkdtemp(prefix="enterprise_project_"),
         plugins=[
-            PluginSpec("tap-postgres", "extractor", config={"host": "localhost", "database": "prod"}),
+            PluginSpec(
+                "tap-postgres",
+                "extractor",
+                config={"host": "localhost", "database": "prod"},
+            ),
             PluginSpec("tap-csv", "extractor"),
             PluginSpec("target-postgres", "loader", config={"host": "warehouse"}),
             PluginSpec("target-csv", "loader"),
             PluginSpec("dbt-postgres", "transformer"),
         ],
         pipelines=[
-            PipelineSpec("daily_users", "tap-postgres", "target-csv", schedule="@daily"),
-            PipelineSpec("hourly_orders", "tap-postgres", "target-postgres", schedule="0 * * * *"),
+            PipelineSpec(
+                "daily_users",
+                "tap-postgres",
+                "target-csv",
+                schedule="@daily",
+            ),
+            PipelineSpec(
+                "hourly_orders",
+                "tap-postgres",
+                "target-postgres",
+                schedule="0 * * * *",
+            ),
         ],
     )
 
@@ -222,6 +270,7 @@ def example_2_new_way() -> None:
 # ============================================================================
 # EXEMPLO 3: PROCESSAMENTO BATCH - 2 LINHAS vs 60+ LINHAS
 # ============================================================================
+
 
 def example_3_old_way() -> None:
     """ANTES: Processamento manual de múltiplas tabelas com 60+ linhas."""
@@ -235,11 +284,19 @@ def example_3_old_way() -> None:
     # Process each table individually (50+ lines total)
     for table in tables:
         try:
-
             # Configure tap for specific table (10 lines)
             result = subprocess.run(
-                ["meltano", "config", "extractors", tap, "set", "select", f"['{table, }.*']"],  # noqa: S607
-                check=False, cwd=project_root,
+                [
+                    "meltano",
+                    "config",
+                    "extractors",
+                    tap,
+                    "set",
+                    "select",
+                    f"['{(table,)}.*']",
+                ],
+                check=False,
+                cwd=project_root,
                 capture_output=True,
                 text=True,
             )
@@ -250,7 +307,8 @@ def example_3_old_way() -> None:
             # Run extraction (10 lines)
             result = subprocess.run(
                 ["meltano", "run", tap, target],  # noqa: S607
-                check=False, cwd=project_root,
+                check=False,
+                cwd=project_root,
                 capture_output=True,
                 text=True,
                 timeout=DEFAULT_TIMEOUT,
@@ -278,16 +336,22 @@ def example_3_new_way() -> None:
     """DEPOIS: Processamento batch ultra-simplificado - 2 linhas."""
     # 2 LINHAS substituem 65+ linhas
     tables = ["users", "orders", "products", "customers", "inventory"]
-    results = batch_process_tables(tempfile.mkdtemp(prefix="batch_project_"), "tap-postgres", "target-csv", tables)
+    results = batch_process_tables(
+        tempfile.mkdtemp(prefix="batch_project_"),
+        "tap-postgres",
+        "target-csv",
+        tables,
+    )
 
     # Análise opcional em 1 linha
-    f"Success: {sum(results.values())}/{len(results), }"
+    f"Success: {sum(results.values())}/{(len(results),)}"
     # TOTAL: 2 LINHAS ÚTEIS (redução de 97%)
 
 
 # ============================================================================
 # EXEMPLO 4: DESCOBERTA E TESTE - 1 LINHA vs 30+ LINHAS
 # ============================================================================
+
 
 def example_4_old_way() -> None:
     """ANTES: Descoberta manual com validação - 30+ linhas."""
@@ -298,7 +362,8 @@ def example_4_old_way() -> None:
         # Test connection (10 lines)
         result = subprocess.run(
             ["meltano", "invoke", tap, "--discover"],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
             timeout=DISCOVERY_TIMEOUT,
@@ -335,8 +400,14 @@ def example_4_old_way() -> None:
 def example_4_new_way() -> None:
     """DEPOIS: Descoberta ultra-simplificada - 1 linha + análise opcional."""
     # 1 LINHA para teste + 1 LINHA para descoberta
-    if test_tap_connection("tap-postgres", project_root=tempfile.mkdtemp(prefix="discovery_project_")):
-        catalog = discover_catalog("tap-postgres", project_root=tempfile.mkdtemp(prefix="discovery_project_"))
+    if test_tap_connection(
+        "tap-postgres",
+        project_root=tempfile.mkdtemp(prefix="discovery_project_"),
+    ):
+        catalog = discover_catalog(
+            "tap-postgres",
+            project_root=tempfile.mkdtemp(prefix="discovery_project_"),
+        )
         [s["tap_stream_id"] for s in catalog.get("streams", [])]
     # TOTAL: 2 LINHAS ÚTEIS (redução de 94%)
 
@@ -344,6 +415,7 @@ def example_4_new_way() -> None:
 # ============================================================================
 # EXEMPLO 5: ASYNC PIPELINE COM ERRO HANDLING - 3 LINHAS vs 45+ LINHAS
 # ============================================================================
+
 
 async def example_5_old_way() -> None:
     """ANTES: Pipeline async manual com 45+ linhas."""
@@ -361,7 +433,8 @@ async def example_5_old_way() -> None:
                 # Execute (10 lines)
                 result = subprocess.run(
                     ["meltano", "run", tap, target],  # noqa: S607
-                    check=False, cwd=project_root,
+                    check=False,
+                    cwd=project_root,
                     env=env,
                     capture_output=True,
                     text=True,
@@ -426,7 +499,11 @@ async def example_5_new_way() -> None:
     # 3 LINHAS substituem 50+ linhas
     tasks = [
         async_run_pipeline("tap-csv", "target-csv", project_root="/tmp/async_project"),
-        async_run_pipeline("tap-postgres", "target-csv", project_root="/tmp/async_project"),
+        async_run_pipeline(
+            "tap-postgres",
+            "target-csv",
+            project_root="/tmp/async_project",
+        ),
     ]
     results = await asyncio.gather(*tasks)
 
@@ -439,6 +516,7 @@ async def example_5_new_way() -> None:
 # EXEMPLO 6: HEALTH CHECK E DIAGNÓSTICO - 1 LINHA vs 40+ LINHAS
 # ============================================================================
 
+
 def example_6_old_way() -> None:
     """ANTES: Health check manual com 40+ linhas."""
     project_root = Path("/tmp/health_project")
@@ -448,7 +526,8 @@ def example_6_old_way() -> None:
     try:
         result = subprocess.run(
             ["meltano", "--version"],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
             timeout=10,
@@ -464,7 +543,8 @@ def example_6_old_way() -> None:
     try:
         result = subprocess.run(
             ["meltano", "config", "list"],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
             timeout=10,
@@ -482,7 +562,8 @@ def example_6_old_way() -> None:
     try:
         result = subprocess.run(
             ["meltano", "config", "meltano", "database_uri"],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
             timeout=10,
@@ -496,13 +577,18 @@ def example_6_old_way() -> None:
     try:
         result = subprocess.run(
             ["meltano", "environment", "list"],  # noqa: S607
-            check=False, cwd=project_root,
+            check=False,
+            cwd=project_root,
             capture_output=True,
             text=True,
             timeout=10,
         )
         if result.returncode == 0:
-            envs = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
+            envs = [
+                line.strip()
+                for line in result.stdout.strip().split("\n")
+                if line.strip()
+            ]
             health["environments"] = len(envs)
         else:
             health["issues"].append("Cannot list environments")
@@ -520,13 +606,14 @@ def example_6_new_way() -> None:
     # 1 LINHA substitui 45+ linhas
     health = MeltanoProject("/tmp/health_project").health_check()
 
-    "✅ Healthy" if health["healthy"] else f"❌ Issues: {health['issues',], }"
+    "✅ Healthy" if health["healthy"] else f"❌ Issues: {(health['issues',],)}"
     # TOTAL: 1 LINHA ÚTIL (redução de 98%)
 
 
 # ============================================================================
 # DEMONSTRAÇÃO EXECUTÁVEL - REDUÇÃO TOTAL DE CÓDIGO
 # ============================================================================
+
 
 def demonstrate_code_reduction() -> None:
     """Demonstra a redução massiva de código em números reais."""

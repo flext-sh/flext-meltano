@@ -14,12 +14,14 @@ poetry run ruff check src/ tests/ --fix --unsafe-fixes
 ```
 
 **Enforcement:**
+
 - **ALL** Ruff rules enabled (no cherry-picking)
 - Zero warnings or errors tolerated
 - Automatic fixes applied where possible
 - Manual fixes required for complex issues
 
 **Specific Rules:**
+
 - Line length: 88 characters
 - Import sorting: Combined as imports, split on trailing comma
 - Docstring format: Google style
@@ -33,6 +35,7 @@ poetry run mypy src/ tests/ --strict
 ```
 
 **Requirements:**
+
 - **Strict mode** - no untyped definitions allowed
 - All functions must have type hints
 - No `Any` types except where absolutely necessary
@@ -40,6 +43,7 @@ poetry run mypy src/ tests/ --strict
 - Return types explicit for all functions
 
 **Example:**
+
 ```python
 from typing import Optional, List, Dict, Any
 from flext_core import FlextResult
@@ -64,6 +68,7 @@ poetry run pip-audit --ignore-vuln PYSEC-2022-42969
 ```
 
 **Security Requirements:**
+
 - Bandit security scan with medium+ severity
 - pip-audit for known vulnerabilities
 - No hardcoded secrets or credentials
@@ -78,6 +83,7 @@ pytest tests/ --cov=src/flext_meltano --cov-fail-under=90
 ```
 
 **Coverage Requirements:**
+
 - **90% minimum** line coverage (enforced)
 - Branch coverage tracking
 - No coverage exclusions without justification
@@ -85,6 +91,7 @@ pytest tests/ --cov=src/flext_meltano --cov-fail-under=90
 - Bridge integration tests required
 
 **Test Organization:**
+
 ```bash
 pytest -m unit               # Unit tests (isolated)
 pytest -m integration        # Integration tests (real dependencies)
@@ -99,6 +106,7 @@ pre-commit run --all-files   # Manual execution
 ```
 
 **Automated Checks:**
+
 - Code formatting (Ruff)
 - Import sorting
 - Trailing whitespace removal
@@ -110,13 +118,13 @@ pre-commit run --all-files   # Manual execution
 
 ### Code Quality Metrics
 
-| Metric | Requirement | Current Status |
-|--------|-------------|----------------|
-| Test Coverage | ≥90% | ✅ Enforced |
-| Type Coverage | 100% | ✅ MyPy Strict |
-| Linting | Zero Issues | ✅ ALL Rules |
-| Security | No Medium+ | ✅ Bandit + pip-audit |
-| Complexity | <10 per function | ✅ Ruff C901 |
+| Metric        | Requirement      | Current Status        |
+| ------------- | ---------------- | --------------------- |
+| Test Coverage | ≥90%             | ✅ Enforced           |
+| Type Coverage | 100%             | ✅ MyPy Strict        |
+| Linting       | Zero Issues      | ✅ ALL Rules          |
+| Security      | No Medium+       | ✅ Bandit + pip-audit |
+| Complexity    | <10 per function | ✅ Ruff C901          |
 
 ### Performance Standards
 
@@ -143,6 +151,7 @@ def performance_test():
 ### Test Categories
 
 #### Unit Tests (`pytest -m unit`)
+
 ```python
 @pytest.mark.unit
 def test_function_logic():
@@ -153,6 +162,7 @@ def test_function_logic():
 ```
 
 #### Integration Tests (`pytest -m integration`)
+
 ```python
 @pytest.mark.integration
 def test_meltano_integration():
@@ -163,6 +173,7 @@ def test_meltano_integration():
 ```
 
 #### End-to-End Tests (`pytest -m e2e`)
+
 ```python
 @pytest.mark.e2e
 def test_complete_pipeline():
@@ -185,6 +196,7 @@ def test_complete_pipeline():
 ### Python Code Style
 
 #### Function Definitions
+
 ```python
 def function_name(
     required_param: str,
@@ -194,16 +206,16 @@ def function_name(
     **kwargs: Any,
 ) -> FlextResult[ReturnType]:
     """Function docstring following Google style.
-    
+
     Args:
         required_param: Description of required parameter
         optional_param: Description of optional parameter
         keyword_only: Keyword-only parameter description
         **kwargs: Additional keyword arguments
-        
+
     Returns:
         FlextResult containing the operation result
-        
+
     Raises:
         ValueError: When invalid parameters are provided
     """
@@ -211,29 +223,31 @@ def function_name(
 ```
 
 #### Class Definitions
+
 ```python
 class FlextMeltanoService:
     """Service class following enterprise patterns.
-    
+
     This class provides enterprise-grade functionality for
     Meltano operations within the FLEXT ecosystem.
-    
+
     Attributes:
         config: Service configuration
         logger: Structured logger instance
     """
-    
+
     def __init__(self, config: FlextMeltanoConfig) -> None:
         """Initialize service with configuration."""
         self.config = config
         self.logger = structlog.get_logger(__name__)
-    
+
     def public_method(self) -> FlextResult[str]:
         """Public method with proper typing and documentation."""
         # Implementation
 ```
 
 #### Error Handling
+
 ```python
 # Use FlextResult pattern for all operations
 def safe_operation() -> FlextResult[str]:
@@ -248,6 +262,7 @@ def safe_operation() -> FlextResult[str]:
 ```
 
 ### Import Organization
+
 ```python
 """Module docstring."""
 
@@ -272,12 +287,12 @@ from flext_meltano.base import FlextMeltanoConfig
 
 ### Execution Time Limits
 
-| Operation Type | Maximum Time | Measurement |
-|---------------|--------------|-------------|
-| Bridge Operations | 1 second | Response time |
-| CLI Commands | 5 seconds | Command execution |
-| Discovery Operations | 10 seconds | Plugin/catalog discovery |
-| Pipeline Execution | Variable | Depends on data volume |
+| Operation Type       | Maximum Time | Measurement              |
+| -------------------- | ------------ | ------------------------ |
+| Bridge Operations    | 1 second     | Response time            |
+| CLI Commands         | 5 seconds    | Command execution        |
+| Discovery Operations | 10 seconds   | Plugin/catalog discovery |
+| Pipeline Execution   | Variable     | Depends on data volume   |
 
 ### Memory Usage
 
@@ -312,9 +327,9 @@ from pydantic import BaseModel, validator
 
 class InputModel(BaseModel):
     """Input validation model."""
-    
+
     plugin_name: str
-    
+
     @validator('plugin_name')
     def validate_plugin_name(cls, v):
         """Validate plugin name for security."""
@@ -333,7 +348,7 @@ def secure_subprocess(command: List[str]) -> subprocess.CompletedProcess:
     """Secure subprocess execution."""
     # Validate command components
     validated_command = validate_command(command)
-    
+
     # Execute with security measures
     return subprocess.run(
         validated_command,
@@ -413,6 +428,6 @@ QUALITY_METRICS = {
 
 ---
 
-*Quality Standards - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
-*Enforced by: Zero Tolerance Policy*
+_Quality Standards - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_
+_Enforced by: Zero Tolerance Policy_

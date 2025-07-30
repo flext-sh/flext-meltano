@@ -41,7 +41,7 @@ class TestCoreLibraryImports:
         """Test that version is available."""
         assert hasattr(flext_meltano, "__version__")
         if flext_meltano.__version__ != "2.0.0-enterprise":
-            msg = f"Expected {"2.0.0-enterprise"}, got {flext_meltano.__version__}"
+            msg = f"Expected {'2.0.0-enterprise'}, got {flext_meltano.__version__}"
             raise AssertionError(msg)
 
     def test_core_classes_available(self) -> None:
@@ -97,11 +97,11 @@ class TestCoreConfiguration:
         """Test configuration defaults."""
         config = FlextMeltanoConfig()
         if config.environment != "dev":
-            msg = f"Expected {"dev"}, got {config.environment}"
+            msg = f"Expected {'dev'}, got {config.environment}"
             raise AssertionError(msg)
         assert config.meltano_ui_bind_port == 5000
         if config.singer_sdk_log_level != "INFO":
-            msg = f"Expected {"INFO"}, got {config.singer_sdk_log_level}"
+            msg = f"Expected {'INFO'}, got {config.singer_sdk_log_level}"
             raise AssertionError(msg)
 
     def test_config_validation(self) -> None:
@@ -166,7 +166,7 @@ class TestServiceValidation:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "execution":
-            msg = f"Expected {"execution"}, got {health_result.data["service"]}"
+            msg = f"Expected {'execution'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_discoverer_validation(self) -> None:
@@ -178,7 +178,7 @@ class TestServiceValidation:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "discovery":
-            msg = f"Expected {"discovery"}, got {health_result.data["service"]}"
+            msg = f"Expected {'discovery'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_installer_validation(self) -> None:
@@ -190,7 +190,7 @@ class TestServiceValidation:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "installation":
-            msg = f"Expected {"installation"}, got {health_result.data["service"]}"
+            msg = f"Expected {'installation'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_validation_service_validation(self) -> None:
@@ -202,7 +202,7 @@ class TestServiceValidation:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["service"] != "validation":
-            msg = f"Expected {"validation"}, got {health_result.data["service"]}"
+            msg = f"Expected {'validation'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
 
