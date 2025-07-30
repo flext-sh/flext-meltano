@@ -5,7 +5,7 @@
 [![Quality Gates](https://img.shields.io/badge/quality-zero%20tolerance-green.svg)](docs/quality-standards.md)
 [![Coverage](https://img.shields.io/badge/coverage-90%25%2B-green.svg)](reports/coverage/index.html)
 
-**STATUS**: ✅ **ENTERPRISE LIBRARY** - Production-ready Singer/Meltano/DBT integration
+**STATUS**: ✅ **ENTERPRISE LIBRARY** - Production-ready Singer/Meltano/DBT orchestration platform
 
 ## 🎯 Overview
 

@@ -29,7 +29,7 @@ from flext_meltano import (
 # =============================================================================
 
 
-def example_1_before():
+def example_1_before() -> None:
     """Traditional Meltano pipeline execution - 52 lines."""
     # Original implementation with standard Meltano
 
@@ -65,11 +65,12 @@ def example_1_before():
     State(state_backend, state_id=f"{tap.name}-to-{target.name}")
 
     # 7. Configure streams
-    catalog_path = tempfile.mktemp(suffix=".json")
-    discover_cmd = job.singer_command_for_plugin(tap, "discover")
-    subprocess.run(discover_cmd, stdout=open(catalog_path, "w", encoding="utf-8"), check=True)
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+        catalog_path = temp_file.name
+        discover_cmd = job.singer_command_for_plugin(tap, "discover")
+        subprocess.run(discover_cmd, stdout=temp_file, check=True)  # noqa: S603
 
-    with open(catalog_path, encoding="utf-8") as f:
+    with Path(catalog_path).open(encoding="utf-8") as f:
         catalog = json.load(f)
 
     # 8. Select streams
@@ -82,7 +83,7 @@ def example_1_before():
     target_cmd = job.singer_command_for_plugin(target, "run")
 
     # 10. Run with state management
-    result = subprocess.run(
+    result = subprocess.run(  # noqa: S602
         f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
         check=False,
         shell=True,
@@ -106,7 +107,7 @@ def example_1_before():
     }
 
 
-async def example_1_after():
+async def example_1_after() -> None:
     """FlextMeltano ultra helper - 1 line."""
     return await flext_meltano_run_pipeline_ultra("tap-postgres", "target-csv")
 
@@ -116,7 +117,7 @@ async def example_1_after():
 # =============================================================================
 
 
-def example_2_before():
+def example_2_before() -> None:
     """Traditional batch processing - 87 lines."""
     tables = ["users", "orders", "products", "categories"]
     results = {}
@@ -138,11 +139,12 @@ def example_2_before():
             target = project.find_plugin("target-csv", plugin_type="loaders")
 
             # Discover catalog
-            catalog_path = tempfile.mktemp(suffix=".json")
-            discover_cmd = job.singer_command_for_plugin(tap, "discover")
-            subprocess.run(discover_cmd, stdout=open(catalog_path, "w", encoding="utf-8"), check=True)
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+                catalog_path = temp_file.name
+                discover_cmd = job.singer_command_for_plugin(tap, "discover")
+                subprocess.run(discover_cmd, stdout=temp_file, check=True)  # noqa: S603
 
-            with open(catalog_path, encoding="utf-8") as f:
+            with Path(catalog_path).open(encoding="utf-8") as f:
                 catalog = json.load(f)
 
             # Select only current table
@@ -151,7 +153,7 @@ def example_2_before():
                 stream["metadata"][0]["metadata"]["selected"] = selected
 
             # Save modified catalog
-            with open(catalog_path, "w", encoding="utf-8") as f:
+            with Path(catalog_path).open("w", encoding="utf-8") as f:
                 json.dump(catalog, f)
 
             # Configure job with catalog
@@ -163,7 +165,7 @@ def example_2_before():
             run_cmd = job.singer_command_for_plugin(tap, "run")
             target_cmd = job.singer_command_for_plugin(target, "run")
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S602
                 f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
                 check=False,
                 shell=True,
@@ -200,7 +202,7 @@ def example_2_before():
     return results
 
 
-async def example_2_after():
+async def example_2_after() -> None:
     """FlextMeltano batch processing - 4 lines."""
     pipelines = [
         ("tap-postgres", "target-csv")
@@ -214,7 +216,7 @@ async def example_2_after():
 # =============================================================================
 
 
-def example_3_before():
+def example_3_before() -> None:
     """Traditional project setup - 143 lines."""
     project_path = Path(tempfile.mkdtemp(prefix="new_project_"))
 
@@ -226,7 +228,7 @@ def example_3_before():
     os.chdir(project_path)
 
     # 2. Run meltano init
-    subprocess.run(
+    subprocess.run(  # noqa: S603
         [shutil.which("meltano") or "meltano", "init", ".", "--no_usage_stats"],
         check=True,
     )
@@ -238,14 +240,14 @@ def example_3_before():
     extractors = ["tap-postgres", "tap-csv", "tap-oracle"]
     for extractor in extractors:
         try:
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 ["meltano", "add", "extractor", extractor],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
         except subprocess.CalledProcessError:
             # Try alternative variant
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 ["meltano", "add", "extractor", extractor, "--variant", "meltanolabs"],  # noqa: S607
                 check=True,
                 cwd=project_path,
@@ -255,14 +257,14 @@ def example_3_before():
     loaders = ["target-postgres", "target-csv", "target-jsonl"]
     for loader in loaders:
         try:
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 ["meltano", "add", "loader", loader],  # noqa: S607
                 check=True,
                 cwd=project_path,
             )
         except subprocess.CalledProcessError:
             # Try alternative variant
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 ["meltano", "add", "loader", loader, "--variant", "meltanolabs"],  # noqa: S607
                 check=True,
                 cwd=project_path,
@@ -278,7 +280,7 @@ def example_3_before():
     # 7. Create environments
     environments = ["dev", "staging", "prod"]
     for env_name in environments:
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             ["meltano", "environment", "add", env_name],  # noqa: S607
             check=True,
             cwd=project_path,
@@ -293,7 +295,7 @@ def example_3_before():
     }
 
     for key, value in dev_config.items():
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
@@ -309,7 +311,7 @@ def example_3_before():
     }
 
     for key, value in staging_config.items():
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
@@ -325,7 +327,7 @@ def example_3_before():
     }
 
     for key, value in prod_config.items():
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             ["meltano", "config", "tap-postgres", "set", key, str(value)],  # noqa: S607
             check=True,
             cwd=project_path,
@@ -339,7 +341,7 @@ def example_3_before():
     ]
 
     for schedule_name, tasks, interval in schedules:
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             [
                 "meltano",
                 "schedule",
@@ -370,7 +372,7 @@ def example_3_before():
     }
 
 
-async def example_3_after():
+async def example_3_after() -> None:
     """FlextMeltano project setup - 6 lines."""
     result = await flext_meltano_setup_project_ultra(
         tempfile.mkdtemp(prefix="new_project_"),
@@ -387,7 +389,7 @@ async def example_3_after():
 # =============================================================================
 
 
-def example_4_before():
+def example_4_before() -> None:
     """Traditional discovery + execution - 78 lines."""
     project = Project.find()
     project.activate_environment("dev")
@@ -404,23 +406,24 @@ def example_4_before():
     target = project.find_plugin("target-csv", plugin_type="loaders")
 
     # 3. Discover catalog
-    catalog_path = tempfile.mktemp(suffix=".json")
-    discover_cmd = job.singer_command_for_plugin(tap, "discover")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+        catalog_path = temp_file.name
+        discover_cmd = job.singer_command_for_plugin(tap, "discover")
 
-    discover_result = subprocess.run(
-        discover_cmd,
-        check=False,
-        stdout=open(catalog_path, "w", encoding="utf-8"),
-        stderr=subprocess.PIPE,
-        text=True,
-    )
+        discover_result = subprocess.run(  # noqa: S603
+            discover_cmd,
+            check=False,
+            stdout=temp_file,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
 
     if discover_result.returncode != 0:
         msg = f"Discovery failed: {(discover_result.stderr,)}"
         raise RuntimeError(msg)
 
     # 4. Load and analyze catalog
-    with open(catalog_path, encoding="utf-8") as f:
+    with Path(catalog_path).open(encoding="utf-8") as f:
         catalog = json.load(f)
 
     streams = catalog.get("streams", [])
@@ -434,7 +437,7 @@ def example_4_before():
         stream["metadata"][0]["metadata"]["replication-method",] = "FULL_TABLE"
 
     # 6. Save modified catalog
-    with open(catalog_path, "w", encoding="utf-8") as f:
+    with Path(catalog_path).open("w", encoding="utf-8") as f:
         json.dump(catalog, f)
 
     # 7. Configure job with catalog
@@ -446,7 +449,7 @@ def example_4_before():
     run_cmd = job.singer_command_for_plugin(tap, "run")
     target_cmd = job.singer_command_for_plugin(target, "run")
 
-    result = subprocess.run(
+    result = subprocess.run(  # noqa: S602
         f"{' '.join(run_cmd)} | {' '.join(target_cmd)}",
         check=False,
         shell=True,
@@ -475,7 +478,7 @@ def example_4_before():
     return catalog, pipeline_result
 
 
-async def example_4_after():
+async def example_4_after() -> None:
     """FlextMeltano discovery + execution - 1 line."""
     catalog, result = await flext_meltano_discover_and_run_ultra(
         "tap-postgres", "target-csv",

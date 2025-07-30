@@ -1,90 +1,12 @@
-# ============================================================================
-# FLEXT-MELTANO - Meltano Data Orchestration .gitignore
-# Python 3.13 | Poetry | Meltano | Singer | ELT Pipelines
-# ============================================================================
-
-# ============================================================================
-# JUNK FILES - NEVER COMMIT THESE
-# ============================================================================
-
-# Archive and backup directories  
-archive/
-archives/
-backup/
-backups/
-.backup/
-*_backup/
-*_backup_*/
-.archive/
-perf-test/
-enterprise-project/
-
-# AI-generated files and reports
-*_REPORT*.md
-*_ANALYSIS*.md
-*_SUMMARY*.md  
-*_FINDINGS*.md
-CLAUDE*.md
-CONFIG_MIGRATION*.md
-DEVELOPMENT_STANDARDS*.md
-DUPLICATION_REPORT*.md
-LINT_CORRECTIONS*.md
-*.ai.md
-*.ai.txt
-
-# Backup files with timestamps
-*_20250*.bak
-*_202507*.bak
-*_202506*.bak
-*.md_20250*
-README_20250*.bak
-*_SUMMARY_20250*.bak
-*_COMPLETE_20250*.bak
-*_FINDINGS_20250*.bak
-CLAUDE*_20250*.bak
-
-# Generic backup patterns
-*.bak
-*.backup
-*.orig
-*.syntax_backup  
-*.broken
-*.tmp.bak
-*_temp.py
-*_temp.md
-
-# Fix scripts and validation files
-fix_*.py
-*_fix.py
-*_validation.py
-validate_*.py
-investigate_*.py
-temp_*.py
-debug_*.py
-
-# Tool reports and analysis
-*_analysis.txt
-*_report.txt
-*_output.txt
-analysis_temp/
-report_*/
-reports/
-reports_*/
-temp_test_*/
-.secrets-baseline
-
-# ============================================================================
-# PYTHON ARTIFACTS
-# ============================================================================
-
-# Python artifacts
+# Python
 __pycache__/
 *.py[cod]
 *.pyc
 *.pyo
 *.pyd
+*.so
 
-# Distribution / packaging
+# Build
 build/
 dist/
 *.egg-info/
@@ -92,7 +14,7 @@ dist/
 *.egg
 MANIFEST
 
-# Testing and coverage
+# Testing
 htmlcov/
 .tox/
 .nox/
@@ -103,7 +25,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Development tools
+# Tools
 .mypy_cache/
 .ruff_cache/
 .pyre/
@@ -116,39 +38,27 @@ env/
 venv/
 ENV/
 
-# IDEs and editors
+# Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# System files
+# System
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# ============================================================================
-# MELTANO AND SINGER ECOSYSTEM
-# ============================================================================
-
-# Meltano core files
+# Meltano specific
 .meltano/
 .secrets/
 meltano.log
-
-# Meltano state and runtime
 state.json
 state/
-state_*.json
-run_log.json
-job_log.json
-
-# Singer tap/target artifacts
 catalog.json
 catalog_*.json
-tap_done
-target_done
+discovery.json
 output/
 extract/
 load/
@@ -156,106 +66,36 @@ load/
 # Pipeline artifacts
 pipeline_run_*/
 pipeline_logs/
-pipeline_state/
-
-# Meltano discovery cache
-discovery.json
-discovery/
-plugins/
-
-# Meltano schedules and locks
-schedule_*.lock
-job_*.lock
-run_*.lock
-
-# ============================================================================
-# DATA PIPELINE ARTIFACTS
-# ============================================================================
-
-# Data files (raw/processed)
 data/
 raw_data/
 processed_data/
-staging/
-warehouse/
 
-# Singer state files
-*.state
-*.state.json
-state_backup/
-
-# Transformation artifacts
-transform/
-models/output/
-target/
-
-# dbt artifacts (if integrated)
-dbt_packages/
-logs/
-dbt.log
-
-# ============================================================================
-# ORCHESTRATION AND MONITORING
-# ============================================================================
-
-# Airflow (if integrated)
-airflow.db
-airflow.cfg
-airflow_home/
-dags/__pycache__/
-
-# Monitoring and metrics
-metrics/
-monitoring/
-prometheus/
-
-# Performance testing
-perf_test/
-benchmark/
-
-# ============================================================================
-# LOGS AND TEMPORARY FILES
-# ============================================================================
+# Documentation
+docs/_build/
+site/
 
 # Logs
 *.log
 logs/
-meltano_logs/
-singer_logs/
-
-# Temporary files
 *.tmp
-temp/
-tmp/
 
-# ============================================================================
-# SECURITY AND CREDENTIALS
-# ============================================================================
-
-# Credentials
+# Security
 *.key
 *.pem
 *.crt
 credentials.json
-connection_secrets.json
 
-# Environment files
-.env.prod
-.env.staging
-.env.dev
+# Archive/backup
+archive/
+backup/
+*.bak
+*.backup
+*.orig
+*_temp.*
+temp_*
+fix_*
 
-# ============================================================================
-# CONTAINERIZATION
-# ============================================================================
-
-# Docker
-.dockerignore.bak
-docker-compose.override.yml
-
-# Force include critical files
-!pyproject.toml
-!Makefile
-!README.md
-!meltano.yml
-!docker-compose.yml
-!example.env
+# Reports
+*_REPORT*.md
+*_ANALYSIS*.md
+*_SUMMARY*.md

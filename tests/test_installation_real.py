@@ -190,7 +190,7 @@ class TestFlextMeltanoPluginInfo:
             pip_url="pipelinewise-tap-postgres",
             executable="tap-postgres",
             description="PostgreSQL tap",
-            version="1.0.0",
+            version="0.9.0",
             installed=True,
         )
         if plugin.name != "tap-postgres":
@@ -205,7 +205,7 @@ class TestFlextMeltanoPluginInfo:
             msg = f"Expected {'tap-postgres'}, got {plugin.executable}"
             raise AssertionError(msg)
         assert plugin.description == "PostgreSQL tap"
-        if plugin.version != "1.0.0":
+        if plugin.version != "0.9.0":
             msg = f"Expected {'1.0.0'}, got {plugin.version}"
             raise AssertionError(msg)
         if not (plugin.installed):

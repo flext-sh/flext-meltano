@@ -113,7 +113,7 @@ class TestFlextMeltanoPluginInfo:
             pip_url="pipelinewise-tap-postgres",
             executable="tap-postgres",
             description="PostgreSQL tap",
-            version="1.0.0",
+            version="0.9.0",
             installed=True,
         )
         if plugin.name != "tap-postgres":
@@ -128,7 +128,7 @@ class TestFlextMeltanoPluginInfo:
             msg = f"Expected {'tap-postgres'}, got {plugin.executable}"
             raise AssertionError(msg)
         assert plugin.description == "PostgreSQL tap"
-        if plugin.version != "1.0.0":
+        if plugin.version != "0.9.0":
             msg = f"Expected {'1.0.0'}, got {plugin.version}"
             raise AssertionError(msg)
         if not (plugin.installed):
@@ -474,7 +474,7 @@ class TestFlextMeltanoInstallerOperations:
                 "namespace": "tap_csv",
                 "pip_url": "pipelinewise-tap-csv",
                 "description": "CSV extractor",
-                "version": "1.0.0",
+                "version": "0.9.0",
             },
             {
                 "name": "tap-postgres",
@@ -496,7 +496,7 @@ class TestFlextMeltanoInstallerOperations:
         if plugins[0].namespace != "tap_csv":
             msg = f"Expected {'tap_csv'}, got {plugins[0].namespace}"
             raise AssertionError(msg)
-        assert plugins[0].version == "1.0.0"
+        assert plugins[0].version == "0.9.0"
 
         # Second plugin with generated namespace
         if plugins[1].name != "tap-postgres":

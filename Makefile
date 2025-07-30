@@ -1,467 +1,181 @@
-# FLEXT MELTANO - Meltano ELT Integration Platform
-# ================================================
-# Enterprise Meltano integration with project management and orchestration
-# PROJECT_TYPE: meltano-integration
-# Python 3.13 + Meltano + Singer + Zero Tolerance Quality Gates
+# FLEXT-MELTANO Makefile
+PROJECT_NAME := flext-meltano
+PYTHON_VERSION := 3.13
+POETRY := poetry
+SRC_DIR := src
+TESTS_DIR := tests
 
-.PHONY: help info diagnose check validate test lint type-check security format format-check fix
-.PHONY: install dev-install setup pre-commit build clean
-.PHONY: coverage coverage-html test-unit test-integration test-meltano
-.PHONY: deps-update deps-audit deps-tree deps-outdated
-.PHONY: meltano-init meltano-install meltano-run meltano-test
+# Quality standards
+MIN_COVERAGE := 90
 
-# ============================================================================
-# 🎯 HELP & INFORMATION
-# ============================================================================
+# Meltano configuration
+MELTANO_PROJECT_ROOT := $(PWD)
+MELTANO_ENVIRONMENT := dev
 
-help: ## Show this help message
-	@echo "🎵 FLEXT MELTANO - Meltano ELT Integration Service"
-	@echo "==============================================="
-	@echo "🎯 Clean Architecture + DDD + Python 3.13 + Meltano + Singer"
-	@echo ""
-	@echo "📦 Native Meltano platform integration with ELT orchestration"
-	@echo "🔒 Zero tolerance quality gates for data integration"
-	@echo "🧪 90%+ test coverage requirement for pipeline components"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+# Help
+help: ## Show available commands
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
+# Installation
+install: ## Install dependencies
+	$(POETRY) install
 
-info: ## Mostrar informações do projeto
-	@echo "📊 Informações do Projeto"
-	@echo "======================"
-	@echo "Nome: flext-meltano"
-	@echo "Título: FLEXT MELTANO"
-	@echo "Versão: $(shell poetry version -s 2>/dev/null || echo "0.7.0")"
-	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
-	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
-	@echo "Venv: $(shell poetry env info --path 2>/dev/null || echo "Não ativado")"
-	@echo "Diretório: $(CURDIR)"
-	@echo "Git Branch: $(shell git branch --show-current 2>/dev/null || echo "Não é repo git")"
-	@echo "Git Status: $(shell git status --porcelain 2>/dev/null | wc -l | xargs echo) arquivos alterados"
+install-dev: ## Install dev dependencies
+	$(POETRY) install --with dev,test,docs
 
-diagnose: ## Executar diagnósticos completos
-	@echo "🔍 Executando diagnósticos para flext-meltano..."
-	@echo "Informações do Sistema:"
-	@echo "OS: $(shell uname -s)"
-	@echo "Arquitetura: $(shell uname -m)"
-	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
-	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
-	@echo ""
-	@echo "Estrutura do Projeto:"
-	@ls -la
-	@echo ""
-	@echo "Configuração Poetry:"
-	@poetry config --list 2>/dev/null || echo "Poetry não configurado"
-	@echo ""
-	@echo "Status das Dependências:"
-	@poetry show --outdated 2>/dev/null || echo "Nenhuma dependência desatualizada"
+setup: install-dev ## Complete project setup
+	$(POETRY) run pre-commit install
 
-# ============================================================================
-# 🎯 CORE QUALITY GATES - ZERO TOLERANCE
-# ============================================================================
+# Quality gates
+validate: lint type-check security test ## Run all quality gates
 
-validate: lint type-check security test ## STRICT compliance validation (all must pass)
-	@echo "✅ ALL QUALITY GATES PASSED - FLEXT MELTANO COMPLIANT"
+check: lint type-check ## Quick health check
 
-check: lint type-check test ## Essential quality checks (pre-commit standard)
-	@echo "✅ Essential checks passed"
+lint: ## Run linting
+	$(POETRY) run ruff check $(SRC_DIR) $(TESTS_DIR)
 
-lint: ## Ruff linting (17 rule categories, ALL enabled)
-	@echo "🔍 Running ruff linter (ALL rules enabled)..."
-	@poetry run ruff check src/ tests/ --fix --unsafe-fixes
-	@echo "✅ Linting complete"
+format: ## Format code
+	$(POETRY) run ruff format $(SRC_DIR) $(TESTS_DIR)
 
-type-check: ## MyPy strict mode type checking (zero errors tolerated)
-	@echo "🛡️ Running MyPy strict type checking..."
-	@poetry run mypy src/ tests/ --strict
-	@echo "✅ Type checking complete"
+type-check: ## Run type checking
+	$(POETRY) run mypy $(SRC_DIR) --strict
 
-security: ## Security scans (bandit + pip-audit + secrets)
-	@echo "🔒 Running security scans..."
-	@poetry run bandit -r src/ --severity-level medium --confidence-level medium
-	@poetry run pip-audit --ignore-vuln PYSEC-2022-42969
-	@poetry run detect-secrets scan --all-files
-	@echo "✅ Security scans complete"
+security: ## Run security scanning
+	$(POETRY) run bandit -r $(SRC_DIR)
+	$(POETRY) run pip-audit
 
-format: ## Format code with ruff
-	@echo "🎨 Formatting code..."
-	@poetry run ruff format src/ tests/
-	@echo "✅ Formatting complete"
+fix: ## Auto-fix issues
+	$(POETRY) run ruff check $(SRC_DIR) $(TESTS_DIR) --fix
+	$(POETRY) run ruff format $(SRC_DIR) $(TESTS_DIR)
 
-format-check: ## Check formatting without fixing
-	@echo "🎨 Checking code formatting..."
-	@poetry run ruff format src/ tests/ --check
-	@echo "✅ Format check complete"
+# Testing
+test: ## Run tests with coverage
+	$(POETRY) run pytest $(TESTS_DIR) --cov=$(SRC_DIR) --cov-report=term-missing --cov-fail-under=$(MIN_COVERAGE)
 
-fix: format lint ## Auto-fix all issues (format + imports + lint)
-	@echo "🔧 Auto-fixing all issues..."
-	@poetry run ruff check src/ tests/ --fix --unsafe-fixes
-	@echo "✅ All auto-fixes applied"
+test-unit: ## Run unit tests
+	$(POETRY) run pytest $(TESTS_DIR) -m "not integration" -v
 
-# ============================================================================
-# 🧪 TESTING - 90% COVERAGE MINIMUM
-# ============================================================================
+test-integration: ## Run integration tests
+	$(POETRY) run pytest $(TESTS_DIR) -m integration -v
 
-test: ## Run tests with coverage (90% minimum required)
-	@echo "🧪 Running tests with coverage..."
-	@poetry run pytest tests/ -v --cov=src/flext_meltano --cov-report=term-missing --cov-fail-under=90
-	@echo "✅ Tests complete"
+test-meltano: ## Run Meltano specific tests
+	$(POETRY) run pytest $(TESTS_DIR) -m meltano -v
 
-test-unit: ## Run unit tests only
-	@echo "🧪 Running unit tests..."
-	@poetry run pytest tests/unit/ -v
-	@echo "✅ Unit tests complete"
+test-fast: ## Run tests without coverage
+	$(POETRY) run pytest $(TESTS_DIR) -v
 
-test-integration: ## Run integration tests only
-	@echo "🧪 Running integration tests..."
-	@poetry run pytest tests/integration/ -v
-	@echo "✅ Integration tests complete"
+coverage-html: ## Generate HTML coverage report
+	$(POETRY) run pytest $(TESTS_DIR) --cov=$(SRC_DIR) --cov-report=html
 
-test-meltano: ## Run Meltano-specific tests
-	@echo "🎵 Running Meltano integration tests..."
-	@poetry run pytest tests/meltano/ -v --tb=short
-	@echo "✅ Meltano tests complete"
-
-coverage: ## Generate detailed coverage report
-	@echo "📊 Generating coverage report..."
-	@poetry run pytest tests/ --cov=src/flext_meltano --cov-report=term-missing --cov-report=html
-	@echo "✅ Coverage report generated in htmlcov/"
-
-coverage-html: coverage ## Generate HTML coverage report
-	@echo "📊 Opening coverage report..."
-	@python -m webbrowser htmlcov/index.html
-
-# ============================================================================
-# 🚀 DEVELOPMENT SETUP
-# ============================================================================
-
-setup: install pre-commit ## Complete development setup
-	@echo "🎯 Development setup complete!"
-
-install: ## Install dependencies with Poetry
-	@echo "📦 Installing dependencies..."
-	@poetry install --all-extras --with dev,test,docs,security
-	@echo "✅ Dependencies installed"
-
-dev-install: install ## Install in development mode
-	@echo "🔧 Setting up development environment..."
-	@poetry install --all-extras --with dev,test,docs,security
-	@poetry run pre-commit install
-	@echo "✅ Development environment ready"
-
-pre-commit: ## Setup pre-commit hooks
-	@echo "🎣 Setting up pre-commit hooks..."
-	@poetry run pre-commit install
-	@poetry run pre-commit run --all-files || true
-	@echo "✅ Pre-commit hooks installed"
-
-# ============================================================================
-# 🎯 MELTANO INTEGRATION OPERATIONS
-# ============================================================================
-
-meltano-install: ## Install and setup Meltano project
-
-meltano-test: ## Test Meltano integration
-
-meltano-discover: ## Discover catalog from extractors
-
-# ============================================================================
-# 🎵 MELTANO CORE OPERATIONS
-# ============================================================================
-
+# Meltano operations
 meltano-init: ## Initialize Meltano project
-	@echo "🎵 Initializing Meltano project..."
 	@if [ ! -f meltano.yml ]; then \
-		poetry run meltano init flext-meltano .; \
-		echo "✅ Meltano project initialized"; \
+		$(POETRY) run meltano init $(PROJECT_NAME) .; \
+		echo "Meltano project initialized"; \
 	else \
-		echo "✅ Meltano project already exists"; \
+		echo "Meltano project already exists"; \
 	fi
 
 meltano-install: ## Install Meltano plugins
-	@echo "🎵 Installing Meltano plugins..."
-	@poetry run meltano install
-	@echo "✅ Meltano plugins installed"
+	$(POETRY) run meltano install
 
 meltano-run: ## Run Meltano pipeline (usage: make meltano-run JOB=job-name)
-	@echo "🎵 Running Meltano pipeline..."
 	@if [ -z "$(JOB)" ]; then \
-		echo "❌ Usage: make meltano-run JOB=job-name"; \
+		echo "Usage: make meltano-run JOB=job-name"; \
 		exit 1; \
 	fi
-	@poetry run meltano run $(JOB)
-	@echo "✅ Meltano pipeline $(JOB) complete"
+	$(POETRY) run meltano run $(JOB)
 
 meltano-test: ## Test Meltano configuration
-	@echo "🎵 Testing Meltano configuration..."
-	@poetry run meltano config meltano list
-	@poetry run meltano invoke --list || true
-	@echo "✅ Meltano configuration tested"
+	$(POETRY) run meltano config meltano list
+	$(POETRY) run meltano invoke --list || true
 
 meltano-discover: ## Discover catalog from tap (usage: make meltano-discover TAP=tap-name)
-	@echo "🔍 Running catalog discovery..."
 	@if [ -z "$(TAP)" ]; then \
-		echo "❌ Usage: make meltano-discover TAP=tap-name"; \
+		echo "Usage: make meltano-discover TAP=tap-name"; \
 		exit 1; \
 	fi
-	@poetry run meltano invoke $(TAP) --discover > catalog-$(TAP).json
-	@echo "✅ Catalog discovered for $(TAP) - saved to catalog-$(TAP).json"
-
-meltano-add-extractor: ## Add extractor plugin (usage: make meltano-add-extractor NAME=tap-name)
-	@echo "🎵 Adding extractor plugin..."
-	@if [ -z "$(NAME)" ]; then \
-		echo "❌ Usage: make meltano-add-extractor NAME=tap-name"; \
-		exit 1; \
-	fi
-	@poetry run meltano add extractor $(NAME)
-	@echo "✅ Extractor $(NAME) added"
-
-meltano-add-loader: ## Add loader plugin (usage: make meltano-add-loader NAME=target-name)
-	@echo "🎵 Adding loader plugin..."
-	@if [ -z "$(NAME)" ]; then \
-		echo "❌ Usage: make meltano-add-loader NAME=target-name"; \
-		exit 1; \
-	fi
-	@poetry run meltano add loader $(NAME)
-	@echo "✅ Loader $(NAME) added"
-
-meltano-schedule: ## Create Meltano schedule (usage: make meltano-schedule JOB=job-name INTERVAL=@daily)
-	@echo "🕐 Creating Meltano schedule..."
-	@if [ -z "$(JOB)" ] || [ -z "$(INTERVAL)" ]; then \
-		echo "❌ Usage: make meltano-schedule JOB=job-name INTERVAL=@daily"; \
-		exit 1; \
-	fi
-	@poetry run meltano schedule add $(JOB)-schedule $(JOB) --interval $(INTERVAL)
-	@echo "✅ Schedule $(JOB)-schedule created"
+	$(POETRY) run meltano invoke $(TAP) --discover > catalog-$(TAP).json
 
 meltano-ui: ## Start Meltano UI
-	@echo "🎵 Starting Meltano UI..."
-	@echo "📡 Meltano UI will be available at: http://localhost:5000"
-	@poetry run meltano ui
+	@echo "Meltano UI will be available at: http://localhost:5000"
+	$(POETRY) run meltano ui
 
-# ============================================================================
-# 🎯 SINGER PROTOCOL OPERATIONS
-# ============================================================================
-
+# Singer operations
 singer-validate: ## Validate Singer output (usage: make singer-validate TAP=tap-name)
-	@echo "🎵 Validating Singer output..."
 	@if [ -z "$(TAP)" ]; then \
-		echo "❌ Usage: make singer-validate TAP=tap-name"; \
+		echo "Usage: make singer-validate TAP=tap-name"; \
 		exit 1; \
 	fi
-	@poetry run meltano invoke $(TAP) --discover | poetry run singer-check-tap
-	@echo "✅ Singer validation complete for $(TAP)"
+	$(POETRY) run meltano invoke $(TAP) --discover | $(POETRY) run singer-check-tap
 
-singer-test-connection: ## Test Singer tap connection (usage: make singer-test-connection TAP=tap-name)
-	@echo "🔗 Testing Singer tap connection..."
-	@if [ -z "$(TAP)" ]; then \
-		echo "❌ Usage: make singer-test-connection TAP=tap-name"; \
-		exit 1; \
-	fi
-	@poetry run meltano invoke $(TAP) --discover > /dev/null && echo "✅ Connection successful" || echo "❌ Connection failed"
+# Build
+build: ## Build package
+	$(POETRY) build
 
-singer-extract-sample: ## Extract sample data (usage: make singer-extract-sample TAP=tap-name LIMIT=10)
-	@echo "📊 Extracting sample data..."
-	@if [ -z "$(TAP)" ]; then \
-		echo "❌ Usage: make singer-extract-sample TAP=tap-name LIMIT=10"; \
-		exit 1; \
-	fi
-	@LIMIT=$${LIMIT:-10} && poetry run meltano invoke $(TAP) | head -$$LIMIT
-	@echo "✅ Sample extraction complete"
+build-clean: clean build ## Clean and build
 
-# ============================================================================
-# 📦 BUILD & DISTRIBUTION
-# ============================================================================
+# Documentation
+docs: ## Build documentation
+	$(POETRY) run mkdocs build
 
-build: clean ## Build distribution packages
-	@echo "🔨 Building distribution..."
-	@poetry build
-	@echo "✅ Build complete - packages in dist/"
+docs-serve: ## Serve documentation
+	$(POETRY) run mkdocs serve
 
-# ============================================================================
-# 🧹 CLEANUP
-# ============================================================================
+# Dependencies
+deps-update: ## Update dependencies
+	$(POETRY) update
 
-clean: ## Remove all artifacts
-	@echo "🧹 Cleaning up..."
-	@rm -rf build/
-	@rm -rf dist/
-	@rm -rf *.egg-info/
-	@rm -rf .coverage
-	@rm -rf htmlcov/
-	@rm -rf .pytest_cache/
-	@rm -rf .meltano/
-	@rm -rf catalog-*.json
-	@rm -rf state.json
-	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
-	@echo "✅ Cleanup complete"
+deps-show: ## Show dependency tree
+	$(POETRY) show --tree
 
-# ============================================================================
-# 📊 DEPENDENCY MANAGEMENT
-# ============================================================================
+deps-audit: ## Audit dependencies
+	$(POETRY) run pip-audit
 
-deps-update: ## Update all dependencies
-	@echo "🔄 Updating dependencies..."
-	@poetry update
-	@echo "✅ Dependencies updated"
+# Development
+shell: ## Open Python shell
+	$(POETRY) run python
 
-deps-audit: ## Audit dependencies for vulnerabilities
-	@echo "🔍 Auditing dependencies..."
-	@poetry run pip-audit
-	@echo "✅ Dependency audit complete"
+pre-commit: ## Run pre-commit hooks
+	$(POETRY) run pre-commit run --all-files
 
-deps-tree: ## Show dependency tree
-	@echo "🌳 Dependency tree:"
-	@poetry show --tree
+# Maintenance
+clean: ## Clean build artifacts
+	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage .mypy_cache/ .ruff_cache/
+	rm -rf .meltano/ catalog-*.json state.json
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
-deps-outdated: ## Show outdated dependencies
-	@echo "📋 Outdated dependencies:"
-	@poetry show --outdated
+clean-all: clean ## Deep clean including venv
+	rm -rf .venv/
 
-# ============================================================================
-# 🔧 ENVIRONMENT CONFIGURATION
-# ============================================================================
+reset: clean-all setup ## Reset project
 
-# Python settings
-PYTHON := python3.13
-export PYTHONPATH := $(PWD)/src:$(PYTHONPATH)
-export PYTHONDONTWRITEBYTECODE := 1
-export PYTHONUNBUFFERED := 1
+# Diagnostics
+diagnose: ## Project diagnostics
+	@echo "Python: $$(python --version)"
+	@echo "Poetry: $$($(POETRY) --version)"
+	@echo "Meltano: $$($(POETRY) run meltano --version 2>/dev/null || echo 'Not available')"
+	@$(POETRY) env info
 
-# Meltano settings
-export MELTANO_PROJECT_ROOT := $(PWD)
-export MELTANO_ENVIRONMENT := dev
-export MELTANO_DATABASE_URI := sqlite:///meltano.db
-export MELTANO_UI_BIND_PORT := 5000
+doctor: diagnose check ## Health check
 
-# Singer settings
-export SINGER_SDK_LOG_LEVEL := INFO
-export SINGER_SDK_BATCH_CONFIG := {"encoding":{"format":"jsonl"}}
-
-# FLEXT Meltano settings
-export FLEXT_MELTANO_AUTO_INSTALL := true
-export FLEXT_MELTANO_STATE_BACKEND := filesystem
-
-# Poetry settings
-export POETRY_VENV_IN_PROJECT := false
-export POETRY_CACHE_DIR := $(HOME)/.cache/pypoetry
-
-# Quality gate settings
-export MYPY_CACHE_DIR := .mypy_cache
-export RUFF_CACHE_DIR := .ruff_cache
-
-# ============================================================================
-# 📝 PROJECT METADATA
-# ============================================================================
-
-# Project information
-PROJECT_NAME := flext-meltano
-PROJECT_TYPE := meltano-integration
-PROJECT_VERSION := $(shell poetry version -s)
-PROJECT_DESCRIPTION := FLEXT Meltano - Meltano ELT Integration Platform
-
-.DEFAULT_GOAL := help
-
-# ============================================================================
-# 🎯 MELTANO SPECIFIC OPERATIONS
-# ============================================================================
-
-meltano-environment: ## Setup Meltano environments
-	@echo "🎵 Setting up Meltano environments..."
-	@poetry run meltano environment add prod
-	@poetry run meltano environment add staging
-	@echo "✅ Meltano environments configured"
-
-meltano-jobs: ## List and manage Meltano jobs
-	@echo "🎵 Managing Meltano jobs..."
-	@poetry run meltano job list
-	@echo "✅ Meltano jobs listed"
-
-meltano-state: ## Manage Meltano state
-	@echo "🎵 Managing Meltano state..."
-	@poetry run meltano state list || echo "No state found"
-	@echo "✅ Meltano state management complete"
-
-meltano-logs: ## View Meltano logs
-	@echo "📜 Viewing Meltano logs..."
-	@tail -f .meltano/logs/*.log || echo "No logs found"
-
-meltano-reset: ## Reset Meltano project
-	@echo "⚠️ Resetting Meltano project..."
-	@read -p "Are you sure you want to reset the Meltano project? (y/N) " -n 1 -r; \
-	echo; \
-	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		rm -rf .meltano/; \
-		echo "✅ Meltano project reset"; \
-	else \
-		echo "❌ Reset cancelled"; \
-	fi
-
-# ============================================================================
-# 🎯 MELTANO VALIDATION COMMANDS
-# ============================================================================
-
-validate-meltano: ## Validate complete Meltano setup
-	@echo "🎵 Validating Meltano setup..."
-	@poetry run meltano --version
-	@if [ -f meltano.yml ]; then \
-		poetry run meltano config meltano list; \
-		echo "✅ Meltano setup validated"; \
-	else \
-		echo "❌ No meltano.yml found - run 'make meltano-init'"; \
-		exit 1; \
-	fi
-
-validate-singer: ## Validate Singer protocol compliance
-	@echo "🎵 Validating Singer protocol compliance..."
-	@poetry run python -c "import singer; print(f'Singer SDK version: {singer.__version__}'); print('✅ Singer protocol validated')"
-
-validate-plugins: ## Validate installed Meltano plugins
-	@echo "🎵 Validating Meltano plugins..."
-	@poetry run meltano invoke --list-commands 2>/dev/null || echo "No plugins installed"
-	@echo "✅ Plugin validation complete"
-
-# ============================================================================
-# 🎯 DEVELOPMENT WORKFLOWS
-# ============================================================================
-
-setup-dev-project: meltano-init ## Setup development Meltano project
-	@echo "🔧 Setting up development Meltano project..."
-	@$(MAKE) meltano-add-extractor NAME=tap-csv
-	@$(MAKE) meltano-add-loader NAME=target-jsonl
-	@echo "✅ Development project setup complete"
-
+# Test pipeline workflow
 test-pipeline: ## Test basic ELT pipeline
-	@echo "🧪 Testing basic ELT pipeline..."
 	@echo "sample_id,name,value" > sample.csv
 	@echo "1,test,100" >> sample.csv
 	@echo "2,demo,200" >> sample.csv
-	@poetry run meltano run tap-csv target-jsonl || echo "Pipeline test completed (check output)"
+	$(POETRY) run meltano run tap-csv target-jsonl || echo "Pipeline test completed"
 	@rm -f sample.csv
-	@echo "✅ Pipeline test complete"
 
-# ============================================================================
-# 🎯 FLEXT ECOSYSTEM INTEGRATION
-# ============================================================================
+# Aliases
+t: test
+l: lint
+f: format
+tc: type-check
+c: clean
+i: install
+v: validate
 
-ecosystem-check: ## Verify FLEXT ecosystem compatibility
-	@echo "🌐 Checking FLEXT ecosystem compatibility..."
-	@echo "📦 Meltano project: $(PROJECT_NAME) v$(PROJECT_VERSION)"
-	@echo "🏗️ Architecture: Clean Architecture + DDD"
-	@echo "🐍 Python: 3.13"
-	@echo "🎵 Framework: Meltano + Singer"
-	@echo "📊 Quality: Zero tolerance enforcement"
-	@echo "✅ Ecosystem compatibility verified"
-
-workspace-info: ## Show workspace integration info
-	@echo "🏢 FLEXT Workspace Integration"
-	@echo "==============================="
-	@echo "📁 Project Path: $(PWD)"
-	@echo "🏆 Role: ELT Pipeline Orchestration"
-	@echo "🔗 Dependencies: flext-core, Meltano, Singer"
-	@echo "📦 Provides: ELT pipelines, Singer integration, data orchestration"
-	@echo "🎯 Standards: Enterprise Meltano patterns"
+.DEFAULT_GOAL := help
+.PHONY: help install install-dev setup validate check lint format type-check security fix test test-unit test-integration test-meltano test-fast coverage-html meltano-init meltano-install meltano-run meltano-test meltano-discover meltano-ui singer-validate build build-clean docs docs-serve deps-update deps-show deps-audit shell pre-commit clean clean-all reset diagnose doctor test-pipeline t l f tc c i v
