@@ -19,13 +19,13 @@ from flext_core import (
     FlextLogger,
     FlextResult,
 )
-from injectable import injectable
+from injectable import injectable  # type: ignore[import-untyped]
 from pydantic import BaseModel, Field, field_validator
 
 if TYPE_CHECKING:
     from logging import Logger
 
-    from meltano.edk import ExtensionBase
+    from meltano.edk.extension import ExtensionBase
     from singer_sdk import Tap, Target
 
 

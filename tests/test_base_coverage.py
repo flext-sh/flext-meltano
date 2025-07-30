@@ -561,7 +561,9 @@ class TestFlextMeltanoExtensionService:
         service = FlextMeltanoExtensionService(config)
 
         # Mock extension class for testing
-        class MockExtension:
+        from meltano.edk.extension import ExtensionBase
+
+        class MockExtension(ExtensionBase):
             pass
 
         result = service.set_extension_class(MockExtension)
