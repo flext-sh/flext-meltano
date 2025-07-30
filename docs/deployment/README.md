@@ -333,46 +333,46 @@ spec:
         app: flext-service
     spec:
       containers:
-      - name: flext-service
-        image: flext/flext-service:2.0.0
-        ports:
-        - containerPort: 8081
-        env:
-        - name: MELTANO_ENVIRONMENT
-          value: "prod"
-        - name: PYTHONPATH
-          value: "/app/src"
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: database-secret
-              key: password
-        volumeMounts:
-        - name: meltano-state
-          mountPath: /app/.meltano
-        resources:
-          requests:
-            cpu: "500m"
-            memory: "1Gi"
-          limits:
-            cpu: "2000m"
-            memory: "4Gi"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8081
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: flext-service
+          image: flext/flext-service:2.0.0
+          ports:
+            - containerPort: 8081
+          env:
+            - name: MELTANO_ENVIRONMENT
+              value: "prod"
+            - name: PYTHONPATH
+              value: "/app/src"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: password
+          volumeMounts:
+            - name: meltano-state
+              mountPath: /app/.meltano
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
-      - name: meltano-state
-        persistentVolumeClaim:
-          claimName: meltano-state-pvc
+        - name: meltano-state
+          persistentVolumeClaim:
+            claimName: meltano-state-pvc
 ```
 
 #### Service Manifest
@@ -386,16 +386,16 @@ spec:
   selector:
     app: flext-service
   ports:
-  - protocol: TCP
-    port: 8081
-    targetPort: 8081
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
   type: ClusterIP
 ```
 
 ### Docker Compose Production
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   flext-service:
@@ -456,59 +456,59 @@ name: Deploy FLEXT Meltano
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ["v*"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.13'
-    
-    - name: Install Poetry
-      run: pip install poetry
-    
-    - name: Install dependencies
-      run: poetry install
-    
-    - name: Run quality gates
-      run: |
-        make validate
-    
-    - name: Test bridge integration
-      run: |
-        python scripts/flext_meltano_bridge.py version
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run quality gates
+        run: |
+          make validate
+
+      - name: Test bridge integration
+        run: |
+          python scripts/flext_meltano_bridge.py version
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Build Docker image
-      run: |
-        docker build -t flext/flext-service:${{ github.sha }} .
-        docker tag flext/flext-service:${{ github.sha }} flext/flext-service:latest
-    
-    - name: Push to registry
-      run: |
-        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        docker push flext/flext-service:${{ github.sha }}
-        docker push flext/flext-service:latest
+      - uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t flext/flext-service:${{ github.sha }} .
+          docker tag flext/flext-service:${{ github.sha }} flext/flext-service:latest
+
+      - name: Push to registry
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push flext/flext-service:${{ github.sha }}
+          docker push flext/flext-service:latest
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-    - name: Deploy to production
-      run: |
-        # Deployment commands
-        kubectl set image deployment/flext-service flext-service=flext/flext-service:${{ github.sha }}
+      - name: Deploy to production
+        run: |
+          # Deployment commands
+          kubectl set image deployment/flext-service flext-service=flext/flext-service:${{ github.sha }}
 ```
 
 ## 🚨 Troubleshooting Production Issues
@@ -588,5 +588,5 @@ docker logs -f flext-service
 
 ---
 
-*Deployment Guide - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
+_Deployment Guide - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_

@@ -25,17 +25,19 @@ from flext_meltano import (
 def example_real_pipeline_builder() -> None:
     """Example using real pipeline builder with actual Meltano CLI."""
     # Create pipeline with fluent API - massive boilerplate reduction
-    pipeline = (create_flext_meltano_pipeline()
-                .from_postgres(
-                    host="localhost",
-                    port=5432,
-                    user="postgres",
-                    database="demo",
-                    password="password",
-                )
-                .to_jsonl(destination_path="./output")
-                .in_project("./meltano_project")
-                .with_environment("dev"))
+    pipeline = (
+        create_flext_meltano_pipeline()
+        .from_postgres(
+            host="localhost",
+            port=5432,
+            user="postgres",
+            database="demo",
+            password="password",
+        )
+        .to_jsonl(destination_path="./output")
+        .in_project("./meltano_project")
+        .with_environment("dev")
+    )
 
     # Test connection before running
     connection_test = pipeline.test_connection()
@@ -61,6 +63,7 @@ def example_real_pipeline_builder() -> None:
 # =============================================================================
 # EXAMPLE 2: Real Configuration Service Usage
 # =============================================================================
+
 
 def example_real_config_service() -> None:
     """Example using real configuration service with validation."""
@@ -97,6 +100,7 @@ def example_real_config_service() -> None:
 # EXAMPLE 3: Real Singer Message Processing
 # =============================================================================
 
+
 def example_real_singer_processing() -> None:
     """Example using real Singer utilities with validation."""
     singer_utils = create_flext_meltano_singer_utils()
@@ -126,9 +130,24 @@ def example_real_singer_processing() -> None:
 
     # Create valid Singer record messages
     sample_records = [
-        {"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "created_at": "2024-01-15T10:30:00Z"},
-        {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "created_at": "2024-01-16T14:22:00Z"},
-        {"id": 3, "name": "Carol Williams", "email": "carol@example.com", "created_at": "2024-01-17T09:15:00Z"},
+        {
+            "id": 1,
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "created_at": "2024-01-15T10:30:00Z",
+        },
+        {
+            "id": 2,
+            "name": "Bob Smith",
+            "email": "bob@example.com",
+            "created_at": "2024-01-16T14:22:00Z",
+        },
+        {
+            "id": 3,
+            "name": "Carol Williams",
+            "email": "carol@example.com",
+            "created_at": "2024-01-17T09:15:00Z",
+        },
     ]
 
     valid_records = 0
@@ -141,7 +160,9 @@ def example_real_singer_processing() -> None:
 
         if record_msg.is_success:
             # Validate each record message
-            validation = singer_utils.flext_meltano_validate_singer_message(record_msg.data)
+            validation = singer_utils.flext_meltano_validate_singer_message(
+                record_msg.data,
+            )
             if validation.is_success:
                 valid_records += 1
 
@@ -163,6 +184,7 @@ def example_real_singer_processing() -> None:
 # =============================================================================
 # EXAMPLE 4: Real Configuration Validation
 # =============================================================================
+
 
 def example_real_config_validation() -> None:
     """Example using real configuration validator with schemas."""
@@ -202,7 +224,9 @@ def example_real_config_validation() -> None:
         "database": "demo",
     }
 
-    validation = validator.flext_meltano_validate_tap_postgres_config(constraint_violation)
+    validation = validator.flext_meltano_validate_tap_postgres_config(
+        constraint_violation,
+    )
     if validation.is_success:
         pass
 
@@ -210,6 +234,7 @@ def example_real_config_validation() -> None:
 # =============================================================================
 # EXAMPLE 5: Decorator Pattern Usage
 # =============================================================================
+
 
 @flext_meltano_safe_operation("demo_etl_job")
 def example_decorated_operation():
@@ -240,21 +265,24 @@ def example_decorator_usage() -> None:
 # EXAMPLE 6: Async Pipeline with Real Error Handling
 # =============================================================================
 
+
 async def example_async_pipeline() -> None:
     """Example showing async pipeline execution."""
-    pipeline = (create_flext_meltano_pipeline()
-                .from_mysql(
-                    host="mysql-server",
-                    port=3306,
-                    user="etl_user",
-                    database="production",
-                )
-                .to_csv(
-                    destination_path="./exports",
-                    delimiter="|",
-                    quotechar='"',
-                )
-                .with_environment("production"))
+    pipeline = (
+        create_flext_meltano_pipeline()
+        .from_mysql(
+            host="mysql-server",
+            port=3306,
+            user="etl_user",
+            database="production",
+        )
+        .to_csv(
+            destination_path="./exports",
+            delimiter="|",
+            quotechar='"',
+        )
+        .with_environment("production")
+    )
 
     try:
         result = await pipeline.run()
@@ -269,6 +297,7 @@ async def example_async_pipeline() -> None:
 # =============================================================================
 # MAIN EXECUTION - Run All Examples
 # =============================================================================
+
 
 def main() -> None:
     """Run all real working examples."""

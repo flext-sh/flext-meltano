@@ -178,7 +178,9 @@ class FlextMeltanoExecutor:
             return FlextResult(error=f"Execution error: {e}")
 
     def run_command(
-        self, args: list[str], context: FlextMeltanoExecutionContext | None = None,
+        self,
+        args: list[str],
+        context: FlextMeltanoExecutionContext | None = None,
     ) -> FlextResult[dict[str, Any]]:
         """Run generic command using enterprise patterns."""
         if not context:
@@ -238,7 +240,8 @@ class FlextMeltanoExecutor:
             return FlextResult(error=f"Command error: {e}")
 
     def execute(
-        self, command: FlextMeltanoExecutionCommand,
+        self,
+        command: FlextMeltanoExecutionCommand,
     ) -> FlextResult[dict[str, Any]]:
         """Execute command using domain service pattern."""
         return self.execute_pipeline(command.tap_name, command.target_name)
@@ -266,7 +269,11 @@ class FlextMeltanoResult:
     """Legacy result type for backward compatibility."""
 
     def __init__(
-        self, *, success: bool, data: dict[str, Any] | None = None, error: str = "",
+        self,
+        *,
+        success: bool,
+        data: dict[str, Any] | None = None,
+        error: str = "",
     ) -> None:
         """Initialize result."""
         self.success = success

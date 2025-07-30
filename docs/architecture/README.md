@@ -34,6 +34,7 @@ src/flext_meltano/
 ### Module Responsibilities
 
 #### `__init__.py` - Public Interface
+
 - **249 exports** providing comprehensive API surface
 - Base classes, core services, and utility functions
 - Singer SDK re-exports (Stream, Tap, Target, etc.)
@@ -41,12 +42,14 @@ src/flext_meltano/
 - Legacy compatibility aliases
 
 #### `base.py` - Foundation Classes
+
 - `FlextMeltanoConfig`: Configuration management
 - `FlextMeltanoTap`, `FlextMeltanoTarget`, `FlextMeltanoDbt`: Base Singer/DBT classes
 - Factory functions: `create_tap()`, `create_target()`, `create_dbt_service()`
 - Enterprise pattern implementations
 
 #### `core.py` - Enterprise Services
+
 - `FlextMeltanoOrchestrationService`: Pipeline orchestration
 - `FlextMeltanoDbtService`: DBT operations and project management
 - `FlextMeltanoSingerService`: Singer protocol handling
@@ -54,33 +57,39 @@ src/flext_meltano/
 - Domain-driven design components
 
 #### `flext_meltano_execution.py` - Execution Layer
+
 - `flext_meltano_execute_job()`: Primary pipeline execution function
 - `flext_meltano_run_command()`: Generic Meltano command execution
 - `FlextMeltanoResult`: Result handling with success/error states
 - Subprocess-based Meltano CLI integration
 
 #### `flext_meltano_cli.py` - CLI Interface
+
 - `FlextMeltanoCli`: CLI command wrapper
 - `flext_meltano_run_cli()`: Direct CLI execution
 - Command parsing and argument handling
 
 #### `flext_meltano_discovery.py` - Plugin Discovery
+
 - `flext_meltano_discover_catalog()`: Schema discovery
 - `flext_meltano_discover_plugins()`: Available plugin enumeration
 - Catalog management and metadata handling
 
 #### `flext_meltano_installation.py` - Plugin Management
+
 - `FlextMeltanoInstaller`: Plugin installation service
 - `flext_meltano_install_plugin()`: Plugin installation function
 - Configuration and dependency management
 
 #### `flext_meltano_validation.py` - Validation Layer
+
 - `flext_meltano_validate_project()`: Project validation
 - `flext_meltano_validate_tap_config()`: Tap configuration validation
 - `flext_meltano_test_tap_connection()`: Connection testing
 - Pipeline validation and health checks
 
 #### `flext_singer.py` - Singer Integration
+
 - Singer SDK integration and protocol handling
 - Stream and schema management
 - Singer-specific utilities and helpers
@@ -218,5 +227,5 @@ tests/
 
 ---
 
-*Architecture Document - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
+_Architecture Document - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_

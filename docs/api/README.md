@@ -45,6 +45,7 @@ else:
 ```
 
 **Parameters:**
+
 - `extractor` (str): Meltano extractor plugin name
 - `loader` (str): Meltano loader plugin name
 - `**kwargs`: Additional arguments passed to Meltano
@@ -69,6 +70,7 @@ result = flext_meltano_run_command(["run", "my-job"], env={"MELTANO_ENVIRONMENT"
 ```
 
 **Parameters:**
+
 - `args` (List[str]): Meltano command arguments
 - `**kwargs`: Additional subprocess arguments
 
@@ -300,6 +302,7 @@ python scripts/flext_meltano_bridge.py discover tap-postgres
 ### Bridge Operations
 
 Available bridge operations:
+
 - `version`: Get Meltano version
 - `run_pipeline <extractor> <loader>`: Execute pipeline
 - `add_plugin <type> <name>`: Install plugin
@@ -376,5 +379,5 @@ pytest --cov=src/flext_meltano --cov-fail-under=90
 
 ---
 
-*API Reference - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
+_API Reference - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_

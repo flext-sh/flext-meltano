@@ -59,7 +59,6 @@ def exemplo_bridge_basico() -> None:
     )
 
     if singer_record.is_success:
-
         # Escrever mensagem Singer
         write_result = bridge.write_singer_message(singer_record.data)
         if write_result.is_success:
@@ -93,7 +92,6 @@ def exemplo_catalog_management() -> None:
     )
 
     if result.is_success:
-
         # Obter catalog completo
         catalog_data = catalog.get_catalog()
         if catalog_data.is_success:
@@ -170,7 +168,6 @@ def exemplo_tap_personalizado() -> None:
     # Descobrir streams
     discovery = tap.discover()
     if discovery.is_success:
-
         # Sync
         catalog = discovery.data["catalog"]
         sync_result = tap.sync(catalog)
@@ -228,7 +225,6 @@ def exemplo_target_personalizado() -> None:
 
     write_result = target.write_records(records)
     if write_result.is_success:
-
         # Obter métricas
         target.get_target_metrics()
 
@@ -278,6 +274,7 @@ class ExemploIncrementalTap(FlextIncrementalTap):
 
     def discover_streams(self) -> list[Any]:
         """Descobrir streams disponíveis."""
+
         class IncrementalStream(Stream):
             def __init__(self, tap: Any, name: str) -> None:
                 super().__init__(tap, name=name)

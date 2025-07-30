@@ -66,10 +66,10 @@ class TestFlextMeltanoInstaller:
         assert result.is_success
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {"service"} in {result.data}"
+            msg = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "installation":
-            msg = f"Expected {"installation"}, got {result.data["service"]}"
+            msg = f"Expected {'installation'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_installer_add_plugin(self) -> None:
@@ -86,7 +86,11 @@ class TestFlextMeltanoInstaller:
 
         config = FlextMeltanoConfig()
         installer = FlextMeltanoInstaller(config)
-        result = installer.add_plugin("extractor", "tap-csv", pip_url="pipelinewise-tap-csv")
+        result = installer.add_plugin(
+            "extractor",
+            "tap-csv",
+            pip_url="pipelinewise-tap-csv",
+        )
         # May fail if meltano not installed, but should not crash
         assert result.is_success or not result.is_success
 

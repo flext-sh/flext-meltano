@@ -27,10 +27,10 @@ class TestFlextMeltanoCli:
         assert result.data is not None
         assert result.data is not None
         if "status" not in result.data:
-            msg = f"Expected {"status"} in {result.data}"
+            msg = f"Expected {'status'} in {result.data}"
             raise AssertionError(msg)
         if result.data["status"] != "healthy":
-            msg = f"Expected {"healthy"}, got {result.data["status"]}"
+            msg = f"Expected {'healthy'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_cli_version_info(self) -> None:
@@ -42,7 +42,7 @@ class TestFlextMeltanoCli:
         assert result.data is not None
         assert result.data is not None
         if "version" not in result.data:
-            msg = f"Expected {"version"} in {result.data}"
+            msg = f"Expected {'version'} in {result.data}"
             raise AssertionError(msg)
         assert isinstance(result.data["version"], str)
 
@@ -55,7 +55,7 @@ class TestFlextMeltanoCli:
         assert result.data is not None
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {"commands"} in {result.data}"
+            msg = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
         assert isinstance(result.data["commands"], list)
 
@@ -96,15 +96,15 @@ class TestFlextMeltanoCli:
         assert result.data is not None
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {"commands"} in {result.data}"
+            msg = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
         commands = result.data["commands"]
         if "version" not in commands:
-            msg = f"Expected {"version"} in {commands}"
+            msg = f"Expected {'version'} in {commands}"
             raise AssertionError(msg)
         assert "help" in commands
         if "health" not in commands:
-            msg = f"Expected {"health"} in {commands}"
+            msg = f"Expected {'health'} in {commands}"
             raise AssertionError(msg)
 
 
@@ -130,7 +130,9 @@ class TestFlextMeltanoRunCli:
         """Test run CLI with invalid command."""
         result = flext_meltano_run_cli(["nonexistent-command"])
         # Should handle gracefully
-        assert result.is_success or not result.is_success  # Either outcome is acceptable
+        assert (
+            result.is_success or not result.is_success
+        )  # Either outcome is acceptable
 
     def test_run_cli_multiple_args(self) -> None:
         """Test run CLI with multiple arguments."""
@@ -162,7 +164,7 @@ class TestCLIIntegrationPatterns:
         assert health_result.is_success
         assert health_result.data is not None
         if health_result.data["status"] != "healthy":
-            msg = f"Expected {"healthy"}, got {health_result.data["status"]}"
+            msg = f"Expected {'healthy'}, got {health_result.data['status']}"
             raise AssertionError(msg)
 
     def test_cli_command_execution_patterns(self) -> None:

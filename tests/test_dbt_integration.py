@@ -54,11 +54,11 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data["models"]}"
+            msg = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {"success"}, got {result.data["status"]}"
+            msg = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_run_models_with_specific_models(self) -> None:
@@ -70,11 +70,11 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data["models"]}"
+            msg = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {"success"}, got {result.data["status"]}"
+            msg = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_test_models_default(self) -> None:
@@ -85,11 +85,11 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data["models"]}"
+            msg = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {"success"}, got {result.data["status"]}"
+            msg = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_test_models_with_specific_models(self) -> None:
@@ -101,7 +101,7 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data["models"]}"
+            msg = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_compile_models_default(self) -> None:
@@ -112,7 +112,7 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data["models"]}"
+            msg = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_compile_models_with_specific_models(self) -> None:
@@ -124,7 +124,7 @@ class TestFlextMeltanoDbtManager:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data["models"]}"
+            msg = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
 
@@ -165,7 +165,9 @@ class TestFlextMeltanoDbtProject:
 
             result = project.initialize()
             assert result.is_success
-            assert result.data is True  # Changed from None to True based on implementation
+            assert (
+                result.data is True
+            )  # Changed from None to True based on implementation
 
     def test_project_validate(self) -> None:
         """Test project validation."""
@@ -179,7 +181,7 @@ class TestFlextMeltanoDbtProject:
         assert result.error is not None
         assert result.error is not None
         if "DBT project directory not found" not in result.error:
-            msg = f"Expected {"DBT project directory not found"} in {result.error}"
+            msg = f"Expected {'DBT project directory not found'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -209,15 +211,15 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["command"] != "run":
-            msg = f"Expected {"run"}, got {result.data["command"]}"
+            msg = f"Expected {'run'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != ["--models", "test_model"]:
-            msg = f"Expected {["--models", "test_model"]}, got {result.data["args"]}"
+            msg = f"Expected {['--models', 'test_model']}, got {result.data['args']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {"success"}, got {result.data["status"]}"
+            msg = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_runner_run_command_no_args(self) -> None:
@@ -228,11 +230,11 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["command"] != "test":
-            msg = f"Expected {"test"}, got {result.data["command"]}"
+            msg = f"Expected {'test'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != []:
-            msg = f"Expected {[]}, got {result.data["args"]}"
+            msg = f"Expected {[]}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_runner_run_models(self) -> None:
@@ -244,7 +246,7 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data["models"]}"
+            msg = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_run_models_default(self) -> None:
@@ -255,7 +257,7 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data["models"]}"
+            msg = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_test_models(self) -> None:
@@ -267,7 +269,7 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data["models"]}"
+            msg = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_test_models_default(self) -> None:
@@ -278,7 +280,7 @@ class TestFlextMeltanoDbtRunner:
         assert result.is_success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data["models"]}"
+            msg = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
 

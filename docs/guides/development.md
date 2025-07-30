@@ -110,27 +110,27 @@ from flext_meltano.flext_meltano_execution import flext_meltano_execute_job
 
 class TestFlextMeltanoExecution:
     """Test class for execution functionality."""
-    
+
     def test_execute_job_success(self):
         """Test successful job execution."""
         # Arrange
         extractor = "tap-csv"
         loader = "target-csv"
-        
+
         # Act
         result = flext_meltano_execute_job(extractor, loader)
-        
+
         # Assert
         assert result.success
         assert result.output
         assert result.returncode == 0
-    
+
     @pytest.mark.integration
     def test_execute_job_with_real_meltano(self):
         """Integration test with real Meltano."""
         # Implementation
         pass
-    
+
     @pytest.mark.slow
     def test_large_pipeline_execution(self):
         """Slow test for large pipeline."""
@@ -178,13 +178,13 @@ def flext_meltano_execute_job(
     **kwargs: Any,
 ) -> FlextResult[str]:
     """Execute Meltano pipeline job.
-    
+
     Args:
         extractor: Meltano extractor plugin name
         loader: Meltano loader plugin name
         environment: Optional environment name
         **kwargs: Additional execution arguments
-        
+
     Returns:
         FlextResult containing execution output or error
     """
@@ -213,10 +213,10 @@ from pydantic import BaseModel, Field
 
 class FlextMeltanoConfig(BaseModel):
     """Configuration with validation."""
-    
+
     meltano_project_root: str = Field(default=".")
     environment: str = Field(default="dev")
-    
+
     class Config:
         """Pydantic configuration."""
         frozen = True
@@ -228,11 +228,13 @@ class FlextMeltanoConfig(BaseModel):
 ### Feature Development
 
 1. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Write Tests First** (TDD approach)
+
    ```bash
    # Add tests to appropriate directory
    # Run tests to ensure they fail initially
@@ -240,22 +242,26 @@ class FlextMeltanoConfig(BaseModel):
    ```
 
 3. **Implement Feature**
+
    - Follow existing patterns in the codebase
    - Use type hints throughout
    - Add proper docstrings
    - Handle errors with FlextResult pattern
 
 4. **Run Quality Gates**
+
    ```bash
    make validate                # All gates must pass
    ```
 
 5. **Update Documentation**
+
    - Update API docs if needed
    - Add examples for new functionality
    - Update README.md if necessary
 
 6. **Test Bridge Integration** (if applicable)
+
    ```bash
    python scripts/flext_meltano_bridge.py your_operation
    ```
@@ -323,6 +329,7 @@ python scripts/flext_meltano_bridge.py invalid_operation
 ### Adding New Bridge Operations
 
 1. **Add operation to bridge script**:
+
    ```python
    # In scripts/flext_meltano_bridge.py
    elif operation == "new_operation":
@@ -330,6 +337,7 @@ python scripts/flext_meltano_bridge.py invalid_operation
    ```
 
 2. **Implement in bridge class**:
+
    ```python
    # In the bridge class
    def new_operation(self, parameter: str) -> FlextMeltanoResult:
@@ -338,6 +346,7 @@ python scripts/flext_meltano_bridge.py invalid_operation
    ```
 
 3. **Test integration**:
+
    ```bash
    python scripts/flext_meltano_bridge.py new_operation test_param
    ```
@@ -372,6 +381,7 @@ poetry install
 ### Common Problems
 
 **Import Errors:**
+
 ```bash
 # Ensure PYTHONPATH is set
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
@@ -381,6 +391,7 @@ echo 'export PYTHONPATH=$(pwd)/src:$PYTHONPATH' >> ~/.bashrc
 ```
 
 **Poetry Issues:**
+
 ```bash
 # Clear cache and reinstall
 poetry cache clear pypi --all
@@ -389,6 +400,7 @@ poetry install --all-extras
 ```
 
 **Pre-commit Failures:**
+
 ```bash
 # Run pre-commit manually
 pre-commit run --all-files
@@ -398,6 +410,7 @@ pre-commit autoupdate
 ```
 
 **Test Failures:**
+
 ```bash
 # Clear test cache
 pytest --cache-clear
@@ -407,6 +420,7 @@ poetry install --extras test
 ```
 
 **Type Checking Issues:**
+
 ```bash
 # Clear MyPy cache
 rm -rf .mypy_cache
@@ -434,17 +448,20 @@ def your_function():
 ## 📚 Resources
 
 ### Documentation
+
 - [Architecture Guide](../architecture/README.md)
 - [API Reference](../api/README.md)
 - [Quick Start](../examples/quick-start.md)
 
 ### External Resources
+
 - [Meltano Documentation](https://docs.meltano.com/)
 - [Singer SDK Documentation](https://sdk.meltano.com/)
 - [DBT Documentation](https://docs.getdbt.com/)
 - [Poetry Documentation](https://python-poetry.org/docs/)
 
 ### FLEXT Ecosystem
+
 - `flext-core`: Foundation patterns and utilities
 - `flext-observability`: Monitoring and metrics
 - FlexCore service: Go runtime container
@@ -452,5 +469,5 @@ def your_function():
 
 ---
 
-*Development Guide - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
+_Development Guide - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_

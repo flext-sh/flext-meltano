@@ -198,12 +198,12 @@ def safe_pipeline_execution(extractor, loader):
     """Execute pipeline with proper error handling."""
     try:
         result = flext_meltano_execute_job(extractor, loader)
-        
+
         if result.success:
             return {"status": "success", "data": result.output}
         else:
             return {"status": "error", "message": result.error}
-            
+
     except Exception as e:
         return {"status": "exception", "message": str(e)}
 
@@ -234,9 +234,9 @@ orchestrator = FlextMeltanoOrchestrationService(config=config)
 from flext_meltano.base import create_tap, create_target
 
 # Create tap instance
-oracle_tap = create_tap("oracle", 
-    host="localhost", 
-    port=1521, 
+oracle_tap = create_tap("oracle",
+    host="localhost",
+    port=1521,
     database="xe"
 )
 
@@ -287,18 +287,21 @@ Before committing:
 ### Common Issues
 
 **Import Errors:**
+
 ```bash
 # Ensure proper Python path
 export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 ```
 
 **Meltano Not Found:**
+
 ```bash
 # Initialize Meltano project
 make meltano-init
 ```
 
 **Poetry Issues:**
+
 ```bash
 # Reinstall dependencies
 rm -rf .venv
@@ -306,6 +309,7 @@ poetry install --all-extras
 ```
 
 **Test Failures:**
+
 ```bash
 # Run specific test with verbose output
 pytest tests/test_specific.py -v -s
@@ -320,5 +324,5 @@ pytest tests/test_specific.py -v -s
 
 ---
 
-*Quick Start Guide - Version 2.0.0-enterprise*
-*Last Updated: 2025-01-29*
+_Quick Start Guide - Version 2.0.0-enterprise_
+_Last Updated: 2025-01-29_

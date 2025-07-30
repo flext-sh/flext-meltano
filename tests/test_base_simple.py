@@ -33,7 +33,7 @@ class TestFlextMeltanoConfig:
         assert config is not None
         assert config.project_root is not None
         if config.environment != "dev":
-            msg = f"Expected {"dev"}, got {config.environment}"
+            msg = f"Expected {'dev'}, got {config.environment}"
             raise AssertionError(msg)
 
     def test_config_initialization_with_params(self) -> None:
@@ -67,7 +67,7 @@ class TestFlextMeltanoEvent:
         )
         assert event is not None
         if event.event_type != "test_event":
-            msg = f"Expected {"test_event"}, got {event.event_type}"
+            msg = f"Expected {'test_event'}, got {event.event_type}"
             raise AssertionError(msg)
         assert event.source == "test_source"
         if event.data != {"key": "value"}:

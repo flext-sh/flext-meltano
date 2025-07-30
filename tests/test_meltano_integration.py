@@ -304,7 +304,15 @@ class TestMeltanoLegacyCompatibility:
                 (object,),
                 {
                     "success": True,
-                    "data": {"plugins": [{"name": "tap-csv", "namespace": "tap_csv", "type": "extractors"}]},
+                    "data": {
+                        "plugins": [
+                            {
+                                "name": "tap-csv",
+                                "namespace": "tap_csv",
+                                "type": "extractors",
+                            },
+                        ],
+                    },
                 },
             )()
 

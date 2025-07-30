@@ -388,7 +388,8 @@ class FlextMeltanoDiscoverer:
         return type_mapping.get(plugin_type_str.lower())
 
     def execute(
-        self, command: FlextMeltanoDiscoveryCommand,
+        self,
+        command: FlextMeltanoDiscoveryCommand,
     ) -> FlextResult[dict[str, Any]]:
         """Execute command using domain service pattern."""
         return asyncio.run(self.discover_catalog(command.tap_name))

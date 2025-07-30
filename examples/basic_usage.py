@@ -123,7 +123,6 @@ def example_legacy_compatibility() -> None:
 
     # Use legacy plugin discovery (with deprecation warning)
     try:
-
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             flext_meltano_discover_plugins()
@@ -173,7 +172,6 @@ def main() -> None:
         example_dbt_integration()
 
     except (RuntimeError, ValueError, TypeError):
-
         traceback.print_exc()
 
 
