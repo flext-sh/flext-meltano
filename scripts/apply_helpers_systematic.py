@@ -36,7 +36,7 @@ class SystematicLintFixer:
 
     def fix_pt017_pytest_fixtures(self, file_path: Path) -> bool:
         """Fix PT017 - pytest fixture problems."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
 
         # PT017: pytest.fixture() without request parameter
         pattern = r"@pytest\.fixture\(\s*\)"
@@ -44,14 +44,14 @@ class SystematicLintFixer:
 
         if re.search(pattern, content):
             content = re.sub(pattern, replacement, content)
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False
 
     def fix_plr2004_magic_numbers(self, file_path: Path) -> bool:
         """Fix PLR2004 - magic numbers."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
         original_content = content
 
         # Common magic numbers in our codebase
@@ -94,14 +94,14 @@ BACKOFF_BASE = 2
             lines.insert(last_import_idx + 1, constants)
             content = "\n".join(lines)
 
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False
 
     def fix_ann401_any_annotations(self, file_path: Path) -> bool:
         """Fix ANN401 - Any type annotations."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
 
         # Replace common Any usages with more specific types
         replacements = {
@@ -117,14 +117,14 @@ BACKOFF_BASE = 2
             content = re.sub(pattern, replacement, content)
 
         if content != original_content:
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False
 
     def fix_up007_union_syntax(self, file_path: Path) -> bool:
         """Fix UP007 - Union typing syntax."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
 
         # Convert X | Y to X | Y
         # This is a simplified regex - for production use ast parsing
@@ -145,14 +145,14 @@ BACKOFF_BASE = 2
             content = re.sub(r"Union | " | "" | content)
 
         if content != original_content:
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False
 
     def fix_try_exception_handling(self, file_path: Path) -> bool:
         """Fix TRY301 | TRY300 | TRY002 - exception handling."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
         original_content = content
 
         # TRY300: try block should not be too long
@@ -183,14 +183,14 @@ BACKOFF_BASE = 2
         )
 
         if content != original_content:
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False
 
     def fix_sim115_simplification(self, file_path: Path) -> bool:
         """Fix SIM115 - simplification issues."""
-        content = file_path.read_text()
+        content = file_path.read_text(encoding="utf-8")
 
         # SIM115: Use context manager for opening files
 
@@ -202,7 +202,7 @@ BACKOFF_BASE = 2
         )
 
         if "stdout=open(" in content:
-            file_path.write_text(content)
+            file_path.write_text(content, encoding="utf-8")
             self.fixes_applied += 1
             return True
         return False

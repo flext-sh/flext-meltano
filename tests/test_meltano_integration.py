@@ -10,6 +10,7 @@ Tests for Meltano integration including:
 import shutil
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -53,7 +54,9 @@ class TestMeltanoProjectOperations:
         if not any(
             "meltano.yml file not found" in issue for issue in validation_result.issues
         ):
-            msg = f"Expected {'meltano.yml file not found'} in {validation_result.issues}"
+            msg = (
+                f"Expected {'meltano.yml file not found'} in {validation_result.issues}"
+            )
             raise AssertionError(
                 msg,
             )
@@ -78,7 +81,9 @@ environments:
         assert validation_result is not None
         assert validation_result.is_valid
         if not (validation_result.details["meltano_yml_exists"]):
-            msg = f"Expected True, got {validation_result.details['meltano_yml_exists']}"
+            msg = (
+                f"Expected True, got {validation_result.details['meltano_yml_exists']}"
+            )
             raise AssertionError(
                 msg,
             )
@@ -286,7 +291,11 @@ class TestMeltanoLegacyCompatibility:
         """Test legacy discovery functions."""
 
         # Should work and return plugins
-        result = flext_meltano_discover_plugins()
+        with patch(
+            "meltano.core.project.Project.find",
+            side_effect=Exception("No project"),
+        ):
+            result = flext_meltano_discover_plugins()
         assert hasattr(result, "success")
         if result.success:
             assert result.data is not None

@@ -61,8 +61,6 @@ def quick_start_with_configuration() -> None:
 
     if result.success:
         pass
-    else:
-        pass
 
 
 # ============================================================================
@@ -119,8 +117,6 @@ def enterprise_project_setup() -> None:
     )
 
     if result.success:
-        pass
-    else:
         pass
 
 
@@ -251,8 +247,6 @@ def data_discovery_workflow() -> None:
 
         if result.success:
             pass
-        else:
-            pass
 
 
 # ============================================================================
@@ -279,10 +273,8 @@ async def async_pipeline_workflow() -> None:
         )
 
         # 📊 Análise de resultados paralelos
-        for _i, result in enumerate(results):
+        for result in results:
             if isinstance(result, Exception):
-                pass
-            else:
                 pass
 
     except TimeoutError:
@@ -304,8 +296,6 @@ def health_monitoring_example() -> None:
     # 📊 Dashboard de saúde
 
     if health["healthy",]:
-        pass
-    else:
         pass
 
     # 🔌 Status de plugins
@@ -354,14 +344,9 @@ def backup_and_recovery_example() -> None:
         # 📊 Informações do backup
         pass
 
-    else:
-        pass
-
     # 🏥 Backup com verificação de saúde
     health = project.health_check()
     if health["healthy",]:
-        pass
-    else:
         pass
 
 
@@ -443,8 +428,6 @@ def real_world_etl_workflow() -> None:
     success_rate = (total_success / total_tables) * 100
 
     if success_rate >= 95 or success_rate >= 80:
-        pass
-    else:
         pass
 
 
