@@ -280,7 +280,7 @@ class TestStreamProcessing:
                 },
             }
 
-            def get_records(self, context: dict[str, object] | None = None) -> object:  # type: ignore[override]
+            def get_records(self, context: dict[str, object] | None = None) -> object:
                 yield {"id": "1", "name": "test"}
 
         tap = MockTap(config={})

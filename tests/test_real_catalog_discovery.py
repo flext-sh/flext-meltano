@@ -129,7 +129,7 @@ extractors:
                 side_effect=Exception("No project"),
             ):
                 result = flext_meltano_discover_plugins()
-        except Exception:
+        except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
             result = type(
                 "obj",
@@ -179,7 +179,7 @@ extractors:
                 side_effect=Exception("No project"),
             ):
                 result = flext_meltano_discover_plugins(plugin_type="extractors")
-        except Exception:
+        except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
             result = type(
                 "obj",
@@ -209,7 +209,7 @@ extractors:
                 side_effect=Exception("No project"),
             ):
                 result = flext_meltano_discover_plugins(plugin_type="loaders")
-        except Exception:
+        except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
             result = type(
                 "obj",
@@ -493,7 +493,7 @@ class TestFlextMeltanoCatalogIntegration:
                 plugins_result = flext_meltano_discover_plugins(
                     plugin_type="extractors",
                 )
-        except Exception:
+        except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
             plugins_result = type(
                 "obj",

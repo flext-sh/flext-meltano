@@ -143,7 +143,7 @@ class TestFlextMeltanoPluginInfo:
             namespace="tap_csv",
         )
         with pytest.raises(Exception, match=".*"):  # ValidationError from Pydantic
-            plugin.name = "changed"  # type: ignore[misc]
+            plugin.name = "changed"
 
 
 class TestFlextMeltanoInstallerValidation:

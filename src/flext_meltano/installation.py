@@ -16,7 +16,7 @@ from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextResult
-from injectable import injectable  # type: ignore[import-untyped]
+from injectable import injectable
 from pydantic import BaseModel, Field
 
 from flext_meltano.base import FlextMeltanoConfig
@@ -73,7 +73,9 @@ class FlextMeltanoInstaller:
         try:
             # Check if project root exists
             if not self.project_root.exists():
-                return FlextResult(error=f"Project root does not exist: {self.project_root}")
+                return FlextResult(
+                    error=f"Project root does not exist: {self.project_root}",
+                )
 
             # Check if meltano.yml exists
             meltano_yml = self.project_root / "meltano.yml"
@@ -91,18 +93,22 @@ class FlextMeltanoInstaller:
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
         """Get installation service health status."""
-        return FlextResult(data={
-            "service": "installation",
-            "project_root": str(self.project_root),
-            "meltano_yml_exists": (self.project_root / "meltano.yml").exists(),
-            "initialized": self._initialized,
-        })
+        return FlextResult(
+            data={
+                "service": "installation",
+                "project_root": str(self.project_root),
+                "meltano_yml_exists": (self.project_root / "meltano.yml").exists(),
+                "initialized": self._initialized,
+            },
+        )
 
-    def add_plugin(self,
-                  plugin_type: str,
-                  plugin_name: str,
-                  pip_url: str | None = None,
-                  context: FlextMeltanoInstallationContext | None = None) -> FlextResult[dict[str, Any]]:
+    def add_plugin(
+        self,
+        plugin_type: str,
+        plugin_name: str,
+        pip_url: str | None = None,
+        context: FlextMeltanoInstallationContext | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Add plugin to meltano project using enterprise patterns."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -144,20 +150,25 @@ class FlextMeltanoInstaller:
                 "success": result.returncode == 0,
                 "started_at": context.started_at.isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (datetime.now(UTC) - context.started_at).total_seconds(),
+                "duration_seconds": (
+                    datetime.now(UTC) - context.started_at
+                ).total_seconds(),
             }
 
             if result.returncode == 0:
                 return FlextResult(data=installation_result)
-            return FlextResult(error=f"Plugin add failed: {result.stderr or result.stdout}")
+            return FlextResult(
+                error=f"Plugin add failed: {result.stderr or result.stdout}",
+            )
 
         except subprocess.TimeoutExpired:
             return FlextResult(error="Plugin add timed out")
         except (OSError, subprocess.CalledProcessError) as e:
             return FlextResult(error=f"Plugin add error: {e}")
 
-    def install_plugins(self,
-                       context: FlextMeltanoInstallationContext | None = None) -> FlextResult[dict[str, Any]]:
+    def install_plugins(
+        self, context: FlextMeltanoInstallationContext | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Install all plugins in meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -193,22 +204,28 @@ class FlextMeltanoInstaller:
                 "success": result.returncode == 0,
                 "started_at": context.started_at.isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (datetime.now(UTC) - context.started_at).total_seconds(),
+                "duration_seconds": (
+                    datetime.now(UTC) - context.started_at
+                ).total_seconds(),
             }
 
             if result.returncode == 0:
                 return FlextResult(data=installation_result)
-            return FlextResult(error=f"Plugin install failed: {result.stderr or result.stdout}")
+            return FlextResult(
+                error=f"Plugin install failed: {result.stderr or result.stdout}",
+            )
 
         except subprocess.TimeoutExpired:
             return FlextResult(error="Plugin install timed out")
         except (OSError, subprocess.CalledProcessError) as e:
             return FlextResult(error=f"Plugin install error: {e}")
 
-    def remove_plugin(self,
-                     plugin_type: str,
-                     plugin_name: str,
-                     context: FlextMeltanoInstallationContext | None = None) -> FlextResult[dict[str, Any]]:
+    def remove_plugin(
+        self,
+        plugin_type: str,
+        plugin_name: str,
+        context: FlextMeltanoInstallationContext | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Remove plugin from meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -249,12 +266,16 @@ class FlextMeltanoInstaller:
                 "success": result.returncode == 0,
                 "started_at": context.started_at.isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (datetime.now(UTC) - context.started_at).total_seconds(),
+                "duration_seconds": (
+                    datetime.now(UTC) - context.started_at
+                ).total_seconds(),
             }
 
             if result.returncode == 0:
                 return FlextResult(data=removal_result)
-            return FlextResult(error=f"Plugin remove failed: {result.stderr or result.stdout}")
+            return FlextResult(
+                error=f"Plugin remove failed: {result.stderr or result.stdout}",
+            )
 
         except subprocess.TimeoutExpired:
             return FlextResult(error="Plugin remove timed out")
@@ -298,9 +319,13 @@ class FlextMeltanoInstaller:
 
         if result.returncode == 0:
             return FlextResult(data=result.stdout)
-        return FlextResult(error=f"Plugin list failed: {result.stderr or result.stdout}")
+        return FlextResult(
+            error=f"Plugin list failed: {result.stderr or result.stdout}",
+        )
 
-    def _parse_plugin_list(self, stdout: str) -> FlextResult[list[FlextMeltanoPluginInfo]]:
+    def _parse_plugin_list(
+        self, stdout: str,
+    ) -> FlextResult[list[FlextMeltanoPluginInfo]]:
         """Parse plugin list JSON response."""
         try:
             plugins_data = json.loads(stdout)
@@ -314,7 +339,9 @@ class FlextMeltanoInstaller:
         except json.JSONDecodeError:
             return FlextResult(error="Failed to parse plugin list JSON")
 
-    def _convert_plugin_list(self, plugin_type: str, plugin_list: object) -> list[FlextMeltanoPluginInfo]:
+    def _convert_plugin_list(
+        self, plugin_type: str, plugin_list: object,
+    ) -> list[FlextMeltanoPluginInfo]:
         """Convert plugin list to FlextMeltanoPluginInfo entities."""
         plugins = []
         if isinstance(plugin_list, list):
@@ -323,7 +350,9 @@ class FlextMeltanoInstaller:
                     plugin_info = FlextMeltanoPluginInfo(
                         name=plugin.get("name", ""),
                         type=plugin_type,
-                        namespace=plugin.get("namespace", plugin.get("name", "").replace("-", "_")),
+                        namespace=plugin.get(
+                            "namespace", plugin.get("name", "").replace("-", "_"),
+                        ),
                         pip_url=plugin.get("pip_url"),
                         executable=plugin.get("executable"),
                         description=plugin.get("description", ""),
@@ -376,13 +405,18 @@ def flext_meltano_install_plugin(
 
 # === FACTORY FUNCTION ===
 
-def create_installer_service(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoInstaller]:
+
+def create_installer_service(
+    config: FlextMeltanoConfig,
+) -> FlextResult[FlextMeltanoInstaller]:
     """Create installer service using dependency injection."""
     try:
         service = FlextMeltanoInstaller(config)
         init_result = service.initialize()
         if not init_result.is_success:
-            return FlextResult(error=f"Installer service initialization failed: {init_result.error}")
+            return FlextResult(
+                error=f"Installer service initialization failed: {init_result.error}",
+            )
 
         return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:

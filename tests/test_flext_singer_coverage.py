@@ -33,7 +33,7 @@ class TestFlextSingerBridge:
         assert result.is_success
         assert result.data is not None
         if result.data["type"] != "RECORD":
-            msg = f"Expected {"RECORD"}, got {result.data["type"]}"
+            msg = f"Expected {'RECORD'}, got {result.data['type']}"
             raise AssertionError(msg)
 
     def test_create_schema_message_universal(self) -> None:
@@ -48,7 +48,7 @@ class TestFlextSingerBridge:
         assert result.is_success
         assert result.data is not None
         if result.data["type"] != "SCHEMA":
-            msg = f"Expected {"SCHEMA"}, got {result.data["type"]}"
+            msg = f"Expected {'SCHEMA'}, got {result.data['type']}"
             raise AssertionError(msg)
 
     def test_create_state_message_universal(self) -> None:
@@ -61,7 +61,7 @@ class TestFlextSingerBridge:
         assert result.is_success
         assert result.data is not None
         if result.data["type"] != "STATE":
-            msg = f"Expected {"STATE"}, got {result.data["type"]}"
+            msg = f"Expected {'STATE'}, got {result.data['type']}"
             raise AssertionError(msg)
 
     def test_create_unknown_message_type(self) -> None:
@@ -175,7 +175,9 @@ class TestFlextSingerBridge:
     def test_read_messages_from_stream(self) -> None:
         """Test reading messages from StringIO stream."""
         bridge = FlextSingerBridge()
-        input_data = StringIO('{"type": "RECORD", "stream": "test", "record": {"id": 1}}\n')
+        input_data = StringIO(
+            '{"type": "RECORD", "stream": "test", "record": {"id": 1}}\n',
+        )
 
         messages = list(bridge.flext_singer_read_messages(input_data))
         if len(messages) != 1:
@@ -194,7 +196,7 @@ class TestFlextSingerBridge:
         bridge = FlextSingerBridge()
         # The current implementation might not validate record type
         # Type ignore needed for intentional type violation test
-        result = bridge.flext_singer_create_record_message("test", "not a dict")  # type: ignore[arg-type]
+        result = bridge.flext_singer_create_record_message("test", "not a dict")
         assert not result.is_success
 
     def test_create_schema_invalid_stream(self) -> None:
@@ -207,7 +209,7 @@ class TestFlextSingerBridge:
         """Test creating schema with invalid schema."""
         bridge = FlextSingerBridge()
         # Type ignore needed for intentional type violation test
-        result = bridge.flext_singer_create_schema_message("test", "not a dict")  # type: ignore[arg-type]
+        result = bridge.flext_singer_create_schema_message("test", "not a dict")
         assert not result.is_success
 
 
@@ -227,7 +229,7 @@ class TestFlextSingerCatalog:
         assert result.is_success
         assert result.data is not None
         if len(result.data["streams"]) != 1:
-            msg = f"Expected {1}, got {len(result.data["streams"])}"
+            msg = f"Expected {1}, got {len(result.data['streams'])}"
             raise AssertionError(msg)
 
     def test_add_stream_success(self) -> None:
@@ -259,7 +261,7 @@ class TestFlextSingerCatalog:
         """Test adding stream with invalid schema."""
         catalog = FlextSingerCatalog()
         # Type ignore needed for intentional type violation test
-        result = catalog.flext_singer_add_stream("test", "not a dict")  # type: ignore[arg-type]
+        result = catalog.flext_singer_add_stream("test", "not a dict")
         assert not result.is_success
 
     def test_get_catalog_success(self) -> None:
@@ -270,7 +272,7 @@ class TestFlextSingerCatalog:
         assert result.data is not None
         assert result.data is not None
         if "streams" not in result.data:
-            msg = f"Expected {"streams"} in {result.data}"
+            msg = f"Expected {'streams'} in {result.data}"
             raise AssertionError(msg)
 
     def test_get_selected_streams_empty(self) -> None:
@@ -293,7 +295,7 @@ class TestFlextSingerCatalog:
         assert result.data is not None
         assert result.data is not None
         if "users" not in result.data:
-            msg = f"Expected {"users"} in {result.data}"
+            msg = f"Expected {'users'} in {result.data}"
             raise AssertionError(msg)
 
 

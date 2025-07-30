@@ -287,7 +287,7 @@ class TestFlextMeltanoPlugin:
             pip_url="tap-csv",
         )
         with pytest.raises(Exception, match=".*"):  # ValidationError from Pydantic
-            plugin.name = "changed"  # type: ignore[misc]
+            plugin.name = "changed"
 
 
 class TestFactoryFunctions:
@@ -332,7 +332,7 @@ class TestFactoryFunctions:
                 side_effect=Exception("No project"),
             ):
                 result = flext_meltano_discover_plugins("extractors")
-        except Exception:
+        except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
             result = type(
                 "obj",
