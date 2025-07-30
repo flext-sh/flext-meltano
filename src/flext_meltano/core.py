@@ -21,7 +21,7 @@ from flext_core import (
     FlextEntity,
     FlextResult,
 )
-from injectable import injectable  # type: ignore[import-untyped]
+from injectable import injectable
 
 # Meltano core integration - MANDATORY for project management
 from pydantic import BaseModel, Field

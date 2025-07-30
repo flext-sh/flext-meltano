@@ -17,7 +17,7 @@ from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextLogger, FlextResult
-from injectable import injectable  # type: ignore[import-untyped]
+from injectable import injectable
 from pydantic import BaseModel, Field
 
 from flext_meltano.base import FlextMeltanoConfig
@@ -85,11 +85,13 @@ class FlextMeltanoExecutor:
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
         """Get executor health status."""
-        return FlextResult(data={
-            "service": "execution",
-            "meltano_available": self._meltano_path is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult(
+            data={
+                "service": "execution",
+                "meltano_available": self._meltano_path is not None,
+                "initialized": self._initialized,
+            },
+        )
 
     def _find_meltano_executable(self) -> Path | None:
         """Find Meltano executable."""
@@ -107,10 +109,12 @@ class FlextMeltanoExecutor:
 
         return None
 
-    def execute_pipeline(self,
-                        tap_name: str,
-                        target_name: str,
-                        context: FlextMeltanoExecutionContext | None = None) -> FlextResult[dict[str, Any]]:
+    def execute_pipeline(
+        self,
+        tap_name: str,
+        target_name: str,
+        context: FlextMeltanoExecutionContext | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Execute pipeline using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -157,21 +161,25 @@ class FlextMeltanoExecutor:
                 "success": result.returncode == 0,
                 "started_at": context.started_at.isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (datetime.now(UTC) - context.started_at).total_seconds(),
+                "duration_seconds": (
+                    datetime.now(UTC) - context.started_at
+                ).total_seconds(),
             }
 
             if result.returncode == 0:
                 return FlextResult(data=execution_result)
-            return FlextResult(error=f"Pipeline failed: {result.stderr or result.stdout}")
+            return FlextResult(
+                error=f"Pipeline failed: {result.stderr or result.stdout}",
+            )
 
         except subprocess.TimeoutExpired:
             return FlextResult(error="Pipeline execution timed out")
         except (OSError, subprocess.CalledProcessError) as e:
             return FlextResult(error=f"Execution error: {e}")
 
-    def run_command(self,
-                   args: list[str],
-                   context: FlextMeltanoExecutionContext | None = None) -> FlextResult[dict[str, Any]]:
+    def run_command(
+        self, args: list[str], context: FlextMeltanoExecutionContext | None = None,
+    ) -> FlextResult[dict[str, Any]]:
         """Run generic command using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -213,19 +221,25 @@ class FlextMeltanoExecutor:
                 "success": result.returncode == 0,
                 "started_at": context.started_at.isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (datetime.now(UTC) - context.started_at).total_seconds(),
+                "duration_seconds": (
+                    datetime.now(UTC) - context.started_at
+                ).total_seconds(),
             }
 
             if result.returncode == 0:
                 return FlextResult(data=execution_result)
-            return FlextResult(error=f"Command failed: {result.stderr or result.stdout}")
+            return FlextResult(
+                error=f"Command failed: {result.stderr or result.stdout}",
+            )
 
         except subprocess.TimeoutExpired:
             return FlextResult(error="Command timed out")
         except (OSError, subprocess.CalledProcessError) as e:
             return FlextResult(error=f"Command error: {e}")
 
-    def execute(self, command: FlextMeltanoExecutionCommand) -> FlextResult[dict[str, Any]]:
+    def execute(
+        self, command: FlextMeltanoExecutionCommand,
+    ) -> FlextResult[dict[str, Any]]:
         """Execute command using domain service pattern."""
         return self.execute_pipeline(command.tap_name, command.target_name)
 
@@ -236,7 +250,9 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
         service = FlextMeltanoExecutor(config)
         init_result = service.initialize()
         if not init_result.is_success:
-            return FlextResult(error=f"Executor initialization failed: {init_result.error}")
+            return FlextResult(
+                error=f"Executor initialization failed: {init_result.error}",
+            )
 
         return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
@@ -245,10 +261,13 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
 
 # === LEGACY COMPATIBILITY ===
 
+
 class FlextMeltanoResult:
     """Legacy result type for backward compatibility."""
 
-    def __init__(self, *, success: bool, data: dict[str, Any] | None = None, error: str = "") -> None:
+    def __init__(
+        self, *, success: bool, data: dict[str, Any] | None = None, error: str = "",
+    ) -> None:
         """Initialize result."""
         self.success = success
         self.data = data

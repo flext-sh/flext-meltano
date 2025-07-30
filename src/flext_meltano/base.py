@@ -19,7 +19,7 @@ from flext_core import (
     FlextLogger,
     FlextResult,
 )
-from injectable import injectable  # type: ignore[import-untyped]
+from injectable import injectable
 from pydantic import BaseModel, Field, field_validator
 
 if TYPE_CHECKING:

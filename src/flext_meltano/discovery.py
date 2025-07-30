@@ -18,7 +18,7 @@ from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextLogger, FlextResult
-from injectable import injectable  # type: ignore[import-untyped]
+from injectable import injectable
 
 # Meltano Hub integration - MANDATORY for plugin discovery
 from meltano.core.hub import MeltanoHubService
@@ -110,7 +110,8 @@ class FlextMeltanoDiscoverer:
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
         """Get discovery service health status."""
-        return FlextResult(data={
+        return FlextResult(
+            data={
                 "service": "discovery",
                 "hub_initialized": self._hub is not None,
                 "initialized": self._initialized,
@@ -133,7 +134,9 @@ class FlextMeltanoDiscoverer:
         try:
             # Validate project root exists
             if not context.project_root.exists():
-                return FlextResult(error=f"Project root does not exist: {context.project_root}")
+                return FlextResult(
+                    error=f"Project root does not exist: {context.project_root}",
+                )
 
             # Try subprocess discovery first
             result = await self._discover_catalog_subprocess(
@@ -161,7 +164,8 @@ class FlextMeltanoDiscoverer:
             # Check if project has meltano.yml
             meltano_yml = context.project_root / "meltano.yml"
             if not meltano_yml.exists():
-                return FlextResult(error=f"No meltano.yml found in {context.project_root}",
+                return FlextResult(
+                    error=f"No meltano.yml found in {context.project_root}",
                 )
 
             # Build command
@@ -191,7 +195,8 @@ class FlextMeltanoDiscoverer:
             if returncode == 0 and stdout_text:
                 try:
                     catalog_data = json.loads(stdout_text)
-                    return FlextResult(data={
+                    return FlextResult(
+                        data={
                             "discovery_id": context.discovery_id,
                             "tap_name": tap_name,
                             "catalog": catalog_data,
@@ -202,7 +207,8 @@ class FlextMeltanoDiscoverer:
                 except json.JSONDecodeError as e:
                     return FlextResult(error=f"Invalid catalog JSON: {e}")
 
-            return FlextResult(error=f"Meltano discovery failed: {stderr_text or 'Unknown error'}",
+            return FlextResult(
+                error=f"Meltano discovery failed: {stderr_text or 'Unknown error'}",
             )
 
         except (TimeoutError, OSError, subprocess.CalledProcessError) as e:
@@ -246,7 +252,8 @@ class FlextMeltanoDiscoverer:
                     ],
                 }
 
-                return FlextResult(data={
+                return FlextResult(
+                    data={
                         "discovery_id": context.discovery_id,
                         "tap_name": tap_name,
                         "catalog": basic_catalog,
@@ -256,7 +263,9 @@ class FlextMeltanoDiscoverer:
                 )
 
             # For unknown taps, fail
-            return FlextResult(error=f"Tap '{tap_name}' not supported in direct discovery mode")
+            return FlextResult(
+                error=f"Tap '{tap_name}' not supported in direct discovery mode",
+            )
 
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct Singer discovery failed: {e}")
@@ -378,7 +387,9 @@ class FlextMeltanoDiscoverer:
 
         return type_mapping.get(plugin_type_str.lower())
 
-    def execute(self, command: FlextMeltanoDiscoveryCommand) -> FlextResult[dict[str, Any]]:
+    def execute(
+        self, command: FlextMeltanoDiscoveryCommand,
+    ) -> FlextResult[dict[str, Any]]:
         """Execute command using domain service pattern."""
         return asyncio.run(self.discover_catalog(command.tap_name))
 
@@ -391,7 +402,8 @@ def create_discoverer(
         service = FlextMeltanoDiscoverer(config)
         init_result = service.initialize()
         if not init_result.is_success:
-            return FlextResult(error=f"Discoverer initialization failed: {init_result.error}",
+            return FlextResult(
+                error=f"Discoverer initialization failed: {init_result.error}",
             )
 
         return FlextResult(data=service)

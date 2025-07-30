@@ -57,10 +57,10 @@ class TestFlextMeltanoInstaller:
         assert result.is_success
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {"service"} in {result.data}"
+            msg = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "installation":
-            msg = f"Expected {"installation"}, got {result.data["service"]}"
+            msg = f"Expected {'installation'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_add_plugin_extractor(self) -> None:
@@ -165,16 +165,16 @@ class TestFlextMeltanoPluginInfo:
             namespace="tap_csv",
         )
         if plugin.name != "tap-csv":
-            msg = f"Expected {"tap-csv"}, got {plugin.name}"
+            msg = f"Expected {'tap-csv'}, got {plugin.name}"
             raise AssertionError(msg)
         assert plugin.type == "extractor"
         if plugin.namespace != "tap_csv":
-            msg = f"Expected {"tap_csv"}, got {plugin.namespace}"
+            msg = f"Expected {'tap_csv'}, got {plugin.namespace}"
             raise AssertionError(msg)
         assert plugin.pip_url is None
         assert plugin.executable is None
         if plugin.description != "":
-            msg = f"Expected {""}, got {plugin.description}"
+            msg = f"Expected {''}, got {plugin.description}"
             raise AssertionError(msg)
         assert plugin.version is None
         if plugin.installed:
@@ -194,19 +194,19 @@ class TestFlextMeltanoPluginInfo:
             installed=True,
         )
         if plugin.name != "tap-postgres":
-            msg = f"Expected {"tap-postgres"}, got {plugin.name}"
+            msg = f"Expected {'tap-postgres'}, got {plugin.name}"
             raise AssertionError(msg)
         assert plugin.type == "extractor"
         if plugin.namespace != "tap_postgres":
-            msg = f"Expected {"tap_postgres"}, got {plugin.namespace}"
+            msg = f"Expected {'tap_postgres'}, got {plugin.namespace}"
             raise AssertionError(msg)
         assert plugin.pip_url == "pipelinewise-tap-postgres"
         if plugin.executable != "tap-postgres":
-            msg = f"Expected {"tap-postgres"}, got {plugin.executable}"
+            msg = f"Expected {'tap-postgres'}, got {plugin.executable}"
             raise AssertionError(msg)
         assert plugin.description == "PostgreSQL tap"
         if plugin.version != "1.0.0":
-            msg = f"Expected {"1.0.0"}, got {plugin.version}"
+            msg = f"Expected {'1.0.0'}, got {plugin.version}"
             raise AssertionError(msg)
         if not (plugin.installed):
             msg = f"Expected True, got {plugin.installed}"
@@ -220,7 +220,7 @@ class TestFlextMeltanoPluginInfo:
             namespace="tap_csv",
         )
         with pytest.raises(Exception, match=".*"):  # ValidationError from Pydantic
-            plugin.name = "changed"  # type: ignore[misc]
+            plugin.name = "changed"
 
 
 class TestFactoryFunctions:
@@ -298,7 +298,6 @@ class TestInstallerIntegration:
             installer = FlextMeltanoInstaller(config)
 
             if installer.project_root != custom_path:
-
                 msg = f"Expected {custom_path}, got {installer.project_root}"
                 raise AssertionError(msg)
             assert installer.config.project_root == str(custom_path)

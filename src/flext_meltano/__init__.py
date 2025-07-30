@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 # === CORE BASE CLASSES ===
 # DBT integration - required dependency
 import dbt.contracts.results
-from dbt.adapters.base import BaseRelation  # type: ignore[attr-defined]
-from dbt.adapters.base.connections import (  # type: ignore[attr-defined]
+from dbt.adapters.base import BaseRelation
+from dbt.adapters.base.connections import (
     BaseConnectionManager,
     ConnectionState,
 )
@@ -32,7 +32,7 @@ from dbt.adapters.contracts.connection import (
     Connection,
     Credentials,
 )
-from dbt.adapters.sql import SQLAdapter  # type: ignore[attr-defined]
+from dbt.adapters.sql import SQLAdapter
 
 # DBT exceptions - using available modules
 from dbt_common.exceptions import (
@@ -118,7 +118,7 @@ from flext_meltano.validation import (
 )
 
 # DBT run result - using available module
-DbtRunResult = dbt.contracts.results.RunResult  # type: ignore[attr-defined]
+DbtRunResult = dbt.contracts.results.RunResult
 
 
 # === LEGACY COMPATIBILITY ===
