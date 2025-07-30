@@ -7,7 +7,6 @@ with Meltano EDK, Singer SDK, and DBT following enterprise architecture.
 from __future__ import annotations
 
 import contextlib
-import uuid
 from abc import abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
@@ -16,6 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 from dbt.cli.main import dbtRunner
 from flext_core import (
     FlextEntity,
+    FlextGenerators,
     FlextLogger,
     FlextResult,
 )
@@ -80,7 +80,7 @@ class FlextMeltanoConfig(BaseModel):
 class FlextMeltanoEvent(FlextEntity):
     """Event entity using MANDATORY flext-core patterns."""
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Event ID")
+    id: str = Field(default_factory=FlextGenerators.generate_uuid, description="Event ID")
     event_type: str = Field(..., description="Type of event")
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
@@ -157,9 +157,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
     def validate_service(self) -> FlextResult[bool]:
         """Validate Singer SDK availability and configuration."""
         if not self.tap_class:
-            pass
-            # Don't fail - just mark as not ready
-
+            return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
@@ -214,9 +212,7 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
     def validate_service(self) -> FlextResult[bool]:
         """Validate Singer SDK availability and configuration."""
         if not self.target_class:
-            pass
-            # Don't fail - just mark as not ready
-
+            return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, Any]]:
@@ -384,7 +380,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
                 return str(result.result)
         except (ImportError, AttributeError, ValueError, TypeError):
             pass
-        return "1.0.0"  # Fallback version
+        return "0.9.0"  # Fallback version
 
     def execute(self) -> FlextResult[dict[str, Any]]:
         """Execute method for service pattern."""
