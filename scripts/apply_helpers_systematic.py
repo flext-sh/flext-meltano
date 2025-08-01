@@ -22,7 +22,6 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any
 
 
 class SystematicLintFixer:
@@ -106,8 +105,8 @@ BACKOFF_BASE = 2
         # Replace common Any usages with more specific types
         replacements = {
             r"\bAny\b(?=\s*=\s*None)": "Any | None",
-            r"dict\[str,\s*Any\]": "dict[str, Any,]",  # Already correct format
-            r"Dict\[str,\s*Any\]": "dict[str, Any,]",  # Convert old style
+            r"dict\[str,\s*Any\]": "dict[str, object,]",  # Already correct format
+            r"Dict\[str,\s*Any\]": "dict[str, object,]",  # Convert old style
             r"List\[Any\]": "list[Any,]",  # Convert old style
             r": Any\s*=\s*None": ": Any | None = None",
         }
@@ -247,7 +246,7 @@ BACKOFF_BASE = 2
         shutil.copytree(self.project_root, backup_dir / "original")
         return backup_dir
 
-    def run_systematic_application(self) -> dict[str, Any]:
+    def run_systematic_application(self) -> dict[str, object]:
         """Run complete systematic application of helpers."""
         print("🚀 Starting systematic helper application...")
 

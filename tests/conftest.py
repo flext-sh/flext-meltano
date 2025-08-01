@@ -43,7 +43,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> dict[str, Any]:
+def meltano_yml_config() -> dict[str, object]:
     """Sample meltano.yml configuration for testing."""
     return {
         "version": 1,
@@ -106,8 +106,8 @@ def meltano_yml_config() -> dict[str, Any]:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: dict[str, Any],
-) -> dict[str, Any]:
+    meltano_yml_config: dict[str, object],
+) -> dict[str, object]:
     """Meltano project for testing."""
     # Create meltano.yml
     import yaml
@@ -129,7 +129,7 @@ def meltano_project(
 
 # Plugin fixtures
 @pytest.fixture
-def tap_csv_config() -> dict[str, Any]:
+def tap_csv_config() -> dict[str, object]:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -144,7 +144,7 @@ def tap_csv_config() -> dict[str, Any]:
 
 
 @pytest.fixture
-def target_csv_config() -> dict[str, Any]:
+def target_csv_config() -> dict[str, object]:
     """Target CSV configuration for testing."""
     return {
         "destination_path": "output",
@@ -178,7 +178,7 @@ def meltano_invoke_args() -> list[str]:
 
 # Singer protocol fixtures
 @pytest.fixture
-def singer_schema() -> dict[str, Any]:
+def singer_schema() -> dict[str, object]:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -197,7 +197,7 @@ def singer_schema() -> dict[str, Any]:
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, Any]]:
+def singer_records() -> list[dict[str, object]]:
     """Sample Singer records for testing."""
     return [
         {
@@ -224,7 +224,7 @@ def singer_records() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
-def singer_state() -> dict[str, Any]:
+def singer_state() -> dict[str, object]:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -241,7 +241,7 @@ def singer_state() -> dict[str, Any]:
 
 # Pipeline execution fixtures
 @pytest.fixture
-def pipeline_execution_config() -> dict[str, Any]:
+def pipeline_execution_config() -> dict[str, object]:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -255,7 +255,7 @@ def pipeline_execution_config() -> dict[str, Any]:
 
 # Environment fixtures
 @pytest.fixture
-def test_environment_config() -> dict[str, Any]:
+def test_environment_config() -> dict[str, object]:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -271,7 +271,7 @@ def test_environment_config() -> dict[str, Any]:
 
 # Schedule fixtures
 @pytest.fixture
-def sample_schedule_config() -> dict[str, Any]:
+def sample_schedule_config() -> dict[str, object]:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -285,7 +285,7 @@ def sample_schedule_config() -> dict[str, Any]:
 
 # Job fixtures
 @pytest.fixture
-def job_run_config() -> dict[str, Any]:
+def job_run_config() -> dict[str, object]:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -317,22 +317,22 @@ def mock_meltano_service() -> object:
     class MockMeltanoService:
         async def create_project(
             self,
-            config: dict[str, Any],
-        ) -> dict[str, Any]:
+            config: dict[str, object],
+        ) -> dict[str, object]:
             return {"project_id": "test-project", "status": "created"}
 
         async def install_plugin(
             self,
             plugin_type: str,
             plugin_name: str,
-        ) -> dict[str, Any]:
+        ) -> dict[str, object]:
             return {"plugin": plugin_name, "status": "installed"}
 
         async def run_pipeline(
             self,
             extractor: str,
             loader: str,
-        ) -> dict[str, Any]:
+        ) -> dict[str, object]:
             return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()
@@ -343,13 +343,13 @@ def mock_singer_tap() -> type[object]:
     """Mock Singer tap for testing."""
 
     class MockSingerTap:
-        def __init__(self, config: dict[str, Any]) -> None:
+        def __init__(self, config: dict[str, object]) -> None:
             self.config = config
 
-        async def discover(self) -> dict[str, Any]:
+        async def discover(self) -> dict[str, object]:
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-        async def extract(self) -> list[dict[str, Any]]:
+        async def extract(self) -> list[dict[str, object]]:
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
@@ -360,10 +360,10 @@ def mock_singer_target() -> object:
     """Mock Singer target for testing."""
 
     class MockSingerTarget:
-        def __init__(self, config: dict[str, Any]) -> None:
+        def __init__(self, config: dict[str, object]) -> None:
             self.config = config
 
-        async def load(self, records: list[dict[str, Any]]) -> dict[str, Any]:
+        async def load(self, records: list[dict[str, object]]) -> dict[str, object]:
             return {"records_loaded": len(records), "status": "success"}
 
     return MockSingerTarget

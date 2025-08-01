@@ -242,7 +242,7 @@ class TestFlextMeltanoBaseService:
         def validate_service(self) -> FlextResult[bool]:
             return FlextResult(data=True)
 
-        def get_health_status(self) -> FlextResult[dict[str, Any]]:
+        def get_health_status(self) -> FlextResult[dict[str, object]]:
             return FlextResult(data={"service": "test"})
 
     def test_base_service_initialization(self) -> None:
@@ -276,7 +276,7 @@ class TestFlextMeltanoBaseService:
             def validate_service(self) -> FlextResult[bool]:
                 return FlextResult(error="Validation failed")
 
-            def get_health_status(self) -> FlextResult[dict[str, Any]]:
+            def get_health_status(self) -> FlextResult[dict[str, object]]:
                 return FlextResult(data={"service": "test"})
 
         service = FailingTestService(config)
@@ -389,7 +389,7 @@ class TestFlextMeltanoTapService:
         # Mock tap instance for testing
         class MockTapInstance:
             @property
-            def catalog_dict(self) -> dict[str, Any]:
+            def catalog_dict(self) -> dict[str, object]:
                 return {"streams": [{"tap_stream_id": "test", "schema": {}}]}
 
         service.tap_instance = MockTapInstance()
@@ -407,7 +407,7 @@ class TestFlextMeltanoTapService:
 
         # Mock tap class that fails on instantiation
         class FailingTapClass:
-            def __init__(self, config: dict[str, Any]) -> None:
+            def __init__(self, config: dict[str, object]) -> None:
                 msg = "Mock instantiation failure"
                 raise ValueError(msg)
 
@@ -428,7 +428,7 @@ class TestFlextMeltanoTapService:
         # Mock tap instance that fails on catalog access
         class FailingTapInstance:
             @property
-            def catalog_dict(self) -> dict[str, Any]:
+            def catalog_dict(self) -> dict[str, object]:
                 msg = "Mock catalog failure"
                 raise RuntimeError(msg)
 

@@ -126,8 +126,8 @@ class ExemploTap(FlextTapBase):
 
             def get_records(
                 self,
-                context: dict[str, Any] | None,
-            ) -> Iterator[dict[str, Any]]:
+                context: dict[str, object] | None,
+            ) -> Iterator[dict[str, object]]:
                 """Get records from stream."""
                 # Simular dados
                 yield {"id": 1, "data": "Record 1"}
@@ -140,7 +140,7 @@ class ExemploTap(FlextTapBase):
         """Testar conexão."""
         return True
 
-    def _process_stream(self, stream_name: str, stream_info: dict[str, Any]) -> None:
+    def _process_stream(self, stream_name: str, stream_info: dict[str, object]) -> None:
         """Processar stream durante sync."""
         # Simular extração de dados
         self._records_extracted += 10
@@ -183,7 +183,7 @@ def exemplo_tap_personalizado() -> None:
 class ExemploTarget(FlextTargetBase):
     """Exemplo de target personalizado."""
 
-    def _write_records_impl(self, records: list[dict[str, Any]]) -> FlextResult[None]:
+    def _write_records_impl(self, records: list[dict[str, object]]) -> FlextResult[None]:
         """Implementação de escrita de records."""
         try:
             for _record in records:
@@ -294,7 +294,7 @@ class ExemploIncrementalTap(FlextIncrementalTap):
         """Testar conexão."""
         return True
 
-    def _load_state(self) -> FlextResult[dict[str, Any]]:
+    def _load_state(self) -> FlextResult[dict[str, object]]:
         """Carregar estado atual."""
         # Simular carregamento de estado
         state = {"incremental_stream": {"updated_at": "2025-01-01T00:00:00Z"}}
@@ -335,7 +335,7 @@ def exemplo_tap_incremental() -> None:
 class ExemploStreamingTarget(FlextStreamingTarget):
     """Exemplo de target streaming."""
 
-    def _write_records_impl(self, records: list[dict[str, Any]]) -> FlextResult[None]:
+    def _write_records_impl(self, records: list[dict[str, object]]) -> FlextResult[None]:
         """Implementação de escrita de records."""
         try:
             for _record in records:

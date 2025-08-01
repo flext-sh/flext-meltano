@@ -30,6 +30,7 @@ except ImportError:
         """Fallback injectable decorator."""
         return cls
 
+
 # Meltano core integration - MANDATORY for project management
 from pydantic import BaseModel, Field
 
@@ -79,7 +80,7 @@ class FlextMeltanoPipelineConfig:
     loader: str
     transformer: str | None = None
     environment: str = "dev"
-    config: dict[str, Any] = field(default_factory=dict)
+    config: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -102,7 +103,7 @@ class FlextMeltanoPipelineResult(FlextEntity):
     duration_seconds: float | None = Field(default=None)
     records_processed: int = Field(default=0)
     error_message: str | None = Field(default=None)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     def start_execution(self) -> None:
         """Mark pipeline execution as started."""
@@ -147,7 +148,7 @@ class FlextMeltanoPipelineEvent(FlextEntity):
     pipeline_id: str = Field(...)
     event_type: PipelineEventType = Field(...)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    data: dict[str, Any] = Field(default_factory=dict)
+    data: dict[str, object] = Field(default_factory=dict)
     source: str = Field(default="flext-meltano")
 
     def validate_domain_rules(self) -> FlextResult[None]:
@@ -291,7 +292,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
 
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get orchestration service health status."""
         return FlextResult(
             data={
@@ -380,7 +381,7 @@ class FlextMeltanoExtension(FlextDomainService):
         """Validate extension."""
         return self.extension_service.validate_service()
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
         return self.extension_service.get_health_status()
 
@@ -394,7 +395,7 @@ class FlextMeltanoExecutionState(BaseModel):
     current_pipeline: str | None = Field(default=None)
     execution_id: str | None = Field(default=None)
     state: ExecutionState = Field(default=ExecutionState.PENDING)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     def start_pipeline(self, pipeline_name: str) -> str:
         """Start pipeline execution and return execution ID."""

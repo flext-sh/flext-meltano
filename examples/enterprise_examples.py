@@ -9,7 +9,6 @@ import json
 import pathlib
 import subprocess
 import tempfile
-from typing import Any
 
 from flext_meltano.helpers import (
     FlextMeltanoSingerUtils,
@@ -266,7 +265,7 @@ def example_singer_processing_traditional():
 
     def create_schema_message(
         stream_name: str,
-        schema: dict[str, Any],
+        schema: dict[str, object],
         key_properties: list[str],
     ):
         return {
@@ -276,14 +275,14 @@ def example_singer_processing_traditional():
             "key_properties": key_properties,
         }
 
-    def create_record_message(stream_name: str, record: dict[str, Any]):
+    def create_record_message(stream_name: str, record: dict[str, object]):
         return {
             "type": "RECORD",
             "stream": stream_name,
             "record": record,
         }
 
-    def validate_singer_message(message: dict[str, Any]) -> bool:
+    def validate_singer_message(message: dict[str, object]) -> bool:
         if not isinstance(message, dict):
             return False
 
@@ -299,7 +298,7 @@ def example_singer_processing_traditional():
 
         return False
 
-    def extract_records_from_output(singer_output: str) -> list[dict[str, Any]]:
+    def extract_records_from_output(singer_output: str) -> list[dict[str, object]]:
         records = []
         for line in singer_output.strip().split("\n"):
             if not line.strip():

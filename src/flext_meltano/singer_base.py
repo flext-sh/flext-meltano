@@ -9,7 +9,7 @@ to eliminate code duplication across flext-tap-* and flext-target-* projects.
 
 Follows SOLID principles and DRY methodology to centralize common Singer patterns.
 
-Copyright (c) 2025 FLEXT Contributors  
+Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
 """
 

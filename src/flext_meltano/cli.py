@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult
 
@@ -23,7 +22,7 @@ class FlextMeltanoCli:
         self,
         command: str = "",
         options: list[str] | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute CLI operations using flext-core patterns."""
         if not command or command.strip() == "":
             # Return basic CLI info for empty commands
@@ -60,7 +59,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def health(self) -> FlextResult[dict[str, Any]]:
+    def health(self) -> FlextResult[dict[str, object]]:
         """Get CLI health status."""
         return FlextResult(
             data={
@@ -69,7 +68,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def version(self) -> FlextResult[dict[str, Any]]:
+    def version(self) -> FlextResult[dict[str, object]]:
         """Get version information."""
         return FlextResult(
             data={
@@ -78,7 +77,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def help(self) -> FlextResult[dict[str, Any]]:
+    def help(self) -> FlextResult[dict[str, object]]:
         """Get help information."""
         return FlextResult(
             data={
@@ -87,7 +86,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def run(self, args: list[str]) -> FlextResult[dict[str, Any]]:
+    def run(self, args: list[str]) -> FlextResult[dict[str, object]]:
         """Run CLI with arguments."""
         if not args:
             return FlextResult(data={"status": "success", "args": []})
@@ -107,7 +106,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def list_commands(self) -> FlextResult[dict[str, Any]]:
+    def list_commands(self) -> FlextResult[dict[str, object]]:
         """List available commands."""
         return FlextResult(
             data={
@@ -115,7 +114,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def flext_meltano_run_command(self, args: list[str]) -> FlextResult[dict[str, Any]]:
+    def flext_meltano_run_command(self, args: list[str]) -> FlextResult[dict[str, object]]:
         """Run meltano command with arguments."""
         try:
             # Build command
@@ -168,13 +167,13 @@ class FlextMeltanoCli:
         self,
         plugin_name: str,
         *args: str,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Invoke specific plugin with arguments."""
         cmd_args = ["invoke", plugin_name, *args]
         return self.flext_meltano_run_command(cmd_args)
 
 
-def flext_meltano_run_cli(args: list[str] | None = None) -> FlextResult[dict[str, Any]]:
+def flext_meltano_run_cli(args: list[str] | None = None) -> FlextResult[dict[str, object]]:
     """Run CLI with arguments."""
     try:
         args = args or []

@@ -27,6 +27,7 @@ except ImportError:
         """Fallback injectable decorator."""
         return cls
 
+
 # Meltano Hub integration - MANDATORY for plugin discovery
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
@@ -59,7 +60,7 @@ class FlextMeltanoDiscoveryContext(BaseModel):
     plugin_type: str | None = Field(default=None)
     timeout_seconds: int = Field(default=60)
     project_root: Path = Field(default_factory=Path)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     class Config:
         """Pydantic configuration."""
@@ -115,7 +116,7 @@ class FlextMeltanoDiscoverer:
         except (OSError, ImportError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get discovery service health status."""
         return FlextResult(
             data={
@@ -128,9 +129,9 @@ class FlextMeltanoDiscoverer:
     async def discover_catalog(
         self,
         tap_name: str,
-        config: dict[str, Any] | None = None,
+        config: dict[str, object] | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Discover tap catalog using enterprise patterns."""
         if not context:
             context = FlextMeltanoDiscoveryContext(
@@ -163,9 +164,9 @@ class FlextMeltanoDiscoverer:
     async def _discover_catalog_subprocess(
         self,
         tap_name: str,
-        _config: dict[str, Any],
+        _config: dict[str, object],
         context: FlextMeltanoDiscoveryContext,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Discover catalog using meltano subprocess calls."""
         try:
             # Check if project has meltano.yml
@@ -224,9 +225,9 @@ class FlextMeltanoDiscoverer:
     async def _discover_catalog_direct(
         self,
         tap_name: str,
-        _config: dict[str, Any],
+        _config: dict[str, object],
         context: FlextMeltanoDiscoveryContext,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Discover catalog using direct Singer SDK calls."""
         try:
             # For nonexistent taps, fail appropriately
@@ -397,7 +398,7 @@ class FlextMeltanoDiscoverer:
     def execute(
         self,
         command: FlextMeltanoDiscoveryCommand,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute command using domain service pattern."""
         return asyncio.run(self.discover_catalog(command.tap_name))
 
@@ -425,7 +426,7 @@ def create_discoverer(
 async def flext_meltano_discover_catalog(
     tap_name: str,
     project_root: Path,
-    config: dict[str, Any] | None = None,
+    config: dict[str, object] | None = None,
 ) -> FlextMeltanoResult:
     """Discover tap catalog (legacy compatibility)."""
     warnings.warn(

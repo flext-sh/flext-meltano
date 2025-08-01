@@ -30,7 +30,7 @@ class CommonSingerSchemas:
         ),
         th.Property(
             "port",
-            th.IntegerType,  
+            th.IntegerType,
             description="Database port",
         ),
         th.Property(
@@ -85,11 +85,7 @@ class CommonSingerSchemas:
             th.StringType,
             description="Oracle database name",
         ),
-        th.Property(
-            "service_name", 
-            th.StringType, 
-            description="Oracle service name"
-        ),
+        th.Property("service_name", th.StringType, description="Oracle service name"),
         th.Property(
             "schema_name",
             th.StringType,
@@ -248,7 +244,7 @@ class CommonSingerSchemas:
         th.Property(
             "oauth_client_id",
             th.StringType,
-            required=True, 
+            required=True,
             description="OAuth2 client ID for IDCS",
         ),
         th.Property(
@@ -309,12 +305,12 @@ class CommonSingerSchemas:
         additional_properties: th.PropertiesList | None = None,
     ) -> th.PropertiesList:
         """Factory method to create tap schemas with REAL reusability.
-        
+
         Args:
             connection_type: Type of connection (oracle, ldap, file)
             include_extraction_config: Include common extraction settings
             additional_properties: Additional tap-specific properties
-            
+
         Returns:
             Complete schema for the tap
         """
@@ -330,13 +326,13 @@ class CommonSingerSchemas:
 
         # Build complete properties list
         all_properties = base_properties
-        
+
         if include_extraction_config:
             all_properties.extend(self.EXTRACTION_CONFIG_SCHEMA.wrapped.values())
-        
+
         if additional_properties:
             all_properties.extend(additional_properties.wrapped.values())
-            
+
         return th.PropertiesList(*all_properties)
 
 
@@ -346,7 +342,7 @@ def create_oracle_tap_schema(
 ) -> th.PropertiesList:
     """Create Oracle tap schema with common patterns."""
     return CommonSingerSchemas.create_tap_schema(
-        "oracle", 
+        "oracle",
         include_extraction_config=True,
         additional_properties=additional_properties,
     )
@@ -355,14 +351,12 @@ def create_oracle_tap_schema(
 def create_ldap_tap_schema(
     additional_properties: th.PropertiesList | None = None,
 ) -> th.PropertiesList:
-    """Create LDAP tap schema with common patterns.""" 
+    """Create LDAP tap schema with common patterns."""
     return CommonSingerSchemas.create_tap_schema(
         "ldap",
         include_extraction_config=True,
         additional_properties=additional_properties,
     )
-
-
 
     @classmethod
     def create_tap_schema(
@@ -372,12 +366,12 @@ def create_ldap_tap_schema(
         additional_properties: th.PropertiesList | None = None,
     ) -> th.PropertiesList:
         """Factory method to create tap schemas with REAL reusability.
-        
+
         Args:
             connection_type: Type of connection (oracle, ldap, file, oauth2, oracle_oic)
             include_extraction_config: Include common extraction settings
             additional_properties: Additional tap-specific properties
-            
+
         Returns:
             Complete schema for the tap
         """
@@ -397,13 +391,13 @@ def create_ldap_tap_schema(
 
         # Build complete properties list
         all_properties = base_properties
-        
+
         if include_extraction_config:
             all_properties.extend(self.EXTRACTION_CONFIG_SCHEMA.wrapped.values())
-        
+
         if additional_properties:
             all_properties.extend(additional_properties.wrapped.values())
-            
+
         return th.PropertiesList(*all_properties)
 
 
@@ -413,7 +407,7 @@ def create_oracle_tap_schema(
 ) -> th.PropertiesList:
     """Create Oracle tap schema with common patterns."""
     return CommonSingerSchemas.create_tap_schema(
-        "oracle", 
+        "oracle",
         include_extraction_config=True,
         additional_properties=additional_properties,
     )
@@ -422,7 +416,7 @@ def create_oracle_tap_schema(
 def create_ldap_tap_schema(
     additional_properties: th.PropertiesList | None = None,
 ) -> th.PropertiesList:
-    """Create LDAP tap schema with common patterns.""" 
+    """Create LDAP tap schema with common patterns."""
     return CommonSingerSchemas.create_tap_schema(
         "ldap",
         include_extraction_config=True,
@@ -436,7 +430,7 @@ def create_file_tap_schema(
     """Create file-based tap schema with common patterns."""
     return CommonSingerSchemas.create_tap_schema(
         "file",
-        include_extraction_config=True, 
+        include_extraction_config=True,
         additional_properties=additional_properties,
     )
 
