@@ -462,28 +462,19 @@ if __name__ == "__main__":
     # Descomente os exemplos que quiser testar:
 
     # 🚀 Quick Start
-    # quick_start_basic()
-    # quick_start_with_configuration()
 
     # 🏢 Enterprise Setup
-    # enterprise_project_setup()
 
     # 🔄 Batch Processing
-    # batch_processing_example()
-    # advanced_batch_processing()
 
     # 🔍 Data Discovery
     # data_discovery_workflow()
 
     # ⚡ Async (requires: asyncio.run(async_pipeline_workflow()))
-    # import asyncio
-    # asyncio.run(async_pipeline_workflow())
 
     # 🏥 Health Monitoring
-    # health_monitoring_example()
 
     # 💾 Backup & Recovery
-    # backup_and_recovery_example()
 
     # 🏪 Real World ETL
     # real_world_etl_workflow()
