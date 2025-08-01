@@ -27,6 +27,8 @@ except ImportError:
     def injectable(cls: type[Any]) -> type[Any]:
         """Fallback injectable decorator."""
         return cls
+
+
 from pydantic import BaseModel, Field, field_validator
 
 if TYPE_CHECKING:
@@ -97,7 +99,7 @@ class FlextMeltanoEvent(FlextEntity):
         description="Event timestamp",
     )
     source: str = Field(..., description="Event source component")
-    data: dict[str, Any] = Field(default_factory=dict, description="Event data")
+    data: dict[str, object] = Field(default_factory=dict, description="Event data")
 
     class Config:
         """Pydantic configuration."""
@@ -147,7 +149,7 @@ class FlextMeltanoBaseService:
         """Validate service state - MANDATORY implementation."""
 
     @abstractmethod
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get service health status - MANDATORY for monitoring."""
 
 
@@ -170,7 +172,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get tap health status."""
         return FlextResult(
             data={
@@ -191,7 +193,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def discover_catalog(self) -> FlextResult[dict[str, Any]]:
+    def discover_catalog(self) -> FlextResult[dict[str, object]]:
         """Discover catalog using Singer SDK patterns."""
         if not self.tap_instance:
             if not self.tap_class:
@@ -225,7 +227,7 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
             return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get target health status."""
         return FlextResult(
             data={
@@ -263,7 +265,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
         """Validate Meltano EDK availability."""
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
         return FlextResult(
             data={
@@ -306,7 +308,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get DBT health status."""
         return FlextResult(
             data={
@@ -392,7 +394,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
             pass
         return "0.9.0"  # Fallback version
 
-    def execute(self) -> FlextResult[dict[str, Any]]:
+    def execute(self) -> FlextResult[dict[str, object]]:
         """Execute method for service pattern."""
         return FlextResult(
             data={

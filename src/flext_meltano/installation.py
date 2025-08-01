@@ -24,6 +24,8 @@ except ImportError:
     def injectable(cls: type[Any]) -> type[Any]:
         """Fallback injectable decorator."""
         return cls
+
+
 from pydantic import BaseModel, Field
 
 from flext_meltano.base import FlextMeltanoConfig
@@ -39,7 +41,7 @@ class FlextMeltanoInstallationContext(BaseModel):
     plugin_type: str = Field(...)
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=600)  # 10 minutes default
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     class Config:
         """Pydantic configuration."""
@@ -98,7 +100,7 @@ class FlextMeltanoInstaller:
         self._initialized = True
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get installation service health status."""
         return FlextResult(
             data={
@@ -115,7 +117,7 @@ class FlextMeltanoInstaller:
         plugin_name: str,
         pip_url: str | None = None,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Add plugin to meltano project using enterprise patterns."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -176,7 +178,7 @@ class FlextMeltanoInstaller:
     def install_plugins(
         self,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Install all plugins in meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -233,7 +235,7 @@ class FlextMeltanoInstaller:
         plugin_type: str,
         plugin_name: str,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Remove plugin from meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(

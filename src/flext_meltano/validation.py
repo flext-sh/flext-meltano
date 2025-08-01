@@ -24,6 +24,8 @@ except ImportError:
     def injectable(cls: type[Any]) -> type[Any]:
         """Fallback injectable decorator."""
         return cls
+
+
 from pydantic import BaseModel, Field
 
 # Singer SDK integration - MANDATORY for tap validation
@@ -41,7 +43,7 @@ class FlextMeltanoValidationContext(BaseModel):
     validation_type: str = Field(...)  # project, tap_connection, tap_config
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=30)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     class Config:
         """Pydantic configuration."""
@@ -57,7 +59,7 @@ class FlextMeltanoValidationResult(BaseModel):
     is_valid: bool = Field(...)
     issues: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
-    details: dict[str, Any] = Field(default_factory=dict)
+    details: dict[str, object] = Field(default_factory=dict)
     validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     class Config:
@@ -94,7 +96,7 @@ class FlextMeltanoValidationService:
         self._initialized = True
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get validation service health status."""
         return FlextResult(
             data={
@@ -118,7 +120,7 @@ class FlextMeltanoValidationService:
         try:
             issues: list[str] = []
             warnings: list[str] = []
-            details: dict[str, Any] = {
+            details: dict[str, object] = {
                 "meltano_yml_exists": False,
                 "meltano_dir_exists": False,
                 "plugins_installed": False,
@@ -164,7 +166,7 @@ class FlextMeltanoValidationService:
     async def test_tap_connection(
         self,
         tap_name: str,
-        config: dict[str, Any] | None = None,
+        config: dict[str, object] | None = None,
         context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test tap connection using enterprise patterns."""
@@ -194,7 +196,7 @@ class FlextMeltanoValidationService:
     async def _test_connection_subprocess(
         self,
         tap_name: str,
-        _config: dict[str, Any],
+        _config: dict[str, object],
         context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test connection using meltano subprocess calls."""
@@ -257,7 +259,7 @@ class FlextMeltanoValidationService:
     async def _test_connection_direct(
         self,
         tap_name: str,
-        config: dict[str, Any],
+        config: dict[str, object],
         context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test connection using direct Singer SDK calls."""
@@ -319,7 +321,7 @@ class FlextMeltanoValidationService:
     def validate_tap_config(
         self,
         tap_name: str,
-        config: dict[str, Any],
+        config: dict[str, object],
         context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Validate tap configuration without testing connection."""
@@ -367,7 +369,7 @@ class FlextMeltanoValidationService:
     def _validate_empty_config(
         self,
         issues: list[str],
-        details: dict[str, Any],
+        details: dict[str, object],
     ) -> None:
         """Validate empty configuration."""
         issues.append("No configuration provided")
@@ -375,9 +377,9 @@ class FlextMeltanoValidationService:
 
     def _validate_file_config(
         self,
-        config: dict[str, Any],
+        config: dict[str, object],
         issues: list[str],
-        details: dict[str, Any],
+        details: dict[str, object],
     ) -> None:
         """Validate file-based configuration."""
         details["config_type"] = "file"
@@ -392,10 +394,10 @@ class FlextMeltanoValidationService:
 
     def _validate_database_config(
         self,
-        config: dict[str, Any],
+        config: dict[str, object],
         issues: list[str],
         warnings: list[str],
-        details: dict[str, Any],
+        details: dict[str, object],
     ) -> None:
         """Validate database configuration."""
         details["config_type"] = "database"
@@ -412,10 +414,10 @@ class FlextMeltanoValidationService:
 
     def _validate_api_config(
         self,
-        config: dict[str, Any],
+        config: dict[str, object],
         issues: list[str],
         warnings: list[str],
-        details: dict[str, Any],
+        details: dict[str, object],
     ) -> None:
         """Validate API configuration."""
         details["config_type"] = "api"
@@ -435,9 +437,9 @@ class FlextMeltanoValidationService:
 
     def _validate_custom_config(
         self,
-        config: dict[str, Any],
+        config: dict[str, object],
         issues: list[str],
-        details: dict[str, Any],
+        details: dict[str, object],
     ) -> None:
         """Validate custom configuration."""
         details["config_type"] = "custom"
@@ -497,7 +499,7 @@ def flext_meltano_validate_project(
 async def flext_meltano_test_tap_connection(
     tap_name: str,
     project_root: Path,
-    config: dict[str, Any] | None = None,
+    config: dict[str, object] | None = None,
 ) -> FlextMeltanoResult:
     """Test tap connection (legacy compatibility).
 
@@ -545,7 +547,7 @@ async def flext_meltano_test_tap_connection(
 
 async def flext_meltano_validate_tap_config(
     tap_name: str,
-    config: dict[str, Any],
+    config: dict[str, object],
 ) -> FlextMeltanoResult:
     """Validate tap configuration (legacy compatibility).
 

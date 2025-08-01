@@ -25,6 +25,8 @@ except ImportError:
     def injectable(cls: type[Any]) -> type[Any]:
         """Fallback injectable decorator."""
         return cls
+
+
 from pydantic import BaseModel, Field
 
 from flext_meltano.base import FlextMeltanoConfig
@@ -48,7 +50,7 @@ class FlextMeltanoExecutionContext(BaseModel):
     environment: str = Field(default="dev")
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=1800)
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
     class Config:
         """Pydantic configuration."""
@@ -90,7 +92,7 @@ class FlextMeltanoExecutor:
         except (OSError, ImportError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
-    def get_health_status(self) -> FlextResult[dict[str, Any]]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get executor health status."""
         return FlextResult(
             data={
@@ -121,7 +123,7 @@ class FlextMeltanoExecutor:
         tap_name: str,
         target_name: str,
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute pipeline using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -188,7 +190,7 @@ class FlextMeltanoExecutor:
         self,
         args: list[str],
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Run generic command using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -249,7 +251,7 @@ class FlextMeltanoExecutor:
     def execute(
         self,
         command: FlextMeltanoExecutionCommand,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute command using domain service pattern."""
         return self.execute_pipeline(command.tap_name, command.target_name)
 
@@ -279,7 +281,7 @@ class FlextMeltanoResult:
         self,
         *,
         success: bool,
-        data: dict[str, Any] | None = None,
+        data: dict[str, object] | None = None,
         error: str = "",
     ) -> None:
         """Initialize result."""
@@ -288,7 +290,7 @@ class FlextMeltanoResult:
         self.error = error
 
     @classmethod
-    def ok(cls, data: dict[str, Any] | None = None) -> FlextMeltanoResult:
+    def ok(cls, data: dict[str, object] | None = None) -> FlextMeltanoResult:
         """Create success result."""
         return cls(success=True, data=data)
 

@@ -230,7 +230,7 @@ __all__ = [
     "FlextMeltanoValidationService",
     # Singer Base Classes (moved from flext-core)
     "FlextSingerAuthenticationError",
-    "FlextSingerConfigurationError", 
+    "FlextSingerConfigurationError",
     "FlextSingerConnectionError",
     "FlextSingerError",
     "FlextSingerProcessingError",
@@ -240,7 +240,7 @@ __all__ = [
     "FlextTransformError",
     # Singer Unified Interface (Central Simplification Hub)
     "FlextSingerUnifiedConfig",
-    "FlextSingerUnifiedInterface", 
+    "FlextSingerUnifiedInterface",
     "FlextSingerUnifiedResult",
     "FlextSingerUnifiedService",
     # Meltano Core
