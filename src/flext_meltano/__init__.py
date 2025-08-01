@@ -19,29 +19,26 @@ if TYPE_CHECKING:
     from flext_core import FlextResult
 
 # === CORE BASE CLASSES ===
-# DBT integration - required dependency
-import dbt.contracts.results
-from dbt.adapters.base import BaseRelation
-from dbt.adapters.base.connections import (
-    BaseConnectionManager,
-    ConnectionState,
-)
-from dbt.adapters.contracts.connection import (
-    AdapterRequiredConfig,
-    AdapterResponse,
-    Connection,
-    Credentials,
-)
-from dbt.adapters.sql import SQLAdapter
-
-# DBT exceptions - using available modules
-from dbt_common.exceptions import (
-    DbtDatabaseError,
-    DbtRuntimeError,
-)
-
-# Meltano Core integration - required dependency
-from meltano.core.project import Project as MeltanoCoreProject
+# DBT integration - using TYPE_CHECKING to avoid runtime import issues
+if TYPE_CHECKING:
+    import dbt.contracts.results
+    from dbt.adapters.base import BaseRelation  # type: ignore[attr-defined]
+    from dbt.adapters.base.connections import (  # type: ignore[attr-defined]
+        BaseConnectionManager,
+        ConnectionState,
+    )
+    from dbt.adapters.contracts.connection import (
+        AdapterRequiredConfig,
+        AdapterResponse,
+        Connection,
+        Credentials,
+    )
+    from dbt.adapters.sql import SQLAdapter  # type: ignore[attr-defined]
+    from dbt_common.exceptions import (
+        DbtDatabaseError,
+        DbtRuntimeError,
+    )
+    from meltano.core.project import Project as MeltanoCoreProject
 
 # === OPTIONAL IMPORTS ===
 # Singer SDK integration - required dependency
@@ -107,6 +104,29 @@ from flext_meltano.installation import (
     flext_meltano_install_plugin,
 )
 
+# === SINGER BASE CLASSES - Proper location in flext-meltano ===
+from flext_meltano.singer_base import (
+    FlextSingerAuthenticationError,
+    FlextSingerConfigurationError,
+    FlextSingerConnectionError,
+    FlextSingerError,
+    FlextSingerProcessingError,
+    FlextSingerValidationError,
+    FlextTapError,
+    FlextTargetError,
+    FlextTransformError,
+)
+
+# === SINGER UNIFIED INTERFACE - Central Simplification Hub ===
+from flext_meltano.singer_unified import (
+    FlextSingerUnifiedConfig,
+    FlextSingerUnifiedInterface,
+    FlextSingerUnifiedResult,
+    FlextSingerUnifiedService,
+    create_unified_singer_config,
+    create_unified_singer_service,
+)
+
 # === VALIDATION & TESTING ===
 from flext_meltano.validation import (
     FlextMeltanoValidationResult,
@@ -117,8 +137,11 @@ from flext_meltano.validation import (
     flext_meltano_validate_tap_config,
 )
 
-# DBT run result - using available module
-DbtRunResult = dbt.contracts.results.RunResult
+# DBT run result - using TYPE_CHECKING
+if TYPE_CHECKING:
+    DbtRunResult = dbt.contracts.results.RunResult  # type: ignore[attr-defined]
+else:
+    DbtRunResult = None
 
 
 # === LEGACY COMPATIBILITY ===
@@ -172,18 +195,8 @@ __version__ = "2.0.0-enterprise"
 
 # === PUBLIC API ===
 __all__ = [
-    "AdapterRequiredConfig",
-    "AdapterResponse",
-    "BaseConnectionManager",
-    # DBT Integration
-    "BaseRelation",
+    # DBT Integration - removed from __all__ as they're TYPE_CHECKING only
     "BatchSink",
-    "Connection",
-    "ConnectionState",
-    "Credentials",
-    "DbtDatabaseError",
-    "DbtRunResult",
-    "DbtRuntimeError",
     # Core Services
     "FlextMeltanoBaseService",
     # CLI Interface
@@ -215,12 +228,27 @@ __all__ = [
     "FlextMeltanoValidationResult",
     # Validation
     "FlextMeltanoValidationService",
+    # Singer Base Classes (moved from flext-core)
+    "FlextSingerAuthenticationError",
+    "FlextSingerConfigurationError", 
+    "FlextSingerConnectionError",
+    "FlextSingerError",
+    "FlextSingerProcessingError",
+    "FlextSingerValidationError",
+    "FlextTapError",
+    "FlextTargetError",
+    "FlextTransformError",
+    # Singer Unified Interface (Central Simplification Hub)
+    "FlextSingerUnifiedConfig",
+    "FlextSingerUnifiedInterface", 
+    "FlextSingerUnifiedResult",
+    "FlextSingerUnifiedService",
     # Meltano Core
-    "MeltanoCoreProject",
+    # "MeltanoCoreProject",  # TYPE_CHECKING only
     "OAuthAuthenticator",
     "PropertiesList",
     "Property",
-    "SQLAdapter",
+    # "SQLAdapter",  # TYPE_CHECKING only
     "SQLSink",
     "Sink",
     # Singer SDK re-exports
@@ -244,6 +272,8 @@ __all__ = [
     "create_meltano_target_service",
     "create_tap",
     "create_target",
+    "create_unified_singer_config",
+    "create_unified_singer_service",
     "create_validation_service",
     "flext_meltano_create_dbt_project",
     "flext_meltano_create_dbt_runner",

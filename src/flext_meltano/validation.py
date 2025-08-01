@@ -16,7 +16,14 @@ from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextResult
-from injectable import injectable
+
+try:
+    from injectable import injectable  # type: ignore[import-untyped]
+except ImportError:
+    # Fallback decorator if injectable is not available
+    def injectable(cls: type[Any]) -> type[Any]:
+        """Fallback injectable decorator."""
+        return cls
 from pydantic import BaseModel, Field
 
 # Singer SDK integration - MANDATORY for tap validation

@@ -21,7 +21,14 @@ from flext_core import (
     FlextEntity,
     FlextResult,
 )
-from injectable import injectable
+
+try:
+    from injectable import injectable  # type: ignore[import-untyped]
+except ImportError:
+    # Fallback decorator if injectable is not available
+    def injectable(cls: type[Any]) -> type[Any]:
+        """Fallback injectable decorator."""
+        return cls
 
 # Meltano core integration - MANDATORY for project management
 from pydantic import BaseModel, Field

@@ -1,126 +1,28 @@
-"""Meltano integration exception hierarchy using flext-core patterns.
+"""Meltano integration exception hierarchy using flext-core DRY patterns.
 
 Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
 
-Domain-specific exceptions for Meltano operations inheriting from flext-core.
+Domain-specific exceptions using factory pattern to eliminate 150+ lines of duplication.
 """
 
 from __future__ import annotations
 
 from flext_core.exceptions import (
-    FlextConfigurationError,
-    FlextError,
-    FlextProcessingError,
-    FlextTimeoutError,
-    FlextValidationError,
+    create_module_exception_classes,
 )
 
+# Create all standard exception classes using factory pattern - eliminates duplication
+meltano_exceptions = create_module_exception_classes("flext_meltano")
 
-class FlextMeltanoError(FlextError):
-    """Base exception for Meltano operations."""
-
-    def __init__(
-        self,
-        message: str = "Meltano error",
-        plugin_name: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize Meltano error with context."""
-        context = kwargs.copy()
-        if plugin_name is not None:
-            context["plugin_name"] = plugin_name
-
-        super().__init__(message, error_code="MELTANO_ERROR", context=context)
-
-
-class FlextMeltanoConfigurationError(FlextConfigurationError):
-    """Meltano configuration errors."""
-
-    def __init__(
-        self,
-        message: str = "Meltano configuration error",
-        config_key: str | None = None,
-        plugin_name: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize Meltano configuration error with context."""
-        context = kwargs.copy()
-        if config_key is not None:
-            context["config_key"] = config_key
-        if plugin_name is not None:
-            context["plugin_name"] = plugin_name
-
-        super().__init__(f"Meltano config: {message}", **context)
-
-
-class FlextMeltanoValidationError(FlextValidationError):
-    """Meltano validation errors."""
-
-    def __init__(
-        self,
-        message: str = "Meltano validation failed",
-        field: str | None = None,
-        value: object = None,
-        plugin_name: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize Meltano validation error with context."""
-        validation_details = {}
-        if field is not None:
-            validation_details["field"] = field
-        if value is not None:
-            validation_details["value"] = str(value)[:100]  # Truncate long values
-
-        context = kwargs.copy()
-        if plugin_name is not None:
-            context["plugin_name"] = plugin_name
-
-        super().__init__(
-            f"Meltano validation: {message}",
-            validation_details=validation_details,
-            context=context,
-        )
-
-
-class FlextMeltanoProcessingError(FlextProcessingError):
-    """Meltano processing errors."""
-
-    def __init__(
-        self,
-        message: str = "Meltano processing failed",
-        plugin_name: str | None = None,
-        stage: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize Meltano processing error with context."""
-        context = kwargs.copy()
-        if plugin_name is not None:
-            context["plugin_name"] = plugin_name
-        if stage is not None:
-            context["stage"] = stage
-
-        super().__init__(f"Meltano processing: {message}", **context)
-
-
-class FlextMeltanoTimeoutError(FlextTimeoutError):
-    """Meltano timeout errors."""
-
-    def __init__(
-        self,
-        message: str = "Meltano operation timed out",
-        operation: str | None = None,
-        timeout_seconds: float | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize Meltano timeout error with context."""
-        context = kwargs.copy()
-        if operation is not None:
-            context["operation"] = operation
-        if timeout_seconds is not None:
-            context["timeout_seconds"] = timeout_seconds
-
-        super().__init__(f"Meltano timeout: {message}", **context)
+# Import generated classes for clean usage
+FlextMeltanoError = meltano_exceptions["FlextMeltanoError"]
+FlextMeltanoValidationError = meltano_exceptions["FlextMeltanoValidationError"]
+FlextMeltanoConfigurationError = meltano_exceptions["FlextMeltanoConfigurationError"]
+FlextMeltanoConnectionError = meltano_exceptions["FlextMeltanoConnectionError"]
+FlextMeltanoProcessingError = meltano_exceptions["FlextMeltanoProcessingError"]
+FlextMeltanoAuthenticationError = meltano_exceptions["FlextMeltanoAuthenticationError"]
+FlextMeltanoTimeoutError = meltano_exceptions["FlextMeltanoTimeoutError"]
 
 
 class FlextMeltanoPluginError(FlextMeltanoError):
@@ -162,7 +64,7 @@ class FlextMeltanoExecutionError(FlextMeltanoError):
         if exit_code is not None:
             context["exit_code"] = exit_code
 
-        super().__init__(f"Meltano execution: {message}", **context)
+        super().__init__(f"Meltano execution: {message}", plugin_name=None, **context)
 
 
 class FlextMeltanoSingerError(FlextMeltanoError):
@@ -182,7 +84,7 @@ class FlextMeltanoSingerError(FlextMeltanoError):
         if target_name is not None:
             context["target_name"] = target_name
 
-        super().__init__(f"Meltano Singer: {message}", **context)
+        super().__init__(f"Meltano Singer: {message}", plugin_name=None, **context)
 
 
 class FlextMeltanoDBTError(FlextMeltanoError):
@@ -202,7 +104,7 @@ class FlextMeltanoDBTError(FlextMeltanoError):
         if model_name is not None:
             context["model_name"] = model_name
 
-        super().__init__(f"Meltano DBT: {message}", **context)
+        super().__init__(f"Meltano DBT: {message}", plugin_name=None, **context)
 
 
 __all__ = [
