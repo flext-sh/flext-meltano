@@ -19,7 +19,14 @@ from flext_core import (
     FlextLogger,
     FlextResult,
 )
-from injectable import injectable
+
+try:
+    from injectable import injectable  # type: ignore[import-untyped]
+except ImportError:
+    # Fallback decorator if injectable is not available
+    def injectable(cls: type[Any]) -> type[Any]:
+        """Fallback injectable decorator."""
+        return cls
 from pydantic import BaseModel, Field, field_validator
 
 if TYPE_CHECKING:
