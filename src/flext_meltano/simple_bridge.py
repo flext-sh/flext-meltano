@@ -424,7 +424,9 @@ class FlextMeltanoBridge:
 
         """
         # Implementation note: Plugin installation requires Meltano project context
-        return FlextResult.fail("Plugin installation requires initialized Meltano project")
+        return FlextResult.fail(
+            "Plugin installation requires initialized Meltano project",
+        )
 
     def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, Any]]:  # noqa: ARG002
         """Discover schema catalog from tap for Go services.

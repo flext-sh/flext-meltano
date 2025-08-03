@@ -154,14 +154,12 @@ def example_postgres_to_jsonl_traditional():
 
 
 def example_postgres_to_jsonl_flext_meltano():
-    """FLEXT Meltano approach - 3 lines of code (95% boilerplate reduction)."""
-    # FLEXT Meltano: Zero boilerplate approach
-    return (
-        create_flext_meltano_pipeline()
-        .from_postgres(host="localhost", database="analytics", user="postgres")
-        .to_jsonl(destination_path="./output")
-        .run_sync()
-    )
+    """FLEXT Meltano approach using real API."""
+    from flext_meltano.simple_bridge import FlextMeltanoBridge
+    
+    # FLEXT Meltano: Use real bridge API
+    bridge = FlextMeltanoBridge()
+    return bridge.run_pipeline("tap-postgres", "target-jsonl")
 
 
 # =============================================================================
@@ -241,7 +239,8 @@ def example_enterprise_config_traditional():
 def example_enterprise_config_flext_meltano():
     """FLEXT Meltano enterprise config - automatic validation with zero boilerplate."""
     # FLEXT Meltano: Professional configuration service
-    config_service = FlextMeltanoConfigService()
+    from flext_meltano.validation import FlextMeltanoValidationService
+    config_service = FlextMeltanoValidationService()
 
     # Get validated PostgreSQL configuration (automatic validation)
     postgres_result = config_service.get_tap_config_template(
@@ -347,7 +346,8 @@ def example_singer_processing_traditional():
 def example_singer_processing_flext_meltano():
     """FLEXT Meltano Singer processing - zero boilerplate message operations."""
     # FLEXT Meltano: Professional Singer utilities
-    singer_utils = FlextMeltanoSingerUtils()
+    from flext_meltano.core import FlextMeltanoSingerService
+    singer_utils = FlextMeltanoSingerService()
 
     # Zero-boilerplate message creation
     schema = {
@@ -380,18 +380,13 @@ def example_singer_processing_flext_meltano():
 # =============================================================================
 
 
-@flext_meltano_safe_operation("enterprise_pipeline")
 def example_enterprise_pipeline_with_error_handling():
     """Enterprise pipeline with professional error handling and logging."""
-    # Complex pipeline with multiple configurations
-    pipeline = (
-        create_flext_meltano_pipeline()
-        .from_postgres(
-            host="production-db.company.com",
-            database="analytics",
-            user="readonly_user",
-            port=5432,
-            filter_schemas=["public", "analytics"],
+    from flext_meltano.simple_bridge import FlextMeltanoBridge
+    
+    # Use real bridge API for pipeline execution
+    bridge = FlextMeltanoBridge()
+    return bridge.run_pipeline("tap-postgres", "target-jsonl")
         )
         .to_parquet(
             destination_path="/data/warehouse/exports",

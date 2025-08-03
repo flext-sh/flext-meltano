@@ -9,18 +9,21 @@ This directory contains **isolated unit tests** for FLEXT Meltano's bridge archi
 ### **Unit Test Categories**
 
 #### **Foundation Module Tests**
+
 - **Configuration Tests**: FlextMeltanoConfig validation and initialization
 - **Base Service Tests**: Service factory patterns and dependency injection
 - **Exception Tests**: Error hierarchy and context management
 - **Utility Tests**: Common functions and validation utilities
 
 #### **Core Module Tests**
+
 - **Bridge Interface Tests**: FlextMeltanoBridge class functionality
 - **Execution Engine Tests**: Subprocess orchestration components
 - **Discovery Service Tests**: Plugin discovery and catalog management
 - **Installation Service Tests**: Plugin lifecycle management
 
 #### **Singer Integration Tests**
+
 - **Protocol Tests**: Singer message parsing and validation
 - **SDK Integration Tests**: Singer SDK component functionality
 - **Stream Processing Tests**: Data stream handling and transformation
@@ -29,12 +32,14 @@ This directory contains **isolated unit tests** for FLEXT Meltano's bridge archi
 ## 🎯 Unit Testing Principles
 
 ### **Isolation Requirements**
+
 - **No External Dependencies**: No database, network, or file system dependencies
 - **Mock Integration**: All external services mocked for isolation
 - **Fast Execution**: < 1 second per test for rapid feedback
 - **Deterministic Results**: Consistent behavior across environments
 
 ### **Coverage Standards**
+
 - **95%+ Coverage**: Comprehensive coverage for all unit-testable components
 - **Edge Case Testing**: Boundary conditions and error scenarios
 - **Type Safety Testing**: Validation of type annotations and contracts
@@ -43,6 +48,7 @@ This directory contains **isolated unit tests** for FLEXT Meltano's bridge archi
 ## 🔧 Unit Test Structure
 
 ### **Test Organization**
+
 ```
 unit/
 ├── __init__.py                    # Unit test module initialization
@@ -57,6 +63,7 @@ unit/
 ```
 
 ### **Test Execution**
+
 ```bash
 # Run all unit tests
 pytest tests/unit/ -v
@@ -74,12 +81,14 @@ pytest tests/unit/ -m "not slow" -v
 ## ⚡ Performance Standards
 
 ### **Execution Speed**
+
 - **Individual Tests**: < 1 second per test
 - **Full Unit Suite**: < 30 seconds total execution
 - **Memory Usage**: < 128MB per test process
 - **Parallelization**: Tests support parallel execution
 
 ### **Quality Gates**
+
 ```bash
 # Unit test quality validation
 pytest tests/unit/ --cov=src/flext_meltano --cov-fail-under=95
@@ -90,6 +99,7 @@ pytest tests/unit/ -m "unit" --tb=short  # Unit tests only
 ## 🛡️ Test Patterns
 
 ### **Mock Patterns**
+
 ```python
 # Standard mocking patterns for unit tests
 from unittest.mock import Mock, patch
@@ -100,13 +110,14 @@ from flext_core import FlextResult
 def test_execution_with_mock(mock_subprocess):
     mock_subprocess.return_value.returncode = 0
     mock_subprocess.return_value.stdout = "test output"
-    
+
     # Test isolated functionality
     result = execute_command(["test", "command"])
     assert result.is_success
 ```
 
 ### **Fixture Patterns**
+
 ```python
 # Reusable test fixtures for unit tests
 import pytest
@@ -124,12 +135,14 @@ def test_config():
 ## 📊 Unit Test Quality
 
 ### **Coverage Metrics**
+
 - **Line Coverage**: 95%+ for all unit-testable modules
-- **Branch Coverage**: 90%+ for conditional logic paths  
+- **Branch Coverage**: 90%+ for conditional logic paths
 - **Function Coverage**: 100% for public API functions
 - **Class Coverage**: 100% for all public classes
 
 ### **Test Categories**
+
 - **Happy Path Tests**: Normal operation scenarios
 - **Error Path Tests**: Exception handling and error conditions
 - **Edge Case Tests**: Boundary values and limit conditions
@@ -142,6 +155,7 @@ def test_config():
 **Current State**: ✅ **ENTERPRISE READY** - Comprehensive unit testing framework
 
 ### **Production Readiness**
+
 - **✅ Isolation**: All tests run without external dependencies
 - **✅ Performance**: Fast execution with parallel support
 - **✅ Coverage**: 95%+ coverage standards maintained
@@ -149,6 +163,7 @@ def test_config():
 - **✅ Integration**: Seamless CI/CD pipeline integration
 
 ### **Quality Metrics**
+
 - **Test Count**: 100+ individual unit tests
 - **Execution Time**: < 30 seconds for full unit suite
 - **Success Rate**: 100% with proper isolation
