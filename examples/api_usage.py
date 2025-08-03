@@ -1,6 +1,34 @@
-"""Exemplo de uso da API modernizada do FLEXT Meltano.
+"""FLEXT Meltano API Usage Examples - Modern Enterprise API Patterns.
 
-Demonstra como usar a nova API FlextMeltanoAPI seguindo padrões flext-core.
+**Purpose**: Demonstrate modern FLEXT Meltano API usage following flext-core patterns
+**Scope**: FlextMeltanoAPI integration, enterprise patterns, production workflows
+**Target Audience**: Developers implementing production FLEXT Meltano integration
+**Dependencies**: flext-core enterprise patterns, FlextMeltanoAPI service layer
+
+## Overview
+
+This example demonstrates the **modern FLEXT Meltano API** usage patterns for
+enterprise applications, focusing on:
+
+1. **FlextMeltanoAPI Integration**: Modern service-oriented API usage
+2. **Enterprise Configuration**: Production-ready configuration management
+3. **Pipeline Orchestration**: Complete pipeline lifecycle management
+4. **Error Handling**: Comprehensive error management with FlextResult patterns
+5. **Production Patterns**: Real-world usage scenarios and best practices
+
+## Usage
+
+```bash
+python api_usage.py
+```
+
+## Architecture Alignment
+
+Examples follow FLEXT Meltano's modern API architecture:
+- **Service Layer**: FlextMeltanoAPI as primary integration point
+- **Enterprise Patterns**: flext-core integration throughout
+- **Production Ready**: Real-world configuration and error handling
+- **Bridge Compatible**: API designed for Go service integration
 """
 
 from __future__ import annotations
@@ -14,39 +42,39 @@ from flext_meltano.api import (
 
 
 def example_basic_api_usage() -> None:
-    """Exemplo básico de uso da API FlextMeltanoAPI."""
-    # Criar diretório temporário para o exemplo
+    """Basic example of FlextMeltanoAPI usage."""
+    # Create temporary directory for the example
     with tempfile.TemporaryDirectory() as temp_dir:
         project_root = Path(temp_dir) / "example_project"
         project_root.mkdir()
 
-        # Inicializar API
+        # Initialize API
         FlextMeltanoAPI(
             project_root=project_root,
             environment="dev",
             auto_install=True,
         )
 
-        # Exemplo de configuração de plugin (seria usado em projeto real)
+        # Example plugin configuration (would be used in real project)
 
-        # Exemplo de descoberta de catálogo (seria usado em projeto real)
+        # Example catalog discovery (would be used in real project)
 
-        # Exemplo de teste de conexão (seria usado em projeto real)
+        # Example connection testing (would be used in real project)
 
-        # Exemplo de execução de pipeline (seria usado em projeto real)
+        # Example pipeline execution (would be used in real project)
 
 
 def example_one_liner_functions() -> None:
-    """Exemplo de uso das funções one-liner."""
+    """Example usage of one-liner functions."""
     with tempfile.TemporaryDirectory() as temp_dir:
         project_root = Path(temp_dir) / "oneliner_project"
         project_root.mkdir()
 
-        # Exemplos conceituais das funções one-liner
+        # Conceptual examples of one-liner functions
 
 
 def example_advanced_usage() -> None:
-    """Exemplo de uso avançado da API."""
+    """Example of advanced API usage."""
     with tempfile.TemporaryDirectory() as temp_dir:
         project_root = Path(temp_dir) / "advanced_project"
         project_root.mkdir()
@@ -61,7 +89,7 @@ def example_advanced_usage() -> None:
 
 
 def example_error_handling() -> None:
-    """Exemplo de tratamento de erros com FlextResult."""
+    """Example of error handling with FlextResult."""
     with tempfile.TemporaryDirectory() as temp_dir:
         project_root = Path(temp_dir) / "error_handling"
         project_root.mkdir()

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""FLEXT Meltano - Aplicador Sistemático de Helpers.
+"""FLEXT Meltano - Systematic Helpers Application Tool.
 
-Script que aplica os helpers de boilerplate_reducers para resolver erros lint
-de forma automática e eficiente seguindo SOLID+DRY+KISS.
+Script that applies boilerplate_reducers helpers to resolve lint errors
+automatically and efficiently following SOLID+DRY+KISS principles.
 
 Usage:
     python scripts/apply_helpers_systematic.py
@@ -25,7 +25,7 @@ from pathlib import Path
 
 
 class SystematicLintFixer:
-    """Aplicador sistemático de correções lint usando helpers."""
+    """Systematic lint corrections applier using helpers."""
 
     def __init__(self, project_root: Path | None = None) -> None:
         """Initialize systematic fixer."""

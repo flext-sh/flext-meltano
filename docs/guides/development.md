@@ -1,473 +1,547 @@
 # FLEXT Meltano Development Guide
 
-Complete guide for developing with and contributing to FLEXT Meltano.
+**⚠️ CRITICAL**: This project has **3 critical issues** that must be resolved before development can proceed. See [../TODO.md](../TODO.md) for immediate fixes required.
 
-## 🚀 Development Environment Setup
+## 🚨 Development Status
 
-### Prerequisites
+**BEFORE STARTING DEVELOPMENT**:
 
-- **Python 3.13**: Strict requirement
-- **Poetry 1.8+**: Dependency management
-- **Git**: Version control
-- **Make**: Build automation
-
-### Initial Setup
+1. **Bridge Integration Broken**: `FlextMeltanoBridge` class missing
+2. **Quality Gates Failing**: 3 MyPy errors, 1 test failure
+3. **Type Safety Compromised**: Cannot merge code until fixes applied
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd flext-meltano
-
-# Complete development setup
-make setup                   # Full setup with dependencies and hooks
-make dev-install             # Development environment only
-make pre-commit              # Setup pre-commit hooks only
+# Current development state verification:
+make validate                 # ❌ FAILING - must fix before proceeding
 ```
 
-### Verify Installation
+## 🔧 Development Setup
+
+### **Prerequisites**
+
+| Requirement | Version | Status      | Notes                      |
+| ----------- | ------- | ----------- | -------------------------- |
+| **Python**  | 3.13+   | ✅ Required | Strict version requirement |
+| **Poetry**  | 1.8+    | ✅ Required | Dependency management      |
+| **Make**    | Any     | ✅ Required | Development commands       |
+| **Git**     | 2.0+    | ✅ Required | Pre-commit hooks           |
+
+### **Initial Setup**
 
 ```bash
-# Check all quality gates
-make validate                # Must pass before development
+# 1. Clone and navigate
+cd /path/to/flext-meltano
 
-# Individual checks
-make check                   # Essential checks
-make lint                    # Code linting
-make type-check              # Type safety
-make test                    # Test suite with coverage
+# 2. Complete development setup
+make setup                    # Install everything + pre-commit hooks
+
+# 3. Verify installation (WILL FAIL until issues fixed)
+make validate                 # ❌ Expected failures - see TODO.md
+
+# 4. Check specific problems
+make type-check              # Shows 3 MyPy errors
+make test                    # Shows 1 test failure
+python scripts/flext_meltano_bridge.py version  # ImportError
 ```
 
-## 🏗️ Architecture Understanding
+### **Environment Configuration**
 
-### Module Organization
+```bash
+# Required environment variables
+export MELTANO_ENVIRONMENT=dev
+export MELTANO_PROJECT_ROOT=$(pwd)
+export PYTHONPATH=$(pwd)/src:$PYTHONPATH
 
-Understand the flat module structure in `src/flext_meltano/`:
-
-```
-src/flext_meltano/
-├── __init__.py                      # Public API (249 exports)
-├── base.py                          # Foundation classes
-├── core.py                          # Enterprise services
-├── flext_meltano_execution.py       # Primary execution API
-├── flext_meltano_cli.py            # CLI interface
-├── flext_meltano_discovery.py      # Plugin discovery
-├── flext_meltano_installation.py   # Plugin management
-├── flext_meltano_validation.py     # Validation layer
-└── flext_singer.py                 # Singer integration
+# Optional: Configure Poetry virtual environment
+poetry config virtualenvs.in-project true
+poetry config virtualenvs.create true
 ```
 
-### Key Design Patterns
+## 🔄 Development Workflow
 
-1. **FlextResult Pattern**: All functions return `FlextResult` for consistent error handling
-2. **Factory Pattern**: Use `create_*()` functions for object creation
-3. **Subprocess Pattern**: All Meltano operations via subprocess execution
-4. **Enterprise Integration**: Built on flext-core foundation patterns
+### **Daily Development Cycle** (After Critical Fixes)
+
+```bash
+# 1. Start with health check
+make doctor                  # Project diagnostics
+make diagnose               # Environment check
+
+# 2. Code quality cycle
+make format                 # Auto-format code (Ruff)
+make lint                   # Check quality (✅ currently passing)
+make type-check             # Check types (❌ currently failing)
+make test                   # Run tests (❌ currently failing)
+
+# 3. Complete validation
+make validate               # All quality gates (❌ currently failing)
+```
+
+### **Pre-commit Workflow**
+
+```bash
+# Automatic quality checks before commit
+git add .
+git commit -m "feature: implement something"
+# → Pre-commit hooks run automatically
+# → Will BLOCK commit until quality gates pass
+```
+
+### **Branch Strategy**
+
+```bash
+# Feature development
+git checkout -b feature/implement-missing-bridge
+# → Work on critical fixes first
+# → Ensure quality gates pass before PR
+
+# Hotfix development
+git checkout -b hotfix/fix-bridge-integration
+# → For critical issues like current bridge problem
+```
 
 ## 🧪 Testing Strategy
 
-### Test Organization
+### **Test Organization (20 Files)**
 
 ```
 tests/
-├── test_*.py                    # Main functionality tests
-├── unit/                        # Unit tests (isolated)
-├── integration/                 # Integration tests (real dependencies)
-├── e2e/                         # End-to-end tests (full pipeline)
-├── extensions/oracle_oic/       # Extension-specific tests
-└── fixtures/                    # Test data and configuration
+├── conftest.py                      # Pytest configuration and fixtures
+├── test_*.py                        # Main functionality tests (12 files)
+├── unit/                            # Unit tests with mocks
+├── integration/                     # Integration tests with real dependencies
+├── e2e/                             # End-to-end pipeline tests
+├── extensions/oracle_oic/           # Extension-specific tests
+└── fixtures/                        # Test data and configuration
 ```
 
-### Running Tests
+### **Test Commands**
 
 ```bash
-# All tests with coverage
-make test                        # 90% coverage required
+# Essential test patterns
+make test                    # Full suite with 90% coverage (❌ failing)
+make test-unit               # Unit tests only
+make test-integration        # Integration tests only
+make test-fast               # Tests without coverage for quick feedback
 
-# Specific test types
-pytest -m unit                   # Unit tests only
-pytest -m integration            # Integration tests only
-pytest -m e2e                    # End-to-end tests only
-pytest -m "not slow"             # Skip slow tests
+# Pytest markers (from pyproject.toml)
+pytest -m unit               # Unit tests only
+pytest -m integration        # Integration tests
+pytest -m e2e                # End-to-end tests
+pytest -m slow               # Slow tests (for CI/CD)
+pytest -m smoke              # Smoke tests for health check
 
-# Specific test files
-pytest tests/test_flext_meltano_execution.py -v
-pytest tests/test_helpers_*.py -v
-
-# Coverage reporting
-make coverage                    # Generate HTML coverage report
+# Specific test execution
+pytest tests/test_flext_singer.py -v                   # Singer integration
+pytest tests/test_dbt_integration.py -v                # DBT integration
+pytest tests/test_singer_integration.py -v             # ❌ Currently failing
+pytest tests/extensions/ -v                            # Extension tests
 ```
 
-### Writing Tests
+### **Coverage Requirements**
 
-#### Test Structure
+```bash
+# Coverage enforcement (90% minimum)
+make coverage-html           # HTML report in reports/coverage/
+pytest --cov=src/flext_meltano --cov-report=term-missing --cov-fail-under=90
+
+# Current metrics:
+# - Target: 90%+ enforced
+# - Files: 18,026 LOC Python
+# - Test Files: 20 (may need more for enterprise standards)
+```
+
+## 🛡️ Quality Gates
+
+### **Quality Standards Enforcement**
+
+```bash
+# Complete validation pipeline (must pass before merge)
+make validate                # ❌ FAILING (3 critical issues)
+├── make lint               # ✅ PASSING (Ruff ALL rules enabled)
+├── make type-check         # ❌ FAILING (3 MyPy errors)
+├── make security           # ⚠️ UNKNOWN (needs testing)
+└── make test               # ❌ FAILING (1 test failure)
+```
+
+### **Individual Quality Checks**
+
+```bash
+# Linting (Ruff with ALL rules enabled)
+make lint                   # ✅ Currently passing
+make format                 # Auto-format code
+make fix                    # Auto-fix linting issues
+
+# Type checking (MyPy strict mode)
+make type-check             # ❌ 3 errors in cli.py:157, validation.py:250,344
+
+# Security scanning
+make security               # Bandit + pip-audit
+make deps-audit             # Dependency vulnerability scanning
+
+# Pre-commit hooks
+make pre-commit             # Run all hooks manually
+pre-commit run --all-files  # Alternative command
+```
+
+### **Quality Gate Failures (Current)**
+
+#### **1. MyPy Type Errors** 🔴
 
 ```python
-"""Test module following FLEXT testing patterns."""
+# src/flext_meltano/cli.py:157
+version = result.data["stdout"].strip() if result.data else "unknown"
+# Error: "object" has no attribute "strip"
 
+# src/flext_meltano/validation.py:250
+dict[str, str | int | None] vs dict[str, object]
+
+# src/flext_meltano/validation.py:344
+dict[str, Sequence[str]] vs dict[str, object]
+```
+
+#### **2. Test Failure** 🔴
+
+```python
+# tests/test_singer_integration.py:135
+FAILED tests/test_singer_integration.py::TestTargetServiceIntegration::test_target_service_creation
+AssertionError: assert False
+FlextResult(data=None, is_success=False, error='Target service initialization failed: Target class not configured')
+```
+
+## 📦 Meltano Development Operations
+
+### **Meltano Project Setup** (After Fixes)
+
+```bash
+# Initialize Meltano project (creates meltano.yml)
+make meltano-init            # One-time setup
+
+# Plugin management
+make meltano-install         # Install configured plugins
+make meltano-discover TAP=tap-csv    # Discover schema from tap
+make meltano-ui              # Start Meltano UI (port 5000)
+
+# Pipeline testing
+make test-pipeline           # Basic CSV ↔ CSV pipeline test
+make meltano-run JOB=job-name    # Run specific pipeline job
+```
+
+### **Singer Development Workflow**
+
+```bash
+# Singer validation
+make singer-validate TAP=tap-csv    # Validate Singer output
+
+# Plugin development cycle
+pytest tests/test_flext_singer.py -v           # Test Singer integration
+pytest tests/test_singer_integration.py -v     # ❌ Currently failing
+```
+
+## 🔗 Bridge Development (CRITICAL)
+
+### **Current Bridge Issue**
+
+```python
+# scripts/flext_meltano_bridge.py:11
+from flext_meltano.simple_bridge import FlextMeltanoBridge
+#                    ^^^^^^^^^^^^^ MODULE DOES NOT EXIST
+
+# Results in:
+# ImportError: No module named 'flext_meltano.simple_bridge'
+```
+
+### **Bridge Implementation Required**
+
+```python
+# MISSING: src/flext_meltano/simple_bridge.py
+"""Bridge interface for Go ↔ Python integration."""
+
+class FlextMeltanoBridge:
+    """Bridge class for Go service integration."""
+
+    def get_version(self) -> None:
+        """Get Meltano version."""
+        # Implementation needed
+
+    def list_plugins(self) -> None:
+        """List available plugins."""
+        # Implementation needed
+
+    def add_plugin(self, plugin_type: str, name: str) -> None:
+        """Add plugin to project."""
+        # Implementation needed
+
+    def discover_catalog(self, tap_name: str) -> None:
+        """Discover catalog from tap."""
+        # Implementation needed
+
+    def run_pipeline(self, tap: str, target: str) -> None:
+        """Execute pipeline between tap and target."""
+        # Implementation needed
+
+    def invoke_dbt(self, command: str, *args: str) -> None:
+        """Execute DBT command."""
+        # Implementation needed
+```
+
+### **Bridge Testing** (After Implementation)
+
+```bash
+# Test bridge operations
+python scripts/flext_meltano_bridge.py version                    # Version check
+python scripts/flext_meltano_bridge.py list_plugins               # Plugin list
+python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv  # Pipeline
+
+# Integration from Go (subprocess simulation)
+subprocess.run(["python", "scripts/flext_meltano_bridge.py", "version"])
+```
+
+## 🏗️ Module Development Patterns
+
+### **Current Module Structure** (17 Modules)
+
+```python
+# Enterprise-grade patterns to follow:
+
+# 1. Base classes (base.py)
+from flext_meltano.base import FlextMeltanoTapService, FlextMeltanoConfig
+
+# 2. Core services (core.py)
+from flext_meltano.core import FlextMeltanoOrchestrationService
+
+# 3. Execution layer (execution.py)
+from flext_meltano.execution import execute_meltano_command, run_pipeline
+
+# 4. Discovery system (discovery.py)
+from flext_meltano.discovery import discover_plugins, discover_catalog
+```
+
+### **Adding New Functionality**
+
+```python
+# 1. Follow existing patterns
+class NewFlextMeltanoService(FlextMeltanoBaseService):
+    """New service following enterprise patterns."""
+
+    def __init__(self, config: FlextMeltanoConfig) -> None:
+        super().__init__(config)
+
+    def new_operation(self) -> FlextResult[str]:
+        """Implement using FlextResult pattern."""
+        try:
+            # Implementation
+            return FlextResult.success("Operation completed")
+        except Exception as e:
+            return FlextResult.failure(f"Operation failed: {e}")
+
+# 2. Add to appropriate module (not __init__.py directly)
+
+# 3. Export through module __init__.py
+# 4. Add to main __init__.py __all__ list (carefully - already 290+ exports)
+```
+
+### **Testing New Features**
+
+```python
+# tests/test_new_feature.py
 import pytest
-from flext_meltano.flext_meltano_execution import flext_meltano_execute_job
+from flext_meltano.new_module import NewFlextMeltanoService
 
+class TestNewFeature:
+    """Test new feature following existing patterns."""
 
-class TestFlextMeltanoExecution:
-    """Test class for execution functionality."""
+    def test_new_operation_success(self):
+        """Test successful operation."""
+        service = NewFlextMeltanoService(mock_config)
+        result = service.new_operation()
+        assert result.is_success
 
-    def test_execute_job_success(self):
-        """Test successful job execution."""
-        # Arrange
-        extractor = "tap-csv"
-        loader = "target-csv"
-
-        # Act
-        result = flext_meltano_execute_job(extractor, loader)
-
-        # Assert
-        assert result.success
-        assert result.output
-        assert result.returncode == 0
-
-    @pytest.mark.integration
-    def test_execute_job_with_real_meltano(self):
-        """Integration test with real Meltano."""
-        # Implementation
-        pass
-
-    @pytest.mark.slow
-    def test_large_pipeline_execution(self):
-        """Slow test for large pipeline."""
-        # Implementation
-        pass
+    def test_new_operation_failure(self):
+        """Test failure handling."""
+        service = NewFlextMeltanoService(invalid_config)
+        result = service.new_operation()
+        assert not result.is_success
 ```
 
-#### Test Markers
+## 🔧 Debugging & Diagnostics
 
-Use pytest markers for test organization:
+### **Common Issues & Solutions**
 
-```python
-@pytest.mark.unit           # Unit test
-@pytest.mark.integration    # Integration test
-@pytest.mark.e2e           # End-to-end test
-@pytest.mark.slow          # Slow test
-@pytest.mark.core          # Core functionality
-```
-
-## 🛡️ Quality Standards
-
-### Zero Tolerance Quality Gates
-
-All code must pass these gates:
-
-1. **Linting**: `make lint` (Ruff with ALL rules)
-2. **Type Checking**: `make type-check` (MyPy strict mode)
-3. **Security**: `make security` (Bandit + pip-audit)
-4. **Testing**: `make test` (90%+ coverage)
-5. **Pre-commit**: Automated checks on commit
-
-### Code Style
-
-#### Type Hints
-
-```python
-from typing import Any, Dict, List, Optional
-from flext_core import FlextResult
-
-def flext_meltano_execute_job(
-    extractor: str,
-    loader: str,
-    *,
-    environment: Optional[str] = None,
-    **kwargs: Any,
-) -> FlextResult[str]:
-    """Execute Meltano pipeline job.
-
-    Args:
-        extractor: Meltano extractor plugin name
-        loader: Meltano loader plugin name
-        environment: Optional environment name
-        **kwargs: Additional execution arguments
-
-    Returns:
-        FlextResult containing execution output or error
-    """
-    # Implementation
-```
-
-#### Error Handling
-
-```python
-from flext_core import FlextResult
-
-def safe_operation() -> FlextResult[str]:
-    """Example of proper error handling."""
-    try:
-        # Operation logic
-        result = perform_operation()
-        return FlextResult.success(result)
-    except Exception as e:
-        return FlextResult.failure(f"Operation failed: {e}")
-```
-
-#### Configuration Classes
-
-```python
-from pydantic import BaseModel, Field
-
-class FlextMeltanoConfig(BaseModel):
-    """Configuration with validation."""
-
-    meltano_project_root: str = Field(default=".")
-    environment: str = Field(default="dev")
-
-    class Config:
-        """Pydantic configuration."""
-        frozen = True
-        extra = "forbid"
-```
-
-## 🔧 Development Workflow
-
-### Feature Development
-
-1. **Create Feature Branch**
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Write Tests First** (TDD approach)
-
-   ```bash
-   # Add tests to appropriate directory
-   # Run tests to ensure they fail initially
-   pytest tests/test_your_feature.py -v
-   ```
-
-3. **Implement Feature**
-
-   - Follow existing patterns in the codebase
-   - Use type hints throughout
-   - Add proper docstrings
-   - Handle errors with FlextResult pattern
-
-4. **Run Quality Gates**
-
-   ```bash
-   make validate                # All gates must pass
-   ```
-
-5. **Update Documentation**
-
-   - Update API docs if needed
-   - Add examples for new functionality
-   - Update README.md if necessary
-
-6. **Test Bridge Integration** (if applicable)
-
-   ```bash
-   python scripts/flext_meltano_bridge.py your_operation
-   ```
-
-### Code Review Checklist
-
-Before submitting:
-
-- [ ] All quality gates pass (`make validate`)
-- [ ] Tests added with 90%+ coverage
-- [ ] Type hints added (MyPy compliant)
-- [ ] Documentation updated
-- [ ] Bridge integration tested (if applicable)
-- [ ] Error handling follows FlextResult pattern
-- [ ] Code follows existing patterns
-- [ ] Security considerations addressed
-
-### Debugging
-
-#### Local Debugging
-
-```python
-# Add debug logging
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-# Use pdb for interactive debugging
-import pdb; pdb.set_trace()
-
-# Or use breakpoint() (Python 3.7+)
-breakpoint()
-```
-
-#### Test Debugging
+#### **ImportError: simple_bridge** 🔴
 
 ```bash
-# Run tests with debugger
-pytest tests/test_file.py::test_function --pdb
-
-# Verbose output
-pytest tests/test_file.py -v -s
-
-# Show local variables on failure
-pytest tests/test_file.py --tb=long
-
-# Run only failed tests
-pytest --lf
+# Problem: Bridge module missing
+# Solution: Implement src/flext_meltano/simple_bridge.py
+touch src/flext_meltano/simple_bridge.py
+# Add FlextMeltanoBridge class implementation
 ```
 
-## 🌉 Bridge Integration Development
-
-### Testing Bridge Functionality
+#### **MyPy Type Errors** 🔴
 
 ```bash
-# Test bridge script directly
-python scripts/flext_meltano_bridge.py version
-
-# Test with parameters
-python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
-
-# Test error handling
-python scripts/flext_meltano_bridge.py invalid_operation
+# Problem: Type annotations incompatible
+# Solution: Fix specific type issues
+make type-check  # Shows exact locations and fixes needed
 ```
 
-### Adding New Bridge Operations
+#### **Test Failures** 🔴
 
-1. **Add operation to bridge script**:
+```bash
+# Problem: Test configuration issues
+# Solution: Review failing test and fix underlying issue
+pytest tests/test_singer_integration.py::TestTargetServiceIntegration::test_target_service_creation -v -s
+```
+
+### **Development Diagnostics**
+
+```bash
+# Project health check
+make doctor                  # Complete project diagnostics
+make diagnose               # Environment and dependency check
+
+# Dependency issues
+poetry check                # Verify poetry configuration
+poetry show --tree          # Show dependency tree
+make deps-audit             # Security audit
+
+# Environment issues
+python --version            # Should be 3.13+
+poetry --version            # Should be 1.8+
+which python               # Should point to poetry venv
+```
+
+## 📋 Development Priorities
+
+### **Phase 1: Critical Fixes** (1-2 days)
+
+**MANDATORY BEFORE OTHER DEVELOPMENT**
+
+1. **Implement `FlextMeltanoBridge`**:
+
+   ```bash
+   touch src/flext_meltano/simple_bridge.py
+   # Implement complete bridge interface
+   ```
+
+2. **Fix MyPy errors**:
 
    ```python
-   # In scripts/flext_meltano_bridge.py
-   elif operation == "new_operation":
-       result = bridge.new_operation(sys.argv[2])
+   # Fix cli.py:157, validation.py:250,344
    ```
 
-2. **Implement in bridge class**:
+3. **Resolve test failure**:
 
    ```python
-   # In the bridge class
-   def new_operation(self, parameter: str) -> FlextMeltanoResult:
-       """New bridge operation."""
-       return flext_meltano_some_function(parameter)
+   # Fix test_singer_integration.py:135
    ```
 
-3. **Test integration**:
+4. **Verify quality gates**:
 
    ```bash
-   python scripts/flext_meltano_bridge.py new_operation test_param
+   make validate  # Must pass before proceeding
    ```
 
-## 📦 Build & Distribution
+### **Phase 2: Development Standards** (1-2 weeks)
 
-### Building the Package
+1. **Refactor overloaded `__init__.py`** (290+ exports → manageable modules)
+2. **Standardize naming conventions** (FlextMeltano*vs Flext* inconsistencies)
+3. **Improve error handling** (consistent FlextResult usage)
+4. **Increase test coverage** (20 files may be insufficient for 18k LOC)
 
-```bash
-# Clean previous builds
-make clean
+### **Phase 3: Advanced Development** (2-4 weeks)
 
-# Build distribution packages
-make build
+1. **Performance optimization** (bridge communication, subprocess efficiency)
+2. **Monitoring integration** (observability patterns)
+3. **Security hardening** (secure subprocess execution)
+4. **Documentation completion** (API docs, examples)
 
-# Verify build
-ls dist/
-```
+## 🚀 Contribution Guidelines
 
-### Local Installation
+### **Code Contribution Workflow**
 
-```bash
-# Install in development mode
-pip install -e .
+1. **Pre-contribution checklist**:
 
-# Or using Poetry
-poetry install
-```
+   - [ ] All critical issues from TODO.md resolved
+   - [ ] `make validate` passes completely
+   - [ ] Feature/bugfix branch created
+   - [ ] Tests written for new functionality
 
-## 🚨 Troubleshooting Development Issues
+2. **Development cycle**:
 
-### Common Problems
+   ```bash
+   # Create feature branch
+   git checkout -b feature/your-feature
 
-**Import Errors:**
+   # Implement changes
+   # ... code changes ...
 
-```bash
-# Ensure PYTHONPATH is set
-export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+   # Quality checks
+   make format && make validate
 
-# Or add to shell profile
-echo 'export PYTHONPATH=$(pwd)/src:$PYTHONPATH' >> ~/.bashrc
-```
+   # Commit with quality gates
+   git add . && git commit -m "feat: implement feature"
+   ```
 
-**Poetry Issues:**
+3. **Pull request requirements**:
+   - [ ] Quality gates passing (`make validate`)
+   - [ ] Test coverage maintained (90%+)
+   - [ ] Documentation updated
+   - [ ] Bridge integration tested (if applicable)
 
-```bash
-# Clear cache and reinstall
-poetry cache clear pypi --all
-rm -rf .venv
-poetry install --all-extras
-```
-
-**Pre-commit Failures:**
-
-```bash
-# Run pre-commit manually
-pre-commit run --all-files
-
-# Update hooks
-pre-commit autoupdate
-```
-
-**Test Failures:**
-
-```bash
-# Clear test cache
-pytest --cache-clear
-
-# Reinstall test dependencies
-poetry install --extras test
-```
-
-**Type Checking Issues:**
-
-```bash
-# Clear MyPy cache
-rm -rf .mypy_cache
-
-# Run with verbose output
-mypy src/ --verbose
-```
-
-### Performance Profiling
+### **Code Style Standards**
 
 ```python
-# Profile function execution
-import cProfile
-cProfile.run('your_function()')
+# Follow enterprise patterns:
+from flext_core import FlextResult
+from flext_meltano.base import FlextMeltanoConfig
 
-# Memory profiling
-from memory_profiler import profile
+class ExampleService:
+    """Enterprise service example."""
 
-@profile
-def your_function():
-    # Function implementation
-    pass
+    def __init__(self, config: FlextMeltanoConfig) -> None:
+        self._config = config
+
+    def process_data(self, data: dict[str, Any]) -> FlextResult[str]:
+        """Process data with proper error handling."""
+        try:
+            # Process data
+            return FlextResult.success("Processing completed")
+        except Exception as e:
+            return FlextResult.failure(f"Processing failed: {e}")
 ```
 
-## 📚 Resources
+## 🆘 Getting Help
 
-### Documentation
+### **For Critical Issues**
 
-- [Architecture Guide](../architecture/README.md)
-- [API Reference](../api/README.md)
-- [Quick Start](../examples/quick-start.md)
+1. **Start with [../TODO.md](../TODO.md)** - detailed problem analysis
+2. **Use diagnostics**: `make doctor`, `make diagnose`
+3. **Check quality gates**: `make validate`
 
-### External Resources
+### **For Development Support**
 
-- [Meltano Documentation](https://docs.meltano.com/)
-- [Singer SDK Documentation](https://sdk.meltano.com/)
-- [DBT Documentation](https://docs.getdbt.com/)
-- [Poetry Documentation](https://python-poetry.org/docs/)
+1. **Review architecture**: [../architecture/README.md](../architecture/README.md)
+2. **Check API documentation**: [../api/README.md](../api/README.md)
+3. **Examine existing patterns**: Study `base.py`, `core.py`, `execution.py`
 
-### FLEXT Ecosystem
+### **Emergency Debugging**
 
-- `flext-core`: Foundation patterns and utilities
-- `flext-observability`: Monitoring and metrics
-- FlexCore service: Go runtime container
-- FLEXT service: Data processing service
+```bash
+# Quick problem identification
+make type-check             # Shows type errors with line numbers
+make test                   # Shows test failures with details
+python scripts/flext_meltano_bridge.py version  # Shows import errors
+
+# Environment debugging
+poetry env info             # Show virtual environment info
+poetry show                # Show installed packages
+make deps-audit             # Check for security issues
+```
 
 ---
 
-_Development Guide - Version 2.0.0-enterprise_
-_Last Updated: 2025-01-29_
+**⚠️ IMPORTANT**: Development is **BLOCKED** until critical issues from [../TODO.md](../TODO.md) are resolved. All workflows above assume these fixes have been implemented.
+
+**Last Updated**: 2025-08-01  
+**Status**: Requires Critical Fixes Before Development  
+**Next Action**: Implement `FlextMeltanoBridge` + fix type errors + resolve test failure

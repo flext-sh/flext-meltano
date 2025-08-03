@@ -1,4 +1,36 @@
-"""Comprehensive tests for execution module to achieve 90%+ coverage."""
+"""Execution Module Comprehensive Test Suite - Core Operations Layer Validation.
+
+**Test Category**: Integration Tests
+**Coverage Target**: 95%+ for execution module components
+**Dependencies**: Mock subprocess calls, flext-core patterns
+**Execution Time**: < 10 seconds total
+
+## Test Scope
+
+Validates the execution module components that provide the **core subprocess orchestration**
+for FLEXT Meltano's bridge architecture, focusing on Meltano CLI execution, pipeline
+orchestration, and bridge integration patterns that enable Go ↔ Python communication.
+
+## Test Coverage Areas
+
+1. **Execution Commands**: FlextMeltanoExecutionCommand model validation
+2. **Execution Context**: Context management and metadata tracking
+3. **Subprocess Orchestration**: Meltano CLI execution with error handling
+4. **Pipeline Execution**: End-to-end pipeline orchestration patterns
+5. **Bridge Integration**: JSON-serializable results for Go service consumption
+6. **Error Handling**: Comprehensive error scenarios and recovery patterns
+
+## Architecture Alignment
+
+Tests align with FLEXT Meltano's execution layer architecture:
+- **Subprocess Bridge**: Meltano CLI execution via subprocess calls
+- **Enterprise Error Handling**: FlextResult pattern validation throughout
+- **Bridge Communication**: JSON-serializable output for Go services
+- **Railway-Oriented Programming**: Result composition and error propagation
+
+These tests ensure the execution module provides reliable subprocess orchestration
+that serves as the foundation for all Go ↔ Python bridge operations.
+"""
 
 from __future__ import annotations
 

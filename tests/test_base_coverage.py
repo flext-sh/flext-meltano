@@ -1,10 +1,14 @@
-"""Test base module coverage - comprehensive version.
+"""Base Module Coverage Test Suite - Comprehensive Foundation Layer Validation.
 
-# Constants
-EXPECTED_TOTAL_PAGES = 8
-EXPECTED_DATA_COUNT = 3
+**Test Category**: Unit Tests
+**Coverage Target**: 95%+ for base module comprehensive functionality
+**Dependencies**: Base module, factory functions, configuration management
+**Execution Time**: < 20 seconds total
 
-Tests all classes and methods that actually exist in base.py.
+## Test Scope
+
+Validates comprehensive base module functionality including factory functions,
+configuration management, and foundation layer patterns for enterprise integration.
 """
 
 from __future__ import annotations
@@ -30,6 +34,10 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+
+# Constants
+EXPECTED_TOTAL_PAGES = 8
+EXPECTED_DATA_COUNT = 3
 
 
 class TestFlextMeltanoConfig:

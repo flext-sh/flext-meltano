@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
-"""FLEXT Meltano - Code Reduction Showcase.
+"""FLEXT Meltano Code Reduction Showcase - API Simplification Demonstration.
 
-Demonstra como a nova API elimina 80-90% do código boilerplate típico.
-Cada exemplo mostra ANTES vs DEPOIS com contagem de linhas real.
+**Purpose**: Demonstrate how the new API eliminates 80-90% of typical boilerplate code
+**Scope**: Before vs After examples with real line count comparisons
+**Target Audience**: Developers evaluating FLEXT Meltano's simplified API benefits
+**Dependencies**: FLEXT Meltano library, comparison examples
+
+## Overview
+
+This showcase demonstrates how the new API eliminates 80-90% of typical boilerplate code.
+Each example shows BEFORE vs AFTER with real line count comparisons.
 """
 
 from __future__ import annotations
@@ -21,6 +28,41 @@ from flext_meltano.api import (
     run_pipeline,
     test_tap_connection,
 )
+
+
+# Mock implementations for showcase examples
+class PluginSpec:
+    """Mock plugin specification for examples."""
+
+    def __init__(self, name: str, plugin_type: str, config: dict | None = None) -> None:
+        self.name = name
+        self.plugin_type = plugin_type
+        self.config = config or {}
+
+
+def setup_project(project_dir: str, plugins: list[PluginSpec] | None = None) -> None:
+    """Mock project setup for examples."""
+
+
+class PipelineSpec:
+    """Mock pipeline specification for examples."""
+
+    def __init__(self, name: str, tap: str, target: str) -> None:
+        self.name = name
+        self.tap = tap
+        self.target = target
+
+
+class MeltanoProject:
+    """Mock Meltano project for examples."""
+
+    def __init__(self, root_dir: str) -> None:
+        self.root_dir = root_dir
+
+
+def batch_process_tables(tables: list[str]) -> None:
+    """Mock batch processing for examples."""
+
 
 # Timeout constants to avoid magic numbers
 DEFAULT_TIMEOUT = 300
@@ -398,8 +440,8 @@ def example_4_old_way() -> None:
 
 
 def example_4_new_way() -> None:
-    """DEPOIS: Descoberta ultra-simplificada - 1 linha + análise opcional."""
-    # 1 LINHA para teste + 1 LINHA para descoberta
+    """AFTER: Ultra-simplified discovery - 1 line + optional analysis."""
+    # 1 LINE for test + 1 LINE for discovery
     if test_tap_connection(
         "tap-postgres",
         project_root=tempfile.mkdtemp(prefix="discovery_project_"),

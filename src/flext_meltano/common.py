@@ -1,6 +1,40 @@
-"""FLEXT Meltano Common - Shared utilities and validation functions.
+"""FLEXT Meltano Common - Shared Utilities and Validation Functions.
 
-Provides common validation functions and utilities for FLEXT Meltano projects.
+**Architecture Layer**: Foundation Layer
+**Status**: ✅ STABLE - Utility functions and validation helpers
+**Dependencies**: Standard library, path validation utilities
+
+## Module Purpose
+
+This module provides **shared utilities and validation functions** for FLEXT
+Meltano's bridge architecture, implementing common validation patterns and
+utility functions used across all modules for consistent operation.
+
+## Design Principles
+
+1. **Pure Functions**: Stateless utility functions with predictable behavior
+2. **Validation Consistency**: Standardized validation patterns across modules
+3. **Bridge-Friendly**: Simple, JSON-compatible validation results
+4. **Path Safety**: Secure path validation and sanitization
+5. **Configuration Validation**: Common configuration validation patterns
+
+## Core Components
+
+### Validation Functions
+- `validate_directory_path()`: Directory existence and accessibility validation
+- `validate_file_path()`: File existence and readability validation
+- `validate_config_value()`: Configuration value validation and sanitization
+- Path traversal protection and security validation
+
+### Utility Functions
+- Common string processing and sanitization
+- Configuration parsing and validation helpers
+- File system operation utilities
+- JSON serialization helpers for bridge integration
+
+This module provides essential **utility and validation capabilities** for all
+FLEXT Meltano operations, ensuring consistent validation patterns and safe
+operation across the bridge architecture.
 """
 
 from __future__ import annotations

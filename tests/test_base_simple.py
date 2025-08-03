@@ -1,4 +1,35 @@
-"""Simple test for base module bypassing __init__.py import issues."""
+"""Foundation Layer Test Suite - Base Module Validation.
+
+**Test Category**: Unit Tests
+**Coverage Target**: 95%+ for base module components
+**Dependencies**: None (isolated unit testing)
+**Execution Time**: < 5 seconds total
+
+## Test Scope
+
+Validates the foundation layer components of FLEXT Meltano's bridge architecture,
+focusing on configuration management, service base classes, and factory functions
+that provide the foundation for all bridge operations.
+
+## Test Coverage Areas
+
+1. **Configuration Management**: FlextMeltanoConfig initialization and validation
+2. **Service Base Classes**: Tap, Target, DBT, and Extension service abstractions
+3. **Factory Functions**: Service creation with dependency injection patterns
+4. **Enterprise Patterns**: FlextResult integration and error handling
+5. **Bridge Integration**: JSON-serializable results for Go service consumption
+
+## Architecture Alignment
+
+Tests align with FLEXT Meltano's foundation layer architecture:
+- **Configuration Value Objects**: Environment-aware settings with validation
+- **Service Abstractions**: Base classes following enterprise patterns
+- **Factory Pattern**: Consistent service creation with dependency injection
+- **Railway-Oriented Programming**: FlextResult pattern validation
+
+These tests ensure the foundation layer provides reliable building blocks for
+the Go ↔ Python bridge integration that all other modules depend upon.
+"""
 
 import sys
 import tempfile
@@ -25,7 +56,16 @@ from flext_meltano.base import (
 
 
 class TestFlextMeltanoConfig:
-    """Test FlextMeltanoConfig functionality."""
+    """Configuration Management Unit Tests.
+
+    **Test Focus**: FlextMeltanoConfig value object validation
+    **Coverage**: Configuration initialization, validation, environment handling
+    **Pattern**: Enterprise configuration management with Pydantic integration
+
+    Validates the core configuration value object that serves as the foundation
+    for all bridge operations, ensuring environment-aware settings with proper
+    validation and type safety.
+    """
 
     def test_config_initialization_default(self) -> None:
         """Test config initialization with defaults."""

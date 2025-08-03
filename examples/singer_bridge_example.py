@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
-"""Exemplo de uso do Bridge Singer SDK com flext-core.
+"""Singer SDK Bridge Usage Example - Professional Tap and Target Development.
 
-Demonstra como usar o bridge real entre Singer SDK e flext-core
-para criar taps e targets profissionais.
+**Purpose**: Demonstrate real Singer SDK bridge integration with flext-core patterns
+**Scope**: Professional tap and target creation, enterprise Singer implementation
+**Target Audience**: Developers creating production Singer components
+**Dependencies**: Singer SDK, flext-core patterns, bridge integration
+
+## Overview
+
+This example demonstrates how to use the real Singer SDK bridge with flext-core
+to create professional taps and targets with enterprise standards.
 
 Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
@@ -10,7 +17,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flext_core import TAnyObject
 
 from flext_core import FlextResult, get_logger
 
@@ -43,8 +53,8 @@ logger = get_logger(__name__)
 # =============================================================================
 
 
-def exemplo_bridge_basico() -> None:
-    """Demonstra uso básico do bridge Singer SDK."""
+def basic_bridge_example() -> None:
+    """Demonstrates basic Singer SDK bridge usage."""
     # Criar bridge
     bridge = create_singer_bridge()
 
@@ -70,8 +80,8 @@ def exemplo_bridge_basico() -> None:
 # =============================================================================
 
 
-def exemplo_catalog_management() -> None:
-    """Demonstra gerenciamento de catalog."""
+def catalog_management_example() -> None:
+    """Demonstrates catalog management."""
     # Criar catalog
     catalog = create_singer_catalog()
 
@@ -104,16 +114,16 @@ def exemplo_catalog_management() -> None:
 
 
 class ExemploTap(FlextTapBase):
-    """Exemplo de tap personalizado."""
+    """Custom tap example."""
 
-    name = "exemplo-tap"
+    name = "example-tap"
 
-    def discover_streams(self) -> list[Any]:
-        """Descobrir streams disponíveis."""
-        # Simular descoberta de streams
+    def discover_streams(self) -> list[TAnyObject]:
+        """Discover available streams."""
+        # Simulate stream discovery
 
-        class ExemploStream(Stream):
-            def __init__(self, tap: Any, name: str) -> None:
+        class ExampleStream(Stream):
+            def __init__(self, tap: TAnyObject, name: str) -> None:
                 schema = {
                     "type": "object",
                     "properties": {
@@ -146,8 +156,8 @@ class ExemploTap(FlextTapBase):
         self._records_extracted += 10
 
 
-def exemplo_tap_personalizado() -> None:
-    """Demonstra criação de tap personalizado."""
+def custom_tap_example() -> None:
+    """Demonstrates custom tap creation."""
     # Configuração do tap
     config = {
         "host": "localhost",
@@ -181,9 +191,12 @@ def exemplo_tap_personalizado() -> None:
 
 
 class ExemploTarget(FlextTargetBase):
-    """Exemplo de target personalizado."""
+    """Custom target example."""
 
-    def _write_records_impl(self, records: list[dict[str, object]]) -> FlextResult[None]:
+    def _write_records_impl(
+        self,
+        records: list[dict[str, object]],
+    ) -> FlextResult[None]:
         """Implementação de escrita de records."""
         try:
             for _record in records:
@@ -197,8 +210,8 @@ class ExemploTarget(FlextTargetBase):
         return True
 
 
-def exemplo_target_personalizado() -> None:
-    """Demonstra criação de target personalizado."""
+def custom_target_example() -> None:
+    """Demonstrates custom target creation."""
     # Configuração do target
     config = {
         "host": "localhost",
@@ -252,7 +265,7 @@ def exemplo_servico_singer() -> None:
         "password": "pass",
     }
 
-    validation = service.validate_tap_config("exemplo-tap", tap_config)
+    validation = service.validate_tap_config("example-tap", tap_config)
     if validation.is_success:
         pass
 
@@ -272,11 +285,11 @@ class ExemploIncrementalTap(FlextIncrementalTap):
 
     name = "exemplo-incremental-tap"
 
-    def discover_streams(self) -> list[Any]:
+    def discover_streams(self) -> list[TAnyObject]:
         """Descobrir streams disponíveis."""
 
         class IncrementalStream(Stream):
-            def __init__(self, tap: Any, name: str) -> None:
+            def __init__(self, tap: TAnyObject, name: str) -> None:
                 super().__init__(tap, name=name)
                 self.schema = {
                     "type": "object",
@@ -295,15 +308,15 @@ class ExemploIncrementalTap(FlextIncrementalTap):
         return True
 
     def _load_state(self) -> FlextResult[dict[str, object]]:
-        """Carregar estado atual."""
+        """Load current state."""
         # Simular carregamento de estado
         state = {"incremental_stream": {"updated_at": "2025-01-01T00:00:00Z"}}
         return FlextResult.ok(state)
 
     def _save_state(self) -> FlextResult[bool]:
-        """Salvar estado atual."""
+        """Save current state."""
         # Simular salvamento de estado
-        return FlextResult.ok(True)
+        return FlextResult.ok(data=True)
 
 
 def exemplo_tap_incremental() -> None:
@@ -335,7 +348,10 @@ def exemplo_tap_incremental() -> None:
 class ExemploStreamingTarget(FlextStreamingTarget):
     """Exemplo de target streaming."""
 
-    def _write_records_impl(self, records: list[dict[str, object]]) -> FlextResult[None]:
+    def _write_records_impl(
+        self,
+        records: list[dict[str, object]],
+    ) -> FlextResult[None]:
         """Implementação de escrita de records."""
         try:
             for _record in records:

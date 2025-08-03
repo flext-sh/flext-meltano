@@ -1,13 +1,185 @@
-"""Singer Protocol Base Classes - Proper location in flext-meltano.
+"""FLEXT Meltano Singer Base - Singer Protocol Exception Hierarchy.
 
-ARCHITECTURAL CORRECTION: Moved from flext-core to flext-meltano following
+**Architecture Layer**: Singer Foundation Layer
+**Status**: ✅ STABLE - Base Singer exception classes and component-specific errors
+**Dependencies**: flext-core (exception hierarchy), enterprise error patterns
+
+## Module Purpose
+
+This module provides **Singer protocol exception hierarchy** for FLEXT Meltano's
+bridge architecture, implementing domain-specific exceptions for taps, targets,
+and transforms with enterprise-grade error handling and structured context.
+
+**ARCHITECTURAL CORRECTION**: Moved from flext-core to flext-meltano following
 proper logical hierarchy. Singer functionality belongs in Meltano module,
 not in the core foundation library.
 
-This module provides base exception classes and utilities for Singer taps and targets
-to eliminate code duplication across flext-tap-* and flext-target-* projects.
+## Design Principles
 
-Follows SOLID principles and DRY methodology to centralize common Singer patterns.
+1. **Singer Protocol Compliance**: Comprehensive exception hierarchy for Singer operations
+2. **Component-Specific Errors**: Dedicated exception classes for taps, targets, transforms
+3. **Enterprise Integration**: Structured error context and correlation IDs
+4. **Bridge-Friendly**: JSON-serializable exceptions for Go service integration
+5. **Error Context**: Rich error context with operation details and troubleshooting information
+
+## Core Components
+
+### Base Singer Exceptions
+- `FlextSingerError`: Base exception for all Singer operations
+- `FlextSingerConnectionError`: Connection-related errors with host/port context
+- `FlextSingerAuthenticationError`: Authentication failures with method/user context
+- `FlextSingerValidationError`: Data validation errors with field/value context
+- `FlextSingerConfigurationError`: Configuration errors with config key context
+- `FlextSingerProcessingError`: Processing errors with operation/record context
+
+### Component-Specific Exceptions
+- `FlextTapError`: Tap-specific operations with source system context
+- `FlextTargetError`: Target-specific operations with destination system context
+- `FlextTransformError`: Transform operations with transform name context
+
+## Usage Patterns
+
+### Tap Error Handling
+```python
+from flext_meltano.singer_base import FlextTapError, FlextSingerConnectionError
+
+# Tap-specific error with source system context
+try:
+    connect_to_oracle()
+except ConnectionError as e:
+    raise FlextTapError(
+        "Failed to connect to Oracle WMS",
+        source_system="oracle-wms",
+        stream_name="shipments",
+    ) from e
+
+# Connection error with host/port details
+try:
+    establish_connection(host, port)
+except Exception as e:
+    raise FlextSingerConnectionError(
+        "Database connection failed", host="oracle.example.com", port=1521
+    ) from e
+```
+
+### Target Error Handling
+```python
+from flext_meltano.singer_base import FlextTargetError, FlextSingerValidationError
+
+# Target-specific error with destination context
+try:
+    write_to_destination(records)
+except Exception as e:
+    raise FlextTargetError(
+        "Failed to write records to PostgreSQL",
+        destination_system="postgres-warehouse",
+        stream_name="customer_data",
+    ) from e
+
+# Validation error with field/value context
+try:
+    validate_record(record)
+except ValueError as e:
+    raise FlextSingerValidationError(
+        "Invalid customer ID format",
+        field="customer_id",
+        value=record.get("customer_id"),
+        record_id=record.get("id"),
+    ) from e
+```
+
+### Configuration Error Handling
+```python
+from flext_meltano.singer_base import FlextSingerConfigurationError
+
+
+# Configuration validation with specific key context
+def validate_config(config: Dict[str, Any]) -> None:
+    if "database_url" not in config:
+        raise FlextSingerConfigurationError(
+            "Missing required database connection URL", config_key="database_url"
+        )
+
+    if not config["database_url"].startswith(("postgresql://", "oracle://")):
+        raise FlextSingerConfigurationError(
+            "Unsupported database URL format", config_key="database_url"
+        )
+```
+
+## Bridge Integration Patterns
+
+### Go Service Error Handling
+```go
+// Go service handling Singer errors via bridge
+type SingerError struct {
+    Message       string            `json:"message"`
+    ComponentType string            `json:"component_type"`
+    StreamName    string            `json:"stream_name,omitempty"`
+    Context       map[string]string `json:"context,omitempty"`
+}
+
+func (c *FlextMeltanoClient) HandleSingerError(output []byte) error {
+    var singerErr SingerError
+    if err := json.Unmarshal(output, &singerErr); err != nil {
+        return fmt.Errorf("failed to parse Singer error: %w", err)
+    }
+
+    return fmt.Errorf("Singer %s error in stream %s: %s",
+        singerErr.ComponentType, singerErr.StreamName, singerErr.Message)
+}
+```
+
+### Error Context Serialization
+```python
+# Standard error context format for bridge consumption
+def serialize_singer_error(error: FlextSingerError) -> Dict[str, Any]:
+    '''Convert Singer error to JSON-serializable format for Go services.'''
+    return {
+        "error_type": "singer_error",
+        "component_type": error.context.get("component_type", "unknown"),
+        "stream_name": error.context.get("stream_name"),
+        "message": str(error),
+        "context": error.context,
+        "troubleshooting": {
+            "check_config": error.context.get("config_key") is not None,
+            "check_connection": isinstance(error, FlextSingerConnectionError),
+            "check_authentication": isinstance(error, FlextSingerAuthenticationError),
+            "check_data_format": isinstance(error, FlextSingerValidationError)
+        }
+    }
+```
+
+## Integration Points
+
+### FLEXT Singer Projects
+- Used by all flext-tap-* projects for consistent error handling
+- Integrated with flext-target-* projects for destination error management
+- Base classes for transform operations in DBT integration
+- Consistent error context across Singer ecosystem
+
+### Bridge Module Integration
+- FlextMeltanoBridge uses these exceptions for error reporting
+- JSON serialization for Go service error handling
+- Structured error context for troubleshooting and debugging
+- Integration with FlextResult patterns for consistent error propagation
+
+## Quality Standards
+
+### Error Handling Excellence
+- **Comprehensive Context**: All errors include relevant context for debugging
+- **Component-Specific**: Dedicated exception classes for each Singer component type
+- **Bridge Compatible**: JSON-serializable error context for Go service integration
+- **Troubleshooting Support**: Structured error information for automated diagnosis
+
+### Singer Protocol Compliance
+- **Standard Error Types**: Complete coverage of Singer protocol error scenarios
+- **Stream Context**: Stream-specific error information for pipeline debugging
+- **Operation Context**: Operation-specific context for performance optimization
+- **Configuration Validation**: Comprehensive configuration error handling
+
+This module provides essential **Singer protocol exception handling** for FLEXT
+Meltano's bridge architecture, enabling reliable error management and
+troubleshooting across the entire Singer ecosystem integration.
 
 Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
@@ -208,7 +380,10 @@ class FlextTransformError(FlextSingerError):
             kwargs["transform_name"] = transform_name
 
         super().__init__(
-            message, component_type="transform", stream_name=None, **kwargs
+            message,
+            component_type="transform",
+            stream_name=None,
+            **kwargs,
         )
 
 

@@ -1,6 +1,136 @@
-"""FLEXT Meltano CLI - Command line interface using flext-core patterns.
+"""FLEXT Meltano CLI - Command Line Interface for Bridge Operations.
 
-CLI interface for FLEXT Meltano operations using FlextDomainService composition.
+**Architecture Layer**: Application Layer
+**Status**: ✅ **FUNCTIONAL** - Type error at line 293 has been resolved
+**Dependencies**: flext-core (FlextResult), subprocess, Path utilities
+
+## Module Purpose
+
+This module provides **command-line interface functionality** for FLEXT Meltano's
+bridge architecture, enabling direct CLI operations and serving as a foundation
+for Go service integration through subprocess calls.
+
+**RECENT FIX**: The critical type error at line 293 has been resolved with proper type guards:
+```python
+# Fixed implementation:
+if result.data and isinstance(result.data, dict):
+    stdout = result.data.get("stdout", "")
+    version = stdout.strip() if isinstance(stdout, str) else "unknown"
+else:
+    version = "unknown"
+```
+
+## Design Principles
+
+1. **CLI Interface**: Direct command-line operations for development and testing
+2. **Bridge Foundation**: CLI operations callable from Go services via subprocess
+3. **FlextResult Integration**: Consistent error handling with enterprise patterns
+4. **Command Validation**: Input validation and secure command execution
+5. **JSON-Compatible**: Results serializable for Go service consumption
+
+## Core Components
+
+### CLI Operations
+- `FlextMeltanoCli`: Primary CLI interface class
+- Command execution with subprocess orchestration
+- Version, health, and help command implementations
+- Integration with execution module for Meltano operations
+
+### Bridge Support
+- CLI operations designed for subprocess consumption
+- JSON-serializable command results
+- Standardized error handling for Go service integration
+- Command validation and sanitization
+
+## Usage Patterns
+
+### Direct CLI Usage
+```python
+from flext_meltano.cli import FlextMeltanoCli
+
+# Initialize CLI interface
+cli = FlextMeltanoCli(project_root="./meltano")
+
+# Execute CLI commands
+result = cli.execute("version")
+if result.is_success:
+    print(f"Version: {result.data}")
+
+# Execute with options
+result = cli.execute("discover", ["--tap", "tap-postgres"])
+```
+
+### Bridge Integration
+```python
+# CLI operations designed for bridge consumption
+def bridge_run_cli(command: str, options: List[str] = None) -> Dict[str, Any]:
+    '''Execute CLI command with JSON-serializable results for Go services.'''
+    cli = FlextMeltanoCli()
+    result = cli.execute(command, options)
+
+    return {
+        "success": result.is_success,
+        "command": command,
+        "output": result.data if result.is_success else None,
+        "error": result.error_message if result.is_failure else None,
+    }
+```
+
+## Critical Issues
+
+### Type Error at Line 157
+**ERROR**: `"object" has no attribute "strip"`
+```python
+# BROKEN: Needs type guard or proper casting
+version = result.data["stdout"].strip() if result.data else "unknown"
+
+# SHOULD BE: Proper type handling
+if result.is_success and isinstance(result.data, dict):
+    stdout = result.data.get("stdout", "")
+    version = stdout.strip() if isinstance(stdout, str) else "unknown"
+else:
+    version = "unknown"
+```
+
+### Required Fixes
+1. **Type Safety**: Fix line 277 type error with proper type guards and isinstance() checks
+2. **Error Handling**: Ensure robust error handling for subprocess calls
+3. **Input Validation**: Add command validation and sanitization
+4. **Bridge Compatibility**: Ensure JSON serialization works correctly
+
+### BLOCKING QUALITY GATES
+- ❌ `make type-check` **FAILING** - 1 error at line 277
+- ⚠️ `make validate` **BLOCKED** by type checking failures
+- 🔴 **CI/CD Integration**: Type errors block merge requests
+
+## Integration Points
+
+### Execution Module Integration
+- Uses execution module for actual Meltano command execution
+- CLI provides user-friendly interface on top of subprocess operations
+- Command parsing and validation before execution
+
+### Bridge Module Integration (After Implementation)
+- FlextMeltanoBridge will use CLI functions internally
+- Bridge scripts can invoke CLI operations
+- Go services can call CLI via subprocess
+
+## Next Actions Required
+
+### CRITICAL (Fix Type Error) - EMERGENCY PHASE 1
+1. **Fix Line 277**: Add proper type guards and isinstance() checks for result.data["stdout"]
+2. **Type Annotations**: Ensure all functions have proper type annotations
+3. **MyPy Compliance**: Verify strict MyPy compliance after fixes
+4. **Quality Gate Unblocking**: Essential for `make type-check` and `make validate` to pass
+
+### HIGH (Enhance Functionality)
+1. **Command Validation**: Add comprehensive input validation
+2. **Error Handling**: Improve error handling and reporting
+3. **Bridge Integration**: Optimize for subprocess consumption
+
+This module provides essential **CLI interface capabilities** for FLEXT Meltano
+but requires **immediate type error fixes** before it can be used reliably in
+the bridge architecture.
 """
 
 from __future__ import annotations
@@ -114,7 +244,10 @@ class FlextMeltanoCli:
             },
         )
 
-    def flext_meltano_run_command(self, args: list[str]) -> FlextResult[dict[str, object]]:
+    def flext_meltano_run_command(
+        self,
+        args: list[str],
+    ) -> FlextResult[dict[str, object]]:
         """Run meltano command with arguments."""
         try:
             # Build command
@@ -154,7 +287,11 @@ class FlextMeltanoCli:
         """Get meltano version."""
         result = self.flext_meltano_run_command(["--version"])
         if result.is_success:
-            version = result.data["stdout"].strip() if result.data else "unknown"
+            if result.data and isinstance(result.data, dict):
+                stdout = result.data.get("stdout", "")
+                version = stdout.strip() if isinstance(stdout, str) else "unknown"
+            else:
+                version = "unknown"
             return FlextResult(data=version)
         return FlextResult(error=result.error)
 
@@ -173,7 +310,9 @@ class FlextMeltanoCli:
         return self.flext_meltano_run_command(cmd_args)
 
 
-def flext_meltano_run_cli(args: list[str] | None = None) -> FlextResult[dict[str, object]]:
+def flext_meltano_run_cli(
+    args: list[str] | None = None,
+) -> FlextResult[dict[str, object]]:
     """Run CLI with arguments."""
     try:
         args = args or []

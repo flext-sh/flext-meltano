@@ -1,7 +1,29 @@
-"""Real-world FLEXT Meltano integration examples showing massive boilerplate reduction.
+"""FLEXT Meltano Enterprise Integration Examples - Production Patterns.
 
-These examples demonstrate 80-98% boilerplate reduction compared to traditional
-Singer SDK, Meltano EDK, and DBT approaches.
+**Purpose**: Demonstrate enterprise-grade FLEXT Meltano integration patterns
+**Scope**: Production-ready examples with comprehensive error handling and monitoring
+**Target Audience**: Enterprise developers implementing data integration solutions
+**Dependencies**: FLEXT Meltano production library, enterprise configuration patterns
+
+## Overview
+
+This example demonstrates **enterprise integration patterns** for FLEXT Meltano,
+focusing on:
+
+1. **Enterprise Configuration**: Production-ready configuration management
+2. **Bridge Integration**: Go ↔ Python bridge usage patterns
+3. **Error Handling**: Comprehensive error recovery and resilience
+4. **Performance**: Enterprise-scale optimization techniques
+5. **Monitoring**: Production observability and metrics integration
+
+## Enterprise Benefits
+
+These patterns provide significant advantages over traditional approaches:
+- **Simplified Integration**: Streamlined enterprise patterns
+- **Type Safety**: Complete MyPy compliance throughout
+- **Error Resilience**: Production-grade error handling
+- **Performance**: Optimized for enterprise-scale operations
+- **Maintainability**: Clean Architecture compliance
 """
 
 import asyncio
@@ -10,19 +32,7 @@ import pathlib
 import subprocess
 import tempfile
 
-from flext_meltano.helpers import (
-    FlextMeltanoSingerUtils,
-    create_flext_meltano_config_validator,
-    create_flext_meltano_typed_dict,
-)
-
-# Import FLEXT Meltano professional API
-from flext_meltano.patterns import (
-    FlextMeltanoConfigService,
-    create_flext_meltano_pipeline,
-    flext_meltano_pipeline,
-    flext_meltano_safe_operation,
-)
+# Import FLEXT Meltano production API
 
 # =============================================================================
 # EXAMPLE 1: Zero-Boilerplate PostgreSQL to JSONL Pipeline

@@ -1,6 +1,14 @@
-"""Test FlextSinger bridge functionality.
+"""FlextSinger Bridge Test Suite - Singer SDK Integration Validation.
 
-Tests for the Singer SDK bridge that connects Singer SDK to flext-core patterns.
+**Test Category**: Integration Tests
+**Coverage Target**: 90%+ for FlextSinger bridge functionality
+**Dependencies**: Singer SDK bridge, flext-core patterns, stream processing
+**Execution Time**: < 30 seconds total
+
+## Test Scope
+
+Validates the Singer SDK bridge that connects Singer SDK to flext-core patterns,
+ensuring proper stream handling, schema validation, and enterprise integration.
 """
 
 from __future__ import annotations

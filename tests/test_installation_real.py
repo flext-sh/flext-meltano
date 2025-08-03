@@ -1,4 +1,16 @@
-"""Tests for installation module focusing on existing methods only."""
+"""Installation Module Real Test Suite - Production Installation Validation.
+
+**Test Category**: Integration Tests
+**Coverage Target**: 90%+ for installation module components
+**Dependencies**: Meltano CLI, plugin installation, filesystem operations
+**Execution Time**: < 30 seconds total
+
+## Test Scope
+
+Validates the installation module's existing methods with real Meltano plugin installation
+scenarios, testing actual plugin discovery, configuration, and installation processes
+within FLEXT Meltano's plugin management architecture.
+"""
 
 from __future__ import annotations
 

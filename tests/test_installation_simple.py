@@ -1,4 +1,15 @@
-"""Simplified tests for installation module to increase coverage."""
+"""Installation Module Simple Test Suite - Core Functionality Validation.
+
+**Test Category**: Unit Tests
+**Coverage Target**: 85%+ for installation module core functionality
+**Dependencies**: Installation module, basic plugin scenarios, core operations
+**Execution Time**: < 10 seconds total
+
+## Test Scope
+
+Validates core installation module functionality with simplified test scenarios
+to ensure basic plugin installation and management operations work correctly.
+"""
 
 from __future__ import annotations
 

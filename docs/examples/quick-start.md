@@ -324,5 +324,5 @@ pytest tests/test_specific.py -v -s
 
 ---
 
-_Quick Start Guide - Version 2.0.0-enterprise_
+_Quick Start Guide - Version: 0.9.0_
 _Last Updated: 2025-01-29_
