@@ -1,7 +1,16 @@
-"""Comprehensive tests for real DBT functionality using dbt-core.
+"""DBT Real Functionality Test Suite - Production DBT Integration Validation.
 
-Tests validate actual DBT model execution, testing, and project operations.
-All tests use real dbt-core integration without mocks.
+**Test Category**: Integration Tests
+**Coverage Target**: 90%+ for DBT core functionality and model execution
+**Dependencies**: dbt-core, real DBT projects, model compilation and execution
+**Execution Time**: < 2 minutes total
+
+## Test Scope
+
+Validates actual DBT model execution, testing, and project operations using real dbt-core
+integration without mocks. Tests comprehensive DBT workflow including model compilation,
+testing, documentation generation, and project management within FLEXT Meltano's
+data transformation architecture.
 """
 
 from __future__ import annotations

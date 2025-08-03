@@ -1,4 +1,36 @@
-"""Comprehensive tests for installation module to achieve 90%+ coverage."""
+"""Installation Module Comprehensive Test Suite - Plugin Management Layer Validation.
+
+**Test Category**: Integration Tests
+**Coverage Target**: 95%+ for installation module components
+**Dependencies**: Mock subprocess calls, plugin registry, Meltano CLI integration
+**Execution Time**: < 12 seconds total
+
+## Test Scope
+
+Validates the installation module components that provide **plugin installation and management**
+for FLEXT Meltano's bridge architecture, focusing on Meltano plugin installation, configuration
+management, and installation context tracking for Go service bridge operations.
+
+## Test Coverage Areas
+
+1. **Plugin Installation**: Meltano plugin installation via CLI orchestration
+2. **Installation Context**: Installation metadata and tracking management
+3. **Configuration Management**: Plugin configuration and setting validation
+4. **Service Patterns**: FlextMeltanoInstaller service functionality
+5. **Bridge Integration**: Installation operations via bridge interface
+6. **Error Handling**: Installation failures and recovery patterns
+
+## Architecture Alignment
+
+Tests align with FLEXT Meltano's installation layer architecture:
+- **Plugin Management**: Direct Meltano plugin installation and configuration
+- **Installation Orchestration**: Subprocess-based installation with monitoring
+- **Bridge Communication**: Installation status and results for Go services
+- **Enterprise Patterns**: FlextResult integration and structured error handling
+
+These tests ensure the installation module provides reliable plugin management
+that enables comprehensive bridge-based plugin operations for Go services.
+"""
 
 from __future__ import annotations
 

@@ -1,7 +1,408 @@
-"""FLEXT Meltano installation helpers using MANDATORY patterns.
+"""FLEXT Meltano Installation - Plugin Installation and Management.
 
-Plugin installation and management using enterprise patterns.
-Uses mandatory flext-core patterns for consistency.
+**Architecture Layer**: Plugin Management Layer
+**Status**: ✅ STABLE - Plugin installation and lifecycle management
+**Dependencies**: flext-core (FlextResult), Meltano Hub, subprocess execution
+
+## Module Purpose
+
+This module provides **plugin installation and lifecycle management** for FLEXT
+Meltano's bridge architecture, enabling Go services to install, configure, and
+manage Meltano plugins through subprocess orchestration with enterprise patterns.
+
+## Design Principles
+
+1. **Plugin Lifecycle**: Complete plugin installation and management workflow
+2. **Hub Integration**: Meltano Hub integration for plugin discovery and installation
+3. **Configuration Management**: Plugin configuration validation and persistence
+4. **Bridge-Friendly**: JSON-serializable installation results for Go services
+5. **Enterprise Patterns**: FlextResult integration and structured error handling
+
+## Core Components
+
+### Plugin Installation
+- `FlextMeltanoInstaller`: Primary plugin installation service
+- `install_plugin()`: Function for installing plugins from Hub or custom sources
+- `FlextMeltanoPluginInfo`: Plugin information entity with installation metadata
+- Version management and dependency resolution
+
+### Installation Context
+- `FlextMeltanoInstallationContext`: Installation tracking and metadata
+- Installation validation and compatibility checking
+- Plugin configuration management and persistence
+- Installation rollback and cleanup mechanisms
+
+### Plugin Management
+- Plugin availability verification and health checking
+- Configuration validation and schema compliance
+- Plugin updates and version management
+- Dependency analysis and conflict resolution
+
+## Usage Patterns
+
+### Basic Plugin Installation
+```python
+from flext_meltano.installation import install_plugin, FlextMeltanoInstaller
+
+# Install extractor plugin
+result = install_plugin("extractor", "tap-postgres")
+if result.is_success:
+    print(f"Plugin installed: {result.data}")
+else:
+    print(f"Installation failed: {result.error_message}")
+
+# Service-based installation with configuration
+installer = FlextMeltanoInstaller(config)
+result = installer.install_plugin_with_config(
+    "extractor", "tap-postgres", config={"host": "localhost", "port": 5432}
+)
+```
+
+### Advanced Installation Operations
+```python
+from flext_meltano.installation import FlextMeltanoInstaller
+
+installer = FlextMeltanoInstaller(config)
+
+# Install with custom pip URL
+result = installer.install_plugin(
+    plugin_type="extractor",
+    name="tap-custom",
+    pip_url="git+https://github.com/example/tap-custom.git",
+)
+
+# Install specific variant
+result = installer.install_plugin(
+    plugin_type="loader", name="target-postgres", variant="transferwise"
+)
+
+# Batch installation
+plugins_to_install = [
+    {"type": "extractor", "name": "tap-postgres"},
+    {"type": "loader", "name": "target-csv"},
+    {"type": "transformer", "name": "dbt"},
+]
+result = installer.install_multiple_plugins(plugins_to_install)
+```
+
+### Plugin Configuration Management
+```python
+from flext_meltano.installation import configure_plugin, validate_plugin_config
+
+# Configure installed plugin
+config_data = {
+    "host": "postgres.example.com",
+    "port": 5432,
+    "database": "analytics",
+    "username": "etl_user",
+}
+
+result = configure_plugin("tap-postgres", config_data)
+if result.is_success:
+    print("Plugin configured successfully")
+
+# Validate configuration before installation
+validation_result = validate_plugin_config("tap-postgres", config_data)
+if validation_result.is_success:
+    # Proceed with installation
+    install_result = install_plugin("extractor", "tap-postgres")
+```
+
+## Bridge Integration Patterns
+
+### Go Service Usage
+```go
+// Go service installing plugins via bridge
+func (c *FlextMeltanoClient) InstallPlugin(pluginType, name string) (*InstallResult, error) {
+    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "add_plugin", pluginType, name)
+    output, err := cmd.Output()
+    if err != nil {
+        return nil, err
+    }
+
+    var result InstallResult
+    err = json.Unmarshal(output, &result)
+    return &result, err
+}
+
+func (c *FlextMeltanoClient) InstallPluginWithConfig(
+    pluginType, name string,
+    config map[string]interface{}
+) (*InstallResult, error) {
+    configJson, _ := json.Marshal(config)
+    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py",
+        "add_plugin", pluginType, name, "--config", string(configJson))
+    // Process installation result
+}
+```
+
+### Installation Result Format
+```python
+# Standard installation result structure for bridge
+installation_result = {
+    "success": True,
+    "plugin": {
+        "name": "tap-postgres",
+        "type": "extractor",
+        "version": "0.4.40",
+        "executable": "tap-postgres",
+        "pip_url": "pipelinewise-tap-postgres==0.4.40"
+    },
+    "installation_context": {
+        "installation_id": "uuid-string",
+        "installed_at": "2025-08-02T10:30:00Z",
+        "environment": "dev",
+        "dependencies_installed": ["psycopg2-binary", "singer-python"]
+    },
+    "configuration": {
+        "schema_applied": True,
+        "settings_available": ["host", "port", "database", "username", "password"],
+        "capabilities": ["discover", "properties", "state"]
+    }
+}
+```
+
+### Error Handling Format
+```python
+# Standard installation error format for bridge
+installation_error = {
+    "success": False,
+    "error": {
+        "message": "Plugin installation failed: dependency conflict",
+        "type": "installation_error",
+        "plugin_name": "tap-postgres",
+        "details": {
+            "conflicting_dependencies": ["psycopg2==2.8.6", "psycopg2-binary==2.9.1"],
+            "resolution_suggestions": [
+                "Use --force flag to override conflicts",
+                "Update conflicting packages manually",
+                "Use virtual environment isolation",
+            ],
+        },
+        "timestamp": "2025-08-02T10:30:00Z",
+    },
+    "plugin": None,
+    "installation_context": None,
+}
+```
+
+## Installation Operations
+
+### Plugin Installation Service
+```python
+class FlextMeltanoInstaller:
+    '''Enterprise plugin installation service with Hub integration.'''
+
+    def __init__(self, config: FlextMeltanoConfig):
+        self._config = config
+        self._installation_cache = {}
+        self._dependency_resolver = DependencyResolver()
+
+    def install_plugin(
+        self,
+        plugin_type: str,
+        name: str,
+        *,
+        variant: Optional[str] = None,
+        pip_url: Optional[str] = None,
+        force: bool = False,
+    ) -> FlextResult[Dict[str, Any]]:
+        '''Install plugin with comprehensive validation and error handling.'''
+        try:
+            # Pre-installation validation
+            validation_result = self._validate_installation_prerequisites(
+                plugin_type, name, variant
+            )
+            if validation_result.is_failure:
+                return validation_result
+
+            # Dependency resolution
+            deps_result = self._resolve_dependencies(name, variant)
+            if deps_result.is_failure:
+                return deps_result
+
+            # Execute installation
+            install_result = self._execute_installation(
+                plugin_type, name, variant, pip_url, force
+            )
+
+            if install_result.is_success:
+                # Post-installation configuration
+                config_result = self._apply_default_configuration(name)
+                return self._build_installation_result(
+                    name, install_result.data, config_result.data
+                )
+            else:
+                return install_result
+
+        except Exception as e:
+            return FlextResult.fail(f"Installation error: {e}")
+```
+
+### Configuration Management
+```python
+def configure_plugin_with_validation(
+    plugin_name: str, config_data: Dict[str, Any], validate_connection: bool = True
+) -> FlextResult[Dict[str, Any]]:
+    '''Configure plugin with validation and connection testing.'''
+    try:
+        # Validate configuration schema
+        schema_result = validate_plugin_configuration_schema(plugin_name, config_data)
+        if schema_result.is_failure:
+            return schema_result
+
+        # Apply configuration
+        config_result = apply_plugin_configuration(plugin_name, config_data)
+        if config_result.is_failure:
+            return config_result
+
+        # Test connection if requested
+        if validate_connection:
+            test_result = test_plugin_connection(plugin_name)
+            if test_result.is_failure:
+                return FlextResult.fail(
+                    f"Configuration applied but connection test failed: {test_result.error_message}"
+                )
+
+        return FlextResult.ok(
+            {
+                "plugin_name": plugin_name,
+                "configuration_applied": True,
+                "connection_tested": validate_connection,
+                "status": "ready",
+            }
+        )
+
+    except Exception as e:
+        return FlextResult.fail(f"Configuration error: {e}")
+```
+
+## Installation Validation
+
+### Prerequisites Checking
+```python
+def validate_installation_prerequisites(
+    plugin_type: str, plugin_name: str
+) -> FlextResult[Dict[str, Any]]:
+    '''Validate installation prerequisites and environment.'''
+    validation_results = {}
+
+    # Check Meltano project
+    if not check_meltano_project_exists():
+        return FlextResult.fail("Meltano project not found")
+
+    # Check plugin availability in Hub
+    hub_check = check_plugin_in_hub(plugin_name)
+    validation_results["hub_available"] = hub_check.is_success
+
+    # Check existing installation
+    existing_check = check_plugin_already_installed(plugin_name)
+    validation_results["already_installed"] = existing_check.is_success
+
+    # Check dependencies
+    deps_check = check_system_dependencies(plugin_name)
+    validation_results["dependencies_met"] = deps_check.is_success
+
+    # Check disk space
+    space_check = check_available_disk_space()
+    validation_results["sufficient_space"] = space_check.is_success
+
+    # Overall validation result
+    all_valid = all(
+        [
+            validation_results["hub_available"],
+            not validation_results["already_installed"],  # Should not be installed
+            validation_results["dependencies_met"],
+            validation_results["sufficient_space"],
+        ]
+    )
+
+    if all_valid:
+        return FlextResult.ok(validation_results)
+    else:
+        return FlextResult.fail(f"Prerequisites not met: {validation_results}")
+```
+
+### Dependency Resolution
+```python
+class DependencyResolver:
+    '''Dependency resolution service for plugin installations.'''
+
+    def resolve_plugin_dependencies(
+        self, plugin_name: str, variant: Optional[str] = None
+    ) -> FlextResult[List[Dict[str, Any]]]:
+        '''Resolve plugin dependencies with conflict detection.'''
+        try:
+            # Get plugin metadata from Hub
+            metadata_result = get_plugin_metadata(plugin_name, variant)
+            if metadata_result.is_failure:
+                return metadata_result
+
+            metadata = metadata_result.data
+            dependencies = metadata.get("dependencies", [])
+
+            # Check for conflicts with existing plugins
+            conflict_check = self._check_dependency_conflicts(dependencies)
+            if conflict_check.is_failure:
+                return conflict_check
+
+            # Resolve dependency versions
+            resolved_deps = []
+            for dep in dependencies:
+                version_result = self._resolve_dependency_version(dep)
+                if version_result.is_success:
+                    resolved_deps.append(version_result.data)
+                else:
+                    return FlextResult.fail(f"Could not resolve dependency: {dep}")
+
+            return FlextResult.ok(resolved_deps)
+
+        except Exception as e:
+            return FlextResult.fail(f"Dependency resolution error: {e}")
+```
+
+## Quality Standards
+
+### Installation Reliability
+- **Validation Pipeline**: Comprehensive pre-installation validation
+- **Dependency Resolution**: Automated dependency conflict detection and resolution
+- **Rollback Capability**: Failed installation cleanup and rollback mechanisms
+- **Configuration Validation**: Schema validation and connection testing
+
+### Bridge Compatibility
+- **JSON Serialization**: All installation results JSON-serializable for Go consumption
+- **Error Standardization**: Consistent error format with troubleshooting context
+- **Progress Tracking**: Installation progress reporting for long-running operations
+- **Configuration Management**: Bridge-friendly configuration apply and validation
+
+## Integration Points
+
+### Execution Module Integration
+- Uses FlextMeltanoExecutor for Meltano CLI installation commands
+- Subprocess execution for plugin installation and configuration
+- Command result parsing and installation status tracking
+
+### Discovery Module Integration
+- Plugin availability verification before installation
+- Hub integration for plugin metadata and version information
+- Dependency discovery and compatibility checking
+
+### Bridge Module Integration (After Implementation)
+- FlextMeltanoBridge will use installation functions
+- Bridge-friendly installation operations with progress tracking
+- Go service integration via subprocess calls
+
+## Next Actions
+
+- ✅ **Plugin Installation**: Hub integration and plugin installation working
+- ✅ **Configuration Management**: Plugin configuration and validation working
+- 🔄 **Bridge Integration**: Ready for bridge module consumption
+- 📈 **Performance**: Installation caching and batch operations
+- 🛡️ **Security**: Secure plugin installation and validation
+
+This module provides essential **plugin installation and management** capabilities
+for FLEXT Meltano's bridge architecture, enabling comprehensive plugin lifecycle
+management for Go service integration.
 """
 
 from __future__ import annotations
@@ -12,7 +413,6 @@ import uuid
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextResult
@@ -21,7 +421,7 @@ try:
     from injectable import injectable  # type: ignore[import-untyped]
 except ImportError:
     # Fallback decorator if injectable is not available
-    def injectable(cls: type[Any]) -> type[Any]:
+    def injectable(cls: type[object]) -> type[object]:
         """Fallback injectable decorator."""
         return cls
 
@@ -147,7 +547,7 @@ class FlextMeltanoInstaller:
                 check=False,
             )
 
-            installation_result = {
+            installation_result: dict[str, object] = {
                 "installation_id": context.installation_id,
                 "plugin_name": plugin_name,
                 "plugin_type": plugin_type,

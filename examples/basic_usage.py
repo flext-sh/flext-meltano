@@ -1,7 +1,45 @@
-"""Basic usage examples for FLEXT Meltano library.
+"""FLEXT Meltano Basic Usage Examples - Foundation Patterns.
 
-This module demonstrates basic usage patterns for the FLEXT Meltano library
-including configuration, service creation, and common operations.
+**Purpose**: Demonstrate fundamental FLEXT Meltano bridge library usage patterns
+**Scope**: Configuration management, service creation, basic operations, result handling
+**Target Audience**: New developers learning FLEXT Meltano integration patterns
+**Dependencies**: flext-core (FlextResult patterns), minimal infrastructure requirements
+
+## Overview
+
+This example demonstrates the essential patterns for integrating FLEXT Meltano's
+Go ↔ Python bridge library into applications, focusing on:
+
+1. **Configuration Management**: Environment-aware settings with validation
+2. **Service Creation**: Factory patterns with dependency injection
+3. **Result Handling**: FlextResult railway-oriented programming patterns
+4. **Error Management**: Enterprise-grade error handling and recovery
+5. **Bridge Integration**: JSON-serializable operations for Go service consumption
+
+## Usage
+
+```bash
+python basic_usage.py
+```
+
+## Expected Output
+
+The example will demonstrate:
+- Configuration initialization with various settings
+- Service creation using factory functions
+- Basic operations with proper error handling
+- Result validation and data extraction patterns
+
+All operations use mocked components to avoid external dependencies,
+making this example suitable for learning and development environments.
+
+## Architecture Alignment
+
+Examples follow FLEXT Meltano's foundation layer patterns:
+- **Value Objects**: Configuration as immutable value objects
+- **Factory Pattern**: Consistent service creation with DI container
+- **Railway Programming**: FlextResult for error handling
+- **Bridge Compatibility**: All results are JSON-serializable for Go services
 """
 
 import traceback

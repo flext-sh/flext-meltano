@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
-"""FLEXT Meltano - Quick Start Guide.
+"""FLEXT Meltano Quick Start Guide - Ultra-Simplified API Examples.
 
-Guia completo para começar rapidamente com a nova API ultra-simplificada.
-Cada exemplo é funcional e pode ser executado independentemente.
+**Purpose**: Complete quick start guide for FLEXT Meltano's ultra-simplified API
+**Scope**: Functional examples demonstrating core library capabilities and patterns
+**Target Audience**: Developers getting started with FLEXT Meltano integration
+**Dependencies**: FLEXT Meltano library, basic configuration requirements
+
+## Overview
+
+This comprehensive guide demonstrates the **ultra-simplified API** for FLEXT Meltano,
+providing functional examples that can be executed independently to quickly understand
+the core capabilities and integration patterns.
 """
 
 from __future__ import annotations
@@ -37,13 +45,13 @@ BACKOFF_BASE = 2
 
 
 def quick_start_basic() -> None:
-    """Quick Start - Pipeline básico em 1 linha."""
-    # ✨ UMA LINHA substitui 50+ linhas de código manual
+    """Quick Start - Basic pipeline in 1 line."""
+    # ✨ ONE LINE replaces 50+ lines of manual code
     run_pipeline("tap-csv", "target-csv")
 
 
 def quick_start_with_configuration() -> None:
-    """Quick Start - Com configuração customizada."""
+    """Quick Start - With custom configuration."""
     # 🏗️ Setup com auto-instalação de plugins
     fm = FlextMeltano(
         project_root="/tmp/my_project",
@@ -51,7 +59,7 @@ def quick_start_with_configuration() -> None:
         auto_install=True,  # Instala plugins automaticamente
     )
 
-    # 🔧 Execução com configuração específica
+    # 🔧 Execution with specific configuration
     result = fm.run(
         "tap-postgres",
         "target-csv",
@@ -73,7 +81,7 @@ def enterprise_project_setup() -> None:
     # 🏢 SETUP ENTERPRISE COMPLETO - 3 linhas vs 100+ manuais
     result = setup_project(
         "/tmp/enterprise_project",
-        # 🔌 Plugins com configuração
+        # 🔌 Plugins with configuration
         plugins=[
             PluginSpec(
                 "tap-postgres",
@@ -157,8 +165,8 @@ def batch_processing_example() -> None:
 
 
 def advanced_batch_processing() -> None:
-    """Processamento batch avançado com controle granular."""
-    # 🎛️ Processor com configuração avançada
+    """Advanced batch processing with granular control."""
+    # 🎛️ Processor with advanced configuration
     processor = BatchProcessor(
         "/tmp/advanced_project",
         environment="prod",
@@ -301,12 +309,12 @@ def health_monitoring_example() -> None:
     # 🔌 Status de plugins
     plugins = health.get("plugins", {})
 
-    # 🌍 Ambientes configurados
+    # 🌍 Configured environments
     environments = health.get("environments", [])
 
     # 🗄️ Status do banco
     database = health.get("database", {})
-    "✅ Configurado" if database.get("configured") else "❌ Não configurado"
+    "✅ Configured" if database.get("configured") else "❌ Not configured"
 
     # 🔔 Alertas automáticos
     if not health["healthy",]:

@@ -1,7 +1,326 @@
-"""Meltano discovery using mandatory enterprise patterns.
+"""FLEXT Meltano Discovery - Plugin Discovery and Catalog Management.
 
-Plugin discovery and catalog management with enterprise patterns.
-Uses mandatory flext-core patterns for consistency.
+**Architecture Layer**: Plugin Management Layer
+**Status**: ✅ STABLE - Plugin discovery and catalog management
+**Dependencies**: flext-core (FlextResult), Meltano Hub, Singer SDK
+
+## Module Purpose
+
+This module provides **plugin discovery and catalog management** for FLEXT Meltano's
+bridge architecture, enabling Go services to discover available plugins, explore
+schema catalogs, and manage plugin registries through subprocess orchestration.
+
+## Design Principles
+
+1. **Hub Integration**: Direct integration with Meltano Hub for plugin discovery
+2. **Catalog Management**: Singer protocol catalog discovery and schema exploration
+3. **Bridge-Friendly**: JSON-serializable plugin information for Go services
+4. **Caching Strategy**: Efficient plugin discovery with caching mechanisms
+5. **Enterprise Patterns**: FlextResult integration and structured error handling
+
+## Core Components
+
+### Plugin Discovery
+- `FlextMeltanoDiscoverer`: Primary plugin discovery service
+- `discover_plugins()`: Function for discovering available plugins from Hub
+- `FlextMeltanoPlugin`: Plugin information entity with metadata
+- Hub integration with caching and filtering capabilities
+
+### Catalog Management
+- `discover_catalog()`: Schema catalog discovery from Singer taps
+- `FlextMeltanoDiscoveryCommand`: Command pattern for discovery operations
+- Stream and schema information extraction and formatting
+- Bridge-compatible catalog response formatting
+
+### Plugin Registry
+- Plugin information aggregation and management
+- Plugin type filtering (extractors, loaders, transformers)
+- Version management and compatibility checking
+- Plugin dependency analysis and resolution
+
+## Usage Patterns
+
+### Plugin Discovery
+```python
+from flext_meltano.discovery import discover_plugins, FlextMeltanoDiscoverer
+
+# Discover all available plugins
+result = discover_plugins()
+if result.is_success:
+    plugins = result.data
+    for plugin in plugins:
+        print(f"Plugin: {plugin['name']} ({plugin['type']})")
+
+# Service-based discovery with filtering
+discoverer = FlextMeltanoDiscoverer(config)
+extractors = discoverer.discover_plugins_by_type("extractor")
+```
+
+### Catalog Discovery
+```python
+from flext_meltano.discovery import discover_catalog
+
+# Discover schema catalog from a tap
+result = discover_catalog("tap-postgres")
+if result.is_success:
+    catalog = result.data
+    streams = catalog.get("streams", [])
+    print(f"Found {len(streams)} available streams")
+
+    for stream in streams:
+        print(f"Stream: {stream['tap_stream_id']}")
+        schema = stream.get("schema", {})
+        properties = schema.get("properties", {})
+        print(f"  Fields: {list(properties.keys())}")
+```
+
+### Bridge Integration
+```python
+# Discovery operations designed for bridge consumption
+def bridge_discover_plugins() -> Dict[str, Any]:
+    '''Bridge-friendly plugin discovery with JSON-serializable results.'''
+    result = discover_plugins()
+
+    if result.is_success:
+        return {"success": True, "plugins": result.data, "count": len(result.data)}
+    else:
+        return {"success": False, "error": result.error_message, "plugins": []}
+```
+
+## Bridge Integration Patterns
+
+### Go Service Usage
+```go
+// Go service discovering plugins via bridge
+func (c *FlextMeltanoClient) DiscoverPlugins() (*PluginList, error) {
+    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "list_plugins")
+    output, err := cmd.Output()
+    if err != nil {
+        return nil, err
+    }
+
+    var result PluginList
+    err = json.Unmarshal(output, &result)
+    return &result, err
+}
+
+func (c *FlextMeltanoClient) DiscoverCatalog(tapName string) (*Catalog, error) {
+    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "discover_catalog", tapName)
+    output, err := cmd.Output()
+    // JSON response processing for catalog
+}
+```
+
+### Plugin Information Format
+```python
+# Standard plugin information structure for bridge
+plugin_info = {
+    "name": "tap-postgres",
+    "type": "extractor",
+    "namespace": "tap_postgres",
+    "executable": "tap-postgres",
+    "description": "PostgreSQL extractor",
+    "version": "latest",
+    "pip_url": "pipelinewise-tap-postgres",
+    "settings": [
+        {
+            "name": "host",
+            "type": "string",
+            "required": True,
+            "description": "PostgreSQL host"
+        }
+    ],
+    "capabilities": ["discover", "properties", "state"]
+}
+```
+
+### Catalog Information Format
+```python
+# Standard catalog structure for bridge
+catalog_info = {
+    "streams": [
+        {
+            "tap_stream_id": "public-users",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "string"},
+                    "email": {"type": "string"},
+                },
+            },
+            "metadata": {"replication-method": "FULL_TABLE", "selected": False},
+        }
+    ],
+    "discovered_at": "2025-08-02T10:30:00Z",
+    "tap_name": "tap-postgres",
+}
+```
+
+## Discovery Operations
+
+### Hub Integration
+```python
+class FlextMeltanoDiscoverer:
+    '''Enterprise plugin discovery service with Hub integration.'''
+
+    def __init__(self, config: FlextMeltanoConfig):
+        self._config = config
+        self._hub_service = MeltanoHubService()
+        self._cache = {}
+
+    def discover_plugins_by_type(
+        self, plugin_type: str
+    ) -> FlextResult[List[Dict[str, Any]]]:
+        '''Discover plugins filtered by type (extractor, loader, transformer).'''
+        # Implementation with Hub integration
+
+    def discover_plugin_details(self, plugin_name: str) -> FlextResult[Dict[str, Any]]:
+        '''Get detailed information about a specific plugin.'''
+        # Implementation with detailed metadata
+```
+
+### Catalog Operations
+```python
+def discover_catalog_with_validation(
+    tap_name: str, config: Optional[Dict[str, Any]] = None
+) -> FlextResult[Dict[str, Any]]:
+    '''Discover catalog with configuration validation.'''
+    try:
+        # Validate tap is available
+        tap_check = validate_tap_availability(tap_name)
+        if tap_check.is_failure:
+            return tap_check
+
+        # Execute discovery
+        result = execute_meltano_command(["invoke", tap_name, "--discover"])
+
+        if result.is_success:
+            catalog = json.loads(result.data["stdout"])
+            return FlextResult.ok(catalog)
+        else:
+            return FlextResult.fail(f"Catalog discovery failed: {result.error_message}")
+
+    except Exception as e:
+        return FlextResult.fail(f"Discovery error: {e}")
+```
+
+## Caching and Performance
+
+### Discovery Caching
+```python
+class PluginDiscoveryCache:
+    '''Caching service for plugin discovery operations.'''
+
+    def __init__(self, ttl: int = 3600):
+        self._cache = {}
+        self._ttl = ttl
+
+    def get_cached_plugins(self) -> Optional[List[Dict[str, Any]]]:
+        '''Get cached plugin list if available and not expired.'''
+        # Cache implementation
+
+    def cache_plugins(self, plugins: List[Dict[str, Any]]) -> None:
+        '''Cache plugin list with expiration.'''
+        # Cache storage implementation
+```
+
+### Performance Optimization
+- Hub API call optimization with request batching
+- Plugin metadata caching with configurable TTL
+- Concurrent discovery operations for multiple plugins
+- Efficient JSON parsing and serialization for bridge
+
+## Error Handling Patterns
+
+### Discovery Error Management
+```python
+def handle_discovery_errors(operation: str) -> Callable:
+    '''Decorator for comprehensive discovery error handling.'''
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+                if result.is_success:
+                    logger.info(f"Discovery operation {operation} succeeded")
+                else:
+                    logger.error(
+                        f"Discovery operation {operation} failed: {result.error_message}"
+                    )
+                return result
+            except Exception as e:
+                error_msg = f"Discovery operation {operation} error: {e}"
+                logger.exception(error_msg)
+                return FlextResult.fail(error_msg)
+
+        return wrapper
+
+    return decorator
+```
+
+### Bridge Error Formatting
+```python
+def format_discovery_error_for_bridge(error: str) -> Dict[str, Any]:
+    '''Format discovery errors for Go service consumption.'''
+    return {
+        "success": False,
+        "error": {
+            "message": error,
+            "type": "discovery_error",
+            "timestamp": datetime.now(UTC).isoformat(),
+            "suggestions": [
+                "Check Meltano project configuration",
+                "Verify tap is installed and available",
+                "Review plugin hub connectivity",
+            ],
+        },
+        "data": None,
+    }
+```
+
+## Quality Standards
+
+### Discovery Reliability
+- **Hub Integration**: Robust Meltano Hub API integration with error handling
+- **Catalog Validation**: Schema validation for discovered catalogs
+- **Plugin Verification**: Plugin availability and compatibility checking
+- **Cache Management**: Efficient caching with proper invalidation
+
+### Bridge Compatibility
+- **JSON Serialization**: All discovery results JSON-serializable
+- **Error Standardization**: Consistent error format for Go consumption
+- **Response Structure**: Standardized response format across operations
+- **Performance Optimization**: Efficient discovery for subprocess calls
+
+## Integration Points
+
+### Execution Module Integration
+- Uses FlextMeltanoExecutor for tap discovery operations
+- Subprocess execution for catalog discovery commands
+- Command result parsing and JSON extraction
+
+### Installation Module Integration
+- Plugin availability checking before discovery
+- Integration with plugin installation workflow
+- Dependency verification and compatibility checking
+
+### Bridge Module Integration (After Implementation)
+- FlextMeltanoBridge will use discovery functions
+- Bridge-friendly discovery operations
+- Go service integration via subprocess calls
+
+## Next Actions
+
+- ✅ **Plugin Discovery**: Hub integration and plugin enumeration working
+- ✅ **Catalog Discovery**: Schema catalog discovery from taps working
+- 🔄 **Bridge Integration**: Ready for bridge module consumption
+- 📈 **Performance**: Caching optimization and concurrent discovery
+- 🛡️ **Security**: Input validation and secure plugin discovery
+
+This module provides essential **plugin discovery and catalog management**
+capabilities for FLEXT Meltano's bridge architecture, enabling comprehensive
+plugin ecosystem exploration for Go service integration.
 """
 
 from __future__ import annotations
@@ -14,7 +333,6 @@ import uuid
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextLogger, FlextResult
@@ -23,7 +341,7 @@ try:
     from injectable import injectable  # type: ignore[import-untyped]
 except ImportError:
     # Fallback decorator if injectable is not available
-    def injectable(cls: type[Any]) -> type[Any]:
+    def injectable(cls: type[object]) -> type[object]:
         """Fallback injectable decorator."""
         return cls
 

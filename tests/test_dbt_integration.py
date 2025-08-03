@@ -1,6 +1,31 @@
-"""Test DBT integration module.
+"""DBT Integration Comprehensive Test Suite - Data Transformation Layer Validation.
 
-Comprehensive tests for the DBT integration classes and methods.
+**Test Category**: Integration Tests
+**Coverage Target**: 95%+ for DBT integration components
+**Dependencies**: DBT Core, flext-core patterns, temporary project directories
+**Execution Time**: < 15 seconds total
+
+## Test Scope
+
+Validates the DBT integration components that provide **data transformation capabilities**
+for FLEXT Meltano's bridge architecture, focusing on DBT project management, model
+execution, and enterprise patterns for data transformation workflows.
+
+## Test Coverage Areas
+
+1. **DBT Project Management**: DBT project lifecycle and configuration
+2. **Model Execution**: DBT run, test, and compile operations
+3. **Integration Patterns**: DBT service creation and configuration management
+4. **Enterprise Patterns**: FlextResult integration and error handling
+5. **Bridge Integration**: DBT operations accessible via Go service bridge
+
+## Architecture Alignment
+
+Tests align with FLEXT Meltano's DBT integration architecture:
+- **Data Transformation**: DBT-based data transformation with enterprise patterns
+- **Project Management**: DBT project lifecycle with proper configuration
+- **Service Integration**: DBT services integrated with FLEXT service patterns
+- **Bridge Communication**: DBT operations designed for Go service consumption
 """
 
 from __future__ import annotations

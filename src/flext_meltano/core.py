@@ -1,7 +1,263 @@
-"""FLEXT Meltano Core - Enterprise orchestration using mandatory patterns.
+"""FLEXT Meltano Core - Enterprise Services for Pipeline Orchestration.
 
-This module implements enterprise orchestration patterns using MANDATORY
-flext-core domain services, entities, and value objects.
+**Architecture Layer**: Application Layer
+**Status**: ✅ STABLE - Enterprise services and orchestration patterns
+**Dependencies**: flext-core (DDD patterns), base module, execution module
+
+## Module Purpose
+
+This module provides **enterprise-grade services and orchestration patterns**
+for FLEXT Meltano's bridge architecture, implementing Domain-Driven Design (DDD),
+CQRS, and enterprise service patterns for complex pipeline management and
+Go service integration.
+
+## Design Principles
+
+1. **Domain-Driven Design**: Entities, aggregates, and domain services
+2. **Enterprise Orchestration**: Complex pipeline workflow management
+3. **CQRS Patterns**: Command/query separation for scalability
+4. **Event-Driven Architecture**: Domain events for pipeline state changes
+5. **Service Composition**: Orchestrated service interactions with dependency injection
+
+## Core Components
+
+### Domain Services
+- `FlextMeltanoOrchestrationService`: Pipeline orchestration and workflow management
+- `FlextMeltanoDbtService`: DBT operations with enterprise patterns
+- `FlextMeltanoSingerService`: Singer protocol handling and stream management
+- Domain service composition with FlextResult integration
+
+### Domain Entities & Aggregates
+- `PipelineExecution`: Aggregate root for pipeline execution state
+- `MeltanoProject`: Entity representing Meltano project configuration
+- `PluginRegistry`: Entity for plugin management and discovery
+- `ExecutionContext`: Value object for execution metadata
+
+### Enterprise Patterns
+- Command pattern implementation for pipeline operations
+- Event sourcing for pipeline execution history
+- Repository pattern for data persistence
+- Factory pattern for service creation
+
+## Service Orchestration Patterns
+
+### Pipeline Orchestration
+```python
+from flext_meltano.core import FlextMeltanoOrchestrationService
+
+orchestrator = FlextMeltanoOrchestrationService(config)
+
+# Complex pipeline execution with multiple stages
+result = orchestrator.execute_complex_pipeline(
+    {
+        "extraction": {"tap": "tap-postgres", "config": {...}},
+        "transformation": {"dbt_models": ["staging", "marts"]},
+        "loading": {"target": "target-snowflake", "config": {...}},
+    }
+)
+```
+
+### Service Composition
+```python
+from flext_meltano.core import (
+    FlextMeltanoOrchestrationService,
+    FlextMeltanoDbtService,
+    FlextMeltanoSingerService,
+)
+
+
+# Composed service execution
+def execute_enterprise_pipeline(config):
+    orchestrator = FlextMeltanoOrchestrationService(config)
+    dbt_service = FlextMeltanoDbtService(config)
+    singer_service = FlextMeltanoSingerService(config)
+
+    return (
+        orchestrator.prepare_pipeline()
+        .flat_map(lambda ctx: singer_service.extract_data(ctx))
+        .flat_map(lambda data: dbt_service.transform_data(data))
+        .flat_map(lambda result: orchestrator.finalize_pipeline(result))
+    )
+```
+
+### Event-Driven Orchestration
+```python
+# Domain events for pipeline state management
+class PipelineStartedEvent:
+    pipeline_id: str
+    started_at: datetime
+
+
+class PipelineCompletedEvent:
+    pipeline_id: str
+    completed_at: datetime
+    execution_metrics: Dict[str, Any]
+
+
+# Event handling in orchestration service
+orchestrator.on_pipeline_started(lambda event: log_pipeline_start(event))
+orchestrator.on_pipeline_completed(lambda event: notify_completion(event))
+```
+
+## Bridge Integration Support
+
+### Go Service Integration
+Enterprise services designed for Go service consumption:
+```python
+# Bridge-friendly service operations
+class FlextMeltanoOrchestrationService:
+    def execute_pipeline_for_bridge(
+        self, pipeline_spec: Dict[str, Any]
+    ) -> FlextResult[Dict[str, Any]]:
+        '''Execute pipeline with JSON-serializable results for Go services.'''
+        # Implementation uses execution module internally
+```
+
+### Service Composition for Bridge
+```python
+# Services work together for bridge operations
+def bridge_execute_complex_operation(bridge_request: Dict[str, Any]):
+    orchestrator = get_orchestration_service()
+
+    return (
+        orchestrator.parse_bridge_request(bridge_request)
+        .flat_map(lambda parsed: orchestrator.execute_pipeline(parsed))
+        .map(lambda result: orchestrator.format_bridge_response(result))
+    )
+```
+
+## Enterprise Patterns Implementation
+
+### Command Pattern
+```python
+class ExecutePipelineCommand:
+    '''Command for pipeline execution with enterprise validation.'''
+    pipeline_id: str
+    tap_config: Dict[str, Any]
+    target_config: Dict[str, Any]
+    execution_context: ExecutionContext
+
+class ExecutePipelineHandler:
+    '''Handler for pipeline execution commands.'''
+    def handle(self, command: ExecutePipelineCommand) -> FlextResult[PipelineResult]:
+        # Enterprise command handling logic
+```
+
+### Repository Pattern
+```python
+class PipelineExecutionRepository:
+    '''Repository for pipeline execution persistence.'''
+    def save_execution(self, execution: PipelineExecution) -> FlextResult[None]:
+        # Persistence logic
+
+    def find_by_id(self, execution_id: str) -> FlextResult[PipelineExecution]:
+        # Retrieval logic
+```
+
+### Factory Pattern
+```python
+def create_orchestration_service(
+    config: FlextMeltanoConfig,
+) -> FlextResult[FlextMeltanoOrchestrationService]:
+    '''Factory for orchestration service with dependency injection.'''
+    try:
+        service = FlextMeltanoOrchestrationService(config)
+        return FlextResult.ok(service)
+    except Exception as e:
+        return FlextResult.fail(f"Service creation failed: {e}")
+```
+
+## Domain Model
+
+### Entities
+```python
+class PipelineExecution(FlextEntity):
+    '''Aggregate root for pipeline execution.'''
+
+    execution_id: str
+    pipeline_name: str
+    status: ExecutionStatus
+    started_at: datetime
+    completed_at: Optional[datetime]
+    execution_metrics: Dict[str, Any]
+
+    def mark_completed(self) -> FlextResult[None]:
+        '''Business logic for marking execution complete.'''
+        if self.status != ExecutionStatus.RUNNING:
+            return FlextResult.fail("Cannot complete non-running execution")
+
+        self.status = ExecutionStatus.COMPLETED
+        self.completed_at = datetime.now(UTC)
+        self.add_domain_event(PipelineCompletedEvent(...))
+        return FlextResult.ok(None)
+```
+
+### Value Objects
+```python
+class ExecutionContext(FlextValueObject):
+    '''Value object for execution context.'''
+
+    correlation_id: str
+    user_id: Optional[str]
+    environment: str
+    execution_timestamp: datetime
+
+    def to_bridge_context(self) -> Dict[str, Any]:
+        '''Convert to bridge-compatible format.'''
+        return {
+            "correlation_id": self.correlation_id,
+            "environment": self.environment,
+            "timestamp": self.execution_timestamp.isoformat(),
+        }
+```
+
+## Quality Standards
+
+### Enterprise Patterns
+- **DDD Implementation**: Proper domain modeling with entities and value objects
+- **Service Layer**: Application services with business logic encapsulation
+- **Event Sourcing**: Domain events for state changes and integration
+- **Repository Pattern**: Data access abstraction with FlextResult integration
+
+### Error Handling
+- **FlextResult Integration**: All operations use FlextResult for error handling
+- **Domain Exceptions**: Custom exceptions for business rule violations
+- **Error Context**: Rich error information for troubleshooting
+- **Rollback Patterns**: Transaction management and compensation
+
+### Testing Strategy
+- **Unit Tests**: Domain logic testing with mocked dependencies
+- **Integration Tests**: Service composition and database integration
+- **Contract Tests**: API contract validation for bridge integration
+- **Performance Tests**: Orchestration performance and scalability
+
+## Integration Points
+
+### Execution Module Integration
+- Uses FlextMeltanoExecutor for actual subprocess execution
+- Service layer adds enterprise patterns on top of execution
+- Complex pipeline orchestration with multiple execution steps
+
+### Base Module Integration
+- Extends base service classes with enterprise patterns
+- Configuration management through FlextMeltanoConfig
+- Factory pattern integration for service creation
+
+### Bridge Module Integration (After Implementation)
+- Services provide bridge-friendly operations
+- JSON-serializable results for Go service consumption
+- Enterprise error handling with bridge-compatible formats
+
+## Next Actions
+
+- ✅ **Enterprise Services**: Domain services implemented and functional
+- 🔄 **Bridge Integration**: Ready for bridge module consumption
+- 📈 **Performance Optimization**: Async patterns and performance monitoring
+- 🛡️ **Security Hardening**: Enterprise security patterns and audit logging
+
+This module provides the **enterprise application layer** for FLEXT Meltano,
+implementing sophisticated orchestration patterns required for production-grade
+data pipeline management and Go service integration.
 """
 
 from __future__ import annotations
@@ -12,7 +268,7 @@ import warnings
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import (
@@ -26,7 +282,7 @@ try:
     from injectable import injectable  # type: ignore[import-untyped]
 except ImportError:
     # Fallback decorator if injectable is not available
-    def injectable(cls: type[Any]) -> type[Any]:
+    def injectable(cls: type[object]) -> type[object]:
         """Fallback injectable decorator."""
         return cls
 

@@ -1,7 +1,14 @@
-"""Test configuration for flext-meltano.
+"""FLEXT Meltano Test Configuration - Enterprise Testing Framework Setup.
+
+**Test Framework**: Pytest with comprehensive fixture management
+**Coverage Target**: Support for 90%+ test coverage across all modules
+**Dependencies**: Meltano projects, flext-core patterns, enterprise test standards
+**Execution Time**: Optimized fixture loading for fast test execution
+
+## Test Configuration Scope
 
 Provides pytest fixtures and configuration for testing Meltano integration functionality
-using real Meltano projects and flext-core patterns.
+using real Meltano projects and flext-core patterns with enterprise testing standards.
 """
 
 from __future__ import annotations

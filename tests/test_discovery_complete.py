@@ -1,4 +1,36 @@
-"""Comprehensive tests for discovery module."""
+"""Discovery Module Complete Test Suite - Plugin Management Layer Validation.
+
+**Test Category**: Integration Tests
+**Coverage Target**: 95%+ for discovery module components
+**Dependencies**: Mock Meltano Hub, subprocess calls, async patterns
+**Execution Time**: < 15 seconds total
+
+## Test Scope
+
+Validates the discovery module components that provide **plugin discovery and catalog management**
+for FLEXT Meltano's bridge architecture, focusing on Meltano Hub integration, schema catalog
+discovery, and bridge-friendly plugin information for Go service consumption.
+
+## Test Coverage Areas
+
+1. **Plugin Discovery**: Meltano Hub integration and plugin enumeration
+2. **Catalog Discovery**: Schema catalog discovery from Singer taps
+3. **Discovery Context**: Discovery metadata and execution tracking
+4. **Service Patterns**: FlextMeltanoDiscoverer service functionality
+5. **Bridge Integration**: JSON-serializable discovery results
+6. **Error Handling**: Hub connection failures and recovery patterns
+
+## Architecture Alignment
+
+Tests align with FLEXT Meltano's discovery layer architecture:
+- **Hub Integration**: Direct Meltano Hub API communication
+- **Catalog Management**: Singer protocol catalog discovery and processing
+- **Bridge Communication**: Structured plugin data for Go services
+- **Enterprise Patterns**: FlextResult integration and dependency injection
+
+These tests ensure the discovery module provides reliable plugin exploration
+and catalog management that enables comprehensive bridge operations.
+"""
 
 from __future__ import annotations
 
