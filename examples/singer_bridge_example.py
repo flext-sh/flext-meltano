@@ -440,6 +440,5 @@ def main() -> None:
     bridge_integrated_pipeline_example()
 
 
-
 if __name__ == "__main__":
     main()

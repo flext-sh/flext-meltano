@@ -676,6 +676,5 @@ def main() -> None:
     demonstrate_code_reduction()
 
 
-
 if __name__ == "__main__":
     main()

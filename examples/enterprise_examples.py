@@ -333,7 +333,7 @@ def example_bridge_integration_health_check() -> dict[str, Any]:
 
         return {
             "bridge_healthy": health_result.success,
-            "health_details": health_result.data if health_result.data else "OK",
+            "health_details": health_result.data or "OK",
             "service_info": service_info.data
             if service_info.success
             else "Not available",
@@ -377,9 +377,7 @@ def example_advanced_configuration_validation() -> dict[str, Any]:
             if project_result.data
             else "No details",
             "service_healthy": health_result.success,
-            "health_details": health_result.data
-            if health_result.data
-            else "No health data",
+            "health_details": health_result.data or "No health data",
             "validation_approach": "enterprise_flext_meltano",
         }
     except Exception as e:
@@ -483,7 +481,6 @@ async def main() -> None:
 
     # Run complete enterprise workflow
     await example_complete_enterprise_workflow()
-
 
 
 if __name__ == "__main__":
