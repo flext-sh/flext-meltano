@@ -523,31 +523,16 @@ class FlextMeltanoValidationService:
             elif not config:
                 issues.append("No configuration provided for connection test")
             else:
-                # Basic validation based on common patterns
-                essential_keys = ["host", "port", "database", "user"]
-                csv_keys = ["files"]
-                api_keys = ["api_url", "api_key", "base_url"]
-
-                has_db_config = any(key in config for key in essential_keys)
-                has_csv_config = any(key in config for key in csv_keys)
-                has_api_config = any(key in config for key in api_keys)
-
-                if not (has_db_config or has_csv_config or has_api_config):
-                    issues.append(
-                        "Insufficient configuration - missing essential connection parameters",
-                    )
-                else:
-                    config_type = (
-                        "database"
-                        if has_db_config
-                        else "csv"
-                        if has_csv_config
-                        else "api"
-                    )
-                    details["config_type"] = config_type
-                    warnings.append(
-                        f"Configuration appears valid for {config_type} tap",
-                    )
+                # Validate configuration using extracted method
+                config_validation = self._validate_config_type(config)
+                validation_issues = config_validation["issues"]
+                validation_warnings = config_validation["warnings"]
+                if isinstance(validation_issues, list):
+                    issues.extend(validation_issues)
+                if isinstance(validation_warnings, list):
+                    warnings.extend(validation_warnings)
+                if config_validation["config_type"]:
+                    details["config_type"] = config_validation["config_type"]
 
             validation_result = FlextMeltanoValidationResult(
                 validation_id=context.validation_id,
@@ -562,6 +547,47 @@ class FlextMeltanoValidationService:
 
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct connection test failed: {e}")
+
+    def _validate_config_type(self, config: dict[str, object]) -> dict[str, object]:
+        """Extract and validate configuration type based on common patterns.
+
+        Args:
+            config: Configuration dictionary to validate
+
+        Returns:
+            Dictionary with validation results including issues, warnings, and config_type
+
+        """
+        issues: list[str] = []
+        warnings: list[str] = []
+        config_type: str | None = None
+
+        # Define configuration patterns
+        essential_keys = ["host", "port", "database", "user"]
+        csv_keys = ["files"]
+        api_keys = ["api_url", "api_key", "base_url"]
+
+        has_db_config = any(key in config for key in essential_keys)
+        has_csv_config = any(key in config for key in csv_keys)
+        has_api_config = any(key in config for key in api_keys)
+
+        if not (has_db_config or has_csv_config or has_api_config):
+            issues.append(
+                "Insufficient configuration - missing essential connection parameters",
+            )
+        else:
+            config_type = (
+                "database" if has_db_config else "csv" if has_csv_config else "api"
+            )
+            warnings.append(
+                f"Configuration appears valid for {config_type} tap",
+            )
+
+        return {
+            "issues": issues,
+            "warnings": warnings,
+            "config_type": config_type,
+        }
 
     def validate_tap_config(
         self,

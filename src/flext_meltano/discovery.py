@@ -614,7 +614,8 @@ class FlextMeltanoDiscoverer:
                     # MeltanoHubService may require project parameter
                     if Project is not None:
                         project = Project.find()
-                        self._hub = MeltanoHubService(project)
+                        if project is not None:  # Ensure project is valid
+                            self._hub = MeltanoHubService(project)
 
             plugins: list[FlextMeltanoPlugin] = []
 

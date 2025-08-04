@@ -182,6 +182,7 @@ import shutil
 import subprocess
 import uuid
 import warnings
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -439,6 +440,75 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
         return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
         return FlextResult(error=f"Failed to create executor: {e}")
+
+
+# === COMMON SUBPROCESS EXECUTOR ===
+
+
+@dataclass
+class SubprocessExecutionContext:
+    """Context for centralized subprocess execution."""
+
+    command: list[str]
+    cwd: Path | None = None
+    env: dict[str, str] | None = None
+    timeout_seconds: int = 300
+    capture_output: bool = True
+    text: bool = True
+    check: bool = False
+
+
+def execute_subprocess_common(
+    context: SubprocessExecutionContext,
+) -> FlextResult[dict[str, object]]:
+    """Centralized subprocess execution to eliminate code duplication.
+
+    This function provides a common pattern for subprocess execution used
+    throughout the FLEXT Meltano ecosystem, ensuring consistent error handling
+    and result formatting.
+
+    Args:
+        context: Subprocess execution context with command and options
+
+    Returns:
+        FlextResult with execution details including stdout, stderr, returncode
+
+    """
+    try:
+        # Set up environment
+        exec_env = dict(os.environ)
+        if context.env:
+            exec_env.update(context.env)
+
+        # Execute subprocess with common pattern
+        result = subprocess.run(  # noqa: S603
+            context.command,
+            cwd=context.cwd,
+            env=exec_env,
+            capture_output=context.capture_output,
+            text=context.text,
+            timeout=context.timeout_seconds,
+            check=context.check,
+        )
+
+        # Return standardized result
+        execution_result = {
+            "command": " ".join(context.command),
+            "returncode": result.returncode,
+            "stdout": result.stdout or "",
+            "stderr": result.stderr or "",
+            "success": result.returncode == 0,
+            "cwd": str(context.cwd) if context.cwd else str(Path.cwd()),
+        }
+
+        return FlextResult(data=execution_result)
+
+    except subprocess.TimeoutExpired as e:
+        return FlextResult(
+            error=f"Command timed out after {context.timeout_seconds} seconds: {e}",
+        )
+    except (subprocess.CalledProcessError, OSError, FileNotFoundError) as e:
+        return FlextResult(error=f"Command error: {e}")
 
 
 # === LEGACY COMPATIBILITY ===

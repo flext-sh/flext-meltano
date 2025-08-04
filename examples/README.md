@@ -8,53 +8,44 @@ Comprehensive collection of working examples demonstrating FLEXT Meltano's Go �
 
 ## Example Categories
 
-### **Basic Usage Examples**
+### **Foundation Examples (Production Ready)**
 
-#### **[basic_usage.py](basic_usage.py)** - ✅ Production Ready
+#### **[01_flext_result_railway_pattern.py](01_flext_result_railway_pattern.py)** - ✅ Production Ready
 
-**Purpose**: Fundamental bridge library usage patterns
-**Scope**: Configuration, basic operations, result handling
-**Target Audience**: New developers learning FLEXT Meltano
-**Dependencies**: None (uses mocked operations)
+**Purpose**: Railway-oriented programming with FlextResult patterns
+**Scope**: Error handling, result chaining, enterprise patterns
+**Target Audience**: Developers learning FLEXT foundation patterns
+**Dependencies**: flext-core (FlextResult)
 
-```python
-# Basic bridge integration example
-from flext_meltano import FlextMeltanoConfig, create_meltano_tap_service
+#### **[02_flext_container_dependency_injection.py](02_flext_container_dependency_injection.py)** - ⚠️ Needs Fix
 
-# Simple configuration and service creation
-config = FlextMeltanoConfig(project_root="./meltano")
-result = create_meltano_tap_service(config)
-```
+**Purpose**: Dependency injection container patterns
+**Scope**: Service registration, dependency resolution, IoC patterns
+**Target Audience**: Enterprise architects implementing DI
+**Dependencies**: flext-core (FlextContainer)
 
-#### **[api_usage.py](api_usage.py)** - ✅ Production Ready
+### **Enterprise Architecture Examples**
 
-**Purpose**: Public API usage patterns and best practices
-**Scope**: API imports, factory functions, service interactions
-**Target Audience**: API consumers and integration developers
-**Dependencies**: flext-core (FlextResult patterns)
+#### **[03_flext_commands_cqrs_pattern.py](03_flext_commands_cqrs_pattern.py)** - ✅ Production Ready
 
-### **Advanced Integration Examples**
-
-#### **[enterprise_examples.py](enterprise_examples.py)** - ✅ Production Ready
-
-**Purpose**: Enterprise-grade usage patterns with full error handling
-**Scope**: Complex workflows, error recovery, monitoring integration
+**Purpose**: CQRS command patterns and enterprise architecture
+**Scope**: Command handling, enterprise patterns, Clean Architecture
 **Target Audience**: Enterprise architects and senior developers
-**Dependencies**: All infrastructure components
+**Dependencies**: flext-core (Command patterns)
 
-#### **[singer_bridge_example.py](singer_bridge_example.py)** - ✅ Production Ready
+#### **[15_flext_advanced_examples.py](15_flext_advanced_examples.py)** - ✅ Production Ready
 
-**Purpose**: Singer SDK bridge integration patterns
-**Scope**: Tap/target creation, stream processing, catalog management
-**Target Audience**: Data engineers working with Singer protocol
-**Dependencies**: Singer SDK, Meltano CLI
+**Purpose**: Advanced FLEXT patterns and integration scenarios
+**Scope**: Complex workflows, advanced patterns, enterprise integration
+**Target Audience**: Senior developers and architects
+**Dependencies**: Complete FLEXT ecosystem
 
-#### **[real_working_examples.py](real_working_examples.py)** - ✅ Production Ready
+#### **[17_flext_working_examples.py](17_flext_working_examples.py)** - ✅ Production Ready
 
-**Purpose**: Real-world scenarios with actual data processing
-**Scope**: End-to-end pipeline execution, data validation, monitoring
-**Target Audience**: Operations teams and data engineers
-**Dependencies**: PostgreSQL, Redis, file system access
+**Purpose**: Real-world working examples with actual functionality
+**Scope**: End-to-end examples, practical usage, production patterns
+**Target Audience**: Operations teams and implementation teams
+**Dependencies**: FLEXT ecosystem components
 
 ### **Code Quality & Architecture Examples**
 

@@ -317,7 +317,7 @@ class TestMeltanoLegacyCompatibility:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins()
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
