@@ -75,7 +75,7 @@ class TestMeltanoProjectOperations:
         validator = FlextMeltanoValidationService(self.config)
         result = validator.validate_project()
 
-        assert result.is_success
+        assert result.success
         validation_result = result.data
         assert validation_result is not None
         assert not validation_result.is_valid
@@ -104,7 +104,7 @@ environments:
         validator = FlextMeltanoValidationService(self.config)
         result = validator.validate_project()
 
-        assert result.is_success
+        assert result.success
         validation_result = result.data
         assert validation_result is not None
         assert validation_result.is_valid
@@ -121,11 +121,11 @@ environments:
         installer = FlextMeltanoInstaller(self.config)
         result = installer.validate()
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "No meltano.yml found" not in result.error:
-            msg = f"Expected {'No meltano.yml found'} in {result.error}"
+            msg: str = f"Expected {'No meltano.yml found'} in {result.error}"
             raise AssertionError(msg)
 
     def test_installer_validation_with_project(self) -> None:
@@ -141,7 +141,7 @@ project_id: test-project
         installer = FlextMeltanoInstaller(self.config)
         result = installer.validate()
 
-        assert result.is_success
+        assert result.success
 
 
 class TestMeltanoCommandExecution:
@@ -162,10 +162,10 @@ class TestMeltanoCommandExecution:
         executor = FlextMeltanoExecutor(self.config)
         result = executor.get_health_status()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["service"] != "execution":
-            msg = f"Expected {'execution'}, got {result.data['service']}"
+            msg: str = f"Expected {'execution'}, got {result.data['service']}"
             raise AssertionError(
                 msg,
             )
@@ -177,7 +177,7 @@ class TestMeltanoCommandExecution:
 
         # Should fail if meltano is not installed
         # But test should handle gracefully
-        assert isinstance(result.is_success, bool)
+        assert isinstance(result.success, bool)
 
     def test_run_command_structure(self) -> None:
         """Test run command structure."""
@@ -198,10 +198,10 @@ class TestMeltanoPluginDiscovery:
         discoverer = FlextMeltanoDiscoverer(config)
         result = discoverer.get_health_status()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["service"] != "discovery":
-            msg = f"Expected {'discovery'}, got {result.data['service']}"
+            msg: str = f"Expected {'discovery'}, got {result.data['service']}"
             raise AssertionError(
                 msg,
             )
@@ -223,13 +223,13 @@ class TestMeltanoPluginDiscovery:
             result = discoverer.discover_plugins()
 
             # Accept either success or failure for discovery since we're testing fallback
-            plugins = result.data if result.is_success else []
+            plugins = result.data if result.success else []
             assert isinstance(plugins, list)
 
         # Check default plugins are present
         plugin_names = [p.name for p in plugins]
         if "tap-csv" not in plugin_names:
-            msg = f"Expected {'tap-csv'} in {plugin_names}"
+            msg: str = f"Expected {'tap-csv'} in {plugin_names}"
             raise AssertionError(msg)
         assert "target-csv" in plugin_names
 
@@ -241,14 +241,14 @@ class TestMeltanoPluginDiscovery:
         # Discover only extractors
         result = discoverer.discover_plugins("extractors")
 
-        assert result.is_success
+        assert result.success
         plugins = result.data
         assert plugins is not None
 
         # All plugins should be extractors
         for plugin in plugins:
             if plugin.type != "extractors":
-                msg = f"Expected {'extractors'}, got {plugin.type}"
+                msg: str = f"Expected {'extractors'}, got {plugin.type}"
                 raise AssertionError(msg)
 
 
@@ -279,11 +279,11 @@ class TestMeltanoConfiguration:
         )
 
         if config.environment != "test":
-            msg = f"Expected {'test'}, got {config.environment}"
+            msg: str = f"Expected {'test'}, got {config.environment}"
             raise AssertionError(msg)
         assert config.meltano_database_uri == "sqlite:///test.db"
         if config.meltano_ui_bind_port != 5001:
-            msg = f"Expected {5001}, got {config.meltano_ui_bind_port}"
+            msg: str = f"Expected {5001}, got {config.meltano_ui_bind_port}"
             raise AssertionError(msg)
 
     def test_config_validation(self) -> None:
@@ -344,7 +344,7 @@ class TestMeltanoLegacyCompatibility:
             assert result.data is not None
         assert result.data is not None
         if "plugins" not in result.data:
-            msg = f"Expected {'plugins'} in {result.data}"
+            msg: str = f"Expected {'plugins'} in {result.data}"
             raise AssertionError(msg)
 
     def test_legacy_validation_functions(self) -> None:

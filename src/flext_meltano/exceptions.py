@@ -243,7 +243,7 @@ class FlextMeltanoDBTError(FlextMeltanoError):
         super().__init__(f"DBT: {message}", plugin_name=None, **context)
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoConfigurationError",
     "FlextMeltanoDBTError",
     "FlextMeltanoError",

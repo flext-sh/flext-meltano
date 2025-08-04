@@ -93,7 +93,7 @@ executor = FlextMeltanoExecutor()
 # Execute pipeline with comprehensive error handling
 result = executor.run_pipeline("tap-csv", "target-csv")
 
-if result.is_success:
+if result.success:
     print(f"Pipeline completed: {result.data}")
     print(f"Metrics: {result.data.get('metrics', {})}")
 else:
@@ -114,7 +114,7 @@ from flext_meltano.execution import execute_meltano_command
 result = execute_meltano_command(["--version"])
 
 # Railway-oriented programming pattern
-if result.is_success:
+if result.success:
     print(f"Meltano version: {result.data['output']}")
     print(f"Exit code: {result.data['exit_code']}")
 else:
@@ -144,7 +144,7 @@ result = run_pipeline(
     dry_run=False
 )
 
-if result.is_success:
+if result.success:
     metrics = result.data
     print(f"Records processed: {metrics.get('record_count', 0)}")
     print(f"Duration: {metrics.get('duration_seconds', 0)}")
@@ -177,7 +177,7 @@ discovery = FlextMeltanoDiscovery()
 # Discover all available plugins
 plugins_result = discovery.discover_plugins()
 
-if plugins_result.is_success:
+if plugins_result.success:
     plugins = plugins_result.data
     print(f"Found {len(plugins)} plugins")
 
@@ -201,7 +201,7 @@ catalog_result = discover_catalog(
     config_override={"host": "localhost", "port": 5432}
 )
 
-if catalog_result.is_success:
+if catalog_result.success:
     catalog = catalog_result.data
     print(f"Discovered {len(catalog['streams'])} streams")
 
@@ -231,7 +231,7 @@ install_result = installer.install_plugin(
     }
 )
 
-if install_result.is_success:
+if install_result.success:
     print(f"Plugin installed: {install_result.data['plugin_name']}")
     print(f"Variant: {install_result.data['variant']}")
 else:
@@ -252,7 +252,7 @@ from flext_meltano.validation import validate_project
 # Complete project validation
 validation_result = validate_project()
 
-if validation_result.is_success:
+if validation_result.success:
     report = validation_result.data
     print(f"Project validation: {report['status']}")
     print(f"Issues found: {len(report['issues'])}")
@@ -277,7 +277,7 @@ test_result = test_tap_connection(
     timeout_seconds=30
 )
 
-if test_result.is_success:
+if test_result.success:
     diagnostics = test_result.data
     print(f"Connection: {diagnostics['connection_status']}")
     print(f"Discovery: {diagnostics['discovery_status']}")
@@ -333,7 +333,7 @@ workflow_result = orchestrator.execute_workflow([
     {"tap": "tap-csv", "target": "target-postgres", "depends_on": "tap-postgres"}
 ])
 
-if workflow_result.is_success:
+if workflow_result.success:
     print(f"Workflow completed: {workflow_result.data['status']}")
     print(f"Jobs executed: {len(workflow_result.data['jobs'])}")
 ```
@@ -359,7 +359,7 @@ dbt_result = dbt_service.run_models(
     full_refresh=False
 )
 
-if dbt_result.is_success:
+if dbt_result.success:
     run_results = dbt_result.data
     print(f"Models executed: {len(run_results['results'])}")
     print(f"Duration: {run_results['elapsed_time']}")
@@ -380,7 +380,7 @@ bridge = FlextMeltanoBridge(config)
 
 # Get version information (JSON serializable)
 version_result = bridge.get_version()
-if version_result.is_success:
+if version_result.success:
     versions = version_result.data
     print(f"Meltano: {versions['meltano']}")
     print(f"Python: {versions['python']}")
@@ -388,14 +388,14 @@ if version_result.is_success:
 
 # List all plugins
 plugins_result = bridge.list_plugins()
-if plugins_result.is_success:
+if plugins_result.success:
     plugins = plugins_result.data
     for plugin in plugins:
         print(f"{plugin['type']}: {plugin['name']} ({plugin['variant']})")
 
 # Execute pipeline via bridge
 pipeline_result = bridge.run_pipeline("tap-csv", "target-csv")
-if pipeline_result.is_success:
+if pipeline_result.success:
     metrics = pipeline_result.data
     print(f"Pipeline metrics: {metrics}")
 ```
@@ -512,7 +512,7 @@ def example_operation() -> FlextResult[Dict[str, Any]]:
 # Usage pattern
 result = example_operation()
 
-if result.is_success:
+if result.success:
     print(f"Success: {result.message}")
     print(f"Data: {result.data}")
 else:
@@ -627,7 +627,7 @@ class ProductionPipelineManager:
         try:
             # Validate configuration
             validation_result = self.orchestrator.validate_configuration()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return validation_result
 
             # Execute pipeline
@@ -638,7 +638,7 @@ class ProductionPipelineManager:
             )
 
             # Log results
-            if pipeline_result.is_success:
+            if pipeline_result.success:
                 metrics = pipeline_result.data
                 self._log_success(metrics)
                 return FlextResult.success(metrics)
@@ -647,7 +647,7 @@ class ProductionPipelineManager:
                 return pipeline_result
 
         except Exception as e:
-            error_msg = f"Pipeline execution failed: {str(e)}"
+            error_msg: str = f"Pipeline execution failed: {str(e)}"
             self._log_error(error_msg)
             return FlextResult.failure(error_msg)
 
@@ -696,7 +696,7 @@ with container.get("tracing").trace("pipeline_execution"):
     # Record metrics
     container.get("metrics").record_counter(
         "pipeline_executions",
-        labels={"tap": "postgres", "target": "csv", "status": "success" if result.is_success else "failure"}
+        labels={"tap": "postgres", "target": "csv", "status": "success" if result.success else "failure"}
     )
 ```
 

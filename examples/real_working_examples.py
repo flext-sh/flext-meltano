@@ -30,12 +30,12 @@ def example_real_pipeline_builder() -> None:
 
     # Create bridge using ACTUAL existing function
     bridge_result = create_flext_meltano_bridge(config)
-    if not bridge_result.is_success:
+    if not bridge_result.success:
         return
 
     # Execute actual pipeline using REAL API
     pipeline_result = flext_meltano_execute_job("tap-postgres", "target-jsonl")
-    if pipeline_result.success:  # Note: FlextMeltanoResult uses .success
+    if pipeline_result.success:  # Note: FlextMeltanoResult uses .success:
         pass
     else:
         return
@@ -65,7 +65,7 @@ def example_real_config_service() -> None:
         schema="public",
     )
 
-    if postgres_config.is_success:
+    if postgres_config.success:
         pass
     else:
         return
@@ -77,7 +77,7 @@ def example_real_config_service() -> None:
         file_naming_scheme="{stream_name}_{date}.jsonl",
     )
 
-    if jsonl_config.is_success:
+    if jsonl_config.success:
         pass
 
 
@@ -107,7 +107,7 @@ def example_real_singer_processing() -> None:
         ["id"],
     )
 
-    if schema_msg.is_success:
+    if schema_msg.success:
         # Validate the message we just created
         validation = singer_utils.flext_meltano_validate_singer_message(schema_msg.data)
     else:
@@ -143,12 +143,12 @@ def example_real_singer_processing() -> None:
             record["created_at"],
         )
 
-        if record_msg.is_success:
+        if record_msg.success:
             # Validate each record message
             validation = singer_utils.flext_meltano_validate_singer_message(
                 record_msg.data,
             )
-            if validation.is_success:
+            if validation.success:
                 valid_records += 1
 
     # Create state message
@@ -162,7 +162,7 @@ def example_real_singer_processing() -> None:
     }
 
     state_msg = singer_utils.flext_meltano_create_singer_state(state_data)
-    if state_msg.is_success:
+    if state_msg.success:
         validation = singer_utils.flext_meltano_validate_singer_message(state_msg.data)
 
 
@@ -186,7 +186,7 @@ def example_real_config_validation() -> None:
     }
 
     validation = validator.flext_meltano_validate_tap_postgres_config(valid_postgres)
-    if validation.is_success:
+    if validation.success:
         pass
 
     # Test invalid configuration (missing required field)
@@ -198,7 +198,7 @@ def example_real_config_validation() -> None:
     }
 
     validation = validator.flext_meltano_validate_tap_postgres_config(invalid_postgres)
-    if validation.is_success:
+    if validation.success:
         pass
 
     # Test configuration with constraint violations
@@ -212,7 +212,7 @@ def example_real_config_validation() -> None:
     validation = validator.flext_meltano_validate_tap_postgres_config(
         constraint_violation,
     )
-    if validation.is_success:
+    if validation.success:
         pass
 
 
@@ -242,7 +242,7 @@ def example_decorator_usage() -> None:
     for _i in range(5):
         result = example_decorated_operation()
 
-        if result.is_success:
+        if result.success:
             pass
 
 
@@ -272,7 +272,7 @@ async def example_async_pipeline() -> None:
     try:
         result = await pipeline.run()
 
-        if result.is_success:
+        if result.success:
             pass
 
     except (RuntimeError, ValueError, TypeError):

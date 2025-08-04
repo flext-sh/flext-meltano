@@ -46,7 +46,7 @@ from flext_meltano.discovery import discover_plugins, FlextMeltanoDiscoverer
 
 # Discover all available plugins
 result = discover_plugins()
-if result.is_success:
+if result.success:
     plugins = result.data
     for plugin in plugins:
         print(f"Plugin: {plugin['name']} ({plugin['type']})")
@@ -62,7 +62,7 @@ from flext_meltano.discovery import discover_catalog
 
 # Discover schema catalog from a tap
 result = discover_catalog("tap-postgres")
-if result.is_success:
+if result.success:
     catalog = result.data
     streams = catalog.get("streams", [])
     print(f"Found {len(streams)} available streams")
@@ -81,7 +81,7 @@ def bridge_discover_plugins() -> Dict[str, Any]:
     '''Bridge-friendly plugin discovery with JSON-serializable results.'''
     result = discover_plugins()
 
-    if result.is_success:
+    if result.success:
         return {"success": True, "plugins": result.data, "count": len(result.data)}
     else:
         return {"success": False, "error": result.error_message, "plugins": []}
@@ -195,7 +195,7 @@ def discover_catalog_with_validation(
         # Execute discovery
         result = execute_meltano_command(["invoke", tap_name, "--discover"])
 
-        if result.is_success:
+        if result.success:
             catalog = json.loads(result.data["stdout"])
             return FlextResult.ok(catalog)
         else:
@@ -242,7 +242,7 @@ def handle_discovery_errors(operation: str) -> Callable:
         def wrapper(*args, **kwargs):
             try:
                 result = func(*args, **kwargs)
-                if result.is_success:
+                if result.success:
                     logger.info(f"Discovery operation {operation} succeeded")
                 else:
                     logger.error(
@@ -250,7 +250,7 @@ def handle_discovery_errors(operation: str) -> Callable:
                     )
                 return result
             except Exception as e:
-                error_msg = f"Discovery operation {operation} error: {e}"
+                error_msg: str = f"Discovery operation {operation} error: {e}"
                 logger.exception(error_msg)
                 return FlextResult.fail(error_msg)
 
@@ -418,7 +418,7 @@ class FlextMeltanoDiscoverer:
         """Initialize service."""
         try:
             validation_result = self.validate()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return validation_result
             self._initialized = True
             return FlextResult(data=True)
@@ -470,7 +470,7 @@ class FlextMeltanoDiscoverer:
                 config or {},
                 context,
             )
-            if result.is_success:
+            if result.success:
                 return result
 
             # Fallback to direct Singer SDK discovery only for valid projects
@@ -729,7 +729,7 @@ def create_discoverer(
     try:
         service = FlextMeltanoDiscoverer(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Discoverer initialization failed: {init_result.error}",
             )
@@ -762,7 +762,7 @@ async def flext_meltano_discover_catalog(
     discoverer = FlextMeltanoDiscoverer(service_config)
 
     result = await discoverer.discover_catalog(tap_name, config)
-    if result.is_success:
+    if result.success:
         return FlextMeltanoResult.ok(result.data)
     return FlextMeltanoResult.fail(result.error or "Unknown error")
 
@@ -783,7 +783,7 @@ def flext_meltano_discover_plugins(
     discoverer = FlextMeltanoDiscoverer(config)
 
     result = discoverer.discover_plugins(plugin_type)
-    if result.is_success:
+    if result.success:
         # Convert plugins to dict format for legacy compatibility
         if result.data is not None:
             plugins_dict = [plugin.dict() for plugin in result.data]

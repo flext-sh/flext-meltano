@@ -53,7 +53,7 @@ cli = FlextMeltanoCli(project_root="./meltano")
 
 # Execute CLI commands
 result = cli.execute("version")
-if result.is_success:
+if result.success:
     print(f"Version: {result.data}")
 
 # Execute with options
@@ -69,9 +69,9 @@ def bridge_run_cli(command: str, options: List[str] = None) -> Dict[str, Any]:
     result = cli.execute(command, options)
 
     return {
-        "success": result.is_success,
+        "success": result.success,
         "command": command,
-        "output": result.data if result.is_success else None,
+        "output": result.data if result.success else None,
         "error": result.error_message if result.is_failure else None,
     }
 ```
@@ -85,7 +85,7 @@ def bridge_run_cli(command: str, options: List[str] = None) -> Dict[str, Any]:
 version = result.data["stdout"].strip() if result.data else "unknown"
 
 # SHOULD BE: Proper type handling
-if result.is_success and isinstance(result.data, dict):
+if result.success and isinstance(result.data, dict):
     stdout = result.data.get("stdout", "")
     version = stdout.strip() if isinstance(stdout, str) else "unknown"
 else:
@@ -267,7 +267,7 @@ class FlextMeltanoCli:
             )
             exec_result = execute_subprocess_common(exec_context)
 
-            if not exec_result.is_success:
+            if not exec_result.success:
                 return FlextResult(error=exec_result.error)
 
             result_data = exec_result.data
@@ -306,7 +306,7 @@ class FlextMeltanoCli:
     def flext_meltano_version(self) -> FlextResult[str]:
         """Get meltano version."""
         result = self.flext_meltano_run_command(["--version"])
-        if result.is_success:
+        if result.success:
             if result.data and isinstance(result.data, dict):
                 stdout = result.data.get("stdout", "")
                 version = stdout.strip() if isinstance(stdout, str) else "unknown"
@@ -318,7 +318,7 @@ class FlextMeltanoCli:
     def flext_meltano_install(self) -> FlextResult[bool]:
         """Install meltano project dependencies."""
         result = self.flext_meltano_run_command(["install"])
-        return FlextResult(data=result.is_success)
+        return FlextResult(data=result.success)
 
     def flext_meltano_invoke(
         self,
@@ -344,7 +344,7 @@ def flext_meltano_run_cli(
         return FlextResult(error=f"CLI execution failed: {e}")
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoCli",
     "flext_meltano_run_cli",
 ]

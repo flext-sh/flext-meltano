@@ -146,7 +146,7 @@ bridge = FlextMeltanoBridge()
 
 # Get version information
 version_result = bridge.get_version()
-if version_result.is_success:
+if version_result.success:
     print(f"Meltano: {version_result.data['meltano']}")
 
 # Execute pipeline

@@ -45,7 +45,7 @@ container = get_meltano_container()
 # Configure with custom settings
 custom_config = FlextMeltanoConfig(project_root="/custom/path")
 result = configure_meltano_container(custom_config)
-if result.is_success:
+if result.success:
     print("Container configured successfully")
 ```
 
@@ -57,20 +57,20 @@ container = get_meltano_container()
 
 # Create tap service
 tap_result = container.create_tap_service()
-if tap_result.is_success:
+if tap_result.success:
     tap_service = tap_result.data
     # Use tap service for data extraction
 
 # Create target service with custom config
 custom_config = FlextMeltanoConfig(project_root="/data/warehouse")
 target_result = container.create_target_service(custom_config)
-if target_result.is_success:
+if target_result.success:
     target_service = target_result.data
     # Use target service for data loading
 
 # Create executor
 executor_result = container.create_executor()
-if executor_result.is_success:
+if executor_result.success:
     executor = executor_result.data
     # Use executor for pipeline operations
 ```
@@ -84,12 +84,12 @@ container = get_meltano_container()
 # Register custom service
 custom_service = MyCustomMeltanoService()
 result = container.register_service("custom_service", custom_service)
-if result.is_success:
+if result.success:
     print("Custom service registered")
 
 # Retrieve registered service
 service_result = container.get_service("custom_service")
-if service_result.is_success:
+if service_result.success:
     service = service_result.data
     # Use retrieved service
 ```
@@ -138,15 +138,15 @@ container = get_meltano_container()
 # Create all core services
 services = {}
 tap_result = container.create_tap_service()
-if tap_result.is_success:
+if tap_result.success:
     services["tap_available"] = True
 
 target_result = container.create_target_service()
-if target_result.is_success:
+if target_result.success:
     services["target_available"] = True
 
 executor_result = container.create_executor()
-if executor_result.is_success:
+if executor_result.success:
     services["executor_available"] = True
 
 print(json.dumps(services))
@@ -175,8 +175,8 @@ def bridge_configure_meltano_container(config_json: str) -> Dict[str, Any]:
         result = configure_meltano_container(config)
 
         return {
-            "success": result.is_success,
-            "container_configured": result.is_success,
+            "success": result.success,
+            "container_configured": result.success,
             "error": result.error_message if result.is_failure else None
         }
     except Exception as e:
@@ -199,7 +199,7 @@ def bridge_create_meltano_services() -> Dict[str, Any]:
     ]:
         result = factory_method()
         services_created[f"{service_name}_service"] = {
-            "available": result.is_success,
+            "available": result.success,
             "error": result.error_message if result.is_failure else None
         }
 
@@ -269,7 +269,7 @@ register_typed(container, ServiceKey("validation_factory"), create_validation_se
 # Register custom services with container
 container = get_meltano_container()
 result = container.register_service("custom_analytics", MyAnalyticsService())
-if result.is_success:
+if result.success:
     # Service available for injection throughout application
     pass
 ```
@@ -599,7 +599,7 @@ def get_meltano_container() -> FlextMeltanoContainer:
         # Initialize with default services
         init_result = _meltano_container.initialize()
         if init_result.is_failure:
-            error_msg = f"Container initialization failed: {init_result.error}"
+            error_msg: str = f"Container initialization failed: {init_result.error}"
             raise RuntimeError(error_msg)
 
     return _meltano_container
@@ -635,7 +635,7 @@ def configure_meltano_container(
 
 
 # Clean public API
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoContainer",
     "configure_meltano_container",
     "get_meltano_container",

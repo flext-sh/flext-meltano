@@ -45,7 +45,7 @@ class TestFlextMeltanoInstaller:
             config = FlextMeltanoConfig(project_root=str(custom_path))
             installer = FlextMeltanoInstaller(config)
             if installer.project_root != custom_path:
-                msg = f"Expected {custom_path}, got {installer.project_root}"
+                msg: str = f"Expected {custom_path}, got {installer.project_root}"
                 raise AssertionError(msg)
 
     def test_installer_validate(self) -> None:
@@ -55,7 +55,7 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.validate()
         # May fail if project doesn't exist, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_installer_initialize(self) -> None:
         """Test installer initialization method."""
@@ -63,9 +63,9 @@ class TestFlextMeltanoInstaller:
         config = FlextMeltanoConfig()
         installer = FlextMeltanoInstaller(config)
         result = installer.initialize()
-        assert result.is_success
+        assert result.success
         if not (installer._initialized):
-            msg = f"Expected True, got {installer._initialized}"
+            msg: str = f"Expected True, got {installer._initialized}"
             raise AssertionError(msg)
 
     def test_installer_get_health_status(self) -> None:
@@ -74,13 +74,13 @@ class TestFlextMeltanoInstaller:
         config = FlextMeltanoConfig()
         installer = FlextMeltanoInstaller(config)
         result = installer.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "installation":
-            msg = f"Expected {'installation'}, got {result.data['service']}"
+            msg: str = f"Expected {'installation'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_installer_add_plugin(self) -> None:
@@ -90,7 +90,7 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.add_plugin("extractor", "tap-csv")
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_installer_add_plugin_with_config(self) -> None:
         """Test installer add plugin with configuration."""
@@ -103,7 +103,7 @@ class TestFlextMeltanoInstaller:
             pip_url="pipelinewise-tap-csv",
         )
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_installer_install_plugins(self) -> None:
         """Test installer install_plugins method."""
@@ -112,7 +112,7 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.install_plugins()
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_installer_remove_plugin(self) -> None:
         """Test installer remove plugin."""
@@ -121,7 +121,7 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.remove_plugin("extractor", "tap-csv")
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_installer_list_plugins(self) -> None:
         """Test installer list plugins."""
@@ -130,7 +130,7 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.list_plugins()
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
 
 class TestFlextMeltanoInstallerFactoryFunctions:
@@ -141,7 +141,7 @@ class TestFlextMeltanoInstallerFactoryFunctions:
 
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoInstaller)
 
     def test_create_installer_service_with_path(self) -> None:
@@ -151,10 +151,10 @@ class TestFlextMeltanoInstallerFactoryFunctions:
             custom_path = Path(temp_dir) / "test"
             config = FlextMeltanoConfig(project_root=str(custom_path))
             result = create_installer_service(config)
-            assert result.is_success
+            assert result.success
         assert result.data is not None
         if result.data.project_root != custom_path:
-            msg = f"Expected {custom_path}, got {result.data.project_root}"
+            msg: str = f"Expected {custom_path}, got {result.data.project_root}"
             raise AssertionError(msg)
 
     def test_flext_meltano_install_plugin(self) -> None:
@@ -183,11 +183,11 @@ class TestFlextMeltanoInstallerIntegration:
 
         # Test initialization
         init_result = installer.initialize()
-        assert init_result.is_success
+        assert init_result.success
 
         # Test health check
         health_result = installer.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
 
         # Test plugin operations - may fail if meltano not installed, but should not crash
         # get_plugin_status method is not implemented yet
@@ -199,18 +199,18 @@ class TestFlextMeltanoInstallerIntegration:
 
         # Create installer service
         create_result = create_installer_service(config)
-        assert create_result.is_success
+        assert create_result.success
 
         installer = create_result.data
         assert installer is not None
 
         # Test basic operations
         health_result = installer.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
 
         validate_result = installer.validate()
         # May fail if project setup is incomplete, but should not crash
-        assert validate_result.is_success or not validate_result.is_success
+        assert validate_result.success or not validate_result.success
 
     def test_installer_error_handling(self) -> None:
         """Test installer error handling."""
@@ -230,7 +230,7 @@ class TestFlextMeltanoInstallerIntegration:
             method = getattr(installer, method_name)
             result = method(*args)
             # Should not raise exceptions, should return FlextResult
-            assert result.is_success or not result.is_success
+            assert result.success or not result.success
 
 
 if __name__ == "__main__":

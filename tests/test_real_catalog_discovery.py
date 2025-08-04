@@ -81,7 +81,7 @@ extractors:
                 if streams:
                     stream = streams[0]
                     if "tap_stream_id" not in stream:
-                        msg = f"Expected {'tap_stream_id'} in {stream}"
+                        msg: str = f"Expected {'tap_stream_id'} in {stream}"
                         raise AssertionError(msg)
                     assert "schema" in stream
         else:
@@ -153,7 +153,7 @@ extractors:
         data = result.data
         assert isinstance(data, dict)
         if "plugins" not in data:
-            msg = f"Expected {'plugins'} in {data}"
+            msg: str = f"Expected {'plugins'} in {data}"
             raise AssertionError(msg)
 
         assert data is not None
@@ -164,11 +164,11 @@ extractors:
         # Validate plugin structure
         plugin = plugins[0]
         if "name" not in plugin:
-            msg = f"Expected {'name'} in {plugin}"
+            msg: str = f"Expected {'name'} in {plugin}"
             raise AssertionError(msg)
         assert "type" in plugin
         if "namespace" not in plugin:
-            msg = f"Expected {'namespace'} in {plugin}"
+            msg: str = f"Expected {'namespace'} in {plugin}"
             raise AssertionError(msg)
 
     def test_flext_meltano_discover_plugins_extractors_only(self) -> None:
@@ -198,7 +198,7 @@ extractors:
         # All plugins should be extractors
         for plugin in plugins:
             if plugin["type"] != "extractors":
-                msg = f"Expected {'extractors'}, got {plugin['type']}"
+                msg: str = f"Expected {'extractors'}, got {plugin['type']}"
                 raise AssertionError(msg)
 
     def test_flext_meltano_discover_plugins_loaders_only(self) -> None:
@@ -228,7 +228,7 @@ extractors:
         # All plugins should be loaders
         for plugin in plugins:
             if plugin["type"] != "loaders":
-                msg = f"Expected {'loaders'}, got {plugin['type']}"
+                msg: str = f"Expected {'loaders'}, got {plugin['type']}"
                 raise AssertionError(msg)
 
     def test_flext_meltano_discover_plugins_invalid_type(self) -> None:
@@ -306,12 +306,12 @@ extractors:
             data = result.data
             assert isinstance(data, dict)
             if "connection_successful" not in data:
-                msg = f"Expected {'connection_successful'} in {data}"
+                msg: str = f"Expected {'connection_successful'} in {data}"
                 raise AssertionError(msg)
             assert "tap_name" in data
             assert data is not None
             if data["tap_name"] != "tap-csv":
-                msg = f"Expected {'tap-csv'}, got {data['tap_name']}"
+                msg: str = f"Expected {'tap-csv'}, got {data['tap_name']}"
                 raise AssertionError(msg)
         else:
             # Connection can fail if meltano/tap not available
@@ -366,15 +366,15 @@ extractors:
         data = result.data
         assert data is not None
         if not (data["config_valid"]):
-            msg = f"Expected True, got {data['config_valid']}"
+            msg: str = f"Expected True, got {data['config_valid']}"
             raise AssertionError(msg)
         assert data is not None
         if data["config_type"] != "file":
-            msg = f"Expected {'file'}, got {data['config_type']}"
+            msg: str = f"Expected {'file'}, got {data['config_type']}"
             raise AssertionError(msg)
         assert data is not None
         if data["tap_name"] != "tap-csv":
-            msg = f"Expected {'tap-csv'}, got {data['tap_name']}"
+            msg: str = f"Expected {'tap-csv'}, got {data['tap_name']}"
             raise AssertionError(msg)
 
     @pytest.mark.asyncio
@@ -398,15 +398,15 @@ extractors:
         data = result.data
         assert data is not None
         if not (data["config_valid"]):
-            msg = f"Expected True, got {data['config_valid']}"
+            msg: str = f"Expected True, got {data['config_valid']}"
             raise AssertionError(msg)
         assert data is not None
         if data["config_type"] != "database":
-            msg = f"Expected {'database'}, got {data['config_type']}"
+            msg: str = f"Expected {'database'}, got {data['config_type']}"
             raise AssertionError(msg)
         assert data is not None
         if data["tap_name"] != "tap-postgres":
-            msg = f"Expected {'tap-postgres'}, got {data['tap_name']}"
+            msg: str = f"Expected {'tap-postgres'}, got {data['tap_name']}"
             raise AssertionError(msg)
 
     @pytest.mark.asyncio
@@ -427,11 +427,11 @@ extractors:
         data = result.data
         assert data is not None
         if not (data["config_valid"]):
-            msg = f"Expected True, got {data['config_valid']}"
+            msg: str = f"Expected True, got {data['config_valid']}"
             raise AssertionError(msg)
         assert data is not None
         if data["config_type"] != "api":
-            msg = f"Expected {'api'}, got {data['config_type']}"
+            msg: str = f"Expected {'api'}, got {data['config_type']}"
             raise AssertionError(msg)
 
     @pytest.mark.asyncio
@@ -447,7 +447,7 @@ extractors:
         data = result.data
         assert data is not None
         if data["config_valid"]:
-            msg = f"Expected False, got {data['config_valid']}"
+            msg: str = f"Expected False, got {data['config_valid']}"
             raise AssertionError(msg)
         assert "issues" in data
         assert len(data["issues"]) > 0
@@ -471,7 +471,7 @@ extractors:
         data = result.data
         assert data is not None
         if data["config_valid"]:
-            msg = f"Expected False, got {data['config_valid']}"
+            msg: str = f"Expected False, got {data['config_valid']}"
             raise AssertionError(msg)
         assert "Missing required database keys" in str(data["issues"])
 
@@ -547,7 +547,7 @@ class TestFlextMeltanoCatalogIntegration:
         config_data = config_result.data
         assert config_data is not None
         if "config_valid" not in config_data:
-            msg = f"Expected {'config_valid'} in {config_data}"
+            msg: str = f"Expected {'config_valid'} in {config_data}"
             raise AssertionError(msg)
 
         # Step 4: If config is valid, attempt catalog discovery

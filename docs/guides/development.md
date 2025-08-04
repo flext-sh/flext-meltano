@@ -205,7 +205,7 @@ dict[str, Sequence[str]] vs dict[str, object]
 # tests/test_singer_integration.py:135
 FAILED tests/test_singer_integration.py::TestTargetServiceIntegration::test_target_service_creation
 AssertionError: assert False
-FlextResult(data=None, is_success=False, error='Target service initialization failed: Target class not configured')
+FlextResult(data=None, success=False, error='Target service initialization failed: Target class not configured')
 ```
 
 ## 📦 Meltano Development Operations
@@ -354,13 +354,13 @@ class TestNewFeature:
         """Test successful operation."""
         service = NewFlextMeltanoService(mock_config)
         result = service.new_operation()
-        assert result.is_success
+        assert result.success
 
     def test_new_operation_failure(self):
         """Test failure handling."""
         service = NewFlextMeltanoService(invalid_config)
         result = service.new_operation()
-        assert not result.is_success
+        assert not result.success
 ```
 
 ## 🔧 Debugging & Diagnostics

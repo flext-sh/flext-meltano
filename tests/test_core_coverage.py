@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Test Coverage for Core Module - Functional Tests.
 
 **Purpose**: Comprehensive functional testing of core.py module
@@ -93,7 +92,7 @@ class TestFlextMeltanoPipelineConfig:
             name="test-pipeline",
             extractor="tap-postgres",
             loader="target-csv",
-            environment="test"
+            environment="test",
         )
 
         assert config.name == "test-pipeline"
@@ -110,7 +109,7 @@ class TestFlextMeltanoPipelineConfig:
             extractor="tap-oracle",
             loader="target-snowflake",
             transformer="dbt-warehouse",
-            environment="prod"
+            environment="prod",
         )
 
         assert config.transformer == "dbt-warehouse"
@@ -125,7 +124,7 @@ class TestFlextMeltanoPipelineConfig:
             extractor="tap-api",
             loader="target-warehouse",
             environment="staging",
-            config=custom_config
+            config=custom_config,
         )
 
         assert config.config == custom_config
@@ -137,34 +136,40 @@ class TestFlextMeltanoPipelineConfig:
         config = FlextMeltanoPipelineConfig(
             name="valid-pipeline",
             extractor="tap-postgres",
-            loader="target-csv"
+            loader="target-csv",
         )
         assert config.name == "valid-pipeline"
 
     def test_pipeline_config_validation_failures(self):
         """Test FlextMeltanoPipelineConfig post-init validation failures."""
         # Empty name should raise ValueError
-        with pytest.raises(ValueError, match="Pipeline name, extractor, and loader are required"):
+        with pytest.raises(
+            ValueError, match="Pipeline name, extractor, and loader are required",
+        ):
             FlextMeltanoPipelineConfig(
                 name="",
                 extractor="tap-postgres",
-                loader="target-csv"
+                loader="target-csv",
             )
 
         # Empty extractor should raise ValueError
-        with pytest.raises(ValueError, match="Pipeline name, extractor, and loader are required"):
+        with pytest.raises(
+            ValueError, match="Pipeline name, extractor, and loader are required",
+        ):
             FlextMeltanoPipelineConfig(
                 name="test-pipeline",
                 extractor="",
-                loader="target-csv"
+                loader="target-csv",
             )
 
         # Empty loader should raise ValueError
-        with pytest.raises(ValueError, match="Pipeline name, extractor, and loader are required"):
+        with pytest.raises(
+            ValueError, match="Pipeline name, extractor, and loader are required",
+        ):
             FlextMeltanoPipelineConfig(
                 name="test-pipeline",
                 extractor="tap-postgres",
-                loader=""
+                loader="",
             )
 
 
@@ -180,7 +185,7 @@ class TestFlextMeltanoPipelineResult:
 
         result = FlextMeltanoPipelineResult(
             id=result_id,
-            pipeline_name="successful-pipeline"
+            pipeline_name="successful-pipeline",
         )
 
         # Start and complete the execution
@@ -200,7 +205,7 @@ class TestFlextMeltanoPipelineResult:
 
         result = FlextMeltanoPipelineResult(
             id=result_id,
-            pipeline_name="failed-pipeline"
+            pipeline_name="failed-pipeline",
         )
 
         # Start and then fail the execution
@@ -217,13 +222,13 @@ class TestFlextMeltanoPipelineResult:
         metadata = {
             "throughput_records_per_second": 125.5,
             "memory_usage_mb": 512,
-            "disk_io_mb": 256
+            "disk_io_mb": 256,
         }
 
         result = FlextMeltanoPipelineResult(
             id=result_id,
             pipeline_name="pipeline-with-metadata",
-            metadata=metadata
+            metadata=metadata,
         )
 
         # Start and complete the execution
@@ -239,21 +244,21 @@ class TestFlextMeltanoPipelineResult:
 
         result = FlextMeltanoPipelineResult(
             id=result_id,
-            pipeline_name="valid-pipeline"
+            pipeline_name="valid-pipeline",
         )
 
         # Domain rule validation should pass
         validation_result = result.validate_domain_rules()
-        assert validation_result.is_success
+        assert validation_result.success
 
         # Test with empty pipeline name (should fail)
         result_empty = FlextMeltanoPipelineResult(
             id=result_id,
-            pipeline_name=""
+            pipeline_name="",
         )
 
         validation_result_empty = result_empty.validate_domain_rules()
-        assert not validation_result_empty.is_success
+        assert not validation_result_empty.success
 
 
 class TestFlextMeltanoPipelineEvent:
@@ -269,7 +274,7 @@ class TestFlextMeltanoPipelineEvent:
             pipeline_id=pipeline_id,
             event_type=PipelineEventType.STARTED,
             timestamp=datetime.now(UTC),
-            data={"pipeline_name": "test-pipeline"}
+            data={"pipeline_name": "test-pipeline"},
         )
 
         assert event.id == event_id
@@ -285,7 +290,7 @@ class TestFlextMeltanoPipelineEvent:
             (PipelineEventType.STARTED, {"action": "start"}),
             (PipelineEventType.COMPLETED, {"status": "success"}),
             (PipelineEventType.FAILED, {"error": "timeout"}),
-            (PipelineEventType.CANCELLED, {"reason": "user_request"})
+            (PipelineEventType.CANCELLED, {"reason": "user_request"}),
         ]
 
         for event_type, data in events:
@@ -294,7 +299,7 @@ class TestFlextMeltanoPipelineEvent:
                 pipeline_id=str(uuid.uuid4()),
                 event_type=event_type,
                 timestamp=datetime.now(UTC),
-                data=data
+                data=data,
             )
 
             assert event.event_type == event_type
@@ -307,12 +312,12 @@ class TestFlextMeltanoPipelineEvent:
             pipeline_id="valid-pipeline-id",
             event_type=PipelineEventType.COMPLETED,
             timestamp=datetime.now(UTC),
-            data={"records": 1000}
+            data={"records": 1000},
         )
 
         # Domain rule validation should pass
         validation_result = event.validate_domain_rules()
-        assert validation_result.is_success
+        assert validation_result.success
 
         # Test with empty pipeline_id (should fail)
         event_empty = FlextMeltanoPipelineEvent(
@@ -320,11 +325,11 @@ class TestFlextMeltanoPipelineEvent:
             pipeline_id="",
             event_type=PipelineEventType.CREATED,
             timestamp=datetime.now(UTC),
-            data={}
+            data={},
         )
 
         validation_result_empty = event_empty.validate_domain_rules()
-        assert not validation_result_empty.is_success
+        assert not validation_result_empty.success
 
 
 class TestFlextMeltanoRepository:
@@ -333,12 +338,13 @@ class TestFlextMeltanoRepository:
     def test_repository_class_exists(self):
         """Test FlextMeltanoRepository class exists and is properly defined."""
         assert FlextMeltanoRepository is not None
-        assert hasattr(FlextMeltanoRepository, '__init__')
-        assert hasattr(FlextMeltanoRepository, 'add_pipeline')
-        assert hasattr(FlextMeltanoRepository, 'get_pipeline')
+        assert hasattr(FlextMeltanoRepository, "__init__")
+        assert hasattr(FlextMeltanoRepository, "add_pipeline")
+        assert hasattr(FlextMeltanoRepository, "get_pipeline")
 
         # Test that it's an aggregate root
         from flext_core import FlextAggregateRoot
+
         assert issubclass(FlextMeltanoRepository, FlextAggregateRoot)
 
     def test_repository_requires_abstract_methods(self):
@@ -357,7 +363,7 @@ class TestFlextMeltanoExecutionState:
         state = FlextMeltanoExecutionState(
             execution_id="exec-123",
             current_pipeline="pipeline-456",
-            state=ExecutionState.RUNNING
+            state=ExecutionState.RUNNING,
         )
 
         assert state.execution_id == "exec-123"
@@ -371,7 +377,7 @@ class TestFlextMeltanoExecutionState:
             execution_id="exec-789",
             current_pipeline="pipeline-abc",
             state=ExecutionState.COMPLETED,
-            metadata={"records_processed": 2500}
+            metadata={"records_processed": 2500},
         )
 
         assert state.state == ExecutionState.COMPLETED
@@ -384,7 +390,7 @@ class TestFlextMeltanoExecutionState:
             execution_id="exec-error",
             current_pipeline="pipeline-fail",
             state=ExecutionState.FAILED,
-            metadata={"error_message": "Database connection timeout"}
+            metadata={"error_message": "Database connection timeout"},
         )
 
         assert state.state == ExecutionState.FAILED
@@ -396,7 +402,7 @@ class TestFlextMeltanoExecutionState:
             execution_id="exec-json",
             current_pipeline="pipeline-json",
             state=ExecutionState.PENDING,
-            metadata={"created_at": "2025-01-01T00:00:00Z"}
+            metadata={"created_at": "2025-01-01T00:00:00Z"},
         )
 
         # Test that it can be serialized to dict
@@ -457,11 +463,12 @@ class TestFlextMeltanoSingerService:
     def test_singer_service_class_exists(self):
         """Test FlextMeltanoSingerService class exists and is properly defined."""
         assert FlextMeltanoSingerService is not None
-        assert hasattr(FlextMeltanoSingerService, '__init__')
-        assert hasattr(FlextMeltanoSingerService, 'execute_singer_pipeline')
+        assert hasattr(FlextMeltanoSingerService, "__init__")
+        assert hasattr(FlextMeltanoSingerService, "execute_singer_pipeline")
 
         # Test that it's a domain service
         from flext_core import FlextDomainService
+
         assert issubclass(FlextMeltanoSingerService, FlextDomainService)
 
 
@@ -479,14 +486,15 @@ class TestFlextMeltanoOrchestrationService:
     def test_orchestration_service_class_exists(self):
         """Test FlextMeltanoOrchestrationService class exists and is properly defined."""
         assert FlextMeltanoOrchestrationService is not None
-        assert hasattr(FlextMeltanoOrchestrationService, '__init__')
-        assert hasattr(FlextMeltanoOrchestrationService, 'validate_service')
-        assert hasattr(FlextMeltanoOrchestrationService, 'get_health_status')
-        assert hasattr(FlextMeltanoOrchestrationService, 'create_pipeline')
-        assert hasattr(FlextMeltanoOrchestrationService, 'execute_pipeline')
+        assert hasattr(FlextMeltanoOrchestrationService, "__init__")
+        assert hasattr(FlextMeltanoOrchestrationService, "validate_service")
+        assert hasattr(FlextMeltanoOrchestrationService, "get_health_status")
+        assert hasattr(FlextMeltanoOrchestrationService, "create_pipeline")
+        assert hasattr(FlextMeltanoOrchestrationService, "execute_pipeline")
 
         # Test that it's a domain service
         from flext_core import FlextDomainService
+
         assert issubclass(FlextMeltanoOrchestrationService, FlextDomainService)
 
 
@@ -504,12 +512,13 @@ class TestFlextMeltanoExtension:
     def test_extension_class_exists(self):
         """Test FlextMeltanoExtension class exists and is properly defined."""
         assert FlextMeltanoExtension is not None
-        assert hasattr(FlextMeltanoExtension, '__init__')
-        assert hasattr(FlextMeltanoExtension, 'validate_service')
-        assert hasattr(FlextMeltanoExtension, 'get_health_status')
+        assert hasattr(FlextMeltanoExtension, "__init__")
+        assert hasattr(FlextMeltanoExtension, "validate_service")
+        assert hasattr(FlextMeltanoExtension, "get_health_status")
 
         # Test that it's a domain service
         from flext_core import FlextDomainService
+
         assert issubclass(FlextMeltanoExtension, FlextDomainService)
 
 
@@ -551,6 +560,7 @@ class TestCoreModuleStructure:
         """Test that core module has comprehensive docstring."""
         try:
             import flext_meltano.core as core_module
+
             assert hasattr(core_module, "__doc__")
             if core_module.__doc__:
                 # Just verify it's a string, not empty
@@ -577,11 +587,15 @@ class TestCoreModuleStructure:
         # Test that the fallback decorator works
 
         # Mock ImportError for injectable
-        with patch('flext_meltano.core.injectable', side_effect=ImportError("injectable not available")):
+        with patch(
+            "flext_meltano.core.injectable",
+            side_effect=ImportError("injectable not available"),
+        ):
             # Re-import the module to trigger fallback
             import sys
-            if 'flext_meltano.core' in sys.modules:
-                del sys.modules['flext_meltano.core']
+
+            if "flext_meltano.core" in sys.modules:
+                del sys.modules["flext_meltano.core"]
 
             # This should import successfully with fallback decorator
             import flext_meltano.core as core_module
@@ -637,14 +651,18 @@ class TestCoreModuleConstants:
             attrs = dir(core_module)
 
             # Look for uppercase constants (common Python pattern)
-            constants = [attr for attr in attrs if attr.isupper() and not attr.startswith("_")]
+            constants = [
+                attr for attr in attrs if attr.isupper() and not attr.startswith("_")
+            ]
 
             # Just verify we can iterate without error
             for const in constants[:5]:  # Limit to first 5 to be safe
                 if hasattr(core_module, const):
                     value = getattr(core_module, const)
                     # Just verify we can access it
-                    assert value is not None or value is None  # Always true, just for coverage
+                    assert (
+                        value is not None or value is None
+                    )  # Always true, just for coverage
 
         except ImportError:
             pytest.skip("core module not available")
@@ -662,7 +680,9 @@ class TestCoreModuleClasses:
 
             # Safely discover classes
             module_members = inspect.getmembers(core_module)
-            classes = [member for name, member in module_members if inspect.isclass(member)]
+            classes = [
+                member for name, member in module_members if inspect.isclass(member)
+            ]
 
             # Just verify we can discover classes without instantiating
             class_count = len(classes)
@@ -675,9 +695,12 @@ class TestCoreModuleClasses:
 
         except ImportError:
             pytest.skip("core module not available")
-        except Exception:  # noqa: BLE001
-            # If inspection fails, just pass - we don't want to break anything
-            pass
+        except Exception as e:  # noqa: BLE001
+            # If inspection fails, log and continue
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.debug("Module inspection failed: %s", str(e))
 
 
 class TestCoreModuleFunctions:
@@ -692,7 +715,9 @@ class TestCoreModuleFunctions:
 
             # Safely discover functions
             module_members = inspect.getmembers(core_module)
-            functions = [member for name, member in module_members if inspect.isfunction(member)]
+            functions = [
+                member for name, member in module_members if inspect.isfunction(member)
+            ]
 
             # Just verify we can discover functions without calling
             function_count = len(functions)
@@ -705,6 +730,9 @@ class TestCoreModuleFunctions:
 
         except ImportError:
             pytest.skip("core module not available")
-        except Exception:  # noqa: BLE001
-            # If inspection fails, just pass - we don't want to break anything
-            pass
+        except Exception as e:  # noqa: BLE001
+            # If inspection fails, log and continue
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.debug("Module inspection failed: %s", str(e))

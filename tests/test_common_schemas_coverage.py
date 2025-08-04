@@ -152,9 +152,12 @@ class TestCommonSchemasFunctions:
                 try:
                     sig = inspect.signature(func)
                     assert sig is not None
-                except Exception:  # noqa: BLE001
-                    # Skip if signature inspection fails
-                    pass
+                except Exception as e:  # noqa: BLE001
+                    # Log and skip if signature inspection fails
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.debug("Signature inspection failed: %s", str(e))
+                    continue
 
         except (ImportError, Exception):
             pytest.skip("Function signature test not available or failed safely")
@@ -218,4 +221,3 @@ class TestCommonSchemasImports:
 
         except (ImportError, Exception):
             pytest.skip("Module loading test not available or failed safely")
-

@@ -65,7 +65,7 @@ singer_service = FlextSingerUnifiedInterface(config)
 
 # Execute Singer operations with enterprise patterns
 result = singer_service.run_extraction("tap-postgres", catalog_config)
-if result.is_success:
+if result.success:
     records_processed = result.data["record_count"]
 ```
 

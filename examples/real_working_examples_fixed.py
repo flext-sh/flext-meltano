@@ -24,12 +24,12 @@ def example_real_pipeline_execution() -> None:
 
     # Create executor using ACTUAL existing function
     executor_result = create_executor(config)
-    if not executor_result.is_success:
+    if not executor_result.success:
         return
 
     # Execute actual pipeline using REAL API
     pipeline_result = flext_meltano_execute_job("tap-csv", "target-jsonl")
-    if pipeline_result.success:  # Note: FlextMeltanoResult uses .success
+    if pipeline_result.success:  # Note: FlextMeltanoResult uses .success:
         pass
 
 
@@ -39,14 +39,14 @@ def example_real_discovery() -> None:
 
     # Create discoverer using ACTUAL existing function
     discoverer_result = create_discoverer(config)
-    if not discoverer_result.is_success:
+    if not discoverer_result.success:
         return
 
     discoverer = discoverer_result.data
 
     # Initialize discoverer
     init_result = discoverer.initialize()
-    if init_result.is_success:
+    if init_result.success:
         pass
 
 
@@ -60,7 +60,7 @@ def example_real_bridge_usage() -> None:
     # Test bridge functionality (if methods exist)
     if hasattr(bridge, "get_version"):
         version_result = bridge.get_version()
-        if hasattr(version_result, "is_success") and version_result.is_success:
+        if hasattr(version_result, "success") and version_result.success:
             pass
 
 

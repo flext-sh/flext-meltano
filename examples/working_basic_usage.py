@@ -57,22 +57,22 @@ def demo_service_creation() -> None:
 
     # Create executor service (WORKS)
     executor_result = create_executor(config)
-    if executor_result.is_success:
+    if executor_result.success:
         pass
 
     # Create discoverer service (WORKS)
     discoverer_result = create_discoverer(config)
-    if discoverer_result.is_success:
+    if discoverer_result.success:
         pass
 
     # Create installer service (WORKS)
     installer_result = create_installer_service(config)
-    if installer_result.is_success:
+    if installer_result.success:
         pass
 
     # Create validation service (WORKS)
     validation_result = create_validation_service(config)
-    if validation_result.is_success:
+    if validation_result.success:
         pass
 
 
@@ -91,7 +91,7 @@ def demo_health_checks() -> None:
     for _name, service in services:
         try:
             health_result = service.get_health_status()
-            if health_result.is_success and health_result.data:
+            if health_result.success and health_result.data:
                 health_data = health_result.data
                 if isinstance(health_data, dict):
                     pass
@@ -106,11 +106,10 @@ def demo_validation() -> None:
 
     # Initialize validator
     init_result = validator.initialize()
-    if init_result.is_success:
-
+    if init_result.success:
         # Validate project (will fail gracefully if no meltano.yml)
         validation_result = validator.validate_project()
-        if validation_result.is_success and validation_result.data:
+        if validation_result.success and validation_result.data:
             val_data = validation_result.data
             if hasattr(val_data, "issues") and val_data.issues:
                 pass
@@ -133,7 +132,7 @@ def demo_deprecation_warnings() -> None:
                 pass
 
             # Check result (may fail due to no meltano project)
-            if result.is_success:
+            if result.success:
                 pass
 
         except Exception:

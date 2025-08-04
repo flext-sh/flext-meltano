@@ -164,7 +164,7 @@ def test_complete_data_pipeline_e2e():
     result = bridge.run_pipeline("tap-postgres", "target-csv")
 
     # Step 3: Validate pipeline execution
-    assert result.is_success
+    assert result.success
     assert result.data["status"] == "success"
 
     # Step 4: Validate output data
@@ -221,7 +221,7 @@ def test_complete_error_recovery_e2e():
 
     # Test recovery after failure resolution
     result_recovery = bridge.run_pipeline("tap-postgres", "target-csv")
-    assert result_recovery.is_success
+    assert result_recovery.success
 
     # Validate recovery metrics
     validate_error_recovery_metrics()

@@ -31,7 +31,7 @@ class TestFlextSingerBridge:
         record_data = {"id": 1, "name": "test"}
         result = bridge.flext_singer_create_record_message("users", record_data)
 
-        assert result.is_success
+        assert result.success
         if result.data is not None:
             assert result.data["type"] == "RECORD"
             assert result.data["stream"] == "users"
@@ -51,7 +51,7 @@ class TestFlextSingerBridge:
 
         result = bridge.flext_singer_create_schema_message("users", schema)
 
-        assert result.is_success
+        assert result.success
         if result.data is not None:
             assert result.data["type"] == "SCHEMA"
             assert result.data["stream"] == "users"
@@ -64,7 +64,7 @@ class TestFlextSingerBridge:
         state = {"bookmarks": {"users": {"timestamp": "2023-01-01T00:00:00Z"}}}
         result = bridge.flext_singer_create_state_message(state)
 
-        assert result.is_success
+        assert result.success
         if result.data is not None:
             assert result.data["type"] == "STATE"
             assert result.data["value"] == state
@@ -76,7 +76,7 @@ class TestFlextSingerBridge:
         message_line = '{"type": "RECORD", "stream": "users", "record": {"id": 1}}'
         result = bridge.flext_singer_parse_message_line(message_line)
 
-        assert result.is_success
+        assert result.success
         if result.data is not None:
             assert result.data["type"] == "RECORD"
             assert result.data["stream"] == "users"
@@ -105,14 +105,14 @@ class TestFlextSingerCatalog:
         }
 
         result = catalog.flext_singer_add_stream("users", stream_schema)
-        assert result.is_success
+        assert result.success
 
     def test_catalog_get_catalog(self) -> None:
         """Test getting catalog."""
         catalog = FlextSingerCatalog()
 
         result = catalog.flext_singer_get_catalog()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
 
 

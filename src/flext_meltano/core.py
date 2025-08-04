@@ -91,7 +91,7 @@ class PipelineStartedEvent:
 class PipelineCompletedEvent:
     pipeline_id: str
     completed_at: datetime
-    execution_metrics: Dict[str, Any]
+    execution_metrics: dict[str, object]
 
 
 # Event handling in orchestration service
@@ -107,8 +107,8 @@ Enterprise services designed for Go service consumption:
 # Bridge-friendly service operations
 class FlextMeltanoOrchestrationService:
     def execute_pipeline_for_bridge(
-        self, pipeline_spec: Dict[str, Any]
-    ) -> FlextResult[Dict[str, Any]]:
+        self, pipeline_spec: dict[str, object]
+    ) -> FlextResult[dict[str, object]]:
         '''Execute pipeline with JSON-serializable results for Go services.'''
         # Implementation uses execution module internally
 ```
@@ -116,7 +116,7 @@ class FlextMeltanoOrchestrationService:
 ### Service Composition for Bridge
 ```python
 # Services work together for bridge operations
-def bridge_execute_complex_operation(bridge_request: Dict[str, Any]):
+def bridge_execute_complex_operation(bridge_request: dict[str, object]):
     orchestrator = get_orchestration_service()
 
     return (
@@ -133,8 +133,8 @@ def bridge_execute_complex_operation(bridge_request: Dict[str, Any]):
 class ExecutePipelineCommand:
     '''Command for pipeline execution with enterprise validation.'''
     pipeline_id: str
-    tap_config: Dict[str, Any]
-    target_config: Dict[str, Any]
+    tap_config: dict[str, object]
+    target_config: dict[str, object]
     execution_context: ExecutionContext
 
 class ExecutePipelineHandler:
@@ -179,7 +179,7 @@ class PipelineExecution(FlextEntity):
     status: ExecutionStatus
     started_at: datetime
     completed_at: Optional[datetime]
-    execution_metrics: Dict[str, Any]
+    execution_metrics: dict[str, object]
 
     def mark_completed(self) -> FlextResult[None]:
         '''Business logic for marking execution complete.'''
@@ -202,7 +202,7 @@ class ExecutionContext(FlextValueObject):
     environment: str
     execution_timestamp: datetime
 
-    def to_bridge_context(self) -> Dict[str, Any]:
+    def to_bridge_context(self) -> dict[str, object]:
         '''Convert to bridge-compatible format.'''
         return {
             "correlation_id": self.correlation_id,
@@ -463,7 +463,7 @@ class FlextMeltanoRepository(FlextAggregateRoot):
 
 
 @injectable
-class FlextMeltanoSingerService(FlextDomainService):
+class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
     """Singer protocol domain service using MANDATORY patterns."""
 
     def __init__(
@@ -492,12 +492,12 @@ class FlextMeltanoSingerService(FlextDomainService):
         try:
             # Validate services
             tap_validation = self.tap_service.validate_service()
-            if not tap_validation.is_success:
+            if not tap_validation.success:
                 result.fail_execution(f"Tap validation failed: {tap_validation.error}")
                 return FlextResult(error=tap_validation.error)
 
             target_validation = self.target_service.validate_service()
-            if not target_validation.is_success:
+            if not target_validation.success:
                 result.fail_execution(
                     f"Target validation failed: {target_validation.error}",
                 )
@@ -505,7 +505,7 @@ class FlextMeltanoSingerService(FlextDomainService):
 
             # Execute discovery
             catalog_result = self.tap_service.discover_catalog()
-            if not catalog_result.is_success:
+            if not catalog_result.success:
                 result.fail_execution(
                     f"Catalog discovery failed: {catalog_result.error}",
                 )
@@ -523,7 +523,7 @@ class FlextMeltanoSingerService(FlextDomainService):
 
 
 @injectable
-class FlextMeltanoOrchestrationService(FlextDomainService):
+class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineResult]):
     """Pipeline orchestration domain service using MANDATORY patterns."""
 
     def __init__(
@@ -564,7 +564,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
         try:
             # Add to repository (aggregate root handles validation)
             add_result = self.repository.add_pipeline(config)
-            if not add_result.is_success:
+            if not add_result.success:
                 return add_result
 
             return FlextResult(data=None)
@@ -579,7 +579,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
         try:
             # Get pipeline configuration from repository
             pipeline_result = self.repository.get_pipeline(pipeline_name)
-            if not pipeline_result.is_success:
+            if not pipeline_result.success:
                 return FlextResult(error=pipeline_result.error)
 
             pipeline_config = pipeline_result.data
@@ -592,7 +592,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
                 pipeline_config.loader,
             )
 
-            if not singer_result.is_success:
+            if not singer_result.success:
                 return singer_result
 
             execution_result = singer_result.data
@@ -620,7 +620,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService):
 
 
 @injectable
-class FlextMeltanoExtension(FlextDomainService):
+class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
     """Meltano extension using MANDATORY Meltano EDK patterns."""
 
     def __init__(

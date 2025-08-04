@@ -131,7 +131,7 @@ class EnterpriseDataPipelineManager:
 
         # Pre-execution validation
         validation_result = validate_project()
-        if not validation_result.is_success:
+        if not validation_result.success:
             return validation_result
 
         # Enterprise orchestration with monitoring

@@ -164,7 +164,7 @@ from flext_core import FlextResult
 
 # Direct subprocess execution
 result = execute_meltano_command(["--version"])
-if result.is_success:
+if result.success:
     print(f"Meltano version: {result.data}")
 
 # Pipeline orchestration
@@ -190,7 +190,7 @@ from flext_meltano.installation import install_plugin
 
 # Plugin discovery
 plugins = discover_plugins()
-if plugins.is_success:
+if plugins.success:
     print(f"Found {len(plugins.data)} plugins")
 
 # Plugin installation
@@ -239,7 +239,7 @@ from flext_meltano.dbt import FlextMeltanoDbtService
 
 dbt_service = FlextMeltanoDbtService(project_dir="./dbt")
 result = dbt_service.run_models()
-if result.is_success:
+if result.success:
     print("DBT models executed successfully")
 ```
 
@@ -377,7 +377,7 @@ pipeline_result = bridge.run_pipeline("tap-csv", "target-csv")
 # JSON serializable results for Go communication
 import json
 response = json.dumps({
-    "success": result.is_success,
+    "success": result.success,
     "data": result.data,
     "error": result.error_message if result.is_failure else None
 })
@@ -717,7 +717,7 @@ class FlextMeltanoBridge:
             FlextResult containing version information
         """
         result = self._executor.execute_command(["--version"])
-        if result.is_success:
+        if result.success:
             version_output = result.data["stdout"].strip()
             return FlextResult.ok({
                 "meltano": version_output,
@@ -729,7 +729,7 @@ class FlextMeltanoBridge:
     def list_plugins(self) -> FlextResult[List[Dict[str, Any]]]:
         """List all available plugins."""
         result = self._executor.execute_command(["discover", "all"])
-        if result.is_success:
+        if result.success:
             # Parse plugin information from output
             plugins = self._parse_plugin_list(result.data["stdout"])
             return FlextResult.ok(plugins)
@@ -751,14 +751,14 @@ class FlextMeltanoBridge:
             args.extend(["--pip-url", pip_url])
 
         result = self._executor.execute_command(args)
-        if result.is_success:
+        if result.success:
             return FlextResult.ok(f"Plugin {name} added successfully")
         return result
 
     def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, Any]]:
         """Discover catalog from tap."""
         result = self._executor.execute_command(["invoke", tap_name, "--discover"])
-        if result.is_success:
+        if result.success:
             try:
                 catalog = json.loads(result.data["stdout"])
                 return FlextResult.ok(catalog)
@@ -781,7 +781,7 @@ class FlextMeltanoBridge:
         args.append(f"{tap}:{target}")
 
         result = self._executor.execute_command(args)
-        if result.is_success:
+        if result.success:
             return FlextResult.ok({
                 "tap": tap,
                 "target": target,
@@ -801,7 +801,7 @@ class FlextMeltanoBridge:
         """Execute DBT command."""
         dbt_args = ["invoke", "dbt", command] + list(args)
         result = self._executor.execute_command(dbt_args)
-        if result.is_success:
+        if result.success:
             return FlextResult.ok({
                 "command": command,
                 "args": args,
@@ -855,7 +855,7 @@ def create_flext_meltano_bridge(
    # Target: Organized exports by functional area
 
    # Bridge integration
-   __all__ = [
+   __all__: list[str] = [
        "FlextMeltanoBridge",  # After implementation
 
        # Core execution
@@ -1002,7 +1002,7 @@ class TestFlextMeltanoBridge:
         """Test successful version retrieval."""
         result = bridge.get_version()
 
-        assert result.is_success
+        assert result.success
         assert "meltano" in result.data
         assert "python" in result.data
         assert "flext_meltano" in result.data
@@ -1011,7 +1011,7 @@ class TestFlextMeltanoBridge:
         """Test successful pipeline execution."""
         result = bridge.run_pipeline("tap-csv", "target-csv")
 
-        assert result.is_success
+        assert result.success
         assert result.data["tap"] == "tap-csv"
         assert result.data["target"] == "target-csv"
         assert result.data["status"] == "completed"
@@ -1109,7 +1109,7 @@ def execute_meltano_command(
 
     Example:
         >>> result = execute_meltano_command(["--version"])
-        >>> if result.is_success:
+        >>> if result.success:
         ...     print(f"Meltano version: {result.data['stdout'].strip()}")
         ... else:
         ...     print(f"Command failed: {result.error_message}")

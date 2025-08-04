@@ -17,7 +17,7 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Import REAL FLEXT Meltano APIs
 from flext_meltano import (
@@ -27,15 +27,13 @@ from flext_meltano import (
     flext_meltano_execute_job,
 )
 
-
 # =============================================================================
 # EXAMPLE 1: Basic Pipeline Execution
 # =============================================================================
 
 
-def example_1_traditional_approach() -> Dict[str, Any]:
+def example_1_traditional_approach() -> dict[str, Any]:
     """Traditional Meltano pipeline execution - 40+ lines of boilerplate."""
-
     # Step 1: Manual configuration file creation
     tap_config = {
         "host": "localhost",
@@ -51,33 +49,36 @@ def example_1_traditional_approach() -> Dict[str, Any]:
     }
 
     # Step 2: Write configuration files manually
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
         json.dump(tap_config, f)
         tap_config_path = f.name
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
         json.dump(target_config, f)
         target_config_path = f.name
 
     try:
         # Step 3: Manual discovery
         discovery_cmd = [
-            "meltano", "invoke", "tap-postgres:discover",
-            "--config", tap_config_path
+            "meltano",
+            "invoke",
+            "tap-postgres:discover",
+            "--config",
+            tap_config_path,
         ]
 
         discovery_result = subprocess.run(
             discovery_cmd,
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
 
         if discovery_result.returncode != 0:
             return {
                 "success": False,
                 "error": f"Discovery failed: {discovery_result.stderr}",
-                "approach": "traditional"
+                "approach": "traditional",
             }
 
         # Step 4: Process catalog manually
@@ -85,30 +86,34 @@ def example_1_traditional_approach() -> Dict[str, Any]:
 
         # Step 5: Manual stream selection
         for stream in catalog.get("streams", []):
-            if stream.get("tap_stream_id") in ["users", "orders"]:
+            if stream.get("tap_stream_id") in {"users", "orders"}:
                 metadata = stream.get("metadata", [])
                 for entry in metadata:
                     if entry.get("breadcrumb") == []:
                         entry.setdefault("metadata", {})["selected"] = True
 
         # Step 6: Write catalog file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
             json.dump(catalog, f)
             catalog_path = f.name
 
         # Step 7: Execute pipeline manually
         pipeline_cmd = [
-            "meltano", "run",
-            "tap-postgres", "target-csv",
-            "--config", tap_config_path,
-            "--catalog", catalog_path
+            "meltano",
+            "run",
+            "tap-postgres",
+            "target-csv",
+            "--config",
+            tap_config_path,
+            "--catalog",
+            catalog_path,
         ]
 
         pipeline_result = subprocess.run(
             pipeline_cmd,
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
 
         # Step 8: Cleanup
@@ -119,9 +124,11 @@ def example_1_traditional_approach() -> Dict[str, Any]:
         return {
             "success": pipeline_result.returncode == 0,
             "output": pipeline_result.stdout,
-            "error": pipeline_result.stderr if pipeline_result.returncode != 0 else None,
+            "error": pipeline_result.stderr
+            if pipeline_result.returncode != 0
+            else None,
             "approach": "traditional",
-            "lines_of_code": 45
+            "lines_of_code": 45,
         }
 
     except Exception as e:
@@ -129,49 +136,46 @@ def example_1_traditional_approach() -> Dict[str, Any]:
             "success": False,
             "error": str(e),
             "approach": "traditional",
-            "lines_of_code": 45
+            "lines_of_code": 45,
         }
 
 
-def example_1_flext_meltano_approach() -> Dict[str, Any]:
+def example_1_flext_meltano_approach() -> dict[str, Any]:
     """FLEXT Meltano approach - 3 lines with real APIs."""
-
     try:
         # FLEXT Meltano: 3 lines replace 45+ lines
         config = FlextMeltanoConfig(project_root="./demo_project")
         executor_result = create_executor(config)
 
-        if executor_result.is_success:
-            executor = executor_result.data
+        if executor_result.success:
 
             # Execute job with real API
             job_result = flext_meltano_execute_job(
                 "tap-postgres",
                 "target-csv",
-                config=config
+                config=config,
             )
 
             return {
-                "success": job_result.is_success,
-                "result": job_result.data if job_result.is_success else None,
-                "error": job_result.error if not job_result.is_success else None,
+                "success": job_result.success,
+                "result": job_result.data if job_result.success else None,
+                "error": job_result.error if not job_result.success else None,
                 "approach": "flext_meltano",
-                "lines_of_code": 3
+                "lines_of_code": 3,
             }
-        else:
-            return {
-                "success": False,
-                "error": f"Executor creation failed: {executor_result.error}",
-                "approach": "flext_meltano",
-                "lines_of_code": 3
-            }
+        return {
+            "success": False,
+            "error": f"Executor creation failed: {executor_result.error}",
+            "approach": "flext_meltano",
+            "lines_of_code": 3,
+        }
 
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
             "approach": "flext_meltano",
-            "lines_of_code": 3
+            "lines_of_code": 3,
         }
 
 
@@ -180,11 +184,11 @@ def example_1_flext_meltano_approach() -> Dict[str, Any]:
 # =============================================================================
 
 
-def example_2_traditional_config_management() -> Dict[str, Any]:
+def example_2_traditional_config_management() -> dict[str, Any]:
     """Traditional configuration management - manual validation and setup."""
 
     # Manual configuration validation (20+ lines)
-    def validate_postgres_config(config: Dict[str, Any]) -> bool:
+    def validate_postgres_config(config: dict[str, Any]) -> bool:
         required_fields = ["host", "port", "user", "password", "database"]
 
         for field in required_fields:
@@ -197,63 +201,60 @@ def example_2_traditional_config_management() -> Dict[str, Any]:
         if not (1 <= config["port"] <= 65535):
             return False
 
-        if not config["host"].strip():
-            return False
-
-        return True
+        return config["host"].strip()
 
     # Manual template creation
-    def create_postgres_template() -> Dict[str, Any]:
+    def create_postgres_template() -> dict[str, Any]:
         return {
             "host": "localhost",
             "port": 5432,
             "user": "postgres",
             "password": "",
             "database": "postgres",
-            "schema": "public"
+            "schema": "public",
         }
 
     # Usage requires manual orchestration
     try:
         template = create_postgres_template()
-        template.update({
-            "host": "production-db",
-            "database": "analytics",
-            "password": "secure_password"
-        })
+        template.update(
+            {
+                "host": "production-db",
+                "database": "analytics",
+                "password": "secure_password",
+            },
+        )
 
         if validate_postgres_config(template):
             return {
                 "success": True,
                 "config": template,
                 "approach": "traditional",
-                "lines_of_code": 35
+                "lines_of_code": 35,
             }
-        else:
-            return {
-                "success": False,
-                "error": "Configuration validation failed",
-                "approach": "traditional",
-                "lines_of_code": 35
-            }
+        return {
+            "success": False,
+            "error": "Configuration validation failed",
+            "approach": "traditional",
+            "lines_of_code": 35,
+        }
 
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
             "approach": "traditional",
-            "lines_of_code": 35
+            "lines_of_code": 35,
         }
 
 
-def example_2_flext_meltano_config_management() -> Dict[str, Any]:
+def example_2_flext_meltano_config_management() -> dict[str, Any]:
     """FLEXT Meltano configuration management - automatic validation."""
-
     try:
         # FLEXT Meltano: Automatic configuration with validation
         config = FlextMeltanoConfig(
             project_root="./demo_project",
-            environment="production"
+            environment="production",
         )
 
         # Configuration is automatically validated through constructor
@@ -261,10 +262,10 @@ def example_2_flext_meltano_config_management() -> Dict[str, Any]:
             "success": True,
             "config": {
                 "project_root": config.project_root,
-                "environment": config.environment
+                "environment": config.environment,
             },
             "approach": "flext_meltano",
-            "lines_of_code": 4
+            "lines_of_code": 4,
         }
 
     except Exception as e:
@@ -272,7 +273,7 @@ def example_2_flext_meltano_config_management() -> Dict[str, Any]:
             "success": False,
             "error": str(e),
             "approach": "flext_meltano",
-            "lines_of_code": 4
+            "lines_of_code": 4,
         }
 
 
@@ -281,9 +282,8 @@ def example_2_flext_meltano_config_management() -> Dict[str, Any]:
 # =============================================================================
 
 
-def example_3_traditional_bridge_integration() -> Dict[str, Any]:
+def example_3_traditional_bridge_integration() -> dict[str, Any]:
     """Traditional bridge integration - manual subprocess orchestration."""
-
     try:
         # Manual bridge setup (25+ lines of subprocess management)
         bridge_script = """
@@ -317,7 +317,7 @@ print(json.dumps(result))
 """
 
         # Write bridge script
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
             f.write(bridge_script)
             script_path = f.name
 
@@ -326,7 +326,7 @@ print(json.dumps(result))
             ["python", script_path, "version"],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
 
         # Cleanup
@@ -338,28 +338,26 @@ print(json.dumps(result))
                 "success": result_data.get("success", False),
                 "bridge_output": result_data,
                 "approach": "traditional",
-                "lines_of_code": 30
+                "lines_of_code": 30,
             }
-        else:
-            return {
-                "success": False,
-                "error": bridge_result.stderr,
-                "approach": "traditional",
-                "lines_of_code": 30
-            }
+        return {
+            "success": False,
+            "error": bridge_result.stderr,
+            "approach": "traditional",
+            "lines_of_code": 30,
+        }
 
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
             "approach": "traditional",
-            "lines_of_code": 30
+            "lines_of_code": 30,
         }
 
 
-def example_3_flext_meltano_bridge_integration() -> Dict[str, Any]:
+def example_3_flext_meltano_bridge_integration() -> dict[str, Any]:
     """FLEXT Meltano bridge integration - one-line setup."""
-
     try:
         # FLEXT Meltano: One-line bridge creation
         bridge = create_flext_meltano_bridge()
@@ -369,12 +367,12 @@ def example_3_flext_meltano_bridge_integration() -> Dict[str, Any]:
         service_info = bridge.get_service_info()
 
         return {
-            "success": health_result.is_success,
-            "bridge_healthy": health_result.is_success,
-            "service_info": service_info.data if service_info.is_success else None,
+            "success": health_result.success,
+            "bridge_healthy": health_result.success,
+            "service_info": service_info.data if service_info.success else None,
             "bridge_version": bridge.get_bridge_version(),
             "approach": "flext_meltano",
-            "lines_of_code": 1
+            "lines_of_code": 1,
         }
 
     except Exception as e:
@@ -382,7 +380,7 @@ def example_3_flext_meltano_bridge_integration() -> Dict[str, Any]:
             "success": False,
             "error": str(e),
             "approach": "flext_meltano",
-            "lines_of_code": 1
+            "lines_of_code": 1,
         }
 
 
@@ -391,25 +389,24 @@ def example_3_flext_meltano_bridge_integration() -> Dict[str, Any]:
 # =============================================================================
 
 
-def generate_comparison_report() -> Dict[str, Any]:
+def generate_comparison_report() -> dict[str, Any]:
     """Generate comprehensive comparison report."""
-
     examples = [
         {
             "name": "Basic Pipeline Execution",
             "traditional": example_1_traditional_approach(),
-            "flext_meltano": example_1_flext_meltano_approach()
+            "flext_meltano": example_1_flext_meltano_approach(),
         },
         {
             "name": "Configuration Management",
             "traditional": example_2_traditional_config_management(),
-            "flext_meltano": example_2_flext_meltano_config_management()
+            "flext_meltano": example_2_flext_meltano_config_management(),
         },
         {
             "name": "Bridge Integration",
             "traditional": example_3_traditional_bridge_integration(),
-            "flext_meltano": example_3_flext_meltano_bridge_integration()
-        }
+            "flext_meltano": example_3_flext_meltano_bridge_integration(),
+        },
     ]
 
     total_traditional_lines = 0
@@ -435,7 +432,9 @@ def generate_comparison_report() -> Dict[str, Any]:
 
     overall_reduction = 0
     if total_traditional_lines > 0:
-        overall_reduction = ((total_traditional_lines - total_flext_lines) / total_traditional_lines) * 100
+        overall_reduction = (
+            (total_traditional_lines - total_flext_lines) / total_traditional_lines
+        ) * 100
 
     return {
         "examples": examples,
@@ -444,8 +443,8 @@ def generate_comparison_report() -> Dict[str, Any]:
             "total_flext_lines": total_flext_lines,
             "overall_reduction_percentage": round(overall_reduction, 1),
             "successful_examples": successful_examples,
-            "total_examples": len(examples)
-        }
+            "total_examples": len(examples),
+        },
     }
 
 
@@ -456,34 +455,18 @@ def generate_comparison_report() -> Dict[str, Any]:
 
 def main() -> None:
     """Execute all code reduction examples and generate report."""
-    print("📊 FLEXT Meltano Code Reduction Analysis")
-    print("=" * 50)
-
     # Generate comparison report
     report = generate_comparison_report()
 
     # Display summary
-    summary = report["summary"]
-    print("\n🎯 Overall Results:")
-    print(f"   Traditional Code: {summary['total_traditional_lines']} lines")
-    print(f"   FLEXT Meltano Code: {summary['total_flext_lines']} lines")
-    print(f"   Code Reduction: {summary['overall_reduction_percentage']}%")
-    print(f"   Successful Examples: {summary['successful_examples']}/{summary['total_examples']}")
+    report["summary"]
 
     # Display individual examples
-    print("\n📋 Individual Example Results:")
     for example in report["examples"]:
-        name = example["name"]
-        reduction = example.get("reduction_percentage", 0)
-        traditional_success = example["traditional"].get("success", False)
-        flext_success = example["flext_meltano"].get("success", False)
-
-        print(f"   {name}:")
-        print(f"     Code Reduction: {reduction}%")
-        print(f"     Traditional Success: {'✅' if traditional_success else '❌'}")
-        print(f"     FLEXT Success: {'✅' if flext_success else '❌'}")
-
-    print("\n✅ Code reduction analysis completed!")
+        example["name"]
+        example.get("reduction_percentage", 0)
+        example["traditional"].get("success", False)
+        example["flext_meltano"].get("success", False)
 
 
 if __name__ == "__main__":

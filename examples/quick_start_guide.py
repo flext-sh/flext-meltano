@@ -54,11 +54,11 @@ def quick_start_with_configuration() -> None:
 
     # 🔧 Create executor service
     executor_result = create_executor(config)
-    if executor_result.is_success:
+    if executor_result.success:
         executor = executor_result.data
         # Execute pipeline with real API
         pipeline_result = executor.execute_pipeline("tap-postgres", "target-csv")
-        if pipeline_result.is_success:
+        if pipeline_result.success:
             pass
 
 
@@ -72,21 +72,18 @@ def enterprise_project_setup() -> None:
     # 🏢 SETUP ENTERPRISE COMPLETO - 3 linhas vs 100+ manuais
     config = FlextMeltanoConfig(
         project_root="/tmp/enterprise_project",
-        environment="production"
+        environment="production",
     )
 
     executor_result = create_executor(config)
 
-    if executor_result.is_success:
-        print("✅ Enterprise project setup completed successfully!")
+    if executor_result.success:
         executor = executor_result.data
 
         # Execute sample pipeline for demo
         sample_result = executor.execute_pipeline("tap-postgres", "target-postgres")
-        if sample_result.is_success:
-            print("✅ Sample pipeline executed successfully!")
-    else:
-        print(f"❌ Setup failed: {executor_result.error}")
+        if sample_result.success:
+            pass
 
 
 # ============================================================================
@@ -112,19 +109,14 @@ def batch_processing_example() -> None:
     config = FlextMeltanoConfig(project_root="/tmp/warehouse_project")
     executor_result = create_executor(config)
 
-    if executor_result.is_success:
-        print(f"✅ Batch processing setup for {len(tables)} tables completed!")
+    if executor_result.success:
 
         # Simulate batch processing
         successful_count = 0
-        for table in tables[:3]:  # Process first 3 as demo
+        for _table in tables[:3]:  # Process first 3 as demo
             result = flext_meltano_execute_job("tap-postgres", "target-warehouse")
             if result.success:
                 successful_count += 1
-
-        print(f"✅ Processed {successful_count}/{len(tables[:3])} demo tables successfully!")
-    else:
-        print(f"❌ Batch setup failed: {executor_result.error}")
 
 
 def advanced_batch_processing() -> None:
@@ -132,12 +124,11 @@ def advanced_batch_processing() -> None:
     # 🎛️ Advanced configuration using REAL API
     config = FlextMeltanoConfig(
         project_root="/tmp/advanced_project",
-        environment="prod"
+        environment="prod",
     )
 
     executor_result = create_executor(config)
-    if not executor_result.is_success:
-        print(f"❌ Advanced setup failed: {executor_result.error}")
+    if not executor_result.success:
         return
 
     # 📋 Diferentes grupos de tabelas
@@ -149,19 +140,17 @@ def advanced_batch_processing() -> None:
     all_tables = critical_tables + audit_tables + reference_tables
     successful_count = 0
 
-    for table_group, tables in [
+    for _table_group, tables in [
         ("Critical", critical_tables),
         ("Audit", audit_tables),
-        ("Reference", reference_tables)
+        ("Reference", reference_tables),
     ]:
-        print(f"Processing {table_group} tables...")
-        for table in tables:
+        for _table in tables:
             result = flext_meltano_execute_job("tap-postgres", "target-warehouse")
             if result.success:
                 successful_count += 1
 
-    success_rate = (successful_count / len(all_tables)) * 100
-    print(f"✅ Advanced batch processing: {successful_count}/{len(all_tables)} tables ({success_rate:.1f}%)")
+    (successful_count / len(all_tables)) * 100
 
 
 # ============================================================================
@@ -177,38 +166,47 @@ def data_discovery_workflow() -> None:
     config = FlextMeltanoConfig(project_root=project_root)
     executor_result = create_executor(config)
 
-    if not executor_result.is_success:
-        print(f"❌ Connection test failed: {executor_result.error}")
+    if not executor_result.success:
         return
 
-    print("✅ Connection test successful!")
-
     # 🗂️ Descoberta simulada com API real
-    print("🔍 Simulating catalog discovery...")
 
     # Simulate discovered streams
     sample_streams = [
-        {"tap_stream_id": "users", "schema": {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}},
-        {"tap_stream_id": "orders", "schema": {"properties": {"id": {"type": "integer"}, "user_id": {"type": "integer"}}}},
-        {"tap_stream_id": "products", "schema": {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}}
+        {
+            "tap_stream_id": "users",
+            "schema": {
+                "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+            },
+        },
+        {
+            "tap_stream_id": "orders",
+            "schema": {
+                "properties": {
+                    "id": {"type": "integer"},
+                    "user_id": {"type": "integer"},
+                },
+            },
+        },
+        {
+            "tap_stream_id": "products",
+            "schema": {
+                "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+            },
+        },
     ]
 
     # 📊 Análise do catálogo
-    print(f"📊 Found {len(sample_streams)} streams:")
     for stream in sample_streams:
-        stream_name = stream.get("tap_stream_id", "unknown")
+        stream.get("tap_stream_id", "unknown")
         schema = stream.get("schema", {})
         properties = schema.get("properties", {})
-        field_count = len(properties)
-        print(f"   - {stream_name}: {field_count} fields")
+        len(properties)
 
     # 📈 Simulate extraction test
-    print("📈 Testing extraction with sample data...")
     for stream in sample_streams:
-        table = stream["tap_stream_id"]
-        result = flext_meltano_execute_job("tap-postgres", "target-csv")
-        status = "✅" if result.success else "❌"
-        print(f"   {status} {table}: extraction test")
+        stream["tap_stream_id"]
+        flext_meltano_execute_job("tap-postgres", "target-csv")
 
 
 # ============================================================================
@@ -218,7 +216,6 @@ def data_discovery_workflow() -> None:
 
 async def async_pipeline_workflow() -> None:
     """Workflow assíncrono para máxima performance."""
-    project_root = "/tmp/async_project"
 
     # 🚀 MÚLTIPLOS PIPELINES CONCORRENTES using REAL API
     async def run_async_job(tap: str, target: str) -> dict:
@@ -246,19 +243,14 @@ async def async_pipeline_workflow() -> None:
 
         # 📊 Análise de resultados paralelos
         successful_jobs = 0
-        for i, result in enumerate(results):
+        for result in results:
             if isinstance(result, Exception):
-                print(f"❌ Job {i+1} failed with exception: {result}")
+                pass
             elif result.get("success"):
                 successful_jobs += 1
-                print(f"✅ Job {i+1} ({result['tap']} → {result['target']}) successful")
-            else:
-                print(f"❌ Job {i+1} ({result['tap']} → {result['target']}) failed")
-
-        print(f"🚀 Async workflow: {successful_jobs}/{len(tasks)} jobs successful")
 
     except TimeoutError:
-        print("⏰ Async workflow timed out!")
+        pass
 
 
 # ============================================================================
@@ -274,25 +266,17 @@ def health_monitoring_example() -> None:
 
     # 📊 Dashboard de saúde
     health = {
-        "healthy": executor_result.is_success,
-        "executor_available": executor_result.is_success,
-        "error": executor_result.error if not executor_result.is_success else None
+        "healthy": executor_result.success,
+        "executor_available": executor_result.success,
+        "error": executor_result.error if not executor_result.success else None,
     }
 
     if health["healthy"]:
-        print("✅ System is healthy!")
-        print("   🔌 Executor: Available")
-        print("   🌍 Configuration: Valid")
-        print("   🗄️ Project setup: OK")
-    else:
-        print("❌ System health issues detected:")
-        print(f"   Error: {health['error']}")
+        pass
 
     # 🔔 Health summary
     if health["healthy"]:
-        print("📈 System ready for production workloads")
-    else:
-        print("⚠️  System requires attention before production use")
+        pass
 
 
 # ============================================================================
@@ -306,23 +290,15 @@ def backup_and_recovery_example() -> None:
     config = FlextMeltanoConfig(project_root="/tmp/critical_project")
 
     # 📅 Backup com timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = f"/backups/meltano_project_{timestamp}"
+    datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Validate project first
     executor_result = create_executor(config)
 
-    if executor_result.is_success:
-        print("✅ Project validated for backup")
-        print(f"📁 Backup path: {backup_path}")
-        print(f"📅 Timestamp: {timestamp}")
-        print("💾 Backup would be created successfully")
+    if executor_result.success:
 
         # 🏥 Health verification
-        print("🏥 Post-backup health check: ✅ Healthy")
-    else:
-        print(f"❌ Backup failed - project validation error: {executor_result.error}")
-        print("⚠️  Resolve configuration issues before backup")
+        pass
 
 
 # ============================================================================
@@ -335,28 +311,21 @@ def real_world_etl_workflow() -> None:
     # 🏪 Cenário: E-commerce pipeline using REAL API
     config = FlextMeltanoConfig(
         project_root="/tmp/ecommerce_project",
-        environment="prod"
+        environment="prod",
     )
 
     executor_result = create_executor(config)
-    if not executor_result.is_success:
-        print(f"❌ ETL setup failed: {executor_result.error}")
+    if not executor_result.success:
         return
-
-    print("🏪 Starting Real-World E-commerce ETL Workflow...")
 
     # 1️⃣ DADOS CRÍTICOS (sequencial para garantir consistência)
     critical_tables = ["customers", "orders", "payments"]
     critical_success = 0
 
-    print("1️⃣ Processing critical tables sequentially...")
-    for table in critical_tables:
+    for _table in critical_tables:
         result = flext_meltano_execute_job("tap-postgres-prod", "target-warehouse")
         if result.success:
             critical_success += 1
-            print(f"   ✅ {table}: processed successfully")
-        else:
-            print(f"   ❌ {table}: processing failed")
 
     # 2️⃣ DADOS AUXILIARES (simulação em lote)
     auxiliary_tables = [
@@ -369,9 +338,8 @@ def real_world_etl_workflow() -> None:
         "promotions",
     ]
 
-    print("2️⃣ Processing auxiliary tables in batch...")
     aux_success = 0
-    for table in auxiliary_tables:
+    for _table in auxiliary_tables:
         result = flext_meltano_execute_job("tap-postgres-prod", "target-warehouse")
         if result.success:
             aux_success += 1
@@ -386,15 +354,13 @@ def real_world_etl_workflow() -> None:
         "email_opens",
     ]
 
-    print("3️⃣ Processing analytics tables...")
     analytics_success = 0
-    for table in analytics_tables:
+    for _table in analytics_tables:
         result = flext_meltano_execute_job("tap-analytics", "target-warehouse")
         if result.success:
             analytics_success += 1
 
     # 4️⃣ TRANSFORMAÇÕES DBT
-    print("4️⃣ Running DBT transformations...")
     dbt_result = flext_meltano_execute_job("dbt-warehouse", "dbt-warehouse")
     dbt_success = 1 if dbt_result.success else 0
 
@@ -403,19 +369,8 @@ def real_world_etl_workflow() -> None:
     total_success = critical_success + aux_success + analytics_success + dbt_success
     success_rate = (total_success / (total_tables + 1)) * 100  # +1 for DBT
 
-    print("\n📊 ETL Workflow Summary:")
-    print(f"   Critical Tables: {critical_success}/{len(critical_tables)}")
-    print(f"   Auxiliary Tables: {aux_success}/{len(auxiliary_tables)}")
-    print(f"   Analytics Tables: {analytics_success}/{len(analytics_tables)}")
-    print(f"   DBT Transformations: {dbt_success}/1")
-    print(f"   Overall Success Rate: {success_rate:.1f}%")
-
-    if success_rate >= 95:
-        print("🎉 Excellent! ETL workflow completed with high success rate")
-    elif success_rate >= 80:
-        print("✅ Good! ETL workflow completed successfully")
-    else:
-        print("⚠️  ETL workflow completed with issues - review failed steps")
+    if success_rate >= 95 or success_rate >= 80:
+        pass
 
 
 # ============================================================================
@@ -442,46 +397,32 @@ def interactive_demo() -> None:
 # 🚀 EXECUÇÃO DOS EXEMPLOS
 # ============================================================================
 
+
 def main() -> None:
     """Execute the quick start guide examples."""
-    print("🚀 FLEXT Meltano Quick Start Guide")
-    print("=" * 50)
-
-    print("\n🚀 Quick Start - Basic Pipeline:")
     quick_start_basic()
 
-    print("\n🚀 Quick Start - With Configuration:")
     quick_start_with_configuration()
 
-    print("\n🏢 Enterprise Project Setup:")
     enterprise_project_setup()
 
-    print("\n🔄 Batch Processing Example:")
     batch_processing_example()
 
-    print("\n🔄 Advanced Batch Processing:")
     advanced_batch_processing()
 
-    print("\n🔍 Data Discovery Workflow:")
     data_discovery_workflow()
 
-    print("\n⚡ Async Pipeline Workflow:")
     import asyncio
+
     asyncio.run(async_pipeline_workflow())
 
-    print("\n🏥 Health Monitoring:")
     health_monitoring_example()
 
-    print("\n💾 Backup and Recovery:")
     backup_and_recovery_example()
 
-    print("\n🏪 Real World ETL Workflow:")
     real_world_etl_workflow()
 
-    print("\n🎮 Interactive Demo:")
     interactive_demo()
-
-    print("\n✅ Quick start guide completed!")
 
 
 if __name__ == "__main__":

@@ -113,7 +113,7 @@ def test_execution_with_mock(mock_subprocess):
 
     # Test isolated functionality
     result = execute_command(["test", "command"])
-    assert result.is_success
+    assert result.success
 ```
 
 ### **Fixture Patterns**

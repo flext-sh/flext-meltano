@@ -73,7 +73,7 @@ from flext_meltano.validation import validate_project, FlextMeltanoValidationSer
 
 # Validate Meltano project structure
 result = validate_project()
-if result.is_success:
+if result.success:
     print("Project validation passed")
     validation_details = result.data
 else:
@@ -92,7 +92,7 @@ from flext_meltano.validation import validate_tap_config
 config_data = {"host": "postgres.example.com", "port": 5432, "database": "analytics"}
 
 result = validate_tap_config("tap-postgres", config_data)
-if result.is_success:
+if result.success:
     print("Configuration is valid")
 else:
     print(f"Configuration errors: {result.error_message}")
@@ -104,7 +104,7 @@ from flext_meltano.validation import test_tap_connection
 
 # Test tap connection
 result = test_tap_connection("tap-postgres")
-if result.is_success:
+if result.success:
     print("Connection test successful")
     connection_info = result.data
 else:
@@ -429,7 +429,7 @@ class FlextMeltanoValidationService:
                 config or {},
                 context,
             )
-            if result.is_success:
+            if result.success:
                 return result
 
             # Fallback to direct Singer SDK test
@@ -749,7 +749,7 @@ def flext_meltano_validate_project(
 
     # Convert FlextResult to legacy FlextMeltanoResult
     result = service.validate_project()
-    if result.is_success:
+    if result.success:
         validation_result = result.data
         if validation_result is None:
             return FlextMeltanoResult.fail("Validation result is None")
@@ -799,7 +799,7 @@ async def flext_meltano_test_tap_connection(
 
     # Convert FlextResult to legacy FlextMeltanoResult
     result = await service.test_tap_connection(tap_name, config)
-    if result.is_success:
+    if result.success:
         validation_result = result.data
         if validation_result is None:
             return FlextMeltanoResult.fail("Validation result is None")
@@ -844,7 +844,7 @@ async def flext_meltano_validate_tap_config(
 
     # Convert FlextResult to legacy FlextMeltanoResult
     result = service.validate_tap_config(tap_name, config)
-    if result.is_success:
+    if result.success:
         validation_result = result.data
         if validation_result is None:
             return FlextMeltanoResult.fail("Validation result is None")
@@ -868,7 +868,7 @@ def create_validation_service(
     try:
         service = FlextMeltanoValidationService(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Validation service initialization failed: {init_result.error}",
             )
@@ -879,7 +879,7 @@ def create_validation_service(
 
 
 # === PUBLIC API ===
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoValidationContext",
     "FlextMeltanoValidationResult",
     "FlextMeltanoValidationService",

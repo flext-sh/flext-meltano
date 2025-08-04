@@ -95,7 +95,7 @@ class TestTapServiceIntegration:
         result = create_meltano_tap_service(config)
 
         # Service creation should fail without tap class configured
-        assert not result.is_success
+        assert not result.success
         assert "Tap class not configured" in result.error
 
     def test_tap_service_validation(self) -> None:
@@ -105,10 +105,12 @@ class TestTapServiceIntegration:
 
         # Should fail validation without tap class
         validation_result = tap_service.validate_ready_for_use()
-        assert not validation_result.is_success
+        assert not validation_result.success
         assert validation_result.error is not None
         if "Tap class not configured" not in validation_result.error:
-            msg = f"Expected {'Tap class not configured'} in {validation_result.error}"
+            msg: str = (
+                f"Expected {'Tap class not configured'} in {validation_result.error}"
+            )
             raise AssertionError(msg)
 
     def test_tap_service_health(self) -> None:
@@ -117,13 +119,13 @@ class TestTapServiceIntegration:
         tap_service = FlextMeltanoTapService(config)
 
         health_result = tap_service.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "tap":
-            msg = f"Expected {'tap'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'tap'}, got {health_result.data['service']}"
             raise AssertionError(msg)
         if health_result.data["tap_configured"]:
-            msg = f"Expected False, got {health_result.data['tap_configured']}"
+            msg: str = f"Expected False, got {health_result.data['tap_configured']}"
             raise AssertionError(msg)
 
     def test_tap_class_setting(self) -> None:
@@ -146,11 +148,11 @@ class TestTapServiceIntegration:
 
         # Set tap class
         result = tap_service.set_tap_class(MockTap)
-        assert result.is_success
+        assert result.success
 
         # Validation should now pass
         validation_result = tap_service.validate_ready_for_use()
-        assert validation_result.is_success
+        assert validation_result.success
 
 
 class TestTargetServiceIntegration:
@@ -162,7 +164,7 @@ class TestTargetServiceIntegration:
         result = create_meltano_target_service(config)
 
         # Service creation should fail without target class configured
-        assert not result.is_success
+        assert not result.success
         assert "Target class not configured" in result.error
 
     def test_target_service_validation(self) -> None:
@@ -172,7 +174,7 @@ class TestTargetServiceIntegration:
 
         # Should fail ready-for-use validation without target class
         validation_result = target_service.validate_ready_for_use()
-        assert not validation_result.is_success
+        assert not validation_result.success
         assert validation_result.error is not None
         if "Target class not configured" not in validation_result.error:
             msg = (
@@ -186,13 +188,13 @@ class TestTargetServiceIntegration:
         target_service = FlextMeltanoTargetService(config)
 
         health_result = target_service.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "target":
-            msg = f"Expected {'target'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'target'}, got {health_result.data['service']}"
             raise AssertionError(msg)
         if health_result.data["target_configured"]:
-            msg = f"Expected False, got {health_result.data['target_configured']}"
+            msg: str = f"Expected False, got {health_result.data['target_configured']}"
             raise AssertionError(msg)
 
     def test_target_class_setting(self) -> None:
@@ -212,11 +214,11 @@ class TestTargetServiceIntegration:
 
         # Set target class
         result = target_service.set_target_class(MockTarget)
-        assert result.is_success
+        assert result.success
 
         # Ready-for-use validation should now pass
         validation_result = target_service.validate_ready_for_use()
-        assert validation_result.is_success
+        assert validation_result.success
 
 
 class TestSingerTypingUtilities:
@@ -238,7 +240,7 @@ class TestSingerTypingUtilities:
         # PropertiesList doesn't support len(), check it has properties
         prop_list = list(props)
         if len(prop_list) != EXPECTED_DATA_COUNT:
-            msg = f"Expected {3}, got {len(prop_list)}"
+            msg: str = f"Expected {3}, got {len(prop_list)}"
             raise AssertionError(msg)
 
     def test_singer_types_available(self) -> None:
@@ -317,7 +319,7 @@ class TestStreamProcessing:
         streams = tap.discover_streams()
 
         if len(streams) != 1:
-            msg = f"Expected {1}, got {len(streams)}"
+            msg: str = f"Expected {1}, got {len(streams)}"
             raise AssertionError(msg)
         assert streams[0].name == "test_stream"
 
@@ -333,12 +335,12 @@ class TestStreamProcessing:
         # PropertiesList doesn't support len(), check via list conversion
         schema_list = list(schema)
         if len(schema_list) != 4:
-            msg = f"Expected {4}, got {len(schema_list)}"
+            msg: str = f"Expected {4}, got {len(schema_list)}"
             raise AssertionError(msg)
         # Schema should be iterable
         fields = list(schema)
         if len(fields) != 4:
-            msg = f"Expected {4}, got {len(fields)}"
+            msg: str = f"Expected {4}, got {len(fields)}"
             raise AssertionError(msg)
 
 

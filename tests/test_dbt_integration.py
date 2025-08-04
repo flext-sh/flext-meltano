@@ -52,7 +52,7 @@ class TestFlextMeltanoDbtManager:
         """Test DBT manager initialization."""
         manager = FlextMeltanoDbtManager()
         if manager.project_dir != Path.cwd():
-            msg = f"Expected {Path.cwd()}, got {manager.project_dir}"
+            msg: str = f"Expected {Path.cwd()}, got {manager.project_dir}"
             raise AssertionError(msg)
 
     def test_manager_initialization_with_path(self) -> None:
@@ -60,7 +60,7 @@ class TestFlextMeltanoDbtManager:
         project_dir = Path("/test/project")
         manager = FlextMeltanoDbtManager(project_dir=project_dir)
         if manager.project_dir != project_dir:
-            msg = f"Expected {project_dir}, got {manager.project_dir}"
+            msg: str = f"Expected {project_dir}, got {manager.project_dir}"
             raise AssertionError(msg)
 
     def test_manager_initialization_with_string_path(self) -> None:
@@ -68,7 +68,7 @@ class TestFlextMeltanoDbtManager:
         project_dir_str = "/test/project"
         manager = FlextMeltanoDbtManager(project_dir=project_dir_str)
         if manager.project_dir != Path(project_dir_str):
-            msg = f"Expected {Path(project_dir_str)}, got {manager.project_dir}"
+            msg: str = f"Expected {Path(project_dir_str)}, got {manager.project_dir}"
             raise AssertionError(msg)
 
     def test_run_models_default(self) -> None:
@@ -76,14 +76,14 @@ class TestFlextMeltanoDbtManager:
         manager = FlextMeltanoDbtManager()
 
         result = manager.run_models()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data['models']}"
+            msg: str = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_run_models_with_specific_models(self) -> None:
@@ -92,14 +92,14 @@ class TestFlextMeltanoDbtManager:
         models = ["model1", "model2", "model3"]
 
         result = manager.run_models(models=models)
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data['models']}"
+            msg: str = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_test_models_default(self) -> None:
@@ -107,14 +107,14 @@ class TestFlextMeltanoDbtManager:
         manager = FlextMeltanoDbtManager()
 
         result = manager.test_models()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data['models']}"
+            msg: str = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_test_models_with_specific_models(self) -> None:
@@ -123,10 +123,10 @@ class TestFlextMeltanoDbtManager:
         models = ["test1", "test2"]
 
         result = manager.test_models(models=models)
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data['models']}"
+            msg: str = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_compile_models_default(self) -> None:
@@ -134,10 +134,10 @@ class TestFlextMeltanoDbtManager:
         manager = FlextMeltanoDbtManager()
 
         result = manager.compile_models()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data['models']}"
+            msg: str = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_compile_models_with_specific_models(self) -> None:
@@ -146,10 +146,10 @@ class TestFlextMeltanoDbtManager:
         models = ["compile_model1", "compile_model2"]
 
         result = manager.compile_models(models=models)
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data['models']}"
+            msg: str = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
 
@@ -169,7 +169,7 @@ class TestFlextMeltanoDbtProject:
         config = FlextMeltanoConfig(dbt_project_dir=project_dir_str)
         project = FlextMeltanoDbtProject(config)
         if project.project_dir != Path(project_dir_str):
-            msg = f"Expected {Path(project_dir_str)}, got {project.project_dir}"
+            msg: str = f"Expected {Path(project_dir_str)}, got {project.project_dir}"
             raise AssertionError(msg)
 
     def test_project_initialization_with_string_path(self) -> None:
@@ -178,7 +178,7 @@ class TestFlextMeltanoDbtProject:
         config = FlextMeltanoConfig(dbt_project_dir=project_dir_str)
         project = FlextMeltanoDbtProject(config)
         if project.project_dir != Path(project_dir_str):
-            msg = f"Expected {Path(project_dir_str)}, got {project.project_dir}"
+            msg: str = f"Expected {Path(project_dir_str)}, got {project.project_dir}"
             raise AssertionError(msg)
 
     def test_project_initialize(self) -> None:
@@ -189,7 +189,7 @@ class TestFlextMeltanoDbtProject:
             project = FlextMeltanoDbtProject(config)
 
             result = project.initialize()
-            assert result.is_success
+            assert result.success
             assert (
                 result.data is True
             )  # Changed from None to True based on implementation
@@ -201,12 +201,12 @@ class TestFlextMeltanoDbtProject:
 
         result = project.validate_service()
         # Should fail because directory doesn't exist
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         assert result.error is not None
         if "DBT project directory not found" not in result.error:
-            msg = f"Expected {'DBT project directory not found'} in {result.error}"
+            msg: str = f"Expected {'DBT project directory not found'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -217,7 +217,7 @@ class TestFlextMeltanoDbtRunner:
         """Test DBT runner initialization."""
         runner = FlextMeltanoDbtRunner()
         if runner.project_dir != Path.cwd():
-            msg = f"Expected {Path.cwd()}, got {runner.project_dir}"
+            msg: str = f"Expected {Path.cwd()}, got {runner.project_dir}"
             raise AssertionError(msg)
 
     def test_runner_initialization_with_path(self) -> None:
@@ -225,7 +225,7 @@ class TestFlextMeltanoDbtRunner:
         project_dir = Path("/test/dbt/runner")
         runner = FlextMeltanoDbtRunner(project_dir=project_dir)
         if runner.project_dir != project_dir:
-            msg = f"Expected {project_dir}, got {runner.project_dir}"
+            msg: str = f"Expected {project_dir}, got {runner.project_dir}"
             raise AssertionError(msg)
 
     def test_runner_run_command(self) -> None:
@@ -233,18 +233,20 @@ class TestFlextMeltanoDbtRunner:
         runner = FlextMeltanoDbtRunner()
 
         result = runner.run("run", args=["--models", "test_model"])
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "run":
-            msg = f"Expected {'run'}, got {result.data['command']}"
+            msg: str = f"Expected {'run'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != ["--models", "test_model"]:
-            msg = f"Expected {['--models', 'test_model']}, got {result.data['args']}"
+            msg: str = (
+                f"Expected {['--models', 'test_model']}, got {result.data['args']}"
+            )
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_runner_run_command_no_args(self) -> None:
@@ -252,14 +254,14 @@ class TestFlextMeltanoDbtRunner:
         runner = FlextMeltanoDbtRunner()
 
         result = runner.run("test")
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "test":
-            msg = f"Expected {'test'}, got {result.data['command']}"
+            msg: str = f"Expected {'test'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != []:
-            msg = f"Expected {[]}, got {result.data['args']}"
+            msg: str = f"Expected {[]}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_runner_run_models(self) -> None:
@@ -268,10 +270,10 @@ class TestFlextMeltanoDbtRunner:
         models = ["model_a", "model_b"]
 
         result = runner.run_models(models=models)
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data['models']}"
+            msg: str = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_run_models_default(self) -> None:
@@ -279,10 +281,10 @@ class TestFlextMeltanoDbtRunner:
         runner = FlextMeltanoDbtRunner()
 
         result = runner.run_models()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data['models']}"
+            msg: str = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_test_models(self) -> None:
@@ -291,10 +293,10 @@ class TestFlextMeltanoDbtRunner:
         models = ["test_a", "test_b"]
 
         result = runner.test_models(models=models)
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != models:
-            msg = f"Expected {models}, got {result.data['models']}"
+            msg: str = f"Expected {models}, got {result.data['models']}"
             raise AssertionError(msg)
 
     def test_runner_test_models_default(self) -> None:
@@ -302,10 +304,10 @@ class TestFlextMeltanoDbtRunner:
         runner = FlextMeltanoDbtRunner()
 
         result = runner.test_models()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["models"] != []:
-            msg = f"Expected {[]}, got {result.data['models']}"
+            msg: str = f"Expected {[]}, got {result.data['models']}"
             raise AssertionError(msg)
 
 
@@ -318,13 +320,13 @@ class TestDBTIntegrationPatterns:
 
         # Typical workflow: compile -> run -> test
         compile_result = manager.compile_models(["staging.*"])
-        assert compile_result.is_success
+        assert compile_result.success
 
         run_result = manager.run_models(["staging.*"])
-        assert run_result.is_success
+        assert run_result.success
 
         test_result = manager.test_models(["staging.*"])
-        assert test_result.is_success
+        assert test_result.success
 
     def test_project_workflow(self) -> None:
         """Test typical project workflow."""
@@ -335,10 +337,10 @@ class TestDBTIntegrationPatterns:
 
             # Initialize and validate project
             init_result = project.initialize()
-            assert init_result.is_success
+            assert init_result.success
 
             validate_result = project.validate_service()
-            assert validate_result.is_success
+            assert validate_result.success
 
     def test_runner_workflow(self) -> None:
         """Test typical runner workflow."""
@@ -346,37 +348,37 @@ class TestDBTIntegrationPatterns:
 
         # Run various DBT commands
         deps_result = runner.run("deps")
-        assert deps_result.is_success
+        assert deps_result.success
 
         seed_result = runner.run("seed")
-        assert seed_result.is_success
+        assert seed_result.success
 
         run_result = runner.run_models()
-        assert run_result.is_success
+        assert run_result.success
 
         test_result = runner.test_models()
-        assert test_result.is_success
+        assert test_result.success
 
     def test_integration_with_different_project_types(self) -> None:
         """Test integration with different project directory types."""
         # Test with None project dir
         manager1 = FlextMeltanoDbtManager(project_dir=None)
         if manager1.project_dir != Path.cwd():
-            msg = f"Expected {Path.cwd()}, got {manager1.project_dir}"
+            msg: str = f"Expected {Path.cwd()}, got {manager1.project_dir}"
             raise AssertionError(msg)
 
         # Test with Path object
         project_path = Path("/some/dbt/project")
         manager2 = FlextMeltanoDbtManager(project_dir=project_path)
         if manager2.project_dir != project_path:
-            msg = f"Expected {project_path}, got {manager2.project_dir}"
+            msg: str = f"Expected {project_path}, got {manager2.project_dir}"
             raise AssertionError(msg)
 
         # Test with string path
         project_str = "/another/dbt/project"
         manager3 = FlextMeltanoDbtManager(project_dir=project_str)
         if manager3.project_dir != Path(project_str):
-            msg = f"Expected {Path(project_str)}, got {manager3.project_dir}"
+            msg: str = f"Expected {Path(project_str)}, got {manager3.project_dir}"
             raise AssertionError(msg)
 
 
