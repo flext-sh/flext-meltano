@@ -74,8 +74,8 @@ class TestFlextMeltanoInstallerExceptionPaths:
         result = installer.add_plugin("extractor", "tap-csv")
         assert not result.is_success
         assert result.error is not None
-        if "Plugin add error" not in result.error:
-            msg = f"Expected {'Plugin add error'} in {result.error}"
+        if "Command error" not in result.error:
+            msg = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -95,8 +95,8 @@ class TestFlextMeltanoInstallerExceptionPaths:
         result = installer.add_plugin("extractor", "tap-csv")
         assert not result.is_success
         assert result.error is not None
-        if "Plugin add error" not in result.error:
-            msg = f"Expected {'Plugin add error'} in {result.error}"
+        if "Command error" not in result.error:
+            msg = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")

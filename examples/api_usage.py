@@ -36,8 +36,11 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from flext_meltano.api import (
-    FlextMeltanoAPI,
+from flext_meltano import (
+    FlextMeltanoConfig,
+    create_flext_meltano_bridge,
+    create_executor,
+    create_discoverer,
 )
 
 
@@ -48,20 +51,27 @@ def example_basic_api_usage() -> None:
         project_root = Path(temp_dir) / "example_project"
         project_root.mkdir()
 
-        # Initialize API
-        FlextMeltanoAPI(
-            project_root=project_root,
+        # Initialize configuration with REAL API
+        config = FlextMeltanoConfig(
+            project_root=str(project_root),
             environment="dev",
-            auto_install=True,
         )
 
-        # Example plugin configuration (would be used in real project)
+        # Create bridge using REAL API
+        bridge = create_flext_meltano_bridge(config)
+        print(f"✅ Created bridge: {type(bridge).__name__}")
 
-        # Example catalog discovery (would be used in real project)
+        # Create executor for pipeline operations
+        executor_result = create_executor(config)
+        if executor_result.is_success:
+            print(f"✅ Created executor: {type(executor_result.data).__name__}")
 
-        # Example connection testing (would be used in real project)
+        # Create discoverer for plugin discovery
+        discoverer_result = create_discoverer(config)
+        if discoverer_result.is_success:
+            print(f"✅ Created discoverer: {type(discoverer_result.data).__name__}")
 
-        # Example pipeline execution (would be used in real project)
+        print("✅ Basic API usage example completed successfully")
 
 
 def example_one_liner_functions() -> None:
@@ -70,7 +80,18 @@ def example_one_liner_functions() -> None:
         project_root = Path(temp_dir) / "oneliner_project"
         project_root.mkdir()
 
-        # Conceptual examples of one-liner functions
+        # Real one-liner functions using actual APIs
+        config = FlextMeltanoConfig(project_root=str(project_root))
+
+        # One-liner: Create and use bridge
+        bridge = create_flext_meltano_bridge(config)
+        print(f"✅ One-liner bridge creation: {type(bridge).__name__}")
+
+        # One-liner: Create executor with result handling
+        executor_result = create_executor(config)
+        print(f"✅ One-liner executor: {'Success' if executor_result.is_success else 'Failed'}")
+
+        print("✅ One-liner functions example completed")
 
 
 def example_advanced_usage() -> None:
@@ -79,13 +100,20 @@ def example_advanced_usage() -> None:
         project_root = Path(temp_dir) / "advanced_project"
         project_root.mkdir()
 
-        # API com configurações customizadas
-        FlextMeltanoAPI(
-            project_root=project_root,
+        # Configuration com configurações customizadas usando REAL API
+        config = FlextMeltanoConfig(
+            project_root=str(project_root),
             environment="prod",
-            auto_install=False,  # Controle manual de plugins
-            state_backend="filesystem",
         )
+
+        # Create bridge with advanced configuration
+        bridge = create_flext_meltano_bridge(config)
+        print(f"✅ Advanced bridge created: {type(bridge).__name__}")
+
+        # Create services for advanced usage
+        executor_result = create_executor(config)
+        if executor_result.is_success:
+            print("✅ Advanced executor ready for production")
 
 
 def example_error_handling() -> None:
@@ -94,7 +122,17 @@ def example_error_handling() -> None:
         project_root = Path(temp_dir) / "error_handling"
         project_root.mkdir()
 
-        FlextMeltanoAPI(project_root=project_root)
+        # Error handling example with REAL API
+        config = FlextMeltanoConfig(project_root=str(project_root))
+
+        # Demonstrate FlextResult error handling patterns
+        executor_result = create_executor(config)
+        if executor_result.is_success:
+            print("✅ Error handling example - executor created successfully")
+        else:
+            print(f"⚠️ Error handling example - failed gracefully: {executor_result.error}")
+
+        print("✅ Error handling example completed")
 
 
 if __name__ == "__main__":

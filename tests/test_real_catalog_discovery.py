@@ -126,7 +126,7 @@ extractors:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins()
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
@@ -176,7 +176,7 @@ extractors:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins(plugin_type="extractors")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
@@ -206,7 +206,7 @@ extractors:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins(plugin_type="loaders")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
@@ -236,7 +236,7 @@ extractors:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins(plugin_type="invalid_type")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
@@ -499,7 +499,7 @@ class TestFlextMeltanoCatalogIntegration:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 plugins_result = flext_meltano_discover_plugins(
                     plugin_type="extractors",
@@ -535,7 +535,7 @@ class TestFlextMeltanoCatalogIntegration:
         test_config = {"files": [{"entity": "test", "path": "test.csv"}]}
         with patch(
             "meltano.core.project.Project.find",
-            side_effect=Exception("No project"),
+            return_value=None,
         ):
             config_result = await flext_meltano_validate_tap_config(
                 tap_name,

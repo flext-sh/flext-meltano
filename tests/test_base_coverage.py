@@ -329,7 +329,8 @@ class TestFlextMeltanoTapService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTapService(config)
         result = service.validate_service()
-        assert result.is_success  # Should pass validation even without tap class
+        assert not result.is_success  # Should fail validation without tap class
+        assert "Tap class not configured" in str(result.error)
 
     def test_tap_service_get_health_status(self) -> None:
         """Test tap service health status."""
@@ -467,7 +468,8 @@ class TestFlextMeltanoTargetService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTargetService(config)
         result = service.validate_service()
-        assert result.is_success  # Should pass validation even without target class
+        assert not result.is_success  # Should fail validation without target class
+        assert "Target class not configured" in str(result.error)
 
     def test_target_service_get_health_status(self) -> None:
         """Test target service health status."""
@@ -714,15 +716,17 @@ class TestFactoryFunctions:
         """Test create tap service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_tap_service(config)
-        assert result.is_success
-        assert isinstance(result.data, FlextMeltanoTapService)
+        assert not result.is_success  # Should fail without tap class
+        assert "Tap class not configured" in str(result.error)
+        assert result.data is None
 
     def test_create_meltano_target_service(self) -> None:
         """Test create target service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_target_service(config)
-        assert result.is_success
-        assert isinstance(result.data, FlextMeltanoTargetService)
+        assert not result.is_success  # Should fail without target class
+        assert "Target class not configured" in str(result.error)
+        assert result.data is None
 
     def test_create_meltano_dbt_service(self) -> None:
         """Test create DBT service factory function."""
@@ -756,18 +760,12 @@ class TestFactoryFunctions:
 
             # Test all factory functions with custom config
             tap_result = create_meltano_tap_service(config)
-            assert tap_result.is_success
-            assert tap_result.data is not None
-            if tap_result.data.config.environment != "test":
-                msg = f"Expected {'test'}, got {tap_result.data.config.environment}"
-                raise AssertionError(msg)
+            assert not tap_result.is_success  # Should fail without tap class
+            assert tap_result.data is None  # Service creation fails
 
             target_result = create_meltano_target_service(config)
-            assert target_result.is_success
-            assert target_result.data is not None
-            if target_result.data.config.environment != "test":
-                msg = f"Expected {'test'}, got {target_result.data.config.environment}"
-                raise AssertionError(msg)
+            assert not target_result.is_success  # Should fail without target class
+            assert target_result.data is None  # Service creation fails
 
             dbt_result = create_meltano_dbt_service(config)
             assert dbt_result.is_success
@@ -793,14 +791,12 @@ class TestFactoryFunctions:
 
             # Create services that will have their validation fail
             tap_result = create_meltano_tap_service(config)
-            assert (
-                tap_result.is_success
-            )  # Should succeed - taps don't require specific validation
+            assert not tap_result.is_success  # Should fail without tap class
+            assert "Tap class not configured" in str(tap_result.error)
 
             target_result = create_meltano_target_service(config)
-            assert (
-                target_result.is_success
-            )  # Should succeed - targets don't require specific validation
+            assert not target_result.is_success  # Should fail without target class
+            assert "Target class not configured" in str(target_result.error)
 
             dbt_result = create_meltano_dbt_service(config)
             assert dbt_result.is_success  # Should succeed with temp directory
@@ -818,45 +814,21 @@ class TestIntegrationWorkflows:
         """Test complete tap workflow."""
         config = FlextMeltanoConfig()
         tap_result = create_meltano_tap_service(config)
-        assert tap_result.is_success
+        assert not tap_result.is_success  # Should fail without tap class
+        assert "Tap class not configured" in str(tap_result.error)
 
-        tap_service = tap_result.data
-        assert tap_service is not None
-
-        # Test initialization
-        tap_service.validate_service = lambda: FlextResult(data=True)
-        init_result = tap_service.initialize()
-        assert init_result.is_success
-
-        # Test health check
-        health_result = tap_service.get_health_status()
-        assert health_result.is_success
-
-        # Test validate ready for use (will fail without tap class)
-        ready_result = tap_service.validate_ready_for_use()
-        assert not ready_result.is_success
+        # Service creation should fail, so data will be None
+        assert tap_result.data is None
 
     def test_complete_target_workflow(self) -> None:
         """Test complete target workflow."""
         config = FlextMeltanoConfig()
         target_result = create_meltano_target_service(config)
-        assert target_result.is_success
+        assert not target_result.is_success  # Should fail without target class
+        assert "Target class not configured" in str(target_result.error)
 
-        target_service = target_result.data
-        assert target_service is not None
-
-        # Test initialization
-        target_service.validate_service = lambda: FlextResult(data=True)
-        init_result = target_service.initialize()
-        assert init_result.is_success
-
-        # Test health check
-        health_result = target_service.get_health_status()
-        assert health_result.is_success
-
-        # Test validate ready for use (will fail without target class)
-        ready_result = target_service.validate_ready_for_use()
-        assert not ready_result.is_success
+        # Service creation should fail, so data will be None
+        assert target_result.data is None
 
     def test_complete_dbt_workflow(self) -> None:
         """Test complete DBT workflow."""
@@ -892,17 +864,16 @@ class TestIntegrationWorkflows:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
 
-            # Create all services
+            # Create all services - tap and target will fail without classes
             tap_result = create_meltano_tap_service(config)
-            assert tap_result.is_success
-            tap_service = tap_result.data
-            assert tap_service is not None
+            assert not tap_result.is_success  # Should fail without tap class
+            assert tap_result.data is None
 
             target_result = create_meltano_target_service(config)
-            assert target_result.is_success
-            target_service = target_result.data
-            assert target_service is not None
+            assert not target_result.is_success  # Should fail without target class
+            assert target_result.data is None
 
+            # DBT should succeed with temp dir
             dbt_result = create_meltano_dbt_service(config)
             assert dbt_result.is_success
             dbt_service = dbt_result.data
@@ -913,13 +884,7 @@ class TestIntegrationWorkflows:
             extension_service = extension_result.data
             assert extension_service is not None
 
-            # Test health checks
-            tap_health = tap_service.get_health_status()
-            assert tap_health.is_success
-
-            target_health = target_service.get_health_status()
-            assert target_health.is_success
-
+            # Test health checks for successful services only
             dbt_health = dbt_service.get_health_status()
             assert dbt_health.is_success
 

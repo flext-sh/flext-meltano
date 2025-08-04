@@ -356,8 +356,8 @@ class TestFlextMeltanoInstallerOperations:
             result = installer.add_plugin("extractor", "tap-csv")
             assert not result.is_success
             assert result.error is not None
-            if "Plugin add timed out" not in result.error:
-                msg = f"Expected {'Plugin add timed out'} in {result.error}"
+            if "Command timed out" not in result.error:
+                msg = f"Expected {'Command timed out'} in {result.error}"
                 raise AssertionError(
                     msg,
                 )

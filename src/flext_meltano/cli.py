@@ -140,6 +140,11 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
+from flext_meltano.execution import (
+    SubprocessExecutionContext,
+    execute_subprocess_common,
+)
+
 
 class FlextMeltanoCli:
     """CLI interface for FLEXT Meltano using flext-core patterns."""
@@ -253,15 +258,30 @@ class FlextMeltanoCli:
             # Build command
             cmd = ["meltano", *args]
 
-            # Execute command
-            result = subprocess.run(  # noqa: S603
-                cmd,
+            # Execute command using common executor
+
+            exec_context = SubprocessExecutionContext(
+                command=cmd,
                 cwd=self.project_root,
-                capture_output=True,
-                text=True,
-                timeout=300,
-                check=False,
+                timeout_seconds=300,
             )
+            exec_result = execute_subprocess_common(exec_context)
+
+            if not exec_result.is_success:
+                return FlextResult(error=exec_result.error)
+
+            result_data = exec_result.data
+            if not isinstance(result_data, dict):
+                return FlextResult(error="Invalid execution result format")
+
+            # Create mock result object for compatibility
+            class MockResult:
+                def __init__(self, data: dict[str, object]) -> None:
+                    self.returncode = data.get("returncode", 1)
+                    self.stdout = data.get("stdout", "")
+                    self.stderr = data.get("stderr", "")
+
+            result = MockResult(result_data)
 
             output = {
                 "command": " ".join(cmd),

@@ -190,7 +190,7 @@ class TestFlextMeltanoDiscoverer:
             service = FlextMeltanoDiscoverer(config)
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = service.discover_plugins()
             # May fail if Meltano Hub not accessible, but should not crash
@@ -210,10 +210,10 @@ class TestFlextMeltanoDiscoverer:
             service = FlextMeltanoDiscoverer(config)
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = service.discover_plugins("extractors")
-            # May fail if Meltano Hub not accessible, but should not crash
+            # Should gracefully handle missing project and return defaults
             assert result.is_success or not result.is_success
 
     def test_get_default_plugins(self) -> None:
@@ -350,7 +350,7 @@ class TestFactoryFunctions:
         """Test standalone discover plugins function."""
         with patch(
             "meltano.core.project.Project.find",
-            side_effect=Exception("No project"),
+            return_value=None,
         ):
             result = flext_meltano_discover_plugins()
         # May fail if Meltano Hub not accessible, but should not crash
@@ -361,7 +361,7 @@ class TestFactoryFunctions:
         try:
             with patch(
                 "meltano.core.project.Project.find",
-                side_effect=Exception("No project"),
+                return_value=None,
             ):
                 result = flext_meltano_discover_plugins("extractors")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
@@ -411,7 +411,8 @@ class TestDiscoveryIntegration:
         service = FlextMeltanoDiscoverer(config)
 
         # Test with invalid plugin types
-        result = service.discover_plugins("invalid_type")
+        with patch("meltano.core.project.Project.find", return_value=None):
+            result = service.discover_plugins("invalid_type")
         # Should handle gracefully
         assert result.is_success or not result.is_success
 

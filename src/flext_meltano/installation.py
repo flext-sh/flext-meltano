@@ -411,11 +411,17 @@ import json
 import subprocess
 import uuid
 import warnings
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextResult
+
+from flext_meltano.execution import (
+    SubprocessExecutionContext,
+    execute_subprocess_common,
+)
 
 try:
     from injectable import injectable  # type: ignore[import-untyped]
@@ -447,6 +453,16 @@ class FlextMeltanoInstallationContext(BaseModel):
         """Pydantic configuration."""
 
         arbitrary_types_allowed = True
+
+
+@dataclass
+class InstallationResultData:
+    """Data class to reduce argument count in installation result building."""
+
+    plugin_name: str
+    plugin_type: str
+    pip_url: str | None
+    cmd: list[str]
 
 
 class FlextMeltanoPluginInfo(BaseModel):
@@ -527,53 +543,87 @@ class FlextMeltanoInstaller:
             )
 
         try:
-            # Validate first
-            validation_result = self.validate()
-            if not validation_result.is_success:
-                return FlextResult(error=validation_result.error)
-
-            # Build command
-            cmd = ["meltano", "add", plugin_type, plugin_name]
-            if pip_url:
-                cmd.extend(["--custom", pip_url])
-
-            # Execute subprocess
-            result = subprocess.run(  # noqa: S603
-                cmd,
-                cwd=self.project_root,
-                capture_output=True,
-                text=True,
-                timeout=context.timeout_seconds,
-                check=False,
-            )
-
-            installation_result: dict[str, object] = {
-                "installation_id": context.installation_id,
-                "plugin_name": plugin_name,
-                "plugin_type": plugin_type,
-                "pip_url": pip_url,
-                "command": " ".join(cmd),
-                "returncode": result.returncode,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "success": result.returncode == 0,
-                "started_at": context.started_at.isoformat(),
-                "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (
-                    datetime.now(UTC) - context.started_at
-                ).total_seconds(),
-            }
-
-            if result.returncode == 0:
-                return FlextResult(data=installation_result)
-            return FlextResult(
-                error=f"Plugin add failed: {result.stderr or result.stdout}",
-            )
-
+            return self._execute_plugin_add(plugin_type, plugin_name, pip_url, context)
         except subprocess.TimeoutExpired:
             return FlextResult(error="Plugin add timed out")
         except (OSError, subprocess.CalledProcessError) as e:
             return FlextResult(error=f"Plugin add error: {e}")
+
+    def _execute_plugin_add(
+        self,
+        plugin_type: str,
+        plugin_name: str,
+        pip_url: str | None,
+        context: FlextMeltanoInstallationContext,
+    ) -> FlextResult[dict[str, object]]:
+        """Execute plugin addition with validation and result processing."""
+        # Validate first
+        validation_result = self.validate()
+        if not validation_result.is_success:
+            return FlextResult(error=validation_result.error)
+
+        # Build and execute command
+        cmd = ["meltano", "add", plugin_type, plugin_name]
+        if pip_url:
+            cmd.extend(["--custom", pip_url])
+
+        exec_context = SubprocessExecutionContext(
+            command=cmd,
+            cwd=self.project_root,
+            timeout_seconds=context.timeout_seconds,
+        )
+        exec_result = execute_subprocess_common(exec_context)
+
+        if not exec_result.is_success:
+            return FlextResult(error=exec_result.error)
+
+        result_data = exec_result.data
+        if not isinstance(result_data, dict):
+            return FlextResult(error="Invalid execution result format")
+
+        # Process results
+        result_data_obj = InstallationResultData(plugin_name, plugin_type, pip_url, cmd)
+        return self._build_installation_result(result_data, context, result_data_obj)
+
+    def _build_installation_result(
+        self,
+        result_data: dict[str, object],
+        context: FlextMeltanoInstallationContext,
+        plugin_data: InstallationResultData,
+    ) -> FlextResult[dict[str, object]]:
+        """Build installation result from execution data."""
+
+        # Create mock result object for compatibility
+        class MockResult:
+            def __init__(self, data: dict[str, object]) -> None:
+                self.returncode = data.get("returncode", 1)
+                self.stdout = data.get("stdout", "")
+                self.stderr = data.get("stderr", "")
+
+        result = MockResult(result_data)
+
+        installation_result: dict[str, object] = {
+            "installation_id": context.installation_id,
+            "plugin_name": plugin_data.plugin_name,
+            "plugin_type": plugin_data.plugin_type,
+            "pip_url": plugin_data.pip_url,
+            "command": " ".join(plugin_data.cmd),
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "success": result.returncode == 0,
+            "started_at": context.started_at.isoformat(),
+            "completed_at": datetime.now(UTC).isoformat(),
+            "duration_seconds": (
+                datetime.now(UTC) - context.started_at
+            ).total_seconds(),
+        }
+
+        if result.returncode == 0:
+            return FlextResult(data=installation_result)
+        return FlextResult(
+            error=f"Plugin add failed: {result.stderr or result.stdout}",
+        )
 
     def install_plugins(
         self,

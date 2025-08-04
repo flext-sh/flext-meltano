@@ -78,19 +78,19 @@ def example_service_creation() -> None:
 
     # Create services using factory functions
     executor_result = create_executor(config)
-    if executor_result.success:
+    if executor_result.is_success:
         pass
 
     discoverer_result = create_discoverer(config)
-    if discoverer_result.success:
+    if discoverer_result.is_success:
         pass
 
     installer_result = create_installer_service(config)
-    if installer_result.success:
+    if installer_result.is_success:
         pass
 
     validation_result = create_validation_service(config)
-    if validation_result.success:
+    if validation_result.is_success:
         pass
 
 
@@ -108,7 +108,7 @@ def example_health_checks() -> None:
 
     for _name, service in services:
         health_result = service.get_health_status()
-        if health_result.success:
+        if health_result.is_success:
             pass
 
 
@@ -119,7 +119,7 @@ def example_plugin_discovery() -> None:
 
     # Discover all plugins
     result = discoverer.discover_plugins()
-    if result.success:
+    if result.is_success:
         plugins = result.data
 
         for _plugin in plugins[:5]:  # Show first 5
@@ -130,7 +130,7 @@ def example_plugin_discovery() -> None:
 
     # Discover extractors only
     extractors_result = discoverer.discover_plugins("extractors")
-    if extractors_result.success:
+    if extractors_result.is_success:
         extractors = extractors_result.data
         for _extractor in extractors[:3]:  # Show first 3
             pass
@@ -143,7 +143,7 @@ def example_project_validation() -> None:
 
     # Validate project
     result = validator.validate_project()
-    if result.success:
+    if result.is_success:
         validation_result = result.data
 
         if validation_result.issues:
