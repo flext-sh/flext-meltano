@@ -145,7 +145,7 @@ def test_bridge_meltano_integration():
 
     # Test actual Meltano CLI interaction
     result = bridge.get_version()
-    assert result.is_success
+    assert result.success
     assert "meltano" in result.data
 ```
 
@@ -183,7 +183,7 @@ def test_complete_pipeline_integration():
     result = run_pipeline("tap-postgres", "target-csv")
 
     # Validate results
-    assert result.is_success
+    assert result.success
     assert_output_files_exist()
     assert_data_integrity()
 ```

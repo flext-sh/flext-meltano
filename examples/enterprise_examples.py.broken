@@ -92,7 +92,7 @@ def example_postgres_to_jsonl_traditional():
     )
 
     if discovery_result.returncode != 0:
-        msg = f"Discovery failed: {discovery_result.stderr}"
+        msg: str = f"Discovery failed: {discovery_result.stderr}"
         raise RuntimeError(msg)
 
     # Step 5: Process catalog manually
@@ -142,7 +142,7 @@ def example_postgres_to_jsonl_traditional():
     _output, error = target_process.communicate()
 
     if target_process.returncode != 0:
-        msg = f"Pipeline failed: {error}"
+        msg: str = f"Pipeline failed: {error}"
         raise RuntimeError(msg)
 
     # Step 10: Clean up manually
@@ -175,7 +175,7 @@ def example_enterprise_config_traditional():
         required_fields = ["host", "port", "user", "database"]
         for field in required_fields:
             if field not in config:
-                msg = f"Missing required field: {field}"
+                msg: str = f"Missing required field: {field}"
                 raise ValueError(msg)
 
         if not isinstance(config["port"], int) or not (1 <= config["port"] <= 65535):
@@ -256,7 +256,7 @@ def example_enterprise_config_flext_meltano():
         destination_path="/data/exports",
     )
 
-    if postgres_result.is_success and jsonl_result.is_success:
+    if postgres_result.success and jsonl_result.success:
         return {
             "postgres_config": postgres_result.data,
             "jsonl_config": jsonl_result.data,
@@ -370,8 +370,8 @@ def example_singer_processing_flext_meltano():
     record_validation = singer_utils.validate_singer_message(record_msg)
 
     return {
-        "schema_valid": schema_validation.is_success,
-        "record_valid": record_validation.is_success,
+        "schema_valid": schema_validation.success,
+        "record_valid": record_validation.success,
     }
 
 
@@ -450,7 +450,7 @@ def example_advanced_configuration_validation():
     # Validate configurations with professional validator
     validator = create_flext_meltano_config_validator()
 
-    if plugin_configs.is_success:
+    if plugin_configs.success:
         configs = plugin_configs.data
 
         # Validate PostgreSQL tap configuration
@@ -460,7 +460,7 @@ def example_advanced_configuration_validation():
                 postgres_config,
             )
 
-            if not postgres_validation.is_success:
+            if not postgres_validation.success:
                 pass
 
         # Validate JSONL target configuration
@@ -468,7 +468,7 @@ def example_advanced_configuration_validation():
             jsonl_config = configs["targets"]["target-jsonl"]["config"]
             jsonl_validation = validator.validate_target_jsonl_config(jsonl_config)
 
-            if not jsonl_validation.is_success:
+            if not jsonl_validation.success:
                 pass
 
     return plugin_configs
@@ -531,15 +531,15 @@ async def example_complete_enterprise_workflow():
 
     return {
         "config_result": config_result,
-        "pipeline_result": pipeline_result.is_success
-        if hasattr(pipeline_result, "is_success")
+        "pipeline_result": pipeline_result.success
+        if hasattr(pipeline_result, "success")
         else True,
         "singer_result": singer_result,
-        "validation_result": validation_result.is_success
-        if hasattr(validation_result, "is_success")
+        "validation_result": validation_result.success
+        if hasattr(validation_result, "success")
         else True,
-        "enterprise_result": enterprise_result.is_success
-        if hasattr(enterprise_result, "is_success")
+        "enterprise_result": enterprise_result.success
+        if hasattr(enterprise_result, "success")
         else True,
         "async_result": async_result,
         "summary": "Complete enterprise workflow executed successfully",

@@ -107,7 +107,7 @@ make validate           # Complete quality gate validation
 from flext_meltano.execution import execute_meltano_command
 
 result = execute_meltano_command(["--version"])
-if result.is_success:
+if result.success:
     version_info = result.data
     print(f"Meltano version: {version_info['stdout']}")
 else:

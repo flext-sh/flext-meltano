@@ -303,14 +303,14 @@ bridge = FlextMeltanoBridge(config)
 
 # Get version information
 version_result = bridge.get_version()
-if version_result.is_success:
+if version_result.success:
     versions = version_result.data
     print(f"Meltano: {versions['meltano']}")
     print(f"FLEXT Meltano: {versions['flext_meltano']}")
 
 # Direct function calls (bypass bridge)
 result = execute_meltano_command(["--version"])
-if result.is_success:
+if result.success:
     print(f"Direct Meltano version: {result.data['stdout']}")
 
 # Pipeline execution with monitoring
@@ -320,7 +320,7 @@ pipeline_result = run_pipeline(
     environment="production"
 )
 
-if pipeline_result.is_success:
+if pipeline_result.success:
     metrics = pipeline_result.data
     print(f"Records processed: {metrics.get('record_count', 0)}")
     print(f"Duration: {metrics.get('duration_seconds', 0)} seconds")
@@ -487,11 +487,11 @@ class FlextMeltanoService:
                     labels={
                         "tap": tap,
                         "target": target,
-                        "status": "success" if result.is_success else "failure"
+                        "status": "success" if result.success else "failure"
                     }
                 )
 
-                if result.is_success:
+                if result.success:
                     metrics = result.data
                     self.metrics.record_histogram(
                         "meltano_pipeline_duration_seconds",
@@ -536,17 +536,17 @@ class FlextMeltanoService:
         try:
             # Validate tap configuration
             tap_validation = self.bridge.test_tap_connection(tap)
-            if not tap_validation.is_success:
+            if not tap_validation.success:
                 return tap_validation
 
             # Validate target configuration
             target_validation = self.bridge.test_target_connection(target)
-            if not target_validation.is_success:
+            if not target_validation.success:
                 return target_validation
 
             # Validate schema compatibility
             catalog_result = self.bridge.discover_catalog(tap)
-            if not catalog_result.is_success:
+            if not catalog_result.success:
                 return catalog_result
 
             return FlextResult.success({
@@ -650,7 +650,7 @@ with bridge.trace("pipeline_execution") as trace:
         "operation": "pipeline_execution",
         "tap": "postgres",
         "target": "csv",
-        "status": "success" if result.is_success else "failure",
+        "status": "success" if result.success else "failure",
         "duration": trace.duration_ms,
         "record_count": result.data.get("record_count", 0)
     })
@@ -688,7 +688,7 @@ class ProductionMeltanoManager:
 
         # Pre-execution validation
         validation_result = await self.validate_pipeline(tap, target)
-        if not validation_result.is_success:
+        if not validation_result.success:
             return validation_result
 
         # Execute with comprehensive monitoring
@@ -702,7 +702,7 @@ class ProductionMeltanoManager:
             )
 
             # Post-execution processing
-            if result.is_success:
+            if result.success:
                 await self.record_success_metrics(result.data)
                 await self.update_data_lineage(tap, target, result.data)
             else:
@@ -715,16 +715,16 @@ class ProductionMeltanoManager:
         try:
             # Connection validation
             tap_test = await self.bridge.test_tap_connection_async(tap)
-            if not tap_test.is_success:
+            if not tap_test.success:
                 return tap_test
 
             target_test = await self.bridge.test_target_connection_async(target)
-            if not target_test.is_success:
+            if not target_test.success:
                 return target_test
 
             # Schema compatibility validation
             catalog = await self.bridge.discover_catalog_async(tap)
-            if not catalog.is_success:
+            if not catalog.success:
                 return catalog
 
             return FlextResult.success(True)
@@ -763,7 +763,7 @@ class ResilientPipelineExecutor:
                     **kwargs
                 )
 
-                if result.is_success:
+                if result.success:
                     if attempt > 0:
                         logger.info(f"Pipeline succeeded on retry {attempt}")
                     return result
@@ -871,7 +871,7 @@ with container.get("tracing").trace("ecosystem_pipeline_execution"):
             "service": "flext_meltano",
             "tap": "postgres",
             "target": "csv",
-            "status": "success" if result.is_success else "failure"
+            "status": "success" if result.success else "failure"
         }
     )
 ```

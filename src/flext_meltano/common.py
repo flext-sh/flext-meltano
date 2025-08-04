@@ -126,7 +126,7 @@ def validate_config_value(
         return default
 
 
-__all__ = [
+__all__: list[str] = [
     "validate_config_value",
     "validate_directory_path",
     "validate_file_path",

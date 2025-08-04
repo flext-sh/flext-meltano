@@ -49,7 +49,7 @@ record_result = bridge.flext_singer_create_record_message(
     time_extracted="2025-08-02T10:30:00Z",
 )
 
-if record_result.is_success:
+if record_result.success:
     print(f"Record message: {record_result.data}")
 
 # Create SCHEMA message
@@ -102,7 +102,7 @@ result = catalog.flext_singer_add_stream(
 
 # Get selected streams
 selected_result = catalog.flext_singer_get_selected_streams()
-if selected_result.is_success:
+if selected_result.success:
     print(f"Selected streams: {selected_result.data}")
 ```
 
@@ -115,7 +115,7 @@ bridge = flext_create_singer_bridge()
 
 # Read messages from stdin
 for message_result in bridge.flext_singer_read_messages(sys.stdin):
-    if message_result.is_success:
+    if message_result.success:
         message = message_result.data
         print(f"Received {message['type']} message for stream {message.get('stream')}")
     else:
@@ -124,7 +124,7 @@ for message_result in bridge.flext_singer_read_messages(sys.stdin):
 # Validate and write message
 message = {"type": "RECORD", "stream": "test", "record": {"id": 1}}
 validation_result = bridge.flext_singer_validate_message(message)
-if validation_result.is_success:
+if validation_result.success:
     write_result = bridge.flext_singer_write_message(message)
 ```
 
@@ -144,7 +144,7 @@ result = bridge.flext_singer_create_record_message(
     stream=sys.argv[1],
     record=json.loads(sys.argv[2])
 )
-if result.is_success:
+if result.success:
     print(json.dumps(result.data))
 else:
     sys.exit(1)
@@ -169,9 +169,9 @@ def bridge_create_singer_message(message_type: str, **kwargs) -> Dict[str, Any]:
     result = bridge.flext_singer_create_message(message_type, **kwargs)
 
     return {
-        "success": result.is_success,
+        "success": result.success,
         "message_type": message_type,
-        "message": result.data if result.is_success else None,
+        "message": result.data if result.success else None,
         "error": result.error_message if result.is_failure else None
     }
 
@@ -183,7 +183,7 @@ def bridge_process_singer_stream(input_data: List[str]) -> Dict[str, Any]:
 
     for line in input_data:
         result = bridge.flext_singer_parse_message_line(line)
-        if result.is_success:
+        if result.success:
             processed_messages.append(result.data)
         else:
             errors.append(result.error_message)
@@ -446,7 +446,7 @@ class FlextSingerBridge:
         """Write Singer message to stdout using flext-core patterns."""
         try:
             validation_result = self.flext_singer_validate_message(message)
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return FlextResult(error=f"Invalid message: {validation_result.error}")
 
             json.dumps(message, separators=(",", ":"))
@@ -577,7 +577,7 @@ def flext_create_singer_catalog(
     return FlextSingerCatalog(catalog)
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextSingerBridge",
     "FlextSingerCatalog",
     "flext_create_singer_bridge",

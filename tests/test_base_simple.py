@@ -73,7 +73,7 @@ class TestFlextMeltanoConfig:
         assert config is not None
         assert config.project_root is not None
         if config.environment != "dev":
-            msg = f"Expected {'dev'}, got {config.environment}"
+            msg: str = f"Expected {'dev'}, got {config.environment}"
             raise AssertionError(msg)
 
     def test_config_initialization_with_params(self) -> None:
@@ -87,11 +87,11 @@ class TestFlextMeltanoConfig:
                 dbt_project_dir=dbt_path,
             )
             if config.project_root != test_path:
-                msg = f"Expected {test_path}, got {config.project_root}"
+                msg: str = f"Expected {test_path}, got {config.project_root}"
                 raise AssertionError(msg)
             assert config.environment == "prod"
             if config.dbt_project_dir != dbt_path:
-                msg = f"Expected {dbt_path}, got {config.dbt_project_dir}"
+                msg: str = f"Expected {dbt_path}, got {config.dbt_project_dir}"
                 raise AssertionError(msg)
 
 
@@ -107,12 +107,12 @@ class TestFlextMeltanoEvent:
         )
         assert event is not None
         if event.event_type != "test_event":
-            msg = f"Expected {'test_event'}, got {event.event_type}"
+            msg: str = f"Expected {'test_event'}, got {event.event_type}"
             raise AssertionError(msg)
         assert event.source == "test_source"
         if event.data != {"key": "value"}:
             expected_data = {"key": "value"}
-            msg = f"Expected {expected_data}, got {event.data}"
+            msg: str = f"Expected {expected_data}, got {event.data}"
             raise AssertionError(msg)
 
 
@@ -157,7 +157,7 @@ class TestFactoryFunctions:
         result = create_meltano_tap_service(config)
         # Tap service requires tap_class to be set for full initialization
         # This is expected behavior - service is created but validation fails
-        assert not result.is_success
+        assert not result.success
         assert "Tap class not configured" in result.error
 
     def test_create_meltano_target_service(self) -> None:
@@ -166,7 +166,7 @@ class TestFactoryFunctions:
         result = create_meltano_target_service(config)
         # Target service requires target_class to be set for full initialization
         # This is expected behavior - service is created but validation fails
-        assert not result.is_success
+        assert not result.success
         assert "Target class not configured" in result.error
 
     def test_create_meltano_dbt_service(self) -> None:
@@ -175,14 +175,14 @@ class TestFactoryFunctions:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             result = create_meltano_dbt_service(config)
-            assert result.is_success
+            assert result.success
             assert isinstance(result.data, FlextMeltanoDbtService)
 
     def test_create_meltano_extension_service(self) -> None:
         """Test create extension service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_extension_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoExtensionService)
 
 

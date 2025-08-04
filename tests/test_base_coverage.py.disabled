@@ -172,42 +172,42 @@ class TestFlextMeltanoDbt:
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.run_models()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_run_models_with_list(self) -> None:
         """Test DBT run models with model list."""
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.run_models(["model1", "model2"])
-        assert result.is_success
+        assert result.success
 
     def test_dbt_test_models(self) -> None:
         """Test DBT test models."""
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.test_models()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_test_models_with_list(self) -> None:
         """Test DBT test models with model list."""
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.test_models(["test1", "test2"])
-        assert result.is_success
+        assert result.success
 
     def test_dbt_compile_models(self) -> None:
         """Test DBT compile models."""
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.compile_models()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_compile_models_with_list(self) -> None:
         """Test DBT compile models with model list."""
         config = FlextMeltanoConfig()
         dbt = FlextMeltanoDbt(config)
         result = dbt.compile_models(["model1", "model2"])
-        assert result.is_success
+        assert result.success
 
 
 class TestFlextMeltanoDbtService:
@@ -230,7 +230,7 @@ class TestFlextMeltanoDbtService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.initialize()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_service_validate_service(self) -> None:
         """Test DBT service validation."""
@@ -238,7 +238,7 @@ class TestFlextMeltanoDbtService:
         service = FlextMeltanoDbtService(config)
         result = service.validate_service()
         # Should fail for nonexistent directory
-        assert not result.is_success
+        assert not result.success
 
     def test_dbt_service_validate_service_success(self) -> None:
         """Test DBT service validation success."""
@@ -247,14 +247,14 @@ class TestFlextMeltanoDbtService:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             service = FlextMeltanoDbtService(config)
             result = service.validate_service()
-            assert result.is_success
+            assert result.success
 
     def test_dbt_service_get_health_status(self) -> None:
         """Test DBT service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert "service" in result.data
         assert result.data["service"] == "dbt"
 
@@ -264,35 +264,35 @@ class TestFlextMeltanoDbtService:
         service = FlextMeltanoDbtService(config)
         result = service.run_dbt_command("version")
         # May fail if DBT not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_dbt_service_execute_models(self) -> None:
         """Test DBT service execute models."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.execute_models()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_service_execute_models_with_list(self) -> None:
         """Test DBT service execute models with list."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.execute_models(["model1", "model2"])
-        assert result.is_success
+        assert result.success
 
     def test_dbt_service_test_models(self) -> None:
         """Test DBT service test models."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.test_models()
-        assert result.is_success
+        assert result.success
 
     def test_dbt_service_compile_project(self) -> None:
         """Test DBT service compile project."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.compile_project()
-        assert result.is_success
+        assert result.success
 
 
 class TestFlextMeltanoOrchestrationService:
@@ -309,7 +309,7 @@ class TestFlextMeltanoOrchestrationService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoOrchestrationService(config)
         result = service.initialize()
-        assert result.is_success
+        assert result.success
 
     def test_orchestration_service_validate_service(self) -> None:
         """Test orchestration service validation."""
@@ -317,14 +317,14 @@ class TestFlextMeltanoOrchestrationService:
         service = FlextMeltanoOrchestrationService(config)
         result = service.validate_service()
         # May fail if project not set up, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_orchestration_service_get_health_status(self) -> None:
         """Test orchestration service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoOrchestrationService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert "service" in result.data
         assert result.data["service"] == "orchestration"
 
@@ -338,7 +338,7 @@ class TestFlextMeltanoOrchestrationService:
             "target": "target-csv"
         }
         result = service.orchestrate_pipeline(pipeline_config)
-        assert result.is_success
+        assert result.success
 
     def test_orchestration_service_execute_job(self) -> None:
         """Test orchestration service execute job."""
@@ -346,7 +346,7 @@ class TestFlextMeltanoOrchestrationService:
         service = FlextMeltanoOrchestrationService(config)
         result = service.execute_job("tap-csv", "target-csv")
         # May fail if Meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_orchestration_service_schedule_job(self) -> None:
         """Test orchestration service schedule job."""
@@ -358,14 +358,14 @@ class TestFlextMeltanoOrchestrationService:
             "job": "tap-csv target-csv"
         }
         result = service.schedule_job(schedule_config)
-        assert result.is_success
+        assert result.success
 
     def test_orchestration_service_monitor_pipeline(self) -> None:
         """Test orchestration service monitor pipeline."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoOrchestrationService(config)
         result = service.monitor_pipeline("test-pipeline")
-        assert result.is_success
+        assert result.success
 
 
 class TestFlextMeltanoSingerService:
@@ -382,21 +382,21 @@ class TestFlextMeltanoSingerService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.initialize()
-        assert result.is_success
+        assert result.success
 
     def test_singer_service_validate_service(self) -> None:
         """Test Singer service validation."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.validate_service()
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_singer_service_get_health_status(self) -> None:
         """Test Singer service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert "service" in result.data
         assert result.data["service"] == "singer"
 
@@ -405,14 +405,14 @@ class TestFlextMeltanoSingerService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.create_tap("tap-csv", {"files": []})
-        assert result.is_success
+        assert result.success
 
     def test_singer_service_create_target(self) -> None:
         """Test Singer service create target."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.create_target("target-csv", {"destination_path": "/tmp"})
-        assert result.is_success
+        assert result.success
 
     def test_singer_service_execute_tap_target(self) -> None:
         """Test Singer service execute tap to target."""
@@ -420,14 +420,14 @@ class TestFlextMeltanoSingerService:
         service = FlextMeltanoSingerService(config)
         result = service.execute_tap_target("tap-csv", "target-csv")
         # May fail if plugins not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_singer_service_discover_catalog(self) -> None:
         """Test Singer service discover catalog."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoSingerService(config)
         result = service.discover_catalog("tap-csv")
-        assert result.is_success
+        assert result.success
 
     def test_singer_service_validate_messages(self) -> None:
         """Test Singer service validate messages."""
@@ -438,7 +438,7 @@ class TestFlextMeltanoSingerService:
             {"type": "SCHEMA", "stream": "test", "schema": {"type": "object"}}
         ]
         result = service.validate_messages(messages)
-        assert result.is_success
+        assert result.success
 
 
 class TestFactoryFunctions:
@@ -447,34 +447,34 @@ class TestFactoryFunctions:
     def test_create_tap(self) -> None:
         """Test create tap factory function."""
         result = create_tap("tap-csv", {"files": []})
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoTap)
 
     def test_create_target(self) -> None:
         """Test create target factory function."""
         result = create_target("target-csv", {"destination_path": "/tmp"})
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoTarget)
 
     def test_create_dbt_service(self) -> None:
         """Test create DBT service factory function."""
         config = FlextMeltanoConfig()
         result = create_dbt_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoDbtService)
 
     def test_create_orchestration_service(self) -> None:
         """Test create orchestration service factory function."""
         config = FlextMeltanoConfig()
         result = create_orchestration_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoOrchestrationService)
 
     def test_create_singer_service(self) -> None:
         """Test create Singer service factory function."""
         config = FlextMeltanoConfig()
         result = create_singer_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoSingerService)
 
 
@@ -487,14 +487,14 @@ class TestIntegrationWorkflows:
         tap_result = create_tap("tap-csv", {
             "files": [{"entity": "users", "path": "/data/users.csv"}]
         })
-        assert tap_result.is_success
+        assert tap_result.success
         tap = tap_result.data
 
         # Create target
         target_result = create_target("target-csv", {
             "destination_path": "/output"
         })
-        assert target_result.is_success
+        assert target_result.success
         target = target_result.data
 
         # Test discovery
@@ -513,41 +513,41 @@ class TestIntegrationWorkflows:
         """Test complete DBT workflow."""
         config = FlextMeltanoConfig()
         dbt_result = create_dbt_service(config)
-        assert dbt_result.is_success
+        assert dbt_result.success
         dbt_service = dbt_result.data
 
         # Test initialization
         init_result = dbt_service.initialize()
-        assert init_result.is_success
+        assert init_result.success
 
         # Test health check
         health_result = dbt_service.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
 
         # Test model operations
         compile_result = dbt_service.compile_project()
-        assert compile_result.is_success
+        assert compile_result.success
 
         execute_result = dbt_service.execute_models()
-        assert execute_result.is_success
+        assert execute_result.success
 
         test_result = dbt_service.test_models()
-        assert test_result.is_success
+        assert test_result.success
 
     def test_complete_orchestration_workflow(self) -> None:
         """Test complete orchestration workflow."""
         config = FlextMeltanoConfig()
         orch_result = create_orchestration_service(config)
-        assert orch_result.is_success
+        assert orch_result.success
         orchestration = orch_result.data
 
         # Test initialization
         init_result = orchestration.initialize()
-        assert init_result.is_success
+        assert init_result.success
 
         # Test health check
         health_result = orchestration.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
 
         # Test pipeline orchestration
         pipeline_config = {
@@ -557,7 +557,7 @@ class TestIntegrationWorkflows:
             "dbt": {"models": ["staging.*"]}
         }
         pipeline_result = orchestration.orchestrate_pipeline(pipeline_config)
-        assert pipeline_result.is_success
+        assert pipeline_result.success
 
     def test_service_integration(self) -> None:
         """Test services working together."""
@@ -565,26 +565,26 @@ class TestIntegrationWorkflows:
         
         # Create all services
         singer_result = create_singer_service(config)
-        assert singer_result.is_success
+        assert singer_result.success
         singer_service = singer_result.data
 
         dbt_result = create_dbt_service(config)
-        assert dbt_result.is_success
+        assert dbt_result.success
         dbt_service = dbt_result.data
 
         orch_result = create_orchestration_service(config)
-        assert orch_result.is_success
+        assert orch_result.success
         orch_service = orch_result.data
 
         # Test health checks
         singer_health = singer_service.get_health_status()
-        assert singer_health.is_success
+        assert singer_health.success
 
         dbt_health = dbt_service.get_health_status()
-        assert dbt_health.is_success
+        assert dbt_health.success
 
         orch_health = orch_service.get_health_status()
-        assert orch_health.is_success
+        assert orch_health.success
 
 
 if __name__ == "__main__":

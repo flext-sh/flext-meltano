@@ -171,7 +171,7 @@ class TestModuleFunctionality:
         **Then**: Expected outcomes
         """
         # Implementation with clear assertions
-        assert result.is_success
+        assert result.success
         assert expected_value in result.data
 ```
 

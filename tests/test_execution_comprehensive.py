@@ -65,7 +65,7 @@ class TestFlextMeltanoExecutionCommand:
         """Test command initialization."""
         command = FlextMeltanoExecutionCommand("tap-csv", "target-jsonl")
         if command.tap_name != "tap-csv":
-            msg = f"Expected {'tap-csv'}, got {command.tap_name}"
+            msg: str = f"Expected {'tap-csv'}, got {command.tap_name}"
             raise AssertionError(msg)
         assert command.target_name == "target-jsonl"
 
@@ -73,7 +73,7 @@ class TestFlextMeltanoExecutionCommand:
         """Test command with different tap/target values."""
         command = FlextMeltanoExecutionCommand("tap-postgres", "target-csv")
         if command.tap_name != "tap-postgres":
-            msg = f"Expected {'tap-postgres'}, got {command.tap_name}"
+            msg: str = f"Expected {'tap-postgres'}, got {command.tap_name}"
             raise AssertionError(msg)
         assert command.target_name == "target-csv"
 
@@ -83,7 +83,7 @@ class TestFlextMeltanoExecutionCommand:
         command.tap_name = "tap-postgres"
         command.target_name = "target-csv"
         if command.tap_name != "tap-postgres":
-            msg = f"Expected {'tap-postgres'}, got {command.tap_name}"
+            msg: str = f"Expected {'tap-postgres'}, got {command.tap_name}"
             raise AssertionError(msg)
         assert command.target_name == "target-csv"
 
@@ -95,11 +95,13 @@ class TestFlextMeltanoExecutionContext:
         """Test context initialization with defaults."""
         context = FlextMeltanoExecutionContext(pipeline_name="tap-csv-to-target-jsonl")
         if context.pipeline_name != "tap-csv-to-target-jsonl":
-            msg = f"Expected {'tap-csv-to-target-jsonl'}, got {context.pipeline_name}"
+            msg: str = (
+                f"Expected {'tap-csv-to-target-jsonl'}, got {context.pipeline_name}"
+            )
             raise AssertionError(msg)
         assert context.environment == "dev"
         if context.timeout_seconds != 1800:
-            msg = f"Expected {1800}, got {context.timeout_seconds}"
+            msg: str = f"Expected {1800}, got {context.timeout_seconds}"
             raise AssertionError(msg)
         assert context.metadata == {}
         assert isinstance(context.execution_id, str)
@@ -121,15 +123,15 @@ class TestFlextMeltanoExecutionContext:
             )
 
             if context.pipeline_name != "tap-postgres-to-target-csv":
-                msg = f"Expected {'tap-postgres-to-target-csv'}, got {context.pipeline_name}"
+                msg: str = f"Expected {'tap-postgres-to-target-csv'}, got {context.pipeline_name}"
                 raise AssertionError(msg)
             assert context.environment == "prod"
             if context.project_root != custom_path:
-                msg = f"Expected {custom_path}, got {context.project_root}"
+                msg: str = f"Expected {custom_path}, got {context.project_root}"
                 raise AssertionError(msg)
             assert context.timeout_seconds == 3600
             if context.metadata != custom_metadata:
-                msg = f"Expected {custom_metadata}, got {context.metadata}"
+                msg: str = f"Expected {custom_metadata}, got {context.metadata}"
                 raise AssertionError(msg)
 
     def test_context_execution_id_uniqueness(self) -> None:
@@ -144,7 +146,7 @@ class TestFlextMeltanoExecutionContext:
         # Since the model is not frozen, attributes can be modified
         context.pipeline_name = "changed"
         if context.pipeline_name != "changed":
-            msg = f"Expected {'changed'}, got {context.pipeline_name}"
+            msg: str = f"Expected {'changed'}, got {context.pipeline_name}"
             raise AssertionError(msg)
 
 
@@ -157,10 +159,10 @@ class TestFlextMeltanoResult:
         result = FlextMeltanoResult(success=True, data=data)
 
         if not (result.success):
-            msg = f"Expected True, got {result.success}"
+            msg: str = f"Expected True, got {result.success}"
             raise AssertionError(msg)
         if result.data != data:
-            msg = f"Expected {data}, got {result.data}"
+            msg: str = f"Expected {data}, got {result.data}"
             raise AssertionError(msg)
         assert result.error == ""
 
@@ -169,11 +171,11 @@ class TestFlextMeltanoResult:
         result = FlextMeltanoResult(success=False, error="Pipeline failed")
 
         if result.success:
-            msg = f"Expected False, got {result.success}"
+            msg: str = f"Expected False, got {result.success}"
             raise AssertionError(msg)
         assert result.data is None
         if result.error != "Pipeline failed":
-            msg = f"Expected {'Pipeline failed'}, got {result.error}"
+            msg: str = f"Expected {'Pipeline failed'}, got {result.error}"
             raise AssertionError(msg)
 
     def test_result_ok_class_method(self) -> None:
@@ -182,10 +184,10 @@ class TestFlextMeltanoResult:
         result = FlextMeltanoResult.ok(data)
 
         if not (result.success):
-            msg = f"Expected True, got {result.success}"
+            msg: str = f"Expected True, got {result.success}"
             raise AssertionError(msg)
         if result.data != data:
-            msg = f"Expected {data}, got {result.data}"
+            msg: str = f"Expected {data}, got {result.data}"
             raise AssertionError(msg)
         assert result.error == ""
 
@@ -194,11 +196,11 @@ class TestFlextMeltanoResult:
         result = FlextMeltanoResult.ok()
 
         if not (result.success):
-            msg = f"Expected True, got {result.success}"
+            msg: str = f"Expected True, got {result.success}"
             raise AssertionError(msg)
         assert result.data is None
         if result.error != "":
-            msg = f"Expected {''}, got {result.error}"
+            msg: str = f"Expected {''}, got {result.error}"
             raise AssertionError(msg)
 
     def test_result_fail_class_method(self) -> None:
@@ -206,11 +208,11 @@ class TestFlextMeltanoResult:
         result = FlextMeltanoResult.fail("Execution error")
 
         if result.success:
-            msg = f"Expected False, got {result.success}"
+            msg: str = f"Expected False, got {result.success}"
             raise AssertionError(msg)
         assert result.data is None
         if result.error != "Execution error":
-            msg = f"Expected {'Execution error'}, got {result.error}"
+            msg: str = f"Expected {'Execution error'}, got {result.error}"
             raise AssertionError(msg)
 
 
@@ -224,7 +226,7 @@ class TestFlextMeltanoExecutor:
         assert service is not None
         assert service.config is not None
         if service._initialized:
-            msg = f"Expected False, got {service._initialized}"
+            msg: str = f"Expected False, got {service._initialized}"
             raise AssertionError(msg)
 
     def test_service_initialization_with_path(self) -> None:
@@ -234,7 +236,9 @@ class TestFlextMeltanoExecutor:
             config = FlextMeltanoConfig(project_root=str(custom_path))
             service = FlextMeltanoExecutor(config)
             if service.config.project_root != str(custom_path):
-                msg = f"Expected {custom_path!s}, got {service.config.project_root}"
+                msg: str = (
+                    f"Expected {custom_path!s}, got {service.config.project_root}"
+                )
                 raise AssertionError(msg)
 
     def test_service_initialize(self) -> None:
@@ -242,9 +246,9 @@ class TestFlextMeltanoExecutor:
         config = FlextMeltanoConfig()
         service = FlextMeltanoExecutor(config)
         result = service.initialize()
-        assert result.is_success
+        assert result.success
         if not (service._initialized):
-            msg = f"Expected True, got {service._initialized}"
+            msg: str = f"Expected True, got {service._initialized}"
             raise AssertionError(msg)
 
     def test_service_validate(self) -> None:
@@ -253,20 +257,20 @@ class TestFlextMeltanoExecutor:
         service = FlextMeltanoExecutor(config)
         result = service.validate()
         # May fail if project doesn't exist, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_service_get_health_status(self) -> None:
         """Test service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoExecutor(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "execution":
-            msg = f"Expected {'execution'}, got {result.data['service']}"
+            msg: str = f"Expected {'execution'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_service_execute_pipeline(self) -> None:
@@ -275,7 +279,7 @@ class TestFlextMeltanoExecutor:
         service = FlextMeltanoExecutor(config)
         result = service.execute_pipeline("tap-csv", "target-jsonl")
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_service_run_command(self) -> None:
         """Test service run_command method."""
@@ -283,7 +287,7 @@ class TestFlextMeltanoExecutor:
         service = FlextMeltanoExecutor(config)
         result = service.run_command(["--version"])
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_service_execute_command(self) -> None:
         """Test service execute command method."""
@@ -292,7 +296,7 @@ class TestFlextMeltanoExecutor:
         command = FlextMeltanoExecutionCommand("tap-csv", "target-jsonl")
         result = service.execute(command)
         # May fail if meltano not installed, but should not crash
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
 
 class TestFlextMeltanoExecutorValidation:
@@ -307,10 +311,10 @@ class TestFlextMeltanoExecutorValidation:
         service = FlextMeltanoExecutor(config)
 
         result = service.validate()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Meltano CLI not found" not in result.error:
-            msg = f"Expected {'Meltano CLI not found'} in {result.error}"
+            msg: str = f"Expected {'Meltano CLI not found'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor._find_meltano_executable")
@@ -322,10 +326,10 @@ class TestFlextMeltanoExecutorValidation:
         service = FlextMeltanoExecutor(config)
 
         result = service.validate()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Validation failed" not in result.error:
-            msg = f"Expected {'Validation failed'} in {result.error}"
+            msg: str = f"Expected {'Validation failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("shutil.which")
@@ -354,10 +358,10 @@ class TestFlextMeltanoExecutorValidation:
         service = FlextMeltanoExecutor(config)
 
         result = service.initialize()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Service initialization failed" not in result.error:
-            msg = f"Expected {'Service initialization failed'} in {result.error}"
+            msg: str = f"Expected {'Service initialization failed'} in {result.error}"
             raise AssertionError(msg)
 
     def test_validation_success_with_meltano_yml(self) -> None:
@@ -371,9 +375,9 @@ class TestFlextMeltanoExecutorValidation:
             service = FlextMeltanoExecutor(config)
 
             result = service.validate()
-            assert result.is_success
+            assert result.success
             if not (result.data):
-                msg = f"Expected True, got {result.data}"
+                msg: str = f"Expected True, got {result.data}"
                 raise AssertionError(msg)
 
     def test_validation_with_nonexistent_path(self) -> None:
@@ -383,7 +387,7 @@ class TestFlextMeltanoExecutorValidation:
 
         result = service.validate()
         # Validation looks for meltano executable, not project root existence
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_validation_meltano_cli_not_found(self) -> None:
         """Test validation failure when meltano CLI not found."""
@@ -393,7 +397,7 @@ class TestFlextMeltanoExecutorValidation:
 
         result = service.validate()
         # May fail if meltano CLI not found, or succeed if found in system
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     def test_validation_exception_handling(self) -> None:
         """Test validation exception handling."""
@@ -402,7 +406,7 @@ class TestFlextMeltanoExecutorValidation:
 
         result = service.validate()
         # Should handle gracefully - may succeed or fail based on Path behavior
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
 
 class TestFlextMeltanoExecutorValidationPaths:
@@ -421,10 +425,10 @@ class TestFlextMeltanoExecutorValidationPaths:
         service._meltano_path = None  # Ensure _meltano_path is None
 
         result = service.execute_pipeline("tap-csv", "target-jsonl")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Validation failed" not in result.error:
-            msg = f"Expected {'Validation failed'} in {result.error}"
+            msg: str = f"Expected {'Validation failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.validate")
@@ -440,10 +444,10 @@ class TestFlextMeltanoExecutorValidationPaths:
         service._meltano_path = None  # Ensure _meltano_path is None
 
         result = service.run_command(["--version"])
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Validation failed" not in result.error:
-            msg = f"Expected {'Validation failed'} in {result.error}"
+            msg: str = f"Expected {'Validation failed'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -469,16 +473,16 @@ class TestFlextMeltanoExecutorOperations:
             service = FlextMeltanoExecutor(config)
 
             result = service.execute_pipeline("tap-csv", "target-jsonl")
-            assert result.is_success
+            assert result.success
             assert result.data is not None
             if not (result.data["success"]):
-                msg = f"Expected True, got {result.data['success']}"
+                msg: str = f"Expected True, got {result.data['success']}"
                 raise AssertionError(msg)
             if result.data["pipeline_name"] != "tap-csv-target-jsonl":
-                msg = f"Expected {'tap-csv-target-jsonl'}, got {result.data['pipeline_name']}"
+                msg: str = f"Expected {'tap-csv-target-jsonl'}, got {result.data['pipeline_name']}"
                 raise AssertionError(msg)
             if "meltano" not in result.data["command"]:
-                msg = f"Expected {'meltano'} in {result.data['command']}"
+                msg: str = f"Expected {'meltano'} in {result.data['command']}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -498,10 +502,10 @@ class TestFlextMeltanoExecutorOperations:
             service = FlextMeltanoExecutor(config)
 
             result = service.execute_pipeline("tap-nonexistent", "target-nonexistent")
-            assert not result.is_success
+            assert not result.success
             assert result.error is not None
             if "Pipeline failed" not in result.error:
-                msg = f"Expected {'Pipeline failed'} in {result.error}"
+                msg: str = f"Expected {'Pipeline failed'} in {result.error}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -517,10 +521,12 @@ class TestFlextMeltanoExecutorOperations:
             service = FlextMeltanoExecutor(config)
 
             result = service.execute_pipeline("tap-csv", "target-jsonl")
-            assert not result.is_success
+            assert not result.success
             assert result.error is not None
             if "Pipeline execution timed out" not in result.error:
-                msg = f"Expected {'Pipeline execution timed out'} in {result.error}"
+                msg: str = (
+                    f"Expected {'Pipeline execution timed out'} in {result.error}"
+                )
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -540,13 +546,13 @@ class TestFlextMeltanoExecutorOperations:
             service = FlextMeltanoExecutor(config)
 
             result = service.run_command(["--version"])
-            assert result.is_success
+            assert result.success
             assert result.data is not None
             if not (result.data["success"]):
-                msg = f"Expected True, got {result.data['success']}"
+                msg: str = f"Expected True, got {result.data['success']}"
                 raise AssertionError(msg)
             if "meltano --version" not in result.data["command"]:
-                msg = f"Expected {'meltano --version'} in {result.data['command']}"
+                msg: str = f"Expected {'meltano --version'} in {result.data['command']}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -566,10 +572,10 @@ class TestFlextMeltanoExecutorOperations:
             service = FlextMeltanoExecutor(config)
 
             result = service.run_command(["invalid", "command"])
-            assert not result.is_success
+            assert not result.success
             assert result.error is not None
             if "Command failed" not in result.error:
-                msg = f"Expected {'Command failed'} in {result.error}"
+                msg: str = f"Expected {'Command failed'} in {result.error}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -595,10 +601,10 @@ class TestFlextMeltanoExecutorOperations:
             )
 
             result = service.execute_pipeline("tap-csv", "target-jsonl", context)
-            assert result.is_success
+            assert result.success
             assert result.data is not None
             if result.data["execution_id"] != context.execution_id:
-                msg = f"Expected {context.execution_id}, got {result.data['execution_id']}"
+                msg: str = f"Expected {context.execution_id}, got {result.data['execution_id']}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -624,10 +630,10 @@ class TestFlextMeltanoExecutorOperations:
             )
 
             result = service.run_command(["--version"], context)
-            assert result.is_success
+            assert result.success
             assert result.data is not None
             if result.data["execution_id"] != context.execution_id:
-                msg = f"Expected {context.execution_id}, got {result.data['execution_id']}"
+                msg: str = f"Expected {context.execution_id}, got {result.data['execution_id']}"
                 raise AssertionError(msg)
 
 
@@ -649,10 +655,10 @@ class TestFlextMeltanoExecutorExceptionPaths:
         service = FlextMeltanoExecutor(config)
 
         result = service.execute_pipeline("tap-csv", "target-jsonl")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Execution error" not in result.error:
-            msg = f"Expected {'Execution error'} in {result.error}"
+            msg: str = f"Expected {'Execution error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -670,10 +676,10 @@ class TestFlextMeltanoExecutorExceptionPaths:
         service = FlextMeltanoExecutor(config)
 
         result = service.execute_pipeline("tap-csv", "target-jsonl")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Execution error" not in result.error:
-            msg = f"Expected {'Execution error'} in {result.error}"
+            msg: str = f"Expected {'Execution error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -687,10 +693,10 @@ class TestFlextMeltanoExecutorExceptionPaths:
         service = FlextMeltanoExecutor(config)
 
         result = service.run_command(["--version"])
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -708,10 +714,10 @@ class TestFlextMeltanoExecutorExceptionPaths:
         service = FlextMeltanoExecutor(config)
 
         result = service.run_command(["--version"])
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -729,10 +735,10 @@ class TestFlextMeltanoExecutorExceptionPaths:
         service = FlextMeltanoExecutor(config)
 
         result = service.run_command(["--version"])
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command timed out" not in result.error:
-            msg = f"Expected {'Command timed out'} in {result.error}"
+            msg: str = f"Expected {'Command timed out'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -744,7 +750,7 @@ class TestFactoryAndLegacyFunctions:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoExecutor)
         assert result.data._initialized is True  # Should be initialized
 
@@ -755,10 +761,12 @@ class TestFactoryAndLegacyFunctions:
             config = FlextMeltanoConfig(project_root=str(custom_path))
             result = create_executor(config)
 
-            assert result.is_success
+            assert result.success
             assert result.data is not None
             if result.data.config.project_root != str(custom_path):
-                msg = f"Expected {custom_path!s}, got {result.data.config.project_root}"
+                msg: str = (
+                    f"Expected {custom_path!s}, got {result.data.config.project_root}"
+                )
                 raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.execute_pipeline")
@@ -773,7 +781,7 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_execute_job("tap-csv", "target-jsonl", Path.cwd())
         if not (result.success):
-            msg = f"Expected True, got {result.success}"
+            msg: str = f"Expected True, got {result.success}"
             raise AssertionError(msg)
 
         # Verify deprecation warning
@@ -790,11 +798,11 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_execute_job("tap-csv", "target-jsonl", Path.cwd())
         if result.success:
-            msg = f"Expected False, got {result.success}"
+            msg: str = f"Expected False, got {result.success}"
             raise AssertionError(msg)
         assert result.error is not None
         if "Pipeline failed" not in result.error:
-            msg = f"Expected {'Pipeline failed'} in {result.error}"
+            msg: str = f"Expected {'Pipeline failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.run_command")
@@ -806,7 +814,7 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_run_command(["--version"], Path.cwd())
         if not (result.success):
-            msg = f"Expected True, got {result.success}"
+            msg: str = f"Expected True, got {result.success}"
             raise AssertionError(msg)
 
         # Verify deprecation warning
@@ -820,11 +828,11 @@ class TestFactoryAndLegacyFunctions:
 
         result = flext_meltano_run_command(["invalid"], Path.cwd())
         if result.success:
-            msg = f"Expected False, got {result.success}"
+            msg: str = f"Expected False, got {result.success}"
             raise AssertionError(msg)
         assert result.error is not None
         if "Command failed" not in result.error:
-            msg = f"Expected {'Command failed'} in {result.error}"
+            msg: str = f"Expected {'Command failed'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -837,7 +845,7 @@ class TestCreateExecutionServiceEdgeCases:
 
         result = create_executor(config)
         # The service should be created successfully, even if validation fails later
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoExecutor)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.validate")
@@ -848,10 +856,10 @@ class TestCreateExecutionServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Executor initialization failed" not in result.error:
-            msg = f"Expected {'Executor initialization failed'} in {result.error}"
+            msg: str = f"Expected {'Executor initialization failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.__init__")
@@ -862,10 +870,10 @@ class TestCreateExecutionServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create executor" not in result.error:
-            msg = f"Expected {'Failed to create executor'} in {result.error}"
+            msg: str = f"Expected {'Failed to create executor'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.__init__")
@@ -876,10 +884,10 @@ class TestCreateExecutionServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create executor" not in result.error:
-            msg = f"Expected {'Failed to create executor'} in {result.error}"
+            msg: str = f"Expected {'Failed to create executor'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.execution.FlextMeltanoExecutor.__init__")
@@ -890,10 +898,10 @@ class TestCreateExecutionServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create executor" not in result.error:
-            msg = f"Expected {'Failed to create executor'} in {result.error}"
+            msg: str = f"Expected {'Failed to create executor'} in {result.error}"
             raise AssertionError(msg)
 
 

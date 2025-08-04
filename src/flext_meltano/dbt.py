@@ -43,12 +43,12 @@ dbt_service = FlextMeltanoDbtService(project_dir="./dbt")
 
 # Run DBT models
 result = dbt_service.run_models()
-if result.is_success:
+if result.success:
     print("DBT models executed successfully")
 
 # Test DBT models
 test_result = dbt_service.test_models()
-if test_result.is_success:
+if test_result.success:
     print("All DBT tests passed")
 ```
 
@@ -61,9 +61,9 @@ def bridge_invoke_dbt(command: str, *args: str) -> Dict[str, Any]:
     result = dbt_service.execute_command(command, *args)
 
     return {
-        "success": result.is_success,
+        "success": result.success,
         "command": command,
-        "output": result.data if result.is_success else None,
+        "output": result.data if result.success else None,
         "error": result.error_message if result.is_failure else None,
     }
 ```
@@ -78,12 +78,8 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
-
-if TYPE_CHECKING:
-    from flext_core.flext_types import TData
 
 
 # Simple stub implementations for Singer project compatibility
@@ -94,15 +90,24 @@ class FlextMeltanoDbtManager:
         """Initialize DBT manager."""
         self.project_dir = Path(project_dir) if project_dir else Path.cwd()
 
-    def run_models(self, models: list[str] | None = None) -> FlextResult[TData]:
+    def run_models(
+        self,
+        models: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Run DBT models."""
         return FlextResult.ok({"models": models or [], "status": "success"})
 
-    def test_models(self, models: list[str] | None = None) -> FlextResult[TData]:
+    def test_models(
+        self,
+        models: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Test DBT models."""
         return FlextResult.ok({"models": models or [], "status": "success"})
 
-    def compile_models(self, models: list[str] | None = None) -> FlextResult[TData]:
+    def compile_models(
+        self,
+        models: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Compile DBT models."""
         return FlextResult.ok({"models": models or [], "status": "success"})
 
@@ -130,23 +135,33 @@ class FlextMeltanoDbtRunner:
         """Initialize DBT runner."""
         self.project_dir = Path(project_dir) if project_dir else Path.cwd()
 
-    def run(self, command: str, args: list[str] | None = None) -> FlextResult[TData]:
+    def run(
+        self,
+        command: str,
+        args: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Run DBT command."""
         return FlextResult.ok(
             {"command": command, "args": args or [], "status": "success"},
         )
 
-    def run_models(self, models: list[str] | None = None) -> FlextResult[TData]:
+    def run_models(
+        self,
+        models: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Run specific DBT models."""
         return FlextResult.ok({"models": models or [], "status": "success"})
 
-    def test_models(self, models: list[str] | None = None) -> FlextResult[TData]:
+    def test_models(
+        self,
+        models: list[str] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Test specific DBT models."""
         return FlextResult.ok({"models": models or [], "status": "success"})
 
 
 # Export classes for Singer project imports
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoDbtManager",
     "FlextMeltanoDbtProject",
     "FlextMeltanoDbtRunner",

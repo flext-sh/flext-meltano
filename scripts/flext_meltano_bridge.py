@@ -90,8 +90,8 @@ def main() -> None:
         # Format response for Go service consumption
         if result is not None:
             response = {
-                "success": result.is_success,
-                "data": result.data if result.is_success else None,
+                "success": result.success,
+                "data": result.data if result.success else None,
                 "error": result.error_message if result.is_failure else None,
             }
         else:

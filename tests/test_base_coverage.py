@@ -49,11 +49,11 @@ class TestFlextMeltanoConfig:
         assert config is not None
         assert config.project_root is not None
         if config.environment != "dev":
-            msg = f"Expected {'dev'}, got {config.environment}"
+            msg: str = f"Expected {'dev'}, got {config.environment}"
             raise AssertionError(msg)
         assert config.meltano_ui_bind_port == 5000
         if config.singer_sdk_log_level != "INFO":
-            msg = f"Expected {'INFO'}, got {config.singer_sdk_log_level}"
+            msg: str = f"Expected {'INFO'}, got {config.singer_sdk_log_level}"
             raise AssertionError(msg)
 
     def test_config_initialization_with_params(self) -> None:
@@ -69,15 +69,15 @@ class TestFlextMeltanoConfig:
                 singer_sdk_log_level="DEBUG",
             )
             if config.project_root != test_path:
-                msg = f"Expected {test_path}, got {config.project_root}"
+                msg: str = f"Expected {test_path}, got {config.project_root}"
                 raise AssertionError(msg)
             assert config.environment == "prod"
             if config.dbt_project_dir != dbt_path:
-                msg = f"Expected {dbt_path}, got {config.dbt_project_dir}"
+                msg: str = f"Expected {dbt_path}, got {config.dbt_project_dir}"
                 raise AssertionError(msg)
             assert config.meltano_ui_bind_port == 8080
             if config.singer_sdk_log_level != "DEBUG":
-                msg = f"Expected {'DEBUG'}, got {config.singer_sdk_log_level}"
+                msg: str = f"Expected {'DEBUG'}, got {config.singer_sdk_log_level}"
                 raise AssertionError(msg)
 
     def test_config_validation(self) -> None:
@@ -101,19 +101,19 @@ class TestFlextMeltanoConfig:
             dbt_profiles_dir="/custom/profiles",
         )
         if config.project_root != "/custom/path":
-            msg = f"Expected {'/custom/path'}, got {config.project_root}"
+            msg: str = f"Expected {'/custom/path'}, got {config.project_root}"
             raise AssertionError(msg)
         assert config.environment == "staging"
         if config.meltano_database_uri != "postgresql://localhost/test":
-            msg = f"Expected {'postgresql://localhost/test'}, got {config.meltano_database_uri}"
+            msg: str = f"Expected {'postgresql://localhost/test'}, got {config.meltano_database_uri}"
             raise AssertionError(msg)
         assert config.meltano_ui_bind_port == 9000
         if config.singer_sdk_log_level != "WARNING":
-            msg = f"Expected {'WARNING'}, got {config.singer_sdk_log_level}"
+            msg: str = f"Expected {'WARNING'}, got {config.singer_sdk_log_level}"
             raise AssertionError(msg)
         assert config.dbt_project_dir == "/custom/dbt"
         if config.dbt_profiles_dir != "/custom/profiles":
-            msg = f"Expected {'/custom/profiles'}, got {config.dbt_profiles_dir}"
+            msg: str = f"Expected {'/custom/profiles'}, got {config.dbt_profiles_dir}"
             raise AssertionError(msg)
 
     def test_config_frozen(self) -> None:
@@ -128,14 +128,14 @@ class TestFlextMeltanoConfig:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(project_root=temp_dir)
             if config.project_root != temp_dir:
-                msg = f"Expected {temp_dir}, got {config.project_root}"
+                msg: str = f"Expected {temp_dir}, got {config.project_root}"
                 raise AssertionError(msg)
 
     def test_config_project_root_validation_nonexistent_test_path(self) -> None:
         """Test project root validation with nonexistent test path."""
         config = FlextMeltanoConfig(project_root="/nonexistent/test/path")
         if "/nonexistent/test/path" not in config.project_root:
-            msg = f"Expected {'/nonexistent/test/path'} in {config.project_root}"
+            msg: str = f"Expected {'/nonexistent/test/path'} in {config.project_root}"
             raise AssertionError(msg)
 
 
@@ -151,12 +151,12 @@ class TestFlextMeltanoEvent:
         )
         assert event is not None
         if event.event_type != "test_event":
-            msg = f"Expected {'test_event'}, got {event.event_type}"
+            msg: str = f"Expected {'test_event'}, got {event.event_type}"
             raise AssertionError(msg)
         assert event.source == "test_source"
         if event.data != {"key": "value"}:
             expected_data = {"key": "value"}
-            msg = f"Expected {expected_data}, got {event.data}"
+            msg: str = f"Expected {expected_data}, got {event.data}"
             raise AssertionError(msg)
         assert event.id is not None
         assert event.timestamp is not None
@@ -169,11 +169,11 @@ class TestFlextMeltanoEvent:
             data={},
         )
         if event.event_type != "minimal":
-            msg = f"Expected {'minimal'}, got {event.event_type}"
+            msg: str = f"Expected {'minimal'}, got {event.event_type}"
             raise AssertionError(msg)
         assert event.source == "test"
         if event.data != {}:
-            msg = f"Expected {{}}, got {event.data}"
+            msg: str = f"Expected {{}}, got {event.data}"
             raise AssertionError(msg)
 
     def test_event_default_id_generation(self) -> None:
@@ -183,7 +183,7 @@ class TestFlextMeltanoEvent:
         assert event1.id != event2.id
         # UUID format check
         if len(event1.id) != 36:
-            msg = f"Expected {36}, got {len(event1.id)}"
+            msg: str = f"Expected {36}, got {len(event1.id)}"
             raise AssertionError(msg)
         assert len(event2.id) == 36
 
@@ -197,11 +197,11 @@ class TestFlextMeltanoEvent:
         # Test that the event can be serialized
         event_dict = event.dict()
         if event_dict["event_type"] != "serialize_test":
-            msg = f"Expected {'serialize_test'}, got {event_dict['event_type']}"
+            msg: str = f"Expected {'serialize_test'}, got {event_dict['event_type']}"
             raise AssertionError(msg)
         assert event_dict["source"] == "test_source"
         if event_dict["data"]["number"] != 42:
-            msg = f"Expected {42}, got {event_dict['data']['number']}"
+            msg: str = f"Expected {42}, got {event_dict['data']['number']}"
             raise AssertionError(msg)
         assert event_dict["data"]["nested"]["key"] == "value"
 
@@ -215,29 +215,29 @@ class TestFlextMeltanoEvent:
         """Test event validation with empty event type."""
         event = FlextMeltanoEvent(event_type="  ", source="test", data={})
         result = event.validate_domain_rules()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Event type cannot be empty" not in result.error:
-            msg = f"Expected {'Event type cannot be empty'} in {result.error}"
+            msg: str = f"Expected {'Event type cannot be empty'} in {result.error}"
             raise AssertionError(msg)
 
     def test_event_validate_domain_rules_empty_source(self) -> None:
         """Test event validation with empty source."""
         event = FlextMeltanoEvent(event_type="test", source="  ", data={})
         result = event.validate_domain_rules()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Event source cannot be empty" not in result.error:
-            msg = f"Expected {'Event source cannot be empty'} in {result.error}"
+            msg: str = f"Expected {'Event source cannot be empty'} in {result.error}"
             raise AssertionError(msg)
 
     def test_event_validate_domain_rules_success(self) -> None:
         """Test event validation success."""
         event = FlextMeltanoEvent(event_type="test", source="test", data={})
         result = event.validate_domain_rules()
-        assert result.is_success
+        assert result.success
         assert result.data is None
 
 
@@ -260,7 +260,7 @@ class TestFlextMeltanoBaseService:
         assert service is not None
         assert service.config is not None
         if service._initialized:
-            msg = f"Expected False, got {service._initialized}"
+            msg: str = f"Expected False, got {service._initialized}"
             raise AssertionError(msg)
         assert service.logger is not None
 
@@ -270,9 +270,9 @@ class TestFlextMeltanoBaseService:
         service = self.ConcreteTestService(config)
 
         result = service.initialize()
-        assert result.is_success
+        assert result.success
         if not (result.data):
-            msg = f"Expected True, got {result.data}"
+            msg: str = f"Expected True, got {result.data}"
             raise AssertionError(msg)
         assert service._initialized is True
 
@@ -289,14 +289,14 @@ class TestFlextMeltanoBaseService:
 
         service = FailingTestService(config)
         result = service.initialize()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Validation failed" not in result.error:
-            msg = f"Expected {'Validation failed'} in {result.error}"
+            msg: str = f"Expected {'Validation failed'} in {result.error}"
             raise AssertionError(msg)
         if service._initialized:
-            msg = f"Expected False, got {service._initialized}"
+            msg: str = f"Expected False, got {service._initialized}"
             raise AssertionError(msg)
 
     def test_base_service_abstract_methods(self) -> None:
@@ -329,7 +329,7 @@ class TestFlextMeltanoTapService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTapService(config)
         result = service.validate_service()
-        assert not result.is_success  # Should fail validation without tap class
+        assert not result.success  # Should fail validation without tap class
         assert "Tap class not configured" in str(result.error)
 
     def test_tap_service_get_health_status(self) -> None:
@@ -337,14 +337,14 @@ class TestFlextMeltanoTapService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTapService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "tap":
-            msg = f"Expected {'tap'}, got {result.data['service']}"
+            msg: str = f"Expected {'tap'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_tap_service_set_tap_class(self) -> None:
@@ -357,9 +357,9 @@ class TestFlextMeltanoTapService:
             pass
 
         result = service.set_tap_class(MockTap)
-        assert result.is_success
+        assert result.success
         if service.tap_class is not MockTap:
-            msg = f"Expected {MockTap}, got {service.tap_class}"
+            msg: str = f"Expected {MockTap}, got {service.tap_class}"
             raise AssertionError(msg)
 
     def test_tap_service_validate_ready_for_use(self) -> None:
@@ -369,11 +369,11 @@ class TestFlextMeltanoTapService:
 
         # Should fail without tap class
         result = service.validate_ready_for_use()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Tap class not configured" not in result.error:
-            msg = f"Expected {'Tap class not configured'} in {result.error}"
+            msg: str = f"Expected {'Tap class not configured'} in {result.error}"
             raise AssertionError(msg)
 
     def test_tap_service_discover_catalog_no_tap_class(self) -> None:
@@ -383,11 +383,11 @@ class TestFlextMeltanoTapService:
 
         # Should fail without tap class
         result = service.discover_catalog()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Tap class not configured" not in result.error:
-            msg = f"Expected {'Tap class not configured'} in {result.error}"
+            msg: str = f"Expected {'Tap class not configured'} in {result.error}"
             raise AssertionError(msg)
 
     def test_tap_service_discover_catalog_with_instance(self) -> None:
@@ -403,10 +403,10 @@ class TestFlextMeltanoTapService:
 
         service.tap_instance = MockTapInstance()
         result = service.discover_catalog()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "streams" not in result.data:
-            msg = f"Expected {'streams'} in {result.data}"
+            msg: str = f"Expected {'streams'} in {result.data}"
             raise AssertionError(msg)
 
     def test_tap_service_discover_catalog_create_instance_failure(self) -> None:
@@ -422,11 +422,11 @@ class TestFlextMeltanoTapService:
 
         service.tap_class = FailingTapClass
         result = service.discover_catalog()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Failed to create tap instance" not in result.error:
-            msg = f"Expected {'Failed to create tap instance'} in {result.error}"
+            msg: str = f"Expected {'Failed to create tap instance'} in {result.error}"
             raise AssertionError(msg)
 
     def test_tap_service_discover_catalog_instance_failure(self) -> None:
@@ -443,11 +443,11 @@ class TestFlextMeltanoTapService:
 
         service.tap_instance = FailingTapInstance()
         result = service.discover_catalog()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Catalog discovery failed" not in result.error:
-            msg = f"Expected {'Catalog discovery failed'} in {result.error}"
+            msg: str = f"Expected {'Catalog discovery failed'} in {result.error}"
             raise AssertionError(msg)
 
 
@@ -468,7 +468,7 @@ class TestFlextMeltanoTargetService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTargetService(config)
         result = service.validate_service()
-        assert not result.is_success  # Should fail validation without target class
+        assert not result.success  # Should fail validation without target class
         assert "Target class not configured" in str(result.error)
 
     def test_target_service_get_health_status(self) -> None:
@@ -476,14 +476,14 @@ class TestFlextMeltanoTargetService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoTargetService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "target":
-            msg = f"Expected {'target'}, got {result.data['service']}"
+            msg: str = f"Expected {'target'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_target_service_set_target_class(self) -> None:
@@ -496,9 +496,9 @@ class TestFlextMeltanoTargetService:
             pass
 
         result = service.set_target_class(MockTarget)
-        assert result.is_success
+        assert result.success
         if service.target_class is not MockTarget:
-            msg = f"Expected {MockTarget}, got {service.target_class}"
+            msg: str = f"Expected {MockTarget}, got {service.target_class}"
             raise AssertionError(msg)
 
     def test_target_service_validate_ready_for_use(self) -> None:
@@ -508,11 +508,11 @@ class TestFlextMeltanoTargetService:
 
         # Should fail without target class
         result = service.validate_ready_for_use()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         if "Target class not configured" not in result.error:
-            msg = f"Expected {'Target class not configured'} in {result.error}"
+            msg: str = f"Expected {'Target class not configured'} in {result.error}"
             raise AssertionError(msg)
 
     def test_target_service_validate_ready_for_use_with_class(self) -> None:
@@ -526,9 +526,9 @@ class TestFlextMeltanoTargetService:
 
         service.set_target_class(MockTarget)
         result = service.validate_ready_for_use()
-        assert result.is_success
+        assert result.success
         if not (result.data):
-            msg = f"Expected True, got {result.data}"
+            msg: str = f"Expected True, got {result.data}"
             raise AssertionError(msg)
 
 
@@ -548,21 +548,21 @@ class TestFlextMeltanoExtensionService:
         config = FlextMeltanoConfig()
         service = FlextMeltanoExtensionService(config)
         result = service.validate_service()
-        assert result.is_success
+        assert result.success
 
     def test_extension_service_get_health_status(self) -> None:
         """Test extension service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoExtensionService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "extension":
-            msg = f"Expected {'extension'}, got {result.data['service']}"
+            msg: str = f"Expected {'extension'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_extension_service_set_extension_class(self) -> None:
@@ -577,9 +577,9 @@ class TestFlextMeltanoExtensionService:
             pass
 
         result = service.set_extension_class(MockExtension)
-        assert result.is_success
+        assert result.success
         if service.extension_class != MockExtension:
-            msg = f"Expected {MockExtension}, got {service.extension_class}"
+            msg: str = f"Expected {MockExtension}, got {service.extension_class}"
             raise AssertionError(msg)
 
 
@@ -610,7 +610,7 @@ class TestFlextMeltanoDbtService:
             service = FlextMeltanoDbtService(config)
             result = service.validate_service()
             # Should fail for nonexistent directory
-            assert not result.is_success
+            assert not result.success
 
     def test_dbt_service_validate_service_success(self) -> None:
         """Test DBT service validation with valid directory."""
@@ -619,21 +619,21 @@ class TestFlextMeltanoDbtService:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             service = FlextMeltanoDbtService(config)
             result = service.validate_service()
-            assert result.is_success
+            assert result.success
 
     def test_dbt_service_get_health_status(self) -> None:
         """Test DBT service health status."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoDbtService(config)
         result = service.get_health_status()
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data is not None
         if "service" not in result.data:
-            msg = f"Expected {'service'} in {result.data}"
+            msg: str = f"Expected {'service'} in {result.data}"
             raise AssertionError(msg)
         if result.data["service"] != "dbt":
-            msg = f"Expected {'dbt'}, got {result.data['service']}"
+            msg: str = f"Expected {'dbt'}, got {result.data['service']}"
             raise AssertionError(msg)
 
     def test_dbt_service_run_models_async(self) -> None:
@@ -644,7 +644,7 @@ class TestFlextMeltanoDbtService:
             service = FlextMeltanoDbtService(config)
             # This will fail since project dir not set up, but should not crash
             result = await service.run_models()
-            assert result.is_success or not result.is_success
+            assert result.success or not result.success
 
         asyncio.run(run_test())
 
@@ -656,7 +656,7 @@ class TestFlextMeltanoDbtService:
             service = FlextMeltanoDbtService(config)
             # This will fail since project dir not set up, but should not crash
             result = await service.run_models(["model1", "model2"])
-            assert result.is_success or not result.is_success
+            assert result.success or not result.success
 
         asyncio.run(run_test())
 
@@ -668,7 +668,7 @@ class TestFlextMeltanoDbtService:
             service = FlextMeltanoDbtService(config)
             assert service.project_dir is not None
             if str(service.project_dir) != test_path:
-                msg = f"Expected {test_path}, got {service.project_dir!s}"
+                msg: str = f"Expected {test_path}, got {service.project_dir!s}"
                 raise AssertionError(msg)
 
     def test_dbt_service_test_models_async(self) -> None:
@@ -681,7 +681,7 @@ class TestFlextMeltanoDbtService:
 
                 # This will fail since project not set up, but should not crash
                 result = await service.test_models()
-                assert result.is_success or not result.is_success
+                assert result.success or not result.success
 
         asyncio.run(run_test())
 
@@ -695,7 +695,7 @@ class TestFlextMeltanoDbtService:
 
                 # This will fail since project not set up, but should not crash
                 result = await service.test_models(["model1"], ["excluded"])
-                assert result.is_success or not result.is_success
+                assert result.success or not result.success
 
         asyncio.run(run_test())
 
@@ -716,7 +716,7 @@ class TestFactoryFunctions:
         """Test create tap service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_tap_service(config)
-        assert not result.is_success  # Should fail without tap class
+        assert not result.success  # Should fail without tap class
         assert "Tap class not configured" in str(result.error)
         assert result.data is None
 
@@ -724,7 +724,7 @@ class TestFactoryFunctions:
         """Test create target service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_target_service(config)
-        assert not result.is_success  # Should fail without target class
+        assert not result.success  # Should fail without target class
         assert "Target class not configured" in str(result.error)
         assert result.data is None
 
@@ -734,14 +734,14 @@ class TestFactoryFunctions:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             result = create_meltano_dbt_service(config)
-            assert result.is_success
+            assert result.success
             assert isinstance(result.data, FlextMeltanoDbtService)
 
     def test_create_meltano_extension_service(self) -> None:
         """Test create extension service factory function."""
         config = FlextMeltanoConfig()
         result = create_meltano_extension_service(config)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoExtensionService)
 
     def test_factory_functions_with_custom_config(self) -> None:
@@ -760,22 +760,22 @@ class TestFactoryFunctions:
 
             # Test all factory functions with custom config
             tap_result = create_meltano_tap_service(config)
-            assert not tap_result.is_success  # Should fail without tap class
+            assert not tap_result.success  # Should fail without tap class
             assert tap_result.data is None  # Service creation fails
 
             target_result = create_meltano_target_service(config)
-            assert not target_result.is_success  # Should fail without target class
+            assert not target_result.success  # Should fail without target class
             assert target_result.data is None  # Service creation fails
 
             dbt_result = create_meltano_dbt_service(config)
-            assert dbt_result.is_success
+            assert dbt_result.success
             assert dbt_result.data is not None
             if dbt_result.data.config.dbt_project_dir != temp_dbt_dir:
-                msg = f"Expected {temp_dbt_dir}, got {dbt_result.data.config.dbt_project_dir}"
+                msg: str = f"Expected {temp_dbt_dir}, got {dbt_result.data.config.dbt_project_dir}"
                 raise AssertionError(msg)
 
             extension_result = create_meltano_extension_service(config)
-            assert extension_result.is_success
+            assert extension_result.success
             assert extension_result.data is not None
             if extension_result.data.config.environment != "test":
                 msg = (
@@ -791,19 +791,19 @@ class TestFactoryFunctions:
 
             # Create services that will have their validation fail
             tap_result = create_meltano_tap_service(config)
-            assert not tap_result.is_success  # Should fail without tap class
+            assert not tap_result.success  # Should fail without tap class
             assert "Tap class not configured" in str(tap_result.error)
 
             target_result = create_meltano_target_service(config)
-            assert not target_result.is_success  # Should fail without target class
+            assert not target_result.success  # Should fail without target class
             assert "Target class not configured" in str(target_result.error)
 
             dbt_result = create_meltano_dbt_service(config)
-            assert dbt_result.is_success  # Should succeed with temp directory
+            assert dbt_result.success  # Should succeed with temp directory
 
             extension_result = create_meltano_extension_service(config)
             assert (
-                extension_result.is_success
+                extension_result.success
             )  # Should succeed - extensions don't require specific validation
 
 
@@ -814,7 +814,7 @@ class TestIntegrationWorkflows:
         """Test complete tap workflow."""
         config = FlextMeltanoConfig()
         tap_result = create_meltano_tap_service(config)
-        assert not tap_result.is_success  # Should fail without tap class
+        assert not tap_result.success  # Should fail without tap class
         assert "Tap class not configured" in str(tap_result.error)
 
         # Service creation should fail, so data will be None
@@ -824,7 +824,7 @@ class TestIntegrationWorkflows:
         """Test complete target workflow."""
         config = FlextMeltanoConfig()
         target_result = create_meltano_target_service(config)
-        assert not target_result.is_success  # Should fail without target class
+        assert not target_result.success  # Should fail without target class
         assert "Target class not configured" in str(target_result.error)
 
         # Service creation should fail, so data will be None
@@ -836,18 +836,18 @@ class TestIntegrationWorkflows:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             dbt_result = create_meltano_dbt_service(config)
-            assert dbt_result.is_success
+            assert dbt_result.success
             dbt_service = dbt_result.data
             assert dbt_service is not None
 
             # Test initialization with mocked validation
             dbt_service.validate_service = lambda: FlextResult(data=True)
             init_result = dbt_service.initialize()
-            assert init_result.is_success
+            assert init_result.success
 
             # Test health check
             health_result = dbt_service.get_health_status()
-            assert health_result.is_success
+            assert health_result.success
 
             # Test async model operations
 
@@ -856,7 +856,7 @@ class TestIntegrationWorkflows:
 
             model_result = asyncio.run(test_models())
             # May succeed or fail based on project setup
-            assert model_result.is_success or not model_result.is_success
+            assert model_result.success or not model_result.success
 
     def test_service_integration(self) -> None:
         """Test services working together."""
@@ -866,30 +866,30 @@ class TestIntegrationWorkflows:
 
             # Create all services - tap and target will fail without classes
             tap_result = create_meltano_tap_service(config)
-            assert not tap_result.is_success  # Should fail without tap class
+            assert not tap_result.success  # Should fail without tap class
             assert tap_result.data is None
 
             target_result = create_meltano_target_service(config)
-            assert not target_result.is_success  # Should fail without target class
+            assert not target_result.success  # Should fail without target class
             assert target_result.data is None
 
             # DBT should succeed with temp dir
             dbt_result = create_meltano_dbt_service(config)
-            assert dbt_result.is_success
+            assert dbt_result.success
             dbt_service = dbt_result.data
             assert dbt_service is not None
 
             extension_result = create_meltano_extension_service(config)
-            assert extension_result.is_success
+            assert extension_result.success
             extension_service = extension_result.data
             assert extension_service is not None
 
             # Test health checks for successful services only
             dbt_health = dbt_service.get_health_status()
-            assert dbt_health.is_success
+            assert dbt_health.success
 
             extension_health = extension_service.get_health_status()
-            assert extension_health.is_success
+            assert extension_health.success
 
 
 if __name__ == "__main__":

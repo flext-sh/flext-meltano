@@ -119,7 +119,7 @@ where id is null
         result = await dbt_service.run_models()
 
         # Should succeed with real DBT project
-        assert result.is_success, f"DBT run failed: {(result.error,)}"
+        assert result.success, f"DBT run failed: {(result.error,)}"
 
         # Should return actual run results
         run_results = result.data
@@ -141,7 +141,7 @@ where id is null
         result = await dbt_service.run_models(models=["test_model"])
 
         # Should succeed with specific model
-        assert result.is_success, f"DBT run failed: {(result.error,)}"
+        assert result.success, f"DBT run failed: {(result.error,)}"
 
         run_results = result.data
         assert isinstance(run_results, list)
@@ -154,13 +154,13 @@ where id is null
         """Test real DBT model testing with dbt-core."""
         # First run models to create tables
         run_result = await dbt_service.run_models()
-        assert run_result.is_success, f"Model run failed: {(run_result.error,)}"
+        assert run_result.success, f"Model run failed: {(run_result.error,)}"
 
         # Then test models
         test_result = await dbt_service.test_models()
 
         # Should succeed with real DBT project
-        assert test_result.is_success, f"DBT test failed: {(test_result.error,)}"
+        assert test_result.success, f"DBT test failed: {(test_result.error,)}"
 
         # Should return actual test results
         test_results = test_result.data
@@ -178,12 +178,12 @@ where id is null
             result = await service.run_models()
 
         # Should fail gracefully
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         assert result.error is not None
         assert result.error is not None
         if "DBT project not found" not in result.error:
-            msg = f"Expected {'DBT project not found'} in {result.error}"
+            msg: str = f"Expected {'DBT project not found'} in {result.error}"
             raise AssertionError(
                 msg,
             )
@@ -197,7 +197,7 @@ where id is null
         result = await dbt_service.run_models(exclude=["nonexistent_model"])
 
         # Should succeed even with exclude
-        assert result.is_success, f"DBT run with exclude failed: {(result.error,)}"
+        assert result.success, f"DBT run with exclude failed: {(result.error,)}"
 
     def test_flext_meltano_dbt_get_version(
         self,
@@ -210,7 +210,7 @@ where id is null
         assert isinstance(version, str)
         assert len(version) > 0
         if "." not in version:  # Version should contain dots
-            msg = f"Expected {'.'} in {version}"
+            msg: str = f"Expected {'.'} in {version}"
             raise AssertionError(msg)
 
     def test_flext_meltano_dbt_service_execute(
@@ -221,14 +221,14 @@ where id is null
         result = dbt_service.execute()
 
         # Should return service info
-        assert result.is_success
+        assert result.success
         data = result.data
         assert isinstance(data, dict)
         if data["service"] != "dbt":
-            msg = f"Expected {'dbt'}, got {data['service']}"
+            msg: str = f"Expected {'dbt'}, got {data['service']}"
             raise AssertionError(msg)
         if "project_dir" not in data:
-            msg = f"Expected {'project_dir'} in {data}"
+            msg: str = f"Expected {'project_dir'} in {data}"
             raise AssertionError(msg)
 
 
@@ -320,7 +320,7 @@ from {{ ref('stg_raw_data') }}
 
         # Run all models
         result = await service.run_models()
-        assert result.is_success, f"Complex DBT run failed: {result.error}"
+        assert result.success, f"Complex DBT run failed: {result.error}"
 
         # Should have run successfully
         run_results = result.data
@@ -336,7 +336,7 @@ from {{ ref('stg_raw_data') }}
         service = FlextMeltanoDbtService(config)
 
         result = await service.run_models(models=["staging"])
-        assert result.is_success, f"Staging models run failed: {(result.error,)}"
+        assert result.success, f"Staging models run failed: {(result.error,)}"
 
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_run_marts_only(
@@ -349,13 +349,11 @@ from {{ ref('stg_raw_data') }}
 
         # First run staging (dependency)
         staging_result = await service.run_models(models=["staging"])
-        assert staging_result.is_success
+        assert staging_result.success
 
         # Then run marts
         marts_result = await service.run_models(models=["marts"])
-        assert marts_result.is_success, (
-            f"Marts models run failed: {(marts_result.error,)}"
-        )
+        assert marts_result.success, f"Marts models run failed: {(marts_result.error,)}"
 
 
 if __name__ == "__main__":

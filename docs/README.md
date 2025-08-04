@@ -168,7 +168,7 @@ bridge = FlextMeltanoBridge(config)
 
 # Execute operations
 version_result = bridge.get_version()
-if version_result.is_success:
+if version_result.success:
     print(f"Meltano version: {version_result.data['meltano']}")
 ```
 

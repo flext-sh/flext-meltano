@@ -390,7 +390,7 @@ def flext_meltano_create_dbt_runner(
 __version__ = "2.0.0-enterprise"
 
 # === PUBLIC API ===
-__all__ = [
+__all__: list[str] = [
     "BatchSink",
     "FlextMeltanoBaseService",
     "FlextMeltanoBridge",

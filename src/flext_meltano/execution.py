@@ -49,7 +49,7 @@ from flext_meltano.execution import execute_meltano_command
 
 # Execute Meltano version command
 result = execute_meltano_command(["--version"])
-if result.is_success:
+if result.success:
     version = result.data["stdout"].strip()
     print(f"Meltano version: {version}")
 ```
@@ -60,7 +60,7 @@ from flext_meltano.execution import run_pipeline
 
 # Execute tap-csv to target-csv pipeline
 result = run_pipeline("tap-csv", "target-csv")
-if result.is_success:
+if result.success:
     print("Pipeline completed successfully")
     metrics = result.data.get("execution_metrics", {})
 else:
@@ -89,7 +89,7 @@ cmd := exec.Command("python", "-c",
     "from flext_meltano.execution import execute_meltano_command; " +
     "import json; " +
     "result = execute_meltano_command(['--version']); " +
-    "print(json.dumps({'success': result.is_success, 'data': result.data}))")
+    "print(json.dumps({'success': result.success, 'data': result.data}))")
 output, err := cmd.Output()
 ```
 
@@ -244,7 +244,7 @@ class FlextMeltanoExecutor:
         """Initialize service."""
         try:
             validation_result = self.validate()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return validation_result
             self._initialized = True
             return FlextResult(data=True)
@@ -306,7 +306,7 @@ class FlextMeltanoExecutor:
         try:
             if not self._meltano_path:
                 validation_result = self.validate()
-                if not validation_result.is_success:
+                if not validation_result.success:
                     return FlextResult(error=validation_result.error)
 
             # Build command
@@ -374,7 +374,7 @@ class FlextMeltanoExecutor:
         try:
             if not self._meltano_path:
                 validation_result = self.validate()
-                if not validation_result.is_success:
+                if not validation_result.success:
                     return FlextResult(error=validation_result.error)
 
             # Build command
@@ -432,7 +432,7 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
     try:
         service = FlextMeltanoExecutor(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Executor initialization failed: {init_result.error}",
             )
@@ -560,7 +560,7 @@ def flext_meltano_execute_job(
     executor = FlextMeltanoExecutor(config)
 
     result = executor.execute_pipeline(tap_name, target_name)
-    if result.is_success:
+    if result.success:
         return FlextMeltanoResult.ok(result.data)
     return FlextMeltanoResult.fail(result.error or "Execution failed")
 
@@ -584,6 +584,6 @@ def flext_meltano_run_command(
     executor = FlextMeltanoExecutor(config)
 
     result = executor.run_command(args)
-    if result.is_success:
+    if result.success:
         return FlextMeltanoResult.ok(result.data)
     return FlextMeltanoResult.fail(result.error or "Execution failed")

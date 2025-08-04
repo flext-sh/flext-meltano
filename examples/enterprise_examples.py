@@ -33,7 +33,7 @@ import json
 import pathlib
 import subprocess
 import tempfile
-from typing import Any, Dict
+from typing import Any
 
 # Import FLEXT Meltano REAL production APIs
 from flext_meltano import (
@@ -44,13 +44,12 @@ from flext_meltano import (
     create_validation_service,
 )
 
-
 # =============================================================================
 # EXAMPLE 1: Zero-Boilerplate PostgreSQL to JSONL Pipeline
 # =============================================================================
 
 
-def example_postgres_to_jsonl_traditional() -> Dict[str, Any]:
+def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
     """Traditional approach - 50+ lines of boilerplate code."""
     # Traditional Singer SDK approach (simplified example)
 
@@ -103,7 +102,7 @@ def example_postgres_to_jsonl_traditional() -> Dict[str, Any]:
     )
 
     if discovery_result.returncode != 0:
-        msg = f"Discovery failed: {discovery_result.stderr}"
+        msg: str = f"Discovery failed: {discovery_result.stderr}"
         raise RuntimeError(msg)
 
     # Step 5: Process catalog manually
@@ -153,7 +152,7 @@ def example_postgres_to_jsonl_traditional() -> Dict[str, Any]:
     _output, error = target_process.communicate()
 
     if target_process.returncode != 0:
-        msg = f"Pipeline failed: {error}"
+        msg: str = f"Pipeline failed: {error}"
         raise RuntimeError(msg)
 
     # Step 10: Clean up manually
@@ -164,37 +163,36 @@ def example_postgres_to_jsonl_traditional() -> Dict[str, Any]:
     return {"status": "completed", "approach": "traditional"}
 
 
-def example_postgres_to_jsonl_flext_meltano() -> Dict[str, Any]:
+def example_postgres_to_jsonl_flext_meltano() -> dict[str, Any]:
     """FLEXT Meltano approach using REAL API."""
     # FLEXT Meltano: Use REAL bridge API
     bridge = create_flext_meltano_bridge()
 
     # Create enterprise config
-    config = FlextMeltanoConfig(
+    FlextMeltanoConfig(
         project_root="./demo_project",
-        environment="production"
+        environment="production",
     )
 
     # Professional pipeline execution with FlextResult
     try:
         result = bridge.validate_bridge_health()
-        if result.is_success:
+        if result.success:
             return {
                 "status": "completed",
                 "approach": "flext_meltano",
-                "bridge_healthy": True
+                "bridge_healthy": True,
             }
-        else:
-            return {
-                "status": "failed",
-                "approach": "flext_meltano",
-                "error": result.error
-            }
+        return {
+            "status": "failed",
+            "approach": "flext_meltano",
+            "error": result.error,
+        }
     except Exception as e:
         return {
             "status": "failed",
             "approach": "flext_meltano",
-            "error": str(e)
+            "error": str(e),
         }
 
 
@@ -203,15 +201,15 @@ def example_postgres_to_jsonl_flext_meltano() -> Dict[str, Any]:
 # =============================================================================
 
 
-def example_enterprise_config_traditional() -> Dict[str, Any] | None:
+def example_enterprise_config_traditional() -> dict[str, Any] | None:
     """Traditional enterprise config management - manual validation and templates."""
 
     # Traditional approach: Manual validation and configuration
-    def validate_postgres_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_postgres_config(config: dict[str, Any]) -> dict[str, Any]:
         required_fields = ["host", "port", "user", "database"]
         for field in required_fields:
             if field not in config:
-                msg = f"Missing required field: {field}"
+                msg: str = f"Missing required field: {field}"
                 raise ValueError(msg)
 
         if not isinstance(config["port"], int) or not (1 <= config["port"] <= 65535):
@@ -224,7 +222,7 @@ def example_enterprise_config_traditional() -> Dict[str, Any] | None:
 
         return config
 
-    def get_postgres_template() -> Dict[str, Any]:
+    def get_postgres_template() -> dict[str, Any]:
         return {
             "host": "localhost",
             "port": 5432,
@@ -235,13 +233,13 @@ def example_enterprise_config_traditional() -> Dict[str, Any] | None:
             "filter_schemas": ["public"],
         }
 
-    def validate_jsonl_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_jsonl_config(config: dict[str, Any]) -> dict[str, Any]:
         if "destination_path" not in config:
             msg = "destination_path is required"
             raise ValueError(msg)
         return config
 
-    def get_jsonl_template() -> Dict[str, Any]:
+    def get_jsonl_template() -> dict[str, Any]:
         return {
             "destination_path": "output",
             "file_naming_scheme": "{stream_name}.jsonl",
@@ -272,21 +270,21 @@ def example_enterprise_config_traditional() -> Dict[str, Any] | None:
         return None
 
 
-def example_enterprise_config_flext_meltano() -> Dict[str, Any] | None:
+def example_enterprise_config_flext_meltano() -> dict[str, Any] | None:
     """FLEXT Meltano enterprise config - using REAL validation service."""
     # Create enterprise configuration FIRST
     config = FlextMeltanoConfig(
         project_root="./demo_project",
-        environment="production"
+        environment="production",
     )
 
     # FLEXT Meltano: REAL validation service with proper config
     validation_service_result = create_validation_service(config)
-    if not validation_service_result.is_success:
+    if not validation_service_result.success:
         return {
             "status": "error",
             "error": f"Failed to create validation service: {validation_service_result.error}",
-            "approach": "flext_meltano_enterprise"
+            "approach": "flext_meltano_enterprise",
         }
 
     validation_service = validation_service_result.data
@@ -295,23 +293,24 @@ def example_enterprise_config_flext_meltano() -> Dict[str, Any] | None:
         # Use REAL validation service to validate project
         project_validation = validation_service.validate_project(config.project_root)
 
-        if project_validation.is_success:
+        if project_validation.success:
             return {
                 "status": "valid",
-                "validation_result": project_validation.data.summary if project_validation.data else "Validated",
-                "approach": "flext_meltano_enterprise"
+                "validation_result": project_validation.data.summary
+                if project_validation.data
+                else "Validated",
+                "approach": "flext_meltano_enterprise",
             }
-        else:
-            return {
-                "status": "invalid",
-                "error": project_validation.error,
-                "approach": "flext_meltano_enterprise"
-            }
+        return {
+            "status": "invalid",
+            "error": project_validation.error,
+            "approach": "flext_meltano_enterprise",
+        }
     except Exception as e:
         return {
             "status": "error",
             "error": str(e),
-            "approach": "flext_meltano_enterprise"
+            "approach": "flext_meltano_enterprise",
         }
 
 
@@ -320,7 +319,7 @@ def example_enterprise_config_flext_meltano() -> Dict[str, Any] | None:
 # =============================================================================
 
 
-def example_bridge_integration_health_check() -> Dict[str, Any]:
+def example_bridge_integration_health_check() -> dict[str, Any]:
     """Enterprise bridge integration with comprehensive health checking."""
     # FLEXT Meltano: REAL bridge integration
     bridge = FlextMeltanoBridge()
@@ -333,17 +332,19 @@ def example_bridge_integration_health_check() -> Dict[str, Any]:
         service_info = bridge.get_service_info()
 
         return {
-            "bridge_healthy": health_result.is_success,
+            "bridge_healthy": health_result.success,
             "health_details": health_result.data if health_result.data else "OK",
-            "service_info": service_info.data if service_info.is_success else "Not available",
+            "service_info": service_info.data
+            if service_info.success
+            else "Not available",
             "bridge_version": bridge.get_bridge_version(),
-            "status": "enterprise_ready"
+            "status": "enterprise_ready",
         }
     except Exception as e:
         return {
             "bridge_healthy": False,
             "error": str(e),
-            "status": "error"
+            "status": "error",
         }
 
 
@@ -352,12 +353,12 @@ def example_bridge_integration_health_check() -> Dict[str, Any]:
 # =============================================================================
 
 
-def example_advanced_configuration_validation() -> Dict[str, Any]:
+def example_advanced_configuration_validation() -> dict[str, Any]:
     """Advanced configuration validation with comprehensive error reporting."""
     # Create enterprise configuration FIRST
     config = FlextMeltanoConfig(
         project_root="./demo_project",
-        environment="production"
+        environment="production",
     )
 
     # FLEXT Meltano: REAL validation service with enterprise patterns
@@ -371,17 +372,21 @@ def example_advanced_configuration_validation() -> Dict[str, Any]:
         health_result = validation_service.get_health_status()
 
         return {
-            "project_valid": project_result.is_success,
-            "project_details": project_result.data.summary if project_result.data else "No details",
-            "service_healthy": health_result.is_success,
-            "health_details": health_result.data if health_result.data else "No health data",
-            "validation_approach": "enterprise_flext_meltano"
+            "project_valid": project_result.success,
+            "project_details": project_result.data.summary
+            if project_result.data
+            else "No details",
+            "service_healthy": health_result.success,
+            "health_details": health_result.data
+            if health_result.data
+            else "No health data",
+            "validation_approach": "enterprise_flext_meltano",
         }
     except Exception as e:
         return {
             "project_valid": False,
             "error": str(e),
-            "validation_approach": "enterprise_flext_meltano"
+            "validation_approach": "enterprise_flext_meltano",
         }
 
 
@@ -390,7 +395,7 @@ def example_advanced_configuration_validation() -> Dict[str, Any]:
 # =============================================================================
 
 
-async def example_complete_enterprise_workflow() -> Dict[str, Any]:
+async def example_complete_enterprise_workflow() -> dict[str, Any]:
     """Complete enterprise workflow demonstrating all FLEXT Meltano capabilities."""
     # Step 1: Configuration Management
     config_result = example_enterprise_config_flext_meltano()
@@ -410,7 +415,7 @@ async def example_complete_enterprise_workflow() -> Dict[str, Any]:
         "bridge_result": bridge_result,
         "validation_result": validation_result,
         "summary": "Complete enterprise workflow executed successfully using REAL APIs",
-        "enterprise_ready": True
+        "enterprise_ready": True,
     }
 
 
@@ -419,7 +424,7 @@ async def example_complete_enterprise_workflow() -> Dict[str, Any]:
 # =============================================================================
 
 
-def compare_boilerplate_reduction() -> Dict[str, Any]:
+def compare_boilerplate_reduction() -> dict[str, Any]:
     """Compare boilerplate reduction across different approaches."""
     comparisons = [
         {
@@ -462,7 +467,7 @@ def compare_boilerplate_reduction() -> Dict[str, Any]:
         "total_traditional_lines": total_traditional,
         "total_flext_lines": total_flext,
         "overall_reduction_percentage": overall_reduction,
-        "status": "enterprise_metrics_calculated"
+        "status": "enterprise_metrics_calculated",
     }
 
 
@@ -473,21 +478,12 @@ def compare_boilerplate_reduction() -> Dict[str, Any]:
 
 async def main() -> None:
     """Run all examples to demonstrate FLEXT Meltano capabilities."""
-    print("🚀 FLEXT Meltano Enterprise Examples - Production Ready")
-    print("=" * 60)
-
     # Run boilerplate comparison
-    print("\n📊 Boilerplate Reduction Analysis:")
-    comparison = compare_boilerplate_reduction()
-    print(f"   Overall reduction: {comparison['overall_reduction_percentage']}%")
+    compare_boilerplate_reduction()
 
     # Run complete enterprise workflow
-    print("\n🏢 Enterprise Workflow Execution:")
-    workflow_result = await example_complete_enterprise_workflow()
-    print(f"   Status: {workflow_result['summary']}")
-    print(f"   Enterprise Ready: {workflow_result['enterprise_ready']}")
+    await example_complete_enterprise_workflow()
 
-    print("\n✅ All enterprise examples completed successfully!")
 
 
 if __name__ == "__main__":

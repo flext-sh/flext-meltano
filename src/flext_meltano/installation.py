@@ -46,7 +46,7 @@ from flext_meltano.installation import install_plugin, FlextMeltanoInstaller
 
 # Install extractor plugin
 result = install_plugin("extractor", "tap-postgres")
-if result.is_success:
+if result.success:
     print(f"Plugin installed: {result.data}")
 else:
     print(f"Installation failed: {result.error_message}")
@@ -98,12 +98,12 @@ config_data = {
 }
 
 result = configure_plugin("tap-postgres", config_data)
-if result.is_success:
+if result.success:
     print("Plugin configured successfully")
 
 # Validate configuration before installation
 validation_result = validate_plugin_config("tap-postgres", config_data)
-if validation_result.is_success:
+if validation_result.success:
     # Proceed with installation
     install_result = install_plugin("extractor", "tap-postgres")
 ```
@@ -226,7 +226,7 @@ class FlextMeltanoInstaller:
                 plugin_type, name, variant, pip_url, force
             )
 
-            if install_result.is_success:
+            if install_result.success:
                 # Post-installation configuration
                 config_result = self._apply_default_configuration(name)
                 return self._build_installation_result(
@@ -293,19 +293,19 @@ def validate_installation_prerequisites(
 
     # Check plugin availability in Hub
     hub_check = check_plugin_in_hub(plugin_name)
-    validation_results["hub_available"] = hub_check.is_success
+    validation_results["hub_available"] = hub_check.success
 
     # Check existing installation
     existing_check = check_plugin_already_installed(plugin_name)
-    validation_results["already_installed"] = existing_check.is_success
+    validation_results["already_installed"] = existing_check.success
 
     # Check dependencies
     deps_check = check_system_dependencies(plugin_name)
-    validation_results["dependencies_met"] = deps_check.is_success
+    validation_results["dependencies_met"] = deps_check.success
 
     # Check disk space
     space_check = check_available_disk_space()
-    validation_results["sufficient_space"] = space_check.is_success
+    validation_results["sufficient_space"] = space_check.success
 
     # Overall validation result
     all_valid = all(
@@ -350,7 +350,7 @@ class DependencyResolver:
             resolved_deps = []
             for dep in dependencies:
                 version_result = self._resolve_dependency_version(dep)
-                if version_result.is_success:
+                if version_result.success:
                     resolved_deps.append(version_result.data)
                 else:
                     return FlextResult.fail(f"Could not resolve dependency: {dep}")
@@ -559,7 +559,7 @@ class FlextMeltanoInstaller:
         """Execute plugin addition with validation and result processing."""
         # Validate first
         validation_result = self.validate()
-        if not validation_result.is_success:
+        if not validation_result.success:
             return FlextResult(error=validation_result.error)
 
         # Build and execute command
@@ -574,7 +574,7 @@ class FlextMeltanoInstaller:
         )
         exec_result = execute_subprocess_common(exec_context)
 
-        if not exec_result.is_success:
+        if not exec_result.success:
             return FlextResult(error=exec_result.error)
 
         result_data = exec_result.data
@@ -640,7 +640,7 @@ class FlextMeltanoInstaller:
         try:
             # Validate first
             validation_result = self.validate()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return FlextResult(error=validation_result.error)
 
             # Execute meltano install
@@ -698,7 +698,7 @@ class FlextMeltanoInstaller:
         try:
             # Validate first
             validation_result = self.validate()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return FlextResult(error=validation_result.error)
 
             # Build command
@@ -747,12 +747,12 @@ class FlextMeltanoInstaller:
         try:
             # Validate first
             validation_result = self.validate()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return FlextResult(error=validation_result.error)
 
             # Execute subprocess
             result = self._execute_meltano_list()
-            if not result.is_success:
+            if not result.success:
                 return FlextResult(error=result.error)
 
             # Parse JSON response
@@ -862,7 +862,7 @@ def flext_meltano_install_plugin(
 
     # Convert FlextResult to legacy FlextMeltanoResult
     result = installer.add_plugin(plugin_type, plugin_name, pip_url)
-    if result.is_success:
+    if result.success:
         return FlextMeltanoResult.ok(result.data)
     return FlextMeltanoResult.fail(result.error or "Unknown error")
 
@@ -877,7 +877,7 @@ def create_installer_service(
     try:
         service = FlextMeltanoInstaller(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Installer service initialization failed: {init_result.error}",
             )
@@ -888,7 +888,7 @@ def create_installer_service(
 
 
 # === PUBLIC API ===
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoInstallationContext",
     "FlextMeltanoInstaller",
     "FlextMeltanoPluginInfo",

@@ -76,7 +76,7 @@ config = FlextMeltanoConfig(project_root="./meltano", environment="production")
 from flext_meltano.base import create_meltano_tap_service
 
 result = create_meltano_tap_service(config)
-if result.is_success:
+if result.success:
     tap_service = result.data
     # Use tap service for operations
 ```
@@ -125,7 +125,6 @@ from flext_core import (
     FlextGenerators,
     FlextLogger,
     FlextResult,
-    TAnyList,
 )
 
 try:
@@ -244,7 +243,7 @@ class FlextMeltanoBaseService:
         try:
             # Simple logging that works
             validation_result = self.validate_service()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return validation_result
 
             self._initialized = True
@@ -430,7 +429,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[TAnyList]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Run DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -461,7 +460,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[TAnyList]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Test DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -523,7 +522,7 @@ def create_meltano_tap_service(
     try:
         service = FlextMeltanoTapService(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Tap service initialization failed: {init_result.error}",
             )
@@ -540,7 +539,7 @@ def create_meltano_target_service(
     try:
         service = FlextMeltanoTargetService(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Target service initialization failed: {init_result.error}",
             )
@@ -557,7 +556,7 @@ def create_meltano_dbt_service(
     try:
         service = FlextMeltanoDbtService(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"DBT service initialization failed: {init_result.error}",
             )
@@ -574,7 +573,7 @@ def create_meltano_extension_service(
     try:
         service = FlextMeltanoExtensionService(config)
         init_result = service.initialize()
-        if not init_result.is_success:
+        if not init_result.success:
             return FlextResult(
                 error=f"Extension service initialization failed: {init_result.error}",
             )

@@ -618,7 +618,7 @@ def create_oracle_oic_tap_schema(
 
 
 # Clean public API
-__all__ = [
+__all__: list[str] = [
     "CommonSingerSchemas",
     "create_file_tap_schema",
     "create_ldap_tap_schema",

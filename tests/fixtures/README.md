@@ -365,7 +365,7 @@ def test_meltano_integration(meltano_test_project, flext_meltano_config):
     bridge = FlextMeltanoBridge(config)
     result = bridge.get_version()
 
-    assert result.is_success
+    assert result.success
 ```
 
 ### **Advanced Fixture Composition**

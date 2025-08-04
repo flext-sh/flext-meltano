@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Test Coverage for Common Module - Functional Tests.
 
 **Purpose**: Comprehensive functional testing of common.py module
@@ -12,10 +11,9 @@ logic and edge cases of the common utility functions.
 
 from __future__ import annotations
 
-import os
+import math
 import tempfile
 from pathlib import Path
-
 
 from flext_meltano.common import (
     validate_config_value,
@@ -40,7 +38,7 @@ class TestValidateDirectoryPath:
     def test_validate_existing_directory_path(self):
         """Test validation with existing directory."""
         # Use current directory which definitely exists
-        current_dir = os.getcwd()
+        current_dir = str(Path.cwd())
         result = validate_directory_path(current_dir)
 
         assert result is not None
@@ -58,7 +56,7 @@ class TestValidateDirectoryPath:
     def test_validate_file_as_directory_path(self):
         """Test validation with file path instead of directory."""
         # Create a temporary file outside temp directory
-        current_dir = Path(os.getcwd())
+        current_dir = Path.cwd()
         test_file = current_dir / "test_temp_file.txt"
         test_file.write_text("test content")
 
@@ -143,7 +141,7 @@ class TestValidateFilePath:
             assert Path(result).exists()
             assert Path(result).is_file()
         finally:
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     def test_validate_nonexistent_file_path(self):
         """Test validation with non-existent file."""
@@ -155,7 +153,7 @@ class TestValidateFilePath:
     def test_validate_directory_as_file_path(self):
         """Test validation with directory path instead of file."""
         # Use current directory
-        current_dir = os.getcwd()
+        current_dir = str(Path.cwd())
         result = validate_file_path(current_dir)
 
         assert result is None  # Should fail because it's a directory, not file
@@ -234,12 +232,12 @@ class TestValidateConfigValue:
     def test_validate_correct_type_bool(self):
         """Test validation with correct boolean type."""
         test_value = True
-        result = validate_config_value(test_value, bool, False)
+        result = validate_config_value(test_value, bool, default=False)
         assert result == test_value
 
     def test_validate_correct_type_float(self):
         """Test validation with correct float type."""
-        test_value = 3.14
+        test_value = math.pi
         result = validate_config_value(test_value, float, 0.0)
         assert result == test_value
 
@@ -287,13 +285,13 @@ class TestValidateConfigValue:
         """Test validation with int convertible to bool."""
         # Non-zero int converts to True
         test_value = 1
-        result = validate_config_value(test_value, bool, False)
+        result = validate_config_value(test_value, bool, default=False)
         assert result is True
         assert isinstance(result, bool)
 
         # Zero int converts to False
         test_value = 0
-        result = validate_config_value(test_value, bool, True)
+        result = validate_config_value(test_value, bool, default=True)
         assert result is False
         assert isinstance(result, bool)
 
@@ -365,7 +363,7 @@ class TestCommonModuleIntegration:
             "port": "5432",
             "debug": "true",
             "timeout": 30,
-            "features": ["feature1", "feature2"]
+            "features": ["feature1", "feature2"],
         }
 
         # Validate each configuration value
@@ -376,7 +374,7 @@ class TestCommonModuleIntegration:
         assert port == 5432
         assert isinstance(port, int)
 
-        debug = validate_config_value(config["debug"], bool, False)
+        debug = validate_config_value(config["debug"], bool, default=False)
         assert debug is True  # "true" string converts to True
 
         timeout = validate_config_value(config["timeout"], int, 60)
@@ -391,8 +389,8 @@ class TestCommonModuleIntegration:
         edge_cases = [
             ("", None),  # Empty string
             ("   ", None),  # Whitespace only
-            (".", os.getcwd()),  # Current directory
-            ("..", str(Path(os.getcwd()).parent)),  # Parent directory
+            (".", str(Path.cwd())),  # Current directory
+            ("..", str(Path.cwd().parent)),  # Parent directory
         ]
 
         for test_path, expected_result in edge_cases:
@@ -442,7 +440,6 @@ class TestCommonModulePerformance:
     def test_mixed_validation_workflow(self):
         """Test mixed validation workflow with various types."""
         test_data = [
-            # (value, expected_type, default, expected_result_type)
             (42, str, "default", str),
             ("123", int, 0, int),
             (True, str, "default", str),

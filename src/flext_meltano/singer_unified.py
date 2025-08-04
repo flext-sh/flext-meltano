@@ -100,7 +100,7 @@ pipeline_config = FlextPipelineConfig(
 )
 
 result = service.execute_pipeline(pipeline_config)
-if result.is_success:
+if result.success:
     print(f"Pipeline processed {result.data.records_processed} records")
 ```
 
@@ -120,9 +120,9 @@ def bridge_execute_unified_pipeline(config_json: str) -> Dict[str, Any]:
     result = service.execute("execute_pipeline", **config)
 
     return {
-        "success": result.is_success,
-        "records_processed": result.data.records_processed if result.is_success else 0,
-        "execution_time_ms": result.data.execution_time_ms if result.is_success else 0,
+        "success": result.success,
+        "records_processed": result.data.records_processed if result.success else 0,
+        "execution_time_ms": result.data.execution_time_ms if result.success else 0,
         "error": result.error_message if result.is_failure else None,
     }
 ```
@@ -344,7 +344,7 @@ class FlextSingerUnifiedInterface(ABC):
         """
 
 
-class FlextSingerUnifiedService(FlextDomainService):
+class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
     """Unified service orchestrating all Singer operations - central orchestration.
 
     SOLID SRP: Single responsibility for orchestrating Singer operations
@@ -357,7 +357,16 @@ class FlextSingerUnifiedService(FlextDomainService):
         super().__init__()
         self._registered_components: dict[str, FlextSingerUnifiedInterface] = {}
 
-    def execute(self, *args: object, **kwargs: object) -> FlextResult[object]:
+    def execute(self) -> FlextResult[FlextSingerUnifiedResult]:
+        """Execute default Singer service operation."""
+        # Default execution - return empty result
+        return FlextResult.ok(FlextSingerUnifiedResult(
+            success=True,
+            records_processed=0,
+            schemas_discovered=[],
+        ))
+
+    def execute_operation(self, *args: object, **kwargs: object) -> FlextResult[object]:
         """Execute unified Singer service operations.
 
         SOLID SRP: Single entry point for all Singer service operations.
@@ -380,7 +389,7 @@ class FlextSingerUnifiedService(FlextDomainService):
             pipeline_result = self._execute_pipeline_operation(kwargs)
             return (
                 FlextResult[object].ok(pipeline_result.data)
-                if pipeline_result.is_success
+                if pipeline_result.success
                 else FlextResult[object].fail(
                     pipeline_result.error or "Pipeline execution failed",
                 )
@@ -389,7 +398,7 @@ class FlextSingerUnifiedService(FlextDomainService):
             catalogs_result = self.discover_all_catalogs()
             return (
                 FlextResult[object].ok(catalogs_result.data)
-                if catalogs_result.is_success
+                if catalogs_result.success
                 else FlextResult[object].fail(
                     catalogs_result.error or "Catalog discovery failed",
                 )
@@ -398,7 +407,7 @@ class FlextSingerUnifiedService(FlextDomainService):
             validation_result = self.validate_all_components()
             return (
                 FlextResult[object].ok(validation_result.data)
-                if validation_result.is_success
+                if validation_result.success
                 else FlextResult[object].fail(
                     validation_result.error or "Component validation failed",
                 )
@@ -670,7 +679,7 @@ class FlextSingerUnifiedService(FlextDomainService):
 
             for name, component in self._registered_components.items():
                 catalog_result = component.discover_catalog()
-                if catalog_result.is_success and catalog_result.data is not None:
+                if catalog_result.success and catalog_result.data is not None:
                     catalogs[name] = catalog_result.data
 
             return FlextResult.ok(catalogs)
@@ -690,7 +699,7 @@ class FlextSingerUnifiedService(FlextDomainService):
 
             for name, component in self._registered_components.items():
                 validation_result = component.validate_configuration()
-                validation_results[name] = validation_result.is_success
+                validation_results[name] = validation_result.success
 
             return FlextResult.ok(validation_results)
 
@@ -747,7 +756,7 @@ def create_unified_singer_config(
     )
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextSingerUnifiedConfig",
     "FlextSingerUnifiedInterface",
     "FlextSingerUnifiedResult",

@@ -347,7 +347,10 @@ class FlextTapError(FlextSingerError):
         if source_system is not None:
             kwargs["source_system"] = source_system
 
-        super().__init__(message, component_type="tap", stream_name=None, **kwargs)
+        kwargs_dict = dict(kwargs)
+        stream_name_raw = kwargs_dict.pop("stream_name", None)
+        stream_name = stream_name_raw if isinstance(stream_name_raw, str) else None
+        super().__init__(message, component_type="tap", stream_name=stream_name, **kwargs_dict)
 
 
 class FlextTargetError(FlextSingerError):
@@ -363,7 +366,10 @@ class FlextTargetError(FlextSingerError):
         if destination_system is not None:
             kwargs["destination_system"] = destination_system
 
-        super().__init__(message, component_type="target", stream_name=None, **kwargs)
+        kwargs_dict = dict(kwargs)
+        stream_name_raw = kwargs_dict.pop("stream_name", None)
+        stream_name = stream_name_raw if isinstance(stream_name_raw, str) else None
+        super().__init__(message, component_type="target", stream_name=stream_name, **kwargs_dict)
 
 
 class FlextTransformError(FlextSingerError):
@@ -379,18 +385,21 @@ class FlextTransformError(FlextSingerError):
         if transform_name is not None:
             kwargs["transform_name"] = transform_name
 
+        kwargs_dict = dict(kwargs)
+        stream_name_raw = kwargs_dict.pop("stream_name", None)
+        stream_name = stream_name_raw if isinstance(stream_name_raw, str) else None
         super().__init__(
             message,
             component_type="transform",
-            stream_name=None,
-            **kwargs,
+            stream_name=stream_name,
+            **kwargs_dict,
         )
 
 
 # Factory functions removed - use direct exception class inheritance instead
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextSingerAuthenticationError",
     "FlextSingerConfigurationError",
     "FlextSingerConnectionError",

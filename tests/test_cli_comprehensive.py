@@ -52,7 +52,7 @@ class TestFlextMeltanoCli:
         """Test CLI initialization with default project root."""
         cli = FlextMeltanoCli()
         if cli.project_root != Path.cwd():
-            msg = f"Expected {Path.cwd()}, got {cli.project_root}"
+            msg: str = f"Expected {Path.cwd()}, got {cli.project_root}"
             raise AssertionError(msg)
 
     def test_cli_initialization_custom_path(self) -> None:
@@ -61,14 +61,14 @@ class TestFlextMeltanoCli:
             custom_path = Path(temp_dir) / "test"
             cli = FlextMeltanoCli(project_root=custom_path)
             if cli.project_root != custom_path:
-                msg = f"Expected {custom_path}, got {cli.project_root}"
+                msg: str = f"Expected {custom_path}, got {cli.project_root}"
                 raise AssertionError(msg)
 
     def test_cli_initialization_none_path(self) -> None:
         """Test CLI initialization with None path."""
         cli = FlextMeltanoCli(project_root=None)
         if cli.project_root != Path.cwd():
-            msg = f"Expected {Path.cwd()}, got {cli.project_root}"
+            msg: str = f"Expected {Path.cwd()}, got {cli.project_root}"
             raise AssertionError(msg)
 
     def test_execute_empty_command(self) -> None:
@@ -76,14 +76,16 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["project_root"] != str(cli.project_root):
-            msg = f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            msg: str = (
+                f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            )
             raise AssertionError(msg)
 
     def test_execute_whitespace_command(self) -> None:
@@ -91,10 +93,10 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("   ")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
 
     def test_execute_version_command(self) -> None:
@@ -102,14 +104,14 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("version")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
 
     def test_execute_help_command(self) -> None:
@@ -117,15 +119,15 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("help")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {'commands'} in {result.data}"
+            msg: str = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
         assert "version" in result.data["commands"]
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
 
     def test_execute_health_command(self) -> None:
@@ -133,14 +135,16 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("health")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "healthy":
-            msg = f"Expected {'healthy'}, got {result.data['status']}"
+            msg: str = f"Expected {'healthy'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["project_root"] != str(cli.project_root):
-            msg = f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            msg: str = (
+                f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            )
             raise AssertionError(msg)
 
     def test_execute_discover_command(self) -> None:
@@ -148,18 +152,18 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("discover", ["--all"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "discover":
-            msg = f"Expected {'discover'}, got {result.data['command']}"
+            msg: str = f"Expected {'discover'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["options"] != ["--all"]:
-            msg = f"Expected {['--all']}, got {result.data['options']}"
+            msg: str = f"Expected {['--all']}, got {result.data['options']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_execute_install_command(self) -> None:
@@ -167,18 +171,18 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("install", ["tap-csv"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "install":
-            msg = f"Expected {'install'}, got {result.data['command']}"
+            msg: str = f"Expected {'install'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["options"] != ["tap-csv"]:
-            msg = f"Expected {['tap-csv']}, got {result.data['options']}"
+            msg: str = f"Expected {['tap-csv']}, got {result.data['options']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_execute_run_command(self) -> None:
@@ -186,10 +190,10 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("run", ["tap-csv", "target-jsonl"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "run":
-            msg = f"Expected {'run'}, got {result.data['command']}"
+            msg: str = f"Expected {'run'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["options"] != ["tap-csv", "target-jsonl"]:
@@ -199,7 +203,7 @@ class TestFlextMeltanoCli:
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_execute_unknown_command(self) -> None:
@@ -207,14 +211,14 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("unknown-command", ["arg1", "arg2"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["command"] != "unknown-command":
-            msg = f"Expected {'unknown-command'}, got {result.data['command']}"
+            msg: str = f"Expected {'unknown-command'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["status"] != "unknown_command":
-            msg = f"Expected {'unknown_command'}, got {result.data['status']}"
+            msg: str = f"Expected {'unknown_command'}, got {result.data['status']}"
             raise AssertionError(msg)
 
     def test_execute_with_none_options(self) -> None:
@@ -222,10 +226,10 @@ class TestFlextMeltanoCli:
         cli = FlextMeltanoCli()
         result = cli.execute("version", None)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
 
 
@@ -237,14 +241,16 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.health()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "healthy":
-            msg = f"Expected {'healthy'}, got {result.data['status']}"
+            msg: str = f"Expected {'healthy'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["project_root"] != str(cli.project_root):
-            msg = f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            msg: str = (
+                f"Expected {cli.project_root!s}, got {result.data['project_root']}"
+            )
             raise AssertionError(msg)
 
     def test_version_method(self) -> None:
@@ -252,14 +258,14 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.version()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
 
     def test_help_method(self) -> None:
@@ -267,19 +273,19 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.help()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {'commands'} in {result.data}"
+            msg: str = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
         expected_commands = ["version", "help", "health", "run", "discover", "install"]
         assert result.data is not None
         if result.data["commands"] != expected_commands:
-            msg = f"Expected {expected_commands}, got {result.data['commands']}"
+            msg: str = f"Expected {expected_commands}, got {result.data['commands']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["cli_type"] != "flext_meltano":
-            msg = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
+            msg: str = f"Expected {'flext_meltano'}, got {result.data['cli_type']}"
             raise AssertionError(msg)
 
     def test_run_empty_args(self) -> None:
@@ -287,14 +293,14 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.run([])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != []:
-            msg = f"Expected {[]}, got {result.data['args']}"
+            msg: str = f"Expected {[]}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_run_version_flag(self) -> None:
@@ -302,10 +308,10 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.run(["--version"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
 
     def test_run_help_flag(self) -> None:
@@ -313,10 +319,10 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.run(["--help"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {'commands'} in {result.data}"
+            msg: str = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
 
     def test_run_help_command(self) -> None:
@@ -324,10 +330,10 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.run(["help"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if "commands" not in result.data:
-            msg = f"Expected {'commands'} in {result.data}"
+            msg: str = f"Expected {'commands'} in {result.data}"
             raise AssertionError(msg)
 
     def test_run_version_command(self) -> None:
@@ -335,10 +341,10 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.run(["version"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
 
     def test_run_custom_args(self) -> None:
@@ -347,14 +353,14 @@ class TestFlextMeltanoCliMethodsDirectly:
         args = ["install", "tap-csv"]
         result = cli.run(args)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != args:
-            msg = f"Expected {args}, got {result.data['args']}"
+            msg: str = f"Expected {args}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_list_commands(self) -> None:
@@ -362,11 +368,11 @@ class TestFlextMeltanoCliMethodsDirectly:
         cli = FlextMeltanoCli()
         result = cli.list_commands()
 
-        assert result.is_success
+        assert result.success
         expected_commands = ["version", "help", "health", "run", "discover", "install"]
         assert result.data is not None
         if result.data["commands"] != expected_commands:
-            msg = f"Expected {expected_commands}, got {result.data['commands']}"
+            msg: str = f"Expected {expected_commands}, got {result.data['commands']}"
             raise AssertionError(msg)
 
 
@@ -385,22 +391,24 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_run_command(["--version"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if not (result.data["success"]):
-            msg = f"Expected True, got {result.data['success']}"
+            msg: str = f"Expected True, got {result.data['success']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["command"] != "meltano --version":
-            msg = f"Expected {'meltano --version'}, got {result.data['command']}"
+            msg: str = f"Expected {'meltano --version'}, got {result.data['command']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["stdout"] != "Meltano, version 3.8.0":
-            msg = f"Expected {'Meltano, version 3.8.0'}, got {result.data['stdout']}"
+            msg: str = (
+                f"Expected {'Meltano, version 3.8.0'}, got {result.data['stdout']}"
+            )
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["returncode"] != 0:
-            msg = f"Expected {0}, got {result.data['returncode']}"
+            msg: str = f"Expected {0}, got {result.data['returncode']}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -415,13 +423,13 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_run_command(["invalid-command"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command failed" not in result.error:
-            msg = f"Expected {'Command failed'} in {result.error}"
+            msg: str = f"Expected {'Command failed'} in {result.error}"
             raise AssertionError(msg)
         if result.error_data["success"]:
-            msg = f"Expected False, got {result.error_data['success']}"
+            msg: str = f"Expected False, got {result.error_data['success']}"
             raise AssertionError(msg)
         assert result.error_data["returncode"] == 1
 
@@ -433,10 +441,10 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_run_command(["long-running-command"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command timed out" not in result.error:
-            msg = f"Expected {'Command timed out'} in {result.error}"
+            msg: str = f"Expected {'Command timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -447,10 +455,10 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_run_command(["nonexistent"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -461,10 +469,10 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_run_command(["failing-command"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -481,9 +489,9 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_version()
 
-        assert result.is_success
+        assert result.success
         if result.data != "Meltano, version 3.8.0":
-            msg = f"Expected {'Meltano, version 3.8.0'}, got {result.data}"
+            msg: str = f"Expected {'Meltano, version 3.8.0'}, got {result.data}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -494,9 +502,9 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_version()
 
-        assert not result.is_success
+        assert not result.success
         if result.error != "Command failed":
-            msg = f"Expected {'Command failed'}, got {result.error}"
+            msg: str = f"Expected {'Command failed'}, got {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -507,9 +515,9 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_version()
 
-        assert result.is_success
+        assert result.success
         if result.data != "unknown":
-            msg = f"Expected {'unknown'}, got {result.data}"
+            msg: str = f"Expected {'unknown'}, got {result.data}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -520,9 +528,9 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_install()
 
-        assert result.is_success
+        assert result.success
         if not (result.data):
-            msg = f"Expected True, got {result.data}"
+            msg: str = f"Expected True, got {result.data}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -533,9 +541,9 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_install()
 
-        assert result.is_success
+        assert result.success
         if result.data:
-            msg = f"Expected False, got {result.data}"
+            msg: str = f"Expected False, got {result.data}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -549,10 +557,10 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_invoke("tap-csv", "--discover")
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if not (result.data["success"]):
-            msg = f"Expected True, got {result.data['success']}"
+            msg: str = f"Expected True, got {result.data['success']}"
             raise AssertionError(msg)
         mock_run_command.assert_called_once_with(["invoke", "tap-csv", "--discover"])
 
@@ -565,7 +573,7 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_invoke("tap-csv")
 
-        assert result.is_success
+        assert result.success
         mock_run_command.assert_called_once_with(["invoke", "tap-csv"])
 
     @patch("flext_meltano.cli.FlextMeltanoCli.flext_meltano_run_command")
@@ -577,7 +585,7 @@ class TestFlextMeltanoCliSubprocessOperations:
         cli = FlextMeltanoCli()
         result = cli.flext_meltano_invoke("tap-csv", "--discover", "--format", "json")
 
-        assert result.is_success
+        assert result.success
         mock_run_command.assert_called_once_with(
             ["invoke", "tap-csv", "--discover", "--format", "json"],
         )
@@ -590,38 +598,38 @@ class TestFlextMeltanoCliFactory:
         """Test flext_meltano_run_cli with no args."""
         result = flext_meltano_run_cli()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != []:
-            msg = f"Expected {[]}, got {result.data['args']}"
+            msg: str = f"Expected {[]}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_flext_meltano_run_cli_empty_args(self) -> None:
         """Test flext_meltano_run_cli with empty args."""
         result = flext_meltano_run_cli([])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["status"] != "success":
-            msg = f"Expected {'success'}, got {result.data['status']}"
+            msg: str = f"Expected {'success'}, got {result.data['status']}"
             raise AssertionError(msg)
         assert result.data is not None
         if result.data["args"] != []:
-            msg = f"Expected {[]}, got {result.data['args']}"
+            msg: str = f"Expected {[]}, got {result.data['args']}"
             raise AssertionError(msg)
 
     def test_flext_meltano_run_cli_version_args(self) -> None:
         """Test flext_meltano_run_cli with version args."""
         result = flext_meltano_run_cli(["--version"])
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["version"] != "3.8.0":
-            msg = f"Expected {'3.8.0'}, got {result.data['version']}"
+            msg: str = f"Expected {'3.8.0'}, got {result.data['version']}"
             raise AssertionError(msg)
 
     def test_flext_meltano_run_cli_custom_args(self) -> None:
@@ -629,10 +637,10 @@ class TestFlextMeltanoCliFactory:
         args = ["install", "tap-postgres"]
         result = flext_meltano_run_cli(args)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         if result.data["args"] != args:
-            msg = f"Expected {args}, got {result.data['args']}"
+            msg: str = f"Expected {args}, got {result.data['args']}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.__init__")
@@ -642,10 +650,10 @@ class TestFlextMeltanoCliFactory:
 
         result = flext_meltano_run_cli(["test"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "CLI execution failed" not in result.error:
-            msg = f"Expected {'CLI execution failed'} in {result.error}"
+            msg: str = f"Expected {'CLI execution failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.cli.FlextMeltanoCli.__init__")
@@ -655,10 +663,10 @@ class TestFlextMeltanoCliFactory:
 
         result = flext_meltano_run_cli(["test"])
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "CLI execution failed" not in result.error:
-            msg = f"Expected {'CLI execution failed'} in {result.error}"
+            msg: str = f"Expected {'CLI execution failed'} in {result.error}"
             raise AssertionError(msg)
 
 

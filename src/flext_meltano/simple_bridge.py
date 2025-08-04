@@ -134,8 +134,8 @@ def main():
 
     # JSON response formatting for Go
     response = {
-        "success": result.is_success,
-        "data": result.data if result.is_success else None,
+        "success": result.success,
+        "data": result.data if result.success else None,
         "error": result.error_message if result.is_failure else None
     }
     print(json.dumps(response))
@@ -149,7 +149,7 @@ from flext_meltano.simple_bridge import FlextMeltanoBridge
 bridge = FlextMeltanoBridge()
 result = bridge.get_version()
 
-if result.is_success:
+if result.success:
     print(f"Meltano version: {result.data['meltano']}")
 ```
 
@@ -328,14 +328,14 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.get_version()
-            >>> if result.is_success:
+            >>> if result.success:
             ...     print(f"Meltano: {result.data['meltano']}")
 
         """
         try:
             # Get Meltano version using executor
             result = self._executor.run_command(["--version"])
-            if result.is_success and result.data:
+            if result.success and result.data:
                 meltano_version = "unknown"
                 if isinstance(result.data, dict) and "stdout" in result.data:
                     stdout = result.data["stdout"]
@@ -365,7 +365,7 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.list_plugins()
-            >>> if result.is_success:
+            >>> if result.success:
             ...     for plugin in result.data:
             ...         print(f"Plugin: {plugin['name']}")
 
@@ -373,7 +373,7 @@ class FlextMeltanoBridge:
         try:
             # Use executor to get plugin list
             result = self._executor.run_command(["list", "--format=json"])
-            if result.is_success and result.data:
+            if result.success and result.data:
                 plugins = []
                 if isinstance(result.data, dict) and "stdout" in result.data:
                     stdout = result.data["stdout"]
@@ -416,7 +416,7 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.add_plugin("extractor", "tap-csv")
-            >>> if result.is_success:
+            >>> if result.success:
             ...     print(result.data)  # "Plugin tap-csv added successfully"
 
         Note:
@@ -440,7 +440,7 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.discover_catalog("tap-csv")
-            >>> if result.is_success:
+            >>> if result.success:
             ...     streams = result.data.get("streams", [])
             ...     print(f"Found {len(streams)} streams")
 
@@ -473,7 +473,7 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.run_pipeline("tap-csv", "target-csv")
-            >>> if result.is_success:
+            >>> if result.success:
             ...     print(f"Pipeline status: {result.data['status']}")
 
         """
@@ -488,7 +488,7 @@ class FlextMeltanoBridge:
             result = self._executor.run_command(cmd)
 
             # Process results
-            if result.is_success:
+            if result.success:
                 pipeline_result = {
                     "status": "success",
                     "tap": tap,
@@ -524,7 +524,7 @@ class FlextMeltanoBridge:
         Example:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.invoke_dbt("run", "--models", "my_model")
-            >>> if result.is_success:
+            >>> if result.success:
             ...     print(f"DBT status: {result.data['status']}")
 
         Note:
@@ -559,7 +559,7 @@ def create_flext_meltano_bridge(
 
 
 # Export for bridge script usage
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoBridge",
     "create_flext_meltano_bridge",
 ]

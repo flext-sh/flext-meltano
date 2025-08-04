@@ -63,7 +63,7 @@ class TestCoreLibraryImports:
         """Test that version is available."""
         assert hasattr(flext_meltano, "__version__")
         if flext_meltano.__version__ != "2.0.0-enterprise":
-            msg = f"Expected {'2.0.0-enterprise'}, got {flext_meltano.__version__}"
+            msg: str = f"Expected {'2.0.0-enterprise'}, got {flext_meltano.__version__}"
             raise AssertionError(msg)
 
     def test_core_classes_available(self) -> None:
@@ -111,7 +111,7 @@ class TestCoreConfiguration:
             environment="test",
         )
         if config.project_root != str(Path().absolute()):
-            msg = f"Expected {Path().absolute()!s}, got {config.project_root}"
+            msg: str = f"Expected {Path().absolute()!s}, got {config.project_root}"
             raise AssertionError(msg)
         assert config.environment == "test"
 
@@ -119,11 +119,11 @@ class TestCoreConfiguration:
         """Test configuration defaults."""
         config = FlextMeltanoConfig()
         if config.environment != "dev":
-            msg = f"Expected {'dev'}, got {config.environment}"
+            msg: str = f"Expected {'dev'}, got {config.environment}"
             raise AssertionError(msg)
         assert config.meltano_ui_bind_port == 5000
         if config.singer_sdk_log_level != "INFO":
-            msg = f"Expected {'INFO'}, got {config.singer_sdk_log_level}"
+            msg: str = f"Expected {'INFO'}, got {config.singer_sdk_log_level}"
             raise AssertionError(msg)
 
     def test_config_validation(self) -> None:
@@ -147,7 +147,7 @@ class TestServiceCreation:
         config = FlextMeltanoConfig()
         result = create_executor(config)
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoExecutor)
 
     def test_discoverer_creation(self) -> None:
@@ -155,7 +155,7 @@ class TestServiceCreation:
         config = FlextMeltanoConfig()
         result = create_discoverer(config)
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoDiscoverer)
 
     def test_installer_creation(self) -> None:
@@ -163,7 +163,7 @@ class TestServiceCreation:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoInstaller)
 
     def test_validation_service_creation(self) -> None:
@@ -171,7 +171,7 @@ class TestServiceCreation:
         config = FlextMeltanoConfig()
         result = create_validation_service(config)
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoValidationService)
 
 
@@ -185,10 +185,10 @@ class TestServiceValidation:
 
         # Should validate even without meltano installed
         health_result = executor.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "execution":
-            msg = f"Expected {'execution'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'execution'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_discoverer_validation(self) -> None:
@@ -197,10 +197,10 @@ class TestServiceValidation:
         discoverer = FlextMeltanoDiscoverer(config)
 
         health_result = discoverer.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "discovery":
-            msg = f"Expected {'discovery'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'discovery'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_installer_validation(self) -> None:
@@ -209,10 +209,10 @@ class TestServiceValidation:
         installer = FlextMeltanoInstaller(config)
 
         health_result = installer.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "installation":
-            msg = f"Expected {'installation'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'installation'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
     def test_validation_service_validation(self) -> None:
@@ -221,10 +221,10 @@ class TestServiceValidation:
         validator = FlextMeltanoValidationService(config)
 
         health_result = validator.get_health_status()
-        assert health_result.is_success
+        assert health_result.success
         assert health_result.data is not None
         if health_result.data["service"] != "validation":
-            msg = f"Expected {'validation'}, got {health_result.data['service']}"
+            msg: str = f"Expected {'validation'}, got {health_result.data['service']}"
             raise AssertionError(msg)
 
 
@@ -237,12 +237,12 @@ class TestEnterprisePatterns:
 
         # All factory functions should return FlextResult
         executor_result = create_executor(config)
-        assert hasattr(executor_result, "is_success")
+        assert hasattr(executor_result, "success")
         assert hasattr(executor_result, "data")
         assert hasattr(executor_result, "error")
 
         discoverer_result = create_discoverer(config)
-        assert hasattr(discoverer_result, "is_success")
+        assert hasattr(discoverer_result, "success")
         assert hasattr(discoverer_result, "data")
         assert hasattr(discoverer_result, "error")
 
@@ -253,12 +253,12 @@ class TestEnterprisePatterns:
         # Services should accept config via constructor
         executor = FlextMeltanoExecutor(config)
         if executor.config != config:
-            msg = f"Expected {config}, got {executor.config}"
+            msg: str = f"Expected {config}, got {executor.config}"
             raise AssertionError(msg)
 
         discoverer = FlextMeltanoDiscoverer(config)
         if discoverer.config != config:
-            msg = f"Expected {config}, got {discoverer.config}"
+            msg: str = f"Expected {config}, got {discoverer.config}"
             raise AssertionError(msg)
 
     def test_service_initialization(self) -> None:
@@ -268,11 +268,11 @@ class TestEnterprisePatterns:
         # Services should have initialize method
         executor = FlextMeltanoExecutor(config)
         init_result = executor.initialize()
-        assert init_result.is_success
+        assert init_result.success
 
         discoverer = FlextMeltanoDiscoverer(config)
         init_result = discoverer.initialize()
-        assert init_result.is_success
+        assert init_result.success
 
 
 class TestLegacyCompatibility:

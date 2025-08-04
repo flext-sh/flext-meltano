@@ -43,7 +43,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate setup result
-        assert result.is_success, f"Project setup failed: {(result.error,)}"
+        assert result.success, f"Project setup failed: {(result.error,)}"
         setup_data = result.data
 
         # Validate project was created
@@ -75,7 +75,7 @@ class TestRealMeltanoProjectOperations:
             targets=["target-csv"],
             environments=["dev"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # Get project status
         status_result = await flext_meltano_manage_project_ultra(
@@ -84,7 +84,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate status result
-        assert status_result.is_success, (
+        assert status_result.success, (
             f"Status retrieval failed: {(status_result.error,)}"
         )
         status_data = status_result.data
@@ -108,7 +108,7 @@ class TestRealMeltanoProjectOperations:
             targets=["target-csv"],
             environments=["dev"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # List project plugins
         plugins_result = await flext_meltano_manage_project_ultra(
@@ -117,7 +117,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate plugins result
-        if plugins_result.is_success:
+        if plugins_result.success:
             plugins_data = plugins_result.data
 
             # Should have plugin categories
@@ -158,7 +158,7 @@ class TestRealMeltanoProjectOperations:
             targets=["target-csv"],
             environments=["dev", "staging", "prod"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # List project environments
         env_result = await flext_meltano_manage_project_ultra(
@@ -167,7 +167,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate environments result
-        if env_result.is_success:
+        if env_result.success:
             env_data = env_result.data
 
             # Should have environments structure
@@ -198,7 +198,7 @@ class TestRealMeltanoProjectOperations:
             targets=["target-csv"],
             environments=["dev"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # Run pipeline
         run_result = await flext_meltano_manage_project_ultra(
@@ -209,7 +209,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Validate run result
-        if run_result.is_success:
+        if run_result.success:
             run_data = run_result.data
 
             # Should contain pipeline execution info
@@ -250,7 +250,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Should succeed with either real or fallback setup
-        assert result.is_success, f"Fallback project setup failed: {(result.error,)}"
+        assert result.success, f"Fallback project setup failed: {(result.error,)}"
         setup_data = result.data
 
         # Basic validation
@@ -283,7 +283,7 @@ class TestRealMeltanoProjectOperations:
             targets=["target-csv"],
             environments=["dev"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # Try to get plugin config
         config_result = await flext_meltano_manage_project_ultra(
@@ -294,7 +294,7 @@ class TestRealMeltanoProjectOperations:
         )
 
         # Config management may succeed or fail depending on meltano-core availability
-        if config_result.is_success:
+        if config_result.success:
             config_data = config_result.data
 
             # Should contain plugin config info
@@ -378,14 +378,14 @@ class TestRealMeltanoProjectIntegration:
             targets=["target-csv"],
             environments=["dev"],
         )
-        assert setup_result.is_success
+        assert setup_result.success
 
         # Step 2: Check project status
         status_result = await flext_meltano_manage_project_ultra(
             project_path,
             action="status",
         )
-        assert status_result.is_success
+        assert status_result.success
 
         # Step 3: List plugins (may fail but shouldn't crash)
         await flext_meltano_manage_project_ultra(
@@ -404,7 +404,7 @@ class TestRealMeltanoProjectIntegration:
         # run_result success is optional
 
         # Validate that all operations completed without crashing
-        assert status_result.is_success  # At minimum, status should work
+        assert status_result.success  # At minimum, status should work
         # Other operations may fail due to missing dependencies, which is acceptable
 
 

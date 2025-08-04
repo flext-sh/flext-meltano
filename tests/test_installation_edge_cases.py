@@ -42,13 +42,13 @@ class TestFlextMeltanoInstallerExceptionPaths:
 
         result = installer.validate()
         # Should handle OSError gracefully
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if (
             "Validation failed" in result.error
             or "Project root does not exist" not in result.error
         ):
-            msg = f"Expected {'Project root does not exist'} in {result.error}"
+            msg: str = f"Expected {'Project root does not exist'} in {result.error}"
             raise AssertionError(msg)
 
     def test_validation_value_error(self) -> None:
@@ -59,7 +59,7 @@ class TestFlextMeltanoInstallerExceptionPaths:
 
         result = installer.validate()
         # Should handle gracefully - may succeed or fail based on Path behavior
-        assert result.is_success or not result.is_success
+        assert result.success or not result.success
 
     @patch("subprocess.run")
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
@@ -72,10 +72,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.add_plugin("extractor", "tap-csv")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -93,10 +93,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.add_plugin("extractor", "tap-csv")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Command error" not in result.error:
-            msg = f"Expected {'Command error'} in {result.error}"
+            msg: str = f"Expected {'Command error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -114,10 +114,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.install_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin install timed out" not in result.error:
-            msg = f"Expected {'Plugin install timed out'} in {result.error}"
+            msg: str = f"Expected {'Plugin install timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -135,10 +135,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.install_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin install error" not in result.error:
-            msg = f"Expected {'Plugin install error'} in {result.error}"
+            msg: str = f"Expected {'Plugin install error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -156,10 +156,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.install_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin install error" not in result.error:
-            msg = f"Expected {'Plugin install error'} in {result.error}"
+            msg: str = f"Expected {'Plugin install error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -181,10 +181,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.install_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin install failed" not in result.error:
-            msg = f"Expected {'Plugin install failed'} in {result.error}"
+            msg: str = f"Expected {'Plugin install failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -202,10 +202,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.remove_plugin("extractor", "tap-csv")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin remove timed out" not in result.error:
-            msg = f"Expected {'Plugin remove timed out'} in {result.error}"
+            msg: str = f"Expected {'Plugin remove timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -219,10 +219,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.remove_plugin("extractor", "tap-csv")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin remove error" not in result.error:
-            msg = f"Expected {'Plugin remove error'} in {result.error}"
+            msg: str = f"Expected {'Plugin remove error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -240,10 +240,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.remove_plugin("extractor", "tap-csv")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin remove error" not in result.error:
-            msg = f"Expected {'Plugin remove error'} in {result.error}"
+            msg: str = f"Expected {'Plugin remove error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -265,10 +265,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.remove_plugin("extractor", "nonexistent-tap")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin remove failed" not in result.error:
-            msg = f"Expected {'Plugin remove failed'} in {result.error}"
+            msg: str = f"Expected {'Plugin remove failed'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -286,10 +286,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.list_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin list timed out" not in result.error:
-            msg = f"Expected {'Plugin list timed out'} in {result.error}"
+            msg: str = f"Expected {'Plugin list timed out'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -303,10 +303,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.list_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin list error" not in result.error:
-            msg = f"Expected {'Plugin list error'} in {result.error}"
+            msg: str = f"Expected {'Plugin list error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -324,10 +324,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
         installer = FlextMeltanoInstaller(config)
 
         result = installer.list_plugins()
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Plugin list error" not in result.error:
-            msg = f"Expected {'Plugin list error'} in {result.error}"
+            msg: str = f"Expected {'Plugin list error'} in {result.error}"
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.validate")
@@ -343,10 +343,10 @@ class TestFlextMeltanoInstallerExceptionPaths:
             mock_execute.return_value = FlextResult(data=None)
 
             result = installer.list_plugins()
-            assert not result.is_success
+            assert not result.success
             assert result.error is not None
             if "No plugin data received" not in result.error:
-                msg = f"Expected {'No plugin data received'} in {result.error}"
+                msg: str = f"Expected {'No plugin data received'} in {result.error}"
                 raise AssertionError(msg)
 
     def test_convert_plugin_list_with_namespaces(self) -> None:
@@ -362,17 +362,19 @@ class TestFlextMeltanoInstallerExceptionPaths:
 
         plugins = installer._convert_plugin_list("extractors", plugin_list)
         if len(plugins) != EXPECTED_BULK_SIZE:
-            msg = f"Expected {2}, got {len(plugins)}"
+            msg: str = f"Expected {2}, got {len(plugins)}"
             raise AssertionError(msg)
 
         # First plugin: namespace generated from name
         if plugins[0].namespace != "tap_postgres_with_dashes":
-            msg = f"Expected {'tap_postgres_with_dashes'}, got {plugins[0].namespace}"
+            msg: str = (
+                f"Expected {'tap_postgres_with_dashes'}, got {plugins[0].namespace}"
+            )
             raise AssertionError(msg)
 
         # Second plugin: uses provided namespace
         if plugins[1].namespace != "custom_namespace":
-            msg = f"Expected {'custom_namespace'}, got {plugins[1].namespace}"
+            msg: str = f"Expected {'custom_namespace'}, got {plugins[1].namespace}"
             raise AssertionError(msg)
 
 
@@ -386,7 +388,7 @@ class TestCreateInstallerServiceEdgeCases:
 
         result = create_installer_service(config)
         # The service should be created successfully, even if validation fails later
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, FlextMeltanoInstaller)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
@@ -400,10 +402,12 @@ class TestCreateInstallerServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {'Failed to create installer service'} in {result.error}"
+            msg: str = (
+                f"Expected {'Failed to create installer service'} in {result.error}"
+            )
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
@@ -414,10 +418,12 @@ class TestCreateInstallerServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {'Failed to create installer service'} in {result.error}"
+            msg: str = (
+                f"Expected {'Failed to create installer service'} in {result.error}"
+            )
             raise AssertionError(msg)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
@@ -428,10 +434,12 @@ class TestCreateInstallerServiceEdgeCases:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
 
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None
         if "Failed to create installer service" not in result.error:
-            msg = f"Expected {'Failed to create installer service'} in {result.error}"
+            msg: str = (
+                f"Expected {'Failed to create installer service'} in {result.error}"
+            )
             raise AssertionError(msg)
 
 

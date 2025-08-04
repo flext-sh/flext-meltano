@@ -46,7 +46,7 @@ from flext_meltano.base import (
 )
 
 # Legacy compatibility
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoTap",
     "FlextMeltanoTarget",
 ]

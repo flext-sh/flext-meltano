@@ -93,7 +93,7 @@ def example_1_old_way() -> None:
             check=False,
         )
         if result.returncode != 0:
-            msg = f"Failed to init: {(result.stderr,)}"
+            msg: str = f"Failed to init: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Add plugins (10+ lines each)
@@ -109,7 +109,7 @@ def example_1_old_way() -> None:
             check=False,
         )
         if result.returncode != 0:
-            msg = f"Failed to add {plugin_name}: {(result.stderr,)}"
+            msg: str = f"Failed to add {plugin_name}: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Run pipeline (10+ lines)
@@ -143,7 +143,7 @@ def example_1_new_way() -> None:
     result = flext_meltano_execute_job("tap-csv", "target-csv")
 
     if result.success:  # Using legacy .success pattern
-        print("✅ Pipeline executed successfully with 1 line!")
+        pass
 
     # TOTAL: 1 LINHA ÚTIL (redução de 98%)
 
@@ -168,7 +168,7 @@ def example_2_old_way() -> None:
             text=True,
         )
         if result.returncode != 0:
-            msg = f"Init failed: {(result.stderr,)}"
+            msg: str = f"Init failed: {(result.stderr,)}"
             raise RuntimeError(msg)
 
     # Create environments (15 lines)
@@ -278,12 +278,12 @@ def example_2_new_way() -> None:
     # 3 LINHAS substituem 110+ linhas using REAL API
     config = FlextMeltanoConfig(
         project_root=tempfile.mkdtemp(prefix="enterprise_project_"),
-        environment="production"
+        environment="production",
     )
 
     executor_result = create_executor(config)
-    if executor_result.is_success:
-        print("✅ Enterprise project setup completed with 3 lines!")
+    if executor_result.success:
+        pass
 
     # TOTAL: 3 LINHAS ÚTEIS (redução de 97%)
 
@@ -364,8 +364,7 @@ def example_3_new_way() -> None:
         result = flext_meltano_execute_job("tap-postgres", "target-csv")
         results.append(table if result.success else None)
 
-    successful_tables = [t for t in results if t is not None]
-    print(f"✅ Batch processing: {len(successful_tables)}/{len(tables)} tables successful!")
+    [t for t in results if t is not None]
 
     # TOTAL: 2 LINHAS ÚTEIS (redução de 97%)
 
@@ -423,12 +422,12 @@ def example_4_new_way() -> None:
     """AFTER: Ultra-simplified discovery - 1 line + optional analysis."""
     # 1 LINE for test + 1 LINE for discovery using REAL API
     config = FlextMeltanoConfig(
-        project_root=tempfile.mkdtemp(prefix="discovery_project_")
+        project_root=tempfile.mkdtemp(prefix="discovery_project_"),
     )
 
     executor_result = create_executor(config)
-    if executor_result.is_success:
-        print("✅ Discovery completed - connection validated with 2 lines!")
+    if executor_result.success:
+        pass
 
     # TOTAL: 2 LINHAS ÚTEIS (redução de 94%)
 
@@ -518,7 +517,6 @@ async def example_5_old_way() -> None:
 async def example_5_new_way() -> None:
     """DEPOIS: Async ultra-simplificado - 3 linhas."""
     # 3 LINHAS substituem 50+ linhas using REAL API
-    tasks = []
 
     # Simulate async execution with real API
     loop = asyncio.get_event_loop()
@@ -529,8 +527,7 @@ async def example_5_new_way() -> None:
     result1 = await loop.run_in_executor(None, run_job)
     result2 = await loop.run_in_executor(None, run_job)
 
-    successes = sum(1 for r in [result1, result2] if r.success)
-    print(f"✅ Async processing: {successes}/2 pipelines successful!")
+    sum(1 for r in [result1, result2] if r.success)
 
     # TOTAL: 3 LINHAS ÚTEIS (redução de 94%)
 
@@ -629,9 +626,7 @@ def example_6_new_way() -> None:
     # 1 LINHA substitui 45+ linhas using REAL API
     config = FlextMeltanoConfig(project_root="/tmp/health_project")
 
-    executor_result = create_executor(config)
-    health_status = "✅ Healthy" if executor_result.is_success else f"❌ Issues: {executor_result.error}"
-    print(f"Health check completed: {health_status}")
+    create_executor(config)
 
     # TOTAL: 1 LINHA ÚTIL (redução de 98%)
 
@@ -664,32 +659,22 @@ def demonstrate_code_reduction() -> None:
 
 def main() -> None:
     """Execute all code reduction examples."""
-    print("🚀 FLEXT Meltano Code Reduction Showcase")
-    print("=" * 50)
-
-    print("\n📊 Example 1: Pipeline Execution (55 lines → 1 line)")
     example_1_new_way()
 
-    print("\n🏢 Example 2: Enterprise Setup (110 lines → 3 lines)")
     example_2_new_way()
 
-    print("\n🔄 Example 3: Batch Processing (65 lines → 2 lines)")
     example_3_new_way()
 
-    print("\n🔍 Example 4: Discovery & Test (35 lines → 2 lines)")
     example_4_new_way()
 
-    print("\n⚡ Example 5: Async Pipeline (50 lines → 3 lines)")
     import asyncio
+
     asyncio.run(example_5_new_way())
 
-    print("\n🏥 Example 6: Health Check (45 lines → 1 line)")
     example_6_new_way()
 
-    print("\n📈 Code Reduction Demonstration:")
     demonstrate_code_reduction()
 
-    print("\n✅ Code reduction showcase completed!")
 
 
 if __name__ == "__main__":

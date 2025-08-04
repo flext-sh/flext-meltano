@@ -53,7 +53,7 @@ src/flext_meltano/
 
 ```python
 # OPTIMIZED: 449+ carefully curated exports organized by functionality
-__all__ = [
+__all__: list[str] = [
     # Bridge Integration Layer
     "FlextMeltanoBridge", "FlextMeltanoResult",
     "flext_meltano_execute_job", "flext_meltano_run_command",

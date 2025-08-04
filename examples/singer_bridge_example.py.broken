@@ -68,10 +68,10 @@ def basic_bridge_example() -> None:
         time_extracted="2025-01-01T12:00:00Z",
     )
 
-    if singer_record.is_success:
+    if singer_record.success:
         # Escrever mensagem Singer
         write_result = bridge.write_singer_message(singer_record.data)
-        if write_result.is_success:
+        if write_result.success:
             pass
 
 
@@ -101,10 +101,10 @@ def catalog_management_example() -> None:
         key_properties=["id"],
     )
 
-    if result.is_success:
+    if result.success:
         # Obter catalog completo
         catalog_data = catalog.get_catalog()
-        if catalog_data.is_success:
+        if catalog_data.success:
             pass
 
 
@@ -169,7 +169,7 @@ def custom_tap_example() -> None:
 
     # Validar configuração
     validation = validate_tap_config(ExemploTap, config)
-    if not validation.is_success:
+    if not validation.success:
         return
 
     # Criar tap
@@ -177,11 +177,11 @@ def custom_tap_example() -> None:
 
     # Descobrir streams
     discovery = tap.discover()
-    if discovery.is_success:
+    if discovery.success:
         # Sync
         catalog = discovery.data["catalog"]
         sync_result = tap.sync(catalog)
-        if sync_result.is_success:
+        if sync_result.success:
             pass
 
 
@@ -223,7 +223,7 @@ def custom_target_example() -> None:
 
     # Validar configuração
     validation = validate_target_config(ExemploTarget, config)
-    if not validation.is_success:
+    if not validation.success:
         return
 
     # Criar target
@@ -237,7 +237,7 @@ def custom_target_example() -> None:
     ]
 
     write_result = target.write_records(records)
-    if write_result.is_success:
+    if write_result.success:
         # Obter métricas
         target.get_target_metrics()
 
@@ -254,7 +254,7 @@ def exemplo_servico_singer() -> None:
 
     # Obter informações do Singer SDK
     info = service.get_singer_sdk_info()
-    if info.is_success:
+    if info.success:
         pass
 
     # Validar configuração de tap
@@ -266,12 +266,12 @@ def exemplo_servico_singer() -> None:
     }
 
     validation = service.validate_tap_config("example-tap", tap_config)
-    if validation.is_success:
+    if validation.success:
         pass
 
     # Descobrir streams
     discovery = service.discover_streams("exemplo-tap", tap_config)
-    if discovery.is_success:
+    if discovery.success:
         pass
 
 
@@ -333,10 +333,10 @@ def exemplo_tap_incremental() -> None:
 
     # Descobrir e sync
     discovery = tap.discover()
-    if discovery.is_success:
+    if discovery.success:
         catalog = discovery.data["catalog"]
         sync_result = tap.sync(catalog)
-        if sync_result.is_success:
+        if sync_result.success:
             pass
 
 

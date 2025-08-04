@@ -38,9 +38,9 @@ from pathlib import Path
 
 from flext_meltano import (
     FlextMeltanoConfig,
-    create_flext_meltano_bridge,
-    create_executor,
     create_discoverer,
+    create_executor,
+    create_flext_meltano_bridge,
 )
 
 
@@ -58,20 +58,17 @@ def example_basic_api_usage() -> None:
         )
 
         # Create bridge using REAL API
-        bridge = create_flext_meltano_bridge(config)
-        print(f"✅ Created bridge: {type(bridge).__name__}")
+        create_flext_meltano_bridge(config)
 
         # Create executor for pipeline operations
         executor_result = create_executor(config)
-        if executor_result.is_success:
-            print(f"✅ Created executor: {type(executor_result.data).__name__}")
+        if executor_result.success:
+            pass
 
         # Create discoverer for plugin discovery
         discoverer_result = create_discoverer(config)
-        if discoverer_result.is_success:
-            print(f"✅ Created discoverer: {type(discoverer_result.data).__name__}")
-
-        print("✅ Basic API usage example completed successfully")
+        if discoverer_result.success:
+            pass
 
 
 def example_one_liner_functions() -> None:
@@ -84,14 +81,10 @@ def example_one_liner_functions() -> None:
         config = FlextMeltanoConfig(project_root=str(project_root))
 
         # One-liner: Create and use bridge
-        bridge = create_flext_meltano_bridge(config)
-        print(f"✅ One-liner bridge creation: {type(bridge).__name__}")
+        create_flext_meltano_bridge(config)
 
         # One-liner: Create executor with result handling
-        executor_result = create_executor(config)
-        print(f"✅ One-liner executor: {'Success' if executor_result.is_success else 'Failed'}")
-
-        print("✅ One-liner functions example completed")
+        create_executor(config)
 
 
 def example_advanced_usage() -> None:
@@ -107,13 +100,12 @@ def example_advanced_usage() -> None:
         )
 
         # Create bridge with advanced configuration
-        bridge = create_flext_meltano_bridge(config)
-        print(f"✅ Advanced bridge created: {type(bridge).__name__}")
+        create_flext_meltano_bridge(config)
 
         # Create services for advanced usage
         executor_result = create_executor(config)
-        if executor_result.is_success:
-            print("✅ Advanced executor ready for production")
+        if executor_result.success:
+            pass
 
 
 def example_error_handling() -> None:
@@ -127,12 +119,8 @@ def example_error_handling() -> None:
 
         # Demonstrate FlextResult error handling patterns
         executor_result = create_executor(config)
-        if executor_result.is_success:
-            print("✅ Error handling example - executor created successfully")
-        else:
-            print(f"⚠️ Error handling example - failed gracefully: {executor_result.error}")
-
-        print("✅ Error handling example completed")
+        if executor_result.success:
+            pass
 
 
 if __name__ == "__main__":

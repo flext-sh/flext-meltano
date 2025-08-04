@@ -183,13 +183,13 @@ def main() -> None:
 
         # JSON response for Go service consumption
         response = {
-            "status": "success" if result.is_success else "error",
-            "data": result.data if result.is_success else None,
+            "status": "success" if result.success else "error",
+            "data": result.data if result.success else None,
             "error": result.error_message if result.is_failure else None
         }
 
         print(json.dumps(response))
-        sys.exit(0 if result.is_success else 1)
+        sys.exit(0 if result.success else 1)
 
     except Exception as e:
         error_response = {

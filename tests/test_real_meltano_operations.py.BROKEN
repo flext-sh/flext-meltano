@@ -34,7 +34,7 @@ class TestFlextMeltanoProjectOperationsReal:
         result = await flext_meltano_setup_project_ultra(project_path)
 
         # Should succeed or fail gracefully (Meltano might not be available)
-        if result.is_success:
+        if result.success:
             # Validate project was created
             assert project_path.exists()
             assert (project_path / "meltano.yml").exists()
@@ -61,7 +61,7 @@ class TestFlextMeltanoProjectOperationsReal:
         )
 
         # Should handle plugin installation
-        if result.is_success:
+        if result.success:
             assert project_path.exists()
             data = result.data
             assert isinstance(data, dict)
@@ -82,7 +82,7 @@ class TestFlextMeltanoProjectOperationsReal:
         # First create a project
         setup_result = await flext_meltano_setup_project_ultra(project_path)
 
-        if setup_result.is_success:
+        if setup_result.success:
             # Then check status
             status_result = await flext_meltano_manage_project_ultra(
                 project_path,
@@ -90,7 +90,7 @@ class TestFlextMeltanoProjectOperationsReal:
             )
 
             # Should return status information
-            if status_result.is_success:
+            if status_result.success:
                 data = status_result.data
                 assert isinstance(data, dict)
             else:
@@ -105,7 +105,7 @@ class TestFlextMeltanoProjectOperationsReal:
         # First create a project
         setup_result = await flext_meltano_setup_project_ultra(project_path)
 
-        if setup_result.is_success:
+        if setup_result.success:
             # Then list plugins
             plugins_result = await flext_meltano_manage_project_ultra(
                 project_path,
@@ -113,7 +113,7 @@ class TestFlextMeltanoProjectOperationsReal:
             )
 
             # Should return plugin information
-            if plugins_result.is_success:
+            if plugins_result.success:
                 data = plugins_result.data
                 assert isinstance(data, dict)
                 # Should have extractors and loaders structure
@@ -133,7 +133,7 @@ class TestFlextMeltanoProjectOperationsReal:
         result = await flext_meltano_setup_project_ultra(invalid_path)
 
         # Should fail gracefully
-        assert not result.is_success
+        assert not result.success
         assert result.error
         assert len(result.error) > 0
 
@@ -148,7 +148,7 @@ class TestFlextMeltanoProjectOperationsReal:
         )
 
         # Should fail gracefully
-        assert not result.is_success
+        assert not result.success
         assert result.error
 
 
@@ -175,7 +175,7 @@ class TestFlextMeltanoProjectOperationsIntegration:
         )
 
         # Step 2: If creation succeeded, test management operations
-        if setup_result.is_success:
+        if setup_result.success:
             # Check status
             status_result = await flext_meltano_manage_project_ultra(
                 project_path,
@@ -190,8 +190,8 @@ class TestFlextMeltanoProjectOperationsIntegration:
 
             # At least one operation should succeed
             operations_succeeded = any([
-                status_result.is_success,
-                plugins_result.is_success,
+                status_result.success,
+                plugins_result.success,
             ])
 
             # If no operations succeeded, at least they should fail gracefully
@@ -212,7 +212,7 @@ class TestFlextMeltanoProjectOperationsIntegration:
         )
 
         # Should handle multiple environments
-        if result.is_success:
+        if result.success:
             data = result.data
             assert isinstance(data, dict)
 
