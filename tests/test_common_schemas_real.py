@@ -109,7 +109,9 @@ class TestCommonSingerSchemasClass:
         property_names = [prop.name for prop in properties.values()]
 
         # Should include file properties
-        file_props_present = any(prop in property_names for prop in ["file_path", "files", "filepath"])
+        file_props_present = any(
+            prop in property_names for prop in ["file_path", "files", "filepath"]
+        )
         assert file_props_present
 
         # Should NOT include extraction config
@@ -208,7 +210,9 @@ class TestSchemaFactoryFunctions:
     def test_create_oracle_tap_schema_with_additional_props(self):
         """Test create_oracle_tap_schema with additional properties."""
         additional = th.PropertiesList(
-            th.Property("warehouse_code", th.StringType, description="WMS warehouse code"),
+            th.Property(
+                "warehouse_code", th.StringType, description="WMS warehouse code"
+            ),
         )
 
         schema = create_oracle_tap_schema(additional_properties=additional)
@@ -240,7 +244,9 @@ class TestSchemaFactoryFunctions:
         property_names = [prop.name for prop in properties.values()]
 
         # Should include file properties
-        file_props_present = any(prop in property_names for prop in ["file_path", "files", "filepath"])
+        file_props_present = any(
+            prop in property_names for prop in ["file_path", "files", "filepath"]
+        )
         assert file_props_present
 
     def test_create_oauth2_api_tap_schema_function(self):
@@ -291,7 +297,9 @@ class TestSchemaValidation:
         property_names = [prop.name for prop in properties.values()]
 
         # Should have file-related properties
-        file_props_present = any(prop in property_names for prop in ["file_path", "files", "filepath"])
+        file_props_present = any(
+            prop in property_names for prop in ["file_path", "files", "filepath"]
+        )
         assert file_props_present
 
     def test_oauth2_api_schema_structure(self):

@@ -370,10 +370,12 @@ class TestFlextSingerBridgeComplete:
         bridge = FlextSingerBridge()
 
         # Missing 'record' field
-        result = bridge.flext_singer_validate_message({
-            "type": "RECORD",
-            "stream": "test",
-        })
+        result = bridge.flext_singer_validate_message(
+            {
+                "type": "RECORD",
+                "stream": "test",
+            }
+        )
 
         assert not result.success
         assert "Missing required field: record" in result.error
@@ -383,10 +385,12 @@ class TestFlextSingerBridgeComplete:
         bridge = FlextSingerBridge()
 
         # Missing 'schema' field
-        result = bridge.flext_singer_validate_message({
-            "type": "SCHEMA",
-            "stream": "test",
-        })
+        result = bridge.flext_singer_validate_message(
+            {
+                "type": "SCHEMA",
+                "stream": "test",
+            }
+        )
 
         assert not result.success
         assert "Missing required field: schema" in result.error

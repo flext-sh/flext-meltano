@@ -41,7 +41,10 @@ class TestCommonSingerSchemas:
 
     def test_database_connection_schema_properties(self):
         """Test DATABASE_CONNECTION_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.DATABASE_CONNECTION_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.DATABASE_CONNECTION_SCHEMA.wrapped.values()
+        }
 
         # Test host property
         host_prop = properties["host"]
@@ -77,7 +80,10 @@ class TestCommonSingerSchemas:
 
     def test_oracle_connection_schema_extends_database(self):
         """Test ORACLE_CONNECTION_SCHEMA properly extends DATABASE_CONNECTION_SCHEMA."""
-        oracle_properties = {prop.name: prop for prop in CommonSingerSchemas.ORACLE_CONNECTION_SCHEMA.wrapped.values()}
+        oracle_properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.ORACLE_CONNECTION_SCHEMA.wrapped.values()
+        }
 
         # Test Oracle-specific properties
         service_name_prop = oracle_properties["service_name"]
@@ -97,14 +103,24 @@ class TestCommonSingerSchemas:
 
         # Check LDAP-specific properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        ldap_properties = ["ldap_host", "ldap_port", "bind_dn", "bind_password", "base_dn", "use_tls"]
+        ldap_properties = [
+            "ldap_host",
+            "ldap_port",
+            "bind_dn",
+            "bind_password",
+            "base_dn",
+            "use_tls",
+        ]
 
         for prop_name in ldap_properties:
             assert prop_name in property_names
 
     def test_ldap_connection_schema_properties(self):
         """Test LDAP_CONNECTION_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.LDAP_CONNECTION_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.LDAP_CONNECTION_SCHEMA.wrapped.values()
+        }
 
         # Test ldap_host property
         host_prop = properties["ldap_host"]
@@ -143,7 +159,10 @@ class TestCommonSingerSchemas:
 
     def test_file_source_schema_properties(self):
         """Test FILE_SOURCE_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.FILE_SOURCE_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.FILE_SOURCE_SCHEMA.wrapped.values()
+        }
 
         # Test file_path property (required)
         path_prop = properties["file_path"]
@@ -169,14 +188,23 @@ class TestCommonSingerSchemas:
 
         # Check OAuth2-specific properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        oauth2_properties = ["client_id", "client_secret", "auth_url", "token_url", "api_base_url"]
+        oauth2_properties = [
+            "client_id",
+            "client_secret",
+            "auth_url",
+            "token_url",
+            "api_base_url",
+        ]
 
         for prop_name in oauth2_properties:
             assert prop_name in property_names
 
     def test_oauth2_api_schema_properties(self):
         """Test OAUTH2_API_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.OAUTH2_API_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.OAUTH2_API_SCHEMA.wrapped.values()
+        }
 
         # Test client_secret (should be secret)
         secret_prop = properties["client_secret"]
@@ -206,7 +234,10 @@ class TestCommonSingerSchemas:
 
     def test_oracle_oic_schema_properties(self):
         """Test ORACLE_OIC_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.ORACLE_OIC_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.ORACLE_OIC_SCHEMA.wrapped.values()
+        }
 
         # Test oic_host (required)
         host_prop = properties["oic_host"]
@@ -233,14 +264,24 @@ class TestCommonSingerSchemas:
 
         # Check extraction-specific properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        extraction_properties = ["start_date", "end_date", "batch_size", "max_records", "stream_maps", "stream_map_config"]
+        extraction_properties = [
+            "start_date",
+            "end_date",
+            "batch_size",
+            "max_records",
+            "stream_maps",
+            "stream_map_config",
+        ]
 
         for prop_name in extraction_properties:
             assert prop_name in property_names
 
     def test_extraction_config_schema_properties(self):
         """Test EXTRACTION_CONFIG_SCHEMA property details."""
-        properties = {prop.name: prop for prop in CommonSingerSchemas.EXTRACTION_CONFIG_SCHEMA.wrapped.values()}
+        properties = {
+            prop.name: prop
+            for prop in CommonSingerSchemas.EXTRACTION_CONFIG_SCHEMA.wrapped.values()
+        }
 
         # Test datetime properties
         start_date_prop = properties["start_date"]
@@ -265,7 +306,15 @@ class TestCommonSingerSchemas:
 
         # Should include Oracle connection properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        oracle_properties = ["host", "port", "username", "password", "database", "service_name", "sid"]
+        oracle_properties = [
+            "host",
+            "port",
+            "username",
+            "password",
+            "database",
+            "service_name",
+            "sid",
+        ]
         extraction_properties = ["start_date", "batch_size", "stream_maps"]
 
         for prop_name in oracle_properties + extraction_properties:
@@ -280,7 +329,14 @@ class TestCommonSingerSchemas:
 
         # Should include LDAP connection properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        ldap_properties = ["ldap_host", "ldap_port", "bind_dn", "bind_password", "base_dn", "use_tls"]
+        ldap_properties = [
+            "ldap_host",
+            "ldap_port",
+            "bind_dn",
+            "bind_password",
+            "base_dn",
+            "use_tls",
+        ]
         extraction_properties = ["start_date", "batch_size"]
 
         for prop_name in ldap_properties + extraction_properties:
@@ -310,7 +366,13 @@ class TestCommonSingerSchemas:
 
         # Should include OAuth2 API properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        oauth2_properties = ["client_id", "client_secret", "auth_url", "token_url", "api_base_url"]
+        oauth2_properties = [
+            "client_id",
+            "client_secret",
+            "auth_url",
+            "token_url",
+            "api_base_url",
+        ]
         extraction_properties = ["start_date", "batch_size"]
 
         for prop_name in oauth2_properties + extraction_properties:
@@ -362,7 +424,15 @@ class TestCommonSingerSchemas:
 
         # Should include Oracle connection properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        oracle_properties = ["host", "port", "username", "password", "database", "service_name", "sid"]
+        oracle_properties = [
+            "host",
+            "port",
+            "username",
+            "password",
+            "database",
+            "service_name",
+            "sid",
+        ]
 
         for prop_name in oracle_properties:
             assert prop_name in property_names
@@ -443,7 +513,13 @@ class TestFactoryFunctions:
 
         # Should include Oracle and extraction properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        expected_properties = ["host", "service_name", "sid", "start_date", "batch_size"]
+        expected_properties = [
+            "host",
+            "service_name",
+            "sid",
+            "start_date",
+            "batch_size",
+        ]
 
         for prop_name in expected_properties:
             assert prop_name in property_names
@@ -451,7 +527,9 @@ class TestFactoryFunctions:
     def test_create_oracle_tap_schema_with_additional_properties(self):
         """Test create_oracle_tap_schema with additional properties."""
         additional_props = th.PropertiesList(
-            th.Property("oracle_specific", th.StringType, description="Oracle specific field"),
+            th.Property(
+                "oracle_specific", th.StringType, description="Oracle specific field"
+            ),
         )
 
         schema = create_oracle_tap_schema(additional_props)
@@ -473,7 +551,13 @@ class TestFactoryFunctions:
 
         # Should include LDAP and extraction properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        expected_properties = ["ldap_host", "bind_dn", "base_dn", "start_date", "batch_size"]
+        expected_properties = [
+            "ldap_host",
+            "bind_dn",
+            "base_dn",
+            "start_date",
+            "batch_size",
+        ]
 
         for prop_name in expected_properties:
             assert prop_name in property_names
@@ -502,7 +586,13 @@ class TestFactoryFunctions:
 
         # Should include file and extraction properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        expected_properties = ["file_path", "file_format", "encoding", "start_date", "batch_size"]
+        expected_properties = [
+            "file_path",
+            "file_format",
+            "encoding",
+            "start_date",
+            "batch_size",
+        ]
 
         for prop_name in expected_properties:
             assert prop_name in property_names
@@ -516,7 +606,13 @@ class TestFactoryFunctions:
 
         # Should include OAuth2 and extraction properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        expected_properties = ["client_id", "client_secret", "auth_url", "start_date", "batch_size"]
+        expected_properties = [
+            "client_id",
+            "client_secret",
+            "auth_url",
+            "start_date",
+            "batch_size",
+        ]
 
         for prop_name in expected_properties:
             assert prop_name in property_names
@@ -530,7 +626,14 @@ class TestFactoryFunctions:
 
         # Should include OIC and extraction properties
         property_names = [prop.name for prop in schema.wrapped.values()]
-        expected_properties = ["oic_host", "username", "password", "api_version", "start_date", "batch_size"]
+        expected_properties = [
+            "oic_host",
+            "username",
+            "password",
+            "api_version",
+            "start_date",
+            "batch_size",
+        ]
 
         for prop_name in expected_properties:
             assert prop_name in property_names

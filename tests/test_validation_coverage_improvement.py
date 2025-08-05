@@ -115,7 +115,9 @@ class TestValidationCoverageImprovement:
 
         # Test connection with different config
         result = await flext_meltano_test_tap_connection(
-            "tap-postgres", Path(), config,
+            "tap-postgres",
+            Path(),
+            config,
         )
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
@@ -195,7 +197,10 @@ class TestValidationCoverageImprovement:
             {},
             {"environment": "dev"},
             {"project_root": tempfile.gettempdir()},
-            {"project_root": str(Path(tempfile.gettempdir()) / "test"), "environment": "test"},
+            {
+                "project_root": str(Path(tempfile.gettempdir()) / "test"),
+                "environment": "test",
+            },
         ]
 
         for config_dict in configs:
@@ -245,7 +250,10 @@ class TestValidationCoverageImprovement:
 
         # Use async test_tap_connection method instead
         import asyncio
-        result = asyncio.run(service.test_tap_connection("tap-postgres", {"host": "localhost"}))
+
+        result = asyncio.run(
+            service.test_tap_connection("tap-postgres", {"host": "localhost"})
+        )
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
@@ -253,7 +261,9 @@ class TestValidationCoverageImprovement:
         config_long = FlextMeltanoConfig(project_root=".")
         service_long = FlextMeltanoValidationService(config_long)
 
-        result = asyncio.run(service_long.test_tap_connection("tap-csv", {"files": ["test.csv"]}))
+        result = asyncio.run(
+            service_long.test_tap_connection("tap-csv", {"files": ["test.csv"]})
+        )
         assert hasattr(result, "success")
 
     def test_validation_caching_behavior(self):

@@ -42,6 +42,16 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
+# === DEPENDENCY INJECTION UTILITIES ===
+
+try:
+    from injectable import injectable  # type: ignore[import-untyped]
+except ImportError:
+    # Fallback decorator if injectable is not available
+    def injectable(cls: type[object]) -> type[object]:
+        """Fallback injectable decorator."""
+        return cls
+
 
 def validate_directory_path(directory_path: str | None) -> str | None:
     """Validate directory path exists and is accessible.
@@ -127,6 +137,7 @@ def validate_config_value(
 
 
 __all__: list[str] = [
+    "injectable",
     "validate_config_value",
     "validate_directory_path",
     "validate_file_path",

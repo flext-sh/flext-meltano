@@ -5,8 +5,8 @@ ensuring all exception classes, error contexts, and integration patterns
 are thoroughly tested following enterprise quality standards.
 """
 
-
-from flext_meltano.singer_base import (
+# Import Singer exceptions from flext-core (singer_base.py was redundant duplication)
+from flext_core import (
     FlextSingerAuthenticationError,
     FlextSingerConfigurationError,
     FlextSingerConnectionError,
@@ -75,16 +75,23 @@ class TestFlextSingerConnectionError:
     def test_connection_error_default_initialization(self) -> None:
         """Test FlextSingerConnectionError with default parameters."""
         error = FlextSingerConnectionError()
-        assert str(error) == "[CONNECTION_ERROR] Singer connection: Singer connection failed"
+        assert (
+            str(error)
+            == "[CONNECTION_ERROR] Singer connection: Singer connection failed"
+        )
 
     def test_connection_error_with_message(self) -> None:
         """Test FlextSingerConnectionError with custom message."""
         error = FlextSingerConnectionError("Database unreachable")
-        assert str(error) == "[CONNECTION_ERROR] Singer connection: Database unreachable"
+        assert (
+            str(error) == "[CONNECTION_ERROR] Singer connection: Database unreachable"
+        )
 
     def test_connection_error_with_host(self) -> None:
         """Test FlextSingerConnectionError with host context."""
-        error = FlextSingerConnectionError("Connection failed", host="oracle.example.com")
+        error = FlextSingerConnectionError(
+            "Connection failed", host="oracle.example.com"
+        )
         assert error.context["host"] == "oracle.example.com"
 
     def test_connection_error_with_port(self) -> None:
@@ -161,12 +168,17 @@ class TestFlextSingerValidationError:
     def test_validation_error_default_initialization(self) -> None:
         """Test FlextSingerValidationError with default parameters."""
         error = FlextSingerValidationError()
-        assert str(error) == "[VALIDATION_ERROR] Singer validation: Singer validation failed"
+        assert (
+            str(error)
+            == "[VALIDATION_ERROR] Singer validation: Singer validation failed"
+        )
 
     def test_validation_error_with_message(self) -> None:
         """Test FlextSingerValidationError with custom message."""
         error = FlextSingerValidationError("Invalid email format")
-        assert str(error) == "[VALIDATION_ERROR] Singer validation: Invalid email format"
+        assert (
+            str(error) == "[VALIDATION_ERROR] Singer validation: Invalid email format"
+        )
 
     def test_validation_error_with_field(self) -> None:
         """Test FlextSingerValidationError with field context."""
@@ -223,7 +235,9 @@ class TestFlextSingerConfigurationError:
 
     def test_config_error_with_config_key(self) -> None:
         """Test FlextSingerConfigurationError with config key context."""
-        error = FlextSingerConfigurationError("Invalid value", config_key="database_url")
+        error = FlextSingerConfigurationError(
+            "Invalid value", config_key="database_url"
+        )
         assert error.context["config_key"] == "database_url"
 
     def test_config_error_with_complete_context(self) -> None:
@@ -236,7 +250,9 @@ class TestFlextSingerConfigurationError:
         )
         assert error.context["config_key"] == "oracle_url"
         assert error.context["config_section"] == "database"
-        assert error.context["expected_format"] == "oracle://user:pass@host:port/service"
+        assert (
+            error.context["expected_format"] == "oracle://user:pass@host:port/service"
+        )
 
 
 class TestFlextSingerProcessingError:
@@ -245,12 +261,18 @@ class TestFlextSingerProcessingError:
     def test_processing_error_default_initialization(self) -> None:
         """Test FlextSingerProcessingError with default parameters."""
         error = FlextSingerProcessingError()
-        assert str(error) == "[PROCESSING_ERROR] Singer processing: Singer processing failed"
+        assert (
+            str(error)
+            == "[PROCESSING_ERROR] Singer processing: Singer processing failed"
+        )
 
     def test_processing_error_with_message(self) -> None:
         """Test FlextSingerProcessingError with custom message."""
         error = FlextSingerProcessingError("Batch processing failed")
-        assert str(error) == "[PROCESSING_ERROR] Singer processing: Batch processing failed"
+        assert (
+            str(error)
+            == "[PROCESSING_ERROR] Singer processing: Batch processing failed"
+        )
 
     def test_processing_error_with_operation(self) -> None:
         """Test FlextSingerProcessingError with operation context."""
@@ -331,7 +353,9 @@ class TestFlextTargetError:
 
     def test_target_error_with_destination_system(self) -> None:
         """Test FlextTargetError with destination system context."""
-        error = FlextTargetError("Write failed", destination_system="postgres-warehouse")
+        error = FlextTargetError(
+            "Write failed", destination_system="postgres-warehouse"
+        )
         assert error.context["destination_system"] == "postgres-warehouse"
         assert error.context["component_type"] == "target"
 
@@ -370,7 +394,9 @@ class TestFlextTransformError:
 
     def test_transform_error_with_transform_name(self) -> None:
         """Test FlextTransformError with transform name context."""
-        error = FlextTransformError("Transform failed", transform_name="customer_aggregation")
+        error = FlextTransformError(
+            "Transform failed", transform_name="customer_aggregation"
+        )
         assert error.context["transform_name"] == "customer_aggregation"
         assert error.context["component_type"] == "transform"
 
@@ -444,8 +470,9 @@ class TestExceptionExports:
     """Test module exports are correctly defined."""
 
     def test_all_exceptions_exported(self) -> None:
-        """Test all exception classes are in __all__."""
-        from flext_meltano.singer_base import __all__
+        """Test all exception classes are in flext-core __all__."""
+        # Singer exceptions are now in flext-core, not singer_base.py
+        import flext_core
 
         expected_exports = [
             "FlextSingerError",
@@ -459,12 +486,16 @@ class TestExceptionExports:
             "FlextTransformError",
         ]
 
+        # Verify all exceptions are available in flext-core
         for exception_class in expected_exports:
-            assert exception_class in __all__, f"{exception_class} not exported in __all__"
+            assert hasattr(flext_core, exception_class), (
+                f"{exception_class} not available in flext-core"
+            )
 
     def test_exported_classes_are_importable(self) -> None:
-        """Test all exported classes can be imported."""
-        from flext_meltano.singer_base import (
+        """Test all exported classes can be imported from flext-core."""
+        # Import from flext-core since singer_base.py was redundant
+        from flext_core import (
             FlextSingerAuthenticationError,
             FlextSingerConfigurationError,
             FlextSingerConnectionError,

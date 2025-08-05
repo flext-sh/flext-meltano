@@ -56,13 +56,15 @@ class FlextMeltanoError(FlextError):
         self,
         message: str = "Meltano error",
         plugin_name: str | None = None,
+        context: dict[str, object] | None = None,
         **kwargs: object,
     ) -> None:
         """Initialize Meltano error with context."""
-        context = dict(kwargs)
+        error_context = dict(context) if context else {}
+        error_context.update(kwargs)
         if plugin_name is not None:
-            context["plugin_name"] = plugin_name
-        super().__init__(f"Meltano: {message}", context=context)
+            error_context["plugin_name"] = plugin_name
+        super().__init__(f"Meltano: {message}", context=error_context)
 
 
 class FlextMeltanoValidationError(FlextValidationError):
@@ -179,7 +181,7 @@ class FlextMeltanoPluginError(FlextMeltanoError):
         super().__init__(
             f"Plugin: {message}",
             plugin_name=plugin_name,
-            **context,
+            context=context,
         )
 
 
@@ -200,7 +202,7 @@ class FlextMeltanoExecutionError(FlextMeltanoError):
         if exit_code is not None:
             context["exit_code"] = exit_code
 
-        super().__init__(f"Execution: {message}", plugin_name=None, **context)
+        super().__init__(f"Execution: {message}", plugin_name=None, context=context)
 
 
 class FlextMeltanoSingerError(FlextMeltanoError):
@@ -220,7 +222,7 @@ class FlextMeltanoSingerError(FlextMeltanoError):
         if target_name is not None:
             context["target_name"] = target_name
 
-        super().__init__(f"Singer: {message}", plugin_name=None, **context)
+        super().__init__(f"Singer: {message}", plugin_name=None, context=context)
 
 
 class FlextMeltanoDBTError(FlextMeltanoError):
@@ -240,7 +242,7 @@ class FlextMeltanoDBTError(FlextMeltanoError):
         if model_name is not None:
             context["model_name"] = model_name
 
-        super().__init__(f"DBT: {message}", plugin_name=None, **context)
+        super().__init__(f"DBT: {message}", plugin_name=None, context=context)
 
 
 __all__: list[str] = [

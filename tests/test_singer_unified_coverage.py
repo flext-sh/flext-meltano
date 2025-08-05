@@ -75,7 +75,7 @@ class TestFlextSingerUnifiedConfig:
             config={"host": "localhost"},
         )
 
-        result = config.validate_domain_rules()
+        result = config.validate_business_rules()
         assert result.success
         assert result.data is None
 
@@ -86,7 +86,7 @@ class TestFlextSingerUnifiedConfig:
             config={"host": "localhost"},
         )
 
-        result = config.validate_domain_rules()
+        result = config.validate_business_rules()
         assert not result.success
         assert "non-empty string" in result.error
 
@@ -97,7 +97,7 @@ class TestFlextSingerUnifiedConfig:
             config={"host": "localhost"},
         )
 
-        result = config.validate_domain_rules()
+        result = config.validate_business_rules()
         assert not result.success
         assert "non-empty string" in result.error
 
@@ -108,7 +108,7 @@ class TestFlextSingerUnifiedConfig:
             config=None,  # Invalid config
         )
 
-        result = config.validate_domain_rules()
+        result = config.validate_business_rules()
         assert not result.success
         assert "non-empty dictionary" in result.error
 
@@ -315,7 +315,7 @@ class TestFlextSingerUnifiedResult:
             execution_time_ms=5000.0,
         )
 
-        validation = result.validate_domain_rules()
+        validation = result.validate_business_rules()
         assert validation.success
 
     def test_result_domain_rules_negative_records(self):
@@ -326,7 +326,7 @@ class TestFlextSingerUnifiedResult:
             execution_time_ms=5000.0,
         )
 
-        validation = result.validate_domain_rules()
+        validation = result.validate_business_rules()
         assert not validation.success
         assert "non-negative integer" in validation.error
 
@@ -338,7 +338,7 @@ class TestFlextSingerUnifiedResult:
             execution_time_ms=-1000.0,  # Invalid negative value
         )
 
-        validation = result.validate_domain_rules()
+        validation = result.validate_business_rules()
         assert not validation.success
 
 
@@ -355,7 +355,7 @@ class TestIntegrationSingerUnified:
         )
 
         # Validate configuration
-        validation_result = config.validate_domain_rules()
+        validation_result = config.validate_business_rules()
         assert validation_result.success
 
         # Create pipeline configuration
@@ -379,7 +379,7 @@ class TestIntegrationSingerUnified:
         )
 
         # Validation should fail
-        validation_result = invalid_config.validate_domain_rules()
+        validation_result = invalid_config.validate_business_rules()
         assert not validation_result.success
         assert "non-empty string" in validation_result.error
 

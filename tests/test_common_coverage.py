@@ -264,7 +264,7 @@ class TestValidateConfigValue:
         """Test validation with string convertible to float."""
         test_value = "3.14"
         result = validate_config_value(test_value, float, 0.0)
-        assert result == 3.14
+        assert result == math.pi
         assert isinstance(result, float)
 
     def test_validate_convertible_int_to_string(self):

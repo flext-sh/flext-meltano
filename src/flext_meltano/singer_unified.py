@@ -360,11 +360,13 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
     def execute(self) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute default Singer service operation."""
         # Default execution - return empty result
-        return FlextResult.ok(FlextSingerUnifiedResult(
-            success=True,
-            records_processed=0,
-            schemas_discovered=[],
-        ))
+        return FlextResult.ok(
+            FlextSingerUnifiedResult(
+                success=True,
+                records_processed=0,
+                schemas_discovered=[],
+            ),
+        )
 
     def execute_operation(self, *args: object, **kwargs: object) -> FlextResult[object]:
         """Execute unified Singer service operations.

@@ -144,7 +144,8 @@ class TestFlextMeltanoPipelineConfig:
         """Test FlextMeltanoPipelineConfig post-init validation failures."""
         # Empty name should raise ValueError
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="",
@@ -154,7 +155,8 @@ class TestFlextMeltanoPipelineConfig:
 
         # Empty extractor should raise ValueError
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="test-pipeline",
@@ -164,7 +166,8 @@ class TestFlextMeltanoPipelineConfig:
 
         # Empty loader should raise ValueError
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="test-pipeline",
@@ -194,7 +197,7 @@ class TestFlextMeltanoPipelineResult:
 
         assert result.id == result_id
         assert result.pipeline_name == "successful-pipeline"
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.records_processed == 1500
         assert result.duration_seconds is not None
         assert result.error_message is None
@@ -212,7 +215,7 @@ class TestFlextMeltanoPipelineResult:
         result.start_execution()
         result.fail_execution("Connection failed to database")
 
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.records_processed == 0
         assert result.error_message == "Connection failed to database"
 
@@ -248,7 +251,7 @@ class TestFlextMeltanoPipelineResult:
         )
 
         # Domain rule validation should pass
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
         assert validation_result.success
 
         # Test with empty pipeline name (should fail)
@@ -257,7 +260,7 @@ class TestFlextMeltanoPipelineResult:
             pipeline_name="",
         )
 
-        validation_result_empty = result_empty.validate_domain_rules()
+        validation_result_empty = result_empty.validate_business_rules()
         assert not validation_result_empty.success
 
 
@@ -279,7 +282,7 @@ class TestFlextMeltanoPipelineEvent:
 
         assert event.id == event_id
         assert event.pipeline_id == pipeline_id
-        assert event.event_type == PipelineEventType.STARTED
+        assert event.event_type == PipelineEventType.STARTED.value
         assert event.timestamp is not None
         assert event.data["pipeline_name"] == "test-pipeline"
 
@@ -302,7 +305,7 @@ class TestFlextMeltanoPipelineEvent:
                 data=data,
             )
 
-            assert event.event_type == event_type
+            assert event.event_type == event_type.value
             assert event.data == data
 
     def test_pipeline_event_domain_rules(self):
@@ -316,7 +319,7 @@ class TestFlextMeltanoPipelineEvent:
         )
 
         # Domain rule validation should pass
-        validation_result = event.validate_domain_rules()
+        validation_result = event.validate_business_rules()
         assert validation_result.success
 
         # Test with empty pipeline_id (should fail)
@@ -328,7 +331,7 @@ class TestFlextMeltanoPipelineEvent:
             data={},
         )
 
-        validation_result_empty = event_empty.validate_domain_rules()
+        validation_result_empty = event_empty.validate_business_rules()
         assert not validation_result_empty.success
 
 
@@ -368,7 +371,7 @@ class TestFlextMeltanoExecutionState:
 
         assert state.execution_id == "exec-123"
         assert state.current_pipeline == "pipeline-456"
-        assert state.state == ExecutionState.RUNNING
+        assert state.state == ExecutionState.RUNNING.value
         assert state.metadata == {}
 
     def test_execution_state_completed(self):
@@ -380,7 +383,7 @@ class TestFlextMeltanoExecutionState:
             metadata={"records_processed": 2500},
         )
 
-        assert state.state == ExecutionState.COMPLETED
+        assert state.state == ExecutionState.COMPLETED.value
         assert state.current_pipeline == "pipeline-abc"
         assert state.metadata["records_processed"] == 2500
 
@@ -393,7 +396,7 @@ class TestFlextMeltanoExecutionState:
             metadata={"error_message": "Database connection timeout"},
         )
 
-        assert state.state == ExecutionState.FAILED
+        assert state.state == ExecutionState.FAILED.value
         assert state.metadata["error_message"] == "Database connection timeout"
 
     def test_execution_state_serialization(self):
@@ -409,7 +412,7 @@ class TestFlextMeltanoExecutionState:
         state_dict = state.model_dump()
         assert isinstance(state_dict, dict)
         assert state_dict["execution_id"] == "exec-json"
-        assert state_dict["state"] == ExecutionState.PENDING
+        assert state_dict["state"] == ExecutionState.PENDING.value
         assert state_dict["metadata"]["created_at"] == "2025-01-01T00:00:00Z"
 
     def test_execution_state_start_pipeline_method(self):
@@ -422,7 +425,7 @@ class TestFlextMeltanoExecutionState:
         assert isinstance(execution_id, str)
         assert state.current_pipeline == "test-pipeline"
         assert state.execution_id == execution_id
-        assert state.state == ExecutionState.RUNNING
+        assert state.state == ExecutionState.RUNNING.value
         assert "started_at" in state.metadata
 
     def test_execution_state_complete_pipeline_method(self):
@@ -433,7 +436,7 @@ class TestFlextMeltanoExecutionState:
         state.start_pipeline("test-pipeline")
         state.complete_pipeline()
 
-        assert state.state == ExecutionState.COMPLETED
+        assert state.state == ExecutionState.COMPLETED.value
         assert "completed_at" in state.metadata
 
     def test_execution_state_fail_pipeline_method(self):
@@ -444,7 +447,7 @@ class TestFlextMeltanoExecutionState:
         state.start_pipeline("test-pipeline")
         state.fail_pipeline("Test error message")
 
-        assert state.state == ExecutionState.FAILED
+        assert state.state == ExecutionState.FAILED.value
         assert state.metadata["error"] == "Test error message"
         assert "failed_at" in state.metadata
 

@@ -84,7 +84,8 @@ class TestExceptionWithContext:
     def test_exception_with_configuration_context(self) -> None:
         """Test exception with configuration context."""
         error = FlextMeltanoConfigurationError(
-            "Invalid configuration", plugin_name="tap-postgres",
+            "Invalid configuration",
+            plugin_name="tap-postgres",
         )
         assert "Invalid configuration" in str(error)
         # Test that context attributes exist if they're set

@@ -265,7 +265,7 @@ make test                    # ❌ FAILING (74% coverage < 90% requirement)
 make validate                # ❌ FAILING (due to coverage requirement)
 
 # Specific Status
-Lint Errors: 0              # ✅ All ruff errors resolved 
+Lint Errors: 0              # ✅ All ruff errors resolved
 Type Errors: 0              # ✅ All MyPy strict errors resolved
 Test Coverage: 74.04%       # ❌ Below 90% requirement (target: +16%)
 Tests Passing: 742/744      # ✅ 99.7% test success rate
@@ -285,6 +285,7 @@ python scripts/flext_meltano_bridge.py list_plugins
 ### Next Phase Priorities (CURRENT FOCUS)
 
 1. **🎯 CRITICAL: Test Coverage Gap**: Increase from 74.04% to 90% minimum (16% gap)
+
    - **Low-coverage modules requiring immediate attention**:
    - `singer_base.py`: 22% coverage (major gap)
    - `singer_unified.py`: 45% coverage (needs improvement)
@@ -435,6 +436,7 @@ PYTHONPATH=$(PWD)/src:$(PYTHONPATH)  # Python path setup for development
 ⚠️ **Current Blockers**:
 
 1. **🚨 CRITICAL: Test Coverage Deficit**: 74.04% vs 90% requirement (15.96% gap)
+
    - **singer_base.py**: 22% coverage - major functionality untested
    - **singer_unified.py**: 45% coverage - unified interface needs comprehensive tests
    - **container.py**: 61% coverage - dependency injection container undertested

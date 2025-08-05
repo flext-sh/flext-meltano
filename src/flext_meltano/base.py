@@ -121,22 +121,16 @@ from typing import TYPE_CHECKING, cast
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
+    FlextConfig,
     FlextEntity,
     FlextGenerators,
     FlextLogger,
     FlextResult,
 )
+from pydantic import Field, field_validator
 
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
-
-
-from pydantic import BaseModel, Field, field_validator
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -145,8 +139,8 @@ if TYPE_CHECKING:
     from singer_sdk import Tap, Target
 
 
-class FlextMeltanoConfig(BaseModel):
-    """Configuration value object using MANDATORY flext-core patterns."""
+class FlextMeltanoConfig(FlextConfig):
+    """Configuration using flext-core FlextConfig pattern (removes BaseModel duplication)."""
 
     project_root: str = Field(default=".", description="Meltano project root directory")
     environment: str = Field(default="dev", description="Meltano environment")
@@ -186,12 +180,6 @@ class FlextMeltanoConfig(BaseModel):
                 path.mkdir(parents=True, exist_ok=True)
         return str(path.absolute())
 
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = True
-        extra = "forbid"
-
 
 class FlextMeltanoEvent(FlextEntity):
     """Event entity using MANDATORY flext-core patterns."""
@@ -208,13 +196,8 @@ class FlextMeltanoEvent(FlextEntity):
     source: str = Field(..., description="Event source component")
     data: dict[str, object] = Field(default_factory=dict, description="Event data")
 
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = True  # Entities are immutable after creation
-
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate event domain rules."""
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate event business rules."""
         if not self.event_type.strip():
             return FlextResult(error="Event type cannot be empty")
         if not self.source.strip():

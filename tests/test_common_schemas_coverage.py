@@ -11,6 +11,7 @@ def test_common_schemas_module_imports():
     """Test that common_schemas module can be imported without errors."""
     try:
         import flext_meltano.common_schemas
+
         assert flext_meltano.common_schemas is not None
     except ImportError:
         pytest.skip("common_schemas module not available for import")
@@ -122,7 +123,9 @@ class TestCommonSchemasFunctions:
 
             # Safely discover functions
             members = inspect.getmembers(schemas_module)
-            functions = [member for name, member in members if inspect.isfunction(member)]
+            functions = [
+                member for name, member in members if inspect.isfunction(member)
+            ]
 
             # Just count functions without calling
             function_count = len(functions)
@@ -145,7 +148,9 @@ class TestCommonSchemasFunctions:
 
             # Safely discover functions
             members = inspect.getmembers(schemas_module)
-            functions = [member for name, member in members if inspect.isfunction(member)]
+            functions = [
+                member for name, member in members if inspect.isfunction(member)
+            ]
 
             # Test signatures exist
             for func in functions[:2]:  # Limit for safety
@@ -155,6 +160,7 @@ class TestCommonSchemasFunctions:
                 except Exception as e:
                     # Log and skip if signature inspection fails
                     import logging
+
                     logger = logging.getLogger(__name__)
                     logger.debug("Signature inspection failed: %s", str(e))
                     continue
@@ -173,14 +179,18 @@ class TestCommonSchemasConstants:
 
             attrs = dir(schemas_module)
             # Look for uppercase constants
-            constants = [attr for attr in attrs if attr.isupper() and not attr.startswith("_")]
+            constants = [
+                attr for attr in attrs if attr.isupper() and not attr.startswith("_")
+            ]
 
             # Test constants accessibility
             for const in constants[:5]:  # Limit for safety
                 if hasattr(schemas_module, const):
                     value = getattr(schemas_module, const)
                     # Just verify we can access without error
-                    assert value is not None or value is None  # Always true, for coverage
+                    assert (
+                        value is not None or value is None
+                    )  # Always true, for coverage
 
         except (ImportError, Exception):
             pytest.skip("Constants test not available or failed safely")
