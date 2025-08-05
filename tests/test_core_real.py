@@ -135,7 +135,7 @@ class TestFlextMeltanoPipelineConfig:
 
         # Should not be able to modify
         with pytest.raises(AttributeError):
-            config.name = "modified_name"  # type: ignore[misc]
+            config.name = "modified_name"
 
 
 class TestFlextMeltanoPipelineResult:

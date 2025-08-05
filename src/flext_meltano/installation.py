@@ -206,7 +206,7 @@ class FlextMeltanoInstaller:
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         force: bool = False,
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         '''Install plugin with comprehensive validation and error handling.'''
         try:
             # Pre-installation validation
@@ -242,8 +242,8 @@ class FlextMeltanoInstaller:
 ### Configuration Management
 ```python
 def configure_plugin_with_validation(
-    plugin_name: str, config_data: Dict[str, Any], validate_connection: bool = True
-) -> FlextResult[Dict[str, Any]]:
+    plugin_name: str, config_data: dict[str, object], validate_connection: bool = True
+) -> FlextResult[dict[str, object]]:
     '''Configure plugin with validation and connection testing.'''
     try:
         # Validate configuration schema
@@ -283,7 +283,7 @@ def configure_plugin_with_validation(
 ```python
 def validate_installation_prerequisites(
     plugin_type: str, plugin_name: str
-) -> FlextResult[Dict[str, Any]]:
+) -> FlextResult[dict[str, object]]:
     '''Validate installation prerequisites and environment.'''
     validation_results = {}
 
@@ -330,7 +330,7 @@ class DependencyResolver:
 
     def resolve_plugin_dependencies(
         self, plugin_name: str, variant: Optional[str] = None
-    ) -> FlextResult[List[Dict[str, Any]]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         '''Resolve plugin dependencies with conflict detection.'''
         try:
             # Get plugin metadata from Hub

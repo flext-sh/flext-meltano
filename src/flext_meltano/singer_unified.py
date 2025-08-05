@@ -66,7 +66,7 @@ class FlextTapOracle(FlextSingerUnifiedInterface):
         self.connection = create_oracle_connection(config.config)
         return FlextResult.ok(None)
 
-    def discover_catalog(self) -> FlextResult[Dict[str, Any]]:
+    def discover_catalog(self) -> FlextResult[dict[str, object]]:
         # Discover Oracle schemas and tables
         return FlextResult.ok(self.connection.discover_schemas())
 
@@ -107,7 +107,7 @@ if result.success:
 ### Bridge Integration
 ```python
 # Unified service operations for Go bridge consumption
-def bridge_execute_unified_pipeline(config_json: str) -> Dict[str, Any]:
+def bridge_execute_unified_pipeline(config_json: str) -> dict[str, object]:
     '''Execute unified pipeline with JSON config for Go services.'''
     config = json.loads(config_json)
     service = create_unified_singer_service()

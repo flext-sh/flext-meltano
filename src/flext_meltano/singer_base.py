@@ -94,7 +94,7 @@ from flext_meltano.singer_base import FlextSingerConfigurationError
 
 
 # Configuration validation with specific key context
-def validate_config(config: Dict[str, Any]) -> None:
+def validate_config(config: dict[str, object]) -> None:
     if "database_url" not in config:
         raise FlextSingerConfigurationError(
             "Missing required database connection URL", config_key="database_url"
@@ -132,7 +132,7 @@ func (c *FlextMeltanoClient) HandleSingerError(output []byte) error {
 ### Error Context Serialization
 ```python
 # Standard error context format for bridge consumption
-def serialize_singer_error(error: FlextSingerError) -> Dict[str, Any]:
+def serialize_singer_error(error: FlextSingerError) -> dict[str, object]:
     '''Convert Singer error to JSON-serializable format for Go services.'''
     return {
         "error_type": "singer_error",

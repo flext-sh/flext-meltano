@@ -60,19 +60,19 @@ class FlextMeltanoBridge:
     def get_version(self) -> FlextResult[Dict[str, str]]:
         '''Get Meltano version information for Go services.'''
 
-    def list_plugins(self) -> FlextResult[List[Dict[str, Any]]]:
+    def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
         '''List all available plugins for Go services.'''
 
     def add_plugin(self, plugin_type: str, name: str, **kwargs) -> FlextResult[str]:
         '''Add plugin to Meltano project via Go service request.'''
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, Any]]:
+    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
         '''Discover schema catalog from tap for Go services.'''
 
-    def run_pipeline(self, tap: str, target: str, **kwargs) -> FlextResult[Dict[str, Any]]:
+    def run_pipeline(self, tap: str, target: str, **kwargs) -> FlextResult[dict[str, object]]:
         '''Execute pipeline between tap and target for Go services.'''
 
-    def invoke_dbt(self, command: str, *args: str, **kwargs) -> FlextResult[Dict[str, Any]]:
+    def invoke_dbt(self, command: str, *args: str, **kwargs) -> FlextResult[dict[str, object]]:
         '''Execute DBT command for Go services.'''
 ```
 
@@ -283,8 +283,8 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from typing import Any
 
+# Removed typing.Any import - using specific types
 from flext_core import FlextResult
 
 from flext_meltano.base import FlextMeltanoConfig
@@ -355,7 +355,7 @@ class FlextMeltanoBridge:
         except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as e:
             return FlextResult.fail(f"Failed to get version information: {e}")
 
-    def list_plugins(self) -> FlextResult[list[dict[str, Any]]]:
+    def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
         """List all available plugins for Go services.
 
         Returns:
@@ -428,7 +428,7 @@ class FlextMeltanoBridge:
             "Plugin installation requires initialized Meltano project",
         )
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, Any]]:  # noqa: ARG002
+    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:  # noqa: ARG002
         """Discover schema catalog from tap for Go services.
 
         Args:
@@ -458,7 +458,7 @@ class FlextMeltanoBridge:
         *,
         environment: str | None = None,
         job_id: str | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute pipeline between tap and target for Go services.
 
         Args:
@@ -489,7 +489,7 @@ class FlextMeltanoBridge:
 
             # Process results
             if result.success:
-                pipeline_result = {
+                pipeline_result: dict[str, object] = {
                     "status": "success",
                     "tap": tap,
                     "target": target,
@@ -510,7 +510,7 @@ class FlextMeltanoBridge:
         command: str,  # noqa: ARG002
         *args: str,  # noqa: ARG002
         **kwargs: object,  # noqa: ARG002
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute DBT command for Go services.
 
         Args:

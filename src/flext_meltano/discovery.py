@@ -77,7 +77,7 @@ if result.success:
 ### Bridge Integration
 ```python
 # Discovery operations designed for bridge consumption
-def bridge_discover_plugins() -> Dict[str, Any]:
+def bridge_discover_plugins() -> dict[str, object]:
     '''Bridge-friendly plugin discovery with JSON-serializable results.'''
     result = discover_plugins()
 
@@ -171,11 +171,11 @@ class FlextMeltanoDiscoverer:
 
     def discover_plugins_by_type(
         self, plugin_type: str
-    ) -> FlextResult[List[Dict[str, Any]]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         '''Discover plugins filtered by type (extractor, loader, transformer).'''
         # Implementation with Hub integration
 
-    def discover_plugin_details(self, plugin_name: str) -> FlextResult[Dict[str, Any]]:
+    def discover_plugin_details(self, plugin_name: str) -> FlextResult[dict[str, object]]:
         '''Get detailed information about a specific plugin.'''
         # Implementation with detailed metadata
 ```
@@ -183,8 +183,8 @@ class FlextMeltanoDiscoverer:
 ### Catalog Operations
 ```python
 def discover_catalog_with_validation(
-    tap_name: str, config: Optional[Dict[str, Any]] = None
-) -> FlextResult[Dict[str, Any]]:
+    tap_name: str, config: dict[str, object] | None = None
+) -> FlextResult[dict[str, object]]:
     '''Discover catalog with configuration validation.'''
     try:
         # Validate tap is available
@@ -216,11 +216,11 @@ class PluginDiscoveryCache:
         self._cache = {}
         self._ttl = ttl
 
-    def get_cached_plugins(self) -> Optional[List[Dict[str, Any]]]:
+    def get_cached_plugins(self) -> list[dict[str, object]] | None:
         '''Get cached plugin list if available and not expired.'''
         # Cache implementation
 
-    def cache_plugins(self, plugins: List[Dict[str, Any]]) -> None:
+    def cache_plugins(self, plugins: list[dict[str, object]]) -> None:
         '''Cache plugin list with expiration.'''
         # Cache storage implementation
 ```
@@ -261,7 +261,7 @@ def handle_discovery_errors(operation: str) -> Callable:
 
 ### Bridge Error Formatting
 ```python
-def format_discovery_error_for_bridge(error: str) -> Dict[str, Any]:
+def format_discovery_error_for_bridge(error: str) -> dict[str, object]:
     '''Format discovery errors for Go service consumption.'''
     return {
         "success": False,

@@ -163,7 +163,7 @@ else:
 ### Bridge-Compatible Operations
 ```python
 # Bridge operations designed for subprocess consumption
-def bridge_create_singer_message(message_type: str, **kwargs) -> Dict[str, Any]:
+def bridge_create_singer_message(message_type: str, **kwargs) -> dict[str, object]:
     '''Create Singer message with JSON-serializable results for Go services.'''
     bridge = flext_create_singer_bridge()
     result = bridge.flext_singer_create_message(message_type, **kwargs)
@@ -175,7 +175,7 @@ def bridge_create_singer_message(message_type: str, **kwargs) -> Dict[str, Any]:
         "error": result.error_message if result.is_failure else None
     }
 
-def bridge_process_singer_stream(input_data: List[str]) -> Dict[str, Any]:
+def bridge_process_singer_stream(input_data: list[str]) -> dict[str, object]:
     '''Process Singer message stream for Go service integration.'''
     bridge = flext_create_singer_bridge()
     processed_messages = []

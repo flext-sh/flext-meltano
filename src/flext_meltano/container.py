@@ -166,7 +166,7 @@ print(json.dumps(services))
 ### Container Configuration Bridge
 ```python
 # Bridge operations for container configuration
-def bridge_configure_meltano_container(config_json: str) -> Dict[str, Any]:
+def bridge_configure_meltano_container(config_json: str) -> dict[str, object]:
     '''Configure Meltano container with JSON config for Go services.'''
     try:
         config_data = json.loads(config_json)
@@ -186,7 +186,7 @@ def bridge_configure_meltano_container(config_json: str) -> Dict[str, Any]:
             "error": str(e)
         }
 
-def bridge_create_meltano_services() -> Dict[str, Any]:
+def bridge_create_meltano_services() -> dict[str, object]:
     '''Create all Meltano services for Go service consumption.'''
     container = get_meltano_container()
     services_created = {}
