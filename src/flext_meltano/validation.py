@@ -260,28 +260,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
-from flext_core import FlextResult
-
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
-
-
-from pydantic import BaseModel, Field
+from flext_core import FlextModel, FlextResult
+from pydantic import Field
 
 # Singer SDK integration - MANDATORY for tap validation
 from flext_meltano.base import FlextMeltanoConfig
+
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 from flext_meltano.execution import FlextMeltanoResult
 
 # Forward declaration for legacy compatibility
 
 
-class FlextMeltanoValidationContext(BaseModel):
-    """Validation context for project and configuration checks."""
+class FlextMeltanoValidationContext(FlextModel):
+    """Validation context using flext-core FlextModel pattern (removes BaseModel duplication)."""
 
     validation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -290,14 +283,9 @@ class FlextMeltanoValidationContext(BaseModel):
     timeout_seconds: int = Field(default=30)
     metadata: dict[str, object] = Field(default_factory=dict)
 
-    class Config:
-        """Pydantic configuration."""
 
-        arbitrary_types_allowed = True
-
-
-class FlextMeltanoValidationResult(BaseModel):
-    """Validation result entity."""
+class FlextMeltanoValidationResult(FlextModel):
+    """Validation result using flext-core FlextModel pattern (removes BaseModel duplication)."""
 
     validation_id: str = Field(...)
     validation_type: str = Field(...)
@@ -306,11 +294,6 @@ class FlextMeltanoValidationResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     details: dict[str, object] = Field(default_factory=dict)
     validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = True
 
 
 @injectable
@@ -608,7 +591,9 @@ class FlextMeltanoValidationService:
             details: dict[str, object] = {
                 "tap_name": tap_name,
                 "config_type": "unknown",
-                "config_keys": list(config.keys()) if config and isinstance(config, dict) else [],
+                "config_keys": list(config.keys())
+                if config and isinstance(config, dict)
+                else [],
             }
 
             # Validate configuration based on type

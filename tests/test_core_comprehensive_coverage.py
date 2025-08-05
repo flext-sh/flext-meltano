@@ -191,7 +191,8 @@ class TestFlextMeltanoPipelineResultEntity:
         result = FlextMeltanoPipelineResult(pipeline_name="test-pipeline")
 
         assert result.pipeline_name == "test-pipeline"
-        assert result.state == ExecutionState.PENDING
+        # Note: Due to use_enum_values=True in model_config, enum gets converted to value
+        assert result.state == ExecutionState.PENDING.value
         assert result.started_at is None
         assert result.completed_at is None
         assert result.duration_seconds is None
@@ -208,7 +209,7 @@ class TestFlextMeltanoPipelineResultEntity:
         # Start execution
         result.start_execution()
 
-        assert result.state == ExecutionState.RUNNING
+        assert result.state == ExecutionState.RUNNING.value
         assert result.started_at is not None
         assert isinstance(result.started_at, datetime)
 
@@ -220,7 +221,7 @@ class TestFlextMeltanoPipelineResultEntity:
         result.start_execution()
         result.complete_execution(records_processed=1000)
 
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.completed_at is not None
         assert result.records_processed == 1000
         assert result.duration_seconds is not None
@@ -235,7 +236,7 @@ class TestFlextMeltanoPipelineResultEntity:
         error_msg = "Test error occurred"
         result.fail_execution(error_msg)
 
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.completed_at is not None
         assert result.error_message == error_msg
         assert result.duration_seconds is not None
@@ -245,7 +246,7 @@ class TestFlextMeltanoPipelineResultEntity:
         """Test pipeline result domain validation success."""
         result = FlextMeltanoPipelineResult(pipeline_name="valid-pipeline")
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert validation_result.success
         assert validation_result.data is None
@@ -254,7 +255,7 @@ class TestFlextMeltanoPipelineResultEntity:
         """Test pipeline result domain validation failure."""
         result = FlextMeltanoPipelineResult(pipeline_name="  ")  # Only whitespace
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert not validation_result.success
         assert validation_result.error == "Pipeline name cannot be empty"
@@ -271,7 +272,7 @@ class TestFlextMeltanoPipelineEventEntity:
         )
 
         assert event.pipeline_id == "test-pipeline-id"
-        assert event.event_type == PipelineEventType.STARTED
+        assert event.event_type == PipelineEventType.STARTED.value
         assert isinstance(event.timestamp, datetime)
         assert isinstance(event.data, dict)
         assert event.source == "flext-meltano"
@@ -303,7 +304,7 @@ class TestFlextMeltanoPipelineEventEntity:
             event_type=PipelineEventType.CREATED,
         )
 
-        validation_result = event.validate_domain_rules()
+        validation_result = event.validate_business_rules()
 
         assert validation_result.success
         assert validation_result.data is None
@@ -315,7 +316,7 @@ class TestFlextMeltanoPipelineEventEntity:
             event_type=PipelineEventType.CREATED,
         )
 
-        validation_result = event.validate_domain_rules()
+        validation_result = event.validate_business_rules()
 
         assert not validation_result.success
         assert validation_result.error == "Pipeline ID cannot be empty"
@@ -336,7 +337,7 @@ class TestFlextMeltanoPipelineEventEntity:
                 event_type=event_type,
             )
 
-            assert event.event_type == event_type
+            assert event.event_type == event_type.value
             assert f"pipeline-{event_type.name.lower()}" in event.pipeline_id
 
 
@@ -349,7 +350,7 @@ class TestFlextMeltanoExecutionStateManagement:
 
         assert state.current_pipeline is None
         assert state.execution_id is None
-        assert state.state == ExecutionState.PENDING
+        assert state.state == ExecutionState.PENDING.value
         assert isinstance(state.metadata, dict)
         assert len(state.metadata) == 0
 
@@ -363,7 +364,7 @@ class TestFlextMeltanoExecutionStateManagement:
         assert len(execution_id) > 0
         assert state.current_pipeline == "test-pipeline"
         assert state.execution_id == execution_id
-        assert state.state == ExecutionState.RUNNING
+        assert state.state == ExecutionState.RUNNING.value
         assert "started_at" in state.metadata
 
     def test_execution_state_complete_pipeline(self):
@@ -374,7 +375,7 @@ class TestFlextMeltanoExecutionStateManagement:
         state.start_pipeline("test-pipeline")
         state.complete_pipeline()
 
-        assert state.state == ExecutionState.COMPLETED
+        assert state.state == ExecutionState.COMPLETED.value
         assert "completed_at" in state.metadata
 
     def test_execution_state_fail_pipeline(self):
@@ -386,7 +387,7 @@ class TestFlextMeltanoExecutionStateManagement:
         error_msg = "Test error occurred"
         state.fail_pipeline(error_msg)
 
-        assert state.state == ExecutionState.FAILED
+        assert state.state == ExecutionState.FAILED.value
         assert state.metadata["error"] == error_msg
         assert "failed_at" in state.metadata
 
@@ -429,11 +430,13 @@ class TestFlextMeltanoRepositoryAggregateRoot:
 
     def create_test_repository(self, name: str) -> FlextMeltanoRepository:
         """Create a test repository with required abstract method implementation."""
+
         # Create a concrete implementation for testing
         class TestRepository(FlextMeltanoRepository):
             def validate_domain_rules(self):
                 """Test implementation of abstract method."""
                 from flext_core import FlextResult
+
                 if not self.name.strip():
                     return FlextResult(error="Repository name cannot be empty")
                 return FlextResult(data=None)
@@ -481,7 +484,7 @@ class TestCoreModuleIntegration:
         state.fail_pipeline(error_message)
 
         # Verify failure state
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.error_message == error_message
-        assert event.event_type == PipelineEventType.FAILED
-        assert state.state == ExecutionState.FAILED
+        assert event.event_type == PipelineEventType.FAILED.value
+        assert state.state == ExecutionState.FAILED.value

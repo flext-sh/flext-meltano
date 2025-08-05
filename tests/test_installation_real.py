@@ -231,8 +231,10 @@ class TestFlextMeltanoPluginInfo:
             type="extractor",
             namespace="tap_csv",
         )
-        with pytest.raises(Exception, match=".*"):  # ValidationError from Pydantic
-            plugin.name = "changed"
+        # FlextModel is mutable (frozen=False), FlextValue is immutable
+        # Plugin info is a model, not a value object, so mutation is allowed
+        plugin.name = "changed"
+        assert plugin.name == "changed"
 
 
 class TestFactoryFunctions:

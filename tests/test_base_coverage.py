@@ -214,7 +214,7 @@ class TestFlextMeltanoEvent:
     def test_event_validate_domain_rules_empty_event_type(self) -> None:
         """Test event validation with empty event type."""
         event = FlextMeltanoEvent(event_type="  ", source="test", data={})
-        result = event.validate_domain_rules()
+        result = event.validate_business_rules()
         assert not result.success
         assert result.error is not None
         assert result.error is not None
@@ -225,7 +225,7 @@ class TestFlextMeltanoEvent:
     def test_event_validate_domain_rules_empty_source(self) -> None:
         """Test event validation with empty source."""
         event = FlextMeltanoEvent(event_type="test", source="  ", data={})
-        result = event.validate_domain_rules()
+        result = event.validate_business_rules()
         assert not result.success
         assert result.error is not None
         assert result.error is not None
@@ -236,7 +236,7 @@ class TestFlextMeltanoEvent:
     def test_event_validate_domain_rules_success(self) -> None:
         """Test event validation success."""
         event = FlextMeltanoEvent(event_type="test", source="test", data={})
-        result = event.validate_domain_rules()
+        result = event.validate_business_rules()
         assert result.success
         assert result.data is None
 

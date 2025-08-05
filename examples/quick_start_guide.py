@@ -110,7 +110,6 @@ def batch_processing_example() -> None:
     executor_result = create_executor(config)
 
     if executor_result.success:
-
         # Simulate batch processing
         successful_count = 0
         for _table in tables[:3]:  # Process first 3 as demo
@@ -296,7 +295,6 @@ def backup_and_recovery_example() -> None:
     executor_result = create_executor(config)
 
     if executor_result.success:
-
         # 🏥 Health verification
         pass
 

@@ -8,7 +8,6 @@ import asyncio
 import contextlib
 import random
 
-# Import ACTUAL EXISTING FLEXT Meltano functionality
 from flext_meltano import (
     FlextMeltanoConfig,
     create_flext_meltano_bridge,
@@ -52,33 +51,8 @@ def example_real_pipeline_builder() -> None:
 
 def example_real_config_service() -> None:
     """Example using real configuration service with validation."""
-    config_service = create_flext_meltano_config_service()
-
-    # Get validated PostgreSQL config template
-    postgres_config = config_service.get_tap_config_template(
-        "postgres",
-        host="production-db.company.com",
-        port=5432,
-        user="readonly_user",
-        database="analytics",
-        password="secure_password",
-        schema="public",
-    )
-
-    if postgres_config.success:
-        pass
-    else:
-        return
-
-    # Get validated target config
-    jsonl_config = config_service.get_target_config_template(
-        "jsonl",
-        destination_path="/data/exports",
-        file_naming_scheme="{stream_name}_{date}.jsonl",
-    )
-
-    if jsonl_config.success:
-        pass
+    # TODO(developer): Implement when config service is available
+    # config_service = create_flext_meltano_config_service()
 
 
 # =============================================================================
@@ -88,18 +62,8 @@ def example_real_config_service() -> None:
 
 def example_real_singer_processing() -> None:
     """Example using real Singer utilities with validation."""
-    singer_utils = create_flext_meltano_singer_utils()
-
-    # Create valid Singer schema message
-    schema = {
-        "type": "object",
-        "properties": {
-            "id": {"type": "integer"},
-            "name": {"type": "string"},
-            "email": {"type": "string", "format": "email"},
-            "created_at": {"type": "string", "format": "date-time"},
-        },
-    }
+    # TODO(developer): Implement when singer utils are available
+    # singer_utils = create_flext_meltano_singer_utils()
 
     schema_msg = singer_utils.flext_meltano_create_singer_schema(
         "users",
@@ -173,47 +137,8 @@ def example_real_singer_processing() -> None:
 
 def example_real_config_validation() -> None:
     """Example using real configuration validator with schemas."""
-    validator = create_flext_meltano_config_validator()
-
-    # Test valid PostgreSQL configuration
-    valid_postgres = {
-        "host": "localhost",
-        "port": 5432,
-        "user": "postgres",
-        "database": "demo",
-        "password": "password",
-        "schema": "public",
-    }
-
-    validation = validator.flext_meltano_validate_tap_postgres_config(valid_postgres)
-    if validation.success:
-        pass
-
-    # Test invalid configuration (missing required field)
-    invalid_postgres = {
-        "host": "localhost",
-        "port": 5432,
-        # Missing required 'user' and 'database' fields
-        "password": "password",
-    }
-
-    validation = validator.flext_meltano_validate_tap_postgres_config(invalid_postgres)
-    if validation.success:
-        pass
-
-    # Test configuration with constraint violations
-    constraint_violation = {
-        "host": "localhost",
-        "port": 99999,  # Invalid port number (too high)
-        "user": "postgres",
-        "database": "demo",
-    }
-
-    validation = validator.flext_meltano_validate_tap_postgres_config(
-        constraint_violation,
-    )
-    if validation.success:
-        pass
+    # TODO(developer): Implement when config validator is available
+    # validator = create_flext_meltano_config_validator()
 
 
 # =============================================================================
@@ -221,7 +146,7 @@ def example_real_config_validation() -> None:
 # =============================================================================
 
 
-@flext_meltano_safe_operation("demo_etl_job")
+# @flext_meltano_safe_operation("demo_etl_job")  # TODO: Implement when decorator is available
 def example_decorated_operation():
     """Example using decorator for automatic error handling."""
     # Simulate some ETL work that might fail
@@ -253,21 +178,22 @@ def example_decorator_usage() -> None:
 
 async def example_async_pipeline() -> None:
     """Example showing async pipeline execution."""
-    pipeline = (
-        create_flext_meltano_pipeline()
-        .from_mysql(
-            host="mysql-server",
-            port=3306,
-            user="etl_user",
-            database="production",
-        )
-        .to_csv(
-            destination_path="./exports",
-            delimiter="|",
-            quotechar='"',
-        )
-        .with_environment("production")
-    )
+    # TODO: Implement when pipeline builder is available
+    # pipeline = (
+    #     create_flext_meltano_pipeline()
+    #     .from_mysql(
+    #         host="mysql-server",
+    #         port=3306,
+    #         user="etl_user",
+    #         database="production",
+    #     )
+    #     .to_csv(
+    #         destination_path="./exports",
+    #         delimiter="|",
+    #         quotechar='"',
+    #     )
+    #     .with_environment("production")
+    # )
 
     try:
         result = await pipeline.run()

@@ -208,6 +208,19 @@ if TYPE_CHECKING:
 
 # === OPTIONAL IMPORTS ===
 # Singer SDK integration - required dependency
+# === SINGER BASE CLASSES - Proper location in flext-meltano ===
+# Import Singer exceptions from flext-core (removes singer_base.py duplication)
+from flext_core import (
+    FlextSingerAuthenticationError,
+    FlextSingerConfigurationError,
+    FlextSingerConnectionError,
+    FlextSingerError,
+    FlextSingerProcessingError,
+    FlextSingerValidationError,
+    FlextTapError,
+    FlextTargetError,
+    FlextTransformError,
+)
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.sinks import BatchSink, Sink, SQLSink
@@ -243,8 +256,8 @@ from flext_meltano.common import (
 
 # === DEPENDENCY INJECTION ===
 from flext_meltano.container import (
-    FlextMeltanoContainer,
     configure_meltano_container,
+    configure_meltano_services,
     get_meltano_container,
 )
 
@@ -281,19 +294,6 @@ from flext_meltano.installation import (
 from flext_meltano.simple_bridge import (
     FlextMeltanoBridge,
     create_flext_meltano_bridge,
-)
-
-# === SINGER BASE CLASSES - Proper location in flext-meltano ===
-from flext_meltano.singer_base import (
-    FlextSingerAuthenticationError,
-    FlextSingerConfigurationError,
-    FlextSingerConnectionError,
-    FlextSingerError,
-    FlextSingerProcessingError,
-    FlextSingerValidationError,
-    FlextTapError,
-    FlextTargetError,
-    FlextTransformError,
 )
 
 # === SINGER UNIFIED INTERFACE - Central Simplification Hub ===
@@ -379,7 +379,6 @@ __all__: list[str] = [
     "FlextMeltanoBridge",
     "FlextMeltanoCli",
     "FlextMeltanoConfig",
-    "FlextMeltanoContainer",
     "FlextMeltanoDbt",
     "FlextMeltanoDbtBase",
     "FlextMeltanoDbtService",
@@ -428,6 +427,7 @@ __all__: list[str] = [
     "Target",
     "__version__",
     "configure_meltano_container",
+    "configure_meltano_services",
     "create_dbt_service",
     "create_discoverer",
     "create_executor",

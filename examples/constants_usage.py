@@ -69,7 +69,11 @@ def example_environment_usage() -> None:
         pass
 
     # Demonstrar diferentes environments
-    for env_name in [MeltanoEnvironment.DEV, MeltanoEnvironment.STAGING, MeltanoEnvironment.PROD]:
+    for env_name in [
+        MeltanoEnvironment.DEV,
+        MeltanoEnvironment.STAGING,
+        MeltanoEnvironment.PROD,
+    ]:
         FlextMeltanoConfig(project_root="./demo", environment=env_name)
 
 

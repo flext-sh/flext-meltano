@@ -275,20 +275,15 @@ from flext_core import (
     FlextAggregateRoot,
     FlextDomainService,
     FlextEntity,
+    FlextModel,
     FlextResult,
 )
 
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
-
-
 # Meltano core integration - MANDATORY for project management
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 
 if TYPE_CHECKING:
     from meltano.core.project import Project as MeltanoProject
@@ -363,12 +358,12 @@ class FlextMeltanoPipelineResult(FlextEntity):
 
     def start_execution(self) -> None:
         """Mark pipeline execution as started."""
-        object.__setattr__(self, "state", ExecutionState.RUNNING)
+        object.__setattr__(self, "state", ExecutionState.RUNNING.value)
         object.__setattr__(self, "started_at", datetime.now(UTC))
 
     def complete_execution(self, records_processed: int = 0) -> None:
         """Mark pipeline execution as completed."""
-        object.__setattr__(self, "state", ExecutionState.COMPLETED)
+        object.__setattr__(self, "state", ExecutionState.COMPLETED.value)
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "records_processed", records_processed)
         if self.started_at and self.completed_at:
@@ -380,7 +375,7 @@ class FlextMeltanoPipelineResult(FlextEntity):
 
     def fail_execution(self, error_message: str) -> None:
         """Mark pipeline execution as failed."""
-        object.__setattr__(self, "state", ExecutionState.FAILED)
+        object.__setattr__(self, "state", ExecutionState.FAILED.value)
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "error_message", error_message)
         if self.started_at and self.completed_at:
@@ -390,8 +385,8 @@ class FlextMeltanoPipelineResult(FlextEntity):
                 (self.completed_at - self.started_at).total_seconds(),
             )
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate pipeline result domain rules."""
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate pipeline result business rules."""
         if not self.pipeline_name.strip():
             return FlextResult(error="Pipeline name cannot be empty")
         return FlextResult(data=None)
@@ -407,8 +402,8 @@ class FlextMeltanoPipelineEvent(FlextEntity):
     data: dict[str, object] = Field(default_factory=dict)
     source: str = Field(default="flext-meltano")
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate pipeline event domain rules."""
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate pipeline event business rules."""
         if not self.pipeline_id.strip():
             return FlextResult(error="Pipeline ID cannot be empty")
         return FlextResult(data=None)
@@ -645,8 +640,8 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
 # === EXECUTION STATE MANAGEMENT ===
 
 
-class FlextMeltanoExecutionState(BaseModel):
-    """Execution state management using domain patterns."""
+class FlextMeltanoExecutionState(FlextModel):
+    """Execution state management using flext-core FlextModel pattern (removes BaseModel duplication)."""
 
     current_pipeline: str | None = Field(default=None)
     execution_id: str | None = Field(default=None)

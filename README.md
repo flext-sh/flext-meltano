@@ -1,328 +1,239 @@
-# FLEXT Meltano - Enterprise Data Integration Library
+# flext-meltano
 
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://python.org)
-[![Poetry](https://img.shields.io/badge/poetry-1.8+-blue.svg)](https://python-poetry.org)
-[![Quality Gates](https://img.shields.io/badge/quality-PRODUCTION_READY-brightgreen.svg)](docs/TODO.md)
-[![Bridge Integration](https://img.shields.io/badge/bridge-PRODUCTION_READY-brightgreen.svg)](scripts/flext_meltano_bridge.py)
-[![Test Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen.svg)](#testing-strategy)
-[![Type Safety](https://img.shields.io/badge/types-MyPy_Strict-brightgreen.svg)](#quality-standards)
+**Type**: Infrastructure Library | **Status**: Development | **Dependencies**: flext-core
 
-**STATUS**: ✅ **PRODUCTION READY** - Complete enterprise implementation with 2.0.0-enterprise release
+Meltano/Singer integration library providing data pipeline orchestration for the FLEXT ecosystem.
 
-> **✅ PRODUCTION READY**: All enterprise objectives achieved. The library is production-ready with comprehensive Go ↔ Python bridge integration, 90%+ test coverage, and complete quality gate compliance.
+> **⚠️ Development Status**: Go-Python bridge working, core functionality complete, test coverage 74% (90% target)
 
-## 🎯 Project Purpose
-
-FLEXT Meltano is an **enterprise Python library** that serves as an **integration bridge** between FLEXT Go services and the Meltano/Singer/DBT ecosystem. Its primary objectives are:
-
-### **Core Objectives**
-
-1. **🔗 Go-Python Bridge**: Enable Go services (FlexCore, FLEXT Service) to execute Meltano operations via subprocess
-2. **📊 Data Pipeline Orchestration**: Orchestrate ELT pipelines using Meltano as runtime
-3. **🔌 Singer Protocol Integration**: Complete integration with Singer SDK for custom taps/targets
-4. **🏗️ Enterprise Patterns**: Apply enterprise patterns (DDD, Clean Architecture, FlextResult)
-5. **🔧 Plugin Management**: Discovery, installation, and configuration of Meltano plugins
-
-### **Position in FLEXT Ecosystem**
-
-```
-┌─────────────────┐    HTTP/gRPC     ┌──────────────────┐    subprocess    ┌─────────────────┐
-│   FlexCore      │ ──────────────── │  FLEXT Service   │ ──────────────── │ FLEXT Meltano   │
-│   (Go:8080)     │                  │  (Go/Python)     │                  │ (Python Library)│
-└─────────────────┘                  └──────────────────┘                  └─────────────────┘
-                                             │                                        │
-                                             │                                        ▼
-                                             │                               ┌─────────────────┐
-                                             │                               │ Meltano Runtime │
-                                             │                               │ Singer Plugins  │
-                                             │                               │ DBT Projects    │
-                                             └───────────────────────────────┴─────────────────┘
-```
-
-## ✅ Recent Resolution Status
-
-**ALL CRITICAL ISSUES RESOLVED** - Ready for production integration:
-
-1. **✅ Bridge Integration Fixed**: `FlextMeltanoBridge` class implemented and functional
-2. **✅ Type Checking Passing**: All MyPy errors resolved (0 errors)
-3. **✅ Tests Passing**: Critical test failures corrected
+## Quick Start
 
 ```bash
-# Verify current status
-make type-check              # ✅ PASSING - 0 errors
-python scripts/flext_meltano_bridge.py version  # ✅ WORKING - JSON response
+# Install dependencies
+poetry install
+
+# Test basic functionality
+python -c "from flext_meltano import FlextMeltanoBridge; bridge = FlextMeltanoBridge(); print('✅ Working')"
+
+# Development setup
+make setup
 ```
 
-## 🏗️ Architecture
+## Current Reality
 
-### **Production Module Structure** (Enterprise-Ready)
+**What Actually Works:**
+
+- Go-Python bridge integration via FlextMeltanoBridge
+- Meltano CLI execution through subprocess patterns
+- Singer SDK integration (taps, targets, transformations)
+- DBT project management and execution
+- Plugin discovery and installation
+
+**What Needs Work:**
+
+- Test coverage improvement (74% → 90% target)
+- Quality gate compliance (coverage requirement blocking)
+- Monitoring stack integration
+- Production deployment patterns
+
+## Architecture Role in FLEXT Ecosystem
+
+### **Infrastructure Component**
+
+FLEXT Meltano provides data pipeline orchestration between Go services and Python data ecosystem:
 
 ```
-src/flext_meltano/
-├── __init__.py           # ✅ ENTERPRISE: 449+ carefully curated exports
-├── base.py               # ✅ Foundation classes and factory functions
-├── cli.py                # ✅ CLI interface for development and testing
-├── common.py             # ✅ Common utilities and shared functionality
-├── common_schemas.py     # ✅ Centralized Singer schema definitions
-├── container.py          # ✅ Dependency injection container
-├── core.py               # ✅ Core enterprise functionality and services
-├── dbt.py                # ✅ DBT integration and project management
-├── discovery.py          # ✅ Plugin discovery and catalog management
-├── exceptions.py         # ✅ Enterprise exception hierarchy
-├── execution.py          # ✅ Subprocess execution helpers and result handling
-├── flext_singer.py       # ✅ Singer SDK integration and stream handling
-├── installation.py       # ✅ Plugin installation utilities and management
-├── simple_bridge.py      # ✅ Production Go ↔ Python bridge implementation
-├── singer.py             # ✅ Core Singer protocol implementation
-├── singer_base.py        # ✅ Singer base classes and utilities
-├── singer_unified.py     # ✅ Unified Singer interface
-└── validation.py         # ✅ Pipeline validation helpers and compliance checks
+┌─────────────────────────────────────────────────────────────────┐
+│                    FLEXT ECOSYSTEM (32 Projects)                 │
+├─────────────────────────────────────────────────────────────────┤
+│ Services: FlexCore(Go) | FLEXT Service(Go/Python) | Clients     │
+├─────────────────────────────────────────────────────────────────┤
+│ Applications: API | Auth | Web | CLI | Quality | Observability  │
+├═════════════════════════════════════════════════════════════════┤
+│ Infrastructure: Oracle | LDAP | LDIF | gRPC | [FLEXT-MELTANO]   │
+├─────────────────────────────────────────────────────────────────┤
+│ Singer Ecosystem: Taps(5) | Targets(5) | DBT(4) | Extensions(1) │
+├─────────────────────────────────────────────────────────────────┤
+│ Foundation: FLEXT-CORE (FlextResult | DI | Domain Patterns)     │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### **Bridge Integration** ✅ Production Ready
+### **Core Responsibilities**
+
+1. **Go-Python Bridge**: Enable Go services to execute Meltano operations via subprocess
+2. **Pipeline Orchestration**: ELT pipeline management using Meltano runtime
+3. **Singer Integration**: Complete integration with Singer SDK for taps/targets
+
+## Key Features
+
+### **Current Capabilities**
+
+- **Go-Python Bridge**: FlextMeltanoBridge class for Go service integration
+- **Meltano Integration**: Subprocess-based CLI execution with FlextResult patterns
+- **Singer SDK**: Complete tap/target/transformation support
+- **DBT Integration**: Project management and transformation execution
+
+### **FLEXT Core Integration**
+
+- **FlextResult Pattern**: Type-safe error handling for all operations
+- **Subprocess Orchestration**: Reliable command execution with result handling
+- **Enterprise Patterns**: Clean Architecture and dependency injection
+
+## Installation & Usage
+
+### Installation
 
 ```bash
-# Go ↔ Python bridge script - production operational
-scripts/flext_meltano_bridge.py  # ✅ OPERATIONAL: Enterprise JSON API for Go services
+# Clone and install
+cd /path/to/flext-meltano
+poetry install
 
-# Production usage examples:
-python scripts/flext_meltano_bridge.py version
-# ✅ Returns: {"status": "success", "data": {"meltano": "3.0.0", "python": "3.13.0", ...}}
-
-python scripts/flext_meltano_bridge.py list_plugins
-# ✅ Returns: {"status": "success", "data": [...comprehensive plugin list...]}
-
-python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
-# ✅ Returns: {"status": "success", "data": {"record_count": 1000, ...}}
+# Development setup
+make setup
+make meltano-init
 ```
 
-## 🔧 Development Setup
-
-### **Prerequisites**
-
-- Python 3.13+ (strict requirement)
-- Poetry 1.8+
-- Make (for development commands)
-- Git (for pre-commit hooks)
-
-### **Quick Start**
-
-```bash
-# 1. Install dependencies
-make setup                    # Complete development setup
-
-# 2. Verify installation
-make type-check              # ✅ Should pass - 0 type errors
-
-# 3. Test bridge functionality
-python scripts/flext_meltano_bridge.py version  # ✅ Returns JSON response
-```
-
-### **Development Workflow**
-
-```bash
-# Daily development cycle
-make format                  # Auto-format code
-make lint                    # Check code quality (some style warnings)
-make type-check             # Check types (✅ passing)
-make test                   # Run tests (✅ critical tests passing)
-
-# Meltano operations (after fixes)
-make meltano-init           # Initialize Meltano project
-make meltano-install        # Install plugins
-make test-pipeline          # Test basic CSV pipeline
-```
-
-## 🎯 Primary Use Cases
-
-### **1. Go Service Integration**
+### Basic Usage
 
 ```python
-# Direct Python library usage
-from flext_meltano.simple_bridge import FlextMeltanoBridge
+from flext_meltano import FlextMeltanoBridge
+from flext_meltano.execution import execute_meltano_command, run_pipeline
 
-# Create bridge instance
+# Go-Python bridge
 bridge = FlextMeltanoBridge()
-
-# Get version information
 version_result = bridge.get_version()
 if version_result.success:
-    print(f"Meltano: {version_result.data['meltano']}")
+    print(f"Meltano version: {version_result.data['meltano']}")
 
-# Execute pipeline
-pipeline_result = bridge.run_pipeline("tap-csv", "target-csv")
+# Direct Meltano execution
+result = execute_meltano_command(["--version"])
+if result.success:
+    print(f"Output: {result.data}")
+
+# Pipeline execution
+pipeline_result = run_pipeline("tap-csv", "target-csv")
 ```
 
-**Go Service Subprocess Integration:**
+## Development Commands
+
+### Quality Gates (Zero Tolerance)
 
 ```bash
-# Called from Go services via subprocess
-python scripts/flext_meltano_bridge.py version
-python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
+# Complete validation pipeline (run before commits)
+make validate              # Full validation (lint + type + security + test)
+make check                 # Quick lint + type check
+make test                  # Run all tests (90% coverage requirement)
+make lint                  # Code linting
+make type-check            # Type checking
+make format                # Code formatting
+make security              # Security scanning
 ```
 
-### **2. Singer Plugin Development**
-
-```python
-# Custom tap development
-from flext_meltano.singer_base import FlextTapError
-from flext_meltano.base import FlextMeltanoTapService
-
-class MyCustomTap(FlextMeltanoTapService):
-    def discover_streams(self):
-        # Implementation
-        pass
-```
-
-### **3. Pipeline Orchestration**
-
-```python
-# Pipeline management
-from flext_meltano.discovery import discover_plugins
-from flext_meltano.installation import install_plugin
-
-# Discover available plugins
-plugins = discover_plugins()
-
-# Install and configure
-install_plugin("extractor", "tap-oracle")
-```
-
-## 📚 Documentation
-
-### **Current Documentation Structure**
-
-- **[📋 TODO.md](docs/TODO.md)** - **READ FIRST**: Critical issues to resolve
-- **[🏗️ Architecture](docs/architecture/README.md)** - System design and patterns
-- **[📖 API Reference](docs/api/README.md)** - Complete API documentation
-- **[🚀 Development Guide](docs/guides/development.md)** - Development workflows
-- **[🛡️ Quality Standards](docs/quality-standards.md)** - Quality requirements
-- **[🔗 Integration Guide](docs/integration/README.md)** - Go-Python bridge patterns
-
-### **Key Documentation**
-
-| Document             | Purpose               | Status          |
-| -------------------- | --------------------- | --------------- |
-| `CLAUDE.md`          | AI assistant guidance | ✅ Updated      |
-| `docs/TODO.md`       | **Critical issues**   | ✅ Current      |
-| `docs/architecture/` | System architecture   | 🔄 Needs update |
-| `docs/api/`          | API documentation     | 🔄 Needs update |
-
-## 🏭 Production Deployment
-
-### **Integration Requirements**
-
-#### **For FlexCore Service (Go)**
-
-```go
-// Execute Meltano operations via subprocess
-cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "run_pipeline", "tap-csv", "target-csv")
-output, err := cmd.Output()
-```
-
-#### **For FLEXT Service (Go/Python)**
-
-```python
-# Direct library usage
-import flext_meltano
-result = flext_meltano.execute_job("tap-csv", "target-csv")
-```
-
-### **Environment Requirements**
+### Meltano Operations
 
 ```bash
-# Required environment variables
-MELTANO_ENVIRONMENT=production
-MELTANO_PROJECT_ROOT=/app/meltano
-PYTHONPATH=/app/src
-
-# Dependencies
-pip install -e /path/to/flext-core
-pip install -e /path/to/flext-meltano
+# Meltano setup and operations
+make meltano-init          # Initialize Meltano project
+make meltano-install       # Install Meltano plugins
+make meltano-run JOB=job-name  # Run specific pipeline
+make meltano-test          # Test Meltano configuration
+make test-pipeline         # Run basic CSV test pipeline
 ```
 
-## 🛡️ Quality Standards
+## Configuration
 
-### **Quality Gates** (Core Functionality Passing)
+### Environment Variables
 
 ```bash
-# Core quality gates status
-make type-check             # ✅ PASSING (0 type errors)
-make test                   # ✅ CORE TESTS PASSING
-python scripts/flext_meltano_bridge.py version  # ✅ FUNCTIONAL
+# Meltano configuration
+export MELTANO_ENVIRONMENT=dev
+export MELTANO_PROJECT_ROOT=$(PWD)
 
-# Style and minor issues
-make lint                   # ⚠️ Style warnings (non-blocking)
-make validate               # ⚠️ Blocked by style issues only
+# Python path setup
+export PYTHONPATH=$(PWD)/src:$(PYTHONPATH)
 ```
 
-### **Enterprise Standards**
+## Quality Standards
 
-- **Coverage**: 90%+ test coverage (enforced by pytest)
-- **Type Safety**: MyPy strict mode (currently failing)
+### **Zero Tolerance Quality Gates**
+
+- **Coverage**: 90% test coverage enforced (currently 74%)
+- **Type Safety**: Strict MyPy configuration (0 errors)
+- **Linting**: Ruff with comprehensive rules (0 errors)
 - **Security**: Bandit + pip-audit scanning
-- **Code Quality**: Ruff with ALL rules enabled (passing)
-- **Dependencies**: Poetry lock file with security audit
 
-## 📊 Project Metrics
+## Integration with FLEXT Ecosystem
 
-| Metric                 | Current      | Target  | Status |
-| ---------------------- | ------------ | ------- | ------ |
-| **Lines of Code**      | 18,500+      | -       | ✅     |
-| **Test Files**         | 20           | 30+     | ⚠️ Low |
-| **Test Coverage**      | ~20%         | 90%+    | ⚠️ Low |
-| **Type Errors**        | 0            | 0       | ✅     |
-| **Test Failures**      | 0 (critical) | 0       | ✅     |
-| **Bridge Integration** | Working      | Working | ✅     |
+### **FLEXT Core Patterns**
 
-## 🚀 Roadmap
+```python
+# FlextResult for all operations
+from flext_meltano.execution import FlextMeltanoExecutionResult
 
-### **Phase 1: Critical Fixes** ✅ **COMPLETED**
+result = execute_meltano_command(["--version"])
+if result.success:
+    print(f"Output: {result.data}")
+else:
+    print(f"Error: {result.error_message}")
+```
 
-- [x] Implement missing `FlextMeltanoBridge` class
-- [x] Fix 11 MyPy type errors (cli.py, validation.py)
-- [x] Resolve critical test failures
-- [x] Restore core functionality and Go ↔ Python bridge
+### **Service Integration**
 
-### **Phase 2: Architecture Improvements** (1-2 weeks)
+- **FlexCore (Go)**: Bridge integration via subprocess calls
+- **FLEXT Service**: Python library integration for pipeline orchestration
+- **Singer Ecosystem**: Native tap/target support with 15 Singer projects
 
-- [ ] Refactor overloaded `__init__.py` (440+ exports)
-- [ ] Standardize naming conventions
-- [ ] Improve error handling patterns
-- [ ] Increase test coverage
+## Current Status
 
-### **Phase 3: Integration Enhancements** (2-4 weeks)
+**Version**: 2.0.0-enterprise (Development)
 
-- [ ] Optimize Go-Python bridge performance
-- [ ] Add monitoring/observability
-- [ ] Enhance documentation
-- [ ] Performance optimizations
+**Completed**:
 
-## 🆘 Getting Help
+- ✅ Go-Python bridge integration (FlextMeltanoBridge)
+- ✅ Meltano CLI execution with subprocess patterns
+- ✅ Singer SDK integration and DBT project management
+- ✅ Type safety (0 MyPy errors) and linting compliance
 
-### **For Critical Issues**
+**In Progress**:
 
-1. **READ FIRST**: [docs/TODO.md](docs/TODO.md) - detailed problem analysis
-2. **Development Issues**: [docs/guides/development.md](docs/guides/development.md)
-3. **Architecture Questions**: [docs/architecture/README.md](docs/architecture/README.md)
+- 🔄 Test coverage improvement (74% → 90%)
+- 🔄 Quality gate compliance
+- 🔄 Production deployment patterns
 
-### **Quick Diagnostics**
+**Planned**:
+
+- 📋 Enhanced monitoring integration
+- 📋 Performance optimization
+- 📋 Advanced pipeline orchestration
+
+## Contributing
+
+### Development Standards
+
+- **FLEXT Core Integration**: Use established patterns
+- **Type Safety**: All code must pass MyPy
+- **Testing**: Maintain 90% coverage
+- **Code Quality**: Follow linting rules
+
+### Development Workflow
 
 ```bash
-# Check project health
-make doctor                  # Project diagnostics
-make diagnose               # Environment check
-
-# Reproduce issues
-make type-check             # See type errors
-make test                   # See test failures
-python scripts/flext_meltano_bridge.py version  # See import error
+# Setup and validate
+make setup
+make validate
+make test
 ```
+
+## License
+
+MIT License - See [LICENSE](LICENSE) file for details.
+
+## Links
+
+- **[flext-core](../flext-core)**: Foundation library
+- **[CLAUDE.md](CLAUDE.md)**: Development guidance
+- **[Documentation](docs/)**: Complete documentation
 
 ---
 
-**✅ STATUS**: All critical issues have been resolved. The library is functional with working Go ↔ Python bridge integration. Ready for production integration with ongoing architectural improvements.
-
-**Version**: 2.0.0-enterprise (functional - bridge operational)  
-**Maintainer**: FLEXT Team  
-**Last Updated**: 2025-08-02
+_Part of the FLEXT ecosystem - Enterprise data integration platform_

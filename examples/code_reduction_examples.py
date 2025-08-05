@@ -49,11 +49,15 @@ def example_1_traditional_approach() -> dict[str, Any]:
     }
 
     # Step 2: Write configuration files manually
-    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8", mode="w", suffix=".json", delete=False
+    ) as f:
         json.dump(tap_config, f)
         tap_config_path = f.name
 
-    with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        encoding="utf-8", mode="w", suffix=".json", delete=False
+    ) as f:
         json.dump(target_config, f)
         target_config_path = f.name
 
@@ -93,7 +97,9 @@ def example_1_traditional_approach() -> dict[str, Any]:
                         entry.setdefault("metadata", {})["selected"] = True
 
         # Step 6: Write catalog file
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".json", delete=False
+        ) as f:
             json.dump(catalog, f)
             catalog_path = f.name
 
@@ -148,7 +154,6 @@ def example_1_flext_meltano_approach() -> dict[str, Any]:
         executor_result = create_executor(config)
 
         if executor_result.success:
-
             # Execute job with real API
             job_result = flext_meltano_execute_job(
                 "tap-postgres",
@@ -198,7 +203,11 @@ def example_2_traditional_config_management() -> dict[str, Any]:
         if not isinstance(config["port"], int):
             return False
 
-        if not (1 <= config["port"] <= 65535):
+        # Constants for port validation
+        MIN_PORT = 1
+        MAX_PORT = 65535
+
+        if not (MIN_PORT <= config["port"] <= MAX_PORT):
             return False
 
         return config["host"].strip()
@@ -317,7 +326,9 @@ print(json.dumps(result))
 """
 
         # Write bridge script
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as f:
             f.write(bridge_script)
             script_path = f.name
 

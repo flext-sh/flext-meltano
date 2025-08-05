@@ -17,8 +17,8 @@ from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoConfig
 from flext_meltano.container import (
-    FlextMeltanoContainer,
     configure_meltano_container,
+    configure_meltano_services,
     get_meltano_container,
 )
 

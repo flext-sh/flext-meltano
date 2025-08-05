@@ -416,29 +416,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
-from flext_core import FlextResult
+from flext_core import FlextModel, FlextResult
+from pydantic import Field
 
+from flext_meltano.base import FlextMeltanoConfig
+
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 from flext_meltano.execution import (
+    FlextMeltanoResult,
     SubprocessExecutionContext,
     execute_subprocess_common,
 )
 
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
 
-
-from pydantic import BaseModel, Field
-
-from flext_meltano.base import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoResult
-
-
-class FlextMeltanoInstallationContext(BaseModel):
+class FlextMeltanoInstallationContext(FlextModel):
     """Installation context for plugin operations."""
 
     installation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -448,11 +440,6 @@ class FlextMeltanoInstallationContext(BaseModel):
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=600)  # 10 minutes default
     metadata: dict[str, object] = Field(default_factory=dict)
-
-    class Config:
-        """Pydantic configuration."""
-
-        arbitrary_types_allowed = True
 
 
 @dataclass
@@ -465,7 +452,7 @@ class InstallationResultData:
     cmd: list[str]
 
 
-class FlextMeltanoPluginInfo(BaseModel):
+class FlextMeltanoPluginInfo(FlextModel):
     """Plugin information entity."""
 
     name: str = Field(...)
@@ -476,11 +463,6 @@ class FlextMeltanoPluginInfo(BaseModel):
     description: str = Field(default="")
     version: str | None = Field(default=None)
     installed: bool = Field(default=False)
-
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = True
 
 
 @injectable

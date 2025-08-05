@@ -248,8 +248,7 @@ class TestMeltanoPluginDiscovery:
             # All plugins should be extractors
             for plugin in plugins:
                 if plugin.type != "extractors":
-                    msg: str = f"Expected {'extractors'}, got {plugin.type}"
-                    raise AssertionError(msg)
+                    pytest.fail(f"Expected extractors, got {plugin.type}")
         except Exception as e:
             # Handle ProjectNotFound and other Meltano-specific exceptions
             if "ProjectNotFound" in str(type(e)) or "meltano.yml" in str(e):

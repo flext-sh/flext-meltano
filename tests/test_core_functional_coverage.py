@@ -38,7 +38,7 @@ class TestFlextMeltanoExecutionStateComplete:
 
         assert state.pipeline_name == "test-pipeline"
         assert state.environment == "production"
-        assert state.state == ExecutionState.RUNNING
+        assert state.state == ExecutionState.RUNNING.value
         assert isinstance(state.metadata, dict)
 
     def test_execution_state_complete_lifecycle(self):
@@ -53,7 +53,7 @@ class TestFlextMeltanoExecutionStateComplete:
 
         # Complete pipeline
         state.complete_pipeline()
-        assert state.state == ExecutionState.COMPLETED
+        assert state.state == ExecutionState.COMPLETED.value
 
         # Reset and test failure path
         state = FlextMeltanoExecutionState()
@@ -63,7 +63,7 @@ class TestFlextMeltanoExecutionStateComplete:
         error_message = "Database connection failed: timeout after 30s"
         state.fail_pipeline(error_message)
 
-        assert state.state == ExecutionState.FAILED
+        assert state.state == ExecutionState.FAILED.value
         assert state.metadata["error"] == error_message
         assert "failed_at" in state.metadata
 
@@ -161,7 +161,9 @@ class TestFlextMeltanoPipelineConfigComplete:
         assert hasattr(config, "config")
 
         # Test empty name handling - should raise ValueError
-        with pytest.raises(ValueError, match="Pipeline name, extractor, and loader are required"):
+        with pytest.raises(
+            ValueError, match="Pipeline name, extractor, and loader are required"
+        ):
             FlextMeltanoPipelineConfig(
                 name="",  # Empty name
                 extractor="tap-test",
@@ -216,7 +218,7 @@ class TestFlextMeltanoPipelineResultComplete:
         )
 
         assert result.pipeline_name == "success-pipeline"
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.error_message is None
         assert isinstance(result.id, str)
         assert len(result.id) > 0
@@ -231,7 +233,7 @@ class TestFlextMeltanoPipelineResultComplete:
         )
 
         assert result.pipeline_name == "failure-pipeline"
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.error_message == error_msg
 
     def test_pipeline_result_with_metadata(self):
@@ -259,7 +261,7 @@ class TestFlextMeltanoPipelineResultComplete:
             state=ExecutionState.COMPLETED,
         )
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
         assert validation_result.success
 
         # Test with empty pipeline name
@@ -268,7 +270,7 @@ class TestFlextMeltanoPipelineResultComplete:
             state=ExecutionState.COMPLETED,
         )
 
-        validation_result = empty_name_result.validate_domain_rules()
+        validation_result = empty_name_result.validate_business_rules()
         # Should fail validation due to empty name
         assert hasattr(validation_result, "success")
 
@@ -334,7 +336,7 @@ class TestFlextMeltanoPipelineEventComplete:
             pipeline_name="validation-test",
         )
 
-        validation_result = event.validate_domain_rules()
+        validation_result = event.validate_business_rules()
         assert validation_result.success
 
 
@@ -356,13 +358,14 @@ class TestFlextMeltanoExtensionComplete:
     def test_extension_validation(self):
         """Test extension service validation."""
         config = FlextMeltanoConfig(project_root=".")
-        
+
         # Create concrete implementation for testing
         class TestExtension(FlextMeltanoExtension):
             def execute(self, *args, **kwargs):
                 from flext_core import FlextResult
+
                 return FlextResult(data="test_executed")
-        
+
         extension = TestExtension(config, "validation-extension")
 
         validation_result = extension.validate_service()
@@ -372,13 +375,14 @@ class TestFlextMeltanoExtensionComplete:
     def test_extension_health_status(self):
         """Test extension health status."""
         config = FlextMeltanoConfig(project_root=".")
-        
+
         # Create concrete implementation for testing
         class TestExtension(FlextMeltanoExtension):
             def execute(self, *args, **kwargs):
                 from flext_core import FlextResult
+
                 return FlextResult(data="test_executed")
-        
+
         extension = TestExtension(config, "health-extension")
 
         health_result = extension.get_health_status()
@@ -557,12 +561,15 @@ class TestCoreModuleFunctionality:
         assert execution_state is not None
 
         pipeline_config = FlextMeltanoPipelineConfig(
-            name="test", extractor="tap-test", loader="target-test",
+            name="test",
+            extractor="tap-test",
+            loader="target-test",
         )
         assert pipeline_config is not None
 
         pipeline_result = FlextMeltanoPipelineResult(
-            pipeline_name="test", success=True,
+            pipeline_name="test",
+            success=True,
         )
         assert pipeline_result is not None
 
@@ -602,7 +609,9 @@ class TestCoreModuleFunctionality:
 
         # Create Singer service
         singer_service = FlextMeltanoSingerService(
-            config, pipeline_config.extractor, pipeline_config.loader,
+            config,
+            pipeline_config.extractor,
+            pipeline_config.loader,
         )
 
         # Validate integration
@@ -620,4 +629,4 @@ class TestCoreModuleFunctionality:
         )
 
         assert completion_result.pipeline_name == pipeline_config.name
-        assert state.state == ExecutionState.COMPLETED
+        assert state.state == ExecutionState.COMPLETED.value

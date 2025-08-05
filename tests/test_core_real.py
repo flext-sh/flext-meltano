@@ -95,7 +95,8 @@ class TestFlextMeltanoPipelineConfig:
     def test_pipeline_config_validation_empty_name(self):
         """Test pipeline config validation fails with empty name."""
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="",
@@ -106,7 +107,8 @@ class TestFlextMeltanoPipelineConfig:
     def test_pipeline_config_validation_empty_extractor(self):
         """Test pipeline config validation fails with empty extractor."""
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="test_pipeline",
@@ -117,7 +119,8 @@ class TestFlextMeltanoPipelineConfig:
     def test_pipeline_config_validation_empty_loader(self):
         """Test pipeline config validation fails with empty loader."""
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="test_pipeline",
@@ -146,7 +149,7 @@ class TestFlextMeltanoPipelineResult:
         result = FlextMeltanoPipelineResult(pipeline_name="test_pipeline")
 
         assert result.pipeline_name == "test_pipeline"
-        assert result.state == ExecutionState.PENDING
+        assert result.state == ExecutionState.PENDING.value
         assert result.started_at is None
         assert result.completed_at is None
         assert result.duration_seconds is None
@@ -159,14 +162,14 @@ class TestFlextMeltanoPipelineResult:
         """Test starting pipeline execution."""
         result = FlextMeltanoPipelineResult(pipeline_name="test_pipeline")
 
-        # Initially pending
-        assert result.state == ExecutionState.PENDING
+        # Initially pending - note: use_enum_values=True converts enum to value
+        assert result.state == ExecutionState.PENDING.value
         assert result.started_at is None
 
         # Start execution
         result.start_execution()
 
-        assert result.state == ExecutionState.RUNNING
+        assert result.state == ExecutionState.RUNNING.value
         assert result.started_at is not None
         assert isinstance(result.started_at, datetime)
 
@@ -178,7 +181,7 @@ class TestFlextMeltanoPipelineResult:
         result.start_execution()
         result.complete_execution(records_processed=1000)
 
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.completed_at is not None
         assert result.records_processed == 1000
         assert result.duration_seconds is not None
@@ -191,7 +194,7 @@ class TestFlextMeltanoPipelineResult:
         result.start_execution()
         result.complete_execution()  # No records specified
 
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.records_processed == 0
 
     def test_pipeline_result_fail_execution(self):
@@ -203,7 +206,7 @@ class TestFlextMeltanoPipelineResult:
         result.start_execution()
         result.fail_execution(error_msg)
 
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.completed_at is not None
         assert result.error_message == error_msg
         assert result.duration_seconds is not None
@@ -213,7 +216,7 @@ class TestFlextMeltanoPipelineResult:
         """Test pipeline result domain validation success."""
         result = FlextMeltanoPipelineResult(pipeline_name="valid_pipeline")
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert validation_result.success
         assert validation_result.data is None
@@ -222,7 +225,7 @@ class TestFlextMeltanoPipelineResult:
         """Test pipeline result domain validation fails with empty name."""
         result = FlextMeltanoPipelineResult(pipeline_name="")
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert validation_result.is_failure
         assert "Pipeline name cannot be empty" in str(validation_result.error)
@@ -231,7 +234,7 @@ class TestFlextMeltanoPipelineResult:
         """Test pipeline result domain validation fails with whitespace-only name."""
         result = FlextMeltanoPipelineResult(pipeline_name="   ")
 
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert validation_result.is_failure
         assert "Pipeline name cannot be empty" in str(validation_result.error)
@@ -251,7 +254,9 @@ class TestFlextMeltanoPipelineResult:
         result.complete_execution(records_processed=500)
         object.__setattr__(result, "completed_at", end_time)
         object.__setattr__(
-            result, "duration_seconds", (end_time - start_time).total_seconds(),
+            result,
+            "duration_seconds",
+            (end_time - start_time).total_seconds(),
         )
 
         assert result.duration_seconds == 5.0
@@ -272,7 +277,9 @@ class TestFlextMeltanoPipelineResult:
         result.fail_execution("Test error")
         object.__setattr__(result, "completed_at", end_time)
         object.__setattr__(
-            result, "duration_seconds", (end_time - start_time).total_seconds(),
+            result,
+            "duration_seconds",
+            (end_time - start_time).total_seconds(),
         )
 
         assert result.duration_seconds == 3.0
@@ -285,7 +292,7 @@ class TestFlextMeltanoPipelineResult:
         # Complete without starting
         result.complete_execution(records_processed=100)
 
-        assert result.state == ExecutionState.COMPLETED
+        assert result.state == ExecutionState.COMPLETED.value
         assert result.records_processed == 100
         assert result.duration_seconds is None  # No start time available
 
@@ -294,15 +301,15 @@ class TestFlextMeltanoPipelineResult:
         result = FlextMeltanoPipelineResult(pipeline_name="test_pipeline")
 
         # Initial state
-        assert result.state == ExecutionState.PENDING
+        assert result.state == ExecutionState.PENDING.value
 
         # Start execution
         result.start_execution()
-        assert result.state == ExecutionState.RUNNING
+        assert result.state == ExecutionState.RUNNING.value
 
         # Fail execution
         result.fail_execution("Network timeout")
-        assert result.state == ExecutionState.FAILED
+        assert result.state == ExecutionState.FAILED.value
         assert result.error_message == "Network timeout"
 
     def test_pipeline_result_metadata_usage(self):
@@ -345,7 +352,7 @@ class TestCoreModuleIntegration:
         """Test integration with flext-core patterns."""
         # Test FlextResult integration
         result = FlextMeltanoPipelineResult(pipeline_name="test")
-        validation_result = result.validate_domain_rules()
+        validation_result = result.validate_business_rules()
 
         assert isinstance(validation_result, FlextResult)
         assert hasattr(validation_result, "success")

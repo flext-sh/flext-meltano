@@ -335,27 +335,20 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
-from flext_core import FlextLogger, FlextResult
-
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
-
-
 # Meltano Hub integration - MANDATORY for plugin discovery
+from flext_core import FlextLogger, FlextModel, FlextResult
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
 
 # Project import for hub initialization
 from meltano.core.project import Project
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 # Singer SDK integration - MANDATORY for catalog discovery
 from flext_meltano.base import FlextMeltanoConfig
+
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 from flext_meltano.execution import FlextMeltanoResult
 
 # Legacy compatibility import
@@ -369,7 +362,7 @@ class FlextMeltanoDiscoveryCommand:
         self.tap_name = tap_name
 
 
-class FlextMeltanoDiscoveryContext(BaseModel):
+class FlextMeltanoDiscoveryContext(FlextModel):
     """Discovery context for catalog and plugin operations."""
 
     discovery_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -380,13 +373,8 @@ class FlextMeltanoDiscoveryContext(BaseModel):
     project_root: Path = Field(default_factory=Path)
     metadata: dict[str, object] = Field(default_factory=dict)
 
-    class Config:
-        """Pydantic configuration."""
 
-        arbitrary_types_allowed = True
-
-
-class FlextMeltanoPlugin(BaseModel):
+class FlextMeltanoPlugin(FlextModel):
     """Plugin information entity."""
 
     name: str = Field(...)
@@ -396,11 +384,6 @@ class FlextMeltanoPlugin(BaseModel):
     pip_url: str = Field(...)
     version: str | None = Field(default=None)
     capabilities: list[str] = Field(default_factory=list)
-
-    class Config:
-        """Pydantic configuration."""
-
-        frozen = True
 
 
 @injectable

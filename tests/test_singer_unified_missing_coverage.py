@@ -35,7 +35,9 @@ class TestSingerUnifiedMissingCoverage:
         # Should succeed or fail gracefully
         assert isinstance(result.success, bool)
         if result.is_failure:
-            assert "Catalog discovery failed" in result.error or result.error is not None
+            assert (
+                "Catalog discovery failed" in result.error or result.error is not None
+            )
 
     def test_service_execute_operation_validate_components(self):
         """Test service execute_operation with validate_components operation (lines 406-414)."""
@@ -46,7 +48,10 @@ class TestSingerUnifiedMissingCoverage:
         # Should succeed or fail gracefully
         assert isinstance(result.success, bool)
         if result.is_failure:
-            assert "Component validation failed" in result.error or result.error is not None
+            assert (
+                "Component validation failed" in result.error
+                or result.error is not None
+            )
 
     def test_service_execute_operation_unknown_operation(self):
         """Test service execute_operation with unknown operation (line 415)."""
@@ -66,7 +71,9 @@ class TestSingerUnifiedMissingCoverage:
         # Should succeed or fail gracefully
         assert isinstance(result.success, bool)
         if result.is_failure:
-            assert "Pipeline execution failed" in result.error or result.error is not None
+            assert (
+                "Pipeline execution failed" in result.error or result.error is not None
+            )
 
     def test_service_execute_method(self):
         """Test the basic execute method."""
@@ -105,7 +112,9 @@ class TestSingerUnifiedMissingCoverage:
             def execute(self, *args: object, **kwargs: object) -> FlextResult[object]:
                 return FlextResult.ok("executed")
 
-            def validate_configuration(self, config: dict[str, object]) -> FlextResult[bool]:
+            def validate_configuration(
+                self, config: dict[str, object]
+            ) -> FlextResult[bool]:
                 return FlextResult.ok(data=True)
 
         # Test the implementation
@@ -159,7 +168,7 @@ class TestSingerUnifiedMissingCoverage:
         )
 
         # Test domain rules validation
-        validation_result = config.validate_domain_rules()
+        validation_result = config.validate_business_rules()
         assert validation_result.success or validation_result.is_failure
 
         # Test with catalog and state
@@ -170,7 +179,7 @@ class TestSingerUnifiedMissingCoverage:
             state={"bookmarks": {}},
         )
 
-        validation_result = config_with_data.validate_domain_rules()
+        validation_result = config_with_data.validate_business_rules()
         assert validation_result.success or validation_result.is_failure
 
     def test_factory_functions(self):
@@ -230,6 +239,9 @@ class TestSingerUnifiedMissingCoverage:
             execution_time_ms=0.0,
         )
 
-        domain_validation = invalid_result.validate_domain_rules()
+        domain_validation = invalid_result.validate_business_rules()
         assert domain_validation.is_failure
-        assert "Records processed must be a non-negative integer" in domain_validation.error
+        assert (
+            "Records processed must be a non-negative integer"
+            in domain_validation.error
+        )

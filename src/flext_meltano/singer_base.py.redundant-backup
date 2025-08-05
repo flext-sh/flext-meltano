@@ -350,7 +350,9 @@ class FlextTapError(FlextSingerError):
         kwargs_dict = dict(kwargs)
         stream_name_raw = kwargs_dict.pop("stream_name", None)
         stream_name = stream_name_raw if isinstance(stream_name_raw, str) else None
-        super().__init__(message, component_type="tap", stream_name=stream_name, **kwargs_dict)
+        super().__init__(
+            message, component_type="tap", stream_name=stream_name, **kwargs_dict
+        )
 
 
 class FlextTargetError(FlextSingerError):
@@ -369,7 +371,9 @@ class FlextTargetError(FlextSingerError):
         kwargs_dict = dict(kwargs)
         stream_name_raw = kwargs_dict.pop("stream_name", None)
         stream_name = stream_name_raw if isinstance(stream_name_raw, str) else None
-        super().__init__(message, component_type="target", stream_name=stream_name, **kwargs_dict)
+        super().__init__(
+            message, component_type="target", stream_name=stream_name, **kwargs_dict
+        )
 
 
 class FlextTransformError(FlextSingerError):

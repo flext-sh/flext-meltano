@@ -187,20 +187,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
-from flext_core import FlextLogger, FlextResult
-
-try:
-    from injectable import injectable  # type: ignore[import-untyped]
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
-
-
-from pydantic import BaseModel, Field
+from flext_core import FlextLogger, FlextModel, FlextResult
+from pydantic import Field
 
 from flext_meltano.base import FlextMeltanoConfig
+
+# Injectable decorator from common utilities
+from flext_meltano.common import injectable
 
 
 class FlextMeltanoExecutionCommand:
@@ -212,7 +205,7 @@ class FlextMeltanoExecutionCommand:
         self.target_name = target_name
 
 
-class FlextMeltanoExecutionContext(BaseModel):
+class FlextMeltanoExecutionContext(FlextModel):
     """Execution context for pipeline operations."""
 
     execution_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -222,11 +215,6 @@ class FlextMeltanoExecutionContext(BaseModel):
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=1800)
     metadata: dict[str, object] = Field(default_factory=dict)
-
-    class Config:
-        """Pydantic configuration."""
-
-        arbitrary_types_allowed = True
 
 
 @injectable
