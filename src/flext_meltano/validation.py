@@ -608,7 +608,7 @@ class FlextMeltanoValidationService:
             details: dict[str, object] = {
                 "tap_name": tap_name,
                 "config_type": "unknown",
-                "config_keys": list(config.keys()) if config else [],
+                "config_keys": list(config.keys()) if config and isinstance(config, dict) else [],
             }
 
             # Validate configuration based on type

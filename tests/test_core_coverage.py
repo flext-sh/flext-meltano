@@ -695,7 +695,7 @@ class TestCoreModuleClasses:
 
         except ImportError:
             pytest.skip("core module not available")
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             # If inspection fails, log and continue
             import logging
 
@@ -730,7 +730,7 @@ class TestCoreModuleFunctions:
 
         except ImportError:
             pytest.skip("core module not available")
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             # If inspection fails, log and continue
             import logging
 

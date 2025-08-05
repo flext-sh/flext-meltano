@@ -34,9 +34,8 @@ make lint                    # ✅ PASSING - Zero issues
 poetry run ruff check src tests examples scripts
 
 # Ruff configuration (pyproject.toml)
-[tool.ruff]
-select = ["ALL"]             # Enable ALL linting rules
-ignore = []                  # Zero exceptions - enterprise standard
+extend = "../.ruff-shared.toml"
+lint.isort.known-first-party = ["flext_meltano"]
 ```
 
 **Enforced Standards**:
