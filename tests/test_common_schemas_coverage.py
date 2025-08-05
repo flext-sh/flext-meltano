@@ -152,7 +152,7 @@ class TestCommonSchemasFunctions:
                 try:
                     sig = inspect.signature(func)
                     assert sig is not None
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
                     # Log and skip if signature inspection fails
                     import logging
                     logger = logging.getLogger(__name__)

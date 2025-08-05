@@ -37,24 +37,24 @@ class TestValidationCoverageImprovement:
         """Test validation result creation and properties."""
         # Test successful result
         success_result = FlextMeltanoValidationResult(
+            validation_id="test-validation-1",
             is_valid=True,
             validation_type="project",
-            message="Validation successful",
         )
         assert success_result.is_valid is True
         assert success_result.validation_type == "project"
-        assert success_result.message == "Validation successful"
+        assert success_result.validation_id == "test-validation-1"
 
         # Test failure result with details
         failure_result = FlextMeltanoValidationResult(
+            validation_id="test-validation-2",
             is_valid=False,
             validation_type="config",
-            message="Validation failed",
-            errors=["Missing required field", "Invalid format"],
+            issues=["Missing required field", "Invalid format"],
             details={"field": "database_url", "expected": "string"},
         )
         assert failure_result.is_valid is False
-        assert len(failure_result.errors) == 2
+        assert len(failure_result.issues) == 2
         assert "database_url" in str(failure_result.details)
 
     def test_create_validation_service_factory(self):
@@ -85,42 +85,45 @@ class TestValidationCoverageImprovement:
             assert hasattr(result, "success")
             assert isinstance(result.success, bool)
 
-    def test_tap_config_validation_function(self):
+    async def test_tap_config_validation_function(self):
         """Test tap configuration validation function."""
         # Test with minimal config
         config = {"host": "localhost", "port": 5432}
-        result = flext_meltano_validate_tap_config("tap-postgres", config)
+        result = await flext_meltano_validate_tap_config("tap-postgres", config)
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
         # Test with empty config
-        result = flext_meltano_validate_tap_config("tap-csv", {})
+        result = await flext_meltano_validate_tap_config("tap-csv", {})
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
-        # Test with None config
-        result = flext_meltano_validate_tap_config("tap-test", None)
+        # Test with None config - convert to empty dict since function expects dict
+        result = await flext_meltano_validate_tap_config("tap-test", {})
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
-    def test_tap_connection_testing_function(self):
+    async def test_tap_connection_testing_function(self):
         """Test tap connection testing function."""
+        from pathlib import Path
+
         # Test connection with valid parameters
         config = {"host": "localhost", "database": "test"}
-        result = flext_meltano_test_tap_connection("tap-postgres", config)
+        result = await flext_meltano_test_tap_connection("tap-postgres", Path(), config)
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
-        # Test connection with timeout
-        result = flext_meltano_test_tap_connection(
-            "tap-postgres", config, timeout=10,
+        # Test connection with different config
+        result = await flext_meltano_test_tap_connection(
+            "tap-postgres", Path(), config,
         )
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
     def test_validation_service_methods(self):
         """Test validation service instance methods."""
-        service = FlextMeltanoValidationService()
+        config = FlextMeltanoConfig()
+        service = FlextMeltanoValidationService(config)
 
         # Test validate_project method
         result = service.validate_project()
@@ -128,19 +131,15 @@ class TestValidationCoverageImprovement:
         assert isinstance(result.success, bool)
 
         # Test validate_tap_config method
-        config = {"test": "value"}
-        result = service.validate_tap_config("tap-test", config)
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
-
-        # Test test_connection method
-        result = service.test_connection("tap-test", config)
+        tap_config = {"test": "value"}
+        result = service.validate_tap_config("tap-test", tap_config)
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
     def test_validation_error_handling(self):
         """Test validation error handling scenarios."""
-        service = FlextMeltanoValidationService()
+        config = FlextMeltanoConfig()
+        service = FlextMeltanoValidationService(config)
 
         # Test with invalid tap name
         result = service.validate_tap_config("", {})
@@ -164,9 +163,8 @@ class TestValidationCoverageImprovement:
             (temp_path / "meltano.yml").touch()
 
             # Test validation with this structure
-            service_with_project = FlextMeltanoValidationService({
-                "project_root": str(temp_path),
-            })
+            project_config = FlextMeltanoConfig(project_root=str(temp_path))
+            service_with_project = FlextMeltanoValidationService(project_config)
             result = service_with_project.validate_project()
             assert hasattr(result, "success")
             assert isinstance(result.success, bool)
@@ -174,9 +172,9 @@ class TestValidationCoverageImprovement:
     def test_validation_result_serialization(self):
         """Test validation result serialization capabilities."""
         result = FlextMeltanoValidationResult(
+            validation_id="test-123",
             is_valid=True,
             validation_type="config",
-            message="Test successful",
             details={"key": "value", "count": 42},
         )
 
@@ -188,19 +186,20 @@ class TestValidationCoverageImprovement:
         # Test that it has expected attributes
         assert hasattr(result, "is_valid")
         assert hasattr(result, "validation_type")
-        assert hasattr(result, "message")
+        assert hasattr(result, "validation_id")
 
     def test_validation_service_configuration_handling(self):
         """Test validation service configuration handling."""
         # Test with various configuration options
         configs = [
             {},
-            {"timeout": 30},
+            {"environment": "dev"},
             {"project_root": tempfile.gettempdir()},
-            {"timeout": 60, "project_root": str(Path(tempfile.gettempdir()) / "test"), "verbose": True},
+            {"project_root": str(Path(tempfile.gettempdir()) / "test"), "environment": "test"},
         ]
 
-        for config in configs:
+        for config_dict in configs:
+            config = FlextMeltanoConfig(**config_dict)
             service = FlextMeltanoValidationService(config)
             assert service is not None
 
@@ -210,7 +209,8 @@ class TestValidationCoverageImprovement:
 
     def test_validation_edge_cases(self):
         """Test validation edge cases and boundary conditions."""
-        service = FlextMeltanoValidationService()
+        config = FlextMeltanoConfig()
+        service = FlextMeltanoValidationService(config)
 
         # Test with very long tap names
         long_tap_name = "tap-" + "x" * 100
@@ -240,23 +240,26 @@ class TestValidationCoverageImprovement:
     def test_validation_timeout_handling(self):
         """Test validation timeout handling."""
         # Test with very short timeout
-        config = {"timeout": 1}
-        service = FlextMeltanoValidationService(config)
+        config_short = FlextMeltanoConfig(project_root=".")
+        service = FlextMeltanoValidationService(config_short)
 
-        result = service.test_connection("tap-postgres", {"host": "localhost"})
+        # Use async test_tap_connection method instead
+        import asyncio
+        result = asyncio.run(service.test_tap_connection("tap-postgres", {"host": "localhost"}))
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
         # Test with longer timeout
-        config = {"timeout": 120}
-        service = FlextMeltanoValidationService(config)
+        config_long = FlextMeltanoConfig(project_root=".")
+        service_long = FlextMeltanoValidationService(config_long)
 
-        result = service.test_connection("tap-csv", {"files": ["test.csv"]})
+        result = asyncio.run(service_long.test_tap_connection("tap-csv", {"files": ["test.csv"]}))
         assert hasattr(result, "success")
 
     def test_validation_caching_behavior(self):
         """Test validation caching and performance behavior."""
-        service = FlextMeltanoValidationService()
+        config = FlextMeltanoConfig()
+        service = FlextMeltanoValidationService(config)
 
         # Perform same validation multiple times
         tap_name = "tap-test"

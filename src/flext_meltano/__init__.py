@@ -205,23 +205,6 @@ if TYPE_CHECKING:
 # DBT integration - using TYPE_CHECKING to avoid runtime import issues
 if TYPE_CHECKING:
     import dbt.contracts.results
-    from dbt.adapters.base import BaseRelation  # type: ignore[attr-defined]
-    from dbt.adapters.base.connections import (  # type: ignore[attr-defined]
-        BaseConnectionManager,
-        ConnectionState,
-    )
-    from dbt.adapters.contracts.connection import (
-        AdapterRequiredConfig,
-        AdapterResponse,
-        Connection,
-        Credentials,
-    )
-    from dbt.adapters.sql import SQLAdapter  # type: ignore[attr-defined]
-    from dbt_common.exceptions import (
-        DbtDatabaseError,
-        DbtRuntimeError,
-    )
-    from meltano.core.project import Project as MeltanoCoreProject
 
 # === OPTIONAL IMPORTS ===
 # Singer SDK integration - required dependency
