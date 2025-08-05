@@ -63,7 +63,7 @@ result = cli.execute("discover", ["--tap", "tap-postgres"])
 ### Bridge Integration
 ```python
 # CLI operations designed for bridge consumption
-def bridge_run_cli(command: str, options: List[str] = None) -> Dict[str, Any]:
+def bridge_run_cli(command: str, options: list[str] | None = None) -> dict[str, object]:
     '''Execute CLI command with JSON-serializable results for Go services.'''
     cli = FlextMeltanoCli()
     result = cli.execute(command, options)

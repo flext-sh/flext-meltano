@@ -55,7 +55,7 @@ if test_result.success:
 ### Bridge Integration
 ```python
 # DBT operations designed for bridge consumption
-def bridge_invoke_dbt(command: str, *args: str) -> Dict[str, Any]:
+def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     '''Execute DBT command with JSON-serializable results for Go services.'''
     dbt_service = FlextMeltanoDbtService()
     result = dbt_service.execute_command(command, *args)

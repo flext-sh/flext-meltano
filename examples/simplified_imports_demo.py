@@ -101,9 +101,9 @@ migration_examples = [
     ("", ""),
     (
         "❌ OLD",
-        "from flext_meltano.domain.entities.project import MeltanoProject",
+        "from flext_meltano.base import FlextMeltanoConfig",
     ),
-    ("✅ NEW", "from flext_meltano import MeltanoProject"),
+    ("✅ NEW", "from flext_meltano import FlextMeltanoConfig"),
     ("", ""),
     (
         "❌ OLD",
