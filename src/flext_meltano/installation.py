@@ -627,7 +627,7 @@ class FlextMeltanoInstaller:
 
             # Execute meltano install
             cmd = ["meltano", "install"]
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 cmd,
                 cwd=self.project_root,
                 capture_output=True,
@@ -687,7 +687,7 @@ class FlextMeltanoInstaller:
             cmd = ["meltano", "remove", plugin_type, plugin_name]
 
             # Execute subprocess
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 cmd,
                 cwd=self.project_root,
                 capture_output=True,
@@ -750,7 +750,7 @@ class FlextMeltanoInstaller:
     def _execute_meltano_list(self) -> FlextResult[str]:
         """Execute meltano list command."""
         cmd = ["meltano", "list", "--format=json"]
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             cmd,
             cwd=self.project_root,
             capture_output=True,

@@ -419,7 +419,10 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
                 return FlextResult(error=f"DBT project not found at {self.project_dir}")
 
             if not self.runner:
-                self.runner = dbtRunner()
+                try:
+                    self.runner = dbtRunner()
+                except (ImportError, AttributeError, ValueError, TypeError) as e:
+                    return FlextResult.fail(f"DBT not available: {e}")
 
             # Build DBT command
             args = ["run"]
@@ -450,7 +453,10 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
                 return FlextResult(error=f"DBT project not found at {self.project_dir}")
 
             if not self.runner:
-                self.runner = dbtRunner()
+                try:
+                    self.runner = dbtRunner()
+                except (ImportError, AttributeError, ValueError, TypeError) as e:
+                    return FlextResult.fail(f"DBT not available: {e}")
 
             # Build DBT command
             args = ["test"]
@@ -474,14 +480,19 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         """Get DBT version."""
         try:
             if not self.runner:
-                self.runner = dbtRunner()
+                try:
+                    self.runner = dbtRunner()
+                except (ImportError, AttributeError, ValueError, TypeError):
+                    return "0.9.0"  # Fallback version when DBT not available
 
             # Try to get version
             result = self.runner.invoke(["--version"])
             if hasattr(result, "result") and result.result:
                 return str(result.result)
-        except (ImportError, AttributeError, ValueError, TypeError):
-            pass
+        except (ImportError, AttributeError, ValueError, TypeError) as e:
+            # Log the specific error for debugging
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to get version: {e}")
         return "0.9.0"  # Fallback version
 
     def execute(self) -> FlextResult[dict[str, object]]:

@@ -106,7 +106,7 @@ def configure_meltano_services(
 
         return FlextResult.ok(None)
 
-    except Exception as e:
+    except (ValueError, TypeError, AttributeError, KeyError) as e:
         return FlextResult.fail(f"Service configuration failed: {e}")
 
 

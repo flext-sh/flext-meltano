@@ -42,15 +42,12 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-# === DEPENDENCY INJECTION UTILITIES ===
 
-try:
-    from injectable import injectable
-except ImportError:
-    # Fallback decorator if injectable is not available
-    def injectable(cls: type[object]) -> type[object]:
-        """Fallback injectable decorator."""
-        return cls
+# === DEPENDENCY INJECTION UTILITIES ===
+# Simple injectable decorator replacement (no external dependency needed)
+def injectable(cls: type) -> type:
+    """Simple injectable decorator for dependency injection compatibility."""
+    return cls
 
 
 def validate_directory_path(directory_path: str | None) -> str | None:

@@ -30,6 +30,7 @@ classifiers = [
 dependencies = [
     "dbt-core (==1.10.5)",
     "flext-core @ file:///home/marlonsc/flext/flext-core",
+    "flext-cli @ file:///home/marlonsc/flext/flext-cli",
     "pydantic (>=2.11.7)",
     "pydantic-settings (>=2.10.1)",
     "requests (>=2.31.0)",
@@ -38,6 +39,9 @@ dependencies = [
     "singer-sdk (>=0.44.0)",
     "click (>=8.2.1)",
     "injectable (>=4.0.1)",
+    "duckdb (>=1.0.0)",
+    "pandas (>=2.0.0)",
+    "jinja2 (>=3.1.0)",
 ]
 [[project.authors]]
 name = "FLEXT Team"
@@ -110,7 +114,7 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=flext_meltano",
+    "--cov=src/flext_meltano",
     "--cov-branch",
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html:reports/coverage",
@@ -205,6 +209,7 @@ pyupgrade = ">=3.19.0"
 autoflake = ">=2.3.1"
 detect-secrets = ">=1.5.0"
 commitizen = ">=4.8.3"
+pandas = "^2.3.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = ">=8.4.0"
