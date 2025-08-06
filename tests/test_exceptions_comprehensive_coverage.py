@@ -78,7 +78,7 @@ class TestFlextMeltanoValidationError:
             "Invalid extractor",
             field="extractor",
             value="invalid-tap",
-            reason="not found"
+            reason="not found",
         )
 
         assert error.context["field"] == "extractor"
@@ -102,9 +102,7 @@ class TestFlextMeltanoConfigurationError:
     def test_configuration_error_with_config_context(self):
         """Test configuration error with config context."""
         error = FlextMeltanoConfigurationError(
-            "Invalid config",
-            config_file="meltano.yml",
-            section="plugins"
+            "Invalid config", config_file="meltano.yml", section="plugins"
         )
 
         assert error.context["context"]["config_file"] == "meltano.yml"
@@ -128,10 +126,7 @@ class TestFlextMeltanoConnectionError:
     def test_connection_error_with_details(self):
         """Test connection error with connection details."""
         error = FlextMeltanoConnectionError(
-            "Database unreachable",
-            host="localhost",
-            port=5432,
-            timeout=30
+            "Database unreachable", host="localhost", port=5432, timeout=30
         )
 
         assert error.context["context"]["host"] == "localhost"
@@ -158,7 +153,7 @@ class TestFlextMeltanoProcessingError:
             "Data processing failed",
             pipeline="test-pipeline",
             stage="extract",
-            records=1000
+            records=1000,
         )
 
         assert error.context["context"]["pipeline"] == "test-pipeline"
@@ -186,7 +181,7 @@ class TestFlextMeltanoAuthenticationError:
             "Invalid credentials",
             user="test_user",
             service="tap-postgres",
-            method="oauth"
+            method="oauth",
         )
 
         assert error.context["context"]["user"] == "test_user"
@@ -359,10 +354,18 @@ class TestExceptionsIntegration:
         assert isinstance(config_error, Exception)
         assert isinstance(processing_error, Exception)
         assert isinstance(timeout_error, Exception)
-        assert isinstance(plugin_error, FlextMeltanoError)  # Direct FlextMeltanoError inheritance
-        assert isinstance(execution_error, FlextMeltanoError)  # Direct FlextMeltanoError inheritance
-        assert isinstance(singer_error, FlextMeltanoError)  # Direct FlextMeltanoError inheritance
-        assert isinstance(dbt_error, FlextMeltanoError)  # Direct FlextMeltanoError inheritance
+        assert isinstance(
+            plugin_error, FlextMeltanoError
+        )  # Direct FlextMeltanoError inheritance
+        assert isinstance(
+            execution_error, FlextMeltanoError
+        )  # Direct FlextMeltanoError inheritance
+        assert isinstance(
+            singer_error, FlextMeltanoError
+        )  # Direct FlextMeltanoError inheritance
+        assert isinstance(
+            dbt_error, FlextMeltanoError
+        )  # Direct FlextMeltanoError inheritance
 
     def test_exception_context_preservation(self):
         """Test that exception context is preserved through inheritance."""
@@ -385,7 +388,9 @@ class TestExceptionsIntegration:
             assert hasattr(exception, "context")
 
             # Some exceptions have nested context, others have direct context
-            if "context" in exception.context and isinstance(exception.context["context"], dict):
+            if "context" in exception.context and isinstance(
+                exception.context["context"], dict
+            ):
                 # Nested context structure
                 assert exception.context["context"]["key"] == "value"
                 assert exception.context["context"]["number"] == 42

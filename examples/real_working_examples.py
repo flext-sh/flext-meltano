@@ -146,12 +146,15 @@ def example_real_config_validation() -> None:
 # =============================================================================
 
 
-# @flext_meltano_safe_operation("demo_etl_job")  # TODO: Implement when decorator is available
+# @flext_meltano_safe_operation("demo_etl_job")  # TODO(developer): Implement when decorator is available
 def example_decorated_operation():
     """Example using decorator for automatic error handling."""
+    # Constants for simulation
+    SUCCESS_RATE = 0.8  # 80% success rate
+
     # Simulate some ETL work that might fail
 
-    if random.random() < 0.8:  # 80% success rate
+    if random.random() < SUCCESS_RATE:  # 80% success rate
         return {
             "records_processed": random.randint(100, 1000),
             "duration_seconds": random.uniform(5.0, 30.0),
@@ -178,7 +181,7 @@ def example_decorator_usage() -> None:
 
 async def example_async_pipeline() -> None:
     """Example showing async pipeline execution."""
-    # TODO: Implement when pipeline builder is available
+    # TODO(developer): Implement when pipeline builder is available
     # pipeline = (
     #     create_flext_meltano_pipeline()
     #     .from_mysql(

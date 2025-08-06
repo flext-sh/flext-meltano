@@ -309,7 +309,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -372,7 +372,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -469,7 +469,7 @@ def execute_subprocess_common(
             exec_env.update(context.env)
 
         # Execute subprocess with common pattern
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(
             context.command,
             cwd=context.cwd,
             env=exec_env,

@@ -81,7 +81,6 @@ def configure_meltano_services(
 
     """
     try:
-
         # Use provided config or create default
         used_config = config or FlextMeltanoConfig()
 
@@ -90,7 +89,9 @@ def configure_meltano_services(
 
         # Register factory functions for Singer services
         register_typed(
-            container, ServiceKey("tap_service_factory"), create_meltano_tap_service,
+            container,
+            ServiceKey("tap_service_factory"),
+            create_meltano_tap_service,
         )
         register_typed(
             container,
@@ -98,7 +99,9 @@ def configure_meltano_services(
             create_meltano_target_service,
         )
         register_typed(
-            container, ServiceKey("dbt_service_factory"), create_meltano_dbt_service,
+            container,
+            ServiceKey("dbt_service_factory"),
+            create_meltano_dbt_service,
         )
 
         return FlextResult.ok(None)

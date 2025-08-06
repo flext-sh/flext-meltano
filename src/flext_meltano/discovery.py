@@ -175,7 +175,9 @@ class FlextMeltanoDiscoverer:
         '''Discover plugins filtered by type (extractor, loader, transformer).'''
         # Implementation with Hub integration
 
-    def discover_plugin_details(self, plugin_name: str) -> FlextResult[dict[str, object]]:
+    def discover_plugin_details(
+        self, plugin_name: str
+    ) -> FlextResult[dict[str, object]]:
         '''Get detailed information about a specific plugin.'''
         # Implementation with detailed metadata
 ```
@@ -579,7 +581,7 @@ class FlextMeltanoDiscoverer:
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct Singer discovery failed: {e}")
 
-    def discover_plugins(  # noqa: C901, PLR0912
+    def discover_plugins(
         self,
         plugin_type: str | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,

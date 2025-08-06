@@ -318,7 +318,7 @@ from flext_meltano.validation import (
 
 # DBT run result - using TYPE_CHECKING
 if TYPE_CHECKING:
-    DbtRunResult = dbt.contracts.results.RunResult  # type: ignore[attr-defined]
+    DbtRunResult = dbt.contracts.results.RunResult
 else:
     DbtRunResult = None
 

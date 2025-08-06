@@ -91,8 +91,8 @@ def _get_default_executor(
     config: FlextMeltanoConfig | None = None,
 ) -> FlextMeltanoExecutor:
     """Create default executor instance avoiding circular imports."""
-    from flext_meltano.base import FlextMeltanoConfig  # noqa: PLC0415
-    from flext_meltano.execution import FlextMeltanoExecutor  # noqa: PLC0415
+    from flext_meltano.base import FlextMeltanoConfig
+    from flext_meltano.execution import FlextMeltanoExecutor
 
     used_config = config or FlextMeltanoConfig()
     return FlextMeltanoExecutor(used_config)

@@ -212,7 +212,13 @@ def example_enterprise_config_traditional() -> dict[str, Any] | None:
                 msg: str = f"Missing required field: {field}"
                 raise ValueError(msg)
 
-        if not isinstance(config["port"], int) or not (1 <= config["port"] <= 65535):
+        # Constants for port validation
+        MIN_PORT = 1
+        MAX_PORT = 65535
+
+        if not isinstance(config["port"], int) or not (
+            MIN_PORT <= config["port"] <= MAX_PORT
+        ):
             msg = "Port must be integer between 1-65535"
             raise ValueError(msg)
 

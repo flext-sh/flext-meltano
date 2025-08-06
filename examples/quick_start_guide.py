@@ -31,6 +31,11 @@ DEFAULT_POSTGRES_PORT = 5432
 DEFAULT_ORACLE_PORT = 1521
 DEFAULT_MYSQL_PORT = 3306
 BACKOFF_BASE = 2
+
+# Constants for success rate thresholds
+EXCELLENT_SUCCESS_RATE = 95
+GOOD_SUCCESS_RATE = 80
+
 # ============================================================================
 # 🚀 QUICK START - Primeiros Passos
 # ============================================================================
@@ -367,7 +372,7 @@ def real_world_etl_workflow() -> None:
     total_success = critical_success + aux_success + analytics_success + dbt_success
     success_rate = (total_success / (total_tables + 1)) * 100  # +1 for DBT
 
-    if success_rate >= 95 or success_rate >= 80:
+    if success_rate >= EXCELLENT_SUCCESS_RATE or success_rate >= GOOD_SUCCESS_RATE:
         pass
 
 
