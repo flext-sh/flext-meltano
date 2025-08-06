@@ -180,6 +180,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import time
 import uuid
 import warnings
 from dataclasses import dataclass
@@ -187,13 +188,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 # FlextResult is MANDATORY for all operations
-from flext_core import FlextLogger, FlextModel, FlextResult
+from flext_core import FlextModel, FlextResult, get_logger
+
+# Observability integration - using flext_core logger instead of flext_observability
 from pydantic import Field
 
 from flext_meltano.base import FlextMeltanoConfig
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
+
+logger = get_logger(__name__)
 
 
 class FlextMeltanoExecutionCommand:
@@ -226,7 +231,7 @@ class FlextMeltanoExecutor:
         self.config = config
         self._initialized = False
         self._meltano_path: Path | None = None
-        self.logger = FlextLogger.get_logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def initialize(self) -> FlextResult[bool]:
         """Initialize service."""
@@ -265,7 +270,12 @@ class FlextMeltanoExecutor:
         """Find Meltano executable."""
         project_path = Path(self.config.project_root)
 
-        # Check project-local venv first
+        # Check workspace venv first (real location)
+        workspace_venv_meltano = Path("/home/marlonsc/flext/.venv/bin/meltano")
+        if workspace_venv_meltano.exists():
+            return workspace_venv_meltano
+
+        # Check project-local venv
         venv_meltano = project_path / ".venv" / "bin" / "meltano"
         if venv_meltano.exists():
             return venv_meltano
@@ -309,7 +319,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -372,7 +382,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -449,11 +459,11 @@ class SubprocessExecutionContext:
 def execute_subprocess_common(
     context: SubprocessExecutionContext,
 ) -> FlextResult[dict[str, object]]:
-    """Centralized subprocess execution to eliminate code duplication.
+    """Centralized subprocess execution with integrated observability.
 
     This function provides a common pattern for subprocess execution used
-    throughout the FLEXT Meltano ecosystem, ensuring consistent error handling
-    and result formatting.
+    throughout the FLEXT Meltano ecosystem, ensuring consistent error handling,
+    result formatting, and comprehensive observability integration.
 
     Args:
         context: Subprocess execution context with command and options
@@ -462,14 +472,20 @@ def execute_subprocess_common(
         FlextResult with execution details including stdout, stderr, returncode
 
     """
+    start_time = time.time()
+    command_str = " ".join(context.command)
+
+    # Log subprocess execution start
+    logger.info(f"Starting subprocess execution: {command_str}")
+
     try:
         # Set up environment
         exec_env = dict(os.environ)
         if context.env:
             exec_env.update(context.env)
 
-        # Execute subprocess with common pattern
-        result = subprocess.run(
+        # Execute subprocess with enhanced monitoring
+        result = subprocess.run(  # noqa: S603
             context.command,
             cwd=context.cwd,
             env=exec_env,
@@ -479,23 +495,36 @@ def execute_subprocess_common(
             check=context.check,
         )
 
-        # Return standardized result
+        # Calculate execution metrics
+        execution_time = time.time() - start_time
+        success = result.returncode == 0
+
+        # Enhanced result with execution metrics
         execution_result = {
-            "command": " ".join(context.command),
+            "command": command_str,
             "returncode": result.returncode,
             "stdout": result.stdout or "",
             "stderr": result.stderr or "",
-            "success": result.returncode == 0,
+            "success": success,
+            "execution_time": execution_time,
             "cwd": str(context.cwd) if context.cwd else str(Path.cwd()),
+            "timeout_seconds": context.timeout_seconds,
         }
+
+        # Log execution completion
+        logger.info(f"Subprocess completed in {execution_time:.2f}s: {success}")
 
         return FlextResult(data=execution_result)
 
     except subprocess.TimeoutExpired as e:
+        execution_time = time.time() - start_time
+        logger.exception(f"Subprocess timed out after {execution_time:.2f}s: {command_str}")
         return FlextResult(
             error=f"Command timed out after {context.timeout_seconds} seconds: {e}",
         )
     except (subprocess.CalledProcessError, OSError, FileNotFoundError) as e:
+        execution_time = time.time() - start_time
+        logger.exception(f"Subprocess failed after {execution_time:.2f}s: {command_str}")
         return FlextResult(error=f"Command error: {e}")
 
 

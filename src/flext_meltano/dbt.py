@@ -82,8 +82,9 @@ from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
 
+from flext_meltano.base import FlextMeltanoConfig
+
 if TYPE_CHECKING:
-    from flext_meltano.base import FlextMeltanoConfig
     from flext_meltano.execution import FlextMeltanoExecutor
 
 
@@ -91,8 +92,8 @@ def _get_default_executor(
     config: FlextMeltanoConfig | None = None,
 ) -> FlextMeltanoExecutor:
     """Create default executor instance avoiding circular imports."""
-    from flext_meltano.base import FlextMeltanoConfig
-    from flext_meltano.execution import FlextMeltanoExecutor
+    # Import locally to avoid circular import at module level
+    from flext_meltano.execution import FlextMeltanoExecutor  # noqa: PLC0415
 
     used_config = config or FlextMeltanoConfig()
     return FlextMeltanoExecutor(used_config)

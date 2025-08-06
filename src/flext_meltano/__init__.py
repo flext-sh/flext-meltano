@@ -202,10 +202,6 @@ if TYPE_CHECKING:
     from flext_core import FlextResult
 
 # === CORE BASE CLASSES ===
-# DBT integration - using TYPE_CHECKING to avoid runtime import issues
-if TYPE_CHECKING:
-    import dbt.contracts.results
-
 # === OPTIONAL IMPORTS ===
 # Singer SDK integration - required dependency
 # === SINGER BASE CLASSES - Proper location in flext-meltano ===
@@ -259,6 +255,19 @@ from flext_meltano.container import (
     configure_meltano_container,
     configure_meltano_services,
     get_meltano_container,
+)
+
+# === DBT HUB INTEGRATION ===
+from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
+from flext_meltano.dbt_packages import (
+    FlextDbtInMemoryExecutor,
+    FlextDbtModel,
+    FlextDbtModelRegistry,
+    FlextDbtPackage,
+    FlextDbtPackageManager,
+    create_in_memory_executor,
+    create_model_registry,
+    create_package_manager,
 )
 
 # === DISCOVERY & CATALOG MANAGEMENT ===
@@ -316,9 +325,10 @@ from flext_meltano.validation import (
     flext_meltano_validate_tap_config,
 )
 
-# DBT run result - using TYPE_CHECKING
+# DBT run result - simplified for compatibility
 if TYPE_CHECKING:
-    DbtRunResult = dbt.contracts.results.RunResult
+    from typing import Any
+    DbtRunResult = Any
 else:
     DbtRunResult = None
 
@@ -375,6 +385,13 @@ __version__ = "2.0.0-enterprise"
 # === PUBLIC API ===
 __all__: list[str] = [
     "BatchSink",
+    # DBT Hub Integration
+    "FlextDbtHub",
+    "FlextDbtInMemoryExecutor",
+    "FlextDbtModel",
+    "FlextDbtModelRegistry",
+    "FlextDbtPackage",
+    "FlextDbtPackageManager",
     "FlextMeltanoBaseService",
     "FlextMeltanoBridge",
     "FlextMeltanoCli",
@@ -428,15 +445,19 @@ __all__: list[str] = [
     "__version__",
     "configure_meltano_container",
     "configure_meltano_services",
+    "create_dbt_hub",
     "create_dbt_service",
     "create_discoverer",
     "create_executor",
     "create_flext_meltano_bridge",
+    "create_in_memory_executor",
     "create_installer_service",
     "create_meltano_dbt_service",
     "create_meltano_extension_service",
     "create_meltano_tap_service",
     "create_meltano_target_service",
+    "create_model_registry",
+    "create_package_manager",
     "create_tap",
     "create_target",
     "create_unified_singer_config",

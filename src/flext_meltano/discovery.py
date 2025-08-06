@@ -341,8 +341,6 @@ from pathlib import Path
 from flext_core import FlextLogger, FlextModel, FlextResult
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
-
-# Project import for hub initialization
 from meltano.core.project import Project
 from pydantic import Field
 
@@ -581,7 +579,7 @@ class FlextMeltanoDiscoverer:
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct Singer discovery failed: {e}")
 
-    def discover_plugins(
+    def discover_plugins(  # noqa: PLR0912
         self,
         plugin_type: str | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,
