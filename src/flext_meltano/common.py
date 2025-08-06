@@ -45,7 +45,7 @@ from pathlib import Path
 # === DEPENDENCY INJECTION UTILITIES ===
 
 try:
-    from injectable import injectable  # type: ignore[import-untyped]
+    from injectable import injectable
 except ImportError:
     # Fallback decorator if injectable is not available
     def injectable(cls: type[object]) -> type[object]:

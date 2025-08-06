@@ -396,11 +396,11 @@ class FlextMeltanoBridge:
 
     def add_plugin(
         self,
-        plugin_type: str,  # noqa: ARG002
-        name: str,  # noqa: ARG002
+        plugin_type: str,
+        name: str,
         *,
-        variant: str | None = None,  # noqa: ARG002
-        pip_url: str | None = None,  # noqa: ARG002
+        variant: str | None = None,
+        pip_url: str | None = None,
     ) -> FlextResult[str]:
         """Add plugin to Meltano project via Go service request.
 
@@ -428,7 +428,7 @@ class FlextMeltanoBridge:
             "Plugin installation requires initialized Meltano project",
         )
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:  # noqa: ARG002
+    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
         """Discover schema catalog from tap for Go services.
 
         Args:
@@ -507,9 +507,9 @@ class FlextMeltanoBridge:
 
     def invoke_dbt(
         self,
-        command: str,  # noqa: ARG002
-        *args: str,  # noqa: ARG002
-        **kwargs: object,  # noqa: ARG002
+        command: str,
+        *args: str,
+        **kwargs: object,
     ) -> FlextResult[dict[str, object]]:
         """Execute DBT command for Go services.
 

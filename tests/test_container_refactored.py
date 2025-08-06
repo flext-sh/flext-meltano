@@ -92,7 +92,9 @@ class TestLegacyContainerCompatibility:
             assert len(w) == 1
             assert issubclass(w[0].category, DeprecationWarning)
             assert "deprecated" in str(w[0].message)
-            assert "get_flext_container() + configure_meltano_services()" in str(w[0].message)
+            assert "get_flext_container() + configure_meltano_services()" in str(
+                w[0].message
+            )
 
         # Container should still work
         assert isinstance(container, FlextContainer)
@@ -133,8 +135,7 @@ class TestLegacyContainerCompatibility:
             warnings.simplefilter("ignore", DeprecationWarning)
 
             custom_config = FlextMeltanoConfig(
-                project_root="./custom_test",
-                environment="test"
+                project_root="./custom_test", environment="test"
             )
 
             result = configure_meltano_container(custom_config)
@@ -233,10 +234,7 @@ class TestContainerServiceIntegration:
     def test_container_service_lifecycle(self):
         """Test complete service lifecycle in container."""
         container = get_flext_container()
-        config = FlextMeltanoConfig(
-            project_root="./lifecycle_test",
-            environment="test"
-        )
+        config = FlextMeltanoConfig(project_root="./lifecycle_test", environment="test")
 
         # 1. Configure services
         configure_result = configure_meltano_services(container, config)
@@ -251,7 +249,7 @@ class TestContainerServiceIntegration:
         factories = [
             "tap_service_factory",
             "target_service_factory",
-            "dbt_service_factory"
+            "dbt_service_factory",
         ]
 
         for factory_name in factories:
@@ -270,7 +268,7 @@ class TestContainerAPIConsistency:
         expected_exports = [
             "configure_meltano_container",
             "configure_meltano_services",
-            "get_meltano_container"
+            "get_meltano_container",
         ]
 
         for export in expected_exports:

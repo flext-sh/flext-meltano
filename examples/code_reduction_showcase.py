@@ -86,7 +86,7 @@ def example_1_old_way() -> None:
     # Initialize Meltano (5+ lines)
     if not (project_root / "meltano.yml").exists():
         result = subprocess.run(
-            ["meltano", "init", "test_project", "."],  # noqa: S607
+            ["meltano", "init", "test_project", "."],
             cwd=project_root.parent,
             capture_output=True,
             text=True,
@@ -102,7 +102,7 @@ def example_1_old_way() -> None:
         ("loader", "target-csv"),
     ]:
         result = subprocess.run(
-            ["meltano", "add", plugin_type, plugin_name],  # noqa: S607
+            ["meltano", "add", plugin_type, plugin_name],
             cwd=project_root,
             capture_output=True,
             text=True,
@@ -115,7 +115,7 @@ def example_1_old_way() -> None:
     # Run pipeline (10+ lines)
     env = {**os.environ, "MELTANO_ENVIRONMENT": "dev"}
     result = subprocess.run(
-        ["meltano", "run", "tap-csv", "target-csv"],  # noqa: S607
+        ["meltano", "run", "tap-csv", "target-csv"],
         cwd=project_root,
         env=env,
         capture_output=True,
@@ -161,7 +161,7 @@ def example_2_old_way() -> None:
     # Initialize project (10 lines)
     if not (project_root / "meltano.yml").exists():
         result = subprocess.run(
-            ["meltano", "init", "enterprise_project", "."],  # noqa: S607
+            ["meltano", "init", "enterprise_project", "."],
             check=False,
             cwd=project_root.parent,
             capture_output=True,
@@ -174,7 +174,7 @@ def example_2_old_way() -> None:
     # Create environments (15 lines)
     for env in ["staging", "prod"]:
         result = subprocess.run(
-            ["meltano", "environment", "add", env],  # noqa: S607
+            ["meltano", "environment", "add", env],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -199,7 +199,7 @@ def example_2_old_way() -> None:
     for plugin_type, plugin_name, config in plugins_config:
         # Add plugin
         result = subprocess.run(
-            ["meltano", "add", plugin_type, plugin_name],  # noqa: S607
+            ["meltano", "add", plugin_type, plugin_name],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -236,7 +236,7 @@ def example_2_old_way() -> None:
 
     for job_name, tap, target in jobs:
         result = subprocess.run(
-            ["meltano", "job", "add", job_name, "--tasks", f"{tap} {(target,)}"],  # noqa: S607
+            ["meltano", "job", "add", job_name, "--tasks", f"{tap} {(target,)}"],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -327,7 +327,7 @@ def example_3_old_way() -> None:
 
             # Run extraction (10 lines)
             result = subprocess.run(
-                ["meltano", "run", tap, target],  # noqa: S607
+                ["meltano", "run", tap, target],
                 check=False,
                 cwd=project_root,
                 capture_output=True,
@@ -382,7 +382,7 @@ def example_4_old_way() -> None:
     try:
         # Test connection (10 lines)
         result = subprocess.run(
-            ["meltano", "invoke", tap, "--discover"],  # noqa: S607
+            ["meltano", "invoke", tap, "--discover"],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -452,7 +452,7 @@ async def example_5_old_way() -> None:
 
                 # Execute (10 lines)
                 result = subprocess.run(
-                    ["meltano", "run", tap, target],  # noqa: S607
+                    ["meltano", "run", tap, target],
                     check=False,
                     cwd=project_root,
                     env=env,
@@ -545,7 +545,7 @@ def example_6_old_way() -> None:
     # Check Meltano CLI (10 lines)
     try:
         result = subprocess.run(
-            ["meltano", "--version"],  # noqa: S607
+            ["meltano", "--version"],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -562,7 +562,7 @@ def example_6_old_way() -> None:
     # Check plugins (10 lines)
     try:
         result = subprocess.run(
-            ["meltano", "config", "list"],  # noqa: S607
+            ["meltano", "config", "list"],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -581,7 +581,7 @@ def example_6_old_way() -> None:
     # Check database (10 lines)
     try:
         result = subprocess.run(
-            ["meltano", "config", "meltano", "database_uri"],  # noqa: S607
+            ["meltano", "config", "meltano", "database_uri"],
             check=False,
             cwd=project_root,
             capture_output=True,
@@ -596,7 +596,7 @@ def example_6_old_way() -> None:
     # Check environments (10 lines)
     try:
         result = subprocess.run(
-            ["meltano", "environment", "list"],  # noqa: S607
+            ["meltano", "environment", "list"],
             check=False,
             cwd=project_root,
             capture_output=True,
