@@ -186,6 +186,7 @@ import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextModel, FlextResult, get_logger
@@ -194,6 +195,9 @@ from flext_core import FlextModel, FlextResult, get_logger
 from pydantic import Field
 
 from flext_meltano.base import FlextMeltanoConfig
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
@@ -219,7 +223,7 @@ class FlextMeltanoExecutionContext(FlextModel):
     environment: str = Field(default="dev")
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=1800)
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
 
 @injectable
@@ -256,7 +260,7 @@ class FlextMeltanoExecutor:
         except (OSError, ImportError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get executor health status."""
         return FlextResult(
             data={
@@ -292,7 +296,7 @@ class FlextMeltanoExecutor:
         tap_name: str,
         target_name: str,
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute pipeline using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -359,7 +363,7 @@ class FlextMeltanoExecutor:
         self,
         args: list[str],
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Run generic command using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -420,7 +424,7 @@ class FlextMeltanoExecutor:
     def execute(
         self,
         command: FlextMeltanoExecutionCommand,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute command using domain service pattern."""
         return self.execute_pipeline(command.tap_name, command.target_name)
 
@@ -438,7 +442,6 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
         return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
         return FlextResult(error=f"Failed to create executor: {e}")
-
 
 # === COMMON SUBPROCESS EXECUTOR ===
 
@@ -458,7 +461,7 @@ class SubprocessExecutionContext:
 
 def execute_subprocess_common(
     context: SubprocessExecutionContext,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[FlextTypes.Core.JsonDict]:
     """Centralized subprocess execution with integrated observability.
 
     This function provides a common pattern for subprocess execution used
@@ -527,7 +530,6 @@ def execute_subprocess_common(
         logger.exception(f"Subprocess failed after {execution_time:.2f}s: {command_str}")
         return FlextResult(error=f"Command error: {e}")
 
-
 # === LEGACY COMPATIBILITY ===
 
 
@@ -538,7 +540,7 @@ class FlextMeltanoResult:
         self,
         *,
         success: bool,
-        data: dict[str, object] | None = None,
+        data: FlextTypes.Core.JsonDict | None = None,
         error: str = "",
     ) -> None:
         """Initialize result."""
@@ -547,7 +549,7 @@ class FlextMeltanoResult:
         self.error = error
 
     @classmethod
-    def ok(cls, data: dict[str, object] | None = None) -> FlextMeltanoResult:
+    def ok(cls, data: FlextTypes.Core.JsonDict | None = None) -> FlextMeltanoResult:
         """Create success result."""
         return cls(success=True, data=data)
 

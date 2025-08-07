@@ -55,7 +55,7 @@ if test_result.success:
 ### Bridge Integration
 ```python
 # DBT operations designed for bridge consumption
-def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
+def bridge_invoke_dbt(command: str, *args: str) -> FlextTypes.Core.JsonDict:
     '''Execute DBT command with JSON-serializable results for Go services.'''
     dbt_service = FlextMeltanoDbtService()
     result = dbt_service.execute_command(command, *args)
@@ -85,6 +85,8 @@ from flext_core import FlextResult
 from flext_meltano.base import FlextMeltanoConfig
 
 if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
+
     from flext_meltano.execution import FlextMeltanoExecutor
 
 
@@ -122,7 +124,7 @@ class FlextMeltanoDbtManager:
         models: list[str] | None = None,
         select: str | None = None,
         exclude: str | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Run DBT models using real Meltano executor."""
         cmd = ["invoke", "dbt:run"]
 
@@ -152,7 +154,7 @@ class FlextMeltanoDbtManager:
         self,
         models: list[str] | None = None,
         select: str | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Test DBT models using real Meltano executor."""
         cmd = ["invoke", "dbt:test"]
 
@@ -178,7 +180,7 @@ class FlextMeltanoDbtManager:
         self,
         models: list[str] | None = None,
         select: str | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Compile DBT models using real Meltano executor."""
         cmd = ["invoke", "dbt:compile"]
 
@@ -200,7 +202,7 @@ class FlextMeltanoDbtManager:
             )
         return FlextResult.fail(f"DBT compile failed: {result.error}")
 
-    def generate_docs(self) -> FlextResult[dict[str, object]]:
+    def generate_docs(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Generate DBT documentation."""
         result = self.executor.run_command(["invoke", "dbt:docs:generate"])
 
@@ -214,7 +216,7 @@ class FlextMeltanoDbtManager:
             )
         return FlextResult.fail(f"DBT docs generation failed: {result.error}")
 
-    def serve_docs(self, port: int = 8080) -> FlextResult[dict[str, object]]:
+    def serve_docs(self, port: int = 8080) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Serve DBT documentation."""
         result = self.executor.run_command(
             [
@@ -296,7 +298,7 @@ class FlextMeltanoDbtRunner:
         self,
         command: str,
         args: list[str] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Run DBT command using Meltano executor."""
         cmd = ["invoke", f"dbt:{command}"]
         if args:
@@ -318,7 +320,7 @@ class FlextMeltanoDbtRunner:
     def run_models(
         self,
         models: list[str] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Run specific DBT models."""
         args = []
         if models:
@@ -329,7 +331,7 @@ class FlextMeltanoDbtRunner:
     def test_models(
         self,
         models: list[str] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Test specific DBT models."""
         args = []
         if models:

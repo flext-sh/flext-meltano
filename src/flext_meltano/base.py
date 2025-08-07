@@ -85,7 +85,6 @@ if result.success:
 ```python
 from flext_meltano.base import FlextMeltanoTapService
 
-
 class CustomTap(FlextMeltanoTapService):
     def discover_streams(self) -> FlextResult[List[Stream]]:
         # Custom implementation using foundation patterns
@@ -135,7 +134,8 @@ from flext_meltano.common import injectable
 if TYPE_CHECKING:
     from logging import Logger
 
-    from meltano.edk.extension import ExtensionBase
+    from flext_core.semantic_types import FlextTypes
+    from meltano.edk.extension import ExtensionBase  # type: ignore[import-not-found]
     from singer_sdk import Tap, Target
 
 
@@ -194,7 +194,7 @@ class FlextMeltanoEvent(FlextEntity):
         description="Event timestamp",
     )
     source: str = Field(..., description="Event source component")
-    data: dict[str, object] = Field(default_factory=dict, description="Event data")
+    data: FlextTypes.Core.JsonDict = Field(default_factory=dict, description="Event data")
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate event business rules."""
@@ -203,7 +203,6 @@ class FlextMeltanoEvent(FlextEntity):
         if not self.source.strip():
             return FlextResult(error="Event source cannot be empty")
         return FlextResult(data=None)
-
 
 # === FLEXT-CORE MANDATORY DOMAIN SERVICES ===
 
@@ -239,9 +238,8 @@ class FlextMeltanoBaseService:
         """Validate service state - MANDATORY implementation."""
 
     @abstractmethod
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get service health status - MANDATORY for monitoring."""
-
 
 # === SINGER SDK INTEGRATION ===
 
@@ -262,7 +260,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get tap health status."""
         return FlextResult(
             data={
@@ -283,7 +281,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def discover_catalog(self) -> FlextResult[dict[str, object]]:
+    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover catalog using Singer SDK patterns."""
         if not self.tap_instance:
             if not self.tap_class:
@@ -317,7 +315,7 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
             return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get target health status."""
         return FlextResult(
             data={
@@ -338,7 +336,6 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
             return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
-
 # === MELTANO EDK INTEGRATION ===
 
 
@@ -355,7 +352,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
         """Validate Meltano EDK availability."""
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get extension health status."""
         return FlextResult(
             data={
@@ -374,7 +371,6 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
             return FlextResult(error="Extension class cannot be None")
         self.extension_class = extension_class
         return FlextResult(data=None)
-
 
 # === DBT INTEGRATION ===
 
@@ -398,7 +394,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get DBT health status."""
         return FlextResult(
             data={
@@ -412,7 +408,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         """Run DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -446,7 +442,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         """Test DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -490,12 +486,12 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
             if hasattr(result, "result") and result.result:
                 return str(result.result)
         except (ImportError, AttributeError, ValueError, TypeError) as e:
-            # Log the specific error for debugging
-            import logging
-            logging.getLogger(__name__).warning(f"Failed to get version: {e}")
+            # Log the specific error for debugging - use local logger
+            logger = FlextLogger(__name__)
+            logger.warning(f"Failed to get version: {e}")
         return "0.9.0"  # Fallback version
 
-    def execute(self) -> FlextResult[dict[str, object]]:
+    def execute(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute method for service pattern."""
         return FlextResult(
             data={
@@ -504,7 +500,6 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
                 "initialized": self._initialized,
             },
         )
-
 
 # === FACTORY FUNCTIONS USING MANDATORY PATTERNS ===
 

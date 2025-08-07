@@ -15,7 +15,7 @@ connections with enterprise-grade error handling and bridge integration.
 **FIX GROUP 1**: Fixed details parameter type compatibility
 ```python
 # Fixed implementation:
-details: dict[str, object] = {
+details: FlextTypes.Core.JsonDict = {
     "tap_name": tap_name,
     "command": " ".join(cmd),
     "returncode": returncode,
@@ -27,7 +27,7 @@ details: dict[str, object] = {
 **FIX GROUP 2**: Fixed type-incompatible details dictionary
 ```python
 # Fixed implementation:
-details: dict[str, object] = {
+details: FlextTypes.Core.JsonDict = {
     "config_type": "unknown",
     "config_keys": list(config.keys()) if config else [],
 }
@@ -118,20 +118,20 @@ else:
 ```python
 # BROKEN: Type mismatch
 metadata: dict[str, str | int | None] = get_metadata()
-result.metadata = metadata  # dict[str, object] expected
+result.metadata = metadata  # FlextTypes.Core.JsonDict expected
 
 # SHOULD BE: Consistent type definitions
-metadata: dict[str, object] = get_metadata()
+metadata: FlextTypes.Core.JsonDict = get_metadata()
 # OR
 metadata: dict[str, str | int | None] = get_metadata()
-result.metadata = dict(metadata)  # Convert to dict[str, object]
+result.metadata = dict(metadata)  # Convert to FlextTypes.Core.JsonDict
 ```
 
 **ERROR 2 (Line 344)**: Type incompatibility in sequence handling
 ```python
 # BROKEN: Type mismatch
 validation_errors: dict[str, Sequence[str]] = collect_errors()
-result.errors = validation_errors  # dict[str, object] expected
+result.errors = validation_errors  # FlextTypes.Core.JsonDict expected
 
 # SHOULD BE: Proper type conversion
 validation_errors: dict[str, Sequence[str]] = collect_errors()
@@ -140,7 +140,7 @@ result.errors = {k: list(v) for k, v in validation_errors.items()}
 
 ### Required Fixes - EMERGENCY PHASE 1
 1. **Type Consistency**: Fix 10 MyPy errors across lines 467,561,563,565,567,569,577,642,643
-2. **Dict Type Annotations**: Ensure consistent dict[str, object] usage throughout module
+2. **Dict Type Annotations**: Ensure consistent FlextTypes.Core.JsonDict usage throughout module
 3. **Object Type Guards**: Add isinstance() checks before calling string methods on objects
 4. **Pydantic Model Compatibility**: Align type definitions with BaseModel requirements
 5. **Bridge Compatibility**: Ensure JSON serialization works correctly after type fixes
@@ -232,10 +232,10 @@ validation_result = {
 ## Next Actions Required
 
 ### CRITICAL (Fix Type Errors) - EMERGENCY PHASE 1
-1. **Fix Line 467**: Resolve details parameter type incompatibility (dict[str, str | int | None] vs dict[str, object])
+1. **Fix Line 467**: Resolve details parameter type incompatibility (dict[str, str | int | None] vs FlextTypes.Core.JsonDict)
 2. **Fix Lines 561,563,565,567,569,577**: Resolve multiple validation method type incompatibilities
 3. **Fix Lines 642,643**: Add isinstance() checks for .strip() method calls on objects
-4. **Type Consistency**: Ensure consistent dict[str, object] usage across all validation methods
+4. **Type Consistency**: Ensure consistent FlextTypes.Core.JsonDict usage across all validation methods
 5. **MyPy Compliance**: Verify strict MyPy compliance - 10 errors must be resolved
 6. **Quality Gate Unblocking**: Essential for CI/CD pipeline and enterprise deployment
 
@@ -258,10 +258,14 @@ import uuid
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextModel, FlextResult
 from pydantic import Field
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 # Singer SDK integration - MANDATORY for tap validation
 from flext_meltano.base import FlextMeltanoConfig
@@ -281,7 +285,7 @@ class FlextMeltanoValidationContext(FlextModel):
     validation_type: str = Field(...)  # project, tap_connection, tap_config
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=30)
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
 
 class FlextMeltanoValidationResult(FlextModel):
@@ -292,7 +296,7 @@ class FlextMeltanoValidationResult(FlextModel):
     is_valid: bool = Field(...)
     issues: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
-    details: dict[str, object] = Field(default_factory=dict)
+    details: FlextTypes.Core.JsonDict = Field(default_factory=dict)
     validated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
@@ -324,7 +328,7 @@ class FlextMeltanoValidationService:
         self._initialized = True
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get validation service health status."""
         return FlextResult(
             data={
@@ -348,7 +352,7 @@ class FlextMeltanoValidationService:
         try:
             issues: list[str] = []
             warnings: list[str] = []
-            details: dict[str, object] = {
+            details: FlextTypes.Core.JsonDict = {
                 "meltano_yml_exists": False,
                 "meltano_dir_exists": False,
                 "plugins_installed": False,
@@ -394,7 +398,7 @@ class FlextMeltanoValidationService:
     async def test_tap_connection(
         self,
         tap_name: str,
-        config: dict[str, object] | None = None,
+        config: FlextTypes.Core.JsonDict | None = None,
         context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test tap connection using enterprise patterns."""
@@ -424,7 +428,7 @@ class FlextMeltanoValidationService:
     async def _test_connection_subprocess(
         self,
         tap_name: str,
-        _config: dict[str, object],
+        _config: FlextTypes.Core.JsonDict,
         context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test connection using meltano subprocess calls."""
@@ -460,7 +464,7 @@ class FlextMeltanoValidationService:
                 return FlextResult(error=f"Connection test timeout for {tap_name}")
 
             issues: list[str] = []
-            details: dict[str, object] = {
+            details: FlextTypes.Core.JsonDict = {
                 "tap_name": tap_name,
                 "command": " ".join(cmd),
                 "returncode": returncode,
@@ -487,7 +491,7 @@ class FlextMeltanoValidationService:
     async def _test_connection_direct(
         self,
         tap_name: str,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Test connection using direct Singer SDK calls."""
@@ -531,7 +535,7 @@ class FlextMeltanoValidationService:
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct connection test failed: {e}")
 
-    def _validate_config_type(self, config: dict[str, object]) -> dict[str, object]:
+    def _validate_config_type(self, config: FlextTypes.Core.JsonDict) -> FlextTypes.Core.JsonDict:
         """Extract and validate configuration type based on common patterns.
 
         Args:
@@ -575,7 +579,7 @@ class FlextMeltanoValidationService:
     def validate_tap_config(
         self,
         tap_name: str,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
         """Validate tap configuration without testing connection."""
@@ -588,7 +592,7 @@ class FlextMeltanoValidationService:
         try:
             issues: list[str] = []
             warnings: list[str] = []
-            details: dict[str, object] = {
+            details: FlextTypes.Core.JsonDict = {
                 "tap_name": tap_name,
                 "config_type": "unknown",
                 "config_keys": list(config.keys())
@@ -625,7 +629,7 @@ class FlextMeltanoValidationService:
     def _validate_empty_config(
         self,
         issues: list[str],
-        details: dict[str, object],
+        details: FlextTypes.Core.JsonDict,
     ) -> None:
         """Validate empty configuration."""
         issues.append("No configuration provided")
@@ -633,9 +637,9 @@ class FlextMeltanoValidationService:
 
     def _validate_file_config(
         self,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         issues: list[str],
-        details: dict[str, object],
+        details: FlextTypes.Core.JsonDict,
     ) -> None:
         """Validate file-based configuration."""
         details["config_type"] = "file"
@@ -650,10 +654,10 @@ class FlextMeltanoValidationService:
 
     def _validate_database_config(
         self,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         issues: list[str],
         warnings: list[str],
-        details: dict[str, object],
+        details: FlextTypes.Core.JsonDict,
     ) -> None:
         """Validate database configuration."""
         details["config_type"] = "database"
@@ -670,10 +674,10 @@ class FlextMeltanoValidationService:
 
     def _validate_api_config(
         self,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         issues: list[str],
         warnings: list[str],
-        details: dict[str, object],
+        details: FlextTypes.Core.JsonDict,
     ) -> None:
         """Validate API configuration."""
         details["config_type"] = "api"
@@ -695,15 +699,14 @@ class FlextMeltanoValidationService:
 
     def _validate_custom_config(
         self,
-        config: dict[str, object],
+        config: FlextTypes.Core.JsonDict,
         issues: list[str],
-        details: dict[str, object],
+        details: FlextTypes.Core.JsonDict,
     ) -> None:
         """Validate custom configuration."""
         details["config_type"] = "custom"
         if len(config) == 0:
             issues.append("Empty configuration")
-
 
 # === LEGACY COMPATIBILITY FUNCTIONS ===
 
@@ -757,7 +760,7 @@ def flext_meltano_validate_project(
 async def flext_meltano_test_tap_connection(
     tap_name: str,
     project_root: Path,
-    config: dict[str, object] | None = None,
+    config: FlextTypes.Core.JsonDict | None = None,
 ) -> FlextMeltanoResult:
     """Test tap connection (legacy compatibility).
 
@@ -805,7 +808,7 @@ async def flext_meltano_test_tap_connection(
 
 async def flext_meltano_validate_tap_config(
     tap_name: str,
-    config: dict[str, object],
+    config: FlextTypes.Core.JsonDict,
 ) -> FlextMeltanoResult:
     """Validate tap configuration (legacy compatibility).
 
@@ -841,7 +844,6 @@ async def flext_meltano_validate_tap_config(
         }
         return FlextMeltanoResult.ok(legacy_data)
     return FlextMeltanoResult.fail(result.error or "Validation failed")
-
 
 # === FACTORY FUNCTION ===
 
