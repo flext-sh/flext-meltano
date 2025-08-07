@@ -60,19 +60,19 @@ class FlextMeltanoBridge:
     def get_version(self) -> FlextResult[Dict[str, str]]:
         '''Get Meltano version information for Go services.'''
 
-    def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
+    def list_plugins(self) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         '''List all available plugins for Go services.'''
 
     def add_plugin(self, plugin_type: str, name: str, **kwargs) -> FlextResult[str]:
         '''Add plugin to Meltano project via Go service request.'''
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
+    def discover_catalog(self, tap_name: str) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Discover schema catalog from tap for Go services.'''
 
-    def run_pipeline(self, tap: str, target: str, **kwargs) -> FlextResult[dict[str, object]]:
+    def run_pipeline(self, tap: str, target: str, **kwargs) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Execute pipeline between tap and target for Go services.'''
 
-    def invoke_dbt(self, command: str, *args: str, **kwargs) -> FlextResult[dict[str, object]]:
+    def invoke_dbt(self, command: str, *args: str, **kwargs) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Execute DBT command for Go services.'''
 ```
 
@@ -269,7 +269,6 @@ This module is **CRITICAL** for the entire FLEXT Meltano architecture and
 **MUST BE IMPLEMENTED** before any Go service integration can function.
 """
 
-
 # ===== PRODUCTION IMPLEMENTATION =====
 #
 # This module provides the complete FLEXT Meltano bridge implementation.
@@ -283,12 +282,23 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from typing import TYPE_CHECKING
 
 # Removed typing.Any import - using specific types
 from flext_core import FlextResult, get_logger
 
 from flext_meltano.base import FlextMeltanoConfig
 from flext_meltano.execution import FlextMeltanoExecutor
+from flext_meltano.plugin_implementation import (
+    FlextMeltanoPlugin,
+    FlextMeltanoPluginRegistry,
+    create_meltano_plugin_registry,
+    create_meltano_tap_plugin,
+    create_meltano_target_plugin,
+)
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 logger = get_logger(__name__)
 
@@ -322,6 +332,13 @@ class FlextMeltanoBridge:
         self.installation_service: object | None = None
         self.discovery_service: object | None = None
         self.dbt_service: object | None = None
+
+        # Initialize plugin registry
+        registry_result = create_meltano_plugin_registry("meltano-bridge")
+        if registry_result.success:
+            self._plugin_registry: FlextMeltanoPluginRegistry | None = registry_result.data
+        else:
+            self._plugin_registry = None
 
     def get_version(self) -> FlextResult[dict[str, str]]:
         """Get Meltano version information for Go services.
@@ -362,7 +379,59 @@ class FlextMeltanoBridge:
         except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as e:
             return FlextResult.fail(f"Failed to get version information: {e}")
 
-    def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
+    def get_plugin_registry(self) -> FlextMeltanoPluginRegistry | None:
+        """Get the plugin registry for managing plugins.
+
+        Returns:
+            Plugin registry instance or None if not initialized
+
+        """
+        return self._plugin_registry
+
+    def create_data_plugin_from_name(self, plugin_name: str) -> FlextResult[FlextMeltanoPlugin]:
+        """Create a data plugin instance from plugin name.
+
+        Args:
+            plugin_name: Name of the plugin to create
+
+        Returns:
+            FlextResult containing the plugin instance or error
+
+        """
+        try:
+            # Determine plugin type based on name
+            if plugin_name.startswith("tap-"):
+                result = create_meltano_tap_plugin(
+                    name=plugin_name,
+                    version="latest",
+                    config={"description": f"Meltano tap: {plugin_name}"},
+                )
+            elif plugin_name.startswith("target-"):
+                result = create_meltano_target_plugin(
+                    name=plugin_name,
+                    version="latest",
+                    config={"description": f"Meltano target: {plugin_name}"},
+                )
+            else:
+                # Generic plugin
+                result = FlextResult.ok(FlextMeltanoPlugin(
+                    name=plugin_name,
+                    version="latest",
+                    plugin_type="generic",
+                ))
+
+            if result.success and self._plugin_registry and result.data:
+                # Register the plugin
+                register_result = self._plugin_registry.register(result.data)
+                if not register_result.success:
+                    logger.warning(f"Failed to register plugin {plugin_name}: {register_result.error}")
+
+            return result
+
+        except Exception as e:
+            return FlextResult.fail(f"Failed to create plugin {plugin_name}: {e}")
+
+    def list_plugins(self) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         """List all available plugins for Go services.
 
         Returns:
@@ -449,7 +518,7 @@ class FlextMeltanoBridge:
         except (ValueError, TypeError, AttributeError, OSError) as e:
             return FlextResult.fail(f"Failed to add plugin {name}: {e}")
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
+    def discover_catalog(self, tap_name: str) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover schema catalog from tap for Go services.
 
         Args:
@@ -475,7 +544,7 @@ class FlextMeltanoBridge:
             if self.discovery_service:
                 logger.info(f"Discovering catalog for tap: {tap_name}")
                 # Mock catalog structure for demonstration
-                catalog: dict[str, object] = {
+                catalog: FlextTypes.Core.JsonDict = {
                     "tap_name": tap_name,
                     "streams": [
                         {
@@ -505,7 +574,7 @@ class FlextMeltanoBridge:
         *,
         environment: str | None = None,
         job_id: str | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute pipeline between tap and target for Go services.
 
         Args:
@@ -536,7 +605,7 @@ class FlextMeltanoBridge:
 
             # Process results
             if result.success:
-                pipeline_result: dict[str, object] = {
+                pipeline_result: FlextTypes.Core.JsonDict = {
                     "status": "success",
                     "tap": tap,
                     "target": target,
@@ -557,7 +626,7 @@ class FlextMeltanoBridge:
         command: str,
         *args: str,
         **kwargs: object,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute DBT command for Go services.
 
         Args:
@@ -588,7 +657,7 @@ class FlextMeltanoBridge:
                     logger.debug(f"Additional DBT options: {kwargs}")
 
                 # Mock successful DBT execution
-                result: dict[str, object] = {
+                result: FlextTypes.Core.JsonDict = {
                     "command": command,
                     "args": list(args),
                     "status": "success",

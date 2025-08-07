@@ -77,7 +77,7 @@ if result.success:
 ### Bridge Integration
 ```python
 # Discovery operations designed for bridge consumption
-def bridge_discover_plugins() -> dict[str, object]:
+def bridge_discover_plugins() -> FlextTypes.Core.JsonDict:
     '''Bridge-friendly plugin discovery with JSON-serializable results.'''
     result = discover_plugins()
 
@@ -171,13 +171,13 @@ class FlextMeltanoDiscoverer:
 
     def discover_plugins_by_type(
         self, plugin_type: str
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         '''Discover plugins filtered by type (extractor, loader, transformer).'''
         # Implementation with Hub integration
 
     def discover_plugin_details(
         self, plugin_name: str
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Get detailed information about a specific plugin.'''
         # Implementation with detailed metadata
 ```
@@ -185,8 +185,8 @@ class FlextMeltanoDiscoverer:
 ### Catalog Operations
 ```python
 def discover_catalog_with_validation(
-    tap_name: str, config: dict[str, object] | None = None
-) -> FlextResult[dict[str, object]]:
+    tap_name: str, config: FlextTypes.Core.JsonDict | None = None
+) -> FlextResult[FlextTypes.Core.JsonDict]:
     '''Discover catalog with configuration validation.'''
     try:
         # Validate tap is available
@@ -218,11 +218,11 @@ class PluginDiscoveryCache:
         self._cache = {}
         self._ttl = ttl
 
-    def get_cached_plugins(self) -> list[dict[str, object]] | None:
+    def get_cached_plugins(self) -> list[FlextTypes.Core.JsonDict] | None:
         '''Get cached plugin list if available and not expired.'''
         # Cache implementation
 
-    def cache_plugins(self, plugins: list[dict[str, object]]) -> None:
+    def cache_plugins(self, plugins: list[FlextTypes.Core.JsonDict]) -> None:
         '''Cache plugin list with expiration.'''
         # Cache storage implementation
 ```
@@ -263,7 +263,7 @@ def handle_discovery_errors(operation: str) -> Callable:
 
 ### Bridge Error Formatting
 ```python
-def format_discovery_error_for_bridge(error: str) -> dict[str, object]:
+def format_discovery_error_for_bridge(error: str) -> FlextTypes.Core.JsonDict:
     '''Format discovery errors for Go service consumption.'''
     return {
         "success": False,
@@ -335,6 +335,7 @@ import uuid
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 # Meltano Hub integration - MANDATORY for plugin discovery
@@ -343,6 +344,9 @@ from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
 from meltano.core.project import Project
 from pydantic import Field
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 # Singer SDK integration - MANDATORY for catalog discovery
 from flext_meltano.base import FlextMeltanoConfig
@@ -371,11 +375,16 @@ class FlextMeltanoDiscoveryContext(FlextModel):
     plugin_type: str | None = Field(default=None)
     timeout_seconds: int = Field(default=60)
     project_root: Path = Field(default_factory=Path)
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
 
-class FlextMeltanoPlugin(FlextModel):
-    """Plugin information entity."""
+class FlextMeltanoPluginInfo(FlextModel):
+    """Plugin information model for discovery operations.
+
+    This model represents plugin metadata discovered from Meltano Hub.
+    It's used for serialization and bridge communication, separate from
+    the actual plugin implementation which uses FlextMeltanoDataPlugin.
+    """
 
     name: str = Field(...)
     type: str = Field(...)
@@ -384,6 +393,27 @@ class FlextMeltanoPlugin(FlextModel):
     pip_url: str = Field(...)
     version: str | None = Field(default=None)
     capabilities: list[str] = Field(default_factory=list)
+
+    def to_plugin_dict(self) -> FlextTypes.Core.JsonDict:
+        """Convert to dictionary for plugin implementation.
+
+        Returns:
+            Dictionary with plugin metadata for bridge integration
+
+        """
+        return {
+            "name": self.name,
+            "version": self.version or "latest",
+            "description": self.description,
+            "type": self.type,
+            "namespace": self.namespace,
+            "pip_url": self.pip_url,
+            "capabilities": self.capabilities,
+        }
+
+
+# Backward compatibility alias
+FlextMeltanoPlugin = FlextMeltanoPluginInfo
 
 
 @injectable
@@ -417,7 +447,7 @@ class FlextMeltanoDiscoverer:
         except (OSError, ImportError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get discovery service health status."""
         return FlextResult(
             data={
@@ -430,9 +460,9 @@ class FlextMeltanoDiscoverer:
     async def discover_catalog(
         self,
         tap_name: str,
-        config: dict[str, object] | None = None,
+        config: FlextTypes.Core.JsonDict | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover tap catalog using enterprise patterns."""
         if not context:
             context = FlextMeltanoDiscoveryContext(
@@ -465,9 +495,9 @@ class FlextMeltanoDiscoverer:
     async def _discover_catalog_subprocess(
         self,
         tap_name: str,
-        _config: dict[str, object],
+        _config: FlextTypes.Core.JsonDict,
         context: FlextMeltanoDiscoveryContext,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover catalog using meltano subprocess calls."""
         try:
             # Check if project has meltano.yml
@@ -526,9 +556,9 @@ class FlextMeltanoDiscoverer:
     async def _discover_catalog_direct(
         self,
         tap_name: str,
-        _config: dict[str, object],
+        _config: FlextTypes.Core.JsonDict,
         context: FlextMeltanoDiscoveryContext,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover catalog using direct Singer SDK calls."""
         try:
             # For nonexistent taps, fail appropriately
@@ -583,7 +613,7 @@ class FlextMeltanoDiscoverer:
         self,
         plugin_type: str | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,
-    ) -> FlextResult[list[FlextMeltanoPlugin]]:
+    ) -> FlextResult[list[FlextMeltanoPluginInfo]]:
         """Discover available plugins using enterprise patterns."""
         if not context:
             context = FlextMeltanoDiscoveryContext(
@@ -600,7 +630,7 @@ class FlextMeltanoDiscoverer:
                         if project is not None:  # Ensure project is valid
                             self._hub = MeltanoHubService(project)
 
-            plugins: list[FlextMeltanoPlugin] = []
+            plugins: list[FlextMeltanoPluginInfo] = []
 
             # Use real Meltano Hub discovery
             try:
@@ -624,9 +654,9 @@ class FlextMeltanoDiscoverer:
                     except (ValueError, TypeError, ImportError, AttributeError):
                         hub_plugins = []
 
-                    # Convert to FlextMeltanoPlugin entities
+                    # Convert to FlextMeltanoPluginInfo entities
                     for plugin in hub_plugins:
-                        flext_plugin = FlextMeltanoPlugin(
+                        flext_plugin = FlextMeltanoPluginInfo(
                             name=plugin.name,
                             type=plugin.type.value
                             if hasattr(plugin.type, "value")
@@ -654,24 +684,24 @@ class FlextMeltanoDiscoverer:
     def _get_default_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> list[FlextMeltanoPlugin]:
+    ) -> list[FlextMeltanoPluginInfo]:
         """Get default plugin list when Hub is not available."""
         default_plugins = [
-            FlextMeltanoPlugin(
+            FlextMeltanoPluginInfo(
                 name="tap-csv",
                 type="extractors",
                 namespace="tap_csv",
                 pip_url="pipelinewise-tap-csv",
                 description="CSV file extractor",
             ),
-            FlextMeltanoPlugin(
+            FlextMeltanoPluginInfo(
                 name="target-jsonl",
                 type="loaders",
                 namespace="target_jsonl",
                 pip_url="target-jsonl",
                 description="JSONL file loader",
             ),
-            FlextMeltanoPlugin(
+            FlextMeltanoPluginInfo(
                 name="target-csv",
                 type="loaders",
                 namespace="target_csv",
@@ -700,7 +730,7 @@ class FlextMeltanoDiscoverer:
     def execute(
         self,
         command: FlextMeltanoDiscoveryCommand,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute command using domain service pattern."""
         return asyncio.run(self.discover_catalog(command.tap_name))
 
@@ -721,14 +751,13 @@ def create_discoverer(
     except (ValueError, TypeError, ImportError) as e:
         return FlextResult(error=f"Failed to create discoverer: {e}")
 
-
 # === LEGACY COMPATIBILITY ===
 
 
 async def flext_meltano_discover_catalog(
     tap_name: str,
     project_root: Path,
-    config: dict[str, object] | None = None,
+    config: FlextTypes.Core.JsonDict | None = None,
 ) -> FlextMeltanoResult:
     """Discover tap catalog (legacy compatibility)."""
     warnings.warn(

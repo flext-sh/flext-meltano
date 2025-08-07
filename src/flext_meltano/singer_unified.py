@@ -57,7 +57,6 @@ from flext_meltano.singer_unified import (
     FlextSingerUnifiedConfig,
 )
 
-
 class FlextTapOracle(FlextSingerUnifiedInterface):
     '''Oracle tap implementation using unified interface.'''
 
@@ -66,7 +65,7 @@ class FlextTapOracle(FlextSingerUnifiedInterface):
         self.connection = create_oracle_connection(config.config)
         return FlextResult.ok(None)
 
-    def discover_catalog(self) -> FlextResult[dict[str, object]]:
+    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         # Discover Oracle schemas and tables
         return FlextResult.ok(self.connection.discover_schemas())
 
@@ -107,7 +106,7 @@ if result.success:
 ### Bridge Integration
 ```python
 # Unified service operations for Go bridge consumption
-def bridge_execute_unified_pipeline(config_json: str) -> dict[str, object]:
+def bridge_execute_unified_pipeline(config_json: str) -> FlextTypes.Core.JsonDict:
     '''Execute unified pipeline with JSON config for Go services.'''
     config = json.loads(config_json)
     service = create_unified_singer_service()
@@ -188,8 +187,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from flext_core import FlextDomainService, FlextResult
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 
 @dataclass
@@ -198,10 +201,10 @@ class FlextPipelineConfig:
 
     tap_name: str
     target_name: str
-    tap_config: dict[str, object]
-    target_config: dict[str, object]
-    catalog: dict[str, object] | None = None
-    state: dict[str, object] | None = None
+    tap_config: FlextTypes.Core.JsonDict
+    target_config: FlextTypes.Core.JsonDict
+    catalog: FlextTypes.Core.JsonDict | None = None
+    state: FlextTypes.Core.JsonDict | None = None
 
 
 class FlextSingerUnifiedConfig:
@@ -214,9 +217,9 @@ class FlextSingerUnifiedConfig:
     def __init__(
         self,
         name: str,
-        config: dict[str, object],
-        catalog: dict[str, object] | None = None,
-        state: dict[str, object] | None = None,
+        config: FlextTypes.Core.JsonDict,
+        catalog: FlextTypes.Core.JsonDict | None = None,
+        state: FlextTypes.Core.JsonDict | None = None,
         environment: str = "dev",
         **extra_config: object,
     ) -> None:
@@ -265,11 +268,11 @@ class FlextSingerUnifiedResult:
     success: bool
     records_processed: int = 0
     schemas_discovered: list[str] | None = None
-    state_updates: dict[str, object] | None = None
-    catalog_updates: dict[str, object] | None = None
+    state_updates: FlextTypes.Core.JsonDict | None = None
+    catalog_updates: FlextTypes.Core.JsonDict | None = None
     execution_time_ms: float = 0.0
     error_message: str | None = None
-    metrics: dict[str, object] = field(default_factory=dict)
+    metrics: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate unified Singer result domain rules.
@@ -311,7 +314,7 @@ class FlextSingerUnifiedInterface(ABC):
         """
 
     @abstractmethod
-    def discover_catalog(self) -> FlextResult[dict[str, object]]:
+    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Discover available schemas and generate Singer catalog.
 
         Returns:
@@ -418,7 +421,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
     def _execute_pipeline_operation(
         self,
-        kwargs: dict[str, object],
+        kwargs: FlextTypes.Core.JsonDict,
     ) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute pipeline operation from service execute method.
 
@@ -669,7 +672,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         return FlextResult.ok(combined_result)
 
-    def discover_all_catalogs(self) -> FlextResult[dict[str, dict[str, object]]]:
+    def discover_all_catalogs(self) -> FlextResult[dict[str, FlextTypes.Core.JsonDict]]:
         """Discover catalogs from all registered components.
 
         Returns:
@@ -677,7 +680,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         """
         try:
-            catalogs: dict[str, dict[str, object]] = {}
+            catalogs: dict[str, FlextTypes.Core.JsonDict] = {}
 
             for name, component in self._registered_components.items():
                 catalog_result = component.discover_catalog()
@@ -708,7 +711,6 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         except (ValueError, TypeError, AttributeError) as e:
             return FlextResult.fail(f"Component validation failed: {e}")
 
-
 # Factory functions for easy instantiation
 
 
@@ -724,7 +726,7 @@ def create_unified_singer_service() -> FlextSingerUnifiedService:
 
 def create_unified_singer_config(
     name: str,
-    config: dict[str, object],
+    config: FlextTypes.Core.JsonDict,
     **kwargs: object,
 ) -> FlextSingerUnifiedConfig:
     """Create unified Singer configuration.

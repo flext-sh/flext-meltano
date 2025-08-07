@@ -65,7 +65,6 @@ from flext_meltano.core import (
     FlextMeltanoSingerService,
 )
 
-
 # Composed service execution
 def execute_enterprise_pipeline(config):
     orchestrator = FlextMeltanoOrchestrationService(config)
@@ -87,12 +86,10 @@ class PipelineStartedEvent:
     pipeline_id: str
     started_at: datetime
 
-
 class PipelineCompletedEvent:
     pipeline_id: str
     completed_at: datetime
-    execution_metrics: dict[str, object]
-
+    execution_metrics: FlextTypes.Core.JsonDict
 
 # Event handling in orchestration service
 orchestrator.on_pipeline_started(lambda event: log_pipeline_start(event))
@@ -107,8 +104,8 @@ Enterprise services designed for Go service consumption:
 # Bridge-friendly service operations
 class FlextMeltanoOrchestrationService:
     def execute_pipeline_for_bridge(
-        self, pipeline_spec: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        self, pipeline_spec: FlextTypes.Core.JsonDict
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Execute pipeline with JSON-serializable results for Go services.'''
         # Implementation uses execution module internally
 ```
@@ -116,7 +113,7 @@ class FlextMeltanoOrchestrationService:
 ### Service Composition for Bridge
 ```python
 # Services work together for bridge operations
-def bridge_execute_complex_operation(bridge_request: dict[str, object]):
+def bridge_execute_complex_operation(bridge_request: FlextTypes.Core.JsonDict):
     orchestrator = get_orchestration_service()
 
     return (
@@ -133,8 +130,8 @@ def bridge_execute_complex_operation(bridge_request: dict[str, object]):
 class ExecutePipelineCommand:
     '''Command for pipeline execution with enterprise validation.'''
     pipeline_id: str
-    tap_config: dict[str, object]
-    target_config: dict[str, object]
+    tap_config: FlextTypes.Core.JsonDict
+    target_config: FlextTypes.Core.JsonDict
     execution_context: ExecutionContext
 
 class ExecutePipelineHandler:
@@ -179,7 +176,7 @@ class PipelineExecution(FlextEntity):
     status: ExecutionStatus
     started_at: datetime
     completed_at: Optional[datetime]
-    execution_metrics: dict[str, object]
+    execution_metrics: FlextTypes.Core.JsonDict
 
     def mark_completed(self) -> FlextResult[None]:
         '''Business logic for marking execution complete.'''
@@ -202,7 +199,7 @@ class ExecutionContext(FlextValueObject):
     environment: str
     execution_timestamp: datetime
 
-    def to_bridge_context(self) -> dict[str, object]:
+    def to_bridge_context(self) -> FlextTypes.Core.JsonDict:
         '''Convert to bridge-compatible format.'''
         return {
             "correlation_id": self.correlation_id,
@@ -279,9 +276,7 @@ from flext_core import (
     FlextResult,
     get_logger,
 )
-
-# Observability integration - using flext_core logger instead of flext_observability
-# Meltano core integration - MANDATORY for project management
+from flext_core.semantic_types import FlextTypes
 from pydantic import Field
 
 # Injectable decorator from common utilities
@@ -322,7 +317,6 @@ class PipelineEventType(Enum):
     FAILED = auto()
     CANCELLED = auto()
 
-
 # === DOMAIN VALUE OBJECTS ===
 
 
@@ -335,14 +329,13 @@ class FlextMeltanoPipelineConfig:
     loader: str
     transformer: str | None = None
     environment: str = "dev"
-    config: dict[str, object] = field(default_factory=dict)
+    config: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if not self.name or not self.extractor or not self.loader:
             msg = "Pipeline name, extractor, and loader are required"
             raise ValueError(msg)
-
 
 # === DOMAIN ENTITIES ===
 
@@ -358,7 +351,7 @@ class FlextMeltanoPipelineResult(FlextEntity):
     duration_seconds: float | None = Field(default=None)
     records_processed: int = Field(default=0)
     error_message: str | None = Field(default=None)
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
     def start_execution(self) -> None:
         """Mark pipeline execution as started."""
@@ -403,7 +396,7 @@ class FlextMeltanoPipelineEvent(FlextEntity):
     pipeline_id: str = Field(...)
     event_type: PipelineEventType = Field(...)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    data: dict[str, object] = Field(default_factory=dict)
+    data: FlextTypes.Core.JsonDict = Field(default_factory=dict)
     source: str = Field(default="flext-meltano")
 
     def validate_business_rules(self) -> FlextResult[None]:
@@ -411,7 +404,6 @@ class FlextMeltanoPipelineEvent(FlextEntity):
         if not self.pipeline_id.strip():
             return FlextResult(error="Pipeline ID cannot be empty")
         return FlextResult(data=None)
-
 
 # === AGGREGATE ROOT ===
 
@@ -456,7 +448,6 @@ class FlextMeltanoRepository(FlextAggregateRoot):
             return FlextResult(data=pipeline)
         except (ValueError, TypeError, KeyError) as e:
             return FlextResult(error=f"Failed to get pipeline: {e}")
-
 
 # === DOMAIN SERVICES ===
 
@@ -556,7 +547,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
 
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get orchestration service health status."""
         return FlextResult(
             data={
@@ -628,7 +619,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
 
 
 @injectable
-class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
+class FlextMeltanoExtension(FlextDomainService[FlextTypes.Core.JsonDict]):
     """Meltano extension using MANDATORY Meltano EDK patterns."""
 
     def __init__(
@@ -645,10 +636,9 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
         """Validate extension."""
         return self.extension_service.validate_service()
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get extension health status."""
         return self.extension_service.get_health_status()
-
 
 # === EXECUTION STATE MANAGEMENT ===
 
@@ -659,7 +649,7 @@ class FlextMeltanoExecutionState(FlextModel):
     current_pipeline: str | None = Field(default=None)
     execution_id: str | None = Field(default=None)
     state: ExecutionState = Field(default=ExecutionState.PENDING)
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
     def start_pipeline(self, pipeline_name: str) -> str:
         """Start pipeline execution and return execution ID."""
@@ -683,7 +673,6 @@ class FlextMeltanoExecutionState(FlextModel):
 
 
 # === BACKWARDS COMPATIBILITY ===
-
 
 # Legacy function to maintain compatibility
 def _deprecated_api_warning(message: str) -> None:

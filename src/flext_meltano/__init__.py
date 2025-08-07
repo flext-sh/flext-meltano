@@ -273,7 +273,6 @@ from flext_meltano.dbt_packages import (
 # === DISCOVERY & CATALOG MANAGEMENT ===
 from flext_meltano.discovery import (
     FlextMeltanoDiscoverer,
-    FlextMeltanoPlugin,
     create_discoverer,
     flext_meltano_discover_catalog,
     flext_meltano_discover_plugins,
@@ -297,6 +296,18 @@ from flext_meltano.installation import (
     FlextMeltanoPluginInfo,
     create_installer_service,
     flext_meltano_install_plugin,
+)
+
+# === PLUGIN IMPLEMENTATION ===
+from flext_meltano.plugin_implementation import (
+    FlextMeltanoPlugin,
+    FlextMeltanoPluginContext,
+    FlextMeltanoPluginRegistry,
+    FlextMeltanoTapPlugin,
+    FlextMeltanoTargetPlugin,
+    create_meltano_plugin_registry,
+    create_meltano_tap_plugin,
+    create_meltano_target_plugin,
 )
 
 # === BRIDGE INTEGRATION ===
@@ -408,13 +419,18 @@ __all__: list[str] = [
     "FlextMeltanoInstallationContext",
     "FlextMeltanoInstaller",
     "FlextMeltanoPlugin",
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPluginContext",
     "FlextMeltanoPluginInfo",
+    "FlextMeltanoPluginRegistry",
     "FlextMeltanoResult",
     "FlextMeltanoTap",
     "FlextMeltanoTapBase",
+    "FlextMeltanoTapPlugin",
     "FlextMeltanoTapService",
     "FlextMeltanoTarget",
     "FlextMeltanoTargetBase",
+    "FlextMeltanoTargetPlugin",
     "FlextMeltanoTargetService",
     "FlextMeltanoValidationResult",
     "FlextMeltanoValidationService",
@@ -454,7 +470,10 @@ __all__: list[str] = [
     "create_installer_service",
     "create_meltano_dbt_service",
     "create_meltano_extension_service",
+    "create_meltano_plugin_registry",
+    "create_meltano_tap_plugin",
     "create_meltano_tap_service",
+    "create_meltano_target_plugin",
     "create_meltano_target_service",
     "create_model_registry",
     "create_package_manager",

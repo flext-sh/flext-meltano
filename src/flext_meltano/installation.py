@@ -206,7 +206,7 @@ class FlextMeltanoInstaller:
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
         force: bool = False,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         '''Install plugin with comprehensive validation and error handling.'''
         try:
             # Pre-installation validation
@@ -242,8 +242,8 @@ class FlextMeltanoInstaller:
 ### Configuration Management
 ```python
 def configure_plugin_with_validation(
-    plugin_name: str, config_data: dict[str, object], validate_connection: bool = True
-) -> FlextResult[dict[str, object]]:
+    plugin_name: str, config_data: FlextTypes.Core.JsonDict, validate_connection: bool = True
+) -> FlextResult[FlextTypes.Core.JsonDict]:
     '''Configure plugin with validation and connection testing.'''
     try:
         # Validate configuration schema
@@ -283,7 +283,7 @@ def configure_plugin_with_validation(
 ```python
 def validate_installation_prerequisites(
     plugin_type: str, plugin_name: str
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[FlextTypes.Core.JsonDict]:
     '''Validate installation prerequisites and environment.'''
     validation_results = {}
 
@@ -330,7 +330,7 @@ class DependencyResolver:
 
     def resolve_plugin_dependencies(
         self, plugin_name: str, variant: Optional[str] = None
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         '''Resolve plugin dependencies with conflict detection.'''
         try:
             # Get plugin metadata from Hub
@@ -414,10 +414,14 @@ import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextModel, FlextResult
 from pydantic import Field
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 from flext_meltano.base import FlextMeltanoConfig
 
@@ -439,7 +443,7 @@ class FlextMeltanoInstallationContext(FlextModel):
     plugin_type: str = Field(...)
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=600)  # 10 minutes default
-    metadata: dict[str, object] = Field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
 
 @dataclass
@@ -498,7 +502,7 @@ class FlextMeltanoInstaller:
         self._initialized = True
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
+    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get installation service health status."""
         return FlextResult(
             data={
@@ -515,7 +519,7 @@ class FlextMeltanoInstaller:
         plugin_name: str,
         pip_url: str | None = None,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Add plugin to meltano project using enterprise patterns."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -537,7 +541,7 @@ class FlextMeltanoInstaller:
         plugin_name: str,
         pip_url: str | None,
         context: FlextMeltanoInstallationContext,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Execute plugin addition with validation and result processing."""
         # Validate first
         validation_result = self.validate()
@@ -569,22 +573,22 @@ class FlextMeltanoInstaller:
 
     def _build_installation_result(
         self,
-        result_data: dict[str, object],
+        result_data: FlextTypes.Core.JsonDict,
         context: FlextMeltanoInstallationContext,
         plugin_data: InstallationResultData,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Build installation result from execution data."""
 
         # Create mock result object for compatibility
         class MockResult:
-            def __init__(self, data: dict[str, object]) -> None:
+            def __init__(self, data: FlextTypes.Core.JsonDict) -> None:
                 self.returncode = data.get("returncode", 1)
                 self.stdout = data.get("stdout", "")
                 self.stderr = data.get("stderr", "")
 
         result = MockResult(result_data)
 
-        installation_result: dict[str, object] = {
+        installation_result: FlextTypes.Core.JsonDict = {
             "installation_id": context.installation_id,
             "plugin_name": plugin_data.plugin_name,
             "plugin_type": plugin_data.plugin_type,
@@ -610,7 +614,7 @@ class FlextMeltanoInstaller:
     def install_plugins(
         self,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Install all plugins in meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -667,7 +671,7 @@ class FlextMeltanoInstaller:
         plugin_type: str,
         plugin_name: str,
         context: FlextMeltanoInstallationContext | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Remove plugin from meltano project."""
         if not context:
             context = FlextMeltanoInstallationContext(
@@ -808,7 +812,6 @@ class FlextMeltanoInstaller:
                     plugins.append(plugin_info)
         return plugins
 
-
 # === LEGACY COMPATIBILITY FUNCTIONS ===
 
 
@@ -847,7 +850,6 @@ def flext_meltano_install_plugin(
     if result.success:
         return FlextMeltanoResult.ok(result.data)
     return FlextMeltanoResult.fail(result.error or "Unknown error")
-
 
 # === FACTORY FUNCTION ===
 

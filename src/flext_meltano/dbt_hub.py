@@ -24,9 +24,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 try:
-    import pandas as pd
+    import pandas as pd  # type: ignore[import-untyped]
 except ImportError:
-    pd = None  # type: ignore[assignment]
+    pd = None
+from typing import TYPE_CHECKING
+
 from flext_core import FlextResult, get_logger
 
 from flext_meltano.dbt_packages.executor import (
@@ -40,6 +42,9 @@ from flext_meltano.dbt_packages.registry import (
     FlextDbtModel,
     create_model_registry,
 )
+
+if TYPE_CHECKING:
+    from flext_core.semantic_types import FlextTypes
 
 logger = get_logger(__name__)
 
@@ -72,7 +77,7 @@ class FlextDbtSnapshot:
     updated_at: str | None = None  # For timestamp strategy
     check_cols: list[str] = field(default_factory=list)  # For check strategy
     tags: list[str] = field(default_factory=list)
-    metadata: dict[str, object] = field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
 
 @dataclass
@@ -95,7 +100,7 @@ class FlextDbtHook:
     package: str
     models: list[str] = field(default_factory=list)
     condition: str | None = None
-    metadata: dict[str, object] = field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
 
 @dataclass
@@ -122,7 +127,7 @@ class FlextDbtExposure:
     depends_on: list[str] = field(default_factory=list)
     package: str = ""
     tags: list[str] = field(default_factory=list)
-    metadata: dict[str, object] = field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
 
 @dataclass
@@ -147,7 +152,7 @@ class FlextDbtLineage:
     sources: list[str] = field(default_factory=list)
     exposures: list[str] = field(default_factory=list)
     depth: int = 0
-    metadata: dict[str, object] = field(default_factory=dict)
+    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
 
 
 class FlextDbtHub:
@@ -310,8 +315,8 @@ class FlextDbtHub:
     def execute_model(  # noqa: PLR0912
         self,
         model: str,
-        mock_data: dict[str, object] | None = None,
-        context: dict[str, object] | None = None,
+        mock_data: FlextTypes.Core.JsonDict | None = None,
+        context: FlextTypes.Core.JsonDict | None = None,
     ) -> FlextResult[pd.DataFrame]:
         """Execute a model in-memory.
 
@@ -378,7 +383,7 @@ class FlextDbtHub:
         self,
         project: str,
         models: list[str] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Validate transformations for a project.
 
         Args:
@@ -962,7 +967,7 @@ class FlextDbtHub:
 
     # Utility Methods
 
-    def get_hub_status(self) -> FlextResult[dict[str, object]]:
+    def get_hub_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
         """Get current status of the DBT hub.
 
         Returns:
@@ -1025,7 +1030,7 @@ class FlextDbtHub:
     def execute_snapshot(
         self,
         snapshot_name: str,
-        mock_data: dict[str, object] | None = None,
+        mock_data: FlextTypes.Core.JsonDict | None = None,
     ) -> FlextResult[pd.DataFrame]:
         """Execute a DBT snapshot in-memory.
 
@@ -1111,7 +1116,7 @@ class FlextDbtHub:
         self,
         hook_type: str,
         model_name: str | None = None,
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
         """Execute DBT hooks of a specific type.
 
         Args:

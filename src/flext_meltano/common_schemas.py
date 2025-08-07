@@ -48,9 +48,9 @@ configurations for maximum code reuse and consistency.
 
 ### Direct Schema Usage
 ```python
+from flext_core.semantic_types import FlextTypes
 from flext_meltano.common_schemas import CommonSingerSchemas
 from singer_sdk import Tap
-
 
 class FlextTapOracle(Tap):
     name = "tap-oracle"
@@ -200,7 +200,7 @@ except jsonschema.ValidationError as e:
 ### Schema Discovery Bridge
 ```python
 # Bridge operations for schema discovery and validation
-def bridge_get_available_schemas() -> dict[str, object]:
+def bridge_get_available_schemas() -> FlextTypes.Core.JsonDict:
     '''Get all available schema types for Go service integration.'''
     schema_types = {
         "oracle": "Oracle database connection with WMS support",
@@ -216,7 +216,7 @@ def bridge_get_available_schemas() -> dict[str, object]:
         "total_schemas": len(schema_types)
     }
 
-def bridge_create_tap_schema(schema_type: str, **kwargs) -> dict[str, object]:
+def bridge_create_tap_schema(schema_type: str, **kwargs) -> FlextTypes.Core.JsonDict:
     '''Create tap schema with JSON output for Go services.'''
     try:
         schema = CommonSingerSchemas.create_tap_schema(
