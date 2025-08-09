@@ -206,16 +206,13 @@ if TYPE_CHECKING:
 # Singer SDK integration - required dependency
 # === SINGER BASE CLASSES - Proper location in flext-meltano ===
 # Import Singer exceptions from flext-core (removes singer_base.py duplication)
-from flext_core import (
-    FlextSingerAuthenticationError,
-    FlextSingerConfigurationError,
-    FlextSingerConnectionError,
-    FlextSingerError,
-    FlextSingerProcessingError,
-    FlextSingerValidationError,
-    FlextTapError,
-    FlextTargetError,
-    FlextTransformError,
+from flext_meltano.exceptions import (
+    FlextMeltanoAuthenticationError as FlextSingerAuthenticationError,
+    FlextMeltanoConfigurationError as FlextSingerConfigurationError,
+    FlextMeltanoConnectionError as FlextSingerConnectionError,
+    FlextMeltanoError as FlextSingerError,
+    FlextMeltanoProcessingError as FlextSingerProcessingError,
+    FlextMeltanoValidationError as FlextSingerValidationError,
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.authenticators import OAuthAuthenticator
@@ -224,10 +221,7 @@ from singer_sdk.testing import get_tap_test_class
 from singer_sdk.typing import PropertiesList, Property
 
 from flext_meltano.base import (
-    FlextMeltanoBaseService,
-    FlextMeltanoConfig,
     FlextMeltanoDbtService,
-    FlextMeltanoEvent,
     FlextMeltanoExtensionService,
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
@@ -236,6 +230,9 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+from flext_meltano.base_service import FlextMeltanoBaseService
+from flext_meltano.models import FlextMeltanoEvent
+from flext_meltano.config import FlextMeltanoConfig
 
 # === CLI INTERFACE ===
 from flext_meltano.cli import (

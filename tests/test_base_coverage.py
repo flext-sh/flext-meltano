@@ -25,7 +25,6 @@ from flext_meltano.base import (
     FlextMeltanoBaseService,
     FlextMeltanoConfig,
     FlextMeltanoDbtService,
-    FlextMeltanoEvent,
     FlextMeltanoExtensionService,
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
@@ -34,6 +33,7 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+from flext_meltano.models import FlextMeltanoEvent
 
 # Constants
 EXPECTED_TOTAL_PAGES = 8

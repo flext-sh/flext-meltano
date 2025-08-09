@@ -163,7 +163,7 @@ else:
 ### Bridge-Compatible Operations
 ```python
 # Bridge operations designed for subprocess consumption
-def bridge_create_singer_message(message_type: str, **kwargs) -> FlextTypes.Core.JsonDict:
+def bridge_create_singer_message(message_type: str, **kwargs) -> "dict[str, object]":
     '''Create Singer message with JSON-serializable results for Go services.'''
     bridge = flext_create_singer_bridge()
     result = bridge.flext_singer_create_message(message_type, **kwargs)
@@ -175,7 +175,7 @@ def bridge_create_singer_message(message_type: str, **kwargs) -> FlextTypes.Core
         "error": result.error_message if result.is_failure else None
     }
 
-def bridge_process_singer_stream(input_data: list[str]) -> FlextTypes.Core.JsonDict:
+def bridge_process_singer_stream(input_data: list[str]) -> "dict[str, object]":
     '''Process Singer message stream for Go service integration.'''
     bridge = flext_create_singer_bridge()
     processed_messages = []
@@ -263,7 +263,7 @@ from flext_core import FlextContainer, FlextResult, get_logger
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-    from flext_core.semantic_types import FlextTypes
+    
 
 # ============================================================================
 # PONTE SINGER SDK <-> FLEXT-CORE
@@ -283,7 +283,7 @@ class FlextSingerBridge:
         # Message types registry - intelligent composition
         self._message_types: dict[
             str,
-            Callable[..., FlextResult[FlextTypes.Core.JsonDict]],
+            Callable[..., FlextResult[dict[str, object]]],
         ] = {
             "RECORD": self._create_record_message,
             "SCHEMA": self._create_schema_message,
@@ -294,7 +294,7 @@ class FlextSingerBridge:
         self,
         message_type: str,
         **kwargs: object,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Create Singer message using intelligent composition - universal method."""
         try:
             if message_type not in self._message_types:
@@ -310,14 +310,14 @@ class FlextSingerBridge:
     def _create_record_message(
         self,
         stream: str,
-        record: FlextTypes.Core.JsonDict,
+        record: dict[str, object],
         time_extracted: str | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Create record message internally."""
         if not stream or not isinstance(record, dict):
             return FlextResult(error="Invalid stream name or record format")
 
-        message: FlextTypes.Core.JsonDict = {
+        message: dict[str, object] = {
             "type": "RECORD",
             "stream": stream,
             "record": record,
@@ -330,14 +330,14 @@ class FlextSingerBridge:
     def _create_schema_message(
         self,
         stream: str,
-        schema: FlextTypes.Core.JsonDict,
+        schema: dict[str, object],
         key_properties: list[str] | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Create schema message internally."""
         if not stream or not isinstance(schema, dict):
             return FlextResult(error="Invalid stream name or schema format")
 
-        message: FlextTypes.Core.JsonDict = {
+        message: dict[str, object] = {
             "type": "SCHEMA",
             "stream": stream,
             "schema": schema,
@@ -348,19 +348,19 @@ class FlextSingerBridge:
 
     def _create_state_message(
         self,
-        value: FlextTypes.Core.JsonDict,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+        value: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Create state message internally."""
-        message: FlextTypes.Core.JsonDict = {"type": "STATE", "value": value}
+        message: dict[str, object] = {"type": "STATE", "value": value}
         return FlextResult(data=message)
 
     # Maintains specific methods for compatibility but uses composition
     def flext_singer_create_record_message(
         self,
         stream: str,
-        record: FlextTypes.Core.JsonDict,
+        record: dict[str, object],
         time_extracted: str | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Create Singer RECORD message - uses composition."""
         return self._create_record_message(
             stream=stream,
@@ -371,9 +371,9 @@ class FlextSingerBridge:
     def flext_singer_create_schema_message(
         self,
         stream: str,
-        schema: FlextTypes.Core.JsonDict,
+        schema: dict[str, object],
         key_properties: list[str] | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Create Singer SCHEMA message - uses composition."""
         return self._create_schema_message(
             stream=stream,
@@ -383,15 +383,15 @@ class FlextSingerBridge:
 
     def flext_singer_create_state_message(
         self,
-        value: FlextTypes.Core.JsonDict,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+        value: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Create Singer STATE message - uses composition."""
         return self._create_state_message(value=value)
 
     def flext_singer_parse_message_line(
         self,
         line: str,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Parse Singer message line using flext-core patterns."""
         try:
             line = line.strip()
@@ -443,7 +443,7 @@ class FlextSingerBridge:
 
     def flext_singer_write_message(
         self,
-        message: FlextTypes.Core.JsonDict,
+        message: dict[str, object],
     ) -> FlextResult[None]:
         """Write Singer message to stdout using flext-core patterns."""
         try:
@@ -462,7 +462,7 @@ class FlextSingerBridge:
     def flext_singer_read_messages(
         self,
         input_stream: TextIO | None = None,
-    ) -> Iterator[FlextResult[FlextTypes.Core.JsonDict]]:
+    ) -> Iterator[FlextResult[dict[str, object]]]:
         """Read Singer messages from input stream using flext-core patterns."""
         stream = input_stream or sys.stdin
 
@@ -476,15 +476,15 @@ class FlextSingerBridge:
 class FlextSingerCatalog:
     """Simplified Singer catalog management using flext-core patterns."""
 
-    def __init__(self, catalog: FlextTypes.Core.JsonDict | None = None) -> None:
+    def __init__(self, catalog: dict[str, object] | None = None) -> None:
         """Initialize with optional catalog data."""
         self._logger = get_logger(self.__class__.__name__)
-        self._catalog: FlextTypes.Core.JsonDict = catalog or {"streams": []}
+        self._catalog: dict[str, object] = catalog or {"streams": []}
 
     def flext_singer_add_stream(
         self,
         stream_name: str,
-        schema: FlextTypes.Core.JsonDict,
+        schema: dict[str, object],
         key_properties: list[str] | None = None,
     ) -> FlextResult[None]:
         """Add stream to catalog using flext-core patterns."""
@@ -518,7 +518,7 @@ class FlextSingerCatalog:
         except (ValueError, TypeError, KeyError) as e:
             return FlextResult(error=f"Failed to add stream to catalog: {e}")
 
-    def flext_singer_get_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def flext_singer_get_catalog(self) -> FlextResult[dict[str, object]]:
         """Get catalog data using flext-core patterns."""
         try:
             return FlextResult(data=self._catalog.copy())
@@ -572,7 +572,7 @@ def flext_create_singer_bridge() -> FlextSingerBridge:
 
 
 def flext_create_singer_catalog(
-    catalog: FlextTypes.Core.JsonDict | None = None,
+    catalog: dict[str, object] | None = None,
 ) -> FlextSingerCatalog:
     """Create Singer catalog instance."""
     return FlextSingerCatalog(catalog)

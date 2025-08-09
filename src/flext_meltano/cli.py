@@ -63,7 +63,9 @@ result = cli.execute("discover", ["--tap", "tap-postgres"])
 ### Bridge Integration
 ```python
 # CLI operations designed for bridge consumption
-def bridge_run_cli(command: str, options: list[str] | None = None) -> FlextTypes.Core.JsonDict:
+def bridge_run_cli(
+    command: str, options: list[str] | None = None
+) -> dict[str, object]:
     '''Execute CLI command with JSON-serializable results for Go services.'''
     cli = FlextMeltanoCli()
     result = cli.execute(command, options)
@@ -139,9 +141,9 @@ import subprocess
 from pathlib import Path
 
 try:
-    import pandas as pd  # type: ignore[import-untyped]
+    import pandas as pd
 except ImportError:
-    pd = None
+    pd = None  # type: ignore[assignment]
 from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
@@ -151,9 +153,6 @@ from flext_meltano.execution import (
     SubprocessExecutionContext,
     execute_subprocess_common,
 )
-
-if TYPE_CHECKING:
-    from flext_core.semantic_types import FlextTypes
 
 # Constants
 MIN_MOCK_DATA_ARGS = 2
@@ -171,7 +170,7 @@ class FlextMeltanoCli:
         self,
         command: str = "",
         options: list[str] | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute CLI operations using flext-core patterns."""
         if not command or command.strip() == "":
             # Return basic CLI info for empty commands
@@ -258,7 +257,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def health(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def health(self) -> FlextResult[dict[str, object]]:
         """Get CLI health status."""
         return FlextResult(
             data={
@@ -267,7 +266,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def version(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def version(self) -> FlextResult[dict[str, object]]:
         """Get version information."""
         return FlextResult(
             data={
@@ -276,7 +275,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def help(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def help(self) -> FlextResult[dict[str, object]]:
         """Get help information."""
         # Basic commands expected by tests
         basic_commands = ["version", "help", "health", "run", "discover", "install"]
@@ -324,7 +323,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def run(self, args: list[str]) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def run(self, args: list[str]) -> FlextResult[dict[str, object]]:
         """Run CLI with arguments."""
         if not args:
             return FlextResult(data={"status": "success", "args": []})
@@ -344,7 +343,7 @@ class FlextMeltanoCli:
             },
         )
 
-    def list_commands(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def list_commands(self) -> FlextResult[dict[str, object]]:
         """List available commands."""
         # Basic commands expected by tests
         basic_commands = ["version", "help", "health", "run", "discover", "install"]
@@ -356,17 +355,27 @@ class FlextMeltanoCli:
                 # Keep detailed information for advanced usage
                 "basic_commands": basic_commands,
                 "dbt_commands": [
-                    "dbt-list-packages", "dbt-run-model", "dbt-test-local",
-                    "dbt-import-ecosystem", "dbt-validate-project", "dbt-list-models",
+                    "dbt-list-packages",
+                    "dbt-run-model",
+                    "dbt-test-local",
+                    "dbt-import-ecosystem",
+                    "dbt-validate-project",
+                    "dbt-list-models",
                     "dbt-create-mock-data",
                 ],
                 "observability_commands": [
-                    "dbt-get-metrics", "dbt-create-dashboard", "dbt-health-check",
+                    "dbt-get-metrics",
+                    "dbt-create-dashboard",
+                    "dbt-health-check",
                 ],
                 "advanced_features": [
-                    "dbt-list-snapshots", "dbt-execute-snapshot",
-                    "dbt-list-hooks", "dbt-execute-hooks",
-                    "dbt-list-exposures", "dbt-build-lineage", "dbt-lineage-path",
+                    "dbt-list-snapshots",
+                    "dbt-execute-snapshot",
+                    "dbt-list-hooks",
+                    "dbt-execute-hooks",
+                    "dbt-list-exposures",
+                    "dbt-build-lineage",
+                    "dbt-lineage-path",
                 ],
                 "total_commands": 20,
             },
@@ -375,7 +384,7 @@ class FlextMeltanoCli:
     def flext_meltano_run_command(
         self,
         args: list[str],
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Run meltano command with arguments."""
         try:
             # Build command
@@ -399,7 +408,7 @@ class FlextMeltanoCli:
 
             # Create mock result object for compatibility
             class MockResult:
-                def __init__(self, data: FlextTypes.Core.JsonDict) -> None:
+                def __init__(self, data: dict[str, object]) -> None:
                     self.returncode = data.get("returncode", 1)
                     self.stdout = data.get("stdout", "")
                     self.stderr = data.get("stderr", "")
@@ -428,7 +437,7 @@ class FlextMeltanoCli:
 
     # DBT Hub Commands
 
-    def dbt_list_packages(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_list_packages(self) -> FlextResult[dict[str, object]]:
         """List available DBT packages."""
         try:
             if not self.dbt_hub:
@@ -454,8 +463,10 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list packages: {e}")
 
     def dbt_run_model(
-        self, model: str, mock_data: FlextTypes.Core.JsonDict | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+        self,
+        model: str,
+        mock_data: dict[str, object] | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Run a DBT model in-memory.
 
         Args:
@@ -488,7 +499,7 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to run model: {e}")
 
-    def dbt_test_local(self, project: str) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_test_local(self, project: str) -> FlextResult[dict[str, object]]:
         """Test DBT transformations locally without database.
 
         Args:
@@ -527,7 +538,7 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to test locally: {e}")
 
-    def dbt_import_ecosystem(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_import_ecosystem(self) -> FlextResult[dict[str, object]]:
         """Import all models from flext-dbt-* ecosystem projects.
 
         Returns:
@@ -545,7 +556,9 @@ class FlextMeltanoCli:
                     data={
                         "status": "success",
                         "imported_projects": result.data,
-                        "total_models": result.data.get("total", 0) if result.data else 0,
+                        "total_models": result.data.get("total", 0)
+                        if result.data
+                        else 0,
                         "message": "Successfully imported all ecosystem models",
                     },
                 )
@@ -554,7 +567,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to import ecosystem: {e}")
 
-    def dbt_validate_project(self, project: str) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_validate_project(
+        self, project: str
+    ) -> FlextResult[dict[str, object]]:
         """Validate a DBT project with comprehensive testing.
 
         Args:
@@ -581,7 +596,9 @@ class FlextMeltanoCli:
                 return FlextResult(error=f"Unknown project: {project}")
 
             if not import_result.success:
-                return FlextResult(error=f"Failed to import project models: {import_result.error}")
+                return FlextResult(
+                    error=f"Failed to import project models: {import_result.error}"
+                )
 
             # Create test environment
             env_result = self.dbt_hub.create_test_environment(project)
@@ -606,7 +623,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to validate project {project}: {e}")
 
-    def dbt_list_models(self, project: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_list_models(
+        self, project: str | None = None
+    ) -> FlextResult[dict[str, object]]:
         """List all available models, optionally filtered by project.
 
         Args:
@@ -643,8 +662,10 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list models: {e}")
 
     def dbt_create_mock_data(
-        self, project: str, model: str,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+        self,
+        project: str,
+        model: str,
+    ) -> FlextResult[dict[str, object]]:
         """Create mock data for a specific model for testing.
 
         Args:
@@ -688,7 +709,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to create mock data: {e}")
 
-    def dbt_get_metrics(self, model: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:  # noqa: ARG002
+    def dbt_get_metrics(
+        self, model: str | None = None  # noqa: ARG002
+    ) -> FlextResult[dict[str, object]]:
         """Get DBT execution metrics with observability integration.
 
         Args:
@@ -718,7 +741,7 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to get DBT metrics: {e}")
 
-    def dbt_create_dashboard(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_create_dashboard(self) -> FlextResult[dict[str, object]]:
         """Create DBT operations dashboard configuration.
 
         Returns:
@@ -729,7 +752,9 @@ class FlextMeltanoCli:
             if not self.dbt_hub:
                 self.dbt_hub = create_dbt_hub()
 
-            dashboard_result = FlextResult.ok({"service": "flext-dbt-hub", "status": "active"})
+            dashboard_result = FlextResult.ok(
+                {"service": "flext-dbt-hub", "status": "active"}
+            )
 
             if dashboard_result.success:
                 return FlextResult(
@@ -740,12 +765,14 @@ class FlextMeltanoCli:
                         "message": "DBT dashboard configuration created",
                     },
                 )
-            return FlextResult(error=dashboard_result.error or "Failed to create dashboard")
+            return FlextResult(
+                error=dashboard_result.error or "Failed to create dashboard"
+            )
 
         except Exception as e:
             return FlextResult(error=f"Failed to create DBT dashboard: {e}")
 
-    def dbt_health_check(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_health_check(self) -> FlextResult[dict[str, object]]:
         """Comprehensive DBT hub health check with observability status.
 
         Returns:
@@ -769,8 +796,12 @@ class FlextMeltanoCli:
             try:
                 metrics_result = self.dbt_hub.get_hub_status()
                 if metrics_result.success and metrics_result.data:
-                    observability_status = metrics_result.data.get("observability_available", False)
-                    health_status["observability"] = "healthy" if observability_status else "disabled"
+                    observability_status = metrics_result.data.get(
+                        "observability_available", False
+                    )
+                    health_status["observability"] = (
+                        "healthy" if observability_status else "disabled"
+                    )
                 else:
                     health_status["observability"] = "error"
             except Exception as e:
@@ -791,8 +822,11 @@ class FlextMeltanoCli:
                 health_status["model_registry"] = f"error: {e}"
 
             # Overall health determination
-            error_components = [k for k, v in health_status.items()
-                             if isinstance(v, str) and v.startswith("error")]
+            error_components = [
+                k
+                for k, v in health_status.items()
+                if isinstance(v, str) and v.startswith("error")
+            ]
             overall_health = "healthy" if not error_components else "degraded"
 
             return FlextResult(
@@ -810,7 +844,9 @@ class FlextMeltanoCli:
 
     # Advanced Features CLI Methods
 
-    def dbt_list_snapshots(self, package: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_list_snapshots(
+        self, package: str | None = None
+    ) -> FlextResult[dict[str, object]]:
         """List all registered DBT snapshots, optionally filtered by package.
 
         Args:
@@ -848,7 +884,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to list snapshots: {e}")
 
-    def dbt_execute_snapshot(self, snapshot_name: str) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_execute_snapshot(
+        self, snapshot_name: str
+    ) -> FlextResult[dict[str, object]]:
         """Execute a DBT snapshot in-memory.
 
         Args:
@@ -881,7 +919,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to execute snapshot: {e}")
 
-    def dbt_list_hooks(self, hook_type: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_list_hooks(
+        self, hook_type: str | None = None
+    ) -> FlextResult[dict[str, object]]:
         """List all registered DBT hooks, optionally filtered by type.
 
         Args:
@@ -911,7 +951,12 @@ class FlextMeltanoCli:
                     ],
                     "total": len(hooks),
                     "filtered_by_type": hook_type,
-                    "available_types": ["pre-hook", "post-hook", "on-run-start", "on-run-end"],
+                    "available_types": [
+                        "pre-hook",
+                        "post-hook",
+                        "on-run-start",
+                        "on-run-end",
+                    ],
                 },
             )
 
@@ -919,8 +964,10 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list hooks: {e}")
 
     def dbt_execute_hooks(
-        self, hook_type: str, model_name: str | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+        self,
+        hook_type: str,
+        model_name: str | None = None,
+    ) -> FlextResult[dict[str, object]]:
         """Execute DBT hooks of a specific type.
 
         Args:
@@ -944,8 +991,16 @@ class FlextMeltanoCli:
                         "model_name": model_name,
                         "results": result.data,
                         "total_hooks": len(result.data) if result.data else 0,
-                        "successful_hooks": len([r for r in result.data if r["success"]]) if result.data else 0,
-                        "failed_hooks": len([r for r in result.data if not r["success"]]) if result.data else 0,
+                        "successful_hooks": len(
+                            [r for r in result.data if r["success"]]
+                        )
+                        if result.data
+                        else 0,
+                        "failed_hooks": len(
+                            [r for r in result.data if not r["success"]]
+                        )
+                        if result.data
+                        else 0,
                         "message": f"Executed {hook_type} hooks successfully",
                     },
                 )
@@ -954,7 +1009,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to execute hooks: {e}")
 
-    def dbt_list_exposures(self, exposure_type: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_list_exposures(
+        self, exposure_type: str | None = None
+    ) -> FlextResult[dict[str, object]]:
         """List all registered DBT exposures, optionally filtered by type.
 
         Args:
@@ -987,14 +1044,22 @@ class FlextMeltanoCli:
                     ],
                     "total": len(exposures),
                     "filtered_by_type": exposure_type,
-                    "available_types": ["dashboard", "notebook", "analysis", "ml", "application"],
+                    "available_types": [
+                        "dashboard",
+                        "notebook",
+                        "analysis",
+                        "ml",
+                        "application",
+                    ],
                 },
             )
 
         except Exception as e:
             return FlextResult(error=f"Failed to list exposures: {e}")
 
-    def dbt_build_lineage(self, package: str | None = None) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_build_lineage(
+        self, package: str | None = None
+    ) -> FlextResult[dict[str, object]]:
         """Build lineage graph for DBT models.
 
         Args:
@@ -1028,7 +1093,11 @@ class FlextMeltanoCli:
                             }
                             for model_name, lineage in lineage_data.items()
                         },
-                        "max_depth": max(lineage.depth for lineage in lineage_data.values()) if lineage_data else 0,
+                        "max_depth": max(
+                            lineage.depth for lineage in lineage_data.values()
+                        )
+                        if lineage_data
+                        else 0,
                         "message": f"Built lineage graph for {len(lineage_data)} models",
                     },
                 )
@@ -1037,7 +1106,9 @@ class FlextMeltanoCli:
         except Exception as e:
             return FlextResult(error=f"Failed to build lineage: {e}")
 
-    def dbt_lineage_path(self, from_model: str, to_model: str) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def dbt_lineage_path(
+        self, from_model: str, to_model: str
+    ) -> FlextResult[dict[str, object]]:
         """Find lineage path between two models.
 
         Args:
@@ -1095,7 +1166,7 @@ class FlextMeltanoCli:
         self,
         plugin_name: str,
         *args: str,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Invoke specific plugin with arguments."""
         cmd_args = ["invoke", plugin_name, *args]
         return self.flext_meltano_run_command(cmd_args)
@@ -1103,7 +1174,7 @@ class FlextMeltanoCli:
 
 def flext_meltano_run_cli(
     args: list[str] | None = None,
-) -> FlextResult[FlextTypes.Core.JsonDict]:
+) -> FlextResult[dict[str, object]]:
     """Run CLI with arguments."""
     try:
         args = args or []

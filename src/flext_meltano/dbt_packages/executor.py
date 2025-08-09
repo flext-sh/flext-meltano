@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import duckdb
-import pandas as pd  # type: ignore[import-untyped]
+import pandas as pd
 from flext_core import FlextResult, get_logger
 
 if TYPE_CHECKING:

@@ -50,17 +50,17 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, ServiceKey, get_flext_container, register_typed
+from flext_core import FlextResult, get_flext_container
 
 if TYPE_CHECKING:
     from flext_core import FlextContainer
 
 from flext_meltano.base import (
-    FlextMeltanoConfig,
     create_meltano_dbt_service,
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+from flext_meltano.config import FlextMeltanoConfig
 
 
 def configure_meltano_services(
@@ -85,22 +85,19 @@ def configure_meltano_services(
         used_config = config or FlextMeltanoConfig()
 
         # Register configuration
-        register_typed(container, ServiceKey("meltano_config"), used_config)
+        container.register("meltano_config", used_config)
 
         # Register factory functions for Singer services
-        register_typed(
-            container,
-            ServiceKey("tap_service_factory"),
+        container.register(
+            "tap_service_factory",
             create_meltano_tap_service,
         )
-        register_typed(
-            container,
-            ServiceKey("target_service_factory"),
+        container.register(
+            "target_service_factory",
             create_meltano_target_service,
         )
-        register_typed(
-            container,
-            ServiceKey("dbt_service_factory"),
+        container.register(
+            "dbt_service_factory",
             create_meltano_dbt_service,
         )
 

@@ -35,7 +35,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from flext_core import FlextResult
-from flext_core.interfaces import (
+from flext_core.protocols import (
     FlextPlugin,
     FlextPluginContext,
 )
@@ -45,13 +45,12 @@ if TYPE_CHECKING:
 
     from structlog.stdlib import BoundLogger
 
-    from flext_meltano.base import FlextMeltanoConfig
+    from flext_meltano.config import FlextMeltanoConfig
 
 from flext_core import get_logger
 
 # Import create_executor function to fix F821 error
-if not TYPE_CHECKING:
-    from flext_meltano.execution import create_executor
+from flext_meltano.execution import create_executor
 
 # =============================================================================
 # MELTANO PLUGIN IMPLEMENTATIONS - FLEXT-CORE INTERFACE COMPLIANCE
@@ -104,6 +103,15 @@ class FlextMeltanoPlugin(FlextPlugin):
             return FlextResult.ok(None)
         except Exception as e:
             return FlextResult.fail(f"Meltano plugin shutdown failed: {e}")
+
+    def get_info(self) -> dict[str, object]:
+        """Get plugin information from abstract interface."""
+        return {
+            "name": self.name,
+            "version": self.version,
+            "plugin_type": self.plugin_type,
+            "status": "active",
+        }
 
 
 class FlextMeltanoPluginExecution:
