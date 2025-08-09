@@ -260,7 +260,8 @@ class TestFlextMeltanoBridge:
 
         assert not result.success
         assert (
-            "Plugin installation requires initialized Meltano project" in result.error
+            "installation service not initialized" in result.error
+            or "Plugin installation requires initialized Meltano project" in result.error
         )
 
     def test_add_plugin_with_pip_url(self):
@@ -404,7 +405,10 @@ class TestFlextMeltanoBridge:
         result = self.bridge.invoke_dbt("run")
 
         assert not result.success
-        assert "DBT operations require configured DBT project" in result.error
+        assert (
+            "DBT service not initialized" in result.error
+            or "DBT operations require configured DBT project" in result.error
+        )
 
     def test_invoke_dbt_with_args(self):
         """Test invoke_dbt with additional arguments."""

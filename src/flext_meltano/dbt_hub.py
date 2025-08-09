@@ -24,9 +24,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 try:
-    import pandas as pd  # type: ignore[import-untyped]
+    import pandas as pd
 except ImportError:
-    pd = None
+    pd = None  # type: ignore[assignment]
 from typing import TYPE_CHECKING
 
 from flext_core import FlextResult, get_logger
@@ -43,8 +43,6 @@ from flext_meltano.dbt_packages.registry import (
     create_model_registry,
 )
 
-if TYPE_CHECKING:
-    from flext_core.semantic_types import FlextTypes
 
 logger = get_logger(__name__)
 
@@ -77,7 +75,7 @@ class FlextDbtSnapshot:
     updated_at: str | None = None  # For timestamp strategy
     check_cols: list[str] = field(default_factory=list)  # For check strategy
     tags: list[str] = field(default_factory=list)
-    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass
@@ -100,7 +98,7 @@ class FlextDbtHook:
     package: str
     models: list[str] = field(default_factory=list)
     condition: str | None = None
-    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass
@@ -127,7 +125,7 @@ class FlextDbtExposure:
     depends_on: list[str] = field(default_factory=list)
     package: str = ""
     tags: list[str] = field(default_factory=list)
-    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass
@@ -152,7 +150,7 @@ class FlextDbtLineage:
     sources: list[str] = field(default_factory=list)
     exposures: list[str] = field(default_factory=list)
     depth: int = 0
-    metadata: FlextTypes.Core.JsonDict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
 
 class FlextDbtHub:
@@ -315,8 +313,8 @@ class FlextDbtHub:
     def execute_model(  # noqa: PLR0912
         self,
         model: str,
-        mock_data: FlextTypes.Core.JsonDict | None = None,
-        context: FlextTypes.Core.JsonDict | None = None,
+        mock_data: dict[str, object] | None = None,
+        context: dict[str, object] | None = None,
     ) -> FlextResult[pd.DataFrame]:
         """Execute a model in-memory.
 
@@ -343,7 +341,9 @@ class FlextDbtHub:
                         elif isinstance(table_data, pd.DataFrame):
                             data_frames[table_name] = table_data
                         else:
-                            return FlextResult.fail(f"Unsupported mock data format for {table_name}")
+                            return FlextResult.fail(
+                                f"Unsupported mock data format for {table_name}"
+                            )
                 except Exception as e:
                     return FlextResult.fail(f"Failed to process mock data: {e}")
 
@@ -383,7 +383,7 @@ class FlextDbtHub:
         self,
         project: str,
         models: list[str] | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Validate transformations for a project.
 
         Args:
@@ -967,7 +967,7 @@ class FlextDbtHub:
 
     # Utility Methods
 
-    def get_hub_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_hub_status(self) -> FlextResult[dict[str, object]]:
         """Get current status of the DBT hub.
 
         Returns:
@@ -1030,7 +1030,7 @@ class FlextDbtHub:
     def execute_snapshot(
         self,
         snapshot_name: str,
-        mock_data: FlextTypes.Core.JsonDict | None = None,
+        mock_data: dict[str, object] | None = None,
     ) -> FlextResult[pd.DataFrame]:
         """Execute a DBT snapshot in-memory.
 
@@ -1061,16 +1061,14 @@ class FlextDbtHub:
             # In a real implementation, this would use DBT's snapshot logic
             # WARNING: Potential SQL injection. 'snapshot.unique_key' is used directly in SQL. For untrusted input,
             # use parameterized queries or strict validation (e.g., allow-list of column names).
-            snapshot_sql = (
-                f"""SELECT  # noqa: S608
+            snapshot_sql = f"""SELECT
                     *,
                     CURRENT_TIMESTAMP AS dbt_updated_at,
                     CURRENT_TIMESTAMP AS dbt_valid_from,
                     NULL AS dbt_valid_to,
-                    md5(CAST({snapshot.unique_key} AS VARCHAR)) AS dbt_scd_id  # noqa: S608
+                    md5(CAST({snapshot.unique_key} AS VARCHAR)) AS dbt_scd_id
                 FROM ({snapshot.sql}) AS snapshot_data
             """
-            )
 
             result = self.executor.execute_model(snapshot_sql)
 
@@ -1116,7 +1114,7 @@ class FlextDbtHub:
         self,
         hook_type: str,
         model_name: str | None = None,
-    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Execute DBT hooks of a specific type.
 
         Args:

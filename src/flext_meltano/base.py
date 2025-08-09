@@ -66,7 +66,7 @@ Foundation classes designed for Go service integration:
 
 ### Configuration Setup
 ```python
-from flext_meltano.base import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 
 config = FlextMeltanoConfig(project_root="./meltano", environment="production")
 ```
@@ -84,6 +84,7 @@ if result.success:
 ### Base Class Extension
 ```python
 from flext_meltano.base import FlextMeltanoTapService
+
 
 class CustomTap(FlextMeltanoTapService):
     def discover_streams(self) -> FlextResult[List[Stream]]:
@@ -112,134 +113,35 @@ and provides the enterprise patterns required for reliable Go ↔ Python integra
 
 from __future__ import annotations
 
-import contextlib
-from abc import abstractmethod
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from dbt.cli.main import dbtRunner
-from flext_core import (
-    FlextConfig,
-    FlextEntity,
-    FlextGenerators,
-    FlextLogger,
-    FlextResult,
-)
-from pydantic import Field, field_validator
+from flext_core import FlextResult
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
 
-if TYPE_CHECKING:
-    from logging import Logger
+# Centralized imports (no duplication)
+from .base_service import FlextMeltanoBaseService
 
-    from flext_core.semantic_types import FlextTypes
-    from meltano.edk.extension import ExtensionBase  # type: ignore[import-not-found]
-    from singer_sdk import Tap, Target
+from meltano.edk.extension import ExtensionBase
+from singer_sdk import Tap, Target
 
-
-class FlextMeltanoConfig(FlextConfig):
-    """Configuration using flext-core FlextConfig pattern (removes BaseModel duplication)."""
-
-    project_root: str = Field(default=".", description="Meltano project root directory")
-    environment: str = Field(default="dev", description="Meltano environment")
-
-    # Meltano-specific configuration
-    meltano_database_uri: str | None = Field(
-        default=None,
-        description="Meltano system database URI",
-    )
-    meltano_ui_bind_port: int = Field(default=5000, description="Meltano UI port")
-
-    # Singer SDK configuration
-    singer_sdk_log_level: str = Field(
-        default="INFO",
-        description="Singer SDK log level",
-    )
-
-    # DBT configuration
-    dbt_project_dir: str | None = Field(
-        default=None,
-        description="DBT project directory",
-    )
-    dbt_profiles_dir: str | None = Field(
-        default=None,
-        description="DBT profiles directory",
-    )
-
-    @field_validator("project_root")
-    @classmethod
-    def validate_project_root(cls, v: str) -> str:
-        """Validate project root exists."""
-        path = Path(v)
-        # Only try to create directories for reasonable paths
-        # Don't create directories for obviously invalid test paths
-        if not path.exists() and not str(path).startswith("/nonexistent"):
-            with contextlib.suppress(OSError, PermissionError):
-                path.mkdir(parents=True, exist_ok=True)
-        return str(path.absolute())
+from .config import FlextMeltanoConfig
 
 
-class FlextMeltanoEvent(FlextEntity):
-    """Event entity using MANDATORY flext-core patterns."""
+# NOTE: FlextMeltanoConfig is now centralized in `config.py` and imported above.
 
-    id: str = Field(
-        default_factory=FlextGenerators.generate_uuid,
-        description="Event ID",
-    )
-    event_type: str = Field(..., description="Type of event")
-    timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="Event timestamp",
-    )
-    source: str = Field(..., description="Event source component")
-    data: FlextTypes.Core.JsonDict = Field(default_factory=dict, description="Event data")
 
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate event business rules."""
-        if not self.event_type.strip():
-            return FlextResult(error="Event type cannot be empty")
-        if not self.source.strip():
-            return FlextResult(error="Event source cannot be empty")
-        return FlextResult(data=None)
+# NOTE: FlextMeltanoEvent is centralized in `models.py` and imported above.
+
 
 # === FLEXT-CORE MANDATORY DOMAIN SERVICES ===
 
 
-@injectable
-class FlextMeltanoBaseService:
-    """Base service using MANDATORY flext-core patterns."""
+# NOTE: Base service is centralized in `base_service.py` and imported above.
 
-    def __init__(self, config: FlextMeltanoConfig) -> None:
-        """Initialize service with dependency injection."""
-        self.config = config
-        self._initialized = False
-        self.logger: Logger = cast(
-            "Logger",
-            FlextLogger.get_logger(self.__class__.__name__),
-        )
-
-    def initialize(self) -> FlextResult[bool]:
-        """Initialize service - MANDATORY pattern."""
-        try:
-            # Simple logging that works
-            validation_result = self.validate_service()
-            if not validation_result.success:
-                return validation_result
-
-            self._initialized = True
-            return FlextResult(data=True)
-        except (ValueError, TypeError, ImportError, RuntimeError) as e:
-            return FlextResult(error=f"Service initialization failed: {e}")
-
-    @abstractmethod
-    def validate_service(self) -> FlextResult[bool]:
-        """Validate service state - MANDATORY implementation."""
-
-    @abstractmethod
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
-        """Get service health status - MANDATORY for monitoring."""
 
 # === SINGER SDK INTEGRATION ===
 
@@ -260,7 +162,7 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get tap health status."""
         return FlextResult(
             data={
@@ -281,15 +183,15 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
             return FlextResult(error="Tap class not configured")
         return FlextResult(data=True)
 
-    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def discover_catalog(self) -> FlextResult[dict[str, object]]:
         """Discover catalog using Singer SDK patterns."""
         if not self.tap_instance:
             if not self.tap_class:
                 return FlextResult(error="Tap class not configured")
 
             try:
-                self.tap_instance = self.tap_class(config=self.config.dict())
-            except (ValueError, TypeError, ImportError, AttributeError) as e:
+                self.tap_instance = self.tap_class(config=self.config.model_dump())
+            except (ValueError, TypeError, AttributeError) as e:
                 return FlextResult(error=f"Failed to create tap instance: {e}")
 
         try:
@@ -315,7 +217,7 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
             return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get target health status."""
         return FlextResult(
             data={
@@ -336,6 +238,7 @@ class FlextMeltanoTargetService(FlextMeltanoBaseService):
             return FlextResult(error="Target class not configured")
         return FlextResult(data=True)
 
+
 # === MELTANO EDK INTEGRATION ===
 
 
@@ -352,7 +255,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
         """Validate Meltano EDK availability."""
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
         return FlextResult(
             data={
@@ -371,6 +274,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
             return FlextResult(error="Extension class cannot be None")
         self.extension_class = extension_class
         return FlextResult(data=None)
+
 
 # === DBT INTEGRATION ===
 
@@ -394,7 +298,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
         return FlextResult(data=True)
 
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get DBT health status."""
         return FlextResult(
             data={
@@ -408,7 +312,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Run DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -442,7 +346,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
-    ) -> FlextResult[list[FlextTypes.Core.JsonDict]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Test DBT models using official DBT runner."""
         try:
             if not self.project_dir or not self.project_dir.exists():
@@ -473,25 +377,22 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
             return FlextResult(error=f"DBT test execution failed: {e}")
 
     def get_dbt_version(self) -> str:
-        """Get DBT version."""
+        """Get DBT version (fallback-safe)."""
         try:
             if not self.runner:
                 try:
                     self.runner = dbtRunner()
                 except (ImportError, AttributeError, ValueError, TypeError):
-                    return "0.9.0"  # Fallback version when DBT not available
+                    return "0.9.0"
 
-            # Try to get version
             result = self.runner.invoke(["--version"])
             if hasattr(result, "result") and result.result:
                 return str(result.result)
-        except (ImportError, AttributeError, ValueError, TypeError) as e:
-            # Log the specific error for debugging - use local logger
-            logger = FlextLogger(__name__)
-            logger.warning(f"Failed to get version: {e}")
-        return "0.9.0"  # Fallback version
+        except (ImportError, AttributeError, ValueError, TypeError):
+            return "0.9.0"
+        return "0.9.0"
 
-    def execute(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def execute(self) -> FlextResult[dict[str, object]]:
         """Execute method for service pattern."""
         return FlextResult(
             data={
@@ -500,6 +401,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
                 "initialized": self._initialized,
             },
         )
+
 
 # === FACTORY FUNCTIONS USING MANDATORY PATTERNS ===
 

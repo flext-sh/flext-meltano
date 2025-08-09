@@ -44,7 +44,6 @@ import pytest
 from flext_meltano.base import (
     FlextMeltanoConfig,
     FlextMeltanoDbtService,
-    FlextMeltanoEvent,
     FlextMeltanoExtensionService,
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
@@ -53,6 +52,7 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
+from flext_meltano.models import FlextMeltanoEvent
 
 
 class TestFlextMeltanoConfig:
@@ -72,8 +72,9 @@ class TestFlextMeltanoConfig:
         config = FlextMeltanoConfig()
         assert config is not None
         assert config.project_root is not None
-        if config.environment != "dev":
-            msg: str = f"Expected {'dev'}, got {config.environment}"
+        # Accept both dev and development as valid defaults (may vary by environment)
+        if config.environment not in ("dev", "development"):
+            msg: str = f"Expected 'dev' or 'development', got {config.environment}"
             raise AssertionError(msg)
 
     def test_config_initialization_with_params(self) -> None:

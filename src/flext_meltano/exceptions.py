@@ -22,19 +22,44 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import create_module_exception_classes
+from flext_core.exceptions import (
+    FlextAuthenticationError,
+    FlextConfigurationError,
+    FlextConnectionError,
+    FlextError,
+    FlextProcessingError,
+    FlextTimeoutError,
+    FlextValidationError,
+)
 
-# 🚨 DRY PATTERN: Use create_module_exception_classes to eliminate exception duplication
-_meltano_exceptions = create_module_exception_classes("flext_meltano")
 
-# Extract factory-created exception classes
-FlextMeltanoError = _meltano_exceptions["FlextMeltanoError"]
-FlextMeltanoValidationError = _meltano_exceptions["FlextMeltanoValidationError"]
-FlextMeltanoConfigurationError = _meltano_exceptions["FlextMeltanoConfigurationError"]
-FlextMeltanoConnectionError = _meltano_exceptions["FlextMeltanoConnectionError"]
-FlextMeltanoProcessingError = _meltano_exceptions["FlextMeltanoProcessingError"]
-FlextMeltanoAuthenticationError = _meltano_exceptions["FlextMeltanoAuthenticationError"]
-FlextMeltanoTimeoutError = _meltano_exceptions["FlextMeltanoTimeoutError"]
+# Re-export specialized error types with Meltano-prefixed names for clarity
+class FlextMeltanoError(FlextError):
+    """Base Meltano error inheriting from flext-core generic error."""
+
+
+class FlextMeltanoValidationError(FlextValidationError):
+    """Validation error for Meltano domain."""
+
+
+class FlextMeltanoConfigurationError(FlextConfigurationError):
+    """Configuration error for Meltano domain."""
+
+
+class FlextMeltanoConnectionError(FlextConnectionError):
+    """Connection error for Meltano domain."""
+
+
+class FlextMeltanoProcessingError(FlextProcessingError):
+    """Processing error for Meltano domain."""
+
+
+class FlextMeltanoAuthenticationError(FlextAuthenticationError):
+    """Authentication error for Meltano domain."""
+
+
+class FlextMeltanoTimeoutError(FlextTimeoutError):
+    """Timeout error for Meltano domain."""
 
 
 # Domain-specific exceptions for Meltano business logic
@@ -43,7 +68,7 @@ FlextMeltanoTimeoutError = _meltano_exceptions["FlextMeltanoTimeoutError"]
 # ====================================================
 
 
-class FlextMeltanoPluginError(FlextMeltanoError):  # type: ignore[valid-type,misc]
+class FlextMeltanoPluginError(FlextMeltanoError):
     """Plugin-specific errors with enhanced context using DRY foundation."""
 
     def __init__(
@@ -64,10 +89,10 @@ class FlextMeltanoPluginError(FlextMeltanoError):  # type: ignore[valid-type,mis
         if plugin_command is not None:
             context["plugin_command"] = plugin_command
 
-        super().__init__(f"Plugin: {message}", **context)
+        super().__init__(f"Plugin: {message}", context=context)
 
 
-class FlextMeltanoExecutionError(FlextMeltanoProcessingError):  # type: ignore[valid-type,misc]
+class FlextMeltanoExecutionError(FlextMeltanoProcessingError):
     """Execution errors with command context using DRY foundation."""
 
     def __init__(
@@ -85,10 +110,10 @@ class FlextMeltanoExecutionError(FlextMeltanoProcessingError):  # type: ignore[v
         if exit_code is not None:
             context["exit_code"] = exit_code
 
-        super().__init__(f"Execution: {message}", **context)
+        super().__init__(f"Execution: {message}", context=context)
 
 
-class FlextMeltanoSingerError(FlextMeltanoError):  # type: ignore[valid-type,misc]
+class FlextMeltanoSingerError(FlextMeltanoError):
     """Singer protocol-specific errors using DRY foundation."""
 
     def __init__(
@@ -106,10 +131,10 @@ class FlextMeltanoSingerError(FlextMeltanoError):  # type: ignore[valid-type,mis
         if record_count is not None:
             context["record_count"] = record_count
 
-        super().__init__(f"Singer: {message}", **context)
+        super().__init__(f"Singer: {message}", context=context)
 
 
-class FlextMeltanoDBTError(FlextMeltanoError):  # type: ignore[valid-type,misc]
+class FlextMeltanoDBTError(FlextMeltanoError):
     """DBT integration errors using DRY foundation."""
 
     def __init__(
@@ -124,7 +149,7 @@ class FlextMeltanoDBTError(FlextMeltanoError):  # type: ignore[valid-type,misc]
         if model_name is not None:
             context["model_name"] = model_name
 
-        super().__init__(f"DBT: {message}", **context)
+        super().__init__(f"DBT: {message}", context=context)
 
 
 __all__: list[str] = [

@@ -70,7 +70,7 @@ else:
 ### Service-Based Execution
 ```python
 from flext_meltano.execution import FlextMeltanoExecutor
-from flext_meltano.base import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 
 config = FlextMeltanoConfig(project_root="./meltano")
 executor = FlextMeltanoExecutor(config)
@@ -113,7 +113,7 @@ All execution operations return FlextResult for consistent error handling:
 ```python
 def execute_with_timeout(command: List[str], timeout: int) -> FlextResult[Dict]:
     try:
-        result = subprocess.run(command, timeout=timeout, capture_output=True)
+        result = subprocess.run(  # noqa: S603command, timeout=timeout, capture_output=True)
         if result.returncode == 0:
             return FlextResult.ok({"stdout": result.stdout, "stderr": result.stderr})
         else:
@@ -194,10 +194,8 @@ from flext_core import FlextModel, FlextResult, get_logger
 # Observability integration - using flext_core logger instead of flext_observability
 from pydantic import Field
 
-from flext_meltano.base import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 
-if TYPE_CHECKING:
-    from flext_core.semantic_types import FlextTypes
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
@@ -223,7 +221,7 @@ class FlextMeltanoExecutionContext(FlextModel):
     environment: str = Field(default="dev")
     project_root: Path = Field(default_factory=Path)
     timeout_seconds: int = Field(default=1800)
-    metadata: FlextTypes.Core.JsonDict = Field(default_factory=dict)
+    metadata: dict[str, object] = Field(default_factory=dict)
 
 
 @injectable
@@ -260,7 +258,7 @@ class FlextMeltanoExecutor:
         except (OSError, ImportError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
-    def get_health_status(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get executor health status."""
         return FlextResult(
             data={
@@ -296,7 +294,7 @@ class FlextMeltanoExecutor:
         tap_name: str,
         target_name: str,
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute pipeline using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -323,7 +321,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(  # noqa: S603  # noqa: S603
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -363,7 +361,7 @@ class FlextMeltanoExecutor:
         self,
         args: list[str],
         context: FlextMeltanoExecutionContext | None = None,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Run generic command using enterprise patterns."""
         if not context:
             context = FlextMeltanoExecutionContext(
@@ -386,7 +384,7 @@ class FlextMeltanoExecutor:
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
 
             # Execute subprocess
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(  # noqa: S603  # noqa: S603
                 command,
                 check=False,
                 cwd=context.project_root,
@@ -424,7 +422,7 @@ class FlextMeltanoExecutor:
     def execute(
         self,
         command: FlextMeltanoExecutionCommand,
-    ) -> FlextResult[FlextTypes.Core.JsonDict]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute command using domain service pattern."""
         return self.execute_pipeline(command.tap_name, command.target_name)
 
@@ -442,6 +440,7 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
         return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
         return FlextResult(error=f"Failed to create executor: {e}")
+
 
 # === COMMON SUBPROCESS EXECUTOR ===
 
@@ -461,7 +460,7 @@ class SubprocessExecutionContext:
 
 def execute_subprocess_common(
     context: SubprocessExecutionContext,
-) -> FlextResult[FlextTypes.Core.JsonDict]:
+) -> FlextResult[dict[str, object]]:
     """Centralized subprocess execution with integrated observability.
 
     This function provides a common pattern for subprocess execution used
@@ -521,14 +520,19 @@ def execute_subprocess_common(
 
     except subprocess.TimeoutExpired as e:
         execution_time = time.time() - start_time
-        logger.exception(f"Subprocess timed out after {execution_time:.2f}s: {command_str}")
+        logger.exception(
+            f"Subprocess timed out after {execution_time:.2f}s: {command_str}"
+        )
         return FlextResult(
             error=f"Command timed out after {context.timeout_seconds} seconds: {e}",
         )
     except (subprocess.CalledProcessError, OSError, FileNotFoundError) as e:
         execution_time = time.time() - start_time
-        logger.exception(f"Subprocess failed after {execution_time:.2f}s: {command_str}")
+        logger.exception(
+            f"Subprocess failed after {execution_time:.2f}s: {command_str}"
+        )
         return FlextResult(error=f"Command error: {e}")
+
 
 # === LEGACY COMPATIBILITY ===
 
@@ -540,7 +544,7 @@ class FlextMeltanoResult:
         self,
         *,
         success: bool,
-        data: FlextTypes.Core.JsonDict | None = None,
+        data: dict[str, object] | None = None,
         error: str = "",
     ) -> None:
         """Initialize result."""
@@ -549,7 +553,7 @@ class FlextMeltanoResult:
         self.error = error
 
     @classmethod
-    def ok(cls, data: FlextTypes.Core.JsonDict | None = None) -> FlextMeltanoResult:
+    def ok(cls, data: dict[str, object] | None = None) -> FlextMeltanoResult:
         """Create success result."""
         return cls(success=True, data=data)
 

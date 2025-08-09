@@ -65,7 +65,7 @@ class FlextTapOracle(FlextSingerUnifiedInterface):
         self.connection = create_oracle_connection(config.config)
         return FlextResult.ok(None)
 
-    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def discover_catalog(self) -> FlextResult[dict[str, object]]:
         # Discover Oracle schemas and tables
         return FlextResult.ok(self.connection.discover_schemas())
 
@@ -106,7 +106,7 @@ if result.success:
 ### Bridge Integration
 ```python
 # Unified service operations for Go bridge consumption
-def bridge_execute_unified_pipeline(config_json: str) -> FlextTypes.Core.JsonDict:
+def bridge_execute_unified_pipeline(config_json: str) -> dict[str, object]:
     '''Execute unified pipeline with JSON config for Go services.'''
     config = json.loads(config_json)
     service = create_unified_singer_service()
@@ -185,14 +185,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from flext_core import FlextDomainService, FlextResult
 
-if TYPE_CHECKING:
-    from flext_core.semantic_types import FlextTypes
+from .protocols import FlextSingerUnifiedInterface
+
 
 
 @dataclass
@@ -201,10 +200,10 @@ class FlextPipelineConfig:
 
     tap_name: str
     target_name: str
-    tap_config: FlextTypes.Core.JsonDict
-    target_config: FlextTypes.Core.JsonDict
-    catalog: FlextTypes.Core.JsonDict | None = None
-    state: FlextTypes.Core.JsonDict | None = None
+    tap_config: dict[str, object]
+    target_config: dict[str, object]
+    catalog: dict[str, object] | None = None
+    state: dict[str, object] | None = None
 
 
 class FlextSingerUnifiedConfig:
@@ -217,9 +216,9 @@ class FlextSingerUnifiedConfig:
     def __init__(
         self,
         name: str,
-        config: FlextTypes.Core.JsonDict,
-        catalog: FlextTypes.Core.JsonDict | None = None,
-        state: FlextTypes.Core.JsonDict | None = None,
+        config: dict[str, object],
+        catalog: dict[str, object] | None = None,
+        state: dict[str, object] | None = None,
         environment: str = "dev",
         **extra_config: object,
     ) -> None:
@@ -268,11 +267,11 @@ class FlextSingerUnifiedResult:
     success: bool
     records_processed: int = 0
     schemas_discovered: list[str] | None = None
-    state_updates: FlextTypes.Core.JsonDict | None = None
-    catalog_updates: FlextTypes.Core.JsonDict | None = None
+    state_updates: dict[str, object] | None = None
+    catalog_updates: dict[str, object] | None = None
     execution_time_ms: float = 0.0
     error_message: str | None = None
-    metrics: FlextTypes.Core.JsonDict = field(default_factory=dict)
+    metrics: dict[str, object] = field(default_factory=dict)
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate unified Singer result domain rules.
@@ -291,60 +290,6 @@ class FlextSingerUnifiedResult:
 
         return FlextResult.ok(None)
 
-
-class FlextSingerUnifiedInterface(ABC):
-    """Abstract interface for unified Singer operations - foundation for all projects.
-
-    SOLID DIP: Dependency inversion principle providing abstract interface
-    that all Singer projects can implement without tight coupling to flext-meltano.
-
-    This interface supports taps, targets, and transforms in a unified way.
-    """
-
-    @abstractmethod
-    def initialize(self, config: FlextSingerUnifiedConfig) -> FlextResult[None]:
-        """Initialize the Singer component with unified configuration.
-
-        Args:
-            config: Unified configuration object
-
-        Returns:
-            FlextResult indicating initialization success/failure
-
-        """
-
-    @abstractmethod
-    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
-        """Discover available schemas and generate Singer catalog.
-
-        Returns:
-            FlextResult containing Singer catalog or error
-
-        """
-
-    @abstractmethod
-    def execute(
-        self,
-        input_data: object | None = None,
-    ) -> FlextResult[FlextSingerUnifiedResult]:
-        """Execute the Singer operation (extract, load, transform).
-
-        Args:
-            input_data: Optional input data for the operation
-
-        Returns:
-            FlextResult containing unified operation result
-
-        """
-
-    @abstractmethod
-    def validate_configuration(self) -> FlextResult[None]:
-        """Validate the current configuration.
-
-        Returns:
-            FlextResult indicating validation success/failure
-
-        """
 
 
 class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
@@ -421,7 +366,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
     def _execute_pipeline_operation(
         self,
-        kwargs: FlextTypes.Core.JsonDict,
+        kwargs: dict[str, object],
     ) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute pipeline operation from service execute method.
 
@@ -672,7 +617,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         return FlextResult.ok(combined_result)
 
-    def discover_all_catalogs(self) -> FlextResult[dict[str, FlextTypes.Core.JsonDict]]:
+    def discover_all_catalogs(self) -> FlextResult[dict[str, dict[str, object]]]:
         """Discover catalogs from all registered components.
 
         Returns:
@@ -680,7 +625,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         """
         try:
-            catalogs: dict[str, FlextTypes.Core.JsonDict] = {}
+            catalogs: dict[str, dict[str, object]] = {}
 
             for name, component in self._registered_components.items():
                 catalog_result = component.discover_catalog()
@@ -726,7 +671,7 @@ def create_unified_singer_service() -> FlextSingerUnifiedService:
 
 def create_unified_singer_config(
     name: str,
-    config: FlextTypes.Core.JsonDict,
+    config: dict[str, object],
     **kwargs: object,
 ) -> FlextSingerUnifiedConfig:
     """Create unified Singer configuration.

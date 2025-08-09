@@ -35,20 +35,19 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from flext_core import FlextResult, get_logger
-from flext_core.interfaces import (
-    FlextDataPlugin,
+from flext_core.protocols import (
+    FlextPlugin,
     FlextPluginContext,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from flext_core.semantic_types import FlextTypes
     from flext_plugin.domain.entities import FlextPluginEntity
     from structlog.stdlib import BoundLogger
 
 
-class FlextSingerPluginBase(FlextDataPlugin, ABC):
+class FlextSingerPluginBase(FlextPlugin, ABC):
     """Abstract base class for all Singer plugins.
 
     Provides common functionality for tap and target plugins while
@@ -71,7 +70,7 @@ class FlextSingerPluginBase(FlextDataPlugin, ABC):
         name: str,
         version: str,
         plugin_type: str,
-        config: FlextTypes.Core.JsonDict | None = None,
+        config: dict[str, object] | None = None,
         entity: FlextPluginEntity | None = None,
     ) -> None:
         """Initialize Singer plugin base.
@@ -89,7 +88,7 @@ class FlextSingerPluginBase(FlextDataPlugin, ABC):
         self._plugin_type = plugin_type
         self._entity = entity
         self._config = config or {}
-        self._catalog: FlextTypes.Core.JsonDict = {}
+        self._catalog: dict[str, object] = {}
         self._logger = get_logger(f"singer.{plugin_type}.{name}")
         self._initialized = False
         self._connection_valid = False
@@ -110,7 +109,7 @@ class FlextSingerPluginBase(FlextDataPlugin, ABC):
         return self._plugin_type
 
     @property
-    def catalog(self) -> FlextTypes.Core.JsonDict:
+    def catalog(self) -> dict[str, object]:
         """Get Singer catalog."""
         return self._catalog
 
@@ -130,7 +129,7 @@ class FlextSingerPluginBase(FlextDataPlugin, ABC):
             )
 
             # Merge context config with instance config
-            context_config = dict(context.config)
+            context_config = dict(context.get_config())
             self._config.update(context_config)
 
             # Validate configuration
@@ -310,7 +309,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
         self,
         name: str,
         version: str,
-        config: FlextTypes.Core.JsonDict | None = None,
+        config: dict[str, object] | None = None,
         entity: FlextPluginEntity | None = None,
     ) -> None:
         """Initialize tap plugin.
@@ -336,7 +335,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
         """Get list of selected streams."""
         return self._selected_streams
 
-    def discover_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def discover_catalog(self) -> FlextResult[dict[str, object]]:
         """Discover available streams and schemas.
 
         Returns:
@@ -428,7 +427,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
             return FlextResult.fail(f"Extraction error: {e!s}")
 
     @abstractmethod
-    def _discover_tap_catalog(self) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def _discover_tap_catalog(self) -> FlextResult[dict[str, object]]:
         """Perform tap-specific catalog discovery.
 
         Returns:
@@ -471,7 +470,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         self,
         name: str,
         version: str,
-        config: FlextTypes.Core.JsonDict | None = None,
+        config: dict[str, object] | None = None,
         entity: FlextPluginEntity | None = None,
     ) -> None:
         """Initialize target plugin.
@@ -497,7 +496,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         """Get count of failed records."""
         return self._error_count
 
-    def load_data(self, data: object) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def load_data(self, data: object) -> FlextResult[dict[str, object]]:
         """Load data to destination.
 
         Args:
@@ -548,7 +547,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
                 self._entity.record_error(str(e))
             return FlextResult.fail(f"Load error: {e!s}")
 
-    def get_load_statistics(self) -> FlextTypes.Core.JsonDict:
+    def get_load_statistics(self) -> dict[str, object]:
         """Get loading statistics.
 
         Returns:
@@ -566,7 +565,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         }
 
     @abstractmethod
-    def _load_target_data(self, data: object) -> FlextResult[FlextTypes.Core.JsonDict]:
+    def _load_target_data(self, data: object) -> FlextResult[dict[str, object]]:
         """Perform target-specific data loading.
 
         Args:
@@ -600,7 +599,7 @@ class FlextSingerPluginContext(FlextPluginContext):
     def __init__(
         self,
         logger: BoundLogger,
-        config: FlextTypes.Core.JsonDict | None = None,
+        config: dict[str, object] | None = None,
         meltano_project: object | None = None,
         singer_io: object | None = None,
     ) -> None:
@@ -617,7 +616,7 @@ class FlextSingerPluginContext(FlextPluginContext):
         self._config = config or {}
         self._meltano_project = meltano_project
         self._singer_io = singer_io
-        self._services: FlextTypes.Core.JsonDict = {
+        self._services: dict[str, object] = {
             "meltano_project": meltano_project,
             "singer_io": singer_io,
         }
