@@ -14,11 +14,11 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-from flext_core import FlextConfig
+from flext_core.config import FlextMainConfig
 from pydantic import Field, field_validator
 
 
-class FlextMeltanoConfig(FlextConfig):
+class FlextMeltanoConfig(FlextMainConfig):
     """Configuration using flext-core `FlextConfig` pattern (no duplication)."""
 
     project_root: str = Field(default=".", description="Meltano project root directory")

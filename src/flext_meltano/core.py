@@ -352,12 +352,12 @@ class FlextMeltanoPipelineResult(FlextEntity):
 
     def start_execution(self) -> None:
         """Mark pipeline execution as started."""
-        object.__setattr__(self, "state", ExecutionState.RUNNING.value)
+        object.__setattr__(self, "state", ExecutionState.RUNNING)
         object.__setattr__(self, "started_at", datetime.now(UTC))
 
     def complete_execution(self, records_processed: int = 0) -> None:
         """Mark pipeline execution as completed."""
-        object.__setattr__(self, "state", ExecutionState.COMPLETED.value)
+        object.__setattr__(self, "state", ExecutionState.COMPLETED)
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "records_processed", records_processed)
         if self.started_at and self.completed_at:
@@ -369,7 +369,7 @@ class FlextMeltanoPipelineResult(FlextEntity):
 
     def fail_execution(self, error_message: str) -> None:
         """Mark pipeline execution as failed."""
-        object.__setattr__(self, "state", ExecutionState.FAILED.value)
+        object.__setattr__(self, "state", ExecutionState.FAILED)
         object.__setattr__(self, "completed_at", datetime.now(UTC))
         object.__setattr__(self, "error_message", error_message)
         if self.started_at and self.completed_at:

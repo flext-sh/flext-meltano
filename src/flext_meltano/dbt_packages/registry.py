@@ -10,7 +10,6 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, get_logger
 from jinja2 import Environment
@@ -38,9 +37,9 @@ class FlextDbtModel:
     package: str
     sql: str
     description: str = ""
-    columns: dict[str, dict[str, Any]] = field(default_factory=dict)
+    columns: dict[str, dict[str, object]] = field(default_factory=dict)
     tags: list[str] = field(default_factory=list)
-    config: dict[str, Any] = field(default_factory=dict)
+    config: dict[str, object] = field(default_factory=dict)
     dependencies: list[str] = field(default_factory=list)
 
     @property
@@ -54,7 +53,7 @@ class FlextDbtModel:
         content = f"{self.sql}{json.dumps(self.columns, sort_keys=True)}"
         return hashlib.sha256(content.encode()).hexdigest()
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert model to dictionary."""
         return {
             "name": self.name,
@@ -68,17 +67,26 @@ class FlextDbtModel:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> FlextDbtModel:
+    def from_dict(cls, data: dict[str, object]) -> FlextDbtModel:
         """Create model from dictionary."""
+        name = str(data.get("name", ""))
+        package = str(data.get("package", ""))
+        sql = str(data.get("sql", ""))
+        description = str(data.get("description", ""))
+        columns = data.get("columns", {})
+        tags = data.get("tags", [])
+        config = data.get("config", {})
+        dependencies = data.get("dependencies", [])
+
         return cls(
-            name=data["name"],
-            package=data["package"],
-            sql=data["sql"],
-            description=data.get("description", ""),
-            columns=data.get("columns", {}),
-            tags=data.get("tags", []),
-            config=data.get("config", {}),
-            dependencies=data.get("dependencies", []),
+            name=name,
+            package=package,
+            sql=sql,
+            description=description,
+            columns=columns if isinstance(columns, dict) else {},
+            tags=[str(t) for t in tags] if isinstance(tags, list) else [],
+            config=config if isinstance(config, dict) else {},
+            dependencies=[str(d) for d in dependencies] if isinstance(dependencies, list) else [],
         )
 
 
@@ -179,7 +187,7 @@ class FlextDbtModelRegistry:
         return FlextResult.fail(f"Model {name} not found")
 
     def compile_model(
-        self, model: FlextDbtModel, context: dict[str, Any],
+        self, model: FlextDbtModel, context: dict[str, object],
     ) -> FlextResult[str]:
         """Compile a model with given context.
 

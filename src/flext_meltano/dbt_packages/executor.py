@@ -6,7 +6,7 @@ requiring external database connections.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, cast
 
 import duckdb
 import pandas as pd
@@ -34,12 +34,12 @@ class FlextDbtInMemoryExecutor:
         """
         self.database = database
         self.connection = duckdb.connect(database)
-        self.schemas: dict[str, dict[str, Any]] = {}
+        self.schemas: dict[str, dict[str, object]] = {}
         self.mock_data: dict[str, pd.DataFrame] = {}
         logger.info(f"Initialized DuckDB executor: {database}")
 
     def load_mock_data(
-        self, schema: dict[str, Any],
+        self, schema: dict[str, object],
     ) -> FlextResult[None]:
         """Load mock data based on schema definition.
 
@@ -53,6 +53,8 @@ class FlextDbtInMemoryExecutor:
         try:
             for table_name, table_def in schema.items():
                 # Create table structure
+                if not isinstance(table_name, str) or not isinstance(table_def, dict):
+                    continue
                 columns = table_def.get("columns", {})
                 if columns:
                     # Build CREATE TABLE statement
@@ -146,8 +148,8 @@ class FlextDbtInMemoryExecutor:
             return FlextResult.fail(f"Failed to execute model: {e}")
 
     def validate_transformations(
-        self, models: list[dict[str, Any]],
-    ) -> FlextResult[dict[str, Any]]:
+        self, models: list[dict[str, object]],
+    ) -> FlextResult[dict[str, object]]:
         """Validate a series of transformations.
 
         Args:
@@ -158,84 +160,53 @@ class FlextDbtInMemoryExecutor:
 
         """
         try:
-            results = {}
+            results: dict[str, dict[str, object]] = {}
 
             for model in models:
-                model_name = model.get("name", "unknown")
-                model_sql = model.get("sql", "")
+                model_name = str(model.get("name", "unknown"))
+                model_sql = str(model.get("sql", ""))
                 expected = model.get("expected", {})
+                if not isinstance(expected, dict):
+                    expected = {}
 
-                # Execute the model
                 exec_result = self.execute_model(model_sql)
+                if not exec_result.success:
+                    results[model_name] = {"success": False, "error": exec_result.error}
+                    continue
 
-                if exec_result.success:
-                    df = exec_result.data
+                df = exec_result.data
+                validations: dict[str, object] = {}
 
-                    # Validate results
-                    validations = {}
-
-                    # Ensure df is a DataFrame
-                    if not isinstance(df, pd.DataFrame):
-                        validations["dataframe_type"] = {
-                            "expected": "DataFrame",
-                            "actual": type(df).__name__,
-                            "passed": False,
-                        }
-                    else:
-                        # Check row count
-                        if "row_count" in expected:
-                            actual_count = len(df)
-                            expected_count = expected["row_count"]
-                            validations["row_count"] = {
-                                "expected": expected_count,
-                                "actual": actual_count,
-                                "passed": actual_count == expected_count,
-                            }
-
-                        # Check columns
-                        if "columns" in expected:
-                            actual_columns = set(df.columns)
-                            expected_columns = set(expected["columns"])
-                            validations["columns"] = {
-                                "expected": list(expected_columns),
-                                "actual": list(actual_columns),
-                                "passed": actual_columns == expected_columns,
-                            }
-
-                        # Check specific values
-                        if "values" in expected:
-                            for check in expected["values"]:
-                                column = check.get("column")
-                                value = check.get("value")
-                                if column and column in df.columns:
-                                    matches = df[column].eq(value).any()
-                                    validations[f"value_{column}"] = {
-                                        "expected": value,
-                                        "found": matches,
-                                        "passed": matches,
-                                    }
-
-                    results[model_name] = {
-                        "success": True,
-                        "validations": validations,
-                        "all_passed": all(
-                            v.get("passed", False) for v in validations.values()
-                        ),
+                if not isinstance(df, pd.DataFrame):
+                    validations["dataframe_type"] = {
+                        "expected": "DataFrame",
+                        "actual": type(df).__name__,
+                        "passed": False,
                     }
-                else:
-                    results[model_name] = {
-                        "success": False,
-                        "error": exec_result.error,
-                    }
+                    results[model_name] = {"success": True, "validations": validations, "all_passed": False}
+                    continue
+
+                # Row count
+                self._validate_row_count(df, expected, validations)
+
+                # Columns
+                self._validate_columns(df, expected, validations)
+
+                # Values
+                self._validate_values(df, expected, validations)
+
+                results[model_name] = {
+                    "success": True,
+                    "validations": validations,
+                    "all_passed": all(bool(cast("dict[str, object]", v).get("passed", False)) for v in validations.values()),
+                }
 
             # Summary
             total_models = len(models)
-            successful = sum(1 for r in results.values() if r["success"])
-            all_valid = all(
-                r.get("all_passed", False) for r in results.values() if r["success"]
-            )
+            successful = sum(1 for r in results.values() if bool(r.get("success", False)))
+            all_valid = all(bool(r.get("all_passed", False)) for r in results.values() if bool(r.get("success", False)))
 
-            summary = {
+            summary: dict[str, object] = {
                 "total_models": total_models,
                 "successful": successful,
                 "failed": total_models - successful,
@@ -252,6 +223,48 @@ class FlextDbtInMemoryExecutor:
 
         except Exception as e:
             return FlextResult.fail(f"Failed to validate transformations: {e}")
+
+    def _validate_row_count(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+        if "row_count" in expected:
+            actual_count = len(df)
+            raw_expected = expected.get("row_count")
+            try:
+                expected_count = int(raw_expected) if raw_expected is not None else 0
+            except Exception:
+                expected_count = 0
+            validations["row_count"] = {
+                "expected": expected_count,
+                "actual": actual_count,
+                "passed": actual_count == expected_count,
+            }
+
+    def _validate_columns(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+        if "columns" in expected:
+            actual_columns = set(df.columns)
+            exp_cols = expected.get("columns", [])
+            expected_columns = set([str(c) for c in exp_cols] if isinstance(exp_cols, list) else [])
+            validations["columns"] = {
+                "expected": list(expected_columns),
+                "actual": list(actual_columns),
+                "passed": actual_columns == expected_columns,
+            }
+
+    def _validate_values(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+        if "values" in expected:
+            exp_values = expected.get("values", [])
+            if isinstance(exp_values, list):
+                for check in exp_values:
+                    if not isinstance(check, dict):
+                        continue
+                    column = check.get("column")
+                    value = check.get("value")
+                    if column and column in df.columns:
+                        matches = df[column].eq(value).any()  # type: ignore[arg-type]
+                        validations[f"value_{column}"] = {
+                            "expected": value,
+                            "found": matches,
+                            "passed": matches,
+                        }
 
     def create_test_data(
         self, table_name: str, rows: int = 100,
@@ -274,8 +287,8 @@ class FlextDbtInMemoryExecutor:
             columns = schema.get("columns", {})
 
             # Generate test data
-            data: dict[str, list[Any]] = {}
-            for col_name, col_type in columns.items():
+            data: dict[str, list[object]] = {}
+            for col_name, col_type in cast("dict[str, str]", columns).items():
                 if "int" in col_type.lower():
                     data[col_name] = list(range(1, rows + 1))
                 elif "float" in col_type.lower() or "double" in col_type.lower():

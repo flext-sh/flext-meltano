@@ -416,12 +416,10 @@ import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextModel, FlextResult
 from pydantic import Field
-
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable

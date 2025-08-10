@@ -54,7 +54,7 @@ class FlextMeltanoEvent(FlextEntity):
             return FlextResult.fail("Event type cannot be empty")
         if not self.source.strip():
             return FlextResult.fail("Event source cannot be empty")
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
 
 class FlextMeltanoExecutionState(FlextModel):
@@ -90,7 +90,7 @@ class FlextMeltanoPipelineExecution(FlextEntity):
             return FlextResult.fail("Tap name cannot be empty")
         if not self.target_name.strip():
             return FlextResult.fail("Target name cannot be empty")
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
     def mark_completed(self, records_processed: int = 0) -> None:
         """Mark execution as completed."""
@@ -131,7 +131,7 @@ class FlextMeltanoPlugin(FlextEntity):
             return FlextResult.fail("Plugin name cannot be empty")
         if not self.namespace.strip():
             return FlextResult.fail("Plugin namespace cannot be empty")
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
     def is_extractable(self) -> bool:
         """Check if plugin can extract data."""
@@ -156,13 +156,13 @@ class FlextMeltanoPluginRegistry(FlextModel):
 
         self.plugins[plugin.name] = plugin
         self.last_updated = datetime.now(UTC)
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
     def get_plugin(self, name: str) -> FlextResult[FlextMeltanoPlugin]:
         """Get plugin by name."""
         if name not in self.plugins:
             return FlextResult.fail(f"Plugin '{name}' not found in registry")
-        return FlextResult.ok(data=self.plugins[name])
+        return FlextResult.ok(self.plugins[name])
 
     def list_plugins_by_type(self, plugin_type: FlextMeltanoPluginType) -> list[FlextMeltanoPlugin]:
         """List plugins by type."""
@@ -193,7 +193,7 @@ class FlextSingerMessage(FlextValueObject):
             return FlextResult.fail("SCHEMA message must have schema data")
         if self.message_type == FlextSingerMessageType.STATE and not self.state:
             return FlextResult.fail("STATE message must have state data")
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
 
 class FlextSingerCatalog(FlextModel):
@@ -209,7 +209,7 @@ class FlextSingerCatalog(FlextModel):
             return FlextResult.fail("Stream definition must have tap_stream_id")
 
         self.streams.append(stream_definition)
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
     def get_stream_names(self) -> list[str]:
         """Get list of stream names."""
@@ -251,7 +251,7 @@ class FlextMeltanoProject(FlextEntity):
             return FlextResult.fail("Project name cannot be empty")
         if not self.project_root.strip():
             return FlextResult.fail("Project root cannot be empty")
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
     def add_plugin(self, plugin: FlextMeltanoPlugin) -> FlextResult[None]:
         """Add plugin to project."""
@@ -261,7 +261,7 @@ class FlextMeltanoProject(FlextEntity):
 
         self.plugins[plugin.name] = plugin
         self.updated_at = datetime.now(UTC)
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
 
 # =============================================================================

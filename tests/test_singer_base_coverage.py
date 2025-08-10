@@ -6,11 +6,9 @@ using the actual exception classes available in the project.
 
 # Import Singer exceptions from flext_meltano.exceptions
 from flext_meltano.exceptions import (
-    FlextMeltanoAuthenticationError,
     FlextMeltanoConfigurationError,
     FlextMeltanoConnectionError,
     FlextMeltanoError,
-    FlextMeltanoProcessingError,
     FlextMeltanoSingerError,
     FlextMeltanoValidationError,
 )

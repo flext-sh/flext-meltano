@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, get_logger
 
@@ -37,9 +36,9 @@ class FlextDbtPackage:
     macros: list[str] = field(default_factory=list)
     seeds: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
-    metadata: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert package to dictionary representation."""
         return {
             "name": self.name,
@@ -52,16 +51,24 @@ class FlextDbtPackage:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> FlextDbtPackage:
+    def from_dict(cls, data: dict[str, object]) -> FlextDbtPackage:
         """Create package from dictionary."""
+        name = str(data.get("name", ""))
+        version = str(data.get("version", ""))
+        models = data.get("models", [])
+        macros = data.get("macros", [])
+        seeds = data.get("seeds", [])
+        dependencies = data.get("dependencies", [])
+        metadata = data.get("metadata", {})
+
         return cls(
-            name=data["name"],
-            version=data["version"],
-            models=data.get("models", []),
-            macros=data.get("macros", []),
-            seeds=data.get("seeds", []),
-            dependencies=data.get("dependencies", []),
-            metadata=data.get("metadata", {}),
+            name=name,
+            version=version,
+            models=[str(m) for m in models] if isinstance(models, list) else [],
+            macros=[str(m) for m in macros] if isinstance(macros, list) else [],
+            seeds=[str(s) for s in seeds] if isinstance(seeds, list) else [],
+            dependencies=[str(d) for d in dependencies] if isinstance(dependencies, list) else [],
+            metadata=metadata if isinstance(metadata, dict) else {},
         )
 
 

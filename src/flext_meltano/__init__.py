@@ -335,9 +335,9 @@ from flext_meltano.validation import (
 
 # DBT run result - simplified for compatibility
 if TYPE_CHECKING:
-    from typing import Any
-    DbtRunResult = Any
+    type DbtRunResult = object
 else:
+    # At runtime, this alias is not used; kept for type checking convenience
     DbtRunResult = None
 
 
