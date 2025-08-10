@@ -27,7 +27,6 @@ try:
     import pandas as pd
 except ImportError:
     pd = None  # type: ignore[assignment]
-from typing import TYPE_CHECKING
 
 from flext_core import FlextResult, get_logger
 
@@ -42,7 +41,6 @@ from flext_meltano.dbt_packages.registry import (
     FlextDbtModel,
     create_model_registry,
 )
-
 
 logger = get_logger(__name__)
 
@@ -409,7 +407,7 @@ class FlextDbtHub:
             model_list = models or package.models
 
             # Prepare models for validation
-            validation_models = []
+            validation_models: list[dict[str, object]] = []
             for model_name in model_list:
                 model_result = self.model_registry.get_model(model_name)
                 if model_result.success and model_result.data:

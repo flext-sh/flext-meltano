@@ -144,7 +144,6 @@ try:
     import pandas as pd
 except ImportError:
     pd = None  # type: ignore[assignment]
-from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
 

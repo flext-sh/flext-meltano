@@ -256,14 +256,14 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import TYPE_CHECKING, TextIO
+from typing import TYPE_CHECKING, TextIO, cast
 
 from flext_core import FlextContainer, FlextResult, get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Iterator
 
-    
+
 
 # ============================================================================
 # PONTE SINGER SDK <-> FLEXT-CORE
@@ -280,15 +280,7 @@ class FlextSingerBridge:
         # Use flext-core container for intelligent composition
         self._container = FlextContainer()
         self._container.register("logger", self._logger)
-        # Message types registry - intelligent composition
-        self._message_types: dict[
-            str,
-            Callable[..., FlextResult[dict[str, object]]],
-        ] = {
-            "RECORD": self._create_record_message,
-            "SCHEMA": self._create_schema_message,
-            "STATE": self._create_state_message,
-        }
+        # Mapping removed to avoid Callable typing issues under strict settings
 
     def flext_singer_create_message(
         self,
@@ -297,12 +289,42 @@ class FlextSingerBridge:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer message using intelligent composition - universal method."""
         try:
-            if message_type not in self._message_types:
-                return FlextResult(error=f"Unknown message type: {message_type}")
+            result: FlextResult[dict[str, object]] | None = None
+            # Route based on message type (reduced returns for lint compliance)
+            if message_type == "RECORD":
+                stream = kwargs.get("stream")
+                record = kwargs.get("record")
+                time_extracted = kwargs.get("time_extracted")
+                if isinstance(stream, str) and isinstance(record, dict):
+                    result = self._create_record_message(
+                        stream=stream,
+                        record=cast("dict[str, object]", record),
+                        time_extracted=cast("str | None", time_extracted) if isinstance(time_extracted, str) else None,
+                    )
+                else:
+                    result = FlextResult(error="Invalid arguments for RECORD message")
+            elif message_type == "SCHEMA":
+                stream = kwargs.get("stream")
+                schema = kwargs.get("schema")
+                key_properties = kwargs.get("key_properties")
+                if isinstance(stream, str) and isinstance(schema, dict):
+                    result = self._create_schema_message(
+                        stream=stream,
+                        schema=cast("dict[str, object]", schema),
+                        key_properties=cast("list[str] | None", key_properties) if isinstance(key_properties, list) else None,
+                    )
+                else:
+                    result = FlextResult(error="Invalid arguments for SCHEMA message")
+            elif message_type == "STATE":
+                value = kwargs.get("value")
+                if isinstance(value, dict):
+                    result = self._create_state_message(value=cast("dict[str, object]", value))
+                else:
+                    result = FlextResult(error="Invalid arguments for STATE message")
+            else:
+                result = FlextResult(error=f"Unknown message type: {message_type}")
 
-            # Use composition pattern - delegates to specific method
-            creator_func = self._message_types[message_type]
-            return creator_func(**kwargs)
+            return result
 
         except (ValueError, TypeError, KeyError) as e:
             return FlextResult(error=f"Failed to create Singer message: {e}")

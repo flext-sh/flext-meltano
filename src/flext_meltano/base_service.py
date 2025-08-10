@@ -5,7 +5,7 @@ Concrete implementations should live in dedicated modules and extend these bases
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from flext_core import FlextResult, get_logger
 
@@ -28,13 +28,13 @@ class FlextMeltanoBaseService:
             if not validation_result.success:
                 return FlextResult.fail(validation_result.error or "Validation failed")
             self._initialized = True
-            return FlextResult.ok(data=True)
+            return FlextResult.ok(True)
         except Exception as e:
             return FlextResult.fail(f"Service initialization failed: {e}")
 
     def validate_service(self) -> FlextResult[bool]:  # To be overridden
         """Validate concrete service requirements."""
-        return FlextResult.ok(data=True)
+        return FlextResult.ok(True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:  # To be overridden
         """Return health information for monitoring."""

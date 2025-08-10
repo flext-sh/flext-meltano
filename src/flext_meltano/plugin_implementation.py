@@ -32,7 +32,7 @@ Example:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
 from flext_core.protocols import (
@@ -280,7 +280,7 @@ class FlextMeltanoPluginContext:
         logger: BoundLogger,
         config: Mapping[str, object],
         meltano_config: FlextMeltanoConfig,
-        services: dict[str, Any] | None = None,
+        services: dict[str, object] | None = None,
     ) -> None:
         """Initialize Meltano plugin context.
 

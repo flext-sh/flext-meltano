@@ -118,6 +118,7 @@ from typing import TYPE_CHECKING
 
 from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
+from flext_meltano.config import FlextMeltanoConfig
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
@@ -125,11 +126,11 @@ from flext_meltano.common import injectable
 # Centralized imports (no duplication)
 from .base_service import FlextMeltanoBaseService
 
-from meltano.edk.extension import ExtensionBase
-from singer_sdk import Tap, Target
+if TYPE_CHECKING:
+    from meltano.edk.extension import ExtensionBase
+    from singer_sdk import Tap, Target
 
-from .config import FlextMeltanoConfig
-
+    from .config import FlextMeltanoConfig
 
 # NOTE: FlextMeltanoConfig is now centralized in `config.py` and imported above.
 

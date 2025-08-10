@@ -186,7 +186,6 @@ import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
 from flext_core import FlextModel, FlextResult, get_logger
@@ -194,11 +193,9 @@ from flext_core import FlextModel, FlextResult, get_logger
 # Observability integration - using flext_core logger instead of flext_observability
 from pydantic import Field
 
-from flext_meltano.config import FlextMeltanoConfig
-
-
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
+from flext_meltano.config import FlextMeltanoConfig
 
 logger = get_logger(__name__)
 

@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from flext_core import FlextResult
-    
 
     from .config import FlextMeltanoConfig
     from .singer_unified import (
