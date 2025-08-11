@@ -34,11 +34,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, get_logger
-from flext_core.protocols import (
-    FlextPlugin,
-    FlextPluginContext,
-)
+from flext_core import FlextPlugin, FlextPluginContext, FlextResult, get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -129,7 +125,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             )
 
             # Merge context config with instance config
-            context_config = dict(context.get_config())
+            context_config = context.get_config() or {}
             self._config.update(context_config)
 
             # Validate configuration
@@ -627,9 +623,9 @@ class FlextSingerPluginContext(FlextPluginContext):
         return self._logger
 
     @property
-    def config(self) -> Mapping[str, object]:
+    def config(self) -> dict[str, object]:
         """Get plugin configuration."""
-        return self._config
+        return dict(self._config)
 
     def get_service(self, service_name: str) -> FlextResult[object]:
         """Get service by name.

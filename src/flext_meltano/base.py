@@ -118,10 +118,10 @@ from typing import TYPE_CHECKING
 
 from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
-from flext_meltano.config import FlextMeltanoConfig
 
 # Injectable decorator from common utilities
 from flext_meltano.common import injectable
+from flext_meltano.config import FlextMeltanoConfig
 
 # Centralized imports (no duplication)
 from .base_service import FlextMeltanoBaseService

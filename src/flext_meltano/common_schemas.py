@@ -298,7 +298,23 @@ from __future__ import annotations
 
 from typing import ClassVar
 
+from flext_core import FlextModel
+from pydantic import Field
 from singer_sdk import typing as th
+
+
+class FlextMeltanoPluginInfo(FlextModel):
+    """Centralized plugin information model - NO DUPLICATION."""
+
+    name: str = Field(..., description="Plugin name")
+    type: str = Field(..., description="Plugin type (extractor/loader/transformer)")
+    namespace: str = Field(..., description="Plugin namespace")
+    description: str = Field(default="", description="Plugin description")
+    version: str = Field(default="latest", description="Plugin version")
+    pip_url: str | None = Field(default=None, description="Pip installation URL")
+    executable: str | None = Field(default=None, description="Plugin executable")
+    installed: bool = Field(default=False, description="Whether plugin is installed")
+    capabilities: list[str] = Field(default_factory=list, description="Plugin capabilities")
 
 
 class CommonSingerSchemas:

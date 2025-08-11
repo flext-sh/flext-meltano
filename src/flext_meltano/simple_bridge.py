@@ -1,281 +1,4 @@
-"""FLEXT Meltano Bridge - Production-Ready Go ↔ Python Integration Interface.
-
-**Architecture Layer**: Bridge Integration Layer
-**Status**: ✅ **PRODUCTION READY** - Complete FlextMeltanoBridge implementation operational
-**Dependencies**: flext-core (FlextResult), execution module, enterprise patterns
-
-**PRODUCTION STATUS**:
-- Bridge script `scripts/flext_meltano_bridge.py` successfully imports `FlextMeltanoBridge`
-- **FULLY OPERATIONAL** Go ↔ Python integration with comprehensive functionality
-- **FLEXT Service executes Meltano operations** with enterprise reliability
-- **Go ↔ Python ↔ Meltano pipeline fully functional** with JSON response handling
-
-## Module Purpose
-
-This module provides the **PRODUCTION-READY INTEGRATION INTERFACE** for Go services to
-execute Meltano operations through Python subprocess calls. It serves as the
-enterprise bridge between Go services (FlexCore, FLEXT Service) and the FLEXT Meltano
-library's subprocess orchestration capabilities with comprehensive error handling.
-
-**PRODUCTION**: This module is COMPLETE and provides full Go ↔ Python integration
-with enterprise-grade reliability and comprehensive functionality.
-
-## Design Principles
-
-1. **Enterprise Interface**: Comprehensive, production-ready API for Go subprocess integration
-2. **JSON Serializable**: All responses JSON-compatible for Go consumption with structured data
-3. **Error Resilience**: Enterprise error handling with detailed context and recovery patterns
-4. **Subprocess Bridge**: Production subprocess orchestration via execution module
-5. **Enterprise Patterns**: Complete FlextResult integration and structured logging
-
-## Production Status
-
-### Current Implementation
-```bash
-# ✅ FUNCTIONAL - All Go integration operational
-python scripts/flext_meltano_bridge.py version
-# ✅ Returns: {"status": "success", "data": {"meltano": "3.0.0", "python": "3.13.0", ...}}
-```
-
-### Production Capabilities
-- **FlexCore Service**: Complete Meltano operations via bridge with monitoring
-- **FLEXT Service**: Python bridge fully functional with enterprise patterns
-- **Go Integration**: Complete operational integration with comprehensive functionality
-- **Pipeline Execution**: Full Go ↔ Python communication with structured responses
-
-## Production Implementation
-
-### Enterprise Bridge Class
-```python
-class FlextMeltanoBridge:
-    '''Bridge class for Go service integration.
-
-    Provides simple interface for Go services to execute Meltano operations
-    via subprocess calls with proper error handling and JSON-serializable results.
-    '''
-
-    def __init__(self, config: Optional[FlextMeltanoConfig] = None) -> None:
-        '''Initialize bridge with configuration.'''
-
-    def get_version(self) -> FlextResult[Dict[str, str]]:
-        '''Get Meltano version information for Go services.'''
-
-    def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
-        '''List all available plugins for Go services.'''
-
-    def add_plugin(self, plugin_type: str, name: str, **kwargs) -> FlextResult[str]:
-        '''Add plugin to Meltano project via Go service request.'''
-
-    def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
-        '''Discover schema catalog from tap for Go services.'''
-
-    def run_pipeline(self, tap: str, target: str, **kwargs) -> FlextResult[dict[str, object]]:
-        '''Execute pipeline between tap and target for Go services.'''
-
-    def invoke_dbt(self, command: str, *args: str, **kwargs) -> FlextResult[dict[str, object]]:
-        '''Execute DBT command for Go services.'''
-```
-
-### Factory Function
-```python
-def create_flext_meltano_bridge(
-    config: Optional[FlextMeltanoConfig] = None,
-) -> FlextMeltanoBridge:
-    '''Factory function for creating bridge instances.'''
-```
-
-## Integration Patterns
-
-### Go Service Usage (After Implementation)
-```go
-// Go service subprocess execution
-package main
-
-import (
-    "encoding/json"
-    "os/exec"
-)
-
-type FlextMeltanoClient struct {
-    bridgeScript string
-}
-
-func (c *FlextMeltanoClient) GetVersion() (*VersionInfo, error) {
-    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "version")
-    output, err := cmd.Output()
-    if err != nil {
-        return nil, err
-    }
-
-    var result VersionInfo
-    err = json.Unmarshal(output, &result)
-    return &result, err
-}
-
-func (c *FlextMeltanoClient) RunPipeline(tap, target string) (*PipelineResult, error) {
-    cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "run_pipeline", tap, target)
-    output, err := cmd.Output()
-    // JSON response processing
-}
-```
-
-### Bridge Script Integration
-```python
-# scripts/flext_meltano_bridge.py (currently broken)
-from flext_meltano.simple_bridge import FlextMeltanoBridge  # ImportError
-
-def main():
-    bridge = FlextMeltanoBridge()
-
-    if sys.argv[1] == "version":
-        result = bridge.get_version()
-    elif sys.argv[1] == "run_pipeline":
-        result = bridge.run_pipeline(sys.argv[2], sys.argv[3])
-
-    # JSON response formatting for Go
-    response = {
-        "success": result.success,
-        "data": result.data if result.success else None,
-        "error": result.error_message if result.is_failure else None
-    }
-    print(json.dumps(response))
-```
-
-### Direct Python Usage
-```python
-from flext_meltano.simple_bridge import FlextMeltanoBridge
-
-# Direct library usage (bypasses subprocess)
-bridge = FlextMeltanoBridge()
-result = bridge.get_version()
-
-if result.success:
-    print(f"Meltano version: {result.data['meltano']}")
-```
-
-## Implementation Requirements
-
-### Error Handling
-- All methods must return FlextResult for consistent error handling
-- JSON-serializable error messages for Go service consumption
-- Detailed error context with operation information
-- Timeout handling for long-running operations
-
-### Result Formatting
-- All responses must be JSON-compatible dictionaries
-- Standardized response structure for Go parsing
-- Version information, plugin lists, execution results
-- Error details with troubleshooting context
-
-### Integration with Execution Module
-- Use FlextMeltanoExecutor for actual subprocess execution
-- Bridge translates high-level operations to Meltano CLI commands
-- Proper configuration management and environment handling
-- Execution context tracking and logging
-
-### Performance Considerations
-- Minimal overhead for subprocess communication
-- Efficient JSON serialization for large responses
-- Timeout configuration for different operation types
-- Resource cleanup and memory management
-
-## Quality Standards
-
-### Type Safety
-- Complete type annotations for all methods and parameters
-- Generic type usage for FlextResult responses
-- Optional parameter handling with proper defaults
-- MyPy strict mode compliance
-
-### Documentation
-- Comprehensive docstrings with Go integration examples
-- Usage patterns for different operation types
-- Error handling documentation with common scenarios
-- Integration testing examples and patterns
-
-### Testing Strategy
-- Unit tests with mocked execution module
-- Integration tests with real Meltano operations
-- Go integration simulation tests
-- Error scenario testing with comprehensive coverage
-
-### Security Considerations
-- Input validation for all parameters
-- Secure subprocess execution patterns
-- Path traversal prevention
-- Command injection protection
-
-## Implementation Dependencies
-
-### Internal Dependencies
-```python
-from flext_core import FlextResult
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoExecutor
-from flext_meltano.discovery import discover_plugins, discover_catalog
-from flext_meltano.installation import install_plugin
-```
-
-### External Dependencies
-- subprocess: For Meltano CLI execution
-- json: For Go service response formatting
-- typing: For comprehensive type annotations
-- logging: For structured logging and debugging
-
-## Migration Strategy
-
-### Phase 1: Basic Implementation (URGENT)
-1. **Implement FlextMeltanoBridge class** with all required methods
-2. **Add to __init__.py exports** for importability
-3. **Basic error handling** with FlextResult patterns
-4. **JSON response formatting** for Go services
-
-### Phase 2: Full Integration (HIGH PRIORITY)
-1. **Complete method implementations** using execution module
-2. **Comprehensive error handling** with detailed context
-3. **Integration testing** with bridge scripts
-4. **Performance optimization** for subprocess communication
-
-### Phase 3: Production Hardening (MEDIUM PRIORITY)
-1. **Security hardening** with input validation
-2. **Monitoring integration** with execution metrics
-3. **Advanced error recovery** and retry mechanisms
-4. **Documentation completion** with examples
-
-## Critical Impact
-
-### Before Implementation
-- ❌ **Go Integration**: Completely broken
-- ❌ **Bridge Scripts**: ImportError on startup
-- ❌ **FlexCore Service**: Cannot use Meltano operations
-- ❌ **FLEXT Service**: Python bridge non-functional
-
-### After Implementation
-- ✅ **Go Integration**: Full subprocess communication
-- ✅ **Bridge Scripts**: Functional CLI interface
-- ✅ **FlexCore Service**: Meltano operations via bridge
-- ✅ **FLEXT Service**: Complete Python bridge functionality
-
-## Next Actions Required
-
-1. **IMMEDIATE**: Implement basic FlextMeltanoBridge class structure
-2. **IMMEDIATE**: Add method stubs returning appropriate FlextResult types
-3. **IMMEDIATE**: Export class in __init__.py to resolve ImportError
-4. **HIGH**: Implement method logic using execution module
-5. **HIGH**: Add comprehensive error handling and JSON formatting
-6. **MEDIUM**: Complete integration testing and optimization
-
-This module is **CRITICAL** for the entire FLEXT Meltano architecture and
-**MUST BE IMPLEMENTED** before any Go service integration can function.
-"""
-
-# ===== PRODUCTION IMPLEMENTATION =====
-#
-# This module provides the complete FLEXT Meltano bridge implementation.
-# All core functionality is operational and tested for enterprise use.
-#
-# STATUS: Production-ready with comprehensive functionality.
-# ===== PRODUCTION IMPLEMENTATION =====
+"""FLEXT Meltano Bridge - Go ↔ Python Integration Interface."""
 
 from __future__ import annotations
 
@@ -288,10 +11,9 @@ from flext_core import FlextResult, get_logger
 
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.execution import FlextMeltanoExecutor
+from flext_meltano.constants import FlextMeltanoPluginType
+from flext_meltano.models import FlextMeltanoPlugin, FlextMeltanoPluginRegistry
 from flext_meltano.plugin_implementation import (
-    FlextMeltanoPlugin,
-    FlextMeltanoPluginRegistry,
-    create_meltano_plugin_registry,
     create_meltano_tap_plugin,
     create_meltano_target_plugin,
 )
@@ -329,14 +51,8 @@ class FlextMeltanoBridge:
         self.discovery_service: object | None = None
         self.dbt_service: object | None = None
 
-        # Initialize plugin registry
-        registry_result = create_meltano_plugin_registry("meltano-bridge")
-        if registry_result.success:
-            self._plugin_registry: FlextMeltanoPluginRegistry | None = (
-                registry_result.data
-            )
-        else:
-            self._plugin_registry = None
+        # Initialize plugin registry directly using FlextModel
+        self._plugin_registry: FlextMeltanoPluginRegistry | None = FlextMeltanoPluginRegistry()
 
     def get_version(self) -> FlextResult[dict[str, str]]:
         """Get Meltano version information for Go services.
@@ -387,7 +103,7 @@ class FlextMeltanoBridge:
         return self._plugin_registry
 
     def create_data_plugin_from_name(
-        self, plugin_name: str
+        self, plugin_name: str,
     ) -> FlextResult[FlextMeltanoPlugin]:
         """Create a data plugin instance from plugin name.
 
@@ -411,8 +127,8 @@ class FlextMeltanoBridge:
                 # Cast tap to base plugin type
                 result = tap_result.map(
                     lambda tap: FlextMeltanoPlugin(
-                        name=tap.name, version=tap.version, plugin_type="tap"
-                    )
+                        name=tap.name, version=tap.version, plugin_type="tap",
+                    ),
                 )
             elif plugin_name.startswith("target-"):
                 target_result = create_meltano_target_plugin(
@@ -423,8 +139,8 @@ class FlextMeltanoBridge:
                 # Cast target to base plugin type
                 result = target_result.map(
                     lambda target: FlextMeltanoPlugin(
-                        name=target.name, version=target.version, plugin_type="target"
-                    )
+                        name=target.name, version=target.version, plugin_type="target",
+                    ),
                 )
             else:
                 # Generic plugin
@@ -433,15 +149,15 @@ class FlextMeltanoBridge:
                         name=plugin_name,
                         version="latest",
                         plugin_type="generic",
-                    )
+                    ),
                 )
 
             if result.success and self._plugin_registry and result.data:
                 # Register the plugin
-                register_result = self._plugin_registry.register(result.data)
+                register_result = self._plugin_registry.add_plugin(result.data)
                 if not register_result.success:
                     logger.warning(
-                        f"Failed to register plugin {plugin_name}: {register_result.error}"
+                        f"Failed to register plugin {plugin_name}: {register_result.error}",
                     )
 
             return result

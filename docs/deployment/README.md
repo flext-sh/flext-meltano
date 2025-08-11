@@ -588,7 +588,7 @@ docker logs -f flext-service
 
 ---
 
-**Status**: ✅ **PRODUCTION READY** - Complete enterprise deployment guide  
+**Status**: Active Development — Deployment guide functional; stabilization in progress  
 **Version: 0.9.0  
 **Last Updated**: 2025-08-01  
 **Maintainer\*\*: FLEXT Development Team

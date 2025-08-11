@@ -229,7 +229,11 @@ class FlextDbtInMemoryExecutor:
             actual_count = len(df)
             raw_expected = expected.get("row_count")
             try:
-                expected_count = int(raw_expected) if raw_expected is not None else 0
+                # Type-safe conversion: cast to int-compatible type
+                if raw_expected is not None and isinstance(raw_expected, (int, float, str)):
+                    expected_count = int(raw_expected)
+                else:
+                    expected_count = 0
             except Exception:
                 expected_count = 0
             validations["row_count"] = {

@@ -30,17 +30,9 @@ except ImportError:
 
 from flext_core import FlextResult, get_logger
 
-from flext_meltano.dbt_packages.executor import (
-    create_in_memory_executor,
-)
-from flext_meltano.dbt_packages.manager import (
-    FlextDbtPackage,
-    create_package_manager,
-)
-from flext_meltano.dbt_packages.registry import (
-    FlextDbtModel,
-    create_model_registry,
-)
+from flext_meltano.dbt_executor import create_in_memory_executor
+from flext_meltano.dbt_manager import FlextDbtPackage, create_package_manager
+from flext_meltano.dbt_registry import FlextDbtModel, create_model_registry
 
 logger = get_logger(__name__)
 
@@ -340,7 +332,7 @@ class FlextDbtHub:
                             data_frames[table_name] = table_data
                         else:
                             return FlextResult.fail(
-                                f"Unsupported mock data format for {table_name}"
+                                f"Unsupported mock data format for {table_name}",
                             )
                 except Exception as e:
                     return FlextResult.fail(f"Failed to process mock data: {e}")
