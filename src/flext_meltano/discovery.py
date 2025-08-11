@@ -160,27 +160,7 @@ catalog_info = {
 ## Discovery Operations
 
 ### Hub Integration
-```python
-class FlextMeltanoDiscoverer:
-    '''Enterprise plugin discovery service with Hub integration.'''
-
-    def __init__(self, config: FlextMeltanoConfig):
-        self._config = config
-        self._hub_service = MeltanoHubService()
-        self._cache = {}
-
-    def discover_plugins_by_type(
-        self, plugin_type: str
-    ) -> FlextResult[list["dict[str, object]"]]:
-        '''Discover plugins filtered by type (extractor, loader, transformer).'''
-        # Implementation with Hub integration
-
-    def discover_plugin_details(
-        self, plugin_name: str
-    ) -> FlextResult["dict[str, object]"]:
-        '''Get detailed information about a specific plugin.'''
-        # Implementation with detailed metadata
-```
+The FlextMeltanoDiscoverer class provides enterprise plugin discovery service with Hub integration and comprehensive filtering capabilities.
 
 ### Catalog Operations
 ```python
@@ -332,9 +312,9 @@ import contextlib
 import json
 import subprocess
 import uuid
-import warnings
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_core import FlextModel, FlextResult, get_logger
 from meltano.core.hub import MeltanoHubService
@@ -343,8 +323,10 @@ from meltano.core.project import Project
 from pydantic import Field
 
 from flext_meltano.common import injectable
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoResult
+from flext_meltano.common_schemas import FlextMeltanoPluginInfo
+
+if TYPE_CHECKING:
+    from flext_meltano.config import FlextMeltanoConfig
 
 
 class FlextMeltanoDiscoveryCommand:
@@ -367,40 +349,7 @@ class FlextMeltanoDiscoveryContext(FlextModel):
     metadata: dict[str, object] = Field(default_factory=dict)
 
 
-class FlextMeltanoPluginInfo(FlextModel):
-    """Plugin information model for discovery operations.
-
-    This model represents plugin metadata discovered from Meltano Hub.
-    It's used for serialization and bridge communication, separate from
-    the actual plugin implementation which uses FlextMeltanoDataPlugin.
-    """
-
-    name: str = Field(...)
-    type: str = Field(...)
-    namespace: str = Field(...)
-    description: str = Field(default="")
-    pip_url: str = Field(...)
-    version: str | None = Field(default=None)
-    capabilities: list[str] = Field(default_factory=list)
-
-    def to_plugin_dict(self) -> dict[str, object]:
-        """Convert to dictionary for plugin implementation.
-
-        Returns:
-            Dictionary with plugin metadata for bridge integration
-
-        """
-        return {
-            "name": self.name,
-            "version": self.version or "latest",
-            "description": self.description,
-            "type": self.type,
-            "namespace": self.namespace,
-            "pip_url": self.pip_url,
-            "capabilities": self.capabilities,
-        }
-
-
+# Use centralized FlextMeltanoPluginInfo from common_schemas
 # Backward compatibility alias
 FlextMeltanoPlugin = FlextMeltanoPluginInfo
 
@@ -657,7 +606,7 @@ class FlextMeltanoDiscoverer:
                             ),
                             description=getattr(plugin, "description", ""),
                             pip_url=getattr(plugin, "pip_url", plugin.name),
-                            version=getattr(plugin, "version", None),
+                            version=getattr(plugin, "version", "latest") or "latest",
                             capabilities=getattr(plugin, "capabilities", []),
                         )
                         plugins.append(flext_plugin)
@@ -744,51 +693,5 @@ def create_discoverer(
 # === LEGACY COMPATIBILITY ===
 
 
-async def flext_meltano_discover_catalog(
-    tap_name: str,
-    project_root: Path,
-    config: dict[str, object] | None = None,
-) -> FlextMeltanoResult:
-    """Discover tap catalog (legacy compatibility)."""
-    warnings.warn(
-        "flext_meltano_discover_catalog is deprecated. Use FlextMeltanoDiscoverer.discover_catalog instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Use legacy result type
-
-    service_config = FlextMeltanoConfig(
-        project_root=str(project_root),
-    )
-    discoverer = FlextMeltanoDiscoverer(service_config)
-
-    result = await discoverer.discover_catalog(tap_name, config)
-    if result.success:
-        return FlextMeltanoResult.ok(result.data)
-    return FlextMeltanoResult.fail(result.error or "Unknown error")
-
-
-def flext_meltano_discover_plugins(
-    plugin_type: str | None = None,
-) -> FlextMeltanoResult:
-    """Discover available plugins (legacy compatibility)."""
-    warnings.warn(
-        "flext_meltano_discover_plugins is deprecated. Use FlextMeltanoDiscoverer.discover_plugins instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Use legacy result type
-
-    config = FlextMeltanoConfig()
-    discoverer = FlextMeltanoDiscoverer(config)
-
-    result = discoverer.discover_plugins(plugin_type)
-    if result.success:
-        # Convert plugins to dict format for legacy compatibility
-        if result.data is not None:
-            plugins_dict = [plugin.dict() for plugin in result.data]
-            return FlextMeltanoResult.ok({"plugins": plugins_dict})
-        return FlextMeltanoResult.ok({"plugins": []})
-    return FlextMeltanoResult.fail(result.error or "Unknown error")
+# Legacy functions have been moved to legacy.py
+# Import them here for re-export to maintain existing API

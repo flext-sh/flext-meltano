@@ -41,11 +41,14 @@ from __future__ import annotations
 
 # Re-export Singer SDK classes from specific modules to avoid circular imports
 from flext_meltano.base import (
-    FlextMeltanoTapService as FlextMeltanoTap,
-    FlextMeltanoTargetService as FlextMeltanoTarget,
+    FlextMeltanoTapService,
+    FlextMeltanoTargetService,
 )
 
-# Legacy compatibility
+# Legacy compatibility exports
+FlextMeltanoTap = FlextMeltanoTapService
+FlextMeltanoTarget = FlextMeltanoTargetService
+
 __all__: list[str] = [
     "FlextMeltanoTap",
     "FlextMeltanoTarget",

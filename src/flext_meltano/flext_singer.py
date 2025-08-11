@@ -27,7 +27,8 @@ data streaming and message processing.
 - **Stream Processing**: Efficient message reading and writing operations
 - **Intelligent Composition**: Dynamic message type handling via composition patterns
 
-### FlextSingerCatalog
+### Singer Catalog Management
+# FlextSingerCatalog is available from flext_meltano.models
 - **Catalog Management**: Singer catalog creation and stream management
 - **Stream Selection**: Metadata-based stream selection and filtering
 - **Schema Discovery**: Dynamic schema discovery and catalog generation
@@ -495,94 +496,6 @@ class FlextSingerBridge:
             yield FlextResult(error=f"Failed to read Singer messages: {e}")
 
 
-class FlextSingerCatalog:
-    """Simplified Singer catalog management using flext-core patterns."""
-
-    def __init__(self, catalog: dict[str, object] | None = None) -> None:
-        """Initialize with optional catalog data."""
-        self._logger = get_logger(self.__class__.__name__)
-        self._catalog: dict[str, object] = catalog or {"streams": []}
-
-    def flext_singer_add_stream(
-        self,
-        stream_name: str,
-        schema: dict[str, object],
-        key_properties: list[str] | None = None,
-    ) -> FlextResult[None]:
-        """Add stream to catalog using flext-core patterns."""
-        try:
-            if not stream_name or not isinstance(schema, dict):
-                return FlextResult(error="Invalid stream name or schema")
-
-            stream_entry = {
-                "tap_stream_id": stream_name,
-                "schema": schema,
-                "metadata": [
-                    {
-                        "breadcrumb": [],
-                        "metadata": {"inclusion": "available", "selected": True},
-                    },
-                ],
-            }
-
-            if key_properties:
-                stream_entry["key_properties"] = key_properties
-
-            # Type-safe access to streams list
-            streams = self._catalog.get("streams")
-            if isinstance(streams, list):
-                streams.append(stream_entry)
-            else:
-                self._catalog["streams"] = [stream_entry]
-
-            return FlextResult(data=None)
-
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Failed to add stream to catalog: {e}")
-
-    def flext_singer_get_catalog(self) -> FlextResult[dict[str, object]]:
-        """Get catalog data using flext-core patterns."""
-        try:
-            return FlextResult(data=self._catalog.copy())
-        except (ValueError, TypeError) as e:
-            return FlextResult(error=f"Failed to get catalog: {e}")
-
-    def flext_singer_get_selected_streams(self) -> FlextResult[list[str]]:
-        """Get list of selected stream names using flext-core patterns."""
-        try:
-            selected_streams = []
-
-            streams = self._catalog.get("streams", [])
-            if not isinstance(streams, list):
-                return FlextResult(error="Invalid streams format in catalog")
-
-            for stream in streams:
-                if not isinstance(stream, dict):
-                    continue
-
-                metadata = stream.get("metadata", [])
-                if not isinstance(metadata, list):
-                    continue
-
-                for meta in metadata:
-                    if not isinstance(meta, dict):
-                        continue
-
-                    if (
-                        meta.get("breadcrumb") == []
-                        and isinstance(meta.get("metadata"), dict)
-                        and meta.get("metadata", {}).get("selected")
-                    ):
-                        stream_id = stream.get("tap_stream_id")
-                        if isinstance(stream_id, str):
-                            selected_streams.append(stream_id)
-                        break
-
-            return FlextResult(data=selected_streams)
-
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Failed to get selected streams: {e}")
-
 # ============================================================================
 # FACTORY FUNCTIONS
 # ============================================================================
@@ -593,16 +506,7 @@ def flext_create_singer_bridge() -> FlextSingerBridge:
     return FlextSingerBridge()
 
 
-def flext_create_singer_catalog(
-    catalog: dict[str, object] | None = None,
-) -> FlextSingerCatalog:
-    """Create Singer catalog instance."""
-    return FlextSingerCatalog(catalog)
-
-
 __all__: list[str] = [
     "FlextSingerBridge",
-    "FlextSingerCatalog",
     "flext_create_singer_bridge",
-    "flext_create_singer_catalog",
 ]

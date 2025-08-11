@@ -1,677 +1,391 @@
-"""FLEXT Meltano Core - Enterprise Services for Pipeline Orchestration.
-
-**Architecture Layer**: Application Layer
-**Status**: ✅ STABLE - Enterprise services and orchestration patterns
-**Dependencies**: flext-core (DDD patterns), base module, execution module
-
-## Module Purpose
-
-This module provides **enterprise-grade services and orchestration patterns**
-for FLEXT Meltano's bridge architecture, implementing Domain-Driven Design (DDD),
-CQRS, and enterprise service patterns for complex pipeline management and
-Go service integration.
-
-## Design Principles
-
-1. **Domain-Driven Design**: Entities, aggregates, and domain services
-2. **Enterprise Orchestration**: Complex pipeline workflow management
-3. **CQRS Patterns**: Command/query separation for scalability
-4. **Event-Driven Architecture**: Domain events for pipeline state changes
-5. **Service Composition**: Orchestrated service interactions with dependency injection
-
-## Core Components
-
-### Domain Services
-- `FlextMeltanoOrchestrationService`: Pipeline orchestration and workflow management
-- `FlextMeltanoDbtService`: DBT operations with enterprise patterns
-- `FlextMeltanoSingerService`: Singer protocol handling and stream management
-- Domain service composition with FlextResult integration
-
-### Domain Entities & Aggregates
-- `PipelineExecution`: Aggregate root for pipeline execution state
-- `MeltanoProject`: Entity representing Meltano project configuration
-- `PluginRegistry`: Entity for plugin management and discovery
-- `ExecutionContext`: Value object for execution metadata
-
-### Enterprise Patterns
-- Command pattern implementation for pipeline operations
-- Event sourcing for pipeline execution history
-- Repository pattern for data persistence
-- Factory pattern for service creation
-
-## Service Orchestration Patterns
-
-### Pipeline Orchestration
-```python
-from flext_meltano.core import FlextMeltanoOrchestrationService
-
-orchestrator = FlextMeltanoOrchestrationService(config)
-
-# Complex pipeline execution with multiple stages
-result = orchestrator.execute_complex_pipeline(
-    {
-        "extraction": {"tap": "tap-postgres", "config": {...}},
-        "transformation": {"dbt_models": ["staging", "marts"]},
-        "loading": {"target": "target-snowflake", "config": {...}},
-    }
-)
-```
-
-### Service Composition
-```python
-from flext_meltano.core import (
-    FlextMeltanoOrchestrationService,
-    FlextMeltanoDbtService,
-    FlextMeltanoSingerService,
-)
-
-# Composed service execution
-def execute_enterprise_pipeline(config):
-    orchestrator = FlextMeltanoOrchestrationService(config)
-    dbt_service = FlextMeltanoDbtService(config)
-    singer_service = FlextMeltanoSingerService(config)
-
-    return (
-        orchestrator.prepare_pipeline()
-        .flat_map(lambda ctx: singer_service.extract_data(ctx))
-        .flat_map(lambda data: dbt_service.transform_data(data))
-        .flat_map(lambda result: orchestrator.finalize_pipeline(result))
-    )
-```
-
-### Event-Driven Orchestration
-```python
-# Domain events for pipeline state management
-class PipelineStartedEvent:
-    pipeline_id: str
-    started_at: datetime
-
-class PipelineCompletedEvent:
-    pipeline_id: str
-    completed_at: datetime
-    execution_metrics: dict[str, object]
-
-# Event handling in orchestration service
-orchestrator.on_pipeline_started(lambda event: log_pipeline_start(event))
-orchestrator.on_pipeline_completed(lambda event: notify_completion(event))
-```
-
-## Bridge Integration Support
-
-### Go Service Integration
-Enterprise services designed for Go service consumption:
-```python
-# Bridge-friendly service operations
-class FlextMeltanoOrchestrationService:
-    def execute_pipeline_for_bridge(
-        self, pipeline_spec: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
-        '''Execute pipeline with JSON-serializable results for Go services.'''
-        # Implementation uses execution module internally
-```
-
-### Service Composition for Bridge
-```python
-# Services work together for bridge operations
-def bridge_execute_complex_operation(bridge_request: dict[str, object]):
-    orchestrator = get_orchestration_service()
-
-    return (
-        orchestrator.parse_bridge_request(bridge_request)
-        .flat_map(lambda parsed: orchestrator.execute_pipeline(parsed))
-        .map(lambda result: orchestrator.format_bridge_response(result))
-    )
-```
-
-## Enterprise Patterns Implementation
-
-### Command Pattern
-```python
-class ExecutePipelineCommand:
-    '''Command for pipeline execution with enterprise validation.'''
-    pipeline_id: str
-    tap_config: dict[str, object]
-    target_config: dict[str, object]
-    execution_context: ExecutionContext
-
-class ExecutePipelineHandler:
-    '''Handler for pipeline execution commands.'''
-    def handle(self, command: ExecutePipelineCommand) -> FlextResult[PipelineResult]:
-        # Enterprise command handling logic
-```
-
-### Repository Pattern
-```python
-class PipelineExecutionRepository:
-    '''Repository for pipeline execution persistence.'''
-    def save_execution(self, execution: PipelineExecution) -> FlextResult[None]:
-        # Persistence logic
-
-    def find_by_id(self, execution_id: str) -> FlextResult[PipelineExecution]:
-        # Retrieval logic
-```
-
-### Factory Pattern
-```python
-def create_orchestration_service(
-    config: FlextMeltanoConfig,
-) -> FlextResult[FlextMeltanoOrchestrationService]:
-    '''Factory for orchestration service with dependency injection.'''
-    try:
-        service = FlextMeltanoOrchestrationService(config)
-        return FlextResult.ok(service)
-    except Exception as e:
-        return FlextResult.fail(f"Service creation failed: {e}")
-```
-
-## Domain Model
-
-### Entities
-```python
-class PipelineExecution(FlextEntity):
-    '''Aggregate root for pipeline execution.'''
-
-    execution_id: str
-    pipeline_name: str
-    status: ExecutionStatus
-    started_at: datetime
-    completed_at: Optional[datetime]
-    execution_metrics: dict[str, object]
-
-    def mark_completed(self) -> FlextResult[None]:
-        '''Business logic for marking execution complete.'''
-        if self.status != ExecutionStatus.RUNNING:
-            return FlextResult.fail("Cannot complete non-running execution")
-
-        self.status = ExecutionStatus.COMPLETED
-        self.completed_at = datetime.now(UTC)
-        self.add_domain_event(PipelineCompletedEvent(...))
-        return FlextResult.ok(None)
-```
-
-### Value Objects
-```python
-class ExecutionContext(FlextValueObject):
-    '''Value object for execution context.'''
-
-    correlation_id: str
-    user_id: Optional[str]
-    environment: str
-    execution_timestamp: datetime
-
-    def to_bridge_context(self) -> dict[str, object]:
-        '''Convert to bridge-compatible format.'''
-        return {
-            "correlation_id": self.correlation_id,
-            "environment": self.environment,
-            "timestamp": self.execution_timestamp.isoformat(),
-        }
-```
-
-## Quality Standards
-
-### Enterprise Patterns
-- **DDD Implementation**: Proper domain modeling with entities and value objects
-- **Service Layer**: Application services with business logic encapsulation
-- **Event Sourcing**: Domain events for state changes and integration
-- **Repository Pattern**: Data access abstraction with FlextResult integration
-
-### Error Handling
-- **FlextResult Integration**: All operations use FlextResult for error handling
-- **Domain Exceptions**: Custom exceptions for business rule violations
-- **Error Context**: Rich error information for troubleshooting
-- **Rollback Patterns**: Transaction management and compensation
-
-### Testing Strategy
-- **Unit Tests**: Domain logic testing with mocked dependencies
-- **Integration Tests**: Service composition and database integration
-- **Contract Tests**: API contract validation for bridge integration
-- **Performance Tests**: Orchestration performance and scalability
-
-## Integration Points
-
-### Execution Module Integration
-- Uses FlextMeltanoExecutor for actual subprocess execution
-- Service layer adds enterprise patterns on top of execution
-- Complex pipeline orchestration with multiple execution steps
-
-### Base Module Integration
-- Extends base service classes with enterprise patterns
-- Configuration management through FlextMeltanoConfig
-- Factory pattern integration for service creation
-
-### Bridge Module Integration (After Implementation)
-- Services provide bridge-friendly operations
-- JSON-serializable results for Go service consumption
-- Enterprise error handling with bridge-compatible formats
-
-## Next Actions
-
-- ✅ **Enterprise Services**: Domain services implemented and functional
-- 🔄 **Bridge Integration**: Ready for bridge module consumption
-- 📈 **Performance Optimization**: Async patterns and performance monitoring
-- 🛡️ **Security Hardening**: Enterprise security patterns and audit logging
-
-This module provides the **enterprise application layer** for FLEXT Meltano,
-implementing sophisticated orchestration patterns required for production-grade
-data pipeline management and Go service integration.
-"""
+"""FLEXT Meltano Core - Enterprise Services for Pipeline Orchestration."""
 
 from __future__ import annotations
 
 import subprocess
 import uuid
-import warnings
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
-# FlextResult is MANDATORY for all operations
 from flext_core import (
     FlextAggregateRoot,
     FlextDomainService,
     FlextEntity,
-    FlextModel,
     FlextResult,
+    FlextValueObject,
     get_logger,
 )
-from pydantic import Field
 
-from flext_meltano.base import (
-    FlextMeltanoDbtService,  # noqa: TC001
-    FlextMeltanoExtensionService,  # noqa: TC001
-    FlextMeltanoTapService,  # noqa: TC001
-    FlextMeltanoTargetService,  # noqa: TC001
-)
 from flext_meltano.common import injectable
-from flext_meltano.config import FlextMeltanoConfig  # noqa: TC001
 
 if TYPE_CHECKING:
-    from meltano.core.project import Project as MeltanoProject
+    from flext_meltano.base import FlextMeltanoDbtService
+    from flext_meltano.config import FlextMeltanoConfig
+    from flext_meltano.execution import FlextMeltanoExecutor
 
 logger = get_logger(__name__)
 
-# === DOMAIN ENUMS ===
+
+# Domain Events
+class FlextMeltanoEventType(Enum):
+    """Domain event types for pipeline lifecycle."""
+
+    PIPELINE_STARTED = auto()
+    PIPELINE_COMPLETED = auto()
+    PIPELINE_FAILED = auto()
+    JOB_STARTED = auto()
+    JOB_COMPLETED = auto()
+    JOB_FAILED = auto()
 
 
-class ExecutionState(Enum):
-    """Pipeline execution states following domain-driven design."""
+@dataclass
+class FlextMeltanoDomainEvent:
+    """Domain event for pipeline operations."""
 
-    PENDING = auto()
-    RUNNING = auto()
-    COMPLETED = auto()
-    FAILED = auto()
-    CANCELLED = auto()
-
-
-class PipelineEventType(Enum):
-    """Pipeline event types for event sourcing."""
-
-    CREATED = auto()
-    STARTED = auto()
-    COMPLETED = auto()
-    FAILED = auto()
-    CANCELLED = auto()
-
-# === DOMAIN VALUE OBJECTS ===
+    event_type: FlextMeltanoEventType
+    aggregate_id: str
+    occurred_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    data: dict[str, object] = field(default_factory=dict)
 
 
-@dataclass(frozen=True)
-class FlextMeltanoPipelineConfig:
-    """Pipeline configuration value object - immutable."""
+# Value Objects
+class FlextMeltanoPipelineContext(FlextValueObject):
+    """Immutable pipeline execution context."""
+
+    tap_name: str
+    target_name: str
+    environment: str = "dev"
+    job_name: str | None = None
+    state_backend: str | None = None
+    catalog: dict[str, object] | None = None
+    config_overrides: dict[str, object] = field(default_factory=dict)
+
+
+class FlextMeltanoEnvironmentContext(FlextValueObject):
+    """Immutable environment context."""
 
     name: str
-    extractor: str
-    loader: str
-    transformer: str | None = None
-    environment: str = "dev"
-    config: dict[str, object] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        """Validate configuration after initialization."""
-        if not self.name or not self.extractor or not self.loader:
-            msg = "Pipeline name, extractor, and loader are required"
-            raise ValueError(msg)
-
-# === DOMAIN ENTITIES ===
+    project_root: str
+    dotenv_path: str | None = None
+    env_vars: dict[str, str] = field(default_factory=dict)
+    active: bool = True
 
 
-class FlextMeltanoPipelineResult(FlextEntity):
-    """Pipeline execution result entity."""
+@dataclass
+class FlextMeltanoPipelineResult:
+    """Pipeline execution result."""
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    pipeline_name: str = Field(...)
-    state: ExecutionState = Field(default=ExecutionState.PENDING)
-    started_at: datetime | None = Field(default=None)
-    completed_at: datetime | None = Field(default=None)
-    duration_seconds: float | None = Field(default=None)
-    records_processed: int = Field(default=0)
-    error_message: str | None = Field(default=None)
-    metadata: dict[str, object] = Field(default_factory=dict)
-
-    def start_execution(self) -> None:
-        """Mark pipeline execution as started."""
-        object.__setattr__(self, "state", ExecutionState.RUNNING)
-        object.__setattr__(self, "started_at", datetime.now(UTC))
-
-    def complete_execution(self, records_processed: int = 0) -> None:
-        """Mark pipeline execution as completed."""
-        object.__setattr__(self, "state", ExecutionState.COMPLETED)
-        object.__setattr__(self, "completed_at", datetime.now(UTC))
-        object.__setattr__(self, "records_processed", records_processed)
-        if self.started_at and self.completed_at:
-            object.__setattr__(
-                self,
-                "duration_seconds",
-                (self.completed_at - self.started_at).total_seconds(),
-            )
-
-    def fail_execution(self, error_message: str) -> None:
-        """Mark pipeline execution as failed."""
-        object.__setattr__(self, "state", ExecutionState.FAILED)
-        object.__setattr__(self, "completed_at", datetime.now(UTC))
-        object.__setattr__(self, "error_message", error_message)
-        if self.started_at and self.completed_at:
-            object.__setattr__(
-                self,
-                "duration_seconds",
-                (self.completed_at - self.started_at).total_seconds(),
-            )
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate pipeline result business rules."""
-        if not self.pipeline_name.strip():
-            return FlextResult(error="Pipeline name cannot be empty")
-        return FlextResult(data=None)
+    success: bool
+    job_id: str
+    tap_name: str
+    target_name: str
+    started_at: datetime
+    completed_at: datetime | None = None
+    records_extracted: int = 0
+    records_loaded: int = 0
+    error_message: str | None = None
+    state: dict[str, object] | None = None
 
 
-class FlextMeltanoPipelineEvent(FlextEntity):
-    """Pipeline event entity for event sourcing."""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    pipeline_id: str = Field(...)
-    event_type: PipelineEventType = Field(...)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    data: dict[str, object] = Field(default_factory=dict)
-    source: str = Field(default="flext-meltano")
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate pipeline event business rules."""
-        if not self.pipeline_id.strip():
-            return FlextResult(error="Pipeline ID cannot be empty")
-        return FlextResult(data=None)
-
-# === AGGREGATE ROOT ===
-
-
-class FlextMeltanoRepository(FlextAggregateRoot):
-    """Pipeline repository aggregate root managing pipeline lifecycle."""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = Field(...)
-    pipelines: list[FlextMeltanoPipelineConfig] = Field(default_factory=list)
-    results: list[FlextMeltanoPipelineResult] = Field(default_factory=list)
-    events: list[FlextMeltanoPipelineEvent] = Field(default_factory=list)
-
-    def add_pipeline(self, config: FlextMeltanoPipelineConfig) -> FlextResult[None]:
-        """Add pipeline configuration to repository."""
-        try:
-            # Validate no duplicate pipeline names
-            if any(p.name == config.name for p in self.pipelines):
-                return FlextResult(error=f"Pipeline '{config.name}' already exists")
-
-            self.pipelines.append(config)
-
-            # Create domain event
-            event = FlextMeltanoPipelineEvent(
-                pipeline_id=config.name,
-                event_type=PipelineEventType.CREATED,
-                data={"extractor": config.extractor, "loader": config.loader},
-            )
-            self.events.append(event)
-
-            return FlextResult(data=None)
-        except (ValueError, TypeError, ImportError) as e:
-            return FlextResult(error=f"Failed to add pipeline: {e}")
-
-    def get_pipeline(self, name: str) -> FlextResult[FlextMeltanoPipelineConfig]:
-        """Get pipeline configuration by name."""
-        try:
-            pipeline = next((p for p in self.pipelines if p.name == name), None)
-            if not pipeline:
-                return FlextResult(error=f"Pipeline '{name}' not found")
-
-            return FlextResult(data=pipeline)
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Failed to get pipeline: {e}")
-
-# === DOMAIN SERVICES ===
-
-
-@injectable
-class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
-    """Singer protocol domain service with integrated observability."""
+# Domain Entities
+class FlextMeltanoJobEntity(FlextEntity):
+    """Job entity representing individual job execution."""
 
     def __init__(
         self,
-        config: FlextMeltanoConfig,
-        tap_service: FlextMeltanoTapService,
-        target_service: FlextMeltanoTargetService,
+        job_id: str,
+        job_type: str,
+        plugin_name: str,
+        started_at: datetime | None = None,
     ) -> None:
-        """Initialize with dependency injection and observability."""
+        super().__init__(id=job_id)
+        self.job_id = job_id
+        self.job_type = job_type
+        self.plugin_name = plugin_name
+        self.started_at = started_at or datetime.now(UTC)
+        self.completed_at: datetime | None = None
+        self.status = "pending"
+        self.error_message: str | None = None
+        self._events: list[FlextMeltanoDomainEvent] = []
+
+    def start(self) -> None:
+        """Start job execution."""
+        self.status = "running"
+        self.started_at = datetime.now(UTC)
+        self._events.append(
+            FlextMeltanoDomainEvent(
+                event_type=FlextMeltanoEventType.JOB_STARTED,
+                aggregate_id=self.id,
+                data={"job_type": self.job_type, "plugin_name": self.plugin_name},
+            )
+        )
+
+    def complete(self, *, is_success: bool = True, error_message: str | None = None) -> None:
+        """Complete job execution."""
+        self.status = "completed" if is_success else "failed"
+        self.completed_at = datetime.now(UTC)
+        self.error_message = error_message
+        event_type = (
+            FlextMeltanoEventType.JOB_COMPLETED
+            if is_success
+            else FlextMeltanoEventType.JOB_FAILED
+        )
+        self._events.append(
+            FlextMeltanoDomainEvent(
+                event_type=event_type,
+                aggregate_id=self.id,
+                data={
+                    "status": self.status,
+                    "error_message": error_message,
+                },
+            )
+        )
+
+
+class FlextMeltanoPipelineEntity(FlextAggregateRoot):
+    """Pipeline aggregate root managing pipeline lifecycle."""
+
+    def __init__(
+        self,
+        pipeline_id: str,
+        tap_name: str,
+        target_name: str,
+        environment: str = "dev",
+    ) -> None:
+        super().__init__(id=pipeline_id)
+        self.tap_name = tap_name
+        self.target_name = target_name
+        self.environment = environment
+        self.jobs: list[FlextMeltanoJobEntity] = []
+        self.started_at: datetime | None = None
+        self.completed_at: datetime | None = None
+        self.status = "pending"
+        self._events: list[FlextMeltanoDomainEvent] = []
+
+    def add_job(self, job: FlextMeltanoJobEntity) -> None:
+        """Add job to pipeline."""
+        self.jobs.append(job)
+
+    def start(self) -> None:
+        """Start pipeline execution."""
+        self.status = "running"
+        self.started_at = datetime.now(UTC)
+        self._events.append(
+            FlextMeltanoDomainEvent(
+                event_type=FlextMeltanoEventType.PIPELINE_STARTED,
+                aggregate_id=self.id,
+                data={
+                    "tap_name": self.tap_name,
+                    "target_name": self.target_name,
+                    "environment": self.environment,
+                },
+            )
+        )
+
+    def complete(
+        self, *, is_success: bool = True, error_message: str | None = None
+    ) -> None:
+        """Complete pipeline execution."""
+        self.status = "completed" if is_success else "failed"
+        self.completed_at = datetime.now(UTC)
+        event_type = (
+            FlextMeltanoEventType.PIPELINE_COMPLETED
+            if is_success
+            else FlextMeltanoEventType.PIPELINE_FAILED
+        )
+        self._events.append(
+            FlextMeltanoDomainEvent(
+                event_type=event_type,
+                aggregate_id=self.id,
+                data={
+                    "status": self.status,
+                    "error_message": error_message,
+                    "job_count": len(self.jobs),
+                },
+            )
+        )
+
+
+# Domain Services
+@injectable
+class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
+    """Singer protocol domain service."""
+
+    def __init__(self, config: FlextMeltanoConfig) -> None:
         super().__init__()
         self.config = config
-        self.tap_service = tap_service
-        self.target_service = target_service
+        self._logger = get_logger(self.__class__.__name__)
 
-        # Enhanced observability integration
-        self._factory = None  # Simplified - no external observability factory needed
-
-    def execute_singer_pipeline(
-        self,
-        extractor: str,
-        loader: str,
-    ) -> FlextResult[FlextMeltanoPipelineResult]:
-        """Execute Singer pipeline with integrated observability."""
-        pipeline_name = f"{extractor}-{loader}"
-        result = FlextMeltanoPipelineResult(pipeline_name=pipeline_name)
-        result.start_execution()
-
-        # Log pipeline start
-        logger.info(f"Starting Singer pipeline: {pipeline_name}")
-
+    async def discover_catalog(
+        self, tap_name: str,
+    ) -> FlextResult[dict[str, object]]:
+        """Discover tap catalog."""
         try:
-            # Enhanced validation with metrics
-            tap_validation = self.tap_service.validate_service()
-            if not tap_validation.success:
-                result.fail_execution(f"Tap validation failed: {tap_validation.error}")
-                return FlextResult(error=tap_validation.error)
+            from flext_meltano.config import FlextMeltanoConfig  # noqa: PLC0415
+            from flext_meltano.discovery import FlextMeltanoDiscoverer  # noqa: PLC0415
 
-            target_validation = self.target_service.validate_service()
-            if not target_validation.success:
-                result.fail_execution(
-                    f"Target validation failed: {target_validation.error}",
-                )
-                return FlextResult(error=target_validation.error)
+            discovery = FlextMeltanoDiscoverer(FlextMeltanoConfig())
+            catalog_result = await discovery.discover_catalog(tap_name)
+            if catalog_result.success and catalog_result.data:
+                return FlextResult.ok(catalog_result.data)
+            return FlextResult.fail(catalog_result.error or "Discovery failed")
+        except Exception as e:
+            return FlextResult.fail(f"Catalog discovery failed: {e}")
 
-            # Execute discovery with monitoring
-            catalog_result = self.tap_service.discover_catalog()
-            if not catalog_result.success:
-                result.fail_execution(
-                    f"Catalog discovery failed: {catalog_result.error}",
-                )
-                return FlextResult(error=catalog_result.error)
+    def validate_stream_selection(
+        self, catalog: dict[str, object], selected_streams: list[str],
+    ) -> FlextResult[None]:
+        """Validate stream selection against catalog."""
+        try:
+            streams_data = catalog.get("streams", [])
+            if not isinstance(streams_data, list):
+                return FlextResult.fail("Invalid catalog format: streams is not a list")
 
-            # Execute pipeline with metrics
-            records_processed = 100  # Simulated for now
-            result.complete_execution(records_processed=records_processed)
+            available_streams = []
+            for stream in streams_data:
+                if isinstance(stream, dict):
+                    stream_id = stream.get("tap_stream_id")
+                    if stream_id:
+                        available_streams.append(stream_id)
 
-            # Log success
-            logger.info(f"Pipeline {pipeline_name} completed successfully: {records_processed} records")
-
-            return FlextResult(data=result)
-
-        except (OSError, subprocess.CalledProcessError) as e:
-            logger.exception(f"Pipeline {pipeline_name} failed")
-            result.fail_execution(str(e))
-            return FlextResult(error=f"Singer pipeline execution failed: {e}")
+            invalid_streams = [
+                s for s in selected_streams if s not in available_streams
+            ]
+            if invalid_streams:
+                return FlextResult.fail(f"Invalid streams: {invalid_streams}")
+            return FlextResult.ok(None)
+        except Exception as e:
+            return FlextResult.fail(f"Stream validation failed: {e}")
 
 
 @injectable
 class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineResult]):
-    """Pipeline orchestration domain service using MANDATORY patterns."""
+    """Pipeline orchestration domain service."""
 
     def __init__(
         self,
         config: FlextMeltanoConfig,
         singer_service: FlextMeltanoSingerService,
         dbt_service: FlextMeltanoDbtService,
-        repository: FlextMeltanoRepository,
+        executor: FlextMeltanoExecutor | None = None,
     ) -> None:
-        """Initialize with dependency injection."""
         super().__init__()
         self.config = config
         self.singer_service = singer_service
         self.dbt_service = dbt_service
-        self.repository = repository
-        self._project: MeltanoProject | None = None
-        self._initialized = False
-
-    def validate_service(self) -> FlextResult[bool]:
-        """Validate orchestration service."""
-        # Meltano is always available (mandatory)
-
-        return FlextResult(data=True)
-
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
-        """Get orchestration service health status."""
-        return FlextResult(
-            data={
-                "service": "orchestration",
-                "meltano_available": True,
-                "initialized": self._initialized,
-                "pipelines_count": len(self.repository.pipelines),
-            },
-        )
-
-    def create_pipeline(self, config: FlextMeltanoPipelineConfig) -> FlextResult[None]:
-        """Create new pipeline using domain patterns."""
-        try:
-            # Add to repository (aggregate root handles validation)
-            add_result = self.repository.add_pipeline(config)
-            if not add_result.success:
-                return add_result
-
-            return FlextResult(data=None)
-        except (ValueError, TypeError, ImportError) as e:
-            return FlextResult(error=f"Failed to create pipeline: {e}")
+        self._executor = executor
+        self._logger = get_logger(self.__class__.__name__)
 
     def execute_pipeline(
-        self,
-        pipeline_name: str,
+        self, context: FlextMeltanoPipelineContext,
     ) -> FlextResult[FlextMeltanoPipelineResult]:
-        """Execute pipeline using orchestration patterns."""
+        """Execute complete pipeline."""
+        pipeline_id = str(uuid.uuid4())
+        pipeline = FlextMeltanoPipelineEntity(
+            pipeline_id=pipeline_id,
+            tap_name=context.tap_name,
+            target_name=context.target_name,
+            environment=context.environment,
+        )
+
         try:
-            # Get pipeline configuration from repository
-            pipeline_result = self.repository.get_pipeline(pipeline_name)
-            if not pipeline_result.success:
-                return FlextResult(error=pipeline_result.error)
+            pipeline.start()
 
-            pipeline_config = pipeline_result.data
-            if pipeline_config is None:
-                return FlextResult(error="Pipeline configuration is None")
+            # Execute tap -> target
+            tap_job = FlextMeltanoJobEntity(
+                job_id=str(uuid.uuid4()),
+                job_type="extractor",
+                plugin_name=context.tap_name,
+            )
+            pipeline.add_job(tap_job)
+            tap_job.start()
 
-            # Execute Singer pipeline
-            singer_result = self.singer_service.execute_singer_pipeline(
-                pipeline_config.extractor,
-                pipeline_config.loader,
+            # Use executor if available
+            if self._executor:
+                exec_result = self._executor.execute_pipeline(
+                    context.tap_name, context.target_name,
+                )
+                if not exec_result.success:
+                    tap_job.complete(is_success=False, error_message=exec_result.error)
+                    pipeline.complete(is_success=False, error_message=exec_result.error)
+                    return FlextResult.fail(exec_result.error or "Pipeline failed")
+
+            tap_job.complete(is_success=True)
+
+            # Complete pipeline
+            pipeline.complete(is_success=True)
+
+            result = FlextMeltanoPipelineResult(
+                success=True,
+                job_id=pipeline_id,
+                tap_name=context.tap_name,
+                target_name=context.target_name,
+                started_at=pipeline.started_at or datetime.now(UTC),
+                completed_at=pipeline.completed_at,
             )
 
-            if not singer_result.success:
-                return singer_result
+            return FlextResult.ok(result)
 
-            execution_result = singer_result.data
-            if execution_result is None:
-                return FlextResult(error="Singer execution result is None")
+        except Exception as e:
+            pipeline.complete(is_success=False, error_message=str(e))
+            return FlextResult.fail(f"Pipeline execution failed: {e}")
 
-            # Store result in repository
-            self.repository.results.append(execution_result)
-
-            # Create completion event
-            event = FlextMeltanoPipelineEvent(
-                pipeline_id=pipeline_name,
-                event_type=PipelineEventType.COMPLETED,
-                data={
-                    "records_processed": execution_result.records_processed,
-                    "duration_seconds": execution_result.duration_seconds,
-                },
-            )
-            self.repository.events.append(event)
-
-            return FlextResult(data=execution_result)
-
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-            return FlextResult(error=f"Pipeline execution failed: {e}")
+    async def execute_dbt_models(
+        self, models: list[str],
+    ) -> FlextResult[dict[str, object]]:
+        """Execute DBT models."""
+        result = await self.dbt_service.run_models(models)
+        # Convert list result to dict for compatibility
+        if result.success and result.data:
+            return FlextResult.ok({"models": result.data, "count": len(result.data)})
+        return FlextResult.fail(result.error or "DBT execution failed")
 
 
 @injectable
 class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
-    """Meltano extension using MANDATORY Meltano EDK patterns."""
+    """Extension service for custom operations."""
 
-    def __init__(
-        self,
-        config: FlextMeltanoConfig,
-        extension_service: FlextMeltanoExtensionService,
-    ) -> None:
-        """Initialize with dependency injection."""
+    def __init__(self, config: FlextMeltanoConfig) -> None:
         super().__init__()
         self.config = config
-        self.extension_service = extension_service
+        self._logger = get_logger(self.__class__.__name__)
 
-    def validate_service(self) -> FlextResult[bool]:
-        """Validate extension."""
-        return self.extension_service.validate_service()
+    def execute_extension(
+        self, extension_name: str, args: list[str],
+    ) -> FlextResult[dict[str, object]]:
+        """Execute custom extension."""
+        try:
+            result = subprocess.run(  # noqa: S603
+                ["meltano", "invoke", extension_name, *args],  # noqa: S607
+                check=False, capture_output=True,
+                text=True,
+                cwd=self.config.project_root,
+            )
 
-    def get_health_status(self) -> FlextResult[dict[str, object]]:
-        """Get extension health status."""
-        return self.extension_service.get_health_status()
-
-# === EXECUTION STATE MANAGEMENT ===
-
-
-class FlextMeltanoExecutionState(FlextModel):
-    """Execution state management using flext-core FlextModel pattern (removes BaseModel duplication)."""
-
-    current_pipeline: str | None = Field(default=None)
-    execution_id: str | None = Field(default=None)
-    state: ExecutionState = Field(default=ExecutionState.PENDING)
-    metadata: dict[str, object] = Field(default_factory=dict)
-
-    def start_pipeline(self, pipeline_name: str) -> str:
-        """Start pipeline execution and return execution ID."""
-        execution_id = str(uuid.uuid4())
-        self.current_pipeline = pipeline_name
-        self.execution_id = execution_id
-        self.state = ExecutionState.RUNNING
-        self.metadata["started_at"] = datetime.now(UTC).isoformat()
-        return execution_id
-
-    def complete_pipeline(self) -> None:
-        """Mark current pipeline as completed."""
-        self.state = ExecutionState.COMPLETED
-        self.metadata["completed_at"] = datetime.now(UTC).isoformat()
-
-    def fail_pipeline(self, error: str) -> None:
-        """Mark current pipeline as failed."""
-        self.state = ExecutionState.FAILED
-        self.metadata["error"] = error
-        self.metadata["failed_at"] = datetime.now(UTC).isoformat()
+            if result.returncode == 0:
+                return FlextResult.ok(
+                    {
+                        "extension": extension_name,
+                        "output": result.stdout,
+                        "success": True,
+                    },
+                )
+            return FlextResult.fail(f"Extension failed: {result.stderr}")
+        except Exception as e:
+            return FlextResult.fail(f"Extension execution failed: {e}")
 
 
-# === BACKWARDS COMPATIBILITY ===
-
-# Legacy function to maintain compatibility
-def _deprecated_api_warning(message: str) -> None:
-    """Issue deprecation warning."""
-    warnings.warn(message, DeprecationWarning, stacklevel=3)
+__all__ = [
+    "FlextMeltanoDomainEvent",
+    "FlextMeltanoEnvironmentContext",
+    "FlextMeltanoEventType",
+    "FlextMeltanoExtension",
+    "FlextMeltanoJobEntity",
+    "FlextMeltanoOrchestrationService",
+    "FlextMeltanoPipelineContext",
+    "FlextMeltanoPipelineEntity",
+    "FlextMeltanoPipelineResult",
+    "FlextMeltanoSingerService",
+]

@@ -147,6 +147,7 @@ except ImportError:
 
 from flext_core import FlextResult
 
+from flext_meltano.common import MockResult
 from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
 from flext_meltano.execution import (
     SubprocessExecutionContext,
@@ -405,13 +406,7 @@ class FlextMeltanoCli:
             if not isinstance(result_data, dict):
                 return FlextResult(error="Invalid execution result format")
 
-            # Create mock result object for compatibility
-            class MockResult:
-                def __init__(self, data: dict[str, object]) -> None:
-                    self.returncode = data.get("returncode", 1)
-                    self.stdout = data.get("stdout", "")
-                    self.stderr = data.get("stderr", "")
-
+            # Use common MockResult class to eliminate duplication
             result = MockResult(result_data)
 
             output = {
@@ -567,7 +562,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to import ecosystem: {e}")
 
     def dbt_validate_project(
-        self, project: str
+        self, project: str,
     ) -> FlextResult[dict[str, object]]:
         """Validate a DBT project with comprehensive testing.
 
@@ -596,7 +591,7 @@ class FlextMeltanoCli:
 
             if not import_result.success:
                 return FlextResult(
-                    error=f"Failed to import project models: {import_result.error}"
+                    error=f"Failed to import project models: {import_result.error}",
                 )
 
             # Create test environment
@@ -623,7 +618,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to validate project {project}: {e}")
 
     def dbt_list_models(
-        self, project: str | None = None
+        self, project: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all available models, optionally filtered by project.
 
@@ -709,7 +704,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to create mock data: {e}")
 
     def dbt_get_metrics(
-        self, model: str | None = None  # noqa: ARG002
+        self, model: str | None = None,  # noqa: ARG002
     ) -> FlextResult[dict[str, object]]:
         """Get DBT execution metrics with observability integration.
 
@@ -752,7 +747,7 @@ class FlextMeltanoCli:
                 self.dbt_hub = create_dbt_hub()
 
             dashboard_result = FlextResult.ok(
-                {"service": "flext-dbt-hub", "status": "active"}
+                {"service": "flext-dbt-hub", "status": "active"},
             )
 
             if dashboard_result.success:
@@ -765,7 +760,7 @@ class FlextMeltanoCli:
                     },
                 )
             return FlextResult(
-                error=dashboard_result.error or "Failed to create dashboard"
+                error=dashboard_result.error or "Failed to create dashboard",
             )
 
         except Exception as e:
@@ -796,7 +791,7 @@ class FlextMeltanoCli:
                 metrics_result = self.dbt_hub.get_hub_status()
                 if metrics_result.success and metrics_result.data:
                     observability_status = metrics_result.data.get(
-                        "observability_available", False
+                        "observability_available", False,
                     )
                     health_status["observability"] = (
                         "healthy" if observability_status else "disabled"
@@ -844,7 +839,7 @@ class FlextMeltanoCli:
     # Advanced Features CLI Methods
 
     def dbt_list_snapshots(
-        self, package: str | None = None
+        self, package: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT snapshots, optionally filtered by package.
 
@@ -884,7 +879,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list snapshots: {e}")
 
     def dbt_execute_snapshot(
-        self, snapshot_name: str
+        self, snapshot_name: str,
     ) -> FlextResult[dict[str, object]]:
         """Execute a DBT snapshot in-memory.
 
@@ -919,7 +914,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to execute snapshot: {e}")
 
     def dbt_list_hooks(
-        self, hook_type: str | None = None
+        self, hook_type: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT hooks, optionally filtered by type.
 
@@ -991,12 +986,12 @@ class FlextMeltanoCli:
                         "results": result.data,
                         "total_hooks": len(result.data) if result.data else 0,
                         "successful_hooks": len(
-                            [r for r in result.data if r["success"]]
+                            [r for r in result.data if r["success"]],
                         )
                         if result.data
                         else 0,
                         "failed_hooks": len(
-                            [r for r in result.data if not r["success"]]
+                            [r for r in result.data if not r["success"]],
                         )
                         if result.data
                         else 0,
@@ -1009,7 +1004,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to execute hooks: {e}")
 
     def dbt_list_exposures(
-        self, exposure_type: str | None = None
+        self, exposure_type: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT exposures, optionally filtered by type.
 
@@ -1057,7 +1052,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list exposures: {e}")
 
     def dbt_build_lineage(
-        self, package: str | None = None
+        self, package: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """Build lineage graph for DBT models.
 
@@ -1106,7 +1101,7 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to build lineage: {e}")
 
     def dbt_lineage_path(
-        self, from_model: str, to_model: str
+        self, from_model: str, to_model: str,
     ) -> FlextResult[dict[str, object]]:
         """Find lineage path between two models.
 

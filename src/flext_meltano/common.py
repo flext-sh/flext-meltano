@@ -133,7 +133,18 @@ def validate_config_value(
         return default
 
 
+class MockResult:
+    """Mock result class for subprocess compatibility - eliminates duplication."""
+
+    def __init__(self, data: dict[str, object]) -> None:
+        """Initialize mock result from execution data."""
+        self.returncode = data.get("returncode", 1)
+        self.stdout = data.get("stdout", "")
+        self.stderr = data.get("stderr", "")
+
+
 __all__: list[str] = [
+    "MockResult",
     "injectable",
     "validate_config_value",
     "validate_directory_path",

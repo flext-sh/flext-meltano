@@ -34,11 +34,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult
-from flext_core.protocols import (
-    FlextPlugin,
-    FlextPluginContext,
-)
+from flext_core import FlextPlugin, FlextPluginContext, FlextResult
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -112,6 +108,24 @@ class FlextMeltanoPlugin(FlextPlugin):
             "plugin_type": self.plugin_type,
             "status": "active",
         }
+
+    def execute(self) -> FlextResult[object]:
+        """Execute the plugin."""
+        try:
+            self._logger.info("Executing Meltano plugin", plugin_name=self.name)
+            # Plugin-specific execution logic would go here
+            return FlextResult.ok({"executed": True, "plugin": self.name})
+        except Exception as e:
+            return FlextResult.fail(f"Plugin execution failed: {e}")
+
+    def cleanup(self) -> FlextResult[None]:
+        """Cleanup plugin resources."""
+        try:
+            self._logger.info("Cleaning up Meltano plugin", plugin_name=self.name)
+            # Delegate to shutdown for consistency
+            return self.shutdown()
+        except Exception as e:
+            return FlextResult.fail(f"Plugin cleanup failed: {e}")
 
 
 class FlextMeltanoPluginExecution:
@@ -334,103 +348,5 @@ class FlextMeltanoPluginContext:
         return FlextResult.fail(f"Service '{service_name}' not found")
 
 
-class FlextMeltanoPluginRegistry:
-    """Meltano-specific plugin registry implementation.
-
-    Simple plugin registry using only flext-core patterns, no domain entity mixing.
-    COMPLIANCE: Uses only FlextMeltanoPlugin concrete implementations.
-    """
-
-    def __init__(self, name: str = "default") -> None:
-        """Initialize registry with simple data storage.
-
-        Args:
-            name: Registry name for identification
-
-        """
-        self.name = name
-        self._meltano_plugins: dict[str, FlextMeltanoPlugin] = {}
-
-    def register(self, plugin: FlextMeltanoPlugin) -> FlextResult[None]:
-        """Register a Meltano plugin.
-
-        Args:
-            plugin: Plugin instance to register
-
-        Returns:
-            FlextResult indicating registration success or failure
-
-        """
-        try:
-            # Store Meltano plugin using simple registry pattern
-            self._meltano_plugins[plugin.name] = plugin
-            return FlextResult.ok(None)
-
-        except Exception as e:
-            return FlextResult.fail(f"Plugin registration failed: {e}")
-
-    def unregister(self, plugin_name: str) -> FlextResult[None]:
-        """Unregister a plugin by name.
-
-        Args:
-            plugin_name: Name of plugin to unregister
-
-        Returns:
-            FlextResult indicating success or not found error
-
-        """
-        try:
-            if plugin_name in self._meltano_plugins:
-                self._meltano_plugins.pop(plugin_name)
-                return FlextResult.ok(None)
-            return FlextResult.fail(f"Plugin '{plugin_name}' not found")
-
-        except Exception as e:
-            return FlextResult.fail(f"Plugin unregistration failed: {e}")
-
-    def get_plugin(self, plugin_name: str) -> FlextResult[FlextMeltanoPlugin]:
-        """Get plugin by name.
-
-        Args:
-            plugin_name: Name of plugin to retrieve
-
-        Returns:
-            FlextResult containing plugin or not found error
-
-        """
-        if plugin_name in self._meltano_plugins:
-            return FlextResult.ok(self._meltano_plugins[plugin_name])
-
-        return FlextResult.fail(f"Plugin '{plugin_name}' not found")
-
-    def list_plugins(self) -> list[str]:
-        """List all registered plugin names.
-
-        Returns:
-            List of registered plugin names
-
-        """
-        return list(self._meltano_plugins.keys())
-
-# Factory functions for clean instantiation using pure flext-core patterns
-
-
-def create_meltano_plugin_registry(
-    name: str = "default",
-) -> FlextResult[FlextMeltanoPluginRegistry]:
-    """Create a Meltano plugin registry using pure flext-core patterns.
-
-    Args:
-        name: Registry name
-
-    Returns:
-        FlextResult containing the created registry or error
-
-    """
-    try:
-        # Create registry implementation with simple data storage
-        registry = FlextMeltanoPluginRegistry(name=name)
-        return FlextResult.ok(registry)
-
-    except Exception as e:
-        return FlextResult.fail(f"Failed to create registry: {e}")
+# FlextMeltanoPluginRegistry is now available from flext_meltano.models
+# Use the centralized FlextModel-based implementation for better validation

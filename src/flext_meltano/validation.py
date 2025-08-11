@@ -255,18 +255,20 @@ from __future__ import annotations
 import asyncio
 import subprocess
 import uuid
-import warnings
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_core import FlextModel, FlextResult
 from pydantic import Field
 
 from flext_meltano.common import injectable
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoResult
 
-# Forward declaration for legacy compatibility
+if TYPE_CHECKING:
+    from flext_meltano.config import FlextMeltanoConfig
+
+# Legacy functions removed to avoid circular import
+# These are available from flext_meltano.legacy
 
 
 class FlextMeltanoValidationContext(FlextModel):
@@ -703,140 +705,8 @@ class FlextMeltanoValidationService:
 
 # === LEGACY COMPATIBILITY FUNCTIONS ===
 
-
-def flext_meltano_validate_project(
-    project_root: Path | None = None,
-) -> FlextMeltanoResult:
-    """Validate Meltano project configuration (legacy compatibility).
-
-    Args:
-        project_root: Meltano project root directory
-
-    Returns:
-        FlextMeltanoResult with validation results
-
-    """
-    warnings.warn(
-        "flext_meltano_validate_project is deprecated. Use FlextMeltanoValidationService.validate_project instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Use new service implementation
-    config = FlextMeltanoConfig(
-        project_root=str(project_root or Path.cwd()),
-    )
-    service = FlextMeltanoValidationService(config)
-
-    # Convert FlextResult to legacy FlextMeltanoResult
-    result = service.validate_project()
-    if result.success:
-        validation_result = result.data
-        if validation_result is None:
-            return FlextMeltanoResult.fail("Validation result is None")
-        legacy_data = {
-            "project_valid": validation_result.is_valid,
-            "meltano_yml_exists": validation_result.details.get(
-                "meltano_yml_exists",
-                False,
-            ),
-            "plugins_installed": validation_result.details.get(
-                "plugins_installed",
-                False,
-            ),
-            "issues": validation_result.issues,
-        }
-        return FlextMeltanoResult.ok(legacy_data)
-    return FlextMeltanoResult.fail(result.error or "Validation failed")
-
-
-async def flext_meltano_test_tap_connection(
-    tap_name: str,
-    project_root: Path,
-    config: dict[str, object] | None = None,
-) -> FlextMeltanoResult:
-    """Test tap connection (legacy compatibility).
-
-    Args:
-        tap_name: Name of the tap to test
-        project_root: Project root directory
-        config: Optional tap configuration
-
-    Returns:
-        FlextResult containing connection test results
-
-    """
-    warnings.warn(
-        "flext_meltano_test_tap_connection is deprecated. Use FlextMeltanoValidationService.test_tap_connection instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Use new service implementation
-    service_config = FlextMeltanoConfig(
-        project_root=str(project_root),
-    )
-    service = FlextMeltanoValidationService(service_config)
-
-    # Convert FlextResult to legacy FlextMeltanoResult
-    result = await service.test_tap_connection(tap_name, config)
-    if result.success:
-        validation_result = result.data
-        if validation_result is None:
-            return FlextMeltanoResult.fail("Validation result is None")
-        legacy_data = {
-            "connection_successful": validation_result.is_valid,
-            "tap_name": tap_name,
-            "message": "Connection test passed"
-            if validation_result.is_valid
-            else "Connection test failed",
-            "issues": validation_result.issues,
-        }
-        # Return success/failure based on actual validation result
-        if validation_result.is_valid:
-            return FlextMeltanoResult.ok(legacy_data)
-        return FlextMeltanoResult.fail(str(legacy_data["message"]))
-    return FlextMeltanoResult.fail(result.error or "Connection test failed")
-
-
-async def flext_meltano_validate_tap_config(
-    tap_name: str,
-    config: dict[str, object],
-) -> FlextMeltanoResult:
-    """Validate tap configuration (legacy compatibility).
-
-    Args:
-        tap_name: Name of the tap
-        config: Tap configuration to validate
-
-    Returns:
-        FlextResult containing validation results
-
-    """
-    warnings.warn(
-        "flext_meltano_validate_tap_config is deprecated. Use FlextMeltanoValidationService.validate_tap_config instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    # Use new service implementation
-    service_config = FlextMeltanoConfig()
-    service = FlextMeltanoValidationService(service_config)
-
-    # Convert FlextResult to legacy FlextMeltanoResult
-    result = service.validate_tap_config(tap_name, config)
-    if result.success:
-        validation_result = result.data
-        if validation_result is None:
-            return FlextMeltanoResult.fail("Validation result is None")
-        legacy_data = {
-            "tap_name": tap_name,
-            "config_valid": validation_result.is_valid,
-            "issues": validation_result.issues,
-            "config_type": validation_result.details.get("config_type", "unknown"),
-        }
-        return FlextMeltanoResult.ok(legacy_data)
-    return FlextMeltanoResult.fail(result.error or "Validation failed")
+# Legacy functions are available from flext_meltano.legacy
+# No aliases needed here to avoid circular imports
 
 
 # === FACTORY FUNCTION ===
@@ -865,7 +735,4 @@ __all__: list[str] = [
     "FlextMeltanoValidationResult",
     "FlextMeltanoValidationService",
     "create_validation_service",
-    "flext_meltano_test_tap_connection",
-    "flext_meltano_validate_project",
-    "flext_meltano_validate_tap_config",
 ]

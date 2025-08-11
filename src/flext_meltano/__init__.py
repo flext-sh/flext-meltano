@@ -207,11 +207,22 @@ if TYPE_CHECKING:
 # === SINGER BASE CLASSES - Proper location in flext-meltano ===
 # Import Singer exceptions from flext-core (removes singer_base.py duplication)
 from flext_meltano.exceptions import (
+    FlextMeltanoAuthenticationError,
     FlextMeltanoAuthenticationError as FlextSingerAuthenticationError,
+    FlextMeltanoConfigurationError,
     FlextMeltanoConfigurationError as FlextSingerConfigurationError,
+    FlextMeltanoConnectionError,
     FlextMeltanoConnectionError as FlextSingerConnectionError,
+    FlextMeltanoDBTError,
+    FlextMeltanoError,
     FlextMeltanoError as FlextSingerError,
+    FlextMeltanoExecutionError,
+    FlextMeltanoPluginError,
+    FlextMeltanoProcessingError,
     FlextMeltanoProcessingError as FlextSingerProcessingError,
+    FlextMeltanoSingerError,
+    FlextMeltanoTimeoutError,
+    FlextMeltanoValidationError,
     FlextMeltanoValidationError as FlextSingerValidationError,
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
@@ -256,23 +267,25 @@ from flext_meltano.container import (
 
 # === DBT HUB INTEGRATION ===
 from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
-from flext_meltano.dbt_packages import (
+from flext_meltano.dbt_executor import (
     FlextDbtInMemoryExecutor,
-    FlextDbtModel,
-    FlextDbtModelRegistry,
+    create_in_memory_executor,
+)
+from flext_meltano.dbt_manager import (
     FlextDbtPackage,
     FlextDbtPackageManager,
-    create_in_memory_executor,
-    create_model_registry,
     create_package_manager,
+)
+from flext_meltano.dbt_registry import (
+    FlextDbtModel,
+    FlextDbtModelRegistry,
+    create_model_registry,
 )
 
 # === DISCOVERY & CATALOG MANAGEMENT ===
 from flext_meltano.discovery import (
     FlextMeltanoDiscoverer,
     create_discoverer,
-    flext_meltano_discover_catalog,
-    flext_meltano_discover_plugins,
 )
 
 # === EXECUTION HELPERS ===
@@ -280,10 +293,20 @@ from flext_meltano.execution import (
     FlextMeltanoExecutionCommand,
     FlextMeltanoExecutionContext,
     FlextMeltanoExecutor,
-    FlextMeltanoResult,
     create_executor,
+)
+
+# === LEGACY COMPATIBILITY ===
+from flext_meltano.legacy import (
+    FlextMeltanoResult,
+    flext_meltano_discover_catalog,
+    flext_meltano_discover_plugins,
     flext_meltano_execute_job,
     flext_meltano_run_command,
+    install_plugin as flext_meltano_install_plugin,
+    test_tap_connection as flext_meltano_test_tap_connection,
+    validate_project as flext_meltano_validate_project,
+    validate_tap_config as flext_meltano_validate_tap_config,
 )
 
 # === INSTALLATION & PLUGIN MANAGEMENT ===
@@ -292,17 +315,14 @@ from flext_meltano.installation import (
     FlextMeltanoInstaller,
     FlextMeltanoPluginInfo,
     create_installer_service,
-    flext_meltano_install_plugin,
 )
 
 # === PLUGIN IMPLEMENTATION ===
 from flext_meltano.plugin_implementation import (
     FlextMeltanoPlugin,
     FlextMeltanoPluginContext,
-    FlextMeltanoPluginRegistry,
     FlextMeltanoTapPlugin,
     FlextMeltanoTargetPlugin,
-    create_meltano_plugin_registry,
     create_meltano_tap_plugin,
     create_meltano_target_plugin,
 )
@@ -328,9 +348,6 @@ from flext_meltano.validation import (
     FlextMeltanoValidationResult,
     FlextMeltanoValidationService,
     create_validation_service,
-    flext_meltano_test_tap_connection,
-    flext_meltano_validate_project,
-    flext_meltano_validate_tap_config,
 )
 
 # DBT run result - simplified for compatibility
@@ -416,7 +433,6 @@ __all__: list[str] = [
     "FlextMeltanoInstallationContext",
     "FlextMeltanoInstaller",
     "FlextMeltanoPlugin",
-    "FlextMeltanoPlugin",
     "FlextMeltanoPluginContext",
     "FlextMeltanoPluginInfo",
     "FlextMeltanoPluginRegistry",
@@ -431,6 +447,16 @@ __all__: list[str] = [
     "FlextMeltanoTargetService",
     "FlextMeltanoValidationResult",
     "FlextMeltanoValidationService",
+    "FlextMeltanoAuthenticationError",
+    "FlextMeltanoConnectionError",
+    "FlextMeltanoDBTError",
+    "FlextMeltanoError",
+    "FlextMeltanoExecutionError",
+    "FlextMeltanoPluginError",
+    "FlextMeltanoProcessingError",
+    "FlextMeltanoSingerError",
+    "FlextMeltanoTimeoutError",
+    "FlextMeltanoValidationError",
     "FlextSingerAuthenticationError",
     "FlextSingerConfigurationError",
     "FlextSingerConnectionError",
@@ -441,9 +467,6 @@ __all__: list[str] = [
     "FlextSingerUnifiedResult",
     "FlextSingerUnifiedService",
     "FlextSingerValidationError",
-    "FlextTapError",
-    "FlextTargetError",
-    "FlextTransformError",
     "OAuthAuthenticator",
     "PropertiesList",
     "Property",
@@ -467,7 +490,6 @@ __all__: list[str] = [
     "create_installer_service",
     "create_meltano_dbt_service",
     "create_meltano_extension_service",
-    "create_meltano_plugin_registry",
     "create_meltano_tap_plugin",
     "create_meltano_tap_service",
     "create_meltano_target_plugin",

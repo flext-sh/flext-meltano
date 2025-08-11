@@ -22,13 +22,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core.exceptions import (
-    FlextAuthenticationError,
+from flext_core import (
     FlextConfigurationError,
-    FlextConnectionError,
     FlextError,
-    FlextProcessingError,
-    FlextTimeoutError,
     FlextValidationError,
 )
 
@@ -46,20 +42,84 @@ class FlextMeltanoConfigurationError(FlextConfigurationError):
     """Configuration error for Meltano domain."""
 
 
-class FlextMeltanoConnectionError(FlextConnectionError):
+class FlextMeltanoConnectionError(FlextMeltanoError):
     """Connection error for Meltano domain."""
 
+    def __init__(
+        self,
+        message: str = "Connection error",
+        *,
+        host: str | None = None,
+        port: int | None = None,
+        **kwargs: object,
+    ) -> None:
+        """Initialize connection error with network context."""
+        context = dict(kwargs)
+        if host is not None:
+            context["host"] = host
+        if port is not None:
+            context["port"] = port
+        super().__init__(f"Connection: {message}", context=context)
 
-class FlextMeltanoProcessingError(FlextProcessingError):
+
+class FlextMeltanoProcessingError(FlextMeltanoError):
     """Processing error for Meltano domain."""
 
+    def __init__(
+        self,
+        message: str = "Processing error",
+        *,
+        operation: str | None = None,
+        records_processed: int | None = None,
+        **kwargs: object,
+    ) -> None:
+        """Initialize processing error with operation context."""
+        context = dict(kwargs)
+        if operation is not None:
+            context["operation"] = operation
+        if records_processed is not None:
+            context["records_processed"] = records_processed
+        super().__init__(f"Processing: {message}", context=context)
 
-class FlextMeltanoAuthenticationError(FlextAuthenticationError):
+
+class FlextMeltanoAuthenticationError(FlextMeltanoError):
     """Authentication error for Meltano domain."""
 
+    def __init__(
+        self,
+        message: str = "Authentication error",
+        *,
+        username: str | None = None,
+        auth_type: str | None = None,
+        **kwargs: object,
+    ) -> None:
+        """Initialize authentication error with auth context."""
+        context = dict(kwargs)
+        if username is not None:
+            context["username"] = username
+        if auth_type is not None:
+            context["auth_type"] = auth_type
+        super().__init__(f"Authentication: {message}", context=context)
 
-class FlextMeltanoTimeoutError(FlextTimeoutError):
+
+class FlextMeltanoTimeoutError(FlextMeltanoError):
     """Timeout error for Meltano domain."""
+
+    def __init__(
+        self,
+        message: str = "Timeout error",
+        *,
+        timeout_seconds: int | None = None,
+        operation: str | None = None,
+        **kwargs: object,
+    ) -> None:
+        """Initialize timeout error with timing context."""
+        context = dict(kwargs)
+        if timeout_seconds is not None:
+            context["timeout_seconds"] = timeout_seconds
+        if operation is not None:
+            context["operation"] = operation
+        super().__init__(f"Timeout: {message}", context=context)
 
 
 # Domain-specific exceptions for Meltano business logic

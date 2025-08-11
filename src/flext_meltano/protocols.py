@@ -1,7 +1,7 @@
 """Protocols and abstract interfaces for flext-meltano.
 
 All abstract contracts are centralized here and, when possible, reuse
-interfaces from `flext_core.interfaces`. New protocols here should extend
+interfaces from `flext_core` root API. New protocols here should extend
 or compose those to avoid duplication.
 
 This module provides comprehensive Protocol definitions following Python 3.13
@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
+
+# Reuse core plugin interfaces to avoid duplication
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -22,6 +24,13 @@ if TYPE_CHECKING:
         FlextSingerUnifiedConfig,
         FlextSingerUnifiedResult,
     )
+
+
+# =============================================================================
+# PLUGIN PROTOCOLS (re-exported from flext-core)
+# =============================================================================
+
+# FlextPluginContext and FlextPlugin are imported from flext_core and re-exported via __all__
 
 
 # =============================================================================
