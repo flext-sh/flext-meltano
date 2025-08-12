@@ -43,7 +43,7 @@ All code is production-grade, fully typed, and SOLID compliant.
 from __future__ import annotations
 
 import contextlib
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Final
 
@@ -160,7 +160,7 @@ LOG_FORMAT_TEXT: Final[str] = "text"
 # =============================================================================
 
 
-class FlextMeltanoEnvironment(str, Enum):
+class FlextMeltanoEnvironment(StrEnum):
     """Supported Meltano environments."""
 
     DEV = "dev"
@@ -169,7 +169,7 @@ class FlextMeltanoEnvironment(str, Enum):
     PRODUCTION = "production"
 
 
-class FlextSingerMessageType(str, Enum):
+class FlextSingerMessageType(StrEnum):
     """Singer message types."""
 
     RECORD = "RECORD"
@@ -177,7 +177,7 @@ class FlextSingerMessageType(str, Enum):
     STATE = "STATE"
 
 
-class FlextMeltanoPluginType(str, Enum):
+class FlextMeltanoPluginType(StrEnum):
     """Meltano plugin types."""
 
     EXTRACTORS = "extractors"
@@ -188,7 +188,7 @@ class FlextMeltanoPluginType(str, Enum):
     FILES = "files"
 
 
-class FlextBridgeOperation(str, Enum):
+class FlextBridgeOperation(StrEnum):
     """Bridge operation types."""
 
     VERSION = "version"
@@ -197,7 +197,7 @@ class FlextBridgeOperation(str, Enum):
     DISCOVER_CATALOG = "discover_catalog"
 
 
-class FlextMeltanoLogLevel(str, Enum):
+class FlextMeltanoLogLevel(StrEnum):
     """Log levels for Meltano operations."""
 
     DEBUG = "DEBUG"
@@ -254,8 +254,6 @@ class FlextMeltanoConfig(FlextBaseConfigModel):
 
 
 __all__ = [
-    # Configuration
-    "FlextMeltanoConfig",
     # Bridge integration
     "BRIDGE_DATA_KEY",
     "BRIDGE_DISCOVER_CATALOG_OP",
@@ -309,6 +307,8 @@ __all__ = [
     "SUPPORTED_ENVIRONMENTS",
     # Enums
     "FlextBridgeOperation",
+    # Configuration
+    "FlextMeltanoConfig",
     "FlextMeltanoEnvironment",
     "FlextMeltanoLogLevel",
     "FlextMeltanoPluginType",

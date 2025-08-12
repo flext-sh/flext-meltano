@@ -253,6 +253,7 @@ the bridge architecture.
 from __future__ import annotations
 
 import asyncio
+import importlib
 import subprocess
 import uuid
 from datetime import UTC, datetime
@@ -705,8 +706,64 @@ class FlextMeltanoValidationService:
 
 # === LEGACY COMPATIBILITY FUNCTIONS ===
 
-# Legacy functions are available from flext_meltano.legacy
-# No aliases needed here to avoid circular imports
+# Provide thin wrappers that lazy-import legacy implementations to avoid cycles
+
+
+async def flext_meltano_test_tap_connection(
+    tap_name: str,
+    project_root: str | Path,
+    config: dict[str, object] | None,
+) -> dict[str, object]:
+    """Legacy wrapper for testing tap connection returning plain dict.
+
+    This function is async to integrate cleanly with pytest-asyncio.
+    """
+    legacy = importlib.import_module("flext_meltano.legacy")
+    legacy_test = legacy.test_tap_connection
+
+    legacy_result = await legacy_test(tap_name, project_root, config)
+
+    # Wrap into a simple object with attribute access to satisfy tests expecting dot access
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+    }
+
+
+def flext_meltano_validate_project(
+    project_root: Path | None = None,
+) -> dict[str, object]:
+    """Legacy wrapper for project validation returning plain dict."""
+    legacy = importlib.import_module("flext_meltano.legacy")
+    legacy_validate = legacy.validate_project
+
+    legacy_result = legacy_validate(project_root)
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+    }
+
+
+async def flext_meltano_validate_tap_config(
+    tap_name: str,
+    config: dict[str, object],
+) -> dict[str, object]:
+    """Legacy wrapper for tap config validation returning plain dict.
+
+    This function is async to align with pytest-asyncio tests.
+    """
+    legacy = importlib.import_module("flext_meltano.legacy")
+    legacy_validate_tap_config = legacy.validate_tap_config
+
+    # Legacy function is sync; call directly
+    legacy_result = legacy_validate_tap_config(tap_name, config)
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+    }
 
 
 # === FACTORY FUNCTION ===

@@ -6,6 +6,7 @@ consumers while they migrate to the new flext-core patterns.
 All code in this module is considered deprecated and will be removed
 in a future major version.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -92,7 +93,8 @@ def flext_meltano_execute_job(
 
     result = executor.execute_pipeline(tap_name, target_name)
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        data_dict = result.data.dict() if hasattr(result.data, "dict") else result.data  # type: ignore[union-attr]
+        return FlextMeltanoResult.ok(data_dict)
     return FlextMeltanoResult.fail(result.error or "Execution failed")
 
 
@@ -120,7 +122,8 @@ def flext_meltano_run_command(
 
     result = executor.run_command(args)
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        data_dict = result.data.dict() if hasattr(result.data, "dict") else result.data  # type: ignore[union-attr]
+        return FlextMeltanoResult.ok(data_dict)
     return FlextMeltanoResult.fail(result.error or "Execution failed")
 
 
@@ -148,10 +151,18 @@ def flext_meltano_discover_catalog(
     meltano_config = FlextMeltanoConfig(project_root=str(project_root))
     discoverer = FlextMeltanoDiscoverer(meltano_config)
 
-    # Run async function in sync context
-    result = asyncio.run(discoverer.discover_catalog(tap_name, config))
+    # Run async function in sync context; if already in loop, fallback to loop.run_until_complete
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if loop and loop.is_running():
+        result = loop.run_until_complete(discoverer.discover_catalog(tap_name, config))
+    else:
+        result = asyncio.run(discoverer.discover_catalog(tap_name, config))
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        data_dict = result.data.dict() if hasattr(result.data, "dict") else result.data  # type: ignore[union-attr]
+        return FlextMeltanoResult.ok(data_dict)
     return FlextMeltanoResult.fail(result.error or "Unknown error")
 
 
@@ -214,8 +225,12 @@ def validate_project(
             return FlextMeltanoResult.fail("Validation result is None")
         legacy_data = {
             "valid": validation_result.is_valid,
-            "has_meltano_yml": validation_result.details.get("meltano_yml_exists", False),
-            "has_project_dir": validation_result.details.get("meltano_dir_exists", False),
+            "has_meltano_yml": validation_result.details.get(
+                "meltano_yml_exists", False,
+            ),
+            "has_project_dir": validation_result.details.get(
+                "meltano_dir_exists", False,
+            ),
             "errors": list(validation_result.issues),
             "warnings": validation_result.warnings,
             "suggestions": ["Review validation errors", "Check project structure"],
@@ -324,9 +339,12 @@ def install_plugin(
     installer = FlextMeltanoInstaller(config)
 
     # Convert FlextResult to legacy FlextMeltanoResult
-    result = installer.add_plugin(plugin_type, plugin_name, pip_url)
+    result = installer.install_plugin(plugin_type, plugin_name, pip_url=pip_url)
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        data_dict: dict[str, object] = (
+            result.data if isinstance(result.data, dict) else {}
+        )
+        return FlextMeltanoResult.ok(data_dict)
     return FlextMeltanoResult.fail(result.error or "Unknown error")
 
 
@@ -361,4 +379,3 @@ __all__ = [
     "validate_project",
     "validate_tap_config",
 ]
-

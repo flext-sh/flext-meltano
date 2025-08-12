@@ -253,6 +253,11 @@ class FlextSingerUnifiedConfig:
 
         return FlextResult.ok(None)
 
+    # Backward-compatible alias expected by some tests
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Alias for validate_domain_rules for compatibility."""
+        return self.validate_domain_rules()
+
 
 @dataclass
 class FlextSingerUnifiedResult:
@@ -288,6 +293,10 @@ class FlextSingerUnifiedResult:
 
         return FlextResult.ok(None)
 
+    # Backward-compatible alias expected by some tests
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Alias for validate_domain_rules for compatibility."""
+        return self.validate_domain_rules()
 
 
 class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):

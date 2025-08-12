@@ -48,9 +48,9 @@ configurations for maximum code reuse and consistency.
 
 ### Direct Schema Usage
 ```python
-
 from flext_meltano.common_schemas import CommonSingerSchemas
 from singer_sdk import Tap
+
 
 class FlextTapOracle(Tap):
     name = "tap-oracle"
@@ -314,7 +314,9 @@ class FlextMeltanoPluginInfo(FlextModel):
     pip_url: str | None = Field(default=None, description="Pip installation URL")
     executable: str | None = Field(default=None, description="Plugin executable")
     installed: bool = Field(default=False, description="Whether plugin is installed")
-    capabilities: list[str] = Field(default_factory=list, description="Plugin capabilities")
+    capabilities: list[str] = Field(
+        default_factory=list, description="Plugin capabilities",
+    )
 
 
 class CommonSingerSchemas:

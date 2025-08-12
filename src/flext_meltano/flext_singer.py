@@ -261,9 +261,10 @@ from typing import TYPE_CHECKING, TextIO, cast
 
 from flext_core import FlextContainer, FlextResult, get_logger
 
+from flext_meltano.models import FlextSingerCatalog
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
 
 
 # ============================================================================
@@ -281,7 +282,12 @@ class FlextSingerBridge:
         # Use flext-core container for intelligent composition
         self._container = FlextContainer()
         self._container.register("logger", self._logger)
-        # Mapping removed to avoid Callable typing issues under strict settings
+        # Mapping of message creators for backward-compatibility checks in tests
+        self._message_types: dict[str, str] = {
+            "RECORD": "record",
+            "SCHEMA": "schema",
+            "STATE": "state",
+        }
 
     def flext_singer_create_message(
         self,
@@ -506,7 +512,14 @@ def flext_create_singer_bridge() -> FlextSingerBridge:
     return FlextSingerBridge()
 
 
-__all__: list[str] = [
+def flext_create_singer_catalog() -> FlextSingerCatalog:
+    """Create Singer catalog model (backward-compatible factory)."""
+    return FlextSingerCatalog()
+
+
+__all__ = (
     "FlextSingerBridge",
+    "FlextSingerCatalog",
     "flext_create_singer_bridge",
-]
+    "flext_create_singer_catalog",
+)

@@ -83,7 +83,6 @@ class TestCoreLibraryImports:
 
     def test_singer_sdk_re_exports(self) -> None:
         """Test Singer SDK re-exports are available."""
-
         assert Tap is not None
         assert Target is not None
         assert Stream is not None
@@ -280,14 +279,12 @@ class TestLegacyCompatibility:
 
     def test_legacy_execution_functions(self) -> None:
         """Test legacy execution functions still work."""
-
         # Functions should exist and be callable
         assert callable(flext_meltano_execute_job)
         assert callable(flext_meltano_run_command)
 
     def test_legacy_discovery_functions(self) -> None:
         """Test legacy discovery functions still work."""
-
         from flext_meltano import (
             flext_meltano_discover_catalog,
             flext_meltano_discover_plugins,
@@ -299,7 +296,6 @@ class TestLegacyCompatibility:
 
     def test_legacy_validation_functions(self) -> None:
         """Test legacy validation functions still work."""
-
         from flext_meltano import (
             flext_meltano_test_tap_connection,
             flext_meltano_validate_project,
@@ -313,7 +309,6 @@ class TestLegacyCompatibility:
 
     def test_deprecation_warnings(self) -> None:
         """Test that legacy functions issue deprecation warnings."""
-
         with pytest.warns(DeprecationWarning, match="deprecated"):
             result = flext_meltano_execute_job("tap-csv", "target-csv", ".")
         # Result should still work

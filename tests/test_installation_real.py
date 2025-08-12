@@ -249,7 +249,6 @@ class TestFactoryFunctions:
 
     def test_flext_meltano_install_plugin(self) -> None:
         """Test standalone install plugin function."""
-
         result = flext_meltano_install_plugin("extractor", "tap-csv", Path.cwd())
         # May fail if meltano not installed, but should not crash
         assert result.success or not result.success

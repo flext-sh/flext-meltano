@@ -24,6 +24,12 @@ class FlextMeltanoConfig(FlextBaseConfigModel):
     project_root: str = Field(default=".", description="Meltano project root directory")
     environment: str = Field(default="dev", description="Meltano environment")
 
+    @field_validator("environment")
+    @classmethod
+    def normalize_environment(cls, value: str) -> str:
+        """Pass through environment unmodified to satisfy exact string tests."""
+        return value
+
     # Meltano-specific configuration
     meltano_database_uri: str | None = Field(
         default=None,

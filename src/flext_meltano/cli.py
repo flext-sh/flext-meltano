@@ -63,9 +63,7 @@ result = cli.execute("discover", ["--tap", "tap-postgres"])
 ### Bridge Integration
 ```python
 # CLI operations designed for bridge consumption
-def bridge_run_cli(
-    command: str, options: list[str] | None = None
-) -> dict[str, object]:
+def bridge_run_cli(command: str, options: list[str] | None = None) -> dict[str, object]:
     '''Execute CLI command with JSON-serializable results for Go services.'''
     cli = FlextMeltanoCli()
     result = cli.execute(command, options)
@@ -138,24 +136,27 @@ the bridge architecture.
 from __future__ import annotations
 
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 try:
     import pandas as pd
-except ImportError:
-    pd = None  # type: ignore[assignment]
+except ImportError:  # pragma: no cover - optional dependency stub
+    from types import SimpleNamespace
+    pd = SimpleNamespace()  # type: ignore[assignment]
 
 from flext_core import FlextResult
 
 from flext_meltano.common import MockResult
 from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
 from flext_meltano.execution import (
-    SubprocessExecutionContext,
-    execute_subprocess_common,
+    SubprocessExecutionContext as SharedSubprocessExecutionContext,
+    execute_subprocess_common as shared_execute_subprocess_common,
 )
 
 # Constants
 MIN_MOCK_DATA_ARGS = 2
+MIN_LINEAGE_ARGS = 2
 
 
 class FlextMeltanoCli:
@@ -166,94 +167,97 @@ class FlextMeltanoCli:
         self.project_root = project_root or Path.cwd()
         self.dbt_hub: FlextDbtHub | None = None
 
-    def execute(  # noqa: PLR0911, PLR0912
+    def execute(
         self,
         command: str = "",
         options: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
         """Execute CLI operations using flext-core patterns."""
-        if not command or command.strip() == "":
-            # Return basic CLI info for empty commands
-            return FlextResult(
-                data={
-                    "cli_type": "flext_meltano",
-                    "project_root": str(self.project_root),
-                },
-            )
-
-        # Handle specific commands
         options = options or []
 
-        # Use early returns to reduce complexity
-        command_handlers = {
-            "version": self.version,
-            "help": self.help,
-            "health": self.health,
+        if not command or command.strip() == "":
+            return self._handle_empty()
+
+        handler_type = Callable[[list[str]], FlextResult[dict[str, object]]]
+
+        def _no_args(handler: Callable[[], FlextResult[dict[str, object]]]) -> handler_type:
+            return lambda _opts: handler()
+
+        def _require_args(n: int, fn: Callable[..., FlextResult[dict[str, object]]]) -> handler_type:  # type: ignore[explicit-any]
+            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
+                if len(opts) < n:
+                    return FlextResult(error=f"Missing required arguments: expected {n}")
+                return fn(*opts[:n])
+            return _inner
+
+        def _require_args_optional(  # type: ignore[explicit-any]
+            n: int,
+            fn: Callable[..., FlextResult[dict[str, object]]],
+        ) -> handler_type:
+            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
+                if len(opts) < n:
+                    return FlextResult(error=f"Missing required arguments: expected {n}")
+                return fn(*opts[:n], *opts[n:])
+            return _inner
+
+        dispatch: dict[str, handler_type] = {
+            # Simple handlers
+            "version": _no_args(self.version),
+            "help": _no_args(self.help),
+            "health": _no_args(self.health),
+            # DBT hub simple
+            "dbt-list-packages": _no_args(self.dbt_list_packages),
+            "dbt-import-ecosystem": _no_args(self.dbt_import_ecosystem),
+            "dbt-create-dashboard": _no_args(self.dbt_create_dashboard),
+            "dbt-health-check": _no_args(self.dbt_health_check),
+            # Meltano pass-through
+            "discover": lambda opts: self._mock_success("discover", opts),
+            "install": lambda opts: self._mock_success("install", opts),
+            "run": lambda opts: self._mock_success("run", opts),
+            # Parameterized
+            "dbt-test-local": _require_args(1, self.dbt_test_local),
+            "dbt-run-model": _require_args(1, self.dbt_run_model),
+            "dbt-validate-project": _require_args(
+                1, self.dbt_validate_project,
+            ),
+            "dbt-list-models": (lambda opts: self.dbt_list_models(opts[0] if opts else None)),
+            "dbt-create-mock-data": _require_args(
+                MIN_MOCK_DATA_ARGS,
+                self.dbt_create_mock_data,
+            ),
+            "dbt-get-metrics": (lambda opts: self.dbt_get_metrics(opts[0] if opts else None)),
+            "dbt-list-snapshots": (lambda opts: self.dbt_list_snapshots(opts[0] if opts else None)),
+            "dbt-execute-snapshot": _require_args(1, self.dbt_execute_snapshot),
+            "dbt-list-hooks": (lambda opts: self.dbt_list_hooks(opts[0] if opts else None)),
+            "dbt-execute-hooks": (lambda opts: self.dbt_execute_hooks(
+                opts[0], opts[1] if len(opts) > 1 else None,
+            ) if opts else FlextResult(error="Missing required arguments: expected 1")),
+            "dbt-list-exposures": (lambda opts: self.dbt_list_exposures(opts[0] if opts else None)),
+            "dbt-build-lineage": (lambda opts: self.dbt_build_lineage(opts[0] if opts else None)),
+            "dbt-lineage-path": _require_args(2, self.dbt_lineage_path),
         }
 
-        if command in command_handlers:
-            return command_handlers[command]()
+        handler = dispatch.get(command)
+        return (
+            handler(options)
+            if handler is not None
+            else FlextResult(data={"command": command, "status": "unknown_command"})
+        )
 
-        if command in {"discover", "install", "run"}:
-            # Mock successful execution for these commands
-            return FlextResult(
-                data={
-                    "command": command,
-                    "options": options,
-                    "status": "success",
-                },
-            )
+    def _handle_empty(self) -> FlextResult[dict[str, object]]:
+        return FlextResult(
+            data={
+                "cli_type": "flext_meltano",
+                "project_root": str(self.project_root),
+            },
+        )
 
-        # DBT Hub commands
-        if command == "dbt-list-packages":
-            return self.dbt_list_packages()
-        if command == "dbt-test-local" and options:
-            return self.dbt_test_local(options[0])
-        if command == "dbt-run-model" and options:
-            return self.dbt_run_model(options[0])
-        if command == "dbt-import-ecosystem":
-            return self.dbt_import_ecosystem()
-        if command == "dbt-validate-project" and options:
-            return self.dbt_validate_project(options[0])
-        if command == "dbt-list-models":
-            project_filter = options[0] if options else None
-            return self.dbt_list_models(project_filter)
-        if command == "dbt-create-mock-data" and len(options) >= MIN_MOCK_DATA_ARGS:
-            return self.dbt_create_mock_data(options[0], options[1])
-        if command == "dbt-get-metrics":
-            model_filter = options[0] if options else None
-            return self.dbt_get_metrics(model_filter)
-        if command == "dbt-create-dashboard":
-            return self.dbt_create_dashboard()
-        if command == "dbt-health-check":
-            return self.dbt_health_check()
-
-        # Advanced Features Commands
-        if command == "dbt-list-snapshots":
-            project_filter = options[0] if options else None
-            return self.dbt_list_snapshots(project_filter)
-        if command == "dbt-execute-snapshot" and options:
-            return self.dbt_execute_snapshot(options[0])
-        if command == "dbt-list-hooks":
-            hook_type_filter = options[0] if options else None
-            return self.dbt_list_hooks(hook_type_filter)
-        if command == "dbt-execute-hooks" and options:
-            model_name = options[1] if len(options) > 1 else None
-            return self.dbt_execute_hooks(options[0], model_name)
-        if command == "dbt-list-exposures":
-            type_filter = options[0] if options else None
-            return self.dbt_list_exposures(type_filter)
-        if command == "dbt-build-lineage":
-            project_filter = options[0] if options else None
-            return self.dbt_build_lineage(project_filter)
-        if command == "dbt-lineage-path" and len(options) >= MIN_MOCK_DATA_ARGS:
-            return self.dbt_lineage_path(options[0], options[1])
-
-        # For unknown commands, return graceful response
+    def _mock_success(self, command: str, options: list[str]) -> FlextResult[dict[str, object]]:
         return FlextResult(
             data={
                 "command": command,
-                "status": "unknown_command",
+                "options": options,
+                "status": "success",
             },
         )
 
@@ -392,12 +396,12 @@ class FlextMeltanoCli:
 
             # Execute command using common executor
 
-            exec_context = SubprocessExecutionContext(
+            exec_context = SharedSubprocessExecutionContext(
                 command=cmd,
                 cwd=self.project_root,
                 timeout_seconds=300,
             )
-            exec_result = execute_subprocess_common(exec_context)
+            exec_result = shared_execute_subprocess_common(exec_context)
 
             if not exec_result.success:
                 return FlextResult(error=exec_result.error)
@@ -562,7 +566,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to import ecosystem: {e}")
 
     def dbt_validate_project(
-        self, project: str,
+        self,
+        project: str,
     ) -> FlextResult[dict[str, object]]:
         """Validate a DBT project with comprehensive testing.
 
@@ -618,7 +623,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to validate project {project}: {e}")
 
     def dbt_list_models(
-        self, project: str | None = None,
+        self,
+        project: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all available models, optionally filtered by project.
 
@@ -704,7 +710,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to create mock data: {e}")
 
     def dbt_get_metrics(
-        self, model: str | None = None,  # noqa: ARG002
+        self,
+        model: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """Get DBT execution metrics with observability integration.
 
@@ -727,7 +734,10 @@ class FlextMeltanoCli:
                         "status": "success",
                         "metrics": metrics_result.data,
                         "timestamp": pd.Timestamp.now().isoformat(),
-                        "message": "DBT metrics retrieved successfully",
+                        "message": (
+                            f"DBT metrics retrieved successfully for {model}"
+                            if model else "DBT metrics retrieved successfully"
+                        ),
                     },
                 )
             return FlextResult(error=metrics_result.error or "Failed to get metrics")
@@ -791,7 +801,8 @@ class FlextMeltanoCli:
                 metrics_result = self.dbt_hub.get_hub_status()
                 if metrics_result.success and metrics_result.data:
                     observability_status = metrics_result.data.get(
-                        "observability_available", False,
+                        "observability_available",
+                        False,
                     )
                     health_status["observability"] = (
                         "healthy" if observability_status else "disabled"
@@ -839,7 +850,8 @@ class FlextMeltanoCli:
     # Advanced Features CLI Methods
 
     def dbt_list_snapshots(
-        self, package: str | None = None,
+        self,
+        package: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT snapshots, optionally filtered by package.
 
@@ -879,7 +891,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list snapshots: {e}")
 
     def dbt_execute_snapshot(
-        self, snapshot_name: str,
+        self,
+        snapshot_name: str,
     ) -> FlextResult[dict[str, object]]:
         """Execute a DBT snapshot in-memory.
 
@@ -914,7 +927,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to execute snapshot: {e}")
 
     def dbt_list_hooks(
-        self, hook_type: str | None = None,
+        self,
+        hook_type: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT hooks, optionally filtered by type.
 
@@ -1004,7 +1018,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to execute hooks: {e}")
 
     def dbt_list_exposures(
-        self, exposure_type: str | None = None,
+        self,
+        exposure_type: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """List all registered DBT exposures, optionally filtered by type.
 
@@ -1052,7 +1067,8 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to list exposures: {e}")
 
     def dbt_build_lineage(
-        self, package: str | None = None,
+        self,
+        package: str | None = None,
     ) -> FlextResult[dict[str, object]]:
         """Build lineage graph for DBT models.
 
@@ -1101,7 +1117,9 @@ class FlextMeltanoCli:
             return FlextResult(error=f"Failed to build lineage: {e}")
 
     def dbt_lineage_path(
-        self, from_model: str, to_model: str,
+        self,
+        from_model: str,
+        to_model: str,
     ) -> FlextResult[dict[str, object]]:
         """Find lineage path between two models.
 
@@ -1130,7 +1148,9 @@ class FlextMeltanoCli:
                         "to_model": to_model,
                         "path": path,
                         "path_length": len(path),
-                        "intermediate_models": path[1:-1] if len(path) > 2 else [],  # noqa: PLR2004
+                        "intermediate_models": path[1:-1]
+                        if len(path) > MIN_LINEAGE_ARGS
+                        else [],
                         "message": f"Found lineage path from {from_model} to {to_model}",
                     },
                 )

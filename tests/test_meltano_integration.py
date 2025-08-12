@@ -310,14 +310,12 @@ class TestMeltanoLegacyCompatibility:
 
     def test_legacy_execution_functions(self) -> None:
         """Test legacy execution functions."""
-
         # Functions should be available
         assert callable(flext_meltano_execute_job)
         assert callable(flext_meltano_run_command)
 
     def test_legacy_discovery_functions(self) -> None:
         """Test legacy discovery functions."""
-
         # Should work and return plugins
         try:
             with patch(
@@ -354,14 +352,12 @@ class TestMeltanoLegacyCompatibility:
 
     def test_legacy_validation_functions(self) -> None:
         """Test legacy validation functions."""
-
         # Should work with default project
         result = flext_meltano_validate_project()
         assert hasattr(result, "success")
 
     def test_legacy_installation_functions(self) -> None:
         """Test legacy installation functions."""
-
         # Function should be available
         assert callable(flext_meltano_install_plugin)
 
