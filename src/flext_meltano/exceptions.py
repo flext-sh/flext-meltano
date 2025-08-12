@@ -34,12 +34,12 @@ class FlextMeltanoError(FlextError):
     """Base Meltano error inheriting from flext-core generic error."""
 
 
-class FlextMeltanoValidationError(FlextValidationError):
-    """Validation error for Meltano domain."""
+class FlextMeltanoValidationError(FlextMeltanoError, FlextValidationError):
+    """Validation error for Meltano domain inheriting from Meltano base and core validation error."""
 
 
-class FlextMeltanoConfigurationError(FlextConfigurationError):
-    """Configuration error for Meltano domain."""
+class FlextMeltanoConfigurationError(FlextMeltanoError, FlextConfigurationError):
+    """Configuration error for Meltano domain inheriting from Meltano base and core configuration error."""
 
 
 class FlextMeltanoConnectionError(FlextMeltanoError):
@@ -71,15 +71,25 @@ class FlextMeltanoProcessingError(FlextMeltanoError):
         *,
         operation: str | None = None,
         records_processed: int | None = None,
+        context: dict[str, object] | None = None,
         **kwargs: object,
     ) -> None:
         """Initialize processing error with operation context."""
-        context = dict(kwargs)
-        if operation is not None:
-            context["operation"] = operation
-        if records_processed is not None:
-            context["records_processed"] = records_processed
-        super().__init__(f"Processing: {message}", context=context)
+        # Fix type annotation issues by properly typing context_dict
+        context_dict: dict[str, object] = {"context": dict(context or {})}
+
+        # Add kwargs to context_dict safely
+        context_dict.update(dict(kwargs.items()))
+
+        # Add operation and records_processed to nested context
+        nested_context = context_dict["context"]
+        if isinstance(nested_context, dict):
+            if operation is not None:
+                nested_context["operation"] = operation
+            if records_processed is not None:
+                nested_context["records_processed"] = records_processed
+
+        super().__init__(f"Processing: {message}", context=context_dict)
 
 
 class FlextMeltanoAuthenticationError(FlextMeltanoError):

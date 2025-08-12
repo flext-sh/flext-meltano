@@ -54,7 +54,7 @@ import json
 import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Iterator, TextIO, cast
+from typing import TYPE_CHECKING, TextIO, cast
 
 from flext_core import (
     FlextContainer,
@@ -66,7 +66,7 @@ from flext_core import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterator, Mapping
 
     from structlog.stdlib import BoundLogger
 
@@ -80,11 +80,11 @@ from .protocols import FlextSingerUnifiedInterface
 # These will be resolved when we consolidate services
 class FlextMeltanoTapService:
     """Placeholder for tap service - will be moved to meltano_services.py."""
-    pass
+
 
 class FlextMeltanoTargetService:
     """Placeholder for target service - will be moved to meltano_services.py."""
-    pass
+
 
 # Legacy compatibility exports
 FlextMeltanoTap = FlextMeltanoTapService
@@ -464,14 +464,14 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         )
 
         # Initialize tap
-        tap_init_result = tap.initialize(tap_config)
+        tap_init_result = tap.initialize(tap_config)  # type: ignore[arg-type]
         if tap_init_result.is_failure:
             return FlextResult.fail(
                 f"Tap initialization failed: {tap_init_result.error}",
             )
 
         # Initialize target
-        target_init_result = target.initialize(target_config)
+        target_init_result = target.initialize(target_config)  # type: ignore[arg-type]
         if target_init_result.is_failure:
             return FlextResult.fail(
                 f"Target initialization failed: {target_init_result.error}",
@@ -899,9 +899,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
             self._logger.info(f"Extracting data from {len(self._selected_streams)} streams")
 
             # Perform tap-specific extraction
-            extraction_result = self._extract_tap_data()
-
-            return extraction_result
+            return self._extract_tap_data()
 
         except Exception as e:
             self._logger.exception("Data extraction failed")
@@ -1411,19 +1409,19 @@ __all__ = [
     # Legacy compatibility exports
     "FlextMeltanoTap",
     "FlextMeltanoTarget",
+    "FlextPipelineConfig",
+    # Singer bridge
+    "FlextSingerBridge",
+    # Plugin base classes
+    "FlextSingerPluginBase",
+    "FlextSingerPluginContext",
     # Unified Singer interface
     "FlextSingerUnifiedConfig",
     "FlextSingerUnifiedInterface",
     "FlextSingerUnifiedResult",
     "FlextSingerUnifiedService",
-    "FlextPipelineConfig",
-    # Plugin base classes
-    "FlextSingerPluginBase",
     "FlextTapPlugin",
     "FlextTargetPlugin",
-    "FlextSingerPluginContext",
-    # Singer bridge
-    "FlextSingerBridge",
     # Factory functions
     "create_unified_singer_config",
     "create_unified_singer_service",

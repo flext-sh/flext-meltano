@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from uuid import uuid4
 
 from flext_core import (
@@ -29,7 +29,7 @@ from .constants import (
 # =============================================================================
 
 
-class FlextMeltanoExecutionStatus(str, Enum):
+class FlextMeltanoExecutionStatus(StrEnum):
     """Execution status enumeration."""
 
     PENDING = "PENDING"
@@ -202,6 +202,64 @@ class FlextSingerCatalog(FlextModel):
     streams: list[dict[str, object]] = Field(default_factory=list)
     generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     tap_name: str | None = Field(default=None)
+
+    def __init__(self, data: dict[str, object] | None = None, **kwargs: object) -> None:
+        """Initialize catalog and set internal logger for compatibility."""
+        # Allow optional positional dict with 'streams' for backward compatibility
+        if data and isinstance(data, dict):
+            # Map incoming dict keys into model fields
+            kwargs = {**kwargs}
+            if "streams" in data and isinstance(data["streams"], list):
+                kwargs.setdefault("streams", data["streams"])
+        super().__init__(**kwargs)
+        # Tests expect a _logger attribute to exist
+        from flext_core import get_logger as _get_logger  # noqa: PLC0415
+        # lazy logger setup compatible with pydantic BaseModel immutability
+        object.__setattr__(self, "_logger", _get_logger(self.__class__.__name__))
+        # Backward-compatibility: also maintain an internal _catalog structure
+        object.__setattr__(self, "_catalog", {"streams": self.streams})
+
+    # Backward-compatible helper methods expected in some tests
+    def flext_singer_add_stream(
+        self,
+        stream_name: str,
+        schema: dict[str, object] | object,
+        key_properties: list[str] | None = None,
+    ) -> FlextResult[None]:
+        """Add a stream with schema using legacy-named method."""
+        if not isinstance(stream_name, str) or not stream_name.strip():
+            return FlextResult.fail("Stream name must be a non-empty string")
+        if not isinstance(schema, dict):
+            return FlextResult.fail("Schema must be a dictionary")
+        stream_def: dict[str, object] = {"tap_stream_id": stream_name, "schema": schema}
+        if key_properties is not None:
+            stream_def["key_properties"] = key_properties
+        return self.add_stream(stream_def)
+
+    def flext_singer_get_catalog(self) -> FlextResult[dict[str, object]]:
+        """Get catalog using legacy-named method."""
+        return FlextResult.ok({"streams": list(self.streams)})
+
+    def flext_singer_get_selected_streams(self) -> FlextResult[list[str]]:
+        """Get selected streams based on Singer metadata rules."""
+        try:
+            selected: list[str] = []
+            for stream in self.streams:
+                sid_obj = stream.get("tap_stream_id")
+                sid = sid_obj if isinstance(sid_obj, str) else None
+                meta_list_obj = stream.get("metadata", [])
+                meta_list = meta_list_obj if isinstance(meta_list_obj, list) else []
+                for entry in meta_list:
+                    if not isinstance(entry, dict):
+                        continue
+                    breadcrumb = entry.get("breadcrumb", [])
+                    md = entry.get("metadata", {})
+                    if breadcrumb == [] and isinstance(md, dict) and md.get("selected") is True and sid:
+                        selected.append(sid)
+                        break
+            return FlextResult.ok(selected)
+        except Exception as exc:  # pragma: no cover
+            return FlextResult.fail(f"Failed to get selected streams: {exc}")
 
     def add_stream(self, stream_definition: dict[str, object]) -> FlextResult[None]:
         """Add stream definition to catalog."""

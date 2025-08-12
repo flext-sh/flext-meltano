@@ -73,7 +73,7 @@ class TestFlextMeltanoConfig:
         assert config is not None
         assert config.project_root is not None
         # Accept both dev and development as valid defaults (may vary by environment)
-        if config.environment not in ("dev", "development"):
+        if config.environment not in {"dev", "development"}:
             msg: str = f"Expected 'dev' or 'development', got {config.environment}"
             raise AssertionError(msg)
 
@@ -172,7 +172,6 @@ class TestFactoryFunctions:
 
     def test_create_meltano_dbt_service(self) -> None:
         """Test create DBT service factory function."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             result = create_meltano_dbt_service(config)

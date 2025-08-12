@@ -3,6 +3,7 @@
 This module centralizes service base classes that were previously spread in `base.py`.
 Concrete implementations should live in dedicated modules and extend these bases.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

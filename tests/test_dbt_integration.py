@@ -183,7 +183,6 @@ class TestFlextMeltanoDbtProject:
 
     def test_project_initialize(self) -> None:
         """Test project initialization."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             project = FlextMeltanoDbtProject(config)
@@ -330,7 +329,6 @@ class TestDBTIntegrationPatterns:
 
     def test_project_workflow(self) -> None:
         """Test typical project workflow."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             project = FlextMeltanoDbtProject(config)

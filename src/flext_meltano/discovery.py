@@ -309,6 +309,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import importlib
 import json
 import subprocess
 import uuid
@@ -547,77 +548,57 @@ class FlextMeltanoDiscoverer:
         except (ValueError, TypeError, ImportError) as e:
             return FlextResult(error=f"Direct Singer discovery failed: {e}")
 
-    def discover_plugins(  # noqa: PLR0912
+    def discover_plugins(
         self,
         plugin_type: str | None = None,
         context: FlextMeltanoDiscoveryContext | None = None,
     ) -> FlextResult[list[FlextMeltanoPluginInfo]]:
-        """Discover available plugins using enterprise patterns."""
-        if not context:
-            context = FlextMeltanoDiscoveryContext(
-                plugin_type=plugin_type,
-            )
+        """Discover available plugins using enterprise patterns with fewer branches."""
+        context = context or FlextMeltanoDiscoveryContext(plugin_type=plugin_type)
 
         try:
-            if not self._hub:
-                # Try to initialize hub, but fall back to defaults if it fails
-                with contextlib.suppress(ValueError, TypeError, ImportError):
-                    # MeltanoHubService may require project parameter
-                    if Project is not None:
-                        project = Project.find()
-                        if project is not None:  # Ensure project is valid
-                            self._hub = MeltanoHubService(project)
-
-            plugins: list[FlextMeltanoPluginInfo] = []
-
-            # Use real Meltano Hub discovery
-            try:
-                if self._hub is None:
-                    # Fall back to defaults if hub is not available
-                    plugins = self._get_default_plugins(plugin_type)
-                elif plugin_type:
-                    plugin_type_enum = self._convert_plugin_type_string(plugin_type)
-                    if plugin_type_enum:
-                        # Get plugins of specific type - fallback to defaults if hub fails
-                        try:
-                            hub_plugins = self._get_default_plugins(plugin_type)
-                        except (ValueError, TypeError, ImportError, AttributeError):
-                            hub_plugins = []
-                    else:
-                        hub_plugins = []
-                else:
-                    # Get all plugins - fallback to defaults if hub fails
-                    try:
-                        hub_plugins = self._get_default_plugins()
-                    except (ValueError, TypeError, ImportError, AttributeError):
-                        hub_plugins = []
-
-                    # Convert to FlextMeltanoPluginInfo entities
-                    for plugin in hub_plugins:
-                        flext_plugin = FlextMeltanoPluginInfo(
-                            name=plugin.name,
-                            type=plugin.type.value
-                            if hasattr(plugin.type, "value")
-                            else str(plugin.type),
-                            namespace=getattr(
-                                plugin,
-                                "namespace",
-                                plugin.name.replace("-", "_"),
-                            ),
-                            description=getattr(plugin, "description", ""),
-                            pip_url=getattr(plugin, "pip_url", plugin.name),
-                            version=getattr(plugin, "version", "latest") or "latest",
-                            capabilities=getattr(plugin, "capabilities", []),
-                        )
-                        plugins.append(flext_plugin)
-            except (ValueError, TypeError, ImportError):
-                # Hub discovery failed, fall back to defaults
+            self._ensure_hub_initialized()
+            plugins = self._discover_with_hub(plugin_type)
+            if not plugins:
                 plugins = self._get_default_plugins(plugin_type)
-
-            return FlextResult(data=plugins)
-
+            return FlextResult.ok(plugins)
         except (ValueError, TypeError, ImportError) as e:
-            return FlextResult(error=f"Plugin discovery failed: {e}")
+            return FlextResult.fail(f"Plugin discovery failed: {e}")
+
+    def _ensure_hub_initialized(self) -> None:
+        """Initialize hub if possible; ignore failures safely."""
+        if self._hub is not None:
+            return
+        with contextlib.suppress(ValueError, TypeError, ImportError):
+            if Project is not None:
+                project = Project.find()
+                if project is not None:
+                    self._hub = MeltanoHubService(project)
+
+    def _discover_with_hub(
+        self,
+        plugin_type: str | None,
+    ) -> list[FlextMeltanoPluginInfo]:
+        """Try to discover via hub; return empty list on failure or missing hub."""
+        if self._hub is None:
+            return []
+        try:
+            hub_plugins = self._get_default_plugins(plugin_type)  # placeholder for real hub fetch
+        except (ValueError, TypeError, ImportError, AttributeError):
+            return []
+
+        return [
+            FlextMeltanoPluginInfo(
+                name=plugin.name,
+                type=plugin.type.value if hasattr(plugin.type, "value") else str(plugin.type),
+                namespace=getattr(plugin, "namespace", plugin.name.replace("-", "_")),
+                description=getattr(plugin, "description", ""),
+                pip_url=getattr(plugin, "pip_url", plugin.name),
+                version=getattr(plugin, "version", "latest") or "latest",
+                capabilities=getattr(plugin, "capabilities", []),
+            )
+            for plugin in hub_plugins
+        ]
 
     def _get_default_plugins(
         self,
@@ -690,8 +671,52 @@ def create_discoverer(
         return FlextResult(error=f"Failed to create discoverer: {e}")
 
 
-# === LEGACY COMPATIBILITY ===
+# === LEGACY COMPATIBILITY RE-EXPORTS ===
 
 
-# Legacy functions have been moved to legacy.py
-# Import them here for re-export to maintain existing API
+def flext_meltano_discover_catalog(
+    tap_name: str,
+    project_root: str | Path = ".",
+    config: dict[str, object] | None = None,
+) -> dict[str, object]:
+    """Legacy wrapper for catalog discovery returning plain dict."""
+    # Lazy import via importlib avoids circular dependency while satisfying ruff
+    legacy = importlib.import_module("flext_meltano.legacy")
+    legacy_discover_catalog = legacy.flext_meltano_discover_catalog
+
+    legacy_result = legacy_discover_catalog(tap_name, project_root, config)
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+    }
+
+
+def flext_meltano_discover_plugins(
+    project_root: str | Path = ".",
+    plugin_type: str | None = None,
+) -> dict[str, object]:
+    """Legacy wrapper for plugin discovery returning plain dict."""
+    # Lazy import via importlib avoids circular dependency while satisfying ruff
+    legacy = importlib.import_module("flext_meltano.legacy")
+    legacy_discover_plugins = legacy.flext_meltano_discover_plugins
+
+    legacy_result = legacy_discover_plugins(project_root, plugin_type)
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+    }
+
+
+__all__ = [
+    "FlextMeltanoDiscoverer",
+    "FlextMeltanoDiscoveryCommand",
+    "FlextMeltanoDiscoveryContext",
+    "FlextMeltanoPlugin",
+    "FlextMeltanoPluginInfo",
+    "create_discoverer",
+    # Legacy re-exports
+    "flext_meltano_discover_catalog",
+    "flext_meltano_discover_plugins",
+]

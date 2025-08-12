@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Script: DBT Hub Integration Verification
+"""Test Script: DBT Hub Integration Verification.
 =============================================
 
 Testa a implementação funcional do DBT_MELTANO_INTEGRATION_PLAN.md
@@ -26,7 +25,6 @@ from flext_meltano.dbt_hub import create_dbt_hub
 
 def test_dbt_hub_basic_functionality() -> bool | None:
     """Test basic DBT Hub functionality."""
-
     try:
         # Create hub instance
         hub = create_dbt_hub()
@@ -74,7 +72,6 @@ def test_dbt_hub_basic_functionality() -> bool | None:
 
 def test_dbt_hub_ecosystem_integration() -> bool | None:
     """Test ecosystem integration (LDAP, Oracle, etc.)."""
-
     try:
         hub = create_dbt_hub()
 
@@ -108,7 +105,6 @@ def test_dbt_hub_ecosystem_integration() -> bool | None:
 
 def test_dbt_hub_advanced_features() -> bool | None:
     """Test advanced features (snapshots, hooks, exposures, lineage)."""
-
     try:
         hub = create_dbt_hub()
 
@@ -140,7 +136,6 @@ def test_dbt_hub_advanced_features() -> bool | None:
 
 def test_dbt_hub_in_memory_execution() -> bool | None:
     """Test in-memory execution with DuckDB."""
-
     try:
         hub = create_dbt_hub()
 
@@ -180,7 +175,6 @@ def test_dbt_hub_in_memory_execution() -> bool | None:
 
 def test_dbt_hub_status_and_health() -> bool | None:
     """Test hub status and health monitoring."""
-
     try:
         hub = create_dbt_hub()
 
@@ -203,7 +197,6 @@ def test_dbt_hub_status_and_health() -> bool | None:
 
 def main() -> int:
     """Run all DBT Hub integration tests."""
-
     tests = [
         test_dbt_hub_basic_functionality,
         test_dbt_hub_ecosystem_integration,

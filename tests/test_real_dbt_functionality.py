@@ -169,7 +169,6 @@ where id is null
     @pytest.mark.asyncio
     async def test_flext_meltano_dbt_nonexistent_project(self) -> None:
         """Test DBT service with nonexistent project."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             nonexistent_dir = Path(temp_dir) / "nonexistent_dbt_project"
             config = FlextMeltanoConfig(dbt_project_dir=str(nonexistent_dir))

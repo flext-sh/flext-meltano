@@ -173,7 +173,6 @@ def sample_csv_data() -> str:
 @pytest.fixture
 def meltano_cli_runner() -> Any:
     """Meltano CLI runner for testing."""
-
     return CliRunner()
 
 

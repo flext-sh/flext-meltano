@@ -124,7 +124,6 @@ class TestFlextMeltanoConfig:
 
     def test_config_project_root_validation_existing_path(self) -> None:
         """Test project root validation with existing path."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(project_root=temp_dir)
             if config.project_root != temp_dir:
@@ -614,7 +613,6 @@ class TestFlextMeltanoDbtService:
 
     def test_dbt_service_validate_service_success(self) -> None:
         """Test DBT service validation with valid directory."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             service = FlextMeltanoDbtService(config)
@@ -730,7 +728,6 @@ class TestFactoryFunctions:
 
     def test_create_meltano_dbt_service(self) -> None:
         """Test create DBT service factory function."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             result = create_meltano_dbt_service(config)
@@ -746,7 +743,6 @@ class TestFactoryFunctions:
 
     def test_factory_functions_with_custom_config(self) -> None:
         """Test factory functions with custom config."""
-
         with (
             tempfile.TemporaryDirectory() as temp_dbt_dir,
             tempfile.TemporaryDirectory() as temp_custom_dir,
@@ -785,7 +781,6 @@ class TestFactoryFunctions:
 
     def test_factory_functions_initialization_failure(self) -> None:
         """Test factory functions when service initialization fails."""
-
         with tempfile.TemporaryDirectory() as temp_dbt_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dbt_dir)
 
@@ -832,7 +827,6 @@ class TestIntegrationWorkflows:
 
     def test_complete_dbt_workflow(self) -> None:
         """Test complete DBT workflow."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
             dbt_result = create_meltano_dbt_service(config)
@@ -860,7 +854,6 @@ class TestIntegrationWorkflows:
 
     def test_service_integration(self) -> None:
         """Test services working together."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
 

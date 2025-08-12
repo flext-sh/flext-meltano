@@ -6,6 +6,7 @@ requiring external database connections.
 
 from __future__ import annotations
 
+from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, cast
 
 import duckdb
@@ -39,7 +40,8 @@ class FlextDbtInMemoryExecutor:
         logger.info(f"Initialized DuckDB executor: {database}")
 
     def load_mock_data(
-        self, schema: dict[str, object],
+        self,
+        schema: dict[str, object],
     ) -> FlextResult[None]:
         """Load mock data based on schema definition.
 
@@ -70,12 +72,14 @@ class FlextDbtInMemoryExecutor:
                     sample_data = table_def.get("sample_data", [])
                     if sample_data:
                         df = pd.DataFrame(sample_data)
-                        self.connection.register(f"temp_{table_name}", df)
-                        # Safe table names for internal DuckDB operations
-                        self.connection.execute(
-                            f"INSERT INTO {table_name} SELECT * FROM {f'temp_{table_name}'}",  # noqa: S608
-                        )
-                        self.connection.unregister(f"temp_{table_name}")
+                        # Safe names for internal DuckDB operations
+                        safe_table = table_name.replace('"', "").replace(";", "")
+                        temp_name = f"temp_{safe_table}"
+                        self.connection.register(temp_name, df)
+                        # Use relation API to avoid string-built SQL insertion
+                        relation = self.connection.table(temp_name)
+                        relation.insert_into(safe_table)
+                        self.connection.unregister(temp_name)
 
                     self.schemas[table_name] = table_def
                     logger.debug(f"Loaded schema for table: {table_name}")
@@ -115,7 +119,9 @@ class FlextDbtInMemoryExecutor:
         return type_mapping.get(type_str.lower(), "VARCHAR")
 
     def execute_model(
-        self, model_sql: str, data: dict[str, pd.DataFrame] | None = None,
+        self,
+        model_sql: str,
+        data: dict[str, pd.DataFrame] | None = None,
     ) -> FlextResult[pd.DataFrame]:
         """Execute a DBT model in-memory.
 
@@ -148,7 +154,8 @@ class FlextDbtInMemoryExecutor:
             return FlextResult.fail(f"Failed to execute model: {e}")
 
     def validate_transformations(
-        self, models: list[dict[str, object]],
+        self,
+        models: list[dict[str, object]],
     ) -> FlextResult[dict[str, object]]:
         """Validate a series of transformations.
 
@@ -183,7 +190,11 @@ class FlextDbtInMemoryExecutor:
                         "actual": type(df).__name__,
                         "passed": False,
                     }
-                    results[model_name] = {"success": True, "validations": validations, "all_passed": False}
+                    results[model_name] = {
+                        "success": True,
+                        "validations": validations,
+                        "all_passed": False,
+                    }
                     continue
 
                 # Row count
@@ -198,13 +209,22 @@ class FlextDbtInMemoryExecutor:
                 results[model_name] = {
                     "success": True,
                     "validations": validations,
-                    "all_passed": all(bool(cast("dict[str, object]", v).get("passed", False)) for v in validations.values()),
+                    "all_passed": all(
+                        bool(cast("dict[str, object]", v).get("passed", False))
+                        for v in validations.values()
+                    ),
                 }
 
             # Summary
             total_models = len(models)
-            successful = sum(1 for r in results.values() if bool(r.get("success", False)))
-            all_valid = all(bool(r.get("all_passed", False)) for r in results.values() if bool(r.get("success", False)))
+            successful = sum(
+                1 for r in results.values() if bool(r.get("success", False))
+            )
+            all_valid = all(
+                bool(r.get("all_passed", False))
+                for r in results.values()
+                if bool(r.get("success", False))
+            )
 
             summary: dict[str, object] = {
                 "total_models": total_models,
@@ -224,13 +244,20 @@ class FlextDbtInMemoryExecutor:
         except Exception as e:
             return FlextResult.fail(f"Failed to validate transformations: {e}")
 
-    def _validate_row_count(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+    def _validate_row_count(
+        self,
+        df: pd.DataFrame,
+        expected: dict[str, object],
+        validations: dict[str, object],
+    ) -> None:
         if "row_count" in expected:
             actual_count = len(df)
             raw_expected = expected.get("row_count")
             try:
                 # Type-safe conversion: cast to int-compatible type
-                if raw_expected is not None and isinstance(raw_expected, (int, float, str)):
+                if raw_expected is not None and isinstance(
+                    raw_expected, (int, float, str),
+                ):
                     expected_count = int(raw_expected)
                 else:
                     expected_count = 0
@@ -242,18 +269,30 @@ class FlextDbtInMemoryExecutor:
                 "passed": actual_count == expected_count,
             }
 
-    def _validate_columns(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+    def _validate_columns(
+        self,
+        df: pd.DataFrame,
+        expected: dict[str, object],
+        validations: dict[str, object],
+    ) -> None:
         if "columns" in expected:
             actual_columns = set(df.columns)
             exp_cols = expected.get("columns", [])
-            expected_columns = set([str(c) for c in exp_cols] if isinstance(exp_cols, list) else [])
+            expected_columns = set(
+                [str(c) for c in exp_cols] if isinstance(exp_cols, list) else [],
+            )
             validations["columns"] = {
                 "expected": list(expected_columns),
                 "actual": list(actual_columns),
                 "passed": actual_columns == expected_columns,
             }
 
-    def _validate_values(self, df: pd.DataFrame, expected: dict[str, object], validations: dict[str, object]) -> None:
+    def _validate_values(
+        self,
+        df: pd.DataFrame,
+        expected: dict[str, object],
+        validations: dict[str, object],
+    ) -> None:
         if "values" in expected:
             exp_values = expected.get("values", [])
             if isinstance(exp_values, list):
@@ -263,7 +302,20 @@ class FlextDbtInMemoryExecutor:
                     column = check.get("column")
                     value = check.get("value")
                     if column and column in df.columns:
-                        matches = df[column].eq(value).any()  # type: ignore[arg-type]
+                        comparable_types = (
+                            str,
+                            bytes,
+                            int,
+                            float,
+                            bool,
+                            date,
+                            datetime,
+                            timedelta,
+                        )
+                        if isinstance(value, comparable_types):
+                            matches = bool(df[column].eq(value).any())
+                        else:
+                            matches = False
                         validations[f"value_{column}"] = {
                             "expected": value,
                             "found": matches,
@@ -271,7 +323,9 @@ class FlextDbtInMemoryExecutor:
                         }
 
     def create_test_data(
-        self, table_name: str, rows: int = 100,
+        self,
+        table_name: str,
+        rows: int = 100,
     ) -> FlextResult[pd.DataFrame]:
         """Create test data for a table.
 
@@ -317,7 +371,10 @@ class FlextDbtInMemoryExecutor:
             return FlextResult.fail(f"Failed to create test data: {e}")
 
     def export_results(
-        self, query: str, path: Path, file_format: str = "csv",
+        self,
+        query: str,
+        path: Path,
+        file_format: str = "csv",
     ) -> FlextResult[None]:
         """Export query results to file.
 

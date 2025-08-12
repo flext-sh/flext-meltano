@@ -42,8 +42,8 @@ All code is production-grade, fully typed, and SOLID compliant.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
-from typing import TYPE_CHECKING, ClassVar
+from enum import StrEnum
+from typing import ClassVar
 from uuid import uuid4
 
 from flext_core import (
@@ -52,11 +52,8 @@ from flext_core import (
     FlextResult,
     FlextValueObject,
 )
-from pydantic import Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 from singer_sdk import typing as th
-
-if TYPE_CHECKING:
-    pass
 
 # Import constants from the new consolidated module
 from .meltano_config import (
@@ -70,7 +67,7 @@ from .meltano_config import (
 # =============================================================================
 
 
-class FlextMeltanoExecutionStatus(str, Enum):
+class FlextMeltanoExecutionStatus(StrEnum):
     """Execution status enumeration."""
 
     PENDING = "PENDING"
@@ -82,6 +79,9 @@ class FlextMeltanoExecutionStatus(str, Enum):
 
 class FlextMeltanoEvent(FlextEntity):
     """Event entity using flext-core patterns."""
+
+    # Ensure immutability for tests expecting frozen behavior
+    model_config = ConfigDict(frozen=True)
 
     id: str = Field(default_factory=lambda: str(uuid4()), description="Event ID")
     event_type: str = Field(..., description="Type of event")
@@ -217,7 +217,7 @@ class FlextMeltanoPluginInfo(FlextModel):
     type: str = Field(..., description="Plugin type (extractor/loader/transformer)")
     namespace: str = Field(..., description="Plugin namespace")
     description: str = Field(default="", description="Plugin description")
-    version: str = Field(default="latest", description="Plugin version")
+    version: str | None = Field(default=None, description="Plugin version")
     pip_url: str | None = Field(default=None, description="Pip installation URL")
     executable: str | None = Field(default=None, description="Plugin executable")
     installed: bool = Field(default=False, description="Whether plugin is installed")
@@ -693,6 +693,8 @@ def create_oracle_oic_tap_schema(
 
 
 __all__ = [
+    # Singer schemas
+    "CommonSingerSchemas",
     # Bridge models
     "FlextMeltanoBridgeRequest",
     "FlextMeltanoBridgeResponse",
@@ -710,8 +712,6 @@ __all__ = [
     "FlextSingerCatalog",
     # Singer models
     "FlextSingerMessage",
-    # Singer schemas
-    "CommonSingerSchemas",
     "create_file_tap_schema",
     "create_ldap_tap_schema",
     "create_oauth2_api_tap_schema",

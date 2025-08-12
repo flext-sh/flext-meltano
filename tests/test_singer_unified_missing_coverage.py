@@ -160,7 +160,6 @@ class TestSingerUnifiedMissingCoverage:
 
     def test_config_edge_cases(self):
         """Test configuration edge cases for coverage."""
-
         # Test with minimal config
         config = FlextSingerUnifiedConfig(
             name="test",
@@ -184,7 +183,6 @@ class TestSingerUnifiedMissingCoverage:
 
     def test_factory_functions(self):
         """Test factory function coverage."""
-
         # Test create_unified_singer_config
         config = create_unified_singer_config(
             name="factory_test",
@@ -215,7 +213,6 @@ class TestSingerUnifiedMissingCoverage:
 
     def test_result_error_scenarios(self):
         """Test result creation in error scenarios."""
-
         # Test result with failure state
         error_result = FlextSingerUnifiedResult(
             success=False,

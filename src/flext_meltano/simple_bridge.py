@@ -10,8 +10,8 @@ import sys
 from flext_core import FlextResult, get_logger
 
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoExecutor
 from flext_meltano.constants import FlextMeltanoPluginType
+from flext_meltano.execution import FlextMeltanoExecutor
 from flext_meltano.models import FlextMeltanoPlugin, FlextMeltanoPluginRegistry
 from flext_meltano.plugin_implementation import (
     create_meltano_tap_plugin,
@@ -124,31 +124,40 @@ class FlextMeltanoBridge:
                     version="latest",
                     config={"description": f"Meltano tap: {plugin_name}"},
                 )
+
                 # Cast tap to base plugin type
-                result = tap_result.map(
-                    lambda tap: FlextMeltanoPlugin(
-                        name=tap.name, version=tap.version, plugin_type="tap",
-                    ),
-                )
+
+                def _to_base_tap(tap_obj: object) -> FlextMeltanoPlugin:
+                    # Minimal mapping to base plugin for registry usage
+                    return FlextMeltanoPlugin(
+                        name=getattr(tap_obj, "name", plugin_name),
+                        plugin_type=FlextMeltanoPluginType.EXTRACTORS,
+                        namespace=(getattr(tap_obj, "name", plugin_name)).replace("-", "_"),
+                    )
+                result = tap_result.map(_to_base_tap)
             elif plugin_name.startswith("target-"):
                 target_result = create_meltano_target_plugin(
                     name=plugin_name,
                     version="latest",
                     config={"description": f"Meltano target: {plugin_name}"},
                 )
+
                 # Cast target to base plugin type
-                result = target_result.map(
-                    lambda target: FlextMeltanoPlugin(
-                        name=target.name, version=target.version, plugin_type="target",
-                    ),
-                )
+
+                def _to_base_target(target_obj: object) -> FlextMeltanoPlugin:
+                    return FlextMeltanoPlugin(
+                        name=getattr(target_obj, "name", plugin_name),
+                        plugin_type=FlextMeltanoPluginType.LOADERS,
+                        namespace=(getattr(target_obj, "name", plugin_name)).replace("-", "_"),
+                    )
+                result = target_result.map(_to_base_target)
             else:
                 # Generic plugin
                 result = FlextResult.ok(
                     FlextMeltanoPlugin(
                         name=plugin_name,
-                        version="latest",
-                        plugin_type="generic",
+                        plugin_type=FlextMeltanoPluginType.UTILITIES,
+                        namespace=plugin_name.replace("-", "_"),
                     ),
                 )
 

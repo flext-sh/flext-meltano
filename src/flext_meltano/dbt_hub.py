@@ -1,4 +1,3 @@
-# ruff: noqa: S608
 """FLEXT DBT Hub - Central hub for DBT functionality in the ecosystem.
 
 Provides a unified interface for managing DBT packages, models, and
@@ -25,8 +24,9 @@ from pathlib import Path
 
 try:
     import pandas as pd
-except ImportError:
-    pd = None  # type: ignore[assignment]
+except ImportError:  # pragma: no cover - optional dependency stub
+    from types import SimpleNamespace
+    pd = SimpleNamespace()  # type: ignore[assignment]
 
 from flext_core import FlextResult, get_logger
 
@@ -300,74 +300,77 @@ class FlextDbtHub:
 
     # Execution Methods
 
-    def execute_model(  # noqa: PLR0912
+    def execute_model(
         self,
         model: str,
         mock_data: dict[str, object] | None = None,
         context: dict[str, object] | None = None,
     ) -> FlextResult[pd.DataFrame]:
-        """Execute a model in-memory.
-
-        Args:
-            model: Model name or SQL
-            mock_data: Mock data for testing
-            context: Jinja2 context for compilation
-
-        Returns:
-            FlextResult with resulting DataFrame
-
-        """
+        """Execute a model in-memory with reduced branching complexity."""
         try:
             logger.info(f"Executing DBT model: {model}")
 
-            # Convert mock data to DataFrames if provided
-            data_frames: dict[str, pd.DataFrame] | None = None
-            if mock_data:
-                try:
-                    data_frames = {}
-                    for table_name, table_data in mock_data.items():
-                        if isinstance(table_data, list):
-                            data_frames[table_name] = pd.DataFrame(table_data)
-                        elif isinstance(table_data, pd.DataFrame):
-                            data_frames[table_name] = table_data
-                        else:
-                            return FlextResult.fail(
-                                f"Unsupported mock data format for {table_name}",
-                            )
-                except Exception as e:
-                    return FlextResult.fail(f"Failed to process mock data: {e}")
+            # Prepare inputs via helpers
+            mock_result = self._prepare_mock_data(mock_data)
+            if mock_result.is_failure:
+                return FlextResult.fail(mock_result.error or "Invalid mock data")
+            data_frames = mock_result.data
 
-            # Check if model is a name or SQL
-            if not model.strip().upper().startswith(("SELECT", "WITH")):
-                # Try to get from registry
-                model_result = self.model_registry.get_model(model)
-                if model_result.success and model_result.data:
-                    dbt_model = model_result.data
-                    # Compile with context
-                    compile_result = self.model_registry.compile_model(
-                        dbt_model,
-                        context or {},
-                    )
-                    if compile_result.success and compile_result.data:
-                        model = compile_result.data
-                    else:
-                        error_msg = compile_result.error or "Failed to compile model"
-                        return FlextResult.fail(error_msg)
+            sql_result = self._resolve_model_sql(model, context or {})
+            if sql_result.is_failure or not sql_result.data:
+                return FlextResult.fail(sql_result.error or "Failed to resolve model SQL")
+            sql_to_run = sql_result.data
 
-            # Execute the SQL
-            result = self.executor.execute_model(model, data_frames)
-
-            if result.success:
-                logger.info(f"DBT model executed successfully: {model}")
-            else:
-                logger.error(f"DBT model execution failed: {model} - {result.error}")
-
+            # Execute SQL
+            result = self.executor.execute_model(sql_to_run, data_frames)
+            log_msg = (
+                "DBT model executed successfully"
+                if result.success
+                else f"DBT model execution failed: {result.error}"
+            )
+            logger.info(f"{log_msg}: {model}")
             return result
-
         except Exception as e:
-            error_msg = f"Failed to execute model: {e}"
-            logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
+            return FlextResult.fail(f"Failed to execute model: {e}")
+
+    def _prepare_mock_data(
+        self,
+        mock_data: dict[str, object] | None,
+    ) -> FlextResult[dict[str, pd.DataFrame] | None]:
+        """Convert mock data into DataFrames if present."""
+        if not mock_data:
+            return FlextResult.ok(None)
+        try:
+            frames: dict[str, pd.DataFrame] = {}
+            for table_name, table_data in mock_data.items():
+                if isinstance(table_data, list):
+                    frames[table_name] = pd.DataFrame(table_data)
+                elif isinstance(table_data, pd.DataFrame):
+                    frames[table_name] = table_data
+                else:
+                    return FlextResult.fail(
+                        f"Unsupported mock data format for {table_name}",
+                    )
+            return FlextResult.ok(frames)
+        except Exception as e:
+            return FlextResult.fail(f"Failed to process mock data: {e}")
+
+    def _resolve_model_sql(
+        self,
+        model_or_sql: str,
+        context: dict[str, object],
+    ) -> FlextResult[str]:
+        """Resolve provided identifier or SQL into final SQL text."""
+        text = model_or_sql.strip()
+        if text.upper().startswith(("SELECT", "WITH")):
+            return FlextResult.ok(text)
+        model_result = self.model_registry.get_model(text)
+        if not model_result.success or not model_result.data:
+            return FlextResult.fail(model_result.error or f"Model not found: {text}")
+        compile_result = self.model_registry.compile_model(model_result.data, context)
+        if compile_result.success and compile_result.data:
+            return FlextResult.ok(compile_result.data)
+        return FlextResult.fail(compile_result.error or "Failed to compile model")
 
     def validate_transformations(
         self,
@@ -1022,51 +1025,48 @@ class FlextDbtHub:
         snapshot_name: str,
         mock_data: dict[str, object] | None = None,
     ) -> FlextResult[pd.DataFrame]:
-        """Execute a DBT snapshot in-memory.
-
-        Args:
-            snapshot_name: Name of snapshot to execute
-            mock_data: Optional mock data for testing
-
-        Returns:
-            FlextResult with snapshot execution result
-
-        """
+        """Execute a DBT snapshot in-memory with consolidated returns."""
         try:
-            if snapshot_name not in self.snapshots:
-                return FlextResult.fail(f"Snapshot {snapshot_name} not found")
+            error_message: str | None = None
+            result: FlextResult[pd.DataFrame] | None = None
 
-            snapshot = self.snapshots[snapshot_name]
+            snapshot = self.snapshots.get(snapshot_name)
+            if snapshot is None:
+                error_message = f"Snapshot {snapshot_name} not found"
+            else:
+                if mock_data:
+                    schema_result = self.executor.load_mock_data(mock_data)
+                    if not schema_result.success:
+                        error_message = schema_result.error or "Failed to load mock data"
 
-            # Load mock data if provided
-            if mock_data:
-                schema_result = self.executor.load_mock_data(mock_data)
-                if not schema_result.success:
-                    error_msg = schema_result.error or "Failed to load mock data"
-                    return FlextResult.fail(error_msg)
+                if error_message is None:
+                    base_result = self.executor.execute_model(snapshot.sql)
+                    if not base_result.success or base_result.data is None:
+                        error_message = base_result.error or "Snapshot base execution failed"
+                    else:
+                        df = base_result.data
+                        if snapshot.unique_key not in df.columns:
+                            error_message = (
+                                f"Unique key column '{snapshot.unique_key}' not present in snapshot data"
+                            )
+                        else:
+                            df = df.copy()
+                            now = pd.Timestamp.now()
+                            df["dbt_updated_at"] = now
+                            df["dbt_valid_from"] = now
+                            df["dbt_valid_to"] = pd.NaT
+                            df["dbt_scd_id"] = (
+                                df[snapshot.unique_key]
+                                .astype(str)
+                                .apply(lambda v: pd.util.hash_pandas_object(pd.Series([v]))[0])
+                            )
+                            result = FlextResult.ok(df)
 
-            # Create snapshot table if it doesn't exist
-
-            # For in-memory execution, we simulate snapshot behavior
-            # In a real implementation, this would use DBT's snapshot logic
-            # WARNING: Potential SQL injection. 'snapshot.unique_key' is used directly in SQL. For untrusted input,
-            # use parameterized queries or strict validation (e.g., allow-list of column names).
-            snapshot_sql = f"""SELECT
-                    *,
-                    CURRENT_TIMESTAMP AS dbt_updated_at,
-                    CURRENT_TIMESTAMP AS dbt_valid_from,
-                    NULL AS dbt_valid_to,
-                    md5(CAST({snapshot.unique_key} AS VARCHAR)) AS dbt_scd_id
-                FROM ({snapshot.sql}) AS snapshot_data
-            """
-
-            result = self.executor.execute_model(snapshot_sql)
-
-            if result.success:
-                logger.info(f"Executed snapshot {snapshot_name} successfully")
-                return result
-            return FlextResult.fail(f"Snapshot execution failed: {result.error}")
-
+            if error_message is not None:
+                return FlextResult.fail(error_message)
+            # result is guaranteed when there's no error_message
+            logger.info(f"Executed snapshot {snapshot_name} successfully")
+            return result if result is not None else FlextResult.fail("Unknown snapshot error")
         except Exception as e:
             return FlextResult.fail(f"Failed to execute snapshot: {e}")
 
