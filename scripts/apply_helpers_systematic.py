@@ -129,7 +129,7 @@ BACKOFF_BASE = 2
         # This is a simplified regex - for production use ast parsing
         pattern = r"Union\[([^]]+)\,]"
 
-        def replace_union(match):
+        def replace_union(match: re.Match[str]) -> str:
             types = match.group(1)
             # Simple split on comma (more complex parsing needed for nested types)
             type_list = [t.strip() for t in types.split(",")]
@@ -139,9 +139,8 @@ BACKOFF_BASE = 2
         content = re.sub(pattern, replace_union, content)
 
         # Remove Union import if no longer needed
-        if "" not in content:
-            content = re.sub(r" | Union" | "" | content)
-            content = re.sub(r"Union | " | "" | content)
+        # Best-effort removal of 'from typing import Union' when no longer used
+        content = re.sub(r"from typing import (.*,\s*)?Union(,\s*.*)?\n", "", content)
 
         if content != original_content:
             file_path.write_text(content, encoding="utf-8")

@@ -40,6 +40,7 @@ PEP8-compliant module following the established project patterns.
 
 All code is production-grade, fully typed, and SOLID compliant.
 """
+
 from __future__ import annotations
 
 import contextlib

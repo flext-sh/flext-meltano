@@ -183,7 +183,7 @@ class FlextMeltanoExecutor:
 
         except TimeoutError:
             return FlextResult(error="Pipeline execution timed out")
-        except (OSError) as e:
+        except OSError as e:
             return FlextResult(error=f"Execution error: {e}")
 
     def run_command(
@@ -247,7 +247,7 @@ class FlextMeltanoExecutor:
 
         except TimeoutError:
             return FlextResult(error="Command timed out")
-        except (OSError) as e:
+        except OSError as e:
             return FlextResult(error=f"Command error: {e}")
 
     def execute(
@@ -329,15 +329,15 @@ async def _execute_subprocess_common_async(
 
     try:
         stdout_bytes, stderr_bytes = await asyncio.wait_for(
-            proc.communicate(), timeout=context.timeout_seconds,
+            proc.communicate(),
+            timeout=context.timeout_seconds,
         )
     except TimeoutError as exc:
         with contextlib.suppress(ProcessLookupError):
             proc.kill()
         await proc.wait()
         timeout_message = (
-            "Command timed out after "
-            f"{context.timeout_seconds} seconds: {command_str}"
+            f"Command timed out after {context.timeout_seconds} seconds: {command_str}"
         )
         raise TimeoutError(timeout_message) from exc
 
@@ -347,9 +347,7 @@ async def _execute_subprocess_common_async(
     )
     # Normalize common CLI capitalization differences for tests
     stdout_text = stdout_text_raw.replace("meltano,", "Meltano,")
-    stderr_text = (
-        stderr_bytes.decode("utf-8", errors="replace") if stderr_bytes else ""
-    )
+    stderr_text = stderr_bytes.decode("utf-8", errors="replace") if stderr_bytes else ""
     success = proc.returncode == 0
 
     result: dict[str, object] = {
@@ -416,7 +414,8 @@ def flext_meltano_execute_job(
     flext_meltano_config = flext_config_module.FlextMeltanoConfig
 
     config = flext_meltano_config(
-        project_root=str(project_root), environment=environment,
+        project_root=str(project_root),
+        environment=environment,
     )
     executor = FlextMeltanoExecutor(config)
     result = executor.execute_pipeline(tap_name, target_name)
@@ -435,7 +434,8 @@ def flext_meltano_run_command(
     flext_meltano_config = flext_config_module.FlextMeltanoConfig
 
     config = flext_meltano_config(
-        project_root=str(project_root), environment=environment,
+        project_root=str(project_root),
+        environment=environment,
     )
     executor = FlextMeltanoExecutor(config)
     result = executor.run_command(args)

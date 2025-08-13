@@ -53,7 +53,7 @@ def quick_start_with_configuration() -> None:
     """Quick Start - With custom configuration."""
     # 🏗️ Real configuration setup
     config = FlextMeltanoConfig(
-        project_root="/tmp/my_project",
+        project_root="./.tmp_my_project",
         environment="dev",
     )
 
@@ -76,7 +76,7 @@ def enterprise_project_setup() -> None:
     """Setup completo de projeto enterprise em 3 linhas."""
     # 🏢 SETUP ENTERPRISE COMPLETO - 3 linhas vs 100+ manuais
     config = FlextMeltanoConfig(
-        project_root="/tmp/enterprise_project",
+        project_root="./.tmp_enterprise_project",
         environment="production",
     )
 
@@ -111,7 +111,7 @@ def batch_processing_example() -> None:
     ]
 
     # 🔄 PROCESSAMENTO BATCH - usando REAL API
-    config = FlextMeltanoConfig(project_root="/tmp/warehouse_project")
+    config = FlextMeltanoConfig(project_root="./.tmp_warehouse_project")
     executor_result = create_executor(config)
 
     if executor_result.success:
@@ -127,7 +127,7 @@ def advanced_batch_processing() -> None:
     """Advanced batch processing with granular control."""
     # 🎛️ Advanced configuration using REAL API
     config = FlextMeltanoConfig(
-        project_root="/tmp/advanced_project",
+        project_root="./.tmp_advanced_project",
         environment="prod",
     )
 
@@ -164,7 +164,7 @@ def advanced_batch_processing() -> None:
 
 def data_discovery_workflow() -> None:
     """Workflow completo de descoberta de dados."""
-    project_root = "/tmp/discovery_project"
+    project_root = "./.tmp_discovery_project"
 
     # 🔌 Teste de conectividade using REAL API
     config = FlextMeltanoConfig(project_root=project_root)
@@ -226,7 +226,7 @@ async def async_pipeline_workflow() -> None:
         """Run job asynchronously using real API."""
         loop = asyncio.get_event_loop()
 
-        def sync_job():
+        def sync_job() -> object:
             return flext_meltano_execute_job(tap, target)
 
         result = await loop.run_in_executor(None, sync_job)
@@ -265,7 +265,7 @@ async def async_pipeline_workflow() -> None:
 def health_monitoring_example() -> None:
     """Sistema completo de monitoramento de saúde."""
     # 🏥 HEALTH CHECK COMPLETO using REAL API
-    config = FlextMeltanoConfig(project_root="/tmp/production_project")
+    config = FlextMeltanoConfig(project_root="./.tmp_production_project")
     executor_result = create_executor(config)
 
     # 📊 Dashboard de saúde
@@ -291,10 +291,10 @@ def health_monitoring_example() -> None:
 def backup_and_recovery_example() -> None:
     """Sistema completo de backup e recuperação."""
     # 💾 BACKUP using REAL API
-    config = FlextMeltanoConfig(project_root="/tmp/critical_project")
+    config = FlextMeltanoConfig(project_root="./.tmp_critical_project")
 
     # 📅 Backup com timestamp
-    datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d_%H%M%S")
 
     # Validate project first
     executor_result = create_executor(config)
@@ -313,7 +313,7 @@ def real_world_etl_workflow() -> None:
     """Workflow ETL real - E-commerce para Data Warehouse."""
     # 🏪 Cenário: E-commerce pipeline using REAL API
     config = FlextMeltanoConfig(
-        project_root="/tmp/ecommerce_project",
+        project_root="./.tmp_ecommerce_project",
         environment="prod",
     )
 

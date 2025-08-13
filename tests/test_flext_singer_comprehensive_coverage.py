@@ -374,7 +374,7 @@ class TestFlextSingerBridgeComplete:
             {
                 "type": "RECORD",
                 "stream": "test",
-            }
+            },
         )
 
         assert not result.success
@@ -389,7 +389,7 @@ class TestFlextSingerBridgeComplete:
             {
                 "type": "SCHEMA",
                 "stream": "test",
-            }
+            },
         )
 
         assert not result.success

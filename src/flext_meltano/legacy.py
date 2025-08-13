@@ -157,7 +157,9 @@ def flext_meltano_discover_catalog(
         # If there's already a running loop, we cannot use asyncio.run or run_until_complete
         # The proper solution would be to make this function async, but for backward compatibility
         # we return a graceful failure that the test can handle
-        return FlextMeltanoResult.fail("Cannot run catalog discovery within existing event loop - use async version")
+        return FlextMeltanoResult.fail(
+            "Cannot run catalog discovery within existing event loop - use async version",
+        )
     except RuntimeError:
         # No running loop, safe to use asyncio.run
         result = asyncio.run(discoverer.discover_catalog(tap_name, config))
@@ -227,10 +229,12 @@ def validate_project(
         legacy_data = {
             "valid": validation_result.is_valid,
             "has_meltano_yml": validation_result.details.get(
-                "meltano_yml_exists", False,
+                "meltano_yml_exists",
+                False,
             ),
             "has_project_dir": validation_result.details.get(
-                "meltano_dir_exists", False,
+                "meltano_dir_exists",
+                False,
             ),
             "errors": list(validation_result.issues),
             "warnings": validation_result.warnings,

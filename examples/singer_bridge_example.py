@@ -17,12 +17,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
-# Import Singer SDK for real tap/target development
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 
-# Import REAL APIs from flext-meltano
 from flext_meltano import (
     FlextMeltanoBridge,
     FlextMeltanoConfig,
@@ -119,9 +117,9 @@ class ProfessionalExampleTap(Tap):
 class ExampleUsersStream(Stream):
     """Example users stream using Singer SDK patterns."""
 
-    name = "users"
-    primary_keys = ["id"]
-    replication_key = "updated_at"
+    name: ClassVar[str] = "users"
+    primary_keys: ClassVar[list[str]] = ["id"]
+    replication_key: ClassVar[str] = "updated_at"
 
     # Schema definition using Singer SDK typing
     schema = singer_typing.PropertiesList(
@@ -148,7 +146,11 @@ class ExampleUsersStream(Stream):
     ).to_dict()
 
     def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
-        """Generate sample user records."""
+        """Generate sample user records.
+
+        When provided, "context" can be used to filter or adjust the output
+        (e.g., by replication bookmark). Here, respect a trivial filter if passed.
+        """
         # Simulate data extraction
         sample_users = [
             {
@@ -170,16 +172,31 @@ class ExampleUsersStream(Stream):
                 "updated_at": "2025-01-01T12:00:00Z",
             },
         ]
+        # If a context with a "min_id" is provided, filter accordingly
+        min_id = None
+        if isinstance(context, dict):
+            raw_min = context.get("min_id")
+            if isinstance(raw_min, (int, str)):
+                try:
+                    min_id = int(raw_min)
+                except ValueError:
+                    min_id = None
 
-        yield from sample_users
+        filtered = (
+            (u for u in sample_users if (min_id is None or int(u["id"]) >= min_id))
+            if min_id is not None
+            else iter(sample_users)
+        )
+
+        yield from filtered
 
 
 class ExampleOrdersStream(Stream):
     """Example orders stream using Singer SDK patterns."""
 
-    name = "orders"
-    primary_keys = ["id"]
-    replication_key = "created_at"
+    name: ClassVar[str] = "orders"
+    primary_keys: ClassVar[list[str]] = ["id"]
+    replication_key: ClassVar[str] = "created_at"
 
     # Schema definition
     schema = singer_typing.PropertiesList(
@@ -206,7 +223,10 @@ class ExampleOrdersStream(Stream):
     ).to_dict()
 
     def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
-        """Generate sample order records."""
+        """Generate sample order records.
+
+        Uses optional context to filter by "user_id" when provided.
+        """
         sample_orders = [
             {
                 "id": 101,
@@ -227,8 +247,26 @@ class ExampleOrdersStream(Stream):
                 "created_at": "2025-01-01T15:00:00Z",
             },
         ]
+        user_id_filter = None
+        if isinstance(context, dict):
+            raw_uid = context.get("user_id")
+            if isinstance(raw_uid, (int, str)):
+                try:
+                    user_id_filter = int(raw_uid)
+                except ValueError:
+                    user_id_filter = None
 
-        yield from sample_orders
+        filtered = (
+            (
+                o
+                for o in sample_orders
+                if (user_id_filter is None or int(o["user_id"]) == user_id_filter)
+            )
+            if user_id_filter is not None
+            else iter(sample_orders)
+        )
+
+        yield from filtered
 
 
 def professional_tap_example() -> dict[str, Any]:
@@ -290,9 +328,14 @@ class ExampleSink:
         self.records_processed = 0
 
     def process_record(self, record: dict[str, Any], context: dict[str, Any]) -> None:
-        """Process a single record."""
+        """Process a single record respecting context flags when present."""
+        # Example: skip records when context requests dry-run
+        if isinstance(context, dict) and context.get("dry_run") is True:
+            return
+
         # Simulate record processing
-        self.records_processed += 1
+        if isinstance(record, dict):
+            self.records_processed += 1
 
         # In real implementation, this would write to destination
 
@@ -329,7 +372,7 @@ def professional_target_example() -> dict[str, Any]:
     """Demonstrates professional target implementation."""
     # Configuration
     config = {
-        "output_path": "/tmp/target_output",
+        "output_path": "./.tmp_target_output",
         "batch_size": 100,
     }
 

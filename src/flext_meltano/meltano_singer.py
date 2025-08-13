@@ -48,6 +48,7 @@ and bridge integration into a single PEP8-compliant module.
 
 All code is production-grade, fully typed, and SOLID compliant.
 """
+
 from __future__ import annotations
 
 import json
@@ -75,6 +76,7 @@ from .protocols import FlextSingerUnifiedInterface
 # =============================================================================
 # SINGER PROTOCOL INTEGRATION (from singer.py)
 # =============================================================================
+
 
 # Import base service classes from the old structure
 # These will be resolved when we consolidate services
@@ -556,6 +558,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         except (ValueError, TypeError, AttributeError) as e:
             return FlextResult.fail(f"Component validation failed: {e}")
 
+
 # =============================================================================
 # SINGER PLUGIN BASE CLASSES (from singer_plugin_base.py)
 # =============================================================================
@@ -649,7 +652,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             return FlextResult.ok(None)
 
         except Exception as e:
-            self._logger.exception(f"Failed to initialize {self._plugin_type} {self.name}")
+            self._logger.exception(
+                f"Failed to initialize {self._plugin_type} {self.name}",
+            )
             return FlextResult.fail(f"Initialization failed: {e!s}")
 
     def shutdown(self) -> FlextResult[None]:
@@ -718,7 +723,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             self._logger.info(f"Testing connection for {self._plugin_type} {self.name}")
 
             if not self._config:
-                return FlextResult.fail("No configuration available for connection test")
+                return FlextResult.fail(
+                    "No configuration available for connection test",
+                )
 
             # Perform plugin-specific connection test
             test_result = self._test_specific_connection()
@@ -766,7 +773,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
         ...
 
     @abstractmethod
-    def _validate_specific_config(self, config: Mapping[str, object]) -> FlextResult[None]:
+    def _validate_specific_config(
+        self, config: Mapping[str, object],
+    ) -> FlextResult[None]:
         """Perform plugin-specific configuration validation.
 
         Args:
@@ -872,7 +881,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
 
         """
         if not self._discovered_streams:
-            return FlextResult.fail("No streams discovered. Run discover_catalog first.")
+            return FlextResult.fail(
+                "No streams discovered. Run discover_catalog first.",
+            )
 
         invalid_streams = [s for s in stream_names if s not in self._discovered_streams]
         if invalid_streams:
@@ -896,7 +907,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
             if not self._selected_streams:
                 return FlextResult.fail("No streams selected for extraction")
 
-            self._logger.info(f"Extracting data from {len(self._selected_streams)} streams")
+            self._logger.info(
+                f"Extracting data from {len(self._selected_streams)} streams",
+            )
 
             # Perform tap-specific extraction
             return self._extract_tap_data()
@@ -1121,6 +1134,7 @@ class FlextSingerPluginContext(FlextPluginContext):
 
         return FlextResult.ok(service)
 
+
 # =============================================================================
 # SINGER SDK BRIDGE INTEGRATION (from flext_singer.py)
 # =============================================================================
@@ -1154,7 +1168,9 @@ class FlextSingerBridge:
                     result = self._create_record_message(
                         stream=stream,
                         record=cast("dict[str, object]", record),
-                        time_extracted=cast("str | None", time_extracted) if isinstance(time_extracted, str) else None,
+                        time_extracted=cast("str | None", time_extracted)
+                        if isinstance(time_extracted, str)
+                        else None,
                     )
                 else:
                     result = FlextResult(error="Invalid arguments for RECORD message")
@@ -1166,14 +1182,18 @@ class FlextSingerBridge:
                     result = self._create_schema_message(
                         stream=stream,
                         schema=cast("dict[str, object]", schema),
-                        key_properties=cast("list[str] | None", key_properties) if isinstance(key_properties, list) else None,
+                        key_properties=cast("list[str] | None", key_properties)
+                        if isinstance(key_properties, list)
+                        else None,
                     )
                 else:
                     result = FlextResult(error="Invalid arguments for SCHEMA message")
             elif message_type == "STATE":
                 value = kwargs.get("value")
                 if isinstance(value, dict):
-                    result = self._create_state_message(value=cast("dict[str, object]", value))
+                    result = self._create_state_message(
+                        value=cast("dict[str, object]", value),
+                    )
                 else:
                     result = FlextResult(error="Invalid arguments for STATE message")
             else:
@@ -1348,6 +1368,7 @@ class FlextSingerBridge:
                 yield self.flext_singer_parse_message_line(line)
         except (OSError, ValueError) as e:
             yield FlextResult(error=f"Failed to read Singer messages: {e}")
+
 
 # =============================================================================
 # FACTORY FUNCTIONS

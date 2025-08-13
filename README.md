@@ -155,7 +155,7 @@ export PYTHONPATH=$(PWD)/src:$(PYTHONPATH)
 
 ## Quality Standards
 
-### **Zero Tolerance Quality Gates**
+### **Quality Targets**
 
 - **Coverage**: 90% target (currently ~74%)
 - **Type Safety**: MyPy strict mode adopted (work in progress)

@@ -261,7 +261,8 @@ class TestFlextMeltanoBridge:
         assert not result.success
         assert (
             "installation service not initialized" in result.error
-            or "Plugin installation requires initialized Meltano project" in result.error
+            or "Plugin installation requires initialized Meltano project"
+            in result.error
         )
 
     def test_add_plugin_with_pip_url(self):

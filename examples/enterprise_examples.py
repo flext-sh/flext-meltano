@@ -213,11 +213,11 @@ def example_enterprise_config_traditional() -> dict[str, Any] | None:
                 raise ValueError(msg)
 
         # Constants for port validation
-        MIN_PORT = 1
-        MAX_PORT = 65535
+        min_port = 1
+        max_port = 65535
 
         if not isinstance(config["port"], int) or not (
-            MIN_PORT <= config["port"] <= MAX_PORT
+            min_port <= config["port"] <= max_port
         ):
             msg = "Port must be integer between 1-65535"
             raise ValueError(msg)

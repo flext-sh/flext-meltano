@@ -259,7 +259,7 @@ class TestValidationCoverageImprovement:
         import asyncio
 
         result = asyncio.run(
-            service.test_tap_connection("tap-postgres", {"host": "localhost"})
+            service.test_tap_connection("tap-postgres", {"host": "localhost"}),
         )
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
@@ -269,7 +269,7 @@ class TestValidationCoverageImprovement:
         service_long = FlextMeltanoValidationService(config_long)
 
         result = asyncio.run(
-            service_long.test_tap_connection("tap-csv", {"files": ["test.csv"]})
+            service_long.test_tap_connection("tap-csv", {"files": ["test.csv"]}),
         )
         assert hasattr(result, "success")
 

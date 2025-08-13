@@ -583,14 +583,18 @@ class FlextMeltanoDiscoverer:
         if self._hub is None:
             return []
         try:
-            hub_plugins = self._get_default_plugins(plugin_type)  # placeholder for real hub fetch
+            hub_plugins = self._get_default_plugins(
+                plugin_type,
+            )  # placeholder for real hub fetch
         except (ValueError, TypeError, ImportError, AttributeError):
             return []
 
         return [
             FlextMeltanoPluginInfo(
                 name=plugin.name,
-                type=plugin.type.value if hasattr(plugin.type, "value") else str(plugin.type),
+                type=plugin.type.value
+                if hasattr(plugin.type, "value")
+                else str(plugin.type),
                 namespace=getattr(plugin, "namespace", plugin.name.replace("-", "_")),
                 description=getattr(plugin, "description", ""),
                 pip_url=getattr(plugin, "pip_url", plugin.name),

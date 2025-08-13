@@ -138,11 +138,13 @@ from __future__ import annotations
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
+from typing import Protocol
 
 try:
     import pandas as pd
 except ImportError:  # pragma: no cover - optional dependency stub
     from types import SimpleNamespace
+
     pd = SimpleNamespace()  # type: ignore[assignment]
 
 from flext_core import FlextResult
@@ -180,24 +182,58 @@ class FlextMeltanoCli:
 
         handler_type = Callable[[list[str]], FlextResult[dict[str, object]]]
 
-        def _no_args(handler: Callable[[], FlextResult[dict[str, object]]]) -> handler_type:
+        class _CmdHandler(Protocol):
+            def __call__(self, *args: str) -> FlextResult[dict[str, object]]: ...
+
+        def _no_args(
+            handler: Callable[[], FlextResult[dict[str, object]]],
+        ) -> handler_type:
             return lambda _opts: handler()
 
-        def _require_args(n: int, fn: Callable[..., FlextResult[dict[str, object]]]) -> handler_type:  # type: ignore[explicit-any]
-            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
-                if len(opts) < n:
-                    return FlextResult(error=f"Missing required arguments: expected {n}")
-                return fn(*opts[:n])
-            return _inner
-
-        def _require_args_optional(  # type: ignore[explicit-any]
+        def _require_args(
             n: int,
-            fn: Callable[..., FlextResult[dict[str, object]]],
+            fn: _CmdHandler,
         ) -> handler_type:
             def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
                 if len(opts) < n:
-                    return FlextResult(error=f"Missing required arguments: expected {n}")
-                return fn(*opts[:n], *opts[n:])
+                    return FlextResult(
+                        error=f"Missing required arguments: expected {n}",
+                    )
+                # Avoid variadic Any error by dispatching explicitly per arity
+                if n == 0:
+                    return fn()
+                if n == 1:
+                    return fn(opts[0])
+                if n == 2:
+                    return fn(opts[0], opts[1])
+                if n == 3:
+                    return fn(opts[0], opts[1], opts[2])
+                # Fallback for larger n: still pass through, safe enough for our handlers
+                return fn(*opts[:n])  # type: ignore[misc]
+
+            return _inner
+
+        def _require_args_optional(
+            n: int,
+            fn: _CmdHandler,
+        ) -> handler_type:
+            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
+                if len(opts) < n:
+                    return FlextResult(
+                        error=f"Missing required arguments: expected {n}",
+                    )
+                required = opts[:n]
+                optional = opts[n:]
+                if n == 0:
+                    return fn(*optional)
+                if n == 1:
+                    return fn(required[0], *optional)
+                if n == 2:
+                    return fn(required[0], required[1], *optional)
+                if n == 3:
+                    return fn(required[0], required[1], required[2], *optional)
+                return fn(*required, *optional)  # type: ignore[misc]
+
             return _inner
 
         dispatch: dict[str, handler_type] = {
@@ -218,22 +254,40 @@ class FlextMeltanoCli:
             "dbt-test-local": _require_args(1, self.dbt_test_local),
             "dbt-run-model": _require_args(1, self.dbt_run_model),
             "dbt-validate-project": _require_args(
-                1, self.dbt_validate_project,
+                1,
+                self.dbt_validate_project,
             ),
-            "dbt-list-models": (lambda opts: self.dbt_list_models(opts[0] if opts else None)),
+            "dbt-list-models": (
+                lambda opts: self.dbt_list_models(opts[0] if opts else None)
+            ),
             "dbt-create-mock-data": _require_args(
                 MIN_MOCK_DATA_ARGS,
                 self.dbt_create_mock_data,
             ),
-            "dbt-get-metrics": (lambda opts: self.dbt_get_metrics(opts[0] if opts else None)),
-            "dbt-list-snapshots": (lambda opts: self.dbt_list_snapshots(opts[0] if opts else None)),
+            "dbt-get-metrics": (
+                lambda opts: self.dbt_get_metrics(opts[0] if opts else None)
+            ),
+            "dbt-list-snapshots": (
+                lambda opts: self.dbt_list_snapshots(opts[0] if opts else None)
+            ),
             "dbt-execute-snapshot": _require_args(1, self.dbt_execute_snapshot),
-            "dbt-list-hooks": (lambda opts: self.dbt_list_hooks(opts[0] if opts else None)),
-            "dbt-execute-hooks": (lambda opts: self.dbt_execute_hooks(
-                opts[0], opts[1] if len(opts) > 1 else None,
-            ) if opts else FlextResult(error="Missing required arguments: expected 1")),
-            "dbt-list-exposures": (lambda opts: self.dbt_list_exposures(opts[0] if opts else None)),
-            "dbt-build-lineage": (lambda opts: self.dbt_build_lineage(opts[0] if opts else None)),
+            "dbt-list-hooks": (
+                lambda opts: self.dbt_list_hooks(opts[0] if opts else None)
+            ),
+            "dbt-execute-hooks": (
+                lambda opts: self.dbt_execute_hooks(
+                    opts[0],
+                    opts[1] if len(opts) > 1 else None,
+                )
+                if opts
+                else FlextResult(error="Missing required arguments: expected 1")
+            ),
+            "dbt-list-exposures": (
+                lambda opts: self.dbt_list_exposures(opts[0] if opts else None)
+            ),
+            "dbt-build-lineage": (
+                lambda opts: self.dbt_build_lineage(opts[0] if opts else None)
+            ),
             "dbt-lineage-path": _require_args(2, self.dbt_lineage_path),
         }
 
@@ -252,7 +306,9 @@ class FlextMeltanoCli:
             },
         )
 
-    def _mock_success(self, command: str, options: list[str]) -> FlextResult[dict[str, object]]:
+    def _mock_success(
+        self, command: str, options: list[str],
+    ) -> FlextResult[dict[str, object]]:
         return FlextResult(
             data={
                 "command": command,
@@ -736,7 +792,8 @@ class FlextMeltanoCli:
                         "timestamp": pd.Timestamp.now().isoformat(),
                         "message": (
                             f"DBT metrics retrieved successfully for {model}"
-                            if model else "DBT metrics retrieved successfully"
+                            if model
+                            else "DBT metrics retrieved successfully"
                         ),
                     },
                 )

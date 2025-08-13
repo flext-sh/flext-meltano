@@ -86,7 +86,9 @@ class FlextDbtModel:
             columns=columns if isinstance(columns, dict) else {},
             tags=[str(t) for t in tags] if isinstance(tags, list) else [],
             config=config if isinstance(config, dict) else {},
-            dependencies=[str(d) for d in dependencies] if isinstance(dependencies, list) else [],
+            dependencies=[str(d) for d in dependencies]
+            if isinstance(dependencies, list)
+            else [],
         )
 
 
@@ -187,7 +189,9 @@ class FlextDbtModelRegistry:
         return FlextResult.fail(f"Model {name} not found")
 
     def compile_model(
-        self, model: FlextDbtModel, context: dict[str, object],
+        self,
+        model: FlextDbtModel,
+        context: dict[str, object],
     ) -> FlextResult[str]:
         """Compile a model with given context.
 
@@ -241,7 +245,8 @@ class FlextDbtModelRegistry:
         return results
 
     def get_model_dependencies(
-        self, model_name: str,
+        self,
+        model_name: str,
     ) -> FlextResult[list[FlextDbtModel]]:
         """Get all dependencies for a model.
 

@@ -93,7 +93,7 @@ class TestLegacyContainerCompatibility:
             assert issubclass(w[0].category, DeprecationWarning)
             assert "deprecated" in str(w[0].message)
             assert "get_flext_container() + configure_meltano_services()" in str(
-                w[0].message
+                w[0].message,
             )
 
         # Container should still work
@@ -135,7 +135,7 @@ class TestLegacyContainerCompatibility:
             warnings.simplefilter("ignore", DeprecationWarning)
 
             custom_config = FlextMeltanoConfig(
-                project_root="./custom_test", environment="test"
+                project_root="./custom_test", environment="test",
             )
 
             result = configure_meltano_container(custom_config)
