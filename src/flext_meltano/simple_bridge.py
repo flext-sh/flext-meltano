@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+
 # Avoid direct subprocess exceptions in bridge; rely on executor
 import sys
 
