@@ -52,7 +52,9 @@ class FlextMeltanoBridge:
         self.dbt_service: object | None = None
 
         # Initialize plugin registry directly using FlextModel
-        self._plugin_registry: FlextMeltanoPluginRegistry | None = FlextMeltanoPluginRegistry()
+        self._plugin_registry: FlextMeltanoPluginRegistry | None = (
+            FlextMeltanoPluginRegistry()
+        )
 
     def get_version(self) -> FlextResult[dict[str, str]]:
         """Get Meltano version information for Go services.
@@ -103,7 +105,8 @@ class FlextMeltanoBridge:
         return self._plugin_registry
 
     def create_data_plugin_from_name(
-        self, plugin_name: str,
+        self,
+        plugin_name: str,
     ) -> FlextResult[FlextMeltanoPlugin]:
         """Create a data plugin instance from plugin name.
 
@@ -132,8 +135,11 @@ class FlextMeltanoBridge:
                     return FlextMeltanoPlugin(
                         name=getattr(tap_obj, "name", plugin_name),
                         plugin_type=FlextMeltanoPluginType.EXTRACTORS,
-                        namespace=(getattr(tap_obj, "name", plugin_name)).replace("-", "_"),
+                        namespace=(getattr(tap_obj, "name", plugin_name)).replace(
+                            "-", "_",
+                        ),
                     )
+
                 result = tap_result.map(_to_base_tap)
             elif plugin_name.startswith("target-"):
                 target_result = create_meltano_target_plugin(
@@ -148,8 +154,11 @@ class FlextMeltanoBridge:
                     return FlextMeltanoPlugin(
                         name=getattr(target_obj, "name", plugin_name),
                         plugin_type=FlextMeltanoPluginType.LOADERS,
-                        namespace=(getattr(target_obj, "name", plugin_name)).replace("-", "_"),
+                        namespace=(getattr(target_obj, "name", plugin_name)).replace(
+                            "-", "_",
+                        ),
                     )
+
                 result = target_result.map(_to_base_target)
             else:
                 # Generic plugin

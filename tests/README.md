@@ -231,7 +231,7 @@ pytest tests/ --mypy                 # Type safety validation
 test_coverage_minimum: 90%
 test_execution_timeout: 30m
 flaky_test_tolerance: 0
-documentation_coverage: 100%
+documentation_coverage: aiming for 100%
 ```
 
 ### Pre-commit Hooks

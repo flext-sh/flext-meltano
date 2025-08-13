@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 """Test Script: DBT Hub Integration Verification.
+
 =============================================
 
 Testa a implementação funcional do DBT_MELTANO_INTEGRATION_PLAN.md
@@ -50,7 +50,7 @@ def test_dbt_hub_basic_functionality() -> bool | None:
             name="test_model",
             package="test-package",
             sql="SELECT 1 as test_column",
-            description="Test model for verification"
+            description="Test model for verification",
         )
 
         if model_result.success:
@@ -152,8 +152,8 @@ def test_dbt_hub_in_memory_execution() -> bool | None:
         mock_data = {
             "users": [
                 {"id": 1, "name": "John Doe", "email": "john@example.com"},
-                {"id": 2, "name": "Jane Smith", "email": "jane@example.com"}
-            ]
+                {"id": 2, "name": "Jane Smith", "email": "jane@example.com"},
+            ],
         }
 
         mock_sql = "SELECT * FROM users WHERE id = 1"
@@ -217,7 +217,7 @@ def main() -> int:
     passed = sum(results)
     total = len(results)
 
-    for _i, (test_func, _result) in enumerate(zip(tests, results, strict=False)):
+    for _i, (_test_func, _result) in enumerate(zip(tests, results, strict=False)):
         pass
 
     if passed == total:

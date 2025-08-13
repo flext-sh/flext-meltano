@@ -91,7 +91,9 @@ def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     }
 
 
-def _get_default_executor(config: FlextMeltanoConfig | None = None) -> FlextMeltanoExecutor:
+def _get_default_executor(
+    config: FlextMeltanoConfig | None = None,
+) -> FlextMeltanoExecutor:
     """Create default executor instance (import at top-level avoids PLC0415)."""
     used_config = config or FlextMeltanoConfig()
     return FlextMeltanoExecutor(used_config)

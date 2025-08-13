@@ -118,17 +118,17 @@ def example_plugin_discovery() -> None:
     discoverer = FlextMeltanoDiscoverer(config)
 
     # Constants for plugin discovery
-    MAX_PLUGINS_TO_SHOW = 5
+    max_plugins_to_show = 5
 
     # Discover all plugins
     result = discoverer.discover_plugins()
     if result.success:
         plugins = result.data
 
-        for _plugin in plugins[:MAX_PLUGINS_TO_SHOW]:  # Show first 5
+        for _plugin in plugins[:max_plugins_to_show]:  # Show first 5
             pass
 
-        if len(plugins) > MAX_PLUGINS_TO_SHOW:
+        if len(plugins) > max_plugins_to_show:
             pass
 
     # Discover extractors only

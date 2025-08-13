@@ -3,6 +3,7 @@
 Single place for constant values used across the library.
 All constants follow SCREAMING_SNAKE_CASE naming convention.
 """
+
 from __future__ import annotations
 
 from enum import StrEnum

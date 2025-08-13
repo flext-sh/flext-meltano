@@ -57,6 +57,7 @@ from flext_meltano.singer_unified import (
     FlextSingerUnifiedConfig,
 )
 
+
 class FlextTapOracle(FlextSingerUnifiedInterface):
     '''Oracle tap implementation using unified interface.'''
 
@@ -662,6 +663,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         except (ValueError, TypeError, AttributeError) as e:
             return FlextResult.fail(f"Component validation failed: {e}")
+
 
 # Factory functions for easy instantiation
 

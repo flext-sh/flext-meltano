@@ -113,7 +113,7 @@ class TestSingerUnifiedMissingCoverage:
                 return FlextResult.ok("executed")
 
             def validate_configuration(
-                self, config: dict[str, object]
+                self, config: dict[str, object],
             ) -> FlextResult[bool]:
                 return FlextResult.ok(data=True)
 

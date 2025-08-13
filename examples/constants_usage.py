@@ -19,6 +19,8 @@ from flext_meltano import FlextMeltanoConfig
 
 # Constants from actual FLEXT Meltano usage patterns
 class MeltanoEnvironment:
+    """Meltano environment names."""
+
     DEV = "dev"
     STAGING = "staging"
     PROD = "prod"
@@ -26,6 +28,8 @@ class MeltanoEnvironment:
 
 
 class MeltanoLogLevel:
+    """Meltano log levels."""
+
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"
@@ -33,6 +37,8 @@ class MeltanoLogLevel:
 
 
 class MeltanoResultStatus:
+    """Meltano result status values."""
+
     SUCCESS = "success"
     FAILED = "failed"
     PENDING = "pending"

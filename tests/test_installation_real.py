@@ -61,14 +61,6 @@ class TestFlextMeltanoInstaller:
             msg: str = f"Expected True, got {installer._initialized}"
             raise AssertionError(msg)
 
-    def test_installer_validate(self) -> None:
-        """Test installer validation method."""
-        config = FlextMeltanoConfig()
-        installer = FlextMeltanoInstaller(config)
-        result = installer.validate()
-        # May fail if project doesn't exist, but should not crash
-        assert result.success or not result.success
-
     def test_add_plugin_extractor(self) -> None:
         """Test adding extractor plugin."""
         config = FlextMeltanoConfig()

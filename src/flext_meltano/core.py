@@ -134,7 +134,8 @@ class FlextMeltanoPipelineResult(FlextEntity):
         self.records_processed = records_processed
         if self.started_at is not None:
             self.duration_seconds = max(
-                0.0, (self.completed_at - self.started_at).total_seconds(),
+                0.0,
+                (self.completed_at - self.started_at).total_seconds(),
             )
         else:
             self.duration_seconds = 0.0
@@ -146,7 +147,8 @@ class FlextMeltanoPipelineResult(FlextEntity):
         self.error_message = error_message
         if self.started_at is not None:
             self.duration_seconds = max(
-                0.0, (self.completed_at - self.started_at).total_seconds(),
+                0.0,
+                (self.completed_at - self.started_at).total_seconds(),
             )
         else:
             self.duration_seconds = 0.0
@@ -314,7 +316,10 @@ class FlextMeltanoJobEntity(FlextEntity):
         )
 
     def complete(
-        self, *, is_success: bool = True, error_message: str | None = None,
+        self,
+        *,
+        is_success: bool = True,
+        error_message: str | None = None,
     ) -> None:
         """Complete job execution."""
         self.status = "completed" if is_success else "failed"
@@ -427,7 +432,14 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
             if catalog_result.success and catalog_result.data:
                 return FlextResult.ok(catalog_result.data)
             return FlextResult.fail(catalog_result.error or "Discovery failed")
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             return FlextResult.fail(f"Catalog discovery failed: {e}")
 
     def execute_singer_pipeline(
@@ -560,7 +572,14 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
             pipeline_result.complete_execution(records_processed=0)
             return FlextResult.ok(pipeline_result)
 
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             pipeline.complete(is_success=False, error_message=str(e))
             return FlextResult.fail(f"Pipeline execution failed: {e}")
 
@@ -613,7 +632,14 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
                     f"Extension failed: {data.get('stderr') or data.get('stdout')}",
                 )
             return FlextResult.fail(exec_result.error or "Extension execution failed")
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             return FlextResult.fail(f"Extension execution failed: {e}")
 
 

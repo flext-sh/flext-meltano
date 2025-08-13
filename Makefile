@@ -52,7 +52,7 @@ install: ## Install dependencies
 
 .PHONY: install-dev
 install-dev: ## Install dev dependencies
-	$(POETRY) install --with dev,test,docs
+	$(POETRY) install --with dev,test,typings,security
 
 .PHONY: setup
 setup: install-dev ## Complete project setup

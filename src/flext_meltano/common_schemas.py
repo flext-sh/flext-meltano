@@ -315,7 +315,8 @@ class FlextMeltanoPluginInfo(FlextModel):
     executable: str | None = Field(default=None, description="Plugin executable")
     installed: bool = Field(default=False, description="Whether plugin is installed")
     capabilities: list[str] = Field(
-        default_factory=list, description="Plugin capabilities",
+        default_factory=list,
+        description="Plugin capabilities",
     )
 
 

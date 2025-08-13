@@ -7,6 +7,7 @@ or compose those to avoid duplication.
 This module provides comprehensive Protocol definitions following Python 3.13
 typing standards and SOLID principles for all FLEXT Meltano components.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -67,7 +68,9 @@ class FlextMeltanoBridgeProtocol(Protocol):
         """List available plugins."""
         ...
 
-    def run_pipeline(self, tap_name: str, target_name: str) -> FlextResult[dict[str, object]]:
+    def run_pipeline(
+        self, tap_name: str, target_name: str,
+    ) -> FlextResult[dict[str, object]]:
         """Run pipeline between tap and target."""
         ...
 
@@ -84,7 +87,9 @@ class FlextMeltanoExecutorProtocol(Protocol):
         """Execute a command and return result."""
         ...
 
-    def run_pipeline(self, tap_name: str, target_name: str) -> FlextResult[dict[str, object]]:
+    def run_pipeline(
+        self, tap_name: str, target_name: str,
+    ) -> FlextResult[dict[str, object]]:
         """Execute a pipeline."""
         ...
 
@@ -111,7 +116,9 @@ class FlextSingerUnifiedInterface(ABC):
         ...
 
     @abstractmethod
-    def execute(self, input_data: object | None = None) -> FlextResult[FlextSingerUnifiedResult]:
+    def execute(
+        self, input_data: object | None = None,
+    ) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute operation and return unified result."""
         ...
 

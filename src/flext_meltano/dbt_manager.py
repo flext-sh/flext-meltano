@@ -67,7 +67,9 @@ class FlextDbtPackage:
             models=[str(m) for m in models] if isinstance(models, list) else [],
             macros=[str(m) for m in macros] if isinstance(macros, list) else [],
             seeds=[str(s) for s in seeds] if isinstance(seeds, list) else [],
-            dependencies=[str(d) for d in dependencies] if isinstance(dependencies, list) else [],
+            dependencies=[str(d) for d in dependencies]
+            if isinstance(dependencies, list)
+            else [],
             metadata=metadata if isinstance(metadata, dict) else {},
         )
 
@@ -86,7 +88,9 @@ class FlextDbtPackageManager:
             registry_path: Path to package registry file
 
         """
-        self.registry_path = registry_path or Path.home() / ".flext" / "dbt_packages.json"
+        self.registry_path = (
+            registry_path or Path.home() / ".flext" / "dbt_packages.json"
+        )
         self.packages: dict[str, FlextDbtPackage] = {}
         self._load_registry()
 
@@ -146,7 +150,8 @@ class FlextDbtPackageManager:
             return FlextResult.fail(f"Failed to register package: {e}")
 
     def resolve_dependencies(
-        self, project: str,
+        self,
+        project: str,
     ) -> FlextResult[list[FlextDbtPackage]]:
         """Resolve dependencies for a project.
 
@@ -192,7 +197,9 @@ class FlextDbtPackageManager:
             return FlextResult.fail(f"Failed to resolve dependencies: {e}")
 
     def install_package(
-        self, package: str, version: str,
+        self,
+        package: str,
+        version: str,
     ) -> FlextResult[FlextDbtPackage]:
         """Install a DBT package.
 

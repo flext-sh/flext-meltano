@@ -151,7 +151,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             return FlextResult.ok(None)
 
         except Exception as e:
-            self._logger.exception("Failed to initialize {self._plugin_type} {self.name}")
+            self._logger.exception(
+                "Failed to initialize {self._plugin_type} {self.name}",
+            )
             return FlextResult.fail(f"Initialization failed: {e!s}")
 
     def shutdown(self) -> FlextResult[None]:
@@ -224,7 +226,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             self._logger.info(f"Testing connection for {self._plugin_type} {self.name}")
 
             if not self._config:
-                return FlextResult.fail("No configuration available for connection test")
+                return FlextResult.fail(
+                    "No configuration available for connection test",
+                )
 
             # Perform plugin-specific connection test
             test_result = self._test_specific_connection()
@@ -272,7 +276,9 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
         ...
 
     @abstractmethod
-    def _validate_specific_config(self, config: Mapping[str, object]) -> FlextResult[None]:
+    def _validate_specific_config(
+        self, config: Mapping[str, object],
+    ) -> FlextResult[None]:
         """Perform plugin-specific configuration validation.
 
         Args:
@@ -378,7 +384,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
 
         """
         if not self._discovered_streams:
-            return FlextResult.fail("No streams discovered. Run discover_catalog first.")
+            return FlextResult.fail(
+                "No streams discovered. Run discover_catalog first.",
+            )
 
         invalid_streams = [s for s in stream_names if s not in self._discovered_streams]
         if invalid_streams:
@@ -402,7 +410,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
             if not self._selected_streams:
                 return FlextResult.fail("No streams selected for extraction")
 
-            self._logger.info(f"Extracting data from {len(self._selected_streams)} streams")
+            self._logger.info(
+                f"Extracting data from {len(self._selected_streams)} streams",
+            )
 
             # Record execution in entity if present
             if self._entity:
@@ -412,7 +422,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
             extraction_result = self._extract_tap_data()
 
             if not extraction_result.success and self._entity:
-                self._entity.record_error(extraction_result.error or "Extraction failed")
+                self._entity.record_error(
+                    extraction_result.error or "Extraction failed",
+                )
 
             return extraction_result
 

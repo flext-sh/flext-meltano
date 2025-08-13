@@ -26,6 +26,7 @@ try:
     import pandas as pd
 except ImportError:  # pragma: no cover - optional dependency stub
     from types import SimpleNamespace
+
     pd = SimpleNamespace()  # type: ignore[assignment]
 
 from flext_core import FlextResult, get_logger
@@ -318,7 +319,9 @@ class FlextDbtHub:
 
             sql_result = self._resolve_model_sql(model, context or {})
             if sql_result.is_failure or not sql_result.data:
-                return FlextResult.fail(sql_result.error or "Failed to resolve model SQL")
+                return FlextResult.fail(
+                    sql_result.error or "Failed to resolve model SQL",
+                )
             sql_to_run = sql_result.data
 
             # Execute SQL
@@ -1037,18 +1040,20 @@ class FlextDbtHub:
                 if mock_data:
                     schema_result = self.executor.load_mock_data(mock_data)
                     if not schema_result.success:
-                        error_message = schema_result.error or "Failed to load mock data"
+                        error_message = (
+                            schema_result.error or "Failed to load mock data"
+                        )
 
                 if error_message is None:
                     base_result = self.executor.execute_model(snapshot.sql)
                     if not base_result.success or base_result.data is None:
-                        error_message = base_result.error or "Snapshot base execution failed"
+                        error_message = (
+                            base_result.error or "Snapshot base execution failed"
+                        )
                     else:
                         df = base_result.data
                         if snapshot.unique_key not in df.columns:
-                            error_message = (
-                                f"Unique key column '{snapshot.unique_key}' not present in snapshot data"
-                            )
+                            error_message = f"Unique key column '{snapshot.unique_key}' not present in snapshot data"
                         else:
                             df = df.copy()
                             now = pd.Timestamp.now()
@@ -1058,7 +1063,11 @@ class FlextDbtHub:
                             df["dbt_scd_id"] = (
                                 df[snapshot.unique_key]
                                 .astype(str)
-                                .apply(lambda v: pd.util.hash_pandas_object(pd.Series([v]))[0])
+                                .apply(
+                                    lambda v: pd.util.hash_pandas_object(
+                                        pd.Series([v]),
+                                    )[0],
+                                )
                             )
                             result = FlextResult.ok(df)
 
@@ -1066,7 +1075,11 @@ class FlextDbtHub:
                 return FlextResult.fail(error_message)
             # result is guaranteed when there's no error_message
             logger.info(f"Executed snapshot {snapshot_name} successfully")
-            return result if result is not None else FlextResult.fail("Unknown snapshot error")
+            return (
+                result
+                if result is not None
+                else FlextResult.fail("Unknown snapshot error")
+            )
         except Exception as e:
             return FlextResult.fail(f"Failed to execute snapshot: {e}")
 

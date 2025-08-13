@@ -22,7 +22,7 @@ Example:
     >>> plugin = FlextMeltanoTapPlugin(
     ...     name="tap-csv",
     ...     version="1.0.0",
-    ...     config={"description": "CSV tap for Meltano"}
+    ...     config={"description": "CSV tap for Meltano"},
     ... )
     >>>
     >>> # Use plugin functionality
@@ -152,7 +152,9 @@ class FlextMeltanoTapPlugin(FlextMeltanoPlugin):
     NO MIXING: Uses only flext-core patterns and Meltano execution layer.
     """
 
-    def __init__(self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None) -> None:
+    def __init__(
+        self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None,
+    ) -> None:
         """Initialize Meltano tap plugin."""
         super().__init__(name, version, "tap")
         self._config = config or {}
@@ -175,7 +177,9 @@ class FlextMeltanoTapPlugin(FlextMeltanoPlugin):
             missing_fields = [field for field in required_fields if field not in config]
 
             if missing_fields:
-                return FlextResult.fail(f"Missing required fields for {self.name}: {missing_fields}")
+                return FlextResult.fail(
+                    f"Missing required fields for {self.name}: {missing_fields}",
+                )
 
             return FlextResult.ok(None)
         except Exception as e:
@@ -202,7 +206,9 @@ class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
     NO MIXING: Uses only flext-core interfaces and Meltano-specific functionality.
     """
 
-    def __init__(self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None) -> None:
+    def __init__(
+        self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None,
+    ) -> None:
         """Initialize Meltano target plugin."""
         super().__init__(name, version, "target")
         self._config = config or {}
@@ -223,7 +229,9 @@ class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
             missing_fields = [field for field in required_fields if field not in config]
 
             if missing_fields:
-                return FlextResult.fail(f"Missing required fields for {self.name}: {missing_fields}")
+                return FlextResult.fail(
+                    f"Missing required fields for {self.name}: {missing_fields}",
+                )
 
             return FlextResult.ok(None)
         except Exception as e:

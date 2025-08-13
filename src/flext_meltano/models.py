@@ -4,6 +4,7 @@
 - No duplication across modules
 - Comprehensive domain modeling following DDD patterns
 """
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -62,7 +63,9 @@ class FlextMeltanoExecutionState(FlextModel):
 
     current_pipeline: str | None = Field(default=None)
     execution_id: str | None = Field(default=None)
-    status: FlextMeltanoExecutionStatus = Field(default=FlextMeltanoExecutionStatus.PENDING)
+    status: FlextMeltanoExecutionStatus = Field(
+        default=FlextMeltanoExecutionStatus.PENDING,
+    )
     metadata: dict[str, object] = Field(default_factory=dict)
     started_at: datetime | None = Field(default=None)
     completed_at: datetime | None = Field(default=None)
@@ -75,7 +78,9 @@ class FlextMeltanoPipelineExecution(FlextEntity):
     pipeline_name: str = Field(...)
     tap_name: str = Field(...)
     target_name: str = Field(...)
-    status: FlextMeltanoExecutionStatus = Field(default=FlextMeltanoExecutionStatus.PENDING)
+    status: FlextMeltanoExecutionStatus = Field(
+        default=FlextMeltanoExecutionStatus.PENDING,
+    )
     started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = Field(default=None)
     error_message: str | None = Field(default=None)
@@ -164,9 +169,15 @@ class FlextMeltanoPluginRegistry(FlextModel):
             return FlextResult.fail(f"Plugin '{name}' not found in registry")
         return FlextResult.ok(self.plugins[name])
 
-    def list_plugins_by_type(self, plugin_type: FlextMeltanoPluginType) -> list[FlextMeltanoPlugin]:
+    def list_plugins_by_type(
+        self, plugin_type: FlextMeltanoPluginType,
+    ) -> list[FlextMeltanoPlugin]:
         """List plugins by type."""
-        return [plugin for plugin in self.plugins.values() if plugin.plugin_type == plugin_type]
+        return [
+            plugin
+            for plugin in self.plugins.values()
+            if plugin.plugin_type == plugin_type
+        ]
 
 
 # =============================================================================
@@ -189,7 +200,10 @@ class FlextSingerMessage(FlextValueObject):
         """Validate Singer message constraints."""
         if self.message_type == FlextSingerMessageType.RECORD and not self.record:
             return FlextResult.fail("RECORD message must have record data")
-        if self.message_type == FlextSingerMessageType.SCHEMA and not self.message_schema:
+        if (
+            self.message_type == FlextSingerMessageType.SCHEMA
+            and not self.message_schema
+        ):
             return FlextResult.fail("SCHEMA message must have schema data")
         if self.message_type == FlextSingerMessageType.STATE and not self.state:
             return FlextResult.fail("STATE message must have state data")
@@ -214,6 +228,7 @@ class FlextSingerCatalog(FlextModel):
         super().__init__(**kwargs)
         # Tests expect a _logger attribute to exist
         from flext_core import get_logger as _get_logger
+
         # logger setup compatible with pydantic BaseModel immutability
         object.__setattr__(self, "_logger", _get_logger(self.__class__.__name__))
         # Backward-compatibility: also maintain an internal _catalog structure
@@ -254,7 +269,12 @@ class FlextSingerCatalog(FlextModel):
                         continue
                     breadcrumb = entry.get("breadcrumb", [])
                     md = entry.get("metadata", {})
-                    if breadcrumb == [] and isinstance(md, dict) and md.get("selected") is True and sid:
+                    if (
+                        breadcrumb == []
+                        and isinstance(md, dict)
+                        and md.get("selected") is True
+                        and sid
+                    ):
                         selected.append(sid)
                         break
             return FlextResult.ok(selected)
@@ -271,7 +291,11 @@ class FlextSingerCatalog(FlextModel):
 
     def get_stream_names(self) -> list[str]:
         """Get list of stream names."""
-        return [str(stream.get("tap_stream_id", "")) for stream in self.streams if "tap_stream_id" in stream]
+        return [
+            str(stream.get("tap_stream_id", ""))
+            for stream in self.streams
+            if "tap_stream_id" in stream
+        ]
 
 
 # =============================================================================
@@ -349,7 +373,9 @@ class FlextMeltanoBridgeResponse(FlextModel):
     """Bridge response model for Go integration."""
 
     success: bool = Field(...)
-    data: dict[str, object] | list[object] | str | int | float | None = Field(default=None)
+    data: dict[str, object] | list[object] | str | int | float | None = Field(
+        default=None,
+    )
     error: str | None = Field(default=None)
     correlation_id: str | None = Field(default=None)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))

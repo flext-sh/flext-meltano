@@ -9,6 +9,7 @@ This module replaces the inline definition that used to live in `base.py`.
 
 All code is production-grade, fully typed, and SOLID compliant.
 """
+
 from __future__ import annotations
 
 import contextlib

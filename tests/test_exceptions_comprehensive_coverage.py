@@ -102,7 +102,7 @@ class TestFlextMeltanoConfigurationError:
     def test_configuration_error_with_config_context(self):
         """Test configuration error with config context."""
         error = FlextMeltanoConfigurationError(
-            "Invalid config", config_file="meltano.yml", section="plugins"
+            "Invalid config", config_file="meltano.yml", section="plugins",
         )
 
         assert error.context["context"]["config_file"] == "meltano.yml"
@@ -126,7 +126,7 @@ class TestFlextMeltanoConnectionError:
     def test_connection_error_with_details(self):
         """Test connection error with connection details."""
         error = FlextMeltanoConnectionError(
-            "Database unreachable", host="localhost", port=5432, timeout=30
+            "Database unreachable", host="localhost", port=5432, timeout=30,
         )
 
         assert error.context["context"]["host"] == "localhost"
@@ -205,7 +205,7 @@ class TestFlextMeltanoTimeoutError:
     def test_timeout_error_with_timing_context(self):
         """Test timeout error with timing context."""
         error = FlextMeltanoTimeoutError(
-            "Sync timeout", timeout=300, elapsed=450, operation="sync"
+            "Sync timeout", timeout=300, elapsed=450, operation="sync",
         )
 
         assert error.context["context"]["timeout"] == 300
@@ -355,16 +355,16 @@ class TestExceptionsIntegration:
         assert isinstance(processing_error, Exception)
         assert isinstance(timeout_error, Exception)
         assert isinstance(
-            plugin_error, FlextMeltanoError
+            plugin_error, FlextMeltanoError,
         )  # Direct FlextMeltanoError inheritance
         assert isinstance(
-            execution_error, FlextMeltanoError
+            execution_error, FlextMeltanoError,
         )  # Direct FlextMeltanoError inheritance
         assert isinstance(
-            singer_error, FlextMeltanoError
+            singer_error, FlextMeltanoError,
         )  # Direct FlextMeltanoError inheritance
         assert isinstance(
-            dbt_error, FlextMeltanoError
+            dbt_error, FlextMeltanoError,
         )  # Direct FlextMeltanoError inheritance
 
     def test_exception_context_preservation(self):
@@ -389,7 +389,7 @@ class TestExceptionsIntegration:
 
             # Some exceptions have nested context, others have direct context
             if "context" in exception.context and isinstance(
-                exception.context["context"], dict
+                exception.context["context"], dict,
             ):
                 # Nested context structure
                 assert exception.context["context"]["key"] == "value"

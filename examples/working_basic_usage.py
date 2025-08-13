@@ -95,8 +95,8 @@ def demo_health_checks() -> None:
                 health_data = health_result.data
                 if isinstance(health_data, dict):
                     pass
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Health check failed: {e}")
 
 
 def demo_validation() -> None:
@@ -135,8 +135,8 @@ def demo_deprecation_warnings() -> None:
             if result.success:
                 pass
 
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Validation demo failed: {e}")
 
 
 def main() -> None:

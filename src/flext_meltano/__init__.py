@@ -56,7 +56,7 @@ Example:
     >>> config = FlextMeltanoConfig(
     ...     meltano_project_root="/path/to/meltano/project",
     ...     environment="production",
-    ...     enable_monitoring=True
+    ...     enable_monitoring=True,
     ... )
     >>>
     >>> # Initialize bridge and execute pipeline

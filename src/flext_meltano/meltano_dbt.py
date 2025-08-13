@@ -82,6 +82,7 @@ except Exception:  # pragma: no cover
 
 try:
     from jinja2 import Environment as _RealJinjaEnvironment
+
     _JINJA_AVAILABLE = True
 except Exception:  # pragma: no cover
     _RealJinjaEnvironment = None  # type: ignore[misc,assignment]
@@ -99,6 +100,7 @@ class _JinjaLike(Protocol):
 if _JINJA_AVAILABLE:
     JINJA_ENV_CLS: type[_JinjaLike] | None = _RealJinjaEnvironment
 else:
+
     class _DummyTemplate:  # pragma: no cover
         def __init__(self, s: str) -> None:
             self._s = s
@@ -625,7 +627,9 @@ class FlextDbtInMemoryExecutor:
                     actual_columns = set(df.columns)
                     exp_cols = expected.get("columns", [])
                     expected_columns = set(
-                        [str(c) for c in exp_cols] if isinstance(exp_cols, list) else [],
+                        [str(c) for c in exp_cols]
+                        if isinstance(exp_cols, list)
+                        else [],
                     )
                     validations["columns"] = {
                         "expected": list(expected_columns),
@@ -838,7 +842,9 @@ class FlextDbtHub:
         )
 
         try:
-            self.executor: FlextDbtInMemoryExecutor | None = FlextDbtInMemoryExecutor(database)
+            self.executor: FlextDbtInMemoryExecutor | None = FlextDbtInMemoryExecutor(
+                database,
+            )
         except ImportError:
             logger.warning("DuckDB/pandas not available, in-memory execution disabled")
             self.executor = None
@@ -928,18 +934,24 @@ class FlextDbtHub:
             if not sql_text.upper().startswith(("SELECT", "WITH")):
                 model_result = self.model_registry.get_model(sql_text)
                 if not model_result.success or not model_result.data:
-                    return FlextResult.fail(model_result.error or f"Model not found: {sql_text}")
+                    return FlextResult.fail(
+                        model_result.error or f"Model not found: {sql_text}",
+                    )
                 compile_result = self.model_registry.compile_model(
                     model_result.data,
                     context or {},
                 )
                 if not compile_result.success or not compile_result.data:
-                    return FlextResult.fail(compile_result.error or "Failed to compile model")
+                    return FlextResult.fail(
+                        compile_result.error or "Failed to compile model",
+                    )
                 sql_text = compile_result.data
 
             result = self.executor.execute_model(sql_text, data_frames)  # type: ignore[arg-type]
             logger.info(
-                "DBT model executed successfully" if result.success else f"DBT model execution failed: {result.error}",
+                "DBT model executed successfully"
+                if result.success
+                else f"DBT model execution failed: {result.error}",
             )
             return result  # type: ignore[return-value]
         except Exception as e:

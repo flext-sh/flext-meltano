@@ -50,13 +50,13 @@ def example_1_traditional_approach() -> dict[str, Any]:
 
     # Step 2: Write configuration files manually
     with tempfile.NamedTemporaryFile(
-        encoding="utf-8", mode="w", suffix=".json", delete=False
+        encoding="utf-8", mode="w", suffix=".json", delete=False,
     ) as f:
         json.dump(tap_config, f)
         tap_config_path = f.name
 
     with tempfile.NamedTemporaryFile(
-        encoding="utf-8", mode="w", suffix=".json", delete=False
+        encoding="utf-8", mode="w", suffix=".json", delete=False,
     ) as f:
         json.dump(target_config, f)
         target_config_path = f.name
@@ -98,7 +98,7 @@ def example_1_traditional_approach() -> dict[str, Any]:
 
         # Step 6: Write catalog file
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".json", delete=False
+            encoding="utf-8", mode="w", suffix=".json", delete=False,
         ) as f:
             json.dump(catalog, f)
             catalog_path = f.name
@@ -204,10 +204,10 @@ def example_2_traditional_config_management() -> dict[str, Any]:
             return False
 
         # Constants for port validation
-        MIN_PORT = 1
-        MAX_PORT = 65535
+        min_port = 1
+        max_port = 65535
 
-        if not (MIN_PORT <= config["port"] <= MAX_PORT):
+        if not (min_port <= config["port"] <= max_port):
             return False
 
         return config["host"].strip()
@@ -327,7 +327,7 @@ print(json.dumps(result))
 
         # Write bridge script
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write(bridge_script)
             script_path = f.name

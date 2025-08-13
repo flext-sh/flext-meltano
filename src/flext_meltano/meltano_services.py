@@ -218,7 +218,10 @@ class FlextMeltanoJobEntity(FlextEntity):
         )
 
     def complete(
-        self, *, is_success: bool = True, error_message: str | None = None,
+        self,
+        *,
+        is_success: bool = True,
+        error_message: str | None = None,
     ) -> None:
         """Complete job execution."""
         self.status = "completed" if is_success else "failed"
@@ -593,7 +596,14 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
             return FlextResult.ok(
                 {"streams": [], "tap_name": tap_name, "discovery_completed": True},
             )
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             return FlextResult.fail(f"Catalog discovery failed: {e}")
 
     def validate_stream_selection(
@@ -706,7 +716,14 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
 
             return FlextResult.ok(result)
 
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             pipeline.complete(is_success=False, error_message=str(e))
             return FlextResult.fail(f"Pipeline execution failed: {e}")
 
@@ -743,12 +760,21 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
                     {
                         "model": model,
                         "success": exec_result.success,
-                        "rows": len(exec_result.data) if exec_result.success and exec_result.data is not None else 0,
+                        "rows": len(exec_result.data)
+                        if exec_result.success and exec_result.data is not None
+                        else 0,
                     },
                 )
             results["count"] = len(models)
             return FlextResult.ok(results)
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             return FlextResult.fail(f"DBT execution failed: {e}")
 
 
@@ -788,7 +814,14 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
                     f"Extension failed: {data.get('stderr') or data.get('stdout')}",
                 )
             return FlextResult.fail(exec_result.error or "Extension execution failed")
-        except (OSError, ConnectionError, TimeoutError, TypeError, ValueError, RuntimeError) as e:
+        except (
+            OSError,
+            ConnectionError,
+            TimeoutError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             return FlextResult.fail(f"Extension execution failed: {e}")
 
     def execute(self) -> FlextResult[dict[str, object]]:

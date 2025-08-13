@@ -51,7 +51,7 @@ def example_real_pipeline_builder() -> None:
 
 def example_real_config_service() -> None:
     """Example using real configuration service with validation."""
-    # TODO(developer): Implement when config service is available
+    # Placeholder: implement when config service is available
     # config_service = create_flext_meltano_config_service()
 
 
@@ -62,8 +62,13 @@ def example_real_config_service() -> None:
 
 def example_real_singer_processing() -> None:
     """Example using real Singer utilities with validation."""
-    # TODO(developer): Implement when singer utils are available
-    # singer_utils = create_flext_meltano_singer_utils()
+    # Placeholder: implement when singer utils are available
+    singer_utils = None  # Placeholder for flext_meltano_singer_utils
+    schema = {}  # Placeholder schema definition
+
+    if singer_utils is None:
+        print("Singer utils not yet implemented - placeholder example")
+        return
 
     schema_msg = singer_utils.flext_meltano_create_singer_schema(
         "users",
@@ -137,7 +142,7 @@ def example_real_singer_processing() -> None:
 
 def example_real_config_validation() -> None:
     """Example using real configuration validator with schemas."""
-    # TODO(developer): Implement when config validator is available
+    # Placeholder: implement when config validator is available
     # validator = create_flext_meltano_config_validator()
 
 
@@ -146,18 +151,18 @@ def example_real_config_validation() -> None:
 # =============================================================================
 
 
-# @flext_meltano_safe_operation("demo_etl_job")  # TODO(developer): Implement when decorator is available
-def example_decorated_operation():
+# @flext_meltano_safe_operation("demo_etl_job")  # Placeholder: decorator will be added when available
+def example_decorated_operation() -> dict[str, float | int | str]:
     """Example using decorator for automatic error handling."""
     # Constants for simulation
-    SUCCESS_RATE = 0.8  # 80% success rate
+    success_rate = 0.8  # 80% success rate
 
     # Simulate some ETL work that might fail
 
-    if random.random() < SUCCESS_RATE:  # 80% success rate
+    if random.random() < success_rate:  # noqa: S311 - non-crypto example
         return {
-            "records_processed": random.randint(100, 1000),
-            "duration_seconds": random.uniform(5.0, 30.0),
+            "records_processed": random.randint(100, 1000),  # noqa: S311 - example
+            "duration_seconds": random.uniform(5.0, 30.0),  # noqa: S311 - example
             "status": "completed",
         }
     # Simulate failure
@@ -168,10 +173,7 @@ def example_decorated_operation():
 def example_decorator_usage() -> None:
     """Example showing decorator automatically handling success/failure."""
     for _i in range(5):
-        result = example_decorated_operation()
-
-        if result.success:
-            pass
+        _ = example_decorated_operation()
 
 
 # =============================================================================
@@ -181,7 +183,7 @@ def example_decorator_usage() -> None:
 
 async def example_async_pipeline() -> None:
     """Example showing async pipeline execution."""
-    # TODO(developer): Implement when pipeline builder is available
+    # Placeholder: implement when pipeline builder is available
     # pipeline = (
     #     create_flext_meltano_pipeline()
     #     .from_mysql(
@@ -197,6 +199,13 @@ async def example_async_pipeline() -> None:
     #     )
     #     .with_environment("production")
     # )
+
+    # pipeline is not defined in this example - this is placeholder code
+    pipeline = None  # Placeholder for actual pipeline implementation
+
+    if pipeline is None:
+        print("Pipeline implementation not yet available - placeholder example")
+        return
 
     try:
         result = await pipeline.run()

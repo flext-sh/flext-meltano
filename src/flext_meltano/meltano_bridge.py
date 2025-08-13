@@ -46,6 +46,7 @@ patterns, and common utilities into a single PEP8-compliant module.
 
 All code is production-grade, fully typed, and SOLID compliant.
 """
+
 from __future__ import annotations
 
 import sys
@@ -102,7 +103,9 @@ def validate_directory_path(path: str | Path) -> FlextResult[Path]:
         return FlextResult.fail(f"Directory validation failed: {e}")
 
 
-def validate_file_path(path: str | Path, *, must_exist: bool = True) -> FlextResult[Path]:
+def validate_file_path(
+    path: str | Path, *, must_exist: bool = True,
+) -> FlextResult[Path]:
     """Validate file path with security checks."""
     try:
         path_obj = Path(path).resolve()
@@ -138,7 +141,9 @@ def validate_file_path(path: str | Path, *, must_exist: bool = True) -> FlextRes
         return FlextResult.fail(f"File validation failed: {e}")
 
 
-def _coerce_value_to_expected_type(value: object, expected_type: type) -> FlextResult[object]:
+def _coerce_value_to_expected_type(
+    value: object, expected_type: type,
+) -> FlextResult[object]:
     """Coerce `value` to `expected_type` when safe and reasonable."""
     if isinstance(value, expected_type):
         return FlextResult.ok(value)
@@ -155,7 +160,9 @@ def _coerce_value_to_expected_type(value: object, expected_type: type) -> FlextR
         except ValueError:
             return FlextResult.fail(f"Expected int, got {type(value).__name__}")
 
-    return FlextResult.fail(f"Expected {expected_type.__name__}, got {type(value).__name__}")
+    return FlextResult.fail(
+        f"Expected {expected_type.__name__}, got {type(value).__name__}",
+    )
 
 
 def _validate_and_sanitize_string(value: str) -> FlextResult[object]:
@@ -176,7 +183,11 @@ def validate_config_value(
     """Validate configuration value with type checking."""
     try:
         if value is None:
-            return FlextResult.ok(None) if allow_none else FlextResult.fail("Value cannot be None")
+            return (
+                FlextResult.ok(None)
+                if allow_none
+                else FlextResult.fail("Value cannot be None")
+            )
 
         # Type coercion when possible
         coerced = _coerce_value_to_expected_type(value, expected_type)
@@ -192,6 +203,7 @@ def validate_config_value(
 
     except Exception as e:
         return FlextResult.fail(f"Value validation failed: {e}")
+
 
 # =============================================================================
 # VALIDATION FRAMEWORK (from validation.py)
@@ -215,7 +227,9 @@ class FlextMeltanoValidator:
             # Validate project root directory
             root_validation = validate_directory_path(project_root)
             if not root_validation.success:
-                return FlextResult.fail(f"Project root validation failed: {root_validation.error}")
+                return FlextResult.fail(
+                    f"Project root validation failed: {root_validation.error}",
+                )
 
             validation_results["project_root"] = {
                 "path": str(project_root),
@@ -243,10 +257,12 @@ class FlextMeltanoValidator:
                 "path": str(meltano_dir),
             }
 
-            return FlextResult.ok({
-                "project_valid": True,
-                "validation_results": validation_results,
-            })
+            return FlextResult.ok(
+                {
+                    "project_valid": True,
+                    "validation_results": validation_results,
+                },
+            )
 
         except Exception as e:
             return FlextResult.fail(f"Project validation failed: {e}")
@@ -277,7 +293,11 @@ class FlextMeltanoValidator:
             else:
                 required_fields = []
 
-            missing_fields = [field for field in required_fields if field not in config or not config[field]]
+            missing_fields = [
+                field
+                for field in required_fields
+                if field not in config or not config[field]
+            ]
 
             if missing_fields:
                 return FlextResult.fail(f"Missing required fields: {missing_fields}")
@@ -294,13 +314,18 @@ class FlextMeltanoValidator:
                 if isinstance(host, str) and host.strip():
                     validation_results["host"] = {"valid": True, "value": host}
                 else:
-                    validation_results["host"] = {"valid": False, "error": "Invalid host"}
+                    validation_results["host"] = {
+                        "valid": False,
+                        "error": "Invalid host",
+                    }
 
-            return FlextResult.ok({
-                "tap_name": tap_name,
-                "connection_valid": True,
-                "validation_results": validation_results,
-            })
+            return FlextResult.ok(
+                {
+                    "tap_name": tap_name,
+                    "connection_valid": True,
+                    "validation_results": validation_results,
+                },
+            )
 
         except Exception as e:
             return FlextResult.fail(f"Tap connection validation failed: {e}")
@@ -328,7 +353,11 @@ class FlextMeltanoValidator:
             else:
                 required_fields = []
 
-            missing_fields = [field for field in required_fields if field not in config or not config[field]]
+            missing_fields = [
+                field
+                for field in required_fields
+                if field not in config or not config[field]
+            ]
 
             validation_results["required_fields"] = {
                 "checked": required_fields,
@@ -336,14 +365,17 @@ class FlextMeltanoValidator:
                 "valid": len(missing_fields) == 0,
             }
 
-            return FlextResult.ok({
-                "target_name": target_name,
-                "connection_valid": len(missing_fields) == 0,
-                "validation_results": validation_results,
-            })
+            return FlextResult.ok(
+                {
+                    "target_name": target_name,
+                    "connection_valid": len(missing_fields) == 0,
+                    "validation_results": validation_results,
+                },
+            )
 
         except Exception as e:
             return FlextResult.fail(f"Target connection validation failed: {e}")
+
 
 # =============================================================================
 # PLUGIN IMPLEMENTATION PATTERNS
@@ -373,7 +405,9 @@ def create_meltano_tap_plugin(
         # Validate business rules
         validation_result = plugin.validate_business_rules()
         if not validation_result.success:
-            return FlextResult.fail(f"Plugin validation failed: {validation_result.error}")
+            return FlextResult.fail(
+                f"Plugin validation failed: {validation_result.error}",
+            )
 
         return FlextResult.ok(plugin)
 
@@ -404,12 +438,15 @@ def create_meltano_target_plugin(
         # Validate business rules
         validation_result = plugin.validate_business_rules()
         if not validation_result.success:
-            return FlextResult.fail(f"Plugin validation failed: {validation_result.error}")
+            return FlextResult.fail(
+                f"Plugin validation failed: {validation_result.error}",
+            )
 
         return FlextResult.ok(plugin)
 
     except Exception as e:
         return FlextResult.fail(f"Failed to create target plugin: {e}")
+
 
 # =============================================================================
 # BRIDGE INTEGRATION (from simple_bridge.py)
@@ -459,8 +496,12 @@ class FlextMeltanoBridge:
 
         """
         try:
-            plugins = self._plugin_registry.list_plugins_by_type(FlextMeltanoPluginType.EXTRACTORS)
-            targets = self._plugin_registry.list_plugins_by_type(FlextMeltanoPluginType.LOADERS)
+            plugins = self._plugin_registry.list_plugins_by_type(
+                FlextMeltanoPluginType.EXTRACTORS,
+            )
+            targets = self._plugin_registry.list_plugins_by_type(
+                FlextMeltanoPluginType.LOADERS,
+            )
 
             return {
                 "success": True,
@@ -625,7 +666,9 @@ class FlextMeltanoBridge:
 
         """
         try:
-            result = create_meltano_tap_plugin(name, namespace, pip_url, executable, config)
+            result = create_meltano_tap_plugin(
+                name, namespace, pip_url, executable, config,
+            )
 
             if result.success and result.data:
                 plugin = result.data

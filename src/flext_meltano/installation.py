@@ -42,6 +42,7 @@ class FlextMeltanoInstallationContext:
 
 # Use centralized FlextMeltanoPluginInfo from common_schemas
 
+
 class FlextMeltanoInstaller:
     """Plugin installer using MANDATORY patterns."""
 
@@ -148,7 +149,9 @@ class FlextMeltanoInstaller:
         if result.success and result.data:
             # Add context metadata to plugin info
             plugin_info = result.data
-            plugin_info.description = f"{plugin_info.description} (env: {context.environment})"
+            plugin_info.description = (
+                f"{plugin_info.description} (env: {context.environment})"
+            )
 
         return result
 
@@ -217,7 +220,9 @@ class FlextMeltanoInstaller:
         return self.list_installed_plugins()
 
     def _convert_plugin_list(
-        self, plugin_type: str, plugin_list: list[dict[str, object]],
+        self,
+        plugin_type: str,
+        plugin_list: list[dict[str, object]],
     ) -> list[FlextMeltanoPluginInfo]:
         """Convert raw plugin list dictionaries into FlextMeltanoPluginInfo objects."""
         converted: list[FlextMeltanoPluginInfo] = []

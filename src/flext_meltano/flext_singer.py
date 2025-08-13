@@ -306,7 +306,9 @@ class FlextSingerBridge:
                     result = self._create_record_message(
                         stream=stream,
                         record=cast("dict[str, object]", record),
-                        time_extracted=cast("str | None", time_extracted) if isinstance(time_extracted, str) else None,
+                        time_extracted=cast("str | None", time_extracted)
+                        if isinstance(time_extracted, str)
+                        else None,
                     )
                 else:
                     result = FlextResult(error="Invalid arguments for RECORD message")
@@ -318,14 +320,18 @@ class FlextSingerBridge:
                     result = self._create_schema_message(
                         stream=stream,
                         schema=cast("dict[str, object]", schema),
-                        key_properties=cast("list[str] | None", key_properties) if isinstance(key_properties, list) else None,
+                        key_properties=cast("list[str] | None", key_properties)
+                        if isinstance(key_properties, list)
+                        else None,
                     )
                 else:
                     result = FlextResult(error="Invalid arguments for SCHEMA message")
             elif message_type == "STATE":
                 value = kwargs.get("value")
                 if isinstance(value, dict):
-                    result = self._create_state_message(value=cast("dict[str, object]", value))
+                    result = self._create_state_message(
+                        value=cast("dict[str, object]", value),
+                    )
                 else:
                     result = FlextResult(error="Invalid arguments for STATE message")
             else:

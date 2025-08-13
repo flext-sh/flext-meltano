@@ -439,13 +439,14 @@ def example_4_new_way() -> None:
 
 async def example_5_old_way() -> None:
     """ANTES: Pipeline async manual com 45+ linhas."""
-    project_root = Path("/tmp/async_project")
+    # Use a safe temporary directory for examples
+    project_root = Path(tempfile.mkdtemp(prefix="async_project_"))
 
     async def run_pipeline_async(tap: str, target: str) -> dict:
         """Run pipeline in executor with full error handling."""
         loop = asyncio.get_event_loop()
 
-        def _run_sync():
+        def _run_sync() -> dict:
             try:
                 # Setup (10 lines)
                 env = {"MELTANO_ENVIRONMENT": "dev"}
@@ -521,7 +522,7 @@ async def example_5_new_way() -> None:
     # Simulate async execution with real API
     loop = asyncio.get_event_loop()
 
-    def run_job():
+    def run_job() -> object:
         return flext_meltano_execute_job("tap-csv", "target-csv")
 
     result1 = await loop.run_in_executor(None, run_job)
@@ -539,7 +540,7 @@ async def example_5_new_way() -> None:
 
 def example_6_old_way() -> None:
     """ANTES: Health check manual com 40+ linhas."""
-    project_root = Path("/tmp/health_project")
+    project_root = Path(tempfile.mkdtemp(prefix="health_project_"))
     health = {"healthy": True, "issues": []}
 
     # Check Meltano CLI (10 lines)
@@ -624,7 +625,7 @@ def example_6_old_way() -> None:
 def example_6_new_way() -> None:
     """DEPOIS: Health check ultra-simplificado - 1 linha."""
     # 1 LINHA substitui 45+ linhas using REAL API
-    config = FlextMeltanoConfig(project_root="/tmp/health_project")
+    config = FlextMeltanoConfig(project_root="./.tmp_health_project")
 
     create_executor(config)
 

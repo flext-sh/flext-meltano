@@ -256,7 +256,8 @@ class FlextDbtInMemoryExecutor:
             try:
                 # Type-safe conversion: cast to int-compatible type
                 if raw_expected is not None and isinstance(
-                    raw_expected, (int, float, str),
+                    raw_expected,
+                    (int, float, str),
                 ):
                     expected_count = int(raw_expected)
                 else:
