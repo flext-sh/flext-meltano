@@ -71,7 +71,7 @@ def example_1_traditional_approach() -> dict[str, Any]:
             tap_config_path,
         ]
 
-        discovery_result = subprocess.run(  # noqa: S603 - Meltano CLI for example
+        discovery_result = subprocess.run(
             discovery_cmd,
             capture_output=True,
             text=True,
@@ -115,7 +115,7 @@ def example_1_traditional_approach() -> dict[str, Any]:
             catalog_path,
         ]
 
-        pipeline_result = subprocess.run(  # noqa: S603 - Meltano CLI for example
+        pipeline_result = subprocess.run(
             pipeline_cmd,
             capture_output=True,
             text=True,
@@ -333,8 +333,8 @@ print(json.dumps(result))
             script_path = f.name
 
         # Execute bridge script
-        bridge_result = subprocess.run(  # noqa: S603 - Python script execution for example
-            ["python", script_path, "version"],  # noqa: S607 - Python interpreter for example
+        bridge_result = subprocess.run(
+            [sys.executable, script_path, "version"],
             capture_output=True,
             text=True,
             check=False,
