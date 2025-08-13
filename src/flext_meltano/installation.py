@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -258,23 +257,12 @@ class FlextMeltanoInstaller:
         that validate error handling paths.
         """
         try:
-            import subprocess
-
-            # Find meltano executable safely
-            meltano_path = shutil.which("meltano")
-            if not meltano_path:
-                return FlextResult(error="meltano executable not found in PATH")
-
-            # shutil.which() returns system PATH executable - safe for subprocess
-            completed = subprocess.run(  # noqa: S603
-                [meltano_path, "list", "plugins"],
-                check=False, capture_output=True,
-                text=True,
-                cwd=str(self.project_root),
-            )
-            if completed.returncode != 0:
-                return FlextResult(error=f"Plugin list failed: {completed.stderr or completed.stdout}")
-            return FlextResult(data=completed.stdout)
+            executor = FlextMeltanoExecutor(self.config)
+            result = executor.run_command(["list", "plugins"])
+            if not result.success or not result.data:
+                return FlextResult(error=result.error or "Plugin list failed")
+            stdout = str(result.data.get("stdout", ""))
+            return FlextResult.ok({"stdout": stdout})
         except Exception as e:  # pragma: no cover - defensive
             return FlextResult(error=f"Execution failed: {e}")
 
@@ -290,42 +278,15 @@ class FlextMeltanoInstaller:
         This simplified implementation shells out to `meltano install` and
         maps common failure modes into FlextResult.
         """
-        import subprocess
-
         try:
-            # Validate environment but proceed even if it fails (tests patch validate)
             _ = self.validate()
-
-            # Find meltano executable safely
-            meltano_path = shutil.which("meltano")
-            if not meltano_path:
-                return FlextResult(error="meltano executable not found in PATH")
-
-            # shutil.which() returns system PATH executable - safe for subprocess
-            # noqa: S603
-            completed = subprocess.run(
-                [meltano_path, "install"],
-                check=False, capture_output=True,
-                text=True,
-                cwd=str(self.project_root),
-            )
-
-            if completed.returncode != 0:
-                return FlextResult(
-                    error=f"Plugin install failed: {completed.stderr or completed.stdout}",
-                )
+            executor = FlextMeltanoExecutor(self.config)
+            result = executor.run_command(["install"])
+            if not result.success:
+                return FlextResult(error=result.error or "Plugin install failed")
             return FlextResult(data=True)
-
         except Exception as e:
-            # Map specific exceptions to user-friendly messages
-            error_mapping = {
-                subprocess.TimeoutExpired: "Plugin install timed out",
-                subprocess.CalledProcessError: "Plugin install error",
-                OSError: f"Plugin install error: {e}",
-            }
-
-            error_msg = error_mapping.get(type(e), f"Unexpected install error: {e}")
-            return FlextResult(error=error_msg)
+            return FlextResult(error=f"Unexpected install error: {e}")
 
     def _convert_plugin_list(
         self,

@@ -254,19 +254,15 @@ from __future__ import annotations
 
 import asyncio
 import importlib
-import subprocess
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_core import FlextModel, FlextResult
 from pydantic import Field
 
 from flext_meltano.common import injectable
-
-if TYPE_CHECKING:
-    from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 
 # Legacy functions provided here for compatibility using modern services
 
@@ -416,7 +412,7 @@ class FlextMeltanoValidationService:
             # Fallback to direct Singer SDK test
             return await self._test_connection_direct(tap_name, config or {}, context)
 
-        except (TimeoutError, OSError, subprocess.CalledProcessError) as e:
+        except (TimeoutError, OSError) as e:
             return FlextResult(error=f"Connection test failed: {e}")
 
     async def _test_connection_subprocess(
@@ -479,7 +475,7 @@ class FlextMeltanoValidationService:
 
             return FlextResult(data=validation_result)
 
-        except (TimeoutError, OSError, subprocess.CalledProcessError) as e:
+        except (TimeoutError, OSError) as e:
             return FlextResult(error=f"Subprocess connection test failed: {e}")
 
     async def _test_connection_direct(
@@ -715,8 +711,6 @@ async def flext_meltano_test_tap_connection(
 ) -> dict[str, object]:
     """Test tap connection and return legacy-compatible dict."""
     try:
-        from flext_meltano.config import FlextMeltanoConfig
-
         service = FlextMeltanoValidationService(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
@@ -731,8 +725,6 @@ def flext_meltano_validate_project(
 ) -> dict[str, object]:
     """Validate project and return legacy-compatible dict."""
     try:
-        from flext_meltano.config import FlextMeltanoConfig
-
         service = FlextMeltanoValidationService(
             FlextMeltanoConfig(project_root=str(project_root or Path.cwd())),
         )

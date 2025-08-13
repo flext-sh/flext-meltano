@@ -452,6 +452,7 @@ def flext_meltano_create_dbt_runner(
 
 # Version information
 __version__ = "2.0.0-enterprise"
+__version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
 
 # === PUBLIC API ===
 __all__: list[str] = [
@@ -525,6 +526,7 @@ __all__: list[str] = [
     "Tap",
     "Target",
     "__version__",
+    "__version_info__",
     "configure_meltano_container",
     "configure_meltano_services",
     "create_dbt_hub",

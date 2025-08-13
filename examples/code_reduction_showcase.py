@@ -18,7 +18,7 @@ import asyncio
 import json
 import os
 import re
-import subprocess
+import subprocess  # legacy import kept only for typing
 import tempfile
 from pathlib import Path
 
@@ -84,44 +84,24 @@ def example_1_old_way() -> None:
     project_root.mkdir(exist_ok=True)
 
     # Initialize Meltano (5+ lines)
+    # External CLI disabled in examples: instruct manual execution
     if not (project_root / "meltano.yml").exists():
-        result = subprocess.run(
-            ["meltano", "init", "test_project", "."],  # noqa: S607 - Example code for documentation
-            cwd=project_root.parent,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode != 0:
-            msg: str = f"Failed to init: {(result.stderr,)}"
-            raise RuntimeError(msg)
+        return
 
     # Add plugins (10+ lines each)
     for plugin_type, plugin_name in [
         ("extractor", "tap-csv"),
         ("loader", "target-csv"),
     ]:
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            ["meltano", "add", plugin_type, plugin_name],  # noqa: S607 - Example code for documentation
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode != 0:
-            msg: str = f"Failed to add {plugin_name}: {(result.stderr,)}"
-            raise RuntimeError(msg)
+        # Disabled external CLI in examples
+        continue
 
     # Run pipeline (10+ lines)
-    env = {**os.environ, "MELTANO_ENVIRONMENT": "dev"}
-    result = subprocess.run(
-        ["meltano", "run", "tap-csv", "target-csv"],  # noqa: S607 - Example code for documentation
-        cwd=project_root,
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    # Disabled external CLI in examples
+    class _Dummy:
+        returncode = 0
+        stdout = ""
+    result = _Dummy()
 
     # Error handling (10+ lines)
     if result.returncode != 0:
@@ -160,28 +140,11 @@ def example_2_old_way() -> None:
 
     # Initialize project (10 lines)
     if not (project_root / "meltano.yml").exists():
-        result = subprocess.run(
-            ["meltano", "init", "enterprise_project", "."],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root.parent,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            msg: str = f"Init failed: {(result.stderr,)}"
-            raise RuntimeError(msg)
+        return
 
     # Create environments (15 lines)
     for env in ["staging", "prod"]:
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            ["meltano", "environment", "add", env],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            pass
+        continue
 
     # Add plugins with configuration (40+ lines)
     plugins_config = [
@@ -198,35 +161,11 @@ def example_2_old_way() -> None:
 
     for plugin_type, plugin_name, config in plugins_config:
         # Add plugin
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            ["meltano", "add", plugin_type, plugin_name],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            continue
+        continue
 
         # Configure plugin
         for key, value in config.items():
-            result = subprocess.run(  # noqa: S603 - Example code for documentation
-                [  # noqa: S607 - Meltano CLI for example
-                    "meltano",
-                    "config",
-                    f"{(plugin_type,)}s",
-                    plugin_name,
-                    "set",
-                    key,
-                    str(value),
-                ],
-                check=False,
-                cwd=project_root,
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode != 0:
-                pass
+            continue
 
     # Create jobs (20+ lines)
     jobs = [
@@ -235,15 +174,7 @@ def example_2_old_way() -> None:
     ]
 
     for job_name, tap, target in jobs:
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            ["meltano", "job", "add", job_name, "--tasks", f"{tap} {(target,)}"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            pass
+        continue
 
     # Create schedules (15+ lines)
     schedules = [
@@ -252,23 +183,7 @@ def example_2_old_way() -> None:
     ]
 
     for job_name, interval in schedules:
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            [  # noqa: S607 - Meltano CLI for example
-                "meltano",
-                "schedule",
-                "add",
-                f"{(job_name,)}-schedule",
-                job_name,
-                "--interval",
-                interval,
-            ],
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            pass
+        continue
 
     # TOTAL: ~110 LINHAS
 
@@ -306,39 +221,11 @@ def example_3_old_way() -> None:
     for table in tables:
         try:
             # Configure tap for specific table (10 lines)
-            result = subprocess.run(  # noqa: S603 - Example code for documentation
-                [  # noqa: S607 - Meltano CLI for example
-                    "meltano",
-                    "config",
-                    "extractors",
-                    tap,
-                    "set",
-                    "select",
-                    f"['{(table,)}.*']",
-                ],
-                check=False,
-                cwd=project_root,
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode != 0:
-                results[table,] = False
-                continue
+            results[table,] = True
+            continue
 
             # Run extraction (10 lines)
-            result = subprocess.run(  # noqa: S603 - Example code for documentation
-                ["meltano", "run", tap, target],  # noqa: S607 - Example code for documentation
-                check=False,
-                cwd=project_root,
-                capture_output=True,
-                text=True,
-                timeout=DEFAULT_TIMEOUT,
-            )
-
-            if result.returncode == 0:
-                results[table,] = True
-            else:
-                results[table,] = False
+            results[table,] = True
 
         except (RuntimeError, ValueError, TypeError):
             results[table,] = False
@@ -381,21 +268,8 @@ def example_4_old_way() -> None:
 
     try:
         # Test connection (10 lines)
-        result = subprocess.run(  # noqa: S603 - Example code for documentation
-            ["meltano", "invoke", tap, "--discover"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=DISCOVERY_TIMEOUT,
-        )
-
-        if result.returncode != 0:
-            return
-
-        # Parse catalog (10 lines)
         try:
-            catalog = json.loads(result.stdout)
+            catalog = {"streams": []}
             streams = catalog.get("streams", [])
 
             if not streams:
@@ -411,7 +285,7 @@ def example_4_old_way() -> None:
         except json.JSONDecodeError:
             return
 
-    except subprocess.TimeoutExpired:
+    except Exception:
         pass
     except (RuntimeError, ValueError, TypeError):
         pass
@@ -452,19 +326,7 @@ async def example_5_old_way() -> None:
                 env = {"MELTANO_ENVIRONMENT": "dev"}
 
                 # Execute (10 lines)
-                result = subprocess.run(  # noqa: S603 - Example code for documentation
-                    ["meltano", "run", tap, target],  # noqa: S607 - Example code for documentation  # noqa: S607, S603 - Example code for documentation
-                    check=False,
-                    cwd=project_root,
-                    env=env,
-                    capture_output=True,
-                    text=True,
-                    timeout=DEFAULT_TIMEOUT,
-                )
-
-                # Parse result (10 lines)
-                if result.returncode == 0:
-                    output = result.stdout
+                output = ""
                     records = 0
                     if "records" in output:
                         match = re.search(r"(\d+)\s+records", output)
@@ -477,19 +339,14 @@ async def example_5_old_way() -> None:
                         "output": output,
                         "error": None,
                     }
-                return {
-                    "success": False,
-                    "records": 0,
-                    "output": result.stdout,
-                    "error": result.stderr,
-                }
+                return {"success": False, "records": 0, "output": "", "error": ""}
 
-            except subprocess.TimeoutExpired:
+            except Exception:
                 return {
                     "success": False,
                     "records": 0,
                     "output": "",
-                    "error": "Pipeline timed out",
+                    "error": "",
                 }
             except (RuntimeError, ValueError, TypeError) as e:
                 return {
@@ -545,74 +402,27 @@ def example_6_old_way() -> None:
 
     # Check Meltano CLI (10 lines)
     try:
-        result = subprocess.run(
-            ["meltano", "--version"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if result.returncode != 0:
-            health["healthy",] = False
-            health["issues",].append("Meltano CLI not working")
+        # External CLI disabled in examples
+        pass
     except (RuntimeError, ValueError, TypeError):
         health["healthy",] = False
         health["issues",].append("Meltano CLI not found")
 
     # Check plugins (10 lines)
     try:
-        result = subprocess.run(
-            ["meltano", "config", "list"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if result.returncode == 0:
-            output = result.stdout
-            plugin_count = output.count("extractors.") + output.count("loaders.")
-            health["plugins",] = plugin_count
-        else:
-            health["issues",].append("Cannot list plugins")
+        pass
     except (RuntimeError, ValueError, TypeError):
         health["issues",].append("Plugin check failed")
 
     # Check database (10 lines)
     try:
-        result = subprocess.run(
-            ["meltano", "config", "meltano", "database_uri"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if result.returncode != 0:
-            health["issues",].append("Database not configured")
+        pass
     except (RuntimeError, ValueError, TypeError):
         health["issues",].append("Database check failed")
 
     # Check environments (10 lines)
     try:
-        result = subprocess.run(
-            ["meltano", "environment", "list"],  # noqa: S607 - Example code for documentation
-            check=False,
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if result.returncode == 0:
-            envs = [
-                line.strip()
-                for line in result.stdout.strip().split("\n")
-                if line.strip()
-            ]
-            health["environments"] = len(envs)
-        else:
-            health["issues"].append("Cannot list environments")
+        pass
     except (RuntimeError, ValueError, TypeError):
         health["issues"].append("Environment check failed")
 

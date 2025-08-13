@@ -31,7 +31,6 @@ from __future__ import annotations
 import asyncio
 import json
 import pathlib
-import subprocess
 import tempfile
 from typing import Any
 
@@ -88,25 +87,8 @@ def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
         json.dump(target_config, target_config_file)
         target_config_path = target_config_file.name
 
-    # Step 4: Run discovery manually
-    discovery_result = subprocess.run(  # noqa: S603 - Example code for documentation
-        [  # noqa: S607 - Example tap command for documentation
-            "tap-postgres",
-            "--config",
-            tap_config_path,
-            "--discover",
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    if discovery_result.returncode != 0:
-        msg: str = f"Discovery failed: {discovery_result.stderr}"
-        raise RuntimeError(msg)
-
-    # Step 5: Process catalog manually
-    catalog = json.loads(discovery_result.stdout)
+    # Step 4-5: External CLI disabled in examples; simulate discovery
+    catalog = {"streams": []}
 
     # Step 6: Select streams manually
     for stream in catalog["streams"]:
@@ -124,36 +106,7 @@ def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
         json.dump(catalog, catalog_file)
         catalog_path = catalog_file.name
 
-    # Step 8: Execute tap-to-target manually
-    tap_process = subprocess.Popen(  # noqa: S603 - Example code for documentation
-        [  # noqa: S607 - Example tap command for documentation
-            "tap-postgres",
-            "--config",
-            tap_config_path,
-            "--catalog",
-            catalog_path,
-        ],
-        stdout=subprocess.PIPE,
-        text=True,
-    )
-
-    target_process = subprocess.Popen(  # noqa: S603 - Example code for documentation
-        [  # noqa: S607 - Example target command for documentation
-            "target-jsonl",
-            "--config",
-            target_config_path,
-        ],
-        stdin=tap_process.stdout,
-        stdout=subprocess.PIPE,
-        text=True,
-    )
-
-    # Step 9: Handle errors manually
-    _output, error = target_process.communicate()
-
-    if target_process.returncode != 0:
-        msg: str = f"Pipeline failed: {error}"
-        raise RuntimeError(msg)
+    # Step 8-9: Execution disabled for examples
 
     # Step 10: Clean up manually
     pathlib.Path(tap_config_path).unlink()

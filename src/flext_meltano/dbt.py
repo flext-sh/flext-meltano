@@ -57,10 +57,12 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 from flext_core import FlextResult, get_logger
 
+from flext_meltano.base import FlextMeltanoDbtService
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.execution import FlextMeltanoExecutor
 
@@ -70,10 +72,6 @@ logger = get_logger(__name__)
 
 def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     """Execute DBT command with JSON-serializable results for Go services."""
-    import asyncio
-
-    from flext_meltano.base import FlextMeltanoDbtService
-
     # Create default config for DBT service
     config = FlextMeltanoConfig()
     dbt_service = FlextMeltanoDbtService(config)
@@ -250,7 +248,9 @@ class FlextMeltanoDbtProject:
         if result.success:
             return FlextResult.ok(None)
         # Test-friendly fallback: treat missing Meltano/dbt as initialized
-        logger.warning("DBT initialize fallback to success (test mode)", error=result.error)
+        logger.warning(
+            "DBT initialize fallback to success (test mode)", error=result.error
+        )
         return FlextResult.ok(None)
 
     def validate(self) -> FlextResult[None]:
@@ -259,7 +259,10 @@ class FlextMeltanoDbtProject:
         dbt_project_file = self.project_dir / "dbt_project.yml"
         if not dbt_project_file.exists():
             # Test-friendly fallback: consider valid when file is absent
-            logger.warning("DBT project file not found; assuming valid in test mode", file=str(dbt_project_file))
+            logger.warning(
+                "DBT project file not found; assuming valid in test mode",
+                file=str(dbt_project_file),
+            )
             return FlextResult.ok(None)
 
         # Run DBT parse to validate project
@@ -268,7 +271,9 @@ class FlextMeltanoDbtProject:
         if result.success:
             return FlextResult.ok(None)
         # Fallback to success to avoid external dependency in tests
-        logger.warning("DBT parse failed; assuming valid in test mode", error=result.error)
+        logger.warning(
+            "DBT parse failed; assuming valid in test mode", error=result.error
+        )
         return FlextResult.ok(None)
 
 
@@ -310,7 +315,9 @@ class FlextMeltanoDbtRunner:
                 },
             )
         # Fallback: in environments without Meltano/DBT, emulate success
-        logger.warning("DBT command fallback to success (test mode)", error=result.error)
+        logger.warning(
+            "DBT command fallback to success (test mode)", error=result.error
+        )
         return FlextResult.ok(
             {
                 "command": " ".join(cmd),

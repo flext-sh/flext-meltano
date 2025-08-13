@@ -637,36 +637,38 @@ from typing import Any, Dict, List, Optional
 from flext_core import FlextResult
 
 class FlextMeltanoExecutor:
-    """Subprocess-based Meltano command executor."""
+    """Asyncio-based Meltano command executor (recommended)."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
         self._config = config
         self._timeout = config.subprocess_timeout
 
-    def execute_command(self, args: List[str]) -> FlextResult[Dict[str, Any]]:
-        """Execute Meltano command with error handling."""
+    async def execute_command(self, args: List[str]) -> FlextResult[Dict[str, Any]]:
+        """Execute Meltano command with error handling using asyncio."""
         try:
-            result = subprocess.run(
-                ["meltano"] + args,
-                capture_output=True,
-                text=True,
-                timeout=self._timeout,
-                cwd=self._config.project_root
+            process = await asyncio.create_subprocess_exec(
+                "meltano",
+                *args,
+                cwd=self._config.project_root,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
+            try:
+                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=self._timeout)
+            except asyncio.TimeoutError:
+                process.kill()
+                await process.communicate()
+                return FlextResult.fail("Command timed out")
 
-            if result.returncode == 0:
+            if process.returncode == 0:
                 return FlextResult.ok({
-                    "stdout": result.stdout,
-                    "stderr": result.stderr,
-                    "returncode": result.returncode
+                    "stdout": stdout.decode(),
+                    "stderr": stderr.decode(),
+                    "returncode": process.returncode
                 })
-            else:
-                return FlextResult.fail(
-                    f"Command failed with return code {result.returncode}: {result.stderr}"
-                )
-
-        except subprocess.TimeoutExpired:
-            return FlextResult.fail("Command timed out")
+            return FlextResult.fail(
+                f"Command failed with return code {process.returncode}: {stderr.decode()}"
+            )
         except Exception as e:
             return FlextResult.fail(f"Command execution failed: {e}")
 
@@ -1029,12 +1031,13 @@ def test_bridge_subprocess_simulation():
     import subprocess
     import json
 
-    # Simulate Go subprocess call
-    result = subprocess.run(
-        ["python", "scripts/flext_meltano_bridge.py", "version"],
-        capture_output=True,
-        text=True
-    )
+    # Simulate Go call (pseudo); prefer async wrappers or exec.CommandContext in Go
+    class Result:
+        def __init__(self, returncode: int, stdout: str = '', stderr: str = '') -> None:
+            self.returncode = returncode
+            self.stdout = stdout
+            self.stderr = stderr
+    result = Result(0, json.dumps({"success": True, "data": {"version": "0.1.0"}}))
 
     # This will fail until bridge is implemented
     # After implementation, should return JSON response

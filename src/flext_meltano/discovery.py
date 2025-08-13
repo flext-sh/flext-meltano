@@ -310,11 +310,10 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import json
-import subprocess
+# Avoid direct subprocess exceptions; use asyncio-based execution only
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_core import FlextModel, FlextResult, get_logger
 from meltano.core.hub import MeltanoHubService
@@ -324,9 +323,7 @@ from pydantic import Field
 
 from flext_meltano.common import injectable
 from flext_meltano.common_schemas import FlextMeltanoPluginInfo
-
-if TYPE_CHECKING:
-    from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 
 
 class FlextMeltanoDiscoveryCommand:
@@ -427,7 +424,7 @@ class FlextMeltanoDiscoverer:
             # Fallback to direct Singer SDK discovery only for valid projects
             return await self._discover_catalog_direct(tap_name, config or {}, context)
 
-        except (TimeoutError, OSError, subprocess.CalledProcessError) as e:
+        except (TimeoutError, OSError) as e:
             return FlextResult(error=f"Catalog discovery failed: {e}")
 
     async def _discover_catalog_subprocess(
@@ -488,7 +485,7 @@ class FlextMeltanoDiscoverer:
                 error=f"Meltano discovery failed: {stderr_text or 'Unknown error'}",
             )
 
-        except (TimeoutError, OSError, subprocess.CalledProcessError) as e:
+        except (TimeoutError, OSError) as e:
             return FlextResult(error=f"Subprocess discovery failed: {e}")
 
     async def _discover_catalog_direct(
@@ -688,8 +685,6 @@ def flext_meltano_discover_catalog(
     discovery metadata and the catalog under key "catalog".
     """
     try:
-        from flext_meltano.config import FlextMeltanoConfig
-
         service_result = create_discoverer(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
@@ -731,8 +726,6 @@ def flext_meltano_discover_plugins(
     Returns a dict with keys: success, data, error. data contains {"plugins": [...]}
     """
     try:
-        from flext_meltano.config import FlextMeltanoConfig
-
         service_result = create_discoverer(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
