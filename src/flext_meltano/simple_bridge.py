@@ -265,7 +265,7 @@ class FlextMeltanoBridge:
 
             # Fallback to error if no installation service
             return FlextResult.fail(
-                f"Cannot add plugin {name}: installation service not initialized",
+                "Plugin installation requires initialized Meltano project",
             )
         except (ValueError, TypeError, AttributeError, OSError) as e:
             return FlextResult.fail(f"Failed to add plugin {name}: {e}")
@@ -418,7 +418,7 @@ class FlextMeltanoBridge:
                 return FlextResult.ok(result)
 
             return FlextResult.fail(
-                f"Cannot execute DBT command {command}: DBT service not initialized",
+                "DBT operations require configured DBT project",
             )
         except Exception as e:
             return FlextResult.fail(f"Failed to execute DBT command {command}: {e}")

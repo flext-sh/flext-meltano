@@ -14,7 +14,6 @@ by comparing traditional approaches with our streamlined enterprise patterns.
 from __future__ import annotations
 
 import json
-import subprocess
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -62,80 +61,29 @@ def example_1_traditional_approach() -> dict[str, Any]:
         target_config_path = f.name
 
     try:
-        # Step 3: Manual discovery
-        discovery_cmd = [
-            "meltano",
-            "invoke",
-            "tap-postgres:discover",
-            "--config",
-            tap_config_path,
-        ]
+        # Step 3/4: Manual discovery disabled in example context
+        return {
+            "success": False,
+            "error": "External Meltano CLI execution disabled in example",
+            "approach": "traditional",
+        }
 
-        discovery_result = subprocess.run(
-            discovery_cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        # Step 5/6 skipped due to disabled external CLI in example
 
-        if discovery_result.returncode != 0:
-            return {
-                "success": False,
-                "error": f"Discovery failed: {discovery_result.stderr}",
-                "approach": "traditional",
-            }
-
-        # Step 4: Process catalog manually
-        catalog = json.loads(discovery_result.stdout)
-
-        # Step 5: Manual stream selection
-        for stream in catalog.get("streams", []):
-            if stream.get("tap_stream_id") in {"users", "orders"}:
-                metadata = stream.get("metadata", [])
-                for entry in metadata:
-                    if entry.get("breadcrumb") == []:
-                        entry.setdefault("metadata", {})["selected"] = True
-
-        # Step 6: Write catalog file
-        with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".json", delete=False,
-        ) as f:
-            json.dump(catalog, f)
-            catalog_path = f.name
-
-        # Step 7: Execute pipeline manually
-        pipeline_cmd = [
-            "meltano",
-            "run",
-            "tap-postgres",
-            "target-csv",
-            "--config",
-            tap_config_path,
-            "--catalog",
-            catalog_path,
-        ]
-
-        pipeline_result = subprocess.run(
-            pipeline_cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        # Step 7: Execute pipeline disabled in example context
+        return {
+            "success": False,
+            "error": "External Meltano CLI execution disabled in example",
+            "approach": "traditional",
+        }
 
         # Step 8: Cleanup
         Path(tap_config_path).unlink(missing_ok=True)
         Path(target_config_path).unlink(missing_ok=True)
-        Path(catalog_path).unlink(missing_ok=True)
+        # catalog_path is not created when CLI is disabled
 
-        return {
-            "success": pipeline_result.returncode == 0,
-            "output": pipeline_result.stdout,
-            "error": pipeline_result.stderr
-            if pipeline_result.returncode != 0
-            else None,
-            "approach": "traditional",
-            "lines_of_code": 45,
-        }
+        # Unreachable due to early return; kept for reference
+        return {"success": False, "approach": "traditional", "lines_of_code": 45}
 
     except Exception as e:
         return {
@@ -330,33 +278,15 @@ print(json.dumps(result))
             encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write(bridge_script)
-            script_path = f.name
 
-        # Execute bridge script
-        bridge_result = subprocess.run(
-            [sys.executable, script_path, "version"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-
-        # Cleanup
-        Path(script_path).unlink(missing_ok=True)
-
-        if bridge_result.returncode == 0:
-            result_data = json.loads(bridge_result.stdout)
-            return {
-                "success": result_data.get("success", False),
-                "bridge_output": result_data,
-                "approach": "traditional",
-                "lines_of_code": 30,
-            }
+        # Disable executing arbitrary scripts in example context
         return {
             "success": False,
-            "error": bridge_result.stderr,
+            "error": "Script execution disabled in example",
             "approach": "traditional",
-            "lines_of_code": 30,
         }
+
+        # (dead code, kept for structure; early returns above)
 
     except Exception as e:
         return {

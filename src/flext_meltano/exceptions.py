@@ -54,11 +54,14 @@ class FlextMeltanoConnectionError(FlextMeltanoError):
         **kwargs: object,
     ) -> None:
         """Initialize connection error with network context."""
-        context = dict(kwargs)
+        nested: dict[str, object] = {}
         if host is not None:
-            context["host"] = host
+            nested["host"] = host
         if port is not None:
-            context["port"] = port
+            nested["port"] = port
+        context: dict[str, object] = {"context": nested}
+        # Merge any extra kwargs into the top-level context
+        context.update(dict(kwargs))
         super().__init__(f"Connection: {message}", context=context)
 
 

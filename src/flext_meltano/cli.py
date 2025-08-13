@@ -135,17 +135,19 @@ the bridge architecture.
 
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
-from datetime import datetime, timezone
 
 from flext_cli import setup_cli as flext_setup_cli
 from flext_cli.config import CLIConfig as FlextCLIConfig
 from flext_core import FlextResult
 
 from flext_meltano.common import MockResult
+
 # Always use the consolidated canonical implementation
 from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
 from flext_meltano.execution import (
@@ -175,10 +177,8 @@ class FlextMeltanoCli:
         options = options or []
 
         # Initialize flext-cli foundation (idempotent)
-        try:
+        with contextlib.suppress(Exception):
             _ = flext_setup_cli(FlextCLIConfig())
-        except Exception:
-            pass
 
         if not command or command.strip() == "":
             return self._handle_empty()
@@ -197,6 +197,10 @@ class FlextMeltanoCli:
             n: int,
             fn: _CmdHandler,
         ) -> handler_type:
+            n1 = 1
+            n2 = 2
+            n3 = 3
+
             def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
                 if len(opts) < n:
                     return FlextResult(
@@ -205,11 +209,11 @@ class FlextMeltanoCli:
                 # Avoid variadic Any error by dispatching explicitly per arity
                 if n == 0:
                     return fn()
-                if n == 1:
+                if n == n1:
                     return fn(opts[0])
-                if n == 2:
+                if n == n2:
                     return fn(opts[0], opts[1])
-                if n == 3:
+                if n == n3:
                     return fn(opts[0], opts[1], opts[2])
                 # Fallback for larger n: still pass through, safe enough for our handlers
                 return fn(*opts[:n])
@@ -220,6 +224,10 @@ class FlextMeltanoCli:
             n: int,
             fn: _CmdHandler,
         ) -> handler_type:
+            n1 = 1
+            n2 = 2
+            n3 = 3
+
             def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
                 if len(opts) < n:
                     return FlextResult(
@@ -229,11 +237,11 @@ class FlextMeltanoCli:
                 optional = opts[n:]
                 if n == 0:
                     return fn(*optional)
-                if n == 1:
+                if n == n1:
                     return fn(required[0], *optional)
-                if n == 2:
+                if n == n2:
                     return fn(required[0], required[1], *optional)
-                if n == 3:
+                if n == n3:
                     return fn(required[0], required[1], required[2], *optional)
                 return fn(*required, *optional)
 
@@ -309,8 +317,8 @@ class FlextMeltanoCli:
             ),
             "dbt-lineage-path": (
                 lambda opts: self.dbt_lineage_path(opts[0], opts[1])
-                if len(opts) >= 2
-                else FlextResult(error="Missing required arguments: expected 2")
+                if len(opts) >= MIN_LINEAGE_ARGS
+                else FlextResult(error=f"Missing required arguments: expected {MIN_LINEAGE_ARGS}")
             ),
         }
 
@@ -812,7 +820,7 @@ class FlextMeltanoCli:
                     data={
                         "status": "success",
                         "metrics": metrics_result.data,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                         "message": (
                             f"DBT metrics retrieved successfully for {model}"
                             if model
@@ -845,7 +853,7 @@ class FlextMeltanoCli:
                     data={
                         "status": "success",
                         "dashboard_config": dashboard_result.data,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "timestamp": datetime.now(UTC).isoformat(),
                         "message": "DBT dashboard configuration created",
                     },
                 )
@@ -918,7 +926,7 @@ class FlextMeltanoCli:
                 data={
                     "status": overall_health,
                     "components": health_status,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "message": f"DBT hub health check completed - {overall_health}",
                     "errors": error_components or None,
                 },

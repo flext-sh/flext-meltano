@@ -589,13 +589,19 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
     ) -> FlextResult[dict[str, object]]:
         """Discover tap catalog."""
         try:
-            # Delegate to discovery service if available, else minimal fallback
-            # Discovery delegation (import at top-level in a real setup); here keep minimal fallback
-            # to avoid late imports flagged by ruff.
+            # Delegate to the canonical discovery service
+            from flext_meltano.discovery import FlextMeltanoDiscoverer
 
-            return FlextResult.ok(
-                {"streams": [], "tap_name": tap_name, "discovery_completed": True},
-            )
+            discoverer = FlextMeltanoDiscoverer(self.config)  # type: ignore[arg-type]
+            result_or_coro = discoverer.discover_catalog(tap_name)
+            # Handle both sync and async returns
+            if hasattr(result_or_coro, "__await__"):
+                result_sync = await result_or_coro  # type: ignore[func-returns-value]
+            else:
+                result_sync = result_or_coro
+            if result_sync.success:
+                return result_sync
+            return FlextResult.fail(result_sync.error or "Discovery failed")
         except (
             OSError,
             ConnectionError,

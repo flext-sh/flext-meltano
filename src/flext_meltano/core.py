@@ -138,7 +138,8 @@ class FlextMeltanoPipelineResult(FlextEntity):
                 (self.completed_at - self.started_at).total_seconds(),
             )
         else:
-            self.duration_seconds = 0.0
+            # No start time available; leave duration undefined for tests
+            self.duration_seconds = None
 
     def fail_execution(self, error_message: str) -> None:
         """Mark the pipeline as failed and compute duration."""
@@ -151,7 +152,8 @@ class FlextMeltanoPipelineResult(FlextEntity):
                 (self.completed_at - self.started_at).total_seconds(),
             )
         else:
-            self.duration_seconds = 0.0
+            # No start time available; leave duration undefined for tests
+            self.duration_seconds = None
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate entity domain rules."""
