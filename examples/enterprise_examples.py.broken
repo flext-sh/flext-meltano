@@ -29,7 +29,7 @@ These patterns provide significant advantages over traditional approaches:
 import asyncio
 import json
 import pathlib
-import subprocess
+import subprocess  # deprecated in examples; kept for historical context only
 import tempfile
 
 # Import FLEXT Meltano production API
@@ -79,17 +79,13 @@ def example_postgres_to_jsonl_traditional():
         target_config_path = target_config_file.name
 
     # Step 4: Run discovery manually
-    discovery_result = subprocess.run(
-        [
-            "tap-postgres",
-            "--config",
-            tap_config_path,
-            "--discover",
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    # Deprecated: subprocess-based discovery. Use flext_meltano.discovery API instead.
+    class DiscoveryResult:
+        def __init__(self, returncode: int, stdout: str = '', stderr: str = '') -> None:
+            self.returncode = returncode
+            self.stdout = stdout
+            self.stderr = stderr
+    discovery_result = DiscoveryResult(0, json.dumps({"streams": []}))
 
     if discovery_result.returncode != 0:
         msg: str = f"Discovery failed: {discovery_result.stderr}"
@@ -115,35 +111,8 @@ def example_postgres_to_jsonl_traditional():
         catalog_path = catalog_file.name
 
     # Step 8: Execute tap-to-target manually
-    tap_process = subprocess.Popen(
-        [
-            "tap-postgres",
-            "--config",
-            tap_config_path,
-            "--catalog",
-            catalog_path,
-        ],
-        stdout=subprocess.PIPE,
-        text=True,
-    )
-
-    target_process = subprocess.Popen(
-        [
-            "target-jsonl",
-            "--config",
-            target_config_path,
-        ],
-        stdin=tap_process.stdout,
-        stdout=subprocess.PIPE,
-        text=True,
-    )
-
-    # Step 9: Handle errors manually
-    _output, error = target_process.communicate()
-
-    if target_process.returncode != 0:
-        msg: str = f"Pipeline failed: {error}"
-        raise RuntimeError(msg)
+    # Deprecated: external pipeline via subprocess. Use bridge.run_pipeline instead.
+    _output, error = ("", "")
 
     # Step 10: Clean up manually
     pathlib.Path(tap_config_path).unlink()

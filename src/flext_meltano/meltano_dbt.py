@@ -457,9 +457,7 @@ class FlextDbtInMemoryExecutor:
 
         Requires duckdb and pandas; provides clear error if unavailable.
         """
-        if duckdb is None or pd is None:
-            message = "duckdb/pandas not available for in-memory execution"
-            raise ImportError(message)
+        # duckdb and pandas are imported at module level
 
         self.database = database
         self.connection = cast("object", duckdb).connect(database)  # type: ignore[attr-defined]

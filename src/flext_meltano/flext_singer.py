@@ -518,7 +518,9 @@ def flext_create_singer_bridge() -> FlextSingerBridge:
     return FlextSingerBridge()
 
 
-def flext_create_singer_catalog(initial_data: dict[str, object] | None = None) -> FlextSingerCatalog:
+def flext_create_singer_catalog(
+    initial_data: dict[str, object] | None = None,
+) -> FlextSingerCatalog:
     """Create Singer catalog model (backward-compatible factory.
 
     Accepts optional initial_data for tests compatibility.

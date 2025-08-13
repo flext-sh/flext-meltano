@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import subprocess
+# Avoid direct subprocess exceptions in bridge; rely on executor
 import sys
 
 # Removed typing.Any import - using specific types
@@ -92,7 +92,7 @@ class FlextMeltanoBridge:
 
             return FlextResult.ok(version_info)
 
-        except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             return FlextResult.fail(f"Failed to get version information: {e}")
 
     def get_plugin_registry(self) -> FlextMeltanoPluginRegistry | None:
@@ -219,7 +219,7 @@ class FlextMeltanoBridge:
                 return FlextResult.ok(plugins)
             return FlextResult.ok([])  # Return empty list if no plugins
 
-        except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             return FlextResult.fail(f"Failed to list plugins: {e}")
 
     def add_plugin(
@@ -370,7 +370,7 @@ class FlextMeltanoBridge:
                 f"Pipeline execution failed: {result.error or 'Unknown error'}",
             )
 
-        except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             return FlextResult.fail(f"Failed to run pipeline: {e}")
 
     def invoke_dbt(

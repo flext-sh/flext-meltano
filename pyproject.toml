@@ -248,8 +248,20 @@ prometheus-client = ">=0.21.0,<1.0.0"
 path = "../flext-core"
 develop = true
 
+[tool.poetry.dependencies.flext-cli]
+path = "../flext-cli"
+develop = true
+
+[tool.poetry.dependencies.flext-api]
+path = "../flext-api"
+develop = true
+
 [tool.poetry.dependencies.flext-observability]
 path = "../flext-observability"
+develop = true
+
+[tool.poetry.dependencies.flext-plugin]
+path = "../flext-plugin"
 develop = true
 
 [tool.poetry.group.dev.dependencies]
@@ -296,6 +308,7 @@ types-requests = ">=2.32.4"
 types-redis = ">=4.6.0"
 types-psutil = ">=7.0.0"
 numpy = ">=2.2.0"
+pandas-stubs = ">=2.1.4"
 
 [tool.poetry.group.security.dependencies]
 bandit = ">=1.8.0"

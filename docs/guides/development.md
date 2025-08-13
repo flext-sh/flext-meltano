@@ -292,8 +292,8 @@ python scripts/flext_meltano_bridge.py version                    # Version chec
 python scripts/flext_meltano_bridge.py list_plugins               # Plugin list
 python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv  # Pipeline
 
-# Integration from Go (subprocess simulation)
-subprocess.run(["python", "scripts/flext_meltano_bridge.py", "version"])
+# Integration from Go (simulation) - prefer invoking Python module via async wrappers
+# Example pseudo-code (Go): use exec.CommandContext with validated args, avoid shell
 ```
 
 ## 🏗️ Module Development Patterns
