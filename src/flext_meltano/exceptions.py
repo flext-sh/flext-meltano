@@ -59,10 +59,12 @@ class FlextMeltanoConnectionError(FlextMeltanoError):
             nested["host"] = host
         if port is not None:
             nested["port"] = port
-        context: dict[str, object] = {"context": nested}
-        # Merge any extra kwargs into the top-level context
-        context.update(dict(kwargs))
-        super().__init__(f"Connection: {message}", context=context)
+        # Compose nested structure and merge extra kwargs under "context" as required by tests
+        context_dict: dict[str, object] = {"context": nested}
+        if kwargs:
+            # Ensure extra kwargs also go into the nested context structure
+            nested.update(dict(kwargs))
+        super().__init__(f"Connection: {message}", context=context_dict)
 
 
 class FlextMeltanoProcessingError(FlextMeltanoError):

@@ -211,7 +211,8 @@ class FlextMeltanoPluginRegistry(FlextModel):
         return FlextResult.ok(self.plugins[name])
 
     def list_plugins_by_type(
-        self, plugin_type: FlextMeltanoPluginType,
+        self,
+        plugin_type: FlextMeltanoPluginType,
     ) -> list[FlextMeltanoPlugin]:
         """List plugins by type."""
         return [
@@ -233,7 +234,8 @@ class FlextMeltanoPluginInfo(FlextModel):
     executable: str | None = Field(default=None, description="Plugin executable")
     installed: bool = Field(default=False, description="Whether plugin is installed")
     capabilities: list[str] = Field(
-        default_factory=list, description="Plugin capabilities",
+        default_factory=list,
+        description="Plugin capabilities",
     )
 
 

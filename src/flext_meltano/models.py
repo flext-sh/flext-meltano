@@ -16,6 +16,7 @@ from flext_core import (
     FlextModel,
     FlextResult,
     FlextValueObject,
+    get_logger as _get_logger,
 )
 from pydantic import ConfigDict, Field, field_validator
 
@@ -173,7 +174,8 @@ class FlextMeltanoPluginRegistry(FlextModel):
         return FlextResult.ok(self.plugins[name])
 
     def list_plugins_by_type(
-        self, plugin_type: FlextMeltanoPluginType,
+        self,
+        plugin_type: FlextMeltanoPluginType,
     ) -> list[FlextMeltanoPlugin]:
         """List plugins by type."""
         return [
@@ -229,9 +231,6 @@ class FlextSingerCatalog(FlextModel):
             if "streams" in data and isinstance(data["streams"], list):
                 kwargs.setdefault("streams", data["streams"])
         super().__init__(**kwargs)
-        # Tests expect a _logger attribute to exist
-        from flext_core import get_logger as _get_logger
-
         # logger setup compatible with pydantic BaseModel immutability
         object.__setattr__(self, "_logger", _get_logger(self.__class__.__name__))
         # Backward-compatibility: also maintain an internal _catalog structure

@@ -308,11 +308,11 @@ plugin ecosystem exploration for Go service integration.
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import json
 
 # Avoid direct subprocess exceptions; use asyncio-based execution only
 import uuid
+from collections import UserDict
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -566,11 +566,15 @@ class FlextMeltanoDiscoverer:
         """Initialize hub if possible; ignore failures safely."""
         if self._hub is not None:
             return
-        with contextlib.suppress(ValueError, TypeError, ImportError):
+        # Avoid raising when running outside a Meltano project
+        try:
             if Project is not None:
                 project = Project.find()
                 if project is not None:
                     self._hub = MeltanoHubService(project)
+        except Exception:
+            # Leave _hub as None; caller will fall back to defaults
+            self._hub = None
 
     def _discover_with_hub(
         self,
@@ -694,20 +698,21 @@ def flext_meltano_discover_catalog(
 
         discoverer = service_result.data
         # Run async method in a temporary event loop for sync API compatibility
-        import asyncio as _asyncio
 
         try:
-            _asyncio.get_running_loop()
+            asyncio.get_running_loop()
             # If already in an event loop, create a new one to avoid RuntimeError
-            loop = _asyncio.new_event_loop()
+            loop = asyncio.new_event_loop()
             try:
-                _asyncio.set_event_loop(loop)
-                result = loop.run_until_complete(discoverer.discover_catalog(tap_name, config or {}))
+                asyncio.set_event_loop(loop)
+                result = loop.run_until_complete(
+                    discoverer.discover_catalog(tap_name, config or {}),
+                )
             finally:
                 loop.close()
         except RuntimeError:
             # No running loop
-            result = _asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
+            result = asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
 
         return {
             "success": result.success,
@@ -727,25 +732,76 @@ def flext_meltano_discover_plugins(
     Returns a dict with keys: success, data, error. data contains {"plugins": [...]}
     """
     try:
+
+        class _LegacyResult(UserDict):
+            def __init__(
+                self,
+                *,
+                success: bool,
+                data: dict[str, object] | None,
+                error: str | None,
+            ) -> None:
+                super().__init__({"success": success, "data": data, "error": error})
+                self.success = success
+                self.data = data
+                self.error = error
+
         service_result = create_discoverer(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
         if not service_result.success or service_result.data is None:
-            return {"success": False, "data": None, "error": service_result.error}
+            return _LegacyResult(success=False, data=None, error=service_result.error)
 
         discoverer = service_result.data
         result = discoverer.discover_plugins(plugin_type)
         if result.success and result.data is not None:
-            data_obj: dict[str, object] = {"plugins": result.data}
+            # Convert plugin info objects to plain dicts for legacy compatibility
+            plugins_list: list[dict[str, object]] = []
+            for item in result.data:
+                try:
+                    if hasattr(item, "model_dump"):
+                        plugins_list.append(item.model_dump())  # type: ignore[attr-defined]
+                    elif isinstance(item, dict):
+                        plugins_list.append(item)
+                    else:
+                        # Best-effort extraction
+                        plugins_list.append(
+                            {
+                                "name": getattr(item, "name", ""),
+                                "type": getattr(item, "type", ""),
+                                "namespace": getattr(item, "namespace", ""),
+                                "pip_url": getattr(item, "pip_url", None),
+                                "description": getattr(item, "description", ""),
+                                "version": getattr(item, "version", "latest"),
+                            },
+                        )
+                except Exception as exc:
+                    # Skip malformed entries (log at debug level)
+                    get_logger(__name__).debug(
+                        "Skipping malformed plugin entry: %s",
+                        exc,
+                    )
+                    continue
+            data_obj: dict[str, object] = {"plugins": plugins_list}
         else:
             data_obj = None  # type: ignore[assignment]
-        return {
-            "success": result.success,
-            "data": data_obj,
-            "error": result.error,
-        }
+        return _LegacyResult(success=result.success, data=data_obj, error=result.error)
     except Exception as e:  # noqa: BLE001
-        return {"success": False, "data": None, "error": str(e)}
+
+        class _LegacyResult(UserDict):
+            def __init__(
+                self,
+                *,
+                success: bool,
+                data: dict[str, object] | None,
+                error: str | None,
+            ) -> None:
+                super().__init__({"success": success, "data": data, "error": error})
+                self.success = success
+                self.data = data
+                self.error = error
+
+        return _LegacyResult(success=False, data=None, error=str(e))
 
 
 __all__ = [

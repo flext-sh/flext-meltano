@@ -104,7 +104,9 @@ def validate_directory_path(path: str | Path) -> FlextResult[Path]:
 
 
 def validate_file_path(
-    path: str | Path, *, must_exist: bool = True,
+    path: str | Path,
+    *,
+    must_exist: bool = True,
 ) -> FlextResult[Path]:
     """Validate file path with security checks."""
     try:
@@ -142,7 +144,8 @@ def validate_file_path(
 
 
 def _coerce_value_to_expected_type(
-    value: object, expected_type: type,
+    value: object,
+    expected_type: type,
 ) -> FlextResult[object]:
     """Coerce `value` to `expected_type` when safe and reasonable."""
     if isinstance(value, expected_type):
@@ -667,7 +670,11 @@ class FlextMeltanoBridge:
         """
         try:
             result = create_meltano_tap_plugin(
-                name, namespace, pip_url, executable, config,
+                name,
+                namespace,
+                pip_url,
+                executable,
+                config,
             )
 
             if result.success and result.data:

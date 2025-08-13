@@ -4,15 +4,19 @@ These tests focus on import verification and basic schema accessibility
 without complex validation that could interfere with production schemas.
 """
 
+import importlib
+import inspect
+
 import pytest
+from flext_core import get_logger
+
+import flext_meltano.common_schemas as schemas_module
 
 
 def test_common_schemas_module_imports():
     """Test that common_schemas module can be imported without errors."""
     try:
-        import flext_meltano.common_schemas
-
-        assert flext_meltano.common_schemas is not None
+        assert schemas_module is not None
     except ImportError:
         pytest.skip("common_schemas module not available for import")
 
@@ -20,7 +24,7 @@ def test_common_schemas_module_imports():
 def test_common_schemas_module_structure():
     """Test basic module structure and docstring."""
     try:
-        import flext_meltano.common_schemas as schemas_module
+        # use already imported module
 
         # Test module has docstring
         assert hasattr(schemas_module, "__doc__")
@@ -38,8 +42,6 @@ class TestCommonSchemasModuleContent:
     def test_module_attributes(self):
         """Test module has expected attributes."""
         try:
-            import flext_meltano.common_schemas as schemas_module
-
             # Get module attributes
             attrs = dir(schemas_module)
             public_attrs = [attr for attr in attrs if not attr.startswith("_")]
@@ -53,8 +55,6 @@ class TestCommonSchemasModuleContent:
     def test_module_file_info(self):
         """Test module file information."""
         try:
-            import flext_meltano.common_schemas as schemas_module
-
             if hasattr(schemas_module, "__file__"):
                 assert isinstance(schemas_module.__file__, str)
                 assert "common_schemas" in schemas_module.__file__
@@ -69,10 +69,6 @@ class TestCommonSchemasClasses:
     def test_class_discovery(self):
         """Test discovering classes without instantiation."""
         try:
-            import inspect
-
-            import flext_meltano.common_schemas as schemas_module
-
             # Safely discover classes
             members = inspect.getmembers(schemas_module)
             classes = [member for name, member in members if inspect.isclass(member)]
@@ -92,10 +88,6 @@ class TestCommonSchemasClasses:
     def test_class_docstrings(self):
         """Test that classes have docstrings."""
         try:
-            import inspect
-
-            import flext_meltano.common_schemas as schemas_module
-
             # Safely discover classes
             members = inspect.getmembers(schemas_module)
             classes = [member for name, member in members if inspect.isclass(member)]
@@ -117,10 +109,6 @@ class TestCommonSchemasFunctions:
     def test_function_discovery(self):
         """Test discovering functions without calling them."""
         try:
-            import inspect
-
-            import flext_meltano.common_schemas as schemas_module
-
             # Safely discover functions
             members = inspect.getmembers(schemas_module)
             functions = [
@@ -142,16 +130,11 @@ class TestCommonSchemasFunctions:
     def test_function_signatures(self):
         """Test function signatures without calling."""
         try:
-            import inspect
-
-            import flext_meltano.common_schemas as schemas_module
-
-            # Safely discover functions
-            members = inspect.getmembers(schemas_module)
             functions = [
-                member for name, member in members if inspect.isfunction(member)
+                getattr(schemas_module, f)
+                for f in dir(schemas_module)
+                if inspect.isfunction(getattr(schemas_module, f))
             ]
-
             # Test signatures exist
             for func in functions[:2]:  # Limit for safety
                 try:
@@ -159,9 +142,7 @@ class TestCommonSchemasFunctions:
                     assert sig is not None
                 except Exception as e:
                     # Log and skip if signature inspection fails
-                    import logging
-
-                    logger = logging.getLogger(__name__)
+                    logger = get_logger(__name__)
                     logger.debug("Signature inspection failed: %s", str(e))
                     continue
 
@@ -175,8 +156,6 @@ class TestCommonSchemasConstants:
     def test_module_constants(self):
         """Test module-level constants if they exist."""
         try:
-            import flext_meltano.common_schemas as schemas_module
-
             attrs = dir(schemas_module)
             # Look for uppercase constants
             constants = [
@@ -202,8 +181,8 @@ class TestCommonSchemasImports:
     def test_internal_imports(self):
         """Test that module handles its imports correctly."""
         try:
-            # This will trigger import-time code execution
-            import flext_meltano.common_schemas as schemas_module
+            # This will trigger import-time code execution (module already imported at top as schemas_module)
+            _ = schemas_module
 
             # Just verify the import succeeded
             assert schemas_module is not None
@@ -219,15 +198,13 @@ class TestCommonSchemasImports:
         """Test module loading and initialization."""
         try:
             # Re-import to test loading
-            import importlib
-
-            import flext_meltano.common_schemas
+            importlib.reload(schemas_module)
 
             # Reload to test initialization
-            importlib.reload(flext_meltano.common_schemas)
+            # schemas_module reloaded above
 
             # Verify reload succeeded
-            assert flext_meltano.common_schemas is not None
+            assert schemas_module is not None
 
         except (ImportError, Exception):
             pytest.skip("Module loading test not available or failed safely")

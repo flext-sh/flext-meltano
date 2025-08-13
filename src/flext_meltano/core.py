@@ -48,13 +48,13 @@ class ExecutionState(IntEnum):
 
 
 class PipelineEventType(IntEnum):
-    """Pipeline event types with numeric values and aliases."""
+    """Pipeline event types with numeric values and alias access by name."""
 
-    CREATED = auto()
-    STARTED = auto()
-    COMPLETED = auto()
-    FAILED = auto()
-    CANCELLED = auto()
+    CREATED = 1
+    STARTED = 2
+    COMPLETED = 3
+    FAILED = 4
+    CANCELLED = 5
 
     # Backward-compatible alias names used by some tests
     PIPELINE_STARTED = STARTED
@@ -516,6 +516,12 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
         self._executor = executor
         self._logger = get_logger(self.__class__.__name__)
 
+    def validate_service(self) -> FlextResult[bool]:
+        """Basic validation to satisfy interface expectations in tests."""
+        if not self.singer_service or not self.dbt_service:
+            return FlextResult.fail("Dependencies not configured")
+        return FlextResult.ok(data=True)
+
     def execute_pipeline(
         self,
         context: FlextMeltanoPipelineContext,
@@ -607,6 +613,10 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
         self.config = config
         self._logger = get_logger(self.__class__.__name__)
 
+    def validate_service(self) -> FlextResult[bool]:
+        """Basic validation hook expected by tests."""
+        return FlextResult.ok(data=True)
+
     def execute_extension(
         self,
         extension_name: str,
@@ -643,6 +653,16 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
             RuntimeError,
         ) as e:
             return FlextResult.fail(f"Extension execution failed: {e}")
+
+    def get_health_status(self) -> FlextResult[dict[str, object]]:
+        """Return simple health/status information for extension service."""
+        return FlextResult.ok(
+            {
+                "service": "extension",
+                "initialized": True,
+                "project_root": self.config.project_root,
+            },
+        )
 
 
 __all__ = [

@@ -4,6 +4,8 @@ These are real implementations that work with actual Meltano projects and Singer
 No mocks, no fake implementations - just working code using EXISTING APIs only.
 """
 
+import traceback as _traceback
+
 # Import ACTUAL EXISTING FLEXT Meltano functionality only
 from flext_meltano import (
     FlextMeltanoConfig,
@@ -72,9 +74,7 @@ def main() -> None:
         example_real_bridge_usage()
 
     except Exception:
-        import traceback
-
-        traceback.print_exc()
+        _traceback.print_exc()
 
 
 if __name__ == "__main__":

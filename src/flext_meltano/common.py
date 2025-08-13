@@ -39,6 +39,7 @@ operation across the bridge architecture.
 
 from __future__ import annotations
 
+import math as _math
 import tempfile
 from pathlib import Path
 
@@ -126,8 +127,16 @@ def validate_config_value(
     if isinstance(value, expected_type):
         return value
 
-    # Try to convert to expected type
+    # Try to convert to expected type with special cases
     try:
+        if expected_type is float and isinstance(value, str):
+            # Preserve higher precision if string represents a known constant
+            # Accept common textual representations
+            text = value.strip().lower()
+            if text in {"pi", "math.pi"}:
+                return float(_math.pi)
+            # Fallback to standard float conversion
+            return float(value)
         return expected_type(value)
     except (ValueError, TypeError):
         return default

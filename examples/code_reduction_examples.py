@@ -49,13 +49,19 @@ def example_1_traditional_approach() -> dict[str, Any]:
 
     # Step 2: Write configuration files manually
     with tempfile.NamedTemporaryFile(
-        encoding="utf-8", mode="w", suffix=".json", delete=False,
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
     ) as f:
         json.dump(tap_config, f)
         tap_config_path = f.name
 
     with tempfile.NamedTemporaryFile(
-        encoding="utf-8", mode="w", suffix=".json", delete=False,
+        encoding="utf-8",
+        mode="w",
+        suffix=".json",
+        delete=False,
     ) as f:
         json.dump(target_config, f)
         target_config_path = f.name
@@ -276,7 +282,10 @@ print(json.dumps(result))
 
         # Write bridge script
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write(bridge_script)
 

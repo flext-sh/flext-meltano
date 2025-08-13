@@ -311,7 +311,7 @@ class FlextSingerBridge:
                         else None,
                     )
                 else:
-                    result = FlextResult(error="Invalid arguments for RECORD message")
+                    result = FlextResult(error="Invalid stream name or record format")
             elif message_type == "SCHEMA":
                 stream = kwargs.get("stream")
                 schema = kwargs.get("schema")
@@ -525,13 +525,10 @@ def flext_create_singer_catalog(
 
     Accepts optional initial_data for tests compatibility.
     """
-    catalog = FlextSingerCatalog()
-    if initial_data and isinstance(initial_data, dict):
-        # Set internal catalog data if provided
-        field_name = "_catalog"
-        if hasattr(catalog, field_name):
-            setattr(catalog, field_name, initial_data)
-    return catalog
+    # Initialize catalog with provided streams if any
+    if initial_data and isinstance(initial_data, dict) and "streams" in initial_data:
+        return FlextSingerCatalog({"streams": initial_data.get("streams", [])})
+    return FlextSingerCatalog()
 
 
 __all__ = (

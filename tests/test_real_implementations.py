@@ -101,7 +101,8 @@ class TestSingerRealImplementations:
 
         # Test record message creation
         result = bridge.flext_singer_create_record_message(
-            stream="test_stream", record={"id": 1, "name": "test"},
+            stream="test_stream",
+            record={"id": 1, "name": "test"},
         )
 
         assert result.success
@@ -120,7 +121,9 @@ class TestSingerRealImplementations:
         }
 
         result = bridge.flext_singer_create_schema_message(
-            stream="test_stream", schema=schema, key_properties=["id"],
+            stream="test_stream",
+            schema=schema,
+            key_properties=["id"],
         )
 
         assert result.success
@@ -136,7 +139,9 @@ class TestSingerRealImplementations:
 
         # Test universal method for record creation
         result = bridge.flext_singer_create_message(
-            "RECORD", stream="test_stream", record={"id": 1, "name": "test"},
+            "RECORD",
+            stream="test_stream",
+            record={"id": 1, "name": "test"},
         )
 
         assert result.success

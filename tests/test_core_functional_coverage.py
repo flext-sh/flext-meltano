@@ -162,7 +162,8 @@ class TestFlextMeltanoPipelineConfigComplete:
 
         # Test empty name handling - should raise ValueError
         with pytest.raises(
-            ValueError, match="Pipeline name, extractor, and loader are required",
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
         ):
             FlextMeltanoPipelineConfig(
                 name="",  # Empty name

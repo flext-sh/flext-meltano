@@ -708,16 +708,21 @@ async def flext_meltano_test_tap_connection(
     tap_name: str,
     project_root: str | Path,
     config: dict[str, object] | None,
-) -> dict[str, object]:
+) -> FlextResult[FlextMeltanoValidationResult]:
     """Test tap connection and return legacy-compatible dict."""
     try:
         service = FlextMeltanoValidationService(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
         result = await service.test_tap_connection(tap_name, config or {})
-        return {"success": result.success, "data": result.data, "error": result.error}
+        # Legacy wrapper should return dict for Go compatibility
+        return {
+            "success": result.success,
+            "data": result.data,
+            "error": result.error,
+        }
     except Exception as e:  # noqa: BLE001
-        return {"success": False, "data": None, "error": str(e)}
+        return FlextResult(error=str(e))
 
 
 def flext_meltano_validate_project(
@@ -737,15 +742,14 @@ def flext_meltano_validate_project(
 async def flext_meltano_validate_tap_config(
     tap_name: str,
     config: dict[str, object],
-) -> dict[str, object]:
+) -> FlextResult[FlextMeltanoValidationResult]:
     """Validate tap config and return legacy-compatible dict."""
     try:
         # Keep async signature for pytest-asyncio compatibility
         service = FlextMeltanoValidationService(
             importlib.import_module("flext_meltano.config").FlextMeltanoConfig(),
         )
-        result = service.validate_tap_config(tap_name, config)
-        return {"success": result.success, "data": result.data, "error": result.error}
+        return service.validate_tap_config(tap_name, config)
     except Exception as e:  # noqa: BLE001
         return {"success": False, "data": None, "error": str(e)}
 

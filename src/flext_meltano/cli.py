@@ -318,7 +318,9 @@ class FlextMeltanoCli:
             "dbt-lineage-path": (
                 lambda opts: self.dbt_lineage_path(opts[0], opts[1])
                 if len(opts) >= MIN_LINEAGE_ARGS
-                else FlextResult(error=f"Missing required arguments: expected {MIN_LINEAGE_ARGS}")
+                else FlextResult(
+                    error=f"Missing required arguments: expected {MIN_LINEAGE_ARGS}",
+                )
             ),
         }
 
@@ -338,7 +340,9 @@ class FlextMeltanoCli:
         )
 
     def _mock_success(
-        self, command: str, options: list[str],
+        self,
+        command: str,
+        options: list[str],
     ) -> FlextResult[dict[str, object]]:
         return FlextResult(
             data={

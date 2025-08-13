@@ -137,7 +137,8 @@ class FlextMeltanoBridge:
                         name=getattr(tap_obj, "name", plugin_name),
                         plugin_type=FlextMeltanoPluginType.EXTRACTORS,
                         namespace=(getattr(tap_obj, "name", plugin_name)).replace(
-                            "-", "_",
+                            "-",
+                            "_",
                         ),
                     )
 
@@ -156,7 +157,8 @@ class FlextMeltanoBridge:
                         name=getattr(target_obj, "name", plugin_name),
                         plugin_type=FlextMeltanoPluginType.LOADERS,
                         namespace=(getattr(target_obj, "name", plugin_name)).replace(
-                            "-", "_",
+                            "-",
+                            "_",
                         ),
                     )
 
@@ -315,7 +317,7 @@ class FlextMeltanoBridge:
                 return FlextResult.ok(catalog)
 
             return FlextResult.fail(
-                f"Cannot discover catalog: discovery service not initialized for {tap_name}",
+                "Catalog discovery requires configured Meltano project",
             )
         except Exception as e:
             return FlextResult.fail(f"Failed to discover catalog for {tap_name}: {e}")

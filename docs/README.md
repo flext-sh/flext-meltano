@@ -17,13 +17,13 @@ FLEXT Meltano operates as a critical component within the 33-project FLEXT ecosy
 
 ## Current Status: Active Development
 
-| **Quality Gate**       | **Status**           | **Details**                               |
-| ---------------------- | -------------------- | ----------------------------------------- |
-| **Type Checking**      | 🟢 Passing           | 0 MyPy errors                             |
-| **Test Suite**         | 🟡 In Progress       | Coverage ~74% (target 90%)                |
-| **Bridge Integration** | 🟢 Functional        | FlextMeltanoBridge implemented            |
-| **Documentation**      | 🟡 In Progress       | Expanding and aligning with code          |
-| **Code Quality**       | 🟢 Passing           | Ruff linting with comprehensive rules     |
+| **Quality Gate**       | **Status**     | **Details**                           |
+| ---------------------- | -------------- | ------------------------------------- |
+| **Type Checking**      | 🟢 Passing     | 0 MyPy errors                         |
+| **Test Suite**         | 🟡 In Progress | Coverage ~74% (target 90%)            |
+| **Bridge Integration** | 🟢 Functional  | FlextMeltanoBridge implemented        |
+| **Documentation**      | 🟡 In Progress | Expanding and aligning with code      |
+| **Code Quality**       | 🟢 Passing     | Ruff linting with comprehensive rules |
 
 ## 📚 Documentation Structure
 

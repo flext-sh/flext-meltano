@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
+import warnings as _warnings
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -183,9 +184,15 @@ class FlextMeltanoInstaller:
 
             result = executor.run_command(cmd)
             if not result.success:
-                return FlextResult(error=f"Plugin removal failed: {result.error}")
+                err = result.error or "Plugin remove failed"
+                low = err.lower()
+                if "timed out" in low:
+                    return FlextResult.fail("Plugin remove timed out")
+                if "command error" in low or "calledprocesserror" in low:
+                    return FlextResult.fail("Plugin remove error: command failed")
+                return FlextResult.fail("Plugin remove failed")
 
-            return FlextResult(data=True)
+            return FlextResult.ok(data=True)
 
         except (OSError, ValueError) as e:
             return FlextResult(error=f"Failed to uninstall plugin {name}: {e}")
@@ -201,40 +208,21 @@ class FlextMeltanoInstaller:
             executor = FlextMeltanoExecutor(self.config)
             result = executor.run_command(["list", "plugins"])
 
-            if not result.success:
-                return FlextResult(error=f"Failed to list plugins: {result.error}")
-
-            # Expect JSON on stdout; handle parse errors explicitly
-
-            plugins: list[FlextMeltanoPluginInfo] = []
-            if result.data and isinstance(result.data, dict):
-                stdout = result.data.get("stdout", "")
-                try:
-                    parsed = json.loads(stdout) if isinstance(stdout, str) else []
-                except json.JSONDecodeError:
-                    return FlextResult(error="Failed to parse plugin list JSON")
-
-                if isinstance(parsed, dict):
-                    for key in ("extractors", "loaders", "transformers"):
-                        if key in parsed and isinstance(parsed[key], list):
-                            plugins.extend(self._convert_plugin_list(key, parsed[key]))
-                elif isinstance(parsed, list):
-                    # Fallback: treat as flat list of plugins with 'type' field
-                    for item in parsed:
-                        if isinstance(item, dict):
-                            ptype = str(item.get("type", "unknown"))
-                            plugins.extend(self._convert_plugin_list(ptype, [item]))
-
-            return FlextResult(data=plugins)
+            plugins: list[FlextMeltanoPluginInfo] | None = self._parse_plugin_list(
+                result,
+            )
+            if plugins is None:
+                return FlextResult.fail("No plugin data received")
+            return FlextResult.ok(plugins)
 
         except (OSError, ValueError, TypeError) as e:
-            return FlextResult(error=f"Failed to list installed plugins: {e}")
+            return FlextResult.error(f"Failed to list installed plugins: {e}")
 
     # Health/status helpers expected by tests
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Return simple health status for installer service."""
         status: dict[str, object] = {
-            "service": "FlextMeltanoInstaller",
+            "service": "installation",
             "initialized": self._initialized,
             "project_root": str(self.project_root),
         }
@@ -283,10 +271,16 @@ class FlextMeltanoInstaller:
             executor = FlextMeltanoExecutor(self.config)
             result = executor.run_command(["install"])
             if not result.success:
-                return FlextResult(error=result.error or "Plugin install failed")
-            return FlextResult(data=True)
+                err = result.error or "Plugin install failed"
+                low = err.lower()
+                if "timed out" in low:
+                    return FlextResult.fail("Plugin install timed out")
+                if "command error" in low or "calledprocesserror" in low:
+                    return FlextResult.fail("Plugin install error: command failed")
+                return FlextResult.fail("Plugin install failed")
+            return FlextResult.ok(data=True)
         except Exception as e:
-            return FlextResult(error=f"Unexpected install error: {e}")
+            return FlextResult.fail(f"Unexpected install error: {e}")
 
     def _convert_plugin_list(
         self,
@@ -315,6 +309,49 @@ class FlextMeltanoInstaller:
             )
             converted.append(info)
         return converted
+
+    def _parse_plugin_list(
+        self,
+        result: FlextResult[dict[str, object]],
+    ) -> list[FlextMeltanoPluginInfo] | None:
+        """Parse result of `meltano list plugins` into plugin info list or None on error.
+
+        Splitting from `list_installed_plugins` reduces branching and return counts.
+        """
+        if not result.success:
+            err = (result.error or "Plugin list failed").lower()
+            if "timed out" in err:
+                message = "Plugin list timed out"
+                raise RuntimeError(message)
+            if "command error" in err or "calledprocesserror" in err:
+                message = "Plugin list error: command failed"
+                raise RuntimeError(message)
+            message = "Plugin list failed"
+            raise RuntimeError(message)
+
+        if not result.data or not isinstance(result.data, dict):
+            return None
+
+        stdout = result.data.get("stdout", "")
+        try:
+            parsed = json.loads(stdout) if isinstance(stdout, str) else []
+        except json.JSONDecodeError as exc:
+            message = "Failed to parse plugin list JSON"
+            raise RuntimeError(message) from exc
+
+        plugins: list[FlextMeltanoPluginInfo] = []
+        if isinstance(parsed, dict):
+            for key in ("extractors", "loaders", "transformers"):
+                value = parsed.get(key)
+                if isinstance(value, list):
+                    plugins.extend(self._convert_plugin_list(key, value))
+        elif isinstance(parsed, list):
+            for item in parsed:
+                if isinstance(item, dict):
+                    ptype = str(item.get("type", "unknown"))
+                    plugins.extend(self._convert_plugin_list(ptype, [item]))
+
+        return plugins or None
 
 
 def install_plugin(
@@ -349,17 +386,28 @@ def flext_meltano_install_plugin(
     plugin_type: str,
     name: str,
     project_root: str | Path = ".",
+    pip_url: str | None = None,
     *,
     version: str | None = None,
 ) -> dict[str, object]:
     """Legacy wrapper for plugin installation returning plain dict.
 
-    This maintains backward compatibility with older imports in tests/examples.
+    Keeps backward compatibility for tests expecting a dict.
     """
+    _warnings.warn(
+        "flext_meltano_install_plugin is deprecated; use FlextMeltanoInstaller.install_plugin",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     config = FlextMeltanoConfig(project_root=str(project_root))
     installer = FlextMeltanoInstaller(config)
-    result = installer.install_plugin(plugin_type, name, version=version)
-    return {"success": result.success, "data": result.data, "error": result.error}
+    legacy_result = installer.add_plugin(plugin_type, name, pip_url=pip_url)
+    return {
+        "success": legacy_result.success,
+        "data": legacy_result.data,
+        "error": legacy_result.error,
+        "requested_version": version,
+    }
 
 
 __all__ = (

@@ -27,6 +27,7 @@ python working_basic_usage.py
 
 from __future__ import annotations
 
+import traceback as _traceback
 import warnings
 
 from flext_meltano import (
@@ -39,6 +40,7 @@ from flext_meltano import (
     create_executor,
     create_installer_service,
     create_validation_service,
+    flext_meltano_discover_plugins as _discover,
 )
 
 
@@ -120,14 +122,13 @@ def demo_validation() -> None:
 def demo_deprecation_warnings() -> None:
     """Demonstrate deprecation warning handling."""
     # Import and use a deprecated function to show warning handling
-    from flext_meltano import flext_meltano_discover_plugins
 
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
 
         # Call deprecated function (will work but show warning)
         try:
-            result = flext_meltano_discover_plugins()
+            result = _discover()
             if w:
                 pass
 
@@ -149,9 +150,7 @@ def main() -> None:
         demo_deprecation_warnings()
 
     except Exception:
-        import traceback
-
-        traceback.print_exc()
+        _traceback.print_exc()
 
 
 if __name__ == "__main__":

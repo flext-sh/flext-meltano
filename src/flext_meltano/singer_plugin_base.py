@@ -277,7 +277,8 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
 
     @abstractmethod
     def _validate_specific_config(
-        self, config: Mapping[str, object],
+        self,
+        config: Mapping[str, object],
     ) -> FlextResult[None]:
         """Perform plugin-specific configuration validation.
 
