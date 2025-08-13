@@ -69,7 +69,9 @@ class FlextMeltanoBridgeProtocol(Protocol):
         ...
 
     def run_pipeline(
-        self, tap_name: str, target_name: str,
+        self,
+        tap_name: str,
+        target_name: str,
     ) -> FlextResult[dict[str, object]]:
         """Run pipeline between tap and target."""
         ...
@@ -88,7 +90,9 @@ class FlextMeltanoExecutorProtocol(Protocol):
         ...
 
     def run_pipeline(
-        self, tap_name: str, target_name: str,
+        self,
+        tap_name: str,
+        target_name: str,
     ) -> FlextResult[dict[str, object]]:
         """Execute a pipeline."""
         ...
@@ -117,7 +121,8 @@ class FlextSingerUnifiedInterface(ABC):
 
     @abstractmethod
     def execute(
-        self, input_data: object | None = None,
+        self,
+        input_data: object | None = None,
     ) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute operation and return unified result."""
         ...

@@ -528,7 +528,9 @@ class TestFactoryFunctions:
         """Test create_oracle_tap_schema with additional properties."""
         additional_props = th.PropertiesList(
             th.Property(
-                "oracle_specific", th.StringType, description="Oracle specific field",
+                "oracle_specific",
+                th.StringType,
+                description="Oracle specific field",
             ),
         )
 

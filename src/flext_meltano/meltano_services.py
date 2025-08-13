@@ -71,6 +71,7 @@ from flext_core import (
 from pydantic import Field
 
 from flext_meltano.dbt_hub import create_dbt_hub
+from flext_meltano.discovery import FlextMeltanoDiscoverer
 from flext_meltano.execution import (
     SubprocessExecutionContext as SharedSubprocessExecutionContext,
     execute_subprocess_common as shared_execute_subprocess_common,
@@ -590,8 +591,6 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
         """Discover tap catalog."""
         try:
             # Delegate to the canonical discovery service
-            from flext_meltano.discovery import FlextMeltanoDiscoverer
-
             discoverer = FlextMeltanoDiscoverer(self.config)  # type: ignore[arg-type]
             result_sync = await discoverer.discover_catalog(tap_name)
             if result_sync.success:

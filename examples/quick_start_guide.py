@@ -415,8 +415,6 @@ def main() -> None:
 
     data_discovery_workflow()
 
-    import asyncio
-
     asyncio.run(async_pipeline_workflow())
 
     health_monitoring_example()

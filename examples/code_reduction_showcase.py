@@ -16,9 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
 import re
-import subprocess  # legacy import kept only for typing
 import tempfile
 from pathlib import Path
 
@@ -89,7 +87,7 @@ def example_1_old_way() -> None:
         return
 
     # Add plugins (10+ lines each)
-    for plugin_type, plugin_name in [
+    for _plugin_type, _plugin_name in [
         ("extractor", "tap-csv"),
         ("loader", "target-csv"),
     ]:
@@ -101,6 +99,7 @@ def example_1_old_way() -> None:
     class _Dummy:
         returncode = 0
         stdout = ""
+
     result = _Dummy()
 
     # Error handling (10+ lines)
@@ -143,7 +142,7 @@ def example_2_old_way() -> None:
         return
 
     # Create environments (15 lines)
-    for env in ["staging", "prod"]:
+    for _env in ["staging", "prod"]:
         continue
 
     # Add plugins with configuration (40+ lines)
@@ -159,12 +158,12 @@ def example_2_old_way() -> None:
         ("transformer", "dbt-postgres", {}),
     ]
 
-    for plugin_type, plugin_name, config in plugins_config:
+    for _plugin_type, _plugin_name, config in plugins_config:
         # Add plugin
         continue
 
         # Configure plugin
-        for key, value in config.items():
+        for _key, _value in config.items():
             continue
 
     # Create jobs (20+ lines)
@@ -173,7 +172,7 @@ def example_2_old_way() -> None:
         ("hourly_orders", "tap-postgres", "target-postgres"),
     ]
 
-    for job_name, tap, target in jobs:
+    for _job_name, _tap, _target in jobs:
         continue
 
     # Create schedules (15+ lines)
@@ -182,7 +181,7 @@ def example_2_old_way() -> None:
         ("hourly_orders", "0 * * * *"),
     ]
 
-    for job_name, interval in schedules:
+    for _job_name, _interval in schedules:
         continue
 
     # TOTAL: ~110 LINHAS
@@ -210,10 +209,10 @@ def example_2_new_way() -> None:
 
 def example_3_old_way() -> None:
     """ANTES: Processamento manual de múltiplas tabelas com 60+ linhas."""
-    project_root = Path(tempfile.mkdtemp(prefix="batch_project_"))
+    _project_root = Path(tempfile.mkdtemp(prefix="batch_project_"))
     tables = ["users", "orders", "products", "customers", "inventory"]
-    tap = "tap-postgres"
-    target = "target-csv"
+    _tap = "tap-postgres"
+    _target = "target-csv"
 
     results = {}
 
@@ -263,8 +262,8 @@ def example_3_new_way() -> None:
 
 def example_4_old_way() -> None:
     """ANTES: Descoberta manual com validação - 30+ linhas."""
-    project_root = Path(tempfile.mkdtemp(prefix="discovery_project_"))
-    tap = "tap-postgres"
+    _project_root = Path(tempfile.mkdtemp(prefix="discovery_project_"))
+    _tap = "tap-postgres"
 
     try:
         # Test connection (10 lines)
@@ -285,8 +284,8 @@ def example_4_old_way() -> None:
         except json.JSONDecodeError:
             return
 
-    except Exception:
-        pass
+    except Exception as _exc:
+        _ = _exc
     except (RuntimeError, ValueError, TypeError):
         pass
     # TOTAL: ~35 LINHAS
@@ -314,39 +313,30 @@ def example_4_new_way() -> None:
 async def example_5_old_way() -> None:
     """ANTES: Pipeline async manual com 45+ linhas."""
     # Use a safe temporary directory for examples
-    project_root = Path(tempfile.mkdtemp(prefix="async_project_"))
+    _project_root = Path(tempfile.mkdtemp(prefix="async_project_"))
 
-    async def run_pipeline_async(tap: str, target: str) -> dict:
+    async def run_pipeline_async(_tap: str, _target: str) -> dict:
         """Run pipeline in executor with full error handling."""
         loop = asyncio.get_event_loop()
 
         def _run_sync() -> dict:
             try:
                 # Setup (10 lines)
-                env = {"MELTANO_ENVIRONMENT": "dev"}
+                _env = {"MELTANO_ENVIRONMENT": "dev"}
 
                 # Execute (10 lines)
                 output = ""
-                    records = 0
-                    if "records" in output:
-                        match = re.search(r"(\d+)\s+records", output)
-                        if match:
-                            records = int(match.group(1))
+                records = 0
+                if "records" in output:
+                    match = re.search(r"(\d+)\s+records", output)
+                    if match:
+                        records = int(match.group(1))
 
-                    return {
-                        "success": True,
-                        "records": records,
-                        "output": output,
-                        "error": None,
-                    }
-                return {"success": False, "records": 0, "output": "", "error": ""}
-
-            except Exception:
                 return {
-                    "success": False,
-                    "records": 0,
-                    "output": "",
-                    "error": "",
+                    "success": True,
+                    "records": records,
+                    "output": output,
+                    "error": None,
                 }
             except (RuntimeError, ValueError, TypeError) as e:
                 return {
@@ -354,6 +344,13 @@ async def example_5_old_way() -> None:
                     "records": 0,
                     "output": "",
                     "error": str(e),
+                }
+            except Exception:
+                return {
+                    "success": False,
+                    "records": 0,
+                    "output": "",
+                    "error": "",
                 }
 
         return await loop.run_in_executor(None, _run_sync)
@@ -397,7 +394,7 @@ async def example_5_new_way() -> None:
 
 def example_6_old_way() -> None:
     """ANTES: Health check manual com 40+ linhas."""
-    project_root = Path(tempfile.mkdtemp(prefix="health_project_"))
+    _project_root = Path(tempfile.mkdtemp(prefix="health_project_"))
     health = {"healthy": True, "issues": []}
 
     # Check Meltano CLI (10 lines)
@@ -477,8 +474,6 @@ def main() -> None:
     example_3_new_way()
 
     example_4_new_way()
-
-    import asyncio
 
     asyncio.run(example_5_new_way())
 

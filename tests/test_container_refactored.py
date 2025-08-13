@@ -135,7 +135,8 @@ class TestLegacyContainerCompatibility:
             warnings.simplefilter("ignore", DeprecationWarning)
 
             custom_config = FlextMeltanoConfig(
-                project_root="./custom_test", environment="test",
+                project_root="./custom_test",
+                environment="test",
             )
 
             result = configure_meltano_container(custom_config)

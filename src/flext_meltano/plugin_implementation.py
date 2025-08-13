@@ -153,7 +153,10 @@ class FlextMeltanoTapPlugin(FlextMeltanoPlugin):
     """
 
     def __init__(
-        self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None,
+        self,
+        name: str,
+        version: str = "2.0.0",
+        config: dict[str, object] | None = None,
     ) -> None:
         """Initialize Meltano tap plugin."""
         super().__init__(name, version, "tap")
@@ -207,7 +210,10 @@ class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
     """
 
     def __init__(
-        self, name: str, version: str = "2.0.0", config: dict[str, object] | None = None,
+        self,
+        name: str,
+        version: str = "2.0.0",
+        config: dict[str, object] | None = None,
     ) -> None:
         """Initialize Meltano target plugin."""
         super().__init__(name, version, "target")

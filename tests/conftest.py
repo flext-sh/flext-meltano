@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
+import yaml
 from click.testing import CliRunner
 
 if TYPE_CHECKING:
@@ -117,7 +118,6 @@ def meltano_project(
 ) -> dict[str, object]:
     """Meltano project for testing."""
     # Create meltano.yml
-    import yaml
 
     meltano_yml = test_meltano_project_dir / "meltano.yml"
     with meltano_yml.open("w", encoding="utf-8") as f:

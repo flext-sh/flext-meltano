@@ -211,7 +211,9 @@ class TestSchemaFactoryFunctions:
         """Test create_oracle_tap_schema with additional properties."""
         additional = th.PropertiesList(
             th.Property(
-                "warehouse_code", th.StringType, description="WMS warehouse code",
+                "warehouse_code",
+                th.StringType,
+                description="WMS warehouse code",
             ),
         )
 
