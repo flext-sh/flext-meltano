@@ -17,7 +17,7 @@ from flext_core import (
     FlextResult,
     FlextValueObject,
 )
-from pydantic import Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from .constants import (
     SUPPORTED_ENVIRONMENTS,
@@ -42,6 +42,9 @@ class FlextMeltanoExecutionStatus(StrEnum):
 
 class FlextMeltanoEvent(FlextEntity):
     """Event entity using flext-core patterns."""
+
+    # Ensure immutability to match test expectations
+    model_config = ConfigDict(frozen=True)
 
     id: str = Field(default_factory=lambda: str(uuid4()), description="Event ID")
     event_type: str = Field(..., description="Type of event")

@@ -309,7 +309,6 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-import importlib
 import json
 import subprocess
 import uuid
@@ -380,10 +379,10 @@ class FlextMeltanoDiscoverer:
     def validate(self) -> FlextResult[bool]:
         """Validate discovery service."""
         try:
-            # Skip hub initialization in validation, use fallback plugins
-            # Hub requires a project which may not be available during validation
+            # Validation ensures config object exists; hub init ocorre no uso
+            _ = self.config
             return FlextResult(data=True)
-        except (OSError, ImportError) as e:
+        except (OSError, ImportError, AttributeError) as e:
             return FlextResult(error=f"Validation failed: {e}")
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
@@ -675,7 +674,7 @@ def create_discoverer(
         return FlextResult(error=f"Failed to create discoverer: {e}")
 
 
-# === LEGACY COMPATIBILITY RE-EXPORTS ===
+# === LEGACY-COMPATIBLE WRAPPERS (implemented using modern services) ===
 
 
 def flext_meltano_discover_catalog(
@@ -683,34 +682,76 @@ def flext_meltano_discover_catalog(
     project_root: str | Path = ".",
     config: dict[str, object] | None = None,
 ) -> dict[str, object]:
-    """Legacy wrapper for catalog discovery returning plain dict."""
-    # Lazy import via importlib avoids circular dependency while satisfying ruff
-    legacy = importlib.import_module("flext_meltano.legacy")
-    legacy_discover_catalog = legacy.flext_meltano_discover_catalog
+    """Discover catalog and return legacy-compatible dict.
 
-    legacy_result = legacy_discover_catalog(tap_name, project_root, config)
-    return {
-        "success": legacy_result.success,
-        "data": legacy_result.data,
-        "error": legacy_result.error,
-    }
+    Returns a dict with keys: success, data, error. data contains a dict with
+    discovery metadata and the catalog under key "catalog".
+    """
+    try:
+        from flext_meltano.config import FlextMeltanoConfig
+
+        service_result = create_discoverer(
+            FlextMeltanoConfig(project_root=str(project_root)),
+        )
+        if not service_result.success or service_result.data is None:
+            return {"success": False, "data": None, "error": service_result.error}
+
+        discoverer = service_result.data
+        # Run async method in a temporary event loop for sync API compatibility
+        import asyncio as _asyncio
+
+        try:
+            _asyncio.get_running_loop()
+            # If already in an event loop, create a new one to avoid RuntimeError
+            loop = _asyncio.new_event_loop()
+            try:
+                _asyncio.set_event_loop(loop)
+                result = loop.run_until_complete(discoverer.discover_catalog(tap_name, config or {}))
+            finally:
+                loop.close()
+        except RuntimeError:
+            # No running loop
+            result = _asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
+
+        return {
+            "success": result.success,
+            "data": result.data,
+            "error": result.error,
+        }
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 def flext_meltano_discover_plugins(
     project_root: str | Path = ".",
     plugin_type: str | None = None,
 ) -> dict[str, object]:
-    """Legacy wrapper for plugin discovery returning plain dict."""
-    # Lazy import via importlib avoids circular dependency while satisfying ruff
-    legacy = importlib.import_module("flext_meltano.legacy")
-    legacy_discover_plugins = legacy.flext_meltano_discover_plugins
+    """Discover plugins and return legacy-compatible dict.
 
-    legacy_result = legacy_discover_plugins(project_root, plugin_type)
-    return {
-        "success": legacy_result.success,
-        "data": legacy_result.data,
-        "error": legacy_result.error,
-    }
+    Returns a dict with keys: success, data, error. data contains {"plugins": [...]}
+    """
+    try:
+        from flext_meltano.config import FlextMeltanoConfig
+
+        service_result = create_discoverer(
+            FlextMeltanoConfig(project_root=str(project_root)),
+        )
+        if not service_result.success or service_result.data is None:
+            return {"success": False, "data": None, "error": service_result.error}
+
+        discoverer = service_result.data
+        result = discoverer.discover_plugins(plugin_type)
+        if result.success and result.data is not None:
+            data_obj: dict[str, object] = {"plugins": result.data}
+        else:
+            data_obj = None  # type: ignore[assignment]
+        return {
+            "success": result.success,
+            "data": data_obj,
+            "error": result.error,
+        }
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 __all__ = [

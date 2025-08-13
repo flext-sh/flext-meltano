@@ -268,8 +268,7 @@ from flext_meltano.common import injectable
 if TYPE_CHECKING:
     from flext_meltano.config import FlextMeltanoConfig
 
-# Legacy functions removed to avoid circular import
-# These are available from flext_meltano.legacy
+# Legacy functions provided here for compatibility using modern services
 
 
 class FlextMeltanoValidationContext(FlextModel):
@@ -714,56 +713,49 @@ async def flext_meltano_test_tap_connection(
     project_root: str | Path,
     config: dict[str, object] | None,
 ) -> dict[str, object]:
-    """Legacy wrapper for testing tap connection returning plain dict.
+    """Test tap connection and return legacy-compatible dict."""
+    try:
+        from flext_meltano.config import FlextMeltanoConfig
 
-    This function is async to integrate cleanly with pytest-asyncio.
-    """
-    legacy = importlib.import_module("flext_meltano.legacy")
-    legacy_test = legacy.test_tap_connection
-
-    legacy_result = await legacy_test(tap_name, project_root, config)
-
-    # Wrap into a simple object with attribute access to satisfy tests expecting dot access
-    return {
-        "success": legacy_result.success,
-        "data": legacy_result.data,
-        "error": legacy_result.error,
-    }
+        service = FlextMeltanoValidationService(
+            FlextMeltanoConfig(project_root=str(project_root)),
+        )
+        result = await service.test_tap_connection(tap_name, config or {})
+        return {"success": result.success, "data": result.data, "error": result.error}
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 def flext_meltano_validate_project(
     project_root: Path | None = None,
 ) -> dict[str, object]:
-    """Legacy wrapper for project validation returning plain dict."""
-    legacy = importlib.import_module("flext_meltano.legacy")
-    legacy_validate = legacy.validate_project
+    """Validate project and return legacy-compatible dict."""
+    try:
+        from flext_meltano.config import FlextMeltanoConfig
 
-    legacy_result = legacy_validate(project_root)
-    return {
-        "success": legacy_result.success,
-        "data": legacy_result.data,
-        "error": legacy_result.error,
-    }
+        service = FlextMeltanoValidationService(
+            FlextMeltanoConfig(project_root=str(project_root or Path.cwd())),
+        )
+        result = service.validate_project()
+        return {"success": result.success, "data": result.data, "error": result.error}
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 async def flext_meltano_validate_tap_config(
     tap_name: str,
     config: dict[str, object],
 ) -> dict[str, object]:
-    """Legacy wrapper for tap config validation returning plain dict.
-
-    This function is async to align with pytest-asyncio tests.
-    """
-    legacy = importlib.import_module("flext_meltano.legacy")
-    legacy_validate_tap_config = legacy.validate_tap_config
-
-    # Legacy function is sync; call directly
-    legacy_result = legacy_validate_tap_config(tap_name, config)
-    return {
-        "success": legacy_result.success,
-        "data": legacy_result.data,
-        "error": legacy_result.error,
-    }
+    """Validate tap config and return legacy-compatible dict."""
+    try:
+        # Keep async signature for pytest-asyncio compatibility
+        service = FlextMeltanoValidationService(
+            importlib.import_module("flext_meltano.config").FlextMeltanoConfig(),
+        )
+        result = service.validate_tap_config(tap_name, config)
+        return {"success": result.success, "data": result.data, "error": result.error}
+    except Exception as e:  # noqa: BLE001
+        return {"success": False, "data": None, "error": str(e)}
 
 
 # === FACTORY FUNCTION ===

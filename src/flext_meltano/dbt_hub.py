@@ -23,7 +23,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
-
 from flext_core import FlextResult, get_logger
 
 from flext_meltano.dbt_executor import create_in_memory_executor
@@ -1051,7 +1050,7 @@ class FlextDbtHub:
                             error_message = f"Unique key column '{snapshot.unique_key}' not present in snapshot data"
                         else:
                             df = df.copy()
-                            now = pd.Timestamp.now()
+                            now = pd.Timestamp.utcnow()
                             df["dbt_updated_at"] = now
                             df["dbt_valid_from"] = now
                             df["dbt_valid_to"] = pd.NaT

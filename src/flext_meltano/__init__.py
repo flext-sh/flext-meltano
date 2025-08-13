@@ -336,17 +336,22 @@ from flext_meltano.execution import (
 )
 
 # === LEGACY COMPATIBILITY ===
-from flext_meltano.legacy import (
+# Re-export legacy-compatible API implemented in modern modules
+from flext_meltano.execution import (
     FlextMeltanoResult,
-    flext_meltano_discover_catalog,
-    flext_meltano_discover_plugins,
     flext_meltano_execute_job,
     flext_meltano_run_command,
-    install_plugin as flext_meltano_install_plugin,
-    test_tap_connection as flext_meltano_test_tap_connection,
-    validate_project as flext_meltano_validate_project,
-    validate_tap_config as flext_meltano_validate_tap_config,
 )
+from flext_meltano.discovery import (
+    flext_meltano_discover_catalog,
+    flext_meltano_discover_plugins,
+)
+from flext_meltano.validation import (
+    flext_meltano_test_tap_connection,
+    flext_meltano_validate_project,
+    flext_meltano_validate_tap_config,
+)
+from flext_meltano.installation import flext_meltano_install_plugin
 
 # === INSTALLATION & PLUGIN MANAGEMENT ===
 from flext_meltano.installation import (

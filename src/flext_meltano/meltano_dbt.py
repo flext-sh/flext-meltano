@@ -73,12 +73,14 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 try:
     import duckdb
 except Exception as _e:  # pragma: no cover
-    raise ImportError("duckdb is required for flext-meltano DBT operations") from _e
+    msg = "duckdb is required for flext-meltano DBT operations"
+    raise ImportError(msg) from _e
 
 try:
     import pandas as pd
 except Exception as _e:  # pragma: no cover
-    raise ImportError("pandas is required for flext-meltano DBT operations") from _e
+    msg = "pandas is required for flext-meltano DBT operations"
+    raise ImportError(msg) from _e
 
 from jinja2 import Environment as _RealJinjaEnvironment
 
@@ -456,7 +458,8 @@ class FlextDbtInMemoryExecutor:
         Requires duckdb and pandas; provides clear error if unavailable.
         """
         if duckdb is None or pd is None:
-            raise ImportError("duckdb/pandas not available for in-memory execution")
+            message = "duckdb/pandas not available for in-memory execution"
+            raise ImportError(message)
 
         self.database = database
         self.connection = cast("object", duckdb).connect(database)  # type: ignore[attr-defined]
