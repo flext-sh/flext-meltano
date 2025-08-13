@@ -89,8 +89,8 @@ def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
         target_config_path = target_config_file.name
 
     # Step 4: Run discovery manually
-    discovery_result = subprocess.run(
-        [
+    discovery_result = subprocess.run(  # noqa: S603 - Example code for documentation
+        [  # noqa: S607 - Example tap command for documentation
             "tap-postgres",
             "--config",
             tap_config_path,
@@ -125,8 +125,8 @@ def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
         catalog_path = catalog_file.name
 
     # Step 8: Execute tap-to-target manually
-    tap_process = subprocess.Popen(
-        [
+    tap_process = subprocess.Popen(  # noqa: S603 - Example code for documentation
+        [  # noqa: S607 - Example tap command for documentation
             "tap-postgres",
             "--config",
             tap_config_path,
@@ -137,8 +137,8 @@ def example_postgres_to_jsonl_traditional() -> dict[str, Any]:
         text=True,
     )
 
-    target_process = subprocess.Popen(
-        [
+    target_process = subprocess.Popen(  # noqa: S603 - Example code for documentation
+        [  # noqa: S607 - Example target command for documentation
             "target-jsonl",
             "--config",
             target_config_path,

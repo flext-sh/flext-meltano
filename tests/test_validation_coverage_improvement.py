@@ -74,44 +74,50 @@ class TestValidationCoverageImprovement:
 
     def test_project_validation_function(self):
         """Test standalone project validation function."""
-        # Test project validation
+        # Test project validation - returns dict for Go compatibility
         result = flext_meltano_validate_project()
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
         # Test with specific project path
         with tempfile.TemporaryDirectory() as temp_dir:
             result = flext_meltano_validate_project(project_root=temp_dir)
-            assert hasattr(result, "success")
-            assert isinstance(result.success, bool)
+            assert isinstance(result, dict)
+            assert "success" in result
+            assert isinstance(result["success"], bool)
 
     async def test_tap_config_validation_function(self):
         """Test tap configuration validation function."""
-        # Test with minimal config
+        # Test with minimal config - returns dict for Go compatibility
         config = {"host": "localhost", "port": 5432}
         result = await flext_meltano_validate_tap_config("tap-postgres", config)
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
         # Test with empty config
         result = await flext_meltano_validate_tap_config("tap-csv", {})
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
         # Test with None config - convert to empty dict since function expects dict
         result = await flext_meltano_validate_tap_config("tap-test", {})
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
     async def test_tap_connection_testing_function(self):
         """Test tap connection testing function."""
         from pathlib import Path
 
-        # Test connection with valid parameters
+        # Test connection with valid parameters - returns dict for Go compatibility
         config = {"host": "localhost", "database": "test"}
         result = await flext_meltano_test_tap_connection("tap-postgres", Path(), config)
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
         # Test connection with different config
         result = await flext_meltano_test_tap_connection(
@@ -119,8 +125,9 @@ class TestValidationCoverageImprovement:
             Path(),
             config,
         )
-        assert hasattr(result, "success")
-        assert isinstance(result.success, bool)
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert isinstance(result["success"], bool)
 
     def test_validation_service_methods(self):
         """Test validation service instance methods."""

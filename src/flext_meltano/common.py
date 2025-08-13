@@ -46,7 +46,7 @@ from pathlib import Path
 # === DEPENDENCY INJECTION UTILITIES ===
 # Simple injectable decorator replacement (no external dependency needed)
 def injectable(cls: type) -> type:
-    """Simple injectable decorator for dependency injection compatibility."""
+    """Provide a no-op injectable decorator for DI compatibility."""
     return cls
 
 

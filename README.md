@@ -1,10 +1,10 @@
 # flext-meltano
 
-**Type**: Infrastructure Library | **Status**: Development | **Dependencies**: flext-core
+**Type**: Infrastructure Library | **Status**: Active Development | **Dependencies**: flext-core
 
 Meltano/Singer integration library providing data pipeline orchestration for the FLEXT ecosystem.
 
-> **⚠️ Development Status**: Go-Python bridge working, core functionality complete, test coverage 74% (90% target)
+> ⚠️ Development Status: Go-Python bridge working; core functionality largely complete; ~74% coverage (90% target).
 
 ## Quick Start
 
@@ -157,9 +157,9 @@ export PYTHONPATH=$(PWD)/src:$(PYTHONPATH)
 
 ### **Zero Tolerance Quality Gates**
 
-- **Coverage**: 90% test coverage enforced (currently 74%)
-- **Type Safety**: Strict MyPy configuration (0 errors)
-- **Linting**: Ruff with comprehensive rules (0 errors)
+- **Coverage**: 90% target (currently ~74%)
+- **Type Safety**: MyPy strict mode adopted (work in progress)
+- **Linting**: Ruff with comprehensive rules (minor issues may remain)
 - **Security**: Bandit + pip-audit scanning
 
 ## Integration with FLEXT Ecosystem
@@ -192,7 +192,7 @@ else:
 - ✅ Go-Python bridge integration (FlextMeltanoBridge)
 - ✅ Meltano CLI execution with subprocess patterns
 - ✅ Singer SDK integration and DBT project management
-- ✅ Type safety (0 MyPy errors) and linting compliance
+- ✅ Type safety baseline in place; strict compliance in progress
 
 **In Progress**:
 

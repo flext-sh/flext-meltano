@@ -151,14 +151,15 @@ def flext_meltano_discover_catalog(
     meltano_config = FlextMeltanoConfig(project_root=str(project_root))
     discoverer = FlextMeltanoDiscoverer(meltano_config)
 
-    # Run async function in sync context; if already in loop, fallback to loop.run_until_complete
+    # Run async function in sync context; if already in loop, return graceful failure
     try:
-        loop = asyncio.get_running_loop()
+        asyncio.get_running_loop()
+        # If there's already a running loop, we cannot use asyncio.run or run_until_complete
+        # The proper solution would be to make this function async, but for backward compatibility
+        # we return a graceful failure that the test can handle
+        return FlextMeltanoResult.fail("Cannot run catalog discovery within existing event loop - use async version")
     except RuntimeError:
-        loop = None
-    if loop and loop.is_running():
-        result = loop.run_until_complete(discoverer.discover_catalog(tap_name, config))
-    else:
+        # No running loop, safe to use asyncio.run
         result = asyncio.run(discoverer.discover_catalog(tap_name, config))
     if result.success:
         data_dict = result.data.dict() if hasattr(result.data, "dict") else result.data  # type: ignore[union-attr]

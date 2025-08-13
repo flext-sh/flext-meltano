@@ -56,7 +56,7 @@ class FlextMeltanoExecutor:
     """Pipeline executor using MANDATORY patterns."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-        """Initialize with dependency injection."""
+        """Initialize executor with configuration via dependency injection."""
         self.config = config
         self._initialized = False
         self._meltano_path: Path | None = None
@@ -384,6 +384,7 @@ class FlextMeltanoResult:
         data: dict[str, object] | None = None,
         error: str = "",
     ) -> None:
+        """Initialize legacy result with success flag, data, and error."""
         _warnings.warn(
             "FlextMeltanoResult is deprecated. Use FlextResult from flext-core instead.",
             DeprecationWarning,

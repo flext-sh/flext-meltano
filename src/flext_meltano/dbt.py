@@ -58,14 +58,11 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
 
 from flext_meltano.config import FlextMeltanoConfig
-
-if TYPE_CHECKING:
-    from flext_meltano.execution import FlextMeltanoExecutor
+from flext_meltano.execution import FlextMeltanoExecutor
 
 
 def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
@@ -73,7 +70,6 @@ def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     import asyncio
 
     from flext_meltano.base import FlextMeltanoDbtService
-    from flext_meltano.config import FlextMeltanoConfig
 
     # Create default config for DBT service
     config = FlextMeltanoConfig()
@@ -95,16 +91,8 @@ def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     }
 
 
-def _get_default_executor(
-    config: FlextMeltanoConfig | None = None,
-) -> FlextMeltanoExecutor:
-    """Create default executor instance avoiding circular imports.
-
-    Import is placed inside function but annotated as a forward reference to
-    satisfy static type checking without PLC0415.
-    """
-    from flext_meltano.execution import FlextMeltanoExecutor  # noqa: PLC0415
-
+def _get_default_executor(config: FlextMeltanoConfig | None = None) -> FlextMeltanoExecutor:
+    """Create default executor instance (import at top-level avoids PLC0415)."""
     used_config = config or FlextMeltanoConfig()
     return FlextMeltanoExecutor(used_config)
 

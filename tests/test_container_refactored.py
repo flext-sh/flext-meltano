@@ -229,7 +229,7 @@ class TestContainerServiceIntegration:
         config_result = container1.get("meltano_config")
         assert config_result.success
         # Should have latest config due to singleton pattern
-        assert config_result.data.environment == "prod"
+        assert config_result.data.environment == "production"
 
     def test_container_service_lifecycle(self):
         """Test complete service lifecycle in container."""

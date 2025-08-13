@@ -18,6 +18,12 @@ class FlextMeltanoBaseService:
     """Base service using flext-core patterns."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
+        """Initialize base service with configuration.
+
+        Args:
+            config: Meltano configuration object.
+
+        """
         self.config = config
         self._initialized = False
         self.logger = get_logger(self.__class__.__name__)
