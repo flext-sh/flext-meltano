@@ -22,12 +22,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 
-try:
-    import pandas as pd
-except ImportError:  # pragma: no cover - optional dependency stub
-    from types import SimpleNamespace
-
-    pd = SimpleNamespace()  # type: ignore[assignment]
+import pandas as pd
 
 from flext_core import FlextResult, get_logger
 

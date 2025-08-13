@@ -139,17 +139,14 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 from typing import Protocol
+from datetime import datetime, timezone
 
-try:
-    import pandas as pd
-except ImportError:  # pragma: no cover - optional dependency stub
-    from types import SimpleNamespace
-
-    pd = SimpleNamespace()  # type: ignore[assignment]
-
+from flext_cli import setup_cli as flext_setup_cli
+from flext_cli.config import CLIConfig as FlextCLIConfig
 from flext_core import FlextResult
 
 from flext_meltano.common import MockResult
+# Always use the consolidated canonical implementation
 from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
 from flext_meltano.execution import (
     SubprocessExecutionContext as SharedSubprocessExecutionContext,
@@ -176,6 +173,12 @@ class FlextMeltanoCli:
     ) -> FlextResult[dict[str, object]]:
         """Execute CLI operations using flext-core patterns."""
         options = options or []
+
+        # Initialize flext-cli foundation (idempotent)
+        try:
+            _ = flext_setup_cli(FlextCLIConfig())
+        except Exception:
+            pass
 
         if not command or command.strip() == "":
             return self._handle_empty()
@@ -209,7 +212,7 @@ class FlextMeltanoCli:
                 if n == 3:
                     return fn(opts[0], opts[1], opts[2])
                 # Fallback for larger n: still pass through, safe enough for our handlers
-                return fn(*opts[:n])  # type: ignore[misc]
+                return fn(*opts[:n])
 
             return _inner
 
@@ -232,7 +235,7 @@ class FlextMeltanoCli:
                     return fn(required[0], required[1], *optional)
                 if n == 3:
                     return fn(required[0], required[1], required[2], *optional)
-                return fn(*required, *optional)  # type: ignore[misc]
+                return fn(*required, *optional)
 
             return _inner
 
@@ -251,18 +254,30 @@ class FlextMeltanoCli:
             "install": lambda opts: self._mock_success("install", opts),
             "run": lambda opts: self._mock_success("run", opts),
             # Parameterized
-            "dbt-test-local": _require_args(1, self.dbt_test_local),
-            "dbt-run-model": _require_args(1, self.dbt_run_model),
-            "dbt-validate-project": _require_args(
-                1,
-                self.dbt_validate_project,
+            "dbt-test-local": (
+                lambda opts: self.dbt_test_local(opts[0])
+                if len(opts) >= 1
+                else FlextResult(error="Missing required arguments: expected 1")
+            ),
+            "dbt-run-model": (
+                lambda opts: self.dbt_run_model(opts[0])
+                if len(opts) >= 1
+                else FlextResult(error="Missing required arguments: expected 1")
+            ),
+            "dbt-validate-project": (
+                lambda opts: self.dbt_validate_project(opts[0])
+                if len(opts) >= 1
+                else FlextResult(error="Missing required arguments: expected 1")
             ),
             "dbt-list-models": (
                 lambda opts: self.dbt_list_models(opts[0] if opts else None)
             ),
-            "dbt-create-mock-data": _require_args(
-                MIN_MOCK_DATA_ARGS,
-                self.dbt_create_mock_data,
+            "dbt-create-mock-data": (
+                lambda opts: self.dbt_create_mock_data(opts[0], opts[1])
+                if len(opts) >= MIN_MOCK_DATA_ARGS
+                else FlextResult(
+                    error=f"Missing required arguments: expected {MIN_MOCK_DATA_ARGS}",
+                )
             ),
             "dbt-get-metrics": (
                 lambda opts: self.dbt_get_metrics(opts[0] if opts else None)
@@ -270,7 +285,11 @@ class FlextMeltanoCli:
             "dbt-list-snapshots": (
                 lambda opts: self.dbt_list_snapshots(opts[0] if opts else None)
             ),
-            "dbt-execute-snapshot": _require_args(1, self.dbt_execute_snapshot),
+            "dbt-execute-snapshot": (
+                lambda opts: self.dbt_execute_snapshot(opts[0])
+                if len(opts) >= 1
+                else FlextResult(error="Missing required arguments: expected 1")
+            ),
             "dbt-list-hooks": (
                 lambda opts: self.dbt_list_hooks(opts[0] if opts else None)
             ),
@@ -288,7 +307,11 @@ class FlextMeltanoCli:
             "dbt-build-lineage": (
                 lambda opts: self.dbt_build_lineage(opts[0] if opts else None)
             ),
-            "dbt-lineage-path": _require_args(2, self.dbt_lineage_path),
+            "dbt-lineage-path": (
+                lambda opts: self.dbt_lineage_path(opts[0], opts[1])
+                if len(opts) >= 2
+                else FlextResult(error="Missing required arguments: expected 2")
+            ),
         }
 
         handler = dispatch.get(command)
@@ -789,7 +812,7 @@ class FlextMeltanoCli:
                     data={
                         "status": "success",
                         "metrics": metrics_result.data,
-                        "timestamp": pd.Timestamp.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                         "message": (
                             f"DBT metrics retrieved successfully for {model}"
                             if model
@@ -822,7 +845,7 @@ class FlextMeltanoCli:
                     data={
                         "status": "success",
                         "dashboard_config": dashboard_result.data,
-                        "timestamp": pd.Timestamp.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                         "message": "DBT dashboard configuration created",
                     },
                 )
@@ -895,7 +918,7 @@ class FlextMeltanoCli:
                 data={
                     "status": overall_health,
                     "components": health_status,
-                    "timestamp": pd.Timestamp.now().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                     "message": f"DBT hub health check completed - {overall_health}",
                     "errors": error_components or None,
                 },

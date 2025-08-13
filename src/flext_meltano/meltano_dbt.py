@@ -72,21 +72,15 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
 try:
     import duckdb
-except Exception:  # pragma: no cover
-    duckdb = None  # type: ignore[assignment]
+except Exception as _e:  # pragma: no cover
+    raise ImportError("duckdb is required for flext-meltano DBT operations") from _e
 
 try:
     import pandas as pd
-except Exception:  # pragma: no cover
-    pd = None  # type: ignore[assignment]
+except Exception as _e:  # pragma: no cover
+    raise ImportError("pandas is required for flext-meltano DBT operations") from _e
 
-try:
-    from jinja2 import Environment as _RealJinjaEnvironment
-
-    _JINJA_AVAILABLE = True
-except Exception:  # pragma: no cover
-    _RealJinjaEnvironment = None  # type: ignore[misc,assignment]
-    _JINJA_AVAILABLE = False
+from jinja2 import Environment as _RealJinjaEnvironment
 
 
 class _TemplateLike(Protocol):
@@ -97,25 +91,7 @@ class _JinjaLike(Protocol):
     def from_string(self, s: str) -> _TemplateLike: ...
 
 
-if _JINJA_AVAILABLE:
-    JINJA_ENV_CLS: type[_JinjaLike] | None = _RealJinjaEnvironment
-else:
-
-    class _DummyTemplate:  # pragma: no cover
-        def __init__(self, s: str) -> None:
-            self._s = s
-
-        def render(self, **_: object) -> str:
-            return self._s
-
-    class _DummyJinja:  # pragma: no cover
-        def __init__(self, *args: object, **kwargs: object) -> None:
-            pass
-
-        def from_string(self, s: str) -> _DummyTemplate:
-            return _DummyTemplate(s)
-
-    JINJA_ENV_CLS = _DummyJinja
+JINJA_ENV_CLS: type[_JinjaLike] | None = _RealJinjaEnvironment
 
 logger = get_logger(__name__)
 
@@ -475,9 +451,13 @@ class FlextDbtInMemoryExecutor:
     """Executes DBT models in-memory using DuckDB."""
 
     def __init__(self, database: str = ":memory:") -> None:
-        """Initialize in-memory executor."""
-        # Note: duckdb and pd imports are handled at module level
-        # If they're not available, the module import will fail
+        """Initialize in-memory executor.
+
+        Requires duckdb and pandas; provides clear error if unavailable.
+        """
+        if duckdb is None or pd is None:
+            raise ImportError("duckdb/pandas not available for in-memory execution")
+
         self.database = database
         self.connection = cast("object", duckdb).connect(database)  # type: ignore[attr-defined]
         self.schemas: dict[str, dict[str, object]] = {}
@@ -841,13 +821,9 @@ class FlextDbtHub:
             self.registry_path / "dbt_models.json",
         )
 
-        try:
-            self.executor: FlextDbtInMemoryExecutor | None = FlextDbtInMemoryExecutor(
-                database,
-            )
-        except ImportError:
-            logger.warning("DuckDB/pandas not available, in-memory execution disabled")
-            self.executor = None
+        self.executor: FlextDbtInMemoryExecutor | None = FlextDbtInMemoryExecutor(
+            database,
+        )
 
         # Initialize advanced feature registries
         self.snapshots: dict[str, FlextDbtSnapshot] = {}
