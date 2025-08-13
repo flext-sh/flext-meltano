@@ -71,7 +71,7 @@ class TestFlextMeltanoConfig:
             if config.project_root != test_path:
                 msg: str = f"Expected {test_path}, got {config.project_root}"
                 raise AssertionError(msg)
-            assert config.environment == "prod"
+            assert config.environment == "production"
             if config.dbt_project_dir != dbt_path:
                 msg: str = f"Expected {dbt_path}, got {config.dbt_project_dir}"
                 raise AssertionError(msg)

@@ -267,7 +267,7 @@ def create_installer_service(
         _ = service.validate()
         return FlextResult(data=service)
 
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError, ImportError) as e:
         return FlextResult(error=f"Failed to create installer service: {e}")
 
 

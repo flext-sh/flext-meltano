@@ -213,8 +213,8 @@ class FlextSingerCatalog(FlextModel):
                 kwargs.setdefault("streams", data["streams"])
         super().__init__(**kwargs)
         # Tests expect a _logger attribute to exist
-        from flext_core import get_logger as _get_logger  # noqa: PLC0415
-        # lazy logger setup compatible with pydantic BaseModel immutability
+        from flext_core import get_logger as _get_logger
+        # logger setup compatible with pydantic BaseModel immutability
         object.__setattr__(self, "_logger", _get_logger(self.__class__.__name__))
         # Backward-compatibility: also maintain an internal _catalog structure
         object.__setattr__(self, "_catalog", {"streams": self.streams})

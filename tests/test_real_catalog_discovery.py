@@ -181,17 +181,13 @@ extractors:
                 result = flext_meltano_discover_plugins(plugin_type="extractors")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
-            result = type(
-                "obj",
-                (object,),
-                {
-                    "success": True,
-                    "data": {"plugins": [{"name": "tap-csv", "type": "extractors"}]},
-                },
-            )()
+            result = {
+                "success": True,
+                "data": {"plugins": [{"name": "tap-csv", "type": "extractors"}]},
+            }
 
-        assert result.success
-        data = result.data
+        assert result["success"]
+        data = result["data"]
         assert data is not None
         plugins = data["plugins"]
 
@@ -211,17 +207,13 @@ extractors:
                 result = flext_meltano_discover_plugins(plugin_type="loaders")
         except (OSError, RuntimeError, ValueError, ImportError, ModuleNotFoundError):
             # Use fallback test data if discovery fails
-            result = type(
-                "obj",
-                (object,),
-                {
-                    "success": True,
-                    "data": {"plugins": [{"name": "target-jsonl", "type": "loaders"}]},
-                },
-            )()
+            result = {
+                "success": True,
+                "data": {"plugins": [{"name": "target-jsonl", "type": "loaders"}]},
+            }
 
-        assert result.success
-        data = result.data
+        assert result["success"]
+        data = result["data"]
         assert data is not None
         plugins = data["plugins"]
 

@@ -6,7 +6,7 @@ architecture interfaces from flext-core while providing Singer-specific
 functionality.
 
 Architecture:
-    - Implements flext_core.interfaces.FlextDataPlugin
+    - Implements flext_core.FlextDataPlugin
     - Uses composition with FlextPluginEntity for domain logic
     - Provides Singer SDK integration points
     - Maintains clean separation of concerns

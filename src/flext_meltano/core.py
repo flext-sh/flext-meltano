@@ -190,6 +190,7 @@ class FlextMeltanoRepository(FlextAggregateRoot):
     """Repository aggregate root base for storing pipeline artifacts."""
 
     def __init__(self, *, name: str) -> None:
+        """Initialize repository with a name."""
         super().__init__(id=str(uuid.uuid4()))
         self.name = name
         self.pipelines: list[FlextMeltanoPipelineEntity] = []
@@ -208,7 +209,7 @@ class FlextMeltanoRepository(FlextAggregateRoot):
     def validate_business_rules(
         self,
     ) -> FlextResult[None]:  # pragma: no cover - abstract placeholder
-        """Default repository validation passes by default."""
+        """Pass repository validation by default."""
         return FlextResult.ok(None)
 
 
@@ -289,6 +290,7 @@ class FlextMeltanoJobEntity(FlextEntity):
         plugin_name: str,
         started_at: datetime | None = None,
     ) -> None:
+        """Initialize job entity with identification and metadata."""
         super().__init__(id=job_id)
         self.job_id = job_id
         self.job_type = job_type
@@ -345,6 +347,7 @@ class FlextMeltanoPipelineEntity(FlextAggregateRoot):
         target_name: str,
         environment: str = "dev",
     ) -> None:
+        """Initialize pipeline entity with basic attributes."""
         super().__init__(id=pipeline_id)
         self.tap_name = tap_name
         self.target_name = target_name
@@ -408,6 +411,7 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
     """Singer protocol domain service."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
+        """Initialize service with configuration."""
         super().__init__()
         self.config = config
         self._logger = get_logger(self.__class__.__name__)
@@ -490,6 +494,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
         dbt_service: FlextMeltanoDbtService,
         executor: FlextMeltanoExecutor | None = None,
     ) -> None:
+        """Initialize orchestration service with required dependencies."""
         super().__init__()
         self.config = config
         self.singer_service = singer_service
@@ -576,6 +581,7 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
     """Extension service for custom operations."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
+        """Initialize extension service with configuration."""
         super().__init__()
         self.config = config
         self._logger = get_logger(self.__class__.__name__)

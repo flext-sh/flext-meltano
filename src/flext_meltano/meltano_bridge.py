@@ -70,7 +70,7 @@ logger = get_logger(__name__)
 
 
 def injectable(cls: type) -> type:
-    """Simple injectable decorator for dependency injection compatibility."""
+    """Provide a no-op injectable decorator for DI compatibility."""
     return cls
 
 
@@ -681,7 +681,7 @@ CLI_MIN_ARGS_RUN_PIPELINE = 4
 
 
 def main() -> None:
-    """Main CLI entry point for bridge operations.
+    """Provide CLI entry point for bridge operations.
 
     This function provides a simple CLI interface for Go services to call
     FLEXT Meltano operations via subprocess.
