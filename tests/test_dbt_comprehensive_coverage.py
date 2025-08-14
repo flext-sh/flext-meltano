@@ -17,6 +17,7 @@ from flext_meltano.dbt import (
     FlextMeltanoDbtManager,
     FlextMeltanoDbtProject,
     FlextMeltanoDbtRunner,
+    __all__ as _dbt_all,
 )
 
 
@@ -407,18 +408,16 @@ class TestDbtModuleIntegration:
 
     def test_module_exports(self):
         """Test that module exports are correctly defined."""
-        from flext_meltano.dbt import __all__
-
         expected_exports = [
             "FlextMeltanoDbtManager",
             "FlextMeltanoDbtProject",
             "FlextMeltanoDbtRunner",
         ]
 
-        assert isinstance(__all__, list)
-        assert len(__all__) == 3
+        assert isinstance(_dbt_all, list)
+        assert len(_dbt_all) == 3
         for export in expected_exports:
-            assert export in __all__
+            assert export in _dbt_all
 
     def test_all_methods_return_flext_result(self):
         """Test that all methods return FlextResult objects."""

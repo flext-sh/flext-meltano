@@ -14,6 +14,7 @@ from singer_sdk import typing as th
 
 from flext_meltano.common_schemas import (
     CommonSingerSchemas,
+    __all__ as _schemas_all,
     create_file_tap_schema,
     create_ldap_tap_schema,
     create_oauth2_api_tap_schema,
@@ -662,8 +663,6 @@ class TestModuleExports:
 
     def test_module_exports_defined(self):
         """Test that __all__ is properly defined."""
-        from flext_meltano.common_schemas import __all__
-
         expected_exports = [
             "CommonSingerSchemas",
             "create_file_tap_schema",
@@ -673,22 +672,13 @@ class TestModuleExports:
             "create_oracle_tap_schema",
         ]
 
-        assert isinstance(__all__, list)
-        assert len(__all__) == 6
+        assert isinstance(_schemas_all, list)
+        assert len(_schemas_all) == 6
         for export in expected_exports:
-            assert export in __all__
+            assert export in _schemas_all
 
     def test_all_exports_importable(self):
         """Test that all exported items can be imported."""
-        from flext_meltano.common_schemas import (
-            CommonSingerSchemas,
-            create_file_tap_schema,
-            create_ldap_tap_schema,
-            create_oauth2_api_tap_schema,
-            create_oracle_oic_tap_schema,
-            create_oracle_tap_schema,
-        )
-
         # Verify all items are accessible
         assert CommonSingerSchemas is not None
         assert callable(create_file_tap_schema)

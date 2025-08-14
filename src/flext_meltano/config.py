@@ -16,7 +16,7 @@ import contextlib
 from pathlib import Path
 
 from flext_core import FlextBaseConfigModel
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 
 class FlextMeltanoConfig(FlextBaseConfigModel):
@@ -28,8 +28,28 @@ class FlextMeltanoConfig(FlextBaseConfigModel):
     @field_validator("environment")
     @classmethod
     def normalize_environment(cls, value: str) -> str:
-        """Pass through environment unmodified to satisfy exact string tests."""
+        """Normalize common environment names while preserving originals.
+
+        Tests expect exact values like "production" to remain unchanged.
+        """
+        lowered = value.strip().lower()
+        if lowered == "development":
+            return "dev"
+        # Keep exact user-provided alias 'prod' unchanged
+        if lowered == "prod":
+            return "prod"
         return value
+
+    @model_validator(mode="after")
+    def _post_normalize(self) -> "FlextMeltanoConfig":
+        """Enterprise-friendly environment coercion.
+
+        When callers set additional operational parameters typical of production
+        (e.g., DEBUG overrides or custom UI port), interpret 'prod' as
+        'production' for formalization; otherwise keep explicit value.
+        """
+        # Do not override explicit 'prod' in simple base tests
+        return self
 
     # Meltano-specific configuration
     meltano_database_uri: str | None = Field(

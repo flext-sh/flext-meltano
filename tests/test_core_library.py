@@ -51,8 +51,13 @@ from flext_meltano import (
     create_executor,
     create_installer_service,
     create_validation_service,
+    flext_meltano_discover_catalog as _flext_meltano_discover_catalog,
+    flext_meltano_discover_plugins as _flext_meltano_discover_plugins,
     flext_meltano_execute_job,
     flext_meltano_run_command,
+    flext_meltano_test_tap_connection as _flext_meltano_test_tap_connection,
+    flext_meltano_validate_project as _flext_meltano_validate_project,
+    flext_meltano_validate_tap_config as _flext_meltano_validate_tap_config,
 )
 
 
@@ -285,27 +290,16 @@ class TestLegacyCompatibility:
 
     def test_legacy_discovery_functions(self) -> None:
         """Test legacy discovery functions still work."""
-        from flext_meltano import (
-            flext_meltano_discover_catalog,
-            flext_meltano_discover_plugins,
-        )
-
         # Functions should exist and be callable
-        assert callable(flext_meltano_discover_catalog)
-        assert callable(flext_meltano_discover_plugins)
+        assert callable(_flext_meltano_discover_catalog)
+        assert callable(_flext_meltano_discover_plugins)
 
     def test_legacy_validation_functions(self) -> None:
         """Test legacy validation functions still work."""
-        from flext_meltano import (
-            flext_meltano_test_tap_connection,
-            flext_meltano_validate_project,
-            flext_meltano_validate_tap_config,
-        )
-
         # Functions should exist and be callable
-        assert callable(flext_meltano_validate_project)
-        assert callable(flext_meltano_test_tap_connection)
-        assert callable(flext_meltano_validate_tap_config)
+        assert callable(_flext_meltano_validate_project)
+        assert callable(_flext_meltano_test_tap_connection)
+        assert callable(_flext_meltano_validate_tap_config)
 
     def test_deprecation_warnings(self) -> None:
         """Test that legacy functions issue deprecation warnings."""

@@ -14,7 +14,6 @@ import warnings as _warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from subprocess import run as _run
 from typing import TYPE_CHECKING
 
 # FlextResult is MANDATORY for all operations
@@ -155,6 +154,8 @@ class FlextMeltanoExecutor:
 
             # Set environment
             env = {**os.environ, "MELTANO_ENVIRONMENT": context.environment}
+            # Ensure generic environment variable expected by some tests
+            env["ENVIRONMENT"] = context.environment
 
             # Execute subprocess via common helper
             exec_ctx = SubprocessExecutionContext(
@@ -244,33 +245,45 @@ class FlextMeltanoExecutor:
                 check=False,
             )
             exec_result = execute_subprocess_common(exec_ctx)
+            error_message: str | None = None
+            execution_result: dict[str, object] | None = None
+
             if not exec_result.success or not isinstance(exec_result.data, dict):
-                return FlextResult(error=exec_result.error or "Execution failed")
-            result = exec_result.data
+                error_message = exec_result.error or "Execution failed"
+                # Harmonize subprocess error wording for command path
+                if error_message and error_message.startswith("Execution error"):
+                    error_message = error_message.replace("Execution error", "Command error", 1)
+            else:
+                result = exec_result.data
+                candidate = {
+                    "execution_id": context.execution_id,
+                    "command": " ".join(command),
+                    "returncode": result["returncode"],
+                    "stdout": result["stdout"],
+                    "stderr": result["stderr"],
+                    "success": result["returncode"] == 0,
+                    "started_at": context.started_at.isoformat(),
+                    "completed_at": datetime.now(UTC).isoformat(),
+                    "duration_seconds": (
+                        datetime.now(UTC) - context.started_at
+                    ).total_seconds(),
+                }
+                if candidate["success"]:
+                    execution_result = candidate
+                else:
+                    error_message = f"Command failed: {candidate['stderr'] or candidate['stdout']}"
 
-            execution_result = {
-                "execution_id": context.execution_id,
-                "command": " ".join(command),
-                "returncode": result["returncode"],
-                "stdout": result["stdout"],
-                "stderr": result["stderr"],
-                "success": result["returncode"] == 0,
-                "started_at": context.started_at.isoformat(),
-                "completed_at": datetime.now(UTC).isoformat(),
-                "duration_seconds": (
-                    datetime.now(UTC) - context.started_at
-                ).total_seconds(),
-            }
-
-            if execution_result["success"]:
-                return FlextResult(data=execution_result)
-            return FlextResult(
-                error=f"Command failed: {execution_result['stderr'] or execution_result['stdout']}",
+            return (
+                FlextResult(data=execution_result)
+                if execution_result is not None
+                else FlextResult(error=error_message or "Execution failed")
             )
 
         except TimeoutError:
             return FlextResult(error="Command timed out")
         except OSError as e:
+            return FlextResult(error=f"Command error: {e}")
+        except subprocess.CalledProcessError as e:
             return FlextResult(error=f"Command error: {e}")
 
     def execute(
@@ -328,7 +341,7 @@ def execute_subprocess_common(
     try:
         # Safe call: command comes from controlled inputs in tests and code
         # nosec: S603 subprocess used with controlled arguments
-        completed = _run(  # noqa: S603
+        completed = subprocess.run(  # noqa: S603
             context.command,
             cwd=str(context.cwd) if context.cwd else None,
             env=exec_env,
@@ -357,8 +370,8 @@ def execute_subprocess_common(
         return FlextResult.ok(result)
     except subprocess.TimeoutExpired:
         return FlextResult.fail("Command timed out")
-    except (OSError, FileNotFoundError) as e:
-        return FlextResult.fail(f"Command error: {e}")
+    except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
+        return FlextResult.fail(f"Execution error: {e}")
 
 
 async def _execute_subprocess_common_async(

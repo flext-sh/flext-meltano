@@ -1,8 +1,8 @@
-"""FLEXT Meltano CLI - Command Line Interface for Bridge Operations with flext-cli Integration.
+"""FLEXT Meltano CLI - Command Line Interface with Command Pattern Architecture.
 
 **Architecture Layer**: Application Layer
-**Status**: ✅ **FUNCTIONAL** - Now integrated with flext-cli foundation patterns
-**Dependencies**: flext-core (FlextResult), flext-cli (CLI foundation), subprocess, Path utilities
+**Status**: ✅ **REFACTORED** - Command Pattern applied to reduce complexity
+**Dependencies**: flext-core (FlextResult), subprocess, Path utilities, SOLID principles
 
 ## Module Purpose
 
@@ -10,19 +10,19 @@ This module provides **command-line interface functionality** for FLEXT Meltano'
 bridge architecture, enabling direct CLI operations and serving as a foundation
 for Go service integration through subprocess calls.
 
-**RECENT FIX**: The critical type error at line 293 has been resolved with proper type guards:
-```python
-# Fixed implementation:
-if result.data and isinstance(result.data, dict):
-    stdout = result.data.get("stdout", "")
-    version = stdout.strip() if isinstance(stdout, str) else "unknown"
-else:
-    version = "unknown"
-```
+## SOLID Refactoring Applied
+
+**Command Pattern Implementation**: The execute method has been refactored from 17 returns
+to a clean command dispatcher architecture:
+
+1. **CommandHandler Protocol**: Type-safe command interface
+2. **FlextMeltanoCommandDispatcher**: Centralized command management
+3. **Command Registration**: Clean separation of command definition and execution
+4. **Reduced Complexity**: Single responsibility for each command handler
 
 ## Design Principles
 
-1. **CLI Interface**: Direct command-line operations for development and testing
+1. **Command Pattern**: Single responsibility for command execution
 2. **Bridge Foundation**: CLI operations callable from Go services via subprocess
 3. **FlextResult Integration**: Consistent error handling with enterprise patterns
 4. **Command Validation**: Input validation and secure command execution
@@ -136,10 +136,9 @@ the bridge architecture.
 from __future__ import annotations
 
 # Avoid direct subprocess exceptions; use higher-level execution wrappers
-from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol, Callable
 
 # Temporarily commented out due to import issues - these are optional
 # from flext_cli import setup_cli as flext_setup_cli
@@ -160,176 +159,206 @@ MIN_MOCK_DATA_ARGS = 2
 MIN_LINEAGE_ARGS = 2
 
 
+class CommandHandler(Protocol):
+    """Protocol for command handlers following Command Pattern."""
+
+    def __call__(self, options: list[str]) -> FlextResult[dict[str, object]]:
+        """Execute command with options and return result."""
+
+
+class FlextMeltanoCommandDispatcher:
+    """Command dispatcher implementing Command Pattern to reduce complexity.
+
+    This class applies SOLID principles:
+    - Single Responsibility: Only handles command dispatch
+    - Open/Closed: Easy to extend with new commands
+    - Interface Segregation: Clean CommandHandler protocol
+    """
+
+    def __init__(self, cli_instance: FlextMeltanoCli) -> None:
+        """Initialize dispatcher with CLI instance."""
+        self.cli = cli_instance
+        self._commands: dict[str, CommandHandler] = {}
+        self._register_commands()
+
+    def _register_commands(self) -> None:
+        """Register all available commands - centralized command management."""
+        # Simple no-argument commands
+        self._commands.update(
+            {
+                "version": self._no_args_handler(self.cli.version),
+                "help": self._no_args_handler(self.cli.help),
+                "health": self._no_args_handler(self.cli.health),
+                "dbt-list-packages": self._no_args_handler(self.cli.dbt_list_packages),
+                "dbt-import-ecosystem": self._no_args_handler(
+                    self.cli.dbt_import_ecosystem
+                ),
+                "dbt-create-dashboard": self._no_args_handler(
+                    self.cli.dbt_create_dashboard
+                ),
+                "dbt-health-check": self._no_args_handler(self.cli.dbt_health_check),
+            }
+        )
+
+        # Mock commands (pass-through to Meltano)
+        self._commands.update(
+            {
+                "discover": self._mock_handler("discover"),
+                "install": self._mock_handler("install"),
+                "run": self._mock_handler("run"),
+            }
+        )
+
+        # Single argument commands
+        self._commands.update(
+            {
+                "dbt-test-local": self._single_arg_handler(self.cli.dbt_test_local),
+                "dbt-run-model": self._single_arg_handler(self.cli.dbt_run_model),
+                "dbt-validate-project": self._single_arg_handler(
+                    self.cli.dbt_validate_project
+                ),
+                "dbt-execute-snapshot": self._single_arg_handler(
+                    self.cli.dbt_execute_snapshot
+                ),
+            }
+        )
+
+        # Optional argument commands
+        self._commands.update(
+            {
+                "dbt-list-models": self._optional_arg_handler(self.cli.dbt_list_models),
+                "dbt-get-metrics": self._optional_arg_handler(self.cli.dbt_get_metrics),
+                "dbt-list-snapshots": self._optional_arg_handler(
+                    self.cli.dbt_list_snapshots
+                ),
+                "dbt-list-hooks": self._optional_arg_handler(self.cli.dbt_list_hooks),
+                "dbt-list-exposures": self._optional_arg_handler(
+                    self.cli.dbt_list_exposures
+                ),
+                "dbt-build-lineage": self._optional_arg_handler(
+                    self.cli.dbt_build_lineage
+                ),
+            }
+        )
+
+        # Multi-argument commands
+        self._commands.update(
+            {
+                "dbt-create-mock-data": self._dual_arg_handler(
+                    self.cli.dbt_create_mock_data, MIN_MOCK_DATA_ARGS
+                ),
+                "dbt-lineage-path": self._dual_arg_handler(
+                    self.cli.dbt_lineage_path, MIN_LINEAGE_ARGS
+                ),
+                "dbt-execute-hooks": self._dual_optional_handler(
+                    self.cli.dbt_execute_hooks
+                ),
+            }
+        )
+
+    def _no_args_handler(
+        self, method: Callable[[], FlextResult[dict[str, object]]]
+    ) -> CommandHandler:
+        """Create handler for commands that take no arguments."""
+
+        def handler(_options: list[str]) -> FlextResult[dict[str, object]]:
+            return method()
+
+        return handler
+
+    def _single_arg_handler(
+        self, method: Callable[[str], FlextResult[dict[str, object]]]
+    ) -> CommandHandler:
+        """Create handler for commands that require exactly one argument."""
+
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:
+            if not options:
+                return FlextResult(error="Missing required argument")
+            return method(options[0])
+
+        return handler
+
+    def _optional_arg_handler(
+        self, method: Callable[[str | None], FlextResult[dict[str, object]]]
+    ) -> CommandHandler:
+        """Create handler for commands with one optional argument."""
+
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:
+            return method(options[0] if options else None)
+
+        return handler
+
+    def _dual_arg_handler(
+        self,
+        method: Callable[[str, str], FlextResult[dict[str, object]]],
+        min_args: int,
+    ) -> CommandHandler:
+        """Create handler for commands that require exactly two arguments."""
+
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:
+            if len(options) < min_args:
+                return FlextResult(
+                    error=f"Missing required arguments: expected {min_args}"
+                )
+            return method(options[0], options[1])
+
+        return handler
+
+    def _dual_optional_handler(
+        self, method: Callable[[str, str | None], FlextResult[dict[str, object]]]
+    ) -> CommandHandler:
+        """Create handler for commands with one required and one optional argument."""
+
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:
+            if not options:
+                return FlextResult(error="Missing required argument")
+            return method(options[0], options[1] if len(options) > 1 else None)
+
+        return handler
+
+    def _mock_handler(self, command: str) -> CommandHandler:
+        """Create handler for mock/pass-through commands."""
+
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:
+            return self.cli._mock_success(command, options)
+
+        return handler
+
+    def dispatch(
+        self, command: str, options: list[str]
+    ) -> FlextResult[dict[str, object]]:
+        """Dispatch command to appropriate handler - single responsibility."""
+        handler = self._commands.get(command)
+        if handler is None:
+            return FlextResult(data={"command": command, "status": "unknown_command"})
+        return handler(options)
+
+
 class FlextMeltanoCli:
     """CLI interface for FLEXT Meltano using flext-core patterns."""
 
     def __init__(self, project_root: Path | None = None) -> None:
-        """Initialize CLI with project root configuration."""
+        """Initialize CLI with project root configuration and command dispatcher."""
         self.project_root = project_root or Path.cwd()
         self.dbt_hub: FlextDbtHub | None = None
+        self._dispatcher = FlextMeltanoCommandDispatcher(self)
 
     def execute(
         self,
         command: str = "",
         options: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Execute CLI operations using flext-core patterns."""
-        options = options or []
+        """Execute CLI operations using Command Pattern dispatcher.
 
-        # Initialize flext-cli foundation (idempotent) - temporarily commented out
-        # with contextlib.suppress(Exception):
-        #     _ = flext_setup_cli(FlextCLIConfig())
+        REFACTORED: Reduced from 17 returns to clean delegation pattern.
+        Complexity reduced by applying SOLID principles with Command dispatcher.
+        """
+        options = options or []
 
         if not command or command.strip() == "":
             return self._handle_empty()
 
-        handler_type = Callable[[list[str]], FlextResult[dict[str, object]]]
-
-        class _CmdHandler(Protocol):
-            def __call__(self, *args: str) -> FlextResult[dict[str, object]]: ...
-
-        def _no_args(
-            handler: Callable[[], FlextResult[dict[str, object]]],
-        ) -> handler_type:
-            return lambda _opts: handler()
-
-        def _require_args(
-            n: int,
-            fn: _CmdHandler,
-        ) -> handler_type:
-            n1 = 1
-            n2 = 2
-            n3 = 3
-
-            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
-                if len(opts) < n:
-                    return FlextResult(
-                        error=f"Missing required arguments: expected {n}",
-                    )
-                # Avoid variadic Any error by dispatching explicitly per arity
-                if n == 0:
-                    return fn()
-                if n == n1:
-                    return fn(opts[0])
-                if n == n2:
-                    return fn(opts[0], opts[1])
-                if n == n3:
-                    return fn(opts[0], opts[1], opts[2])
-                # Fallback for larger n: still pass through, safe enough for our handlers
-                return fn(*opts[:n])
-
-            return _inner
-
-        def _require_args_optional(
-            n: int,
-            fn: _CmdHandler,
-        ) -> handler_type:
-            n1 = 1
-            n2 = 2
-            n3 = 3
-
-            def _inner(opts: list[str]) -> FlextResult[dict[str, object]]:
-                if len(opts) < n:
-                    return FlextResult(
-                        error=f"Missing required arguments: expected {n}",
-                    )
-                required = opts[:n]
-                optional = opts[n:]
-                if n == 0:
-                    return fn(*optional)
-                if n == n1:
-                    return fn(required[0], *optional)
-                if n == n2:
-                    return fn(required[0], required[1], *optional)
-                if n == n3:
-                    return fn(required[0], required[1], required[2], *optional)
-                return fn(*required, *optional)
-
-            return _inner
-
-        dispatch: dict[str, handler_type] = {
-            # Simple handlers
-            "version": _no_args(self.version),
-            "help": _no_args(self.help),
-            "health": _no_args(self.health),
-            # DBT hub simple
-            "dbt-list-packages": _no_args(self.dbt_list_packages),
-            "dbt-import-ecosystem": _no_args(self.dbt_import_ecosystem),
-            "dbt-create-dashboard": _no_args(self.dbt_create_dashboard),
-            "dbt-health-check": _no_args(self.dbt_health_check),
-            # Meltano pass-through
-            "discover": lambda opts: self._mock_success("discover", opts),
-            "install": lambda opts: self._mock_success("install", opts),
-            "run": lambda opts: self._mock_success("run", opts),
-            # Parameterized
-            "dbt-test-local": (
-                lambda opts: self.dbt_test_local(opts[0])
-                if len(opts) >= 1
-                else FlextResult(error="Missing required arguments: expected 1")
-            ),
-            "dbt-run-model": (
-                lambda opts: self.dbt_run_model(opts[0])
-                if len(opts) >= 1
-                else FlextResult(error="Missing required arguments: expected 1")
-            ),
-            "dbt-validate-project": (
-                lambda opts: self.dbt_validate_project(opts[0])
-                if len(opts) >= 1
-                else FlextResult(error="Missing required arguments: expected 1")
-            ),
-            "dbt-list-models": (
-                lambda opts: self.dbt_list_models(opts[0] if opts else None)
-            ),
-            "dbt-create-mock-data": (
-                lambda opts: self.dbt_create_mock_data(opts[0], opts[1])
-                if len(opts) >= MIN_MOCK_DATA_ARGS
-                else FlextResult(
-                    error=f"Missing required arguments: expected {MIN_MOCK_DATA_ARGS}",
-                )
-            ),
-            "dbt-get-metrics": (
-                lambda opts: self.dbt_get_metrics(opts[0] if opts else None)
-            ),
-            "dbt-list-snapshots": (
-                lambda opts: self.dbt_list_snapshots(opts[0] if opts else None)
-            ),
-            "dbt-execute-snapshot": (
-                lambda opts: self.dbt_execute_snapshot(opts[0])
-                if len(opts) >= 1
-                else FlextResult(error="Missing required arguments: expected 1")
-            ),
-            "dbt-list-hooks": (
-                lambda opts: self.dbt_list_hooks(opts[0] if opts else None)
-            ),
-            "dbt-execute-hooks": (
-                lambda opts: self.dbt_execute_hooks(
-                    opts[0],
-                    opts[1] if len(opts) > 1 else None,
-                )
-                if opts
-                else FlextResult(error="Missing required arguments: expected 1")
-            ),
-            "dbt-list-exposures": (
-                lambda opts: self.dbt_list_exposures(opts[0] if opts else None)
-            ),
-            "dbt-build-lineage": (
-                lambda opts: self.dbt_build_lineage(opts[0] if opts else None)
-            ),
-            "dbt-lineage-path": (
-                lambda opts: self.dbt_lineage_path(opts[0], opts[1])
-                if len(opts) >= MIN_LINEAGE_ARGS
-                else FlextResult(
-                    error=f"Missing required arguments: expected {MIN_LINEAGE_ARGS}",
-                )
-            ),
-        }
-
-        handler = dispatch.get(command)
-        return (
-            handler(options)
-            if handler is not None
-            else FlextResult(data={"command": command, "status": "unknown_command"})
-        )
+        return self._dispatcher.dispatch(command, options)
 
     def _handle_empty(self) -> FlextResult[dict[str, object]]:
         return FlextResult(
@@ -495,7 +524,11 @@ class FlextMeltanoCli:
             exec_result = shared_execute_subprocess_common(exec_context)
 
             if not exec_result.success:
-                return FlextResult(error=exec_result.error)
+                # Harmonize subprocess error wording to 'Command error'
+                err = exec_result.error or "Execution error"
+                if err.startswith("Execution error"):
+                    err = err.replace("Execution error", "Command error", 1)
+                return FlextResult(error=err)
 
             result_data = exec_result.data
             if not isinstance(result_data, dict):

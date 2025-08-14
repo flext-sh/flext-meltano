@@ -17,6 +17,7 @@ from unittest.mock import patch
 from flext_meltano.flext_singer import (
     FlextSingerBridge,
     FlextSingerCatalog,
+    __all__ as _singer_all,
     flext_create_singer_bridge,
     flext_create_singer_catalog,
 )
@@ -751,8 +752,6 @@ class TestModuleExports:
 
     def test_module_exports_defined(self):
         """Test that __all__ is properly defined."""
-        from flext_meltano.flext_singer import __all__
-
         expected_exports = [
             "FlextSingerBridge",
             "FlextSingerCatalog",
@@ -760,20 +759,13 @@ class TestModuleExports:
             "flext_create_singer_catalog",
         ]
 
-        assert isinstance(__all__, list)
-        assert len(__all__) == 4
+        assert isinstance(_singer_all, list)
+        assert len(_singer_all) == 4
         for export in expected_exports:
-            assert export in __all__
+            assert export in _singer_all
 
     def test_all_exports_importable(self):
         """Test that all exported items can be imported."""
-        from flext_meltano.flext_singer import (
-            FlextSingerBridge,
-            FlextSingerCatalog,
-            flext_create_singer_bridge,
-            flext_create_singer_catalog,
-        )
-
         # Verify all items are callable/instantiable
         assert callable(FlextSingerBridge)
         assert callable(FlextSingerCatalog)

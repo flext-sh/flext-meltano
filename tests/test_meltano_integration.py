@@ -208,9 +208,6 @@ class TestMeltanoPluginDiscovery:
 
     def test_plugin_discovery_fallback(self) -> None:
         """Test plugin discovery fallback functionality."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a mock meltano.yml file
             meltano_yml = Path(temp_dir) / "meltano.yml"

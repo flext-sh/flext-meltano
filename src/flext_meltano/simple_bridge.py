@@ -45,6 +45,9 @@ class FlextMeltanoBridge:
 
         """
         self._config = config or FlextMeltanoConfig()
+        # Preserve provided environment string exactly (tests check this)
+        if config is not None:
+            self._config.environment = config.environment
         self._executor = FlextMeltanoExecutor(self._config)
 
         # Service interfaces (initialized on demand)

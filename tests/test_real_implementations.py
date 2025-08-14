@@ -10,6 +10,8 @@ resulted in working code.
 
 from __future__ import annotations
 
+from flext_core import FlextResult as _FlextResult
+
 from flext_meltano.dbt import (
     FlextMeltanoDbtManager,
     FlextMeltanoDbtProject,
@@ -178,10 +180,6 @@ class TestIntegrationBasics:
 
     def test_imports_work_correctly(self):
         """Test that all imports work without circular dependency issues."""
-        # This test validates that our refactoring didn't break imports
-        from flext_meltano.dbt import FlextMeltanoDbtManager
-        from flext_meltano.flext_singer import FlextSingerBridge
-
         # Should be able to create instances without errors
         dbt_manager = FlextMeltanoDbtManager()
         singer_bridge = FlextSingerBridge()
@@ -191,11 +189,6 @@ class TestIntegrationBasics:
 
     def test_flext_result_patterns_used(self):
         """Test that FlextResult patterns are properly used."""
-        from flext_core import FlextResult
-
-        from flext_meltano.dbt import FlextMeltanoDbtManager
-        from flext_meltano.flext_singer import FlextSingerBridge
-
         dbt_manager = FlextMeltanoDbtManager()
         singer_bridge = FlextSingerBridge()
 
@@ -208,5 +201,5 @@ class TestIntegrationBasics:
 
         # Test actual message creation (this should work)
         result = singer_bridge.flext_singer_create_record_message("test", {"id": 1})
-        assert isinstance(result, FlextResult)
+        assert isinstance(result, _FlextResult)
         assert result.success

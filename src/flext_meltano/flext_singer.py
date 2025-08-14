@@ -531,9 +531,9 @@ def flext_create_singer_catalog(
     return FlextSingerCatalog()
 
 
-__all__ = (
+__all__ = [
     "FlextSingerBridge",
     "FlextSingerCatalog",
     "flext_create_singer_bridge",
     "flext_create_singer_catalog",
-)
+]

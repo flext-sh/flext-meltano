@@ -20,6 +20,7 @@ from typing import Any
 
 import pytest
 from flext_core import FlextResult
+from meltano.edk.extension import ExtensionBase as _ExtensionBase
 
 from flext_meltano.base import (
     FlextMeltanoBaseService,
@@ -570,9 +571,7 @@ class TestFlextMeltanoExtensionService:
         service = FlextMeltanoExtensionService(config)
 
         # Mock extension class for testing
-        from meltano.edk.extension import ExtensionBase
-
-        class MockExtension(ExtensionBase):
+        class MockExtension(_ExtensionBase):
             pass
 
         result = service.set_extension_class(MockExtension)

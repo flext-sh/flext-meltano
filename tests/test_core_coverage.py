@@ -11,13 +11,19 @@ and enterprise patterns of the FLEXT Meltano core services.
 
 from __future__ import annotations
 
+import importlib as _importlib
+import inspect
+import logging as _logging
+import sys as _sys
 import uuid
 import warnings
 from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
+from flext_core import FlextAggregateRoot, FlextDomainService
 
+import flext_meltano.core as _core_module
 from flext_meltano.core import (
     ExecutionState,
     FlextMeltanoExecutionState,
@@ -346,8 +352,6 @@ class TestFlextMeltanoRepository:
         assert hasattr(FlextMeltanoRepository, "get_pipeline")
 
         # Test that it's an aggregate root
-        from flext_core import FlextAggregateRoot
-
         assert issubclass(FlextMeltanoRepository, FlextAggregateRoot)
 
     def test_repository_requires_abstract_methods(self):
@@ -470,8 +474,6 @@ class TestFlextMeltanoSingerService:
         assert hasattr(FlextMeltanoSingerService, "execute_singer_pipeline")
 
         # Test that it's a domain service
-        from flext_core import FlextDomainService
-
         assert issubclass(FlextMeltanoSingerService, FlextDomainService)
 
 
@@ -496,8 +498,6 @@ class TestFlextMeltanoOrchestrationService:
         assert hasattr(FlextMeltanoOrchestrationService, "execute_pipeline")
 
         # Test that it's a domain service
-        from flext_core import FlextDomainService
-
         assert issubclass(FlextMeltanoOrchestrationService, FlextDomainService)
 
 
@@ -520,8 +520,6 @@ class TestFlextMeltanoExtension:
         assert hasattr(FlextMeltanoExtension, "get_health_status")
 
         # Test that it's a domain service
-        from flext_core import FlextDomainService
-
         assert issubclass(FlextMeltanoExtension, FlextDomainService)
 
 
@@ -562,7 +560,7 @@ class TestCoreModuleStructure:
     def test_module_docstring_exists(self):
         """Test that core module has comprehensive docstring."""
         try:
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             assert hasattr(core_module, "__doc__")
             if core_module.__doc__:
@@ -575,7 +573,7 @@ class TestCoreModuleStructure:
     def test_module_metadata(self):
         """Test basic module metadata."""
         try:
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             # Test basic Python module attributes
             assert hasattr(core_module, "__name__")
@@ -595,13 +593,11 @@ class TestCoreModuleStructure:
             side_effect=ImportError("injectable not available"),
         ):
             # Re-import the module to trigger fallback
-            import sys
-
-            if "flext_meltano.core" in sys.modules:
-                del sys.modules["flext_meltano.core"]
+            if "flext_meltano.core" in _sys.modules:
+                del _sys.modules["flext_meltano.core"]
 
             # This should import successfully with fallback decorator
-            import flext_meltano.core as core_module
+            core_module = _importlib.import_module("flext_meltano.core")
 
             # Test that module loads successfully
             assert core_module is not None
@@ -613,7 +609,7 @@ class TestCoreModuleSafety:
     def test_safe_module_inspection(self):
         """Test safe inspection of module contents."""
         try:
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             # Safe inspection without instantiation
             module_dir = dir(core_module)
@@ -631,7 +627,7 @@ class TestCoreModuleSafety:
     def test_module_file_path(self):
         """Test module file path accessibility."""
         try:
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             if hasattr(core_module, "__file__"):
                 file_path = core_module.__file__
@@ -648,7 +644,7 @@ class TestCoreModuleConstants:
     def test_module_level_constants(self):
         """Test access to module-level constants if they exist."""
         try:
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             # Safely check for common constant patterns
             attrs = dir(core_module)
@@ -677,9 +673,7 @@ class TestCoreModuleClasses:
     def test_class_discovery(self):
         """Test discovering classes in core module."""
         try:
-            import inspect
-
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             # Safely discover classes
             module_members = inspect.getmembers(core_module)
@@ -700,9 +694,7 @@ class TestCoreModuleClasses:
             pytest.skip("core module not available")
         except Exception as e:
             # If inspection fails, log and continue
-            import logging
-
-            logger = logging.getLogger(__name__)
+            logger = _logging.getLogger(__name__)
             logger.debug("Module inspection failed: %s", str(e))
 
 
@@ -712,9 +704,7 @@ class TestCoreModuleFunctions:
     def test_function_discovery(self):
         """Test discovering functions in core module."""
         try:
-            import inspect
-
-            import flext_meltano.core as core_module
+            core_module = _core_module
 
             # Safely discover functions
             module_members = inspect.getmembers(core_module)
@@ -735,7 +725,5 @@ class TestCoreModuleFunctions:
             pytest.skip("core module not available")
         except Exception as e:
             # If inspection fails, log and continue
-            import logging
-
-            logger = logging.getLogger(__name__)
+            logger = _logging.getLogger(__name__)
             logger.debug("Module inspection failed: %s", str(e))

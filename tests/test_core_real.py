@@ -8,13 +8,17 @@ Following zero tolerance methodology - test ALL functionality.
 from datetime import UTC, datetime
 
 import pytest
-from flext_core import FlextResult
+from flext_core import FlextEntity as _FlextEntity, FlextResult
 
 from flext_meltano.core import (
     ExecutionState,
+    ExecutionState as _ExecutionState,
     FlextMeltanoPipelineConfig,
+    FlextMeltanoPipelineConfig as _FlextMeltanoPipelineConfig,
     FlextMeltanoPipelineResult,
+    FlextMeltanoPipelineResult as _FlextMeltanoPipelineResult,
     PipelineEventType,
+    PipelineEventType as _PipelineEventType,
 )
 
 
@@ -335,18 +339,11 @@ class TestCoreModuleIntegration:
 
     def test_all_exports_importable(self):
         """Test all core module exports can be imported."""
-        from flext_meltano.core import (
-            ExecutionState,
-            FlextMeltanoPipelineConfig,
-            FlextMeltanoPipelineResult,
-            PipelineEventType,
-        )
-
         # Test classes are accessible
-        assert ExecutionState is not None
-        assert FlextMeltanoPipelineConfig is not None
-        assert FlextMeltanoPipelineResult is not None
-        assert PipelineEventType is not None
+        assert _ExecutionState is not None
+        assert _FlextMeltanoPipelineConfig is not None
+        assert _FlextMeltanoPipelineResult is not None
+        assert _PipelineEventType is not None
 
     def test_flext_core_integration(self):
         """Test integration with flext-core patterns."""
@@ -360,7 +357,5 @@ class TestCoreModuleIntegration:
 
     def test_entity_inheritance(self):
         """Test FlextMeltanoPipelineResult inherits from FlextEntity."""
-        from flext_core import FlextEntity
-
-        result = FlextMeltanoPipelineResult(pipeline_name="test")
-        assert isinstance(result, FlextEntity)
+        result = _FlextMeltanoPipelineResult(pipeline_name="test")
+        assert isinstance(result, _FlextEntity)

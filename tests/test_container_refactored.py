@@ -20,6 +20,7 @@ from flext_core import FlextContainer, get_flext_container
 
 from flext_meltano import FlextMeltanoConfig
 from flext_meltano.container import (
+    __all__ as _container_all,
     configure_meltano_container,
     configure_meltano_services,
     get_meltano_container,
@@ -264,8 +265,6 @@ class TestContainerAPIConsistency:
 
     def test_public_api_exports(self):
         """Test that all public functions are accessible."""
-        from flext_meltano.container import __all__
-
         expected_exports = [
             "configure_meltano_container",
             "configure_meltano_services",
@@ -273,7 +272,7 @@ class TestContainerAPIConsistency:
         ]
 
         for export in expected_exports:
-            assert export in __all__
+            assert export in _container_all
 
         # Verify functions are importable
         assert callable(configure_meltano_container)
