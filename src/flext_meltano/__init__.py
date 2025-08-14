@@ -55,7 +55,7 @@ Example:
     >>> # Configure bridge for Go <-> Python integration
     >>> config = FlextMeltanoConfig(
     ...     meltano_project_root="/path/to/meltano/project",
-    ...     environment="production",
+    ...     environment="prod",
     ...     enable_monitoring=True,
     ... )
     >>>

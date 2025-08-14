@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import tempfile
 from pathlib import Path
 
@@ -110,8 +111,6 @@ class TestValidationCoverageImprovement:
 
     async def test_tap_connection_testing_function(self):
         """Test tap connection testing function."""
-        from pathlib import Path
-
         # Test connection with valid parameters - returns dict for Go compatibility
         config = {"host": "localhost", "database": "test"}
         result = await flext_meltano_test_tap_connection("tap-postgres", Path(), config)
@@ -256,8 +255,6 @@ class TestValidationCoverageImprovement:
         service = FlextMeltanoValidationService(config_short)
 
         # Use async test_tap_connection method instead
-        import asyncio
-
         result = asyncio.run(
             service.test_tap_connection("tap-postgres", {"host": "localhost"}),
         )

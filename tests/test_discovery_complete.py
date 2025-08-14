@@ -178,9 +178,6 @@ class TestFlextMeltanoDiscoverer:
 
     def test_discover_plugins(self) -> None:
         """Test discover plugins method."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a mock meltano.yml file
             meltano_yml = Path(temp_dir) / "meltano.yml"
@@ -198,9 +195,6 @@ class TestFlextMeltanoDiscoverer:
 
     def test_discover_plugins_with_type(self) -> None:
         """Test discover plugins with specific type."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a mock meltano.yml file
             meltano_yml = Path(temp_dir) / "meltano.yml"

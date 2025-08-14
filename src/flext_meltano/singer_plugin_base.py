@@ -38,9 +38,19 @@ from flext_core import FlextPlugin, FlextPluginContext, FlextResult, get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from typing import Protocol
 
-    from flext_plugin.domain.entities import FlextPluginEntity
     from structlog.stdlib import BoundLogger
+
+    # Protocol for plugin entity interface
+    class FlextPluginEntity(Protocol):
+        """Protocol defining the expected interface for plugin entities."""
+
+        def validate_business_rules(self) -> FlextResult[None]: ...
+        def activate(self) -> bool: ...
+        def deactivate(self) -> bool: ...
+        def record_execution(self, duration: float, *, success: bool) -> None: ...
+        def record_error(self, error: str) -> None: ...
 
 
 class FlextSingerPluginBase(FlextPlugin, ABC):
@@ -135,7 +145,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
 
             # Activate entity if present
             if self._entity:
-                entity_validation = self._entity.validate_business_rules()
+                entity_validation: FlextResult[None] = self._entity.validate_business_rules()
                 if not entity_validation.success:
                     return entity_validation
 

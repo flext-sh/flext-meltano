@@ -14,6 +14,7 @@ import warnings
 from datetime import datetime
 
 import pytest
+from flext_core import FlextResult as _FlextResult
 
 from flext_meltano.core import (
     ExecutionState,
@@ -435,11 +436,9 @@ class TestFlextMeltanoRepositoryAggregateRoot:
         class TestRepository(FlextMeltanoRepository):
             def validate_domain_rules(self):
                 """Test implementation of abstract method."""
-                from flext_core import FlextResult
-
                 if not self.name.strip():
-                    return FlextResult(error="Repository name cannot be empty")
-                return FlextResult(data=None)
+                    return _FlextResult(error="Repository name cannot be empty")
+                return _FlextResult(data=None)
 
         return TestRepository(name=name)
 

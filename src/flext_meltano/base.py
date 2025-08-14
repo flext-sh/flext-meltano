@@ -68,7 +68,7 @@ Foundation classes designed for Go service integration:
 ```python
 from flext_meltano.config import FlextMeltanoConfig
 
-config = FlextMeltanoConfig(project_root="./meltano", environment="production")
+config = FlextMeltanoConfig(project_root="./meltano", environment="prod")
 ```
 
 ### Service Creation
@@ -129,8 +129,9 @@ from flext_meltano.config import FlextMeltanoConfig
 # Centralized imports (no duplication)
 from .base_service import FlextMeltanoBaseService
 
-# Python 3.12+ preferred type alias syntax
-type ExtensionBase = object
+if TYPE_CHECKING:
+    # Type-only import to satisfy ruff TC002
+    from meltano.edk.extension import ExtensionBase  # pragma: no cover
 
 if TYPE_CHECKING:
     from singer_sdk import Tap, Target
@@ -312,12 +313,53 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
             },
         )
 
+    async def _execute_dbt_command(
+        self,
+        command: str,
+        models: list[str] | None = None,
+        exclude: list[str] | None = None,
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Template Method: Execute DBT command with common validation and error handling.
+        
+        REFACTORED: Applied Template Method pattern to eliminate code duplication 
+        between run_models and test_models (reduced from 41 duplicated lines).
+        Follows DRY principle and Single Responsibility Principle.
+        """
+        try:
+            # Validate project directory
+            if not self.project_dir or not self.project_dir.exists():
+                return FlextResult(error=f"DBT project not found at {self.project_dir}")
+
+            # Handle test environment (emulate successful execution)
+            if not self.runner:
+                return FlextResult.ok([])
+
+            # Build DBT command with options
+            args = [command]
+            if models:
+                args.extend(["--models", *models])
+            if exclude:
+                args.extend(["--exclude", *exclude])
+            args.extend(["--project-dir", str(self.project_dir)])
+
+            # Execute command with null check
+            if self.runner is not None:
+                self.runner.invoke(args)  # type: ignore[attr-defined]
+            else:
+                return FlextResult(error="DBT runner is None")
+
+            # Return consistent format
+            return FlextResult(data=[])
+
+        except (ValueError, TypeError, ImportError, RuntimeError) as e:
+            return FlextResult(error=f"DBT {command} execution failed: {e}")
+
     async def run_models(
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
     ) -> FlextResult[list[dict[str, object]]]:
-        """Run DBT models using official DBT runner.
+        """Run DBT models using Template Method pattern.
 
         Test environment shim: when dbt runner isn't available, emulate a
         successful execution to allow integration tests to validate flow
@@ -325,69 +367,15 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         projects used by tests and does not affect production behavior when
         a runner is configured.
         """
-        try:
-            if not self.project_dir or not self.project_dir.exists():
-                return FlextResult(error=f"DBT project not found at {self.project_dir}")
-
-            if not self.runner:
-                # Emulate successful execution in test context
-                return FlextResult.ok([])
-
-            # Build DBT command
-            args = ["run"]
-            if models:
-                args.extend(["--models", *models])
-            if exclude:
-                args.extend(["--exclude", *exclude])
-
-            # Add project directory
-            args.extend(["--project-dir", str(self.project_dir)])
-
-            # Execute using DBT runner - add null check for MyPy
-            if self.runner is not None:
-                self.runner.invoke(args)  # type: ignore[attr-defined]
-            else:
-                return FlextResult(error="DBT runner is None")
-
-            # Return list format as expected by tests
-            return FlextResult(data=[])
-        except (ValueError, TypeError, ImportError, RuntimeError) as e:
-            return FlextResult(error=f"DBT execution failed: {e}")
+        return await self._execute_dbt_command("run", models, exclude)
 
     async def test_models(
         self,
         models: list[str] | None = None,
         exclude: list[str] | None = None,
     ) -> FlextResult[list[dict[str, object]]]:
-        """Test DBT models using official DBT runner."""
-        try:
-            if not self.project_dir or not self.project_dir.exists():
-                return FlextResult(error=f"DBT project not found at {self.project_dir}")
-
-            if not self.runner:
-                # Emulate successful execution in test context
-                return FlextResult.ok([])
-
-            # Build DBT command
-            args = ["test"]
-            if models:
-                args.extend(["--models", *models])
-            if exclude:
-                args.extend(["--exclude", *exclude])
-
-            # Add project directory
-            args.extend(["--project-dir", str(self.project_dir)])
-
-            # Execute using DBT runner - add null check for MyPy
-            if self.runner is not None:
-                self.runner.invoke(args)  # type: ignore[attr-defined]
-            else:
-                return FlextResult(error="DBT runner is None")
-
-            # Return list format as expected by tests
-            return FlextResult(data=[])
-        except (ValueError, TypeError, ImportError, RuntimeError) as e:
-            return FlextResult(error=f"DBT test execution failed: {e}")
+        """Test DBT models using Template Method pattern."""
+        return await self._execute_dbt_command("test", models, exclude)
 
     def get_dbt_version(self) -> str:
         """Get DBT version (fallback-safe)."""
