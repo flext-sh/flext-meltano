@@ -138,7 +138,10 @@ from __future__ import annotations
 # Avoid direct subprocess exceptions; use higher-level execution wrappers
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, Callable
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # Temporarily commented out due to import issues - these are optional
 # from flext_cli import setup_cli as flext_setup_cli
@@ -261,7 +264,7 @@ class FlextMeltanoCommandDispatcher:
     ) -> CommandHandler:
         """Create handler for commands that take no arguments."""
 
-        def handler(_options: list[str]) -> FlextResult[dict[str, object]]:
+        def handler(options: list[str]) -> FlextResult[dict[str, object]]:  # noqa: ARG001
             return method()
 
         return handler

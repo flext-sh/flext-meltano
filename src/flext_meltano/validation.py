@@ -255,7 +255,6 @@ from __future__ import annotations
 import asyncio
 import importlib
 import uuid
-from collections import UserDict
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -724,13 +723,14 @@ async def flext_meltano_test_tap_connection(
                 details = dict(getattr(result.data, "details", {}) or {})
                 shaped = {"connection_successful": is_valid, **details}
             except Exception:  # noqa: BLE001
-                shaped = result.data  # best effort
-        class AttrDict(dict):
+                shaped = getattr(result.data, "model_dump", dict)()
+        class AttrDict(dict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]
                 except KeyError:
                     return dict.__getattribute__(self, name)
+
         # For invalid project roots (nonexistent), normalize to failure for legacy tests
         if not Path(str(project_root)).exists():
             return AttrDict({"success": False, "data": shaped, "error": "Invalid project root"})
@@ -748,7 +748,7 @@ def flext_meltano_validate_project(
             FlextMeltanoConfig(project_root=str(project_root or Path.cwd())),
         )
         result = service.validate_project()
-        class AttrDict(dict):
+        class AttrDict(dict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]
@@ -793,7 +793,7 @@ async def flext_meltano_validate_tap_config(
             "warnings": warnings_list,
             **details,
         }
-        class AttrDict(dict):
+        class AttrDict(dict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]

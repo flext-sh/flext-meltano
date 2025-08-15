@@ -707,7 +707,7 @@ def flext_meltano_discover_catalog(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
         if not service_result.success or service_result.data is None:
-            class _AttrAwaitable(UserDict):
+            class _AttrAwaitableError(UserDict[str, object]):
                 def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                     return self[name] if name in self else UserDict.__getattribute__(self, name)
 
@@ -715,7 +715,7 @@ def flext_meltano_discover_catalog(
                     async def _inner() -> object:
                         return self
                     return _inner().__await__()
-            return _AttrAwaitable({"success": False, "data": None, "error": service_result.error})
+            return _AttrAwaitableError({"success": False, "data": None, "error": service_result.error})
 
         discoverer = service_result.data
         # Run async method in a temporary event loop for sync API compatibility
@@ -727,7 +727,7 @@ def flext_meltano_discover_catalog(
         if running_loop is None:
             result = asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
             # Return an object with attribute access which is also awaitable (trivial await)
-            class _AttrAwaitable(UserDict):
+            class _AttrAwaitableSuccess(UserDict[str, object]):
                 def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                     return self[name] if name in self else UserDict.__getattribute__(self, name)
 
@@ -735,29 +735,31 @@ def flext_meltano_discover_catalog(
                     async def _inner() -> object:
                         return self
                     return _inner().__await__()
-            return _AttrAwaitable({"success": result.success, "data": result.data, "error": result.error})
-        else:
-            # Inside a running loop: return an object that awaits the coroutine to produce the mapping
-            fut = running_loop.create_task(discoverer.discover_catalog(tap_name, config or {}))
+            return _AttrAwaitableSuccess({"success": result.success, "data": result.data, "error": result.error})
+        # Inside a running loop: return an object that awaits the coroutine to produce the mapping
+        fut = running_loop.create_task(discoverer.discover_catalog(tap_name, config or {}))
 
-            class _AttrAwaitable(UserDict):
-                def __init__(self, _future) -> None:
-                    super().__init__()
-                    self._future = _future
+        class _AttrAwaitableFuture(UserDict[str, object]):
+            def __init__(self, _future: object) -> None:
+                super().__init__()
+                self._future = _future
 
-                def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-                    return self[name] if name in self else UserDict.__getattribute__(self, name)
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                return self[name] if name in self else UserDict.__getattribute__(self, name)
 
-                def __await__(self):  # pragma: no cover - executed in async tests
-                    async def _compute() -> object:
+            def __await__(self) -> object:  # pragma: no cover - executed in async tests
+                async def _compute() -> object:
+                    # Type-safe future awaiting
+                    if hasattr(self._future, "__await__"):
                         fr = await self._future
                         return {"success": fr.success, "data": fr.data, "error": fr.error}
+                    return {"success": False, "data": None, "error": "Invalid future object"}
 
-                    return _compute().__await__()
+                return _compute().__await__()
 
-            return _AttrAwaitable(fut)
+        return _AttrAwaitableFuture(fut)
     except Exception as e:  # noqa: BLE001
-        class _AttrAwaitable(UserDict):
+        class _AttrAwaitableException(UserDict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 return self[name] if name in self else UserDict.__getattribute__(self, name)
 
@@ -765,7 +767,7 @@ def flext_meltano_discover_catalog(
                 async def _inner() -> object:
                     return self
                 return _inner().__await__()
-        return _AttrAwaitable({"success": False, "data": None, "error": str(e)})
+        return _AttrAwaitableException({"success": False, "data": None, "error": str(e)})
 
 
 def flext_meltano_discover_plugins(
@@ -782,20 +784,20 @@ def flext_meltano_discover_plugins(
             FlextMeltanoConfig(project_root=str(project_root)),
         )
 
-        class _AttrDict(UserDict):
+        class _AttrDict(UserDict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 if name in self:
                     return self[name]
                 return UserDict.__getattribute__(self, name)
 
         if not service_result.success or service_result.data is None:
-            class AttrDict(dict):
+            class AttrDictError(dict[str, object]):
                 def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                     try:
                         return self[name]
                     except KeyError:
                         return dict.__getattribute__(self, name)
-            return AttrDict({"success": False, "data": None, "error": service_result.error})
+            return AttrDictError({"success": False, "data": None, "error": service_result.error})
 
         discoverer = service_result.data
         result = discoverer.discover_plugins(plugin_type)
@@ -833,21 +835,21 @@ def flext_meltano_discover_plugins(
             data_obj: dict[str, object] = {"plugins": plugins_list}
         else:
             data_obj = None  # type: ignore[assignment]
-        class AttrDict(dict):
+        class AttrDictSuccess(dict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]
                 except KeyError:
                     return dict.__getattribute__(self, name)
-        return AttrDict({"success": result.success, "data": data_obj, "error": result.error})
+        return AttrDictSuccess({"success": result.success, "data": data_obj, "error": result.error})
     except Exception as e:  # noqa: BLE001
-        class AttrDict(dict):
+        class AttrDictException(dict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]
                 except KeyError:
                     return dict.__getattribute__(self, name)
-        return AttrDict({"success": False, "data": None, "error": str(e)})
+        return AttrDictException({"success": False, "data": None, "error": str(e)})
 
 
 __all__ = [
