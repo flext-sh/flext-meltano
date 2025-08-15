@@ -242,7 +242,7 @@ class FlextMeltanoInstaller:
             if raw_result.data is None:
                 return FlextResult.fail("No plugin data received")
 
-            parsed = self._parse_plugin_list(raw_result.data)
+            parsed = self._parse_plugin_list(raw_result)
             if not parsed.success:
                 # Always normalize to expected error for this edge case path
                 return FlextResult.fail("No plugin data received")
@@ -290,7 +290,7 @@ class FlextMeltanoInstaller:
                 return FlextResult.fail("Plugin list failed")
             raw_stdout = str(result.data.get("stdout", ""))
             # Private method is validated by tests to return raw JSON string
-            return FlextResult.ok(raw_stdout)
+            return FlextResult.ok({"stdout": raw_stdout})
         except Exception as e:  # pragma: no cover - defensive
             return FlextResult(error=f"Execution failed: {e}")
 
@@ -448,7 +448,7 @@ def flext_meltano_install_plugin(
     else:
         legacy_result = installer.add_plugin(plugin_type, name)
     # Return mapping with attribute access as some tests use .success
-    class AttrDict(dict):
+    class AttrDict(dict[str, object]):
         def __getattr__(self, item: str) -> object:  # pragma: no cover - trivial
             try:
                 return self[item]

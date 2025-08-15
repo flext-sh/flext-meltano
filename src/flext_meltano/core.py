@@ -189,7 +189,7 @@ class FlextMeltanoExecutionState(FlextModel):
     pipeline_name: str | None = Field(default=None)
     environment: str | None = Field(default=None)
 
-    def __init__(self, **data: object) -> None:  # type: ignore[override]
+    def __init__(self, **data: object) -> None:
         """Initialize and auto-set RUNNING when pipeline_name provided.
 
         Tests expect that providing a non-empty pipeline_name implies a running state.
@@ -569,7 +569,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
         )
 
     # Legacy API expected by tests
-    def create_pipeline(self, name: str, extractor: str, loader: str) -> FlextResult[FlextMeltanoPipelineEntity]:
+    def create_pipeline(self, _name: str, extractor: str, loader: str) -> FlextResult[FlextMeltanoPipelineEntity]:
         """Create a simple pipeline entity (legacy compatibility)."""
         try:
             pipeline = FlextMeltanoPipelineEntity(

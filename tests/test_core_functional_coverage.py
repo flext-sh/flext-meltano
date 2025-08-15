@@ -11,18 +11,15 @@ that can be instantiated and tested without complex dependency injection.
 from __future__ import annotations
 
 import pytest
-from flext_core import FlextResult as _FlextResult
 
 import flext_meltano.core as _core_module
-from flext_meltano.base import FlextMeltanoConfig
-from flext_meltano.base import FlextMeltanoExtensionService
+from flext_meltano.base import FlextMeltanoConfig, FlextMeltanoExtensionService
 from flext_meltano.core import (
     ExecutionState,
     FlextMeltanoExecutionState,
     FlextMeltanoPipelineConfig,
     FlextMeltanoPipelineEvent,
     FlextMeltanoPipelineResult,
-    FlextMeltanoSingerService,
     PipelineEventType,
 )
 

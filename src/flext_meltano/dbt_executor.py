@@ -9,9 +9,16 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, cast
 
-import duckdb
-import pandas as pd
 from flext_core import FlextResult, get_logger
+
+try:
+    import duckdb
+    import pandas as pd
+    HAS_DUCKDB = True
+except ImportError:
+    HAS_DUCKDB = False
+    duckdb = None
+    pd = None
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -34,6 +41,9 @@ class FlextDbtInMemoryExecutor:
 
         """
         self.database = database
+        if not HAS_DUCKDB:
+            msg = "duckdb is required for FlextDbtInMemoryExecutor"
+            raise ImportError(msg)
         self.connection = duckdb.connect(database)
         self.schemas: dict[str, dict[str, object]] = {}
         self.mock_data: dict[str, pd.DataFrame] = {}
@@ -425,6 +435,9 @@ def create_in_memory_executor(
 
     Returns:
         FlextDbtInMemoryExecutor instance
+
+    Raises:
+        ImportError: If duckdb is not available
 
     """
     return FlextDbtInMemoryExecutor(database)

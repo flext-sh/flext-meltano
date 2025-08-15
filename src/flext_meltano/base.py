@@ -130,10 +130,7 @@ from flext_meltano.config import FlextMeltanoConfig
 from .base_service import FlextMeltanoBaseService
 
 if TYPE_CHECKING:
-    # Type-only import to satisfy ruff TC002
-    from meltano.edk.extension import ExtensionBase  # pragma: no cover
-
-if TYPE_CHECKING:
+    from meltano.edk.extension import ExtensionBase
     from singer_sdk import Tap, Target
 
 # NOTE: FlextMeltanoConfig is now centralized in `config.py` and imported above.
@@ -270,7 +267,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
             },
         )
 
-    def set_extension_class(
+    def set_extension_class(  # type: ignore[no-any-unimported]
         self,
         extension_class: type[ExtensionBase] | None,
     ) -> FlextResult[None]:
@@ -320,8 +317,8 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
         exclude: list[str] | None = None,
     ) -> FlextResult[list[dict[str, object]]]:
         """Template Method: Execute DBT command with common validation and error handling.
-        
-        REFACTORED: Applied Template Method pattern to eliminate code duplication 
+
+        REFACTORED: Applied Template Method pattern to eliminate code duplication
         between run_models and test_models (reduced from 41 duplicated lines).
         Follows DRY principle and Single Responsibility Principle.
         """
