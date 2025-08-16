@@ -267,7 +267,7 @@ class FlextMeltanoExtensionService(FlextMeltanoBaseService):
             },
         )
 
-    def set_extension_class(  # type: ignore[no-any-unimported]
+    def set_extension_class(
         self,
         extension_class: type[ExtensionBase] | None,
     ) -> FlextResult[None]:

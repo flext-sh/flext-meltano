@@ -19,7 +19,7 @@ from flext_meltano.common_schemas import (
 class TestCommonSingerSchemasClass:
     """Test the CommonSingerSchemas class functionality - REAL execution."""
 
-    def test_database_connection_schema_structure(self):
+    def test_database_connection_schema_structure(self) -> None:
         """Test DATABASE_CONNECTION_SCHEMA has correct properties."""
         schema = CommonSingerSchemas.DATABASE_CONNECTION_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -34,7 +34,7 @@ class TestCommonSingerSchemasClass:
         for prop in expected_props:
             assert prop in property_names
 
-    def test_oracle_connection_schema_structure(self):
+    def test_oracle_connection_schema_structure(self) -> None:
         """Test ORACLE_CONNECTION_SCHEMA has Oracle-specific properties."""
         schema = CommonSingerSchemas.ORACLE_CONNECTION_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -47,7 +47,7 @@ class TestCommonSingerSchemasClass:
         for prop in oracle_props:
             assert prop in property_names
 
-    def test_ldap_connection_schema_structure(self):
+    def test_ldap_connection_schema_structure(self) -> None:
         """Test LDAP_CONNECTION_SCHEMA has LDAP-specific properties."""
         schema = CommonSingerSchemas.LDAP_CONNECTION_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -60,7 +60,7 @@ class TestCommonSingerSchemasClass:
         for prop in ldap_props:
             assert prop in property_names
 
-    def test_create_tap_schema_oracle(self):
+    def test_create_tap_schema_oracle(self) -> None:
         """Test create_tap_schema method for Oracle connection type."""
         schema = CommonSingerSchemas.create_tap_schema(
             "oracle",
@@ -79,7 +79,7 @@ class TestCommonSingerSchemasClass:
         assert "start_date" in property_names
         assert "batch_size" in property_names
 
-    def test_create_tap_schema_ldap(self):
+    def test_create_tap_schema_ldap(self) -> None:
         """Test create_tap_schema method for LDAP connection type."""
         schema = CommonSingerSchemas.create_tap_schema(
             "ldap",
@@ -97,7 +97,7 @@ class TestCommonSingerSchemasClass:
         # Should include extraction config
         assert "start_date" in property_names
 
-    def test_create_tap_schema_file(self):
+    def test_create_tap_schema_file(self) -> None:
         """Test create_tap_schema method for file connection type."""
         schema = CommonSingerSchemas.create_tap_schema(
             "file",
@@ -117,7 +117,7 @@ class TestCommonSingerSchemasClass:
         # Should NOT include extraction config
         assert "start_date" not in property_names
 
-    def test_create_tap_schema_oauth2(self):
+    def test_create_tap_schema_oauth2(self) -> None:
         """Test create_tap_schema method for OAuth2 connection type."""
         schema = CommonSingerSchemas.create_tap_schema(
             "oauth2",
@@ -132,7 +132,7 @@ class TestCommonSingerSchemasClass:
         assert "client_id" in property_names
         assert "client_secret" in property_names
 
-    def test_create_tap_schema_oracle_oic(self):
+    def test_create_tap_schema_oracle_oic(self) -> None:
         """Test create_tap_schema method for Oracle OIC connection type."""
         schema = CommonSingerSchemas.create_tap_schema(
             "oracle_oic",
@@ -147,7 +147,7 @@ class TestCommonSingerSchemasClass:
         assert "oic_host" in property_names
         assert "username" in property_names
 
-    def test_create_tap_schema_default_database(self):
+    def test_create_tap_schema_default_database(self) -> None:
         """Test create_tap_schema method defaults to database schema for unknown types."""
         schema = CommonSingerSchemas.create_tap_schema(
             "unknown_type",
@@ -162,7 +162,7 @@ class TestCommonSingerSchemasClass:
         assert "host" in property_names
         assert "database" in property_names
 
-    def test_create_tap_schema_with_additional_properties(self):
+    def test_create_tap_schema_with_additional_properties(self) -> None:
         """Test create_tap_schema method with additional properties."""
         additional_props = th.PropertiesList(
             th.Property("custom_field", th.StringType, description="Custom field"),
@@ -191,7 +191,7 @@ class TestCommonSingerSchemasClass:
 class TestSchemaFactoryFunctions:
     """Test the factory functions for schema creation - REAL execution."""
 
-    def test_create_oracle_tap_schema_function(self):
+    def test_create_oracle_tap_schema_function(self) -> None:
         """Test create_oracle_tap_schema factory function."""
         schema = create_oracle_tap_schema()
 
@@ -207,7 +207,7 @@ class TestSchemaFactoryFunctions:
         assert "start_date" in property_names
         assert "batch_size" in property_names
 
-    def test_create_oracle_tap_schema_with_additional_props(self):
+    def test_create_oracle_tap_schema_with_additional_props(self) -> None:
         """Test create_oracle_tap_schema with additional properties."""
         additional = th.PropertiesList(
             th.Property(
@@ -225,7 +225,7 @@ class TestSchemaFactoryFunctions:
         assert "warehouse_code" in property_names
         assert "host" in property_names
 
-    def test_create_ldap_tap_schema_function(self):
+    def test_create_ldap_tap_schema_function(self) -> None:
         """Test create_ldap_tap_schema factory function."""
         schema = create_ldap_tap_schema()
 
@@ -237,7 +237,7 @@ class TestSchemaFactoryFunctions:
         assert "ldap_host" in property_names
         assert "bind_dn" in property_names
 
-    def test_create_file_tap_schema_function(self):
+    def test_create_file_tap_schema_function(self) -> None:
         """Test create_file_tap_schema factory function."""
         schema = create_file_tap_schema()
 
@@ -251,7 +251,7 @@ class TestSchemaFactoryFunctions:
         )
         assert file_props_present
 
-    def test_create_oauth2_api_tap_schema_function(self):
+    def test_create_oauth2_api_tap_schema_function(self) -> None:
         """Test create_oauth2_api_tap_schema factory function."""
         schema = create_oauth2_api_tap_schema()
 
@@ -267,7 +267,7 @@ class TestSchemaFactoryFunctions:
 class TestSchemaValidation:
     """Test schema validation and structure - REAL validation."""
 
-    def test_schema_properties_have_correct_types(self):
+    def test_schema_properties_have_correct_types(self) -> None:
         """Test that schema properties have correct Singer SDK types."""
         schema = CommonSingerSchemas.DATABASE_CONNECTION_SCHEMA
         properties = schema.wrapped
@@ -278,7 +278,7 @@ class TestSchemaValidation:
             assert isinstance(prop.name, str)
             assert len(prop.name) > 0
 
-    def test_extraction_config_schema_structure(self):
+    def test_extraction_config_schema_structure(self) -> None:
         """Test EXTRACTION_CONFIG_SCHEMA has expected properties."""
         schema = CommonSingerSchemas.EXTRACTION_CONFIG_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -290,7 +290,7 @@ class TestSchemaValidation:
         for prop in expected_props:
             assert prop in property_names
 
-    def test_file_source_schema_structure(self):
+    def test_file_source_schema_structure(self) -> None:
         """Test FILE_SOURCE_SCHEMA has file-specific properties."""
         schema = CommonSingerSchemas.FILE_SOURCE_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -304,7 +304,7 @@ class TestSchemaValidation:
         )
         assert file_props_present
 
-    def test_oauth2_api_schema_structure(self):
+    def test_oauth2_api_schema_structure(self) -> None:
         """Test OAUTH2_API_SCHEMA has OAuth2-specific properties."""
         schema = CommonSingerSchemas.OAUTH2_API_SCHEMA
         assert isinstance(schema, th.PropertiesList)
@@ -316,7 +316,7 @@ class TestSchemaValidation:
         for prop in oauth2_props:
             assert prop in property_names
 
-    def test_oracle_oic_schema_structure(self):
+    def test_oracle_oic_schema_structure(self) -> None:
         """Test ORACLE_OIC_SCHEMA has OIC-specific properties."""
         schema = CommonSingerSchemas.ORACLE_OIC_SCHEMA
         assert isinstance(schema, th.PropertiesList)

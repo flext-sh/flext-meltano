@@ -7,10 +7,6 @@ from typing import TYPE_CHECKING
 
 from flext_meltano import singer
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
-    from flext_core import FlextResult
 
 # === CORE BASE CLASSES ===
 # === OPTIONAL IMPORTS ===
@@ -168,12 +164,12 @@ from flext_meltano.validation import (
     create_validation_service,
 )
 
-# DBT run result - simplified for compatibility
 if TYPE_CHECKING:
-    type DbtRunResult = object
-else:
-    # At runtime, this alias is not used; kept for type checking convenience
-    DbtRunResult = None
+    from flext_core import FlextResult
+    from pathlib import Path
+
+# DBT run result - simplified for compatibility
+type DbtRunResult = object
 
 
 # === LEGACY COMPATIBILITY ===

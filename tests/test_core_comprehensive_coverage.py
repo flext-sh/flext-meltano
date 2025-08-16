@@ -31,7 +31,7 @@ from flext_meltano.core import (
 class TestExecutionStateEnum:
     """Test ExecutionState enum."""
 
-    def test_execution_state_values(self):
+    def test_execution_state_values(self) -> None:
         """Test ExecutionState enum values."""
         assert ExecutionState.PENDING.value == 1
         assert ExecutionState.RUNNING.value == 2
@@ -39,7 +39,7 @@ class TestExecutionStateEnum:
         assert ExecutionState.FAILED.value == 4
         assert ExecutionState.CANCELLED.value == 5
 
-    def test_execution_state_names(self):
+    def test_execution_state_names(self) -> None:
         """Test ExecutionState enum names."""
         assert ExecutionState.PENDING.name == "PENDING"
         assert ExecutionState.RUNNING.name == "RUNNING"
@@ -47,7 +47,7 @@ class TestExecutionStateEnum:
         assert ExecutionState.FAILED.name == "FAILED"
         assert ExecutionState.CANCELLED.name == "CANCELLED"
 
-    def test_execution_state_iteration(self):
+    def test_execution_state_iteration(self) -> None:
         """Test ExecutionState enum iteration."""
         states = list(ExecutionState)
         assert len(states) == 5
@@ -61,7 +61,7 @@ class TestExecutionStateEnum:
 class TestPipelineEventTypeEnum:
     """Test PipelineEventType enum."""
 
-    def test_pipeline_event_type_values(self):
+    def test_pipeline_event_type_values(self) -> None:
         """Test PipelineEventType enum values."""
         assert PipelineEventType.CREATED.value == 1
         assert PipelineEventType.STARTED.value == 2
@@ -69,7 +69,7 @@ class TestPipelineEventTypeEnum:
         assert PipelineEventType.FAILED.value == 4
         assert PipelineEventType.CANCELLED.value == 5
 
-    def test_pipeline_event_type_names(self):
+    def test_pipeline_event_type_names(self) -> None:
         """Test PipelineEventType enum names."""
         assert PipelineEventType.CREATED.name == "CREATED"
         assert PipelineEventType.STARTED.name == "STARTED"
@@ -77,7 +77,7 @@ class TestPipelineEventTypeEnum:
         assert PipelineEventType.FAILED.name == "FAILED"
         assert PipelineEventType.CANCELLED.name == "CANCELLED"
 
-    def test_pipeline_event_type_iteration(self):
+    def test_pipeline_event_type_iteration(self) -> None:
         """Test PipelineEventType enum iteration."""
         event_types = list(PipelineEventType)
         assert len(event_types) == 5
@@ -91,7 +91,7 @@ class TestPipelineEventTypeEnum:
 class TestFlextMeltanoPipelineConfigValueObject:
     """Test FlextMeltanoPipelineConfig value object."""
 
-    def test_pipeline_config_creation_minimal(self):
+    def test_pipeline_config_creation_minimal(self) -> None:
         """Test minimal pipeline configuration creation."""
         config = FlextMeltanoPipelineConfig(
             name="test-pipeline",
@@ -107,7 +107,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
         assert isinstance(config.config, dict)
         assert len(config.config) == 0
 
-    def test_pipeline_config_creation_complete(self):
+    def test_pipeline_config_creation_complete(self) -> None:
         """Test complete pipeline configuration creation."""
         custom_config = {
             "database_url": "postgresql://localhost/test",
@@ -131,7 +131,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
         assert config.config["database_url"] == "postgresql://localhost/test"
         assert config.config["batch_size"] == 1000
 
-    def test_pipeline_config_validation_success(self):
+    def test_pipeline_config_validation_success(self) -> None:
         """Test pipeline configuration validation success."""
         # This should not raise an exception
         config = FlextMeltanoPipelineConfig(
@@ -141,7 +141,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
         )
         assert config.name == "valid-pipeline"
 
-    def test_pipeline_config_validation_empty_name(self):
+    def test_pipeline_config_validation_empty_name(self) -> None:
         """Test pipeline configuration validation with empty name."""
         error_msg = "Pipeline name, extractor, and loader are required"
         with pytest.raises(ValueError, match=error_msg):
@@ -151,7 +151,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
                 loader="target-test",
             )
 
-    def test_pipeline_config_validation_empty_extractor(self):
+    def test_pipeline_config_validation_empty_extractor(self) -> None:
         """Test pipeline configuration validation with empty extractor."""
         error_msg = "Pipeline name, extractor, and loader are required"
         with pytest.raises(ValueError, match=error_msg):
@@ -161,7 +161,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
                 loader="target-test",
             )
 
-    def test_pipeline_config_validation_empty_loader(self):
+    def test_pipeline_config_validation_empty_loader(self) -> None:
         """Test pipeline configuration validation with empty loader."""
         error_msg = "Pipeline name, extractor, and loader are required"
         with pytest.raises(ValueError, match=error_msg):
@@ -171,7 +171,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
                 loader="",
             )
 
-    def test_pipeline_config_is_frozen(self):
+    def test_pipeline_config_is_frozen(self) -> None:
         """Test that pipeline configuration is immutable (frozen dataclass)."""
         config = FlextMeltanoPipelineConfig(
             name="test-pipeline",
@@ -187,7 +187,7 @@ class TestFlextMeltanoPipelineConfigValueObject:
 class TestFlextMeltanoPipelineResultEntity:
     """Test FlextMeltanoPipelineResult entity."""
 
-    def test_pipeline_result_creation_basic(self):
+    def test_pipeline_result_creation_basic(self) -> None:
         """Test basic pipeline result creation."""
         result = FlextMeltanoPipelineResult(pipeline_name="test-pipeline")
 
@@ -203,7 +203,7 @@ class TestFlextMeltanoPipelineResultEntity:
         assert isinstance(result.id, str)
         assert len(result.id) > 0
 
-    def test_pipeline_result_start_execution(self):
+    def test_pipeline_result_start_execution(self) -> None:
         """Test pipeline result start execution."""
         result = FlextMeltanoPipelineResult(pipeline_name="test-pipeline")
 
@@ -214,7 +214,7 @@ class TestFlextMeltanoPipelineResultEntity:
         assert result.started_at is not None
         assert isinstance(result.started_at, datetime)
 
-    def test_pipeline_result_complete_execution(self):
+    def test_pipeline_result_complete_execution(self) -> None:
         """Test pipeline result complete execution."""
         result = FlextMeltanoPipelineResult(pipeline_name="test-pipeline")
 
@@ -228,7 +228,7 @@ class TestFlextMeltanoPipelineResultEntity:
         assert result.duration_seconds is not None
         assert result.duration_seconds >= 0
 
-    def test_pipeline_result_fail_execution(self):
+    def test_pipeline_result_fail_execution(self) -> None:
         """Test pipeline result fail execution."""
         result = FlextMeltanoPipelineResult(pipeline_name="test-pipeline")
 
@@ -243,7 +243,7 @@ class TestFlextMeltanoPipelineResultEntity:
         assert result.duration_seconds is not None
         assert result.duration_seconds >= 0
 
-    def test_pipeline_result_validate_domain_rules_success(self):
+    def test_pipeline_result_validate_domain_rules_success(self) -> None:
         """Test pipeline result domain validation success."""
         result = FlextMeltanoPipelineResult(pipeline_name="valid-pipeline")
 
@@ -252,7 +252,7 @@ class TestFlextMeltanoPipelineResultEntity:
         assert validation_result.success
         assert validation_result.data is None
 
-    def test_pipeline_result_validate_domain_rules_failure(self):
+    def test_pipeline_result_validate_domain_rules_failure(self) -> None:
         """Test pipeline result domain validation failure."""
         result = FlextMeltanoPipelineResult(pipeline_name="  ")  # Only whitespace
 
@@ -265,7 +265,7 @@ class TestFlextMeltanoPipelineResultEntity:
 class TestFlextMeltanoPipelineEventEntity:
     """Test FlextMeltanoPipelineEvent entity."""
 
-    def test_pipeline_event_creation_basic(self):
+    def test_pipeline_event_creation_basic(self) -> None:
         """Test basic pipeline event creation."""
         event = FlextMeltanoPipelineEvent(
             pipeline_id="test-pipeline-id",
@@ -280,7 +280,7 @@ class TestFlextMeltanoPipelineEventEntity:
         assert isinstance(event.id, str)
         assert len(event.id) > 0
 
-    def test_pipeline_event_creation_with_data(self):
+    def test_pipeline_event_creation_with_data(self) -> None:
         """Test pipeline event creation with custom data."""
         custom_data = {
             "execution_id": "exec-123",
@@ -298,7 +298,7 @@ class TestFlextMeltanoPipelineEventEntity:
         assert event.data["records"] == 1000
         assert event.data["duration"] == 45.5
 
-    def test_pipeline_event_validate_domain_rules_success(self):
+    def test_pipeline_event_validate_domain_rules_success(self) -> None:
         """Test pipeline event domain validation success."""
         event = FlextMeltanoPipelineEvent(
             pipeline_id="valid-pipeline-id",
@@ -310,7 +310,7 @@ class TestFlextMeltanoPipelineEventEntity:
         assert validation_result.success
         assert validation_result.data is None
 
-    def test_pipeline_event_validate_domain_rules_failure(self):
+    def test_pipeline_event_validate_domain_rules_failure(self) -> None:
         """Test pipeline event domain validation failure."""
         event = FlextMeltanoPipelineEvent(
             pipeline_id="  ",  # Only whitespace
@@ -322,7 +322,7 @@ class TestFlextMeltanoPipelineEventEntity:
         assert not validation_result.success
         assert validation_result.error == "Pipeline ID cannot be empty"
 
-    def test_all_pipeline_event_types(self):
+    def test_all_pipeline_event_types(self) -> None:
         """Test creating events with all event types."""
         event_types = [
             PipelineEventType.CREATED,
@@ -345,7 +345,7 @@ class TestFlextMeltanoPipelineEventEntity:
 class TestFlextMeltanoExecutionStateManagement:
     """Test FlextMeltanoExecutionState management."""
 
-    def test_execution_state_creation(self):
+    def test_execution_state_creation(self) -> None:
         """Test execution state creation."""
         state = FlextMeltanoExecutionState()
 
@@ -355,7 +355,7 @@ class TestFlextMeltanoExecutionStateManagement:
         assert isinstance(state.metadata, dict)
         assert len(state.metadata) == 0
 
-    def test_execution_state_start_pipeline(self):
+    def test_execution_state_start_pipeline(self) -> None:
         """Test starting pipeline execution."""
         state = FlextMeltanoExecutionState()
 
@@ -368,7 +368,7 @@ class TestFlextMeltanoExecutionStateManagement:
         assert state.state == ExecutionState.RUNNING.value
         assert "started_at" in state.metadata
 
-    def test_execution_state_complete_pipeline(self):
+    def test_execution_state_complete_pipeline(self) -> None:
         """Test completing pipeline execution."""
         state = FlextMeltanoExecutionState()
 
@@ -379,7 +379,7 @@ class TestFlextMeltanoExecutionStateManagement:
         assert state.state == ExecutionState.COMPLETED.value
         assert "completed_at" in state.metadata
 
-    def test_execution_state_fail_pipeline(self):
+    def test_execution_state_fail_pipeline(self) -> None:
         """Test failing pipeline execution."""
         state = FlextMeltanoExecutionState()
 
@@ -396,7 +396,7 @@ class TestFlextMeltanoExecutionStateManagement:
 class TestDeprecatedApiWarning:
     """Test deprecated API warning function."""
 
-    def test_deprecated_api_warning(self):
+    def test_deprecated_api_warning(self) -> None:
         """Test that deprecated API warning issues proper deprecation warning."""
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -407,7 +407,7 @@ class TestDeprecatedApiWarning:
             assert issubclass(warning_list[0].category, DeprecationWarning)
             assert "This API is deprecated" in str(warning_list[0].message)
 
-    def test_deprecated_api_warning_with_different_messages(self):
+    def test_deprecated_api_warning_with_different_messages(self) -> None:
         """Test deprecated API warning with different messages."""
         messages = [
             "Function is deprecated, use new_function instead",
@@ -442,7 +442,7 @@ class TestFlextMeltanoRepositoryAggregateRoot:
 
         return TestRepository(name=name)
 
-    def test_repository_creation(self):
+    def test_repository_creation(self) -> None:
         """Test repository creation."""
         repo = self.create_test_repository("test-repo")
 
@@ -460,7 +460,7 @@ class TestFlextMeltanoRepositoryAggregateRoot:
 class TestCoreModuleIntegration:
     """Integration tests for core module components."""
 
-    def test_pipeline_failure_scenario(self):
+    def test_pipeline_failure_scenario(self) -> None:
         """Test pipeline failure scenario."""
         # Create pipeline result
         result = FlextMeltanoPipelineResult(pipeline_name="failing-pipeline")

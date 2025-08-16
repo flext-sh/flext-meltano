@@ -727,6 +727,7 @@ def flext_meltano_discover_catalog(
         if running_loop is None:
             result = asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
             # Return an object with attribute access which is also awaitable (trivial await)
+
             class _AttrAwaitableSuccess(UserDict[str, object]):
                 def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                     return self[name] if name in self else UserDict.__getattribute__(self, name)
@@ -791,7 +792,7 @@ def flext_meltano_discover_plugins(
                 return UserDict.__getattribute__(self, name)
 
         if not service_result.success or service_result.data is None:
-            class AttrDictError(dict[str, object]):
+            class AttrDictError(UserDict[str, object]):
                 def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                     try:
                         return self[name]
@@ -835,7 +836,8 @@ def flext_meltano_discover_plugins(
             data_obj: dict[str, object] = {"plugins": plugins_list}
         else:
             data_obj = None  # type: ignore[assignment]
-        class AttrDictSuccess(dict[str, object]):
+
+        class AttrDictSuccess(UserDict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]
@@ -843,7 +845,7 @@ def flext_meltano_discover_plugins(
                     return dict.__getattribute__(self, name)
         return AttrDictSuccess({"success": result.success, "data": data_obj, "error": result.error})
     except Exception as e:  # noqa: BLE001
-        class AttrDictException(dict[str, object]):
+        class AttrDictException(UserDict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
                 try:
                     return self[name]

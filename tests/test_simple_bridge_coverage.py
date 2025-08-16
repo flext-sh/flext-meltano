@@ -28,7 +28,7 @@ from flext_meltano.simple_bridge import (
 class TestFlextMeltanoBridge:
     """Test FlextMeltanoBridge with real functionality."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.config = FlextMeltanoConfig(
             project_root=tempfile.mkdtemp(prefix="test_project_"),
@@ -36,7 +36,7 @@ class TestFlextMeltanoBridge:
         )
         self.bridge = FlextMeltanoBridge(self.config)
 
-    def test_bridge_initialization_with_config(self):
+    def test_bridge_initialization_with_config(self) -> None:
         """Test bridge initialization with custom config."""
         config = FlextMeltanoConfig(project_root=tempfile.mkdtemp(prefix="custom_"))
         bridge = FlextMeltanoBridge(config)
@@ -45,14 +45,14 @@ class TestFlextMeltanoBridge:
         assert "/custom_" in bridge._config.project_root
         assert bridge._executor is not None
 
-    def test_bridge_initialization_without_config(self):
+    def test_bridge_initialization_without_config(self) -> None:
         """Test bridge initialization with default config."""
         bridge = FlextMeltanoBridge()
 
         assert bridge._config is not None
         assert bridge._executor is not None
 
-    def test_bridge_initialization_with_none_config(self):
+    def test_bridge_initialization_with_none_config(self) -> None:
         """Test bridge initialization with None config."""
         bridge = FlextMeltanoBridge(None)
 
@@ -60,7 +60,7 @@ class TestFlextMeltanoBridge:
         assert bridge._executor is not None
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_get_version_success(self, mock_executor_class):
+    def test_get_version_success(self, mock_executor_class) -> None:
         """Test successful version retrieval."""
         # Mock the executor
         mock_executor = Mock()
@@ -92,7 +92,7 @@ class TestFlextMeltanoBridge:
         assert result.data["flext_meltano"] == "2.0.0-enterprise"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_get_version_failure(self, mock_executor_class):
+    def test_get_version_failure(self, mock_executor_class) -> None:
         """Test version retrieval failure."""
         # Mock the executor
         mock_executor = Mock()
@@ -110,7 +110,7 @@ class TestFlextMeltanoBridge:
         assert result.data["meltano"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_get_version_exception_handling(self, mock_executor_class):
+    def test_get_version_exception_handling(self, mock_executor_class) -> None:
         """Test version retrieval with exception."""
         # Mock the executor to raise an exception
         mock_executor = Mock()
@@ -125,7 +125,7 @@ class TestFlextMeltanoBridge:
         assert "Failed to get version information" in result.error
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_list_plugins_success_with_json(self, mock_executor_class):
+    def test_list_plugins_success_with_json(self, mock_executor_class) -> None:
         """Test successful plugin listing with JSON response."""
         # Mock the executor
         mock_executor = Mock()
@@ -156,7 +156,7 @@ class TestFlextMeltanoBridge:
         assert result.data[1]["name"] == "target-csv"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_list_plugins_success_without_json(self, mock_executor_class):
+    def test_list_plugins_success_without_json(self, mock_executor_class) -> None:
         """Test successful plugin listing with non-JSON response."""
         # Mock the executor
         mock_executor = Mock()
@@ -184,7 +184,7 @@ class TestFlextMeltanoBridge:
         assert result.data[1]["name"] == "target-csv"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_list_plugins_empty_response(self, mock_executor_class):
+    def test_list_plugins_empty_response(self, mock_executor_class) -> None:
         """Test plugin listing with empty response."""
         # Mock the executor
         mock_executor = Mock()
@@ -209,7 +209,7 @@ class TestFlextMeltanoBridge:
         assert len(result.data) == 0
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_list_plugins_failure(self, mock_executor_class):
+    def test_list_plugins_failure(self, mock_executor_class) -> None:
         """Test plugin listing failure."""
         # Mock the executor
         mock_executor = Mock()
@@ -227,7 +227,7 @@ class TestFlextMeltanoBridge:
         assert result.data == []
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_list_plugins_exception_handling(self, mock_executor_class):
+    def test_list_plugins_exception_handling(self, mock_executor_class) -> None:
         """Test plugin listing with exception."""
         # Mock the executor to raise an exception
         mock_executor = Mock()
@@ -241,7 +241,7 @@ class TestFlextMeltanoBridge:
         assert not result.success
         assert "Failed to list plugins" in result.error
 
-    def test_add_plugin_always_fails(self):
+    def test_add_plugin_always_fails(self) -> None:
         """Test that add_plugin always fails (not implemented)."""
         result = self.bridge.add_plugin("extractor", "tap-csv")
 
@@ -250,7 +250,7 @@ class TestFlextMeltanoBridge:
             "Plugin installation requires initialized Meltano project" in result.error
         )
 
-    def test_add_plugin_with_variant(self):
+    def test_add_plugin_with_variant(self) -> None:
         """Test add_plugin with variant parameter."""
         result = self.bridge.add_plugin(
             "extractor",
@@ -265,7 +265,7 @@ class TestFlextMeltanoBridge:
             in result.error
         )
 
-    def test_add_plugin_with_pip_url(self):
+    def test_add_plugin_with_pip_url(self) -> None:
         """Test add_plugin with pip_url parameter."""
         result = self.bridge.add_plugin(
             "extractor",
@@ -278,7 +278,7 @@ class TestFlextMeltanoBridge:
             "Plugin installation requires initialized Meltano project" in result.error
         )
 
-    def test_discover_catalog_always_fails(self):
+    def test_discover_catalog_always_fails(self) -> None:
         """Test that discover_catalog always fails (not implemented)."""
         result = self.bridge.discover_catalog("tap-csv")
 
@@ -286,7 +286,7 @@ class TestFlextMeltanoBridge:
         assert "Catalog discovery requires configured Meltano project" in result.error
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_run_pipeline_success(self, mock_executor_class):
+    def test_run_pipeline_success(self, mock_executor_class) -> None:
         """Test successful pipeline execution."""
         # Mock the executor
         mock_executor = Mock()
@@ -315,7 +315,7 @@ class TestFlextMeltanoBridge:
         assert result.data["job_id"] is None
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_run_pipeline_with_environment(self, mock_executor_class):
+    def test_run_pipeline_with_environment(self, mock_executor_class) -> None:
         """Test pipeline execution with environment parameter."""
         # Mock the executor
         mock_executor = Mock()
@@ -347,7 +347,7 @@ class TestFlextMeltanoBridge:
         mock_executor.run_command.assert_called_with(expected_cmd)
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_run_pipeline_with_job_id(self, mock_executor_class):
+    def test_run_pipeline_with_job_id(self, mock_executor_class) -> None:
         """Test pipeline execution with job_id parameter."""
         # Mock the executor
         mock_executor = Mock()
@@ -369,7 +369,7 @@ class TestFlextMeltanoBridge:
         assert result.data["job_id"] == "job-12345"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_run_pipeline_failure(self, mock_executor_class):
+    def test_run_pipeline_failure(self, mock_executor_class) -> None:
         """Test pipeline execution failure."""
         # Mock the executor
         mock_executor = Mock()
@@ -387,7 +387,7 @@ class TestFlextMeltanoBridge:
         assert "Pipeline execution failed" in result.error
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_run_pipeline_exception_handling(self, mock_executor_class):
+    def test_run_pipeline_exception_handling(self, mock_executor_class) -> None:
         """Test pipeline execution with exception."""
         # Mock the executor to raise an exception
         mock_executor = Mock()
@@ -401,7 +401,7 @@ class TestFlextMeltanoBridge:
         assert not result.success
         assert "Failed to run pipeline" in result.error
 
-    def test_invoke_dbt_always_fails(self):
+    def test_invoke_dbt_always_fails(self) -> None:
         """Test that invoke_dbt always fails (not implemented)."""
         result = self.bridge.invoke_dbt("run")
 
@@ -411,14 +411,14 @@ class TestFlextMeltanoBridge:
             or "DBT operations require configured DBT project" in result.error
         )
 
-    def test_invoke_dbt_with_args(self):
+    def test_invoke_dbt_with_args(self) -> None:
         """Test invoke_dbt with additional arguments."""
         result = self.bridge.invoke_dbt("run", "--models", "my_model")
 
         assert not result.success
         assert "DBT operations require configured DBT project" in result.error
 
-    def test_invoke_dbt_with_kwargs(self):
+    def test_invoke_dbt_with_kwargs(self) -> None:
         """Test invoke_dbt with keyword arguments."""
         result = self.bridge.invoke_dbt("test", environment="prod", full_refresh=True)
 
@@ -429,7 +429,7 @@ class TestFlextMeltanoBridge:
 class TestCreateFlextMeltanoBridge:
     """Test create_flext_meltano_bridge factory function."""
 
-    def test_create_bridge_without_config(self):
+    def test_create_bridge_without_config(self) -> None:
         """Test creating bridge without config."""
         bridge = create_flext_meltano_bridge()
 
@@ -437,7 +437,7 @@ class TestCreateFlextMeltanoBridge:
         assert bridge._config is not None
         assert bridge._executor is not None
 
-    def test_create_bridge_with_config(self):
+    def test_create_bridge_with_config(self) -> None:
         """Test creating bridge with custom config."""
         config = FlextMeltanoConfig(
             project_root=tempfile.mkdtemp(prefix="custom_project_"),
@@ -450,7 +450,7 @@ class TestCreateFlextMeltanoBridge:
         assert "/custom_project_" in bridge._config.project_root
         assert bridge._config.environment == "production"
 
-    def test_create_bridge_with_none_config(self):
+    def test_create_bridge_with_none_config(self) -> None:
         """Test creating bridge with None config."""
         bridge = create_flext_meltano_bridge(None)
 
@@ -463,7 +463,7 @@ class TestBridgeIntegration:
     """Integration tests for bridge functionality."""
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_complete_bridge_workflow(self, mock_executor_class):
+    def test_complete_bridge_workflow(self, mock_executor_class) -> None:
         """Test complete bridge workflow simulation."""
         # Mock the executor
         mock_executor = Mock()
@@ -510,7 +510,7 @@ class TestBridgeIntegration:
         pipeline = bridge.run_pipeline("tap-csv", "target-csv")
         assert pipeline.success
 
-    def test_bridge_json_serialization(self):
+    def test_bridge_json_serialization(self) -> None:
         """Test that bridge results are JSON serializable."""
         bridge = FlextMeltanoBridge()
 
@@ -540,7 +540,7 @@ class TestBridgeIntegration:
                 parsed = json.loads(json_data)
                 assert isinstance(parsed, dict)
 
-    def test_bridge_error_handling_patterns(self):
+    def test_bridge_error_handling_patterns(self) -> None:
         """Test consistent error handling across bridge methods."""
         bridge = FlextMeltanoBridge()
 
@@ -560,7 +560,7 @@ class TestBridgeIntegration:
         assert dbt_result.error is not None
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_bridge_command_building(self, mock_executor_class):
+    def test_bridge_command_building(self, mock_executor_class) -> None:
         """Test bridge command building for different operations."""
         # Mock the executor
         mock_executor = Mock()
@@ -598,7 +598,7 @@ class TestBridgeEdgeCases:
     """Test edge cases and error scenarios for bridge."""
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_version_with_invalid_stdout_type(self, mock_executor_class):
+    def test_version_with_invalid_stdout_type(self, mock_executor_class) -> None:
         """Test version handling with invalid stdout type."""
         # Mock the executor
         mock_executor = Mock()
@@ -621,7 +621,7 @@ class TestBridgeEdgeCases:
         assert result.data["meltano"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_plugins_with_invalid_json(self, mock_executor_class):
+    def test_plugins_with_invalid_json(self, mock_executor_class) -> None:
         """Test plugin listing with invalid JSON."""
         # Mock the executor
         mock_executor = Mock()
@@ -646,7 +646,7 @@ class TestBridgeEdgeCases:
         assert result.data[0]["type"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_plugins_with_missing_stdout(self, mock_executor_class):
+    def test_plugins_with_missing_stdout(self, mock_executor_class) -> None:
         """Test plugin listing with missing stdout."""
         # Mock the executor
         mock_executor = Mock()
@@ -667,7 +667,7 @@ class TestBridgeEdgeCases:
         assert result.success
         assert result.data == []
 
-    def test_bridge_with_minimal_config(self):
+    def test_bridge_with_minimal_config(self) -> None:
         """Test bridge with minimal configuration."""
         config = FlextMeltanoConfig()  # Minimal config
         bridge = FlextMeltanoBridge(config)
@@ -676,7 +676,7 @@ class TestBridgeEdgeCases:
         assert bridge._executor is not None
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
-    def test_pipeline_with_all_parameters(self, mock_executor_class):
+    def test_pipeline_with_all_parameters(self, mock_executor_class) -> None:
         """Test pipeline execution with all parameters."""
         # Mock the executor
         mock_executor = Mock()

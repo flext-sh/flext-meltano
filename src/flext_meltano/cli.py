@@ -194,13 +194,13 @@ class FlextMeltanoCommandDispatcher:
                 "health": self._no_args_handler(self.cli.health),
                 "dbt-list-packages": self._no_args_handler(self.cli.dbt_list_packages),
                 "dbt-import-ecosystem": self._no_args_handler(
-                    self.cli.dbt_import_ecosystem
+                    self.cli.dbt_import_ecosystem,
                 ),
                 "dbt-create-dashboard": self._no_args_handler(
-                    self.cli.dbt_create_dashboard
+                    self.cli.dbt_create_dashboard,
                 ),
                 "dbt-health-check": self._no_args_handler(self.cli.dbt_health_check),
-            }
+            },
         )
 
         # Mock commands (pass-through to Meltano)
@@ -209,7 +209,7 @@ class FlextMeltanoCommandDispatcher:
                 "discover": self._mock_handler("discover"),
                 "install": self._mock_handler("install"),
                 "run": self._mock_handler("run"),
-            }
+            },
         )
 
         # Single argument commands
@@ -218,12 +218,12 @@ class FlextMeltanoCommandDispatcher:
                 "dbt-test-local": self._single_arg_handler(self.cli.dbt_test_local),
                 "dbt-run-model": self._single_arg_handler(self.cli.dbt_run_model),
                 "dbt-validate-project": self._single_arg_handler(
-                    self.cli.dbt_validate_project
+                    self.cli.dbt_validate_project,
                 ),
                 "dbt-execute-snapshot": self._single_arg_handler(
-                    self.cli.dbt_execute_snapshot
+                    self.cli.dbt_execute_snapshot,
                 ),
-            }
+            },
         )
 
         # Optional argument commands
@@ -232,35 +232,35 @@ class FlextMeltanoCommandDispatcher:
                 "dbt-list-models": self._optional_arg_handler(self.cli.dbt_list_models),
                 "dbt-get-metrics": self._optional_arg_handler(self.cli.dbt_get_metrics),
                 "dbt-list-snapshots": self._optional_arg_handler(
-                    self.cli.dbt_list_snapshots
+                    self.cli.dbt_list_snapshots,
                 ),
                 "dbt-list-hooks": self._optional_arg_handler(self.cli.dbt_list_hooks),
                 "dbt-list-exposures": self._optional_arg_handler(
-                    self.cli.dbt_list_exposures
+                    self.cli.dbt_list_exposures,
                 ),
                 "dbt-build-lineage": self._optional_arg_handler(
-                    self.cli.dbt_build_lineage
+                    self.cli.dbt_build_lineage,
                 ),
-            }
+            },
         )
 
         # Multi-argument commands
         self._commands.update(
             {
                 "dbt-create-mock-data": self._dual_arg_handler(
-                    self.cli.dbt_create_mock_data, MIN_MOCK_DATA_ARGS
+                    self.cli.dbt_create_mock_data, MIN_MOCK_DATA_ARGS,
                 ),
                 "dbt-lineage-path": self._dual_arg_handler(
-                    self.cli.dbt_lineage_path, MIN_LINEAGE_ARGS
+                    self.cli.dbt_lineage_path, MIN_LINEAGE_ARGS,
                 ),
                 "dbt-execute-hooks": self._dual_optional_handler(
-                    self.cli.dbt_execute_hooks
+                    self.cli.dbt_execute_hooks,
                 ),
-            }
+            },
         )
 
     def _no_args_handler(
-        self, method: Callable[[], FlextResult[dict[str, object]]]
+        self, method: Callable[[], FlextResult[dict[str, object]]],
     ) -> CommandHandler:
         """Create handler for commands that take no arguments."""
 
@@ -270,7 +270,7 @@ class FlextMeltanoCommandDispatcher:
         return handler
 
     def _single_arg_handler(
-        self, method: Callable[[str], FlextResult[dict[str, object]]]
+        self, method: Callable[[str], FlextResult[dict[str, object]]],
     ) -> CommandHandler:
         """Create handler for commands that require exactly one argument."""
 
@@ -282,7 +282,7 @@ class FlextMeltanoCommandDispatcher:
         return handler
 
     def _optional_arg_handler(
-        self, method: Callable[[str | None], FlextResult[dict[str, object]]]
+        self, method: Callable[[str | None], FlextResult[dict[str, object]]],
     ) -> CommandHandler:
         """Create handler for commands with one optional argument."""
 
@@ -301,14 +301,14 @@ class FlextMeltanoCommandDispatcher:
         def handler(options: list[str]) -> FlextResult[dict[str, object]]:
             if len(options) < min_args:
                 return FlextResult(
-                    error=f"Missing required arguments: expected {min_args}"
+                    error=f"Missing required arguments: expected {min_args}",
                 )
             return method(options[0], options[1])
 
         return handler
 
     def _dual_optional_handler(
-        self, method: Callable[[str, str | None], FlextResult[dict[str, object]]]
+        self, method: Callable[[str, str | None], FlextResult[dict[str, object]]],
     ) -> CommandHandler:
         """Create handler for commands with one required and one optional argument."""
 
@@ -328,7 +328,7 @@ class FlextMeltanoCommandDispatcher:
         return handler
 
     def dispatch(
-        self, command: str, options: list[str]
+        self, command: str, options: list[str],
     ) -> FlextResult[dict[str, object]]:
         """Dispatch command to appropriate handler - single responsibility."""
         handler = self._commands.get(command)

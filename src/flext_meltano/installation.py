@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import uuid
 import warnings as _warnings
+from collections import UserDict
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -448,7 +449,8 @@ def flext_meltano_install_plugin(
     else:
         legacy_result = installer.add_plugin(plugin_type, name)
     # Return mapping with attribute access as some tests use .success
-    class AttrDict(dict[str, object]):
+
+    class AttrDict(UserDict[str, object]):
         def __getattr__(self, item: str) -> object:  # pragma: no cover - trivial
             try:
                 return self[item]

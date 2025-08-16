@@ -10,6 +10,8 @@ they work correctly and provide proper error context.
 
 from __future__ import annotations
 
+from typing import Never
+
 import pytest
 
 import flext_meltano.exceptions as exc
@@ -33,13 +35,13 @@ FlextMeltanoAuthenticationError = exc.FlextMeltanoAuthenticationError
 class TestFlextMeltanoBaseException:
     """Test base FlextMeltanoError exception."""
 
-    def test_flext_meltano_error_creation(self):
+    def test_flext_meltano_error_creation(self) -> None:
         """Test basic FlextMeltanoError creation."""
         error = FlextMeltanoError("Base Meltano error")
         assert "Base Meltano error" in str(error)
         assert isinstance(error, Exception)
 
-    def test_flext_meltano_error_with_context(self):
+    def test_flext_meltano_error_with_context(self) -> None:
         """Test FlextMeltanoError with context."""
         context = {"operation": "test", "component": "meltano"}
         error = FlextMeltanoError("Context error", context=context)
@@ -48,13 +50,13 @@ class TestFlextMeltanoBaseException:
         assert error.context == context
         assert error.context["operation"] == "test"
 
-    def test_flext_meltano_error_inheritance(self):
+    def test_flext_meltano_error_inheritance(self) -> None:
         """Test FlextMeltanoError inheritance."""
         error = FlextMeltanoError("Inheritance test")
         assert isinstance(error, FlextMeltanoError)
         assert isinstance(error, Exception)
 
-    def test_flext_meltano_error_raising(self):
+    def test_flext_meltano_error_raising(self) -> Never:
         """Test raising FlextMeltanoError."""
         error_message = "Test raising"
         with pytest.raises(FlextMeltanoError) as exc_info:
@@ -66,13 +68,13 @@ class TestFlextMeltanoBaseException:
 class TestFlextMeltanoValidationError:
     """Test FlextMeltanoValidationError exception."""
 
-    def test_validation_error_creation(self):
+    def test_validation_error_creation(self) -> None:
         """Test validation error creation."""
         error = FlextMeltanoValidationError("Validation failed")
         assert "Validation failed" in str(error)
         assert isinstance(error, FlextMeltanoValidationError)
 
-    def test_validation_error_with_details(self):
+    def test_validation_error_with_details(self) -> None:
         """Test validation error with field details."""
         error = FlextMeltanoValidationError(
             "Invalid extractor",
@@ -84,7 +86,7 @@ class TestFlextMeltanoValidationError:
         assert error.context["field"] == "extractor"
         assert error.context["value"] == "invalid-tap"
 
-    def test_validation_error_raising(self):
+    def test_validation_error_raising(self) -> Never:
         """Test raising validation error."""
         error_message = "Config validation failed"
         with pytest.raises(FlextMeltanoValidationError):
@@ -94,12 +96,12 @@ class TestFlextMeltanoValidationError:
 class TestFlextMeltanoConfigurationError:
     """Test FlextMeltanoConfigurationError exception."""
 
-    def test_configuration_error_creation(self):
+    def test_configuration_error_creation(self) -> None:
         """Test configuration error creation."""
         error = FlextMeltanoConfigurationError("Configuration error")
         assert "Configuration error" in str(error)
 
-    def test_configuration_error_with_config_context(self):
+    def test_configuration_error_with_config_context(self) -> None:
         """Test configuration error with config context."""
         error = FlextMeltanoConfigurationError(
             "Invalid config",
@@ -110,7 +112,7 @@ class TestFlextMeltanoConfigurationError:
         assert error.context["context"]["config_file"] == "meltano.yml"
         assert error.context["context"]["section"] == "plugins"
 
-    def test_configuration_error_raising(self):
+    def test_configuration_error_raising(self) -> Never:
         """Test raising configuration error."""
         error_message = "Missing required config"
         with pytest.raises(FlextMeltanoConfigurationError):
@@ -120,12 +122,12 @@ class TestFlextMeltanoConfigurationError:
 class TestFlextMeltanoConnectionError:
     """Test FlextMeltanoConnectionError exception."""
 
-    def test_connection_error_creation(self):
+    def test_connection_error_creation(self) -> None:
         """Test connection error creation."""
         error = FlextMeltanoConnectionError("Connection failed")
         assert "Connection failed" in str(error)
 
-    def test_connection_error_with_details(self):
+    def test_connection_error_with_details(self) -> None:
         """Test connection error with connection details."""
         error = FlextMeltanoConnectionError(
             "Database unreachable",
@@ -137,7 +139,7 @@ class TestFlextMeltanoConnectionError:
         assert error.context["context"]["host"] == "localhost"
         assert error.context["context"]["port"] == 5432
 
-    def test_connection_error_raising(self):
+    def test_connection_error_raising(self) -> Never:
         """Test raising connection error."""
         error_message = "Connection timeout"
         with pytest.raises(FlextMeltanoConnectionError):
@@ -147,12 +149,12 @@ class TestFlextMeltanoConnectionError:
 class TestFlextMeltanoProcessingError:
     """Test FlextMeltanoProcessingError exception."""
 
-    def test_processing_error_creation(self):
+    def test_processing_error_creation(self) -> None:
         """Test processing error creation."""
         error = FlextMeltanoProcessingError("Processing failed")
         assert "Processing failed" in str(error)
 
-    def test_processing_error_with_pipeline_context(self):
+    def test_processing_error_with_pipeline_context(self) -> None:
         """Test processing error with pipeline context."""
         error = FlextMeltanoProcessingError(
             "Data processing failed",
@@ -164,7 +166,7 @@ class TestFlextMeltanoProcessingError:
         assert error.context["context"]["pipeline"] == "test-pipeline"
         assert error.context["context"]["stage"] == "extract"
 
-    def test_processing_error_raising(self):
+    def test_processing_error_raising(self) -> Never:
         """Test raising processing error."""
         error_message = "Data transformation error"
         with pytest.raises(FlextMeltanoProcessingError):
@@ -174,13 +176,13 @@ class TestFlextMeltanoProcessingError:
 class TestFlextMeltanoAuthenticationError:
     """Test FlextMeltanoAuthenticationError exception."""
 
-    def test_authentication_error_creation(self):
+    def test_authentication_error_creation(self) -> None:
         """Test authentication error creation."""
         error = FlextMeltanoAuthenticationError("Authentication failed")
         assert "Authentication failed" in str(error)
         assert isinstance(error, FlextMeltanoAuthenticationError)
 
-    def test_authentication_error_with_user_context(self):
+    def test_authentication_error_with_user_context(self) -> None:
         """Test authentication error with user context."""
         error = FlextMeltanoAuthenticationError(
             "Invalid credentials",
@@ -192,7 +194,7 @@ class TestFlextMeltanoAuthenticationError:
         assert error.context["context"]["user"] == "test_user"
         assert error.context["context"]["service"] == "tap-postgres"
 
-    def test_authentication_error_raising(self):
+    def test_authentication_error_raising(self) -> Never:
         """Test raising authentication error."""
         error_message = "Token expired"
         with pytest.raises(FlextMeltanoAuthenticationError):
@@ -202,12 +204,12 @@ class TestFlextMeltanoAuthenticationError:
 class TestFlextMeltanoTimeoutError:
     """Test FlextMeltanoTimeoutError exception."""
 
-    def test_timeout_error_creation(self):
+    def test_timeout_error_creation(self) -> None:
         """Test timeout error creation."""
         error = FlextMeltanoTimeoutError("Operation timed out")
         assert "Operation timed out" in str(error)
 
-    def test_timeout_error_with_timing_context(self):
+    def test_timeout_error_with_timing_context(self) -> None:
         """Test timeout error with timing context."""
         error = FlextMeltanoTimeoutError(
             "Sync timeout",
@@ -219,7 +221,7 @@ class TestFlextMeltanoTimeoutError:
         assert error.context["context"]["timeout"] == 300
         assert error.context["context"]["elapsed"] == 450
 
-    def test_timeout_error_raising(self):
+    def test_timeout_error_raising(self) -> Never:
         """Test raising timeout error."""
         error_message = "Pipeline execution timeout"
         with pytest.raises(FlextMeltanoTimeoutError):
@@ -229,12 +231,12 @@ class TestFlextMeltanoTimeoutError:
 class TestFlextMeltanoPluginError:
     """Test FlextMeltanoPluginError exception."""
 
-    def test_plugin_error_creation(self):
+    def test_plugin_error_creation(self) -> None:
         """Test plugin error creation."""
         error = FlextMeltanoPluginError("Plugin error")
         assert "Plugin error" in str(error)
 
-    def test_plugin_error_with_plugin_context(self):
+    def test_plugin_error_with_plugin_context(self) -> None:
         """Test plugin error with plugin context."""
         error = FlextMeltanoPluginError(
             "Plugin discovery failed",
@@ -247,7 +249,7 @@ class TestFlextMeltanoPluginError:
         assert error.context["plugin_name"] == "tap-postgres"
         assert error.context["plugin_type"] == "extractor"
 
-    def test_plugin_error_raising(self):
+    def test_plugin_error_raising(self) -> Never:
         """Test raising plugin error."""
         error_message = "Plugin not found"
         with pytest.raises(FlextMeltanoPluginError):
@@ -257,12 +259,12 @@ class TestFlextMeltanoPluginError:
 class TestFlextMeltanoExecutionError:
     """Test FlextMeltanoExecutionError exception."""
 
-    def test_execution_error_creation(self):
+    def test_execution_error_creation(self) -> None:
         """Test execution error creation."""
         error = FlextMeltanoExecutionError("Execution failed")
         assert "Execution failed" in str(error)
 
-    def test_execution_error_with_execution_context(self):
+    def test_execution_error_with_execution_context(self) -> None:
         """Test execution error with execution context."""
         error = FlextMeltanoExecutionError(
             "Pipeline execution failed",
@@ -275,7 +277,7 @@ class TestFlextMeltanoExecutionError:
         assert error.context["exit_code"] == 1
         assert error.context["duration"] == 120.5
 
-    def test_execution_error_raising(self):
+    def test_execution_error_raising(self) -> Never:
         """Test raising execution error."""
         error_message = "Command failed with exit code 1"
         with pytest.raises(FlextMeltanoExecutionError):
@@ -285,12 +287,12 @@ class TestFlextMeltanoExecutionError:
 class TestFlextMeltanoSingerError:
     """Test FlextMeltanoSingerError exception."""
 
-    def test_singer_error_creation(self):
+    def test_singer_error_creation(self) -> None:
         """Test Singer error creation."""
         error = FlextMeltanoSingerError("Singer protocol error")
         assert "Singer protocol error" in str(error)
 
-    def test_singer_error_with_stream_context(self):
+    def test_singer_error_with_stream_context(self) -> None:
         """Test Singer error with stream context."""
         context = {
             "tap": "tap-postgres",
@@ -305,7 +307,7 @@ class TestFlextMeltanoSingerError:
         assert hasattr(error, "context")
         assert isinstance(error.context, dict)
 
-    def test_singer_error_raising(self):
+    def test_singer_error_raising(self) -> Never:
         """Test raising Singer error."""
         error_message = "Invalid Singer message format"
         with pytest.raises(FlextMeltanoSingerError):
@@ -315,12 +317,12 @@ class TestFlextMeltanoSingerError:
 class TestFlextMeltanoDBTError:
     """Test FlextMeltanoDBTError exception."""
 
-    def test_dbt_error_creation(self):
+    def test_dbt_error_creation(self) -> None:
         """Test DBT error creation."""
         error = FlextMeltanoDBTError("DBT transformation failed")
         assert "DBT transformation failed" in str(error)
 
-    def test_dbt_error_with_model_context(self):
+    def test_dbt_error_with_model_context(self) -> None:
         """Test DBT error with model context."""
         error = FlextMeltanoDBTError(
             "Model compilation failed",
@@ -335,7 +337,7 @@ class TestFlextMeltanoDBTError:
         assert error.context["model_name"] == "dim_customers"
         assert error.context["line"] == 42
 
-    def test_dbt_error_raising(self):
+    def test_dbt_error_raising(self) -> Never:
         """Test raising DBT error."""
         error_message = "DBT run failed"
         with pytest.raises(FlextMeltanoDBTError):
@@ -345,7 +347,7 @@ class TestFlextMeltanoDBTError:
 class TestExceptionsIntegration:
     """Test exception integration and hierarchy."""
 
-    def test_exception_hierarchy(self):
+    def test_exception_hierarchy(self) -> None:
         """Test that all exceptions inherit correctly."""
         # Create exceptions
         validation_error = FlextMeltanoValidationError("test")
@@ -379,7 +381,7 @@ class TestExceptionsIntegration:
             FlextMeltanoError,
         )  # Direct FlextMeltanoError inheritance
 
-    def test_exception_context_preservation(self):
+    def test_exception_context_preservation(self) -> None:
         """Test that exception context is preserved through inheritance."""
         # Create exceptions using kwargs to ensure proper context structure
         exceptions = [
@@ -412,7 +414,7 @@ class TestExceptionsIntegration:
                 assert exception.context["key"] == "value"
                 assert exception.context["number"] == 42
 
-    def test_exception_chaining(self):
+    def test_exception_chaining(self) -> None:
         """Test exception chaining with cause."""
         original_error = ValueError("Original error")
 
@@ -427,7 +429,7 @@ class TestExceptionsIntegration:
         assert meltano_error.__cause__ is original_error
         assert "Wrapped error" in str(meltano_error)
 
-    def test_all_exceptions_can_be_raised_and_caught(self):
+    def test_all_exceptions_can_be_raised_and_caught(self) -> Never:
         """Test that all exceptions can be raised and caught properly."""
         exception_classes = [
             FlextMeltanoError,
@@ -448,7 +450,7 @@ class TestExceptionsIntegration:
             with pytest.raises(exception_class):
                 raise exception_class(msg)
 
-    def test_exception_string_representations(self):
+    def test_exception_string_representations(self) -> None:
         """Test string representations of all exceptions."""
         exceptions = [
             FlextMeltanoError("Base error"),

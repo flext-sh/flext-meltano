@@ -23,28 +23,28 @@ from flext_meltano.flext_singer import FlextSingerBridge, FlextSingerCatalog
 class TestDbtRealImplementations:
     """Test DBT real implementations."""
 
-    def test_dbt_manager_creation(self):
+    def test_dbt_manager_creation(self) -> None:
         """Test DBT manager can be created."""
         manager = FlextMeltanoDbtManager()
         assert manager is not None
         assert hasattr(manager, "executor")
         assert hasattr(manager, "project_dir")
 
-    def test_dbt_project_creation(self):
+    def test_dbt_project_creation(self) -> None:
         """Test DBT project can be created."""
         project = FlextMeltanoDbtProject()
         assert project is not None
         assert hasattr(project, "executor")
         assert hasattr(project, "project_dir")
 
-    def test_dbt_runner_creation(self):
+    def test_dbt_runner_creation(self) -> None:
         """Test DBT runner can be created."""
         runner = FlextMeltanoDbtRunner()
         assert runner is not None
         assert hasattr(runner, "executor")
         assert hasattr(runner, "project_dir")
 
-    def test_dbt_manager_methods_exist(self):
+    def test_dbt_manager_methods_exist(self) -> None:
         """Test DBT manager has expected methods."""
         manager = FlextMeltanoDbtManager()
 
@@ -60,7 +60,7 @@ class TestDbtRealImplementations:
         assert callable(manager.test_models)
         assert callable(manager.compile_models)
 
-    def test_dbt_project_methods_exist(self):
+    def test_dbt_project_methods_exist(self) -> None:
         """Test DBT project has expected methods."""
         project = FlextMeltanoDbtProject()
 
@@ -69,7 +69,7 @@ class TestDbtRealImplementations:
         assert callable(project.initialize)
         assert callable(project.validate)
 
-    def test_dbt_runner_methods_exist(self):
+    def test_dbt_runner_methods_exist(self) -> None:
         """Test DBT runner has expected methods."""
         runner = FlextMeltanoDbtRunner()
 
@@ -84,20 +84,20 @@ class TestDbtRealImplementations:
 class TestSingerRealImplementations:
     """Test Singer real implementations."""
 
-    def test_singer_bridge_creation(self):
+    def test_singer_bridge_creation(self) -> None:
         """Test Singer bridge can be created."""
         bridge = FlextSingerBridge()
         assert bridge is not None
         assert hasattr(bridge, "_logger")
         assert hasattr(bridge, "_container")
 
-    def test_singer_catalog_creation(self):
+    def test_singer_catalog_creation(self) -> None:
         """Test Singer catalog can be created."""
         catalog = FlextSingerCatalog()
         assert catalog is not None
         assert hasattr(catalog, "_logger")
 
-    def test_singer_bridge_message_creation(self):
+    def test_singer_bridge_message_creation(self) -> None:
         """Test Singer bridge can create messages."""
         bridge = FlextSingerBridge()
 
@@ -113,7 +113,7 @@ class TestSingerRealImplementations:
         assert result.data["stream"] == "test_stream"
         assert result.data["record"] == {"id": 1, "name": "test"}
 
-    def test_singer_bridge_schema_creation(self):
+    def test_singer_bridge_schema_creation(self) -> None:
         """Test Singer bridge can create schema messages."""
         bridge = FlextSingerBridge()
 
@@ -135,7 +135,7 @@ class TestSingerRealImplementations:
         assert result.data["schema"] == schema
         assert result.data["key_properties"] == ["id"]
 
-    def test_singer_bridge_universal_method(self):
+    def test_singer_bridge_universal_method(self) -> None:
         """Test Singer bridge universal message creation method."""
         bridge = FlextSingerBridge()
 
@@ -150,7 +150,7 @@ class TestSingerRealImplementations:
         assert result.data is not None
         assert result.data["type"] == "RECORD"
 
-    def test_singer_bridge_error_handling(self):
+    def test_singer_bridge_error_handling(self) -> None:
         """Test Singer bridge error handling."""
         bridge = FlextSingerBridge()
 
@@ -159,7 +159,7 @@ class TestSingerRealImplementations:
         assert not result.success
         assert "Unknown message type" in str(result.error)
 
-    def test_singer_bridge_methods_exist(self):
+    def test_singer_bridge_methods_exist(self) -> None:
         """Test Singer bridge has expected methods."""
         bridge = FlextSingerBridge()
 
@@ -178,7 +178,7 @@ class TestSingerRealImplementations:
 class TestIntegrationBasics:
     """Test basic integration between components."""
 
-    def test_imports_work_correctly(self):
+    def test_imports_work_correctly(self) -> None:
         """Test that all imports work without circular dependency issues."""
         # Should be able to create instances without errors
         dbt_manager = FlextMeltanoDbtManager()
@@ -187,7 +187,7 @@ class TestIntegrationBasics:
         assert dbt_manager is not None
         assert singer_bridge is not None
 
-    def test_flext_result_patterns_used(self):
+    def test_flext_result_patterns_used(self) -> None:
         """Test that FlextResult patterns are properly used."""
         dbt_manager = FlextMeltanoDbtManager()
         singer_bridge = FlextSingerBridge()

@@ -42,7 +42,7 @@ from flext_meltano.core import (
 class TestExecutionState:
     """Test ExecutionState enum with real functionality."""
 
-    def test_execution_state_values(self):
+    def test_execution_state_values(self) -> None:
         """Test all ExecutionState enum values."""
         assert ExecutionState.PENDING
         assert ExecutionState.RUNNING
@@ -50,7 +50,7 @@ class TestExecutionState:
         assert ExecutionState.FAILED
         assert ExecutionState.CANCELLED
 
-    def test_execution_state_names(self):
+    def test_execution_state_names(self) -> None:
         """Test ExecutionState names."""
         assert ExecutionState.PENDING.name == "PENDING"
         assert ExecutionState.RUNNING.name == "RUNNING"
@@ -58,7 +58,7 @@ class TestExecutionState:
         assert ExecutionState.FAILED.name == "FAILED"
         assert ExecutionState.CANCELLED.name == "CANCELLED"
 
-    def test_execution_state_iteration(self):
+    def test_execution_state_iteration(self) -> None:
         """Test ExecutionState iteration."""
         all_states = list(ExecutionState)
         assert len(all_states) == 5
@@ -69,7 +69,7 @@ class TestExecutionState:
 class TestPipelineEventType:
     """Test PipelineEventType enum with real functionality."""
 
-    def test_pipeline_event_type_values(self):
+    def test_pipeline_event_type_values(self) -> None:
         """Test all PipelineEventType enum values."""
         assert PipelineEventType.CREATED
         assert PipelineEventType.STARTED
@@ -77,7 +77,7 @@ class TestPipelineEventType:
         assert PipelineEventType.FAILED
         assert PipelineEventType.CANCELLED
 
-    def test_pipeline_event_type_names(self):
+    def test_pipeline_event_type_names(self) -> None:
         """Test PipelineEventType names."""
         assert PipelineEventType.CREATED.name == "CREATED"
         assert PipelineEventType.STARTED.name == "STARTED"
@@ -92,7 +92,7 @@ class TestPipelineEventType:
 class TestFlextMeltanoPipelineConfig:
     """Test FlextMeltanoPipelineConfig dataclass with real functionality."""
 
-    def test_pipeline_config_creation(self):
+    def test_pipeline_config_creation(self) -> None:
         """Test FlextMeltanoPipelineConfig creation."""
         config = FlextMeltanoPipelineConfig(
             name="test-pipeline",
@@ -108,7 +108,7 @@ class TestFlextMeltanoPipelineConfig:
         assert config.transformer is None
         assert config.config == {}  # Default empty dict
 
-    def test_pipeline_config_with_transformer(self):
+    def test_pipeline_config_with_transformer(self) -> None:
         """Test FlextMeltanoPipelineConfig with transformer."""
         config = FlextMeltanoPipelineConfig(
             name="dbt-pipeline",
@@ -121,7 +121,7 @@ class TestFlextMeltanoPipelineConfig:
         assert config.transformer == "dbt-warehouse"
         assert config.environment == "prod"
 
-    def test_pipeline_config_with_custom_config(self):
+    def test_pipeline_config_with_custom_config(self) -> None:
         """Test FlextMeltanoPipelineConfig with custom configuration."""
         custom_config = {"batch_size": 1000, "timeout": 300}
 
@@ -136,7 +136,7 @@ class TestFlextMeltanoPipelineConfig:
         assert config.config == custom_config
         assert config.config["batch_size"] == 1000
 
-    def test_pipeline_config_validation_success(self):
+    def test_pipeline_config_validation_success(self) -> None:
         """Test FlextMeltanoPipelineConfig post-init validation success."""
         # Valid configuration should not raise any exception
         config = FlextMeltanoPipelineConfig(
@@ -146,7 +146,7 @@ class TestFlextMeltanoPipelineConfig:
         )
         assert config.name == "valid-pipeline"
 
-    def test_pipeline_config_validation_failures(self):
+    def test_pipeline_config_validation_failures(self) -> None:
         """Test FlextMeltanoPipelineConfig post-init validation failures."""
         # Empty name should raise ValueError
         with pytest.raises(
@@ -188,7 +188,7 @@ class TestFlextMeltanoPipelineConfig:
 class TestFlextMeltanoPipelineResult:
     """Test FlextMeltanoPipelineResult entity with real functionality."""
 
-    def test_pipeline_result_creation_success(self):
+    def test_pipeline_result_creation_success(self) -> None:
         """Test FlextMeltanoPipelineResult creation for successful execution."""
         result_id = str(uuid.uuid4())
 
@@ -208,7 +208,7 @@ class TestFlextMeltanoPipelineResult:
         assert result.duration_seconds is not None
         assert result.error_message is None
 
-    def test_pipeline_result_creation_failure(self):
+    def test_pipeline_result_creation_failure(self) -> None:
         """Test FlextMeltanoPipelineResult creation for failed execution."""
         result_id = str(uuid.uuid4())
 
@@ -225,7 +225,7 @@ class TestFlextMeltanoPipelineResult:
         assert result.records_processed == 0
         assert result.error_message == "Connection failed to database"
 
-    def test_pipeline_result_with_metadata(self):
+    def test_pipeline_result_with_metadata(self) -> None:
         """Test FlextMeltanoPipelineResult with metadata."""
         result_id = str(uuid.uuid4())
         metadata = {
@@ -247,7 +247,7 @@ class TestFlextMeltanoPipelineResult:
         assert result.metadata == metadata
         assert result.metadata["throughput_records_per_second"] == 125.5
 
-    def test_pipeline_result_domain_rules(self):
+    def test_pipeline_result_domain_rules(self) -> None:
         """Test FlextMeltanoPipelineResult domain rule validation."""
         result_id = str(uuid.uuid4())
 
@@ -273,7 +273,7 @@ class TestFlextMeltanoPipelineResult:
 class TestFlextMeltanoPipelineEvent:
     """Test FlextMeltanoPipelineEvent entity with real functionality."""
 
-    def test_pipeline_event_creation(self):
+    def test_pipeline_event_creation(self) -> None:
         """Test FlextMeltanoPipelineEvent creation."""
         event_id = str(uuid.uuid4())
         pipeline_id = str(uuid.uuid4())
@@ -292,7 +292,7 @@ class TestFlextMeltanoPipelineEvent:
         assert event.timestamp is not None
         assert event.data["pipeline_name"] == "test-pipeline"
 
-    def test_pipeline_event_different_types(self):
+    def test_pipeline_event_different_types(self) -> None:
         """Test FlextMeltanoPipelineEvent with different event types."""
         events = [
             (PipelineEventType.CREATED, {"action": "create"}),
@@ -314,7 +314,7 @@ class TestFlextMeltanoPipelineEvent:
             assert event.event_type == event_type.value
             assert event.data == data
 
-    def test_pipeline_event_domain_rules(self):
+    def test_pipeline_event_domain_rules(self) -> None:
         """Test FlextMeltanoPipelineEvent domain rule validation."""
         event = FlextMeltanoPipelineEvent(
             id=str(uuid.uuid4()),
@@ -344,7 +344,7 @@ class TestFlextMeltanoPipelineEvent:
 class TestFlextMeltanoRepository:
     """Test FlextMeltanoRepository aggregate root with real functionality."""
 
-    def test_repository_class_exists(self):
+    def test_repository_class_exists(self) -> None:
         """Test FlextMeltanoRepository class exists and is properly defined."""
         assert FlextMeltanoRepository is not None
         assert hasattr(FlextMeltanoRepository, "__init__")
@@ -354,7 +354,7 @@ class TestFlextMeltanoRepository:
         # Test that it's an aggregate root
         assert issubclass(FlextMeltanoRepository, FlextAggregateRoot)
 
-    def test_repository_requires_abstract_methods(self):
+    def test_repository_requires_abstract_methods(self) -> None:
         """Test FlextMeltanoRepository requires validate_domain_rules implementation."""
         # FlextMeltanoRepository requires validate_domain_rules from FlextEntity
         # Cannot instantiate without implementing the abstract method
@@ -365,7 +365,7 @@ class TestFlextMeltanoRepository:
 class TestFlextMeltanoExecutionState:
     """Test FlextMeltanoExecutionState Pydantic model with real functionality."""
 
-    def test_execution_state_creation(self):
+    def test_execution_state_creation(self) -> None:
         """Test FlextMeltanoExecutionState creation."""
         state = FlextMeltanoExecutionState(
             execution_id="exec-123",
@@ -378,7 +378,7 @@ class TestFlextMeltanoExecutionState:
         assert state.state == ExecutionState.RUNNING.value
         assert state.metadata == {}
 
-    def test_execution_state_completed(self):
+    def test_execution_state_completed(self) -> None:
         """Test FlextMeltanoExecutionState for completed execution."""
         state = FlextMeltanoExecutionState(
             execution_id="exec-789",
@@ -391,7 +391,7 @@ class TestFlextMeltanoExecutionState:
         assert state.current_pipeline == "pipeline-abc"
         assert state.metadata["records_processed"] == 2500
 
-    def test_execution_state_failed(self):
+    def test_execution_state_failed(self) -> None:
         """Test FlextMeltanoExecutionState for failed execution."""
         state = FlextMeltanoExecutionState(
             execution_id="exec-error",
@@ -403,7 +403,7 @@ class TestFlextMeltanoExecutionState:
         assert state.state == ExecutionState.FAILED.value
         assert state.metadata["error_message"] == "Database connection timeout"
 
-    def test_execution_state_serialization(self):
+    def test_execution_state_serialization(self) -> None:
         """Test FlextMeltanoExecutionState JSON serialization."""
         state = FlextMeltanoExecutionState(
             execution_id="exec-json",
@@ -419,7 +419,7 @@ class TestFlextMeltanoExecutionState:
         assert state_dict["state"] == ExecutionState.PENDING.value
         assert state_dict["metadata"]["created_at"] == "2025-01-01T00:00:00Z"
 
-    def test_execution_state_start_pipeline_method(self):
+    def test_execution_state_start_pipeline_method(self) -> None:
         """Test FlextMeltanoExecutionState start_pipeline method."""
         state = FlextMeltanoExecutionState()
 
@@ -432,7 +432,7 @@ class TestFlextMeltanoExecutionState:
         assert state.state == ExecutionState.RUNNING.value
         assert "started_at" in state.metadata
 
-    def test_execution_state_complete_pipeline_method(self):
+    def test_execution_state_complete_pipeline_method(self) -> None:
         """Test FlextMeltanoExecutionState complete_pipeline method."""
         state = FlextMeltanoExecutionState()
 
@@ -443,7 +443,7 @@ class TestFlextMeltanoExecutionState:
         assert state.state == ExecutionState.COMPLETED.value
         assert "completed_at" in state.metadata
 
-    def test_execution_state_fail_pipeline_method(self):
+    def test_execution_state_fail_pipeline_method(self) -> None:
         """Test FlextMeltanoExecutionState fail_pipeline method."""
         state = FlextMeltanoExecutionState()
 
@@ -459,7 +459,7 @@ class TestFlextMeltanoExecutionState:
 class TestFlextMeltanoSingerService:
     """Test FlextMeltanoSingerService domain service with real functionality."""
 
-    def test_singer_service_requires_dependencies(self):
+    def test_singer_service_requires_dependencies(self) -> None:
         """Test FlextMeltanoSingerService requires proper dependencies."""
         # FlextMeltanoSingerService requires config, tap_service, target_service
         # These are not available in this test context, so we test the requirement
@@ -467,7 +467,7 @@ class TestFlextMeltanoSingerService:
             # Should fail because required dependencies are missing
             FlextMeltanoSingerService()
 
-    def test_singer_service_class_exists(self):
+    def test_singer_service_class_exists(self) -> None:
         """Test FlextMeltanoSingerService class exists and is properly defined."""
         assert FlextMeltanoSingerService is not None
         assert hasattr(FlextMeltanoSingerService, "__init__")
@@ -480,7 +480,7 @@ class TestFlextMeltanoSingerService:
 class TestFlextMeltanoOrchestrationService:
     """Test FlextMeltanoOrchestrationService domain service with real functionality."""
 
-    def test_orchestration_service_requires_dependencies(self):
+    def test_orchestration_service_requires_dependencies(self) -> None:
         """Test FlextMeltanoOrchestrationService requires proper dependencies."""
         # FlextMeltanoOrchestrationService requires config, singer_service, dbt_service, repository
         # These are not available in this test context, so we test the requirement
@@ -488,7 +488,7 @@ class TestFlextMeltanoOrchestrationService:
             # Should fail because required dependencies are missing
             FlextMeltanoOrchestrationService()
 
-    def test_orchestration_service_class_exists(self):
+    def test_orchestration_service_class_exists(self) -> None:
         """Test FlextMeltanoOrchestrationService class exists and is properly defined."""
         assert FlextMeltanoOrchestrationService is not None
         assert hasattr(FlextMeltanoOrchestrationService, "__init__")
@@ -504,7 +504,7 @@ class TestFlextMeltanoOrchestrationService:
 class TestFlextMeltanoExtension:
     """Test FlextMeltanoExtension domain service with real functionality."""
 
-    def test_extension_requires_dependencies(self):
+    def test_extension_requires_dependencies(self) -> None:
         """Test FlextMeltanoExtension requires proper dependencies."""
         # FlextMeltanoExtension requires config, extension_service
         # These are not available in this test context, so we test the requirement
@@ -512,7 +512,7 @@ class TestFlextMeltanoExtension:
             # Should fail because required dependencies are missing
             FlextMeltanoExtension()
 
-    def test_extension_class_exists(self):
+    def test_extension_class_exists(self) -> None:
         """Test FlextMeltanoExtension class exists and is properly defined."""
         assert FlextMeltanoExtension is not None
         assert hasattr(FlextMeltanoExtension, "__init__")
@@ -526,7 +526,7 @@ class TestFlextMeltanoExtension:
 class TestDeprecatedApiWarning:
     """Test _deprecated_api_warning function with real functionality."""
 
-    def test_deprecated_api_warning(self):
+    def test_deprecated_api_warning(self) -> None:
         """Test _deprecated_api_warning function."""
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -537,7 +537,7 @@ class TestDeprecatedApiWarning:
             assert issubclass(warning_list[0].category, DeprecationWarning)
             assert "This API is deprecated" in str(warning_list[0].message)
 
-    def test_deprecated_api_warning_with_details(self):
+    def test_deprecated_api_warning_with_details(self) -> None:
         """Test _deprecated_api_warning with detailed message."""
         message = "FlextMeltanoLegacyService is deprecated. Use FlextMeltanoOrchestrationService instead."
 
@@ -557,7 +557,7 @@ class TestDeprecatedApiWarning:
 class TestCoreModuleStructure:
     """Test core module structure and organization."""
 
-    def test_module_docstring_exists(self):
+    def test_module_docstring_exists(self) -> None:
         """Test that core module has comprehensive docstring."""
         try:
             core_module = _core_module
@@ -570,7 +570,7 @@ class TestCoreModuleStructure:
         except ImportError:
             pytest.skip("core module not available")
 
-    def test_module_metadata(self):
+    def test_module_metadata(self) -> None:
         """Test basic module metadata."""
         try:
             core_module = _core_module
@@ -583,7 +583,7 @@ class TestCoreModuleStructure:
         except ImportError:
             pytest.skip("core module not available")
 
-    def test_injectable_decorator_fallback(self):
+    def test_injectable_decorator_fallback(self) -> None:
         """Test the injectable decorator fallback functionality."""
         # Test that the fallback decorator works
 
@@ -606,7 +606,7 @@ class TestCoreModuleStructure:
 class TestCoreModuleSafety:
     """Test that core module can be safely imported and inspected."""
 
-    def test_safe_module_inspection(self):
+    def test_safe_module_inspection(self) -> None:
         """Test safe inspection of module contents."""
         try:
             core_module = _core_module
@@ -624,7 +624,7 @@ class TestCoreModuleSafety:
         except ImportError:
             pytest.skip("core module not available")
 
-    def test_module_file_path(self):
+    def test_module_file_path(self) -> None:
         """Test module file path accessibility."""
         try:
             core_module = _core_module
@@ -641,7 +641,7 @@ class TestCoreModuleSafety:
 class TestCoreModuleConstants:
     """Test any constants or module-level variables in core."""
 
-    def test_module_level_constants(self):
+    def test_module_level_constants(self) -> None:
         """Test access to module-level constants if they exist."""
         try:
             core_module = _core_module
@@ -670,7 +670,7 @@ class TestCoreModuleConstants:
 class TestCoreModuleClasses:
     """Test basic class discovery in core module."""
 
-    def test_class_discovery(self):
+    def test_class_discovery(self) -> None:
         """Test discovering classes in core module."""
         try:
             core_module = _core_module
@@ -701,7 +701,7 @@ class TestCoreModuleClasses:
 class TestCoreModuleFunctions:
     """Test basic function discovery in core module."""
 
-    def test_function_discovery(self):
+    def test_function_discovery(self) -> None:
         """Test discovering functions in core module."""
         try:
             core_module = _core_module

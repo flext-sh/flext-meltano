@@ -26,7 +26,7 @@ from flext_meltano.flext_singer import (
 class TestFlextSingerBridgeComplete:
     """Complete tests for FlextSingerBridge class."""
 
-    def test_singer_bridge_initialization(self):
+    def test_singer_bridge_initialization(self) -> None:
         """Test Singer bridge initialization."""
         bridge = FlextSingerBridge()
 
@@ -39,7 +39,7 @@ class TestFlextSingerBridgeComplete:
         assert "SCHEMA" in bridge._message_types
         assert "STATE" in bridge._message_types
 
-    def test_create_record_message_success(self):
+    def test_create_record_message_success(self) -> None:
         """Test creating record message successfully."""
         bridge = FlextSingerBridge()
 
@@ -57,7 +57,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["record"] == record
         assert result.data["time_extracted"] == "2025-08-05T10:00:00Z"
 
-    def test_create_record_message_without_time(self):
+    def test_create_record_message_without_time(self) -> None:
         """Test creating record message without time_extracted."""
         bridge = FlextSingerBridge()
 
@@ -74,7 +74,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["record"] == record
         assert "time_extracted" not in result.data
 
-    def test_create_record_message_invalid_stream(self):
+    def test_create_record_message_invalid_stream(self) -> None:
         """Test creating record message with invalid stream."""
         bridge = FlextSingerBridge()
 
@@ -86,7 +86,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid stream name or record format" in result.error
 
-    def test_create_record_message_invalid_record(self):
+    def test_create_record_message_invalid_record(self) -> None:
         """Test creating record message with invalid record."""
         bridge = FlextSingerBridge()
 
@@ -98,7 +98,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid stream name or record format" in result.error
 
-    def test_create_schema_message_success(self):
+    def test_create_schema_message_success(self) -> None:
         """Test creating schema message successfully."""
         bridge = FlextSingerBridge()
 
@@ -124,7 +124,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["schema"] == schema
         assert result.data["key_properties"] == key_properties
 
-    def test_create_schema_message_without_key_properties(self):
+    def test_create_schema_message_without_key_properties(self) -> None:
         """Test creating schema message without key properties."""
         bridge = FlextSingerBridge()
 
@@ -139,7 +139,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data is not None
         assert result.data["key_properties"] == []
 
-    def test_create_schema_message_invalid_stream(self):
+    def test_create_schema_message_invalid_stream(self) -> None:
         """Test creating schema message with invalid stream."""
         bridge = FlextSingerBridge()
 
@@ -151,7 +151,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid stream name or schema format" in result.error
 
-    def test_create_schema_message_invalid_schema(self):
+    def test_create_schema_message_invalid_schema(self) -> None:
         """Test creating schema message with invalid schema."""
         bridge = FlextSingerBridge()
 
@@ -163,7 +163,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid stream name or schema format" in result.error
 
-    def test_create_state_message_success(self):
+    def test_create_state_message_success(self) -> None:
         """Test creating state message successfully."""
         bridge = FlextSingerBridge()
 
@@ -180,7 +180,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["type"] == "STATE"
         assert result.data["value"] == state_value
 
-    def test_create_message_universal_method_record(self):
+    def test_create_message_universal_method_record(self) -> None:
         """Test universal message creation method for RECORD."""
         bridge = FlextSingerBridge()
 
@@ -196,7 +196,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["type"] == "RECORD"
         assert result.data["stream"] == "test_stream"
 
-    def test_create_message_universal_method_schema(self):
+    def test_create_message_universal_method_schema(self) -> None:
         """Test universal message creation method for SCHEMA."""
         bridge = FlextSingerBridge()
 
@@ -214,7 +214,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["type"] == "SCHEMA"
         assert result.data["stream"] == "test_stream"
 
-    def test_create_message_universal_method_state(self):
+    def test_create_message_universal_method_state(self) -> None:
         """Test universal message creation method for STATE."""
         bridge = FlextSingerBridge()
 
@@ -230,7 +230,7 @@ class TestFlextSingerBridgeComplete:
         assert result.data["type"] == "STATE"
         assert result.data["value"] == state_value
 
-    def test_create_message_unknown_type(self):
+    def test_create_message_unknown_type(self) -> None:
         """Test universal message creation with unknown type."""
         bridge = FlextSingerBridge()
 
@@ -242,7 +242,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Unknown message type: UNKNOWN" in result.error
 
-    def test_parse_message_line_success(self):
+    def test_parse_message_line_success(self) -> None:
         """Test parsing valid Singer message line."""
         bridge = FlextSingerBridge()
 
@@ -254,7 +254,7 @@ class TestFlextSingerBridgeComplete:
         assert result.success
         assert result.data == message_dict
 
-    def test_parse_message_line_with_whitespace(self):
+    def test_parse_message_line_with_whitespace(self) -> None:
         """Test parsing message line with whitespace."""
         bridge = FlextSingerBridge()
 
@@ -266,7 +266,7 @@ class TestFlextSingerBridgeComplete:
         assert result.success
         assert result.data == message_dict
 
-    def test_parse_message_line_empty(self):
+    def test_parse_message_line_empty(self) -> None:
         """Test parsing empty message line."""
         bridge = FlextSingerBridge()
 
@@ -275,7 +275,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Empty message line" in result.error
 
-    def test_parse_message_line_invalid_json(self):
+    def test_parse_message_line_invalid_json(self) -> None:
         """Test parsing invalid JSON message line."""
         bridge = FlextSingerBridge()
 
@@ -284,7 +284,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid JSON in Singer message" in result.error
 
-    def test_parse_message_line_missing_type(self):
+    def test_parse_message_line_missing_type(self) -> None:
         """Test parsing message line without type field."""
         bridge = FlextSingerBridge()
 
@@ -295,7 +295,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Invalid Singer message format" in result.error
 
-    def test_validate_message_record_success(self):
+    def test_validate_message_record_success(self) -> None:
         """Test validating valid RECORD message."""
         bridge = FlextSingerBridge()
 
@@ -310,7 +310,7 @@ class TestFlextSingerBridgeComplete:
         assert result.success
         assert result.data == "RECORD"
 
-    def test_validate_message_schema_success(self):
+    def test_validate_message_schema_success(self) -> None:
         """Test validating valid SCHEMA message."""
         bridge = FlextSingerBridge()
 
@@ -325,7 +325,7 @@ class TestFlextSingerBridgeComplete:
         assert result.success
         assert result.data == "SCHEMA"
 
-    def test_validate_message_state_success(self):
+    def test_validate_message_state_success(self) -> None:
         """Test validating valid STATE message."""
         bridge = FlextSingerBridge()
 
@@ -339,7 +339,7 @@ class TestFlextSingerBridgeComplete:
         assert result.success
         assert result.data == "STATE"
 
-    def test_validate_message_not_dict(self):
+    def test_validate_message_not_dict(self) -> None:
         """Test validating non-dictionary message."""
         bridge = FlextSingerBridge()
 
@@ -348,7 +348,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Message must be a dictionary" in result.error
 
-    def test_validate_message_missing_type(self):
+    def test_validate_message_missing_type(self) -> None:
         """Test validating message without type field."""
         bridge = FlextSingerBridge()
 
@@ -357,7 +357,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Message must have 'type' field" in result.error
 
-    def test_validate_message_unknown_type(self):
+    def test_validate_message_unknown_type(self) -> None:
         """Test validating message with unknown type."""
         bridge = FlextSingerBridge()
 
@@ -366,7 +366,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Unknown message type: UNKNOWN" in result.error
 
-    def test_validate_message_record_missing_fields(self):
+    def test_validate_message_record_missing_fields(self) -> None:
         """Test validating RECORD message missing required fields."""
         bridge = FlextSingerBridge()
 
@@ -381,7 +381,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Missing required field: record" in result.error
 
-    def test_validate_message_schema_missing_fields(self):
+    def test_validate_message_schema_missing_fields(self) -> None:
         """Test validating SCHEMA message missing required fields."""
         bridge = FlextSingerBridge()
 
@@ -396,7 +396,7 @@ class TestFlextSingerBridgeComplete:
         assert not result.success
         assert "Missing required field: schema" in result.error
 
-    def test_validate_message_state_missing_fields(self):
+    def test_validate_message_state_missing_fields(self) -> None:
         """Test validating STATE message missing required fields."""
         bridge = FlextSingerBridge()
 
@@ -407,7 +407,7 @@ class TestFlextSingerBridgeComplete:
         assert "Missing required field: value" in result.error
 
     @patch("sys.stdout")
-    def test_write_message_success(self, mock_stdout):
+    def test_write_message_success(self, mock_stdout) -> None:
         """Test writing valid message to stdout."""
         bridge = FlextSingerBridge()
 
@@ -425,7 +425,7 @@ class TestFlextSingerBridgeComplete:
         mock_stdout.flush.assert_called_once()
 
     @patch("sys.stdout")
-    def test_write_message_invalid(self, mock_stdout):
+    def test_write_message_invalid(self, mock_stdout) -> None:
         """Test writing invalid message."""
         bridge = FlextSingerBridge()
 
@@ -439,7 +439,7 @@ class TestFlextSingerBridgeComplete:
         # Verify stdout.flush was not called
         mock_stdout.flush.assert_not_called()
 
-    def test_read_messages_from_string_io(self):
+    def test_read_messages_from_string_io(self) -> None:
         """Test reading messages from StringIO."""
         bridge = FlextSingerBridge()
 
@@ -460,7 +460,7 @@ class TestFlextSingerBridgeComplete:
             assert result.success
             assert result.data == messages[i]
 
-    def test_read_messages_default_stdin(self):
+    def test_read_messages_default_stdin(self) -> None:
         """Test reading messages using default stdin."""
         bridge = FlextSingerBridge()
 
@@ -475,7 +475,7 @@ class TestFlextSingerBridgeComplete:
             assert results[0].success
             assert results[0].data == test_message
 
-    def test_read_messages_with_invalid_line(self):
+    def test_read_messages_with_invalid_line(self) -> None:
         """Test reading messages with invalid JSON line."""
         bridge = FlextSingerBridge()
 
@@ -490,7 +490,7 @@ class TestFlextSingerBridgeComplete:
 class TestFlextSingerCatalogComplete:
     """Complete tests for FlextSingerCatalog class."""
 
-    def test_catalog_initialization_empty(self):
+    def test_catalog_initialization_empty(self) -> None:
         """Test catalog initialization without data."""
         catalog = FlextSingerCatalog()
 
@@ -499,7 +499,7 @@ class TestFlextSingerCatalogComplete:
         assert hasattr(catalog, "_catalog")
         assert catalog._catalog == {"streams": []}
 
-    def test_catalog_initialization_with_data(self):
+    def test_catalog_initialization_with_data(self) -> None:
         """Test catalog initialization with existing data."""
         existing_catalog = {
             "streams": [
@@ -511,7 +511,7 @@ class TestFlextSingerCatalogComplete:
 
         assert catalog._catalog == existing_catalog
 
-    def test_add_stream_success(self):
+    def test_add_stream_success(self) -> None:
         """Test adding stream to catalog successfully."""
         catalog = FlextSingerCatalog()
 
@@ -544,7 +544,7 @@ class TestFlextSingerCatalogComplete:
         assert stream["schema"] == schema
         assert stream["key_properties"] == key_properties
 
-    def test_add_stream_without_key_properties(self):
+    def test_add_stream_without_key_properties(self) -> None:
         """Test adding stream without key properties."""
         catalog = FlextSingerCatalog()
 
@@ -567,7 +567,7 @@ class TestFlextSingerCatalogComplete:
         assert stream["tap_stream_id"] == "users"
         assert "key_properties" not in stream
 
-    def test_add_stream_invalid_name(self):
+    def test_add_stream_invalid_name(self) -> None:
         """Test adding stream with invalid name."""
         catalog = FlextSingerCatalog()
 
@@ -579,7 +579,7 @@ class TestFlextSingerCatalogComplete:
         assert not result.success
         assert "Invalid stream name or schema" in result.error
 
-    def test_add_stream_invalid_schema(self):
+    def test_add_stream_invalid_schema(self) -> None:
         """Test adding stream with invalid schema."""
         catalog = FlextSingerCatalog()
 
@@ -591,7 +591,7 @@ class TestFlextSingerCatalogComplete:
         assert not result.success
         assert "Invalid stream name or schema" in result.error
 
-    def test_add_multiple_streams(self):
+    def test_add_multiple_streams(self) -> None:
         """Test adding multiple streams to catalog."""
         catalog = FlextSingerCatalog()
 
@@ -618,7 +618,7 @@ class TestFlextSingerCatalogComplete:
         assert "customers" in stream_names
         assert "orders" in stream_names
 
-    def test_get_catalog_success(self):
+    def test_get_catalog_success(self) -> None:
         """Test getting catalog data successfully."""
         initial_data = {"streams": [{"tap_stream_id": "test", "schema": {}}]}
         catalog = FlextSingerCatalog(initial_data)
@@ -630,7 +630,7 @@ class TestFlextSingerCatalogComplete:
         # Verify it's a copy, not the original
         assert result.data is not catalog._catalog
 
-    def test_get_selected_streams_with_selection(self):
+    def test_get_selected_streams_with_selection(self) -> None:
         """Test getting selected streams when streams are selected."""
         catalog = FlextSingerCatalog()
 
@@ -645,7 +645,7 @@ class TestFlextSingerCatalogComplete:
         assert result.success
         assert result.data == ["selected_stream"]
 
-    def test_get_selected_streams_empty_catalog(self):
+    def test_get_selected_streams_empty_catalog(self) -> None:
         """Test getting selected streams from empty catalog."""
         catalog = FlextSingerCatalog()
 
@@ -654,7 +654,7 @@ class TestFlextSingerCatalogComplete:
         assert result.success
         assert result.data == []
 
-    def test_get_selected_streams_complex_metadata(self):
+    def test_get_selected_streams_complex_metadata(self) -> None:
         """Test getting selected streams with complex metadata structure."""
         # Create catalog with manually crafted streams for testing edge cases
         catalog_data = {
@@ -699,7 +699,7 @@ class TestFlextSingerCatalogComplete:
         # Only stream1 should be selected (empty breadcrumb and selected=True)
         assert result.data == ["stream1"]
 
-    def test_get_selected_streams_invalid_streams_format(self):
+    def test_get_selected_streams_invalid_streams_format(self) -> None:
         """Test getting selected streams with invalid streams format."""
         catalog_data = {"streams": "invalid"}  # Not a list
         catalog = FlextSingerCatalog(catalog_data)
@@ -714,14 +714,14 @@ class TestFlextSingerCatalogComplete:
 class TestFactoryFunctions:
     """Test factory functions."""
 
-    def test_create_singer_bridge(self):
+    def test_create_singer_bridge(self) -> None:
         """Test creating Singer bridge via factory function."""
         bridge = flext_create_singer_bridge()
 
         assert bridge is not None
         assert isinstance(bridge, FlextSingerBridge)
 
-    def test_create_singer_catalog_empty(self):
+    def test_create_singer_catalog_empty(self) -> None:
         """Test creating Singer catalog via factory function without data."""
         catalog = flext_create_singer_catalog()
 
@@ -730,7 +730,7 @@ class TestFactoryFunctions:
         catalog_data = catalog.flext_singer_get_catalog()
         assert catalog_data.data == {"streams": []}
 
-    def test_create_singer_catalog_with_data(self):
+    def test_create_singer_catalog_with_data(self) -> None:
         """Test creating Singer catalog via factory function with data."""
         # Factory function takes no parameters, so create empty catalog and add data
         catalog = flext_create_singer_catalog()
@@ -750,7 +750,7 @@ class TestFactoryFunctions:
 class TestModuleExports:
     """Test module exports."""
 
-    def test_module_exports_defined(self):
+    def test_module_exports_defined(self) -> None:
         """Test that __all__ is properly defined."""
         expected_exports = [
             "FlextSingerBridge",
@@ -764,7 +764,7 @@ class TestModuleExports:
         for export in expected_exports:
             assert export in _singer_all
 
-    def test_all_exports_importable(self):
+    def test_all_exports_importable(self) -> None:
         """Test that all exported items can be imported."""
         # Verify all items are callable/instantiable
         assert callable(FlextSingerBridge)
@@ -776,7 +776,7 @@ class TestModuleExports:
 class TestIntegrationWorkflows:
     """Integration tests for complete Singer workflows."""
 
-    def test_complete_singer_workflow(self):
+    def test_complete_singer_workflow(self) -> None:
         """Test complete Singer workflow from catalog to message processing."""
         # Create catalog
         catalog = flext_create_singer_catalog()
@@ -836,7 +836,7 @@ class TestIntegrationWorkflows:
         assert record_validation.success
         assert state_validation.success
 
-    def test_error_handling_throughout_workflow(self):
+    def test_error_handling_throughout_workflow(self) -> None:
         """Test error handling throughout Singer workflow."""
         bridge = flext_create_singer_bridge()
         catalog = flext_create_singer_catalog()

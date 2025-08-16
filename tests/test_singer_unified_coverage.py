@@ -25,7 +25,7 @@ from flext_meltano.singer_unified import (
 class TestFlextSingerUnifiedConfig:
     """Test FlextSingerUnifiedConfig with real functionality."""
 
-    def test_valid_config_initialization(self):
+    def test_valid_config_initialization(self) -> None:
         """Test successful config initialization with valid data."""
         config = FlextSingerUnifiedConfig(
             name="tap-postgres",
@@ -39,7 +39,7 @@ class TestFlextSingerUnifiedConfig:
         assert config.catalog == {}
         assert config.state == {}
 
-    def test_config_with_catalog_and_state(self):
+    def test_config_with_catalog_and_state(self) -> None:
         """Test config initialization with catalog and state."""
         catalog = {"streams": [{"tap_stream_id": "users"}]}
         state = {"bookmarks": {"users": {"updated_at": "2025-01-01"}}}
@@ -56,7 +56,7 @@ class TestFlextSingerUnifiedConfig:
         assert config.state == state
         assert config.environment == "prod"
 
-    def test_config_with_extra_config(self):
+    def test_config_with_extra_config(self) -> None:
         """Test config with extra configuration parameters."""
         config = FlextSingerUnifiedConfig(
             name="target-csv",
@@ -68,7 +68,7 @@ class TestFlextSingerUnifiedConfig:
         assert config.extra_config["batch_size"] == 1000
         assert config.extra_config["parallel_workers"] == 4
 
-    def test_validate_domain_rules_success(self):
+    def test_validate_domain_rules_success(self) -> None:
         """Test successful domain rule validation."""
         config = FlextSingerUnifiedConfig(
             name="tap-postgres",
@@ -79,7 +79,7 @@ class TestFlextSingerUnifiedConfig:
         assert result.success
         assert result.data is None
 
-    def test_validate_domain_rules_empty_name_failure(self):
+    def test_validate_domain_rules_empty_name_failure(self) -> None:
         """Test domain rule validation failure with empty name."""
         config = FlextSingerUnifiedConfig(
             name="",
@@ -90,7 +90,7 @@ class TestFlextSingerUnifiedConfig:
         assert not result.success
         assert "non-empty string" in result.error
 
-    def test_validate_domain_rules_invalid_name_type(self):
+    def test_validate_domain_rules_invalid_name_type(self) -> None:
         """Test domain rule validation failure with invalid name type."""
         config = FlextSingerUnifiedConfig(
             name=123,  # Invalid type
@@ -101,7 +101,7 @@ class TestFlextSingerUnifiedConfig:
         assert not result.success
         assert "non-empty string" in result.error
 
-    def test_validate_domain_rules_missing_config(self):
+    def test_validate_domain_rules_missing_config(self) -> None:
         """Test domain rule validation failure with missing config."""
         config = FlextSingerUnifiedConfig(
             name="tap-postgres",
@@ -116,7 +116,7 @@ class TestFlextSingerUnifiedConfig:
 class TestFlextPipelineConfig:
     """Test FlextPipelineConfig with real functionality."""
 
-    def test_pipeline_config_initialization(self):
+    def test_pipeline_config_initialization(self) -> None:
         """Test pipeline config initialization with tap and target."""
         pipeline_config = FlextPipelineConfig(
             tap_name="tap-postgres",
@@ -130,7 +130,7 @@ class TestFlextPipelineConfig:
         assert pipeline_config.tap_config["host"] == "localhost"
         assert "/output_" in pipeline_config.target_config["destination_path"]
 
-    def test_pipeline_config_with_catalog_and_state(self):
+    def test_pipeline_config_with_catalog_and_state(self) -> None:
         """Test pipeline config with catalog and state."""
         catalog = {"streams": [{"tap_stream_id": "orders"}]}
         state = {"bookmarks": {"orders": {"id": 12345}}}
@@ -151,16 +151,16 @@ class TestFlextPipelineConfig:
 class TestFlextSingerUnifiedService:
     """Test FlextSingerUnifiedService with real functionality."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextSingerUnifiedService()
 
-    def test_service_initialization(self):
+    def test_service_initialization(self) -> None:
         """Test service initialization."""
         assert self.service is not None
         assert isinstance(self.service, FlextSingerUnifiedService)
 
-    def test_register_component_success(self):
+    def test_register_component_success(self) -> None:
         """Test successful component registration."""
         mock_component = Mock()
         mock_component.name = "tap-test"
@@ -174,7 +174,7 @@ class TestFlextSingerUnifiedService:
             # If method doesn't return FlextResult, just verify no exception
             assert True
 
-    def test_get_component_existing(self):
+    def test_get_component_existing(self) -> None:
         """Test getting a registered component."""
         # First register a mock component
         mock_component = Mock()
@@ -186,7 +186,7 @@ class TestFlextSingerUnifiedService:
         if hasattr(result, "success"):
             assert isinstance(result.success, bool)
 
-    def test_get_component_nonexistent(self):
+    def test_get_component_nonexistent(self) -> None:
         """Test getting a non-existent component."""
         result = self.service.get_component("non-existent-tap")
 
@@ -194,7 +194,7 @@ class TestFlextSingerUnifiedService:
             # Should fail for non-existent component
             assert not result.success
 
-    def test_execute_pipeline_with_valid_config(self):
+    def test_execute_pipeline_with_valid_config(self) -> None:
         """Test pipeline execution with valid configuration."""
         pipeline_config = FlextPipelineConfig(
             tap_name="tap-csv",
@@ -210,7 +210,7 @@ class TestFlextSingerUnifiedService:
             # Result should be boolean, even if it fails due to missing components
             assert isinstance(result.success, bool)
 
-    def test_discover_all_catalogs(self):
+    def test_discover_all_catalogs(self) -> None:
         """Test discovering catalogs from all components."""
         result = self.service.discover_all_catalogs()
 
@@ -219,7 +219,7 @@ class TestFlextSingerUnifiedService:
             if result.success:
                 assert isinstance(result.data, dict)
 
-    def test_validate_all_components(self):
+    def test_validate_all_components(self) -> None:
         """Test validating all registered components."""
         result = self.service.validate_all_components()
 
@@ -228,7 +228,7 @@ class TestFlextSingerUnifiedService:
             if result.success:
                 assert isinstance(result.data, dict)
 
-    def test_service_execute_method(self):
+    def test_service_execute_method(self) -> None:
         """Test general service execute method."""
         # Test the general execute method with various inputs
         result = self.service.execute()
@@ -240,7 +240,7 @@ class TestFlextSingerUnifiedService:
 class TestFlextSingerUnifiedResult:
     """Test FlextSingerUnifiedResult with real functionality."""
 
-    def test_result_creation_success(self):
+    def test_result_creation_success(self) -> None:
         """Test successful result creation."""
         result = FlextSingerUnifiedResult(
             success=True,
@@ -254,7 +254,7 @@ class TestFlextSingerUnifiedResult:
         assert result.execution_time_ms == 45200.0
         assert result.schemas_discovered == ["users", "orders"]
 
-    def test_result_creation_failure(self):
+    def test_result_creation_failure(self) -> None:
         """Test failure result creation."""
         error_message = "Connection failed to database"
 
@@ -270,7 +270,7 @@ class TestFlextSingerUnifiedResult:
         assert result.execution_time_ms == 5100.0
         assert result.records_processed == 0
 
-    def test_result_with_catalog_and_state_updates(self):
+    def test_result_with_catalog_and_state_updates(self) -> None:
         """Test result with catalog and state updates."""
         catalog_updates = {"streams": [{"tap_stream_id": "products"}]}
         state_updates = {
@@ -289,7 +289,7 @@ class TestFlextSingerUnifiedResult:
         assert result.state_updates == state_updates
         assert result.records_processed == 250
 
-    def test_result_with_metrics(self):
+    def test_result_with_metrics(self) -> None:
         """Test result with performance metrics."""
         metrics = {
             "throughput_records_per_second": 1500.5,
@@ -307,7 +307,7 @@ class TestFlextSingerUnifiedResult:
         assert result.metrics == metrics
         assert result.metrics["throughput_records_per_second"] == 1500.5
 
-    def test_result_domain_rules_validation_success(self):
+    def test_result_domain_rules_validation_success(self) -> None:
         """Test successful domain rule validation."""
         result = FlextSingerUnifiedResult(
             success=True,
@@ -318,7 +318,7 @@ class TestFlextSingerUnifiedResult:
         validation = result.validate_business_rules()
         assert validation.success
 
-    def test_result_domain_rules_negative_records(self):
+    def test_result_domain_rules_negative_records(self) -> None:
         """Test domain rule validation failure with negative records."""
         result = FlextSingerUnifiedResult(
             success=True,
@@ -330,7 +330,7 @@ class TestFlextSingerUnifiedResult:
         assert not validation.success
         assert "non-negative integer" in validation.error
 
-    def test_result_domain_rules_negative_execution_time(self):
+    def test_result_domain_rules_negative_execution_time(self) -> None:
         """Test domain rule validation failure with negative execution time."""
         result = FlextSingerUnifiedResult(
             success=True,
@@ -345,7 +345,7 @@ class TestFlextSingerUnifiedResult:
 class TestIntegrationSingerUnified:
     """Integration tests for Singer Unified components."""
 
-    def test_end_to_end_pipeline_simulation(self):
+    def test_end_to_end_pipeline_simulation(self) -> None:
         """Test end-to-end pipeline simulation with unified components."""
         # Create unified configuration
         config = FlextSingerUnifiedConfig(
@@ -370,7 +370,7 @@ class TestIntegrationSingerUnified:
         assert pipeline_config.tap_name == "tap-postgres"
         assert pipeline_config.target_name == "target-csv"
 
-    def test_error_handling_chain(self):
+    def test_error_handling_chain(self) -> None:
         """Test error handling chain across unified components."""
         # Test with invalid configuration
         invalid_config = FlextSingerUnifiedConfig(
@@ -383,7 +383,7 @@ class TestIntegrationSingerUnified:
         assert not validation_result.success
         assert "non-empty string" in validation_result.error
 
-    def test_configuration_inheritance_and_override(self):
+    def test_configuration_inheritance_and_override(self) -> None:
         """Test configuration inheritance and override patterns."""
         base_config = {
             "host": "localhost",
@@ -413,7 +413,7 @@ class TestIntegrationSingerUnified:
 class TestSingerUnifiedPerformance:
     """Performance and edge case tests for Singer Unified components."""
 
-    def test_large_catalog_handling(self):
+    def test_large_catalog_handling(self) -> None:
         """Test handling of large catalog configurations."""
         # Simulate large catalog
         large_catalog = {
@@ -440,7 +440,7 @@ class TestSingerUnifiedPerformance:
         assert len(config.catalog["streams"]) == 100
         assert "table_50" in [s["tap_stream_id"] for s in config.catalog["streams"]]
 
-    def test_empty_and_null_configurations(self):
+    def test_empty_and_null_configurations(self) -> None:
         """Test handling of empty and null configurations."""
         # Test with empty config dict
         config_empty = FlextSingerUnifiedConfig(
@@ -454,7 +454,7 @@ class TestSingerUnifiedPerformance:
         assert config_empty.catalog == {}
         assert config_empty.state == {}
 
-    def test_configuration_deep_nesting(self):
+    def test_configuration_deep_nesting(self) -> None:
         """Test deeply nested configuration structures."""
         deep_config = {
             "database": {

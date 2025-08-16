@@ -17,8 +17,9 @@ try:
     HAS_DUCKDB = True
 except ImportError:
     HAS_DUCKDB = False
-    duckdb = None
-    pd = None
+    duckdb = None  # type: ignore[assignment]
+    pd = None  # type: ignore[assignment]
+
 
 if TYPE_CHECKING:
     from pathlib import Path
