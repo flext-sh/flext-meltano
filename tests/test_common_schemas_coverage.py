@@ -13,7 +13,7 @@ from flext_core import get_logger
 import flext_meltano.common_schemas as schemas_module
 
 
-def test_common_schemas_module_imports():
+def test_common_schemas_module_imports() -> None:
     """Test that common_schemas module can be imported without errors."""
     try:
         assert schemas_module is not None
@@ -21,7 +21,7 @@ def test_common_schemas_module_imports():
         pytest.skip("common_schemas module not available for import")
 
 
-def test_common_schemas_module_structure():
+def test_common_schemas_module_structure() -> None:
     """Test basic module structure and docstring."""
     try:
         # use already imported module
@@ -39,7 +39,7 @@ def test_common_schemas_module_structure():
 class TestCommonSchemasModuleContent:
     """Test the content and organization of common_schemas module."""
 
-    def test_module_attributes(self):
+    def test_module_attributes(self) -> None:
         """Test module has expected attributes."""
         try:
             # Get module attributes
@@ -52,7 +52,7 @@ class TestCommonSchemasModuleContent:
         except ImportError:
             pytest.skip("common_schemas module not available")
 
-    def test_module_file_info(self):
+    def test_module_file_info(self) -> None:
         """Test module file information."""
         try:
             if hasattr(schemas_module, "__file__"):
@@ -66,7 +66,7 @@ class TestCommonSchemasModuleContent:
 class TestCommonSchemasClasses:
     """Test classes in common_schemas module."""
 
-    def test_class_discovery(self):
+    def test_class_discovery(self) -> None:
         """Test discovering classes without instantiation."""
         try:
             # Safely discover classes
@@ -85,7 +85,7 @@ class TestCommonSchemasClasses:
         except (ImportError, Exception):
             pytest.skip("Class discovery not available or failed safely")
 
-    def test_class_docstrings(self):
+    def test_class_docstrings(self) -> None:
         """Test that classes have docstrings."""
         try:
             # Safely discover classes
@@ -106,7 +106,7 @@ class TestCommonSchemasClasses:
 class TestCommonSchemasFunctions:
     """Test functions in common_schemas module."""
 
-    def test_function_discovery(self):
+    def test_function_discovery(self) -> None:
         """Test discovering functions without calling them."""
         try:
             # Safely discover functions
@@ -127,7 +127,7 @@ class TestCommonSchemasFunctions:
         except (ImportError, Exception):
             pytest.skip("Function discovery not available or failed safely")
 
-    def test_function_signatures(self):
+    def test_function_signatures(self) -> None:
         """Test function signatures without calling."""
         try:
             functions = [
@@ -153,7 +153,7 @@ class TestCommonSchemasFunctions:
 class TestCommonSchemasConstants:
     """Test constants and module-level variables."""
 
-    def test_module_constants(self):
+    def test_module_constants(self) -> None:
         """Test module-level constants if they exist."""
         try:
             attrs = dir(schemas_module)
@@ -178,7 +178,7 @@ class TestCommonSchemasConstants:
 class TestCommonSchemasImports:
     """Test imports and dependencies."""
 
-    def test_internal_imports(self):
+    def test_internal_imports(self) -> None:
         """Test that module handles its imports correctly."""
         try:
             # This will trigger import-time code execution (module already imported at top as schemas_module)
@@ -194,7 +194,7 @@ class TestCommonSchemasImports:
         except ImportError:
             pytest.skip("Module imports not available")
 
-    def test_module_loading(self):
+    def test_module_loading(self) -> None:
         """Test module loading and initialization."""
         try:
             # Re-import to test loading

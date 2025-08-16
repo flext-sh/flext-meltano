@@ -20,7 +20,7 @@ from flext_meltano.validation import (
 class TestValidationCoverageImprovement:
     """Tests to improve validation.py coverage."""
 
-    def test_validation_service_creation(self):
+    def test_validation_service_creation(self) -> None:
         """Test validation service creation and basic functionality."""
         # Test with default config
         config = FlextMeltanoConfig()
@@ -34,7 +34,7 @@ class TestValidationCoverageImprovement:
         service_with_config = FlextMeltanoValidationService(config_with_params)
         assert service_with_config is not None
 
-    def test_validation_result_creation(self):
+    def test_validation_result_creation(self) -> None:
         """Test validation result creation and properties."""
         # Test successful result
         success_result = FlextMeltanoValidationResult(
@@ -58,7 +58,7 @@ class TestValidationCoverageImprovement:
         assert len(failure_result.issues) == 2
         assert "database_url" in str(failure_result.details)
 
-    def test_create_validation_service_factory(self):
+    def test_create_validation_service_factory(self) -> None:
         """Test validation service factory function."""
         # Test with default config
         config = FlextMeltanoConfig()
@@ -73,7 +73,7 @@ class TestValidationCoverageImprovement:
         assert result.success
         assert isinstance(result.data, FlextMeltanoValidationService)
 
-    def test_project_validation_function(self):
+    def test_project_validation_function(self) -> None:
         """Test standalone project validation function."""
         # Test project validation - returns dict for Go compatibility
         result = flext_meltano_validate_project()
@@ -88,7 +88,7 @@ class TestValidationCoverageImprovement:
             assert "success" in result
             assert isinstance(result["success"], bool)
 
-    async def test_tap_config_validation_function(self):
+    async def test_tap_config_validation_function(self) -> None:
         """Test tap configuration validation function."""
         # Test with minimal config - returns dict for Go compatibility
         config = {"host": "localhost", "port": 5432}
@@ -109,7 +109,7 @@ class TestValidationCoverageImprovement:
         assert "success" in result
         assert isinstance(result["success"], bool)
 
-    async def test_tap_connection_testing_function(self):
+    async def test_tap_connection_testing_function(self) -> None:
         """Test tap connection testing function."""
         # Test connection with valid parameters - returns dict for Go compatibility
         config = {"host": "localhost", "database": "test"}
@@ -128,7 +128,7 @@ class TestValidationCoverageImprovement:
         assert "success" in result
         assert isinstance(result["success"], bool)
 
-    def test_validation_service_methods(self):
+    def test_validation_service_methods(self) -> None:
         """Test validation service instance methods."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoValidationService(config)
@@ -144,7 +144,7 @@ class TestValidationCoverageImprovement:
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
-    def test_validation_error_handling(self):
+    def test_validation_error_handling(self) -> None:
         """Test validation error handling scenarios."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoValidationService(config)
@@ -161,7 +161,7 @@ class TestValidationCoverageImprovement:
         assert hasattr(result, "success")
         assert isinstance(result.success, bool)
 
-    def test_validation_with_project_structure(self):
+    def test_validation_with_project_structure(self) -> None:
         """Test validation with different project structures."""
         # Test with temporary directory structure
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -177,7 +177,7 @@ class TestValidationCoverageImprovement:
             assert hasattr(result, "success")
             assert isinstance(result.success, bool)
 
-    def test_validation_result_serialization(self):
+    def test_validation_result_serialization(self) -> None:
         """Test validation result serialization capabilities."""
         result = FlextMeltanoValidationResult(
             validation_id="test-123",
@@ -196,7 +196,7 @@ class TestValidationCoverageImprovement:
         assert hasattr(result, "validation_type")
         assert hasattr(result, "validation_id")
 
-    def test_validation_service_configuration_handling(self):
+    def test_validation_service_configuration_handling(self) -> None:
         """Test validation service configuration handling."""
         # Test with various configuration options
         configs = [
@@ -218,7 +218,7 @@ class TestValidationCoverageImprovement:
             result = service.validate_project()
             assert hasattr(result, "success")
 
-    def test_validation_edge_cases(self):
+    def test_validation_edge_cases(self) -> None:
         """Test validation edge cases and boundary conditions."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoValidationService(config)
@@ -248,7 +248,7 @@ class TestValidationCoverageImprovement:
         result = service.validate_tap_config("tap-postgres", complex_config)
         assert hasattr(result, "success")
 
-    def test_validation_timeout_handling(self):
+    def test_validation_timeout_handling(self) -> None:
         """Test validation timeout handling."""
         # Test with very short timeout
         config_short = FlextMeltanoConfig(project_root=".")
@@ -270,7 +270,7 @@ class TestValidationCoverageImprovement:
         )
         assert hasattr(result, "success")
 
-    def test_validation_caching_behavior(self):
+    def test_validation_caching_behavior(self) -> None:
         """Test validation caching and performance behavior."""
         config = FlextMeltanoConfig()
         service = FlextMeltanoValidationService(config)

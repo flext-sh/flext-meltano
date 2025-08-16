@@ -17,7 +17,7 @@ from flext_meltano.singer_unified import (
 class TestSingerUnifiedMissingCoverage:
     """Test missing coverage areas in singer_unified module."""
 
-    def test_service_execute_operation_empty_args(self):
+    def test_service_execute_operation_empty_args(self) -> None:
         """Test service execute_operation method with empty args (line 383-384)."""
         service = FlextSingerUnifiedService()
 
@@ -26,7 +26,7 @@ class TestSingerUnifiedMissingCoverage:
         assert result.is_failure
         assert "Operation name required as first argument" in result.error
 
-    def test_service_execute_operation_discover_catalogs(self):
+    def test_service_execute_operation_discover_catalogs(self) -> None:
         """Test service execute_operation with discover_catalogs operation (lines 397-405)."""
         service = FlextSingerUnifiedService()
 
@@ -39,7 +39,7 @@ class TestSingerUnifiedMissingCoverage:
                 "Catalog discovery failed" in result.error or result.error is not None
             )
 
-    def test_service_execute_operation_validate_components(self):
+    def test_service_execute_operation_validate_components(self) -> None:
         """Test service execute_operation with validate_components operation (lines 406-414)."""
         service = FlextSingerUnifiedService()
 
@@ -53,7 +53,7 @@ class TestSingerUnifiedMissingCoverage:
                 or result.error is not None
             )
 
-    def test_service_execute_operation_unknown_operation(self):
+    def test_service_execute_operation_unknown_operation(self) -> None:
         """Test service execute_operation with unknown operation (line 415)."""
         service = FlextSingerUnifiedService()
 
@@ -62,7 +62,7 @@ class TestSingerUnifiedMissingCoverage:
         assert result.is_failure
         assert "Unknown operation: unknown_operation" in result.error
 
-    def test_service_execute_operation_pipeline_operation(self):
+    def test_service_execute_operation_pipeline_operation(self) -> None:
         """Test service execute_operation with execute_pipeline operation (lines 388-396)."""
         service = FlextSingerUnifiedService()
 
@@ -75,7 +75,7 @@ class TestSingerUnifiedMissingCoverage:
                 "Pipeline execution failed" in result.error or result.error is not None
             )
 
-    def test_service_execute_method(self):
+    def test_service_execute_method(self) -> None:
         """Test the basic execute method."""
         service = FlextSingerUnifiedService()
 
@@ -86,7 +86,7 @@ class TestSingerUnifiedMissingCoverage:
         assert result.data.success is True
         assert result.data.records_processed == 0
 
-    def test_execute_pipeline_operation_private_method(self):
+    def test_execute_pipeline_operation_private_method(self) -> None:
         """Test private _execute_pipeline_operation method."""
         service = FlextSingerUnifiedService()
 
@@ -97,7 +97,7 @@ class TestSingerUnifiedMissingCoverage:
         # Should return a result
         assert hasattr(result, "success")
 
-    def test_unified_interface_abstract_methods(self):
+    def test_unified_interface_abstract_methods(self) -> None:
         """Test abstract interface methods for coverage."""
 
         class TestInterface(FlextSingerUnifiedInterface):
@@ -141,7 +141,7 @@ class TestSingerUnifiedMissingCoverage:
         assert result.success
         assert result.data is True
 
-    def test_result_serialization_methods(self):
+    def test_result_serialization_methods(self) -> None:
         """Test result serialization methods for coverage."""
         result = FlextSingerUnifiedResult(
             success=True,
@@ -159,7 +159,7 @@ class TestSingerUnifiedMissingCoverage:
             assert data["success"] is True
             assert data["records_processed"] == 100
 
-    def test_config_edge_cases(self):
+    def test_config_edge_cases(self) -> None:
         """Test configuration edge cases for coverage."""
         # Test with minimal config
         config = FlextSingerUnifiedConfig(
@@ -182,7 +182,7 @@ class TestSingerUnifiedMissingCoverage:
         validation_result = config_with_data.validate_business_rules()
         assert validation_result.success or validation_result.is_failure
 
-    def test_factory_functions(self):
+    def test_factory_functions(self) -> None:
         """Test factory function coverage."""
         # Test create_unified_singer_config
         config = create_unified_singer_config(
@@ -197,7 +197,7 @@ class TestSingerUnifiedMissingCoverage:
         service = create_unified_singer_service()
         assert isinstance(service, FlextSingerUnifiedService)
 
-    def test_service_component_management_edge_cases(self):
+    def test_service_component_management_edge_cases(self) -> None:
         """Test service component management edge cases."""
         service = FlextSingerUnifiedService()
 
@@ -212,7 +212,7 @@ class TestSingerUnifiedMissingCoverage:
         # Should handle gracefully
         assert isinstance(result.success, bool)
 
-    def test_result_error_scenarios(self):
+    def test_result_error_scenarios(self) -> None:
         """Test result creation in error scenarios."""
         # Test result with failure state
         error_result = FlextSingerUnifiedResult(

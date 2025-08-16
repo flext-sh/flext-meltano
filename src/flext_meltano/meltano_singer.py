@@ -143,8 +143,8 @@ class FlextSingerUnifiedConfig:
         self.environment = environment
         self.extra_config = extra_config
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate unified Singer configuration domain rules.
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate unified Singer configuration business rules.
 
         Returns:
             FlextResult indicating validation success/failure
@@ -176,8 +176,8 @@ class FlextSingerUnifiedResult:
     error_message: str | None = None
     metrics: dict[str, object] = field(default_factory=dict)
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate unified Singer result domain rules.
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate unified Singer result business rules.
 
         Returns:
             FlextResult indicating validation success/failure

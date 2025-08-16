@@ -30,7 +30,7 @@ from flext_meltano.container import (
 class TestRefactoredContainerPatterns:
     """Test the new SOLID-compliant container patterns."""
 
-    def test_configure_meltano_services_success(self):
+    def test_configure_meltano_services_success(self) -> None:
         """Test successful Meltano service configuration."""
         container = get_flext_container()
         config = FlextMeltanoConfig(project_root="./test")
@@ -45,7 +45,7 @@ class TestRefactoredContainerPatterns:
         assert config_result.success
         assert isinstance(config_result.data, FlextMeltanoConfig)
 
-    def test_configure_meltano_services_default_config(self):
+    def test_configure_meltano_services_default_config(self) -> None:
         """Test service configuration with default config."""
         container = get_flext_container()
 
@@ -58,7 +58,7 @@ class TestRefactoredContainerPatterns:
         assert config_result.success
         assert isinstance(config_result.data, FlextMeltanoConfig)
 
-    def test_service_factories_registered(self):
+    def test_service_factories_registered(self) -> None:
         """Test that service factories are properly registered."""
         container = get_flext_container()
 
@@ -83,7 +83,7 @@ class TestRefactoredContainerPatterns:
 class TestLegacyContainerCompatibility:
     """Test legacy container functions for backward compatibility."""
 
-    def test_get_meltano_container_warns_deprecation(self):
+    def test_get_meltano_container_warns_deprecation(self) -> None:
         """Test that legacy function issues deprecation warning."""
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
@@ -100,7 +100,7 @@ class TestLegacyContainerCompatibility:
         # Container should still work
         assert isinstance(container, FlextContainer)
 
-    def test_get_meltano_container_returns_configured_container(self):
+    def test_get_meltano_container_returns_configured_container(self) -> None:
         """Test that legacy function returns properly configured container."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
@@ -114,7 +114,7 @@ class TestLegacyContainerCompatibility:
             config_result = container.get("meltano_config")
             assert config_result.success
 
-    def test_configure_meltano_container_warns_deprecation(self):
+    def test_configure_meltano_container_warns_deprecation(self) -> None:
         """Test that legacy configuration function warns."""
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
@@ -130,7 +130,7 @@ class TestLegacyContainerCompatibility:
         # Should still work
         assert result.success
 
-    def test_configure_meltano_container_functionality(self):
+    def test_configure_meltano_container_functionality(self) -> None:
         """Test legacy configuration function still works."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
@@ -154,7 +154,7 @@ class TestLegacyContainerCompatibility:
 class TestContainerErrorHandling:
     """Test error handling in container operations."""
 
-    def test_configure_services_with_invalid_container(self):
+    def test_configure_services_with_invalid_container(self) -> None:
         """Test error handling with invalid container."""
         # Mock a container that will cause registration to fail
         mock_container = Mock()
@@ -169,7 +169,7 @@ class TestContainerErrorHandling:
         result = configure_meltano_services(get_flext_container(), config)
         assert result.success  # Should work with real container
 
-    def test_get_meltano_container_handles_configuration_failure(self):
+    def test_get_meltano_container_handles_configuration_failure(self) -> None:
         """Test error handling when configuration fails."""
         # This test validates that if service configuration fails,
         # the function raises an appropriate error
@@ -186,7 +186,7 @@ class TestContainerErrorHandling:
 class TestContainerServiceIntegration:
     """Test integration between container and services."""
 
-    def test_service_factory_execution(self):
+    def test_service_factory_execution(self) -> None:
         """Test that registered factory functions can be executed."""
         container = get_flext_container()
         config = FlextMeltanoConfig(project_root="./test")
@@ -208,7 +208,7 @@ class TestContainerServiceIntegration:
         assert hasattr(service_result, "success")
         # Result depends on actual service implementation
 
-    def test_multiple_containers_isolation(self):
+    def test_multiple_containers_isolation(self) -> None:
         """Test that multiple container instances work independently."""
         # Get two different container instances
         container1 = get_flext_container()
@@ -233,7 +233,7 @@ class TestContainerServiceIntegration:
         # Should have latest config due to singleton pattern
         assert config_result.data.environment == "production"
 
-    def test_container_service_lifecycle(self):
+    def test_container_service_lifecycle(self) -> None:
         """Test complete service lifecycle in container."""
         container = get_flext_container()
         config = FlextMeltanoConfig(project_root="./lifecycle_test", environment="test")
@@ -263,7 +263,7 @@ class TestContainerServiceIntegration:
 class TestContainerAPIConsistency:
     """Test API consistency and public interface."""
 
-    def test_public_api_exports(self):
+    def test_public_api_exports(self) -> None:
         """Test that all public functions are accessible."""
         expected_exports = [
             "configure_meltano_container",
@@ -279,7 +279,7 @@ class TestContainerAPIConsistency:
         assert callable(configure_meltano_services)
         assert callable(get_meltano_container)
 
-    def test_container_pattern_consistency(self):
+    def test_container_pattern_consistency(self) -> None:
         """Test that all container functions follow consistent patterns."""
         # All functions should work with FlextResult patterns where applicable
         container = get_flext_container()

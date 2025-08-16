@@ -45,8 +45,7 @@ class MeltanoResultStatus:
 
 
 def example_constants_usage() -> None:
-    """Exemplo de uso das constantes do FlextMeltanoConstants."""
-    # 1. Demonstrar uso real com FlextMeltanoConfig
+    """Exemplo de uso das constantes do FlextMeltanoConstants."""  # 1. Demonstrar uso real com FlextMeltanoConfig
     FlextMeltanoConfig(
         project_root="./demo_project",
         environment=MeltanoEnvironment.DEV,
@@ -58,8 +57,7 @@ def example_constants_usage() -> None:
 
 
 def example_environment_usage() -> None:
-    """Exemplo de uso dos enums de ambiente."""
-    # Uso dos enums REAIS (corrigindo DEVELOPMENT -> DEV)
+    """Exemplo de uso dos enums de ambiente."""  # Uso dos enums REAIS (corrigindo DEVELOPMENT -> DEV)
     env = MeltanoEnvironment.DEV
     log_level = MeltanoLogLevel.INFO
     status = MeltanoResultStatus.SUCCESS

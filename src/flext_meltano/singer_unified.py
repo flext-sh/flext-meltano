@@ -239,8 +239,8 @@ class FlextSingerUnifiedConfig:
         self.environment = environment
         self.extra_config = extra_config
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate unified Singer configuration domain rules.
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate unified Singer configuration business rules.
 
         Returns:
             FlextResult indicating validation success/failure
@@ -255,9 +255,9 @@ class FlextSingerUnifiedConfig:
         return FlextResult.ok(None)
 
     # Backward-compatible alias expected by some tests
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Alias for validate_domain_rules for compatibility."""
-        return self.validate_domain_rules()
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Alias for validate_business_rules for compatibility."""
+        return self.validate_business_rules()
 
 
 @dataclass
@@ -277,8 +277,8 @@ class FlextSingerUnifiedResult:
     error_message: str | None = None
     metrics: dict[str, object] = field(default_factory=dict)
 
-    def validate_domain_rules(self) -> FlextResult[None]:
-        """Validate unified Singer result domain rules.
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate unified Singer result business rules.
 
         Returns:
             FlextResult indicating validation success/failure
@@ -295,9 +295,9 @@ class FlextSingerUnifiedResult:
         return FlextResult.ok(None)
 
     # Backward-compatible alias expected by some tests
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Alias for validate_domain_rules for compatibility."""
-        return self.validate_domain_rules()
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Alias for validate_business_rules for compatibility."""
+        return self.validate_business_rules()
 
 
 class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):

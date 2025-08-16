@@ -8,6 +8,8 @@ This module provides simple tests for all custom exceptions to ensure
 maximum coverage with minimal complexity.
 """
 
+from typing import Never
+
 import pytest
 
 from flext_meltano.exceptions import (
@@ -28,7 +30,7 @@ from flext_meltano.exceptions import (
 class TestAllExceptions:
     """Test all exception classes for basic functionality."""
 
-    def test_flext_meltano_error(self):
+    def test_flext_meltano_error(self) -> Never:
         """Test FlextMeltanoError."""
         error = FlextMeltanoError("Base error")
         assert isinstance(error, FlextMeltanoError)
@@ -36,7 +38,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoError):
             raise error
 
-    def test_flext_meltano_validation_error(self):
+    def test_flext_meltano_validation_error(self) -> Never:
         """Test FlextMeltanoValidationError."""
         error = FlextMeltanoValidationError("Validation error")
         assert isinstance(error, FlextMeltanoValidationError)
@@ -45,7 +47,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoValidationError):
             raise error
 
-    def test_flext_meltano_configuration_error(self):
+    def test_flext_meltano_configuration_error(self) -> Never:
         """Test FlextMeltanoConfigurationError."""
         error = FlextMeltanoConfigurationError("Config error")
         assert isinstance(error, FlextMeltanoConfigurationError)
@@ -54,7 +56,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoConfigurationError):
             raise error
 
-    def test_flext_meltano_connection_error(self):
+    def test_flext_meltano_connection_error(self) -> Never:
         """Test FlextMeltanoConnectionError."""
         error = FlextMeltanoConnectionError("Connection error")
         assert isinstance(error, FlextMeltanoConnectionError)
@@ -63,7 +65,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoConnectionError):
             raise error
 
-    def test_flext_meltano_processing_error(self):
+    def test_flext_meltano_processing_error(self) -> Never:
         """Test FlextMeltanoProcessingError."""
         error = FlextMeltanoProcessingError("Processing error")
         assert isinstance(error, FlextMeltanoProcessingError)
@@ -72,7 +74,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoProcessingError):
             raise error
 
-    def test_flext_meltano_authentication_error(self):
+    def test_flext_meltano_authentication_error(self) -> Never:
         """Test FlextMeltanoAuthenticationError."""
         error = FlextMeltanoAuthenticationError("Auth error")
         assert isinstance(error, FlextMeltanoAuthenticationError)
@@ -81,7 +83,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoAuthenticationError):
             raise error
 
-    def test_flext_meltano_timeout_error(self):
+    def test_flext_meltano_timeout_error(self) -> Never:
         """Test FlextMeltanoTimeoutError."""
         error = FlextMeltanoTimeoutError("Timeout error")
         assert isinstance(error, FlextMeltanoTimeoutError)
@@ -90,7 +92,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoTimeoutError):
             raise error
 
-    def test_flext_meltano_plugin_error(self):
+    def test_flext_meltano_plugin_error(self) -> Never:
         """Test FlextMeltanoPluginError."""
         error = FlextMeltanoPluginError("Plugin error")
         assert isinstance(error, FlextMeltanoPluginError)
@@ -98,7 +100,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoPluginError):
             raise error
 
-    def test_flext_meltano_execution_error(self):
+    def test_flext_meltano_execution_error(self) -> Never:
         """Test FlextMeltanoExecutionError."""
         error = FlextMeltanoExecutionError("Execution error")
         assert isinstance(error, FlextMeltanoExecutionError)
@@ -106,7 +108,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoExecutionError):
             raise error
 
-    def test_flext_meltano_singer_error(self):
+    def test_flext_meltano_singer_error(self) -> Never:
         """Test FlextMeltanoSingerError."""
         error = FlextMeltanoSingerError("Singer error")
         assert isinstance(error, FlextMeltanoSingerError)
@@ -114,7 +116,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoSingerError):
             raise error
 
-    def test_flext_meltano_dbt_error(self):
+    def test_flext_meltano_dbt_error(self) -> Never:
         """Test FlextMeltanoDBTError."""
         error = FlextMeltanoDBTError("DBT error")
         assert isinstance(error, FlextMeltanoDBTError)
@@ -122,7 +124,7 @@ class TestAllExceptions:
         with pytest.raises(FlextMeltanoDBTError):
             raise error
 
-    def test_all_exceptions_with_context(self):
+    def test_all_exceptions_with_context(self) -> None:
         """Test all exceptions can be created with context."""
         context = {"test": "value"}
 
@@ -145,7 +147,7 @@ class TestAllExceptions:
             assert isinstance(exception, Exception)
             assert hasattr(exception, "context")
 
-    def test_exception_string_representations(self):
+    def test_exception_string_representations(self) -> None:
         """Test that all exceptions have string representations."""
         exceptions = [
             FlextMeltanoError("Base error"),
@@ -166,7 +168,7 @@ class TestAllExceptions:
             assert isinstance(str_repr, str)
             assert len(str_repr) > 0
 
-    def test_exception_hierarchy(self):
+    def test_exception_hierarchy(self) -> None:
         """Test that exception hierarchy is correct."""
         # Domain-specific exceptions inherit from FlextMeltanoError
         domain_exceptions = [
@@ -194,7 +196,7 @@ class TestAllExceptions:
             # These don't inherit from FlextMeltanoError, but do inherit from Exception
             assert isinstance(exception, Exception)
 
-    def test_exception_chaining(self):
+    def test_exception_chaining(self) -> None:
         """Test exception chaining works."""
         original = ValueError("original")
 
@@ -208,7 +210,7 @@ class TestAllExceptions:
         chained = exc_info.value
         assert chained.__cause__ is original
 
-    def test_exception_messages(self):
+    def test_exception_messages(self) -> None:
         """Test exception messages are preserved."""
         test_message = "Test exception message"
 
@@ -229,7 +231,7 @@ class TestAllExceptions:
         for exception in exceptions:
             assert test_message in str(exception)
 
-    def test_all_exceptions_are_raisable(self):
+    def test_all_exceptions_are_raisable(self) -> Never:
         """Test that all exceptions can be raised and caught."""
         exception_classes = [
             FlextMeltanoError,
@@ -250,7 +252,7 @@ class TestAllExceptions:
             with pytest.raises(exception_class):
                 raise exception_class(msg)
 
-    def test_import_all_exceptions(self):
+    def test_import_all_exceptions(self) -> None:
         """Test that all exceptions can be imported."""
         # This test exercises the import paths
         assert FlextMeltanoError is not None
