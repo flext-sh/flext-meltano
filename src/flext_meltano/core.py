@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum, IntEnum, auto
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_core import (
     FlextAggregateRoot,
@@ -21,17 +20,15 @@ from flext_core import (
 )
 from pydantic import Field, model_validator
 
+from flext_meltano.base import FlextMeltanoDbtService
 from flext_meltano.common import injectable
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.discovery import FlextMeltanoDiscoverer
 from flext_meltano.execution import (
+    FlextMeltanoExecutor,
     SubprocessExecutionContext as SharedSubprocessExecutionContext,
     execute_subprocess_common as shared_execute_subprocess_common,
 )
-
-if TYPE_CHECKING:
-    from flext_meltano.base import FlextMeltanoDbtService
-    from flext_meltano.execution import FlextMeltanoExecutor
 
 logger = get_logger(__name__)
 
@@ -47,8 +44,8 @@ class ExecutionState(IntEnum):
     CANCELLED = auto()
 
     def __str__(self) -> str:
-        """Return full enum name for string representation."""
-        return f"{self.__class__.__name__}.{self.name}"
+      """Return full enum name for string representation."""
+      return f"{self.__class__.__name__}.{self.name}"
 
 
 class PipelineEventType(IntEnum):
@@ -78,18 +75,18 @@ class FlextMeltanoPipelineConfig:
     config: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Validate required fields after initialization."""
-        # Validate required fields are non-empty
-        if not self.name or not self.extractor or not self.loader:
-            msg = "Pipeline name, extractor, and loader are required"
-            raise ValueError(msg)
-        if (
-            not self.name.strip()
-            or not self.extractor.strip()
-            or not self.loader.strip()
-        ):
-            msg = "Pipeline name, extractor, and loader are required"
-            raise ValueError(msg)
+      """Validate required fields after initialization."""
+      # Validate required fields are non-empty
+      if not self.name or not self.extractor or not self.loader:
+          msg = "Pipeline name, extractor, and loader are required"
+          raise ValueError(msg)
+      if (
+          not self.name.strip()
+          or not self.extractor.strip()
+          or not self.loader.strip()
+      ):
+          msg = "Pipeline name, extractor, and loader are required"
+          raise ValueError(msg)
 
 
 class FlextMeltanoPipelineEvent(FlextEntity):
@@ -109,20 +106,24 @@ class FlextMeltanoPipelineEvent(FlextEntity):
     @model_validator(mode="before")
     @classmethod
     def _accept_pipeline_name_alias(cls, data: object) -> object:
-        """Allow `pipeline_name` as an alias for `pipeline_id` in tests.
+      """Allow `pipeline_name` as an alias for `pipeline_id` in tests.
 
-        Tests sometimes provide `pipeline_name` instead of `pipeline_id`.
-        """
-        if isinstance(data, dict) and "pipeline_id" not in data and "pipeline_name" in data:
-            data = {**data}
-            data["pipeline_id"] = data.pop("pipeline_name")
-        return data
+      Tests sometimes provide `pipeline_name` instead of `pipeline_id`.
+      """
+      if (
+          isinstance(data, dict)
+          and "pipeline_id" not in data
+          and "pipeline_name" in data
+      ):
+          data = {**data}
+          data["pipeline_id"] = data.pop("pipeline_name")
+      return data
 
     def validate_business_rules(self) -> FlextResult[None]:
-        """Validate entity domain rules."""
-        if not self.pipeline_id.strip():
-            return FlextResult.fail("Pipeline ID cannot be empty")
-        return FlextResult.ok(None)
+      """Validate entity domain rules."""
+      if not self.pipeline_id.strip():
+          return FlextResult.fail("Pipeline ID cannot be empty")
+      return FlextResult.ok(None)
 
 
 class FlextMeltanoPipelineResult(FlextEntity):
@@ -139,43 +140,43 @@ class FlextMeltanoPipelineResult(FlextEntity):
     metadata: dict[str, object] = Field(default_factory=dict)
 
     def start_execution(self) -> None:
-        """Mark the pipeline as running and set start time."""
-        self.state = int(ExecutionState.RUNNING.value)
-        self.started_at = datetime.now(UTC)
+      """Mark the pipeline as running and set start time."""
+      self.state = int(ExecutionState.RUNNING.value)
+      self.started_at = datetime.now(UTC)
 
     def complete_execution(self, *, records_processed: int = 0) -> None:
-        """Mark the pipeline as completed and compute duration."""
-        self.state = int(ExecutionState.COMPLETED.value)
-        self.completed_at = datetime.now(UTC)
-        self.records_processed = records_processed
-        if self.started_at is not None:
-            self.duration_seconds = max(
-                0.0,
-                (self.completed_at - self.started_at).total_seconds(),
-            )
-        else:
-            # No start time available; leave duration undefined for tests
-            self.duration_seconds = None
+      """Mark the pipeline as completed and compute duration."""
+      self.state = int(ExecutionState.COMPLETED.value)
+      self.completed_at = datetime.now(UTC)
+      self.records_processed = records_processed
+      if self.started_at is not None:
+          self.duration_seconds = max(
+              0.0,
+              (self.completed_at - self.started_at).total_seconds(),
+          )
+      else:
+          # No start time available; leave duration undefined for tests
+          self.duration_seconds = None
 
     def fail_execution(self, error_message: str) -> None:
-        """Mark the pipeline as failed and compute duration."""
-        self.state = int(ExecutionState.FAILED.value)
-        self.completed_at = datetime.now(UTC)
-        self.error_message = error_message
-        if self.started_at is not None:
-            self.duration_seconds = max(
-                0.0,
-                (self.completed_at - self.started_at).total_seconds(),
-            )
-        else:
-            # No start time available; leave duration undefined for tests
-            self.duration_seconds = None
+      """Mark the pipeline as failed and compute duration."""
+      self.state = int(ExecutionState.FAILED.value)
+      self.completed_at = datetime.now(UTC)
+      self.error_message = error_message
+      if self.started_at is not None:
+          self.duration_seconds = max(
+              0.0,
+              (self.completed_at - self.started_at).total_seconds(),
+          )
+      else:
+          # No start time available; leave duration undefined for tests
+          self.duration_seconds = None
 
     def validate_business_rules(self) -> FlextResult[None]:
-        """Validate entity domain rules."""
-        if not self.pipeline_name.strip():
-            return FlextResult.fail("Pipeline name cannot be empty")
-        return FlextResult.ok(None)
+      """Validate entity domain rules."""
+      if not self.pipeline_name.strip():
+          return FlextResult.fail("Pipeline name cannot be empty")
+      return FlextResult.ok(None)
 
 
 class FlextMeltanoExecutionState(FlextModel):
@@ -190,67 +191,67 @@ class FlextMeltanoExecutionState(FlextModel):
     environment: str | None = Field(default=None)
 
     def __init__(self, **data: object) -> None:
-        """Initialize and auto-set RUNNING when pipeline_name provided.
+      """Initialize and auto-set RUNNING when pipeline_name provided.
 
-        Tests expect that providing a non-empty pipeline_name implies a running state.
-        """
-        super().__init__(**data)
-        if self.pipeline_name and str(self.pipeline_name).strip():
-            self.state = int(ExecutionState.RUNNING.value)
+      Tests expect that providing a non-empty pipeline_name implies a running state.
+      """
+      super().__init__(**data)
+      if self.pipeline_name and str(self.pipeline_name).strip():
+          self.state = int(ExecutionState.RUNNING.value)
 
     def start_pipeline(self, pipeline_name: str) -> str:
-        """Start pipeline execution and return a new execution id."""
-        self.current_pipeline = pipeline_name
-        self.pipeline_name = pipeline_name
-        self.execution_id = str(uuid.uuid4())
-        self.state = int(ExecutionState.RUNNING.value)
-        self.metadata.setdefault("started_at", datetime.now(UTC).isoformat())
-        return self.execution_id
+      """Start pipeline execution and return a new execution id."""
+      self.current_pipeline = pipeline_name
+      self.pipeline_name = pipeline_name
+      self.execution_id = str(uuid.uuid4())
+      self.state = int(ExecutionState.RUNNING.value)
+      self.metadata.setdefault("started_at", datetime.now(UTC).isoformat())
+      return self.execution_id
 
     def complete_pipeline(self) -> None:
-        """Complete pipeline execution."""
-        self.state = int(ExecutionState.COMPLETED.value)
-        self.metadata.setdefault("completed_at", datetime.now(UTC).isoformat())
+      """Complete pipeline execution."""
+      self.state = int(ExecutionState.COMPLETED.value)
+      self.metadata.setdefault("completed_at", datetime.now(UTC).isoformat())
 
     def fail_pipeline(self, error_message: str) -> None:
-        """Fail pipeline execution with an error message."""
-        self.state = int(ExecutionState.FAILED.value)
-        self.metadata["error"] = error_message
-        self.metadata.setdefault("failed_at", datetime.now(UTC).isoformat())
+      """Fail pipeline execution with an error message."""
+      self.state = int(ExecutionState.FAILED.value)
+      self.metadata["error"] = error_message
+      self.metadata.setdefault("failed_at", datetime.now(UTC).isoformat())
 
 
 class FlextMeltanoRepository(FlextAggregateRoot):
     """Repository aggregate root base for storing pipeline artifacts."""
 
     def __init__(self, *, name: str) -> None:
-        """Initialize repository with a name."""
-        super().__init__(id=str(uuid.uuid4()))
-        self.name = name
-        self.pipelines: list[FlextMeltanoPipelineEntity] = []
-        self.results: list[FlextMeltanoPipelineResult] = []
-        self.events: list[FlextMeltanoPipelineEvent] = []
+      """Initialize repository with a name."""
+      super().__init__(id=str(uuid.uuid4()))
+      self.name = name
+      self.pipelines: list[FlextMeltanoPipelineEntity] = []
+      self.results: list[FlextMeltanoPipelineResult] = []
+      self.events: list[FlextMeltanoPipelineEvent] = []
 
     # Minimal methods expected by tests
     def add_pipeline(self, pipeline: FlextMeltanoPipelineEntity) -> None:
-        """Add pipeline to repository."""
-        self.pipelines.append(pipeline)
+      """Add pipeline to repository."""
+      self.pipelines.append(pipeline)
 
     def get_pipelines(self) -> list[FlextMeltanoPipelineEntity]:
-        """Return list of pipelines."""
-        return self.pipelines
+      """Return list of pipelines."""
+      return self.pipelines
 
     # Legacy method name expected by some tests
     def get_pipeline(self, index: int = 0) -> FlextMeltanoPipelineEntity | None:
-        """Return a single pipeline by index if available."""
-        if 0 <= index < len(self.pipelines):
-            return self.pipelines[index]
-        return None
+      """Return a single pipeline by index if available."""
+      if 0 <= index < len(self.pipelines):
+          return self.pipelines[index]
+      return None
 
     def validate_business_rules(
-        self,
+      self,
     ) -> FlextResult[None]:  # pragma: no cover - abstract placeholder
-        """Pass repository validation by default."""
-        return FlextResult.ok(None)
+      """Pass repository validation by default."""
+      return FlextResult.ok(None)
 
 
 def _deprecated_api_warning(message: str) -> None:
@@ -324,128 +325,128 @@ class FlextMeltanoJobEntity(FlextEntity):
     """Job entity representing individual job execution."""
 
     def __init__(
-        self,
-        job_id: str,
-        job_type: str,
-        plugin_name: str,
-        started_at: datetime | None = None,
+      self,
+      job_id: str,
+      job_type: str,
+      plugin_name: str,
+      started_at: datetime | None = None,
     ) -> None:
-        """Initialize job entity with identification and metadata."""
-        super().__init__(id=job_id)
-        self.job_id = job_id
-        self.job_type = job_type
-        self.plugin_name = plugin_name
-        self.started_at = started_at or datetime.now(UTC)
-        self.completed_at: datetime | None = None
-        self.status = "pending"
-        self.error_message: str | None = None
-        self._events: list[FlextMeltanoDomainEvent] = []
+      """Initialize job entity with identification and metadata."""
+      super().__init__(id=job_id)
+      self.job_id = job_id
+      self.job_type = job_type
+      self.plugin_name = plugin_name
+      self.started_at = started_at or datetime.now(UTC)
+      self.completed_at: datetime | None = None
+      self.status = "pending"
+      self.error_message: str | None = None
+      self._events: list[FlextMeltanoDomainEvent] = []
 
     def start(self) -> None:
-        """Start job execution."""
-        self.status = "running"
-        self.started_at = datetime.now(UTC)
-        self._events.append(
-            FlextMeltanoDomainEvent(
-                event_type=FlextMeltanoEventType.JOB_STARTED,
-                aggregate_id=self.id,
-                data={"job_type": self.job_type, "plugin_name": self.plugin_name},
-            ),
-        )
+      """Start job execution."""
+      self.status = "running"
+      self.started_at = datetime.now(UTC)
+      self._events.append(
+          FlextMeltanoDomainEvent(
+              event_type=FlextMeltanoEventType.JOB_STARTED,
+              aggregate_id=self.id,
+              data={"job_type": self.job_type, "plugin_name": self.plugin_name},
+          ),
+      )
 
     def complete(
-        self,
-        *,
-        is_success: bool = True,
-        error_message: str | None = None,
+      self,
+      *,
+      is_success: bool = True,
+      error_message: str | None = None,
     ) -> None:
-        """Complete job execution."""
-        self.status = "completed" if is_success else "failed"
-        self.completed_at = datetime.now(UTC)
-        self.error_message = error_message
-        event_type = (
-            FlextMeltanoEventType.JOB_COMPLETED
-            if is_success
-            else FlextMeltanoEventType.JOB_FAILED
-        )
-        self._events.append(
-            FlextMeltanoDomainEvent(
-                event_type=event_type,
-                aggregate_id=self.id,
-                data={
-                    "status": self.status,
-                    "error_message": error_message,
-                },
-            ),
-        )
+      """Complete job execution."""
+      self.status = "completed" if is_success else "failed"
+      self.completed_at = datetime.now(UTC)
+      self.error_message = error_message
+      event_type = (
+          FlextMeltanoEventType.JOB_COMPLETED
+          if is_success
+          else FlextMeltanoEventType.JOB_FAILED
+      )
+      self._events.append(
+          FlextMeltanoDomainEvent(
+              event_type=event_type,
+              aggregate_id=self.id,
+              data={
+                  "status": self.status,
+                  "error_message": error_message,
+              },
+          ),
+      )
 
 
 class FlextMeltanoPipelineEntity(FlextAggregateRoot):
     """Pipeline aggregate root managing pipeline lifecycle."""
 
     def __init__(
-        self,
-        pipeline_id: str,
-        tap_name: str,
-        target_name: str,
-        environment: str = "dev",
+      self,
+      pipeline_id: str,
+      tap_name: str,
+      target_name: str,
+      environment: str = "dev",
     ) -> None:
-        """Initialize pipeline entity with basic attributes."""
-        super().__init__(id=pipeline_id)
-        self.tap_name = tap_name
-        self.target_name = target_name
-        self.environment = environment
-        self.jobs: list[FlextMeltanoJobEntity] = []
-        self.started_at: datetime | None = None
-        self.completed_at: datetime | None = None
-        self.status = "pending"
-        self._events: list[FlextMeltanoDomainEvent] = []
+      """Initialize pipeline entity with basic attributes."""
+      super().__init__(id=pipeline_id)
+      self.tap_name = tap_name
+      self.target_name = target_name
+      self.environment = environment
+      self.jobs: list[FlextMeltanoJobEntity] = []
+      self.started_at: datetime | None = None
+      self.completed_at: datetime | None = None
+      self.status = "pending"
+      self._events: list[FlextMeltanoDomainEvent] = []
 
     def add_job(self, job: FlextMeltanoJobEntity) -> None:
-        """Add job to pipeline."""
-        self.jobs.append(job)
+      """Add job to pipeline."""
+      self.jobs.append(job)
 
     def start(self) -> None:
-        """Start pipeline execution."""
-        self.status = "running"
-        self.started_at = datetime.now(UTC)
-        self._events.append(
-            FlextMeltanoDomainEvent(
-                event_type=FlextMeltanoEventType.PIPELINE_STARTED,
-                aggregate_id=self.id,
-                data={
-                    "tap_name": self.tap_name,
-                    "target_name": self.target_name,
-                    "environment": self.environment,
-                },
-            ),
-        )
+      """Start pipeline execution."""
+      self.status = "running"
+      self.started_at = datetime.now(UTC)
+      self._events.append(
+          FlextMeltanoDomainEvent(
+              event_type=FlextMeltanoEventType.PIPELINE_STARTED,
+              aggregate_id=self.id,
+              data={
+                  "tap_name": self.tap_name,
+                  "target_name": self.target_name,
+                  "environment": self.environment,
+              },
+          ),
+      )
 
     def complete(
-        self,
-        *,
-        is_success: bool = True,
-        error_message: str | None = None,
+      self,
+      *,
+      is_success: bool = True,
+      error_message: str | None = None,
     ) -> None:
-        """Complete pipeline execution."""
-        self.status = "completed" if is_success else "failed"
-        self.completed_at = datetime.now(UTC)
-        event_type = (
-            FlextMeltanoEventType.PIPELINE_COMPLETED
-            if is_success
-            else FlextMeltanoEventType.PIPELINE_FAILED
-        )
-        self._events.append(
-            FlextMeltanoDomainEvent(
-                event_type=event_type,
-                aggregate_id=self.id,
-                data={
-                    "status": self.status,
-                    "error_message": error_message,
-                    "job_count": len(self.jobs),
-                },
-            ),
-        )
+      """Complete pipeline execution."""
+      self.status = "completed" if is_success else "failed"
+      self.completed_at = datetime.now(UTC)
+      event_type = (
+          FlextMeltanoEventType.PIPELINE_COMPLETED
+          if is_success
+          else FlextMeltanoEventType.PIPELINE_FAILED
+      )
+      self._events.append(
+          FlextMeltanoDomainEvent(
+              event_type=event_type,
+              aggregate_id=self.id,
+              data={
+                  "status": self.status,
+                  "error_message": error_message,
+                  "job_count": len(self.jobs),
+              },
+          ),
+      )
 
 
 # Domain Services
@@ -454,83 +455,83 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
     """Singer protocol domain service."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-        """Initialize service with configuration."""
-        super().__init__()
-        self.config = config
-        self._logger = get_logger(self.__class__.__name__)
+      """Initialize service with configuration."""
+      super().__init__()
+      self.config = config
+      self._logger = get_logger(self.__class__.__name__)
 
     async def discover_catalog(
-        self,
-        tap_name: str,
+      self,
+      tap_name: str,
     ) -> FlextResult[dict[str, object]]:
-        """Discover tap catalog."""
-        try:
-            discovery = FlextMeltanoDiscoverer(FlextMeltanoConfig())
-            catalog_result = await discovery.discover_catalog(tap_name)
-            if catalog_result.success and catalog_result.data:
-                return FlextResult.ok(catalog_result.data)
-            return FlextResult.fail(catalog_result.error or "Discovery failed")
-        except (
-            OSError,
-            ConnectionError,
-            TimeoutError,
-            TypeError,
-            ValueError,
-            RuntimeError,
-        ) as e:
-            return FlextResult.fail(f"Catalog discovery failed: {e}")
+      """Discover tap catalog."""
+      try:
+          discovery = FlextMeltanoDiscoverer(FlextMeltanoConfig())
+          catalog_result = await discovery.discover_catalog(tap_name)
+          if catalog_result.success and catalog_result.data:
+              return FlextResult.ok(catalog_result.data)
+          return FlextResult.fail(catalog_result.error or "Discovery failed")
+      except (
+          OSError,
+          ConnectionError,
+          TimeoutError,
+          TypeError,
+          ValueError,
+          RuntimeError,
+      ) as e:
+          return FlextResult.fail(f"Catalog discovery failed: {e}")
 
     def execute_singer_pipeline(
-        self,
-        tap_name: str,
-        target_name: str,
-        *,
-        selected_streams: list[str] | None = None,
+      self,
+      tap_name: str,
+      target_name: str,
+      *,
+      selected_streams: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Execute a Singer pipeline at a high level.
+      """Execute a Singer pipeline at a high level.
 
-        This is a convenience wrapper validating inputs and formatting a
-        response; actual execution is delegated to orchestration/executor.
-        """
-        try:
-            if not tap_name or not target_name:
-                return FlextResult.fail("tap_name and target_name are required")
-            result: dict[str, object] = {
-                "tap": tap_name,
-                "target": target_name,
-                "selected_streams": selected_streams or [],
-                "status": "accepted",
-            }
-            return FlextResult.ok(result)
-        except Exception as exc:  # pragma: no cover
-            return FlextResult.fail(f"Singer pipeline execution failed: {exc}")
+      This is a convenience wrapper validating inputs and formatting a
+      response; actual execution is delegated to orchestration/executor.
+      """
+      try:
+          if not tap_name or not target_name:
+              return FlextResult.fail("tap_name and target_name are required")
+          result: dict[str, object] = {
+              "tap": tap_name,
+              "target": target_name,
+              "selected_streams": selected_streams or [],
+              "status": "accepted",
+          }
+          return FlextResult.ok(result)
+      except Exception as exc:  # pragma: no cover
+          return FlextResult.fail(f"Singer pipeline execution failed: {exc}")
 
     def validate_stream_selection(
-        self,
-        catalog: dict[str, object],
-        selected_streams: list[str],
+      self,
+      catalog: dict[str, object],
+      selected_streams: list[str],
     ) -> FlextResult[None]:
-        """Validate stream selection against catalog."""
-        try:
-            streams_data = catalog.get("streams", [])
-            if not isinstance(streams_data, list):
-                return FlextResult.fail("Invalid catalog format: streams is not a list")
+      """Validate stream selection against catalog."""
+      try:
+          streams_data = catalog.get("streams", [])
+          if not isinstance(streams_data, list):
+              return FlextResult.fail("Invalid catalog format: streams is not a list")
 
-            available_streams = []
-            for stream in streams_data:
-                if isinstance(stream, dict):
-                    stream_id = stream.get("tap_stream_id")
-                    if stream_id:
-                        available_streams.append(stream_id)
+          available_streams = []
+          for stream in streams_data:
+              if isinstance(stream, dict):
+                  stream_id = stream.get("tap_stream_id")
+                  if stream_id:
+                      available_streams.append(stream_id)
 
-            invalid_streams = [
-                s for s in selected_streams if s not in available_streams
-            ]
-            if invalid_streams:
-                return FlextResult.fail(f"Invalid streams: {invalid_streams}")
-            return FlextResult.ok(None)
-        except (TypeError, ValueError, AttributeError, RuntimeError) as e:
-            return FlextResult.fail(f"Stream validation failed: {e}")
+          invalid_streams = [
+              s for s in selected_streams if s not in available_streams
+          ]
+          if invalid_streams:
+              return FlextResult.fail(f"Invalid streams: {invalid_streams}")
+          return FlextResult.ok(None)
+      except (TypeError, ValueError, AttributeError, RuntimeError) as e:
+          return FlextResult.fail(f"Stream validation failed: {e}")
 
 
 @injectable
@@ -538,129 +539,131 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
     """Pipeline orchestration domain service."""
 
     def __init__(
-        self,
-        config: FlextMeltanoConfig,
-        singer_service: FlextMeltanoSingerService,
-        dbt_service: FlextMeltanoDbtService,
-        executor: FlextMeltanoExecutor | None = None,
+      self,
+      config: FlextMeltanoConfig,
+      singer_service: FlextMeltanoSingerService,
+      dbt_service: FlextMeltanoDbtService,
+      executor: FlextMeltanoExecutor | None = None,
     ) -> None:
-        """Initialize orchestration service with required dependencies."""
-        super().__init__()
-        self.config = config
-        self.singer_service = singer_service
-        self.dbt_service = dbt_service
-        self._executor = executor
-        self._logger = get_logger(self.__class__.__name__)
+      """Initialize orchestration service with required dependencies."""
+      super().__init__()
+      self.config = config
+      self.singer_service = singer_service
+      self.dbt_service = dbt_service
+      self._executor = executor
+      self._logger = get_logger(self.__class__.__name__)
 
     def validate_service(self) -> FlextResult[bool]:
-        """Basic validation to satisfy interface expectations in tests."""
-        if not self.singer_service or not self.dbt_service:
-            return FlextResult.fail("Dependencies not configured")
-        return FlextResult.ok(data=True)
+      """Basic validation to satisfy interface expectations in tests."""
+      if not self.singer_service or not self.dbt_service:
+          return FlextResult.fail("Dependencies not configured")
+      return FlextResult.ok(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
-        """Return simple health status for orchestration service."""
-        return FlextResult.ok(
-            {
-                "service": "orchestration",
-                "initialized": True,
-                "has_executor": self._executor is not None,
-            },
-        )
+      """Return simple health status for orchestration service."""
+      return FlextResult.ok(
+          {
+              "service": "orchestration",
+              "initialized": True,
+              "has_executor": self._executor is not None,
+          },
+      )
 
     # Legacy API expected by tests
-    def create_pipeline(self, _name: str, extractor: str, loader: str) -> FlextResult[FlextMeltanoPipelineEntity]:
-        """Create a simple pipeline entity (legacy compatibility)."""
-        try:
-            pipeline = FlextMeltanoPipelineEntity(
-                pipeline_id=str(uuid.uuid4()),
-                tap_name=extractor,
-                target_name=loader,
-                environment=self.config.environment,
-            )
-            return FlextResult.ok(pipeline)
-        except Exception as e:  # pragma: no cover - defensive
-            return FlextResult.fail(f"Failed to create pipeline: {e}")
+    def create_pipeline(
+      self, _name: str, extractor: str, loader: str,
+    ) -> FlextResult[FlextMeltanoPipelineEntity]:
+      """Create a simple pipeline entity (legacy compatibility)."""
+      try:
+          pipeline = FlextMeltanoPipelineEntity(
+              pipeline_id=str(uuid.uuid4()),
+              tap_name=extractor,
+              target_name=loader,
+              environment=self.config.environment,
+          )
+          return FlextResult.ok(pipeline)
+      except Exception as e:  # pragma: no cover - defensive
+          return FlextResult.fail(f"Failed to create pipeline: {e}")
 
     def execute_pipeline(
-        self,
-        context: FlextMeltanoPipelineContext,
+      self,
+      context: FlextMeltanoPipelineContext,
     ) -> FlextResult[FlextMeltanoPipelineResult]:
-        """Execute complete pipeline."""
-        pipeline_id = str(uuid.uuid4())
-        pipeline = FlextMeltanoPipelineEntity(
-            pipeline_id=pipeline_id,
-            tap_name=context.tap_name,
-            target_name=context.target_name,
-            environment=context.environment,
-        )
+      """Execute complete pipeline."""
+      pipeline_id = str(uuid.uuid4())
+      pipeline = FlextMeltanoPipelineEntity(
+          pipeline_id=pipeline_id,
+          tap_name=context.tap_name,
+          target_name=context.target_name,
+          environment=context.environment,
+      )
 
-        try:
-            pipeline.start()
+      try:
+          pipeline.start()
 
-            # Execute tap -> target
-            tap_job = FlextMeltanoJobEntity(
-                job_id=str(uuid.uuid4()),
-                job_type="extractor",
-                plugin_name=context.tap_name,
-            )
-            pipeline.add_job(tap_job)
-            tap_job.start()
+          # Execute tap -> target
+          tap_job = FlextMeltanoJobEntity(
+              job_id=str(uuid.uuid4()),
+              job_type="extractor",
+              plugin_name=context.tap_name,
+          )
+          pipeline.add_job(tap_job)
+          tap_job.start()
 
-            # Use executor if available
-            if self._executor:
-                exec_result = self._executor.execute_pipeline(
-                    context.tap_name,
-                    context.target_name,
-                )
-                if not exec_result.success:
-                    tap_job.complete(is_success=False, error_message=exec_result.error)
-                    pipeline.complete(is_success=False, error_message=exec_result.error)
-                    return FlextResult.fail(exec_result.error or "Pipeline failed")
+          # Use executor if available
+          if self._executor:
+              exec_result = self._executor.execute_pipeline(
+                  context.tap_name,
+                  context.target_name,
+              )
+              if not exec_result.success:
+                  tap_job.complete(is_success=False, error_message=exec_result.error)
+                  pipeline.complete(is_success=False, error_message=exec_result.error)
+                  return FlextResult.fail(exec_result.error or "Pipeline failed")
 
-            tap_job.complete(is_success=True)
+          tap_job.complete(is_success=True)
 
-            # Complete pipeline
-            pipeline.complete(is_success=True)
+          # Complete pipeline
+          pipeline.complete(is_success=True)
 
-            FlextMeltanoPipelineSummary(
-                success=True,
-                job_id=pipeline_id,
-                tap_name=context.tap_name,
-                target_name=context.target_name,
-                started_at=pipeline.started_at or datetime.now(UTC),
-                completed_at=pipeline.completed_at,
-            )
+          FlextMeltanoPipelineSummary(
+              success=True,
+              job_id=pipeline_id,
+              tap_name=context.tap_name,
+              target_name=context.target_name,
+              started_at=pipeline.started_at or datetime.now(UTC),
+              completed_at=pipeline.completed_at,
+          )
 
-            # Return domain entity result as required by type signature
-            pipeline_result = FlextMeltanoPipelineResult(
-                pipeline_name=f"{context.tap_name}-{context.target_name}",
-            )
-            pipeline_result.start_execution()
-            pipeline_result.complete_execution(records_processed=0)
-            return FlextResult.ok(pipeline_result)
+          # Return domain entity result as required by type signature
+          pipeline_result = FlextMeltanoPipelineResult(
+              pipeline_name=f"{context.tap_name}-{context.target_name}",
+          )
+          pipeline_result.start_execution()
+          pipeline_result.complete_execution(records_processed=0)
+          return FlextResult.ok(pipeline_result)
 
-        except (
-            OSError,
-            ConnectionError,
-            TimeoutError,
-            TypeError,
-            ValueError,
-            RuntimeError,
-        ) as e:
-            pipeline.complete(is_success=False, error_message=str(e))
-            return FlextResult.fail(f"Pipeline execution failed: {e}")
+      except (
+          OSError,
+          ConnectionError,
+          TimeoutError,
+          TypeError,
+          ValueError,
+          RuntimeError,
+      ) as e:
+          pipeline.complete(is_success=False, error_message=str(e))
+          return FlextResult.fail(f"Pipeline execution failed: {e}")
 
     async def execute_dbt_models(
-        self,
-        models: list[str],
+      self,
+      models: list[str],
     ) -> FlextResult[dict[str, object]]:
-        """Execute DBT models."""
-        result = await self.dbt_service.run_models(models)
-        # Convert list result to dict for compatibility
-        if result.success and result.data:
-            return FlextResult.ok({"models": result.data, "count": len(result.data)})
-        return FlextResult.fail(result.error or "DBT execution failed")
+      """Execute DBT models."""
+      result = await self.dbt_service.run_models(models)
+      # Convert list result to dict for compatibility
+      if result.success and result.data:
+          return FlextResult.ok({"models": result.data, "count": len(result.data)})
+      return FlextResult.fail(result.error or "DBT execution failed")
 
 
 @injectable
@@ -668,61 +671,61 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
     """Extension service for custom operations."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-        """Initialize extension service with configuration."""
-        super().__init__()
-        self.config = config
-        self._logger = get_logger(self.__class__.__name__)
+      """Initialize extension service with configuration."""
+      super().__init__()
+      self.config = config
+      self._logger = get_logger(self.__class__.__name__)
 
     def validate_service(self) -> FlextResult[bool]:
-        """Basic validation hook expected by tests."""
-        return FlextResult.ok(data=True)
+      """Basic validation hook expected by tests."""
+      return FlextResult.ok(data=True)
 
     def execute_extension(
-        self,
-        extension_name: str,
-        args: list[str],
+      self,
+      extension_name: str,
+      args: list[str],
     ) -> FlextResult[dict[str, object]]:
-        """Execute custom extension."""
-        try:
-            exec_ctx = SharedSubprocessExecutionContext(
-                command=["meltano", "invoke", extension_name, *args],
-                cwd=Path(self.config.project_root),
-                timeout_seconds=300,
-            )
-            exec_result = shared_execute_subprocess_common(exec_ctx)
-            if exec_result.success and isinstance(exec_result.data, dict):
-                data = exec_result.data
-                if data.get("returncode", 1) == 0:
-                    return FlextResult.ok(
-                        {
-                            "extension": extension_name,
-                            "output": data.get("stdout", ""),
-                            "success": True,
-                        },
-                    )
-                return FlextResult.fail(
-                    f"Extension failed: {data.get('stderr') or data.get('stdout')}",
-                )
-            return FlextResult.fail(exec_result.error or "Extension execution failed")
-        except (
-            OSError,
-            ConnectionError,
-            TimeoutError,
-            TypeError,
-            ValueError,
-            RuntimeError,
-        ) as e:
-            return FlextResult.fail(f"Extension execution failed: {e}")
+      """Execute custom extension."""
+      try:
+          exec_ctx = SharedSubprocessExecutionContext(
+              command=["meltano", "invoke", extension_name, *args],
+              cwd=Path(self.config.project_root),
+              timeout_seconds=300,
+          )
+          exec_result = shared_execute_subprocess_common(exec_ctx)
+          if exec_result.success and isinstance(exec_result.data, dict):
+              data = exec_result.data
+              if data.get("returncode", 1) == 0:
+                  return FlextResult.ok(
+                      {
+                          "extension": extension_name,
+                          "output": data.get("stdout", ""),
+                          "success": True,
+                      },
+                  )
+              return FlextResult.fail(
+                  f"Extension failed: {data.get('stderr') or data.get('stdout')}",
+              )
+          return FlextResult.fail(exec_result.error or "Extension execution failed")
+      except (
+          OSError,
+          ConnectionError,
+          TimeoutError,
+          TypeError,
+          ValueError,
+          RuntimeError,
+      ) as e:
+          return FlextResult.fail(f"Extension execution failed: {e}")
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
-        """Return simple health/status information for extension service."""
-        return FlextResult.ok(
-            {
-                "service": "extension",
-                "initialized": True,
-                "project_root": self.config.project_root,
-            },
-        )
+      """Return simple health/status information for extension service."""
+      return FlextResult.ok(
+          {
+              "service": "extension",
+              "initialized": True,
+              "project_root": self.config.project_root,
+          },
+      )
 
 
 __all__ = [

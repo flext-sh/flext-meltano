@@ -56,37 +56,37 @@ with contextlib.suppress(Exception):
 def functional_example() -> dict:
     """Demonstrates new simplified API vs old complex imports."""
     try:
-        # ✅ NEW: Simple configuration
-        config = FlextMeltanoConfig(project_root="./demo_project")
+      # ✅ NEW: Simple configuration
+      config = FlextMeltanoConfig(project_root="./demo_project")
 
-        # ✅ NEW: One-line executor creation
-        executor_result = create_executor(config)
-        if executor_result.success:
-            pass
+      # ✅ NEW: One-line executor creation
+      executor_result = create_executor(config)
+      if executor_result.success:
+          pass
 
-        # ✅ NEW: Simple bridge creation
-        bridge = create_flext_meltano_bridge()
-        health_result = bridge.validate_bridge_health()
-        bridge_version = bridge.get_bridge_version()
+      # ✅ NEW: Simple bridge creation
+      bridge = create_flext_meltano_bridge()
+      health_result = bridge.validate_bridge_health()
+      bridge_version = bridge.get_bridge_version()
 
-        # ✅ NEW: One-line job execution
-        job_result = flext_meltano_execute_job("tap-csv", "target-csv")
+      # ✅ NEW: One-line job execution
+      job_result = flext_meltano_execute_job("tap-csv", "target-csv")
 
-        return {
-            "new_api_functional": True,
-            "executor_created": executor_result.success,
-            "bridge_healthy": health_result.success,
-            "bridge_version": bridge_version,
-            "job_executed": job_result.success,  # Using legacy .success pattern
-            "status": "simplified_imports_successful",
-        }
+      return {
+          "new_api_functional": True,
+          "executor_created": executor_result.success,
+          "bridge_healthy": health_result.success,
+          "bridge_version": bridge_version,
+          "job_executed": job_result.success,  # Using legacy .success pattern
+          "status": "simplified_imports_successful",
+      }
 
     except Exception as e:
-        return {
-            "new_api_functional": False,
-            "error": str(e),
-            "status": "simplified_imports_failed",
-        }
+      return {
+          "new_api_functional": False,
+          "error": str(e),
+          "status": "simplified_imports_failed",
+      }
 
 
 # ===== 📖 GUIA DE MIGRAÇÃO =====
@@ -94,20 +94,20 @@ def functional_example() -> dict:
 
 migration_examples = [
     (
-        "❌ OLD",
-        "from flext_meltano.application.services.project_service import ProjectApplicationService",
+      "❌ OLD",
+      "from flext_meltano.application.services.project_service import ProjectApplicationService",
     ),
     ("✅ NEW", "from flext_meltano import ProjectService"),
     ("", ""),
     (
-        "❌ OLD",
-        "from flext_meltano.base import FlextMeltanoConfig",
+      "❌ OLD",
+      "from flext_meltano import FlextMeltanoConfig",
     ),
     ("✅ NEW", "from flext_meltano import FlextMeltanoConfig"),
     ("", ""),
     (
-        "❌ OLD",
-        "from flext_meltano.application.services.state_service import MeltanoStateService",
+      "❌ OLD",
+      "from flext_meltano.application.services.state_service import MeltanoStateService",
     ),
     ("✅ NEW", "from flext_meltano import StateService"),
 ]
@@ -119,12 +119,12 @@ def main() -> None:
     result = functional_example()
 
     if result.get("new_api_functional"):
-        pass
+      pass
 
     # Show migration examples
     for label, _example in migration_examples:
-        if label:
-            pass
+      if label:
+          pass
 
 
 if __name__ == "__main__":

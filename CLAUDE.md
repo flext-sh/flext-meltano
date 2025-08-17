@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FLEXT Meltano is a **production-ready Python library** that serves as the Go ↔ Python bridge integration component within the FLEXT Enterprise Data Integration Platform. This library enables Go services (FlexCore, FLEXT Service) to orchestrate data pipelines using the Meltano/Singer/DBT ecosystem through enterprise subprocess orchestration.
 
-**Status**: 🚧 **IN PROGRESS** - 74% test coverage, zero lint/type errors achieved, but coverage below 90% requirement
+**Status**: 🚧 **ACTIVE DEVELOPMENT** - Core functionality working, significant quality issues remain
 
-**Architecture**: Consolidated module organization with bridge integration, **74% test coverage** (target: 90%), and full type safety compliance.
+**Architecture**: Consolidated module organization with bridge integration, **~20% test coverage** (target: 90%), MyPy type errors need resolution.
 
 ### Position in FLEXT Ecosystem
 
@@ -60,17 +60,35 @@ src/flext_meltano/
 - **JSON Serialization**: Complete Go-compatible response formatting
 - **JSON API**: Returns structured JSON responses for Go service consumption
 
+## Critical Development Notes
+
+### **PRIORITY 1: Quality Gates Must Pass First**
+
+Before any feature development, these must be resolved:
+
+1. **MyPy Type Errors**: 147 errors across 16 files - use `poetry run mypy src --strict` to see details
+2. **Test Coverage**: Currently ~20%, target 90% - run `make test` to check current status  
+3. **Lint Issues**: 7 errors in test files - run `make lint` to see specifics
+4. **Module Architecture**: 36 source files need consolidation
+
+### **Critical Architecture Understanding**
+
+- **Bridge Pattern**: `simple_bridge.py` contains `FlextMeltanoBridge` for Go ↔ Python communication
+- **Execution Core**: `execution.py` handles subprocess-based Meltano CLI calls with FlextResult patterns
+- **Singer Integration**: `singer_*.py` modules provide tap/target functionality
+- **DBT Integration**: `dbt.py` and related modules handle transformation workflows
+
 ## Development Commands
 
 ### Essential Makefile Commands
 
 ```bash
-# Quality Gates (MUST pass before committing)
+# Quality Gates (pytest config now fixed)
 make validate                 # Complete validation (lint + type + security + test)
 make check                   # Quick health check (lint + type-check only)
-make lint                    # Ruff linting (ALL rules enabled)
-make type-check              # MyPy strict type checking
-make test                    # Run tests with 90% coverage minimum
+make lint                    # Ruff linting (7 errors to fix)
+make type-check              # MyPy strict type checking (147 errors to fix)
+make test                    # Run tests with coverage (config fixed)
 make security                # Bandit security scanning + pip-audit
 
 # Development Setup
@@ -221,11 +239,11 @@ python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
 python scripts/flext_meltano_bridge.py add_plugin extractor tap-csv
 ```
 
-## ✅ Emergency Resolution Status (2025-08-02)
+## 🚧 Development Status (2025-08-17)
 
-**ALL CRITICAL ISSUES RESOLVED** - Library is now production-ready with functional Go ↔ Python bridge.
+**ACTIVE DEVELOPMENT** - Core functionality implemented but quality gates failing.
 
-### Emergency Fixes Completed
+### Current Implementation Status
 
 1. **✅ FlextMeltanoBridge Implementation**:
 
@@ -233,42 +251,40 @@ python scripts/flext_meltano_bridge.py add_plugin extractor tap-csv
    - Functional methods: `get_version()`, `list_plugins()`, `run_pipeline()`
    - JSON API responses for Go service consumption
 
-2. **✅ Type Checking Resolution**:
+2. **❌ Type Checking Issues**:
 
-   - Fixed CLI type error: `"object" has no attribute "strip"` (line 293)
-   - Fixed 9 validation.py type errors with proper type annotations
-   - **MyPy Status**: ✅ 0 errors (passing)
+   - **MyPy Status**: ❌ 147 errors across 16 files
+   - Type safety issues in core modules need resolution
+   - Missing type stubs for duckdb and pandas
 
-3. **✅ Bridge Script Syntax**:
+3. **✅ Bridge Script Implementation**:
 
-   - Fixed 5 trailing comma syntax errors in `scripts/flext_meltano_bridge.py`
-   - Added JSON response formatting for Go service integration
+   - JSON response formatting for Go service integration
    - **Bridge Status**: ✅ Functional with JSON API
 
-4. **✅ Test Failures Resolution**:
+4. **❌ Test Infrastructure Issues**:
 
-   - Corrected test expectations in `test_singer_integration.py:135`
-   - Fixed service creation validation logic
-   - **Test Status**: ✅ Critical tests passing
+   - **Test Status**: ❌ Pytest configuration conflicts
+   - Coverage reporting broken due to duplicate arguments
+   - Test coverage at ~20% vs 90% requirement
 
 5. **✅ Module Exports**:
-   - Added `FlextMeltanoBridge` to `__init__.py` exports
-   - Resolved ImportError issues
-   - **Import Status**: ✅ All bridge imports working
+   - Bridge components available in `__init__.py`
+   - **Import Status**: ✅ Core imports working
 
-### Current Quality Status (2025-08-04)
+### Current Quality Status (2025-08-17)
 
 ```bash
 # Quality Gate Status
-make check                   # ✅ PASSING (0 lint errors, 0 MyPy errors)
-make test                    # ❌ FAILING (74% coverage < 90% requirement)
-make validate                # ❌ FAILING (due to coverage requirement)
+make check                   # ❌ FAILING (7 lint errors, 147 MyPy errors)
+make test                    # ❌ FAILING (pytest config conflicts, ~20% coverage)
+make validate                # ❌ FAILING (multiple quality issues)
 
 # Specific Status
-Lint Errors: 0              # ✅ All ruff errors resolved
-Type Errors: 0              # ✅ All MyPy strict errors resolved
-Test Coverage: 74.04%       # ❌ Below 90% requirement (target: +16%)
-Tests Passing: 742/744      # ✅ 99.7% test success rate
+Lint Errors: 7              # ❌ ARG002, ANN401 violations in tests
+Type Errors: 147            # ❌ Multiple type safety issues across modules
+Test Coverage: ~20%         # ❌ Significantly below 90% requirement
+Pytest Config: Conflicting  # ❌ Duplicate coverage arguments
 ```
 
 ### Bridge Integration Demo
@@ -284,18 +300,19 @@ python scripts/flext_meltano_bridge.py list_plugins
 
 ### Next Phase Priorities (CURRENT FOCUS)
 
-1. **🎯 CRITICAL: Test Coverage Gap**: Increase from 74.04% to 90% minimum (16% gap)
+1. **🚨 CRITICAL: Quality Gates Completely Failing**: Fix fundamental issues before feature development
 
-   - **Low-coverage modules requiring immediate attention**:
-   - `singer_base.py`: 22% coverage (major gap)
-   - `singer_unified.py`: 45% coverage (needs improvement)
-   - `container.py`: 61% coverage (missing functionality tests)
-   - `core.py`: 55% coverage (core service testing needed)
-   - `exceptions.py`: 55% coverage (exception handling tests)
+   - **Immediate blockers requiring attention**:
+   - Test Coverage: ~20% (need 70% improvement to reach 90%)
+   - MyPy Errors: 147 type errors across 16 files
+   - Pytest Configuration: Conflicting coverage arguments prevent test execution
+   - Lint Issues: 7 errors in test files (ARG002, ANN401)
+   - Module Architecture: 36 source files with complex interdependencies
 
-2. **Architecture Consolidation**: Reduce module complexity while improving coverage
-3. **Bridge Performance**: Optimize Go ↔ Python communication patterns
-4. **Documentation Accuracy**: Update all status claims to reflect actual measurements
+2. **✅ Fix Pytest Configuration**: Resolved conflicting coverage arguments
+3. **Type Safety Overhaul**: Address 147 MyPy errors across core modules
+4. **Test Infrastructure**: Build comprehensive test suite from ~20% to 90% coverage
+5. **Architecture Consolidation**: Simplify 36-module structure while maintaining functionality
 
 ## Integration Patterns & Architecture
 
@@ -435,24 +452,23 @@ PYTHONPATH=$(PWD)/src:$(PYTHONPATH)  # Python path setup for development
 
 ⚠️ **Current Blockers**:
 
-1. **🚨 CRITICAL: Test Coverage Deficit**: 74.04% vs 90% requirement (15.96% gap)
+1. **🚨 CRITICAL: Quality Gates Not Functional**: All quality checks failing
 
-   - **singer_base.py**: 22% coverage - major functionality untested
-   - **singer_unified.py**: 45% coverage - unified interface needs comprehensive tests
-   - **container.py**: 61% coverage - dependency injection container undertested
-   - **core.py**: 55% coverage - core services missing test scenarios
-   - **exceptions.py**: 55% coverage - error handling paths not validated
+   - **Test Coverage**: ~20% vs 90% requirement (70% gap)
+   - **Type Safety**: 147 MyPy errors requiring resolution
+   - **Test Execution**: ✅ Pytest config fixed, can now run tests
+   - **Lint Compliance**: 7 lint errors in test files
 
-2. **Quality Gate Failure**: `make validate` fails due to coverage requirement
-3. **Production Readiness**: Cannot be released until 90% coverage achieved
+2. **Quality Gate Infrastructure**: `make test` now functional, others need quality fixes
+3. **Production Readiness**: Cannot be released until quality gates pass
 4. **Meltano Project**: No `meltano.yml` in repository (initialized on demand)
-5. **Architecture Debt**: Large `__init__.py` with 440+ exports needs consolidation
+5. **Architecture Debt**: 36 modules with complex interdependencies need consolidation
 
 ### Current Architecture Benefits
 
 - **Simplified Structure**: Consolidated from complex hierarchy to flat module organization
 - **Enterprise Integration**: Built on flext-core patterns (FlextResult, dependency injection)
-- **Type Safety**: ✅ MyPy strict mode passing (0 errors)
+- **Type Safety**: ❌ 147 MyPy errors across 16 files
 - **Bridge Pattern**: ✅ Functional Go service integration via `scripts/flext_meltano_bridge.py`
 - **Core Functionality**: ✅ All critical features operational
 

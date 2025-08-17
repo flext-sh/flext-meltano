@@ -57,12 +57,12 @@ if record_result.success:
 schema_result = bridge.flext_singer_create_schema_message(
     stream="customers",
     schema={
-        "type": "object",
-        "properties": {
-            "id": {"type": "integer"},
-            "name": {"type": "string"},
-            "email": {"type": "string"},
-        },
+      "type": "object",
+      "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "email": {"type": "string"},
+      },
     },
     key_properties=["id"],
 )
@@ -95,8 +95,8 @@ catalog = flext_create_singer_catalog()
 result = catalog.flext_singer_add_stream(
     stream_name="customers",
     schema={
-        "type": "object",
-        "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+      "type": "object",
+      "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
     },
     key_properties=["id"],
 )
@@ -117,10 +117,10 @@ bridge = flext_create_singer_bridge()
 # Read messages from stdin
 for message_result in bridge.flext_singer_read_messages(sys.stdin):
     if message_result.success:
-        message = message_result.data
-        print(f"Received {message['type']} message for stream {message.get('stream')}")
+      message = message_result.data
+      print(f"Received {message['type']} message for stream {message.get('stream')}")
     else:
-        print(f"Error reading message: {message_result.error}")
+      print(f"Error reading message: {message_result.error}")
 
 # Validate and write message
 message = {"type": "RECORD", "stream": "test", "record": {"id": 1}}
@@ -153,7 +153,7 @@ else:
 
     output, err := cmd.Output()
     if err != nil {
-        return fmt.Errorf("failed to create Singer record: %w", err)
+      return fmt.Errorf("failed to create Singer record: %w", err)
     }
 
     var message map[string]interface{}
@@ -170,10 +170,10 @@ def bridge_create_singer_message(message_type: str, **kwargs) -> "dict[str, obje
     result = bridge.flext_singer_create_message(message_type, **kwargs)
 
     return {
-        "success": result.success,
-        "message_type": message_type,
-        "message": result.data if result.success else None,
-        "error": result.error_message if result.is_failure else None
+      "success": result.success,
+      "message_type": message_type,
+      "message": result.data if result.success else None,
+      "error": result.error_message if result.is_failure else None
     }
 
 def bridge_process_singer_stream(input_data: list[str]) -> "dict[str, object]":
@@ -183,17 +183,17 @@ def bridge_process_singer_stream(input_data: list[str]) -> "dict[str, object]":
     errors = []
 
     for line in input_data:
-        result = bridge.flext_singer_parse_message_line(line)
-        if result.success:
-            processed_messages.append(result.data)
-        else:
-            errors.append(result.error_message)
+      result = bridge.flext_singer_parse_message_line(line)
+      if result.success:
+          processed_messages.append(result.data)
+      else:
+          errors.append(result.error_message)
 
     return {
-        "success": len(errors) == 0,
-        "messages_processed": len(processed_messages),
-        "messages": processed_messages,
-        "errors": errors
+      "success": len(errors) == 0,
+      "messages_processed": len(processed_messages),
+      "messages": processed_messages,
+      "errors": errors
     }
 ```
 
@@ -257,15 +257,12 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import TYPE_CHECKING, TextIO, cast
+from collections.abc import Iterator
+from typing import TextIO, cast
 
 from flext_core import FlextContainer, FlextResult, get_logger
 
 from flext_meltano.models import FlextSingerCatalog
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-
 
 # ============================================================================
 # PONTE SINGER SDK <-> FLEXT-CORE
@@ -276,236 +273,236 @@ class FlextSingerBridge:
     """Intelligent bridge between Singer SDK and flext-core with composition patterns."""
 
     def __init__(self) -> None:
-        """Initialize Singer bridge using flext-core patterns."""
-        self._logger = get_logger(self.__class__.__name__)
+      """Initialize Singer bridge using flext-core patterns."""
+      self._logger = get_logger(self.__class__.__name__)
 
-        # Use flext-core container for intelligent composition
-        self._container = FlextContainer()
-        self._container.register("logger", self._logger)
-        # Mapping of message creators for backward-compatibility checks in tests
-        self._message_types: dict[str, str] = {
-            "RECORD": "record",
-            "SCHEMA": "schema",
-            "STATE": "state",
-        }
+      # Use flext-core container for intelligent composition
+      self._container = FlextContainer()
+      self._container.register("logger", self._logger)
+      # Mapping of message creators for backward-compatibility checks in tests
+      self._message_types: dict[str, str] = {
+          "RECORD": "record",
+          "SCHEMA": "schema",
+          "STATE": "state",
+      }
 
     def flext_singer_create_message(
-        self,
-        message_type: str,
-        **kwargs: object,
+      self,
+      message_type: str,
+      **kwargs: object,
     ) -> FlextResult[dict[str, object]]:
-        """Create Singer message using intelligent composition - universal method."""
-        try:
-            result: FlextResult[dict[str, object]] | None = None
-            # Route based on message type (reduced returns for lint compliance)
-            if message_type == "RECORD":
-                stream = kwargs.get("stream")
-                record = kwargs.get("record")
-                time_extracted = kwargs.get("time_extracted")
-                if isinstance(stream, str) and isinstance(record, dict):
-                    result = self._create_record_message(
-                        stream=stream,
-                        record=cast("dict[str, object]", record),
-                        time_extracted=cast("str | None", time_extracted)
-                        if isinstance(time_extracted, str)
-                        else None,
-                    )
-                else:
-                    result = FlextResult(error="Invalid stream name or record format")
-            elif message_type == "SCHEMA":
-                stream = kwargs.get("stream")
-                schema = kwargs.get("schema")
-                key_properties = kwargs.get("key_properties")
-                if isinstance(stream, str) and isinstance(schema, dict):
-                    result = self._create_schema_message(
-                        stream=stream,
-                        schema=cast("dict[str, object]", schema),
-                        key_properties=cast("list[str] | None", key_properties)
-                        if isinstance(key_properties, list)
-                        else None,
-                    )
-                else:
-                    result = FlextResult(error="Invalid arguments for SCHEMA message")
-            elif message_type == "STATE":
-                value = kwargs.get("value")
-                if isinstance(value, dict):
-                    result = self._create_state_message(
-                        value=cast("dict[str, object]", value),
-                    )
-                else:
-                    result = FlextResult(error="Invalid arguments for STATE message")
-            else:
-                result = FlextResult(error=f"Unknown message type: {message_type}")
+      """Create Singer message using intelligent composition - universal method."""
+      try:
+          result: FlextResult[dict[str, object]] | None = None
+          # Route based on message type (reduced returns for lint compliance)
+          if message_type == "RECORD":
+              stream = kwargs.get("stream")
+              record = kwargs.get("record")
+              time_extracted = kwargs.get("time_extracted")
+              if isinstance(stream, str) and isinstance(record, dict):
+                  result = self._create_record_message(
+                      stream=stream,
+                      record=cast("dict[str, object]", record),
+                      time_extracted=cast("str | None", time_extracted)
+                      if isinstance(time_extracted, str)
+                      else None,
+                  )
+              else:
+                  result = FlextResult(error="Invalid stream name or record format")
+          elif message_type == "SCHEMA":
+              stream = kwargs.get("stream")
+              schema = kwargs.get("schema")
+              key_properties = kwargs.get("key_properties")
+              if isinstance(stream, str) and isinstance(schema, dict):
+                  result = self._create_schema_message(
+                      stream=stream,
+                      schema=cast("dict[str, object]", schema),
+                      key_properties=cast("list[str] | None", key_properties)
+                      if isinstance(key_properties, list)
+                      else None,
+                  )
+              else:
+                  result = FlextResult(error="Invalid arguments for SCHEMA message")
+          elif message_type == "STATE":
+              value = kwargs.get("value")
+              if isinstance(value, dict):
+                  result = self._create_state_message(
+                      value=cast("dict[str, object]", value),
+                  )
+              else:
+                  result = FlextResult(error="Invalid arguments for STATE message")
+          else:
+              result = FlextResult(error=f"Unknown message type: {message_type}")
 
-            return result
+          return result
 
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Failed to create Singer message: {e}")
+      except (ValueError, TypeError, KeyError) as e:
+          return FlextResult(error=f"Failed to create Singer message: {e}")
 
     def _create_record_message(
-        self,
-        stream: str,
-        record: dict[str, object],
-        time_extracted: str | None = None,
+      self,
+      stream: str,
+      record: dict[str, object],
+      time_extracted: str | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Create record message internally."""
-        if not stream or not isinstance(record, dict):
-            return FlextResult(error="Invalid stream name or record format")
+      """Create record message internally."""
+      if not stream or not isinstance(record, dict):
+          return FlextResult(error="Invalid stream name or record format")
 
-        message: dict[str, object] = {
-            "type": "RECORD",
-            "stream": stream,
-            "record": record,
-        }
-        if time_extracted:
-            message["time_extracted"] = time_extracted
+      message: dict[str, object] = {
+          "type": "RECORD",
+          "stream": stream,
+          "record": record,
+      }
+      if time_extracted:
+          message["time_extracted"] = time_extracted
 
-        return FlextResult(data=message)
+      return FlextResult(data=message)
 
     def _create_schema_message(
-        self,
-        stream: str,
-        schema: dict[str, object],
-        key_properties: list[str] | None = None,
+      self,
+      stream: str,
+      schema: dict[str, object],
+      key_properties: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Create schema message internally."""
-        if not stream or not isinstance(schema, dict):
-            return FlextResult(error="Invalid stream name or schema format")
+      """Create schema message internally."""
+      if not stream or not isinstance(schema, dict):
+          return FlextResult(error="Invalid stream name or schema format")
 
-        message: dict[str, object] = {
-            "type": "SCHEMA",
-            "stream": stream,
-            "schema": schema,
-            "key_properties": key_properties or [],
-        }
+      message: dict[str, object] = {
+          "type": "SCHEMA",
+          "stream": stream,
+          "schema": schema,
+          "key_properties": key_properties or [],
+      }
 
-        return FlextResult(data=message)
+      return FlextResult(data=message)
 
     def _create_state_message(
-        self,
-        value: dict[str, object],
+      self,
+      value: dict[str, object],
     ) -> FlextResult[dict[str, object]]:
-        """Create state message internally."""
-        message: dict[str, object] = {"type": "STATE", "value": value}
-        return FlextResult(data=message)
+      """Create state message internally."""
+      message: dict[str, object] = {"type": "STATE", "value": value}
+      return FlextResult(data=message)
 
     # Maintains specific methods for compatibility but uses composition
     def flext_singer_create_record_message(
-        self,
-        stream: str,
-        record: dict[str, object],
-        time_extracted: str | None = None,
+      self,
+      stream: str,
+      record: dict[str, object],
+      time_extracted: str | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Create Singer RECORD message - uses composition."""
-        return self._create_record_message(
-            stream=stream,
-            record=record,
-            time_extracted=time_extracted,
-        )
+      """Create Singer RECORD message - uses composition."""
+      return self._create_record_message(
+          stream=stream,
+          record=record,
+          time_extracted=time_extracted,
+      )
 
     def flext_singer_create_schema_message(
-        self,
-        stream: str,
-        schema: dict[str, object],
-        key_properties: list[str] | None = None,
+      self,
+      stream: str,
+      schema: dict[str, object],
+      key_properties: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Create Singer SCHEMA message - uses composition."""
-        return self._create_schema_message(
-            stream=stream,
-            schema=schema,
-            key_properties=key_properties,
-        )
+      """Create Singer SCHEMA message - uses composition."""
+      return self._create_schema_message(
+          stream=stream,
+          schema=schema,
+          key_properties=key_properties,
+      )
 
     def flext_singer_create_state_message(
-        self,
-        value: dict[str, object],
+      self,
+      value: dict[str, object],
     ) -> FlextResult[dict[str, object]]:
-        """Create Singer STATE message - uses composition."""
-        return self._create_state_message(value=value)
+      """Create Singer STATE message - uses composition."""
+      return self._create_state_message(value=value)
 
     def flext_singer_parse_message_line(
-        self,
-        line: str,
+      self,
+      line: str,
     ) -> FlextResult[dict[str, object]]:
-        """Parse Singer message line using flext-core patterns."""
-        try:
-            line = line.strip()
-            if not line:
-                return FlextResult(error="Empty message line")
+      """Parse Singer message line using flext-core patterns."""
+      try:
+          line = line.strip()
+          if not line:
+              return FlextResult(error="Empty message line")
 
-            message = json.loads(line)
+          message = json.loads(line)
 
-            if not isinstance(message, dict) or "type" not in message:
-                return FlextResult(error="Invalid Singer message format")
+          if not isinstance(message, dict) or "type" not in message:
+              return FlextResult(error="Invalid Singer message format")
 
-            return FlextResult(data=message)
+          return FlextResult(data=message)
 
-        except json.JSONDecodeError as e:
-            return FlextResult(error=f"Invalid JSON in Singer message: {e}")
-        except (ValueError, TypeError) as e:
-            return FlextResult(error=f"Failed to parse Singer message: {e}")
+      except json.JSONDecodeError as e:
+          return FlextResult(error=f"Invalid JSON in Singer message: {e}")
+      except (ValueError, TypeError) as e:
+          return FlextResult(error=f"Failed to parse Singer message: {e}")
 
     def flext_singer_validate_message(
-        self,
-        message: object,
+      self,
+      message: object,
     ) -> FlextResult[str]:
-        """Validate Singer message format using flext-core patterns."""
-        try:
-            if not isinstance(message, dict):
-                return FlextResult(error="Message must be a dictionary")
+      """Validate Singer message format using flext-core patterns."""
+      try:
+          if not isinstance(message, dict):
+              return FlextResult(error="Message must be a dictionary")
 
-            msg_type = message.get("type")
-            if not msg_type:
-                return FlextResult(error="Message must have 'type' field")
+          msg_type = message.get("type")
+          if not msg_type:
+              return FlextResult(error="Message must have 'type' field")
 
-            if msg_type == "RECORD":
-                required_fields = ["stream", "record"]
-            elif msg_type == "SCHEMA":
-                required_fields = ["stream", "schema"]
-            elif msg_type == "STATE":
-                required_fields = ["value"]
-            else:
-                return FlextResult(error=f"Unknown message type: {msg_type}")
+          if msg_type == "RECORD":
+              required_fields = ["stream", "record"]
+          elif msg_type == "SCHEMA":
+              required_fields = ["stream", "schema"]
+          elif msg_type == "STATE":
+              required_fields = ["value"]
+          else:
+              return FlextResult(error=f"Unknown message type: {msg_type}")
 
-            for field in required_fields:
-                if field not in message:
-                    return FlextResult(error=f"Missing required field: {field}")
+          for field in required_fields:
+              if field not in message:
+                  return FlextResult(error=f"Missing required field: {field}")
 
-            return FlextResult(data=msg_type)
+          return FlextResult(data=msg_type)
 
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Failed to validate Singer message: {e}")
+      except (ValueError, TypeError, KeyError) as e:
+          return FlextResult(error=f"Failed to validate Singer message: {e}")
 
     def flext_singer_write_message(
-        self,
-        message: dict[str, object],
+      self,
+      message: dict[str, object],
     ) -> FlextResult[None]:
-        """Write Singer message to stdout using flext-core patterns."""
-        try:
-            validation_result = self.flext_singer_validate_message(message)
-            if not validation_result.success:
-                return FlextResult(error=f"Invalid message: {validation_result.error}")
+      """Write Singer message to stdout using flext-core patterns."""
+      try:
+          validation_result = self.flext_singer_validate_message(message)
+          if not validation_result.success:
+              return FlextResult(error=f"Invalid message: {validation_result.error}")
 
-            json.dumps(message, separators=(",", ":"))
-            sys.stdout.flush()
+          json.dumps(message, separators=(",", ":"))
+          sys.stdout.flush()
 
-            return FlextResult(data=None)
+          return FlextResult(data=None)
 
-        except (OSError, ValueError) as e:
-            return FlextResult(error=f"Failed to write Singer message: {e}")
+      except (OSError, ValueError) as e:
+          return FlextResult(error=f"Failed to write Singer message: {e}")
 
     def flext_singer_read_messages(
-        self,
-        input_stream: TextIO | None = None,
+      self,
+      input_stream: TextIO | None = None,
     ) -> Iterator[FlextResult[dict[str, object]]]:
-        """Read Singer messages from input stream using flext-core patterns."""
-        stream = input_stream or sys.stdin
+      """Read Singer messages from input stream using flext-core patterns."""
+      stream = input_stream or sys.stdin
 
-        try:
-            for line in stream:
-                yield self.flext_singer_parse_message_line(line)
-        except (OSError, ValueError) as e:
-            yield FlextResult(error=f"Failed to read Singer messages: {e}")
+      try:
+          for line in stream:
+              yield self.flext_singer_parse_message_line(line)
+      except (OSError, ValueError) as e:
+          yield FlextResult(error=f"Failed to read Singer messages: {e}")
 
 
 # ============================================================================
@@ -527,7 +524,7 @@ def flext_create_singer_catalog(
     """
     # Initialize catalog with provided streams if any
     if initial_data and isinstance(initial_data, dict) and "streams" in initial_data:
-        return FlextSingerCatalog({"streams": initial_data.get("streams", [])})
+      return FlextSingerCatalog({"streams": initial_data.get("streams", [])})
     return FlextSingerCatalog()
 
 

@@ -67,8 +67,8 @@ def example_basic_configuration() -> None:
     """Demonstrate basic configuration setup."""
     # Create basic configuration
     FlextMeltanoConfig(
-        project_root="./my_meltano_project",
-        environment="dev",
+      project_root="./my_meltano_project",
+      environment="dev",
     )
 
 
@@ -79,19 +79,19 @@ def example_service_creation() -> None:
     # Create services using factory functions
     executor_result = create_executor(config)
     if executor_result.success:
-        pass
+      pass
 
     discoverer_result = create_discoverer(config)
     if discoverer_result.success:
-        pass
+      pass
 
     installer_result = create_installer_service(config)
     if installer_result.success:
-        pass
+      pass
 
     validation_result = create_validation_service(config)
     if validation_result.success:
-        pass
+      pass
 
 
 def example_health_checks() -> None:
@@ -100,16 +100,16 @@ def example_health_checks() -> None:
 
     # Check health of all services
     services = [
-        ("Executor", FlextMeltanoExecutor(config)),
-        ("Discoverer", FlextMeltanoDiscoverer(config)),
-        ("Installer", FlextMeltanoInstaller(config)),
-        ("Validator", FlextMeltanoValidationService(config)),
+      ("Executor", FlextMeltanoExecutor(config)),
+      ("Discoverer", FlextMeltanoDiscoverer(config)),
+      ("Installer", FlextMeltanoInstaller(config)),
+      ("Validator", FlextMeltanoValidationService(config)),
     ]
 
     for _name, service in services:
-        health_result = service.get_health_status()
-        if health_result.success:
-            pass
+      health_result = service.get_health_status()
+      if health_result.success:
+          pass
 
 
 def example_plugin_discovery() -> None:
@@ -123,20 +123,20 @@ def example_plugin_discovery() -> None:
     # Discover all plugins
     result = discoverer.discover_plugins()
     if result.success:
-        plugins = result.data
+      plugins = result.data
 
-        for _plugin in plugins[:max_plugins_to_show]:  # Show first 5
-            pass
+      for _plugin in plugins[:max_plugins_to_show]:  # Show first 5
+          pass
 
-        if len(plugins) > max_plugins_to_show:
-            pass
+      if len(plugins) > max_plugins_to_show:
+          pass
 
     # Discover extractors only
     extractors_result = discoverer.discover_plugins("extractors")
     if extractors_result.success:
-        extractors = extractors_result.data
-        for _extractor in extractors[:3]:  # Show first 3
-            pass
+      extractors = extractors_result.data
+      for _extractor in extractors[:3]:  # Show first 3
+          pass
 
 
 def example_project_validation() -> None:
@@ -147,15 +147,15 @@ def example_project_validation() -> None:
     # Validate project
     result = validator.validate_project()
     if result.success:
-        validation_result = result.data
+      validation_result = result.data
 
-        if validation_result.issues:
-            for _issue in validation_result.issues:
-                pass
+      if validation_result.issues:
+          for _issue in validation_result.issues:
+              pass
 
-        if validation_result.warnings:
-            for _warning in validation_result.warnings:
-                pass
+      if validation_result.warnings:
+          for _warning in validation_result.warnings:
+              pass
 
 
 def example_legacy_compatibility() -> None:
@@ -164,13 +164,13 @@ def example_legacy_compatibility() -> None:
 
     # Use legacy plugin discovery (with deprecation warning)
     try:
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            flext_meltano_discover_plugins()
-            if w:
-                pass
+      with warnings.catch_warnings(record=True) as w:
+          warnings.simplefilter("always")
+          flext_meltano_discover_plugins()
+          if w:
+              pass
     except (RuntimeError, ValueError, TypeError):
-        pass
+      pass
 
 
 def example_singer_sdk_integration() -> None:
@@ -179,12 +179,12 @@ def example_singer_sdk_integration() -> None:
 
     # Create a basic schema using Singer SDK types
     if singer_typing and Property and PropertiesList:
-        PropertiesList(
-            Property("id", singer_typing.StringType),
-            Property("name", singer_typing.StringType),
-            Property("created_at", singer_typing.DateTimeType),
-            Property("active", singer_typing.BooleanType),
-        )
+      PropertiesList(
+          Property("id", singer_typing.StringType),
+          Property("name", singer_typing.StringType),
+          Property("created_at", singer_typing.DateTimeType),
+          Property("active", singer_typing.BooleanType),
+      )
 
 
 def example_dbt_integration() -> None:
@@ -197,23 +197,23 @@ def example_dbt_integration() -> None:
     # Create DBT service
     dbt_result = create_meltano_dbt_service(config)
     if dbt_result.success:
-        pass
+      pass
 
 
 def main() -> None:
     """Run all examples."""
     try:
-        example_basic_configuration()
-        example_service_creation()
-        example_health_checks()
-        example_plugin_discovery()
-        example_project_validation()
-        example_legacy_compatibility()
-        example_singer_sdk_integration()
-        example_dbt_integration()
+      example_basic_configuration()
+      example_service_creation()
+      example_health_checks()
+      example_plugin_discovery()
+      example_project_validation()
+      example_legacy_compatibility()
+      example_singer_sdk_integration()
+      example_dbt_integration()
 
     except (RuntimeError, ValueError, TypeError):
-        traceback.print_exc()
+      traceback.print_exc()
 
 
 if __name__ == "__main__":

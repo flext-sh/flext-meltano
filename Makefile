@@ -96,7 +96,7 @@ fix: ## Auto-fix issues
 
 .PHONY: test
 test: ## Run tests with coverage
-	$(POETRY) run pytest $(TESTS_DIR) --cov=$(COV_DIR) --cov-report=term-missing --cov-fail-under=$(MIN_COVERAGE)
+	$(POETRY) run pytest $(TESTS_DIR) --cov=src/flext_meltano --cov-report=term-missing --cov-fail-under=$(MIN_COVERAGE)
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
@@ -116,7 +116,7 @@ test-fast: ## Run tests without coverage
 
 .PHONY: coverage-html
 coverage-html: ## Generate HTML coverage report
-	$(POETRY) run pytest $(TESTS_DIR) --cov=$(COV_DIR) --cov-report=html
+	$(POETRY) run pytest $(TESTS_DIR) --cov-report=html
 
 # =============================================================================
 # BUILD & DISTRIBUTION

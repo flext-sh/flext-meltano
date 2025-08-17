@@ -47,8 +47,8 @@ class MeltanoResultStatus:
 def example_constants_usage() -> None:
     """Exemplo de uso das constantes do FlextMeltanoConstants."""  # 1. Demonstrar uso real com FlextMeltanoConfig
     FlextMeltanoConfig(
-        project_root="./demo_project",
-        environment=MeltanoEnvironment.DEV,
+      project_root="./demo_project",
+      environment=MeltanoEnvironment.DEV,
     )
 
     # 2. Demonstrar patterns de status
@@ -64,21 +64,21 @@ def example_environment_usage() -> None:
 
     # Comparação real com output
     if env == MeltanoEnvironment.DEV:
-        pass
+      pass
 
     if log_level == MeltanoLogLevel.INFO:
-        pass
+      pass
 
     if status == MeltanoResultStatus.SUCCESS:
-        pass
+      pass
 
     # Demonstrar diferentes environments
     for env_name in [
-        MeltanoEnvironment.DEV,
-        MeltanoEnvironment.STAGING,
-        MeltanoEnvironment.PROD,
+      MeltanoEnvironment.DEV,
+      MeltanoEnvironment.STAGING,
+      MeltanoEnvironment.PROD,
     ]:
-        FlextMeltanoConfig(project_root="./demo", environment=env_name)
+      FlextMeltanoConfig(project_root="./demo", environment=env_name)
 
 
 if __name__ == "__main__":

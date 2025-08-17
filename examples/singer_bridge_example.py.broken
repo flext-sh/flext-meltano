@@ -19,8 +19,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from flext_core import TAnyObject
+     from flext_core import TAnyObject
 
 from flext_core import FlextResult, get_logger
 
@@ -42,8 +41,7 @@ from flext_meltano import (
 )
 from flext_meltano._base import Stream
 
-if TYPE_CHECKING:
-    from collections.abc import Iterator
+     from collections.abc import Iterator
 
 logger = get_logger(__name__)
 

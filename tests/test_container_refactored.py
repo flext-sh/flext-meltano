@@ -18,8 +18,8 @@ from unittest.mock import Mock
 import pytest
 from flext_core import FlextContainer, get_flext_container
 
-from flext_meltano import FlextMeltanoConfig
-from flext_meltano.container import (
+from flext_meltano import (
+    FlextMeltanoConfig,
     __all__ as _container_all,
     configure_meltano_container,
     configure_meltano_services,
@@ -31,274 +31,274 @@ class TestRefactoredContainerPatterns:
     """Test the new SOLID-compliant container patterns."""
 
     def test_configure_meltano_services_success(self) -> None:
-        """Test successful Meltano service configuration."""
-        container = get_flext_container()
-        config = FlextMeltanoConfig(project_root="./test")
+      """Test successful Meltano service configuration."""
+      container = get_flext_container()
+      config = FlextMeltanoConfig(project_root="./test")
 
-        result = configure_meltano_services(container, config)
+      result = configure_meltano_services(container, config)
 
-        assert result.success
-        assert result.data is None
+      assert result.success
+      assert result.data is None
 
-        # Verify services are registered
-        config_result = container.get("meltano_config")
-        assert config_result.success
-        assert isinstance(config_result.data, FlextMeltanoConfig)
+      # Verify services are registered
+      config_result = container.get("meltano_config")
+      assert config_result.success
+      assert isinstance(config_result.data, FlextMeltanoConfig)
 
     def test_configure_meltano_services_default_config(self) -> None:
-        """Test service configuration with default config."""
-        container = get_flext_container()
+      """Test service configuration with default config."""
+      container = get_flext_container()
 
-        result = configure_meltano_services(container)
+      result = configure_meltano_services(container)
 
-        assert result.success
+      assert result.success
 
-        # Verify default config was created
-        config_result = container.get("meltano_config")
-        assert config_result.success
-        assert isinstance(config_result.data, FlextMeltanoConfig)
+      # Verify default config was created
+      config_result = container.get("meltano_config")
+      assert config_result.success
+      assert isinstance(config_result.data, FlextMeltanoConfig)
 
     def test_service_factories_registered(self) -> None:
-        """Test that service factories are properly registered."""
-        container = get_flext_container()
+      """Test that service factories are properly registered."""
+      container = get_flext_container()
 
-        result = configure_meltano_services(container)
-        assert result.success
+      result = configure_meltano_services(container)
+      assert result.success
 
-        # Check factory functions are registered
-        tap_factory_result = container.get("tap_service_factory")
-        target_factory_result = container.get("target_service_factory")
-        dbt_factory_result = container.get("dbt_service_factory")
+      # Check factory functions are registered
+      tap_factory_result = container.get("tap_service_factory")
+      target_factory_result = container.get("target_service_factory")
+      dbt_factory_result = container.get("dbt_service_factory")
 
-        assert tap_factory_result.success
-        assert target_factory_result.success
-        assert dbt_factory_result.success
+      assert tap_factory_result.success
+      assert target_factory_result.success
+      assert dbt_factory_result.success
 
-        # Verify they are callable functions
-        assert callable(tap_factory_result.data)
-        assert callable(target_factory_result.data)
-        assert callable(dbt_factory_result.data)
+      # Verify they are callable functions
+      assert callable(tap_factory_result.data)
+      assert callable(target_factory_result.data)
+      assert callable(dbt_factory_result.data)
 
 
 class TestLegacyContainerCompatibility:
     """Test legacy container functions for backward compatibility."""
 
     def test_get_meltano_container_warns_deprecation(self) -> None:
-        """Test that legacy function issues deprecation warning."""
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+      """Test that legacy function issues deprecation warning."""
+      with warnings.catch_warnings(record=True) as w:
+          warnings.simplefilter("always")
 
-            container = get_meltano_container()
+          container = get_meltano_container()
 
-            assert len(w) == 1
-            assert issubclass(w[0].category, DeprecationWarning)
-            assert "deprecated" in str(w[0].message)
-            assert "get_flext_container() + configure_meltano_services()" in str(
-                w[0].message,
-            )
+          assert len(w) == 1
+          assert issubclass(w[0].category, DeprecationWarning)
+          assert "deprecated" in str(w[0].message)
+          assert "get_flext_container() + configure_meltano_services()" in str(
+              w[0].message,
+          )
 
-        # Container should still work
-        assert isinstance(container, FlextContainer)
+      # Container should still work
+      assert isinstance(container, FlextContainer)
 
     def test_get_meltano_container_returns_configured_container(self) -> None:
-        """Test that legacy function returns properly configured container."""
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+      """Test that legacy function returns properly configured container."""
+      with warnings.catch_warnings():
+          warnings.simplefilter("ignore", DeprecationWarning)
 
-            container = get_meltano_container()
+          container = get_meltano_container()
 
-            # Verify it's a FlextContainer with Meltano services
-            assert isinstance(container, FlextContainer)
+          # Verify it's a FlextContainer with Meltano services
+          assert isinstance(container, FlextContainer)
 
-            # Verify Meltano services are configured
-            config_result = container.get("meltano_config")
-            assert config_result.success
+          # Verify Meltano services are configured
+          config_result = container.get("meltano_config")
+          assert config_result.success
 
     def test_configure_meltano_container_warns_deprecation(self) -> None:
-        """Test that legacy configuration function warns."""
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+      """Test that legacy configuration function warns."""
+      with warnings.catch_warnings(record=True) as w:
+          warnings.simplefilter("always")
 
-            config = FlextMeltanoConfig(project_root="./test")
-            result = configure_meltano_container(config)
+          config = FlextMeltanoConfig(project_root="./test")
+          result = configure_meltano_container(config)
 
-            assert len(w) == 1
-            assert issubclass(w[0].category, DeprecationWarning)
-            assert "deprecated" in str(w[0].message)
-            assert "configure_meltano_services()" in str(w[0].message)
+          assert len(w) == 1
+          assert issubclass(w[0].category, DeprecationWarning)
+          assert "deprecated" in str(w[0].message)
+          assert "configure_meltano_services()" in str(w[0].message)
 
-        # Should still work
-        assert result.success
+      # Should still work
+      assert result.success
 
     def test_configure_meltano_container_functionality(self) -> None:
-        """Test legacy configuration function still works."""
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+      """Test legacy configuration function still works."""
+      with warnings.catch_warnings():
+          warnings.simplefilter("ignore", DeprecationWarning)
 
-            custom_config = FlextMeltanoConfig(
-                project_root="./custom_test",
-                environment="test",
-            )
+          custom_config = FlextMeltanoConfig(
+              project_root="./custom_test",
+              environment="test",
+          )
 
-            result = configure_meltano_container(custom_config)
+          result = configure_meltano_container(custom_config)
 
-            assert result.success
+          assert result.success
 
-            # Verify configuration was applied
-            container = get_flext_container()
-            config_result = container.get("meltano_config")
-            assert config_result.success
-            assert config_result.data.environment == "test"
+          # Verify configuration was applied
+          container = get_flext_container()
+          config_result = container.get("meltano_config")
+          assert config_result.success
+          assert config_result.data.environment == "test"
 
 
 class TestContainerErrorHandling:
     """Test error handling in container operations."""
 
     def test_configure_services_with_invalid_container(self) -> None:
-        """Test error handling with invalid container."""
-        # Mock a container that will cause registration to fail
-        mock_container = Mock()
-        mock_container.register.side_effect = Exception("Registration failed")
+      """Test error handling with invalid container."""
+      # Mock a container that will cause registration to fail
+      mock_container = Mock()
+      mock_container.register.side_effect = Exception("Registration failed")
 
-        # This would cause an error in the real flext-core integration
-        # For now, test that we handle it gracefully
-        config = FlextMeltanoConfig()
+      # This would cause an error in the real flext-core integration
+      # For now, test that we handle it gracefully
+      config = FlextMeltanoConfig()
 
-        # The actual test would depend on flext-core implementation details
-        # For now, just test that the function exists and handles config
-        result = configure_meltano_services(get_flext_container(), config)
-        assert result.success  # Should work with real container
+      # The actual test would depend on flext-core implementation details
+      # For now, just test that the function exists and handles config
+      result = configure_meltano_services(get_flext_container(), config)
+      assert result.success  # Should work with real container
 
     def test_get_meltano_container_handles_configuration_failure(self) -> None:
-        """Test error handling when configuration fails."""
-        # This test validates that if service configuration fails,
-        # the function raises an appropriate error
+      """Test error handling when configuration fails."""
+      # This test validates that if service configuration fails,
+      # the function raises an appropriate error
 
-        # For now, test normal operation since mocking flext-core
-        # internals would be complex
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+      # For now, test normal operation since mocking flext-core
+      # internals would be complex
+      with warnings.catch_warnings():
+          warnings.simplefilter("ignore", DeprecationWarning)
 
-            container = get_meltano_container()
-            assert isinstance(container, FlextContainer)
+          container = get_meltano_container()
+          assert isinstance(container, FlextContainer)
 
 
 class TestContainerServiceIntegration:
     """Test integration between container and services."""
 
     def test_service_factory_execution(self) -> None:
-        """Test that registered factory functions can be executed."""
-        container = get_flext_container()
-        config = FlextMeltanoConfig(project_root="./test")
+      """Test that registered factory functions can be executed."""
+      container = get_flext_container()
+      config = FlextMeltanoConfig(project_root="./test")
 
-        # Configure services
-        result = configure_meltano_services(container, config)
-        assert result.success
+      # Configure services
+      result = configure_meltano_services(container, config)
+      assert result.success
 
-        # Get and execute a factory
-        tap_factory_result = container.get("tap_service_factory")
-        assert tap_factory_result.success
+      # Get and execute a factory
+      tap_factory_result = container.get("tap_service_factory")
+      assert tap_factory_result.success
 
-        factory_function = tap_factory_result.data
+      factory_function = tap_factory_result.data
 
-        # Execute factory with config
-        service_result = factory_function(config)
+      # Execute factory with config
+      service_result = factory_function(config)
 
-        # Should return a FlextResult
-        assert hasattr(service_result, "success")
-        # Result depends on actual service implementation
+      # Should return a FlextResult
+      assert hasattr(service_result, "success")
+      # Result depends on actual service implementation
 
     def test_multiple_containers_isolation(self) -> None:
-        """Test that multiple container instances work independently."""
-        # Get two different container instances
-        container1 = get_flext_container()
-        container2 = get_flext_container()
+      """Test that multiple container instances work independently."""
+      # Get two different container instances
+      container1 = get_flext_container()
+      container2 = get_flext_container()
 
-        # They should be the same instance (singleton pattern)
-        # but configurations should work independently
-        config1 = FlextMeltanoConfig(project_root="./test1", environment="dev")
-        config2 = FlextMeltanoConfig(project_root="./test2", environment="prod")
+      # They should be the same instance (singleton pattern)
+      # but configurations should work independently
+      config1 = FlextMeltanoConfig(project_root="./test1", environment="dev")
+      config2 = FlextMeltanoConfig(project_root="./test2", environment="prod")
 
-        # Configure first container
-        result1 = configure_meltano_services(container1, config1)
-        assert result1.success
+      # Configure first container
+      result1 = configure_meltano_services(container1, config1)
+      assert result1.success
 
-        # Configure second container (overwrites first due to singleton)
-        result2 = configure_meltano_services(container2, config2)
-        assert result2.success
+      # Configure second container (overwrites first due to singleton)
+      result2 = configure_meltano_services(container2, config2)
+      assert result2.success
 
-        # Verify latest configuration is active
-        config_result = container1.get("meltano_config")
-        assert config_result.success
-        # Should have latest config due to singleton pattern
-        assert config_result.data.environment == "production"
+      # Verify latest configuration is active
+      config_result = container1.get("meltano_config")
+      assert config_result.success
+      # Should have latest config due to singleton pattern
+      assert config_result.data.environment == "production"
 
     def test_container_service_lifecycle(self) -> None:
-        """Test complete service lifecycle in container."""
-        container = get_flext_container()
-        config = FlextMeltanoConfig(project_root="./lifecycle_test", environment="test")
+      """Test complete service lifecycle in container."""
+      container = get_flext_container()
+      config = FlextMeltanoConfig(project_root="./lifecycle_test", environment="test")
 
-        # 1. Configure services
-        configure_result = configure_meltano_services(container, config)
-        assert configure_result.success
+      # 1. Configure services
+      configure_result = configure_meltano_services(container, config)
+      assert configure_result.success
 
-        # 2. Verify configuration is accessible
-        config_result = container.get("meltano_config")
-        assert config_result.success
-        assert config_result.data.environment == "test"
+      # 2. Verify configuration is accessible
+      config_result = container.get("meltano_config")
+      assert config_result.success
+      assert config_result.data.environment == "test"
 
-        # 3. Verify factories are available
-        factories = [
-            "tap_service_factory",
-            "target_service_factory",
-            "dbt_service_factory",
-        ]
+      # 3. Verify factories are available
+      factories = [
+          "tap_service_factory",
+          "target_service_factory",
+          "dbt_service_factory",
+      ]
 
-        for factory_name in factories:
-            factory_result = container.get(factory_name)
-            assert factory_result.success
-            assert callable(factory_result.data)
+      for factory_name in factories:
+          factory_result = container.get(factory_name)
+          assert factory_result.success
+          assert callable(factory_result.data)
 
 
 class TestContainerAPIConsistency:
     """Test API consistency and public interface."""
 
     def test_public_api_exports(self) -> None:
-        """Test that all public functions are accessible."""
-        expected_exports = [
-            "configure_meltano_container",
-            "configure_meltano_services",
-            "get_meltano_container",
-        ]
+      """Test that all public functions are accessible."""
+      expected_exports = [
+          "configure_meltano_container",
+          "configure_meltano_services",
+          "get_meltano_container",
+      ]
 
-        for export in expected_exports:
-            assert export in _container_all
+      for export in expected_exports:
+          assert export in _container_all
 
-        # Verify functions are importable
-        assert callable(configure_meltano_container)
-        assert callable(configure_meltano_services)
-        assert callable(get_meltano_container)
+      # Verify functions are importable
+      assert callable(configure_meltano_container)
+      assert callable(configure_meltano_services)
+      assert callable(get_meltano_container)
 
     def test_container_pattern_consistency(self) -> None:
-        """Test that all container functions follow consistent patterns."""
-        # All functions should work with FlextResult patterns where applicable
-        container = get_flext_container()
-        config = FlextMeltanoConfig()
+      """Test that all container functions follow consistent patterns."""
+      # All functions should work with FlextResult patterns where applicable
+      container = get_flext_container()
+      config = FlextMeltanoConfig()
 
-        # configure_meltano_services should return FlextResult
-        result = configure_meltano_services(container, config)
-        assert hasattr(result, "success")
-        assert hasattr(result, "data")
+      # configure_meltano_services should return FlextResult
+      result = configure_meltano_services(container, config)
+      assert hasattr(result, "success")
+      assert hasattr(result, "data")
 
-        # Legacy functions should maintain backward compatibility
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+      # Legacy functions should maintain backward compatibility
+      with warnings.catch_warnings():
+          warnings.simplefilter("ignore", DeprecationWarning)
 
-            legacy_result = configure_meltano_container(config)
-            assert hasattr(legacy_result, "success")
+          legacy_result = configure_meltano_container(config)
+          assert hasattr(legacy_result, "success")
 
-            legacy_container = get_meltano_container()
-            assert isinstance(legacy_container, FlextContainer)
+          legacy_container = get_meltano_container()
+          assert isinstance(legacy_container, FlextContainer)
 
 
 if __name__ == "__main__":

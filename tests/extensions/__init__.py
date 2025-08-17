@@ -1,3 +1,4 @@
-"""init   module.
-This module is part of the FLEXT ecosystem. Docstrings follow PEP 257 and Google style.
+"""Test package for flext-meltano extensions.
+
+This package contains tests for extension functionality.
 """

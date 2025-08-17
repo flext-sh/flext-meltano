@@ -23,25 +23,25 @@ def example_real_pipeline_builder() -> None:
     """Example using REAL FLEXT Meltano bridge with actual functionality."""
     # Create configuration with REAL API
     config = FlextMeltanoConfig(
-        project_root="./meltano_project",
-        environment="dev",
+      project_root="./meltano_project",
+      environment="dev",
     )
 
     # Create bridge using ACTUAL existing function
     bridge_result = create_flext_meltano_bridge(config)
     if not bridge_result.success:
-        return
+      return
 
     # Execute actual pipeline using REAL API
     pipeline_result = flext_meltano_execute_job("tap-postgres", "target-jsonl")
     if pipeline_result.success:  # Note: FlextMeltanoResult uses .success:
-        pass
+      pass
     else:
-        return
+      return
 
     # Success case
     if True:  # Placeholder for success logic
-        pass
+      pass
 
 
 # =============================================================================
@@ -67,72 +67,72 @@ def example_real_singer_processing() -> None:
     schema = {}  # Placeholder schema definition
 
     if singer_utils is None:
-        print("Singer utils not yet implemented - placeholder example")
-        return
+      print("Singer utils not yet implemented - placeholder example")
+      return
 
     schema_msg = singer_utils.flext_meltano_create_singer_schema(
-        "users",
-        schema,
-        ["id"],
+      "users",
+      schema,
+      ["id"],
     )
 
     if schema_msg.success:
-        # Validate the message we just created
-        validation = singer_utils.flext_meltano_validate_singer_message(schema_msg.data)
+      # Validate the message we just created
+      validation = singer_utils.flext_meltano_validate_singer_message(schema_msg.data)
     else:
-        return
+      return
 
     # Create valid Singer record messages
     sample_records = [
-        {
-            "id": 1,
-            "name": "Alice Johnson",
-            "email": "alice@example.com",
-            "created_at": "2024-01-15T10:30:00Z",
-        },
-        {
-            "id": 2,
-            "name": "Bob Smith",
-            "email": "bob@example.com",
-            "created_at": "2024-01-16T14:22:00Z",
-        },
-        {
-            "id": 3,
-            "name": "Carol Williams",
-            "email": "carol@example.com",
-            "created_at": "2024-01-17T09:15:00Z",
-        },
+      {
+          "id": 1,
+          "name": "Alice Johnson",
+          "email": "alice@example.com",
+          "created_at": "2024-01-15T10:30:00Z",
+      },
+      {
+          "id": 2,
+          "name": "Bob Smith",
+          "email": "bob@example.com",
+          "created_at": "2024-01-16T14:22:00Z",
+      },
+      {
+          "id": 3,
+          "name": "Carol Williams",
+          "email": "carol@example.com",
+          "created_at": "2024-01-17T09:15:00Z",
+      },
     ]
 
     valid_records = 0
     for record in sample_records:
-        record_msg = singer_utils.flext_meltano_create_singer_record(
-            "users",
-            record,
-            record["created_at"],
-        )
+      record_msg = singer_utils.flext_meltano_create_singer_record(
+          "users",
+          record,
+          record["created_at"],
+      )
 
-        if record_msg.success:
-            # Validate each record message
-            validation = singer_utils.flext_meltano_validate_singer_message(
-                record_msg.data,
-            )
-            if validation.success:
-                valid_records += 1
+      if record_msg.success:
+          # Validate each record message
+          validation = singer_utils.flext_meltano_validate_singer_message(
+              record_msg.data,
+          )
+          if validation.success:
+              valid_records += 1
 
     # Create state message
     state_data = {
-        "bookmarks": {
-            "users": {
-                "replication_key_value": "2024-01-17T09:15:00Z",
-                "replication_key": "created_at",
-            },
-        },
+      "bookmarks": {
+          "users": {
+              "replication_key_value": "2024-01-17T09:15:00Z",
+              "replication_key": "created_at",
+          },
+      },
     }
 
     state_msg = singer_utils.flext_meltano_create_singer_state(state_data)
     if state_msg.success:
-        validation = singer_utils.flext_meltano_validate_singer_message(state_msg.data)
+      validation = singer_utils.flext_meltano_validate_singer_message(state_msg.data)
 
 
 # =============================================================================
@@ -160,11 +160,11 @@ def example_decorated_operation() -> dict[str, float | int | str]:
     # Simulate some ETL work that might fail
 
     if random.random() < success_rate:  # noqa: S311 - non-crypto example
-        return {
-            "records_processed": random.randint(100, 1000),  # noqa: S311 - example
-            "duration_seconds": random.uniform(5.0, 30.0),  # noqa: S311 - example
-            "status": "completed",
-        }
+      return {
+          "records_processed": random.randint(100, 1000),  # noqa: S311 - example
+          "duration_seconds": random.uniform(5.0, 30.0),  # noqa: S311 - example
+          "status": "completed",
+      }
     # Simulate failure
     msg = "Simulated database connection timeout"
     raise RuntimeError(msg)
@@ -173,7 +173,7 @@ def example_decorated_operation() -> dict[str, float | int | str]:
 def example_decorator_usage() -> None:
     """Example showing decorator automatically handling success/failure."""
     for _i in range(5):
-        _ = example_decorated_operation()
+      _ = example_decorated_operation()
 
 
 # =============================================================================
@@ -204,17 +204,17 @@ async def example_async_pipeline() -> None:
     pipeline = None  # Placeholder for actual pipeline implementation
 
     if pipeline is None:
-        print("Pipeline implementation not yet available - placeholder example")
-        return
+      print("Pipeline implementation not yet available - placeholder example")
+      return
 
     try:
-        result = await pipeline.run()
+      result = await pipeline.run()
 
-        if result.success:
-            pass
+      if result.success:
+          pass
 
     except (RuntimeError, ValueError, TypeError):
-        pass
+      pass
 
 
 # =============================================================================
@@ -225,22 +225,22 @@ async def example_async_pipeline() -> None:
 def main() -> None:
     """Run all real working examples."""
     with contextlib.suppress(Exception):
-        example_real_pipeline_builder()
+      example_real_pipeline_builder()
 
     with contextlib.suppress(Exception):
-        example_real_config_service()
+      example_real_config_service()
 
     with contextlib.suppress(Exception):
-        example_real_singer_processing()
+      example_real_singer_processing()
 
     with contextlib.suppress(Exception):
-        example_real_config_validation()
+      example_real_config_validation()
 
     with contextlib.suppress(Exception):
-        example_decorator_usage()
+      example_decorator_usage()
 
     with contextlib.suppress(Exception):
-        asyncio.run(example_async_pipeline())
+      asyncio.run(example_async_pipeline())
 
 
 if __name__ == "__main__":

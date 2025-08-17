@@ -14,7 +14,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import warnings
-from typing import Any
 
 # Import modern implementations to re-export under legacy names
 from flext_meltano.base import (
@@ -58,162 +57,196 @@ from flext_meltano.simple_bridge import FlextMeltanoBridge
 def _deprecation_warning(old_name: str, new_name: str) -> None:
     """Issue a deprecation warning for legacy imports."""
     warnings.warn(
-        f"{old_name} is deprecated, use {new_name} instead",
-        DeprecationWarning,
-        stacklevel=3,
+      f"{old_name} is deprecated, use {new_name} instead",
+      DeprecationWarning,
+      stacklevel=3,
     )
 
 
 # Legacy aliases for main classes - commonly used names
-def MeltanoConfig(*args: Any, **kwargs: Any) -> FlextMeltanoConfig:
+def MeltanoConfig(*args: object, **kwargs: object) -> FlextMeltanoConfig:  # noqa: N802
     """Legacy alias for FlextMeltanoConfig."""
     _deprecation_warning("MeltanoConfig", "FlextMeltanoConfig")
     return FlextMeltanoConfig(*args, **kwargs)
 
 
-def MeltanoBridge(*args: Any, **kwargs: Any) -> FlextMeltanoBridge:
+def MeltanoBridge(*args: object, **kwargs: object) -> FlextMeltanoBridge:  # noqa: N802
     """Legacy alias for FlextMeltanoBridge."""
     _deprecation_warning("MeltanoBridge", "FlextMeltanoBridge")
     return FlextMeltanoBridge(*args, **kwargs)
 
 
-def MeltanoCli(*args: Any, **kwargs: Any) -> FlextMeltanoCli:
+def MeltanoCli(*args: object, **kwargs: object) -> FlextMeltanoCli:  # noqa: N802
     """Legacy alias for FlextMeltanoCli."""
     _deprecation_warning("MeltanoCli", "FlextMeltanoCli")
     return FlextMeltanoCli(*args, **kwargs)
 
 
-def MeltanoOrchestrationService(*args: Any, **kwargs: Any) -> FlextMeltanoOrchestrationService:
+def MeltanoOrchestrationService(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoOrchestrationService:
     """Legacy alias for FlextMeltanoOrchestrationService."""
-    _deprecation_warning("MeltanoOrchestrationService", "FlextMeltanoOrchestrationService")
+    _deprecation_warning(
+      "MeltanoOrchestrationService", "FlextMeltanoOrchestrationService",
+    )
     return FlextMeltanoOrchestrationService(*args, **kwargs)
 
 
-def MeltanoDbtService(*args: Any, **kwargs: Any) -> FlextMeltanoDbtService:
+def MeltanoDbtService(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoDbtService:
     """Legacy alias for FlextMeltanoDbtService."""
     _deprecation_warning("MeltanoDbtService", "FlextMeltanoDbtService")
     return FlextMeltanoDbtService(*args, **kwargs)
 
 
-def MeltanoSingerService(*args: Any, **kwargs: Any) -> FlextMeltanoSingerService:
+def MeltanoSingerService(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoSingerService:
     """Legacy alias for FlextMeltanoSingerService."""
     _deprecation_warning("MeltanoSingerService", "FlextMeltanoSingerService")
     return FlextMeltanoSingerService(*args, **kwargs)
 
 
 # Legacy aliases for base classes
-def MeltanoTap(*args: Any, **kwargs: Any) -> FlextMeltanoTap:
+def MeltanoTap(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoTap:
     """Legacy alias for FlextMeltanoTap."""
     _deprecation_warning("MeltanoTap", "FlextMeltanoTap")
     return FlextMeltanoTap(*args, **kwargs)
 
 
-def MeltanoTarget(*args: Any, **kwargs: Any) -> FlextMeltanoTarget:
+def MeltanoTarget(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoTarget:
     """Legacy alias for FlextMeltanoTarget."""
     _deprecation_warning("MeltanoTarget", "FlextMeltanoTarget")
     return FlextMeltanoTarget(*args, **kwargs)
 
 
-def MeltanoDbt(*args: Any, **kwargs: Any) -> FlextMeltanoDbt:
+def MeltanoDbt(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoDbt:
     """Legacy alias for FlextMeltanoDbt."""
     _deprecation_warning("MeltanoDbt", "FlextMeltanoDbt")
     return FlextMeltanoDbt(*args, **kwargs)
 
 
 # Legacy aliases for utility classes
-def MeltanoDiscovery(*args: Any, **kwargs: Any) -> FlextMeltanoDiscovery:
+def MeltanoDiscovery(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoDiscovery:
     """Legacy alias for FlextMeltanoDiscovery."""
     _deprecation_warning("MeltanoDiscovery", "FlextMeltanoDiscovery")
     return FlextMeltanoDiscovery(*args, **kwargs)
 
 
-def MeltanoInstaller(*args: Any, **kwargs: Any) -> FlextMeltanoInstaller:
+def MeltanoInstaller(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoInstaller:
     """Legacy alias for FlextMeltanoInstaller."""
     _deprecation_warning("MeltanoInstaller", "FlextMeltanoInstaller")
     return FlextMeltanoInstaller(*args, **kwargs)
 
 
 # Legacy exception aliases (more concise names that were probably used)
-def MeltanoError(*args: Any, **kwargs: Any) -> FlextMeltanoError:
+def MeltanoError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoError:
     """Legacy alias for FlextMeltanoError."""
     _deprecation_warning("MeltanoError", "FlextMeltanoError")
     return FlextMeltanoError(*args, **kwargs)
 
 
-def MeltanoValidationError(*args: Any, **kwargs: Any) -> FlextMeltanoValidationError:
+def MeltanoValidationError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoValidationError:
     """Legacy alias for FlextMeltanoValidationError."""
     _deprecation_warning("MeltanoValidationError", "FlextMeltanoValidationError")
     return FlextMeltanoValidationError(*args, **kwargs)
 
 
-def MeltanoConfigurationError(*args: Any, **kwargs: Any) -> FlextMeltanoConfigurationError:
+def MeltanoConfigurationError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoConfigurationError:
     """Legacy alias for FlextMeltanoConfigurationError."""
     _deprecation_warning("MeltanoConfigurationError", "FlextMeltanoConfigurationError")
     return FlextMeltanoConfigurationError(*args, **kwargs)
 
 
-def MeltanoConnectionError(*args: Any, **kwargs: Any) -> FlextMeltanoConnectionError:
+def MeltanoConnectionError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoConnectionError:
     """Legacy alias for FlextMeltanoConnectionError."""
     _deprecation_warning("MeltanoConnectionError", "FlextMeltanoConnectionError")
     return FlextMeltanoConnectionError(*args, **kwargs)
 
 
-def MeltanoPluginError(*args: Any, **kwargs: Any) -> FlextMeltanoPluginError:
+def MeltanoPluginError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoPluginError:
     """Legacy alias for FlextMeltanoPluginError."""
     _deprecation_warning("MeltanoPluginError", "FlextMeltanoPluginError")
     return FlextMeltanoPluginError(*args, **kwargs)
 
 
-def MeltanoExecutionError(*args: Any, **kwargs: Any) -> FlextMeltanoExecutionError:
+def MeltanoExecutionError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoExecutionError:
     """Legacy alias for FlextMeltanoExecutionError."""
     _deprecation_warning("MeltanoExecutionError", "FlextMeltanoExecutionError")
     return FlextMeltanoExecutionError(*args, **kwargs)
 
 
-def MeltanoSingerError(*args: Any, **kwargs: Any) -> FlextMeltanoSingerError:
+def MeltanoSingerError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoSingerError:
     """Legacy alias for FlextMeltanoSingerError."""
     _deprecation_warning("MeltanoSingerError", "FlextMeltanoSingerError")
     return FlextMeltanoSingerError(*args, **kwargs)
 
 
-def MeltanoDBTError(*args: Any, **kwargs: Any) -> FlextMeltanoDBTError:
+def MeltanoDBTError(  # noqa: N802
+    *args: object, **kwargs: object,
+) -> FlextMeltanoDBTError:
     """Legacy alias for FlextMeltanoDBTError."""
     _deprecation_warning("MeltanoDBTError", "FlextMeltanoDBTError")
     return FlextMeltanoDBTError(*args, **kwargs)
 
 
 # Legacy function aliases
-def get_meltano_bridge(*args: Any, **kwargs: Any) -> Any:
+def get_meltano_bridge(*args: object, **kwargs: object) -> object:
     """Legacy alias for FlextMeltanoBridge constructor."""
     _deprecation_warning("get_meltano_bridge", "FlextMeltanoBridge")
     return FlextMeltanoBridge(*args, **kwargs)
 
 
-def create_meltano_tap(*args: Any, **kwargs: Any) -> Any:
+def create_meltano_tap(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_tap."""
     _deprecation_warning("create_meltano_tap", "create_tap")
     return create_tap(*args, **kwargs)
 
 
-def create_meltano_target(*args: Any, **kwargs: Any) -> Any:
+def create_meltano_target(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_target."""
     _deprecation_warning("create_meltano_target", "create_target")
     return create_target(*args, **kwargs)
 
 
-def create_meltano_dbt(*args: Any, **kwargs: Any) -> Any:
+def create_meltano_dbt(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_dbt_service."""
     _deprecation_warning("create_meltano_dbt", "create_dbt_service")
     return create_dbt_service(*args, **kwargs)
 
 
-def execute_command(*args: Any, **kwargs: Any) -> Any:
+def execute_command(*args: object, **kwargs: object) -> object:
     """Legacy alias for execute_meltano_command."""
     _deprecation_warning("execute_command", "execute_meltano_command")
     return execute_meltano_command(*args, **kwargs)
 
 
-def run_meltano_pipeline(*args: Any, **kwargs: Any) -> Any:
+def run_meltano_pipeline(*args: object, **kwargs: object) -> object:
     """Legacy alias for run_pipeline."""
     _deprecation_warning("run_meltano_pipeline", "run_pipeline")
     return run_pipeline(*args, **kwargs)
