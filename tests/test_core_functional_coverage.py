@@ -31,356 +31,356 @@ class TestFlextMeltanoExecutionStateComplete:
     """Complete tests for FlextMeltanoExecutionState."""
 
     def test_execution_state_creation_and_initialization(self) -> None:
-      """Test execution state creation with all fields."""
-      state = FlextMeltanoExecutionState(
-          pipeline_name="test-pipeline",
-          environment="production",
-          started_at="2025-08-05T10:00:00Z",
-      )
+        """Test execution state creation with all fields."""
+        state = FlextMeltanoExecutionState(
+            pipeline_name="test-pipeline",
+            environment="production",
+            started_at="2025-08-05T10:00:00Z",
+        )
 
-      assert state.pipeline_name == "test-pipeline"
-      assert state.environment == "production"
-      assert state.state == ExecutionState.RUNNING.value
-      assert isinstance(state.metadata, dict)
+        assert state.pipeline_name == "test-pipeline"
+        assert state.environment == "production"
+        assert state.state == ExecutionState.RUNNING.value
+        assert isinstance(state.metadata, dict)
 
     def test_execution_state_complete_lifecycle(self) -> None:
-      """Test complete execution state lifecycle."""
-      state = FlextMeltanoExecutionState()
+        """Test complete execution state lifecycle."""
+        state = FlextMeltanoExecutionState()
 
-      # Start pipeline
-      execution_id = state.start_pipeline("comprehensive-test")
-      assert isinstance(execution_id, str)
-      assert len(execution_id) > 0
-      assert state.current_pipeline == "comprehensive-test"
+        # Start pipeline
+        execution_id = state.start_pipeline("comprehensive-test")
+        assert isinstance(execution_id, str)
+        assert len(execution_id) > 0
+        assert state.current_pipeline == "comprehensive-test"
 
-      # Complete pipeline
-      state.complete_pipeline()
-      assert state.state == ExecutionState.COMPLETED.value
+        # Complete pipeline
+        state.complete_pipeline()
+        assert state.state == ExecutionState.COMPLETED.value
 
-      # Reset and test failure path
-      state = FlextMeltanoExecutionState()
-      state.start_pipeline("failure-test")
+        # Reset and test failure path
+        state = FlextMeltanoExecutionState()
+        state.start_pipeline("failure-test")
 
-      # Fail pipeline with detailed error
-      error_message = "Database connection failed: timeout after 30s"
-      state.fail_pipeline(error_message)
+        # Fail pipeline with detailed error
+        error_message = "Database connection failed: timeout after 30s"
+        state.fail_pipeline(error_message)
 
-      assert state.state == ExecutionState.FAILED.value
-      assert state.metadata["error"] == error_message
-      assert "failed_at" in state.metadata
+        assert state.state == ExecutionState.FAILED.value
+        assert state.metadata["error"] == error_message
+        assert "failed_at" in state.metadata
 
     def test_execution_state_metadata_management(self) -> None:
-      """Test execution state metadata handling."""
-      state = FlextMeltanoExecutionState()
+        """Test execution state metadata handling."""
+        state = FlextMeltanoExecutionState()
 
-      # Test metadata is properly initialized
-      assert isinstance(state.metadata, dict)
+        # Test metadata is properly initialized
+        assert isinstance(state.metadata, dict)
 
-      # Start pipeline and check metadata updates
-      execution_id = state.start_pipeline("metadata-test")
-      assert "started_at" in state.metadata
-      assert state.execution_id == execution_id
+        # Start pipeline and check metadata updates
+        execution_id = state.start_pipeline("metadata-test")
+        assert "started_at" in state.metadata
+        assert state.execution_id == execution_id
 
-      # Complete and check completion metadata
-      state.complete_pipeline()
-      assert "completed_at" in state.metadata
+        # Complete and check completion metadata
+        state.complete_pipeline()
+        assert "completed_at" in state.metadata
 
     def test_execution_state_edge_cases(self) -> None:
-      """Test execution state edge cases."""
-      state = FlextMeltanoExecutionState()
+        """Test execution state edge cases."""
+        state = FlextMeltanoExecutionState()
 
-      # Test empty pipeline name
-      execution_id = state.start_pipeline("")
-      assert isinstance(execution_id, str)
-      assert len(execution_id) > 0
+        # Test empty pipeline name
+        execution_id = state.start_pipeline("")
+        assert isinstance(execution_id, str)
+        assert len(execution_id) > 0
 
-      # Test complete without start
-      state_2 = FlextMeltanoExecutionState()
-      state_2.complete_pipeline()
-      assert state_2.state == ExecutionState.COMPLETED
+        # Test complete without start
+        state_2 = FlextMeltanoExecutionState()
+        state_2.complete_pipeline()
+        assert state_2.state == ExecutionState.COMPLETED
 
-      # Test fail without start
-      state_3 = FlextMeltanoExecutionState()
-      state_3.fail_pipeline("No pipeline was running")
-      assert state_3.state == ExecutionState.FAILED
+        # Test fail without start
+        state_3 = FlextMeltanoExecutionState()
+        state_3.fail_pipeline("No pipeline was running")
+        assert state_3.state == ExecutionState.FAILED
 
 
 class TestFlextMeltanoPipelineConfigComplete:
     """Complete tests for FlextMeltanoPipelineConfig."""
 
     def test_pipeline_config_creation_minimal(self) -> None:
-      """Test minimal pipeline configuration creation."""
-      config = FlextMeltanoPipelineConfig(
-          name="minimal-pipeline",
-          extractor="tap-csv",
-          loader="target-csv",
-      )
+        """Test minimal pipeline configuration creation."""
+        config = FlextMeltanoPipelineConfig(
+            name="minimal-pipeline",
+            extractor="tap-csv",
+            loader="target-csv",
+        )
 
-      assert config.name == "minimal-pipeline"
-      assert config.extractor == "tap-csv"
-      assert config.loader == "target-csv"
-      assert config.transformer is None
-      assert isinstance(config.config, dict)
+        assert config.name == "minimal-pipeline"
+        assert config.extractor == "tap-csv"
+        assert config.loader == "target-csv"
+        assert config.transformer is None
+        assert isinstance(config.config, dict)
 
     def test_pipeline_config_creation_complete(self) -> None:
-      """Test complete pipeline configuration creation."""
-      custom_config = {
-          "database_url": "postgresql://user:pass@localhost/db",
-          "batch_size": 1000,
-          "timeout": 300,
-      }
+        """Test complete pipeline configuration creation."""
+        custom_config = {
+            "database_url": "postgresql://user:pass@localhost/db",
+            "batch_size": 1000,
+            "timeout": 300,
+        }
 
-      config = FlextMeltanoPipelineConfig(
-          name="complete-pipeline",
-          extractor="tap-postgres",
-          loader="target-snowflake",
-          transformer="dbt-postgres",
-          config=custom_config,
-      )
+        config = FlextMeltanoPipelineConfig(
+            name="complete-pipeline",
+            extractor="tap-postgres",
+            loader="target-snowflake",
+            transformer="dbt-postgres",
+            config=custom_config,
+        )
 
-      assert config.name == "complete-pipeline"
-      assert config.extractor == "tap-postgres"
-      assert config.loader == "target-snowflake"
-      assert config.transformer == "dbt-postgres"
-      assert config.config["database_url"] == "postgresql://user:pass@localhost/db"
-      assert config.config["batch_size"] == 1000
+        assert config.name == "complete-pipeline"
+        assert config.extractor == "tap-postgres"
+        assert config.loader == "target-snowflake"
+        assert config.transformer == "dbt-postgres"
+        assert config.config["database_url"] == "postgresql://user:pass@localhost/db"
+        assert config.config["batch_size"] == 1000
 
     def test_pipeline_config_validation(self) -> None:
-      """Test pipeline configuration validation through properties."""
-      config = FlextMeltanoPipelineConfig(
-          name="validation-test",
-          extractor="tap-test",
-          loader="target-test",
-      )
+        """Test pipeline configuration validation through properties."""
+        config = FlextMeltanoPipelineConfig(
+            name="validation-test",
+            extractor="tap-test",
+            loader="target-test",
+        )
 
-      # Test basic properties
-      assert config.name == "validation-test"
-      assert config.extractor == "tap-test"
-      assert config.loader == "target-test"
+        # Test basic properties
+        assert config.name == "validation-test"
+        assert config.extractor == "tap-test"
+        assert config.loader == "target-test"
 
-      # Test optional properties
-      assert config.transformer is None
-      assert hasattr(config, "config")
+        # Test optional properties
+        assert config.transformer is None
+        assert hasattr(config, "config")
 
-      # Test empty name handling - should raise ValueError
-      with pytest.raises(
-          ValueError,
-          match="Pipeline name, extractor, and loader are required",
-      ):
-          FlextMeltanoPipelineConfig(
-              name="",  # Empty name
-              extractor="tap-test",
-              loader="target-test",
-          )
+        # Test empty name handling - should raise ValueError
+        with pytest.raises(
+            ValueError,
+            match="Pipeline name, extractor, and loader are required",
+        ):
+            FlextMeltanoPipelineConfig(
+                name="",  # Empty name
+                extractor="tap-test",
+                loader="target-test",
+            )
 
     def test_pipeline_config_with_complex_configuration(self) -> None:
-      """Test pipeline configuration with complex nested config."""
-      complex_config = {
-          "source": {
-              "host": "localhost",
-              "port": 5432,
-              "database": "analytics",
-              "credentials": {
-                  "username": "user",
-                  "password": "secret",
-              },
-          },
-          "target": {
-              "warehouse": "snowflake",
-              "schema": "public",
-              "threads": 8,
-          },
-          "transformations": {
-              "models": ["model1", "model2", "model3"],
-              "tests": True,
-              "documentation": True,
-          },
-      }
+        """Test pipeline configuration with complex nested config."""
+        complex_config = {
+            "source": {
+                "host": "localhost",
+                "port": 5432,
+                "database": "analytics",
+                "credentials": {
+                    "username": "user",
+                    "password": "secret",
+                },
+            },
+            "target": {
+                "warehouse": "snowflake",
+                "schema": "public",
+                "threads": 8,
+            },
+            "transformations": {
+                "models": ["model1", "model2", "model3"],
+                "tests": True,
+                "documentation": True,
+            },
+        }
 
-      config = FlextMeltanoPipelineConfig(
-          name="complex-pipeline",
-          extractor="tap-postgres",
-          loader="target-snowflake",
-          transformer="dbt-postgres",
-          config=complex_config,
-      )
+        config = FlextMeltanoPipelineConfig(
+            name="complex-pipeline",
+            extractor="tap-postgres",
+            loader="target-snowflake",
+            transformer="dbt-postgres",
+            config=complex_config,
+        )
 
-      assert config.config["source"]["host"] == "localhost"
-      assert config.config["target"]["threads"] == 8
-      assert len(config.config["transformations"]["models"]) == 3
+        assert config.config["source"]["host"] == "localhost"
+        assert config.config["target"]["threads"] == 8
+        assert len(config.config["transformations"]["models"]) == 3
 
 
 class TestFlextMeltanoPipelineResultComplete:
     """Complete tests for FlextMeltanoPipelineResult."""
 
     def test_pipeline_result_creation_success(self) -> None:
-      """Test successful pipeline result creation."""
-      result = FlextMeltanoPipelineResult(
-          pipeline_name="success-pipeline",
-          state=ExecutionState.COMPLETED,
-      )
+        """Test successful pipeline result creation."""
+        result = FlextMeltanoPipelineResult(
+            pipeline_name="success-pipeline",
+            state=ExecutionState.COMPLETED,
+        )
 
-      assert result.pipeline_name == "success-pipeline"
-      assert result.state == ExecutionState.COMPLETED.value
-      assert result.error_message is None
-      assert isinstance(result.id, str)
-      assert len(result.id) > 0
+        assert result.pipeline_name == "success-pipeline"
+        assert result.state == ExecutionState.COMPLETED.value
+        assert result.error_message is None
+        assert isinstance(result.id, str)
+        assert len(result.id) > 0
 
     def test_pipeline_result_creation_failure(self) -> None:
-      """Test failed pipeline result creation."""
-      error_msg = "Pipeline execution failed: Connection timeout"
-      result = FlextMeltanoPipelineResult(
-          pipeline_name="failure-pipeline",
-          state=ExecutionState.FAILED,
-          error_message=error_msg,
-      )
+        """Test failed pipeline result creation."""
+        error_msg = "Pipeline execution failed: Connection timeout"
+        result = FlextMeltanoPipelineResult(
+            pipeline_name="failure-pipeline",
+            state=ExecutionState.FAILED,
+            error_message=error_msg,
+        )
 
-      assert result.pipeline_name == "failure-pipeline"
-      assert result.state == ExecutionState.FAILED.value
-      assert result.error_message == error_msg
+        assert result.pipeline_name == "failure-pipeline"
+        assert result.state == ExecutionState.FAILED.value
+        assert result.error_message == error_msg
 
     def test_pipeline_result_with_metadata(self) -> None:
-      """Test pipeline result with metadata."""
-      metadata = {
-          "duration": 120.5,
-          "records_processed": 10000,
-          "warnings": 3,
-      }
+        """Test pipeline result with metadata."""
+        metadata = {
+            "duration": 120.5,
+            "records_processed": 10000,
+            "warnings": 3,
+        }
 
-      result = FlextMeltanoPipelineResult(
-          pipeline_name="metadata-pipeline",
-          state=ExecutionState.COMPLETED,
-          metadata=metadata,
-      )
+        result = FlextMeltanoPipelineResult(
+            pipeline_name="metadata-pipeline",
+            state=ExecutionState.COMPLETED,
+            metadata=metadata,
+        )
 
-      assert result.metadata["duration"] == 120.5
-      assert result.metadata["records_processed"] == 10000
-      assert result.metadata["warnings"] == 3
+        assert result.metadata["duration"] == 120.5
+        assert result.metadata["records_processed"] == 10000
+        assert result.metadata["warnings"] == 3
 
     def test_pipeline_result_domain_validation(self) -> None:
-      """Test pipeline result domain validation."""
-      result = FlextMeltanoPipelineResult(
-          pipeline_name="validation-test",
-          state=ExecutionState.COMPLETED,
-      )
+        """Test pipeline result domain validation."""
+        result = FlextMeltanoPipelineResult(
+            pipeline_name="validation-test",
+            state=ExecutionState.COMPLETED,
+        )
 
-      validation_result = result.validate_business_rules()
-      assert validation_result.success
+        validation_result = result.validate_business_rules()
+        assert validation_result.success
 
-      # Test with empty pipeline name
-      empty_name_result = FlextMeltanoPipelineResult(
-          pipeline_name="",
-          state=ExecutionState.COMPLETED,
-      )
+        # Test with empty pipeline name
+        empty_name_result = FlextMeltanoPipelineResult(
+            pipeline_name="",
+            state=ExecutionState.COMPLETED,
+        )
 
-      validation_result = empty_name_result.validate_business_rules()
-      # Should fail validation due to empty name
-      assert hasattr(validation_result, "success")
+        validation_result = empty_name_result.validate_business_rules()
+        # Should fail validation due to empty name
+        assert hasattr(validation_result, "success")
 
 
 class TestFlextMeltanoPipelineEventComplete:
     """Complete tests for FlextMeltanoPipelineEvent."""
 
     def test_pipeline_event_creation_basic(self) -> None:
-      """Test basic pipeline event creation."""
-      event = FlextMeltanoPipelineEvent(
-          event_type=PipelineEventType.STARTED,
-          pipeline_id="test-pipeline",
-      )
+        """Test basic pipeline event creation."""
+        event = FlextMeltanoPipelineEvent(
+            event_type=PipelineEventType.STARTED,
+            pipeline_id="test-pipeline",
+        )
 
-      assert event.event_type == PipelineEventType.STARTED
-      assert event.pipeline_id == "test-pipeline"
-      assert isinstance(event.id, str)
-      assert isinstance(event.data, dict)
+        assert event.event_type == PipelineEventType.STARTED
+        assert event.pipeline_id == "test-pipeline"
+        assert isinstance(event.id, str)
+        assert isinstance(event.data, dict)
 
     def test_pipeline_event_creation_with_data(self) -> None:
-      """Test pipeline event creation with data."""
-      event_data = {
-          "execution_id": "exec-123",
-          "environment": "production",
-          "triggered_by": "scheduler",
-          "config": {
-              "timeout": 300,
-              "retry_count": 3,
-          },
-      }
+        """Test pipeline event creation with data."""
+        event_data = {
+            "execution_id": "exec-123",
+            "environment": "production",
+            "triggered_by": "scheduler",
+            "config": {
+                "timeout": 300,
+                "retry_count": 3,
+            },
+        }
 
-      event = FlextMeltanoPipelineEvent(
-          event_type=PipelineEventType.COMPLETED,
-          pipeline_id="data-pipeline",
-          data=event_data,
-      )
+        event = FlextMeltanoPipelineEvent(
+            event_type=PipelineEventType.COMPLETED,
+            pipeline_id="data-pipeline",
+            data=event_data,
+        )
 
-      assert event.event_type == PipelineEventType.COMPLETED
-      assert event.data["execution_id"] == "exec-123"
-      assert event.data["config"]["timeout"] == 300
+        assert event.event_type == PipelineEventType.COMPLETED
+        assert event.data["execution_id"] == "exec-123"
+        assert event.data["config"]["timeout"] == 300
 
     def test_pipeline_event_all_types(self) -> None:
-      """Test all pipeline event types."""
-      event_types = [
-          PipelineEventType.PIPELINE_STARTED,
-          PipelineEventType.PIPELINE_COMPLETED,
-          PipelineEventType.PIPELINE_FAILED,
-      ]
+        """Test all pipeline event types."""
+        event_types = [
+            PipelineEventType.PIPELINE_STARTED,
+            PipelineEventType.PIPELINE_COMPLETED,
+            PipelineEventType.PIPELINE_FAILED,
+        ]
 
-      for event_type in event_types:
-          event = FlextMeltanoPipelineEvent(
-              event_type=event_type,
-              pipeline_id=f"test-{event_type.value}",
-          )
+        for event_type in event_types:
+            event = FlextMeltanoPipelineEvent(
+                event_type=event_type,
+                pipeline_id=f"test-{event_type.value}",
+            )
 
-          assert event.event_type == event_type
-          assert f"test-{event_type.value}" in event.pipeline_id
+            assert event.event_type == event_type
+            assert f"test-{event_type.value}" in event.pipeline_id
 
     def test_pipeline_event_domain_validation(self) -> None:
-      """Test pipeline event domain validation."""
-      event = FlextMeltanoPipelineEvent(
-          event_type=PipelineEventType.PIPELINE_STARTED,
-          pipeline_id="validation-test",
-      )
+        """Test pipeline event domain validation."""
+        event = FlextMeltanoPipelineEvent(
+            event_type=PipelineEventType.PIPELINE_STARTED,
+            pipeline_id="validation-test",
+        )
 
-      validation_result = event.validate_business_rules()
-      assert validation_result.success
+        validation_result = event.validate_business_rules()
+        assert validation_result.success
 
 
 class TestFlextMeltanoExtensionServiceComplete:
     """Complete tests for FlextMeltanoExtensionService."""
 
     def test_extension_service_creation_and_initialization(self) -> None:
-      """Test extension service creation and initialization."""
-      config = FlextMeltanoConfig(project_root=".")
-      extension_service = FlextMeltanoExtensionService(config)
+        """Test extension service creation and initialization."""
+        config = FlextMeltanoConfig(project_root=".")
+        extension_service = FlextMeltanoExtensionService(config)
 
-      assert extension_service.config == config
+        assert extension_service.config == config
 
-      # Test validation which is available
-      validation_result = extension_service.validate_service()
-      assert validation_result.success
+        # Test validation which is available
+        validation_result = extension_service.validate_service()
+        assert validation_result.success
 
     def test_extension_service_validation(self) -> None:
-      """Test extension service validation."""
-      config = FlextMeltanoConfig(project_root=".")
-      extension_service = FlextMeltanoExtensionService(config)
+        """Test extension service validation."""
+        config = FlextMeltanoConfig(project_root=".")
+        extension_service = FlextMeltanoExtensionService(config)
 
-      validation_result = extension_service.validate_service()
-      assert hasattr(validation_result, "success")
-      assert isinstance(validation_result.success, bool)
+        validation_result = extension_service.validate_service()
+        assert hasattr(validation_result, "success")
+        assert isinstance(validation_result.success, bool)
 
     def test_extension_service_with_various_configurations(self) -> None:
-      """Test extension service creation with various configurations."""
-      # Test extension service creation with different project roots
-      project_roots = [".", tempfile.gettempdir(), "/path/to/project"]
+        """Test extension service creation with various configurations."""
+        # Test extension service creation with different project roots
+        project_roots = [".", tempfile.gettempdir(), "/path/to/project"]
 
-      for root in project_roots:
-          config = FlextMeltanoConfig(project_root=root)
-          extension_service = FlextMeltanoExtensionService(config)
-          # Config may normalize paths to absolute, so just check it has a project_root
-          assert hasattr(extension_service.config, "project_root")
-          assert extension_service.config.project_root is not None
+        for root in project_roots:
+            config = FlextMeltanoConfig(project_root=root)
+            extension_service = FlextMeltanoExtensionService(config)
+            # Config may normalize paths to absolute, so just check it has a project_root
+            assert hasattr(extension_service.config, "project_root")
+            assert extension_service.config.project_root is not None
 
-          # Test that all can be validated
-          validation_result = extension_service.validate_service()
-          assert validation_result.success
+            # Test that all can be validated
+            validation_result = extension_service.validate_service()
+            assert validation_result.success
 
 
 # FlextMeltanoSingerService is abstract and cannot be instantiated directly
@@ -391,127 +391,127 @@ class TestPipelineEventTypeEnum:
     """Test PipelineEventType enum functionality."""
 
     def test_pipeline_event_type_values(self) -> None:
-      """Test all pipeline event type values."""
-      assert PipelineEventType.PIPELINE_STARTED.value == 2  # STARTED = 2
-      assert PipelineEventType.PIPELINE_COMPLETED.value == 3  # COMPLETED = 3
-      assert PipelineEventType.PIPELINE_FAILED.value == 4  # FAILED = 4
+        """Test all pipeline event type values."""
+        assert PipelineEventType.PIPELINE_STARTED.value == 2  # STARTED = 2
+        assert PipelineEventType.PIPELINE_COMPLETED.value == 3  # COMPLETED = 3
+        assert PipelineEventType.PIPELINE_FAILED.value == 4  # FAILED = 4
 
     def test_pipeline_event_type_iteration(self) -> None:
-      """Test pipeline event type iteration."""
-      event_types = list(PipelineEventType)
-      assert len(event_types) >= 3
-      assert PipelineEventType.STARTED in event_types
-      assert PipelineEventType.COMPLETED in event_types
-      assert PipelineEventType.FAILED in event_types
+        """Test pipeline event type iteration."""
+        event_types = list(PipelineEventType)
+        assert len(event_types) >= 3
+        assert PipelineEventType.STARTED in event_types
+        assert PipelineEventType.COMPLETED in event_types
+        assert PipelineEventType.FAILED in event_types
 
     def test_pipeline_event_type_membership(self) -> None:
-      """Test pipeline event type membership."""
-      assert "STARTED" in [t.name for t in PipelineEventType]
-      assert "COMPLETED" in [t.name for t in PipelineEventType]
-      assert "FAILED" in [t.name for t in PipelineEventType]
+        """Test pipeline event type membership."""
+        assert "STARTED" in [t.name for t in PipelineEventType]
+        assert "COMPLETED" in [t.name for t in PipelineEventType]
+        assert "FAILED" in [t.name for t in PipelineEventType]
 
 
 class TestExecutionStateEnum:
     """Test ExecutionState enum functionality."""
 
     def test_execution_state_values(self) -> None:
-      """Test all execution state values."""
-      assert ExecutionState.RUNNING.value == 2
-      assert ExecutionState.COMPLETED.value == 3
-      assert ExecutionState.FAILED.value == 4
+        """Test all execution state values."""
+        assert ExecutionState.RUNNING.value == 2
+        assert ExecutionState.COMPLETED.value == 3
+        assert ExecutionState.FAILED.value == 4
 
     def test_execution_state_iteration(self) -> None:
-      """Test execution state iteration."""
-      states = list(ExecutionState)
-      assert len(states) >= 3
-      assert ExecutionState.RUNNING in states
-      assert ExecutionState.COMPLETED in states
-      assert ExecutionState.FAILED in states
+        """Test execution state iteration."""
+        states = list(ExecutionState)
+        assert len(states) >= 3
+        assert ExecutionState.RUNNING in states
+        assert ExecutionState.COMPLETED in states
+        assert ExecutionState.FAILED in states
 
     def test_execution_state_string_representation(self) -> None:
-      """Test execution state string representation."""
-      assert str(ExecutionState.RUNNING) == "ExecutionState.RUNNING"
-      assert str(ExecutionState.COMPLETED) == "ExecutionState.COMPLETED"
-      assert str(ExecutionState.FAILED) == "ExecutionState.FAILED"
+        """Test execution state string representation."""
+        assert str(ExecutionState.RUNNING) == "ExecutionState.RUNNING"
+        assert str(ExecutionState.COMPLETED) == "ExecutionState.COMPLETED"
+        assert str(ExecutionState.FAILED) == "ExecutionState.FAILED"
 
 
 class TestCoreModuleFunctionality:
     """Test core module level functionality and integration."""
 
     def test_module_imports_successfully(self) -> None:
-      """Test that core module imports work correctly."""
-      # Test that main classes are available
-      assert hasattr(_core_module, "FlextMeltanoExecutionState")
-      assert hasattr(_core_module, "FlextMeltanoPipelineConfig")
-      assert hasattr(_core_module, "FlextMeltanoPipelineResult")
-      assert hasattr(_core_module, "FlextMeltanoPipelineEvent")
-      assert hasattr(_core_module, "FlextMeltanoSingerService")
+        """Test that core module imports work correctly."""
+        # Test that main classes are available
+        assert hasattr(_core_module, "FlextMeltanoExecutionState")
+        assert hasattr(_core_module, "FlextMeltanoPipelineConfig")
+        assert hasattr(_core_module, "FlextMeltanoPipelineResult")
+        assert hasattr(_core_module, "FlextMeltanoPipelineEvent")
+        assert hasattr(_core_module, "FlextMeltanoSingerService")
 
     def test_core_classes_instantiation(self) -> None:
-      """Test that core classes can be instantiated."""
-      config = FlextMeltanoConfig(project_root=".")
+        """Test that core classes can be instantiated."""
+        config = FlextMeltanoConfig(project_root=".")
 
-      # Test each class can be created
-      execution_state = FlextMeltanoExecutionState()
-      assert execution_state is not None
+        # Test each class can be created
+        execution_state = FlextMeltanoExecutionState()
+        assert execution_state is not None
 
-      pipeline_config = FlextMeltanoPipelineConfig(
-          name="test",
-          extractor="tap-test",
-          loader="target-test",
-      )
-      assert pipeline_config is not None
+        pipeline_config = FlextMeltanoPipelineConfig(
+            name="test",
+            extractor="tap-test",
+            loader="target-test",
+        )
+        assert pipeline_config is not None
 
-      pipeline_result = FlextMeltanoPipelineResult(
-          pipeline_name="test",
-          state=ExecutionState.COMPLETED,
-      )
-      assert pipeline_result is not None
+        pipeline_result = FlextMeltanoPipelineResult(
+            pipeline_name="test",
+            state=ExecutionState.COMPLETED,
+        )
+        assert pipeline_result is not None
 
-      pipeline_event = FlextMeltanoPipelineEvent(
-          event_type=PipelineEventType.PIPELINE_STARTED,
-          pipeline_id="test",
-      )
-      assert pipeline_event is not None
+        pipeline_event = FlextMeltanoPipelineEvent(
+            event_type=PipelineEventType.PIPELINE_STARTED,
+            pipeline_id="test",
+        )
+        assert pipeline_event is not None
 
-      extension_service = FlextMeltanoExtensionService(config)
-      assert extension_service is not None
+        extension_service = FlextMeltanoExtensionService(config)
+        assert extension_service is not None
 
-      # FlextMeltanoSingerService is abstract, cannot be instantiated
+        # FlextMeltanoSingerService is abstract, cannot be instantiated
 
     def test_core_integration_workflow(self) -> None:
-      """Test integration between core classes."""
-      FlextMeltanoConfig(project_root=".")
+        """Test integration between core classes."""
+        FlextMeltanoConfig(project_root=".")
 
-      # Create execution state
-      state = FlextMeltanoExecutionState()
-      execution_id = state.start_pipeline("integration-test")
+        # Create execution state
+        state = FlextMeltanoExecutionState()
+        execution_id = state.start_pipeline("integration-test")
 
-      # Create pipeline configuration
-      pipeline_config = FlextMeltanoPipelineConfig(
-          name="integration-test",
-          extractor="tap-csv",
-          loader="target-csv",
-      )
+        # Create pipeline configuration
+        pipeline_config = FlextMeltanoPipelineConfig(
+            name="integration-test",
+            extractor="tap-csv",
+            loader="target-csv",
+        )
 
-      # Create pipeline event
-      start_event = FlextMeltanoPipelineEvent(
-          event_type=PipelineEventType.PIPELINE_STARTED,
-          pipeline_id=pipeline_config.name,
-          data={"execution_id": execution_id},
-      )
+        # Create pipeline event
+        start_event = FlextMeltanoPipelineEvent(
+            event_type=PipelineEventType.PIPELINE_STARTED,
+            pipeline_id=pipeline_config.name,
+            data={"execution_id": execution_id},
+        )
 
-      # Validate integration without Singer service (since it's abstract)
-      assert start_event.data["execution_id"] == execution_id
+        # Validate integration without Singer service (since it's abstract)
+        assert start_event.data["execution_id"] == execution_id
 
-      # Complete the workflow
-      state.complete_pipeline()
+        # Complete the workflow
+        state.complete_pipeline()
 
-      # Create completion result
-      completion_result = FlextMeltanoPipelineResult(
-          pipeline_name=pipeline_config.name,
-          state=ExecutionState.COMPLETED,
-      )
+        # Create completion result
+        completion_result = FlextMeltanoPipelineResult(
+            pipeline_name=pipeline_config.name,
+            state=ExecutionState.COMPLETED,
+        )
 
-      assert completion_result.pipeline_name == pipeline_config.name
-      assert state.state == ExecutionState.COMPLETED.value
+        assert completion_result.pipeline_name == pipeline_config.name
+        assert state.state == ExecutionState.COMPLETED.value

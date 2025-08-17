@@ -77,30 +77,30 @@ def configure_meltano_services(
 
     """
     try:
-      # Use provided config or create default
-      used_config = config or FlextMeltanoConfig()
+        # Use provided config or create default
+        used_config = config or FlextMeltanoConfig()
 
-      # Register configuration
-      container.register("meltano_config", used_config)
+        # Register configuration
+        container.register("meltano_config", used_config)
 
-      # Register factory functions for Singer services
-      container.register(
-          "tap_service_factory",
-          create_meltano_tap_service,
-      )
-      container.register(
-          "target_service_factory",
-          create_meltano_target_service,
-      )
-      container.register(
-          "dbt_service_factory",
-          create_meltano_dbt_service,
-      )
+        # Register factory functions for Singer services
+        container.register(
+            "tap_service_factory",
+            create_meltano_tap_service,
+        )
+        container.register(
+            "target_service_factory",
+            create_meltano_target_service,
+        )
+        container.register(
+            "dbt_service_factory",
+            create_meltano_dbt_service,
+        )
 
-      return FlextResult.ok(None)
+        return FlextResult.ok(None)
 
     except (ValueError, TypeError, AttributeError, KeyError) as e:
-      return FlextResult.fail(f"Service configuration failed: {e}")
+        return FlextResult.fail(f"Service configuration failed: {e}")
 
 
 def get_meltano_container() -> FlextContainer:
@@ -114,20 +114,20 @@ def get_meltano_container() -> FlextContainer:
 
     """
     warnings.warn(
-      "get_meltano_container() is deprecated. "
-      "Use get_flext_container() + configure_meltano_services() instead.",
-      DeprecationWarning,
-      stacklevel=2,
+        "get_meltano_container() is deprecated. "
+        "Use get_flext_container() + configure_meltano_services() instead.",
+        DeprecationWarning,
+        stacklevel=2,
     )
 
     container = get_flext_container()
 
     # Configure if not already done
     if not container.get("meltano_config").success:
-      result = configure_meltano_services(container)
-      if result.is_failure:
-          error_msg = f"Container configuration failed: {result.error}"
-          raise RuntimeError(error_msg)
+        result = configure_meltano_services(container)
+        if result.is_failure:
+            error_msg = f"Container configuration failed: {result.error}"
+            raise RuntimeError(error_msg)
 
     return container
 
@@ -148,10 +148,10 @@ def configure_meltano_container(
 
     """
     warnings.warn(
-      "configure_meltano_container() is deprecated. "
-      "Use configure_meltano_services() directly.",
-      DeprecationWarning,
-      stacklevel=2,
+        "configure_meltano_container() is deprecated. "
+        "Use configure_meltano_services() directly.",
+        DeprecationWarning,
+        stacklevel=2,
     )
 
     container = get_flext_container()

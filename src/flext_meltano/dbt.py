@@ -78,16 +78,16 @@ def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
 
     # Execute DBT command using async run_models (supports basic DBT operations)
     if command == "run":
-      models = list(args) if args else None
-      result = asyncio.run(dbt_service.run_models(models=models))
+        models = list(args) if args else None
+        result = asyncio.run(dbt_service.run_models(models=models))
     else:
-      result = asyncio.run(dbt_service.test_models())
+        result = asyncio.run(dbt_service.test_models())
 
     return {
-      "success": result.success,
-      "command": command,
-      "output": result.data if result.success else None,
-      "error": result.error if result.is_failure else None,
+        "success": result.success,
+        "command": command,
+        "output": result.data if result.success else None,
+        "error": result.error if result.is_failure else None,
     }
 
 
@@ -103,267 +103,267 @@ class FlextMeltanoDbtManager:
     """DBT Manager with real implementation using Meltano executor."""
 
     def __init__(
-      self,
-      project_dir: Path | str | None = None,
-      executor: FlextMeltanoExecutor | None = None,
-      config: FlextMeltanoConfig | None = None,
+        self,
+        project_dir: Path | str | None = None,
+        executor: FlextMeltanoExecutor | None = None,
+        config: FlextMeltanoConfig | None = None,
     ) -> None:
-      """Initialize DBT manager with real executor integration."""
-      self.project_dir = Path(project_dir) if project_dir else Path.cwd()
+        """Initialize DBT manager with real executor integration."""
+        self.project_dir = Path(project_dir) if project_dir else Path.cwd()
 
-      # Use dependency injection pattern from CLAUDE.md
-      if executor is not None:
-          self.executor = executor
-      else:
-          self.executor = _get_default_executor(config)
+        # Use dependency injection pattern from CLAUDE.md
+        if executor is not None:
+            self.executor = executor
+        else:
+            self.executor = _get_default_executor(config)
 
     def run_models(
-      self,
-      models: list[str] | None = None,
-      select: str | None = None,
-      exclude: str | None = None,
+        self,
+        models: list[str] | None = None,
+        select: str | None = None,
+        exclude: str | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Run DBT models using real Meltano executor."""
-      cmd = ["invoke", "dbt:run"]
+        """Run DBT models using real Meltano executor."""
+        cmd = ["invoke", "dbt:run"]
 
-      if models:
-          cmd.extend(["--models", " ".join(models)])
-      elif select:
-          cmd.extend(["--select", select])
+        if models:
+            cmd.extend(["--models", " ".join(models)])
+        elif select:
+            cmd.extend(["--select", select])
 
-      if exclude:
-          cmd.extend(["--exclude", exclude])
+        if exclude:
+            cmd.extend(["--exclude", exclude])
 
-      # For tests, return structured success without invoking Meltano
-      return FlextResult.ok(
-          {
-              "models": models or [],
-              "command": " ".join(cmd),
-              "status": "success",
-              "output": "DBT models executed successfully",
-          },
-      )
+        # For tests, return structured success without invoking Meltano
+        return FlextResult.ok(
+            {
+                "models": models or [],
+                "command": " ".join(cmd),
+                "status": "success",
+                "output": "DBT models executed successfully",
+            },
+        )
 
     def test_models(
-      self,
-      models: list[str] | None = None,
-      select: str | None = None,
+        self,
+        models: list[str] | None = None,
+        select: str | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Test DBT models using real Meltano executor."""
-      cmd = ["invoke", "dbt:test"]
+        """Test DBT models using real Meltano executor."""
+        cmd = ["invoke", "dbt:test"]
 
-      if models:
-          cmd.extend(["--models", " ".join(models)])
-      elif select:
-          cmd.extend(["--select", select])
+        if models:
+            cmd.extend(["--models", " ".join(models)])
+        elif select:
+            cmd.extend(["--select", select])
 
-      return FlextResult.ok(
-          {
-              "models": models or [],
-              "command": " ".join(cmd),
-              "status": "success",
-              "output": "DBT tests executed successfully",
-          },
-      )
+        return FlextResult.ok(
+            {
+                "models": models or [],
+                "command": " ".join(cmd),
+                "status": "success",
+                "output": "DBT tests executed successfully",
+            },
+        )
 
     def compile_models(
-      self,
-      models: list[str] | None = None,
-      select: str | None = None,
+        self,
+        models: list[str] | None = None,
+        select: str | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Compile DBT models using real Meltano executor."""
-      cmd = ["invoke", "dbt:compile"]
+        """Compile DBT models using real Meltano executor."""
+        cmd = ["invoke", "dbt:compile"]
 
-      if models:
-          cmd.extend(["--models", " ".join(models)])
-      elif select:
-          cmd.extend(["--select", select])
+        if models:
+            cmd.extend(["--models", " ".join(models)])
+        elif select:
+            cmd.extend(["--select", select])
 
-      return FlextResult.ok(
-          {
-              "models": models or [],
-              "command": " ".join(cmd),
-              "status": "success",
-              "output": "DBT models compiled successfully",
-          },
-      )
+        return FlextResult.ok(
+            {
+                "models": models or [],
+                "command": " ".join(cmd),
+                "status": "success",
+                "output": "DBT models compiled successfully",
+            },
+        )
 
     def generate_docs(self) -> FlextResult[dict[str, object]]:
-      """Generate DBT documentation."""
-      result = self.executor.run_command(["invoke", "dbt:docs:generate"])
+        """Generate DBT documentation."""
+        result = self.executor.run_command(["invoke", "dbt:docs:generate"])
 
-      if result.success:
-          return FlextResult.ok(
-              {
-                  "command": "dbt docs generate",
-                  "status": "success",
-                  "output": result.data,
-              },
-          )
-      return FlextResult.fail(f"DBT docs generation failed: {result.error}")
+        if result.success:
+            return FlextResult.ok(
+                {
+                    "command": "dbt docs generate",
+                    "status": "success",
+                    "output": result.data,
+                },
+            )
+        return FlextResult.fail(f"DBT docs generation failed: {result.error}")
 
     def serve_docs(self, port: int = 8080) -> FlextResult[dict[str, object]]:
-      """Serve DBT documentation."""
-      result = self.executor.run_command(
-          [
-              "invoke",
-              "dbt:docs:serve",
-              "--port",
-              str(port),
-          ],
-      )
+        """Serve DBT documentation."""
+        result = self.executor.run_command(
+            [
+                "invoke",
+                "dbt:docs:serve",
+                "--port",
+                str(port),
+            ],
+        )
 
-      if result.success:
-          return FlextResult.ok(
-              {
-                  "command": f"dbt docs serve --port {port}",
-                  "status": "success",
-                  "port": port,
-                  "output": result.data,
-              },
-          )
-      return FlextResult.fail(f"DBT docs serve failed: {result.error}")
+        if result.success:
+            return FlextResult.ok(
+                {
+                    "command": f"dbt docs serve --port {port}",
+                    "status": "success",
+                    "port": port,
+                    "output": result.data,
+                },
+            )
+        return FlextResult.fail(f"DBT docs serve failed: {result.error}")
 
 
 class FlextMeltanoDbtProject:
     """DBT Project management with real Meltano integration."""
 
     def __init__(
-      self,
-      project_dir: Path | str | None = None,
-      executor: FlextMeltanoExecutor | None = None,
+        self,
+        project_dir: Path | str | None = None,
+        executor: FlextMeltanoExecutor | None = None,
     ) -> None:
-      """Initialize DBT project with real executor."""
-      self.project_dir = Path(project_dir) if project_dir else Path.cwd()
+        """Initialize DBT project with real executor."""
+        self.project_dir = Path(project_dir) if project_dir else Path.cwd()
 
-      if executor is not None:
-          self.executor = executor
-      else:
-          self.executor = _get_default_executor()
+        if executor is not None:
+            self.executor = executor
+        else:
+            self.executor = _get_default_executor()
 
     def initialize(self) -> FlextResult[None]:
-      """Initialize DBT project using Meltano."""
-      result = self.executor.run_command(["invoke", "dbt:initialize"])
+        """Initialize DBT project using Meltano."""
+        result = self.executor.run_command(["invoke", "dbt:initialize"])
 
-      if result.success:
-          return FlextResult.ok(None)
-      # Test-friendly fallback: treat missing Meltano/dbt as initialized
-      logger.warning(
-          "DBT initialize fallback to success (test mode)",
-          error=result.error,
-      )
-      return FlextResult.ok(None)
+        if result.success:
+            return FlextResult.ok(None)
+        # Test-friendly fallback: treat missing Meltano/dbt as initialized
+        logger.warning(
+            "DBT initialize fallback to success (test mode)",
+            error=result.error,
+        )
+        return FlextResult.ok(None)
 
     def validate(self) -> FlextResult[None]:
-      """Validate DBT project configuration."""
-      # Check if dbt_project.yml exists
-      dbt_project_file = self.project_dir / "dbt_project.yml"
-      if not dbt_project_file.exists():
-          # Test-friendly fallback: consider valid when file is absent
-          logger.warning(
-              "DBT project file not found; assuming valid in test mode",
-              file=str(dbt_project_file),
-          )
-          return FlextResult.ok(None)
+        """Validate DBT project configuration."""
+        # Check if dbt_project.yml exists
+        dbt_project_file = self.project_dir / "dbt_project.yml"
+        if not dbt_project_file.exists():
+            # Test-friendly fallback: consider valid when file is absent
+            logger.warning(
+                "DBT project file not found; assuming valid in test mode",
+                file=str(dbt_project_file),
+            )
+            return FlextResult.ok(None)
 
-      # Run DBT parse to validate project
-      result = self.executor.run_command(["invoke", "dbt:parse"])
+        # Run DBT parse to validate project
+        result = self.executor.run_command(["invoke", "dbt:parse"])
 
-      if result.success:
-          return FlextResult.ok(None)
-      # Fallback to success to avoid external dependency in tests
-      logger.warning(
-          "DBT parse failed; assuming valid in test mode",
-          error=result.error,
-      )
-      return FlextResult.ok(None)
+        if result.success:
+            return FlextResult.ok(None)
+        # Fallback to success to avoid external dependency in tests
+        logger.warning(
+            "DBT parse failed; assuming valid in test mode",
+            error=result.error,
+        )
+        return FlextResult.ok(None)
 
 
 class FlextMeltanoDbtRunner:
     """DBT Runner for executing DBT commands with real implementation."""
 
     def __init__(
-      self,
-      project_dir: Path | str | None = None,
-      executor: FlextMeltanoExecutor | None = None,
+        self,
+        project_dir: Path | str | None = None,
+        executor: FlextMeltanoExecutor | None = None,
     ) -> None:
-      """Initialize DBT runner with real executor."""
-      self.project_dir = Path(project_dir) if project_dir else Path.cwd()
+        """Initialize DBT runner with real executor."""
+        self.project_dir = Path(project_dir) if project_dir else Path.cwd()
 
-      if executor is not None:
-          self.executor = executor
-      else:
-          self.executor = _get_default_executor()
+        if executor is not None:
+            self.executor = executor
+        else:
+            self.executor = _get_default_executor()
 
     def run(
-      self,
-      command: str,
-      args: list[str] | None = None,
+        self,
+        command: str,
+        args: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Run DBT command using Meltano executor."""
-      cmd = ["invoke", f"dbt:{command}"]
-      if args:
-          cmd.extend(args)
+        """Run DBT command using Meltano executor."""
+        cmd = ["invoke", f"dbt:{command}"]
+        if args:
+            cmd.extend(args)
 
-      result = self.executor.run_command(cmd)
+        result = self.executor.run_command(cmd)
 
-      if result.success:
-          return FlextResult.ok(
-              {
-                  # Expose the logical DBT command (not the Meltano wrapper)
-                  "command": command,
-                  "args": args or [],
-                  "status": "success",
-                  "output": result.data,
-              },
-          )
-      # Fallback: in environments without Meltano/DBT, emulate success
-      logger.warning(
-          "DBT command fallback to success (test mode)",
-          error=result.error,
-      )
-      return FlextResult.ok(
-          {
-              "command": command,
-              "args": args or [],
-              "status": "success",
-              "output": {"stdout": "simulated"},
-          },
-      )
+        if result.success:
+            return FlextResult.ok(
+                {
+                    # Expose the logical DBT command (not the Meltano wrapper)
+                    "command": command,
+                    "args": args or [],
+                    "status": "success",
+                    "output": result.data,
+                },
+            )
+        # Fallback: in environments without Meltano/DBT, emulate success
+        logger.warning(
+            "DBT command fallback to success (test mode)",
+            error=result.error,
+        )
+        return FlextResult.ok(
+            {
+                "command": command,
+                "args": args or [],
+                "status": "success",
+                "output": {"stdout": "simulated"},
+            },
+        )
 
     def run_models(
-      self,
-      models: list[str] | None = None,
+        self,
+        models: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Run specific DBT models."""
-      args: list[str] = []
-      if models:
-          args.extend(["--models", " ".join(models)])
+        """Run specific DBT models."""
+        args: list[str] = []
+        if models:
+            args.extend(["--models", " ".join(models)])
 
-      # Return structured result matching tests without depending on Meltano
-      return FlextResult.ok(
-          {
-              "models": models or [],
-              "status": "success",
-          },
-      )
+        # Return structured result matching tests without depending on Meltano
+        return FlextResult.ok(
+            {
+                "models": models or [],
+                "status": "success",
+            },
+        )
 
     def test_models(
-      self,
-      models: list[str] | None = None,
+        self,
+        models: list[str] | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Test specific DBT models."""
-      args: list[str] = []
-      if models:
-          args.extend(["--models", " ".join(models)])
+        """Test specific DBT models."""
+        args: list[str] = []
+        if models:
+            args.extend(["--models", " ".join(models)])
 
-      # Return structured result matching tests without depending on Meltano
-      return FlextResult.ok(
-          {
-              "models": models or [],
-              "status": "success",
-          },
-      )
+        # Return structured result matching tests without depending on Meltano
+        return FlextResult.ok(
+            {
+                "models": models or [],
+                "status": "success",
+            },
+        )
 
 
 # Export classes for Singer project imports

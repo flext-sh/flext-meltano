@@ -48,79 +48,79 @@ def example_basic_api_usage() -> None:
     """Basic example of FlextMeltanoAPI usage."""
     # Create temporary directory for the example
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_root = Path(temp_dir) / "example_project"
-      project_root.mkdir()
+        project_root = Path(temp_dir) / "example_project"
+        project_root.mkdir()
 
-      # Initialize configuration with REAL API
-      config = FlextMeltanoConfig(
-          project_root=str(project_root),
-          environment="dev",
-      )
+        # Initialize configuration with REAL API
+        config = FlextMeltanoConfig(
+            project_root=str(project_root),
+            environment="dev",
+        )
 
-      # Create bridge using REAL API
-      create_flext_meltano_bridge(config)
+        # Create bridge using REAL API
+        create_flext_meltano_bridge(config)
 
-      # Create executor for pipeline operations
-      executor_result = create_executor(config)
-      if executor_result.success:
-          pass
+        # Create executor for pipeline operations
+        executor_result = create_executor(config)
+        if executor_result.success:
+            pass
 
-      # Create discoverer for plugin discovery
-      discoverer_result = create_discoverer(config)
-      if discoverer_result.success:
-          pass
+        # Create discoverer for plugin discovery
+        discoverer_result = create_discoverer(config)
+        if discoverer_result.success:
+            pass
 
 
 def example_one_liner_functions() -> None:
     """Example usage of one-liner functions."""
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_root = Path(temp_dir) / "oneliner_project"
-      project_root.mkdir()
+        project_root = Path(temp_dir) / "oneliner_project"
+        project_root.mkdir()
 
-      # Real one-liner functions using actual APIs
-      config = FlextMeltanoConfig(project_root=str(project_root))
+        # Real one-liner functions using actual APIs
+        config = FlextMeltanoConfig(project_root=str(project_root))
 
-      # One-liner: Create and use bridge
-      create_flext_meltano_bridge(config)
+        # One-liner: Create and use bridge
+        create_flext_meltano_bridge(config)
 
-      # One-liner: Create executor with result handling
-      create_executor(config)
+        # One-liner: Create executor with result handling
+        create_executor(config)
 
 
 def example_advanced_usage() -> None:
     """Example of advanced API usage."""
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_root = Path(temp_dir) / "advanced_project"
-      project_root.mkdir()
+        project_root = Path(temp_dir) / "advanced_project"
+        project_root.mkdir()
 
-      # Configuration com configurações customizadas usando REAL API
-      config = FlextMeltanoConfig(
-          project_root=str(project_root),
-          environment="prod",
-      )
+        # Configuration com configurações customizadas usando REAL API
+        config = FlextMeltanoConfig(
+            project_root=str(project_root),
+            environment="prod",
+        )
 
-      # Create bridge with advanced configuration
-      create_flext_meltano_bridge(config)
+        # Create bridge with advanced configuration
+        create_flext_meltano_bridge(config)
 
-      # Create services for advanced usage
-      executor_result = create_executor(config)
-      if executor_result.success:
-          pass
+        # Create services for advanced usage
+        executor_result = create_executor(config)
+        if executor_result.success:
+            pass
 
 
 def example_error_handling() -> None:
     """Example of error handling with FlextResult."""
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_root = Path(temp_dir) / "error_handling"
-      project_root.mkdir()
+        project_root = Path(temp_dir) / "error_handling"
+        project_root.mkdir()
 
-      # Error handling example with REAL API
-      config = FlextMeltanoConfig(project_root=str(project_root))
+        # Error handling example with REAL API
+        config = FlextMeltanoConfig(project_root=str(project_root))
 
-      # Demonstrate FlextResult error handling patterns
-      executor_result = create_executor(config)
-      if executor_result.success:
-          pass
+        # Demonstrate FlextResult error handling patterns
+        executor_result = create_executor(config)
+        if executor_result.success:
+            pass
 
 
 if __name__ == "__main__":

@@ -42,69 +42,69 @@ def set_test_environment() -> Generator[None]:
 def test_meltano_project_dir() -> Generator[Path]:
     """Temporary Meltano project directory for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_dir = Path(temp_dir) / "test_meltano_project"
-      project_dir.mkdir()
-      yield project_dir
+        project_dir = Path(temp_dir) / "test_meltano_project"
+        project_dir.mkdir()
+        yield project_dir
 
 
 @pytest.fixture
 def meltano_yml_config() -> dict[str, object]:
     """Sample meltano.yml configuration for testing."""
     return {
-      "version": 1,
-      "default_environment": "test",
-      "project_id": "test-project",
-      "environments": [
-          {
-              "name": "test",
-              "config": {
-                  "plugins": {
-                      "extractors": [
-                          {
-                              "name": "tap-csv",
-                              "variant": "meltanolabs",
-                              "pip_url": "pipelinewise-tap-csv",
-                          },
-                      ],
-                      "loaders": [
-                          {
-                              "name": "target-csv",
-                              "variant": "meltanolabs",
-                              "pip_url": "pipelinewise-target-csv",
-                          },
-                      ],
-                  },
-              },
-          },
-      ],
-      "plugins": {
-          "extractors": [
-              {
-                  "name": "tap-csv",
-                  "variant": "meltanolabs",
-                  "pip_url": "pipelinewise-tap-csv",
-                  "config": {
-                      "files": [
-                          {
-                              "entity": "test_data",
-                              "path": "test_data.csv",
-                              "keys": ["id"],
-                          },
-                      ],
-                  },
-              },
-          ],
-          "loaders": [
-              {
-                  "name": "target-csv",
-                  "variant": "meltanolabs",
-                  "pip_url": "pipelinewise-target-csv",
-                  "config": {
-                      "destination_path": "output",
-                  },
-              },
-          ],
-      },
+        "version": 1,
+        "default_environment": "test",
+        "project_id": "test-project",
+        "environments": [
+            {
+                "name": "test",
+                "config": {
+                    "plugins": {
+                        "extractors": [
+                            {
+                                "name": "tap-csv",
+                                "variant": "meltanolabs",
+                                "pip_url": "pipelinewise-tap-csv",
+                            },
+                        ],
+                        "loaders": [
+                            {
+                                "name": "target-csv",
+                                "variant": "meltanolabs",
+                                "pip_url": "pipelinewise-target-csv",
+                            },
+                        ],
+                    },
+                },
+            },
+        ],
+        "plugins": {
+            "extractors": [
+                {
+                    "name": "tap-csv",
+                    "variant": "meltanolabs",
+                    "pip_url": "pipelinewise-tap-csv",
+                    "config": {
+                        "files": [
+                            {
+                                "entity": "test_data",
+                                "path": "test_data.csv",
+                                "keys": ["id"],
+                            },
+                        ],
+                    },
+                },
+            ],
+            "loaders": [
+                {
+                    "name": "target-csv",
+                    "variant": "meltanolabs",
+                    "pip_url": "pipelinewise-target-csv",
+                    "config": {
+                        "destination_path": "output",
+                    },
+                },
+            ],
+        },
     }
 
 
@@ -118,16 +118,16 @@ def meltano_project(
 
     meltano_yml = test_meltano_project_dir / "meltano.yml"
     with meltano_yml.open("w", encoding="utf-8") as f:
-      yaml.dump(meltano_yml_config, f)
+        yaml.dump(meltano_yml_config, f)
 
     # Return simple dict instead of missing MeltanoProject class
     return {
-      "name": "test-project",
-      "directory": test_meltano_project_dir,
-      "config_path": test_meltano_project_dir / "meltano.yml",
-      "description": "Test project for flext-meltano",
-      "version": "1",
-      "config": meltano_yml_config,
+        "name": "test-project",
+        "directory": test_meltano_project_dir,
+        "config_path": test_meltano_project_dir / "meltano.yml",
+        "description": "Test project for flext-meltano",
+        "version": "1",
+        "config": meltano_yml_config,
     }
 
 
@@ -136,14 +136,14 @@ def meltano_project(
 def tap_csv_config() -> dict[str, object]:
     """Tap CSV configuration for testing."""
     return {
-      "files": [
-          {
-              "entity": "test_entity",
-              "path": "test_data.csv",
-              "keys": ["id"],
-              "encoding": "utf-8",
-          },
-      ],
+        "files": [
+            {
+                "entity": "test_entity",
+                "path": "test_data.csv",
+                "keys": ["id"],
+                "encoding": "utf-8",
+            },
+        ],
     }
 
 
@@ -151,9 +151,9 @@ def tap_csv_config() -> dict[str, object]:
 def target_csv_config() -> dict[str, object]:
     """Target CSV configuration for testing."""
     return {
-      "destination_path": "output",
-      "file_format": "csv",
-      "delimiter": ",",
+        "destination_path": "output",
+        "file_format": "csv",
+        "delimiter": ",",
     }
 
 
@@ -184,18 +184,18 @@ def meltano_invoke_args() -> list[str]:
 def singer_schema() -> dict[str, object]:
     """Sample Singer schema for testing."""
     return {
-      "type": "SCHEMA",
-      "stream": "test_entity",
-      "schema": {
-          "type": "object",
-          "properties": {
-              "id": {"type": "integer"},
-              "name": {"type": "string"},
-              "email": {"type": "string"},
-              "created_at": {"type": "string", "format": "date-time"},
-          },
-      },
-      "key_properties": ["id"],
+        "type": "SCHEMA",
+        "stream": "test_entity",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "id": {"type": "integer"},
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "created_at": {"type": "string", "format": "date-time"},
+            },
+        },
+        "key_properties": ["id"],
     }
 
 
@@ -203,26 +203,26 @@ def singer_schema() -> dict[str, object]:
 def singer_records() -> list[dict[str, object]]:
     """Sample Singer records for testing."""
     return [
-      {
-          "type": "RECORD",
-          "stream": "test_entity",
-          "record": {
-              "id": 1,
-              "name": "John Doe",
-              "email": "john@example.com",
-              "created_at": "2023-01-01T00:00:00Z",
-          },
-      },
-      {
-          "type": "RECORD",
-          "stream": "test_entity",
-          "record": {
-              "id": 2,
-              "name": "Jane Smith",
-              "email": "jane@example.com",
-              "created_at": "2023-01-02T00:00:00Z",
-          },
-      },
+        {
+            "type": "RECORD",
+            "stream": "test_entity",
+            "record": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "created_at": "2023-01-01T00:00:00Z",
+            },
+        },
+        {
+            "type": "RECORD",
+            "stream": "test_entity",
+            "record": {
+                "id": 2,
+                "name": "Jane Smith",
+                "email": "jane@example.com",
+                "created_at": "2023-01-02T00:00:00Z",
+            },
+        },
     ]
 
 
@@ -230,15 +230,15 @@ def singer_records() -> list[dict[str, object]]:
 def singer_state() -> dict[str, object]:
     """Sample Singer state for testing."""
     return {
-      "type": "STATE",
-      "value": {
-          "bookmarks": {
-              "test_entity": {
-                  "replication_key": "created_at",
-                  "replication_key_value": "2023-01-02T00:00:00Z",
-              },
-          },
-      },
+        "type": "STATE",
+        "value": {
+            "bookmarks": {
+                "test_entity": {
+                    "replication_key": "created_at",
+                    "replication_key_value": "2023-01-02T00:00:00Z",
+                },
+            },
+        },
     }
 
 
@@ -247,12 +247,12 @@ def singer_state() -> dict[str, object]:
 def pipeline_execution_config() -> dict[str, object]:
     """Pipeline execution configuration for testing."""
     return {
-      "extractor": "tap-csv",
-      "loader": "target-csv",
-      "transform": "skip",
-      "full_refresh": False,
-      "state_backend": "local",
-      "job_logging_level": "debug",
+        "extractor": "tap-csv",
+        "loader": "target-csv",
+        "transform": "skip",
+        "full_refresh": False,
+        "state_backend": "local",
+        "job_logging_level": "debug",
     }
 
 
@@ -261,14 +261,14 @@ def pipeline_execution_config() -> dict[str, object]:
 def test_environment_config() -> dict[str, object]:
     """Test environment configuration."""
     return {
-      "name": "test",
-      "config": {
-          "project_id": "test-meltano-project",
-          "cli": {
-              "log_level": "debug",
-              "log_config": False,
-          },
-      },
+        "name": "test",
+        "config": {
+            "project_id": "test-meltano-project",
+            "cli": {
+                "log_level": "debug",
+                "log_config": False,
+            },
+        },
     }
 
 
@@ -277,12 +277,12 @@ def test_environment_config() -> dict[str, object]:
 def sample_schedule_config() -> dict[str, object]:
     """Sample schedule configuration."""
     return {
-      "name": "daily-sync",
-      "extractor": "tap-csv",
-      "loader": "target-csv",
-      "transform": "skip",
-      "interval": "@daily",
-      "start_date": "2023-01-01",
+        "name": "daily-sync",
+        "extractor": "tap-csv",
+        "loader": "target-csv",
+        "transform": "skip",
+        "interval": "@daily",
+        "start_date": "2023-01-01",
     }
 
 
@@ -291,11 +291,11 @@ def sample_schedule_config() -> dict[str, object]:
 def job_run_config() -> dict[str, object]:
     """Job run configuration for testing."""
     return {
-      "job_id": "test-job-123",
-      "run_id": "test-run-456",
-      "pipeline": "tap-csv-to-target-csv",
-      "environment": "test",
-      "started_at": "2023-01-01T00:00:00Z",
+        "job_id": "test-job-123",
+        "run_id": "test-run-456",
+        "pipeline": "tap-csv-to-target-csv",
+        "environment": "test",
+        "started_at": "2023-01-01T00:00:00Z",
     }
 
 
@@ -318,25 +318,25 @@ def mock_meltano_service() -> object:
     """Mock Meltano service for testing."""
 
     class MockMeltanoService:
-      async def create_project(
-          self,
-          config: dict[str, object],  # noqa: ARG002
-      ) -> dict[str, object]:
-          return {"project_id": "test-project", "status": "created"}
+        async def create_project(
+            self,
+            config: dict[str, object],  # noqa: ARG002
+        ) -> dict[str, object]:
+            return {"project_id": "test-project", "status": "created"}
 
-      async def install_plugin(
-          self,
-          plugin_type: str,  # noqa: ARG002
-          plugin_name: str,
-      ) -> dict[str, object]:
-          return {"plugin": plugin_name, "status": "installed"}
+        async def install_plugin(
+            self,
+            plugin_type: str,  # noqa: ARG002
+            plugin_name: str,
+        ) -> dict[str, object]:
+            return {"plugin": plugin_name, "status": "installed"}
 
-      async def run_pipeline(
-          self,
-          extractor: str,  # noqa: ARG002
-          loader: str,  # noqa: ARG002
-      ) -> dict[str, object]:
-          return {"execution_id": "test-execution", "status": "running"}
+        async def run_pipeline(
+            self,
+            extractor: str,  # noqa: ARG002
+            loader: str,  # noqa: ARG002
+        ) -> dict[str, object]:
+            return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()
 
@@ -346,14 +346,14 @@ def mock_singer_tap() -> type[object]:
     """Mock Singer tap for testing."""
 
     class MockSingerTap:
-      def __init__(self, config: dict[str, object]) -> None:
-          self.config = config
+        def __init__(self, config: dict[str, object]) -> None:
+            self.config = config
 
-      async def discover(self) -> dict[str, object]:
-          return {"streams": [{"stream": "test_entity", "schema": {}}]}
+        async def discover(self) -> dict[str, object]:
+            return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-      async def extract(self) -> list[dict[str, object]]:
-          return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
+        async def extract(self) -> list[dict[str, object]]:
+            return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
 
@@ -363,10 +363,10 @@ def mock_singer_target() -> object:
     """Mock Singer target for testing."""
 
     class MockSingerTarget:
-      def __init__(self, config: dict[str, object]) -> None:
-          self.config = config
+        def __init__(self, config: dict[str, object]) -> None:
+            self.config = config
 
-      async def load(self, records: list[dict[str, object]]) -> dict[str, object]:
-          return {"records_loaded": len(records), "status": "success"}
+        async def load(self, records: list[dict[str, object]]) -> dict[str, object]:
+            return {"records_loaded": len(records), "status": "success"}
 
     return MockSingerTarget
