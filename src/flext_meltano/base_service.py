@@ -15,38 +15,38 @@ class FlextMeltanoBaseService:
     """Base service using flext-core patterns."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-      """Initialize base service with configuration.
+        """Initialize base service with configuration.
 
-      Args:
-          config: Meltano configuration object.
+        Args:
+            config: Meltano configuration object.
 
-      """
-      self.config = config
-      self._initialized = False
-      self.logger = get_logger(self.__class__.__name__)
+        """
+        self.config = config
+        self._initialized = False
+        self.logger = get_logger(self.__class__.__name__)
 
     def initialize(self) -> FlextResult[bool]:
-      """Initialize the service after validating state."""
-      try:
-          validation_result = self.validate_service()
-          if not validation_result.success:
-              return FlextResult.fail(validation_result.error or "Validation failed")
-          self._initialized = True
-          success_value = True
-          result: FlextResult[bool] = FlextResult.ok(success_value)
-          return result
-      except Exception as e:
-          return FlextResult.fail(f"Service initialization failed: {e}")
+        """Initialize the service after validating state."""
+        try:
+            validation_result = self.validate_service()
+            if not validation_result.success:
+                return FlextResult.fail(validation_result.error or "Validation failed")
+            self._initialized = True
+            success_value = True
+            result: FlextResult[bool] = FlextResult.ok(success_value)
+            return result
+        except Exception as e:
+            return FlextResult.fail(f"Service initialization failed: {e}")
 
     def validate_service(self) -> FlextResult[bool]:  # To be overridden
-      """Validate concrete service requirements."""
-      validation_success = True
-      result: FlextResult[bool] = FlextResult.ok(validation_success)
-      return result
+        """Validate concrete service requirements."""
+        validation_success = True
+        result: FlextResult[bool] = FlextResult.ok(validation_success)
+        return result
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:  # To be overridden
-      """Return health information for monitoring."""
-      return FlextResult.ok({"initialized": self._initialized})
+        """Return health information for monitoring."""
+        return FlextResult.ok({"initialized": self._initialized})
 
 
 __all__ = ["FlextMeltanoBaseService"]

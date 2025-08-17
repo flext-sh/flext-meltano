@@ -62,24 +62,24 @@ class FlextTapOracle(FlextSingerUnifiedInterface):
     '''Oracle tap implementation using unified interface.'''
 
     def initialize(self, config: FlextSingerUnifiedConfig) -> FlextResult[None]:
-      # Initialize Oracle connection with unified config
-      self.connection = create_oracle_connection(config.config)
-      return FlextResult.ok(None)
+        # Initialize Oracle connection with unified config
+        self.connection = create_oracle_connection(config.config)
+        return FlextResult.ok(None)
 
     def discover_catalog(self) -> FlextResult[dict[str, object]]:
-      # Discover Oracle schemas and tables
-      return FlextResult.ok(self.connection.discover_schemas())
+        # Discover Oracle schemas and tables
+        return FlextResult.ok(self.connection.discover_schemas())
 
     def execute(self, input_data=None) -> FlextResult[FlextSingerUnifiedResult]:
-      # Extract data from Oracle
-      records = self.connection.extract_records()
-      return FlextResult.ok(
-          FlextSingerUnifiedResult(
-              success=True,
-              records_processed=len(records),
-              schemas_discovered=list(self.catalog.keys()),
-          )
-      )
+        # Extract data from Oracle
+        records = self.connection.extract_records()
+        return FlextResult.ok(
+            FlextSingerUnifiedResult(
+                success=True,
+                records_processed=len(records),
+                schemas_discovered=list(self.catalog.keys()),
+            )
+        )
 ```
 
 ### Service Registration and Pipeline Execution
@@ -114,16 +114,16 @@ def bridge_execute_unified_pipeline(config_json: str) -> dict[str, object]:
 
     # Register components dynamically
     for component_name, component_class in get_registered_components():
-      service.register_component(component_name, component_class())
+        service.register_component(component_name, component_class())
 
     # Execute pipeline
     result = service.execute("execute_pipeline", **config)
 
     return {
-      "success": result.success,
-      "records_processed": result.data.records_processed if result.success else 0,
-      "execution_time_ms": result.data.execution_time_ms if result.success else 0,
-      "error": result.error_message if result.is_failure else None,
+        "success": result.success,
+        "records_processed": result.data.records_processed if result.success else 0,
+        "execution_time_ms": result.data.execution_time_ms if result.success else 0,
+        "error": result.error_message if result.is_failure else None,
     }
 ```
 
@@ -213,51 +213,51 @@ class FlextSingerUnifiedConfig:
     """
 
     def __init__(
-      self,
-      name: str,
-      config: dict[str, object],
-      catalog: dict[str, object] | None = None,
-      state: dict[str, object] | None = None,
-      environment: str = "dev",
-      **extra_config: object,
+        self,
+        name: str,
+        config: dict[str, object],
+        catalog: dict[str, object] | None = None,
+        state: dict[str, object] | None = None,
+        environment: str = "dev",
+        **extra_config: object,
     ) -> None:
-      """Initialize unified Singer configuration.
+        """Initialize unified Singer configuration.
 
-      Args:
-          name: Singer plugin name (tap-oracle, target-csv, etc.)
-          config: Plugin-specific configuration
-          catalog: Singer catalog for schema definition
-          state: Singer state for incremental processing
-          environment: Execution environment
-          **extra_config: Additional configuration options
+        Args:
+            name: Singer plugin name (tap-oracle, target-csv, etc.)
+            config: Plugin-specific configuration
+            catalog: Singer catalog for schema definition
+            state: Singer state for incremental processing
+            environment: Execution environment
+            **extra_config: Additional configuration options
 
-      """
-      self.name = name
-      self.config = config
-      self.catalog = catalog or {}
-      self.state = state or {}
-      self.environment = environment
-      self.extra_config = extra_config
+        """
+        self.name = name
+        self.config = config
+        self.catalog = catalog or {}
+        self.state = state or {}
+        self.environment = environment
+        self.extra_config = extra_config
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate unified Singer configuration business rules.
+        """Validate unified Singer configuration business rules.
 
-      Returns:
-          FlextResult indicating validation success/failure
+        Returns:
+            FlextResult indicating validation success/failure
 
-      """
-      if not self.name or not isinstance(self.name, str):
-          return FlextResult.fail("Singer plugin name must be a non-empty string")
+        """
+        if not self.name or not isinstance(self.name, str):
+            return FlextResult.fail("Singer plugin name must be a non-empty string")
 
-      if not self.config or not isinstance(self.config, dict):
-          return FlextResult.fail("Singer config must be a non-empty dictionary")
+        if not self.config or not isinstance(self.config, dict):
+            return FlextResult.fail("Singer config must be a non-empty dictionary")
 
-      return FlextResult.ok(None)
+        return FlextResult.ok(None)
 
     # Backward-compatible alias expected by some tests
     def validate_domain_rules(self) -> FlextResult[None]:
-      """Alias for validate_business_rules for compatibility."""
-      return self.validate_business_rules()
+        """Alias for validate_business_rules for compatibility."""
+        return self.validate_business_rules()
 
 
 @dataclass
@@ -278,26 +278,26 @@ class FlextSingerUnifiedResult:
     metrics: dict[str, object] = field(default_factory=dict)
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate unified Singer result business rules.
+        """Validate unified Singer result business rules.
 
-      Returns:
-          FlextResult indicating validation success/failure
+        Returns:
+            FlextResult indicating validation success/failure
 
-      """
-      # Since this is a dataclass with type annotations, most type checks are redundant
-      # Keep only meaningful business rule validations
-      if self.records_processed < 0:
-          return FlextResult.fail("Records processed must be a non-negative integer")
+        """
+        # Since this is a dataclass with type annotations, most type checks are redundant
+        # Keep only meaningful business rule validations
+        if self.records_processed < 0:
+            return FlextResult.fail("Records processed must be a non-negative integer")
 
-      if self.execution_time_ms < 0:
-          return FlextResult.fail("Execution time must be a non-negative number")
+        if self.execution_time_ms < 0:
+            return FlextResult.fail("Execution time must be a non-negative number")
 
-      return FlextResult.ok(None)
+        return FlextResult.ok(None)
 
     # Backward-compatible alias expected by some tests
     def validate_domain_rules(self) -> FlextResult[None]:
-      """Alias for validate_business_rules for compatibility."""
-      return self.validate_business_rules()
+        """Alias for validate_business_rules for compatibility."""
+        return self.validate_business_rules()
 
 
 class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
@@ -309,360 +309,360 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
     """
 
     def __init__(self) -> None:
-      """Initialize the unified Singer service."""
-      super().__init__()
-      self._registered_components: dict[str, FlextSingerUnifiedInterface] = {}
+        """Initialize the unified Singer service."""
+        super().__init__()
+        self._registered_components: dict[str, FlextSingerUnifiedInterface] = {}
 
     def execute(self) -> FlextResult[FlextSingerUnifiedResult]:
-      """Execute default Singer service operation."""
-      # Default execution - return empty result
-      return FlextResult.ok(
-          FlextSingerUnifiedResult(
-              success=True,
-              records_processed=0,
-              schemas_discovered=[],
-          ),
-      )
+        """Execute default Singer service operation."""
+        # Default execution - return empty result
+        return FlextResult.ok(
+            FlextSingerUnifiedResult(
+                success=True,
+                records_processed=0,
+                schemas_discovered=[],
+            ),
+        )
 
     def execute_operation(self, *args: object, **kwargs: object) -> FlextResult[object]:
-      """Execute unified Singer service operations.
+        """Execute unified Singer service operations.
 
-      SOLID SRP: Single entry point for all Singer service operations.
-      Delegates to specific methods based on operation type.
+        SOLID SRP: Single entry point for all Singer service operations.
+        Delegates to specific methods based on operation type.
 
-      Args:
-          *args: Operation arguments (first arg should be operation name)
-          **kwargs: Operation parameters
+        Args:
+            *args: Operation arguments (first arg should be operation name)
+            **kwargs: Operation parameters
 
-      Returns:
-          FlextResult with operation result
+        Returns:
+            FlextResult with operation result
 
-      """
-      if not args:
-          return FlextResult.fail("Operation name required as first argument")
+        """
+        if not args:
+            return FlextResult.fail("Operation name required as first argument")
 
-      operation = args[0]
+        operation = args[0]
 
-      if operation == "execute_pipeline":
-          pipeline_result = self._execute_pipeline_operation(kwargs)
-          return (
-              FlextResult[object].ok(pipeline_result.data)
-              if pipeline_result.success
-              else FlextResult[object].fail(
-                  pipeline_result.error or "Pipeline execution failed",
-              )
-          )
-      if operation == "discover_catalogs":
-          catalogs_result = self.discover_all_catalogs()
-          return (
-              FlextResult[object].ok(catalogs_result.data)
-              if catalogs_result.success
-              else FlextResult[object].fail(
-                  catalogs_result.error or "Catalog discovery failed",
-              )
-          )
-      if operation == "validate_components":
-          validation_result = self.validate_all_components()
-          return (
-              FlextResult[object].ok(validation_result.data)
-              if validation_result.success
-              else FlextResult[object].fail(
-                  validation_result.error or "Component validation failed",
-              )
-          )
-      return FlextResult.fail(f"Unknown operation: {operation}")
+        if operation == "execute_pipeline":
+            pipeline_result = self._execute_pipeline_operation(kwargs)
+            return (
+                FlextResult[object].ok(pipeline_result.data)
+                if pipeline_result.success
+                else FlextResult[object].fail(
+                    pipeline_result.error or "Pipeline execution failed",
+                )
+            )
+        if operation == "discover_catalogs":
+            catalogs_result = self.discover_all_catalogs()
+            return (
+                FlextResult[object].ok(catalogs_result.data)
+                if catalogs_result.success
+                else FlextResult[object].fail(
+                    catalogs_result.error or "Catalog discovery failed",
+                )
+            )
+        if operation == "validate_components":
+            validation_result = self.validate_all_components()
+            return (
+                FlextResult[object].ok(validation_result.data)
+                if validation_result.success
+                else FlextResult[object].fail(
+                    validation_result.error or "Component validation failed",
+                )
+            )
+        return FlextResult.fail(f"Unknown operation: {operation}")
 
     def _execute_pipeline_operation(
-      self,
-      kwargs: dict[str, object],
+        self,
+        kwargs: dict[str, object],
     ) -> FlextResult[FlextSingerUnifiedResult]:
-      """Execute pipeline operation from service execute method.
+        """Execute pipeline operation from service execute method.
 
-      Args:
-          kwargs: Pipeline parameters
+        Args:
+            kwargs: Pipeline parameters
 
-      Returns:
-          FlextResult with pipeline execution result
+        Returns:
+            FlextResult with pipeline execution result
 
-      """
-      required_params = ["tap_name", "target_name", "tap_config", "target_config"]
-      for param in required_params:
-          if param not in kwargs:
-              return FlextResult.fail(f"Missing required parameter: {param}")
+        """
+        required_params = ["tap_name", "target_name", "tap_config", "target_config"]
+        for param in required_params:
+            if param not in kwargs:
+                return FlextResult.fail(f"Missing required parameter: {param}")
 
-      # Create pipeline config from kwargs
-      try:
-          pipeline_config = FlextPipelineConfig(
-              tap_name=str(kwargs["tap_name"]),
-              target_name=str(kwargs["target_name"]),
-              tap_config=dict(kwargs["tap_config"])
-              if isinstance(kwargs["tap_config"], dict)
-              else {},
-              target_config=dict(kwargs["target_config"])
-              if isinstance(kwargs["target_config"], dict)
-              else {},
-              catalog=dict(kwargs["catalog"])
-              if kwargs.get("catalog") and isinstance(kwargs["catalog"], dict)
-              else None,
-              state=dict(kwargs["state"])
-              if kwargs.get("state") and isinstance(kwargs["state"], dict)
-              else None,
-          )
-          return self.execute_pipeline(pipeline_config)
-      except (ValueError, TypeError) as e:
-          return FlextResult.fail(f"Invalid pipeline configuration: {e}")
+        # Create pipeline config from kwargs
+        try:
+            pipeline_config = FlextPipelineConfig(
+                tap_name=str(kwargs["tap_name"]),
+                target_name=str(kwargs["target_name"]),
+                tap_config=dict(kwargs["tap_config"])
+                if isinstance(kwargs["tap_config"], dict)
+                else {},
+                target_config=dict(kwargs["target_config"])
+                if isinstance(kwargs["target_config"], dict)
+                else {},
+                catalog=dict(kwargs["catalog"])
+                if kwargs.get("catalog") and isinstance(kwargs["catalog"], dict)
+                else None,
+                state=dict(kwargs["state"])
+                if kwargs.get("state") and isinstance(kwargs["state"], dict)
+                else None,
+            )
+            return self.execute_pipeline(pipeline_config)
+        except (ValueError, TypeError) as e:
+            return FlextResult.fail(f"Invalid pipeline configuration: {e}")
 
     def register_component(
-      self,
-      name: str,
-      component: FlextSingerUnifiedInterface,
+        self,
+        name: str,
+        component: FlextSingerUnifiedInterface,
     ) -> FlextResult[None]:
-      """Register a Singer component (tap, target, transform) with the service.
+        """Register a Singer component (tap, target, transform) with the service.
 
-      SOLID OCP: Open/closed principle - service is open for extension
-      by registering new components without modifying existing code.
+        SOLID OCP: Open/closed principle - service is open for extension
+        by registering new components without modifying existing code.
 
-      Args:
-          name: Unique component name
-          component: Singer component implementing unified interface
+        Args:
+            name: Unique component name
+            component: Singer component implementing unified interface
 
-      Returns:
-          FlextResult indicating registration success/failure
+        Returns:
+            FlextResult indicating registration success/failure
 
-      """
-      try:
-          if name in self._registered_components:
-              return FlextResult.fail(f"Component '{name}' is already registered")
+        """
+        try:
+            if name in self._registered_components:
+                return FlextResult.fail(f"Component '{name}' is already registered")
 
-          self._registered_components[name] = component
-          return FlextResult.ok(None)
+            self._registered_components[name] = component
+            return FlextResult.ok(None)
 
-      except (ValueError, TypeError, AttributeError) as e:
-          return FlextResult.fail(f"Failed to register component '{name}': {e}")
+        except (ValueError, TypeError, AttributeError) as e:
+            return FlextResult.fail(f"Failed to register component '{name}': {e}")
 
     def get_component(self, name: str) -> FlextResult[FlextSingerUnifiedInterface]:
-      """Get a registered Singer component by name.
+        """Get a registered Singer component by name.
 
-      Args:
-          name: Component name
+        Args:
+            name: Component name
 
-      Returns:
-          FlextResult containing the component or error
+        Returns:
+            FlextResult containing the component or error
 
-      """
-      try:
-          if name not in self._registered_components:
-              return FlextResult.fail(f"Component '{name}' is not registered")
+        """
+        try:
+            if name not in self._registered_components:
+                return FlextResult.fail(f"Component '{name}' is not registered")
 
-          return FlextResult.ok(self._registered_components[name])
+            return FlextResult.ok(self._registered_components[name])
 
-      except (KeyError, ValueError) as e:
-          return FlextResult.fail(f"Failed to get component '{name}': {e}")
+        except (KeyError, ValueError) as e:
+            return FlextResult.fail(f"Failed to get component '{name}': {e}")
 
     def execute_pipeline(
-      self,
-      pipeline_config: FlextPipelineConfig,
+        self,
+        pipeline_config: FlextPipelineConfig,
     ) -> FlextResult[FlextSingerUnifiedResult]:
-      """Execute a complete Singer pipeline (tap -> target).
+        """Execute a complete Singer pipeline (tap -> target).
 
-      SOLID SRP: Single responsibility for end-to-end pipeline execution.
-      This orchestrates the complete flow without implementing tap/target logic.
+        SOLID SRP: Single responsibility for end-to-end pipeline execution.
+        This orchestrates the complete flow without implementing tap/target logic.
 
-      Args:
-          pipeline_config: Complete pipeline configuration containing tap/target settings
+        Args:
+            pipeline_config: Complete pipeline configuration containing tap/target settings
 
-      Returns:
-          FlextResult containing pipeline execution result
+        Returns:
+            FlextResult containing pipeline execution result
 
-      """
-      try:
-          # Get and initialize components using helper method
-          components_result = self._get_and_initialize_components(pipeline_config)
-          if components_result.is_failure:
-              return FlextResult.fail(
-                  components_result.error or "Component initialization failed",
-              )
+        """
+        try:
+            # Get and initialize components using helper method
+            components_result = self._get_and_initialize_components(pipeline_config)
+            if components_result.is_failure:
+                return FlextResult.fail(
+                    components_result.error or "Component initialization failed",
+                )
 
-          # Type-safe extraction of components tuple
-          components_data = components_result.data
-          if components_data is None:
-              return FlextResult.fail("Components result data is None")
+            # Type-safe extraction of components tuple
+            components_data = components_result.data
+            if components_data is None:
+                return FlextResult.fail("Components result data is None")
 
-          tap, target = components_data
+            tap, target = components_data
 
-          # Execute extraction and loading using helper method
-          return self._execute_pipeline_steps(tap, target)
+            # Execute extraction and loading using helper method
+            return self._execute_pipeline_steps(tap, target)
 
-      except (ValueError, TypeError, RuntimeError) as e:
-          return FlextResult.fail(f"Pipeline execution failed: {e}")
+        except (ValueError, TypeError, RuntimeError) as e:
+            return FlextResult.fail(f"Pipeline execution failed: {e}")
 
     def _get_and_initialize_components(
-      self,
-      pipeline_config: FlextPipelineConfig,
+        self,
+        pipeline_config: FlextPipelineConfig,
     ) -> FlextResult[tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]]:
-      """Get and initialize tap and target components."""
-      # Get and validate components
-      components_result = self._get_components(pipeline_config)
-      if components_result.is_failure:
-          return components_result
+        """Get and initialize tap and target components."""
+        # Get and validate components
+        components_result = self._get_components(pipeline_config)
+        if components_result.is_failure:
+            return components_result
 
-      # Type-safe extraction of components
-      components_data = components_result.data
-      if components_data is None:
-          return FlextResult.fail("Components result data is None")
+        # Type-safe extraction of components
+        components_data = components_result.data
+        if components_data is None:
+            return FlextResult.fail("Components result data is None")
 
-      tap, target = components_data
+        tap, target = components_data
 
-      # Initialize components with configs
-      initialization_result = self._initialize_components(
-          pipeline_config,
-          tap,
-          target,
-      )
-      if initialization_result.is_failure:
-          return FlextResult.fail(
-              initialization_result.error or "Component initialization failed",
-          )
+        # Initialize components with configs
+        initialization_result = self._initialize_components(
+            pipeline_config,
+            tap,
+            target,
+        )
+        if initialization_result.is_failure:
+            return FlextResult.fail(
+                initialization_result.error or "Component initialization failed",
+            )
 
-      return FlextResult.ok((tap, target))
+        return FlextResult.ok((tap, target))
 
     def _get_components(
-      self,
-      pipeline_config: FlextPipelineConfig,
+        self,
+        pipeline_config: FlextPipelineConfig,
     ) -> FlextResult[tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]]:
-      """Get and validate tap and target components."""
-      tap_result = self.get_component(pipeline_config.tap_name)
-      if tap_result.is_failure:
-          return FlextResult.fail(f"Tap error: {tap_result.error}")
+        """Get and validate tap and target components."""
+        tap_result = self.get_component(pipeline_config.tap_name)
+        if tap_result.is_failure:
+            return FlextResult.fail(f"Tap error: {tap_result.error}")
 
-      target_result = self.get_component(pipeline_config.target_name)
-      if target_result.is_failure:
-          return FlextResult.fail(f"Target error: {target_result.error}")
+        target_result = self.get_component(pipeline_config.target_name)
+        if target_result.is_failure:
+            return FlextResult.fail(f"Target error: {target_result.error}")
 
-      # Type-safe extraction of components
-      tap = tap_result.data
-      target = target_result.data
+        # Type-safe extraction of components
+        tap = tap_result.data
+        target = target_result.data
 
-      if tap is None:
-          return FlextResult.fail("Tap component is None")
-      if target is None:
-          return FlextResult.fail("Target component is None")
+        if tap is None:
+            return FlextResult.fail("Tap component is None")
+        if target is None:
+            return FlextResult.fail("Target component is None")
 
-      return FlextResult.ok((tap, target))
+        return FlextResult.ok((tap, target))
 
     def _initialize_components(
-      self,
-      pipeline_config: FlextPipelineConfig,
-      tap: FlextSingerUnifiedInterface,
-      target: FlextSingerUnifiedInterface,
+        self,
+        pipeline_config: FlextPipelineConfig,
+        tap: FlextSingerUnifiedInterface,
+        target: FlextSingerUnifiedInterface,
     ) -> FlextResult[None]:
-      """Initialize tap and target components with configuration."""
-      # Create configurations
-      tap_config = FlextSingerUnifiedConfig(
-          name=pipeline_config.tap_name,
-          config=pipeline_config.tap_config,
-          catalog=pipeline_config.catalog,
-          state=pipeline_config.state,
-      )
+        """Initialize tap and target components with configuration."""
+        # Create configurations
+        tap_config = FlextSingerUnifiedConfig(
+            name=pipeline_config.tap_name,
+            config=pipeline_config.tap_config,
+            catalog=pipeline_config.catalog,
+            state=pipeline_config.state,
+        )
 
-      target_config = FlextSingerUnifiedConfig(
-          name=pipeline_config.target_name,
-          config=pipeline_config.target_config,
-          catalog=pipeline_config.catalog,
-      )
+        target_config = FlextSingerUnifiedConfig(
+            name=pipeline_config.target_name,
+            config=pipeline_config.target_config,
+            catalog=pipeline_config.catalog,
+        )
 
-      # Initialize tap
-      tap_init_result = tap.initialize(tap_config)
-      if tap_init_result.is_failure:
-          return FlextResult.fail(
-              f"Tap initialization failed: {tap_init_result.error}",
-          )
+        # Initialize tap
+        tap_init_result = tap.initialize(tap_config)
+        if tap_init_result.is_failure:
+            return FlextResult.fail(
+                f"Tap initialization failed: {tap_init_result.error}",
+            )
 
-      # Initialize target
-      target_init_result = target.initialize(target_config)
-      if target_init_result.is_failure:
-          return FlextResult.fail(
-              f"Target initialization failed: {target_init_result.error}",
-          )
+        # Initialize target
+        target_init_result = target.initialize(target_config)
+        if target_init_result.is_failure:
+            return FlextResult.fail(
+                f"Target initialization failed: {target_init_result.error}",
+            )
 
-      return FlextResult.ok(None)
+        return FlextResult.ok(None)
 
     def _execute_pipeline_steps(
-      self,
-      tap: FlextSingerUnifiedInterface,
-      target: FlextSingerUnifiedInterface,
+        self,
+        tap: FlextSingerUnifiedInterface,
+        target: FlextSingerUnifiedInterface,
     ) -> FlextResult[FlextSingerUnifiedResult]:
-      """Execute pipeline extraction and loading steps."""
-      # Extract data from tap
-      extract_result = tap.execute()
-      if extract_result.is_failure:
-          return FlextResult.fail(f"Extract failed: {extract_result.error}")
+        """Execute pipeline extraction and loading steps."""
+        # Extract data from tap
+        extract_result = tap.execute()
+        if extract_result.is_failure:
+            return FlextResult.fail(f"Extract failed: {extract_result.error}")
 
-      # Type-safe extraction of extract data
-      extract_data = extract_result.data
-      if extract_data is None:
-          return FlextResult.fail("Extract result data is None")
+        # Type-safe extraction of extract data
+        extract_data = extract_result.data
+        if extract_data is None:
+            return FlextResult.fail("Extract result data is None")
 
-      # Load data to target
-      load_result = target.execute(extract_data)
-      if load_result.is_failure:
-          return FlextResult.fail(f"Load failed: {load_result.error}")
+        # Load data to target
+        load_result = target.execute(extract_data)
+        if load_result.is_failure:
+            return FlextResult.fail(f"Load failed: {load_result.error}")
 
-      # Type-safe extraction of load data
-      load_data = load_result.data
-      if load_data is None:
-          return FlextResult.fail("Load result data is None")
+        # Type-safe extraction of load data
+        load_data = load_result.data
+        if load_data is None:
+            return FlextResult.fail("Load result data is None")
 
-      # Combine results
-      combined_result = FlextSingerUnifiedResult(
-          success=True,
-          records_processed=extract_data.records_processed,
-          schemas_discovered=extract_data.schemas_discovered,
-          state_updates=extract_data.state_updates,
-          execution_time_ms=extract_data.execution_time_ms
-          + load_data.execution_time_ms,
-      )
+        # Combine results
+        combined_result = FlextSingerUnifiedResult(
+            success=True,
+            records_processed=extract_data.records_processed,
+            schemas_discovered=extract_data.schemas_discovered,
+            state_updates=extract_data.state_updates,
+            execution_time_ms=extract_data.execution_time_ms
+            + load_data.execution_time_ms,
+        )
 
-      return FlextResult.ok(combined_result)
+        return FlextResult.ok(combined_result)
 
     def discover_all_catalogs(self) -> FlextResult[dict[str, dict[str, object]]]:
-      """Discover catalogs from all registered components.
+        """Discover catalogs from all registered components.
 
-      Returns:
-          FlextResult containing dictionary of component catalogs
+        Returns:
+            FlextResult containing dictionary of component catalogs
 
-      """
-      try:
-          catalogs: dict[str, dict[str, object]] = {}
+        """
+        try:
+            catalogs: dict[str, dict[str, object]] = {}
 
-          for name, component in self._registered_components.items():
-              catalog_result = component.discover_catalog()
-              if catalog_result.success and catalog_result.data is not None:
-                  catalogs[name] = catalog_result.data
+            for name, component in self._registered_components.items():
+                catalog_result = component.discover_catalog()
+                if catalog_result.success and catalog_result.data is not None:
+                    catalogs[name] = catalog_result.data
 
-          return FlextResult.ok(catalogs)
+            return FlextResult.ok(catalogs)
 
-      except (ValueError, TypeError, RuntimeError) as e:
-          return FlextResult.fail(f"Catalog discovery failed: {e}")
+        except (ValueError, TypeError, RuntimeError) as e:
+            return FlextResult.fail(f"Catalog discovery failed: {e}")
 
     def validate_all_components(self) -> FlextResult[dict[str, bool]]:
-      """Validate configuration of all registered components.
+        """Validate configuration of all registered components.
 
-      Returns:
-          FlextResult containing validation status for each component
+        Returns:
+            FlextResult containing validation status for each component
 
-      """
-      try:
-          validation_results = {}
+        """
+        try:
+            validation_results = {}
 
-          for name, component in self._registered_components.items():
-              validation_result = component.validate_configuration()
-              validation_results[name] = validation_result.success
+            for name, component in self._registered_components.items():
+                validation_result = component.validate_configuration()
+                validation_results[name] = validation_result.success
 
-          return FlextResult.ok(validation_results)
+            return FlextResult.ok(validation_results)
 
-      except (ValueError, TypeError, AttributeError) as e:
-          return FlextResult.fail(f"Component validation failed: {e}")
+        except (ValueError, TypeError, AttributeError) as e:
+            return FlextResult.fail(f"Component validation failed: {e}")
 
 
 # Factory functions for easy instantiation
@@ -701,16 +701,16 @@ def create_unified_singer_config(
 
     # Create configuration with proper type handling
     return FlextSingerUnifiedConfig(
-      name=name,
-      config=config,
-      catalog=catalog if isinstance(catalog, dict) else None,
-      state=state if isinstance(state, dict) else None,
-      environment=str(environment),
-      **{
-          k: v
-          for k, v in kwargs.items()
-          if k not in {"catalog", "state", "environment"}
-      },
+        name=name,
+        config=config,
+        catalog=catalog if isinstance(catalog, dict) else None,
+        state=state if isinstance(state, dict) else None,
+        environment=str(environment),
+        **{
+            k: v
+            for k, v in kwargs.items()
+            if k not in {"catalog", "state", "environment"}
+        },
     )
 
 

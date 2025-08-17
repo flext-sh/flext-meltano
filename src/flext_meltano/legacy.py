@@ -57,9 +57,9 @@ from flext_meltano.simple_bridge import FlextMeltanoBridge
 def _deprecation_warning(old_name: str, new_name: str) -> None:
     """Issue a deprecation warning for legacy imports."""
     warnings.warn(
-      f"{old_name} is deprecated, use {new_name} instead",
-      DeprecationWarning,
-      stacklevel=3,
+        f"{old_name} is deprecated, use {new_name} instead",
+        DeprecationWarning,
+        stacklevel=3,
     )
 
 
@@ -83,17 +83,20 @@ def MeltanoCli(*args: object, **kwargs: object) -> FlextMeltanoCli:  # noqa: N80
 
 
 def MeltanoOrchestrationService(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoOrchestrationService:
     """Legacy alias for FlextMeltanoOrchestrationService."""
     _deprecation_warning(
-      "MeltanoOrchestrationService", "FlextMeltanoOrchestrationService",
+        "MeltanoOrchestrationService",
+        "FlextMeltanoOrchestrationService",
     )
     return FlextMeltanoOrchestrationService(*args, **kwargs)
 
 
 def MeltanoDbtService(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoDbtService:
     """Legacy alias for FlextMeltanoDbtService."""
     _deprecation_warning("MeltanoDbtService", "FlextMeltanoDbtService")
@@ -101,7 +104,8 @@ def MeltanoDbtService(  # noqa: N802
 
 
 def MeltanoSingerService(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoSingerService:
     """Legacy alias for FlextMeltanoSingerService."""
     _deprecation_warning("MeltanoSingerService", "FlextMeltanoSingerService")
@@ -110,7 +114,8 @@ def MeltanoSingerService(  # noqa: N802
 
 # Legacy aliases for base classes
 def MeltanoTap(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoTap:
     """Legacy alias for FlextMeltanoTap."""
     _deprecation_warning("MeltanoTap", "FlextMeltanoTap")
@@ -118,7 +123,8 @@ def MeltanoTap(  # noqa: N802
 
 
 def MeltanoTarget(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoTarget:
     """Legacy alias for FlextMeltanoTarget."""
     _deprecation_warning("MeltanoTarget", "FlextMeltanoTarget")
@@ -126,7 +132,8 @@ def MeltanoTarget(  # noqa: N802
 
 
 def MeltanoDbt(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoDbt:
     """Legacy alias for FlextMeltanoDbt."""
     _deprecation_warning("MeltanoDbt", "FlextMeltanoDbt")
@@ -135,7 +142,8 @@ def MeltanoDbt(  # noqa: N802
 
 # Legacy aliases for utility classes
 def MeltanoDiscovery(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoDiscovery:
     """Legacy alias for FlextMeltanoDiscovery."""
     _deprecation_warning("MeltanoDiscovery", "FlextMeltanoDiscovery")
@@ -143,7 +151,8 @@ def MeltanoDiscovery(  # noqa: N802
 
 
 def MeltanoInstaller(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoInstaller:
     """Legacy alias for FlextMeltanoInstaller."""
     _deprecation_warning("MeltanoInstaller", "FlextMeltanoInstaller")
@@ -152,7 +161,8 @@ def MeltanoInstaller(  # noqa: N802
 
 # Legacy exception aliases (more concise names that were probably used)
 def MeltanoError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoError:
     """Legacy alias for FlextMeltanoError."""
     _deprecation_warning("MeltanoError", "FlextMeltanoError")
@@ -160,7 +170,8 @@ def MeltanoError(  # noqa: N802
 
 
 def MeltanoValidationError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoValidationError:
     """Legacy alias for FlextMeltanoValidationError."""
     _deprecation_warning("MeltanoValidationError", "FlextMeltanoValidationError")
@@ -168,7 +179,8 @@ def MeltanoValidationError(  # noqa: N802
 
 
 def MeltanoConfigurationError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoConfigurationError:
     """Legacy alias for FlextMeltanoConfigurationError."""
     _deprecation_warning("MeltanoConfigurationError", "FlextMeltanoConfigurationError")
@@ -176,7 +188,8 @@ def MeltanoConfigurationError(  # noqa: N802
 
 
 def MeltanoConnectionError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoConnectionError:
     """Legacy alias for FlextMeltanoConnectionError."""
     _deprecation_warning("MeltanoConnectionError", "FlextMeltanoConnectionError")
@@ -184,7 +197,8 @@ def MeltanoConnectionError(  # noqa: N802
 
 
 def MeltanoPluginError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoPluginError:
     """Legacy alias for FlextMeltanoPluginError."""
     _deprecation_warning("MeltanoPluginError", "FlextMeltanoPluginError")
@@ -192,7 +206,8 @@ def MeltanoPluginError(  # noqa: N802
 
 
 def MeltanoExecutionError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoExecutionError:
     """Legacy alias for FlextMeltanoExecutionError."""
     _deprecation_warning("MeltanoExecutionError", "FlextMeltanoExecutionError")
@@ -200,7 +215,8 @@ def MeltanoExecutionError(  # noqa: N802
 
 
 def MeltanoSingerError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoSingerError:
     """Legacy alias for FlextMeltanoSingerError."""
     _deprecation_warning("MeltanoSingerError", "FlextMeltanoSingerError")
@@ -208,7 +224,8 @@ def MeltanoSingerError(  # noqa: N802
 
 
 def MeltanoDBTError(  # noqa: N802
-    *args: object, **kwargs: object,
+    *args: object,
+    **kwargs: object,
 ) -> FlextMeltanoDBTError:
     """Legacy alias for FlextMeltanoDBTError."""
     _deprecation_warning("MeltanoDBTError", "FlextMeltanoDBTError")

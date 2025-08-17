@@ -33,9 +33,9 @@ class PluginSpec:
     """Mock plugin specification for examples."""
 
     def __init__(self, name: str, plugin_type: str, config: dict | None = None) -> None:
-      self.name = name
-      self.plugin_type = plugin_type
-      self.config = config or {}
+        self.name = name
+        self.plugin_type = plugin_type
+        self.config = config or {}
 
 
 def setup_project(project_dir: str, plugins: list[PluginSpec] | None = None) -> None:
@@ -46,16 +46,16 @@ class PipelineSpec:
     """Mock pipeline specification for examples."""
 
     def __init__(self, name: str, tap: str, target: str) -> None:
-      self.name = name
-      self.tap = tap
-      self.target = target
+        self.name = name
+        self.tap = tap
+        self.target = target
 
 
 class MeltanoProject:
     """Mock Meltano project for examples."""
 
     def __init__(self, root_dir: str) -> None:
-      self.root_dir = root_dir
+        self.root_dir = root_dir
 
 
 def batch_process_tables(tables: list[str]) -> None:
@@ -84,34 +84,34 @@ def example_1_old_way() -> None:
     # Initialize Meltano (5+ lines)
     # External CLI disabled in examples: instruct manual execution
     if not (project_root / "meltano.yml").exists():
-      return
+        return
 
     # Add plugins (10+ lines each)
     for _plugin_type, _plugin_name in [
-      ("extractor", "tap-csv"),
-      ("loader", "target-csv"),
+        ("extractor", "tap-csv"),
+        ("loader", "target-csv"),
     ]:
-      # Disabled external CLI in examples
-      continue
+        # Disabled external CLI in examples
+        continue
 
     # Run pipeline (10+ lines)
     # Disabled external CLI in examples
     class _Dummy:
-      returncode = 0
-      stdout = ""
+        returncode = 0
+        stdout = ""
 
     result = _Dummy()
 
     # Error handling (10+ lines)
     if result.returncode != 0:
-      return
+        return
 
     # Parse output for metrics (10+ lines)
     output = result.stdout
     if "records" in output:
-      match = re.search(r"(\d+)\s+records", output)
-      if match:
-          int(match.group(1))
+        match = re.search(r"(\d+)\s+records", output)
+        if match:
+            int(match.group(1))
 
     # TOTAL: ~55 LINHAS
 
@@ -122,7 +122,7 @@ def example_1_new_way() -> None:
     result = flext_meltano_execute_job("tap-csv", "target-csv")
 
     if result.success:  # Using legacy .success pattern
-      pass
+        pass
 
     # TOTAL: 1 LINHA ÚTIL (redução de 98%)
 
@@ -139,50 +139,50 @@ def example_2_old_way() -> None:
 
     # Initialize project (10 lines)
     if not (project_root / "meltano.yml").exists():
-      return
+        return
 
     # Create environments (15 lines)
     for _env in ["staging", "prod"]:
-      continue
+        continue
 
     # Add plugins with configuration (40+ lines)
     plugins_config = [
-      (
-          "extractor",
-          "tap-postgres",
-          {"host": "localhost", "port": 5432, "database": "prod"},
-      ),
-      ("extractor", "tap-csv", {}),
-      ("loader", "target-postgres", {"host": "warehouse", "port": 5432}),
-      ("loader", "target-csv", {}),
-      ("transformer", "dbt-postgres", {}),
+        (
+            "extractor",
+            "tap-postgres",
+            {"host": "localhost", "port": 5432, "database": "prod"},
+        ),
+        ("extractor", "tap-csv", {}),
+        ("loader", "target-postgres", {"host": "warehouse", "port": 5432}),
+        ("loader", "target-csv", {}),
+        ("transformer", "dbt-postgres", {}),
     ]
 
     for _plugin_type, _plugin_name, config in plugins_config:
-      # Add plugin
-      continue
+        # Add plugin
+        continue
 
-      # Configure plugin
-      for _key, _value in config.items():
-          continue
+        # Configure plugin
+        for _key, _value in config.items():
+            continue
 
     # Create jobs (20+ lines)
     jobs = [
-      ("daily_users", "tap-postgres", "target-csv"),
-      ("hourly_orders", "tap-postgres", "target-postgres"),
+        ("daily_users", "tap-postgres", "target-csv"),
+        ("hourly_orders", "tap-postgres", "target-postgres"),
     ]
 
     for _job_name, _tap, _target in jobs:
-      continue
+        continue
 
     # Create schedules (15+ lines)
     schedules = [
-      ("daily_users", "@daily"),
-      ("hourly_orders", "0 * * * *"),
+        ("daily_users", "@daily"),
+        ("hourly_orders", "0 * * * *"),
     ]
 
     for _job_name, _interval in schedules:
-      continue
+        continue
 
     # TOTAL: ~110 LINHAS
 
@@ -191,13 +191,13 @@ def example_2_new_way() -> None:
     """DEPOIS: Setup completo em 3 linhas."""
     # 3 LINHAS substituem 110+ linhas using REAL API
     config = FlextMeltanoConfig(
-      project_root=tempfile.mkdtemp(prefix="enterprise_project_"),
-      environment="production",
+        project_root=tempfile.mkdtemp(prefix="enterprise_project_"),
+        environment="production",
     )
 
     executor_result = create_executor(config)
     if executor_result.success:
-      pass
+        pass
 
     # TOTAL: 3 LINHAS ÚTEIS (redução de 97%)
 
@@ -218,16 +218,16 @@ def example_3_old_way() -> None:
 
     # Process each table individually (50+ lines total)
     for table in tables:
-      try:
-          # Configure tap for specific table (10 lines)
-          results[table,] = True
-          continue
+        try:
+            # Configure tap for specific table (10 lines)
+            results[table,] = True
+            continue
 
-          # Run extraction (10 lines)
-          results[table,] = True
+            # Run extraction (10 lines)
+            results[table,] = True
 
-      except (RuntimeError, ValueError, TypeError):
-          results[table,] = False
+        except (RuntimeError, ValueError, TypeError):
+            results[table,] = False
 
     # Summary (10 lines)
     sum(1 for success in results.values() if success)
@@ -235,7 +235,7 @@ def example_3_old_way() -> None:
 
     failed_tables = [table for table, success in results.items() if not success]
     if failed_tables:
-      pass
+        pass
     # TOTAL: ~65 LINHAS
 
 
@@ -247,8 +247,8 @@ def example_3_new_way() -> None:
     # Process each table with one line using real API
     results = []
     for table in tables:
-      result = flext_meltano_execute_job("tap-postgres", "target-csv")
-      results.append(table if result.success else None)
+        result = flext_meltano_execute_job("tap-postgres", "target-csv")
+        results.append(table if result.success else None)
 
     [t for t in results if t is not None]
 
@@ -266,28 +266,28 @@ def example_4_old_way() -> None:
     _tap = "tap-postgres"
 
     try:
-      # Test connection (10 lines)
-      try:
-          catalog = {"streams": []}
-          streams = catalog.get("streams", [])
+        # Test connection (10 lines)
+        try:
+            catalog = {"streams": []}
+            streams = catalog.get("streams", [])
 
-          if not streams:
-              return
+            if not streams:
+                return
 
-          # List available tables (10 lines)
-          for stream in streams[:10,]:  # Show first 10
-              stream.get("tap_stream_id", "unknown")
-              schema = stream.get("schema", {})
-              properties = schema.get("properties", {})
-              len(properties)
+            # List available tables (10 lines)
+            for stream in streams[:10,]:  # Show first 10
+                stream.get("tap_stream_id", "unknown")
+                schema = stream.get("schema", {})
+                properties = schema.get("properties", {})
+                len(properties)
 
-      except json.JSONDecodeError:
-          return
+        except json.JSONDecodeError:
+            return
 
     except Exception as _exc:
-      _ = _exc
+        _ = _exc
     except (RuntimeError, ValueError, TypeError):
-      pass
+        pass
     # TOTAL: ~35 LINHAS
 
 
@@ -295,12 +295,12 @@ def example_4_new_way() -> None:
     """AFTER: Ultra-simplified discovery - 1 line + optional analysis."""
     # 1 LINE for test + 1 LINE for discovery using REAL API
     config = FlextMeltanoConfig(
-      project_root=tempfile.mkdtemp(prefix="discovery_project_"),
+        project_root=tempfile.mkdtemp(prefix="discovery_project_"),
     )
 
     executor_result = create_executor(config)
     if executor_result.success:
-      pass
+        pass
 
     # TOTAL: 2 LINHAS ÚTEIS (redução de 94%)
 
@@ -316,56 +316,56 @@ async def example_5_old_way() -> None:
     _project_root = Path(tempfile.mkdtemp(prefix="async_project_"))
 
     async def run_pipeline_async(_tap: str, _target: str) -> dict:
-      """Run pipeline in executor with full error handling."""
-      loop = asyncio.get_event_loop()
+        """Run pipeline in executor with full error handling."""
+        loop = asyncio.get_event_loop()
 
-      def _run_sync() -> dict:
-          try:
-              # Setup (10 lines)
-              _env = {"MELTANO_ENVIRONMENT": "dev"}
+        def _run_sync() -> dict:
+            try:
+                # Setup (10 lines)
+                _env = {"MELTANO_ENVIRONMENT": "dev"}
 
-              # Execute (10 lines)
-              output = ""
-              records = 0
-              if "records" in output:
-                  match = re.search(r"(\d+)\s+records", output)
-                  if match:
-                      records = int(match.group(1))
+                # Execute (10 lines)
+                output = ""
+                records = 0
+                if "records" in output:
+                    match = re.search(r"(\d+)\s+records", output)
+                    if match:
+                        records = int(match.group(1))
 
-              return {
-                  "success": True,
-                  "records": records,
-                  "output": output,
-                  "error": None,
-              }
-          except (RuntimeError, ValueError, TypeError) as e:
-              return {
-                  "success": False,
-                  "records": 0,
-                  "output": "",
-                  "error": str(e),
-              }
-          except Exception:
-              return {
-                  "success": False,
-                  "records": 0,
-                  "output": "",
-                  "error": "",
-              }
+                return {
+                    "success": True,
+                    "records": records,
+                    "output": output,
+                    "error": None,
+                }
+            except (RuntimeError, ValueError, TypeError) as e:
+                return {
+                    "success": False,
+                    "records": 0,
+                    "output": "",
+                    "error": str(e),
+                }
+            except Exception:
+                return {
+                    "success": False,
+                    "records": 0,
+                    "output": "",
+                    "error": "",
+                }
 
-      return await loop.run_in_executor(None, _run_sync)
+        return await loop.run_in_executor(None, _run_sync)
 
     # Run multiple pipelines concurrently (15 lines)
     tasks = [
-      run_pipeline_async("tap-csv", "target-csv"),
-      run_pipeline_async("tap-postgres", "target-csv"),
+        run_pipeline_async("tap-csv", "target-csv"),
+        run_pipeline_async("tap-postgres", "target-csv"),
     ]
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     for result in results:
-      if isinstance(result, Exception):
-          pass
+        if isinstance(result, Exception):
+            pass
     # TOTAL: ~50 LINHAS
 
 
@@ -377,7 +377,7 @@ async def example_5_new_way() -> None:
     loop = asyncio.get_event_loop()
 
     def run_job() -> object:
-      return flext_meltano_execute_job("tap-csv", "target-csv")
+        return flext_meltano_execute_job("tap-csv", "target-csv")
 
     result1 = await loop.run_in_executor(None, run_job)
     result2 = await loop.run_in_executor(None, run_job)
@@ -399,33 +399,33 @@ def example_6_old_way() -> None:
 
     # Check Meltano CLI (10 lines)
     try:
-      # External CLI disabled in examples
-      pass
+        # External CLI disabled in examples
+        pass
     except (RuntimeError, ValueError, TypeError):
-      health["healthy",] = False
-      health["issues",].append("Meltano CLI not found")
+        health["healthy",] = False
+        health["issues",].append("Meltano CLI not found")
 
     # Check plugins (10 lines)
     try:
-      pass
+        pass
     except (RuntimeError, ValueError, TypeError):
-      health["issues",].append("Plugin check failed")
+        health["issues",].append("Plugin check failed")
 
     # Check database (10 lines)
     try:
-      pass
+        pass
     except (RuntimeError, ValueError, TypeError):
-      health["issues",].append("Database check failed")
+        health["issues",].append("Database check failed")
 
     # Check environments (10 lines)
     try:
-      pass
+        pass
     except (RuntimeError, ValueError, TypeError):
-      health["issues"].append("Environment check failed")
+        health["issues"].append("Environment check failed")
 
     # Print results
     if health["healthy"]:
-      pass
+        pass
     # TOTAL: ~45 LINHAS
 
 
@@ -447,20 +447,20 @@ def example_6_new_way() -> None:
 def demonstrate_code_reduction() -> None:
     """Demonstra a redução massiva de código em números reais."""
     examples = [
-      ("Pipeline Simples", 55, 1, 98),
-      ("Setup Completo", 110, 3, 97),
-      ("Batch Processing", 65, 2, 97),
-      ("Discovery & Test", 35, 2, 94),
-      ("Async Pipeline", 50, 3, 94),
-      ("Health Check", 45, 1, 98),
+        ("Pipeline Simples", 55, 1, 98),
+        ("Setup Completo", 110, 3, 97),
+        ("Batch Processing", 65, 2, 97),
+        ("Discovery & Test", 35, 2, 94),
+        ("Async Pipeline", 50, 3, 94),
+        ("Health Check", 45, 1, 98),
     ]
 
     total_before = 0
     total_after = 0
 
     for _name, before, after, _reduction in examples:
-      total_before += before
-      total_after += after
+        total_before += before
+        total_after += after
 
     round((1 - total_after / total_before) * 100)
 

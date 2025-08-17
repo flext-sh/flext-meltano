@@ -49,7 +49,7 @@ result = discover_plugins()
 if result.success:
     plugins = result.data
     for plugin in plugins:
-      print(f"Plugin: {plugin['name']} ({plugin['type']})")
+        print(f"Plugin: {plugin['name']} ({plugin['type']})")
 
 # Service-based discovery with filtering
 discoverer = FlextMeltanoDiscoverer(config)
@@ -68,10 +68,10 @@ if result.success:
     print(f"Found {len(streams)} available streams")
 
     for stream in streams:
-      print(f"Stream: {stream['tap_stream_id']}")
-      schema = stream.get("schema", {})
-      properties = schema.get("properties", {})
-      print(f"  Fields: {list(properties.keys())}")
+        print(f"Stream: {stream['tap_stream_id']}")
+        schema = stream.get("schema", {})
+        properties = schema.get("properties", {})
+        print(f"  Fields: {list(properties.keys())}")
 ```
 
 ### Bridge Integration
@@ -82,9 +82,9 @@ def bridge_discover_plugins() -> "dict[str, object]":
     result = discover_plugins()
 
     if result.success:
-      return {"success": True, "plugins": result.data, "count": len(result.data)}
+        return {"success": True, "plugins": result.data, "count": len(result.data)}
     else:
-      return {"success": False, "error": result.error_message, "plugins": []}
+        return {"success": False, "error": result.error_message, "plugins": []}
 ```
 
 ## Bridge Integration Patterns
@@ -139,18 +139,18 @@ plugin_info = {
 # Standard catalog structure for bridge
 catalog_info = {
     "streams": [
-      {
-          "tap_stream_id": "public-users",
-          "schema": {
-              "type": "object",
-              "properties": {
-                  "id": {"type": "integer"},
-                  "name": {"type": "string"},
-                  "email": {"type": "string"},
-              },
-          },
-          "metadata": {"replication-method": "FULL_TABLE", "selected": False},
-      }
+        {
+            "tap_stream_id": "public-users",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "string"},
+                    "email": {"type": "string"},
+                },
+            },
+            "metadata": {"replication-method": "FULL_TABLE", "selected": False},
+        }
     ],
     "discovered_at": "2025-08-02T10:30:00Z",
     "tap_name": "tap-postgres",
@@ -169,22 +169,22 @@ def discover_catalog_with_validation(
 ) -> FlextResult["dict[str, object]"]:
     '''Discover catalog with configuration validation.'''
     try:
-      # Validate tap is available
-      tap_check = validate_tap_availability(tap_name)
-      if tap_check.is_failure:
-          return tap_check
+        # Validate tap is available
+        tap_check = validate_tap_availability(tap_name)
+        if tap_check.is_failure:
+            return tap_check
 
-      # Execute discovery
-      result = execute_meltano_command(["invoke", tap_name, "--discover"])
+        # Execute discovery
+        result = execute_meltano_command(["invoke", tap_name, "--discover"])
 
-      if result.success:
-          catalog = json.loads(result.data["stdout"])
-          return FlextResult.ok(catalog)
-      else:
-          return FlextResult.fail(f"Catalog discovery failed: {result.error_message}")
+        if result.success:
+            catalog = json.loads(result.data["stdout"])
+            return FlextResult.ok(catalog)
+        else:
+            return FlextResult.fail(f"Catalog discovery failed: {result.error_message}")
 
     except Exception as e:
-      return FlextResult.fail(f"Discovery error: {e}")
+        return FlextResult.fail(f"Discovery error: {e}")
 ```
 
 ## Caching and Performance
@@ -195,16 +195,16 @@ class PluginDiscoveryCache:
     '''Caching service for plugin discovery operations.'''
 
     def __init__(self, ttl: int = 3600):
-      self._cache = {}
-      self._ttl = ttl
+        self._cache = {}
+        self._ttl = ttl
 
     def get_cached_plugins(self) -> list["dict[str, object]"] | None:
-      '''Get cached plugin list if available and not expired.'''
-      # Cache implementation
+        '''Get cached plugin list if available and not expired.'''
+        # Cache implementation
 
     def cache_plugins(self, plugins: list["dict[str, object]"]) -> None:
-      '''Cache plugin list with expiration.'''
-      # Cache storage implementation
+        '''Cache plugin list with expiration.'''
+        # Cache storage implementation
 ```
 
 ### Performance Optimization
@@ -221,22 +221,22 @@ def handle_discovery_errors(operation: str) -> Callable:
     '''Decorator for comprehensive discovery error handling.'''
 
     def decorator(func):
-      def wrapper(*args, **kwargs):
-          try:
-              result = func(*args, **kwargs)
-              if result.success:
-                  logger.info(f"Discovery operation {operation} succeeded")
-              else:
-                  logger.error(
-                      f"Discovery operation {operation} failed: {result.error_message}"
-                  )
-              return result
-          except Exception as e:
-              error_msg: str = f"Discovery operation {operation} error: {e}"
-              logger.exception(error_msg)
-              return FlextResult.fail(error_msg)
+        def wrapper(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+                if result.success:
+                    logger.info(f"Discovery operation {operation} succeeded")
+                else:
+                    logger.error(
+                        f"Discovery operation {operation} failed: {result.error_message}"
+                    )
+                return result
+            except Exception as e:
+                error_msg: str = f"Discovery operation {operation} error: {e}"
+                logger.exception(error_msg)
+                return FlextResult.fail(error_msg)
 
-      return wrapper
+        return wrapper
 
     return decorator
 ```
@@ -246,18 +246,18 @@ def handle_discovery_errors(operation: str) -> Callable:
 def format_discovery_error_for_bridge(error: str) -> "dict[str, object]":
     '''Format discovery errors for Go service consumption.'''
     return {
-      "success": False,
-      "error": {
-          "message": error,
-          "type": "discovery_error",
-          "timestamp": datetime.now(UTC).isoformat(),
-          "suggestions": [
-              "Check Meltano project configuration",
-              "Verify tap is installed and available",
-              "Review plugin hub connectivity",
-          ],
-      },
-      "data": None,
+        "success": False,
+        "error": {
+            "message": error,
+            "type": "discovery_error",
+            "timestamp": datetime.now(UTC).isoformat(),
+            "suggestions": [
+                "Check Meltano project configuration",
+                "Verify tap is installed and available",
+                "Review plugin hub connectivity",
+            ],
+        },
+        "data": None,
     }
 ```
 
@@ -331,8 +331,8 @@ class FlextMeltanoDiscoveryCommand:
     """Command for discovery."""
 
     def __init__(self, tap_name: str) -> None:
-      """Initialize discovery command."""
-      self.tap_name = tap_name
+        """Initialize discovery command."""
+        self.tap_name = tap_name
 
 
 class FlextMeltanoDiscoveryContext(FlextModel):
@@ -370,306 +370,306 @@ class FlextMeltanoDiscoverer:
     """Discovery service using MANDATORY patterns."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-      """Initialize with dependency injection."""
-      self.config = config
-      self._initialized = False
-      self._hub: MeltanoHubService | None = None
-      self.logger = get_logger(self.__class__.__name__)
+        """Initialize with dependency injection."""
+        self.config = config
+        self._initialized = False
+        self._hub: MeltanoHubService | None = None
+        self.logger = get_logger(self.__class__.__name__)
 
     def initialize(self) -> FlextResult[bool]:
-      """Initialize service."""
-      try:
-          validation_result = self.validate()
-          if not validation_result.success:
-              return validation_result
-          self._initialized = True
-          return FlextResult(data=True)
-      except (ValueError, TypeError, ImportError) as e:
-          return FlextResult(error=f"Service initialization failed: {e}")
+        """Initialize service."""
+        try:
+            validation_result = self.validate()
+            if not validation_result.success:
+                return validation_result
+            self._initialized = True
+            return FlextResult(data=True)
+        except (ValueError, TypeError, ImportError) as e:
+            return FlextResult(error=f"Service initialization failed: {e}")
 
     def validate(self) -> FlextResult[bool]:
-      """Validate discovery service."""
-      try:
-          # Validation ensures config object exists; hub init ocorre no uso
-          _ = self.config
-          return FlextResult(data=True)
-      except (OSError, ImportError, AttributeError) as e:
-          return FlextResult(error=f"Validation failed: {e}")
+        """Validate discovery service."""
+        try:
+            # Validation ensures config object exists; hub init ocorre no uso
+            _ = self.config
+            return FlextResult(data=True)
+        except (OSError, ImportError, AttributeError) as e:
+            return FlextResult(error=f"Validation failed: {e}")
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
-      """Get discovery service health status."""
-      return FlextResult(
-          data={
-              "service": "discovery",
-              "hub_initialized": self._hub is not None,
-              "initialized": self._initialized,
-          },
-      )
+        """Get discovery service health status."""
+        return FlextResult(
+            data={
+                "service": "discovery",
+                "hub_initialized": self._hub is not None,
+                "initialized": self._initialized,
+            },
+        )
 
     async def discover_catalog(
-      self,
-      tap_name: str,
-      config: dict[str, object] | None = None,
-      context: FlextMeltanoDiscoveryContext | None = None,
+        self,
+        tap_name: str,
+        config: dict[str, object] | None = None,
+        context: FlextMeltanoDiscoveryContext | None = None,
     ) -> FlextResult[dict[str, object]]:
-      """Discover tap catalog using enterprise patterns."""
-      if not context:
-          context = FlextMeltanoDiscoveryContext(
-              tap_name=tap_name,
-              project_root=Path(self.config.project_root),
-          )
+        """Discover tap catalog using enterprise patterns."""
+        if not context:
+            context = FlextMeltanoDiscoveryContext(
+                tap_name=tap_name,
+                project_root=Path(self.config.project_root),
+            )
 
-      try:
-          # Validate project root exists
-          if not context.project_root.exists():
-              return FlextResult(
-                  error=f"Project root does not exist: {context.project_root}",
-              )
+        try:
+            # Validate project root exists
+            if not context.project_root.exists():
+                return FlextResult(
+                    error=f"Project root does not exist: {context.project_root}",
+                )
 
-          # Try subprocess discovery first
-          result = await self._discover_catalog_subprocess(
-              tap_name,
-              config or {},
-              context,
-          )
-          if result.success:
-              return result
+            # Try subprocess discovery first
+            result = await self._discover_catalog_subprocess(
+                tap_name,
+                config or {},
+                context,
+            )
+            if result.success:
+                return result
 
-          # Fallback to direct Singer SDK discovery only for valid projects
-          return await self._discover_catalog_direct(tap_name, config or {}, context)
+            # Fallback to direct Singer SDK discovery only for valid projects
+            return await self._discover_catalog_direct(tap_name, config or {}, context)
 
-      except (TimeoutError, OSError) as e:
-          return FlextResult(error=f"Catalog discovery failed: {e}")
+        except (TimeoutError, OSError) as e:
+            return FlextResult(error=f"Catalog discovery failed: {e}")
 
     async def _discover_catalog_subprocess(
-      self,
-      tap_name: str,
-      _config: dict[str, object],
-      context: FlextMeltanoDiscoveryContext,
+        self,
+        tap_name: str,
+        _config: dict[str, object],
+        context: FlextMeltanoDiscoveryContext,
     ) -> FlextResult[dict[str, object]]:
-      """Discover catalog using meltano subprocess calls."""
-      try:
-          # Check if project has meltano.yml
-          meltano_yml = context.project_root / "meltano.yml"
-          if not meltano_yml.exists():
-              return FlextResult(
-                  error=f"No meltano.yml found in {context.project_root}",
-              )
+        """Discover catalog using meltano subprocess calls."""
+        try:
+            # Check if project has meltano.yml
+            meltano_yml = context.project_root / "meltano.yml"
+            if not meltano_yml.exists():
+                return FlextResult(
+                    error=f"No meltano.yml found in {context.project_root}",
+                )
 
-          # Build command
-          cmd = ["meltano", "invoke", tap_name, "--discover"]
+            # Build command
+            cmd = ["meltano", "invoke", tap_name, "--discover"]
 
-          # Execute subprocess
-          process = await asyncio.create_subprocess_exec(
-              *cmd,
-              cwd=context.project_root,
-              stdout=asyncio.subprocess.PIPE,
-              stderr=asyncio.subprocess.PIPE,
-          )
+            # Execute subprocess
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                cwd=context.project_root,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
 
-          try:
-              stdout, stderr = await asyncio.wait_for(
-                  process.communicate(),
-                  timeout=context.timeout_seconds,
-              )
-              stdout_text = stdout.decode("utf-8") if stdout else ""
-              stderr_text = stderr.decode("utf-8") if stderr else ""
-              returncode = process.returncode
-          except TimeoutError:
-              process.kill()
-              await process.wait()
-              return FlextResult(error=f"Discovery timeout for {tap_name}")
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(),
+                    timeout=context.timeout_seconds,
+                )
+                stdout_text = stdout.decode("utf-8") if stdout else ""
+                stderr_text = stderr.decode("utf-8") if stderr else ""
+                returncode = process.returncode
+            except TimeoutError:
+                process.kill()
+                await process.wait()
+                return FlextResult(error=f"Discovery timeout for {tap_name}")
 
-          if returncode == 0 and stdout_text:
-              try:
-                  catalog_data = json.loads(stdout_text)
-                  return FlextResult(
-                      data={
-                          "discovery_id": context.discovery_id,
-                          "tap_name": tap_name,
-                          "catalog": catalog_data,
-                          "method": "subprocess",
-                          "discovered_at": datetime.now(UTC).isoformat(),
-                      },
-                  )
-              except json.JSONDecodeError as e:
-                  return FlextResult(error=f"Invalid catalog JSON: {e}")
+            if returncode == 0 and stdout_text:
+                try:
+                    catalog_data = json.loads(stdout_text)
+                    return FlextResult(
+                        data={
+                            "discovery_id": context.discovery_id,
+                            "tap_name": tap_name,
+                            "catalog": catalog_data,
+                            "method": "subprocess",
+                            "discovered_at": datetime.now(UTC).isoformat(),
+                        },
+                    )
+                except json.JSONDecodeError as e:
+                    return FlextResult(error=f"Invalid catalog JSON: {e}")
 
-          return FlextResult(
-              error=f"Meltano discovery failed: {stderr_text or 'Unknown error'}",
-          )
+            return FlextResult(
+                error=f"Meltano discovery failed: {stderr_text or 'Unknown error'}",
+            )
 
-      except (TimeoutError, OSError) as e:
-          return FlextResult(error=f"Subprocess discovery failed: {e}")
+        except (TimeoutError, OSError) as e:
+            return FlextResult(error=f"Subprocess discovery failed: {e}")
 
     async def _discover_catalog_direct(
-      self,
-      tap_name: str,
-      _config: dict[str, object],
-      context: FlextMeltanoDiscoveryContext,
+        self,
+        tap_name: str,
+        _config: dict[str, object],
+        context: FlextMeltanoDiscoveryContext,
     ) -> FlextResult[dict[str, object]]:
-      """Discover catalog using direct Singer SDK calls."""
-      try:
-          # For nonexistent taps, fail appropriately
-          if "nonexistent" in tap_name.lower():
-              return FlextResult(error=f"Tap '{tap_name}' not found or not installed")
+        """Discover catalog using direct Singer SDK calls."""
+        try:
+            # For nonexistent taps, fail appropriately
+            if "nonexistent" in tap_name.lower():
+                return FlextResult(error=f"Tap '{tap_name}' not found or not installed")
 
-          # For known taps like tap-csv, create basic catalog structure
-          if tap_name == "tap-csv":
-              basic_catalog = {
-                  "streams": [
-                      {
-                          "tap_stream_id": "default_stream",
-                          "schema": {
-                              "type": "object",
-                              "properties": {
-                                  "id": {"type": "string"},
-                                  "data": {"type": "string"},
-                              },
-                          },
-                          "metadata": [
-                              {
-                                  "breadcrumb": [],
-                                  "metadata": {
-                                      "selected": True,
-                                      "replication-method": "FULL_TABLE",
-                                  },
-                              },
-                          ],
-                      },
-                  ],
-              }
+            # For known taps like tap-csv, create basic catalog structure
+            if tap_name == "tap-csv":
+                basic_catalog = {
+                    "streams": [
+                        {
+                            "tap_stream_id": "default_stream",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {"type": "string"},
+                                    "data": {"type": "string"},
+                                },
+                            },
+                            "metadata": [
+                                {
+                                    "breadcrumb": [],
+                                    "metadata": {
+                                        "selected": True,
+                                        "replication-method": "FULL_TABLE",
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                }
 
-              return FlextResult(
-                  data={
-                      "discovery_id": context.discovery_id,
-                      "tap_name": tap_name,
-                      "catalog": basic_catalog,
-                      "method": "direct",
-                      "discovered_at": datetime.now(UTC).isoformat(),
-                  },
-              )
+                return FlextResult(
+                    data={
+                        "discovery_id": context.discovery_id,
+                        "tap_name": tap_name,
+                        "catalog": basic_catalog,
+                        "method": "direct",
+                        "discovered_at": datetime.now(UTC).isoformat(),
+                    },
+                )
 
-          # For unknown taps, fail
-          return FlextResult(
-              error=f"Tap '{tap_name}' not supported in direct discovery mode",
-          )
+            # For unknown taps, fail
+            return FlextResult(
+                error=f"Tap '{tap_name}' not supported in direct discovery mode",
+            )
 
-      except (ValueError, TypeError, ImportError) as e:
-          return FlextResult(error=f"Direct Singer discovery failed: {e}")
+        except (ValueError, TypeError, ImportError) as e:
+            return FlextResult(error=f"Direct Singer discovery failed: {e}")
 
     def discover_plugins(
-      self,
-      plugin_type: str | None = None,
-      context: FlextMeltanoDiscoveryContext | None = None,
+        self,
+        plugin_type: str | None = None,
+        context: FlextMeltanoDiscoveryContext | None = None,
     ) -> FlextResult[list[FlextMeltanoPluginInfo]]:
-      """Discover available plugins using enterprise patterns with fewer branches."""
-      context = context or FlextMeltanoDiscoveryContext(plugin_type=plugin_type)
+        """Discover available plugins using enterprise patterns with fewer branches."""
+        context = context or FlextMeltanoDiscoveryContext(plugin_type=plugin_type)
 
-      try:
-          self._ensure_hub_initialized()
-          plugins = self._discover_with_hub(plugin_type)
-          if not plugins:
-              plugins = self._get_default_plugins(plugin_type)
-          return FlextResult.ok(plugins)
-      except (ValueError, TypeError, ImportError) as e:
-          return FlextResult.fail(f"Plugin discovery failed: {e}")
+        try:
+            self._ensure_hub_initialized()
+            plugins = self._discover_with_hub(plugin_type)
+            if not plugins:
+                plugins = self._get_default_plugins(plugin_type)
+            return FlextResult.ok(plugins)
+        except (ValueError, TypeError, ImportError) as e:
+            return FlextResult.fail(f"Plugin discovery failed: {e}")
 
     def _ensure_hub_initialized(self) -> None:
-      """Initialize hub if possible; ignore failures safely."""
-      if self._hub is not None:
-          return
-      # Avoid raising when running outside a Meltano project
-      try:
-          if Project is not None:
-              project = Project.find()
-              if project is not None:
-                  self._hub = MeltanoHubService(project)
-      except Exception:
-          # Leave _hub as None; caller will fall back to defaults
-          self._hub = None
+        """Initialize hub if possible; ignore failures safely."""
+        if self._hub is not None:
+            return
+        # Avoid raising when running outside a Meltano project
+        try:
+            if Project is not None:
+                project = Project.find()
+                if project is not None:
+                    self._hub = MeltanoHubService(project)
+        except Exception:
+            # Leave _hub as None; caller will fall back to defaults
+            self._hub = None
 
     def _discover_with_hub(
-      self,
-      plugin_type: str | None,
+        self,
+        plugin_type: str | None,
     ) -> list[FlextMeltanoPluginInfo]:
-      """Try to discover via hub; return empty list on failure or missing hub."""
-      if self._hub is None:
-          return []
-      try:
-          hub_plugins = self._get_default_plugins(
-              plugin_type,
-          )  # placeholder for real hub fetch
-      except (ValueError, TypeError, ImportError, AttributeError):
-          return []
+        """Try to discover via hub; return empty list on failure or missing hub."""
+        if self._hub is None:
+            return []
+        try:
+            hub_plugins = self._get_default_plugins(
+                plugin_type,
+            )  # placeholder for real hub fetch
+        except (ValueError, TypeError, ImportError, AttributeError):
+            return []
 
-      return [
-          FlextMeltanoPluginInfo(
-              name=plugin.name,
-              type=plugin.type.value
-              if hasattr(plugin.type, "value")
-              else str(plugin.type),
-              namespace=getattr(plugin, "namespace", plugin.name.replace("-", "_")),
-              description=getattr(plugin, "description", ""),
-              pip_url=getattr(plugin, "pip_url", plugin.name),
-              version=getattr(plugin, "version", "latest") or "latest",
-              capabilities=getattr(plugin, "capabilities", []),
-          )
-          for plugin in hub_plugins
-      ]
+        return [
+            FlextMeltanoPluginInfo(
+                name=plugin.name,
+                type=plugin.type.value
+                if hasattr(plugin.type, "value")
+                else str(plugin.type),
+                namespace=getattr(plugin, "namespace", plugin.name.replace("-", "_")),
+                description=getattr(plugin, "description", ""),
+                pip_url=getattr(plugin, "pip_url", plugin.name),
+                version=getattr(plugin, "version", "latest") or "latest",
+                capabilities=getattr(plugin, "capabilities", []),
+            )
+            for plugin in hub_plugins
+        ]
 
     def _get_default_plugins(
-      self,
-      plugin_type: str | None = None,
+        self,
+        plugin_type: str | None = None,
     ) -> list[FlextMeltanoPluginInfo]:
-      """Get default plugin list when Hub is not available."""
-      default_plugins = [
-          FlextMeltanoPluginInfo(
-              name="tap-csv",
-              type="extractors",
-              namespace="tap_csv",
-              pip_url="pipelinewise-tap-csv",
-              description="CSV file extractor",
-          ),
-          FlextMeltanoPluginInfo(
-              name="target-jsonl",
-              type="loaders",
-              namespace="target_jsonl",
-              pip_url="target-jsonl",
-              description="JSONL file loader",
-          ),
-          FlextMeltanoPluginInfo(
-              name="target-csv",
-              type="loaders",
-              namespace="target_csv",
-              pip_url="target-csv",
-              description="CSV file loader",
-          ),
-      ]
+        """Get default plugin list when Hub is not available."""
+        default_plugins = [
+            FlextMeltanoPluginInfo(
+                name="tap-csv",
+                type="extractors",
+                namespace="tap_csv",
+                pip_url="pipelinewise-tap-csv",
+                description="CSV file extractor",
+            ),
+            FlextMeltanoPluginInfo(
+                name="target-jsonl",
+                type="loaders",
+                namespace="target_jsonl",
+                pip_url="target-jsonl",
+                description="JSONL file loader",
+            ),
+            FlextMeltanoPluginInfo(
+                name="target-csv",
+                type="loaders",
+                namespace="target_csv",
+                pip_url="target-csv",
+                description="CSV file loader",
+            ),
+        ]
 
-      if plugin_type:
-          return [p for p in default_plugins if p.type == plugin_type]
+        if plugin_type:
+            return [p for p in default_plugins if p.type == plugin_type]
 
-      return default_plugins
+        return default_plugins
 
     def _convert_plugin_type_string(self, plugin_type_str: str) -> object | None:
-      """Convert plugin type string to Meltano PluginType enum."""
-      type_mapping = {
-          "extractors": PluginType.EXTRACTORS,
-          "loaders": PluginType.LOADERS,
-          "transformers": PluginType.TRANSFORMERS,
-          "orchestrators": PluginType.ORCHESTRATORS,
-          "utilities": PluginType.UTILITIES,
-      }
+        """Convert plugin type string to Meltano PluginType enum."""
+        type_mapping = {
+            "extractors": PluginType.EXTRACTORS,
+            "loaders": PluginType.LOADERS,
+            "transformers": PluginType.TRANSFORMERS,
+            "orchestrators": PluginType.ORCHESTRATORS,
+            "utilities": PluginType.UTILITIES,
+        }
 
-      return type_mapping.get(plugin_type_str.lower())
+        return type_mapping.get(plugin_type_str.lower())
 
     def execute(
-      self,
-      command: FlextMeltanoDiscoveryCommand,
+        self,
+        command: FlextMeltanoDiscoveryCommand,
     ) -> FlextResult[dict[str, object]]:
-      """Execute command using domain service pattern."""
-      return asyncio.run(self.discover_catalog(command.tap_name))
+        """Execute command using domain service pattern."""
+        return asyncio.run(self.discover_catalog(command.tap_name))
 
 
 def create_discoverer(
@@ -677,16 +677,16 @@ def create_discoverer(
 ) -> FlextResult[FlextMeltanoDiscoverer]:
     """Create discoverer using dependency injection."""
     try:
-      service = FlextMeltanoDiscoverer(config)
-      init_result = service.initialize()
-      if not init_result.success:
-          return FlextResult(
-              error=f"Discoverer initialization failed: {init_result.error}",
-          )
+        service = FlextMeltanoDiscoverer(config)
+        init_result = service.initialize()
+        if not init_result.success:
+            return FlextResult(
+                error=f"Discoverer initialization failed: {init_result.error}",
+            )
 
-      return FlextResult(data=service)
+        return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
-      return FlextResult(error=f"Failed to create discoverer: {e}")
+        return FlextResult(error=f"Failed to create discoverer: {e}")
 
 
 # === LEGACY-COMPATIBLE WRAPPERS (implemented using modern services) ===
@@ -703,122 +703,130 @@ def flext_meltano_discover_catalog(
     discovery metadata and the catalog under key "catalog".
     """
     try:
-      service_result = create_discoverer(
-          FlextMeltanoConfig(project_root=str(project_root)),
-      )
-      if not service_result.success or service_result.data is None:
+        service_result = create_discoverer(
+            FlextMeltanoConfig(project_root=str(project_root)),
+        )
+        if not service_result.success or service_result.data is None:
 
-          class _AttrAwaitableError(UserDict[str, object]):
-              def __getattr__(
-                  self, name: str,
-              ) -> object:  # pragma: no cover - trivial
-                  return (
-                      self[name]
-                      if name in self
-                      else UserDict.__getattribute__(self, name)
-                  )
+            class _AttrAwaitableError(UserDict[str, object]):
+                def __getattr__(
+                    self,
+                    name: str,
+                ) -> object:  # pragma: no cover - trivial
+                    return (
+                        self[name]
+                        if name in self
+                        else UserDict.__getattribute__(self, name)
+                    )
 
-              def __await__(self) -> object:  # pragma: no cover - trivial shim
-                  async def _inner() -> object:
-                      return self
+                def __await__(self) -> object:  # pragma: no cover - trivial shim
+                    async def _inner() -> object:
+                        return self
 
-                  return _inner().__await__()
+                    return _inner().__await__()
 
-          return _AttrAwaitableError({
-              "success": False,
-              "data": None,
-              "error": service_result.error,
-          })
+            return _AttrAwaitableError(
+                {
+                    "success": False,
+                    "data": None,
+                    "error": service_result.error,
+                }
+            )
 
-      discoverer = service_result.data
-      # Run async method in a temporary event loop for sync API compatibility
-      try:
-          running_loop = asyncio.get_running_loop()
-      except RuntimeError:
-          running_loop = None
+        discoverer = service_result.data
+        # Run async method in a temporary event loop for sync API compatibility
+        try:
+            running_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            running_loop = None
 
-      if running_loop is None:
-          result = asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
-          # Return an object with attribute access which is also awaitable (trivial await)
+        if running_loop is None:
+            result = asyncio.run(discoverer.discover_catalog(tap_name, config or {}))
+            # Return an object with attribute access which is also awaitable (trivial await)
 
-          class _AttrAwaitableSuccess(UserDict[str, object]):
-              def __getattr__(
-                  self, name: str,
-              ) -> object:  # pragma: no cover - trivial
-                  return (
-                      self[name]
-                      if name in self
-                      else UserDict.__getattribute__(self, name)
-                  )
+            class _AttrAwaitableSuccess(UserDict[str, object]):
+                def __getattr__(
+                    self,
+                    name: str,
+                ) -> object:  # pragma: no cover - trivial
+                    return (
+                        self[name]
+                        if name in self
+                        else UserDict.__getattribute__(self, name)
+                    )
 
-              def __await__(self) -> object:  # pragma: no cover - trivial shim
-                  async def _inner() -> object:
-                      return self
+                def __await__(self) -> object:  # pragma: no cover - trivial shim
+                    async def _inner() -> object:
+                        return self
 
-                  return _inner().__await__()
+                    return _inner().__await__()
 
-          return _AttrAwaitableSuccess({
-              "success": result.success,
-              "data": result.data,
-              "error": result.error,
-          })
-      # Inside a running loop: return an object that awaits the coroutine to produce the mapping
-      fut = running_loop.create_task(
-          discoverer.discover_catalog(tap_name, config or {}),
-      )
+            return _AttrAwaitableSuccess(
+                {
+                    "success": result.success,
+                    "data": result.data,
+                    "error": result.error,
+                }
+            )
+        # Inside a running loop: return an object that awaits the coroutine to produce the mapping
+        fut = running_loop.create_task(
+            discoverer.discover_catalog(tap_name, config or {}),
+        )
 
-      class _AttrAwaitableFuture(UserDict[str, object]):
-          def __init__(self, _future: object) -> None:
-              super().__init__()
-              self._future = _future
+        class _AttrAwaitableFuture(UserDict[str, object]):
+            def __init__(self, _future: object) -> None:
+                super().__init__()
+                self._future = _future
 
-          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-              return (
-                  self[name]
-                  if name in self
-                  else UserDict.__getattribute__(self, name)
-              )
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                return (
+                    self[name]
+                    if name in self
+                    else UserDict.__getattribute__(self, name)
+                )
 
-          def __await__(self) -> object:  # pragma: no cover - executed in async tests
-              async def _compute() -> object:
-                  # Type-safe future awaiting
-                  if hasattr(self._future, "__await__"):
-                      fr = await self._future
-                      return {
-                          "success": fr.success,
-                          "data": fr.data,
-                          "error": fr.error,
-                      }
-                  return {
-                      "success": False,
-                      "data": None,
-                      "error": "Invalid future object",
-                  }
+            def __await__(self) -> object:  # pragma: no cover - executed in async tests
+                async def _compute() -> object:
+                    # Type-safe future awaiting
+                    if hasattr(self._future, "__await__"):
+                        fr = await self._future
+                        return {
+                            "success": fr.success,
+                            "data": fr.data,
+                            "error": fr.error,
+                        }
+                    return {
+                        "success": False,
+                        "data": None,
+                        "error": "Invalid future object",
+                    }
 
-              return _compute().__await__()
+                return _compute().__await__()
 
-      return _AttrAwaitableFuture(fut)
+        return _AttrAwaitableFuture(fut)
     except Exception as e:  # noqa: BLE001
 
-      class _AttrAwaitableException(UserDict[str, object]):
-          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-              return (
-                  self[name]
-                  if name in self
-                  else UserDict.__getattribute__(self, name)
-              )
+        class _AttrAwaitableException(UserDict[str, object]):
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                return (
+                    self[name]
+                    if name in self
+                    else UserDict.__getattribute__(self, name)
+                )
 
-          def __await__(self) -> object:  # pragma: no cover - trivial shim
-              async def _inner() -> object:
-                  return self
+            def __await__(self) -> object:  # pragma: no cover - trivial shim
+                async def _inner() -> object:
+                    return self
 
-              return _inner().__await__()
+                return _inner().__await__()
 
-      return _AttrAwaitableException({
-          "success": False,
-          "data": None,
-          "error": str(e),
-      })
+        return _AttrAwaitableException(
+            {
+                "success": False,
+                "data": None,
+                "error": str(e),
+            }
+        )
 
 
 def flext_meltano_discover_plugins(
@@ -830,92 +838,97 @@ def flext_meltano_discover_plugins(
     Returns a dict with keys: success, data, error. data contains {"plugins": [...]}
     """
     try:
-      service_result = create_discoverer(
-          FlextMeltanoConfig(project_root=str(project_root)),
-      )
+        service_result = create_discoverer(
+            FlextMeltanoConfig(project_root=str(project_root)),
+        )
 
-      class _AttrDict(UserDict[str, object]):
-          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-              if name in self:
-                  return self[name]
-              return UserDict.__getattribute__(self, name)
+        class _AttrDict(UserDict[str, object]):
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                if name in self:
+                    return self[name]
+                return UserDict.__getattribute__(self, name)
 
-      if not service_result.success or service_result.data is None:
+        if not service_result.success or service_result.data is None:
 
-          class AttrDictError(UserDict[str, object]):
-              def __getattr__(
-                  self, name: str,
-              ) -> object:  # pragma: no cover - trivial
-                  try:
-                      return self[name]
-                  except KeyError:
-                      return dict.__getattribute__(self, name)
+            class AttrDictError(UserDict[str, object]):
+                def __getattr__(
+                    self,
+                    name: str,
+                ) -> object:  # pragma: no cover - trivial
+                    try:
+                        return self[name]
+                    except KeyError:
+                        return dict.__getattribute__(self, name)
 
-          return AttrDictError({
-              "success": False,
-              "data": None,
-              "error": service_result.error,
-          })
+            return AttrDictError(
+                {
+                    "success": False,
+                    "data": None,
+                    "error": service_result.error,
+                }
+            )
 
-      discoverer = service_result.data
-      result = discoverer.discover_plugins(plugin_type)
-      if result.success and result.data is not None:
-          # Convert plugin info objects to plain dicts for legacy compatibility
-          plugins_list: list[dict[str, object]] = []
-          for item in result.data:
-              try:
-                  if hasattr(item, "model_dump"):
-                      dumped = item.model_dump()
-                      if isinstance(dumped, dict):
-                          # Ensure version defaults to 'latest' when None
-                          if dumped.get("version") is None:
-                              dumped["version"] = "latest"
-                          plugins_list.append(dumped)
-                  else:
-                      # Best-effort extraction
-                      plugins_list.append(
-                          {
-                              "name": getattr(item, "name", ""),
-                              "type": getattr(item, "type", ""),
-                              "namespace": getattr(item, "namespace", ""),
-                              "pip_url": getattr(item, "pip_url", None),
-                              "description": getattr(item, "description", ""),
-                              "version": getattr(item, "version", None) or "latest",
-                          },
-                      )
-              except Exception as exc:
-                  # Skip malformed entries (log at debug level)
-                  get_logger(__name__).debug(
-                      "Skipping malformed plugin entry: %s",
-                      exc,
-                  )
-                  continue
-          data_obj: dict[str, object] = {"plugins": plugins_list}
-      else:
-          data_obj = None  # type: ignore[assignment]
+        discoverer = service_result.data
+        result = discoverer.discover_plugins(plugin_type)
+        if result.success and result.data is not None:
+            # Convert plugin info objects to plain dicts for legacy compatibility
+            plugins_list: list[dict[str, object]] = []
+            for item in result.data:
+                try:
+                    if hasattr(item, "model_dump"):
+                        dumped = item.model_dump()
+                        if isinstance(dumped, dict):
+                            # Ensure version defaults to 'latest' when None
+                            if dumped.get("version") is None:
+                                dumped["version"] = "latest"
+                            plugins_list.append(dumped)
+                    else:
+                        # Best-effort extraction
+                        plugins_list.append(
+                            {
+                                "name": getattr(item, "name", ""),
+                                "type": getattr(item, "type", ""),
+                                "namespace": getattr(item, "namespace", ""),
+                                "pip_url": getattr(item, "pip_url", None),
+                                "description": getattr(item, "description", ""),
+                                "version": getattr(item, "version", None) or "latest",
+                            },
+                        )
+                except Exception as exc:
+                    # Skip malformed entries (log at debug level)
+                    get_logger(__name__).debug(
+                        "Skipping malformed plugin entry: %s",
+                        exc,
+                    )
+                    continue
+            data_obj: dict[str, object] = {"plugins": plugins_list}
+        else:
+            data_obj = None  # type: ignore[assignment]
 
-      class AttrDictSuccess(UserDict[str, object]):
-          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-              try:
-                  return self[name]
-              except KeyError:
-                  return dict.__getattribute__(self, name)
+        class AttrDictSuccess(UserDict[str, object]):
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                try:
+                    return self[name]
+                except KeyError:
+                    return dict.__getattribute__(self, name)
 
-      return AttrDictSuccess({
-          "success": result.success,
-          "data": data_obj,
-          "error": result.error,
-      })
+        return AttrDictSuccess(
+            {
+                "success": result.success,
+                "data": data_obj,
+                "error": result.error,
+            }
+        )
     except Exception as e:  # noqa: BLE001
 
-      class AttrDictException(UserDict[str, object]):
-          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-              try:
-                  return self[name]
-              except KeyError:
-                  return dict.__getattribute__(self, name)
+        class AttrDictException(UserDict[str, object]):
+            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+                try:
+                    return self[name]
+                except KeyError:
+                    return dict.__getattribute__(self, name)
 
-      return AttrDictException({"success": False, "data": None, "error": str(e)})
+        return AttrDictException({"success": False, "data": None, "error": str(e)})
 
 
 __all__ = [

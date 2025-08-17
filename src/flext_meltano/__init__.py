@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
 from flext_meltano import singer
 
 from flext_meltano.exceptions import (
@@ -181,9 +180,9 @@ class ConfigValidationError(FlextMeltanoValidationError):
 def _deprecated_api_warning(old_name: str, new_name: str) -> None:
     """Issue deprecation warning for old API usage."""
     warnings.warn(
-      f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
-      DeprecationWarning,
-      stacklevel=3,
+        f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
+        DeprecationWarning,
+        stacklevel=3,
     )
 
 
