@@ -12,7 +12,7 @@ from typing import Never
 
 import pytest
 
-from flext_meltano.exceptions import (
+from flext_meltano import (
     FlextMeltanoAuthenticationError,
     FlextMeltanoConfigurationError,
     FlextMeltanoConnectionError,
@@ -31,238 +31,238 @@ class TestAllExceptions:
     """Test all exception classes for basic functionality."""
 
     def test_flext_meltano_error(self) -> Never:
-        """Test FlextMeltanoError."""
-        error = FlextMeltanoError("Base error")
-        assert isinstance(error, FlextMeltanoError)
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoError):
-            raise error
+      """Test FlextMeltanoError."""
+      error = FlextMeltanoError("Base error")
+      assert isinstance(error, FlextMeltanoError)
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoError):
+          raise error
 
     def test_flext_meltano_validation_error(self) -> Never:
-        """Test FlextMeltanoValidationError."""
-        error = FlextMeltanoValidationError("Validation error")
-        assert isinstance(error, FlextMeltanoValidationError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoValidationError):
-            raise error
+      """Test FlextMeltanoValidationError."""
+      error = FlextMeltanoValidationError("Validation error")
+      assert isinstance(error, FlextMeltanoValidationError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoValidationError):
+          raise error
 
     def test_flext_meltano_configuration_error(self) -> Never:
-        """Test FlextMeltanoConfigurationError."""
-        error = FlextMeltanoConfigurationError("Config error")
-        assert isinstance(error, FlextMeltanoConfigurationError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoConfigurationError):
-            raise error
+      """Test FlextMeltanoConfigurationError."""
+      error = FlextMeltanoConfigurationError("Config error")
+      assert isinstance(error, FlextMeltanoConfigurationError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoConfigurationError):
+          raise error
 
     def test_flext_meltano_connection_error(self) -> Never:
-        """Test FlextMeltanoConnectionError."""
-        error = FlextMeltanoConnectionError("Connection error")
-        assert isinstance(error, FlextMeltanoConnectionError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoConnectionError):
-            raise error
+      """Test FlextMeltanoConnectionError."""
+      error = FlextMeltanoConnectionError("Connection error")
+      assert isinstance(error, FlextMeltanoConnectionError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoConnectionError):
+          raise error
 
     def test_flext_meltano_processing_error(self) -> Never:
-        """Test FlextMeltanoProcessingError."""
-        error = FlextMeltanoProcessingError("Processing error")
-        assert isinstance(error, FlextMeltanoProcessingError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoProcessingError):
-            raise error
+      """Test FlextMeltanoProcessingError."""
+      error = FlextMeltanoProcessingError("Processing error")
+      assert isinstance(error, FlextMeltanoProcessingError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoProcessingError):
+          raise error
 
     def test_flext_meltano_authentication_error(self) -> Never:
-        """Test FlextMeltanoAuthenticationError."""
-        error = FlextMeltanoAuthenticationError("Auth error")
-        assert isinstance(error, FlextMeltanoAuthenticationError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoAuthenticationError):
-            raise error
+      """Test FlextMeltanoAuthenticationError."""
+      error = FlextMeltanoAuthenticationError("Auth error")
+      assert isinstance(error, FlextMeltanoAuthenticationError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoAuthenticationError):
+          raise error
 
     def test_flext_meltano_timeout_error(self) -> Never:
-        """Test FlextMeltanoTimeoutError."""
-        error = FlextMeltanoTimeoutError("Timeout error")
-        assert isinstance(error, FlextMeltanoTimeoutError)
-        # This inherits from flext-core, not FlextMeltanoError
-        assert isinstance(error, Exception)
-        with pytest.raises(FlextMeltanoTimeoutError):
-            raise error
+      """Test FlextMeltanoTimeoutError."""
+      error = FlextMeltanoTimeoutError("Timeout error")
+      assert isinstance(error, FlextMeltanoTimeoutError)
+      # This inherits from flext-core, not FlextMeltanoError
+      assert isinstance(error, Exception)
+      with pytest.raises(FlextMeltanoTimeoutError):
+          raise error
 
     def test_flext_meltano_plugin_error(self) -> Never:
-        """Test FlextMeltanoPluginError."""
-        error = FlextMeltanoPluginError("Plugin error")
-        assert isinstance(error, FlextMeltanoPluginError)
-        assert isinstance(error, FlextMeltanoError)
-        with pytest.raises(FlextMeltanoPluginError):
-            raise error
+      """Test FlextMeltanoPluginError."""
+      error = FlextMeltanoPluginError("Plugin error")
+      assert isinstance(error, FlextMeltanoPluginError)
+      assert isinstance(error, FlextMeltanoError)
+      with pytest.raises(FlextMeltanoPluginError):
+          raise error
 
     def test_flext_meltano_execution_error(self) -> Never:
-        """Test FlextMeltanoExecutionError."""
-        error = FlextMeltanoExecutionError("Execution error")
-        assert isinstance(error, FlextMeltanoExecutionError)
-        assert isinstance(error, FlextMeltanoError)
-        with pytest.raises(FlextMeltanoExecutionError):
-            raise error
+      """Test FlextMeltanoExecutionError."""
+      error = FlextMeltanoExecutionError("Execution error")
+      assert isinstance(error, FlextMeltanoExecutionError)
+      assert isinstance(error, FlextMeltanoError)
+      with pytest.raises(FlextMeltanoExecutionError):
+          raise error
 
     def test_flext_meltano_singer_error(self) -> Never:
-        """Test FlextMeltanoSingerError."""
-        error = FlextMeltanoSingerError("Singer error")
-        assert isinstance(error, FlextMeltanoSingerError)
-        assert isinstance(error, FlextMeltanoError)
-        with pytest.raises(FlextMeltanoSingerError):
-            raise error
+      """Test FlextMeltanoSingerError."""
+      error = FlextMeltanoSingerError("Singer error")
+      assert isinstance(error, FlextMeltanoSingerError)
+      assert isinstance(error, FlextMeltanoError)
+      with pytest.raises(FlextMeltanoSingerError):
+          raise error
 
     def test_flext_meltano_dbt_error(self) -> Never:
-        """Test FlextMeltanoDBTError."""
-        error = FlextMeltanoDBTError("DBT error")
-        assert isinstance(error, FlextMeltanoDBTError)
-        assert isinstance(error, FlextMeltanoError)
-        with pytest.raises(FlextMeltanoDBTError):
-            raise error
+      """Test FlextMeltanoDBTError."""
+      error = FlextMeltanoDBTError("DBT error")
+      assert isinstance(error, FlextMeltanoDBTError)
+      assert isinstance(error, FlextMeltanoError)
+      with pytest.raises(FlextMeltanoDBTError):
+          raise error
 
     def test_all_exceptions_with_context(self) -> None:
-        """Test all exceptions can be created with context."""
-        context = {"test": "value"}
+      """Test all exceptions can be created with context."""
+      context = {"test": "value"}
 
-        exceptions = [
-            FlextMeltanoError("test", context=context),
-            FlextMeltanoValidationError("test", context=context),
-            FlextMeltanoConfigurationError("test", context=context),
-            FlextMeltanoConnectionError("test", context=context),
-            FlextMeltanoProcessingError("test", context=context),
-            FlextMeltanoAuthenticationError("test", context=context),
-            FlextMeltanoTimeoutError("test", context=context),
-            FlextMeltanoPluginError("test", context=context),
-            FlextMeltanoExecutionError("test", context=context),
-            FlextMeltanoSingerError("test", context=context),
-            FlextMeltanoDBTError("test", context=context),
-        ]
+      exceptions = [
+          FlextMeltanoError("test", context=context),
+          FlextMeltanoValidationError("test", context=context),
+          FlextMeltanoConfigurationError("test", context=context),
+          FlextMeltanoConnectionError("test", context=context),
+          FlextMeltanoProcessingError("test", context=context),
+          FlextMeltanoAuthenticationError("test", context=context),
+          FlextMeltanoTimeoutError("test", context=context),
+          FlextMeltanoPluginError("test", context=context),
+          FlextMeltanoExecutionError("test", context=context),
+          FlextMeltanoSingerError("test", context=context),
+          FlextMeltanoDBTError("test", context=context),
+      ]
 
-        # Test that all exceptions were created successfully
-        for exception in exceptions:
-            assert isinstance(exception, Exception)
-            assert hasattr(exception, "context")
+      # Test that all exceptions were created successfully
+      for exception in exceptions:
+          assert isinstance(exception, Exception)
+          assert hasattr(exception, "context")
 
     def test_exception_string_representations(self) -> None:
-        """Test that all exceptions have string representations."""
-        exceptions = [
-            FlextMeltanoError("Base error"),
-            FlextMeltanoValidationError("Validation error"),
-            FlextMeltanoConfigurationError("Config error"),
-            FlextMeltanoConnectionError("Connection error"),
-            FlextMeltanoProcessingError("Processing error"),
-            FlextMeltanoAuthenticationError("Auth error"),
-            FlextMeltanoTimeoutError("Timeout error"),
-            FlextMeltanoPluginError("Plugin error"),
-            FlextMeltanoExecutionError("Execution error"),
-            FlextMeltanoSingerError("Singer error"),
-            FlextMeltanoDBTError("DBT error"),
-        ]
+      """Test that all exceptions have string representations."""
+      exceptions = [
+          FlextMeltanoError("Base error"),
+          FlextMeltanoValidationError("Validation error"),
+          FlextMeltanoConfigurationError("Config error"),
+          FlextMeltanoConnectionError("Connection error"),
+          FlextMeltanoProcessingError("Processing error"),
+          FlextMeltanoAuthenticationError("Auth error"),
+          FlextMeltanoTimeoutError("Timeout error"),
+          FlextMeltanoPluginError("Plugin error"),
+          FlextMeltanoExecutionError("Execution error"),
+          FlextMeltanoSingerError("Singer error"),
+          FlextMeltanoDBTError("DBT error"),
+      ]
 
-        for exception in exceptions:
-            str_repr = str(exception)
-            assert isinstance(str_repr, str)
-            assert len(str_repr) > 0
+      for exception in exceptions:
+          str_repr = str(exception)
+          assert isinstance(str_repr, str)
+          assert len(str_repr) > 0
 
     def test_exception_hierarchy(self) -> None:
-        """Test that exception hierarchy is correct."""
-        # Domain-specific exceptions inherit from FlextMeltanoError
-        domain_exceptions = [
-            FlextMeltanoPluginError("test"),
-            FlextMeltanoExecutionError("test"),
-            FlextMeltanoSingerError("test"),
-            FlextMeltanoDBTError("test"),
-        ]
+      """Test that exception hierarchy is correct."""
+      # Domain-specific exceptions inherit from FlextMeltanoError
+      domain_exceptions = [
+          FlextMeltanoPluginError("test"),
+          FlextMeltanoExecutionError("test"),
+          FlextMeltanoSingerError("test"),
+          FlextMeltanoDBTError("test"),
+      ]
 
-        for exception in domain_exceptions:
-            assert isinstance(exception, FlextMeltanoError)
-            assert isinstance(exception, Exception)
+      for exception in domain_exceptions:
+          assert isinstance(exception, FlextMeltanoError)
+          assert isinstance(exception, Exception)
 
-        # Core-based exceptions inherit from flext-core
-        core_exceptions = [
-            FlextMeltanoValidationError("test"),
-            FlextMeltanoConfigurationError("test"),
-            FlextMeltanoConnectionError("test"),
-            FlextMeltanoProcessingError("test"),
-            FlextMeltanoAuthenticationError("test"),
-            FlextMeltanoTimeoutError("test"),
-        ]
+      # Core-based exceptions inherit from flext-core
+      core_exceptions = [
+          FlextMeltanoValidationError("test"),
+          FlextMeltanoConfigurationError("test"),
+          FlextMeltanoConnectionError("test"),
+          FlextMeltanoProcessingError("test"),
+          FlextMeltanoAuthenticationError("test"),
+          FlextMeltanoTimeoutError("test"),
+      ]
 
-        for exception in core_exceptions:
-            # These don't inherit from FlextMeltanoError, but do inherit from Exception
-            assert isinstance(exception, Exception)
+      for exception in core_exceptions:
+          # These don't inherit from FlextMeltanoError, but do inherit from Exception
+          assert isinstance(exception, Exception)
 
     def test_exception_chaining(self) -> None:
-        """Test exception chaining works."""
-        original = ValueError("original")
+      """Test exception chaining works."""
+      original = ValueError("original")
 
-        try:
-            raise original
-        except ValueError:
-            error_message = "chained"
-            with pytest.raises(FlextMeltanoError) as exc_info:
-                raise FlextMeltanoError(error_message) from original
+      try:
+          raise original
+      except ValueError:
+          error_message = "chained"
+          with pytest.raises(FlextMeltanoError) as exc_info:
+              raise FlextMeltanoError(error_message) from original
 
-        chained = exc_info.value
-        assert chained.__cause__ is original
+      chained = exc_info.value
+      assert chained.__cause__ is original
 
     def test_exception_messages(self) -> None:
-        """Test exception messages are preserved."""
-        test_message = "Test exception message"
+      """Test exception messages are preserved."""
+      test_message = "Test exception message"
 
-        exceptions = [
-            FlextMeltanoError(test_message),
-            FlextMeltanoValidationError(test_message),
-            FlextMeltanoConfigurationError(test_message),
-            FlextMeltanoConnectionError(test_message),
-            FlextMeltanoProcessingError(test_message),
-            FlextMeltanoAuthenticationError(test_message),
-            FlextMeltanoTimeoutError(test_message),
-            FlextMeltanoPluginError(test_message),
-            FlextMeltanoExecutionError(test_message),
-            FlextMeltanoSingerError(test_message),
-            FlextMeltanoDBTError(test_message),
-        ]
+      exceptions = [
+          FlextMeltanoError(test_message),
+          FlextMeltanoValidationError(test_message),
+          FlextMeltanoConfigurationError(test_message),
+          FlextMeltanoConnectionError(test_message),
+          FlextMeltanoProcessingError(test_message),
+          FlextMeltanoAuthenticationError(test_message),
+          FlextMeltanoTimeoutError(test_message),
+          FlextMeltanoPluginError(test_message),
+          FlextMeltanoExecutionError(test_message),
+          FlextMeltanoSingerError(test_message),
+          FlextMeltanoDBTError(test_message),
+      ]
 
-        for exception in exceptions:
-            assert test_message in str(exception)
+      for exception in exceptions:
+          assert test_message in str(exception)
 
     def test_all_exceptions_are_raisable(self) -> Never:
-        """Test that all exceptions can be raised and caught."""
-        exception_classes = [
-            FlextMeltanoError,
-            FlextMeltanoValidationError,
-            FlextMeltanoConfigurationError,
-            FlextMeltanoConnectionError,
-            FlextMeltanoProcessingError,
-            FlextMeltanoAuthenticationError,
-            FlextMeltanoTimeoutError,
-            FlextMeltanoPluginError,
-            FlextMeltanoExecutionError,
-            FlextMeltanoSingerError,
-            FlextMeltanoDBTError,
-        ]
+      """Test that all exceptions can be raised and caught."""
+      exception_classes = [
+          FlextMeltanoError,
+          FlextMeltanoValidationError,
+          FlextMeltanoConfigurationError,
+          FlextMeltanoConnectionError,
+          FlextMeltanoProcessingError,
+          FlextMeltanoAuthenticationError,
+          FlextMeltanoTimeoutError,
+          FlextMeltanoPluginError,
+          FlextMeltanoExecutionError,
+          FlextMeltanoSingerError,
+          FlextMeltanoDBTError,
+      ]
 
-        for exception_class in exception_classes:
-            msg = "Test exception"
-            with pytest.raises(exception_class):
-                raise exception_class(msg)
+      for exception_class in exception_classes:
+          msg = "Test exception"
+          with pytest.raises(exception_class):
+              raise exception_class(msg)
 
     def test_import_all_exceptions(self) -> None:
-        """Test that all exceptions can be imported."""
-        # This test exercises the import paths
-        assert FlextMeltanoError is not None
-        assert FlextMeltanoValidationError is not None
-        assert FlextMeltanoConfigurationError is not None
-        assert FlextMeltanoConnectionError is not None
-        assert FlextMeltanoProcessingError is not None
-        assert FlextMeltanoAuthenticationError is not None
-        assert FlextMeltanoTimeoutError is not None
-        assert FlextMeltanoPluginError is not None
-        assert FlextMeltanoExecutionError is not None
-        assert FlextMeltanoSingerError is not None
-        assert FlextMeltanoDBTError is not None
+      """Test that all exceptions can be imported."""
+      # This test exercises the import paths
+      assert FlextMeltanoError is not None
+      assert FlextMeltanoValidationError is not None
+      assert FlextMeltanoConfigurationError is not None
+      assert FlextMeltanoConnectionError is not None
+      assert FlextMeltanoProcessingError is not None
+      assert FlextMeltanoAuthenticationError is not None
+      assert FlextMeltanoTimeoutError is not None
+      assert FlextMeltanoPluginError is not None
+      assert FlextMeltanoExecutionError is not None
+      assert FlextMeltanoSingerError is not None
+      assert FlextMeltanoDBTError is not None

@@ -48,12 +48,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, get_flext_container
-
-if TYPE_CHECKING:
-    from flext_core import FlextContainer
+from flext_core import FlextContainer, FlextResult, get_flext_container
 
 from flext_meltano.base import (
     create_meltano_dbt_service,
@@ -73,38 +69,38 @@ def configure_meltano_services(
     service configuration following SOLID principles.
 
     Args:
-        container: FlextContainer instance to configure
-        config: Optional configuration (creates default if None)
+      container: FlextContainer instance to configure
+      config: Optional configuration (creates default if None)
 
     Returns:
-        FlextResult indicating success or failure
+      FlextResult indicating success or failure
 
     """
     try:
-        # Use provided config or create default
-        used_config = config or FlextMeltanoConfig()
+      # Use provided config or create default
+      used_config = config or FlextMeltanoConfig()
 
-        # Register configuration
-        container.register("meltano_config", used_config)
+      # Register configuration
+      container.register("meltano_config", used_config)
 
-        # Register factory functions for Singer services
-        container.register(
-            "tap_service_factory",
-            create_meltano_tap_service,
-        )
-        container.register(
-            "target_service_factory",
-            create_meltano_target_service,
-        )
-        container.register(
-            "dbt_service_factory",
-            create_meltano_dbt_service,
-        )
+      # Register factory functions for Singer services
+      container.register(
+          "tap_service_factory",
+          create_meltano_tap_service,
+      )
+      container.register(
+          "target_service_factory",
+          create_meltano_target_service,
+      )
+      container.register(
+          "dbt_service_factory",
+          create_meltano_dbt_service,
+      )
 
-        return FlextResult.ok(None)
+      return FlextResult.ok(None)
 
     except (ValueError, TypeError, AttributeError, KeyError) as e:
-        return FlextResult.fail(f"Service configuration failed: {e}")
+      return FlextResult.fail(f"Service configuration failed: {e}")
 
 
 def get_meltano_container() -> FlextContainer:
@@ -114,24 +110,24 @@ def get_meltano_container() -> FlextContainer:
     Prefer using get_flext_container() + configure_meltano_services() directly.
 
     Returns:
-        FlextContainer with Meltano services pre-configured
+      FlextContainer with Meltano services pre-configured
 
     """
     warnings.warn(
-        "get_meltano_container() is deprecated. "
-        "Use get_flext_container() + configure_meltano_services() instead.",
-        DeprecationWarning,
-        stacklevel=2,
+      "get_meltano_container() is deprecated. "
+      "Use get_flext_container() + configure_meltano_services() instead.",
+      DeprecationWarning,
+      stacklevel=2,
     )
 
     container = get_flext_container()
 
     # Configure if not already done
     if not container.get("meltano_config").success:
-        result = configure_meltano_services(container)
-        if result.is_failure:
-            error_msg = f"Container configuration failed: {result.error}"
-            raise RuntimeError(error_msg)
+      result = configure_meltano_services(container)
+      if result.is_failure:
+          error_msg = f"Container configuration failed: {result.error}"
+          raise RuntimeError(error_msg)
 
     return container
 
@@ -145,17 +141,17 @@ def configure_meltano_container(
     Prefer using configure_meltano_services() directly.
 
     Args:
-        custom_config: Optional custom configuration
+      custom_config: Optional custom configuration
 
     Returns:
-        FlextResult indicating configuration success or failure
+      FlextResult indicating configuration success or failure
 
     """
     warnings.warn(
-        "configure_meltano_container() is deprecated. "
-        "Use configure_meltano_services() directly.",
-        DeprecationWarning,
-        stacklevel=2,
+      "configure_meltano_container() is deprecated. "
+      "Use configure_meltano_services() directly.",
+      DeprecationWarning,
+      stacklevel=2,
     )
 
     container = get_flext_container()

@@ -189,9 +189,8 @@ create_tap = create_meltano_tap_service   # Consistent factory functions
 
 ```python
 # Production-ready conditional imports:
-if TYPE_CHECKING:
-    import dbt.contracts.results
-    from dbt.adapters.base import BaseRelation
+     import dbt.contracts.results
+from dbt.adapters.base import BaseRelation
     # Optimized import patterns for runtime performance
 ```
 

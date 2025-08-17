@@ -160,7 +160,7 @@ func (c *FlextMeltanoClient) ValidateProject() (*ValidationResult, error) {
     cmd := exec.Command("python", "scripts/flext_meltano_bridge.py", "validate_project")
     output, err := cmd.Output()
     if err != nil {
-        return nil, err
+      return nil, err
     }
 
     var result ValidationResult
@@ -182,16 +182,16 @@ validation_result = {
     "success": True,
     "validation_type": "project_structure",
     "validation_context": {
-        "validation_id": "uuid-string",
-        "validated_at": "2025-08-02T10:30:00Z",
-        "project_root": "./meltano",
-        "timeout_seconds": 30
+      "validation_id": "uuid-string",
+      "validated_at": "2025-08-02T10:30:00Z",
+      "project_root": "./meltano",
+      "timeout_seconds": 30
     },
     "results": {
-        "meltano_yml_valid": True,
-        "plugins_configured": True,
-        "environments_valid": True,
-        "dependencies_met": True
+      "meltano_yml_valid": True,
+      "plugins_configured": True,
+      "environments_valid": True,
+      "dependencies_met": True
     },
     "warnings": [],
     "errors": []
@@ -296,408 +296,408 @@ class FlextMeltanoValidationService:
     """Validation service using MANDATORY patterns."""
 
     def __init__(self, config: FlextMeltanoConfig) -> None:
-        """Initialize with dependency injection."""
-        self.config = config
-        self.project_root = Path(config.project_root)
-        self._initialized = False
+      """Initialize with dependency injection."""
+      self.config = config
+      self.project_root = Path(config.project_root)
+      self._initialized = False
 
     def validate(self) -> FlextResult[bool]:
-        """Validate validation service."""
-        try:
-            # Check if project root exists
-            if not self.project_root.exists():
-                return FlextResult(
-                    error=f"Project root does not exist: {self.project_root}",
-                )
+      """Validate validation service."""
+      try:
+          # Check if project root exists
+          if not self.project_root.exists():
+              return FlextResult(
+                  error=f"Project root does not exist: {self.project_root}",
+              )
 
-            return FlextResult(data=True)
-        except (OSError, ValueError) as e:
-            return FlextResult(error=f"Validation failed: {e}")
+          return FlextResult(data=True)
+      except (OSError, ValueError) as e:
+          return FlextResult(error=f"Validation failed: {e}")
 
     def initialize(self) -> FlextResult[bool]:
-        """Initialize service."""
-        self._initialized = True
-        return FlextResult(data=True)
+      """Initialize service."""
+      self._initialized = True
+      return FlextResult(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
-        """Get validation service health status."""
-        return FlextResult(
-            data={
-                "service": "validation",
-                "project_root": str(self.project_root),
-                "initialized": self._initialized,
-            },
-        )
+      """Get validation service health status."""
+      return FlextResult(
+          data={
+              "service": "validation",
+              "project_root": str(self.project_root),
+              "initialized": self._initialized,
+          },
+      )
 
     def validate_project(
-        self,
-        context: FlextMeltanoValidationContext | None = None,
+      self,
+      context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
-        """Validate Meltano project configuration using enterprise patterns."""
-        if not context:
-            context = FlextMeltanoValidationContext(
-                validation_type="project",
-                project_root=self.project_root,
-            )
+      """Validate Meltano project configuration using enterprise patterns."""
+      if not context:
+          context = FlextMeltanoValidationContext(
+              validation_type="project",
+              project_root=self.project_root,
+          )
 
-        try:
-            issues: list[str] = []
-            warnings: list[str] = []
-            details: dict[str, object] = {
-                "meltano_yml_exists": False,
-                "meltano_dir_exists": False,
-                "plugins_installed": False,
-            }
+      try:
+          issues: list[str] = []
+          warnings: list[str] = []
+          details: dict[str, object] = {
+              "meltano_yml_exists": False,
+              "meltano_dir_exists": False,
+              "plugins_installed": False,
+          }
 
-            # Check for meltano.yml file
-            meltano_yml = context.project_root / "meltano.yml"
-            if meltano_yml.exists():
-                details["meltano_yml_exists"] = True
-            else:
-                issues.append("meltano.yml file not found in project root")
+          # Check for meltano.yml file
+          meltano_yml = context.project_root / "meltano.yml"
+          if meltano_yml.exists():
+              details["meltano_yml_exists"] = True
+          else:
+              issues.append("meltano.yml file not found in project root")
 
-            # Check for .meltano directory (indicates initialized project)
-            meltano_dir = context.project_root / ".meltano"
-            if meltano_dir.exists():
-                details["meltano_dir_exists"] = True
-                details["plugins_installed"] = True
-            else:
-                warnings.append(".meltano directory not found - run 'meltano install'")
+          # Check for .meltano directory (indicates initialized project)
+          meltano_dir = context.project_root / ".meltano"
+          if meltano_dir.exists():
+              details["meltano_dir_exists"] = True
+              details["plugins_installed"] = True
+          else:
+              warnings.append(".meltano directory not found - run 'meltano install'")
 
-            # Check for venv directory
-            venv_dir = context.project_root / ".venv"
-            details["venv_exists"] = venv_dir.exists()
-            if not venv_dir.exists():
-                warnings.append(
-                    "Virtual environment not found - consider running 'meltano install'",
-                )
+          # Check for venv directory
+          venv_dir = context.project_root / ".venv"
+          details["venv_exists"] = venv_dir.exists()
+          if not venv_dir.exists():
+              warnings.append(
+                  "Virtual environment not found - consider running 'meltano install'",
+              )
 
-            validation_result = FlextMeltanoValidationResult(
-                validation_id=context.validation_id,
-                validation_type="project",
-                is_valid=len(issues) == 0,
-                issues=issues,
-                warnings=warnings,
-                details=details,
-            )
+          validation_result = FlextMeltanoValidationResult(
+              validation_id=context.validation_id,
+              validation_type="project",
+              is_valid=len(issues) == 0,
+              issues=issues,
+              warnings=warnings,
+              details=details,
+          )
 
-            return FlextResult(data=validation_result)
+          return FlextResult(data=validation_result)
 
-        except (OSError, ValueError, TypeError) as e:
-            return FlextResult(error=f"Project validation failed: {e}")
+      except (OSError, ValueError, TypeError) as e:
+          return FlextResult(error=f"Project validation failed: {e}")
 
     async def test_tap_connection(
-        self,
-        tap_name: str,
-        config: dict[str, object] | None = None,
-        context: FlextMeltanoValidationContext | None = None,
+      self,
+      tap_name: str,
+      config: dict[str, object] | None = None,
+      context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
-        """Test tap connection using enterprise patterns."""
-        if not context:
-            context = FlextMeltanoValidationContext(
-                validation_type="tap_connection",
-                project_root=self.project_root,
-                metadata={"tap_name": tap_name},
-            )
+      """Test tap connection using enterprise patterns."""
+      if not context:
+          context = FlextMeltanoValidationContext(
+              validation_type="tap_connection",
+              project_root=self.project_root,
+              metadata={"tap_name": tap_name},
+          )
 
-        try:
-            # Try subprocess connection test first
-            result = await self._test_connection_subprocess(
-                tap_name,
-                config or {},
-                context,
-            )
-            if result.success:
-                return result
+      try:
+          # Try subprocess connection test first
+          result = await self._test_connection_subprocess(
+              tap_name,
+              config or {},
+              context,
+          )
+          if result.success:
+              return result
 
-            # Fallback to direct Singer SDK test
-            return await self._test_connection_direct(tap_name, config or {}, context)
+          # Fallback to direct Singer SDK test
+          return await self._test_connection_direct(tap_name, config or {}, context)
 
-        except (TimeoutError, OSError) as e:
-            return FlextResult(error=f"Connection test failed: {e}")
+      except (TimeoutError, OSError) as e:
+          return FlextResult(error=f"Connection test failed: {e}")
 
     async def _test_connection_subprocess(
-        self,
-        tap_name: str,
-        _config: dict[str, object],
-        context: FlextMeltanoValidationContext,
+      self,
+      tap_name: str,
+      _config: dict[str, object],
+      context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
-        """Test connection using meltano subprocess calls."""
-        try:
-            # Check if project has meltano.yml
-            meltano_yml = context.project_root / "meltano.yml"
-            if not meltano_yml.exists():
-                return FlextResult(
-                    error=f"No meltano.yml found in {context.project_root}",
-                )
+      """Test connection using meltano subprocess calls."""
+      try:
+          # Check if project has meltano.yml
+          meltano_yml = context.project_root / "meltano.yml"
+          if not meltano_yml.exists():
+              return FlextResult(
+                  error=f"No meltano.yml found in {context.project_root}",
+              )
 
-            # Run meltano test command
-            cmd = ["meltano", "invoke", tap_name, "--test"]
+          # Run meltano test command
+          cmd = ["meltano", "invoke", tap_name, "--test"]
 
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                cwd=context.project_root,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
+          process = await asyncio.create_subprocess_exec(
+              *cmd,
+              cwd=context.project_root,
+              stdout=asyncio.subprocess.PIPE,
+              stderr=asyncio.subprocess.PIPE,
+          )
 
-            try:
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(),
-                    timeout=context.timeout_seconds,
-                )
-                stdout_text = stdout.decode("utf-8") if stdout else ""
-                stderr_text = stderr.decode("utf-8") if stderr else ""
-                returncode = process.returncode
-            except TimeoutError:
-                process.kill()
-                await process.wait()
-                return FlextResult(error=f"Connection test timeout for {tap_name}")
+          try:
+              stdout, stderr = await asyncio.wait_for(
+                  process.communicate(),
+                  timeout=context.timeout_seconds,
+              )
+              stdout_text = stdout.decode("utf-8") if stdout else ""
+              stderr_text = stderr.decode("utf-8") if stderr else ""
+              returncode = process.returncode
+          except TimeoutError:
+              process.kill()
+              await process.wait()
+              return FlextResult(error=f"Connection test timeout for {tap_name}")
 
-            issues: list[str] = []
-            details: dict[str, object] = {
-                "tap_name": tap_name,
-                "command": " ".join(cmd),
-                "returncode": returncode,
-                "stdout": stdout_text,
-                "stderr": stderr_text,
-            }
+          issues: list[str] = []
+          details: dict[str, object] = {
+              "tap_name": tap_name,
+              "command": " ".join(cmd),
+              "returncode": returncode,
+              "stdout": stdout_text,
+              "stderr": stderr_text,
+          }
 
-            if returncode != 0:
-                issues.append(f"Connection test failed: {stderr_text or stdout_text}")
+          if returncode != 0:
+              issues.append(f"Connection test failed: {stderr_text or stdout_text}")
 
-            validation_result = FlextMeltanoValidationResult(
-                validation_id=context.validation_id,
-                validation_type="tap_connection",
-                is_valid=returncode == 0,
-                issues=issues,
-                details=details,
-            )
+          validation_result = FlextMeltanoValidationResult(
+              validation_id=context.validation_id,
+              validation_type="tap_connection",
+              is_valid=returncode == 0,
+              issues=issues,
+              details=details,
+          )
 
-            return FlextResult(data=validation_result)
+          return FlextResult(data=validation_result)
 
-        except (TimeoutError, OSError) as e:
-            return FlextResult(error=f"Subprocess connection test failed: {e}")
+      except (TimeoutError, OSError) as e:
+          return FlextResult(error=f"Subprocess connection test failed: {e}")
 
     async def _test_connection_direct(
-        self,
-        tap_name: str,
-        config: dict[str, object],
-        context: FlextMeltanoValidationContext,
+      self,
+      tap_name: str,
+      config: dict[str, object],
+      context: FlextMeltanoValidationContext,
     ) -> FlextResult[FlextMeltanoValidationResult]:
-        """Test connection using direct Singer SDK calls."""
-        try:
-            issues: list[str] = []
-            warnings: list[str] = []
-            details = {
-                "tap_name": tap_name,
-                "config_provided": bool(config),
-                "method": "direct_validation",
-            }
+      """Test connection using direct Singer SDK calls."""
+      try:
+          issues: list[str] = []
+          warnings: list[str] = []
+          details = {
+              "tap_name": tap_name,
+              "config_provided": bool(config),
+              "method": "direct_validation",
+          }
 
-            # Check if tap exists first
-            if "nonexistent" in tap_name.lower():
-                issues.append(f"Tap '{tap_name}' not found or not installed")
-            elif not config:
-                issues.append("No configuration provided for connection test")
-            else:
-                # Validate configuration using extracted method
-                config_validation = self._validate_config_type(config)
-                validation_issues = config_validation["issues"]
-                validation_warnings = config_validation["warnings"]
-                if isinstance(validation_issues, list):
-                    issues.extend(validation_issues)
-                if isinstance(validation_warnings, list):
-                    warnings.extend(validation_warnings)
-                if config_validation["config_type"]:
-                    details["config_type"] = config_validation["config_type"]
+          # Check if tap exists first
+          if "nonexistent" in tap_name.lower():
+              issues.append(f"Tap '{tap_name}' not found or not installed")
+          elif not config:
+              issues.append("No configuration provided for connection test")
+          else:
+              # Validate configuration using extracted method
+              config_validation = self._validate_config_type(config)
+              validation_issues = config_validation["issues"]
+              validation_warnings = config_validation["warnings"]
+              if isinstance(validation_issues, list):
+                  issues.extend(validation_issues)
+              if isinstance(validation_warnings, list):
+                  warnings.extend(validation_warnings)
+              if config_validation["config_type"]:
+                  details["config_type"] = config_validation["config_type"]
 
-            validation_result = FlextMeltanoValidationResult(
-                validation_id=context.validation_id,
-                validation_type="tap_connection",
-                is_valid=len(issues) == 0,
-                issues=issues,
-                warnings=warnings,
-                details=details,
-            )
+          validation_result = FlextMeltanoValidationResult(
+              validation_id=context.validation_id,
+              validation_type="tap_connection",
+              is_valid=len(issues) == 0,
+              issues=issues,
+              warnings=warnings,
+              details=details,
+          )
 
-            return FlextResult(data=validation_result)
+          return FlextResult(data=validation_result)
 
-        except (ValueError, TypeError, ImportError) as e:
-            return FlextResult(error=f"Direct connection test failed: {e}")
+      except (ValueError, TypeError, ImportError) as e:
+          return FlextResult(error=f"Direct connection test failed: {e}")
 
     def _validate_config_type(self, config: dict[str, object]) -> dict[str, object]:
-        """Extract and validate configuration type based on common patterns.
+      """Extract and validate configuration type based on common patterns.
 
-        Args:
-            config: Configuration dictionary to validate
+      Args:
+          config: Configuration dictionary to validate
 
-        Returns:
-            Dictionary with validation results including issues, warnings, and config_type
+      Returns:
+          Dictionary with validation results including issues, warnings, and config_type
 
-        """
-        issues: list[str] = []
-        warnings: list[str] = []
-        config_type: str | None = None
+      """
+      issues: list[str] = []
+      warnings: list[str] = []
+      config_type: str | None = None
 
-        # Define configuration patterns
-        essential_keys = ["host", "port", "database", "user"]
-        csv_keys = ["files"]
-        api_keys = ["api_url", "api_key", "base_url"]
+      # Define configuration patterns
+      essential_keys = ["host", "port", "database", "user"]
+      csv_keys = ["files"]
+      api_keys = ["api_url", "api_key", "base_url"]
 
-        has_db_config = any(key in config for key in essential_keys)
-        has_csv_config = any(key in config for key in csv_keys)
-        has_api_config = any(key in config for key in api_keys)
+      has_db_config = any(key in config for key in essential_keys)
+      has_csv_config = any(key in config for key in csv_keys)
+      has_api_config = any(key in config for key in api_keys)
 
-        if not (has_db_config or has_csv_config or has_api_config):
-            issues.append(
-                "Insufficient configuration - missing essential connection parameters",
-            )
-        else:
-            config_type = (
-                "database" if has_db_config else "csv" if has_csv_config else "api"
-            )
-            warnings.append(
-                f"Configuration appears valid for {config_type} tap",
-            )
+      if not (has_db_config or has_csv_config or has_api_config):
+          issues.append(
+              "Insufficient configuration - missing essential connection parameters",
+          )
+      else:
+          config_type = (
+              "database" if has_db_config else "csv" if has_csv_config else "api"
+          )
+          warnings.append(
+              f"Configuration appears valid for {config_type} tap",
+          )
 
-        return {
-            "issues": issues,
-            "warnings": warnings,
-            "config_type": config_type,
-        }
+      return {
+          "issues": issues,
+          "warnings": warnings,
+          "config_type": config_type,
+      }
 
     def validate_tap_config(
-        self,
-        tap_name: str,
-        config: dict[str, object],
-        context: FlextMeltanoValidationContext | None = None,
+      self,
+      tap_name: str,
+      config: dict[str, object],
+      context: FlextMeltanoValidationContext | None = None,
     ) -> FlextResult[FlextMeltanoValidationResult]:
-        """Validate tap configuration without testing connection."""
-        if not context:
-            context = FlextMeltanoValidationContext(
-                validation_type="tap_config",
-                metadata={"tap_name": tap_name},
-            )
+      """Validate tap configuration without testing connection."""
+      if not context:
+          context = FlextMeltanoValidationContext(
+              validation_type="tap_config",
+              metadata={"tap_name": tap_name},
+          )
 
-        try:
-            issues: list[str] = []
-            warnings: list[str] = []
-            details: dict[str, object] = {
-                "tap_name": tap_name,
-                "config_type": "unknown",
-                "config_keys": list(config.keys())
-                if config and isinstance(config, dict)
-                else [],
-            }
+      try:
+          issues: list[str] = []
+          warnings: list[str] = []
+          details: dict[str, object] = {
+              "tap_name": tap_name,
+              "config_type": "unknown",
+              "config_keys": list(config.keys())
+              if config and isinstance(config, dict)
+              else [],
+          }
 
-            # Validate configuration based on type
-            if not config:
-                self._validate_empty_config(issues, details)
-            elif "files" in config:
-                self._validate_file_config(config, issues, details)
-            elif any(key in config for key in ["host", "database"]):
-                self._validate_database_config(config, issues, warnings, details)
-            elif any(key in config for key in ["api_url", "base_url"]):
-                self._validate_api_config(config, issues, warnings, details)
-            else:
-                self._validate_custom_config(config, issues, details)
+          # Validate configuration based on type
+          if not config:
+              self._validate_empty_config(issues, details)
+          elif "files" in config:
+              self._validate_file_config(config, issues, details)
+          elif any(key in config for key in ["host", "database"]):
+              self._validate_database_config(config, issues, warnings, details)
+          elif any(key in config for key in ["api_url", "base_url"]):
+              self._validate_api_config(config, issues, warnings, details)
+          else:
+              self._validate_custom_config(config, issues, details)
 
-            validation_result = FlextMeltanoValidationResult(
-                validation_id=context.validation_id,
-                validation_type="tap_config",
-                is_valid=len(issues) == 0,
-                issues=issues,
-                warnings=warnings,
-                details=details,
-            )
+          validation_result = FlextMeltanoValidationResult(
+              validation_id=context.validation_id,
+              validation_type="tap_config",
+              is_valid=len(issues) == 0,
+              issues=issues,
+              warnings=warnings,
+              details=details,
+          )
 
-            return FlextResult(data=validation_result)
+          return FlextResult(data=validation_result)
 
-        except (ValueError, TypeError, KeyError) as e:
-            return FlextResult(error=f"Config validation failed: {e}")
+      except (ValueError, TypeError, KeyError) as e:
+          return FlextResult(error=f"Config validation failed: {e}")
 
     def _validate_empty_config(
-        self,
-        issues: list[str],
-        details: dict[str, object],
+      self,
+      issues: list[str],
+      details: dict[str, object],
     ) -> None:
-        """Validate empty configuration."""
-        issues.append("No configuration provided")
-        details["config_type"] = "empty"
+      """Validate empty configuration."""
+      issues.append("No configuration provided")
+      details["config_type"] = "empty"
 
     def _validate_file_config(
-        self,
-        config: dict[str, object],
-        issues: list[str],
-        details: dict[str, object],
+      self,
+      config: dict[str, object],
+      issues: list[str],
+      details: dict[str, object],
     ) -> None:
-        """Validate file-based configuration."""
-        details["config_type"] = "file"
-        files = config["files"]
-        if not files:
-            issues.append("Files list is empty")
-        elif isinstance(files, list):
-            details["file_count"] = len(files)
-            for i, file_config in enumerate(files):
-                if not isinstance(file_config, dict) or "entity" not in file_config:
-                    issues.append(f"File config {i} missing required 'entity' field")
+      """Validate file-based configuration."""
+      details["config_type"] = "file"
+      files = config["files"]
+      if not files:
+          issues.append("Files list is empty")
+      elif isinstance(files, list):
+          details["file_count"] = len(files)
+          for i, file_config in enumerate(files):
+              if not isinstance(file_config, dict) or "entity" not in file_config:
+                  issues.append(f"File config {i} missing required 'entity' field")
 
     def _validate_database_config(
-        self,
-        config: dict[str, object],
-        issues: list[str],
-        warnings: list[str],
-        details: dict[str, object],
+      self,
+      config: dict[str, object],
+      issues: list[str],
+      warnings: list[str],
+      details: dict[str, object],
     ) -> None:
-        """Validate database configuration."""
-        details["config_type"] = "database"
-        required_db_keys = ["host", "port", "database", "user"]
-        missing_keys = [key for key in required_db_keys if key not in config]
-        if missing_keys:
-            issues.append(f"Missing required database keys: {missing_keys}")
+      """Validate database configuration."""
+      details["config_type"] = "database"
+      required_db_keys = ["host", "port", "database", "user"]
+      missing_keys = [key for key in required_db_keys if key not in config]
+      if missing_keys:
+          issues.append(f"Missing required database keys: {missing_keys}")
 
-        # Check for password
-        if "password" not in config:
-            warnings.append(
-                "Password not found in config - may be set via environment variable",
-            )
+      # Check for password
+      if "password" not in config:
+          warnings.append(
+              "Password not found in config - may be set via environment variable",
+          )
 
     def _validate_api_config(
-        self,
-        config: dict[str, object],
-        issues: list[str],
-        warnings: list[str],
-        details: dict[str, object],
+      self,
+      config: dict[str, object],
+      issues: list[str],
+      warnings: list[str],
+      details: dict[str, object],
     ) -> None:
-        """Validate API configuration."""
-        details["config_type"] = "api"
+      """Validate API configuration."""
+      details["config_type"] = "api"
 
-        # Check if both api_url and base_url are missing or empty
-        api_url = config.get("api_url", "")
-        api_url_valid = api_url.strip() if isinstance(api_url, str) else ""
-        base_url = config.get("base_url", "")
-        base_url_valid = base_url.strip() if isinstance(base_url, str) else ""
+      # Check if both api_url and base_url are missing or empty
+      api_url = config.get("api_url", "")
+      api_url_valid = api_url.strip() if isinstance(api_url, str) else ""
+      base_url = config.get("base_url", "")
+      base_url_valid = base_url.strip() if isinstance(base_url, str) else ""
 
-        if not api_url_valid and not base_url_valid:
-            issues.append("Missing API URL configuration")
+      if not api_url_valid and not base_url_valid:
+          issues.append("Missing API URL configuration")
 
-        # Check for API authentication
-        if not any(key in config for key in ["api_key", "access_token", "oauth"]):
-            warnings.append(
-                "No API authentication found - may be set via environment variable",
-            )
+      # Check for API authentication
+      if not any(key in config for key in ["api_key", "access_token", "oauth"]):
+          warnings.append(
+              "No API authentication found - may be set via environment variable",
+          )
 
     def _validate_custom_config(
-        self,
-        config: dict[str, object],
-        issues: list[str],
-        details: dict[str, object],
+      self,
+      config: dict[str, object],
+      issues: list[str],
+      details: dict[str, object],
     ) -> None:
-        """Validate custom configuration."""
-        details["config_type"] = "custom"
-        if len(config) == 0:
-            issues.append("Empty configuration")
+      """Validate custom configuration."""
+      details["config_type"] = "custom"
+      if len(config) == 0:
+          issues.append("Empty configuration")
 
 
 # === LEGACY COMPATIBILITY FUNCTIONS ===
@@ -712,33 +712,41 @@ async def flext_meltano_test_tap_connection(
 ) -> object:
     """Test tap connection and return legacy-compatible dict."""
     try:
-        service = FlextMeltanoValidationService(
-            FlextMeltanoConfig(project_root=str(project_root)),
-        )
-        result = await service.test_tap_connection(tap_name, config or {})
-        # Shape data for legacy expectations
-        shaped: dict[str, object] | None = None
-        if result.data is not None:
-            try:
-                is_valid = bool(getattr(result.data, "is_valid", False))
-                details = dict(getattr(result.data, "details", {}) or {})
-                shaped = {"connection_successful": is_valid, **details}
-            except Exception:  # noqa: BLE001
-                shaped = getattr(result.data, "model_dump", dict)()
+      service = FlextMeltanoValidationService(
+          FlextMeltanoConfig(project_root=str(project_root)),
+      )
+      result = await service.test_tap_connection(tap_name, config or {})
+      # Shape data for legacy expectations
+      shaped: dict[str, object] | None = None
+      if result.data is not None:
+          try:
+              is_valid = bool(getattr(result.data, "is_valid", False))
+              details = dict(getattr(result.data, "details", {}) or {})
+              shaped = {"connection_successful": is_valid, **details}
+          except Exception:  # noqa: BLE001
+              shaped = getattr(result.data, "model_dump", dict)()
 
-        class AttrDict(UserDict[str, object]):
-            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-                try:
-                    return self[name]
-                except KeyError:
-                    return dict.__getattribute__(self, name)
+      class AttrDict(UserDict[str, object]):
+          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+              try:
+                  return self[name]
+              except KeyError:
+                  return dict.__getattribute__(self, name)
 
-        # For invalid project roots (nonexistent), normalize to failure for legacy tests
-        if not Path(str(project_root)).exists():
-            return AttrDict({"success": False, "data": shaped, "error": "Invalid project root"})
-        return AttrDict({"success": result.success, "data": shaped, "error": result.error})
+      # For invalid project roots (nonexistent), normalize to failure for legacy tests
+      if not Path(str(project_root)).exists():
+          return AttrDict({
+              "success": False,
+              "data": shaped,
+              "error": "Invalid project root",
+          })
+      return AttrDict({
+          "success": result.success,
+          "data": shaped,
+          "error": result.error,
+      })
     except Exception as e:  # noqa: BLE001
-        return {"success": False, "data": None, "error": str(e)}
+      return {"success": False, "data": None, "error": str(e)}
 
 
 def flext_meltano_validate_project(
@@ -746,20 +754,25 @@ def flext_meltano_validate_project(
 ) -> object:
     """Validate project and return legacy-compatible dict."""
     try:
-        service = FlextMeltanoValidationService(
-            FlextMeltanoConfig(project_root=str(project_root or Path.cwd())),
-        )
-        result = service.validate_project()
+      service = FlextMeltanoValidationService(
+          FlextMeltanoConfig(project_root=str(project_root or Path.cwd())),
+      )
+      result = service.validate_project()
 
-        class AttrDict(UserDict[str, object]):
-            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-                try:
-                    return self[name]
-                except KeyError:
-                    return dict.__getattribute__(self, name)
-        return AttrDict({"success": result.success, "data": result.data, "error": result.error})
+      class AttrDict(UserDict[str, object]):
+          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+              try:
+                  return self[name]
+              except KeyError:
+                  return dict.__getattribute__(self, name)
+
+      return AttrDict({
+          "success": result.success,
+          "data": result.data,
+          "error": result.error,
+      })
     except Exception as e:  # noqa: BLE001
-        return {"success": False, "data": None, "error": str(e)}
+      return {"success": False, "data": None, "error": str(e)}
 
 
 async def flext_meltano_validate_tap_config(
@@ -768,44 +781,45 @@ async def flext_meltano_validate_tap_config(
 ) -> object:
     """Validate tap config and return legacy-compatible dict."""
     try:
-        # Keep async signature for pytest-asyncio compatibility
-        service = FlextMeltanoValidationService(
-            importlib.import_module("flext_meltano.config").FlextMeltanoConfig(),
-        )
-        val = service.validate_tap_config(tap_name, config)
-        # Shape validation data for legacy expectations
-        details = {}
-        is_valid = False
-        issues_list: list[str] = []
-        warnings_list: list[str] = []
-        if val.data is not None:
-            try:
-                is_valid = bool(getattr(val.data, "is_valid", False))
-                details = dict(getattr(val.data, "details", {}) or {})
-                issues_attr = getattr(val.data, "issues", [])
-                if isinstance(issues_attr, list):
-                    issues_list = [str(x) for x in issues_attr]
-                warnings_attr = getattr(val.data, "warnings", [])
-                if isinstance(warnings_attr, list):
-                    warnings_list = [str(x) for x in warnings_attr]
-            except Exception:  # noqa: BLE001
-                details = {}
-        data_obj: dict[str, object] = {
-            "config_valid": is_valid,
-            "issues": issues_list,
-            "warnings": warnings_list,
-            **details,
-        }
+      # Keep async signature for pytest-asyncio compatibility
+      service = FlextMeltanoValidationService(
+          importlib.import_module("flext_meltano.config").FlextMeltanoConfig(),
+      )
+      val = service.validate_tap_config(tap_name, config)
+      # Shape validation data for legacy expectations
+      details = {}
+      is_valid = False
+      issues_list: list[str] = []
+      warnings_list: list[str] = []
+      if val.data is not None:
+          try:
+              is_valid = bool(getattr(val.data, "is_valid", False))
+              details = dict(getattr(val.data, "details", {}) or {})
+              issues_attr = getattr(val.data, "issues", [])
+              if isinstance(issues_attr, list):
+                  issues_list = [str(x) for x in issues_attr]
+              warnings_attr = getattr(val.data, "warnings", [])
+              if isinstance(warnings_attr, list):
+                  warnings_list = [str(x) for x in warnings_attr]
+          except Exception:  # noqa: BLE001
+              details = {}
+      data_obj: dict[str, object] = {
+          "config_valid": is_valid,
+          "issues": issues_list,
+          "warnings": warnings_list,
+          **details,
+      }
 
-        class AttrDict(UserDict[str, object]):
-            def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
-                try:
-                    return self[name]
-                except KeyError:
-                    return dict.__getattribute__(self, name)
-        return AttrDict({"success": val.success, "data": data_obj, "error": val.error})
+      class AttrDict(UserDict[str, object]):
+          def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial
+              try:
+                  return self[name]
+              except KeyError:
+                  return dict.__getattribute__(self, name)
+
+      return AttrDict({"success": val.success, "data": data_obj, "error": val.error})
     except Exception as e:  # noqa: BLE001
-        return {"success": False, "data": None, "error": str(e)}
+      return {"success": False, "data": None, "error": str(e)}
 
 
 # === FACTORY FUNCTION ===
@@ -816,16 +830,16 @@ def create_validation_service(
 ) -> FlextResult[FlextMeltanoValidationService]:
     """Create validation service using dependency injection."""
     try:
-        service = FlextMeltanoValidationService(config)
-        init_result = service.initialize()
-        if not init_result.success:
-            return FlextResult(
-                error=f"Validation service initialization failed: {init_result.error}",
-            )
+      service = FlextMeltanoValidationService(config)
+      init_result = service.initialize()
+      if not init_result.success:
+          return FlextResult(
+              error=f"Validation service initialization failed: {init_result.error}",
+          )
 
-        return FlextResult(data=service)
+      return FlextResult(data=service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult(error=f"Failed to create validation service: {e}")
+      return FlextResult(error=f"Failed to create validation service: {e}")
 
 
 # === PUBLIC API ===

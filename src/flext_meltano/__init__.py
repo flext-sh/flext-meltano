@@ -4,15 +4,8 @@ from __future__ import annotations
 
 import warnings
 from typing import TYPE_CHECKING
-
 from flext_meltano import singer
 
-
-# === CORE BASE CLASSES ===
-# === OPTIONAL IMPORTS ===
-# Singer SDK integration - required dependency
-# === SINGER BASE CLASSES - Proper location in flext-meltano ===
-# Import Singer exceptions from flext-core (removes singer_base.py duplication)
 from flext_meltano.exceptions import (
     FlextMeltanoAuthenticationError,
     FlextMeltanoAuthenticationError as FlextSingerAuthenticationError,
@@ -35,7 +28,7 @@ from flext_meltano.exceptions import (
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.sinks import BatchSink, Sink, SQLSink
-from singer_sdk.testing import get_tap_test_class
+from singer_sdk.testing import get_tap_test_class, get_target_test_class
 from singer_sdk.typing import PropertiesList, Property
 
 from flext_meltano.base import (
@@ -49,6 +42,7 @@ from flext_meltano.base import (
     create_meltano_target_service,
 )
 from flext_meltano.base_service import FlextMeltanoBaseService
+from flext_meltano.meltano_models import FlextMeltanoPluginRegistry
 from flext_meltano.models import FlextMeltanoEvent
 from flext_meltano.config import FlextMeltanoConfig
 
@@ -87,6 +81,11 @@ from flext_meltano.dbt_registry import (
     FlextDbtModel,
     FlextDbtModelRegistry,
     create_model_registry,
+)
+from flext_meltano.dbt import (
+    FlextMeltanoDbtManager,
+    FlextMeltanoDbtProject,
+    FlextMeltanoDbtRunner,
 )
 
 # === DISCOVERY & CATALOG MANAGEMENT ===
@@ -164,21 +163,27 @@ from flext_meltano.validation import (
     create_validation_service,
 )
 
-if TYPE_CHECKING:
-    from flext_core import FlextResult
-    from pathlib import Path
+
+from pathlib import Path
+from flext_core import FlextResult
 
 # DBT run result - simplified for compatibility
 type DbtRunResult = object
+
+
+# === TEST COMPATIBILITY SHIMS ===
+# Some tests expect a ConfigValidationError at construction time
+class ConfigValidationError(FlextMeltanoValidationError):
+    """Configuration validation error alias for backward compatibility."""
 
 
 # === LEGACY COMPATIBILITY ===
 def _deprecated_api_warning(old_name: str, new_name: str) -> None:
     """Issue deprecation warning for old API usage."""
     warnings.warn(
-        f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
-        DeprecationWarning,
-        stacklevel=3,
+      f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
+      DeprecationWarning,
+      stacklevel=3,
     )
 
 
@@ -232,6 +237,9 @@ __all__: list[str] = [
     "FlextDbtModelRegistry",
     "FlextDbtPackage",
     "FlextDbtPackageManager",
+    "FlextMeltanoDbtManager",
+    "FlextMeltanoDbtProject",
+    "FlextMeltanoDbtRunner",
     "FlextMeltanoBaseService",
     "FlextMeltanoBridge",
     "FlextMeltanoCli",
@@ -293,6 +301,7 @@ __all__: list[str] = [
     "TMeltanoTargetConfig",
     "Tap",
     "Target",
+    "ConfigValidationError",
     "__version__",
     "__version_info__",
     "configure_meltano_container",
@@ -330,6 +339,7 @@ __all__: list[str] = [
     "flext_meltano_validate_tap_config",
     "get_meltano_container",
     "get_tap_test_class",
+    "get_target_test_class",
     "singer",
     "singer_typing",
     "validate_config_value",
@@ -338,3 +348,6 @@ __all__: list[str] = [
 ]
 
 # Ensure singer module is available
+
+from . import core
+from . import exceptions

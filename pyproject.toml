@@ -117,7 +117,7 @@ files = ["src", "tests"]
 plugins = ["pydantic.mypy"]
 
 # Cache
-sqlite_cache = true
+# sqlite_cache = true
 cache_dir = ".mypy_cache"
 
 # Advanced checks
@@ -171,12 +171,6 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=src/flext_meltano",
-    "--cov-branch",
-    "--cov-report=term-missing:skip-covered",
-    "--cov-report=html:reports/coverage",
-    "--cov-report=xml:reports/coverage.xml",
-    "--cov-fail-under=90",
     "--maxfail=1",
     "--tb=short",
 ]

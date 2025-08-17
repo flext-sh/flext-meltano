@@ -55,25 +55,25 @@ def validate_directory_path(directory_path: str | None) -> str | None:
     """Validate directory path exists and is accessible.
 
     Args:
-        directory_path: Path to directory to validate
+      directory_path: Path to directory to validate
 
     Returns:
-        Validated directory path or None if invalid
+      Validated directory path or None if invalid
 
     """
     if not directory_path:
-        return None
+      return None
 
     path = Path(directory_path)
 
     # Check if path exists and is a directory
     if path.exists() and path.is_dir():
-        return str(path.absolute())
+      return str(path.absolute())
 
     # For test environments, allow non-existent paths in secure temp directory
     temp_dir = Path(tempfile.gettempdir())
     if path.is_relative_to(temp_dir) or str(path).startswith(("/test", "test_")):
-        return str(path)
+      return str(path)
 
     return None
 
@@ -82,25 +82,25 @@ def validate_file_path(file_path: str | None) -> str | None:
     """Validate file path exists and is accessible.
 
     Args:
-        file_path: Path to file to validate
+      file_path: Path to file to validate
 
     Returns:
-        Validated file path or None if invalid
+      Validated file path or None if invalid
 
     """
     if not file_path:
-        return None
+      return None
 
     path = Path(file_path)
 
     # Check if path exists and is a file
     if path.exists() and path.is_file():
-        return str(path.absolute())
+      return str(path.absolute())
 
     # For test environments, allow non-existent paths in secure temp directory
     temp_dir = Path(tempfile.gettempdir())
     if path.is_relative_to(temp_dir) or str(path).startswith(("/test", "test_")):
-        return str(path)
+      return str(path)
 
     return None
 
@@ -113,38 +113,42 @@ def validate_config_value(
     """Validate configuration value matches expected type.
 
     Args:
-        value: Value to validate
-        expected_type: Expected type for the value
-        default: Default value if validation fails
+      value: Value to validate
+      expected_type: Expected type for the value
+      default: Default value if validation fails
 
     Returns:
-        Validated value or default
+      Validated value or default
 
     """
     result: object | None = default
 
     if value is None:
-        return result
+      return result
 
     if isinstance(value, expected_type):
-        result = value
+      result = value
     else:
-        # Try to convert to expected type with special cases
-        try:
-            if expected_type is float and isinstance(value, str):
-                text = value.strip().lower()
-                if text in {"pi", "math.pi", "3.14"}:
-                    result = _math.pi
-                else:
-                    converted = float(value)
-                    pi_approx = _math.pi
-                    tolerance = 1e-9
-                    result = _math.pi if abs(converted - pi_approx) < tolerance else converted
-            else:
-                # Normalize common textual representations to match test expectations
-                result = expected_type(value)
-        except (ValueError, TypeError):
-            result = default
+      # Try to convert to expected type with special cases
+      try:
+          if expected_type is float and isinstance(value, str):
+              text = value.strip().lower()
+              if text in {"pi", "math.pi", "3.14"}:
+                  result = _math.pi
+              else:
+                  converted = float(value)
+                  pi_approx = _math.pi
+                  tolerance = 1e-9
+                  result = (
+                      _math.pi
+                      if abs(converted - pi_approx) < tolerance
+                      else converted
+                  )
+          else:
+              # Normalize common textual representations to match test expectations
+              result = expected_type(value)
+      except (ValueError, TypeError):
+          result = default
 
     return result
 
@@ -153,10 +157,10 @@ class MockResult:
     """Mock result class for subprocess compatibility - eliminates duplication."""
 
     def __init__(self, data: dict[str, object]) -> None:
-        """Initialize mock result from execution data."""
-        self.returncode = data.get("returncode", 1)
-        self.stdout = data.get("stdout", "")
-        self.stderr = data.get("stderr", "")
+      """Initialize mock result from execution data."""
+      self.returncode = data.get("returncode", 1)
+      self.stdout = data.get("stdout", "")
+      self.stderr = data.get("stderr", "")
 
 
 __all__: list[str] = [
