@@ -463,14 +463,14 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         )
 
         # Initialize tap
-        tap_init_result = tap.initialize(tap_config)  # type: ignore[arg-type]
+        tap_init_result = tap.initialize(tap_config)
         if tap_init_result.is_failure:
             return FlextResult.fail(
                 f"Tap initialization failed: {tap_init_result.error}",
             )
 
         # Initialize target
-        target_init_result = target.initialize(target_config)  # type: ignore[arg-type]
+        target_init_result = target.initialize(target_config)
         if target_init_result.is_failure:
             return FlextResult.fail(
                 f"Target initialization failed: {target_init_result.error}",

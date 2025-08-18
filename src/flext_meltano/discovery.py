@@ -903,7 +903,7 @@ def flext_meltano_discover_plugins(
                     continue
             data_obj: dict[str, object] = {"plugins": plugins_list}
         else:
-            data_obj = None  # type: ignore[assignment]
+            data_obj = None
 
         class AttrDictSuccess(UserDict[str, object]):
             def __getattr__(self, name: str) -> object:  # pragma: no cover - trivial

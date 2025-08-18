@@ -10,18 +10,13 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import cast
 
+import duckdb
+import pandas as pd
 from flext_core import FlextResult, get_logger
 
-try:
-    import duckdb
-    import pandas as pd
-
-    HAS_DUCKDB = True
-except ImportError:
-    HAS_DUCKDB = False
-    duckdb = None  # type: ignore[assignment]
-    pd = None  # type: ignore[assignment]
 logger = get_logger(__name__)
+
+HAS_DUCKDB = True
 
 
 class FlextDbtInMemoryExecutor:
