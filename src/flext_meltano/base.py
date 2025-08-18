@@ -205,7 +205,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
             # Execute command with null check
             if self.runner is not None:
-                self.runner.invoke(args)  # type: ignore[attr-defined]
+                self.runner.invoke(args)
             else:
                 return FlextResult(error="DBT runner is None")
 
@@ -247,7 +247,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
             # Execute using DBT runner - add null check for MyPy
             if self.runner is not None:
-                result = self.runner.invoke(["--version"])  # type: ignore[attr-defined]
+                result = self.runner.invoke(["--version"])
             else:
                 return "0.9.0"  # Default fallback version
             if hasattr(result, "result") and result.result:

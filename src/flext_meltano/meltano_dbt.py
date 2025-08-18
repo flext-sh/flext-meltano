@@ -13,7 +13,9 @@ import pandas as pd
 from flext_core import FlextDomainService, FlextResult, get_logger
 from jinja2 import Environment as _RealJinjaEnvironment
 
-from .meltano_config import FlextMeltanoConfig
+from flext_meltano.meltano_config import FlextMeltanoConfig
+
+logger = get_logger(__name__)
 
 
 class _TemplateLike(Protocol):
@@ -25,8 +27,6 @@ class _JinjaLike(Protocol):
 
 
 JINJA_ENV_CLS: type[_JinjaLike] | None = _RealJinjaEnvironment
-
-logger = get_logger(__name__)
 
 # =============================================================================
 # DBT PACKAGE MANAGEMENT (from dbt_manager.py)
@@ -265,7 +265,7 @@ class FlextDbtModelRegistry:
         self.jinja_env: object | None = None
         try:
             if JINJA_ENV_CLS is not None:
-                self.jinja_env = JINJA_ENV_CLS(autoescape=True)  # type: ignore[call-arg]
+                self.jinja_env = JINJA_ENV_CLS(autoescape=True)
             else:
                 self.jinja_env = None
         except Exception:
@@ -339,7 +339,7 @@ class FlextDbtModelRegistry:
             if self.jinja_env is None:
                 return FlextResult.fail("Jinja2 not available for model compilation")
 
-            template = self.jinja_env.from_string(model.sql)  # type: ignore[attr-defined]
+            template = self.jinja_env.from_string(model.sql)
             compiled_sql = str(template.render(**context))
 
             logger.debug(f"Compiled model {model.model_id}")
@@ -391,7 +391,7 @@ class FlextDbtInMemoryExecutor:
         # duckdb and pandas are imported at module level
 
         self.database = database
-        self.connection = cast("object", duckdb).connect(database)  # type: ignore[attr-defined]
+        self.connection = cast("object", duckdb).connect(database)
         self.schemas: dict[str, dict[str, object]] = {}
         self.mock_data: dict[str, object] = {}
         logger.info(f"Initialized DuckDB executor: {database}")
@@ -832,7 +832,7 @@ class FlextDbtHub:
                     if isinstance(table_data, list):
                         data_frames[table_name] = pd.DataFrame(table_data)
                     elif hasattr(table_data, "columns"):
-                        data_frames[table_name] = table_data  # type: ignore[assignment]
+                        data_frames[table_name] = table_data
                     else:
                         return FlextResult.fail(
                             f"Unsupported mock data format for {table_name}",
@@ -855,13 +855,13 @@ class FlextDbtHub:
                     )
                 sql_text = compile_result.data
 
-            result = self.executor.execute_model(sql_text, data_frames)  # type: ignore[arg-type]
+            result = self.executor.execute_model(sql_text, data_frames)
             logger.info(
                 "DBT model executed successfully"
                 if result.success
                 else f"DBT model execution failed: {result.error}",
             )
-            return result  # type: ignore[return-value]
+            return result
         except Exception as e:
             return FlextResult.fail(f"Failed to execute model: {e}")
 
