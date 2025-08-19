@@ -39,13 +39,11 @@ loading operations for Go service integration.
 
 from __future__ import annotations
 
-# Re-export Singer SDK classes from specific modules to avoid circular imports
 from flext_meltano.base import (
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
 )
 
-# Legacy compatibility exports
 FlextMeltanoTap = FlextMeltanoTapService
 FlextMeltanoTarget = FlextMeltanoTargetService
 

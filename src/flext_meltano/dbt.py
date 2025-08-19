@@ -135,7 +135,7 @@ class FlextMeltanoDbtManager:
             cmd.extend(["--exclude", exclude])
 
         # For tests, return structured success without invoking Meltano
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -157,7 +157,7 @@ class FlextMeltanoDbtManager:
         elif select:
             cmd.extend(["--select", select])
 
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -179,7 +179,7 @@ class FlextMeltanoDbtManager:
         elif select:
             cmd.extend(["--select", select])
 
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -193,14 +193,14 @@ class FlextMeltanoDbtManager:
         result = self.executor.run_command(["invoke", "dbt:docs:generate"])
 
         if result.success:
-            return FlextResult.ok(
+            return FlextResult[None].ok(
                 {
                     "command": "dbt docs generate",
                     "status": "success",
                     "output": result.data,
                 },
             )
-        return FlextResult.fail(f"DBT docs generation failed: {result.error}")
+        return FlextResult[None].fail(f"DBT docs generation failed: {result.error}")
 
     def serve_docs(self, port: int = 8080) -> FlextResult[dict[str, object]]:
         """Serve DBT documentation."""
@@ -214,7 +214,7 @@ class FlextMeltanoDbtManager:
         )
 
         if result.success:
-            return FlextResult.ok(
+            return FlextResult[None].ok(
                 {
                     "command": f"dbt docs serve --port {port}",
                     "status": "success",
@@ -222,7 +222,7 @@ class FlextMeltanoDbtManager:
                     "output": result.data,
                 },
             )
-        return FlextResult.fail(f"DBT docs serve failed: {result.error}")
+        return FlextResult[None].fail(f"DBT docs serve failed: {result.error}")
 
 
 class FlextMeltanoDbtProject:
@@ -246,13 +246,13 @@ class FlextMeltanoDbtProject:
         result = self.executor.run_command(["invoke", "dbt:initialize"])
 
         if result.success:
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         # Test-friendly fallback: treat missing Meltano/dbt as initialized
         logger.warning(
             "DBT initialize fallback to success (test mode)",
             error=result.error,
         )
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def validate(self) -> FlextResult[None]:
         """Validate DBT project configuration."""
@@ -264,19 +264,19 @@ class FlextMeltanoDbtProject:
                 "DBT project file not found; assuming valid in test mode",
                 file=str(dbt_project_file),
             )
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         # Run DBT parse to validate project
         result = self.executor.run_command(["invoke", "dbt:parse"])
 
         if result.success:
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         # Fallback to success to avoid external dependency in tests
         logger.warning(
             "DBT parse failed; assuming valid in test mode",
             error=result.error,
         )
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
 
 class FlextMeltanoDbtRunner:
@@ -308,7 +308,7 @@ class FlextMeltanoDbtRunner:
         result = self.executor.run_command(cmd)
 
         if result.success:
-            return FlextResult.ok(
+            return FlextResult[None].ok(
                 {
                     # Expose the logical DBT command (not the Meltano wrapper)
                     "command": command,
@@ -322,7 +322,7 @@ class FlextMeltanoDbtRunner:
             "DBT command fallback to success (test mode)",
             error=result.error,
         )
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "command": command,
                 "args": args or [],
@@ -341,7 +341,7 @@ class FlextMeltanoDbtRunner:
             args.extend(["--models", " ".join(models)])
 
         # Return structured result matching tests without depending on Meltano
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "status": "success",
@@ -358,7 +358,7 @@ class FlextMeltanoDbtRunner:
             args.extend(["--models", " ".join(models)])
 
         # Return structured result matching tests without depending on Meltano
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "status": "success",

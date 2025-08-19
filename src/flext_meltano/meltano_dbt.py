@@ -114,9 +114,9 @@ class FlextDbtPackageManager:
             }
             with self.registry_path.open("w") as f:
                 json.dump(data, f, indent=2)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to save registry: {e}")
+            return FlextResult[None].fail(f"Failed to save registry: {e}")
 
     def register_package(self, package: FlextDbtPackage) -> FlextResult[None]:
         """Register a new DBT package."""
@@ -135,13 +135,13 @@ class FlextDbtPackageManager:
             return self._save_registry()
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register package: {e}")
+            return FlextResult[None].fail(f"Failed to register package: {e}")
 
     def get_package(self, name: str) -> FlextResult[FlextDbtPackage]:
         """Get a package by name."""
         if name in self.packages:
-            return FlextResult.ok(self.packages[name])
-        return FlextResult.fail(f"Package {name} not found")
+            return FlextResult[None].ok(self.packages[name])
+        return FlextResult[None].fail(f"Package {name} not found")
 
     def list_packages(self) -> list[FlextDbtPackage]:
         """List all registered packages."""
@@ -154,7 +154,7 @@ class FlextDbtPackageManager:
         """Resolve dependencies for a project."""
         try:
             if project not in self.packages:
-                return FlextResult.fail(f"Package {project} not found")
+                return FlextResult[None].fail(f"Package {project} not found")
 
             resolved: list[FlextDbtPackage] = []
             visited: set[str] = set()
@@ -181,10 +181,10 @@ class FlextDbtPackageManager:
                 f"{[p.name for p in resolved]}",
             )
 
-            return FlextResult.ok(resolved)
+            return FlextResult[None].ok(resolved)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to resolve dependencies: {e}")
+            return FlextResult[None].fail(f"Failed to resolve dependencies: {e}")
 
 
 # =============================================================================
@@ -294,9 +294,9 @@ class FlextDbtModelRegistry:
             }
             with self.registry_path.open("w") as f:
                 json.dump(data, f, indent=2)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to save model registry: {e}")
+            return FlextResult[None].fail(f"Failed to save model registry: {e}")
 
     def register_model(self, model: FlextDbtModel) -> FlextResult[None]:
         """Register a reusable DBT model."""
@@ -314,20 +314,20 @@ class FlextDbtModelRegistry:
             return self._save_registry()
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register model: {e}")
+            return FlextResult[None].fail(f"Failed to register model: {e}")
 
     def get_model(self, name: str) -> FlextResult[FlextDbtModel]:
         """Get a model from the registry."""
         # Try direct lookup
         if name in self.models:
-            return FlextResult.ok(self.models[name])
+            return FlextResult[None].ok(self.models[name])
 
         # Try by name only
         for model in self.models.values():
             if model.name == name:
-                return FlextResult.ok(model)
+                return FlextResult[None].ok(model)
 
-        return FlextResult.fail(f"Model {name} not found")
+        return FlextResult[None].fail(f"Model {name} not found")
 
     def compile_model(
         self,
@@ -337,16 +337,16 @@ class FlextDbtModelRegistry:
         """Compile a model with given context."""
         try:
             if self.jinja_env is None:
-                return FlextResult.fail("Jinja2 not available for model compilation")
+                return FlextResult[None].fail("Jinja2 not available for model compilation")
 
             template = self.jinja_env.from_string(model.sql)
             compiled_sql = str(template.render(**context))
 
             logger.debug(f"Compiled model {model.model_id}")
-            return FlextResult.ok(compiled_sql)
+            return FlextResult[None].ok(compiled_sql)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to compile model: {e}")
+            return FlextResult[None].fail(f"Failed to compile model: {e}")
 
     def search_models(
         self,
@@ -430,10 +430,10 @@ class FlextDbtInMemoryExecutor:
                     self.schemas[table_name] = table_def
                     logger.debug(f"Loaded schema for table: {table_name}")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to load mock data: {e}")
+            return FlextResult[None].fail(f"Failed to load mock data: {e}")
 
     def _map_to_duckdb_type(self, type_str: str) -> str:
         """Map generic types to DuckDB types."""
@@ -477,10 +477,10 @@ class FlextDbtInMemoryExecutor:
                     self.connection.unregister(name)
 
             logger.debug(f"Executed model, returned {len(result)} rows")
-            return FlextResult.ok(result)
+            return FlextResult[None].ok(result)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute model: {e}")
+            return FlextResult[None].fail(f"Failed to execute model: {e}")
 
     def validate_transformations(
         self,
@@ -582,10 +582,10 @@ class FlextDbtInMemoryExecutor:
                 f"all valid: {all_valid}",
             )
 
-            return FlextResult.ok(summary)
+            return FlextResult[None].ok(summary)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to validate transformations: {e}")
+            return FlextResult[None].fail(f"Failed to validate transformations: {e}")
 
     def close(self) -> None:
         """Close the database connection."""
@@ -632,7 +632,7 @@ class FlextMeltanoDbtManager:
             cmd.extend(["--exclude", exclude])
 
         # Execution would use Meltano executor when available; currently returns structured success
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -655,7 +655,7 @@ class FlextMeltanoDbtManager:
             cmd.extend(["--select", select])
 
         # Execution would use Meltano executor when available; currently returns structured success
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -678,7 +678,7 @@ class FlextMeltanoDbtManager:
             cmd.extend(["--select", select])
 
         # Execution would use Meltano executor when available; currently returns structured success
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -690,7 +690,7 @@ class FlextMeltanoDbtManager:
     def generate_docs(self) -> FlextResult[dict[str, object]]:
         """Generate DBT documentation."""
         # Execution would use Meltano executor when available; currently returns structured success
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "command": "dbt docs generate",
                 "status": "success",
@@ -819,7 +819,7 @@ class FlextDbtHub:
     ) -> FlextResult[pd.DataFrame]:
         """Execute a model in-memory with reduced branching complexity."""
         if self.executor is None:
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 "In-memory execution not available (missing DuckDB/pandas)",
             )
         try:
@@ -834,7 +834,7 @@ class FlextDbtHub:
                     elif hasattr(table_data, "columns"):
                         data_frames[table_name] = table_data
                     else:
-                        return FlextResult.fail(
+                        return FlextResult[None].fail(
                             f"Unsupported mock data format for {table_name}",
                         )
 
@@ -842,7 +842,7 @@ class FlextDbtHub:
             if not sql_text.upper().startswith(("SELECT", "WITH")):
                 model_result = self.model_registry.get_model(sql_text)
                 if not model_result.success or not model_result.data:
-                    return FlextResult.fail(
+                    return FlextResult[None].fail(
                         model_result.error or f"Model not found: {sql_text}",
                     )
                 compile_result = self.model_registry.compile_model(
@@ -850,7 +850,7 @@ class FlextDbtHub:
                     context or {},
                 )
                 if not compile_result.success or not compile_result.data:
-                    return FlextResult.fail(
+                    return FlextResult[None].fail(
                         compile_result.error or "Failed to compile model",
                     )
                 sql_text = compile_result.data
@@ -863,34 +863,34 @@ class FlextDbtHub:
             )
             return result
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute model: {e}")
+            return FlextResult[None].fail(f"Failed to execute model: {e}")
 
     def register_snapshot(self, snapshot: FlextDbtSnapshot) -> FlextResult[None]:
         """Register a DBT snapshot configuration."""
         try:
             # Validate snapshot configuration
             if not snapshot.name or not snapshot.sql:
-                return FlextResult.fail("Snapshot name and SQL are required")
+                return FlextResult[None].fail("Snapshot name and SQL are required")
 
             if snapshot.strategy not in {"timestamp", "check"}:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     "Snapshot strategy must be 'timestamp' or 'check'",
                 )
 
             if snapshot.strategy == "timestamp" and not snapshot.updated_at:
-                return FlextResult.fail("Timestamp strategy requires updated_at field")
+                return FlextResult[None].fail("Timestamp strategy requires updated_at field")
 
             if snapshot.strategy == "check" and not snapshot.check_cols:
-                return FlextResult.fail("Check strategy requires check_cols")
+                return FlextResult[None].fail("Check strategy requires check_cols")
 
             # Register snapshot
             self.snapshots[snapshot.name] = snapshot
             logger.info(f"Registered DBT snapshot: {snapshot.name}")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register snapshot: {e}")
+            return FlextResult[None].fail(f"Failed to register snapshot: {e}")
 
     def register_exposure(self, exposure: FlextDbtExposure) -> FlextResult[None]:
         """Register a DBT exposure configuration."""
@@ -898,24 +898,24 @@ class FlextDbtHub:
             # Validate exposure configuration
             valid_types = ("dashboard", "notebook", "analysis", "ml", "application")
             if exposure.type not in valid_types:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Invalid exposure type. Must be one of: {valid_types}",
                 )
 
             if not exposure.name or not exposure.description:
-                return FlextResult.fail("Exposure name and description are required")
+                return FlextResult[None].fail("Exposure name and description are required")
 
             if not exposure.owner or "name" not in exposure.owner:
-                return FlextResult.fail("Exposure owner information is required")
+                return FlextResult[None].fail("Exposure owner information is required")
 
             # Register exposure
             self.exposures[exposure.name] = exposure
             logger.info(f"Registered DBT exposure: {exposure.name} ({exposure.type})")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register exposure: {e}")
+            return FlextResult[None].fail(f"Failed to register exposure: {e}")
 
     def import_ldap_models(self) -> FlextResult[int]:
         """Import models from flext-dbt-ldap."""
@@ -963,10 +963,10 @@ class FlextDbtHub:
             models_registered += 1
 
             logger.info(f"Imported {models_registered} LDAP models")
-            return FlextResult.ok(models_registered)
+            return FlextResult[None].ok(models_registered)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import LDAP models: {e}")
+            return FlextResult[None].fail(f"Failed to import LDAP models: {e}")
 
     def close(self) -> None:
         """Clean up resources."""
@@ -1002,7 +1002,7 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
     def execute_operation(self, *args: object, **kwargs: object) -> FlextResult[object]:
         """Execute specific DBT operations."""
         if not args:
-            return FlextResult.fail("Operation name required as first argument")
+            return FlextResult[None].fail("Operation name required as first argument")
 
         operation = str(args[0])
 
@@ -1021,7 +1021,7 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
         if operation == "generate_docs":
             return FlextResult[object].ok(self.manager.generate_docs().data)
 
-        return FlextResult.fail(f"Unknown DBT operation: {operation}")
+        return FlextResult[None].fail(f"Unknown DBT operation: {operation}")
 
 
 # =============================================================================

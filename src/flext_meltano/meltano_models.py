@@ -52,10 +52,10 @@ class FlextMeltanoEvent(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain constraints for the event."""
         if not self.event_type.strip():
-            return FlextResult.fail("Event type cannot be empty")
+            return FlextResult[None].fail("Event type cannot be empty")
         if not self.source.strip():
-            return FlextResult.fail("Event source cannot be empty")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Event source cannot be empty")
+        return FlextResult[None].ok(None)
 
 
 class FlextMeltanoExecutionState(FlextModel):
@@ -90,12 +90,12 @@ class FlextMeltanoPipelineExecution(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate pipeline execution constraints."""
         if not self.pipeline_name.strip():
-            return FlextResult.fail("Pipeline name cannot be empty")
+            return FlextResult[None].fail("Pipeline name cannot be empty")
         if not self.tap_name.strip():
-            return FlextResult.fail("Tap name cannot be empty")
+            return FlextResult[None].fail("Tap name cannot be empty")
         if not self.target_name.strip():
-            return FlextResult.fail("Target name cannot be empty")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Target name cannot be empty")
+        return FlextResult[None].ok(None)
 
     def mark_completed(self, records_processed: int = 0) -> None:
         """Mark execution as completed."""
@@ -133,10 +133,10 @@ class FlextMeltanoPlugin(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate plugin constraints."""
         if not self.name.strip():
-            return FlextResult.fail("Plugin name cannot be empty")
+            return FlextResult[None].fail("Plugin name cannot be empty")
         if not self.namespace.strip():
-            return FlextResult.fail("Plugin namespace cannot be empty")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Plugin namespace cannot be empty")
+        return FlextResult[None].ok(None)
 
     def is_extractable(self) -> bool:
         """Check if plugin can extract data."""
@@ -161,13 +161,13 @@ class FlextMeltanoPluginRegistry(FlextModel):
 
         self.plugins[plugin.name] = plugin
         self.last_updated = datetime.now(UTC)
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def get_plugin(self, name: str) -> FlextResult[FlextMeltanoPlugin]:
         """Get plugin by name."""
         if name not in self.plugins:
-            return FlextResult.fail(f"Plugin '{name}' not found in registry")
-        return FlextResult.ok(self.plugins[name])
+            return FlextResult[None].fail(f"Plugin '{name}' not found in registry")
+        return FlextResult[None].ok(self.plugins[name])
 
     def list_plugins_by_type(
         self,
@@ -217,15 +217,15 @@ class FlextSingerMessage(FlextValueObject):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate Singer message constraints."""
         if self.message_type == FlextSingerMessageType.RECORD and not self.record:
-            return FlextResult.fail("RECORD message must have record data")
+            return FlextResult[None].fail("RECORD message must have record data")
         if (
             self.message_type == FlextSingerMessageType.SCHEMA
             and not self.message_schema
         ):
-            return FlextResult.fail("SCHEMA message must have schema data")
+            return FlextResult[None].fail("SCHEMA message must have schema data")
         if self.message_type == FlextSingerMessageType.STATE and not self.state:
-            return FlextResult.fail("STATE message must have state data")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("STATE message must have state data")
+        return FlextResult[None].ok(None)
 
 
 class FlextSingerCatalog(FlextModel):
@@ -238,10 +238,10 @@ class FlextSingerCatalog(FlextModel):
     def add_stream(self, stream_definition: dict[str, object]) -> FlextResult[None]:
         """Add stream definition to catalog."""
         if "tap_stream_id" not in stream_definition:
-            return FlextResult.fail("Stream definition must have tap_stream_id")
+            return FlextResult[None].fail("Stream definition must have tap_stream_id")
 
         self.streams.append(stream_definition)
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def get_stream_names(self) -> list[str]:
         """Get list of stream names."""
@@ -284,10 +284,10 @@ class FlextMeltanoProject(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate project constraints."""
         if not self.name.strip():
-            return FlextResult.fail("Project name cannot be empty")
+            return FlextResult[None].fail("Project name cannot be empty")
         if not self.project_root.strip():
-            return FlextResult.fail("Project root cannot be empty")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Project root cannot be empty")
+        return FlextResult[None].ok(None)
 
     def add_plugin(self, plugin: FlextMeltanoPlugin) -> FlextResult[None]:
         """Add plugin to project."""
@@ -297,7 +297,7 @@ class FlextMeltanoProject(FlextEntity):
 
         self.plugins[plugin.name] = plugin
         self.updated_at = datetime.now(UTC)
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
 
 # =============================================================================

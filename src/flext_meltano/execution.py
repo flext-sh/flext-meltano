@@ -129,7 +129,7 @@ class FlextMeltanoExecutor:
             if not self._meltano_path:
                 validation_result = self.validate()
                 if not validation_result.success:
-                    final_result = FlextResult.fail(
+                    final_result = FlextResult[None].fail(
                         validation_result.error or "Validation failed",
                     )
                     return final_result
@@ -166,7 +166,7 @@ class FlextMeltanoExecutor:
                 err = exec_result.error or "Execution failed"
                 if "timed out" in err.lower():
                     err = "Pipeline execution timed out"
-                final_result = FlextResult.fail(err)
+                final_result = FlextResult[None].fail(err)
             else:
                 result = exec_result.data
                 execution_result = {
@@ -185,16 +185,16 @@ class FlextMeltanoExecutor:
                 }
 
                 if execution_result["success"]:
-                    final_result = FlextResult.ok(execution_result)
+                    final_result = FlextResult[None].ok(execution_result)
                 else:
-                    final_result = FlextResult.fail(
+                    final_result = FlextResult[None].fail(
                         f"Pipeline failed: {execution_result['stderr'] or execution_result['stdout']}",
                     )
 
         except TimeoutError:
-            final_result = FlextResult.fail("Pipeline execution timed out")
+            final_result = FlextResult[None].fail("Pipeline execution timed out")
         except OSError as e:
-            final_result = FlextResult.fail(f"Execution error: {e}")
+            final_result = FlextResult[None].fail(f"Execution error: {e}")
 
         return final_result
 
@@ -366,11 +366,11 @@ def execute_subprocess_common(
         logger.info(
             f"Subprocess completed in {context.timeout_seconds}s or less: {result['success']}",
         )
-        return FlextResult.ok(result)
+        return FlextResult[None].ok(result)
     except subprocess.TimeoutExpired:
-        return FlextResult.fail("Command timed out")
+        return FlextResult[None].fail("Command timed out")
     except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
-        return FlextResult.fail(f"Execution error: {e}")
+        return FlextResult[None].fail(f"Execution error: {e}")
 
 
 async def _execute_subprocess_common_async(

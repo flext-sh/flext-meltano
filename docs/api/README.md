@@ -495,16 +495,16 @@ def example_operation() -> FlextResult[Dict[str, Any]]:
     try:
         # Perform operation
         result_data = {"success": True, "records": 1000}
-        return FlextResult.success(result_data, message="Operation completed")
+        return FlextResult[None].ok(result_data, message="Operation completed")
 
     except FlextMeltanoError as e:
-        return FlextResult.failure(
+        return FlextResult[None].fail(
             error_message=str(e),
             details={"error_type": "FlextMeltanoError", "context": e.context}
         )
 
     except Exception as e:
-        return FlextResult.failure(
+        return FlextResult[None].fail(
             error_message=f"Unexpected error: {str(e)}",
             details={"error_type": type(e).__name__}
         )
@@ -641,7 +641,7 @@ class ProductionPipelineManager:
             if pipeline_result.success:
                 metrics = pipeline_result.data
                 self._log_success(metrics)
-                return FlextResult.success(metrics)
+                return FlextResult[None].ok(metrics)
             else:
                 self._log_failure(pipeline_result.error_message)
                 return pipeline_result
@@ -649,7 +649,7 @@ class ProductionPipelineManager:
         except Exception as e:
             error_msg: str = f"Pipeline execution failed: {str(e)}"
             self._log_error(error_msg)
-            return FlextResult.failure(error_msg)
+            return FlextResult[None].fail(error_msg)
 
     def _log_success(self, metrics: Dict[str, Any]) -> None:
         """Log successful pipeline execution."""

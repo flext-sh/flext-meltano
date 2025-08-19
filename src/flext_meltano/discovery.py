@@ -179,12 +179,12 @@ def discover_catalog_with_validation(
 
         if result.success:
             catalog = json.loads(result.data["stdout"])
-            return FlextResult.ok(catalog)
+            return FlextResult[None].ok(catalog)
         else:
-            return FlextResult.fail(f"Catalog discovery failed: {result.error_message}")
+            return FlextResult[None].fail(f"Catalog discovery failed: {result.error_message}")
 
     except Exception as e:
-        return FlextResult.fail(f"Discovery error: {e}")
+        return FlextResult[None].fail(f"Discovery error: {e}")
 ```
 
 ## Caching and Performance
@@ -234,7 +234,7 @@ def handle_discovery_errors(operation: str) -> Callable:
             except Exception as e:
                 error_msg: str = f"Discovery operation {operation} error: {e}"
                 logger.exception(error_msg)
-                return FlextResult.fail(error_msg)
+                return FlextResult[None].fail(error_msg)
 
         return wrapper
 
@@ -571,9 +571,9 @@ class FlextMeltanoDiscoverer:
             plugins = self._discover_with_hub(plugin_type)
             if not plugins:
                 plugins = self._get_default_plugins(plugin_type)
-            return FlextResult.ok(plugins)
+            return FlextResult[None].ok(plugins)
         except (ValueError, TypeError, ImportError) as e:
-            return FlextResult.fail(f"Plugin discovery failed: {e}")
+            return FlextResult[None].fail(f"Plugin discovery failed: {e}")
 
     def _ensure_hub_initialized(self) -> None:
         """Initialize hub if possible; ignore failures safely."""

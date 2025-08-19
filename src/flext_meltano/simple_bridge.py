@@ -94,10 +94,10 @@ class FlextMeltanoBridge:
                 "flext_meltano": "2.0.0-enterprise",
             }
 
-            return FlextResult.ok(version_info)
+            return FlextResult[None].ok(version_info)
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult.fail(f"Failed to get version information: {e}")
+            return FlextResult[None].fail(f"Failed to get version information: {e}")
 
     def get_plugin_registry(self) -> FlextMeltanoPluginRegistry | None:
         """Get the plugin registry for managing plugins.
@@ -168,7 +168,7 @@ class FlextMeltanoBridge:
                 result = target_result.map(_to_base_target)
             else:
                 # Generic plugin
-                result = FlextResult.ok(
+                result = FlextResult[None].ok(
                     FlextMeltanoPlugin(
                         name=plugin_name,
                         plugin_type=FlextMeltanoPluginType.UTILITIES,
@@ -187,7 +187,7 @@ class FlextMeltanoBridge:
             return result
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to create plugin {plugin_name}: {e}")
+            return FlextResult[None].fail(f"Failed to create plugin {plugin_name}: {e}")
 
     def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
         """List all available plugins for Go services.
@@ -222,11 +222,11 @@ class FlextMeltanoBridge:
                                     plugins.append(
                                         {"name": line.strip(), "type": "unknown"},
                                     )
-                return FlextResult.ok(plugins)
-            return FlextResult.ok([])  # Return empty list if no plugins
+                return FlextResult[None].ok(plugins)
+            return FlextResult[None].ok([])  # Return empty list if no plugins
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult.fail(f"Failed to list plugins: {e}")
+            return FlextResult[None].fail(f"Failed to list plugins: {e}")
 
     def add_plugin(
         self,
@@ -267,14 +267,14 @@ class FlextMeltanoBridge:
                     logger.debug(f"Using variant: {variant}")
                 if pip_url:
                     logger.debug(f"Using pip URL: {pip_url}")
-                return FlextResult.ok(f"Plugin {name} added successfully (mocked)")
+                return FlextResult[None].ok(f"Plugin {name} added successfully (mocked)")
 
             # Fallback to error if no installation service
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 "Plugin installation requires initialized Meltano project",
             )
         except (ValueError, TypeError, AttributeError, OSError) as e:
-            return FlextResult.fail(f"Failed to add plugin {name}: {e}")
+            return FlextResult[None].fail(f"Failed to add plugin {name}: {e}")
 
     def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
         """Discover schema catalog from tap for Go services.
@@ -317,13 +317,13 @@ class FlextMeltanoBridge:
                     ],
                     "discovered_at": "2025-01-08T00:00:00Z",
                 }
-                return FlextResult.ok(catalog)
+                return FlextResult[None].ok(catalog)
 
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 "Catalog discovery requires configured Meltano project",
             )
         except Exception as e:
-            return FlextResult.fail(f"Failed to discover catalog for {tap_name}: {e}")
+            return FlextResult[None].fail(f"Failed to discover catalog for {tap_name}: {e}")
 
     def run_pipeline(
         self,
@@ -371,13 +371,13 @@ class FlextMeltanoBridge:
                     "job_id": job_id,
                     "execution_details": result.data,
                 }
-                return FlextResult.ok(pipeline_result)
-            return FlextResult.fail(
+                return FlextResult[None].ok(pipeline_result)
+            return FlextResult[None].fail(
                 f"Pipeline execution failed: {result.error or 'Unknown error'}",
             )
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult.fail(f"Failed to run pipeline: {e}")
+            return FlextResult[None].fail(f"Failed to run pipeline: {e}")
 
     def invoke_dbt(
         self,
@@ -421,13 +421,13 @@ class FlextMeltanoBridge:
                     "status": "success",
                     "output": f"DBT {command} completed successfully",
                 }
-                return FlextResult.ok(result)
+                return FlextResult[None].ok(result)
 
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 "DBT operations require configured DBT project",
             )
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute DBT command {command}: {e}")
+            return FlextResult[None].fail(f"Failed to execute DBT command {command}: {e}")
 
 
 def create_flext_meltano_bridge(

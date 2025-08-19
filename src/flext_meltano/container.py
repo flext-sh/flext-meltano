@@ -97,10 +97,10 @@ def configure_meltano_services(
             create_meltano_dbt_service,
         )
 
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     except (ValueError, TypeError, AttributeError, KeyError) as e:
-        return FlextResult.fail(f"Service configuration failed: {e}")
+        return FlextResult[None].fail(f"Service configuration failed: {e}")
 
 
 def get_meltano_container() -> FlextContainer:

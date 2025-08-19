@@ -194,7 +194,7 @@ class FlextMeltanoInstaller:
                 installed=pi.installed,
                 capabilities=list(pi.capabilities),
             )
-            return FlextResult.ok(enriched)
+            return FlextResult[None].ok(enriched)
 
         return result
 
@@ -213,12 +213,12 @@ class FlextMeltanoInstaller:
                 err = result.error or "Plugin remove failed"
                 low = err.lower()
                 if "timed out" in low:
-                    return FlextResult.fail("Plugin remove timed out")
+                    return FlextResult[None].fail("Plugin remove timed out")
                 if "command error" in low or "calledprocesserror" in low:
-                    return FlextResult.fail("Plugin remove error: command failed")
-                return FlextResult.fail("Plugin remove failed")
+                    return FlextResult[None].fail("Plugin remove error: command failed")
+                return FlextResult[None].fail("Plugin remove failed")
 
-            return FlextResult.ok(data=True)
+            return FlextResult[None].ok(True)
 
         except (OSError, ValueError) as e:
             return FlextResult(error=f"Failed to uninstall plugin {name}: {e}")
@@ -238,16 +238,16 @@ class FlextMeltanoInstaller:
                 err = raw_result.error or ""
                 low = err.lower() if isinstance(err, str) else ""
                 if "command not found" in low or "calledprocesserror" in low:
-                    return FlextResult.fail("Plugin list error: command failed")
-                return FlextResult.fail(raw_result.error or "Plugin list failed")
+                    return FlextResult[None].fail("Plugin list error: command failed")
+                return FlextResult[None].fail(raw_result.error or "Plugin list failed")
             if raw_result.data is None:
-                return FlextResult.fail("No plugin data received")
+                return FlextResult[None].fail("No plugin data received")
 
             parsed = self._parse_plugin_list(raw_result)
             if not parsed.success:
                 # Always normalize to expected error for this edge case path
-                return FlextResult.fail("No plugin data received")
-            return FlextResult.ok(parsed.data or [])
+                return FlextResult[None].fail("No plugin data received")
+            return FlextResult[None].ok(parsed.data or [])
 
         except (OSError, ValueError, TypeError) as e:
             return FlextResult(error=f"Failed to list installed plugins: {e}")
@@ -286,12 +286,12 @@ class FlextMeltanoInstaller:
                 err_text = result.error or ""
                 low = err_text.lower() if isinstance(err_text, str) else ""
                 if "timed out" in low:
-                    return FlextResult.fail("Plugin list timed out")
+                    return FlextResult[None].fail("Plugin list timed out")
                 # For generic CLI errors, surface canonical message
-                return FlextResult.fail("Plugin list failed")
+                return FlextResult[None].fail("Plugin list failed")
             raw_stdout = str(result.data.get("stdout", ""))
             # Private method is validated by tests to return raw JSON string
-            return FlextResult.ok({"stdout": raw_stdout})
+            return FlextResult[None].ok({"stdout": raw_stdout})
         except Exception as e:  # pragma: no cover - defensive
             return FlextResult(error=f"Execution failed: {e}")
 
@@ -315,12 +315,12 @@ class FlextMeltanoInstaller:
                 err = result.error or "Plugin install failed"
                 low = err.lower()
                 if "timed out" in low:
-                    return FlextResult.fail("Plugin install timed out")
+                    return FlextResult[None].fail("Plugin install timed out")
                 if "command error" in low or "calledprocesserror" in low:
-                    return FlextResult.fail("Plugin install error: command failed")
-                return FlextResult.fail("Plugin install failed")
+                    return FlextResult[None].fail("Plugin install error: command failed")
+                return FlextResult[None].fail("Plugin install failed")
             # On success, return structured data expected by tests
-            return FlextResult.ok(
+            return FlextResult[None].ok(
                 {
                     "operation": "install_all",
                     "success": True,
@@ -330,7 +330,7 @@ class FlextMeltanoInstaller:
                 },
             )
         except Exception as e:
-            return FlextResult.fail(f"Unexpected install error: {e}")
+            return FlextResult[None].fail(f"Unexpected install error: {e}")
 
     def _convert_plugin_list(
         self,
@@ -372,16 +372,16 @@ class FlextMeltanoInstaller:
             stdout = result
         else:
             if not result.success:
-                return FlextResult.fail(result.error or "Plugin list failed")
+                return FlextResult[None].fail(result.error or "Plugin list failed")
             if not result.data or not isinstance(result.data, dict):
-                return FlextResult.fail("No plugin data received")
+                return FlextResult[None].fail("No plugin data received")
             stdout_obj = result.data.get("stdout", "")
             stdout = stdout_obj if isinstance(stdout_obj, str) else ""
 
         try:
             parsed = json.loads(stdout) if isinstance(stdout, str) else []
         except json.JSONDecodeError:
-            return FlextResult.fail("Failed to parse plugin list JSON")
+            return FlextResult[None].fail("Failed to parse plugin list JSON")
 
         plugins: list[FlextMeltanoPluginInfo] = []
         if isinstance(parsed, dict):
@@ -395,7 +395,7 @@ class FlextMeltanoInstaller:
                     ptype = str(item.get("type", "unknown"))
                     plugins.extend(self._convert_plugin_list(ptype, [item]))
 
-        return FlextResult.ok(plugins)
+        return FlextResult[None].ok(plugins)
 
 
 def install_plugin(

@@ -104,19 +104,19 @@ class TestSingerUnifiedMissingCoverage:
             """Test implementation of abstract interface."""
 
             def initialize(self, config: dict[str, object]) -> FlextResult[bool]:
-                return FlextResult.ok(data=True)
+                return FlextResult[None].ok(True)
 
             def discover_catalog(self) -> FlextResult[dict[str, object]]:
-                return FlextResult.ok({"streams": []})
+                return FlextResult[None].ok({"streams": []})
 
             def execute(self, *args: object, **kwargs: object) -> FlextResult[object]:
-                return FlextResult.ok("executed")
+                return FlextResult[None].ok("executed")
 
             def validate_configuration(
                 self,
                 config: dict[str, object],
             ) -> FlextResult[bool]:
-                return FlextResult.ok(data=True)
+                return FlextResult[None].ok(True)
 
         # Test the implementation
         interface = TestInterface()

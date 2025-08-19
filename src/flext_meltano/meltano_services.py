@@ -49,11 +49,11 @@ class FlextMeltanoBaseService:
         try:
             validation_result = self.validate_service()
             if not validation_result.success:
-                return FlextResult.fail(validation_result.error or "Validation failed")
+                return FlextResult[None].fail(validation_result.error or "Validation failed")
             self._initialized = True
             return FlextResult(data=True)
         except (TypeError, ValueError, AttributeError, RuntimeError) as e:
-            return FlextResult.fail(f"Service initialization failed: {e}")
+            return FlextResult[None].fail(f"Service initialization failed: {e}")
 
     def validate_service(self) -> FlextResult[bool]:
         """Validate concrete service requirements - to be overridden."""
@@ -61,7 +61,7 @@ class FlextMeltanoBaseService:
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Return health information for monitoring - to be overridden."""
-        return FlextResult.ok({"initialized": self._initialized})
+        return FlextResult[None].ok({"initialized": self._initialized})
 
 
 # =============================================================================
@@ -313,16 +313,16 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
         try:
             meltano_path = self._find_meltano_executable()
             if not meltano_path:
-                return FlextResult.fail("Meltano CLI not found")
+                return FlextResult[None].fail("Meltano CLI not found")
 
             self._meltano_path = meltano_path
             return FlextResult(data=True)
         except (OSError, ImportError) as e:
-            return FlextResult.fail(f"Validation failed: {e}")
+            return FlextResult[None].fail(f"Validation failed: {e}")
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get executor health status."""
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             {
                 "service": "execution",
                 "meltano_available": self._meltano_path is not None,
@@ -369,7 +369,7 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             if not self._meltano_path:
                 validation_result = self.validate_service()
                 if not validation_result.success:
-                    return FlextResult.fail(
+                    return FlextResult[None].fail(
                         validation_result.error or "Validation failed",
                     )
 
@@ -396,7 +396,7 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             )
             exec_result = shared_execute_subprocess_common(exec_ctx)
             if not exec_result.success or not isinstance(exec_result.data, dict):
-                return FlextResult.fail(exec_result.error or "Execution failed")
+                return FlextResult[None].fail(exec_result.error or "Execution failed")
 
             data = exec_result.data
             execution_result = {
@@ -415,15 +415,15 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             }
 
             if execution_result["success"]:
-                return FlextResult.ok(execution_result)
-            return FlextResult.fail(
+                return FlextResult[None].ok(execution_result)
+            return FlextResult[None].fail(
                 f"Pipeline failed: {execution_result['stderr'] or execution_result['stdout']}",
             )
 
         except TimeoutError:
-            return FlextResult.fail("Pipeline execution timed out")
+            return FlextResult[None].fail("Pipeline execution timed out")
         except OSError as e:
-            return FlextResult.fail(f"Execution error: {e}")
+            return FlextResult[None].fail(f"Execution error: {e}")
 
     def run_command(
         self,
@@ -443,7 +443,7 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             if not self._meltano_path:
                 validation_result = self.validate_service()
                 if not validation_result.success:
-                    return FlextResult.fail(
+                    return FlextResult[None].fail(
                         validation_result.error or "Validation failed",
                     )
 
@@ -465,7 +465,7 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             )
             exec_result = shared_execute_subprocess_common(exec_ctx)
             if not exec_result.success or not isinstance(exec_result.data, dict):
-                return FlextResult.fail(exec_result.error or "Execution failed")
+                return FlextResult[None].fail(exec_result.error or "Execution failed")
 
             data = exec_result.data
             execution_result = {
@@ -483,15 +483,15 @@ class FlextMeltanoExecutor(FlextMeltanoBaseService):
             }
 
             if execution_result["success"]:
-                return FlextResult.ok(execution_result)
-            return FlextResult.fail(
+                return FlextResult[None].ok(execution_result)
+            return FlextResult[None].fail(
                 f"Command failed: {execution_result['stderr'] or execution_result['stdout']}",
             )
 
         except TimeoutError:
-            return FlextResult.fail("Command timed out")
+            return FlextResult[None].fail("Command timed out")
         except OSError as e:
-            return FlextResult.fail(f"Command error: {e}")
+            return FlextResult[None].fail(f"Command error: {e}")
 
     def execute(
         self,
@@ -543,7 +543,7 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
             result_sync = await discoverer.discover_catalog(tap_name)
             if result_sync.success:
                 return result_sync
-            return FlextResult.fail(result_sync.error or "Discovery failed")
+            return FlextResult[None].fail(result_sync.error or "Discovery failed")
         except (
             OSError,
             ConnectionError,
@@ -552,7 +552,7 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
             ValueError,
             RuntimeError,
         ) as e:
-            return FlextResult.fail(f"Catalog discovery failed: {e}")
+            return FlextResult[None].fail(f"Catalog discovery failed: {e}")
 
     def validate_stream_selection(
         self,
@@ -563,7 +563,7 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
         try:
             streams_data = catalog.get("streams", [])
             if not isinstance(streams_data, list):
-                return FlextResult.fail("Invalid catalog format: streams is not a list")
+                return FlextResult[None].fail("Invalid catalog format: streams is not a list")
 
             available_streams = []
             for stream in streams_data:
@@ -576,15 +576,15 @@ class FlextMeltanoSingerService(FlextDomainService[FlextMeltanoPipelineResult]):
                 s for s in selected_streams if s not in available_streams
             ]
             if invalid_streams:
-                return FlextResult.fail(f"Invalid streams: {invalid_streams}")
-            return FlextResult.ok(None)
+                return FlextResult[None].fail(f"Invalid streams: {invalid_streams}")
+            return FlextResult[None].ok(None)
         except (TypeError, ValueError, AttributeError, RuntimeError) as e:
-            return FlextResult.fail(f"Stream validation failed: {e}")
+            return FlextResult[None].fail(f"Stream validation failed: {e}")
 
     def execute(self) -> FlextResult[FlextMeltanoPipelineResult]:
         """Execute default Singer service operation."""
         # Return a default pipeline result
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             FlextMeltanoPipelineResult(
                 success=True,
                 job_id=str(uuid.uuid4()),
@@ -646,7 +646,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
                 if not exec_result.success:
                     tap_job.complete(is_success=False, error_message=exec_result.error)
                     pipeline.complete(is_success=False, error_message=exec_result.error)
-                    return FlextResult.fail(exec_result.error or "Pipeline failed")
+                    return FlextResult[None].fail(exec_result.error or "Pipeline failed")
 
             tap_job.complete(is_success=True)
 
@@ -662,7 +662,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
                 completed_at=pipeline.completed_at,
             )
 
-            return FlextResult.ok(result)
+            return FlextResult[None].ok(result)
 
         except (
             OSError,
@@ -673,12 +673,12 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
             RuntimeError,
         ) as e:
             pipeline.complete(is_success=False, error_message=str(e))
-            return FlextResult.fail(f"Pipeline execution failed: {e}")
+            return FlextResult[None].fail(f"Pipeline execution failed: {e}")
 
     def execute(self) -> FlextResult[FlextMeltanoPipelineResult]:
         """Execute default orchestration service operation."""
         # Return a default pipeline result
-        return FlextResult.ok(
+        return FlextResult[None].ok(
             FlextMeltanoPipelineResult(
                 success=True,
                 job_id=str(uuid.uuid4()),
@@ -714,7 +714,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
                     },
                 )
             results["count"] = len(models)
-            return FlextResult.ok(results)
+            return FlextResult[None].ok(results)
         except (
             OSError,
             ConnectionError,
@@ -723,7 +723,7 @@ class FlextMeltanoOrchestrationService(FlextDomainService[FlextMeltanoPipelineRe
             ValueError,
             RuntimeError,
         ) as e:
-            return FlextResult.fail(f"DBT execution failed: {e}")
+            return FlextResult[None].fail(f"DBT execution failed: {e}")
 
 
 class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
@@ -751,17 +751,17 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
             if exec_result.success and isinstance(exec_result.data, dict):
                 data = exec_result.data
                 if data.get("returncode", 1) == 0:
-                    return FlextResult.ok(
+                    return FlextResult[None].ok(
                         {
                             "extension": extension_name,
                             "output": data.get("stdout", ""),
                             "success": True,
                         },
                     )
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Extension failed: {data.get('stderr') or data.get('stdout')}",
                 )
-            return FlextResult.fail(exec_result.error or "Extension execution failed")
+            return FlextResult[None].fail(exec_result.error or "Extension execution failed")
         except (
             OSError,
             ConnectionError,
@@ -770,11 +770,11 @@ class FlextMeltanoExtension(FlextDomainService[dict[str, object]]):
             ValueError,
             RuntimeError,
         ) as e:
-            return FlextResult.fail(f"Extension execution failed: {e}")
+            return FlextResult[None].fail(f"Extension execution failed: {e}")
 
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute default extension service operation."""
-        return FlextResult.ok({"service": "extension", "status": "active"})
+        return FlextResult[None].ok({"service": "extension", "status": "active"})
 
 
 # =============================================================================
@@ -796,13 +796,13 @@ def create_executor(config: FlextMeltanoConfig) -> FlextResult[FlextMeltanoExecu
         service = FlextMeltanoExecutor(config)
         init_result = service.initialize()
         if not init_result.success:
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 f"Executor initialization failed: {init_result.error}",
             )
 
-        return FlextResult.ok(service)
+        return FlextResult[None].ok(service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult.fail(f"Failed to create executor: {e}")
+        return FlextResult[None].fail(f"Failed to create executor: {e}")
 
 
 def create_singer_service(config: FlextMeltanoConfig) -> FlextMeltanoSingerService:

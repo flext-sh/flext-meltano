@@ -67,7 +67,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful command execution
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": "meltano 3.0.0",
                 "stderr": "",
@@ -99,7 +99,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock failed command execution
-        mock_result = FlextResult.fail("Meltano not found")
+        mock_result = FlextResult[None].fail("Meltano not found")
         mock_executor.run_command.return_value = mock_result
 
         # Create bridge and test
@@ -136,7 +136,7 @@ class TestFlextMeltanoBridge:
             {"name": "tap-csv", "type": "extractors"},
             {"name": "target-csv", "type": "loaders"},
         ]
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": json.dumps(plugins_json),
                 "stderr": "",
@@ -163,7 +163,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful command execution with plain text
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": "tap-csv\ntarget-csv\n",
                 "stderr": "",
@@ -191,7 +191,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful command execution with empty stdout
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": "",
                 "stderr": "",
@@ -216,7 +216,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock failed command execution
-        mock_result = FlextResult.fail("Command failed")
+        mock_result = FlextResult[None].fail("Command failed")
         mock_executor.run_command.return_value = mock_result
 
         # Create bridge and test
@@ -293,7 +293,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful pipeline execution
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": "Pipeline completed successfully",
                 "stderr": "",
@@ -322,7 +322,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful pipeline execution
-        mock_result = FlextResult.ok({"stdout": "Success", "returncode": 0})
+        mock_result = FlextResult[None].ok({"stdout": "Success", "returncode": 0})
         mock_executor.run_command.return_value = mock_result
 
         # Create bridge and test
@@ -354,7 +354,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock successful pipeline execution
-        mock_result = FlextResult.ok({"stdout": "Success", "returncode": 0})
+        mock_result = FlextResult[None].ok({"stdout": "Success", "returncode": 0})
         mock_executor.run_command.return_value = mock_result
 
         # Create bridge and test
@@ -376,7 +376,7 @@ class TestFlextMeltanoBridge:
         mock_executor_class.return_value = mock_executor
 
         # Mock failed pipeline execution
-        mock_result = FlextResult.fail("Pipeline execution failed")
+        mock_result = FlextResult[None].fail("Pipeline execution failed")
         mock_executor.run_command.return_value = mock_result
 
         # Create bridge and test
@@ -473,7 +473,7 @@ class TestBridgeIntegration:
         bridge = FlextMeltanoBridge()
 
         # Test version retrieval
-        version_result = FlextResult.ok(
+        version_result = FlextResult[None].ok(
             {
                 "stdout": "meltano 3.0.0",
                 "returncode": 0,
@@ -486,7 +486,7 @@ class TestBridgeIntegration:
         assert "meltano" in version.data
 
         # Test plugin listing
-        plugins_result = FlextResult.ok(
+        plugins_result = FlextResult[None].ok(
             {
                 "stdout": json.dumps([{"name": "tap-csv", "type": "extractors"}]),
                 "returncode": 0,
@@ -499,7 +499,7 @@ class TestBridgeIntegration:
         assert len(plugins.data) == 1
 
         # Test pipeline execution
-        pipeline_result = FlextResult.ok(
+        pipeline_result = FlextResult[None].ok(
             {
                 "stdout": "Pipeline completed",
                 "returncode": 0,
@@ -522,7 +522,7 @@ class TestBridgeIntegration:
             mock_executor_class.return_value = mock_executor
 
             # Mock version result
-            mock_executor.run_command.return_value = FlextResult.ok(
+            mock_executor.run_command.return_value = FlextResult[None].ok(
                 {
                     "stdout": "meltano 3.0.0",
                     "returncode": 0,
@@ -565,7 +565,7 @@ class TestBridgeIntegration:
         # Mock the executor
         mock_executor = Mock()
         mock_executor_class.return_value = mock_executor
-        mock_executor.run_command.return_value = FlextResult.ok({"stdout": "Success"})
+        mock_executor.run_command.return_value = FlextResult[None].ok({"stdout": "Success"})
 
         bridge = FlextMeltanoBridge()
 
@@ -605,7 +605,7 @@ class TestBridgeEdgeCases:
         mock_executor_class.return_value = mock_executor
 
         # Mock result with non-string stdout
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": 123,  # Invalid type
                 "returncode": 0,
@@ -628,7 +628,7 @@ class TestBridgeEdgeCases:
         mock_executor_class.return_value = mock_executor
 
         # Mock result with invalid JSON
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "stdout": "{invalid json}",
                 "returncode": 0,
@@ -653,7 +653,7 @@ class TestBridgeEdgeCases:
         mock_executor_class.return_value = mock_executor
 
         # Mock result without stdout key
-        mock_result = FlextResult.ok(
+        mock_result = FlextResult[None].ok(
             {
                 "returncode": 0,
             },
@@ -681,7 +681,7 @@ class TestBridgeEdgeCases:
         # Mock the executor
         mock_executor = Mock()
         mock_executor_class.return_value = mock_executor
-        mock_executor.run_command.return_value = FlextResult.ok(
+        mock_executor.run_command.return_value = FlextResult[None].ok(
             {
                 "stdout": "Success",
                 "returncode": 0,
