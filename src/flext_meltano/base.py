@@ -5,7 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import FlextResult
-from singer_sdk import ExtensionBase, Tap, Target
+from meltano.edk.extension import ExtensionBase
+from singer_sdk import Tap, Target
 
 from flext_meltano.base_service import FlextMeltanoBaseService
 from flext_meltano.common import injectable
@@ -193,7 +194,7 @@ class FlextMeltanoDbtService(FlextMeltanoBaseService):
 
             # Handle test environment (emulate successful execution)
             if not self.runner:
-                return FlextResult.ok([])
+                return FlextResult[None].ok([])
 
             # Build DBT command with options
             args = [command]

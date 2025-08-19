@@ -133,9 +133,9 @@ class FlextDbtModelRegistry:
             }
             with self.registry_path.open("w") as f:
                 json.dump(data, f, indent=2)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to save model registry: {e}")
+            return FlextResult[None].fail(f"Failed to save model registry: {e}")
 
     def register_model(self, model: FlextDbtModel) -> FlextResult[None]:
         """Register a reusable DBT model.
@@ -165,7 +165,7 @@ class FlextDbtModelRegistry:
             return self._save_registry()
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register model: {e}")
+            return FlextResult[None].fail(f"Failed to register model: {e}")
 
     def get_model(self, name: str) -> FlextResult[FlextDbtModel]:
         """Get a model from the registry.
@@ -179,14 +179,14 @@ class FlextDbtModelRegistry:
         """
         # Try direct lookup
         if name in self.models:
-            return FlextResult.ok(self.models[name])
+            return FlextResult[None].ok(self.models[name])
 
         # Try by name only
         for model in self.models.values():
             if model.name == name:
-                return FlextResult.ok(model)
+                return FlextResult[None].ok(model)
 
-        return FlextResult.fail(f"Model {name} not found")
+        return FlextResult[None].fail(f"Model {name} not found")
 
     def compile_model(
         self,
@@ -208,10 +208,10 @@ class FlextDbtModelRegistry:
             compiled_sql = template.render(**context)
 
             logger.debug(f"Compiled model {model.model_id}")
-            return FlextResult.ok(compiled_sql)
+            return FlextResult[None].ok(compiled_sql)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to compile model: {e}")
+            return FlextResult[None].fail(f"Failed to compile model: {e}")
 
     def search_models(
         self,
@@ -262,11 +262,11 @@ class FlextDbtModelRegistry:
             model_result = self.get_model(model_name)
             if not model_result.success:
                 error_msg = model_result.error or f"Model {model_name} not found"
-                return FlextResult.fail(error_msg)
+                return FlextResult[None].fail(error_msg)
 
             model = model_result.data
             if not model:
-                return FlextResult.fail(f"Model {model_name} data is None")
+                return FlextResult[None].fail(f"Model {model_name} data is None")
             resolved: list[FlextDbtModel] = []
             visited: set[str] = set()
 
@@ -285,10 +285,10 @@ class FlextDbtModelRegistry:
             for dep in model.dependencies:
                 _resolve(dep)
 
-            return FlextResult.ok(resolved)
+            return FlextResult[None].ok(resolved)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to get dependencies: {e}")
+            return FlextResult[None].fail(f"Failed to get dependencies: {e}")
 
     def list_models(self) -> list[FlextDbtModel]:
         """List all registered models.

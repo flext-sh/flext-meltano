@@ -308,12 +308,12 @@ class FlextDbtHub:
             # Prepare inputs via helpers
             mock_result = self._prepare_mock_data(mock_data)
             if mock_result.is_failure:
-                return FlextResult.fail(mock_result.error or "Invalid mock data")
+                return FlextResult[None].fail(mock_result.error or "Invalid mock data")
             data_frames = mock_result.data
 
             sql_result = self._resolve_model_sql(model, context or {})
             if sql_result.is_failure or not sql_result.data:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     sql_result.error or "Failed to resolve model SQL",
                 )
             sql_to_run = sql_result.data
@@ -328,7 +328,7 @@ class FlextDbtHub:
             logger.info(f"{log_msg}: {model}")
             return result
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute model: {e}")
+            return FlextResult[None].fail(f"Failed to execute model: {e}")
 
     def _prepare_mock_data(
         self,
@@ -336,7 +336,7 @@ class FlextDbtHub:
     ) -> FlextResult[dict[str, pd.DataFrame] | None]:
         """Convert mock data into DataFrames if present."""
         if not mock_data:
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         try:
             frames: dict[str, pd.DataFrame] = {}
             for table_name, table_data in mock_data.items():
@@ -345,12 +345,12 @@ class FlextDbtHub:
                 elif isinstance(table_data, pd.DataFrame):
                     frames[table_name] = table_data
                 else:
-                    return FlextResult.fail(
+                    return FlextResult[None].fail(
                         f"Unsupported mock data format for {table_name}",
                     )
-            return FlextResult.ok(frames)
+            return FlextResult[list[object]].ok(frames)
         except Exception as e:
-            return FlextResult.fail(f"Failed to process mock data: {e}")
+            return FlextResult[None].fail(f"Failed to process mock data: {e}")
 
     def _resolve_model_sql(
         self,
@@ -360,14 +360,14 @@ class FlextDbtHub:
         """Resolve provided identifier or SQL into final SQL text."""
         text = model_or_sql.strip()
         if text.upper().startswith(("SELECT", "WITH")):
-            return FlextResult.ok(text)
+            return FlextResult[str].ok(text)
         model_result = self.model_registry.get_model(text)
         if not model_result.success or not model_result.data:
-            return FlextResult.fail(model_result.error or f"Model not found: {text}")
+            return FlextResult[None].fail(model_result.error or f"Model not found: {text}")
         compile_result = self.model_registry.compile_model(model_result.data, context)
         if compile_result.success and compile_result.data:
-            return FlextResult.ok(compile_result.data)
-        return FlextResult.fail(compile_result.error or "Failed to compile model")
+            return FlextResult[str].ok(compile_result.data)
+        return FlextResult[None].fail(compile_result.error or "Failed to compile model")
 
     def validate_transformations(
         self,
@@ -389,11 +389,11 @@ class FlextDbtHub:
             package_result = self.package_manager.get_package(project)
             if not package_result.success:
                 error_msg = package_result.error or f"Package {project} not found"
-                return FlextResult.fail(error_msg)
+                return FlextResult[None].fail(error_msg)
 
             package = package_result.data
             if not package:
-                return FlextResult.fail(f"Package {project} data is None")
+                return FlextResult[None].fail(f"Package {project} data is None")
 
             # Get models to validate
             model_list = models or package.models
@@ -415,7 +415,7 @@ class FlextDbtHub:
             return self.executor.validate_transformations(validation_models)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to validate transformations: {e}")
+            return FlextResult[None].fail(f"Failed to validate transformations: {e}")
 
     # Integration Methods for flext-dbt-* Projects
 
@@ -561,10 +561,10 @@ class FlextDbtHub:
             logger.info(
                 f"Imported {models_registered} LDAP models with advanced features",
             )
-            return FlextResult.ok(models_registered)
+            return FlextResult[dict[str, object]].ok(models_registered)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import LDAP models: {e}")
+            return FlextResult[None].fail(f"Failed to import LDAP models: {e}")
 
     def import_oracle_models(self) -> FlextResult[int]:
         """Import models from flext-dbt-oracle.
@@ -612,10 +612,10 @@ class FlextDbtHub:
             models_registered += 1
 
             logger.info(f"Imported {models_registered} Oracle models")
-            return FlextResult.ok(models_registered)
+            return FlextResult[dict[str, object]].ok(models_registered)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import Oracle models: {e}")
+            return FlextResult[None].fail(f"Failed to import Oracle models: {e}")
 
     def import_oracle_wms_models(self) -> FlextResult[int]:
         """Import models from flext-dbt-oracle-wms.
@@ -781,10 +781,10 @@ class FlextDbtHub:
             logger.info(
                 f"Imported {models_registered} Oracle WMS models with advanced features",
             )
-            return FlextResult.ok(models_registered)
+            return FlextResult[dict[str, object]].ok(models_registered)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import Oracle WMS models: {e}")
+            return FlextResult[None].fail(f"Failed to import Oracle WMS models: {e}")
 
     def import_ldif_models(self) -> FlextResult[int]:
         """Import models from flext-dbt-ldif.
@@ -839,10 +839,10 @@ class FlextDbtHub:
             models_registered += 1
 
             logger.info(f"Imported {models_registered} LDIF models")
-            return FlextResult.ok(models_registered)
+            return FlextResult[dict[str, object]].ok(models_registered)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import LDIF models: {e}")
+            return FlextResult[None].fail(f"Failed to import LDIF models: {e}")
 
     def import_all_ecosystem_models(self) -> FlextResult[dict[str, int]]:
         """Import models from all flext-dbt-* projects in the ecosystem.
@@ -887,10 +887,10 @@ class FlextDbtHub:
                 f"Ecosystem import complete: {total_models} total models across {len(projects)} projects",
             )
 
-            return FlextResult.ok(results)
+            return FlextResult[dict[str, object]].ok(results)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to import ecosystem models: {e}")
+            return FlextResult[None].fail(f"Failed to import ecosystem models: {e}")
 
     def create_test_environment(
         self,
@@ -945,10 +945,10 @@ class FlextDbtHub:
                 test_data["groups"] = pd.DataFrame(groups_data)
 
             logger.info(f"Created test environment for {project}")
-            return FlextResult.ok(test_data)
+            return FlextResult[dict[str, object]].ok(test_data)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to create test environment: {e}")
+            return FlextResult[None].fail(f"Failed to create test environment: {e}")
 
     def close(self) -> None:
         """Clean up resources."""
@@ -975,10 +975,10 @@ class FlextDbtHub:
                 "status": "active",
             }
 
-            return FlextResult.ok(status_data)
+            return FlextResult[dict[str, object]].ok(status_data)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to get hub status: {e}")
+            return FlextResult[None].fail(f"Failed to get hub status: {e}")
 
     # Advanced Features Methods
 
@@ -995,27 +995,27 @@ class FlextDbtHub:
         try:
             # Validate snapshot configuration
             if not snapshot.name or not snapshot.sql:
-                return FlextResult.fail("Snapshot name and SQL are required")
+                return FlextResult[None].fail("Snapshot name and SQL are required")
 
             if snapshot.strategy not in {"timestamp", "check"}:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     "Snapshot strategy must be 'timestamp' or 'check'",
                 )
 
             if snapshot.strategy == "timestamp" and not snapshot.updated_at:
-                return FlextResult.fail("Timestamp strategy requires updated_at field")
+                return FlextResult[None].fail("Timestamp strategy requires updated_at field")
 
             if snapshot.strategy == "check" and not snapshot.check_cols:
-                return FlextResult.fail("Check strategy requires check_cols")
+                return FlextResult[None].fail("Check strategy requires check_cols")
 
             # Register snapshot
             self.snapshots[snapshot.name] = snapshot
             logger.info(f"Registered DBT snapshot: {snapshot.name}")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register snapshot: {e}")
+            return FlextResult[None].fail(f"Failed to register snapshot: {e}")
 
     def execute_snapshot(
         self,
@@ -1063,19 +1063,19 @@ class FlextDbtHub:
                                     )[0],
                                 )
                             )
-                            result = FlextResult.ok(df)
+                            result = FlextResult[object].ok(df)
 
             if error_message is not None:
-                return FlextResult.fail(error_message)
+                return FlextResult[None].fail(error_message)
             # result is guaranteed when there's no error_message
             logger.info(f"Executed snapshot {snapshot_name} successfully")
             return (
                 result
                 if result is not None
-                else FlextResult.fail("Unknown snapshot error")
+                else FlextResult[object].fail("Unknown snapshot error")
             )
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute snapshot: {e}")
+            return FlextResult[None].fail(f"Failed to execute snapshot: {e}")
 
     def register_hook(self, hook: FlextDbtHook) -> FlextResult[None]:
         """Register a DBT hook configuration.
@@ -1091,21 +1091,21 @@ class FlextDbtHub:
             # Validate hook configuration
             valid_hook_types = ("pre-hook", "post-hook", "on-run-start", "on-run-end")
             if hook.hook_type not in valid_hook_types:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Invalid hook type. Must be one of: {valid_hook_types}",
                 )
 
             if not hook.name or not hook.sql:
-                return FlextResult.fail("Hook name and SQL are required")
+                return FlextResult[None].fail("Hook name and SQL are required")
 
             # Register hook
             self.hooks[hook.name] = hook
             logger.info(f"Registered DBT hook: {hook.name} ({hook.hook_type})")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register hook: {e}")
+            return FlextResult[None].fail(f"Failed to register hook: {e}")
 
     def execute_hooks(
         self,
@@ -1173,10 +1173,10 @@ class FlextDbtHub:
                         },
                     )
 
-            return FlextResult.ok(results)
+            return FlextResult[dict[str, object]].ok(results)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute hooks: {e}")
+            return FlextResult[None].fail(f"Failed to execute hooks: {e}")
 
     def register_exposure(self, exposure: FlextDbtExposure) -> FlextResult[None]:
         """Register a DBT exposure configuration.
@@ -1192,24 +1192,24 @@ class FlextDbtHub:
             # Validate exposure configuration
             valid_types = ("dashboard", "notebook", "analysis", "ml", "application")
             if exposure.type not in valid_types:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Invalid exposure type. Must be one of: {valid_types}",
                 )
 
             if not exposure.name or not exposure.description:
-                return FlextResult.fail("Exposure name and description are required")
+                return FlextResult[None].fail("Exposure name and description are required")
 
             if not exposure.owner or "name" not in exposure.owner:
-                return FlextResult.fail("Exposure owner information is required")
+                return FlextResult[None].fail("Exposure owner information is required")
 
             # Register exposure
             self.exposures[exposure.name] = exposure
             logger.info(f"Registered DBT exposure: {exposure.name} ({exposure.type})")
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to register exposure: {e}")
+            return FlextResult[None].fail(f"Failed to register exposure: {e}")
 
     def get_exposure_dependencies(self, exposure_name: str) -> FlextResult[list[str]]:
         """Get models that an exposure depends on.
@@ -1223,13 +1223,13 @@ class FlextDbtHub:
         """
         try:
             if exposure_name not in self.exposures:
-                return FlextResult.fail(f"Exposure {exposure_name} not found")
+                return FlextResult[None].fail(f"Exposure {exposure_name} not found")
 
             exposure = self.exposures[exposure_name]
-            return FlextResult.ok(exposure.depends_on)
+            return FlextResult[list[str]].ok(exposure.depends_on)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to get exposure dependencies: {e}")
+            return FlextResult[None].fail(f"Failed to get exposure dependencies: {e}")
 
     def build_lineage_graph(
         self,
@@ -1284,10 +1284,10 @@ class FlextDbtHub:
             self.lineage.update(lineage_graph)
 
             logger.info(f"Built lineage graph for {len(lineage_graph)} models")
-            return FlextResult.ok(lineage_graph)
+            return FlextResult[dict[str, object]].ok(lineage_graph)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to build lineage graph: {e}")
+            return FlextResult[None].fail(f"Failed to build lineage graph: {e}")
 
     def _calculate_lineage_depth(
         self,
@@ -1338,7 +1338,7 @@ class FlextDbtHub:
         """
         try:
             if from_model not in self.lineage or to_model not in self.lineage:
-                return FlextResult.fail("One or both models not found in lineage graph")
+                return FlextResult[None].fail("One or both models not found in lineage graph")
 
             # Simple BFS to find path
             queue = deque([(from_model, [from_model])])
@@ -1348,7 +1348,7 @@ class FlextDbtHub:
                 current_model, path = queue.popleft()
 
                 if current_model == to_model:
-                    return FlextResult.ok(path)
+                    return FlextResult[list[str]].ok(path)
 
                 lineage = self.lineage[current_model]
                 for downstream in lineage.downstream_models:
@@ -1356,12 +1356,12 @@ class FlextDbtHub:
                         visited.add(downstream)
                         queue.append((downstream, [*path, downstream]))
 
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 f"No lineage path found from {from_model} to {to_model}",
             )
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to find lineage path: {e}")
+            return FlextResult[None].fail(f"Failed to find lineage path: {e}")
 
     def list_snapshots(self, package: str | None = None) -> list[FlextDbtSnapshot]:
         """List registered snapshots, optionally filtered by package."""

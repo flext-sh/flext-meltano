@@ -112,7 +112,7 @@ class CustomTapService(FlextMeltanoBaseService):
         super().__init__(config)
 
     def discover_streams(self) -> FlextResult[List[Stream]]:
-        return FlextResult.ok([])
+        return FlextResult[None].ok([])
 ```
 
 ### **Bridge Integration Layer** (CRITICAL - MISSING)
@@ -218,7 +218,7 @@ from flext_meltano.flext_singer import FlextSingerService
 class CustomTap(FlextSingerTap):
     def discover_streams(self) -> FlextResult[List[Stream]]:
         # Implementation using Singer SDK patterns
-        return FlextResult.ok(streams)
+        return FlextResult[None].ok(streams)
 ```
 
 ### **Data Transformation Layer**
@@ -493,7 +493,7 @@ def validate_pipeline_inputs(
     if not config.get("database_url"):
         errors.append("Database URL is required")
 
-    return FlextResult.fail(errors) if errors else FlextResult.ok({
+    return FlextResult[None].fail(errors) if errors else FlextResult[None].ok({
         "tap": tap_name,
         "target": target_name,
         "config": config
@@ -530,7 +530,7 @@ class FlextMeltanoPipelineService:
     def _validate_pipeline_spec(self, spec: dict) -> FlextResult[dict]:
         """Validate pipeline specification."""
         # Implementation with FlextResult pattern
-        return FlextResult.ok(spec)
+        return FlextResult[None].ok(spec)
 ```
 
 ### **Configuration Management Patterns**
@@ -658,19 +658,19 @@ class FlextMeltanoExecutor:
             except asyncio.TimeoutError:
                 process.kill()
                 await process.communicate()
-                return FlextResult.fail("Command timed out")
+                return FlextResult[None].fail("Command timed out")
 
             if process.returncode == 0:
-                return FlextResult.ok({
+                return FlextResult[None].ok({
                     "stdout": stdout.decode(),
                     "stderr": stderr.decode(),
                     "returncode": process.returncode
                 })
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 f"Command failed with return code {process.returncode}: {stderr.decode()}"
             )
         except Exception as e:
-            return FlextResult.fail(f"Command execution failed: {e}")
+            return FlextResult[None].fail(f"Command execution failed: {e}")
 
     def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, Any]]:
         """Execute pipeline between tap and target."""
@@ -721,7 +721,7 @@ class FlextMeltanoBridge:
         result = self._executor.execute_command(["--version"])
         if result.success:
             version_output = result.data["stdout"].strip()
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 "meltano": version_output,
                 "python": sys.version.split()[0],
                 "flext_meltano": "0.9.0"
@@ -734,7 +734,7 @@ class FlextMeltanoBridge:
         if result.success:
             # Parse plugin information from output
             plugins = self._parse_plugin_list(result.data["stdout"])
-            return FlextResult.ok(plugins)
+            return FlextResult[None].ok(plugins)
         return result
 
     def add_plugin(
@@ -754,7 +754,7 @@ class FlextMeltanoBridge:
 
         result = self._executor.execute_command(args)
         if result.success:
-            return FlextResult.ok(f"Plugin {name} added successfully")
+            return FlextResult[None].ok(f"Plugin {name} added successfully")
         return result
 
     def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, Any]]:
@@ -763,9 +763,9 @@ class FlextMeltanoBridge:
         if result.success:
             try:
                 catalog = json.loads(result.data["stdout"])
-                return FlextResult.ok(catalog)
+                return FlextResult[None].ok(catalog)
             except json.JSONDecodeError as e:
-                return FlextResult.fail(f"Failed to parse catalog: {e}")
+                return FlextResult[None].fail(f"Failed to parse catalog: {e}")
         return result
 
     def run_pipeline(
@@ -784,7 +784,7 @@ class FlextMeltanoBridge:
 
         result = self._executor.execute_command(args)
         if result.success:
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 "tap": tap,
                 "target": target,
                 "environment": environment or "dev",
@@ -804,7 +804,7 @@ class FlextMeltanoBridge:
         dbt_args = ["invoke", "dbt", command] + list(args)
         result = self._executor.execute_command(dbt_args)
         if result.success:
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 "command": command,
                 "args": args,
                 "output": result.data["stdout"],

@@ -82,9 +82,9 @@ class FlextDbtInMemoryExecutor:
                         self.connection.unregister(temp_name)
                     self.schemas[table_name] = table_def
                     logger.debug(f"Loaded schema for table: {table_name}")
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to load mock data: {e}")
+            return FlextResult[None].fail(f"Failed to load mock data: {e}")
 
     def _map_to_duckdb_type(self, type_str: str) -> str:
         """Map generic types to DuckDB types.
@@ -140,9 +140,9 @@ class FlextDbtInMemoryExecutor:
                 for name in data:
                     self.connection.unregister(name)
             logger.debug(f"Executed model, returned {len(result)} rows")
-            return FlextResult.ok(result)
+            return FlextResult[None].ok(result)
         except Exception as e:
-            return FlextResult.fail(f"Failed to execute model: {e}")
+            return FlextResult[None].fail(f"Failed to execute model: {e}")
 
     def validate_transformations(
         self,
@@ -217,9 +217,9 @@ class FlextDbtInMemoryExecutor:
                 f"Validation complete: {successful}/{total_models} models successful, "
                 f"all valid: {all_valid}",
             )
-            return FlextResult.ok(summary)
+            return FlextResult[None].ok(summary)
         except Exception as e:
-            return FlextResult.fail(f"Failed to validate transformations: {e}")
+            return FlextResult[None].fail(f"Failed to validate transformations: {e}")
 
     def _validate_row_count(
         self,
@@ -316,7 +316,7 @@ class FlextDbtInMemoryExecutor:
         """
         try:
             if table_name not in self.schemas:
-                return FlextResult.fail(f"Schema not found for table: {table_name}")
+                return FlextResult[None].fail(f"Schema not found for table: {table_name}")
             schema = self.schemas[table_name]
             columns = schema.get("columns", {})
             # Generate test data
@@ -338,9 +338,9 @@ class FlextDbtInMemoryExecutor:
             df = pd.DataFrame(data)
             self.mock_data[table_name] = df
             logger.debug(f"Generated {rows} rows of test data for {table_name}")
-            return FlextResult.ok(df)
+            return FlextResult[None].ok(df)
         except Exception as e:
-            return FlextResult.fail(f"Failed to create test data: {e}")
+            return FlextResult[None].fail(f"Failed to create test data: {e}")
 
     def export_results(
         self,
@@ -370,11 +370,11 @@ class FlextDbtInMemoryExecutor:
             elif file_format == "json":
                 result.to_json(path, orient="records", indent=2)
             else:
-                return FlextResult.fail(f"Unsupported format: {file_format}")
+                return FlextResult[None].fail(f"Unsupported format: {file_format}")
             logger.info(f"Exported {len(result)} rows to {path} as {file_format}")
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to export results: {e}")
+            return FlextResult[None].fail(f"Failed to export results: {e}")
 
     def close(self) -> None:
         """Close the database connection."""

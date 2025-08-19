@@ -436,7 +436,7 @@ class TestFlextMeltanoRepositoryAggregateRoot:
         class TestRepository(FlextMeltanoRepository):
             def validate_domain_rules(self) -> FlextResult[None]:
                 """Validate domain rules."""
-                return FlextResult.ok(None)
+                return FlextResult[None].ok(None)
 
         return TestRepository(name=name)
 

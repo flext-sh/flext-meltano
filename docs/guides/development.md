@@ -330,9 +330,9 @@ class NewFlextMeltanoService(FlextMeltanoBaseService):
         """Implement using FlextResult pattern."""
         try:
             # Implementation
-            return FlextResult.success("Operation completed")
+            return FlextResult[None].ok("Operation completed")
         except Exception as e:
-            return FlextResult.failure(f"Operation failed: {e}")
+            return FlextResult[None].fail(f"Operation failed: {e}")
 
 # 2. Add to appropriate module (not __init__.py directly)
 
@@ -505,9 +505,9 @@ class ExampleService:
         """Process data with proper error handling."""
         try:
             # Process data
-            return FlextResult.success("Processing completed")
+            return FlextResult[None].ok("Processing completed")
         except Exception as e:
-            return FlextResult.failure(f"Processing failed: {e}")
+            return FlextResult[None].fail(f"Processing failed: {e}")
 ```
 
 ## 🆘 Getting Help

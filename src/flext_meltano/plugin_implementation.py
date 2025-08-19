@@ -80,17 +80,17 @@ class FlextMeltanoPlugin(FlextPlugin):
             # Use context for Meltano initialization if needed
             _ = context  # Acknowledge parameter for interface compliance
             self._logger.info("Meltano plugin initialized", plugin_name=self.name)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Meltano plugin initialization failed: {e}")
+            return FlextResult[None].fail(f"Meltano plugin initialization failed: {e}")
 
     def shutdown(self) -> FlextResult[None]:
         """Shutdown plugin and release resources from abstract interface."""
         try:
             self._logger.info("Meltano plugin shutdown", plugin_name=self.name)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Meltano plugin shutdown failed: {e}")
+            return FlextResult[None].fail(f"Meltano plugin shutdown failed: {e}")
 
     def get_info(self) -> dict[str, object]:
         """Get plugin information from abstract interface."""
@@ -106,9 +106,9 @@ class FlextMeltanoPlugin(FlextPlugin):
         try:
             self._logger.info("Executing Meltano plugin", plugin_name=self.name)
             # Plugin-specific execution logic would go here
-            return FlextResult.ok({"executed": True, "plugin": self.name})
+            return FlextResult[None].ok({"executed": True, "plugin": self.name})
         except Exception as e:
-            return FlextResult.fail(f"Plugin execution failed: {e}")
+            return FlextResult[None].fail(f"Plugin execution failed: {e}")
 
     def cleanup(self) -> FlextResult[None]:
         """Cleanup plugin resources."""
@@ -117,7 +117,7 @@ class FlextMeltanoPlugin(FlextPlugin):
             # Delegate to shutdown for consistency
             return self.shutdown()
         except Exception as e:
-            return FlextResult.fail(f"Plugin cleanup failed: {e}")
+            return FlextResult[None].fail(f"Plugin cleanup failed: {e}")
 
 
 class FlextMeltanoPluginExecution:
@@ -172,26 +172,26 @@ class FlextMeltanoTapPlugin(FlextMeltanoPlugin):
             missing_fields = [field for field in required_fields if field not in config]
 
             if missing_fields:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Missing required fields for {self.name}: {missing_fields}",
                 )
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Config validation failed: {e}")
+            return FlextResult[None].fail(f"Config validation failed: {e}")
 
     def discover_catalog(self) -> FlextResult[dict[str, object]]:
         """Discover schema catalog for tap."""
         try:
             if not self._executor:
-                return FlextResult.fail("Executor not initialized")
+                return FlextResult[None].fail("Executor not initialized")
 
             # Execute discovery via Meltano executor
             # This would be implemented with actual Meltano execution
-            return FlextResult.ok({"streams": []})  # Placeholder
+            return FlextResult[None].ok({"streams": []})  # Placeholder
 
         except Exception as e:
-            return FlextResult.fail(f"Catalog discovery error: {e}")
+            return FlextResult[None].fail(f"Catalog discovery error: {e}")
 
 
 class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
@@ -227,13 +227,13 @@ class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
             missing_fields = [field for field in required_fields if field not in config]
 
             if missing_fields:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Missing required fields for {self.name}: {missing_fields}",
                 )
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Config validation failed: {e}")
+            return FlextResult[None].fail(f"Config validation failed: {e}")
 
 
 # =============================================================================
@@ -259,9 +259,9 @@ def create_meltano_tap_plugin(
     """
     try:
         plugin = FlextMeltanoTapPlugin(name=name, version=version, config=config)
-        return FlextResult.ok(plugin)
+        return FlextResult[None].ok(plugin)
     except Exception as e:
-        return FlextResult.fail(f"Failed to create tap plugin: {e}")
+        return FlextResult[None].fail(f"Failed to create tap plugin: {e}")
 
 
 def create_meltano_target_plugin(
@@ -282,9 +282,9 @@ def create_meltano_target_plugin(
     """
     try:
         plugin = FlextMeltanoTargetPlugin(name=name, version=version, config=config)
-        return FlextResult.ok(plugin)
+        return FlextResult[None].ok(plugin)
     except Exception as e:
-        return FlextResult.fail(f"Failed to create target plugin: {e}")
+        return FlextResult[None].fail(f"Failed to create target plugin: {e}")
 
 
 class FlextMeltanoPluginContext:
@@ -342,16 +342,16 @@ class FlextMeltanoPluginContext:
 
         """
         if service_name in self._services:
-            return FlextResult.ok(self._services[service_name])
+            return FlextResult[None].ok(self._services[service_name])
 
         # Try to resolve common Meltano services
         if service_name == "executor":
             result = create_executor(self._meltano_config)
             if result.success:
                 self._services[service_name] = result.data
-                return FlextResult.ok(result.data)
+                return FlextResult[None].ok(result.data)
 
-        return FlextResult.fail(f"Service '{service_name}' not found")
+        return FlextResult[None].fail(f"Service '{service_name}' not found")
 
 
 # FlextMeltanoPluginRegistry is now available from flext_meltano.models

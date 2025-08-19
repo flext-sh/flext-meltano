@@ -751,7 +751,7 @@ class FlextMeltanoCli:
             if not self.dbt_hub:
                 self.dbt_hub = create_dbt_hub()
 
-            dashboard_result = FlextResult.ok(
+            dashboard_result = FlextResult[None].ok(
                 {"service": "flext-dbt-hub", "status": "active"},
             )
 

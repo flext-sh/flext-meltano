@@ -30,23 +30,23 @@ class FlextMeltanoBaseService:
         try:
             validation_result = self.validate_service()
             if not validation_result.success:
-                return FlextResult.fail(validation_result.error or "Validation failed")
+                return FlextResult[None].fail(validation_result.error or "Validation failed")
             self._initialized = True
             success_value = True
-            result: FlextResult[bool] = FlextResult.ok(success_value)
+            result: FlextResult[bool] = FlextResult[None].ok(success_value)
             return result
         except Exception as e:
-            return FlextResult.fail(f"Service initialization failed: {e}")
+            return FlextResult[None].fail(f"Service initialization failed: {e}")
 
     def validate_service(self) -> FlextResult[bool]:  # To be overridden
         """Validate concrete service requirements."""
         validation_success = True
-        result: FlextResult[bool] = FlextResult.ok(validation_success)
+        result: FlextResult[bool] = FlextResult[None].ok(validation_success)
         return result
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:  # To be overridden
         """Return health information for monitoring."""
-        return FlextResult.ok({"initialized": self._initialized})
+        return FlextResult[None].ok({"initialized": self._initialized})
 
 
 __all__ = ["FlextMeltanoBaseService"]

@@ -524,7 +524,7 @@ class FlextMeltanoService:
                     error=str(e)
                 )
                 span.record_exception(e)
-                return FlextResult.failure(f"Pipeline execution failed: {e}")
+                return FlextResult[None].fail(f"Pipeline execution failed: {e}")
 
     def validate_pipeline_configuration(
         self,
@@ -549,7 +549,7 @@ class FlextMeltanoService:
             if not catalog_result.success:
                 return catalog_result
 
-            return FlextResult.success({
+            return FlextResult[None].ok({
                 "tap_valid": True,
                 "target_valid": True,
                 "schema_discovered": True,
@@ -557,7 +557,7 @@ class FlextMeltanoService:
             })
 
         except Exception as e:
-            return FlextResult.failure(f"Pipeline validation failed: {e}")
+            return FlextResult[None].fail(f"Pipeline validation failed: {e}")
 ```
 
 ## 🔧 Development Integration Workflows
@@ -727,10 +727,10 @@ class ProductionMeltanoManager:
             if not catalog.success:
                 return catalog
 
-            return FlextResult.success(True)
+            return FlextResult[None].ok(True)
 
         except Exception as e:
-            return FlextResult.failure(f"Pipeline validation failed: {e}")
+            return FlextResult[None].fail(f"Pipeline validation failed: {e}")
 ```
 
 ### **Error Handling & Recovery** ✅
@@ -783,7 +783,7 @@ class ResilientPipelineExecutor:
                     await asyncio.sleep(self.retry_delay * (attempt + 1))
                     continue
 
-        return FlextResult.failure(
+        return FlextResult[None].fail(
             f"Pipeline failed after {self.max_retries} retries: {last_error}"
         )
 

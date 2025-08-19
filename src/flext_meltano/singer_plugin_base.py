@@ -122,12 +122,12 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             if not init_result.success:
                 return init_result
             self._initialized = True
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
             self._logger.exception(
                 "Failed to initialize {self._plugin_type} {self.name}",
             )
-            return FlextResult.fail(f"Initialization failed: {e!s}")
+            return FlextResult[None].fail(f"Initialization failed: {e!s}")
 
     def shutdown(self) -> FlextResult[None]:
         """Shutdown plugin and release resources.
@@ -148,10 +148,10 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
                 self._logger.info(f"Plugin entity {self.name} cleanup completed")
             self._initialized = False
             self._connection_valid = False
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
             self._logger.exception("Failed to shutdown plugin")
-            return FlextResult.fail(f"Shutdown failed: {e!s}")
+            return FlextResult[None].fail(f"Shutdown failed: {e!s}")
 
     def validate_config(self, config: Mapping[str, object]) -> FlextResult[None]:
         """Validate plugin configuration.
@@ -167,7 +167,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             required_fields = self._get_required_config_fields()
             missing_fields = [f for f in required_fields if f not in config]
             if missing_fields:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     f"Missing required configuration fields: {missing_fields}",
                 )
             # Perform plugin-specific validation
@@ -175,10 +175,10 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             if not specific_validation.success:
                 return specific_validation
             self._config.update(config)
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
             self._logger.exception("Configuration validation failed")
-            return FlextResult.fail(f"Validation error: {e!s}")
+            return FlextResult[None].fail(f"Validation error: {e!s}")
 
     def test_connection(self) -> FlextResult[None]:
         """Test connection to data source/destination.
@@ -190,7 +190,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
         try:
             self._logger.info(f"Testing connection for {self._plugin_type} {self.name}")
             if not self._config:
-                return FlextResult.fail(
+                return FlextResult[None].fail(
                     "No configuration available for connection test",
                 )
             # Perform plugin-specific connection test
@@ -200,11 +200,11 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
                 return test_result
             self._connection_valid = True
             self._logger.info(f"Connection test successful for {self.name}")
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
             self._logger.exception("Connection test failed")
             self._connection_valid = False
-            return FlextResult.fail(f"Connection test error: {e!s}")
+            return FlextResult[None].fail(f"Connection test error: {e!s}")
 
     @abstractmethod
     def _singer_initialize(self) -> FlextResult[None]:
@@ -307,11 +307,11 @@ class FlextTapPlugin(FlextSingerPluginBase):
         """
         try:
             if not self._initialized:
-                return FlextResult.fail("Plugin not initialized")
+                return FlextResult[None].fail("Plugin not initialized")
             if not self._connection_valid:
                 test_result = self.test_connection()
                 if not test_result.success:
-                    return FlextResult.fail(f"Connection required: {test_result.error}")
+                    return FlextResult[None].fail(f"Connection required: {test_result.error}")
             self._logger.info(f"Discovering catalog for tap {self.name}")
             # Perform tap-specific discovery
             discovery_result = self._discover_tap_catalog()
@@ -323,10 +323,10 @@ class FlextTapPlugin(FlextSingerPluginBase):
                 self._discovered_streams = list(streams_obj.keys())
             else:
                 self._discovered_streams = []
-            return FlextResult.ok(self._catalog)
+            return FlextResult[None].ok(self._catalog)
         except Exception as e:
             self._logger.exception("Catalog discovery failed")
-            return FlextResult.fail(f"Discovery error: {e!s}")
+            return FlextResult[None].fail(f"Discovery error: {e!s}")
 
     def select_streams(self, stream_names: list[str]) -> FlextResult[None]:
         """Select streams for extraction.
@@ -338,15 +338,15 @@ class FlextTapPlugin(FlextSingerPluginBase):
 
         """
         if not self._discovered_streams:
-            return FlextResult.fail(
+            return FlextResult[None].fail(
                 "No streams discovered. Run discover_catalog first.",
             )
         invalid_streams = [s for s in stream_names if s not in self._discovered_streams]
         if invalid_streams:
-            return FlextResult.fail(f"Invalid streams: {invalid_streams}")
+            return FlextResult[None].fail(f"Invalid streams: {invalid_streams}")
         self._selected_streams = stream_names
         self._logger.info(f"Selected {len(stream_names)} streams for extraction")
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def extract_data(self) -> FlextResult[object]:
         """Extract data from selected streams.
@@ -357,9 +357,9 @@ class FlextTapPlugin(FlextSingerPluginBase):
         """
         try:
             if not self._initialized:
-                return FlextResult.fail("Plugin not initialized")
+                return FlextResult[None].fail("Plugin not initialized")
             if not self._selected_streams:
-                return FlextResult.fail("No streams selected for extraction")
+                return FlextResult[None].fail("No streams selected for extraction")
             self._logger.info(
                 f"Extracting data from {len(self._selected_streams)} streams",
             )
@@ -377,7 +377,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
             self._logger.exception("Data extraction failed")
             if self._entity:
                 self._entity.record_error(str(e))
-            return FlextResult.fail(f"Extraction error: {e!s}")
+            return FlextResult[None].fail(f"Extraction error: {e!s}")
 
     @abstractmethod
     def _discover_tap_catalog(self) -> FlextResult[dict[str, object]]:
@@ -402,7 +402,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
     def _singer_initialize(self) -> FlextResult[None]:
         """Perform Singer tap initialization."""
         # Default implementation - can be overridden
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def _singer_cleanup(self) -> FlextResult[None]:
         """Perform Singer tap cleanup."""
@@ -410,7 +410,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
         self._discovered_streams.clear()
         self._selected_streams.clear()
         self._catalog.clear()
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
 
 class FlextTargetPlugin(FlextSingerPluginBase):
@@ -461,11 +461,11 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         """
         try:
             if not self._initialized:
-                return FlextResult.fail("Plugin not initialized")
+                return FlextResult[None].fail("Plugin not initialized")
             if not self._connection_valid:
                 test_result = self.test_connection()
                 if not test_result.success:
-                    return FlextResult.fail(f"Connection required: {test_result.error}")
+                    return FlextResult[None].fail(f"Connection required: {test_result.error}")
             self._logger.info(f"Loading data with target {self.name}")
             # Record execution in entity if present
             if self._entity:
@@ -490,7 +490,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
             self._logger.exception("Data loading failed")
             if self._entity:
                 self._entity.record_error(str(e))
-            return FlextResult.fail(f"Load error: {e!s}")
+            return FlextResult[None].fail(f"Load error: {e!s}")
 
     def get_load_statistics(self) -> dict[str, object]:
         """Get loading statistics.
@@ -526,12 +526,12 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         # Default implementation - can be overridden
         self._loaded_count = 0
         self._error_count = 0
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
     def _singer_cleanup(self) -> FlextResult[None]:
         """Perform Singer target cleanup."""
         # Default implementation - can be overridden
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)
 
 
 class FlextSingerPluginContext(FlextPluginContext):
@@ -585,8 +585,8 @@ class FlextSingerPluginContext(FlextPluginContext):
 
         """
         if service_name not in self._services:
-            return FlextResult.fail(f"Service not found: {service_name}")
+            return FlextResult[None].fail(f"Service not found: {service_name}")
         service = self._services[service_name]
         if service is None:
-            return FlextResult.fail(f"Service {service_name} not initialized")
-        return FlextResult.ok(service)
+            return FlextResult[None].fail(f"Service {service_name} not initialized")
+        return FlextResult[None].ok(service)
