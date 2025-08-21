@@ -107,7 +107,7 @@ class FlextDbtPackageManager:
             except Exception:
                 logger.exception("Failed to load registry")
 
-    def _save_registry(self) -> FlextResult[None]:
+    def _save_registry(self) -> FlextResult[bool]:
         """Save package registry to disk."""
         try:
             self.registry_path.parent.mkdir(parents=True, exist_ok=True)
@@ -116,11 +116,12 @@ class FlextDbtPackageManager:
             }
             with self.registry_path.open("w") as f:
                 json.dump(data, f, indent=2)
-            return FlextResult[None].ok(None)
+            success_result = True
+            return FlextResult[bool].ok(success_result)
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to save registry: {e}")
+            return FlextResult[bool].fail(f"Failed to save registry: {e}")
 
-    def register_package(self, package: FlextDbtPackage) -> FlextResult[None]:
+    def register_package(self, package: FlextDbtPackage) -> FlextResult[bool]:
         """Register a new DBT package.
 
         Args:
@@ -147,7 +148,7 @@ class FlextDbtPackageManager:
             return self._save_registry()
 
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to register package: {e}")
+            return FlextResult[bool].fail(f"Failed to register package: {e}")
 
     def resolve_dependencies(
         self,
@@ -164,7 +165,9 @@ class FlextDbtPackageManager:
         """
         try:
             if project not in self.packages:
-                return FlextResult[None].fail(f"Package {project} not found")
+                return FlextResult[list[FlextDbtPackage]].fail(
+                    f"Package {project} not found"
+                )
 
             resolved: list[FlextDbtPackage] = []
             visited: set[str] = set()
@@ -191,10 +194,12 @@ class FlextDbtPackageManager:
                 f"{[p.name for p in resolved]}",
             )
 
-            return FlextResult[None].ok(resolved)
+            return FlextResult[list[FlextDbtPackage]].ok(resolved)
 
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to resolve dependencies: {e}")
+            return FlextResult[list[FlextDbtPackage]].fail(
+                f"Failed to resolve dependencies: {e}"
+            )
 
     def install_package(
         self,
@@ -228,13 +233,13 @@ class FlextDbtPackageManager:
             result = self.register_package(pkg)
             if not result.success:
                 error_msg = result.error or "Failed to register package"
-                return FlextResult[None].fail(error_msg)
+                return FlextResult[FlextDbtPackage].fail(error_msg)
 
             logger.info(f"Installed package: {package} v{version}")
-            return FlextResult[None].ok(pkg)
+            return FlextResult[FlextDbtPackage].ok(pkg)
 
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to install package: {e}")
+            return FlextResult[FlextDbtPackage].fail(f"Failed to install package: {e}")
 
     def get_package(self, name: str) -> FlextResult[FlextDbtPackage]:
         """Get a package by name.
@@ -247,8 +252,8 @@ class FlextDbtPackageManager:
 
         """
         if name in self.packages:
-            return FlextResult[None].ok(self.packages[name])
-        return FlextResult[None].fail(f"Package {name} not found")
+            return FlextResult[FlextDbtPackage].ok(self.packages[name])
+        return FlextResult[FlextDbtPackage].fail(f"Package {name} not found")
 
     def list_packages(self) -> list[FlextDbtPackage]:
         """List all registered packages.

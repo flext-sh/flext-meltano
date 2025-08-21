@@ -30,7 +30,8 @@ if result.success:
     print("Meltano services configured")
 
 # Use services directly
-tap_factory = container.get("tap_service_factory").unwrap()
+# Use FlextResult's unwrap_or method for cleaner code
+tap_factory = container.get("tap_service_factory").unwrap_or(None)
 ```
 
 ### Legacy Support (Backward Compatibility)

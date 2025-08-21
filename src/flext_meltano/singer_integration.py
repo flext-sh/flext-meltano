@@ -55,7 +55,7 @@ import json
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TextIO, cast
 
 from flext_core import (
@@ -68,6 +68,10 @@ from flext_core import (
 )
 from structlog.stdlib import BoundLogger
 
+from flext_meltano.adapters_singer import (
+    FlextSingerUnifiedConfig,
+    FlextSingerUnifiedResult,
+)
 from flext_meltano.protocols import FlextSingerUnifiedInterface
 
 # =============================================================================
@@ -106,89 +110,10 @@ class FlextPipelineConfig:
     state: dict[str, object] | None = None
 
 
-class FlextSingerUnifiedConfig:
-    """Unified configuration for all Singer operations - eliminates duplication.
-
-    SOLID SRP: Single configuration object supporting taps, targets, and transforms.
-    This eliminates the need for separate config classes in each Singer project.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        config: dict[str, object],
-        catalog: dict[str, object] | None = None,
-        state: dict[str, object] | None = None,
-        environment: str = "dev",
-        **extra_config: object,
-    ) -> None:
-        """Initialize unified Singer configuration.
-
-        Args:
-            name: Singer plugin name (tap-oracle, target-csv, etc.)
-            config: Plugin-specific configuration
-            catalog: Singer catalog for schema definition
-            state: Singer state for incremental processing
-            environment: Execution environment
-            **extra_config: Additional configuration options
-
-        """
-        self.name = name
-        self.config = config
-        self.catalog = catalog or {}
-        self.state = state or {}
-        self.environment = environment
-        self.extra_config = extra_config
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate unified Singer configuration business rules.
-
-        Returns:
-            FlextResult indicating validation success/failure
-
-        """
-        if not self.name or not isinstance(self.name, str):
-            return FlextResult[object].fail("Singer plugin name must be a non-empty string")
-
-        if not self.config or not isinstance(self.config, dict):
-            return FlextResult[object].fail("Singer config must be a non-empty dictionary")
-
-        return FlextResult[object].ok(None)
+# FlextSingerUnifiedConfig imported from adapters_singer.py to avoid duplication
 
 
-@dataclass
-class FlextSingerUnifiedResult:
-    """Unified result object for all Singer operations - consistent interface.
-
-    SOLID ISP: Interface segregation with optional result components.
-    This provides a consistent result interface across all Singer operations.
-    """
-
-    success: bool
-    records_processed: int = 0
-    schemas_discovered: list[str] | None = None
-    state_updates: dict[str, object] | None = None
-    catalog_updates: dict[str, object] | None = None
-    execution_time_ms: float = 0.0
-    error_message: str | None = None
-    metrics: dict[str, object] = field(default_factory=dict)
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate unified Singer result business rules.
-
-        Returns:
-            FlextResult indicating validation success/failure
-
-        """
-        # Since this is a dataclass with type annotations, most type checks are redundant
-        # Keep only meaningful business rule validations
-        if self.records_processed < 0:
-            return FlextResult[object].fail("Records processed must be a non-negative integer")
-
-        if self.execution_time_ms < 0:
-            return FlextResult[object].fail("Execution time must be a non-negative number")
-
-        return FlextResult[object].ok(None)
+# FlextSingerUnifiedResult imported from adapters_singer.py to avoid duplication
 
 
 class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
@@ -207,7 +132,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
     def execute(self) -> FlextResult[FlextSingerUnifiedResult]:
         """Execute default Singer service operation."""
         # Default execution - return empty result
-        return FlextResult[object].ok(
+        return FlextResult[FlextSingerUnifiedResult].ok(
             FlextSingerUnifiedResult(
                 success=True,
                 records_processed=0,
@@ -236,31 +161,19 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
         if operation == "execute_pipeline":
             pipeline_result = self._execute_pipeline_operation(kwargs)
-            return (
-                FlextResult[object].ok(pipeline_result.data)
-                if pipeline_result.success
-                else FlextResult[object].fail(
-                    pipeline_result.error or "Pipeline execution failed",
-                )
+            # Use unwrap_or pattern for cleaner code with correct type
+            default_result = FlextSingerUnifiedResult(
+                success=False, records_processed=0, schemas_discovered=[]
             )
+            return FlextResult[object].ok(pipeline_result.unwrap_or(default_result))
         if operation == "discover_catalogs":
             catalogs_result = self.discover_all_catalogs()
-            return (
-                FlextResult[object].ok(catalogs_result.data)
-                if catalogs_result.success
-                else FlextResult[object].fail(
-                    catalogs_result.error or "Catalog discovery failed",
-                )
-            )
+            # Use unwrap_or pattern for cleaner code with correct type
+            return FlextResult[object].ok(catalogs_result.unwrap_or({}))
         if operation == "validate_components":
             validation_result = self.validate_all_components()
-            return (
-                FlextResult[object].ok(validation_result.data)
-                if validation_result.success
-                else FlextResult[object].fail(
-                    validation_result.error or "Component validation failed",
-                )
-            )
+            # Use unwrap_or pattern for cleaner code with correct type
+            return FlextResult[object].ok(validation_result.unwrap_or({}))
         return FlextResult[object].fail(f"Unknown operation: {operation}")
 
     def _execute_pipeline_operation(
@@ -279,7 +192,9 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         required_params = ["tap_name", "target_name", "tap_config", "target_config"]
         for param in required_params:
             if param not in kwargs:
-                return FlextResult[object].fail(f"Missing required parameter: {param}")
+                return FlextResult[FlextSingerUnifiedResult].fail(
+                    f"Missing required parameter: {param}"
+                )
 
         # Create pipeline config from kwargs
         try:
@@ -301,7 +216,9 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
             )
             return self.execute_pipeline(pipeline_config)
         except (ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Invalid pipeline configuration: {e}")
+            return FlextResult[FlextSingerUnifiedResult].fail(
+                f"Invalid pipeline configuration: {e}"
+            )
 
     def register_component(
         self,
@@ -323,13 +240,15 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         """
         try:
             if name in self._registered_components:
-                return FlextResult[object].fail(f"Component '{name}' is already registered")
+                return FlextResult[None].fail(
+                    f"Component '{name}' is already registered"
+                )
 
             self._registered_components[name] = component
-            return FlextResult[object].ok(None)
+            return FlextResult[None].ok(None)
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[object].fail(f"Failed to register component '{name}': {e}")
+            return FlextResult[None].fail(f"Failed to register component '{name}': {e}")
 
     def get_component(self, name: str) -> FlextResult[FlextSingerUnifiedInterface]:
         """Get a registered Singer component by name.
@@ -343,12 +262,18 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         """
         try:
             if name not in self._registered_components:
-                return FlextResult[object].fail(f"Component '{name}' is not registered")
+                return FlextResult[FlextSingerUnifiedInterface].fail(
+                    f"Component '{name}' is not registered"
+                )
 
-            return FlextResult[object].ok(self._registered_components[name])
+            return FlextResult[FlextSingerUnifiedInterface].ok(
+                self._registered_components[name]
+            )
 
         except (KeyError, ValueError) as e:
-            return FlextResult[object].fail(f"Failed to get component '{name}': {e}")
+            return FlextResult[FlextSingerUnifiedInterface].fail(
+                f"Failed to get component '{name}': {e}"
+            )
 
     def execute_pipeline(
         self,
@@ -370,22 +295,26 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
             # Get and initialize components using helper method
             components_result = self._get_and_initialize_components(pipeline_config)
             if components_result.is_failure:
-                return FlextResult[object].fail(
+                return FlextResult[FlextSingerUnifiedResult].fail(
                     components_result.error or "Component initialization failed",
                 )
 
-            # Type-safe extraction of components tuple
-            components_data = components_result.data
-            if components_data is None:
-                return FlextResult[object].fail("Components result data is None")
-
-            tap, target = components_data
+            # Type-safe extraction of components tuple using unwrap_or pattern
+            # Note: unwrap_or should never be called here since we check is_failure above
+            tap, target = components_result.unwrap_or(
+                (
+                    cast("FlextSingerUnifiedInterface", None),
+                    cast("FlextSingerUnifiedInterface", None),
+                )
+            )
 
             # Execute extraction and loading using helper method
             return self._execute_pipeline_steps(tap, target)
 
         except (ValueError, TypeError, RuntimeError) as e:
-            return FlextResult[object].fail(f"Pipeline execution failed: {e}")
+            return FlextResult[FlextSingerUnifiedResult].fail(
+                f"Pipeline execution failed: {e}"
+            )
 
     def _get_and_initialize_components(
         self,
@@ -397,12 +326,14 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         if components_result.is_failure:
             return components_result
 
-        # Type-safe extraction of components
-        components_data = components_result.data
-        if components_data is None:
-            return FlextResult[object].fail("Components result data is None")
-
-        tap, target = components_data
+        # Type-safe extraction of components using unwrap_or pattern
+        # Note: unwrap_or should never be called here since we check is_failure above
+        tap, target = components_result.unwrap_or(
+            (
+                cast("FlextSingerUnifiedInterface", None),
+                cast("FlextSingerUnifiedInterface", None),
+            )
+        )
 
         # Initialize components with configs
         initialization_result = self._initialize_components(
@@ -411,11 +342,15 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
             target,
         )
         if initialization_result.is_failure:
-            return FlextResult[object].fail(
+            return FlextResult[
+                tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]
+            ].fail(
                 initialization_result.error or "Component initialization failed",
             )
 
-        return FlextResult[object].ok((tap, target))
+        return FlextResult[
+            tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]
+        ].ok((tap, target))
 
     def _get_components(
         self,
@@ -424,22 +359,23 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         """Get and validate tap and target components."""
         tap_result = self.get_component(pipeline_config.tap_name)
         if tap_result.is_failure:
-            return FlextResult[object].fail(f"Tap error: {tap_result.error}")
+            return FlextResult[
+                tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]
+            ].fail(f"Tap error: {tap_result.error}")
 
         target_result = self.get_component(pipeline_config.target_name)
         if target_result.is_failure:
-            return FlextResult[object].fail(f"Target error: {target_result.error}")
+            return FlextResult[
+                tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]
+            ].fail(f"Target error: {target_result.error}")
 
-        # Type-safe extraction of components
-        tap = tap_result.data
-        target = target_result.data
+        # Use modern FlextResult pattern: direct access after success check
+        tap = tap_result.value
+        target = target_result.value
 
-        if tap is None:
-            return FlextResult[object].fail("Tap component is None")
-        if target is None:
-            return FlextResult[object].fail("Target component is None")
-
-        return FlextResult[object].ok((tap, target))
+        return FlextResult[
+            tuple[FlextSingerUnifiedInterface, FlextSingerUnifiedInterface]
+        ].ok((tap, target))
 
     def _initialize_components(
         self,
@@ -465,18 +401,18 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         # Initialize tap
         tap_init_result = tap.initialize(tap_config)
         if tap_init_result.is_failure:
-            return FlextResult[object].fail(
+            return FlextResult[None].fail(
                 f"Tap initialization failed: {tap_init_result.error}",
             )
 
         # Initialize target
         target_init_result = target.initialize(target_config)
         if target_init_result.is_failure:
-            return FlextResult[object].fail(
+            return FlextResult[None].fail(
                 f"Target initialization failed: {target_init_result.error}",
             )
 
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
     def _execute_pipeline_steps(
         self,
@@ -487,22 +423,22 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
         # Extract data from tap
         extract_result = tap.execute()
         if extract_result.is_failure:
-            return FlextResult[object].fail(f"Extract failed: {extract_result.error}")
+            return FlextResult[FlextSingerUnifiedResult].fail(
+                f"Extract failed: {extract_result.error}"
+            )
 
-        # Type-safe extraction of extract data
-        extract_data = extract_result.data
-        if extract_data is None:
-            return FlextResult[object].fail("Extract result data is None")
+        # Use modern FlextResult pattern: direct access after success check
+        extract_data = extract_result.value
 
         # Load data to target
         load_result = target.execute(extract_data)
         if load_result.is_failure:
-            return FlextResult[object].fail(f"Load failed: {load_result.error}")
+            return FlextResult[FlextSingerUnifiedResult].fail(
+                f"Load failed: {load_result.error}"
+            )
 
-        # Type-safe extraction of load data
-        load_data = load_result.data
-        if load_data is None:
-            return FlextResult[object].fail("Load result data is None")
+        # Use modern FlextResult pattern: direct access after success check
+        load_data = load_result.value
 
         # Combine results
         combined_result = FlextSingerUnifiedResult(
@@ -514,7 +450,7 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
             + load_data.execution_time_ms,
         )
 
-        return FlextResult[object].ok(combined_result)
+        return FlextResult[FlextSingerUnifiedResult].ok(combined_result)
 
     def discover_all_catalogs(self) -> FlextResult[dict[str, dict[str, object]]]:
         """Discover catalogs from all registered components.
@@ -528,13 +464,15 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
 
             for name, component in self._registered_components.items():
                 catalog_result = component.discover_catalog()
-                if catalog_result.success and catalog_result.data is not None:
-                    catalogs[name] = catalog_result.data
+                if catalog_result.success and catalog_result.value is not None:
+                    catalogs[name] = catalog_result.value
 
-            return FlextResult[object].ok(catalogs)
+            return FlextResult[dict[str, dict[str, object]]].ok(catalogs)
 
         except (ValueError, TypeError, RuntimeError) as e:
-            return FlextResult[object].fail(f"Catalog discovery failed: {e}")
+            return FlextResult[dict[str, dict[str, object]]].fail(
+                f"Catalog discovery failed: {e}"
+            )
 
     def validate_all_components(self) -> FlextResult[dict[str, bool]]:
         """Validate configuration of all registered components.
@@ -550,10 +488,12 @@ class FlextSingerUnifiedService(FlextDomainService[FlextSingerUnifiedResult]):
                 validation_result = component.validate_configuration()
                 validation_results[name] = validation_result.success
 
-            return FlextResult[object].ok(validation_results)
+            return FlextResult[dict[str, bool]].ok(validation_results)
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[object].fail(f"Component validation failed: {e}")
+            return FlextResult[dict[str, bool]].fail(
+                f"Component validation failed: {e}"
+            )
 
 
 # =============================================================================
@@ -646,13 +586,13 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
                 return init_result
 
             self._initialized = True
-            return FlextResult[object].ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
             self._logger.exception(
                 f"Failed to initialize {self._plugin_type} {self.name}",
             )
-            return FlextResult[object].fail(f"Initialization failed: {e!s}")
+            return FlextResult[None].fail(f"Initialization failed: {e!s}")
 
     def shutdown(self) -> FlextResult[None]:
         """Shutdown plugin and release resources.
@@ -671,11 +611,11 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
 
             self._initialized = False
             self._connection_valid = False
-            return FlextResult[object].ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
             self._logger.exception("Failed to shutdown plugin")
-            return FlextResult[object].fail(f"Shutdown failed: {e!s}")
+            return FlextResult[None].fail(f"Shutdown failed: {e!s}")
 
     def validate_config(self, config: Mapping[str, object]) -> FlextResult[None]:
         """Validate plugin configuration.
@@ -693,7 +633,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             missing_fields = [f for f in required_fields if f not in config]
 
             if missing_fields:
-                return FlextResult[object].fail(
+                return FlextResult[None].fail(
                     f"Missing required configuration fields: {missing_fields}",
                 )
 
@@ -703,11 +643,11 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
                 return specific_validation
 
             self._config.update(config)
-            return FlextResult[object].ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
             self._logger.exception("Configuration validation failed")
-            return FlextResult[object].fail(f"Validation error: {e!s}")
+            return FlextResult[None].fail(f"Validation error: {e!s}")
 
     def test_connection(self) -> FlextResult[None]:
         """Test connection to data source/destination.
@@ -720,7 +660,7 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
             self._logger.info(f"Testing connection for {self._plugin_type} {self.name}")
 
             if not self._config:
-                return FlextResult[object].fail(
+                return FlextResult[None].fail(
                     "No configuration available for connection test",
                 )
 
@@ -732,12 +672,12 @@ class FlextSingerPluginBase(FlextPlugin, ABC):
 
             self._connection_valid = True
             self._logger.info(f"Connection test successful for {self.name}")
-            return FlextResult[object].ok(None)
+            return FlextResult[None].ok(None)
 
         except Exception as e:
             self._logger.exception("Connection test failed")
             self._connection_valid = False
-            return FlextResult[object].fail(f"Connection test error: {e!s}")
+            return FlextResult[None].fail(f"Connection test error: {e!s}")
 
     @abstractmethod
     def _singer_initialize(self) -> FlextResult[None]:
@@ -841,12 +781,14 @@ class FlextTapPlugin(FlextSingerPluginBase):
         """
         try:
             if not self._initialized:
-                return FlextResult[object].fail("Plugin not initialized")
+                return FlextResult[dict[str, object]].fail("Plugin not initialized")
 
             if not self._connection_valid:
                 test_result = self.test_connection()
                 if not test_result.success:
-                    return FlextResult[object].fail(f"Connection required: {test_result.error}")
+                    return FlextResult[dict[str, object]].fail(
+                        f"Connection required: {test_result.error}"
+                    )
 
             self._logger.info(f"Discovering catalog for tap {self.name}")
 
@@ -855,18 +797,18 @@ class FlextTapPlugin(FlextSingerPluginBase):
             if not discovery_result.success:
                 return discovery_result
 
-            self._catalog = discovery_result.data or {}
+            self._catalog = discovery_result.value or {}
             streams_obj = self._catalog.get("streams", {})
             if isinstance(streams_obj, dict):
                 self._discovered_streams = list(streams_obj.keys())
             else:
                 self._discovered_streams = []
 
-            return FlextResult[object].ok(self._catalog)
+            return FlextResult[dict[str, object]].ok(self._catalog)
 
         except Exception as e:
             self._logger.exception("Catalog discovery failed")
-            return FlextResult[object].fail(f"Discovery error: {e!s}")
+            return FlextResult[dict[str, object]].fail(f"Discovery error: {e!s}")
 
     def select_streams(self, stream_names: list[str]) -> FlextResult[None]:
         """Select streams for extraction.
@@ -879,17 +821,17 @@ class FlextTapPlugin(FlextSingerPluginBase):
 
         """
         if not self._discovered_streams:
-            return FlextResult[object].fail(
+            return FlextResult[None].fail(
                 "No streams discovered. Run discover_catalog first.",
             )
 
         invalid_streams = [s for s in stream_names if s not in self._discovered_streams]
         if invalid_streams:
-            return FlextResult[object].fail(f"Invalid streams: {invalid_streams}")
+            return FlextResult[None].fail(f"Invalid streams: {invalid_streams}")
 
         self._selected_streams = stream_names
         self._logger.info(f"Selected {len(stream_names)} streams for extraction")
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
     def extract_data(self) -> FlextResult[object]:
         """Extract data from selected streams.
@@ -939,7 +881,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
     def _singer_initialize(self) -> FlextResult[None]:
         """Perform Singer tap initialization."""
         # Default implementation - can be overridden
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
     def _singer_cleanup(self) -> FlextResult[None]:
         """Perform Singer tap cleanup."""
@@ -947,7 +889,7 @@ class FlextTapPlugin(FlextSingerPluginBase):
         self._discovered_streams.clear()
         self._selected_streams.clear()
         self._catalog.clear()
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
 
 class FlextTargetPlugin(FlextSingerPluginBase):
@@ -998,12 +940,14 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         """
         try:
             if not self._initialized:
-                return FlextResult[object].fail("Plugin not initialized")
+                return FlextResult[dict[str, object]].fail("Plugin not initialized")
 
             if not self._connection_valid:
                 test_result = self.test_connection()
                 if not test_result.success:
-                    return FlextResult[object].fail(f"Connection required: {test_result.error}")
+                    return FlextResult[dict[str, object]].fail(
+                        f"Connection required: {test_result.error}"
+                    )
 
             self._logger.info(f"Loading data with target {self.name}")
 
@@ -1014,7 +958,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
                 return load_result
 
             # Update statistics
-            stats = load_result.data
+            stats = load_result.value
             if isinstance(stats, dict):
                 loaded = stats.get("loaded", 0)
                 errors = stats.get("errors", 0)
@@ -1027,7 +971,7 @@ class FlextTargetPlugin(FlextSingerPluginBase):
 
         except Exception as e:
             self._logger.exception("Data loading failed")
-            return FlextResult[object].fail(f"Load error: {e!s}")
+            return FlextResult[dict[str, object]].fail(f"Load error: {e!s}")
 
     def get_load_statistics(self) -> dict[str, object]:
         """Get loading statistics.
@@ -1064,12 +1008,12 @@ class FlextTargetPlugin(FlextSingerPluginBase):
         # Default implementation - can be overridden
         self._loaded_count = 0
         self._error_count = 0
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
     def _singer_cleanup(self) -> FlextResult[None]:
         """Perform Singer target cleanup."""
         # Default implementation - can be overridden
-        return FlextResult[object].ok(None)
+        return FlextResult[None].ok(None)
 
 
 class FlextSingerPluginContext(FlextPluginContext):

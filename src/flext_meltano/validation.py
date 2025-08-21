@@ -731,7 +731,7 @@ async def flext_meltano_test_tap_connection(
                 try:
                     return self[name]
                 except KeyError:
-                    return dict.__getattribute__(self, name)
+                    return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
         # For invalid project roots (nonexistent), normalize to failure for legacy tests
         if not Path(str(project_root)).exists():
@@ -768,7 +768,7 @@ def flext_meltano_validate_project(
                 try:
                     return self[name]
                 except KeyError:
-                    return dict.__getattribute__(self, name)
+                    return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
         return AttrDict(
             {
@@ -821,7 +821,7 @@ async def flext_meltano_validate_tap_config(
                 try:
                     return self[name]
                 except KeyError:
-                    return dict.__getattribute__(self, name)
+                    return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
         return AttrDict({"success": val.success, "data": data_obj, "error": val.error})
     except Exception as e:  # noqa: BLE001

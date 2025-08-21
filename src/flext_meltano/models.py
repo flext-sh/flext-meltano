@@ -17,11 +17,12 @@ from flext_core import (
     FlextEntity,
     FlextModel,
     FlextResult,
+    FlextTimestamp,
     FlextValueObject,
     get_logger,
 )
 from flext_core.config import FlextBaseConfigModel
-from flext_core.root_models import FlextEntityId, FlextTimestamp
+from flext_core.root_models import FlextEntityId
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from .constants import (
@@ -51,7 +52,7 @@ class FlextMeltanoEvent(FlextEntity):
     # Ensure immutability to match test expectations
     model_config = ConfigDict(frozen=True)
 
-    id: FlextEntityId = Field(
+    id: FlextEntityId | str = Field(
         default_factory=lambda: FlextEntityId(str(uuid4())),
         description="Event ID",
     )
@@ -87,7 +88,7 @@ class FlextMeltanoExecutionState(FlextModel):
 class FlextMeltanoPipelineExecution(FlextEntity):
     """Pipeline execution entity with complete tracking."""
 
-    id: FlextEntityId = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
+    id: FlextEntityId | str = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
     pipeline_name: str = Field(...)
     tap_name: str = Field(...)
     target_name: str = Field(...)
@@ -133,7 +134,7 @@ class FlextMeltanoPipelineExecution(FlextEntity):
 class FlextMeltanoPlugin(FlextEntity):
     """Meltano plugin entity with configuration."""
 
-    id: FlextEntityId = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
+    id: FlextEntityId | str = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
     name: str = Field(...)
     plugin_type: FlextMeltanoPluginType = Field(...)
     namespace: str = Field(...)
@@ -155,11 +156,11 @@ class FlextMeltanoPlugin(FlextEntity):
 
     def is_extractable(self) -> bool:
         """Check if plugin can extract data."""
-        return self.plugin_type == FlextMeltanoPluginType.EXTRACTORS
+        return self.plugin_type == FlextMeltanoPluginType.EXTRACTOR
 
     def is_loadable(self) -> bool:
         """Check if plugin can load data."""
-        return self.plugin_type == FlextMeltanoPluginType.LOADERS
+        return self.plugin_type == FlextMeltanoPluginType.LOADER
 
 
 class FlextMeltanoPluginRegistry(FlextModel):
@@ -177,14 +178,16 @@ class FlextMeltanoPluginRegistry(FlextModel):
             return validation_result
 
         self.plugins[plugin.name] = plugin
-        self.last_updated = datetime.now(UTC)
+        self.last_updated = FlextTimestamp(datetime.now(UTC))
         return FlextResult[None].ok(None)
 
     def get_plugin(self, name: str) -> FlextResult[FlextMeltanoPlugin]:
         """Get plugin by name."""
         if name not in self.plugins:
-            return FlextResult[None].fail(f"Plugin '{name}' not found in registry")
-        return FlextResult[None].ok(self.plugins[name])
+            return FlextResult[FlextMeltanoPlugin].fail(
+                f"Plugin '{name}' not found in registry"
+            )
+        return FlextResult[FlextMeltanoPlugin].ok(self.plugins[name])
 
     def list_plugins_by_type(
         self,
@@ -270,7 +273,7 @@ class FlextSingerCatalog(FlextModel):
 
     def flext_singer_get_catalog(self) -> FlextResult[dict[str, object]]:
         """Get catalog using legacy-named method."""
-        return FlextResult[None].ok({"streams": list(self.streams)})
+        return FlextResult[dict[str, object]].ok({"streams": list(self.streams)})
 
     def flext_singer_get_selected_streams(self) -> FlextResult[list[str]]:
         """Get selected streams based on Singer metadata rules.
@@ -305,9 +308,9 @@ class FlextSingerCatalog(FlextModel):
                     ):
                         selected.append(sid)
                         break
-            return FlextResult[None].ok(selected)
+            return FlextResult[list[str]].ok(selected)
         except Exception as exc:  # pragma: no cover
-            return FlextResult[None].fail(f"Failed to get selected streams: {exc}")
+            return FlextResult[list[str]].fail(f"Failed to get selected streams: {exc}")
 
     def add_stream(self, stream_definition: dict[str, object]) -> FlextResult[None]:
         """Add stream definition to catalog."""
@@ -334,13 +337,17 @@ class FlextSingerCatalog(FlextModel):
 class FlextMeltanoProject(FlextEntity):
     """Meltano project entity with metadata."""
 
-    id: FlextEntityId = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
+    id: FlextEntityId | str = Field(default_factory=lambda: FlextEntityId(str(uuid4())))
     name: str = Field(...)
     project_root: str = Field(...)
     environment: str = Field(default="dev")
     database_uri: str | None = Field(default=None)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    created_at: FlextTimestamp = Field(
+        default_factory=lambda: FlextTimestamp(datetime.now(UTC))
+    )
+    updated_at: FlextTimestamp = Field(
+        default_factory=lambda: FlextTimestamp(datetime.now(UTC))
+    )
     plugins: dict[str, FlextMeltanoPlugin] = Field(default_factory=dict)
     schedules: list[dict[str, object]] = Field(default_factory=list)
     jobs: list[dict[str, object]] = Field(default_factory=list)
@@ -370,7 +377,7 @@ class FlextMeltanoProject(FlextEntity):
             return validation_result
 
         self.plugins[plugin.name] = plugin
-        self.updated_at = datetime.now(UTC)
+        self.updated_at = FlextTimestamp(datetime.now(UTC))
         return FlextResult[None].ok(None)
 
 
