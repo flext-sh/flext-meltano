@@ -9,12 +9,13 @@ from typing import Protocol
 
 from flext_core import FlextResult
 
-from flext_meltano.common import MockResult
-from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
 from flext_meltano.execution import (
     SubprocessExecutionContext as SharedSubprocessExecutionContext,
     execute_subprocess_common as shared_execute_subprocess_common,
 )
+
+# MockResult removed - no mocks in production code
+from flext_meltano.hubs import FlextDbtHub, create_dbt_hub
 
 # Constants
 MIN_MOCK_DATA_ARGS = 2
@@ -26,6 +27,7 @@ class CommandHandler(Protocol):
 
     def __call__(self, options: list[str]) -> FlextResult[dict[str, object]]:
         """Execute command with options and return result."""
+        ...
 
 
 class FlextMeltanoCommandDispatcher:
@@ -400,26 +402,37 @@ class FlextMeltanoCli:
                     err = err.replace("Execution error", "Command error", 1)
                 return FlextResult(error=err)
 
-            result_data = exec_result.data
-            if not isinstance(result_data, dict):
-                return FlextResult(error="Invalid execution result format")
+            # For successful results, we can safely access the value
+            result_data = exec_result.value
 
-            # Use common MockResult class to eliminate duplication
-            result = MockResult(result_data)
+            # Extract real data from subprocess result
+            if isinstance(result_data, dict):
+                output = {
+                    "command": " ".join(cmd),
+                    "returncode": result_data.get("returncode", 1),
+                    "stdout": result_data.get("stdout", ""),
+                    "stderr": result_data.get("stderr", ""),
+                    "success": result_data.get("returncode", 1) == 0,
+                }
 
-            output = {
-                "command": " ".join(cmd),
-                "returncode": result.returncode,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "success": result.returncode == 0,
-            }
+                if result_data.get("returncode", 1) == 0:
+                    return FlextResult(data=output)
 
-            if result.returncode == 0:
-                return FlextResult(data=output)
+                # Command failed case
+                return FlextResult(
+                    error=f"Command failed: {result_data.get('stderr', '') or result_data.get('stdout', '')}",
+                    error_data=output,
+                )
+            # Fallback for non-dict results
             return FlextResult(
-                error=f"Command failed: {result.stderr or result.stdout}",
-                error_data=output,
+                error=f"Command failed: Invalid result format - {result_data}",
+                error_data={
+                    "command": " ".join(cmd),
+                    "returncode": 1,
+                    "stdout": str(result_data) if result_data else "",
+                    "stderr": "Invalid result format",
+                    "success": False,
+                },
             )
 
         except TimeoutError:
@@ -475,13 +488,25 @@ class FlextMeltanoCli:
 
             result = self.dbt_hub.execute_model(model, mock_data)
 
-            if result.success and result.data is not None:
-                df = result.data
+            if result.success and result.value is not None:
+                result_data = result.value
+                # Check if result_data has pandas-like methods (for DataFrames)
+                if hasattr(result_data, "columns") and hasattr(result_data, "head"):
+                    # Handle DataFrame case
+                    return FlextResult(
+                        data={
+                            "rows": len(result_data),
+                            "columns": list(result_data.columns),
+                            "sample": result_data.head(5).to_dict("records")
+                            if len(result_data) > 0
+                            else [],
+                            "success": True,
+                        },
+                    )
+                # Handle dict result case
                 return FlextResult(
                     data={
-                        "rows": len(df),
-                        "columns": list(df.columns),
-                        "sample": df.head(5).to_dict("records") if len(df) > 0 else [],
+                        "result": result_data,
                         "success": True,
                     },
                 )
@@ -509,23 +534,29 @@ class FlextMeltanoCli:
             if project == "flext-dbt-ldap":
                 import_result = self.dbt_hub.import_ldap_models()
                 if not import_result.success:
-                    return FlextResult(error=import_result.error)
+                    return FlextResult(
+                        error=import_result.error or "Failed to import LDAP models"
+                    )
             elif project == "flext-dbt-oracle":
                 import_result = self.dbt_hub.import_oracle_models()
                 if not import_result.success:
-                    return FlextResult(error=import_result.error)
+                    return FlextResult(
+                        error=import_result.error or "Failed to import Oracle models"
+                    )
 
             # Create test environment
             env_result = self.dbt_hub.create_test_environment(project)
             if not env_result.success:
-                return FlextResult(error=env_result.error)
+                return FlextResult(
+                    error=env_result.error or "Failed to create test environment"
+                )
 
             # Run validation
             validation_result = self.dbt_hub.validate_transformations(project)
 
             if validation_result.success:
-                return FlextResult(data=validation_result.data)
-            return FlextResult(error=validation_result.error)
+                return FlextResult(data=validation_result.value)
+            return FlextResult(error=validation_result.error or "Validation failed")
 
         except Exception as e:
             return FlextResult(error=f"Failed to test locally: {e}")
@@ -547,9 +578,9 @@ class FlextMeltanoCli:
                 return FlextResult(
                     data={
                         "status": "success",
-                        "imported_projects": result.data,
-                        "total_models": result.data.get("total", 0)
-                        if result.data
+                        "imported_projects": result.value,
+                        "total_models": result.value.get("total", 0)
+                        if result.value
                         else 0,
                         "message": "Successfully imported all ecosystem models",
                     },
@@ -596,7 +627,9 @@ class FlextMeltanoCli:
             # Create test environment
             env_result = self.dbt_hub.create_test_environment(project)
             if not env_result.success:
-                return FlextResult(error=env_result.error)
+                return FlextResult(
+                    error=env_result.error or "Failed to create test environment"
+                )
 
             # Run comprehensive validation
             validation_result = self.dbt_hub.validate_transformations(project)
@@ -606,12 +639,14 @@ class FlextMeltanoCli:
                     data={
                         "project": project,
                         "status": "validated",
-                        "models_imported": import_result.data,
-                        "validation_results": validation_result.data,
+                        "models_imported": import_result.value,
+                        "validation_results": validation_result.value,
                         "message": f"Project {project} validated successfully",
                     },
                 )
-            return FlextResult(error=validation_result.error)
+            return FlextResult(
+                error=validation_result.error or "Project validation failed"
+            )
 
         except Exception as e:
             return FlextResult(error=f"Failed to validate project {project}: {e}")
@@ -677,18 +712,30 @@ class FlextMeltanoCli:
             # Create test environment for the project
             env_result = self.dbt_hub.create_test_environment(project)
             if not env_result.success:
-                return FlextResult(error=env_result.error)
+                return FlextResult(
+                    error=env_result.error or "Failed to create test environment"
+                )
 
             # Generate mock data for the specific model
             mock_data = {}
-            if env_result.data:
-                for table_name, df in env_result.data.items():
-                    if model.lower() in table_name.lower():
-                        mock_data[table_name] = {
-                            "rows": len(df),
-                            "columns": list(df.columns),
-                            "sample": df.head(3).to_dict("records"),
-                        }
+            if env_result.value:
+                env_data = env_result.value
+                if isinstance(env_data, dict):
+                    for table_name, df in env_data.items():
+                        if model.lower() in table_name.lower():
+                            # Check if df has DataFrame-like methods
+                            if hasattr(df, "columns") and hasattr(df, "head"):
+                                mock_data[table_name] = {
+                                    "rows": len(df),
+                                    "columns": list(df.columns),
+                                    "sample": df.head(3).to_dict("records"),
+                                }
+                            else:
+                                # Handle non-DataFrame data
+                                mock_data[table_name] = {
+                                    "data": df,
+                                    "type": str(type(df).__name__),
+                                }
 
             return FlextResult(
                 data={
@@ -751,7 +798,7 @@ class FlextMeltanoCli:
             if not self.dbt_hub:
                 self.dbt_hub = create_dbt_hub()
 
-            dashboard_result = FlextResult[None].ok(
+            dashboard_result = FlextResult[dict[str, object]].ok(
                 {"service": "flext-dbt-hub", "status": "active"},
             )
 
@@ -794,8 +841,8 @@ class FlextMeltanoCli:
             # Check observability components
             try:
                 metrics_result = self.dbt_hub.get_hub_status()
-                if metrics_result.success and metrics_result.data:
-                    observability_status = metrics_result.data.get(
+                if metrics_result.success and metrics_result.value:
+                    observability_status = metrics_result.value.get(
                         "observability_available",
                         False,
                     )
@@ -829,18 +876,16 @@ class FlextMeltanoCli:
             ]
             overall_health = "healthy" if not error_components else "degraded"
 
-            return FlextResult(
-                data={
-                    "status": overall_health,
-                    "components": health_status,
-                    "timestamp": datetime.now(UTC).isoformat(),
-                    "message": f"DBT hub health check completed - {overall_health}",
-                    "errors": error_components or None,
-                },
-            )
+            return FlextResult[dict[str, object]].ok({
+                "status": overall_health,
+                "components": health_status,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "message": f"DBT hub health check completed - {overall_health}",
+                "errors": error_components or None,
+            })
 
         except Exception as e:
-            return FlextResult(error=f"Failed DBT health check: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed DBT health check: {e}")
 
     # Advanced Features CLI Methods
 
@@ -904,14 +949,27 @@ class FlextMeltanoCli:
 
             result = self.dbt_hub.execute_snapshot(snapshot_name)
 
-            if result.success and result.data is not None:
-                df = result.data
+            if result.success and result.value is not None:
+                result_data = result.value
+                # Check if result_data has DataFrame-like methods
+                if hasattr(result_data, "columns") and hasattr(result_data, "head"):
+                    return FlextResult(
+                        data={
+                            "snapshot": snapshot_name,
+                            "rows": len(result_data),
+                            "columns": list(result_data.columns),
+                            "sample": result_data.head(5).to_dict("records")
+                            if len(result_data) > 0
+                            else [],
+                            "success": True,
+                            "message": f"Snapshot {snapshot_name} executed successfully",
+                        },
+                    )
+                # Handle non-DataFrame result
                 return FlextResult(
                     data={
                         "snapshot": snapshot_name,
-                        "rows": len(df),
-                        "columns": list(df.columns),
-                        "sample": df.head(5).to_dict("records") if len(df) > 0 else [],
+                        "result": result_data,
                         "success": True,
                         "message": f"Snapshot {snapshot_name} executed successfully",
                     },
@@ -992,17 +1050,17 @@ class FlextMeltanoCli:
                     data={
                         "hook_type": hook_type,
                         "model_name": model_name,
-                        "results": result.data,
-                        "total_hooks": len(result.data) if result.data else 0,
+                        "results": result.value,
+                        "total_hooks": len(result.value) if result.value else 0,
                         "successful_hooks": len(
-                            [r for r in result.data if r["success"]],
+                            [r for r in result.value if r["success"]],
                         )
-                        if result.data
+                        if result.value
                         else 0,
                         "failed_hooks": len(
-                            [r for r in result.data if not r["success"]],
+                            [r for r in result.value if not r["success"]],
                         )
-                        if result.data
+                        if result.value
                         else 0,
                         "message": f"Executed {hook_type} hooks successfully",
                     },
@@ -1080,8 +1138,8 @@ class FlextMeltanoCli:
 
             result = self.dbt_hub.build_lineage_graph(package)
 
-            if result.success and result.data:
-                lineage_data = result.data
+            if result.success and result.value:
+                lineage_data = result.value
                 return FlextResult(
                     data={
                         "package": package,
@@ -1135,8 +1193,8 @@ class FlextMeltanoCli:
 
             result = self.dbt_hub.get_lineage_path(from_model, to_model)
 
-            if result.success and result.data:
-                path = result.data
+            if result.success and result.value:
+                path = result.value
                 return FlextResult(
                     data={
                         "from_model": from_model,
@@ -1158,13 +1216,13 @@ class FlextMeltanoCli:
         """Get meltano version."""
         result = self.flext_meltano_run_command(["--version"])
         if result.success:
-            if result.data and isinstance(result.data, dict):
-                stdout = result.data.get("stdout", "")
+            if result.value and isinstance(result.value, dict):
+                stdout = result.value.get("stdout", "")
                 version = stdout.strip() if isinstance(stdout, str) else "unknown"
             else:
                 version = "unknown"
             return FlextResult(data=version)
-        return FlextResult(error=result.error)
+        return FlextResult(error=result.error or "Failed to get version")
 
     def flext_meltano_install(self) -> FlextResult[bool]:
         """Install meltano project dependencies."""

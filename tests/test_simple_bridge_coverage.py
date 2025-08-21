@@ -565,7 +565,9 @@ class TestBridgeIntegration:
         # Mock the executor
         mock_executor = Mock()
         mock_executor_class.return_value = mock_executor
-        mock_executor.run_command.return_value = FlextResult[None].ok({"stdout": "Success"})
+        mock_executor.run_command.return_value = FlextResult[None].ok(
+            {"stdout": "Success"}
+        )
 
         bridge = FlextMeltanoBridge()
 

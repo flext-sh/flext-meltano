@@ -12,12 +12,17 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_core import FlextResult
 
-from flext_meltano import FlextSingerUnifiedConfig, FlextSingerUnifiedResult
 from flext_meltano.config import FlextMeltanoConfig
+
+if TYPE_CHECKING:
+    from flext_meltano.adapters_singer import (
+        FlextSingerUnifiedConfig,
+        FlextSingerUnifiedResult,
+    )
 
 
 @runtime_checkable
@@ -91,7 +96,7 @@ class FlextSingerUnifiedInterface(ABC):
     """
 
     @abstractmethod
-    def initialize(self, config: FlextSingerUnifiedConfig) -> FlextResult[None]:
+    def initialize(self, config: FlextSingerUnifiedConfig) -> FlextResult[bool]:
         """Initialize component with unified configuration."""
         ...
 
@@ -109,7 +114,7 @@ class FlextSingerUnifiedInterface(ABC):
         ...
 
     @abstractmethod
-    def validate_configuration(self) -> FlextResult[None]:
+    def validate_configuration(self) -> FlextResult[bool]:
         """Validate current configuration."""
         ...
 
@@ -122,7 +127,7 @@ class FlextSingerTapProtocol(Protocol):
         """Discover schema catalog."""
         ...
 
-    def set_tap_class(self, tap_class: type) -> FlextResult[None]:
+    def set_tap_class(self, tap_class: type) -> FlextResult[bool]:
         """Set Singer tap class."""
         ...
 
@@ -135,7 +140,7 @@ class FlextSingerTapProtocol(Protocol):
 class FlextSingerTargetProtocol(Protocol):
     """Protocol for Singer target implementations."""
 
-    def set_target_class(self, target_class: type) -> FlextResult[None]:
+    def set_target_class(self, target_class: type) -> FlextResult[bool]:
         """Set Singer target class."""
         ...
 
@@ -183,11 +188,11 @@ class FlextMeltanoDbtProtocol(Protocol):
 class FlextMeltanoPluginProtocol(Protocol):
     """Protocol for plugin implementations."""
 
-    def install(self) -> FlextResult[None]:
+    def install(self) -> FlextResult[bool]:
         """Install the plugin."""
         ...
 
-    def configure(self, config: dict[str, object]) -> FlextResult[None]:
+    def configure(self, config: dict[str, object]) -> FlextResult[bool]:
         """Configure the plugin."""
         ...
 
@@ -218,7 +223,7 @@ class FlextMeltanoInstallationProtocol(Protocol):
         plugin_type: str,
         plugin_name: str,
         config: dict[str, object] | None = None,
-    ) -> FlextResult[None]:
+    ) -> FlextResult[bool]:
         """Install a plugin."""
         ...
 
@@ -238,11 +243,11 @@ class FlextMeltanoConfigurableProtocol(Protocol):
 
     config: FlextMeltanoConfig
 
-    def validate_configuration(self) -> FlextResult[None]:
+    def validate_configuration(self) -> FlextResult[bool]:
         """Validate current configuration."""
         ...
 
-    def reload_configuration(self, config: FlextMeltanoConfig) -> FlextResult[None]:
+    def reload_configuration(self, config: FlextMeltanoConfig) -> FlextResult[bool]:
         """Reload configuration."""
         ...
 

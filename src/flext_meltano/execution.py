@@ -129,7 +129,7 @@ class FlextMeltanoExecutor:
             if not self._meltano_path:
                 validation_result = self.validate()
                 if not validation_result.success:
-                    final_result = FlextResult[None].fail(
+                    final_result = FlextResult[dict[str, object]].fail(
                         validation_result.error or "Validation failed",
                     )
                     return final_result
@@ -161,14 +161,14 @@ class FlextMeltanoExecutor:
                 check=False,
             )
             exec_result = execute_subprocess_common(exec_ctx)
-            if not exec_result.success or not isinstance(exec_result.data, dict):
+            if not exec_result.success or not isinstance(exec_result.value, dict):
                 # Normalize timeout message to match test expectations
                 err = exec_result.error or "Execution failed"
                 if "timed out" in err.lower():
                     err = "Pipeline execution timed out"
-                final_result = FlextResult[None].fail(err)
+                final_result = FlextResult[dict[str, object]].fail(err)
             else:
-                result = exec_result.data
+                result = exec_result.value
                 execution_result = {
                     "execution_id": context.execution_id,
                     "pipeline_name": context.pipeline_name,
@@ -185,16 +185,18 @@ class FlextMeltanoExecutor:
                 }
 
                 if execution_result["success"]:
-                    final_result = FlextResult[None].ok(execution_result)
+                    final_result = FlextResult[dict[str, object]].ok(execution_result)
                 else:
-                    final_result = FlextResult[None].fail(
+                    final_result = FlextResult[dict[str, object]].fail(
                         f"Pipeline failed: {execution_result['stderr'] or execution_result['stdout']}",
                     )
 
         except TimeoutError:
-            final_result = FlextResult[None].fail("Pipeline execution timed out")
+            final_result = FlextResult[dict[str, object]].fail(
+                "Pipeline execution timed out"
+            )
         except OSError as e:
-            final_result = FlextResult[None].fail(f"Execution error: {e}")
+            final_result = FlextResult[dict[str, object]].fail(f"Execution error: {e}")
 
         return final_result
 
@@ -216,7 +218,9 @@ class FlextMeltanoExecutor:
             if not self._meltano_path:
                 validation_result = self.validate()
                 if not validation_result.success:
-                    return FlextResult(error=validation_result.error)
+                    return FlextResult[dict[str, object]].fail(
+                        validation_result.error or "Validation failed"
+                    )
                 # If validation was mocked to succeed without setting path, fallback
                 if self._meltano_path is None:
                     self._meltano_path = Path("meltano")
@@ -241,7 +245,7 @@ class FlextMeltanoExecutor:
             error_message: str | None = None
             execution_result: dict[str, object] | None = None
 
-            if not exec_result.success or not isinstance(exec_result.data, dict):
+            if not exec_result.success or not isinstance(exec_result.value, dict):
                 error_message = exec_result.error or "Execution failed"
                 # Harmonize subprocess error wording for command path
                 if error_message and error_message.startswith("Execution error"):
@@ -251,7 +255,7 @@ class FlextMeltanoExecutor:
                         1,
                     )
             else:
-                result = exec_result.data
+                result = exec_result.value
                 candidate = {
                     "execution_id": context.execution_id,
                     "command": " ".join(command),
@@ -366,11 +370,11 @@ def execute_subprocess_common(
         logger.info(
             f"Subprocess completed in {context.timeout_seconds}s or less: {result['success']}",
         )
-        return FlextResult[None].ok(result)
+        return FlextResult[dict[str, object]].ok(result)
     except subprocess.TimeoutExpired:
-        return FlextResult[None].fail("Command timed out")
+        return FlextResult[dict[str, object]].fail("Command timed out")
     except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
-        return FlextResult[None].fail(f"Execution error: {e}")
+        return FlextResult[dict[str, object]].fail(f"Execution error: {e}")
 
 
 async def _execute_subprocess_common_async(
@@ -487,7 +491,7 @@ def flext_meltano_execute_job(
     executor = FlextMeltanoExecutor(config)
     result = executor.execute_pipeline(tap_name, target_name)
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        return FlextMeltanoResult.ok(result.value)
     return FlextMeltanoResult.fail(result.error or "Execution failed")
 
 
@@ -507,7 +511,7 @@ def flext_meltano_run_command(
     executor = FlextMeltanoExecutor(config)
     result = executor.run_command(args)
     if result.success:
-        return FlextMeltanoResult.ok(result.data)
+        return FlextMeltanoResult.ok(result.value)
     return FlextMeltanoResult.fail(result.error or "Execution failed")
 
 

@@ -86,7 +86,7 @@ def bridge_invoke_dbt(command: str, *args: str) -> dict[str, object]:
     return {
         "success": result.success,
         "command": command,
-        "output": result.data if result.success else None,
+        "output": result.value if result.success else None,
         "error": result.error if result.is_failure else None,
     }
 
@@ -135,7 +135,7 @@ class FlextMeltanoDbtManager:
             cmd.extend(["--exclude", exclude])
 
         # For tests, return structured success without invoking Meltano
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -157,7 +157,7 @@ class FlextMeltanoDbtManager:
         elif select:
             cmd.extend(["--select", select])
 
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -179,7 +179,7 @@ class FlextMeltanoDbtManager:
         elif select:
             cmd.extend(["--select", select])
 
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "models": models or [],
                 "command": " ".join(cmd),
@@ -193,14 +193,16 @@ class FlextMeltanoDbtManager:
         result = self.executor.run_command(["invoke", "dbt:docs:generate"])
 
         if result.success:
-            return FlextResult[None].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
                     "command": "dbt docs generate",
                     "status": "success",
-                    "output": result.data,
+                    "output": result.value,
                 },
             )
-        return FlextResult[None].fail(f"DBT docs generation failed: {result.error}")
+        return FlextResult[dict[str, object]].fail(
+            f"DBT docs generation failed: {result.error}"
+        )
 
     def serve_docs(self, port: int = 8080) -> FlextResult[dict[str, object]]:
         """Serve DBT documentation."""
@@ -214,15 +216,17 @@ class FlextMeltanoDbtManager:
         )
 
         if result.success:
-            return FlextResult[None].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
                     "command": f"dbt docs serve --port {port}",
                     "status": "success",
                     "port": port,
-                    "output": result.data,
+                    "output": result.value,
                 },
             )
-        return FlextResult[None].fail(f"DBT docs serve failed: {result.error}")
+        return FlextResult[dict[str, object]].fail(
+            f"DBT docs serve failed: {result.error}"
+        )
 
 
 class FlextMeltanoDbtProject:
@@ -308,13 +312,13 @@ class FlextMeltanoDbtRunner:
         result = self.executor.run_command(cmd)
 
         if result.success:
-            return FlextResult[None].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
                     # Expose the logical DBT command (not the Meltano wrapper)
                     "command": command,
                     "args": args or [],
                     "status": "success",
-                    "output": result.data,
+                    "output": result.value,
                 },
             )
         # Fallback: in environments without Meltano/DBT, emulate success
@@ -322,7 +326,7 @@ class FlextMeltanoDbtRunner:
             "DBT command fallback to success (test mode)",
             error=result.error,
         )
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "command": command,
                 "args": args or [],
@@ -341,7 +345,7 @@ class FlextMeltanoDbtRunner:
             args.extend(["--models", " ".join(models)])
 
         # Return structured result matching tests without depending on Meltano
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "models": models or [],
                 "status": "success",
@@ -358,7 +362,7 @@ class FlextMeltanoDbtRunner:
             args.extend(["--models", " ".join(models)])
 
         # Return structured result matching tests without depending on Meltano
-        return FlextResult[None].ok(
+        return FlextResult[dict[str, object]].ok(
             {
                 "models": models or [],
                 "status": "success",

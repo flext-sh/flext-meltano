@@ -316,7 +316,9 @@ class FlextDbtInMemoryExecutor:
         """
         try:
             if table_name not in self.schemas:
-                return FlextResult[None].fail(f"Schema not found for table: {table_name}")
+                return FlextResult[None].fail(
+                    f"Schema not found for table: {table_name}"
+                )
             schema = self.schemas[table_name]
             columns = schema.get("columns", {})
             # Generate test data

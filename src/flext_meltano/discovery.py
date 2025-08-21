@@ -179,12 +179,14 @@ def discover_catalog_with_validation(
 
         if result.success:
             catalog = json.loads(result.data["stdout"])
-            return FlextResult[None].ok(catalog)
+            return FlextResult[dict[str, object]].ok(catalog)
         else:
-            return FlextResult[None].fail(f"Catalog discovery failed: {result.error_message}")
+            return FlextResult[dict[str, object]].fail(
+                f"Catalog discovery failed: {result.error_message}"
+            )
 
     except Exception as e:
-        return FlextResult[None].fail(f"Discovery error: {e}")
+        return FlextResult[dict[str, object]].fail(f"Discovery error: {e}")
 ```
 
 ## Caching and Performance
@@ -234,7 +236,7 @@ def handle_discovery_errors(operation: str) -> Callable:
             except Exception as e:
                 error_msg: str = f"Discovery operation {operation} error: {e}"
                 logger.exception(error_msg)
-                return FlextResult[None].fail(error_msg)
+                return FlextResult[object].fail(error_msg)
 
         return wrapper
 
@@ -323,8 +325,8 @@ from meltano.core.project import Project
 from pydantic import Field
 
 from flext_meltano.common import injectable
-from flext_meltano.common_schemas import FlextMeltanoPluginInfo
 from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.schemas import FlextMeltanoPluginInfo
 
 
 class FlextMeltanoDiscoveryCommand:
@@ -571,9 +573,11 @@ class FlextMeltanoDiscoverer:
             plugins = self._discover_with_hub(plugin_type)
             if not plugins:
                 plugins = self._get_default_plugins(plugin_type)
-            return FlextResult[None].ok(plugins)
+            return FlextResult[list[FlextMeltanoPluginInfo]].ok(plugins)
         except (ValueError, TypeError, ImportError) as e:
-            return FlextResult[None].fail(f"Plugin discovery failed: {e}")
+            return FlextResult[list[FlextMeltanoPluginInfo]].fail(
+                f"Plugin discovery failed: {e}"
+            )
 
     def _ensure_hub_initialized(self) -> None:
         """Initialize hub if possible; ignore failures safely."""
@@ -858,7 +862,7 @@ def flext_meltano_discover_plugins(
                     try:
                         return self[name]
                     except KeyError:
-                        return dict.__getattribute__(self, name)
+                        return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
             return AttrDictError(
                 {
@@ -901,7 +905,7 @@ def flext_meltano_discover_plugins(
                         exc,
                     )
                     continue
-            data_obj: dict[str, object] = {"plugins": plugins_list}
+            data_obj: dict[str, object] | None = {"plugins": plugins_list}
         else:
             data_obj = None
 
@@ -910,7 +914,7 @@ def flext_meltano_discover_plugins(
                 try:
                     return self[name]
                 except KeyError:
-                    return dict.__getattribute__(self, name)
+                    return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
         return AttrDictSuccess(
             {
@@ -926,7 +930,7 @@ def flext_meltano_discover_plugins(
                 try:
                     return self[name]
                 except KeyError:
-                    return dict.__getattribute__(self, name)
+                    return dict.__getattribute__(self, name)  # type: ignore[arg-type]
 
         return AttrDictException({"success": False, "data": None, "error": str(e)})
 

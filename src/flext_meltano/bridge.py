@@ -14,7 +14,7 @@ from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoPluginType
 from flext_meltano.execution import FlextMeltanoExecutor
 from flext_meltano.models import FlextMeltanoPlugin, FlextMeltanoPluginRegistry
-from flext_meltano.plugin_implementation import (
+from flext_meltano.plugins import (
     create_meltano_tap_plugin,
     create_meltano_target_plugin,
 )
@@ -73,20 +73,18 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.get_version()
             >>> if result.success:
-            ...     print(f"Meltano: {result.data['meltano']}")
+            ...     print(f"Meltano: {result.value['meltano']}")
 
         """
         try:
-            # Get Meltano version using executor
+            # Get Meltano version using executor with cleaner FlextResult pattern
             result = self._executor.run_command(["--version"])
-            if result.success and result.data:
-                meltano_version = "unknown"
-                if isinstance(result.data, dict) and "stdout" in result.data:
-                    stdout = result.data["stdout"]
-                    if isinstance(stdout, str):
-                        meltano_version = stdout.strip()
-            else:
-                meltano_version = "unknown"
+            exec_data = result.unwrap_or({})
+            meltano_version = "unknown"
+            if isinstance(exec_data, dict) and "stdout" in exec_data:
+                stdout = exec_data["stdout"]
+                if isinstance(stdout, str):
+                    meltano_version = stdout.strip()
 
             version_info = {
                 "meltano": meltano_version,
@@ -94,10 +92,12 @@ class FlextMeltanoBridge:
                 "flext_meltano": "2.0.0-enterprise",
             }
 
-            return FlextResult[None].ok(version_info)
+            return FlextResult[dict[str, str]].ok(version_info)
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult[None].fail(f"Failed to get version information: {e}")
+            return FlextResult[dict[str, str]].fail(
+                f"Failed to get version information: {e}"
+            )
 
     def get_plugin_registry(self) -> FlextMeltanoPluginRegistry | None:
         """Get the plugin registry for managing plugins.
@@ -138,7 +138,7 @@ class FlextMeltanoBridge:
                     # Minimal mapping to base plugin for registry usage
                     return FlextMeltanoPlugin(
                         name=getattr(tap_obj, "name", plugin_name),
-                        plugin_type=FlextMeltanoPluginType.EXTRACTORS,
+                        plugin_type=FlextMeltanoPluginType.EXTRACTOR,
                         namespace=(getattr(tap_obj, "name", plugin_name)).replace(
                             "-",
                             "_",
@@ -158,7 +158,7 @@ class FlextMeltanoBridge:
                 def _to_base_target(target_obj: object) -> FlextMeltanoPlugin:
                     return FlextMeltanoPlugin(
                         name=getattr(target_obj, "name", plugin_name),
-                        plugin_type=FlextMeltanoPluginType.LOADERS,
+                        plugin_type=FlextMeltanoPluginType.LOADER,
                         namespace=(getattr(target_obj, "name", plugin_name)).replace(
                             "-",
                             "_",
@@ -168,17 +168,17 @@ class FlextMeltanoBridge:
                 result = target_result.map(_to_base_target)
             else:
                 # Generic plugin
-                result = FlextResult[None].ok(
+                result = FlextResult[FlextMeltanoPlugin].ok(
                     FlextMeltanoPlugin(
                         name=plugin_name,
-                        plugin_type=FlextMeltanoPluginType.UTILITIES,
+                        plugin_type=FlextMeltanoPluginType.UTILITY,
                         namespace=plugin_name.replace("-", "_"),
                     ),
                 )
 
-            if result.success and self._plugin_registry and result.data:
+            if result.success and self._plugin_registry and result.value:
                 # Register the plugin
-                register_result = self._plugin_registry.add_plugin(result.data)
+                register_result = self._plugin_registry.add_plugin(result.value)
                 if not register_result.success:
                     logger.warning(
                         f"Failed to register plugin {plugin_name}: {register_result.error}",
@@ -187,7 +187,9 @@ class FlextMeltanoBridge:
             return result
 
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to create plugin {plugin_name}: {e}")
+            return FlextResult[FlextMeltanoPlugin].fail(
+                f"Failed to create plugin {plugin_name}: {e}"
+            )
 
     def list_plugins(self) -> FlextResult[list[dict[str, object]]]:
         """List all available plugins for Go services.
@@ -200,17 +202,17 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.list_plugins()
             >>> if result.success:
-            ...     for plugin in result.data:
+            ...     for plugin in result.value:
             ...         print(f"Plugin: {plugin['name']}")
 
         """
         try:
             # Use executor to get plugin list
             result = self._executor.run_command(["list", "--format=json"])
-            if result.success and result.data:
+            if result.success and result.value:
                 plugins = []
-                if isinstance(result.data, dict) and "stdout" in result.data:
-                    stdout = result.data["stdout"]
+                if isinstance(result.value, dict) and "stdout" in result.value:
+                    stdout = result.value["stdout"]
                     if isinstance(stdout, str) and stdout.strip():
                         try:
                             plugins = json.loads(stdout)
@@ -222,11 +224,15 @@ class FlextMeltanoBridge:
                                     plugins.append(
                                         {"name": line.strip(), "type": "unknown"},
                                     )
-                return FlextResult[None].ok(plugins)
-            return FlextResult[None].ok([])  # Return empty list if no plugins
+                return FlextResult[list[dict[str, object]]].ok(plugins)
+            return FlextResult[list[dict[str, object]]].ok(
+                []
+            )  # Return empty list if no plugins
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult[None].fail(f"Failed to list plugins: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"Failed to list plugins: {e}"
+            )
 
     def add_plugin(
         self,
@@ -251,7 +257,7 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.add_plugin("extractor", "tap-csv")
             >>> if result.success:
-            ...     print(result.data)  # "Plugin tap-csv added successfully"
+            ...     print(result.value)  # "Plugin tap-csv added successfully"
 
         Note:
             Requires Meltano project configuration for full functionality.
@@ -267,14 +273,14 @@ class FlextMeltanoBridge:
                     logger.debug(f"Using variant: {variant}")
                 if pip_url:
                     logger.debug(f"Using pip URL: {pip_url}")
-                return FlextResult[None].ok(f"Plugin {name} added successfully (mocked)")
+                return FlextResult[str].ok(f"Plugin {name} added successfully (mocked)")
 
             # Fallback to error if no installation service
-            return FlextResult[None].fail(
+            return FlextResult[str].fail(
                 "Plugin installation requires initialized Meltano project",
             )
         except (ValueError, TypeError, AttributeError, OSError) as e:
-            return FlextResult[None].fail(f"Failed to add plugin {name}: {e}")
+            return FlextResult[str].fail(f"Failed to add plugin {name}: {e}")
 
     def discover_catalog(self, tap_name: str) -> FlextResult[dict[str, object]]:
         """Discover schema catalog from tap for Go services.
@@ -289,7 +295,7 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.discover_catalog("tap-csv")
             >>> if result.success:
-            ...     streams = result.data.get("streams", [])
+            ...     streams = result.value.get("streams", [])
             ...     print(f"Found {len(streams)} streams")
 
         Note:
@@ -317,13 +323,15 @@ class FlextMeltanoBridge:
                     ],
                     "discovered_at": "2025-01-08T00:00:00Z",
                 }
-                return FlextResult[None].ok(catalog)
+                return FlextResult[dict[str, object]].ok(catalog)
 
-            return FlextResult[None].fail(
+            return FlextResult[dict[str, object]].fail(
                 "Catalog discovery requires configured Meltano project",
             )
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to discover catalog for {tap_name}: {e}")
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to discover catalog for {tap_name}: {e}"
+            )
 
     def run_pipeline(
         self,
@@ -348,7 +356,7 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.run_pipeline("tap-csv", "target-csv")
             >>> if result.success:
-            ...     print(f"Pipeline status: {result.data['status']}")
+            ...     print(f"Pipeline status: {result.value['status']}")
 
         """
         try:
@@ -369,15 +377,15 @@ class FlextMeltanoBridge:
                     "target": target,
                     "environment": environment or "dev",
                     "job_id": job_id,
-                    "execution_details": result.data,
+                    "execution_details": result.value,
                 }
-                return FlextResult[None].ok(pipeline_result)
-            return FlextResult[None].fail(
+                return FlextResult[dict[str, object]].ok(pipeline_result)
+            return FlextResult[dict[str, object]].fail(
                 f"Pipeline execution failed: {result.error or 'Unknown error'}",
             )
 
         except (OSError, json.JSONDecodeError) as e:
-            return FlextResult[None].fail(f"Failed to run pipeline: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to run pipeline: {e}")
 
     def invoke_dbt(
         self,
@@ -399,7 +407,7 @@ class FlextMeltanoBridge:
             >>> bridge = FlextMeltanoBridge()
             >>> result = bridge.invoke_dbt("run", "--models", "my_model")
             >>> if result.success:
-            ...     print(f"DBT status: {result.data['status']}")
+            ...     print(f"DBT status: {result.value['status']}")
 
         Note:
             Requires Meltano project configuration for full functionality.
@@ -421,13 +429,15 @@ class FlextMeltanoBridge:
                     "status": "success",
                     "output": f"DBT {command} completed successfully",
                 }
-                return FlextResult[None].ok(result)
+                return FlextResult[dict[str, object]].ok(result)
 
-            return FlextResult[None].fail(
+            return FlextResult[dict[str, object]].fail(
                 "DBT operations require configured DBT project",
             )
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to execute DBT command {command}: {e}")
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to execute DBT command {command}: {e}"
+            )
 
 
 def create_flext_meltano_bridge(

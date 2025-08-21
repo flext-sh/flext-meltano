@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import warnings
-from flext_meltano import singer
 
 from flext_meltano.exceptions import (
     FlextMeltanoAuthenticationError,
@@ -40,8 +39,8 @@ from flext_meltano.base import (
     create_meltano_tap_service,
     create_meltano_target_service,
 )
-from flext_meltano.base_service import FlextMeltanoBaseService
-from flext_meltano.meltano_models import FlextMeltanoPluginRegistry
+from flext_meltano.services import FlextMeltanoBaseService
+from flext_meltano.models import FlextMeltanoPluginRegistry
 from flext_meltano.models import FlextMeltanoEvent
 from flext_meltano.config import FlextMeltanoConfig
 
@@ -52,31 +51,29 @@ from flext_meltano.cli import (
 )
 
 # === COMMON UTILITIES ===
-from flext_meltano.common import (
+from flext_meltano.utilities import (
     validate_config_value,
     validate_directory_path,
     validate_file_path,
 )
 
 # === DEPENDENCY INJECTION ===
-from flext_meltano.container import (
+from flext_meltano.dependencies import (
     configure_meltano_container,
     configure_meltano_services,
     get_meltano_container,
 )
 
 # === DBT HUB INTEGRATION ===
-from flext_meltano.dbt_hub import FlextDbtHub, create_dbt_hub
-from flext_meltano.dbt_executor import (
-    FlextDbtInMemoryExecutor,
-    create_in_memory_executor,
-)
-from flext_meltano.dbt_manager import (
+from flext_meltano.hubs import FlextDbtHub, create_dbt_hub
+
+# Executors moved to tests - no longer needed in production
+from flext_meltano.managers import (
     FlextDbtPackage,
     FlextDbtPackageManager,
     create_package_manager,
 )
-from flext_meltano.dbt_registry import (
+from flext_meltano.registries import (
     FlextDbtModel,
     FlextDbtModelRegistry,
     create_model_registry,
@@ -127,7 +124,7 @@ from flext_meltano.installation import (
 )
 
 # === PLUGIN IMPLEMENTATION ===
-from flext_meltano.plugin_implementation import (
+from flext_meltano.plugins import (
     FlextMeltanoPlugin,
     FlextMeltanoPluginContext,
     FlextMeltanoTapPlugin,
@@ -137,16 +134,16 @@ from flext_meltano.plugin_implementation import (
 )
 
 # Centralized plugin info schema
-from flext_meltano.common_schemas import FlextMeltanoPluginInfo
+from flext_meltano.schemas import FlextMeltanoPluginInfo
 
 # === BRIDGE INTEGRATION ===
-from flext_meltano.simple_bridge import (
+from flext_meltano.bridge import (
     FlextMeltanoBridge,
     create_flext_meltano_bridge,
 )
 
 # === SINGER UNIFIED INTERFACE - Central Simplification Hub ===
-from flext_meltano.singer_unified import (
+from flext_meltano.adapters_singer import (
     FlextSingerUnifiedConfig,
     FlextSingerUnifiedInterface,
     FlextSingerUnifiedResult,
@@ -231,7 +228,6 @@ __all__: list[str] = [
     "BatchSink",
     # DBT Hub Integration
     "FlextDbtHub",
-    "FlextDbtInMemoryExecutor",
     "FlextDbtModel",
     "FlextDbtModelRegistry",
     "FlextDbtPackage",
@@ -339,7 +335,6 @@ __all__: list[str] = [
     "get_meltano_container",
     "get_tap_test_class",
     "get_target_test_class",
-    "singer",
     "singer_typing",
     "validate_config_value",
     "validate_directory_path",

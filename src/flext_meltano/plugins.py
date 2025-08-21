@@ -106,9 +106,9 @@ class FlextMeltanoPlugin(FlextPlugin):
         try:
             self._logger.info("Executing Meltano plugin", plugin_name=self.name)
             # Plugin-specific execution logic would go here
-            return FlextResult[None].ok({"executed": True, "plugin": self.name})
+            return FlextResult[object].ok({"executed": True, "plugin": self.name})
         except Exception as e:
-            return FlextResult[None].fail(f"Plugin execution failed: {e}")
+            return FlextResult[object].fail(f"Plugin execution failed: {e}")
 
     def cleanup(self) -> FlextResult[None]:
         """Cleanup plugin resources."""
@@ -184,14 +184,14 @@ class FlextMeltanoTapPlugin(FlextMeltanoPlugin):
         """Discover schema catalog for tap."""
         try:
             if not self._executor:
-                return FlextResult[None].fail("Executor not initialized")
+                return FlextResult[dict[str, object]].fail("Executor not initialized")
 
             # Execute discovery via Meltano executor
             # This would be implemented with actual Meltano execution
-            return FlextResult[None].ok({"streams": []})  # Placeholder
+            return FlextResult[dict[str, object]].ok({"streams": []})  # Placeholder
 
         except Exception as e:
-            return FlextResult[None].fail(f"Catalog discovery error: {e}")
+            return FlextResult[dict[str, object]].fail(f"Catalog discovery error: {e}")
 
 
 class FlextMeltanoTargetPlugin(FlextMeltanoPlugin):
@@ -259,9 +259,11 @@ def create_meltano_tap_plugin(
     """
     try:
         plugin = FlextMeltanoTapPlugin(name=name, version=version, config=config)
-        return FlextResult[None].ok(plugin)
+        return FlextResult[FlextMeltanoTapPlugin].ok(plugin)
     except Exception as e:
-        return FlextResult[None].fail(f"Failed to create tap plugin: {e}")
+        return FlextResult[FlextMeltanoTapPlugin].fail(
+            f"Failed to create tap plugin: {e}"
+        )
 
 
 def create_meltano_target_plugin(
@@ -282,9 +284,11 @@ def create_meltano_target_plugin(
     """
     try:
         plugin = FlextMeltanoTargetPlugin(name=name, version=version, config=config)
-        return FlextResult[None].ok(plugin)
+        return FlextResult[FlextMeltanoTargetPlugin].ok(plugin)
     except Exception as e:
-        return FlextResult[None].fail(f"Failed to create target plugin: {e}")
+        return FlextResult[FlextMeltanoTargetPlugin].fail(
+            f"Failed to create target plugin: {e}"
+        )
 
 
 class FlextMeltanoPluginContext:
@@ -342,16 +346,16 @@ class FlextMeltanoPluginContext:
 
         """
         if service_name in self._services:
-            return FlextResult[None].ok(self._services[service_name])
+            return FlextResult[object].ok(self._services[service_name])
 
         # Try to resolve common Meltano services
         if service_name == "executor":
             result = create_executor(self._meltano_config)
             if result.success:
                 self._services[service_name] = result.data
-                return FlextResult[None].ok(result.data)
+                return FlextResult[object].ok(result.data)
 
-        return FlextResult[None].fail(f"Service '{service_name}' not found")
+        return FlextResult[object].fail(f"Service '{service_name}' not found")
 
 
 # FlextMeltanoPluginRegistry is now available from flext_meltano.models
