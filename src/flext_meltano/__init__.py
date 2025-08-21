@@ -1,347 +1,82 @@
-"""Enterprise data pipeline orchestration bridge for FLEXT ecosystem."""
+"""FLEXT Meltano - Enterprise wrapper for Meltano/Singer SDK/DBT.
+
+Provides 3 core functions:
+1. **Wrapper**: Adapts Meltano/Singer SDK/DBT APIs to flext-core patterns
+2. **Runtime**: Go bridge execution for Meltano/DBT commands  
+3. **Base Components**: Base classes for flext-(dbt|tap|target) projects
+
+**Real Native Integration**: Uses installed Meltano 3.9.1, DBT Core 1.10.5, Singer SDK 0.48.0
+**No subprocess calls** - Pure Python API integration
+"""
 
 from __future__ import annotations
 
-import warnings
-
-from flext_meltano.exceptions import (
-    FlextMeltanoAuthenticationError,
-    FlextMeltanoAuthenticationError as FlextSingerAuthenticationError,
-    FlextMeltanoConfigurationError,
-    FlextMeltanoConfigurationError as FlextSingerConfigurationError,
-    FlextMeltanoConnectionError,
-    FlextMeltanoConnectionError as FlextSingerConnectionError,
-    FlextMeltanoDBTError,
-    FlextMeltanoError,
-    FlextMeltanoError as FlextSingerError,
-    FlextMeltanoExecutionError,
-    FlextMeltanoPluginError,
-    FlextMeltanoProcessingError,
-    FlextMeltanoProcessingError as FlextSingerProcessingError,
-    FlextMeltanoSingerError,
-    FlextMeltanoTimeoutError,
-    FlextMeltanoValidationError,
-    FlextMeltanoValidationError as FlextSingerValidationError,
-)
+# === FUNÇÃO 1: WRAPPERS FOR EXTERNAL LIBRARIES ===
+# Direct integration with real installed libraries
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.sinks import BatchSink, Sink, SQLSink
-from singer_sdk.testing import get_tap_test_class, get_target_test_class
+from singer_sdk.testing import get_tap_test_class
 from singer_sdk.typing import PropertiesList, Property
 
-from flext_meltano.base import (
-    FlextMeltanoDbtService,
-    FlextMeltanoExtensionService,
+# Wrapper modules adapting APIs to flext-core patterns
+from .meltano_wrapper import MeltanoBridge, FlextMeltanoAdapter
+from .dbt_wrapper import MeltanoDbtWrapper, FlextDbtAdapter
+from .singer_wrapper import MeltanoSingerWrapper, FlextSingerAdapter
+
+# === FUNÇÃO 2: RUNTIME EXECUTION VIA GO BRIDGE ===
+from .runtime import FlextMeltanoExecutor, FlextExecutionResult
+from .go_bridge import FlextMeltanoBridge
+from .cli import FlextMeltanoCli
+
+# === FUNÇÃO 3: BASE COMPONENTS FOR FLEXT-* PROJECTS ===
+from .base_services import (
     FlextMeltanoTapService,
-    FlextMeltanoTargetService,
-    create_meltano_dbt_service,
-    create_meltano_extension_service,
-    create_meltano_tap_service,
-    create_meltano_target_service,
+    FlextMeltanoTargetService, 
+    FlextMeltanoDbtService,
 )
-from flext_meltano.services import FlextMeltanoBaseService
-from flext_meltano.models import FlextMeltanoPluginRegistry
-from flext_meltano.models import FlextMeltanoEvent
-from flext_meltano.config import FlextMeltanoConfig
-
-# === CLI INTERFACE ===
-from flext_meltano.cli import (
-    FlextMeltanoCli,
-    flext_meltano_run_cli,
+from .base_plugins import (
+    FlextTapPlugin,
+    FlextTargetPlugin,
+    FlextDbtPlugin,
 )
 
-# === COMMON UTILITIES ===
-from flext_meltano.utilities import (
-    validate_config_value,
-    validate_directory_path,
-    validate_file_path,
-)
+# Core utilities and configuration
+from .base import FlextMeltanoConfig, FlextMeltanoTap, FlextMeltanoTarget
+from .exceptions import FlextMeltanoError
+from .constants import FLEXT_MELTANO_VERSION
 
-# === DEPENDENCY INJECTION ===
-from flext_meltano.dependencies import (
-    configure_meltano_container,
-    configure_meltano_services,
-    get_meltano_container,
-)
+# =============================================================================
+# PUBLIC API EXPORTS
+# =============================================================================
 
-# === DBT HUB INTEGRATION ===
-from flext_meltano.hubs import FlextDbtHub, create_dbt_hub
-
-# Executors moved to tests - no longer needed in production
-from flext_meltano.managers import (
-    FlextDbtPackage,
-    FlextDbtPackageManager,
-    create_package_manager,
-)
-from flext_meltano.registries import (
-    FlextDbtModel,
-    FlextDbtModelRegistry,
-    create_model_registry,
-)
-from flext_meltano.dbt import (
-    FlextMeltanoDbtManager,
-    FlextMeltanoDbtProject,
-    FlextMeltanoDbtRunner,
-)
-
-# === DISCOVERY & CATALOG MANAGEMENT ===
-from flext_meltano.discovery import (
-    FlextMeltanoDiscoverer,
-    create_discoverer,
-)
-
-# === EXECUTION HELPERS ===
-from flext_meltano.execution import (
-    FlextMeltanoExecutionCommand,
-    FlextMeltanoExecutionContext,
-    FlextMeltanoExecutor,
-    create_executor,
-)
-
-# === LEGACY COMPATIBILITY ===
-# Re-export legacy-compatible API implemented in modern modules
-from flext_meltano.execution import (
-    FlextMeltanoResult,
-    flext_meltano_execute_job,
-    flext_meltano_run_command,
-)
-from flext_meltano.discovery import (
-    flext_meltano_discover_catalog,
-    flext_meltano_discover_plugins,
-)
-from flext_meltano.validation import (
-    flext_meltano_test_tap_connection,
-    flext_meltano_validate_project,
-    flext_meltano_validate_tap_config,
-)
-from flext_meltano.installation import flext_meltano_install_plugin
-
-# === INSTALLATION & PLUGIN MANAGEMENT ===
-from flext_meltano.installation import (
-    FlextMeltanoInstallationContext,
-    FlextMeltanoInstaller,
-    create_installer_service,
-)
-
-# === PLUGIN IMPLEMENTATION ===
-from flext_meltano.plugins import (
-    FlextMeltanoPlugin,
-    FlextMeltanoPluginContext,
-    FlextMeltanoTapPlugin,
-    FlextMeltanoTargetPlugin,
-    create_meltano_tap_plugin,
-    create_meltano_target_plugin,
-)
-
-# Centralized plugin info schema
-from flext_meltano.schemas import FlextMeltanoPluginInfo
-
-# === BRIDGE INTEGRATION ===
-from flext_meltano.bridge import (
-    FlextMeltanoBridge,
-    create_flext_meltano_bridge,
-)
-
-# === SINGER UNIFIED INTERFACE - Central Simplification Hub ===
-from flext_meltano.adapters_singer import (
-    FlextSingerUnifiedConfig,
-    FlextSingerUnifiedInterface,
-    FlextSingerUnifiedResult,
-    FlextSingerUnifiedService,
-    create_unified_singer_config,
-    create_unified_singer_service,
-)
-
-# === VALIDATION & TESTING ===
-from flext_meltano.validation import (
-    FlextMeltanoValidationResult,
-    FlextMeltanoValidationService,
-    create_validation_service,
-)
-
-
-from pathlib import Path
-from flext_core import FlextResult
-
-# DBT run result - simplified for compatibility
-type DbtRunResult = object
-
-
-# === TEST COMPATIBILITY SHIMS ===
-# Some tests expect a ConfigValidationError at construction time
-class ConfigValidationError(FlextMeltanoValidationError):
-    """Configuration validation error alias for backward compatibility."""
-
-
-# === LEGACY COMPATIBILITY ===
-def _deprecated_api_warning(old_name: str, new_name: str) -> None:
-    """Issue deprecation warning for old API usage."""
-    warnings.warn(
-        f"{old_name} is deprecated and will be removed in v3.0. Use {new_name} instead.",
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
-
-# Type aliases for backward compatibility
-TMeltanoTapConfig = FlextMeltanoConfig
-TMeltanoTargetConfig = FlextMeltanoConfig
-TMeltanoDbtConfig = FlextMeltanoConfig
-FlextMeltanoTapBase = FlextMeltanoTapService
-FlextMeltanoTargetBase = FlextMeltanoTargetService
-FlextMeltanoDbtBase = FlextMeltanoDbtService
-
-# Legacy aliases
-FlextMeltanoTap = FlextMeltanoTapService
-FlextMeltanoTarget = FlextMeltanoTargetService
-FlextMeltanoDbt = FlextMeltanoDbtService
-create_tap = create_meltano_tap_service
-create_target = create_meltano_target_service
-create_dbt_service = create_meltano_dbt_service
-
-
-# Legacy factory functions
-def flext_meltano_create_dbt_project(
-    project_dir: Path,
-) -> FlextResult[FlextMeltanoDbtService]:
-    """Create DBT project using new base implementation."""
-    _deprecated_api_warning("flext_meltano_create_dbt_project", "create_dbt_service")
-    config = FlextMeltanoConfig(project_root=str(project_dir))
-    return create_dbt_service(config)
-
-
-def flext_meltano_create_dbt_runner(
-    project_dir: Path,
-) -> FlextResult[FlextMeltanoDbtService]:
-    """Create DBT runner using new base implementation."""
-    _deprecated_api_warning("flext_meltano_create_dbt_runner", "create_dbt_service")
-    config = FlextMeltanoConfig(project_root=str(project_dir))
-    return create_dbt_service(config)
-
-
-# Version information
-__version__ = "2.0.0-enterprise"
-__version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
-
-# === PUBLIC API ===
-__all__: list[str] = [
-    "BatchSink",
-    # DBT Hub Integration
-    "FlextDbtHub",
-    "FlextDbtModel",
-    "FlextDbtModelRegistry",
-    "FlextDbtPackage",
-    "FlextDbtPackageManager",
-    "FlextMeltanoDbtManager",
-    "FlextMeltanoDbtProject",
-    "FlextMeltanoDbtRunner",
-    "FlextMeltanoBaseService",
-    "FlextMeltanoBridge",
-    "FlextMeltanoCli",
-    "FlextMeltanoConfig",
-    "FlextMeltanoDbt",
-    "FlextMeltanoDbtBase",
-    "FlextMeltanoDbtService",
-    "FlextMeltanoDiscoverer",
-    "FlextMeltanoEvent",
-    "FlextMeltanoExecutionCommand",
-    "FlextMeltanoExecutionContext",
-    "FlextMeltanoExecutor",
-    "FlextMeltanoExtensionService",
-    "FlextMeltanoInstallationContext",
-    "FlextMeltanoInstaller",
-    "FlextMeltanoPlugin",
-    "FlextMeltanoPluginContext",
-    "FlextMeltanoPluginInfo",
-    "FlextMeltanoPluginRegistry",
-    "FlextMeltanoResult",
-    "FlextMeltanoTap",
-    "FlextMeltanoTapBase",
-    "FlextMeltanoTapPlugin",
-    "FlextMeltanoTapService",
-    "FlextMeltanoTarget",
-    "FlextMeltanoTargetBase",
-    "FlextMeltanoTargetPlugin",
-    "FlextMeltanoTargetService",
-    "FlextMeltanoValidationResult",
-    "FlextMeltanoValidationService",
-    "FlextMeltanoAuthenticationError",
-    "FlextMeltanoConnectionError",
-    "FlextMeltanoDBTError",
-    "FlextMeltanoError",
-    "FlextMeltanoExecutionError",
-    "FlextMeltanoPluginError",
-    "FlextMeltanoProcessingError",
-    "FlextMeltanoSingerError",
-    "FlextMeltanoTimeoutError",
-    "FlextMeltanoValidationError",
-    "FlextSingerAuthenticationError",
-    "FlextSingerConfigurationError",
-    "FlextSingerConnectionError",
-    "FlextSingerError",
-    "FlextSingerProcessingError",
-    "FlextSingerUnifiedConfig",
-    "FlextSingerUnifiedInterface",
-    "FlextSingerUnifiedResult",
-    "FlextSingerUnifiedService",
-    "FlextSingerValidationError",
-    "OAuthAuthenticator",
-    "PropertiesList",
-    "Property",
-    "SQLSink",
-    "Sink",
-    "Stream",
-    "TMeltanoDbtConfig",
-    "TMeltanoTapConfig",
-    "TMeltanoTargetConfig",
-    "Tap",
-    "Target",
-    "ConfigValidationError",
-    "__version__",
-    "__version_info__",
-    "configure_meltano_container",
-    "configure_meltano_services",
-    "create_dbt_hub",
-    "create_dbt_service",
-    "create_discoverer",
-    "create_executor",
-    "create_flext_meltano_bridge",
-    "create_in_memory_executor",
-    "create_installer_service",
-    "create_meltano_dbt_service",
-    "create_meltano_extension_service",
-    "create_meltano_tap_plugin",
-    "create_meltano_tap_service",
-    "create_meltano_target_plugin",
-    "create_meltano_target_service",
-    "create_model_registry",
-    "create_package_manager",
-    "create_tap",
-    "create_target",
-    "create_unified_singer_config",
-    "create_unified_singer_service",
-    "create_validation_service",
-    "flext_meltano_create_dbt_project",
-    "flext_meltano_create_dbt_runner",
-    "flext_meltano_discover_catalog",
-    "flext_meltano_discover_plugins",
-    "flext_meltano_execute_job",
-    "flext_meltano_install_plugin",
-    "flext_meltano_run_cli",
-    "flext_meltano_run_command",
-    "flext_meltano_test_tap_connection",
-    "flext_meltano_validate_project",
-    "flext_meltano_validate_tap_config",
-    "get_meltano_container",
-    "get_tap_test_class",
-    "get_target_test_class",
-    "singer_typing",
-    "validate_config_value",
-    "validate_directory_path",
-    "validate_file_path",
+__all__ = [
+    # === FUNÇÃO 1: WRAPPERS ===
+    # Singer SDK re-exports (direct from installed library)
+    "Stream", "Tap", "Target", "singer_typing",
+    "OAuthAuthenticator", "BatchSink", "Sink", "SQLSink",
+    "get_tap_test_class", "PropertiesList", "Property",
+    
+    # Native API Wrappers
+    "MeltanoBridge", "FlextMeltanoAdapter",           # Meltano Core wrapper
+    "MeltanoDbtWrapper", "FlextDbtAdapter",          # DBT Core wrapper
+    "MeltanoSingerWrapper", "FlextSingerAdapter",    # Singer SDK wrapper
+    
+    # === FUNÇÃO 2: RUNTIME GO BRIDGE ===
+    "FlextMeltanoExecutor", "FlextExecutionResult",   # Runtime execution
+    "FlextMeltanoBridge",                             # Go bridge JSON API
+    "FlextMeltanoCli",                                # CLI interface
+    
+    # === FUNÇÃO 3: BASE COMPONENTS ===
+    "FlextMeltanoTapService",                         # Base for flext-tap-*
+    "FlextMeltanoTargetService",                      # Base for flext-target-*
+    "FlextMeltanoDbtService",                         # Base for flext-dbt-*
+    "FlextTapPlugin", "FlextTargetPlugin", "FlextDbtPlugin", # Plugin interfaces
+    
+    # === CORE UTILITIES ===
+    "FlextMeltanoConfig", "FlextMeltanoTap", "FlextMeltanoTarget",
+    "FlextMeltanoError", "FLEXT_MELTANO_VERSION",
 ]
 
-# Ensure singer module is available
-
-from . import core
-from . import exceptions
+# Version info
+__version__ = "2.0.0-enterprise"

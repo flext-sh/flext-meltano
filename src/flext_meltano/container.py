@@ -26,12 +26,11 @@ container = get_flext_container()
 
 # Configure with Meltano-specific services
 result = configure_meltano_services(container)
-if result.success:
+if result.is_success:
     print("Meltano services configured")
 
 # Use services directly
-# Use FlextResult's unwrap_or method for cleaner code
-tap_factory = container.get("tap_service_factory").unwrap_or(None)
+tap_factory = container.get("tap_service_factory").unwrap()
 ```
 
 ### Legacy Support (Backward Compatibility)
@@ -49,8 +48,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
-from flext_core import FlextContainer, FlextResult, get_flext_container
+from flext_core import FlextResult, get_flext_container
+
+if TYPE_CHECKING:
+    from flext_core import FlextContainer
 
 from flext_meltano.base import (
     create_meltano_dbt_service,
@@ -70,11 +73,11 @@ def configure_meltano_services(
     service configuration following SOLID principles.
 
     Args:
-      container: FlextContainer instance to configure
-      config: Optional configuration (creates default if None)
+        container: FlextContainer instance to configure
+        config: Optional configuration (creates default if None)
 
     Returns:
-      FlextResult indicating success or failure
+        FlextResult indicating success or failure
 
     """
     try:
@@ -98,10 +101,10 @@ def configure_meltano_services(
             create_meltano_dbt_service,
         )
 
-        return FlextResult[None].ok(None)
+        return FlextResult.ok(None)
 
     except (ValueError, TypeError, AttributeError, KeyError) as e:
-        return FlextResult[None].fail(f"Service configuration failed: {e}")
+        return FlextResult.fail(f"Service configuration failed: {e}")
 
 
 def get_meltano_container() -> FlextContainer:
@@ -111,7 +114,7 @@ def get_meltano_container() -> FlextContainer:
     Prefer using get_flext_container() + configure_meltano_services() directly.
 
     Returns:
-      FlextContainer with Meltano services pre-configured
+        FlextContainer with Meltano services pre-configured
 
     """
     warnings.warn(
@@ -124,7 +127,7 @@ def get_meltano_container() -> FlextContainer:
     container = get_flext_container()
 
     # Configure if not already done
-    if not container.get("meltano_config").success:
+    if not container.get("meltano_config").is_success:
         result = configure_meltano_services(container)
         if result.is_failure:
             error_msg = f"Container configuration failed: {result.error}"
@@ -142,10 +145,10 @@ def configure_meltano_container(
     Prefer using configure_meltano_services() directly.
 
     Args:
-      custom_config: Optional custom configuration
+        custom_config: Optional custom configuration
 
     Returns:
-      FlextResult indicating configuration success or failure
+        FlextResult indicating configuration success or failure
 
     """
     warnings.warn(
