@@ -176,11 +176,13 @@ class FlextMeltanoTapService(FlextDomainService):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get tap health status."""
-        return FlextResult.ok({
-            "service": "tap",
-            "tap_configured": self.tap_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult.ok(
+            {
+                "service": "tap",
+                "tap_configured": self.tap_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_tap_class(self, tap_class: type[Tap]) -> FlextResult[None]:
         """Set Singer tap class - MANDATORY for operation."""
@@ -239,11 +241,13 @@ class FlextMeltanoTargetService(FlextDomainService):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get target health status."""
-        return FlextResult.ok({
-            "service": "target",
-            "target_configured": self.target_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult.ok(
+            {
+                "service": "target",
+                "target_configured": self.target_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_target_class(self, target_class: type[Target]) -> FlextResult[None]:
         """Set Singer target class - MANDATORY for operation."""
@@ -285,11 +289,13 @@ class FlextMeltanoExtensionService(FlextDomainService):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
-        return FlextResult.ok({
-            "service": "extension",
-            "extension_configured": self.extension_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult.ok(
+            {
+                "service": "extension",
+                "extension_configured": self.extension_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_extension_class(
         self,
@@ -336,11 +342,13 @@ class FlextMeltanoDbtService(FlextDomainService):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get DBT health status."""
-        return FlextResult.ok({
-            "service": "dbt",
-            "project_dir": str(self.project_dir) if self.project_dir else None,
-            "initialized": self._initialized,
-        })
+        return FlextResult.ok(
+            {
+                "service": "dbt",
+                "project_dir": str(self.project_dir) if self.project_dir else None,
+                "initialized": self._initialized,
+            }
+        )
 
     async def _execute_dbt_command(
         self,
@@ -426,11 +434,13 @@ class FlextMeltanoDbtService(FlextDomainService):
 
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute method for service pattern."""
-        return FlextResult.ok({
-            "service": "dbt",
-            "project_dir": str(self.project_dir) if self.project_dir else None,
-            "initialized": self._initialized,
-        })
+        return FlextResult.ok(
+            {
+                "service": "dbt",
+                "project_dir": str(self.project_dir) if self.project_dir else None,
+                "initialized": self._initialized,
+            }
+        )
 
 
 # === FACTORY FUNCTIONS USING MANDATORY PATTERNS ===

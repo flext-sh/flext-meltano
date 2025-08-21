@@ -9,10 +9,9 @@ FUNÇÃO 1: Wrapper para Singer SDK adaptando para flext-core
 from __future__ import annotations
 
 from collections.abc import Iterator
-from flext_core import FlextLogger
-# Removendo Any types - usando types específicos
 
-from flext_core import FlextDomainService, FlextResult, get_logger
+# Removendo Any types - usando types específicos
+from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.typing import PropertiesList, Property
 
@@ -33,7 +32,7 @@ class MeltanoSingerWrapper(FlextDomainService[None]):
     def __init__(self) -> None:
         super().__init__()
 
-    @property  
+    @property
     def logger(self) -> FlextLogger:
         """Get logger instance."""
         return get_logger(self.__class__.__name__)
@@ -264,7 +263,9 @@ class FlextSingerAdapter:
     """Adaptador de tipos Singer → FLEXT patterns."""
 
     @staticmethod
-    def adapt_catalog(singer_catalog: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def adapt_catalog(
+        singer_catalog: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Converte singer catalog para FlextCatalog pattern.
 
         Args:
@@ -306,7 +307,9 @@ class FlextSingerAdapter:
             return FlextResult.fail(f"Failed to adapt catalog: {e}")
 
     @staticmethod
-    def adapt_schema(singer_schema: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def adapt_schema(
+        singer_schema: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Converte singer schema para FlextSchema pattern.
 
         Args:

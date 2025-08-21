@@ -269,7 +269,9 @@ class MeltanoDbtWrapper(FlextDomainService):
             if result.is_success:
                 self.logger.info("DBT project compiled successfully")
             else:
-                self.logger.exception("DBT compilation failed", exit_code=result.exit_code)
+                self.logger.exception(
+                    "DBT compilation failed", exit_code=result.exit_code
+                )
 
             return FlextResult.ok(compile_result)
 
@@ -340,7 +342,9 @@ class FlextDbtAdapter:
     """Adaptador de tipos DBT → FLEXT patterns."""
 
     @staticmethod
-    def adapt_run_results(dbt_results: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def adapt_run_results(
+        dbt_results: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Converte resultados DBT para FlextDbtResults pattern.
 
         Args:
@@ -380,7 +384,9 @@ class FlextDbtAdapter:
             return FlextResult.fail(f"Failed to adapt DBT results: {e}")
 
     @staticmethod
-    def adapt_manifest(dbt_manifest: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def adapt_manifest(
+        dbt_manifest: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Converte manifest DBT para FlextDbtManifest pattern.
 
         Args:

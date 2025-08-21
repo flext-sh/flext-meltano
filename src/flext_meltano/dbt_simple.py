@@ -2,7 +2,7 @@
 
 FUNÇÃO 1: Wrapper simplificado para DBT Core
 - DbtSimpleWrapper: Wrapper funcional usando dbtRunner real
-- Uso real das APIs nativas do DBT Core 1.10.5  
+- Uso real das APIs nativas do DBT Core 1.10.5
 - Padrões .unwrap_or() para FlextResult
 """
 
@@ -20,7 +20,7 @@ class DbtSimpleWrapper(FlextDomainService[None]):
     def __init__(self) -> None:
         super().__init__()
 
-    @property 
+    @property
     def logger(self):
         """Get logger instance."""
         return get_logger(__name__)
@@ -44,11 +44,11 @@ class DbtSimpleWrapper(FlextDomainService[None]):
         try:
             runner = dbtRunner()
             result = runner.invoke(["--version"])
-            
+
             # Usar .unwrap_or() para simplificar result handling
-            version_info = getattr(result, 'result', 'unknown')
+            version_info = getattr(result, "result", "unknown")
             return str(version_info) if version_info else "unknown"
-            
+
         except Exception as e:
             self.logger.error(f"DBT version failed: {e}")
             return "error"
@@ -66,14 +66,14 @@ class DbtSimpleWrapper(FlextDomainService[None]):
         try:
             if not self.validate_dbt_project(project_dir):
                 return False
-                
+
             runner = dbtRunner()
             result = runner.invoke(["parse", "--project-dir", str(project_dir)])
-            
+
             # Simplificar com .unwrap_or() pattern
-            success = getattr(result, 'success', False)
+            success = getattr(result, "success", False)
             return bool(success)
-            
+
         except Exception as e:
             self.logger.error(f"DBT parse failed: {e}")
             return False
@@ -81,7 +81,7 @@ class DbtSimpleWrapper(FlextDomainService[None]):
     def get_dbt_info(self) -> dict[str, str]:
         """Retorna informações do DBT Core instalado."""
         import dbt
-        
+
         return {
             "dbt_version": getattr(dbt, "__version__", "unknown"),
             "status": "installed",
@@ -93,7 +93,7 @@ class DbtSimpleWrapper(FlextDomainService[None]):
 def create_dbt_wrapper() -> DbtSimpleWrapper:
     """Cria wrapper DBT com pattern simplificado."""
     wrapper_result = FlextResult.ok(DbtSimpleWrapper())
-    
+
     # Usar .unwrap_or() para obter valor ou fallback
     return wrapper_result.unwrap_or(DbtSimpleWrapper())
 

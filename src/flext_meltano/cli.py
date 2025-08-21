@@ -7,10 +7,8 @@ FUNÇÃO 2: Runtime CLI interface
 from __future__ import annotations
 
 import sys
-from pathlib import Path
-from typing import Any
 
-from flext_core import FlextResult, get_logger
+from flext_core import get_logger
 
 from .runtime import FlextMeltanoExecutor
 from .go_bridge import FlextMeltanoBridge
@@ -58,10 +56,12 @@ class FlextMeltanoCli:
             elif command == "run" and len(args) >= 3:
                 tap_name, target_name = args[1], args[2]
                 project_root = args[3] if len(args) > 3 else "."
-                
+
                 result = self.bridge.run_pipeline(tap_name, target_name, project_root)
                 if result["success"]:
-                    print(f"Pipeline {tap_name} -> {target_name} completed successfully")
+                    print(
+                        f"Pipeline {tap_name} -> {target_name} completed successfully"
+                    )
                     return 0
                 else:
                     print(f"Error: {result['error']}", file=sys.stderr)

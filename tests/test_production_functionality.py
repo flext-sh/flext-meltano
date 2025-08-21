@@ -242,7 +242,8 @@ class TestRealSubprocessExecution:
         # Test a command that should complete quickly
         result = subprocess.run(
             ["python3", "-c", "import time; print('Quick command')"],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=5,
         )
@@ -255,7 +256,8 @@ class TestRealSubprocessExecution:
         # Test a command that should fail
         result = subprocess.run(
             ["python3", "-c", "raise ValueError('Test error')"],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
         )
 
@@ -275,7 +277,8 @@ class TestRealSubprocessExecution:
                 "-c",
                 "import os; print(os.environ.get('TEST_VAR', 'not_found'))",
             ],
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             env=env,
         )
