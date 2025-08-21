@@ -15,8 +15,8 @@ from typing import Any
 
 from flext_core import FlextDomainService, FlextResult, get_logger
 
-from .meltano_wrapper import MeltanoBridge
 from .dbt_wrapper import MeltanoDbtWrapper
+from .meltano_wrapper import MeltanoBridge
 
 logger = get_logger(__name__)
 
@@ -105,7 +105,9 @@ class FlextMeltanoExecutor(FlextDomainService):
                         "timeout": timeout,
                         "execution_method": "native_api",
                     },
-                    "parsed_output": self._parse_output(bridge_result.get("stdout", "")),
+                    "parsed_output": self._parse_output(
+                        bridge_result.get("stdout", "")
+                    ),
                 }
 
                 self.logger.info(
@@ -155,7 +157,9 @@ class FlextMeltanoExecutor(FlextDomainService):
             # Criar runner DBT
             runner_result = dbt_wrapper.create_runner(project_root)
             if not runner_result.is_success:
-                return FlextResult.fail(f"Failed to create DBT runner: {runner_result.error}")
+                return FlextResult.fail(
+                    f"Failed to create DBT runner: {runner_result.error}"
+                )
 
             runner = runner_result.value
 

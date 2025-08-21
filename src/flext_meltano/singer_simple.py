@@ -35,10 +35,10 @@ class SingerSimpleWrapper(FlextDomainService[None]):
         try:
             # Configuração mínima para tap
             config = {"start_date": "2024-01-01"}
-            
+
             # Criar tap
             tap = tap_class(config=config)
-            
+
             # Testar descoberta (usando .unwrap_or() para simplificar)
             try:
                 streams = tap.discover_streams()
@@ -48,7 +48,7 @@ class SingerSimpleWrapper(FlextDomainService[None]):
             except Exception as discover_error:
                 self.logger.warning(f"Discovery failed: {discover_error}")
                 return False
-                
+
         except Exception as e:
             self.logger.error(f"Tap creation failed: {e}")
             return False
@@ -58,16 +58,16 @@ class SingerSimpleWrapper(FlextDomainService[None]):
         try:
             # Configuração mínima para target
             config = {"target_path": str(Path.cwd() / "output")}
-            
+
             # Criar target
             target = target_class(config=config)
-            
+
             # Verificar se tem sink
-            has_sink = hasattr(target, 'get_sink') and callable(getattr(target, 'get_sink'))
-            
+            has_sink = hasattr(target, "get_sink") and callable(target.get_sink)
+
             self.logger.info("Target test successful", has_sink=has_sink)
             return True
-            
+
         except Exception as e:
             self.logger.error(f"Target creation failed: {e}")
             return False
@@ -75,7 +75,7 @@ class SingerSimpleWrapper(FlextDomainService[None]):
     def get_singer_info(self) -> dict[str, str]:
         """Retorna informações do Singer SDK instalado."""
         import singer_sdk
-        
+
         return {
             "singer_sdk_version": getattr(singer_sdk, "__version__", "unknown"),
             "status": "installed",
@@ -88,7 +88,7 @@ class SingerSimpleWrapper(FlextDomainService[None]):
 def create_singer_wrapper() -> SingerSimpleWrapper:
     """Cria wrapper Singer com pattern simplificado."""
     wrapper_result = FlextResult.ok(SingerSimpleWrapper())
-    
+
     # Usar .unwrap_or() para obter valor ou fallback
     return wrapper_result.unwrap_or(SingerSimpleWrapper())
 

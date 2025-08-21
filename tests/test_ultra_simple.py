@@ -67,7 +67,8 @@ def test_real_subprocess_execution() -> None:
     # Test real subprocess call
     result = subprocess.run(
         ["python", "-c", "print('Hello from subprocess')"],
-        check=False, capture_output=True,
+        check=False,
+        capture_output=True,
         text=True,
         timeout=10,
     )

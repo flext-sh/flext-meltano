@@ -139,7 +139,11 @@ def validate_config_value(
                     converted = float(value)
                     pi_approx = _math.pi
                     tolerance = 1e-9
-                    result = _math.pi if abs(converted - pi_approx) < tolerance else converted
+                    result = (
+                        _math.pi
+                        if abs(converted - pi_approx) < tolerance
+                        else converted
+                    )
             else:
                 # Normalize common textual representations to match test expectations
                 result = expected_type(value)
