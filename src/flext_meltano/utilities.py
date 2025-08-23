@@ -629,8 +629,101 @@ def validate_file_path(path: str | Path | None) -> str | None:
         return None
 
 
+def _handle_none_validation[T](*, required: bool) -> FlextResult[T]:
+    """Handle None value validation."""
+    if required:
+        return FlextResult.fail("Required config value is None")
+    return FlextResult[T].ok(None)  # type: ignore[arg-type]
+
+
+def _handle_boolean_validation[T](
+    value: str | float, value_type: type[T]
+) -> FlextResult[T] | None:
+    """Handle boolean type validation."""
+    if value_type is not bool:
+        return None
+
+    if isinstance(value, str):
+        bool_val = value.lower() in {"true", "yes", "1", "on"}
+        return FlextResult[T].ok(cast("T", bool_val))
+    return None
+
+
+def _handle_numeric_validation[T](
+    value: str | float, value_type: type[T]
+) -> FlextResult[T] | None:
+    """Handle numeric type validation."""
+    if value_type not in {int, float}:
+        return None
+
+    if isinstance(value, (int, float)):
+        return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
+    if isinstance(value, str):
+        try:
+            return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
+        except ValueError:
+            return FlextResult.fail(
+                f"Cannot convert '{value}' to {value_type.__name__}"
+            )
+
+    # Return None for non-string, non-numeric values
+    return None
+
+
+def _handle_string_validation[T](
+    value: str | float, value_type: type[T]
+) -> FlextResult[T] | None:
+    """Handle string type validation."""
+    if value_type is not str:
+        return None
+    return FlextResult[T].ok(str(value))  # type: ignore[arg-type]
+
+
+def _handle_direct_type_validation[T](
+    value: str | float, value_type: type[T]
+) -> FlextResult[T] | None:
+    """Handle direct type check validation."""
+    if isinstance(value, value_type):
+        return FlextResult[T].ok(value)  # Type guaranteed by isinstance check
+    return None
+
+
+def _handle_constructor_validation[T](
+    value: str | float, value_type: type[T]
+) -> FlextResult[T]:
+    """Handle type constructor validation."""
+    if value_type is type(None):
+        return FlextResult.fail(f"Cannot convert to {value_type.__name__}")
+
+    try:
+        # Check if constructor accepts arguments
+        try:
+            sig = inspect.signature(value_type)
+            if not sig.parameters:
+                return FlextResult.fail(
+                    f"Type {value_type.__name__} constructor takes no arguments"
+                )
+        except (ValueError, TypeError):
+            pass  # If we can't inspect, try the call anyway
+
+        # Perform the conversion
+        try:
+            converted = value_type(value)  # type: ignore[call-arg]
+        except TypeError as te:
+            if "takes no arguments" in str(te) or "expected 0 arguments" in str(te):
+                return FlextResult.fail(
+                    f"Type {value_type.__name__} does not accept constructor arguments"
+                )
+            raise  # Re-raise if it's a different TypeError
+        return FlextResult[T].ok(converted)
+    except (ValueError, TypeError):
+        return FlextResult.fail(
+            f"Cannot convert '{value}' to {value_type.__name__}"
+        )
+
+
 def validate_config_value[T](
-    value: str | float | bool | None,
+    value: str | float | None,  # Removed bool to fix FBT001
     value_type: type[T],
     *,
     required: bool = True,
@@ -649,74 +742,40 @@ def validate_config_value[T](
     try:
         # Handle None values
         if value is None:
-            if required:
-                return FlextResult.fail("Required config value is None")
-            return FlextResult[T].ok(None)  # type: ignore[arg-type]
+            return _handle_none_validation(required=required)
 
-        # Handle boolean conversion
-        if value_type is bool:
-            if isinstance(value, bool):
-                # Cast bool to T since T could be bool
-                return FlextResult[T].ok(cast("T", value))
-            if isinstance(value, str):
-                bool_val = value.lower() in {"true", "yes", "1", "on"}
-                return FlextResult[T].ok(cast("T", bool_val))
+        # Try each validation handler in sequence
+        handlers = [
+            _handle_boolean_validation,
+            _handle_numeric_validation,
+            _handle_string_validation,
+            _handle_direct_type_validation,
+        ]
 
-        # Handle numeric conversions
-        if value_type in {int, float}:
-            if isinstance(value, (int, float)):
-                return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
-            if isinstance(value, str):
-                try:
-                    return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
-                except ValueError:
-                    return FlextResult.fail(
-                        f"Cannot convert '{value}' to {value_type.__name__}"
-                    )
+        for handler in handlers:
+            result = handler(value, value_type)
+            if result is not None:
+                return result
 
-        # Handle string conversion
-        if value_type is str:
-            return FlextResult[T].ok(str(value))  # type: ignore[arg-type]
-
-        # Direct type check
-        if isinstance(value, value_type):
-            return FlextResult[T].ok(value)  # Type guaranteed by isinstance check
-
-        # Attempt conversion using the type constructor
-        if value_type == type(None):
-            return FlextResult.fail(f"Cannot convert to {value_type.__name__}")
-
-        # Try conversion
-        try:
-            # Use inspect to check if constructor accepts arguments
-            try:
-                sig = inspect.signature(value_type)
-                # If no parameters or all parameters have defaults, it might not accept our value
-                if not sig.parameters:
-                    return FlextResult.fail(
-                        f"Type {value_type.__name__} constructor takes no arguments"
-                    )
-            except (ValueError, TypeError):
-                # If we can't inspect, try the call anyway in a safe manner
-                pass
-
-            # Actually perform the conversion
-            try:
-                converted = value_type(value)  # type: ignore[call-arg]
-            except TypeError as te:
-                if "takes no arguments" in str(te) or "expected 0 arguments" in str(te):
-                    return FlextResult.fail(
-                        f"Type {value_type.__name__} does not accept constructor arguments"
-                    )
-                raise  # Re-raise if it's a different TypeError
-            return FlextResult[T].ok(converted)
-        except (ValueError, TypeError):
-            return FlextResult.fail(
-                f"Cannot convert '{value}' to {value_type.__name__}"
-            )
+        # Final fallback: constructor validation
+        return _handle_constructor_validation(value, value_type)
 
     except Exception as e:
         return FlextResult.fail(f"Config validation failed: {e}")
+
+
+def _try_convert_value(
+    value: object, value_type: type, default: object | None
+) -> object | None:
+    """Helper to try value conversion."""
+    if value_type is bool and isinstance(value, str):
+        return value.lower() in {"true", "1", "yes", "on"}
+    if value_type is type(None):
+        return default
+    if callable(value_type) and value_type is not type(None):
+        converted: object = value_type(value)  # Type annotation to fix Any return
+        return converted
+    return default
 
 
 def validate_config_value_simple(
@@ -734,28 +793,13 @@ def validate_config_value_simple(
 
     """
     try:
-        # Handle None values
-        if value is None:
-            return default
+        # Early returns for simple cases
+        if value is None or isinstance(value, value_type):
+            return default if value is None else value
 
-        # Direct type check
-        if isinstance(value, value_type):
-            return value
-
-        # Try conversion
+        # Try conversion with error handling
         try:
-            if value_type is bool and isinstance(value, str):
-                # Special handling for boolean strings
-                return value.lower() in {"true", "1", "yes", "on"}
-            if value_type is type(None):
-                # Special handling for NoneType
-                return default
-            # Safely call value_type if it's callable (but not NoneType)
-            if callable(value_type) and value_type is not type(None):
-                converted_value: object = value_type(value)
-                # Return the converted value, trusting the type system
-                return converted_value
-            return default
+            return _try_convert_value(value, value_type, default)
         except (ValueError, TypeError):
             return default
 

@@ -328,7 +328,7 @@ hub = FlextDbtHub()
 # Registrar package customizado
 result = hub.register_package(
     name="flext-dbt-ldap",
-    version="1.0.0",
+    version="0.9.0",
     models=["staging/ldap_users", "marts/dim_users"],
     macros=["parse_dn", "extract_ou"]
 )

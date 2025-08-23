@@ -1,12 +1,43 @@
 # flext-meltano - Enterprise Data Integration Library
 
-**Type**: Level 3 - Technological Base | **Status**: Architectural Refactoring | **Dependencies**: flext-core, flext-cli
+**Version**: 0.9.0-dev | **Status**: ARCHITECTURAL REFACTORING | **Updated**: 2025-08-23
 
-Enterprise data integration library providing native Meltano 3.9.1, Singer SDK 0.48.0, and DBT Core 1.10.5 integration using proper FLEXT architectural patterns.
+Enterprise Python library providing native integration with Meltano, Singer SDK, and DBT ecosystem for the FLEXT Enterprise Data Integration Platform. Serves as the technological foundation for data pipeline orchestration and processing.
 
-> 🚧 **Current Status**: Undergoing architectural refactoring to eliminate violations and implement proper FLEXT patterns. MyPy: 100% clean, Ruff: 8 errors being fixed.
+> **Current Status**: Active architectural refactoring to implement SOLID principles and eliminate code duplication. Core functionality validated with 35% test coverage using 100% real APIs. Quality gates require resolution before production readiness.
+
+## Position in FLEXT Ecosystem
+
+**Architecture Level**: Level 3 - Technological Base
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ LEVEL 4 - MELTANO PLUGINS                                          │
+│ 🔌 flext-tap-*, flext-target-*, flext-dbt-* (import from this)     │
+├─────────────────────────────────────────────────────────────────────┤
+│ LEVEL 3 - TECHNOLOGICAL BASES                                      │
+│ 🛠️ [FLEXT-MELTANO] ← THIS PROJECT                                 │
+│ ✅ Imports: flext-core (Level 1), flext-cli (Level 2)             │
+│ ❌ Cannot import: Same level or higher components                  │
+├─────────────────────────────────────────────────────────────────────┤
+│ LEVEL 2 - INTERMEDIATE SERVICES                                    │
+│ ⚙️ flext-cli, flext-observability, flext-grpc                     │
+├─────────────────────────────────────────────────────────────────────┤
+│ LEVEL 1 - ABSTRACT FOUNDATION                                      │
+│ 🏗️ flext-core (provides FlextResult, DI, service patterns)       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Core Responsibilities
+
+1. **Data Pipeline Orchestration**: Native integration with Meltano 3.9.1 ecosystem
+2. **Singer Protocol Support**: Complete tap/target/transformation workflow management
+3. **DBT Integration**: Data transformation project lifecycle management
+4. **Go Bridge Communication**: Python ↔ Go service interoperability via JSON API
 
 ## Quick Start
+
+### Installation & Setup
 
 ```bash
 # Use FLEXT workspace virtual environment
@@ -17,68 +48,59 @@ cd flext-meltano
 # Install dependencies
 make install-dev
 
-# Validate current status
-make validate
+# Check current status
+make check
 ```
 
-## Architecture Position
-
-### FLEXT Level 3 - Technological Base
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│ LEVEL 4 - MELTANO PLUGINS                                          │
-│ 🔌 flext-tap-*, flext-target-*, flext-dbt-* (can import this)      │
-├─────────────────────────────────────────────────────────────────────┤
-│ LEVEL 3 - TECHNOLOGICAL BASES                                      │
-│ 🛠️ [FLEXT-MELTANO] ← YOU ARE HERE                                 │
-│ ✅ CAN import: flext-core (Level 1), flext-cli (Level 2)          │
-│ ❌ CANNOT import: Level 4+ components                              │
-├─────────────────────────────────────────────────────────────────────┤
-│ LEVEL 2 - INTERMEDIATE SERVICES                                    │
-│ ⚙️ flext-cli, flext-observability, flext-grpc (provides to this)   │
-├─────────────────────────────────────────────────────────────────────┤
-│ LEVEL 1 - ABSTRACT FOUNDATION                                      │
-│ 🏗️ flext-core (provides foundation patterns)                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Core Responsibilities
-
-1. **Data Pipeline Orchestration**: Native integration with Meltano ecosystem
-2. **Singer SDK Integration**: Complete tap/target/transformation support  
-3. **DBT Integration**: Data transformation project management
-4. **FLEXT Pattern Implementation**: Proper service patterns and DI support
-
-## Current Refactoring Status
-
-### ✅ What Works (Validated)
-
-- **Type Safety**: MyPy 100% clean (0 errors)
-- **Foundation**: flext-core integration working
-- **Dependencies**: Poetry configuration correct
-- **APIs**: Meltano 3.9.1, Singer SDK 0.48.0, DBT Core 1.10.5 integrated
-
-### 🔄 Active Refactoring (In Progress)
-
-- **Service Architecture**: Converting FlextDomainService → FlextServiceProcessor
-- **Import Corrections**: Moving to root module imports only
-- **CLI Integration**: Implementing flext-cli patterns
-- **Quality Gates**: Fixing 8 ruff errors
-
-### ❌ Known Issues (Being Fixed)
-
-- **Ruff Errors**: 8 errors in utilities.py and executors_cli.py
-- **Test Imports**: ImportError for create_meltano_tap_service  
-- **Architecture**: Some violations of FLEXT dependency rules
-- **Coverage**: Unknown (tests don't execute due to import errors)
-
-## Proper Usage Patterns
-
-### Service Implementation (New Architecture)
+### Basic Usage
 
 ```python
-# ✅ CORRECT: Using FlextServiceProcessor
+# Import from root module (mandatory pattern)
+from flext_meltano import FlextMeltanoConfig, execute_meltano_command
+from flext_core import FlextResult
+
+# Execute Meltano operations with FlextResult pattern
+result = execute_meltano_command(["--version"])
+if result.success:
+    print(f"Meltano version: {result.data}")
+else:
+    print(f"Error: {result.error}")
+```
+
+## Current Status (2025-08-23)
+
+### ✅ Validated Functionality
+
+- **Core APIs**: Native Meltano 3.9.1, Singer SDK 0.48.0, DBT Core 1.10.5 integration
+- **Bridge Communication**: Go ↔ Python JSON API working via `scripts/flext_meltano_bridge.py`
+- **Test Coverage**: 35% with 116 tests using 100% real APIs (zero mocks)
+- **Data Processing**: Complete ELT pipeline functionality validated
+- **Dependencies**: Poetry configuration with correct version constraints
+
+### 🚨 Critical Issues Requiring Resolution
+
+- **Quality Gates**: MyPy 7 errors, Ruff 11 errors preventing compilation
+- **Architecture**: Massive SOLID violations requiring complete reorganization
+- **Import Dependencies**: Missing FlextDomainService imports breaking test execution
+- **Code Duplication**: Significant duplication of flext-core functionality
+- **PEP8 Compliance**: Non-standard naming conventions throughout codebase
+
+### 📊 Quality Metrics
+
+```bash
+# Current Status (2025-08-23)
+Lint Errors: 11/0           # PLR0911, FBT001, E721, F821 violations
+Type Errors: 7/0            # FlextDomainService undefined, explicit Any issues
+Test Coverage: 35%/100%     # 116 real API tests, systematic improvement needed
+Architecture: Major Violations/SOLID Clean  # Complete reorganization required
+```
+
+## Architecture & Design
+
+### Service Implementation Pattern
+
+```python
+# Target architecture (after refactoring)
 from flext_meltano import FlextMeltanoTapService
 from flext_core import FlextResult
 from singer_sdk import Tap
@@ -86,227 +108,198 @@ from singer_sdk import Tap
 class MyTapService(FlextMeltanoTapService):
     def __init__(self) -> None:
         super().__init__(tap_name="my-tap")
-    
+
     def get_tap_class(self) -> type[Tap]:
-        return MyTap
-    
+        return MyCustomTap
+
     def get_default_config(self) -> dict[str, Any]:
         return {"api_key": "required"}
 
-# Usage with proper DI
+# Usage with dependency injection
 service = MyTapService()
 result = service.run_with_metrics("tap_processing", {"api_key": "test"})
-
-if result.is_success:
-    tap_info = result.value
-    print(f"Tap ready: {tap_info['tap_name']}")
 ```
 
-### Root Module Imports (Mandatory)
+### Import Rules (Mandatory)
 
 ```python
-# ✅ CORRECT: Root module imports
+# ✅ CORRECT: Root module imports only
 from flext_core import FlextResult, FlextServiceProcessor, get_logger
 from flext_cli import CLICommand, FlextCliApi
-from flext_meltano import FlextMeltanoTapService, FlextMeltanoConfig
+from flext_meltano import FlextMeltanoConfig, execute_meltano_command
 
-# ❌ WRONG: Internal module imports (architectural violation)
+# ❌ PROHIBITED: Internal module imports (architectural violation)
 from flext_meltano.base_services import FlextMeltanoTapService  # Use root import
-from flext_core.internal.services import InternalService       # Forbidden
-```
-
-### Data Pipeline Operations
-
-```python
-# ✅ CORRECT: Using proper FLEXT patterns
-from flext_meltano import execute_meltano_command, run_pipeline
-from flext_core import FlextResult
-
-# Execute Meltano command with FlextResult
-result = execute_meltano_command(["--version"])
-if result.is_success:
-    print(f"Meltano version: {result.value}")
-else:
-    print(f"Error: {result.error}")
-
-# Run pipeline with proper error handling
-pipeline_result = run_pipeline("tap-csv", "target-csv")
-if pipeline_result.is_success:
-    print(f"Pipeline completed: {pipeline_result.value}")
+from flext_core.internal.services import InternalService       # Forbidden pattern
 ```
 
 ## Development Commands
 
-### Quality Gates (Zero Tolerance)
+### Essential Commands
 
 ```bash
-# Current status check
-make lint                    # ❌ 8 errors (being fixed)
-make type-check              # ✅ 0 errors (MyPy clean)
-make test                    # ❌ ImportError (being fixed)
+# Quality validation
+make validate                # Complete validation (all quality gates)
+make check                   # Quick health check (lint + type-check)
+make lint                    # Ruff linting
+make type-check              # MyPy strict type checking
+make test                    # Test suite with coverage
+make format                  # Auto-format code
 
-# After refactoring completion
-make validate                # Complete validation
-make check                   # Quick health check
-make fix                     # Auto-fix linting issues
-```
-
-### Meltano Operations
-
-```bash
-# Meltano setup and operations
+# Meltano operations
 make meltano-init            # Initialize Meltano project
-make meltano-install         # Install Meltano plugins
-make meltano-run JOB=job-name    # Run specific pipeline
-make meltano-test            # Test Meltano configuration
+make meltano-install         # Install plugins
+make meltano-run JOB=job     # Execute specific pipeline
 make test-pipeline           # Run basic CSV test pipeline
 ```
-
-### Development Workflow
-
-```bash
-# Setup (use FLEXT workspace venv)
-cd /path/to/flext && source .venv/bin/activate
-cd flext-meltano && make install-dev
-
-# Development cycle
-make validate                # Check current state
-# ... make changes following FLEXT patterns ...
-make lint && make type-check # Validate changes
-make test                    # Run tests (after fixing imports)
-```
-
-## Integration with FLEXT Ecosystem
-
-### Dependencies (Level 1-2 Only)
-
-```python
-# ✅ ALLOWED: Level 1 (Foundation)
-from flext_core import (
-    FlextResult,
-    FlextServiceProcessor, 
-    FlextLogger,
-    get_logger
-)
-
-# ✅ ALLOWED: Level 2 (Intermediate Services)  
-from flext_cli import (
-    CLICommand,
-    FlextCliApi,
-    cli_enhanced
-)
-
-# ❌ FORBIDDEN: Level 3+ (Same or higher levels)
-from flext_ldap import SomeClass        # Same level - forbidden
-from flext_tap_oracle import SomeTap    # Higher level - forbidden
-```
-
-### Provided to Higher Levels
-
-```python
-# Level 4 components can import from this library:
-from flext_meltano import (
-    FlextMeltanoTapService,      # Base for flext-tap-*
-    FlextMeltanoTargetService,   # Base for flext-target-*
-    FlextMeltanoDbtService,      # Base for flext-dbt-*
-    FlextMeltanoConfig,          # Configuration patterns
-    execute_meltano_command,     # Pipeline operations
-    run_pipeline                 # ELT orchestration
-)
-```
-
-## Configuration
-
-### Environment Variables
-
-```bash
-# Meltano configuration
-export MELTANO_ENVIRONMENT=dev
-export MELTANO_PROJECT_ROOT=$(PWD)
-
-# Python path setup (for development)
-export PYTHONPATH=$(PWD)/src:$(PYTHONPATH)
-```
-
-### Dependencies
-
-- **Python 3.13+** (strict requirement)
-- **Meltano 3.9.1+** (ELT orchestration)
-- **Singer SDK 0.48.0+** (data extraction/loading)
-- **DBT Core 1.10.5** (data transformation)
-- **flext-core** (foundation patterns)
-- **flext-cli** (CLI patterns)
-
-## Quality Standards
-
-### FLEXT Requirements
-
-- **Architecture**: Must follow Level 3 dependency rules
-- **Imports**: Root module imports only
-- **Patterns**: FlextServiceProcessor for services
-- **Results**: FlextResult for all operations
-- **Coverage**: 100% target with real APIs (no mocks)
-- **Type Safety**: MyPy strict mode compliance
 
 ### Current Quality Status
 
 ```bash
-# Quality metrics (current/target)
-Lint Errors: 8/0            # 🔄 Being fixed
-Type Errors: 0/0            # ✅ Already clean  
-Test Coverage: ?/100%       # 🔄 Tests being fixed
-Architecture: Violations/Clean  # 🔄 Being refactored
+# Status as of 2025-08-23 (requires fixing before proceeding)
+make lint                    # ❌ 11 errors (PLR0911, FBT001, E721, F821)
+make type-check              # ❌ 7 errors (FlextDomainService undefined, explicit Any)
+make test                    # ❌ NameError: FlextDomainService not defined
 ```
 
-## Refactoring Progress
+## Dependencies & Requirements
 
-### Phase 1: Architectural Correction (In Progress)
+### Core Dependencies
 
-- [x] Analyze violations and create strategy
-- [x] Start service refactoring (FlextMeltanoTapService)
-- [ ] Complete all service refactoring
-- [ ] Fix CLI to use flext-cli patterns
-- [ ] Correct all imports to root modules
+- **Python 3.13+** (strict requirement)
+- **Meltano 3.9.1+** (ELT orchestration platform)
+- **Singer SDK 0.48.0+** (data extraction/loading protocol)
+- **DBT Core 1.10.5** (data transformation framework)
+- **flext-core** (foundation patterns and service architecture)
+- **flext-cli** (CLI patterns and command processing)
 
-### Phase 2: Quality Gates (Planned)
+### Environment Configuration
 
-- [ ] Fix all ruff errors
-- [ ] Fix broken test imports
-- [ ] Achieve 100% test coverage
-- [ ] Validate complete functionality
+```bash
+# Required environment variables
+export MELTANO_ENVIRONMENT=dev
+export MELTANO_PROJECT_ROOT=$(PWD)
+export PYTHONPATH=$(PWD)/src:$(PYTHONPATH)
+```
 
-### Phase 3: Legacy Compatibility (Planned)
+## Integration Points
 
-- [ ] Create compatibility layer for old APIs
-- [ ] Add deprecation warnings
-- [ ] Update all examples and documentation
-- [ ] Final validation and cleanup
+### FLEXT Ecosystem Dependencies
+
+```python
+# Allowed dependencies (Level 1-2 only)
+from flext_core import (
+    FlextResult,                # Railway-oriented programming
+    FlextServiceProcessor,      # Service base classes
+    FlextLogger,               # Structured logging
+    get_logger                 # Logger factory
+)
+
+from flext_cli import (
+    CLICommand,                # Command implementation
+    FlextCliApi,              # CLI API patterns
+    cli_enhanced              # Enhanced CLI utilities
+)
+```
+
+### External Ecosystem Integration
+
+- **Meltano Hub**: Plugin discovery and installation
+- **Singer Protocol**: Tap/target specification compliance
+- **DBT Projects**: Transformation project management
+- **PostgreSQL/Redis**: Data storage and caching (via FLEXT platform)
+
+## Production API
+
+### Bridge Integration (Go ↔ Python)
+
+```bash
+# JSON API for Go service integration
+python scripts/flext_meltano_bridge.py version
+# {"success": true, "data": {"meltano": "3.9.1", "python": "3.13.5"}}
+
+python scripts/flext_meltano_bridge.py list_plugins
+# {"success": true, "data": [...]}
+
+python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
+# {"success": true, "data": {"status": "completed", "records": 1000}}
+```
+
+### Core Library API
+
+```python
+# Primary APIs (after architectural refactoring)
+from flext_meltano import (
+    # Configuration
+    FlextMeltanoConfig,
+
+    # Service base classes
+    FlextMeltanoTapService,
+    FlextMeltanoTargetService,
+    FlextMeltanoDbtService,
+
+    # Execution functions
+    execute_meltano_command,
+    run_pipeline,
+
+    # Singer SDK re-exports
+    Stream, Tap, Target, Sink,
+
+    # Exception hierarchy
+    FlextMeltanoError,
+    FlextMeltanoValidationError
+)
+```
+
+## Development Standards
+
+### Architecture Compliance
+
+1. **Dependency Inversion**: Follow FLEXT hierarchical architecture (Level 3)
+2. **Root Module Imports**: Never import internal modules directly
+3. **Service Patterns**: Use FlextServiceProcessor for all service implementations
+4. **Result Handling**: FlextResult pattern for all operations
+5. **Real API Integration**: No mocks in tests, use actual Meltano/Singer/DBT APIs
+
+### Code Quality Requirements
+
+- **Type Safety**: MyPy strict mode with comprehensive type annotations
+- **Linting**: Ruff with all rules enabled (zero tolerance)
+- **Testing**: Minimum 90% coverage with real API integration
+- **Documentation**: Keep README.md and architectural docs updated
+- **SOLID Principles**: Single responsibility, dependency inversion throughout
+
+### Refactoring Phase Requirements
+
+1. **Phase 1**: Fix critical quality gate failures (MyPy, Ruff errors)
+2. **Phase 2**: Implement proper SOLID architecture and eliminate duplication
+3. **Phase 3**: Achieve 90%+ test coverage with comprehensive validation
+4. **Phase 4**: Create backward compatibility layer for existing consumers
 
 ## Contributing
 
-### Development Standards
+### Before Contributing
 
-1. **Follow FLEXT Architecture**: Respect Level 3 position in hierarchy
-2. **Use Root Imports**: Never import internal modules
-3. **Implement Proper Patterns**: FlextServiceProcessor, FlextResult
-4. **Quality Gates**: All checks must pass
-5. **Real API Integration**: No mocks, use actual Meltano/Singer/DBT
-6. **Documentation**: Update both README.md and CLAUDE.md
+1. **Quality Gates**: All quality checks must pass (`make validate`)
+2. **Architecture Review**: Follow FLEXT Level 3 dependency rules
+3. **Real API Testing**: Use actual Meltano/Singer/DBT APIs in tests
+4. **Documentation**: Update both README.md and integration docs
 
-### Architectural Rules
+### Prohibited Patterns
 
-- ✅ **CAN import**: flext-core, flext-cli
-- ❌ **CANNOT import**: flext-ldap, flext-tap-*, flext-target-*, etc.
-- ✅ **PROVIDES to**: flext-tap-*, flext-target-*, flext-dbt-*
-- ❌ **NEVER violate**: Dependency inversion rules
+- ❌ Internal module imports (violates architectural boundaries)
+- ❌ Mock/subprocess patterns in tests (use real APIs)
+- ❌ Code duplication (use flext-core functionality)
+- ❌ Non-SOLID implementations (single responsibility violation)
+- ❌ Direct database access (use FLEXT service patterns)
 
-## Links
+## Links & Resources
 
-- **[FLEXT Workspace](../README.md)**: Ecosystem overview
-- **[flext-core](../flext-core/README.md)**: Foundation patterns
-- **[flext-cli](../flext-cli/README.md)**: CLI patterns  
-- **[CLAUDE.md](CLAUDE.md)**: Development guidance for this component
+- **[FLEXT Platform Overview](../README.md)** - Complete ecosystem documentation
+- **[flext-core Foundation](../flext-core/README.md)** - Base patterns and service architecture
+- **[flext-cli Patterns](../flext-cli/README.md)** - CLI implementation standards
+- **[Architecture Documentation](../docs/architecture/)** - System design and integration patterns
 
 ---
 
-**flext-meltano** - *Enterprise data integration with proper FLEXT architectural patterns*
+**flext-meltano** - *Enterprise data integration foundation for the FLEXT ecosystem*

@@ -306,7 +306,7 @@ build-backend = "poetry.core.masonry.api"
 # Enterprise dependencies - locked versions
 dependencies = [
     "meltano (>=3.0.0,<4.0.0)",
-    "singer-sdk (>=0.44.0,<1.0.0)",
+    "singer-sdk (>=0.44.0,<0.9.0)",
     "dbt-core (==1.10.5)",
     "flext-core @ file:///path/to/flext/flext-core",
     # ... comprehensive dependency set
@@ -580,7 +580,7 @@ make security-audit          # ✅ PASSING - Security compliance
 
 ---
 
-**Status**: Active Development — Architecture functional; hardening and coverage improvements in progress  
-**Version: 0.9.0  
-**Last Updated**: 2025-08-01  
+**Status**: Active Development — Architecture functional; hardening and coverage improvements in progress
+**Version: 0.9.0
+**Last Updated**: 2025-08-01
 **Maintainer\*\*: FLEXT Development Team

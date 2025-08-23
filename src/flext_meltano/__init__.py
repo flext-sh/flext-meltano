@@ -50,7 +50,12 @@ from .utilities import (
     validate_directory_path,
     validate_file_path,
 )
-from .base_projects import FlextMeltanoConfig
+from .base_projects import (
+    FlextMeltanoConfig,
+    create_meltano_tap_service,
+    create_meltano_target_service,
+    create_meltano_dbt_service,
+)
 from .exceptions import FlextMeltanoError
 from .constants import FLEXT_MELTANO_VERSION
 
@@ -90,6 +95,10 @@ __all__ = [
     "FlextTapPlugin",
     "FlextTargetPlugin",
     "FlextDbtPlugin",
+    # Factory functions
+    "create_meltano_tap_service",
+    "create_meltano_target_service",
+    "create_meltano_dbt_service",
     # === UTILITIES ===
     "FlextMeltanoUtilities",  # Utilidades gerais
     # === CORE ===
