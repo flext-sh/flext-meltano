@@ -680,7 +680,7 @@ def validate_config_value[T](
 
         # Direct type check
         if isinstance(value, value_type):
-            return FlextResult[T].ok(cast("T", value))  # Type guaranteed by isinstance check
+            return FlextResult[T].ok(value)  # Type guaranteed by isinstance check
 
         # Attempt conversion using the type constructor
         if value_type in (type(None),):
