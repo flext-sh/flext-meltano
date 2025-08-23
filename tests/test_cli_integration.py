@@ -33,13 +33,13 @@ class TestFlextMeltanoCli:
 
         result = cli.health()
         assert result.success
-        assert result.data is not None
-        assert result.data is not None
-        if "status" not in result.data:
-            msg: str = f"Expected {'status'} in {result.data}"
+        assert result.value is not None
+        assert result.value is not None
+        if "status" not in result.value:
+            msg: str = f"Expected {'status'} in {result.value}"
             raise AssertionError(msg)
-        if result.data["status"] != "healthy":
-            msg: str = f"Expected {'healthy'}, got {result.data['status']}"
+        if result.value["status"] != "healthy":
+            msg: str = f"Expected {'healthy'}, got {result.value['status']}"
             raise AssertionError(msg)
 
     def test_cli_version_info(self) -> None:
@@ -48,12 +48,12 @@ class TestFlextMeltanoCli:
 
         result = cli.version()
         assert result.success
-        assert result.data is not None
-        assert result.data is not None
-        if "version" not in result.data:
-            msg: str = f"Expected {'version'} in {result.data}"
+        assert result.value is not None
+        assert result.value is not None
+        if "version" not in result.value:
+            msg: str = f"Expected {'version'} in {result.value}"
             raise AssertionError(msg)
-        assert isinstance(result.data["version"], str)
+        assert isinstance(result.value["version"], str)
 
     def test_cli_help_command(self) -> None:
         """Test CLI help command."""
@@ -61,12 +61,12 @@ class TestFlextMeltanoCli:
 
         result = cli.help()
         assert result.success
-        assert result.data is not None
-        assert result.data is not None
-        if "commands" not in result.data:
-            msg: str = f"Expected {'commands'} in {result.data}"
+        assert result.value is not None
+        assert result.value is not None
+        if "commands" not in result.value:
+            msg: str = f"Expected {'commands'} in {result.value}"
             raise AssertionError(msg)
-        assert isinstance(result.data["commands"], list)
+        assert isinstance(result.value["commands"], list)
 
     def test_cli_run_command_success(self) -> None:
         """Test CLI run command with success."""
@@ -102,12 +102,12 @@ class TestFlextMeltanoCli:
 
         result = cli.list_commands()
         assert result.success
-        assert result.data is not None
-        assert result.data is not None
-        if "commands" not in result.data:
-            msg: str = f"Expected {'commands'} in {result.data}"
+        assert result.value is not None
+        assert result.value is not None
+        if "commands" not in result.value:
+            msg: str = f"Expected {'commands'} in {result.value}"
             raise AssertionError(msg)
-        commands = result.data["commands"]
+        commands = result.value["commands"]
         if "version" not in commands:
             msg: str = f"Expected {'version'} in {commands}"
             raise AssertionError(msg)
@@ -169,9 +169,9 @@ class TestCLIIntegrationPatterns:
         # Check health
         health_result = cli.health()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["status"] != "healthy":
-            msg: str = f"Expected {'healthy'}, got {health_result.data['status']}"
+        assert health_result.value is not None
+        if health_result.value["status"] != "healthy":
+            msg: str = f"Expected {'healthy'}, got {health_result.value['status']}"
             raise AssertionError(msg)
 
     def test_cli_command_execution_patterns(self) -> None:
@@ -273,8 +273,8 @@ class TestCLIEdgeCases:
         result = cli.list_commands()
         assert result.success
 
-        assert result.data is not None
-        commands = result.data.get("commands", [])
+        assert result.value is not None
+        commands = result.value.get("commands", [])
         assert isinstance(commands, list)
 
         # Basic commands should be available

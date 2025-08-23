@@ -8,13 +8,12 @@ FUNÇÃO 2: Runtime Go Bridge
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import get_logger
 
-from .runtime import FlextMeltanoExecutor
-from .meltano_wrapper import MeltanoBridge
-from .dbt_wrapper import MeltanoDbtWrapper
+from .funcao2_runtime_executor import FlextMeltanoExecutor
+from .funcao1_wrapper_dbt import MeltanoDbtWrapper
+from .funcao1_wrapper_meltano import MeltanoBridge
 
 logger = get_logger(__name__)
 
@@ -25,9 +24,9 @@ class FlextMeltanoBridge:
     def __init__(self) -> None:
         self.executor = FlextMeltanoExecutor()
         self.meltano_bridge = MeltanoBridge()
-        self.dbt_wrapper = MeltanoDbtWrapper()
+        self.wrapper_dbt = MeltanoDbtWrapper()
 
-    def get_version(self) -> dict[str, Any]:
+    def get_version(self) -> dict[str, object]:
         """Get version information for Go service."""
         try:
             return {
@@ -44,11 +43,11 @@ class FlextMeltanoBridge:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def list_plugins(self) -> dict[str, Any]:
+    def list_plugins(self) -> dict[str, object]:
         """List available Meltano plugins."""
         try:
             result = self.meltano_bridge.discover_plugins()
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
@@ -56,13 +55,13 @@ class FlextMeltanoBridge:
 
     def run_pipeline(
         self, tap_name: str, target_name: str, project_root: str = "."
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Run ELT pipeline between tap and target."""
         try:
             project_path = Path(project_root)
             result = self.executor.run_elt_pipeline(project_path, tap_name, target_name)
 
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
@@ -70,13 +69,13 @@ class FlextMeltanoBridge:
 
     def execute_meltano_command(
         self, command: list[str], project_root: str = "."
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Execute arbitrary Meltano command."""
         try:
             project_path = Path(project_root)
             result = self.executor.execute_meltano_command(project_path, command)
 
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
@@ -84,13 +83,13 @@ class FlextMeltanoBridge:
 
     def execute_dbt_command(
         self, command: list[str], project_root: str = "."
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Execute arbitrary DBT command."""
         try:
             project_path = Path(project_root)
             result = self.executor.execute_dbt_command(project_path, command)
 
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
@@ -98,7 +97,7 @@ class FlextMeltanoBridge:
 
     def install_plugin(
         self, plugin_type: str, plugin_name: str, project_root: str = "."
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Install Meltano plugin."""
         try:
             project_path = Path(project_root)
@@ -106,27 +105,55 @@ class FlextMeltanoBridge:
                 project_path, plugin_type, plugin_name
             )
 
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def get_project_info(self, project_root: str = ".") -> dict[str, Any]:
+    def get_project_info(self, project_root: str = ".") -> dict[str, object]:
         """Get project information."""
         try:
             project_path = Path(project_root)
             result = self.executor.get_project_info(project_path)
 
-            if result.is_success:
+            if result.success:
                 return {"success": True, "data": result.value}
             return {"success": False, "error": result.error}
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    def invoke_dbt(self, command: str, **kwargs: object) -> dict[str, object]:
+        """Invoke DBT command with additional arguments."""
+        try:
+            cmd_list = [command]
+            for key, value in kwargs.items():
+                if key.startswith("_"):
+                    # Convert _arg to --arg format
+                    cmd_list.extend([f"--{key[1:].replace('_', '-')}", str(value)])
+                else:
+                    # Convert arg to --arg format
+                    cmd_list.extend([f"--{key.replace('_', '-')}", str(value)])
+
+            project_root_value = kwargs.get("project_dir", ".")
+            project_root = str(project_root_value) if project_root_value else "."
+            return self.execute_dbt_command(cmd_list, project_root)
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+
+# =============================================================================
+# FACTORY FUNCTIONS
+# =============================================================================
+
+def create_flext_meltano_bridge(_config: dict[str, object] | None = None) -> FlextMeltanoBridge:
+    """Factory function to create FlextMeltanoBridge instance."""
+    # For now, ignore config parameter for compatibility
+    return FlextMeltanoBridge()
 
 
 # =============================================================================
 # PUBLIC API EXPORTS
 # =============================================================================
 
-__all__ = ["FlextMeltanoBridge"]
+__all__ = ["FlextMeltanoBridge", "create_flext_meltano_bridge"]

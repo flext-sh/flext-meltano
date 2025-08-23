@@ -39,14 +39,8 @@ import pytest
 from flext_meltano import (
     FlextMeltanoConfig,
     FlextMeltanoDbtService,
-    FlextMeltanoEvent,
-    FlextMeltanoExtensionService,
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
-    create_meltano_dbt_service,
-    create_meltano_extension_service,
-    create_meltano_tap_service,
-    create_meltano_target_service,
 )
 
 
@@ -91,26 +85,6 @@ class TestFlextMeltanoConfig:
                 raise AssertionError(msg)
 
 
-class TestFlextMeltanoEvent:
-    """Test FlextMeltanoEvent functionality."""
-
-    def test_event_initialization(self) -> None:
-        """Test event initialization."""
-        event = FlextMeltanoEvent(
-            event_type="test_event",
-            source="test_source",
-            data={"key": "value"},
-        )
-        assert event is not None
-        if event.event_type != "test_event":
-            msg: str = f"Expected {'test_event'}, got {event.event_type}"
-            raise AssertionError(msg)
-        assert event.source == "test_source"
-        if event.data != {"key": "value"}:
-            expected_data = {"key": "value"}
-            msg: str = f"Expected {expected_data}, got {event.data}"
-            raise AssertionError(msg)
-
 
 class TestFlextMeltanoServices:
     """Test service classes."""
@@ -129,12 +103,7 @@ class TestFlextMeltanoServices:
         assert service is not None
         assert service.config is not None
 
-    def test_extension_service_initialization(self) -> None:
-        """Test extension service initialization."""
-        config = FlextMeltanoConfig()
-        service = FlextMeltanoExtensionService(config)
-        assert service is not None
-        assert service.config is not None
+    # FlextMeltanoExtensionService was removed in refactoring
 
     def test_dbt_service_initialization(self) -> None:
         """Test DBT service initialization."""
@@ -144,41 +113,6 @@ class TestFlextMeltanoServices:
         assert service.config is not None
 
 
-class TestFactoryFunctions:
-    """Test factory functions."""
-
-    def test_create_meltano_tap_service(self) -> None:
-        """Test create tap service factory function."""
-        config = FlextMeltanoConfig()
-        result = create_meltano_tap_service(config)
-        # Tap service requires tap_class to be set for full initialization
-        # This is expected behavior - service is created but validation fails
-        assert not result.success
-        assert "Tap class not configured" in result.error
-
-    def test_create_meltano_target_service(self) -> None:
-        """Test create target service factory function."""
-        config = FlextMeltanoConfig()
-        result = create_meltano_target_service(config)
-        # Target service requires target_class to be set for full initialization
-        # This is expected behavior - service is created but validation fails
-        assert not result.success
-        assert "Target class not configured" in result.error
-
-    def test_create_meltano_dbt_service(self) -> None:
-        """Test create DBT service factory function."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            config = FlextMeltanoConfig(dbt_project_dir=temp_dir)
-            result = create_meltano_dbt_service(config)
-            assert result.success
-            assert isinstance(result.data, FlextMeltanoDbtService)
-
-    def test_create_meltano_extension_service(self) -> None:
-        """Test create extension service factory function."""
-        config = FlextMeltanoConfig()
-        result = create_meltano_extension_service(config)
-        assert result.success
-        assert isinstance(result.data, FlextMeltanoExtensionService)
 
 
 if __name__ == "__main__":

@@ -118,12 +118,12 @@ class TestTapServiceIntegration:
 
         health_result = tap_service.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "tap":
-            msg: str = f"Expected {'tap'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "tap":
+            msg: str = f"Expected {'tap'}, got {health_result.value['service']}"
             raise AssertionError(msg)
-        if health_result.data["tap_configured"]:
-            msg: str = f"Expected False, got {health_result.data['tap_configured']}"
+        if health_result.value["tap_configured"]:
+            msg: str = f"Expected False, got {health_result.value['tap_configured']}"
             raise AssertionError(msg)
 
     def test_tap_class_setting(self) -> None:
@@ -187,12 +187,12 @@ class TestTargetServiceIntegration:
 
         health_result = target_service.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "target":
-            msg: str = f"Expected {'target'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "target":
+            msg: str = f"Expected {'target'}, got {health_result.value['service']}"
             raise AssertionError(msg)
-        if health_result.data["target_configured"]:
-            msg: str = f"Expected False, got {health_result.data['target_configured']}"
+        if health_result.value["target_configured"]:
+            msg: str = f"Expected False, got {health_result.value['target_configured']}"
             raise AssertionError(msg)
 
     def test_target_class_setting(self) -> None:

@@ -32,10 +32,10 @@ class TestFlextSingerBridge:
         result = bridge.flext_singer_create_record_message("users", record_data)
 
         assert result.success
-        if result.data is not None:
-            assert result.data["type"] == "RECORD"
-            assert result.data["stream"] == "users"
-            assert result.data["record"] == {"id": 1, "name": "test"}
+        if result.value is not None:
+            assert result.value["type"] == "RECORD"
+            assert result.value["stream"] == "users"
+            assert result.value["record"] == {"id": 1, "name": "test"}
 
     def test_create_schema_message(self) -> None:
         """Test creating SCHEMA message."""
@@ -52,10 +52,10 @@ class TestFlextSingerBridge:
         result = bridge.flext_singer_create_schema_message("users", schema)
 
         assert result.success
-        if result.data is not None:
-            assert result.data["type"] == "SCHEMA"
-            assert result.data["stream"] == "users"
-            assert result.data["schema"] == schema
+        if result.value is not None:
+            assert result.value["type"] == "SCHEMA"
+            assert result.value["stream"] == "users"
+            assert result.value["schema"] == schema
 
     def test_create_state_message(self) -> None:
         """Test creating STATE message."""
@@ -65,9 +65,9 @@ class TestFlextSingerBridge:
         result = bridge.flext_singer_create_state_message(state)
 
         assert result.success
-        if result.data is not None:
-            assert result.data["type"] == "STATE"
-            assert result.data["value"] == state
+        if result.value is not None:
+            assert result.value["type"] == "STATE"
+            assert result.value["value"] == state
 
     def test_parse_message_line(self) -> None:
         """Test parsing Singer message line."""
@@ -77,9 +77,9 @@ class TestFlextSingerBridge:
         result = bridge.flext_singer_parse_message_line(message_line)
 
         assert result.success
-        if result.data is not None:
-            assert result.data["type"] == "RECORD"
-            assert result.data["stream"] == "users"
+        if result.value is not None:
+            assert result.value["type"] == "RECORD"
+            assert result.value["stream"] == "users"
 
 
 class TestFlextSingerCatalog:
@@ -113,7 +113,7 @@ class TestFlextSingerCatalog:
 
         result = catalog.flext_singer_get_catalog()
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
 
 
 class TestFlextSingerFactoryFunctions:

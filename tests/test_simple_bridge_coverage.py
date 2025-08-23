@@ -81,15 +81,15 @@ class TestFlextMeltanoBridge:
         result = bridge.get_version()
 
         assert result.success
-        assert isinstance(result.data, dict)
-        assert "meltano" in result.data
-        assert "python" in result.data
-        assert "flext_meltano" in result.data
+        assert isinstance(result.value, dict)
+        assert "meltano" in result.value
+        assert "python" in result.value
+        assert "flext_meltano" in result.value
         assert (
-            result.data["python"]
+            result.value["python"]
             == f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         )
-        assert result.data["flext_meltano"] == "2.0.0-enterprise"
+        assert result.value["flext_meltano"] == "2.0.0-enterprise"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_get_version_failure(self, mock_executor_class: type) -> None:
@@ -107,7 +107,7 @@ class TestFlextMeltanoBridge:
         result = bridge.get_version()
 
         assert result.success  # Should still succeed with "unknown" version
-        assert result.data["meltano"] == "unknown"
+        assert result.value["meltano"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_get_version_exception_handling(self, mock_executor_class: type) -> None:
@@ -150,10 +150,10 @@ class TestFlextMeltanoBridge:
         result = bridge.list_plugins()
 
         assert result.success
-        assert isinstance(result.data, list)
-        assert len(result.data) == 2
-        assert result.data[0]["name"] == "tap-csv"
-        assert result.data[1]["name"] == "target-csv"
+        assert isinstance(result.value, list)
+        assert len(result.value) == 2
+        assert result.value[0]["name"] == "tap-csv"
+        assert result.value[1]["name"] == "target-csv"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_list_plugins_success_without_json(self, mock_executor_class: type) -> None:
@@ -177,11 +177,11 @@ class TestFlextMeltanoBridge:
         result = bridge.list_plugins()
 
         assert result.success
-        assert isinstance(result.data, list)
-        assert len(result.data) == 2
-        assert result.data[0]["name"] == "tap-csv"
-        assert result.data[0]["type"] == "unknown"
-        assert result.data[1]["name"] == "target-csv"
+        assert isinstance(result.value, list)
+        assert len(result.value) == 2
+        assert result.value[0]["name"] == "tap-csv"
+        assert result.value[0]["type"] == "unknown"
+        assert result.value[1]["name"] == "target-csv"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_list_plugins_empty_response(self, mock_executor_class: type) -> None:
@@ -205,8 +205,8 @@ class TestFlextMeltanoBridge:
         result = bridge.list_plugins()
 
         assert result.success
-        assert isinstance(result.data, list)
-        assert len(result.data) == 0
+        assert isinstance(result.value, list)
+        assert len(result.value) == 0
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_list_plugins_failure(self, mock_executor_class: type) -> None:
@@ -224,7 +224,7 @@ class TestFlextMeltanoBridge:
         result = bridge.list_plugins()
 
         assert result.success  # Should return empty list on failure
-        assert result.data == []
+        assert result.value == []
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_list_plugins_exception_handling(self, mock_executor_class: type) -> None:
@@ -307,12 +307,12 @@ class TestFlextMeltanoBridge:
         result = bridge.run_pipeline("tap-csv", "target-csv")
 
         assert result.success
-        assert isinstance(result.data, dict)
-        assert result.data["status"] == "success"
-        assert result.data["tap"] == "tap-csv"
-        assert result.data["target"] == "target-csv"
-        assert result.data["environment"] == "dev"
-        assert result.data["job_id"] is None
+        assert isinstance(result.value, dict)
+        assert result.value["status"] == "success"
+        assert result.value["tap"] == "tap-csv"
+        assert result.value["target"] == "target-csv"
+        assert result.value["environment"] == "dev"
+        assert result.value["job_id"] is None
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_run_pipeline_with_environment(self, mock_executor_class: type) -> None:
@@ -334,7 +334,7 @@ class TestFlextMeltanoBridge:
         )
 
         assert result.success
-        assert result.data["environment"] == "prod"
+        assert result.value["environment"] == "prod"
 
         # Verify correct command was called
         expected_cmd = [
@@ -366,7 +366,7 @@ class TestFlextMeltanoBridge:
         )
 
         assert result.success
-        assert result.data["job_id"] == "job-12345"
+        assert result.value["job_id"] == "job-12345"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_run_pipeline_failure(self, mock_executor_class: type) -> None:
@@ -483,7 +483,7 @@ class TestBridgeIntegration:
 
         version = bridge.get_version()
         assert version.success
-        assert "meltano" in version.data
+        assert "meltano" in version.value
 
         # Test plugin listing
         plugins_result = FlextResult[None].ok(
@@ -496,7 +496,7 @@ class TestBridgeIntegration:
 
         plugins = bridge.list_plugins()
         assert plugins.success
-        assert len(plugins.data) == 1
+        assert len(plugins.value) == 1
 
         # Test pipeline execution
         pipeline_result = FlextResult[None].ok(
@@ -533,7 +533,7 @@ class TestBridgeIntegration:
 
             # Test JSON serialization
             if version_result.success:
-                json_data = json.dumps(version_result.data)
+                json_data = json.dumps(version_result.value)
                 assert isinstance(json_data, str)
 
                 # Verify we can parse it back
@@ -620,7 +620,7 @@ class TestBridgeEdgeCases:
 
         # Should still succeed with "unknown" version
         assert result.success
-        assert result.data["meltano"] == "unknown"
+        assert result.value["meltano"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_plugins_with_invalid_json(self, mock_executor_class: type) -> None:
@@ -643,9 +643,9 @@ class TestBridgeEdgeCases:
 
         # Should fallback to simple parsing
         assert result.success
-        assert len(result.data) == 1
-        assert result.data[0]["name"] == "{invalid json}"
-        assert result.data[0]["type"] == "unknown"
+        assert len(result.value) == 1
+        assert result.value[0]["name"] == "{invalid json}"
+        assert result.value[0]["type"] == "unknown"
 
     @patch("flext_meltano.simple_bridge.FlextMeltanoExecutor")
     def test_plugins_with_missing_stdout(self, mock_executor_class: type) -> None:
@@ -667,7 +667,7 @@ class TestBridgeEdgeCases:
 
         # Should return empty list
         assert result.success
-        assert result.data == []
+        assert result.value == []
 
     def test_bridge_with_minimal_config(self) -> None:
         """Test bridge with minimal configuration."""
@@ -699,7 +699,7 @@ class TestBridgeEdgeCases:
         )
 
         assert result.success
-        assert result.data["tap"] == "tap-postgres"
-        assert result.data["target"] == "target-warehouse"
-        assert result.data["environment"] == "production"
-        assert result.data["job_id"] == "job-abc123"
+        assert result.value["tap"] == "tap-postgres"
+        assert result.value["target"] == "target-warehouse"
+        assert result.value["environment"] == "production"
+        assert result.value["job_id"] == "job-abc123"

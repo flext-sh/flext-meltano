@@ -152,7 +152,7 @@ class TestServiceCreation:
         result = create_executor(config)
 
         assert result.success
-        assert isinstance(result.data, FlextMeltanoExecutor)
+        assert isinstance(result.value, FlextMeltanoExecutor)
 
     def test_discoverer_creation(self) -> None:
         """Test discoverer service creation."""
@@ -160,7 +160,7 @@ class TestServiceCreation:
         result = create_discoverer(config)
 
         assert result.success
-        assert isinstance(result.data, FlextMeltanoDiscoverer)
+        assert isinstance(result.value, FlextMeltanoDiscoverer)
 
     def test_installer_creation(self) -> None:
         """Test installer service creation."""
@@ -168,7 +168,7 @@ class TestServiceCreation:
         result = create_installer_service(config)
 
         assert result.success
-        assert isinstance(result.data, FlextMeltanoInstaller)
+        assert isinstance(result.value, FlextMeltanoInstaller)
 
     def test_validation_service_creation(self) -> None:
         """Test validation service creation."""
@@ -176,7 +176,7 @@ class TestServiceCreation:
         result = create_validation_service(config)
 
         assert result.success
-        assert isinstance(result.data, FlextMeltanoValidationService)
+        assert isinstance(result.value, FlextMeltanoValidationService)
 
 
 class TestServiceValidation:
@@ -190,9 +190,9 @@ class TestServiceValidation:
         # Should validate even without meltano installed
         health_result = executor.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "execution":
-            msg: str = f"Expected {'execution'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "execution":
+            msg: str = f"Expected {'execution'}, got {health_result.value['service']}"
             raise AssertionError(msg)
 
     def test_discoverer_validation(self) -> None:
@@ -202,9 +202,9 @@ class TestServiceValidation:
 
         health_result = discoverer.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "discovery":
-            msg: str = f"Expected {'discovery'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "discovery":
+            msg: str = f"Expected {'discovery'}, got {health_result.value['service']}"
             raise AssertionError(msg)
 
     def test_installer_validation(self) -> None:
@@ -214,9 +214,9 @@ class TestServiceValidation:
 
         health_result = installer.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "installation":
-            msg: str = f"Expected {'installation'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "installation":
+            msg: str = f"Expected {'installation'}, got {health_result.value['service']}"
             raise AssertionError(msg)
 
     def test_validation_service_validation(self) -> None:
@@ -226,9 +226,9 @@ class TestServiceValidation:
 
         health_result = validator.get_health_status()
         assert health_result.success
-        assert health_result.data is not None
-        if health_result.data["service"] != "validation":
-            msg: str = f"Expected {'validation'}, got {health_result.data['service']}"
+        assert health_result.value is not None
+        if health_result.value["service"] != "validation":
+            msg: str = f"Expected {'validation'}, got {health_result.value['service']}"
             raise AssertionError(msg)
 
 

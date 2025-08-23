@@ -38,12 +38,12 @@ class TestRefactoredContainerPatterns:
         result = configure_meltano_services(container, config)
 
         assert result.success
-        assert result.data is None
+        assert result.value is None
 
         # Verify services are registered
         config_result = container.get("meltano_config")
         assert config_result.success
-        assert isinstance(config_result.data, FlextMeltanoConfig)
+        assert isinstance(config_result.value, FlextMeltanoConfig)
 
     def test_configure_meltano_services_default_config(self) -> None:
         """Test service configuration with default config."""
@@ -56,7 +56,7 @@ class TestRefactoredContainerPatterns:
         # Verify default config was created
         config_result = container.get("meltano_config")
         assert config_result.success
-        assert isinstance(config_result.data, FlextMeltanoConfig)
+        assert isinstance(config_result.value, FlextMeltanoConfig)
 
     def test_service_factories_registered(self) -> None:
         """Test that service factories are properly registered."""
@@ -75,9 +75,9 @@ class TestRefactoredContainerPatterns:
         assert dbt_factory_result.success
 
         # Verify they are callable functions
-        assert callable(tap_factory_result.data)
-        assert callable(target_factory_result.data)
-        assert callable(dbt_factory_result.data)
+        assert callable(tap_factory_result.value)
+        assert callable(target_factory_result.value)
+        assert callable(dbt_factory_result.value)
 
 
 class TestLegacyContainerCompatibility:
@@ -148,7 +148,7 @@ class TestLegacyContainerCompatibility:
             container = get_flext_container()
             config_result = container.get("meltano_config")
             assert config_result.success
-            assert config_result.data.environment == "test"
+            assert config_result.value.environment == "test"
 
 
 class TestContainerErrorHandling:
@@ -199,7 +199,7 @@ class TestContainerServiceIntegration:
         tap_factory_result = container.get("tap_service_factory")
         assert tap_factory_result.success
 
-        factory_function = tap_factory_result.data
+        factory_function = tap_factory_result.value
 
         # Execute factory with config
         service_result = factory_function(config)
@@ -231,7 +231,7 @@ class TestContainerServiceIntegration:
         config_result = container1.get("meltano_config")
         assert config_result.success
         # Should have latest config due to singleton pattern
-        assert config_result.data.environment == "production"
+        assert config_result.value.environment == "production"
 
     def test_container_service_lifecycle(self) -> None:
         """Test complete service lifecycle in container."""
@@ -245,7 +245,7 @@ class TestContainerServiceIntegration:
         # 2. Verify configuration is accessible
         config_result = container.get("meltano_config")
         assert config_result.success
-        assert config_result.data.environment == "test"
+        assert config_result.value.environment == "test"
 
         # 3. Verify factories are available
         factories = [
@@ -257,7 +257,7 @@ class TestContainerServiceIntegration:
         for factory_name in factories:
             factory_result = container.get(factory_name)
             assert factory_result.success
-            assert callable(factory_result.data)
+            assert callable(factory_result.value)
 
 
 class TestContainerAPIConsistency:

@@ -250,7 +250,7 @@ class TestFlextMeltanoPipelineResultEntity:
         validation_result = result.validate_business_rules()
 
         assert validation_result.success
-        assert validation_result.data is None
+        assert validation_result.value is None
 
     def test_pipeline_result_validate_domain_rules_failure(self) -> None:
         """Test pipeline result domain validation failure."""
@@ -275,7 +275,7 @@ class TestFlextMeltanoPipelineEventEntity:
         assert event.pipeline_id == "test-pipeline-id"
         assert event.event_type == PipelineEventType.STARTED.value
         assert isinstance(event.timestamp, datetime)
-        assert isinstance(event.data, dict)
+        assert isinstance(event.value, dict)
         assert event.source == "flext-meltano"
         assert isinstance(event.id, str)
         assert len(event.id) > 0
@@ -294,9 +294,9 @@ class TestFlextMeltanoPipelineEventEntity:
             data=custom_data,
         )
 
-        assert event.data["execution_id"] == "exec-123"
-        assert event.data["records"] == 1000
-        assert event.data["duration"] == 45.5
+        assert event.value["execution_id"] == "exec-123"
+        assert event.value["records"] == 1000
+        assert event.value["duration"] == 45.5
 
     def test_pipeline_event_validate_domain_rules_success(self) -> None:
         """Test pipeline event domain validation success."""
@@ -308,7 +308,7 @@ class TestFlextMeltanoPipelineEventEntity:
         validation_result = event.validate_business_rules()
 
         assert validation_result.success
-        assert validation_result.data is None
+        assert validation_result.value is None
 
     def test_pipeline_event_validate_domain_rules_failure(self) -> None:
         """Test pipeline event domain validation failure."""

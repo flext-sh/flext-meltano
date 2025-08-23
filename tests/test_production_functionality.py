@@ -22,9 +22,11 @@ from pathlib import Path
 import pytest
 from flext_core import FlextResult
 
-from flext_meltano import FlextMeltanoBridge, create_flext_meltano_bridge
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoExecutor
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoConfig,
+    FlextMeltanoExecutor,
+)
 
 
 class TestFlextMeltanoBridgeProduction:
@@ -59,13 +61,13 @@ class TestFlextMeltanoBridgeProduction:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            assert isinstance(result.data, dict)
-            assert "python" in result.data
-            assert "flext_meltano" in result.data
+            assert isinstance(result.value, dict)
+            assert "python" in result.value
+            assert "flext_meltano" in result.value
             # Python version should be current version
             expected_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-            assert result.data["python"] == expected_version
-            assert result.data["flext_meltano"] == "2.0.0-enterprise"
+            assert result.value["python"] == expected_version
+            assert result.value["flext_meltano"] == "2.0.0-enterprise"
         else:
             # If meltano is not available, that's acceptable in test environment
             assert "Failed to get version information" in str(result.error)
@@ -86,7 +88,7 @@ class TestFlextMeltanoBridgeProduction:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            plugin = result.data
+            plugin = result.value
             assert plugin.name == "tap-csv"
             assert "tap" in plugin.name.lower()
         else:
@@ -101,7 +103,7 @@ class TestFlextMeltanoBridgeProduction:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            plugin = result.data
+            plugin = result.value
             assert plugin.name == "target-jsonl"
             assert "target" in plugin.name.lower()
 
@@ -113,9 +115,9 @@ class TestFlextMeltanoBridgeProduction:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            assert isinstance(result.data, list)
+            assert isinstance(result.value, list)
             # Each plugin should be a dict with basic info
-            for plugin in result.data:
+            for plugin in result.value:
                 assert isinstance(plugin, dict)
                 if plugin:  # If plugin has data
                     assert "name" in plugin or "type" in plugin
@@ -157,10 +159,10 @@ class TestFlextMeltanoBridgeProduction:
 
         # Pipeline execution requires proper Meltano setup, but interface should work
         if result.success:
-            assert isinstance(result.data, dict)
-            assert "status" in result.data
-            assert "tap" in result.data
-            assert "target" in result.data
+            assert isinstance(result.value, dict)
+            assert "status" in result.value
+            assert "tap" in result.value
+            assert "target" in result.value
         else:
             # Expected to fail without proper Meltano project setup
             assert result.error is not None
@@ -198,7 +200,7 @@ class TestFlextMeltanoExecutor:
         assert isinstance(result, FlextResult)
         # This should work in any environment with Meltano, or fail gracefully
         if result.success:
-            assert isinstance(result.data, dict)
+            assert isinstance(result.value, dict)
         else:
             assert result.error is not None
 
@@ -295,7 +297,7 @@ class TestFlextCoreIntegration:
         result: FlextResult[str] = FlextResult[str].ok("Success value")
 
         assert result.success
-        assert result.data == "Success value"
+        assert result.value == "Success value"
         assert result.error is None
 
     def test_flext_result_failure_pattern(self) -> None:
@@ -303,7 +305,7 @@ class TestFlextCoreIntegration:
         result: FlextResult[str] = FlextResult[str].fail("Error message")
 
         assert not result.success
-        assert result.data is None
+        assert result.value is None
         assert result.error == "Error message"
 
     def test_flext_result_chaining(self) -> None:
@@ -318,7 +320,7 @@ class TestFlextCoreIntegration:
         result = FlextResult[int].ok(5).map(double_value).map(stringify_value)
 
         assert result.success
-        assert result.data == "Value: 10"
+        assert result.value == "Value: 10"
 
 
 class TestFileSystemOperations:

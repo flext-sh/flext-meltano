@@ -48,8 +48,8 @@ class TestFlextSingerBridge:
         )
 
         assert result.success
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if data["type"] != "RECORD":
             msg: str = f"Expected {'RECORD'}, got {data['type']}"
             raise AssertionError(msg)
@@ -72,8 +72,8 @@ class TestFlextSingerBridge:
         )
 
         assert result.success
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if data["type"] != "RECORD":
             msg: str = f"Expected {'RECORD'}, got {data['type']}"
             raise AssertionError(msg)
@@ -144,8 +144,8 @@ class TestFlextSingerBridge:
         )
 
         assert result.success
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if data["type"] != "SCHEMA":
             msg: str = f"Expected {'SCHEMA'}, got {data['type']}"
             raise AssertionError(msg)
@@ -169,8 +169,8 @@ class TestFlextSingerBridge:
         )
 
         assert result.success
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if data["type"] != "SCHEMA":
             msg: str = f"Expected {'SCHEMA'}, got {data['type']}"
             raise AssertionError(msg)
@@ -207,8 +207,8 @@ class TestFlextSingerBridge:
         )
 
         assert result.success
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if data["type"] != "STATE":
             msg: str = f"Expected {'STATE'}, got {data['type']}"
             raise AssertionError(msg)
@@ -272,8 +272,8 @@ class TestFlextSingerCatalog:
         result = catalog.flext_singer_get_catalog()
         assert result.success
         expected_data: dict[str, list[dict[str, object]]] = {"streams": []}
-        if result.data != expected_data:
-            msg: str = f"Expected {expected_data}, got {result.data}"
+        if result.value != expected_data:
+            msg: str = f"Expected {expected_data}, got {result.value}"
             raise AssertionError(msg)
 
     def test_catalog_initialization_with_data(
@@ -284,8 +284,8 @@ class TestFlextSingerCatalog:
         result = catalog_with_data.flext_singer_get_catalog()
         assert result.success
 
-        assert result.data is not None
-        data = result.data
+        assert result.value is not None
+        data = result.value
         if "streams" not in data:
             msg: str = f"Expected {'streams'} in {data}"
             raise AssertionError(msg)
@@ -316,8 +316,8 @@ class TestFlextSingerCatalog:
         catalog_result = catalog.flext_singer_get_catalog()
         assert catalog_result.success
 
-        assert catalog_result.data is not None
-        streams = catalog_result.data["streams"]
+        assert catalog_result.value is not None
+        streams = catalog_result.value["streams"]
         if len(streams) != 1:
             msg: str = f"Expected {1}, got {len(streams)}"
             raise AssertionError(msg)
@@ -342,8 +342,8 @@ class TestFlextSingerCatalog:
         assert result.success
 
         catalog_result = catalog.flext_singer_get_catalog()
-        assert catalog_result.data is not None
-        streams = catalog_result.data["streams"]
+        assert catalog_result.value is not None
+        streams = catalog_result.value["streams"]
         if len(streams) != 1:
             msg: str = f"Expected {1}, got {len(streams)}"
             raise AssertionError(msg)
@@ -354,7 +354,7 @@ class TestFlextSingerCatalog:
         result = catalog_with_data.flext_singer_get_selected_streams()
         assert result.success
 
-        selected_streams = result.data
+        selected_streams = result.value
         assert isinstance(selected_streams, list)
         if "existing_stream" not in selected_streams:
             msg: str = f"Expected {'existing_stream'} in {selected_streams}"
@@ -368,7 +368,7 @@ class TestFlextSingerCatalog:
         result = catalog.flext_singer_get_selected_streams()
         assert result.success
 
-        selected_streams = result.data
+        selected_streams = result.value
         assert isinstance(selected_streams, list)
         if len(selected_streams) != 0:
             msg: str = f"Expected {0}, got {len(selected_streams)}"
@@ -393,8 +393,8 @@ class TestFlextSingerFactoryFunctions:
         result = catalog.flext_singer_get_catalog()
         assert result.success
         expected_data: dict[str, list[dict[str, object]]] = {"streams": []}
-        if result.data != expected_data:
-            msg: str = f"Expected {expected_data}, got {result.data}"
+        if result.value != expected_data:
+            msg: str = f"Expected {expected_data}, got {result.value}"
             raise AssertionError(msg)
 
     def test_flext_create_singer_catalog_with_data(self) -> None:
@@ -414,8 +414,8 @@ class TestFlextSingerFactoryFunctions:
 
         result = catalog.flext_singer_get_catalog()
         assert result.success
-        if result.data != initial_data:
-            msg: str = f"Expected {initial_data}, got {result.data}"
+        if result.value != initial_data:
+            msg: str = f"Expected {initial_data}, got {result.value}"
             raise AssertionError(msg)
 
 

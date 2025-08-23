@@ -109,10 +109,10 @@ class TestSingerRealImplementations:
         )
 
         assert result.success
-        assert result.data is not None
-        assert result.data["type"] == "RECORD"
-        assert result.data["stream"] == "test_stream"
-        assert result.data["record"] == {"id": 1, "name": "test"}
+        assert result.value is not None
+        assert result.value["type"] == "RECORD"
+        assert result.value["stream"] == "test_stream"
+        assert result.value["record"] == {"id": 1, "name": "test"}
 
     def test_singer_bridge_schema_creation(self) -> None:
         """Test Singer bridge can create schema messages."""
@@ -130,11 +130,11 @@ class TestSingerRealImplementations:
         )
 
         assert result.success
-        assert result.data is not None
-        assert result.data["type"] == "SCHEMA"
-        assert result.data["stream"] == "test_stream"
-        assert result.data["schema"] == schema
-        assert result.data["key_properties"] == ["id"]
+        assert result.value is not None
+        assert result.value["type"] == "SCHEMA"
+        assert result.value["stream"] == "test_stream"
+        assert result.value["schema"] == schema
+        assert result.value["key_properties"] == ["id"]
 
     def test_singer_bridge_universal_method(self) -> None:
         """Test Singer bridge universal message creation method."""
@@ -148,8 +148,8 @@ class TestSingerRealImplementations:
         )
 
         assert result.success
-        assert result.data is not None
-        assert result.data["type"] == "RECORD"
+        assert result.value is not None
+        assert result.value["type"] == "RECORD"
 
     def test_singer_bridge_error_handling(self) -> None:
         """Test Singer bridge error handling."""

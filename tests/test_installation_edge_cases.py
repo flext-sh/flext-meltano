@@ -389,7 +389,7 @@ class TestCreateInstallerServiceEdgeCases:
         result = create_installer_service(config)
         # The service should be created successfully, even if validation fails later
         assert result.success
-        assert isinstance(result.data, FlextMeltanoInstaller)
+        assert isinstance(result.value, FlextMeltanoInstaller)
 
     @patch("flext_meltano.installation.FlextMeltanoInstaller.__init__")
     def test_create_installer_service_initialization_exception(

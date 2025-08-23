@@ -58,9 +58,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.run_models()
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_run_models_with_models_list(self) -> None:
         """Test DBT manager run models with models list."""
@@ -70,9 +70,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.run_models(test_models)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == test_models
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == test_models
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_run_models_with_empty_list(self) -> None:
         """Test DBT manager run models with empty list."""
@@ -81,9 +81,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.run_models([])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_test_models_no_arguments(self) -> None:
         """Test DBT manager test models without arguments."""
@@ -92,9 +92,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.test_models()
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_test_models_with_models_list(self) -> None:
         """Test DBT manager test models with models list."""
@@ -104,9 +104,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.test_models(test_models)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == test_models
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == test_models
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_test_models_with_empty_list(self) -> None:
         """Test DBT manager test models with empty list."""
@@ -115,9 +115,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.test_models([])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_compile_models_no_arguments(self) -> None:
         """Test DBT manager compile models without arguments."""
@@ -126,9 +126,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.compile_models()
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_compile_models_with_models_list(self) -> None:
         """Test DBT manager compile models with models list."""
@@ -138,9 +138,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.compile_models(test_models)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == test_models
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == test_models
+        assert result.value["status"] == "success"
 
     def test_dbt_manager_compile_models_with_empty_list(self) -> None:
         """Test DBT manager compile models with empty list."""
@@ -149,9 +149,9 @@ class TestFlextMeltanoDbtManagerComplete:
         result = manager.compile_models([])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
 
 class TestFlextMeltanoDbtProjectComplete:
@@ -191,7 +191,7 @@ class TestFlextMeltanoDbtProjectComplete:
         result = project.initialize()
 
         assert result.success
-        assert result.data is None
+        assert result.value is None
         assert result.error is None
 
     def test_dbt_project_validate(self) -> None:
@@ -201,7 +201,7 @@ class TestFlextMeltanoDbtProjectComplete:
         result = project.validate()
 
         assert result.success
-        assert result.data is None
+        assert result.value is None
         assert result.error is None
 
 
@@ -242,10 +242,10 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run("compile")
 
         assert result.success
-        assert result.data is not None
-        assert result.data["command"] == "compile"
-        assert result.data["args"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["command"] == "compile"
+        assert result.value["args"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_command_with_args(self) -> None:
         """Test DBT runner run method with command and arguments."""
@@ -255,10 +255,10 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run("run", test_args)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["command"] == "run"
-        assert result.data["args"] == test_args
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["command"] == "run"
+        assert result.value["args"] == test_args
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_command_with_none_args(self) -> None:
         """Test DBT runner run method with None arguments."""
@@ -267,10 +267,10 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run("test", None)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["command"] == "test"
-        assert result.data["args"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["command"] == "test"
+        assert result.value["args"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_command_with_empty_args(self) -> None:
         """Test DBT runner run method with empty arguments list."""
@@ -279,10 +279,10 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run("docs", [])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["command"] == "docs"
-        assert result.data["args"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["command"] == "docs"
+        assert result.value["args"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_models_no_arguments(self) -> None:
         """Test DBT runner run models without arguments."""
@@ -291,9 +291,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run_models()
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_models_with_models_list(self) -> None:
         """Test DBT runner run models with models list."""
@@ -303,9 +303,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run_models(test_models)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == test_models
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == test_models
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_run_models_with_empty_list(self) -> None:
         """Test DBT runner run models with empty list."""
@@ -314,9 +314,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.run_models([])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_test_models_no_arguments(self) -> None:
         """Test DBT runner test models without arguments."""
@@ -325,9 +325,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.test_models()
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_test_models_with_models_list(self) -> None:
         """Test DBT runner test models with models list."""
@@ -337,9 +337,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.test_models(test_models)
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == test_models
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == test_models
+        assert result.value["status"] == "success"
 
     def test_dbt_runner_test_models_with_empty_list(self) -> None:
         """Test DBT runner test models with empty list."""
@@ -348,9 +348,9 @@ class TestFlextMeltanoDbtRunnerComplete:
         result = runner.test_models([])
 
         assert result.success
-        assert result.data is not None
-        assert result.data["models"] == []
-        assert result.data["status"] == "success"
+        assert result.value is not None
+        assert result.value["models"] == []
+        assert result.value["status"] == "success"
 
 
 class TestDbtModuleIntegration:

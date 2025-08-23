@@ -193,8 +193,8 @@ class TestFlextMeltanoInstallerValidation:
 
             result = installer.validate()
             assert result.success
-            if not (result.data):
-                msg: str = f"Expected True, got {result.data}"
+            if not (result.value):
+                msg: str = f"Expected True, got {result.value}"
                 raise AssertionError(msg)
 
     def test_validation_failure_missing_project_root(self) -> None:
@@ -260,16 +260,16 @@ class TestFlextMeltanoInstallerOperations:
 
             result = installer.add_plugin("extractor", "tap-csv")
             assert result.success
-            assert result.data is not None
-            if not (result.data["success"]):
-                msg: str = f"Expected True, got {result.data['success']}"
+            assert result.value is not None
+            if not (result.value["success"]):
+                msg: str = f"Expected True, got {result.value['success']}"
                 raise AssertionError(msg)
-            if result.data["plugin_name"] != "tap-csv":
-                msg: str = f"Expected {'tap-csv'}, got {result.data['plugin_name']}"
+            if result.value["plugin_name"] != "tap-csv":
+                msg: str = f"Expected {'tap-csv'}, got {result.value['plugin_name']}"
                 raise AssertionError(
                     msg,
                 )
-            assert result.data["plugin_type"] == "extractor"
+            assert result.value["plugin_type"] == "extractor"
 
     @patch("subprocess.run")
     def test_add_plugin_with_pip_url(self, mock_run: Mock) -> None:
@@ -293,10 +293,10 @@ class TestFlextMeltanoInstallerOperations:
                 "pipelinewise-tap-csv",
             )
             assert result.success
-            assert result.data is not None
-            if result.data["pip_url"] != "pipelinewise-tap-csv":
+            assert result.value is not None
+            if result.value["pip_url"] != "pipelinewise-tap-csv":
                 msg: str = (
-                    f"Expected {'pipelinewise-tap-csv'}, got {result.data['pip_url']}"
+                    f"Expected {'pipelinewise-tap-csv'}, got {result.value['pip_url']}"
                 )
                 raise AssertionError(
                     msg,
@@ -382,14 +382,14 @@ class TestFlextMeltanoInstallerOperations:
 
             result = installer.install_plugins()
             assert result.success
-            assert result.data is not None
-            if result.data["operation"] != "install_all":
-                msg: str = f"Expected {'install_all'}, got {result.data['operation']}"
+            assert result.value is not None
+            if result.value["operation"] != "install_all":
+                msg: str = f"Expected {'install_all'}, got {result.value['operation']}"
                 raise AssertionError(
                     msg,
                 )
-            if not (result.data["success"]):
-                msg: str = f"Expected True, got {result.data['success']}"
+            if not (result.value["success"]):
+                msg: str = f"Expected True, got {result.value['success']}"
                 raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -410,13 +410,13 @@ class TestFlextMeltanoInstallerOperations:
 
             result = installer.remove_plugin("extractor", "tap-csv")
             assert result.success
-            assert result.data is not None
-            if result.data["operation"] != "remove":
-                msg: str = f"Expected {'remove'}, got {result.data['operation']}"
+            assert result.value is not None
+            if result.value["operation"] != "remove":
+                msg: str = f"Expected {'remove'}, got {result.value['operation']}"
                 raise AssertionError(
                     msg,
                 )
-            assert result.data["plugin_name"] == "tap-csv"
+            assert result.value["plugin_name"] == "tap-csv"
 
     @patch("subprocess.run")
     def test_list_plugins_success(self, mock_run: Mock) -> None:
@@ -456,14 +456,14 @@ class TestFlextMeltanoInstallerOperations:
 
             result = installer.list_plugins()
             assert result.success
-            assert result.data is not None
-            if len(result.data) != EXPECTED_BULK_SIZE:  # 2 plugins total
-                msg: str = f"Expected {2}, got {len(result.data)}"
+            assert result.value is not None
+            if len(result.value) != EXPECTED_BULK_SIZE:  # 2 plugins total
+                msg: str = f"Expected {2}, got {len(result.value)}"
                 raise AssertionError(msg)
 
             # Check first plugin
-            assert result.data is not None
-            plugin = result.data[0]
+            assert result.value is not None
+            plugin = result.value[0]
             if plugin.name != "tap-csv":
                 msg: str = f"Expected {'tap-csv'}, got {plugin.name}"
                 raise AssertionError(msg)
@@ -585,8 +585,8 @@ class TestFlextMeltanoInstallerPrivateMethods:
 
         result = installer._execute_meltano_list()
         assert result.success
-        if result.data != '{"extractors": []}':
-            msg: str = f"Expected {'{"extractors": []}'}, got {result.data}"
+        if result.value != '{"extractors": []}':
+            msg: str = f"Expected {'{"extractors": []}'}, got {result.value}"
             raise AssertionError(msg)
 
     @patch("subprocess.run")
@@ -617,11 +617,11 @@ class TestFlextMeltanoInstallerPrivateMethods:
         result = installer._parse_plugin_list(json_data)
 
         assert result.success
-        assert result.data is not None
-        if len(result.data) != 1:
-            msg: str = f"Expected {1}, got {len(result.data)}"
+        assert result.value is not None
+        if len(result.value) != 1:
+            msg: str = f"Expected {1}, got {len(result.value)}"
             raise AssertionError(msg)
-        assert result.data[0].name == "tap-csv"
+        assert result.value[0].name == "tap-csv"
 
     def test_parse_plugin_list_invalid_json(self) -> None:
         """Test _parse_plugin_list with invalid JSON."""
@@ -667,9 +667,9 @@ class TestFlextMeltanoInstallerContexts:
 
             result = installer.add_plugin("extractor", "tap-csv", context=context)
             assert result.success
-            assert result.data is not None
-            if result.data["installation_id"] != context.installation_id:
-                msg: str = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+            assert result.value is not None
+            if result.value["installation_id"] != context.installation_id:
+                msg: str = f"Expected {context.installation_id}, got {result.value['installation_id']}"
                 raise AssertionError(
                     msg,
                 )
@@ -698,9 +698,9 @@ class TestFlextMeltanoInstallerContexts:
 
             result = installer.install_plugins(context)
             assert result.success
-            assert result.data is not None
-            if result.data["installation_id"] != context.installation_id:
-                msg: str = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+            assert result.value is not None
+            if result.value["installation_id"] != context.installation_id:
+                msg: str = f"Expected {context.installation_id}, got {result.value['installation_id']}"
                 raise AssertionError(
                     msg,
                 )
@@ -729,9 +729,9 @@ class TestFlextMeltanoInstallerContexts:
 
             result = installer.remove_plugin("extractor", "tap-csv", context)
             assert result.success
-            assert result.data is not None
-            if result.data["installation_id"] != context.installation_id:
-                msg: str = f"Expected {context.installation_id}, got {result.data['installation_id']}"
+            assert result.value is not None
+            if result.value["installation_id"] != context.installation_id:
+                msg: str = f"Expected {context.installation_id}, got {result.value['installation_id']}"
                 raise AssertionError(
                     msg,
                 )
@@ -746,8 +746,8 @@ class TestFactoryAndLegacyFunctions:
         result = create_installer_service(config)
 
         assert result.success
-        assert isinstance(result.data, FlextMeltanoInstaller)
-        assert result.data._initialized is True  # Should be initialized
+        assert isinstance(result.value, FlextMeltanoInstaller)
+        assert result.value._initialized is True  # Should be initialized
 
     def test_create_installer_service_initialization_failure(self) -> None:
         """Test installer service creation with initialization failure."""

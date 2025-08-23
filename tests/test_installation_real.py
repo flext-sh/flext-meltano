@@ -231,7 +231,7 @@ class TestFactoryFunctions:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
         assert result.success
-        assert isinstance(result.data, FlextMeltanoInstaller)
+        assert isinstance(result.value, FlextMeltanoInstaller)
 
     def test_flext_meltano_install_plugin(self) -> None:
         """Test standalone install plugin function."""
@@ -254,7 +254,7 @@ class TestInstallerIntegration:
         create_result = create_installer_service(config)
         assert create_result.success
 
-        installer = create_result.data
+        installer = create_result.value
         assert installer is not None
 
         # Test initialization

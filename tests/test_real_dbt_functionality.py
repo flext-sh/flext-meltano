@@ -118,7 +118,7 @@ where id is null
         assert result.success, f"DBT run failed: {(result.error,)}"
 
         # Should return actual run results
-        run_results = result.data
+        run_results = result.value
         assert isinstance(run_results, list)
 
         # With a real model, should have results
@@ -139,7 +139,7 @@ where id is null
         # Should succeed with specific model
         assert result.success, f"DBT run failed: {(result.error,)}"
 
-        run_results = result.data
+        run_results = result.value
         assert isinstance(run_results, list)
 
     @pytest.mark.asyncio
@@ -159,7 +159,7 @@ where id is null
         assert test_result.success, f"DBT test failed: {(test_result.error,)}"
 
         # Should return actual test results
-        test_results = test_result.data
+        test_results = test_result.value
         assert isinstance(test_results, list)
 
     @pytest.mark.asyncio
@@ -217,7 +217,7 @@ where id is null
 
         # Should return service info
         assert result.success
-        data = result.data
+        data = result.value
         assert isinstance(data, dict)
         if data["service"] != "dbt":
             msg: str = f"Expected {'dbt'}, got {data['service']}"
@@ -318,7 +318,7 @@ from {{ ref('stg_raw_data') }}
         assert result.success, f"Complex DBT run failed: {result.error}"
 
         # Should have run successfully
-        run_results = result.data
+        run_results = result.value
         assert isinstance(run_results, list)
 
     @pytest.mark.asyncio
