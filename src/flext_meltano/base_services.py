@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
@@ -23,13 +23,8 @@ from flext_core import (
 )
 from singer_sdk import Tap, Target
 
-from .funcao1_wrapper_dbt import FlextDbtAdapter, MeltanoDbtWrapper
-
-# Import dos wrappers para composição
-from .funcao1_wrapper_singer import FlextSingerAdapter, MeltanoSingerWrapper
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
+from flext_meltano.base_dbt import FlextDbtAdapter, MeltanoDbtWrapper
+from flext_meltano.base_singer import FlextSingerAdapter, MeltanoSingerWrapper
 
 logger = get_logger(__name__)
 
@@ -61,7 +56,7 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoTapService",
                 "tap_name": getattr(self, "tap_name", "unknown"),
-                "status": "ready"
+                "status": "ready",
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -101,7 +96,9 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
             config_valid = self.validate_tap_config(config).unwrap_or(default=False)
             if not config_valid:
                 validation_result = self.validate_tap_config(config)
-                return FlextResult[Tap].fail(f"Invalid config: {validation_result.error}")
+                return FlextResult[Tap].fail(
+                    f"Invalid config: {validation_result.error}"
+                )
 
             # Criar tap usando wrapper
             tap_class = self.get_tap_class()
@@ -128,7 +125,9 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
             # Usar wrapper para descoberta
             catalog_result = self.wrapper_singer.discover_catalog(tap)
             if not catalog_result.success:
-                return FlextResult[list[dict[str, object]]].fail(f"Failed to discover: {catalog_result.error}")
+                return FlextResult[list[dict[str, object]]].fail(
+                    f"Failed to discover: {catalog_result.error}"
+                )
 
             # Adaptar catálogo para formato FLEXT
             catalog = catalog_result.value
@@ -174,7 +173,7 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
                 if field not in config:
                     return FlextResult[bool].fail(f"Missing required field: {field}")
 
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(data=True)
 
         except Exception as e:
             return FlextResult[bool].fail(f"Config validation error: {e}")
@@ -213,7 +212,7 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]], ABC):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoTargetService",
                 "target_name": getattr(self, "target_name", "unknown"),
-                "status": "ready"
+                "status": "ready",
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -252,7 +251,9 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]], ABC):
             # Validar configuração
             validation_result = self.validate_target_config(config)
             if not validation_result.success:
-                return FlextResult[Target].fail(f"Invalid config: {validation_result.error}")
+                return FlextResult[Target].fail(
+                    f"Invalid config: {validation_result.error}"
+                )
 
             # Criar target usando wrapper
             target_class = self.get_target_class()
@@ -344,7 +345,7 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]], ABC):
                 if field not in config:
                     return FlextResult[bool].fail(f"Missing required field: {field}")
 
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(data=True)
 
         except Exception as e:
             return FlextResult[bool].fail(f"Config validation error: {e}")
@@ -383,7 +384,7 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoDbtService",
                 "project_name": self.project_name,
-                "status": "ready"
+                "status": "ready",
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -407,11 +408,7 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
             "snapshot-paths": ["snapshots"],
             "target-path": "target",
             "clean-targets": ["target", "dbt_packages"],
-            "models": {
-                self.project_name: {
-                    "materialized": "table"
-                }
-            }
+            "models": {self.project_name: {"materialized": "table"}},
         }
 
     def get_models_directory(self) -> Path:
@@ -422,7 +419,6 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
 
         """
         return Path("models")
-
 
     def initialize_project(self, project_root: Path) -> FlextResult[dbtRunner]:
         """Inicializa projeto DBT.
@@ -443,7 +439,9 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
 
             # Validar estrutura do projeto
             if not (project_root / "dbt_project.yml").exists():
-                return FlextResult[dbtRunner].fail(f"No dbt_project.yml found in {project_root}")
+                return FlextResult[dbtRunner].fail(
+                    f"No dbt_project.yml found in {project_root}"
+                )
 
             # Criar runner DBT
             return self.wrapper_dbt.create_runner(project_root)
@@ -548,7 +546,9 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
             runner = runner_result.value
             compile_result = self.wrapper_dbt.compile_project(runner, project_dir)
             if not compile_result.success:
-                return FlextResult[dict[str, object]].fail(f"Failed to compile: {compile_result.error}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to compile: {compile_result.error}"
+                )
 
             # Tentar ler manifest.json
             manifest_path = project_dir / "target" / "manifest.json"
@@ -560,8 +560,12 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
                 adapted_manifest = self.dbt_adapter.adapt_manifest(manifest_data)
                 if adapted_manifest.success:
                     return adapted_manifest
-                return FlextResult[dict[str, object]].fail(f"Failed to adapt manifest: {adapted_manifest.error}")
-            return FlextResult[dict[str, object]].fail("Manifest.json not found after compilation")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to adapt manifest: {adapted_manifest.error}"
+                )
+            return FlextResult[dict[str, object]].fail(
+                "Manifest.json not found after compilation"
+            )
 
         except Exception as e:
             error_msg = f"Failed to get model lineage: {e}"

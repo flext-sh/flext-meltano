@@ -11,9 +11,9 @@ from pathlib import Path
 
 from flext_core import get_logger
 
-from .funcao2_runtime_executor import FlextMeltanoExecutor
-from .funcao1_wrapper_dbt import MeltanoDbtWrapper
-from .funcao1_wrapper_meltano import MeltanoBridge
+from flext_meltano.base_dbt import MeltanoDbtWrapper
+from flext_meltano.base_meltano import MeltanoBridge
+from flext_meltano.executors_meltano import FlextMeltanoExecutor
 
 logger = get_logger(__name__)
 
@@ -146,7 +146,10 @@ class FlextMeltanoBridge:
 # FACTORY FUNCTIONS
 # =============================================================================
 
-def create_flext_meltano_bridge(_config: dict[str, object] | None = None) -> FlextMeltanoBridge:
+
+def create_flext_meltano_bridge(
+    _config: dict[str, object] | None = None,
+) -> FlextMeltanoBridge:
     """Factory function to create FlextMeltanoBridge instance."""
     # For now, ignore config parameter for compatibility
     return FlextMeltanoBridge()

@@ -14,9 +14,11 @@ from pathlib import Path
 from typing import TypeVar, cast
 
 import yaml
-from flext_core import FlextResult
+from flext_core import FlextResult, get_logger
 
 T = TypeVar("T")
+
+logger = get_logger(__name__)
 
 
 class FlextMeltanoUtilities:
@@ -36,7 +38,9 @@ class FlextMeltanoUtilities:
         return Path(tempfile.mkdtemp(prefix=prefix))
 
     @staticmethod
-    def create_meltano_config(project_id: str, project_name: str = "") -> dict[str, object]:
+    def create_meltano_config(
+        project_id: str, project_name: str = ""
+    ) -> dict[str, object]:
         """Cria configuração completa do Meltano com estrutura real.
 
         Args:
@@ -61,7 +65,9 @@ class FlextMeltanoUtilities:
         }
 
     @staticmethod
-    def create_dbt_config(project_name: str, profile_name: str = "") -> dict[str, object]:
+    def create_dbt_config(
+        project_name: str, profile_name: str = ""
+    ) -> dict[str, object]:
         """Cria configuração básica do DBT.
 
         Args:
@@ -84,19 +90,12 @@ class FlextMeltanoUtilities:
             "snapshot-paths": ["snapshots"],
             "target-path": "target",
             "clean-targets": ["target", "dbt_packages"],
-            "models": {
-                project_name: {
-                    "+materialized": "view"
-                }
-            }
+            "models": {project_name: {"+materialized": "view"}},
         }
 
     @staticmethod
     def create_singer_tap_config(
-        tap_name: str,
-        namespace: str = "",
-        pip_url: str = "",
-        executable: str = ""
+        tap_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
     ) -> dict[str, object]:
         """Cria configuração para Singer tap.
 
@@ -121,10 +120,7 @@ class FlextMeltanoUtilities:
 
     @staticmethod
     def create_singer_target_config(
-        target_name: str,
-        namespace: str = "",
-        pip_url: str = "",
-        executable: str = ""
+        target_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
     ) -> dict[str, object]:
         """Cria configuração para Singer target.
 
@@ -147,7 +143,9 @@ class FlextMeltanoUtilities:
         }
 
     @staticmethod
-    def save_yaml_config(config: dict[str, object], file_path: Path) -> FlextResult[bool]:
+    def save_yaml_config(
+        config: dict[str, object], file_path: Path
+    ) -> FlextResult[bool]:
         """Salva configuração YAML em arquivo.
 
         Args:
@@ -161,7 +159,7 @@ class FlextMeltanoUtilities:
         try:
             with file_path.open("w") as f:
                 yaml.dump(config, f)
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult.fail(f"Failed to save YAML config: {e}")
 
@@ -184,9 +182,7 @@ class FlextMeltanoUtilities:
                 config = yaml.safe_load(f)
 
             # Garantir que todos valores são strings
-            str_config = {
-                str(k): str(v) for k, v in (config or {}).items()
-            }
+            str_config = {str(k): str(v) for k, v in (config or {}).items()}
 
             return FlextResult[dict[str, str]].ok(str_config)
         except Exception as e:
@@ -207,10 +203,7 @@ class FlextMeltanoUtilities:
 
     @staticmethod
     def create_plugin_config(
-        name: str,
-        plugin_type: str,
-        namespace: str = "",
-        pip_url: str = ""
+        name: str, plugin_type: str, namespace: str = "", pip_url: str = ""
     ) -> dict[str, str]:
         """Cria configuração padrão de plugin.
 
@@ -235,7 +228,9 @@ class FlextMeltanoUtilities:
         }
 
     @staticmethod
-    def setup_project_structure(project_root: Path, project_name: str) -> FlextResult[dict[str, str]]:
+    def setup_project_structure(
+        project_root: Path, project_name: str
+    ) -> FlextResult[dict[str, str]]:
         """Configura estrutura completa de projeto Meltano + DBT.
 
         Args:
@@ -308,7 +303,7 @@ class FlextMeltanoUtilities:
             if not config[field]:
                 return FlextResult.fail(f"Empty required field: {field}")
 
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     @staticmethod
     def normalize_plugin_name(name: str, plugin_type: str) -> str:
@@ -325,7 +320,12 @@ class FlextMeltanoUtilities:
         if plugin_type.lower() in ["extractor", "extractors"]:
             if not name.startswith("tap-"):
                 return f"tap-{name}"
-        elif plugin_type.lower() in ["loader", "loaders", "target", "targets"] and not name.startswith("target-"):
+        elif plugin_type.lower() in [
+            "loader",
+            "loaders",
+            "target",
+            "targets",
+        ] and not name.startswith("target-"):
             return f"target-{name}"
 
         return name
@@ -451,6 +451,7 @@ class FlextTypeAdapters:
 # FUNCTION-SPECIFIC UTILITIES
 # =============================================================================
 
+
 class FlextWrapperUtilities(FlextMeltanoUtilities):
     """Utilidades específicas para wrappers (FUNÇÃO 1)."""
 
@@ -471,7 +472,7 @@ class FlextWrapperUtilities(FlextMeltanoUtilities):
             "type": str(meltano_plugin.get("type", "")),
             "namespace": str(meltano_plugin.get("namespace", "")),
             "version": str(meltano_plugin.get("version", "")),
-            "status": "adapted"
+            "status": "adapted",
         }
 
 
@@ -479,7 +480,9 @@ class FlextRuntimeUtilities(FlextMeltanoUtilities):
     """Utilidades específicas para runtime bridge (FUNÇÃO 2)."""
 
     @staticmethod
-    def create_bridge_response(*, success: bool, data: dict[str, str] | None = None) -> dict[str, str]:
+    def create_bridge_response(
+        *, success: bool, data: dict[str, str] | None = None
+    ) -> dict[str, str]:
         """Cria resposta padrão para Go bridge.
 
         Args:
@@ -497,7 +500,9 @@ class FlextRuntimeUtilities(FlextMeltanoUtilities):
         }
 
     @staticmethod
-    def format_command_result(exit_code: int, output: str, command: str) -> dict[str, str]:
+    def format_command_result(
+        exit_code: int, output: str, command: str
+    ) -> dict[str, str]:
         """Formata resultado de comando para Go bridge.
 
         Args:
@@ -521,7 +526,9 @@ class FlextBaseUtilities(FlextMeltanoUtilities):
     """Utilidades específicas para base projects (FUNÇÃO 3)."""
 
     @staticmethod
-    def create_base_service_config(service_name: str, service_type: str) -> dict[str, str]:
+    def create_base_service_config(
+        service_name: str, service_type: str
+    ) -> dict[str, str]:
         """Cria configuração base para serviços flext-*.
 
         Args:
@@ -537,13 +544,14 @@ class FlextBaseUtilities(FlextMeltanoUtilities):
             "type": service_type,
             "framework": "flext_meltano",
             "version": "2.0.0",
-            "status": "active"
+            "status": "active",
         }
 
 
 # =============================================================================
 # VALIDATION FUNCTIONS - Required by tests
 # =============================================================================
+
 
 def validate_directory_path(path: str | Path | None) -> str | None:
     """Valida se um diretório existe e é acessível.
@@ -571,8 +579,8 @@ def validate_directory_path(path: str | Path | None) -> str | None:
             temp_path = Path(tempfile.gettempdir())
             if temp_path in dir_path.parents or dir_path == temp_path:
                 return str(dir_path)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Failed to check temp directory", error=str(e))
 
         # Check if directory actually exists
         if not dir_path.exists() or not dir_path.is_dir():
@@ -609,8 +617,8 @@ def validate_file_path(path: str | Path | None) -> str | None:
             temp_path = Path(tempfile.gettempdir())
             if temp_path in file_path.parents:
                 return str(file_path)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Failed to check temp directory for file", error=str(e))
 
         # Check if file actually exists
         if not file_path.exists() or not file_path.is_file():
@@ -662,7 +670,9 @@ def validate_config_value[T](
                 try:
                     return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
                 except ValueError:
-                    return FlextResult.fail(f"Cannot convert '{value}' to {value_type.__name__}")
+                    return FlextResult.fail(
+                        f"Cannot convert '{value}' to {value_type.__name__}"
+                    )
 
         # Handle string conversion
         if value_type is str:
@@ -670,25 +680,22 @@ def validate_config_value[T](
 
         # Direct type check
         if isinstance(value, value_type):
-            return FlextResult[T].ok(cast("T", value))
+            return FlextResult[T].ok(cast("T", value))  # Type guaranteed by isinstance check
 
-        # Check if value_type is callable before attempting conversion
-        if not callable(value_type):
-            return FlextResult.fail(f"Cannot convert using non-callable type {value_type}")  # type: ignore[unreachable]
-
-        # Avoid calling types that don't accept parameters
+        # Attempt conversion using the type constructor
         if value_type in (type(None),):
             return FlextResult.fail(f"Cannot convert to {value_type.__name__}")
 
         # Try conversion
         try:
-
             # Use inspect to check if constructor accepts arguments
             try:
                 sig = inspect.signature(value_type)
                 # If no parameters or all parameters have defaults, it might not accept our value
                 if not sig.parameters:
-                    return FlextResult.fail(f"Type {value_type.__name__} constructor takes no arguments")
+                    return FlextResult.fail(
+                        f"Type {value_type.__name__} constructor takes no arguments"
+                    )
             except (ValueError, TypeError):
                 # If we can't inspect, try the call anyway in a safe manner
                 pass
@@ -698,17 +705,23 @@ def validate_config_value[T](
                 converted = value_type(value)  # type: ignore[call-arg]
             except TypeError as te:
                 if "takes no arguments" in str(te) or "expected 0 arguments" in str(te):
-                    return FlextResult.fail(f"Type {value_type.__name__} does not accept constructor arguments")
+                    return FlextResult.fail(
+                        f"Type {value_type.__name__} does not accept constructor arguments"
+                    )
                 raise  # Re-raise if it's a different TypeError
             return FlextResult[T].ok(converted)
         except (ValueError, TypeError):
-            return FlextResult.fail(f"Cannot convert '{value}' to {value_type.__name__}")
+            return FlextResult.fail(
+                f"Cannot convert '{value}' to {value_type.__name__}"
+            )
 
     except Exception as e:
         return FlextResult.fail(f"Config validation failed: {e}")
 
 
-def validate_config_value_simple(value: object, value_type: type, default: object | None = None) -> object | None:
+def validate_config_value_simple(
+    value: object, value_type: type, default: object | None = None
+) -> object | None:
     """Valida valor de configuração com interface simples (compatível com testes).
 
     Args:

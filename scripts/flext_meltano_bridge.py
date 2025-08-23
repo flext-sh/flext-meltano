@@ -89,11 +89,8 @@ def main() -> None:
 
         # Format response for Go service consumption
         if result is not None:
-            response = {
-                "success": result.success,
-                "data": result.data if result.success else None,
-                "error": result.error_message if result.is_failure else None,
-            }
+            # Bridge methods already return dict format for Go consumption
+            response = result
         else:
             response = {"success": False, "error": f"Unknown operation: {operation}"}
 

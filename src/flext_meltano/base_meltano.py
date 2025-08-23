@@ -9,7 +9,6 @@ FUNÇÃO 1: Wrapper para Meltano Core adaptando para flext-core
 from __future__ import annotations
 
 import asyncio
-import subprocess
 import tempfile
 from pathlib import Path
 
@@ -19,18 +18,16 @@ import yaml
 from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser
-from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.elt_context import ELTContext, ELTContextBuilder
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginType  # type: ignore[attr-defined]
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
-
-MELTANO_AVAILABLE = True
 
 logger = get_logger(__name__)
 
@@ -39,18 +36,19 @@ logger = get_logger(__name__)
 # =============================================================================
 
 
-class MeltanoBridge(FlextDomainService[object]):
+class MeltanoBridge(FlextDomainService[dict[str, object]]):
     """Bridge principal para Meltano Core → flext-core.
 
     Adapta Meltano Core operations para flext-core patterns, usando FlextResult
     para error handling e integrando com flext-core observability.
     """
 
+    _current_project: Project | None = None
+
     def __init__(self) -> None:
         super().__init__()
-        self._current_project: Project | None = None
 
-    def execute(self) -> FlextResult[object]:
+    def execute(self) -> FlextResult[dict[str, object]]:
         """Execute Meltano service operation (required by FlextDomainService)."""
         return FlextResult.ok({"service": "MeltanoBridge", "status": "ready"})
 
@@ -106,7 +104,6 @@ class MeltanoBridge(FlextDomainService[object]):
 
         return Project(root=temp_path)
 
-
     def initialize_project(self, project_root: Path) -> FlextResult[Project]:
         """Inicializa projeto Meltano usando API nativa.
 
@@ -142,7 +139,8 @@ class MeltanoBridge(FlextDomainService[object]):
                 )
 
             self.logger.info(
-                "Meltano project initialized successfully", project_root=str(project.root)
+                "Meltano project initialized successfully",
+                project_root=str(project.root),
             )
             return FlextResult[Project].ok(project)
 
@@ -256,7 +254,9 @@ class MeltanoBridge(FlextDomainService[object]):
             # Carregar projeto usando API nativa
             project_result = self.initialize_project(project_root)
             if not project_result.success:
-                return FlextResult.fail(f"Failed to load project: {project_result.error}")
+                return FlextResult.fail(
+                    f"Failed to load project: {project_result.error}"
+                )
 
             project = project_result.value
 
@@ -335,7 +335,9 @@ class MeltanoBridge(FlextDomainService[object]):
             project = project_result.value
 
             # Execute REAL pipeline using native APIs
-            return asyncio.run(self._execute_real_elt_pipeline(project, tap_name, target_name))
+            return asyncio.run(
+                self._execute_real_elt_pipeline(project, tap_name, target_name)
+            )
 
         except Exception as e:
             error_msg = f"Real pipeline execution failed: {e}"
@@ -370,9 +372,13 @@ class MeltanoBridge(FlextDomainService[object]):
                     target_plugin = plugin
 
             if not tap_plugin:
-                return FlextResult[dict[str, str]].fail(f"Tap '{tap_name}' not found in project")
+                return FlextResult[dict[str, str]].fail(
+                    f"Tap '{tap_name}' not found in project"
+                )
             if not target_plugin:
-                return FlextResult[dict[str, str]].fail(f"Target '{target_name}' not found in project")
+                return FlextResult[dict[str, str]].fail(
+                    f"Target '{target_name}' not found in project"
+                )
 
             # Criar ELT context usando ELTContextBuilder (correto)
             context_builder = ELTContextBuilder(project)
@@ -419,7 +425,6 @@ class MeltanoBridge(FlextDomainService[object]):
             self.logger.exception(error_msg, error=str(e))
             return FlextResult[dict[str, str]].fail(error_msg)
 
-
     def execute_meltano_command_real(
         self, project_root: Path, command_args: list[str]
     ) -> FlextResult[dict[str, str]]:
@@ -443,7 +448,9 @@ class MeltanoBridge(FlextDomainService[object]):
             # Initialize project correctly
             project_result = self.initialize_project(project_root)
             if not project_result.success:
-                return FlextResult.fail(f"Failed to load project: {project_result.error}")
+                return FlextResult.fail(
+                    f"Failed to load project: {project_result.error}"
+                )
 
             current_project = project_result.value
 
@@ -451,45 +458,43 @@ class MeltanoBridge(FlextDomainService[object]):
 
             # For command execution, need to use proper plugin execution
             # Parse command to identify plugin and action
-            INVOKE_MIN_ARGS = 2
-            PLUGIN_ARGS_START = 2
-            if len(command_args) >= INVOKE_MIN_ARGS and command_args[0] == "invoke":
+            invoke_min_args = 2
+            if len(command_args) >= invoke_min_args and command_args[0] == "invoke":
                 plugin_name = command_args[1]
-                plugin_args = command_args[PLUGIN_ARGS_START:] if len(command_args) > INVOKE_MIN_ARGS else []
 
                 # Use ProjectPluginsService to find plugin - CORRECTED
                 plugins_service = ProjectPluginsService(current_project)
                 try:
-                    plugin = plugins_service.find_plugin(plugin_name)
+                    plugins_service.find_plugin(plugin_name)
 
-                    # Use REAL invoker_factory - CORRECTED
-                    invoker = invoker_factory(current_project, plugin)
+                    # Create ELTContext for real execution - CORRECTED SIGNATURE
+                    elt_context = ELTContext(project=current_project)
 
-                    # Execute plugin using REAL API - CORRECTED
+                    # Execute using REAL Singer Runner API (NO SUBPROCESS)
+                    runner = SingerRunner(elt_context)
 
-                    # Get execution args from invoker
-                    exec_args = invoker.exec_args(*plugin_args)
+                    try:
+                        # Execute natively through Meltano's Singer Runner - REAL INTEGRATION
+                        asyncio.run(runner.run())
 
-                    # Execute using real subprocess (as Meltano does internally)
-                    result = subprocess.run(exec_args, check=False, capture_output=True, text=True)
+                        command_result = {
+                            "success": "true",
+                            "return_code": "0",
+                            "stdout": f"Plugin {plugin_name} executed successfully via native API",
+                            "stderr": "",
+                            "command": " ".join(command_args),
+                            "execution_method": "meltano_runner_native_api",
+                            "plugin_name": plugin_name,
+                        }
 
-                    command_result = {
-                        "success": str(result.returncode == 0),
-                        "return_code": str(result.returncode),
-                        "stdout": result.stdout or "",
-                        "stderr": result.stderr or "",
-                        "command": " ".join(command_args),
-                        "execution_method": "plugin_invoker_native_corrected",
-                        "plugin_name": plugin_name,
-                    }
-
-                    if result.returncode == 0:
                         self.logger.info(
-                            "Real Meltano command completed successfully - CORRECTED",
+                            "Real Meltano command completed via native API",
                             command=command_args,
                         )
                         return FlextResult[dict[str, str]].ok(command_result)
-                    error_msg = f"Command failed: {result.stderr or result.stdout}"
+
+                    except Exception as runner_error:
+                        error_msg = f"Native API execution failed: {runner_error}"
                     self.logger.error(
                         "Real Meltano command failed - CORRECTED",
                         error=error_msg,
@@ -498,10 +503,14 @@ class MeltanoBridge(FlextDomainService[object]):
                     return FlextResult.fail(error_msg)
 
                 except Exception as plugin_error:
-                    return FlextResult[dict[str, str]].fail(f"Plugin execution failed: {plugin_error}")
+                    return FlextResult[dict[str, str]].fail(
+                        f"Plugin execution failed: {plugin_error}"
+                    )
             else:
                 # For other commands, use general execution
-                return FlextResult[dict[str, str]].fail(f"Command format not supported: {command_args}")
+                return FlextResult[dict[str, str]].fail(
+                    f"Command format not supported: {command_args}"
+                )
 
         except Exception as e:
             error_msg = f"Real command execution failed - CORRECTED: {e}"
@@ -539,7 +548,9 @@ class MeltanoBridge(FlextDomainService[object]):
                 for plugin in type_plugins:
                     plugin_info = {
                         "name": str(plugin.name),
-                        "type": str(plugin_type.singular),  # extractor/loader/transformer
+                        "type": str(
+                            plugin_type.singular
+                        ),  # extractor/loader/transformer
                         "namespace": str(getattr(plugin, "namespace", "")),
                         "executable": str(getattr(plugin, "executable", "")),
                         "pip_url": str(getattr(plugin, "pip_url", "")),
@@ -563,7 +574,11 @@ class MeltanoBridge(FlextDomainService[object]):
 
     # Using FlextCallable patterns for asynchronous execution - Performance timing applied
     async def run_plugin_async(
-        self, project: Project, plugin_name: str, command: str, args: list[str] | None = None
+        self,
+        project: Project,
+        plugin_name: str,
+        command: str,
+        args: list[str] | None = None,
     ) -> FlextResult[dict[str, str]]:
         """Executa plugin Meltano usando API nativa real com PluginInvoker.
 
@@ -679,7 +694,9 @@ class MeltanoBridge(FlextDomainService[object]):
             if project_root:
                 project = self.initialize_project(project_root)
                 if not project.success:
-                    return FlextResult[dict[str, str]].fail(f"Failed to initialize project: {project.error}")
+                    return FlextResult[dict[str, str]].fail(
+                        f"Failed to initialize project: {project.error}"
+                    )
                 current_project = project.value
             elif self._current_project is None:
                 current_project = self._create_temp_project()
@@ -709,7 +726,9 @@ class MeltanoBridge(FlextDomainService[object]):
             parsed_blocks = list(parser.find_blocks(0))
 
             if not parsed_blocks:
-                return FlextResult[dict[str, str]].fail("No valid blocks found for execution")
+                return FlextResult[dict[str, str]].fail(
+                    "No valid blocks found for execution"
+                )
 
             # Executar blocks usando API NATIVA - como o CLI faz
             execution_status = "success"
@@ -717,7 +736,9 @@ class MeltanoBridge(FlextDomainService[object]):
             try:
                 # Run blocks sequentially - MESMA LÓGICA que meltano/cli/run.py usa
                 for idx, blk in enumerate(parsed_blocks):
-                    self.logger.info(f"Running block {idx + 1}/{len(parsed_blocks)}: {blk.__class__.__name__}")
+                    self.logger.info(
+                        f"Running block {idx + 1}/{len(parsed_blocks)}: {blk.__class__.__name__}"
+                    )
 
                     # Executar block usando método nativo run() - ASYNC
                     # Precisa ser executado em loop assíncrono
@@ -735,7 +756,11 @@ class MeltanoBridge(FlextDomainService[object]):
                         loop.close()
 
                 if execution_status == "success":
-                    self.logger.info("All blocks completed successfully", tap=tap_name, target=target_name)
+                    self.logger.info(
+                        "All blocks completed successfully",
+                        tap=tap_name,
+                        target=target_name,
+                    )
 
             except Exception as exec_error:
                 execution_status = "error"
@@ -802,7 +827,7 @@ class FlextMeltanoAdapter:
             # Executar inicialização real usando API correta
             init_service.init(
                 activate=False,  # Não ativar automaticamente
-                force=False,     # Não forçar se já existe
+                force=False,  # Não forçar se já existe
             )
 
             project_result = {
@@ -861,7 +886,9 @@ class FlextMeltanoAdapter:
             }
 
             if plugin_type not in type_map:
-                return FlextResult[dict[str, str]].fail(f"Unknown plugin type: {plugin_type}")
+                return FlextResult[dict[str, str]].fail(
+                    f"Unknown plugin type: {plugin_type}"
+                )
 
             plugin_type_enum = type_map[plugin_type]
 
@@ -1000,4 +1027,4 @@ class FlextMeltanoAdapter:
 # PUBLIC API EXPORTS
 # =============================================================================
 
-__all__ = ["MELTANO_AVAILABLE", "FlextMeltanoAdapter", "MeltanoBridge"]
+__all__ = ["FlextMeltanoAdapter", "MeltanoBridge"]

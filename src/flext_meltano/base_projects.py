@@ -115,33 +115,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# ExtensionBase would come from meltano.edk.extension when available
-# ExtensionBase interface - using object for generic extension support
-from typing import TYPE_CHECKING
-
 from dbt.cli.main import dbtRunner
-
-# Using flext-core base service directly
 from flext_core import FlextDomainService, FlextResult
+from meltano.edk.extension import ExtensionBase
+from singer_sdk import Tap, Target
 
-# Dependency injection is handled by FlextDomainService from flext-core
 from flext_meltano.config import FlextMeltanoConfig
-
-if TYPE_CHECKING:
-    from meltano.edk.extension import ExtensionBase
-    from singer_sdk import Tap, Target
-
-# NOTE: FlextMeltanoConfig is now centralized in `config.py` and imported above.
-
-
-# NOTE: FlextMeltanoEvent is centralized in `models.py` and imported above.
-
-
-# === FLEXT-CORE MANDATORY DOMAIN SERVICES ===
-
-
-# NOTE: Base service is centralized in `base_service.py` and imported above.
-
 
 # === SINGER SDK INTEGRATION ===
 
@@ -163,7 +142,7 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoTapService",
                 "status": "ready",
-                "initialized": self._initialized
+                "initialized": self._initialized,
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -180,17 +159,15 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
         """Validate Singer SDK availability and configuration."""
         if not self.tap_class:
             return FlextResult[bool].fail("Tap class not configured")
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get tap health status."""
-        return FlextResult[dict[str, object]].ok(
-            {
-                "service": "tap",
-                "tap_configured": self.tap_class is not None,
-                "initialized": self._initialized,
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "service": "tap",
+            "tap_configured": self.tap_class is not None,
+            "initialized": self._initialized,
+        })
 
     def set_tap_class(self, tap_class: type[Tap]) -> FlextResult[None]:
         """Set Singer tap class - MANDATORY for operation."""
@@ -201,7 +178,7 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
         """Validate if service is ready for actual use."""
         if not self.tap_class:
             return FlextResult[bool].fail("Tap class not configured")
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def discover_catalog(self) -> FlextResult[dict[str, object]]:
         """Discover catalog using Singer SDK patterns."""
@@ -212,7 +189,9 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
             try:
                 self.tap_instance = self.tap_class(config=self.config.model_dump())
             except (ValueError, TypeError, AttributeError) as e:
-                return FlextResult[dict[str, object]].fail(f"Failed to create tap instance: {e}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to create tap instance: {e}"
+                )
 
         try:
             catalog = self.tap_instance.catalog_dict
@@ -238,7 +217,7 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]]):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoTargetService",
                 "status": "ready",
-                "initialized": self._initialized
+                "initialized": self._initialized,
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -255,17 +234,15 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]]):
         """Validate Singer SDK availability and configuration."""
         if not self.target_class:
             return FlextResult[bool].fail("Target class not configured")
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get target health status."""
-        return FlextResult[dict[str, object]].ok(
-            {
-                "service": "target",
-                "target_configured": self.target_class is not None,
-                "initialized": self._initialized,
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "service": "target",
+            "target_configured": self.target_class is not None,
+            "initialized": self._initialized,
+        })
 
     def set_target_class(self, target_class: type[Target]) -> FlextResult[None]:
         """Set Singer target class - MANDATORY for operation."""
@@ -276,7 +253,7 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]]):
         """Validate if service is ready for actual use."""
         if not self.target_class:
             return FlextResult[bool].fail("Target class not configured")
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
 
 # === MELTANO EDK INTEGRATION ===
@@ -298,7 +275,7 @@ class FlextMeltanoExtensionService(FlextDomainService[dict[str, object]]):
             return FlextResult[dict[str, object]].ok({
                 "service": "FlextMeltanoExtensionService",
                 "status": "ready",
-                "initialized": self._initialized
+                "initialized": self._initialized,
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -313,17 +290,15 @@ class FlextMeltanoExtensionService(FlextDomainService[dict[str, object]]):
 
     def validate_service(self) -> FlextResult[bool]:
         """Validate Meltano EDK availability."""
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
-        return FlextResult[dict[str, object]].ok(
-            {
-                "service": "extension",
-                "extension_configured": self.extension_class is not None,
-                "initialized": self._initialized,
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "service": "extension",
+            "extension_configured": self.extension_class is not None,
+            "initialized": self._initialized,
+        })
 
     def set_extension_class(
         self,
@@ -359,7 +334,7 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
                 "service": "FlextMeltanoDbtService",
                 "status": "ready",
                 "project_dir": str(self.project_dir) if self.project_dir else None,
-                "initialized": self._initialized
+                "initialized": self._initialized,
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
@@ -377,17 +352,15 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
         if not self.project_dir or not self.project_dir.exists():
             return FlextResult[bool].fail("DBT project directory not found")
 
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get DBT health status."""
-        return FlextResult[dict[str, object]].ok(
-            {
-                "service": "dbt",
-                "project_dir": str(self.project_dir) if self.project_dir else None,
-                "initialized": self._initialized,
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "service": "dbt",
+            "project_dir": str(self.project_dir) if self.project_dir else None,
+            "initialized": self._initialized,
+        })
 
     async def _execute_dbt_command(
         self,
@@ -404,7 +377,9 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
         try:
             # Validate project directory
             if not self.project_dir or not self.project_dir.exists():
-                return FlextResult[list[dict[str, object]]].fail(f"DBT project not found at {self.project_dir}")
+                return FlextResult[list[dict[str, object]]].fail(
+                    f"DBT project not found at {self.project_dir}"
+                )
 
             # Handle test environment (emulate successful execution)
             if not self.runner:
@@ -428,7 +403,9 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
             return FlextResult[list[dict[str, object]]].ok([])
 
         except (ValueError, TypeError, ImportError, RuntimeError) as e:
-            return FlextResult[list[dict[str, object]]].fail(f"DBT {command} execution failed: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"DBT {command} execution failed: {e}"
+            )
 
     async def run_models(
         self,
@@ -471,7 +448,6 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
         return "1.10.5"  # Current DBT Core version
 
 
-
 # === FACTORY FUNCTIONS USING MANDATORY PATTERNS ===
 
 
@@ -483,13 +459,15 @@ def create_meltano_tap_service(
         service = FlextMeltanoTapService(config)
         init_result = service.initialize()
         if not init_result.success:
-            return FlextResult.fail(
+            return FlextResult[FlextMeltanoTapService].fail(
                 f"Tap service initialization failed: {init_result.error}"
             )
 
         return FlextResult[FlextMeltanoTapService].ok(service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult[FlextMeltanoTapService].fail(f"Failed to create tap service: {e}")
+        return FlextResult[FlextMeltanoTapService].fail(
+            f"Failed to create tap service: {e}"
+        )
 
 
 def create_meltano_target_service(
@@ -500,13 +478,15 @@ def create_meltano_target_service(
         service = FlextMeltanoTargetService(config)
         init_result = service.initialize()
         if not init_result.success:
-            return FlextResult.fail(
+            return FlextResult[FlextMeltanoTargetService].fail(
                 f"Target service initialization failed: {init_result.error}"
             )
 
         return FlextResult[FlextMeltanoTargetService].ok(service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult[FlextMeltanoTargetService].fail(f"Failed to create target service: {e}")
+        return FlextResult[FlextMeltanoTargetService].fail(
+            f"Failed to create target service: {e}"
+        )
 
 
 def create_meltano_dbt_service(
@@ -517,13 +497,15 @@ def create_meltano_dbt_service(
         service = FlextMeltanoDbtService(config)
         init_result = service.initialize()
         if not init_result.success:
-            return FlextResult.fail(
+            return FlextResult[FlextMeltanoDbtService].fail(
                 f"DBT service initialization failed: {init_result.error}"
             )
 
         return FlextResult[FlextMeltanoDbtService].ok(service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult[FlextMeltanoDbtService].fail(f"Failed to create DBT service: {e}")
+        return FlextResult[FlextMeltanoDbtService].fail(
+            f"Failed to create DBT service: {e}"
+        )
 
 
 def create_meltano_extension_service(
@@ -534,13 +516,15 @@ def create_meltano_extension_service(
         service = FlextMeltanoExtensionService(config)
         init_result = service.initialize()
         if not init_result.success:
-            return FlextResult.fail(
+            return FlextResult[FlextMeltanoExtensionService].fail(
                 f"Extension service initialization failed: {init_result.error}"
             )
 
         return FlextResult[FlextMeltanoExtensionService].ok(service)
     except (ValueError, TypeError, ImportError) as e:
-        return FlextResult[FlextMeltanoExtensionService].fail(f"Failed to create extension service: {e}")
+        return FlextResult[FlextMeltanoExtensionService].fail(
+            f"Failed to create extension service: {e}"
+        )
 
 
 # Legacy aliases removed - use full service names for clarity
