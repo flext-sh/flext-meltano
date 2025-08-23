@@ -13,7 +13,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from flext_meltano.runtime_bridge import FlextMeltanoBridge, create_flext_meltano_bridge
+from flext_meltano.executors_bridge import FlextMeltanoBridge, create_flext_meltano_bridge
 
 
 class TestFlextMeltanoBridgeComprehensive:

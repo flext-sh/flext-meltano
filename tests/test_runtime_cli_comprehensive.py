@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
-from flext_meltano.runtime_cli import (
+from flext_meltano.executors_cli import (
     FlextMeltanoCli,
     flext_meltano_run_cli,
 )
