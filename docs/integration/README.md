@@ -88,7 +88,7 @@ class FlextMeltanoBridge:
             {
                 "meltano": "3.0.0",
                 "python": "3.13.0",
-                "flext_meltano": "2.0.0",
+                "flext_meltano": "0.9.0",
                 "singer_sdk": "0.44.0",
                 "dbt_core": "1.10.5"
             }
@@ -904,7 +904,7 @@ make security-audit          # ✅ PASSING - Security compliance
 
 ---
 
-**Status**: Active Development — Integration functional; stabilization and coverage improvements in progress  
-**Version: 0.9.0  
-**Last Updated**: 2025-08-01  
+**Status**: Active Development — Integration functional; stabilization and coverage improvements in progress
+**Version: 0.9.0
+**Last Updated**: 2025-08-01
 **Maintainer\*\*: FLEXT Development Team

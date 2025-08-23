@@ -5,7 +5,7 @@ Este módulo implementa testes REAIS para TODAS as funcionalidades do MeltanoBri
 - Cobrindo TODAS as funções públicas
 - Usando FlextResult patterns (.value, .unwrap_or())
 - Testando cenários de sucesso E erro
-- Target: 85%+ coverage para wrapper_meltano.py
+- Target: 85%+ coverage para base_meltano.py
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from flext_meltano.wrapper_meltano import FlextMeltanoAdapter, MeltanoBridge
+from flext_meltano.base_meltano import FlextMeltanoAdapter, MeltanoBridge
 
 
 class TestMeltanoBridgeComprehensive:

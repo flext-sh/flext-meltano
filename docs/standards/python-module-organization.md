@@ -1173,7 +1173,7 @@ def flext_meltano_execute_job(*args, **kwargs):
     """
     DEPRECATED: Use execute_meltano_command instead.
 
-    This function will be removed in version 1.0.0.
+    This function will be removed in version 0.9.0.
     Use execute_meltano_command for consistent naming.
     """
     warn(
@@ -1221,7 +1221,7 @@ python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-csv
 
 ---
 
-**Last Updated**: 2025-08-01  
-**Target Audience**: FLEXT Meltano developers and Go integration developers  
-**Scope**: Python module organization for Go ↔ Python bridge integration  
+**Last Updated**: 2025-08-01
+**Target Audience**: FLEXT Meltano developers and Go integration developers
+**Scope**: Python module organization for Go ↔ Python bridge integration
 **Status**: ⚠️ **Requires Critical Fixes** - 3 issues must be resolved before implementation

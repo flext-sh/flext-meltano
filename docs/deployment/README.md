@@ -334,7 +334,7 @@ spec:
     spec:
       containers:
         - name: flext-service
-          image: flext/flext-service:2.0.0
+          image: flext/flext-service:0.9.0
           ports:
             - containerPort: 8081
           env:
@@ -399,7 +399,7 @@ version: "3.8"
 
 services:
   flext-service:
-    image: flext/flext-service:2.0.0
+    image: flext/flext-service:0.9.0
     ports:
       - "8081:8081"
     environment:
@@ -588,7 +588,7 @@ docker logs -f flext-service
 
 ---
 
-**Status**: Active Development — Deployment guide functional; stabilization in progress  
-**Version: 0.9.0  
-**Last Updated**: 2025-08-01  
+**Status**: Active Development — Deployment guide functional; stabilization in progress
+**Version: 0.9.0
+**Last Updated**: 2025-08-01
 **Maintainer\*\*: FLEXT Development Team

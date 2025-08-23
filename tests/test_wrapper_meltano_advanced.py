@@ -5,7 +5,7 @@ Este módulo expande a cobertura testando funcionalidades AVANÇADAS do MeltanoB
 - Testes de pipeline ELT REAL completo
 - Testes de error handling COMPREHENSIVE
 - Testes de performance e edge cases
-- Target: Cobertura 90%+ para wrapper_meltano.py
+- Target: Cobertura 90%+ para base_meltano.py
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
-from flext_meltano.wrapper_meltano import FlextMeltanoAdapter, MeltanoBridge
+from flext_meltano.base_meltano import FlextMeltanoAdapter, MeltanoBridge
 
 
 class TestMeltanoBridgeAdvanced:

@@ -259,7 +259,7 @@ def isolated_test_database():
 
 ---
 
-**Status**: Active Development — Integration testing framework functional; stabilization in progress  
-**Version**: 2.0.0-enterprise  
-**Last Updated**: 2025-08-02  
+**Status**: Active Development — Integration testing framework functional; stabilization in progress
+**Version**: 0.9.0-enterprise
+**Last Updated**: 2025-08-02
 **Maintainer**: FLEXT Development Team

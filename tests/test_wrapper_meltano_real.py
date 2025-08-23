@@ -13,7 +13,7 @@ import importlib
 
 from flext_core import FlextResult
 
-from flext_meltano.wrapper_meltano import FlextMeltanoAdapter, MeltanoBridge
+from flext_meltano.base_meltano import FlextMeltanoAdapter, MeltanoBridge
 
 
 class TestMeltanoBridgeReal:
