@@ -75,7 +75,8 @@ class TestMeltanoBridgeReal:
 
     def test_dbt_imports_available(self) -> None:
         """Verifica disponibilidade das APIs reais do DBT."""
-        try:            importlib.find_spec("dbt.cli.main")
+        try:
+            importlib.find_spec("dbt.cli.main")
             importlib.find_spec("dbt.version")
             importlib.find_spec("dbt.cli.main.dbtRunner")
 

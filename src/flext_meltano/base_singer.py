@@ -37,10 +37,12 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
         """
         # Execute operation - Singer wrapper is operational
         self.logger.info("Singer wrapper executed successfully")
-        return FlextResult[dict[str, object]].ok({
-            "service": "MeltanoSingerWrapper",
-            "status": "ready",
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "MeltanoSingerWrapper",
+                "status": "ready",
+            }
+        )
 
     @property
     def logger(self) -> FlextLogger:

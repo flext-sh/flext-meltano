@@ -8,7 +8,10 @@ Tests focus on verifying that the production code actually works.
 from pathlib import Path
 
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.executors_bridge import FlextMeltanoBridge, create_flext_meltano_bridge
+from flext_meltano.executors_bridge import (
+    FlextMeltanoBridge,
+    create_flext_meltano_bridge,
+)
 from flext_meltano.executors_meltano import FlextMeltanoExecutor
 
 
@@ -111,7 +114,7 @@ class TestFlextMeltanoBridgeRealFunctionality:
         assert isinstance(result, dict)
         assert "success" in result
         assert "data" in result or "error" in result
-        
+
         # If successful, data should be a list
         if result["success"]:
             assert isinstance(result["data"], list)
@@ -209,19 +212,19 @@ class TestFlextMeltanoExecutorRealFunctionality:
         bridge = FlextMeltanoBridge()
         version_result = bridge.get_version()
         assert version_result["success"] is True
-        
+
         # Test that executor can be used in bridge operations
         plugins_result = bridge.list_plugins()
         assert plugins_result["success"] is True
 
     def test_python_version_command(self) -> None:
         """Test executor integration with bridge functionality."""
-        executor = FlextMeltanoExecutor()
+        FlextMeltanoExecutor()
 
         # Test bridge integration instead of direct command execution
         bridge = FlextMeltanoBridge()
         version_result = bridge.get_version()
-        
+
         assert version_result["success"] is True
         assert "python" in version_result["data"]
         assert "3.13+" in version_result["data"]["python"]

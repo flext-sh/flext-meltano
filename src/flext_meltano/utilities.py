@@ -157,7 +157,7 @@ class FlextMeltanoUtilities:
 
         """
         try:
-            with file_path.open("w") as f:
+            with file_path.open("w", encoding="utf-8") as f:
                 yaml.dump(config, f)
             return FlextResult[bool].ok(data=True)
         except Exception as e:
@@ -178,7 +178,7 @@ class FlextMeltanoUtilities:
             if not file_path.exists():
                 return FlextResult.fail(f"Config file not found: {file_path}")
 
-            with file_path.open("r") as f:
+            with file_path.open("r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
             # Garantir que todos valores são strings
@@ -317,15 +317,15 @@ class FlextMeltanoUtilities:
             Nome normalizado
 
         """
-        if plugin_type.lower() in ["extractor", "extractors"]:
+        if plugin_type.lower() in {"extractor", "extractors"}:
             if not name.startswith("tap-"):
                 return f"tap-{name}"
-        elif plugin_type.lower() in [
+        elif plugin_type.lower() in {
             "loader",
             "loaders",
             "target",
             "targets",
-        ] and not name.startswith("target-"):
+        } and not name.startswith("target-"):
             return f"target-{name}"
 
         return name
@@ -659,11 +659,11 @@ def validate_config_value[T](
                 # Cast bool to T since T could be bool
                 return FlextResult[T].ok(cast("T", value))
             if isinstance(value, str):
-                bool_val = value.lower() in ("true", "yes", "1", "on")
+                bool_val = value.lower() in {"true", "yes", "1", "on"}
                 return FlextResult[T].ok(cast("T", bool_val))
 
         # Handle numeric conversions
-        if value_type in (int, float):
+        if value_type in {int, float}:
             if isinstance(value, (int, float)):
                 return FlextResult[T].ok(value_type(value))  # type: ignore[call-arg]
             if isinstance(value, str):
@@ -683,7 +683,7 @@ def validate_config_value[T](
             return FlextResult[T].ok(value)  # Type guaranteed by isinstance check
 
         # Attempt conversion using the type constructor
-        if value_type in (type(None),):
+        if value_type == type(None):
             return FlextResult.fail(f"Cannot convert to {value_type.__name__}")
 
         # Try conversion
@@ -746,7 +746,7 @@ def validate_config_value_simple(
         try:
             if value_type is bool and isinstance(value, str):
                 # Special handling for boolean strings
-                return value.lower() in ("true", "1", "yes", "on")
+                return value.lower() in {"true", "1", "yes", "on"}
             if value_type is type(None):
                 # Special handling for NoneType
                 return default

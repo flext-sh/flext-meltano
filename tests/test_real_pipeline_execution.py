@@ -11,11 +11,12 @@ Objetivo: Validar que as APIs nativas funcionam SEM subprocess.
 
 import tempfile
 from pathlib import Path
-import pytest
 
-from flext_meltano.wrapper_meltano import FlextMeltanoAdapter
-from flext_meltano.wrapper_dbt import MeltanoDbtWrapper
+import pytest
 from flext_core import FlextResult
+
+from flext_meltano.wrapper_dbt import MeltanoDbtWrapper
+from flext_meltano.wrapper_meltano import FlextMeltanoAdapter
 
 
 class TestRealPipelineExecution:
@@ -39,7 +40,7 @@ class TestRealPipelineExecution:
 
     def test_create_real_meltano_project(
         self, meltano_adapter: FlextMeltanoAdapter, temp_project_dir: Path
-    ):
+    ) -> None:
         """Testa criação REAL de projeto Meltano usando BlockParser."""
         # Criar projeto usando API nativa Meltano
         result = meltano_adapter.create_project_real(
@@ -55,11 +56,11 @@ class TestRealPipelineExecution:
         # Validar estrutura do projeto criado
         project_path = temp_project_dir / "test_project"
         assert project_path.exists(), "Project directory should exist"
-        
+
         # Verificar arquivos essenciais do Meltano
         meltano_yml = project_path / "meltano.yml"
         assert meltano_yml.exists(), "meltano.yml should exist"
-        
+
         # Verificar conteúdo do meltano.yml
         content = meltano_yml.read_text()
         assert "version:" in content, "Version should be in meltano.yml"
@@ -68,7 +69,7 @@ class TestRealPipelineExecution:
 
     def test_add_plugins_real(
         self, meltano_adapter: FlextMeltanoAdapter, temp_project_dir: Path
-    ):
+    ) -> None:
         """Testa adição REAL de plugins usando ProjectPluginsService."""
         # Primeiro criar projeto
         create_result = meltano_adapter.create_project_real(
@@ -93,7 +94,9 @@ class TestRealPipelineExecution:
             plugin_type="loaders",
             plugin_name="target-jsonl",
         )
-        assert target_result.success, f"Failed to add target-jsonl: {target_result.error}"
+        assert target_result.success, (
+            f"Failed to add target-jsonl: {target_result.error}"
+        )
 
         # Verificar que plugins foram adicionados ao meltano.yml
         meltano_yml = project_path / "meltano.yml"
@@ -103,7 +106,7 @@ class TestRealPipelineExecution:
 
     def test_run_real_elt_pipeline(
         self, meltano_adapter: FlextMeltanoAdapter, temp_project_dir: Path
-    ):
+    ) -> None:
         """Testa execução REAL de pipeline ELT usando PluginInvoker."""
         # Criar projeto com plugins
         create_result = meltano_adapter.create_project_real(
@@ -147,7 +150,7 @@ class TestRealPipelineExecution:
         # Validar resultado da execução
         # Nota: Pode falhar por configuração, mas não deve ter erro de API
         assert isinstance(pipeline_result, FlextResult)
-        
+
         if pipeline_result.success:
             assert pipeline_result.value is not None
             assert isinstance(pipeline_result.value, dict)
@@ -155,13 +158,15 @@ class TestRealPipelineExecution:
             assert pipeline_result.value["execution_method"] == "plugin_invoker_native"
         else:
             # Se falhou, deve ter mensagem de erro clara (não erro de API)
-            assert "not found" in str(pipeline_result.error) or \
-                   "configuration" in str(pipeline_result.error) or \
-                   "failed" in str(pipeline_result.error)
+            assert (
+                "not found" in str(pipeline_result.error)
+                or "configuration" in str(pipeline_result.error)
+                or "failed" in str(pipeline_result.error)
+            )
 
     def test_run_real_dbt_models(
         self, dbt_wrapper: MeltanoDbtWrapper, temp_project_dir: Path
-    ):
+    ) -> None:
         """Testa execução REAL de modelos DBT usando dbtRunner.invoke()."""
         # Criar estrutura básica de projeto DBT
         dbt_project_dir = temp_project_dir / "test_dbt_project"
@@ -224,7 +229,7 @@ test_dbt_project:
 
         # Validar resultado da execução
         assert isinstance(result, FlextResult)
-        
+
         if result.success:
             assert result.value is not None
             assert isinstance(result.value, dict)
@@ -237,12 +242,16 @@ test_dbt_project:
             # Podem falhar por dependências, mas não por erro de API
             assert not any(
                 error_type in str(result.error)
-                for error_type in ["ImportError", "ModuleNotFoundError", "AttributeError"]
+                for error_type in [
+                    "ImportError",
+                    "ModuleNotFoundError",
+                    "AttributeError",
+                ]
             )
 
     def test_compile_dbt_project_real(
         self, dbt_wrapper: MeltanoDbtWrapper, temp_project_dir: Path
-    ):
+    ) -> None:
         """Testa compilação REAL de projeto DBT usando dbtRunner.invoke()."""
         # Criar projeto DBT básico
         dbt_project_dir = temp_project_dir / "compile_test"
@@ -291,11 +300,11 @@ models:
             assert result_data["command"][0] == "compile"
 
     def test_full_elt_dbt_pipeline_integration(
-        self, 
+        self,
         meltano_adapter: FlextMeltanoAdapter,
         dbt_wrapper: MeltanoDbtWrapper,
-        temp_project_dir: Path
-    ):
+        temp_project_dir: Path,
+    ) -> None:
         """Teste integração REAL completa: ELT + DBT."""
         # 1. Criar projeto Meltano
         project_result = meltano_adapter.create_project_real(
@@ -344,7 +353,7 @@ models:
         transform_model = models_dir / "processed_data.sql"
         transform_model.write_text("""
 -- Transform data from ELT pipeline
-SELECT 
+SELECT
     'transformed' as status,
     current_timestamp as processed_at
 """)
@@ -355,7 +364,7 @@ SELECT
             tap_name="tap-csv",
             target_name="target-jsonl",
         )
-        
+
         # Pipeline ELT pode falhar por configuração, mas API deve funcionar
         assert isinstance(elt_result, FlextResult)
 
@@ -367,7 +376,7 @@ SELECT
 
         # Validar que ambas as APIs funcionaram (sem erros de importação/API)
         assert isinstance(dbt_result, FlextResult)
-        
+
         # Se tudo funcionou, validar estrutura de resposta
         if elt_result.success and dbt_result.success:
             assert "execution_method" in elt_result.value
@@ -375,21 +384,19 @@ SELECT
             assert elt_result.value["execution_method"] == "plugin_invoker_native"
             assert dbt_result.value["execution_method"] == "dbt_runner_invoke"
 
-
     @pytest.mark.integration
-    def test_api_availability_real(self):
+    def test_api_availability_real(self) -> None:
         """Testa disponibilidade REAL das APIs nativas do Meltano 3.9.1 e DBT."""
         # Teste que as APIs necessárias estão disponíveis
         try:
             # APIs Meltano Core 3.9.1 - estrutura real
-            from meltano.core.project import Project
-            from meltano.core.plugin_invoker import invoker_factory
-            from meltano.core.project_plugins_service import ProjectPluginsService
-            from meltano.core.elt_context import ELTContext
-            from meltano.core.runner import Runner
-
             # APIs DBT Core
             from dbt.cli.main import dbtRunner
+            from meltano.core.elt_context import ELTContext
+            from meltano.core.plugin_invoker import invoker_factory
+            from meltano.core.project import Project
+            from meltano.core.project_plugins_service import ProjectPluginsService
+            from meltano.core.runner import Runner
 
             # Se chegou até aqui, todas as APIs estão disponíveis
             assert True
@@ -398,7 +405,7 @@ SELECT
             pytest.fail(f"Required API not available: {e}")
 
     @pytest.mark.integration
-    def test_native_api_instantiation(self):
+    def test_native_api_instantiation(self) -> None:
         """Testa instanciação REAL das APIs nativas."""
         # Teste que as APIs podem ser instanciadas
         try:

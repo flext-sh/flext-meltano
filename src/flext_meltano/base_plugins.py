@@ -19,7 +19,9 @@ class FlextTapPlugin(ABC):
     """Interface base para plugins flext-tap-*."""
 
     @abstractmethod
-    def extract_data(self, config: dict[str, object]) -> FlextResult[list[dict[str, object]]]:
+    def extract_data(
+        self, config: dict[str, object]
+    ) -> FlextResult[list[dict[str, object]]]:
         """Extract data using tap-specific logic."""
 
 

@@ -38,9 +38,6 @@ import pytest
 
 from flext_meltano import (
     FlextMeltanoConfig,
-    FlextMeltanoDbtService,
-    FlextMeltanoTapService,
-    FlextMeltanoTargetService,
 )
 
 
@@ -85,7 +82,6 @@ class TestFlextMeltanoConfig:
                 raise AssertionError(msg)
 
 
-
 class TestFlextMeltanoServices:
     """Test service classes."""
 
@@ -93,9 +89,10 @@ class TestFlextMeltanoServices:
         """Test tap service functionality through bridge integration."""
         # FlextMeltanoTapService is abstract, so we test it through bridge functionality
         from flext_meltano.executors_bridge import FlextMeltanoBridge
+
         bridge = FlextMeltanoBridge()
         assert bridge is not None
-        # Test that the bridge can access tap functionality  
+        # Test that the bridge can access tap functionality
         plugins_result = bridge.list_plugins()
         assert plugins_result["success"] is True
         assert "data" in plugins_result
@@ -104,6 +101,7 @@ class TestFlextMeltanoServices:
         """Test target service initialization - using concrete implementation pattern."""
         # FlextMeltanoTargetService is abstract, so we test it through bridge functionality
         from flext_meltano.executors_bridge import FlextMeltanoBridge
+
         bridge = FlextMeltanoBridge()
         assert bridge is not None
         # Test that the bridge can access target functionality
@@ -116,14 +114,13 @@ class TestFlextMeltanoServices:
         """Test DBT service functionality through bridge integration."""
         # FlextMeltanoDbtService is abstract, so we test it through bridge functionality
         from flext_meltano.executors_bridge import FlextMeltanoBridge
+
         bridge = FlextMeltanoBridge()
         assert bridge is not None
         # Test that DBT functionality is accessible through the bridge
         version_result = bridge.get_version()
         assert version_result["success"] is True
         assert "dbt_core" in version_result["data"]
-
-
 
 
 if __name__ == "__main__":

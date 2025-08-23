@@ -13,14 +13,11 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-import pytest
 from flext_core import FlextResult
 
 from flext_meltano.runtime_cli import (
     FlextMeltanoCli,
-    cli_main,
     flext_meltano_run_cli,
-    main,
 )
 
 
@@ -216,7 +213,7 @@ class TestFlextMeltanoCliComprehensive:
         assert "project_root" in health_data
 
         # Meltano status deve ser healthy ou degraded
-        assert health_data["meltano_status"] in ["healthy", "degraded"]
+        assert health_data["meltano_status"] in {"healthy", "degraded"}
 
     def test_version_check_comprehensive(self) -> None:
         """Testa version check com API nativa."""
@@ -326,7 +323,7 @@ environments:
 
             # Deve tentar executar pipeline
             assert isinstance(result, FlextResult)
-            
+
             if result.success:
                 pipeline_data = result.value
                 assert "status" in pipeline_data
@@ -609,7 +606,7 @@ class TestFlextMeltanoCliIntegrationComprehensive:
         health_result = cli.health()
         assert health_result.success is True
 
-        # 2. Version check  
+        # 2. Version check
         version_result = cli.version()
         assert version_result.success is True
 

@@ -13,7 +13,6 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-import pytest
 from flext_meltano.runtime_bridge import FlextMeltanoBridge, create_flext_meltano_bridge
 
 
@@ -55,7 +54,7 @@ class TestFlextMeltanoBridgeComprehensive:
             "dbt_core",
             "singer_sdk",
             "python",
-            "integration_method"
+            "integration_method",
         ]
         for field in required_fields:
             assert field in version_data, f"Campo obrigatório ausente: {field}"
@@ -75,10 +74,10 @@ class TestFlextMeltanoBridgeComprehensive:
 
         # Deve retornar response JSON para Go
         assert isinstance(result, dict)
-        
+
         # Verificar estrutura Go-compatible
         assert "success" in result
-        
+
         if result["success"]:
             # Se sucesso, deve ter dados
             assert "data" in result
@@ -92,14 +91,14 @@ class TestFlextMeltanoBridgeComprehensive:
     def test_run_pipeline_without_project(self) -> None:
         """Testa execução de pipeline sem projeto válido."""
         bridge = FlextMeltanoBridge()
-        
+
         # Usar diretório inválido
         result = bridge.run_pipeline("tap-csv", "target-csv", "/invalid/path")
 
         # Deve retornar response JSON estruturada
         assert isinstance(result, dict)
         assert "success" in result
-        
+
         # Deve falhar por projeto inválido
         assert result["success"] is False
         assert "error" in result
@@ -132,7 +131,7 @@ plugins:
             # Deve tentar executar e retornar JSON response
             assert isinstance(result, dict)
             assert "success" in result
-            
+
             if result["success"]:
                 # Se sucesso, verificar dados
                 assert "data" in result
@@ -165,7 +164,7 @@ environments:
             # Deve retornar response JSON
             assert isinstance(result, dict)
             assert "success" in result
-            
+
             if result["success"]:
                 assert "data" in result
             else:
@@ -216,7 +215,7 @@ target-path: "target"
             # Deve tentar executar (pode falhar por falta de profiles.yml)
             assert isinstance(result, dict)
             assert "success" in result
-            
+
             if result["success"]:
                 assert "data" in result
             else:
@@ -256,7 +255,7 @@ environments:
             # Deve tentar instalar plugin
             assert isinstance(result, dict)
             assert "success" in result
-            
+
             if result["success"]:
                 assert "data" in result
             else:
@@ -287,7 +286,7 @@ plugins:
 
             assert isinstance(result, dict)
             assert "success" in result
-            
+
             if result["success"]:
                 project_info = result["data"]
                 assert isinstance(project_info, dict)
@@ -313,7 +312,7 @@ plugins:
         # Deve tentar executar (pode falhar por falta de projeto)
         assert isinstance(result, dict)
         assert "success" in result
-        
+
         if not result["success"]:
             # OK - falha esperada sem projeto válido
             assert "error" in result
@@ -323,9 +322,9 @@ plugins:
         bridge = FlextMeltanoBridge()
 
         result = bridge.invoke_dbt(
-            "compile", 
+            "compile",
             project_dir="/tmp/test_project",
-            profiles_dir="/tmp/test_profiles"
+            profiles_dir="/tmp/test_profiles",
         )
 
         # Deve tentar executar com argumentos
@@ -336,11 +335,7 @@ plugins:
         """Testa invoke_dbt com argumentos com underscore."""
         bridge = FlextMeltanoBridge()
 
-        result = bridge.invoke_dbt(
-            "run",
-            _select="models.staging",
-            _full_refresh=True
-        )
+        result = bridge.invoke_dbt("run", _select="models.staging", _full_refresh=True)
 
         # Deve converter _select para --select
         assert isinstance(result, dict)
@@ -448,9 +443,7 @@ integration_profile:
 
             # 2. Testar invoke_dbt
             invoke_result = bridge.invoke_dbt(
-                "compile", 
-                project_dir=project_root,
-                profiles_dir=project_root
+                "compile", project_dir=project_root, profiles_dir=project_root
             )
             assert isinstance(invoke_result, dict)
             assert "success" in invoke_result
@@ -540,26 +533,34 @@ class TestFlextMeltanoBridgeJsonApiCompatibility:
 
         for method, args in methods_to_test:
             result = method(*args)
-            
+
             # Deve ser dict
-            assert isinstance(result, dict), f"Method {method.__name__} não retornou dict"
-            
+            assert isinstance(result, dict), (
+                f"Method {method.__name__} não retornou dict"
+            )
+
             # Deve ter success field
             assert "success" in result, f"Method {method.__name__} sem 'success' field"
-            assert isinstance(result["success"], bool), f"Method {method.__name__} success não é bool"
-            
+            assert isinstance(result["success"], bool), (
+                f"Method {method.__name__} success não é bool"
+            )
+
             # Se success=True, deve ter data
             if result["success"]:
                 assert "data" in result, f"Method {method.__name__} success sem 'data'"
             else:
                 # Se success=False, deve ter error
-                assert "error" in result, f"Method {method.__name__} failure sem 'error'"
-                assert isinstance(result["error"], str), f"Method {method.__name__} error não é string"
+                assert "error" in result, (
+                    f"Method {method.__name__} failure sem 'error'"
+                )
+                assert isinstance(result["error"], str), (
+                    f"Method {method.__name__} error não é string"
+                )
 
     def test_json_serialization_compatibility(self) -> None:
         """Testa que responses são JSON-serializáveis para Go."""
         import json
-        
+
         bridge = FlextMeltanoBridge()
 
         # Testar que todas as responses são serializáveis
@@ -581,11 +582,12 @@ class TestFlextMeltanoBridgeJsonApiCompatibility:
         version_result = bridge.get_version()
         if version_result["success"]:
             data = version_result["data"]
-            
+
             # Todos os valores devem ser tipos básicos (string, number, bool)
             for key, value in data.items():
-                assert isinstance(value, (str, int, float, bool)), \
+                assert isinstance(value, (str, int, float, bool)), (
                     f"Value for {key} is not Go-compatible type: {type(value)}"
+                )
 
         # Testar que errors são sempre strings
         error_result = bridge.execute_meltano_command(["invalid"], "/invalid")

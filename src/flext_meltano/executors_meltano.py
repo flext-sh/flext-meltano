@@ -54,17 +54,19 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
             FlextResult contendo informações do serviço
 
         """
-        return FlextResult[dict[str, object]].ok({
-            "service": "FlextMeltanoExecutor",
-            "status": "ready",
-            "capabilities": [
-                "execute_meltano_command",
-                "execute_dbt_command",
-                "run_elt_pipeline",
-                "install_plugin",
-                "get_project_info",
-            ],
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "FlextMeltanoExecutor",
+                "status": "ready",
+                "capabilities": [
+                    "execute_meltano_command",
+                    "execute_dbt_command",
+                    "run_elt_pipeline",
+                    "install_plugin",
+                    "get_project_info",
+                ],
+            }
+        )
 
     def execute_meltano_command(
         self, project_root: Path, command: list[str], timeout: int = 300
@@ -99,10 +101,12 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
             # Use native project execution instead of command
             project_result = bridge.initialize_project(project_root)
             if project_result.success:
-                result = FlextResult[dict[str, str]].ok({
-                    "success": "true",
-                    "command": " ".join(command),
-                })
+                result = FlextResult[dict[str, str]].ok(
+                    {
+                        "success": "true",
+                        "command": " ".join(command),
+                    }
+                )
             else:
                 result = FlextResult[dict[str, str]].fail(
                     f"Project error: {project_result.error}"
@@ -135,7 +139,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 return FlextResult[dict[str, object]].ok(execution_result)
 
             error_msg = f"Native Meltano command failed: {result.error}"
-            self.logger.exception(error_msg, command=command)
+            self.logger.error(error_msg, command=command)
             return FlextResult[dict[str, object]].fail(error_msg)
 
         except Exception as e:

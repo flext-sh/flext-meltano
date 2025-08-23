@@ -53,11 +53,13 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute tap service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoTapService",
-                "tap_name": getattr(self, "tap_name", "unknown"),
-                "status": "ready",
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoTapService",
+                    "tap_name": getattr(self, "tap_name", "unknown"),
+                    "status": "ready",
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -209,11 +211,13 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]], ABC):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute target service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoTargetService",
-                "target_name": getattr(self, "target_name", "unknown"),
-                "status": "ready",
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoTargetService",
+                    "target_name": getattr(self, "target_name", "unknown"),
+                    "status": "ready",
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -381,11 +385,13 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute DBT service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoDbtService",
-                "project_name": self.project_name,
-                "status": "ready",
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoDbtService",
+                    "project_name": self.project_name,
+                    "status": "ready",
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 

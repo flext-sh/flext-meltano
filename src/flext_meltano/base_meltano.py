@@ -60,11 +60,13 @@ class MeltanoBridge(FlextDomainService[dict[str, object]]):
             # Get Meltano version
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult[dict[str, str]].ok({
-                "version": meltano_version,
-                "meltano": meltano_version,
-                "cli_type": "native_meltano_api",
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "version": meltano_version,
+                    "meltano": meltano_version,
+                    "cli_type": "native_meltano_api",
+                }
+            )
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
@@ -262,11 +264,11 @@ class MeltanoBridge(FlextDomainService[dict[str, object]]):
 
             # Converter string type para PluginType enum
             plugin_type_enum = None
-            if plugin_type.lower() in ["extractor", "extractors"]:
+            if plugin_type.lower() in {"extractor", "extractors"}:
                 plugin_type_enum = PluginType.EXTRACTORS
-            elif plugin_type.lower() in ["loader", "loaders", "target", "targets"]:
+            elif plugin_type.lower() in {"loader", "loaders", "target", "targets"}:
                 plugin_type_enum = PluginType.LOADERS
-            elif plugin_type.lower() in ["transformer", "transformers", "dbt"]:
+            elif plugin_type.lower() in {"transformer", "transformers", "dbt"}:
                 plugin_type_enum = PluginType.TRANSFORMERS
             else:
                 return FlextResult.fail(f"Invalid plugin type: {plugin_type}")
@@ -956,15 +958,19 @@ class FlextMeltanoAdapter:
                 "namespace": meltano_plugin.get("namespace", ""),
                 "description": meltano_plugin.get("description", ""),
                 "version": meltano_plugin.get("version", ""),
-                "configuration": str({
-                    "pip_url": meltano_plugin.get("pip_url", ""),
-                    "executable": meltano_plugin.get("executable", ""),
-                    "config": str(meltano_plugin.get("config", {})),
-                }),
-                "metadata": str({
-                    "source": "meltano",
-                    "installed": str(meltano_plugin.get("installed", False)),
-                }),
+                "configuration": str(
+                    {
+                        "pip_url": meltano_plugin.get("pip_url", ""),
+                        "executable": meltano_plugin.get("executable", ""),
+                        "config": str(meltano_plugin.get("config", {})),
+                    }
+                ),
+                "metadata": str(
+                    {
+                        "source": "meltano",
+                        "installed": str(meltano_plugin.get("installed", False)),
+                    }
+                ),
             }
 
             return FlextResult[dict[str, str]].ok(flext_plugin)
@@ -1005,16 +1011,20 @@ class FlextMeltanoAdapter:
                 "project_name": str(meltano_config.get("project_name", "")),
                 "project_id": str(meltano_config.get("project_id", "")),
                 "environments": str(environments_data),
-                "plugins": str({
-                    "extractors": str(extractors_list),
-                    "loaders": str(loaders_list),
-                    "transformers": str(transformers_list),
-                }),
+                "plugins": str(
+                    {
+                        "extractors": str(extractors_list),
+                        "loaders": str(loaders_list),
+                        "transformers": str(transformers_list),
+                    }
+                ),
                 "schedules": str(schedules_data),
-                "metadata": str({
-                    "meltano_version": str(meltano_config.get("version", "")),
-                    "created_at": str(meltano_config.get("created_at", "")),
-                }),
+                "metadata": str(
+                    {
+                        "meltano_version": str(meltano_config.get("version", "")),
+                        "created_at": str(meltano_config.get("created_at", "")),
+                    }
+                ),
             }
 
             return FlextResult[dict[str, str]].ok(flext_config)
