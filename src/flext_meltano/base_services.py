@@ -4,7 +4,7 @@ FUNÇÃO 3: Base components para projetos flext-*
 - FlextMeltanoTapService: Base para flext-tap-* projects
 - FlextMeltanoTargetService: Base para flext-target-* projects
 - FlextMeltanoDbtService: Base para flext-dbt-* projects
-- Real flext-core integration (NO MOCKS)
+- Real flext-core integration using proper protocols and service patterns
 """
 
 from __future__ import annotations
@@ -13,12 +13,13 @@ import json
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
-    FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextServiceProcessor,
     get_logger,
 )
 from singer_sdk import Tap, Target
@@ -33,35 +34,60 @@ logger = get_logger(__name__)
 # =============================================================================
 
 
-class FlextMeltanoTapService(FlextDomainService[dict[str, object]], ABC):
+class FlextMeltanoTapService(
+    FlextServiceProcessor[dict[str, Any], Tap, dict[str, Any]], ABC
+):
     """Serviço base para projetos flext-tap-*.
 
     Fornece funcionalidades comuns para todos os taps FLEXT,
-    integrando Singer SDK com padrões flext-core.
+    integrando Singer SDK com padrões flext-core usando FlextServiceProcessor.
     """
 
-    # Pydantic fields for frozen model
-    tap_name: str
-    wrapper_singer: MeltanoSingerWrapper = MeltanoSingerWrapper()
-    singer_adapter: FlextSingerAdapter = FlextSingerAdapter()
+    def __init__(self, tap_name: str) -> None:
+        """Initialize tap service with name."""
+        super().__init__()
+        self.tap_name = tap_name
+        self.wrapper_singer = MeltanoSingerWrapper()
+        self.singer_adapter = FlextSingerAdapter()
+        self._logger = get_logger(self.__class__.__name__)
 
     @property
     def logger(self) -> FlextLogger:
         """Get logger instance."""
-        return get_logger(self.__class__.__name__)
+        return self._logger
 
-    def execute(self) -> FlextResult[dict[str, object]]:
-        """Execute tap service operation (required by FlextDomainService)."""
+    def process(self, request: dict[str, Any]) -> FlextResult[Tap]:
+        """Process tap configuration and create Singer Tap instance."""
         try:
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "FlextMeltanoTapService",
-                    "tap_name": getattr(self, "tap_name", "unknown"),
-                    "status": "ready",
-                }
-            )
+            self.logger.info("Processing tap configuration", tap_name=self.tap_name)
+
+            # Validate configuration
+            config_result = self.validate_tap_config(request)
+            if config_result.is_failure:
+                return FlextResult[Tap].fail(
+                    config_result.error or "Invalid configuration"
+                )
+
+            # Create tap instance
+            tap_class = self.get_tap_class()
+            tap_instance = tap_class(config=request)
+
+            return FlextResult[Tap].ok(tap_instance)
+
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
+            error_msg = f"Failed to process tap configuration: {e}"
+            self.logger.error(error_msg, tap_name=self.tap_name, error=str(e))
+            return FlextResult[Tap].fail(error_msg)
+
+    def build(self, domain: Tap, *, correlation_id: str) -> dict[str, Any]:
+        """Build final result from tap instance."""
+        return {
+            "service": "FlextMeltanoTapService",
+            "tap_name": self.tap_name,
+            "tap_class": domain.__class__.__name__,
+            "status": "ready",
+            "correlation_id": correlation_id,
+        }
 
     @abstractmethod
     def get_tap_class(self) -> type[Tap]:
@@ -211,13 +237,11 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]], ABC):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute target service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "FlextMeltanoTargetService",
-                    "target_name": getattr(self, "target_name", "unknown"),
-                    "status": "ready",
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                "service": "FlextMeltanoTargetService",
+                "target_name": getattr(self, "target_name", "unknown"),
+                "status": "ready",
+            })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -385,13 +409,11 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute DBT service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "FlextMeltanoDbtService",
-                    "project_name": self.project_name,
-                    "status": "ready",
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                "service": "FlextMeltanoDbtService",
+                "project_name": self.project_name,
+                "status": "ready",
+            })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 

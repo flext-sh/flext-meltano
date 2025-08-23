@@ -18,11 +18,11 @@ from unittest.mock import Mock, patch
 
 from flext_core import FlextResult
 
-from flext_meltano import (
+from flext_meltano.executors_bridge import (
     FlextMeltanoBridge,
-    FlextMeltanoConfig,
     create_flext_meltano_bridge,
 )
+from flext_meltano.config import FlextMeltanoConfig
 
 
 class TestFlextMeltanoBridge:

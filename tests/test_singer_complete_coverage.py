@@ -454,8 +454,8 @@ class TestSingerRealWorldUsage:
         target_config = {"destination": "test_destination", "format": "jsonl"}
 
         # Step 2: Run pipeline
-        pipeline_result = wrapper.run_tap_target_pipeline(
-            TestTap, tap_config, TestTarget, target_config
+        pipeline_result = wrapper.run_elt_pipeline_real(
+            TestTap, TestTarget, tap_config, target_config
         )
 
         # Step 3: Validate pipeline result

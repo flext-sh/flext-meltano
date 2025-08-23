@@ -15,8 +15,8 @@ from pathlib import Path
 import pytest
 from flext_core import FlextResult
 
-from flext_meltano.wrapper_dbt import MeltanoDbtWrapper
-from flext_meltano.wrapper_meltano import FlextMeltanoAdapter
+from flext_meltano.base_dbt import MeltanoDbtWrapper
+from flext_meltano.base_meltano import FlextMeltanoAdapter
 
 
 class TestRealPipelineExecution:
