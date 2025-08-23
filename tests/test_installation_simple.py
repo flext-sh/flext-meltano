@@ -70,12 +70,12 @@ class TestFlextMeltanoInstaller:
         installer = FlextMeltanoInstaller(config)
         result = installer.get_health_status()
         assert result.success
-        assert result.data is not None
-        if "service" not in result.data:
-            msg: str = f"Expected {'service'} in {result.data}"
+        assert result.value is not None
+        if "service" not in result.value:
+            msg: str = f"Expected {'service'} in {result.value}"
             raise AssertionError(msg)
-        if result.data["service"] != "installation":
-            msg: str = f"Expected {'installation'}, got {result.data['service']}"
+        if result.value["service"] != "installation":
+            msg: str = f"Expected {'installation'}, got {result.value['service']}"
             raise AssertionError(msg)
 
     def test_installer_add_plugin(self) -> None:
@@ -131,7 +131,7 @@ class TestFlextMeltanoInstallerFactoryFunctions:
         config = FlextMeltanoConfig()
         result = create_installer_service(config)
         assert result.success
-        assert isinstance(result.data, FlextMeltanoInstaller)
+        assert isinstance(result.value, FlextMeltanoInstaller)
 
     def test_create_installer_service_with_path(self) -> None:
         """Test creating installer service with custom path."""
@@ -140,9 +140,9 @@ class TestFlextMeltanoInstallerFactoryFunctions:
             config = FlextMeltanoConfig(project_root=str(custom_path))
             result = create_installer_service(config)
             assert result.success
-        assert result.data is not None
-        if result.data.project_root != custom_path:
-            msg: str = f"Expected {custom_path}, got {result.data.project_root}"
+        assert result.value is not None
+        if result.value.project_root != custom_path:
+            msg: str = f"Expected {custom_path}, got {result.value.project_root}"
             raise AssertionError(msg)
 
     def test_flext_meltano_install_plugin(self) -> None:
@@ -185,7 +185,7 @@ class TestFlextMeltanoInstallerIntegration:
         create_result = create_installer_service(config)
         assert create_result.success
 
-        installer = create_result.data
+        installer = create_result.value
         assert installer is not None
 
         # Test basic operations

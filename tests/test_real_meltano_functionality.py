@@ -9,9 +9,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_meltano.bridge import FlextMeltanoBridge
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.execution import FlextMeltanoExecutor
+from flext_meltano.wrapper_meltano import MeltanoBridge
+from flext_meltano.runtime_executor import FlextMeltanoExecutor
+from flext_meltano.runtime_bridge import FlextMeltanoBridge
 
 
 class TestRealMeltanoFunctionality:

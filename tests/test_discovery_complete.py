@@ -117,12 +117,12 @@ class TestFlextMeltanoDiscoverer:
         service = FlextMeltanoDiscoverer(config)
         result = service.get_health_status()
         assert result.success
-        assert result.data is not None
-        if "service" not in result.data:
-            msg: str = f"Expected {'service'} in {result.data}"
+        assert result.value is not None
+        if "service" not in result.value:
+            msg: str = f"Expected {'service'} in {result.value}"
             raise AssertionError(msg)
-        if result.data["service"] != "discovery":
-            msg: str = f"Expected {'discovery'}, got {result.data['service']}"
+        if result.value["service"] != "discovery":
+            msg: str = f"Expected {'discovery'}, got {result.value['service']}"
             raise AssertionError(msg)
 
     def test_discover_catalog_async(self) -> None:
@@ -326,7 +326,7 @@ class TestFactoryFunctions:
         config = FlextMeltanoConfig()
         result = create_discoverer(config)
         assert result.success
-        assert isinstance(result.data, FlextMeltanoDiscoverer)
+        assert isinstance(result.value, FlextMeltanoDiscoverer)
 
     def test_flext_meltano_discover_catalog_async(self) -> None:
         """Test standalone discover catalog function."""
@@ -385,8 +385,8 @@ class TestDiscoveryIntegration:
         create_result = create_discoverer(config)
         assert create_result.success
 
-        assert create_result.data is not None
-        service = create_result.data
+        assert create_result.value is not None
+        service = create_result.value
 
         # Test initialization
         init_result = service.initialize()

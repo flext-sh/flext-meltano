@@ -291,7 +291,7 @@ class TestFlextMeltanoPipelineEventComplete:
         assert event.event_type == PipelineEventType.STARTED
         assert event.pipeline_id == "test-pipeline"
         assert isinstance(event.id, str)
-        assert isinstance(event.data, dict)
+        assert isinstance(event.value, dict)
 
     def test_pipeline_event_creation_with_data(self) -> None:
         """Test pipeline event creation with data."""
@@ -312,8 +312,8 @@ class TestFlextMeltanoPipelineEventComplete:
         )
 
         assert event.event_type == PipelineEventType.COMPLETED
-        assert event.data["execution_id"] == "exec-123"
-        assert event.data["config"]["timeout"] == 300
+        assert event.value["execution_id"] == "exec-123"
+        assert event.value["config"]["timeout"] == 300
 
     def test_pipeline_event_all_types(self) -> None:
         """Test all pipeline event types."""
@@ -502,7 +502,7 @@ class TestCoreModuleFunctionality:
         )
 
         # Validate integration without Singer service (since it's abstract)
-        assert start_event.data["execution_id"] == execution_id
+        assert start_event.value["execution_id"] == execution_id
 
         # Complete the workflow
         state.complete_pipeline()

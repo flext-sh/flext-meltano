@@ -33,7 +33,7 @@ class FlextDbtInMemoryExecutor:
             database: DuckDB database path (default: in-memory)
 
         """
-        self.database = database
+        self.valuebase = database
         if not HAS_DUCKDB:
             msg = "duckdb is required for FlextDbtInMemoryExecutor"
             raise ImportError(msg)
@@ -168,7 +168,7 @@ class FlextDbtInMemoryExecutor:
                 if not exec_result.success:
                     results[model_name] = {"success": False, "error": exec_result.error}
                     continue
-                df = exec_result.data
+                df = exec_result.value
                 validations: dict[str, object] = {}
                 if not isinstance(df, pd.DataFrame):
                     validations["dataframe_type"] = {

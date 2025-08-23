@@ -43,9 +43,9 @@ class TestFlextSingerBridge:
             record={"id": 1, "name": "test"},
         )
         assert result.success
-        assert result.data is not None
-        if result.data["type"] != "RECORD":
-            msg: str = f"Expected {'RECORD'}, got {result.data['type']}"
+        assert result.value is not None
+        if result.value["type"] != "RECORD":
+            msg: str = f"Expected {'RECORD'}, got {result.value['type']}"
             raise AssertionError(msg)
 
     def test_create_schema_message_universal(self) -> None:
@@ -58,9 +58,9 @@ class TestFlextSingerBridge:
             key_properties=["id"],
         )
         assert result.success
-        assert result.data is not None
-        if result.data["type"] != "SCHEMA":
-            msg: str = f"Expected {'SCHEMA'}, got {result.data['type']}"
+        assert result.value is not None
+        if result.value["type"] != "SCHEMA":
+            msg: str = f"Expected {'SCHEMA'}, got {result.value['type']}"
             raise AssertionError(msg)
 
     def test_create_state_message_universal(self) -> None:
@@ -71,9 +71,9 @@ class TestFlextSingerBridge:
             value={"bookmark": "test"},
         )
         assert result.success
-        assert result.data is not None
-        if result.data["type"] != "STATE":
-            msg: str = f"Expected {'STATE'}, got {result.data['type']}"
+        assert result.value is not None
+        if result.value["type"] != "STATE":
+            msg: str = f"Expected {'STATE'}, got {result.value['type']}"
             raise AssertionError(msg)
 
     def test_create_unknown_message_type(self) -> None:
@@ -239,9 +239,9 @@ class TestFlextSingerCatalog:
         catalog = FlextSingerCatalog(data)
         result = catalog.flext_singer_get_catalog()
         assert result.success
-        assert result.data is not None
-        if len(result.data["streams"]) != 1:
-            msg: str = f"Expected {1}, got {len(result.data['streams'])}"
+        assert result.value is not None
+        if len(result.value["streams"]) != 1:
+            msg: str = f"Expected {1}, got {len(result.value['streams'])}"
             raise AssertionError(msg)
 
     def test_add_stream_success(self) -> None:
@@ -281,10 +281,10 @@ class TestFlextSingerCatalog:
         catalog = FlextSingerCatalog()
         result = catalog.flext_singer_get_catalog()
         assert result.success
-        assert result.data is not None
-        assert result.data is not None
-        if "streams" not in result.data:
-            msg: str = f"Expected {'streams'} in {result.data}"
+        assert result.value is not None
+        assert result.value is not None
+        if "streams" not in result.value:
+            msg: str = f"Expected {'streams'} in {result.value}"
             raise AssertionError(msg)
 
     def test_get_selected_streams_empty(self) -> None:
@@ -292,9 +292,9 @@ class TestFlextSingerCatalog:
         catalog = FlextSingerCatalog()
         result = catalog.flext_singer_get_selected_streams()
         assert result.success
-        assert result.data is not None
-        if result.data != []:
-            msg: str = f"Expected {[]}, got {result.data}"
+        assert result.value is not None
+        if result.value != []:
+            msg: str = f"Expected {[]}, got {result.value}"
             raise AssertionError(msg)
 
     def test_get_selected_streams_with_data(self) -> None:
@@ -304,9 +304,9 @@ class TestFlextSingerCatalog:
 
         result = catalog.flext_singer_get_selected_streams()
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
         # Stream is added but not marked as selected, so result should be empty
-        assert result.data == []
+        assert result.value == []
 
 
 class TestFlextSingerFactoryFunctions:
@@ -348,8 +348,8 @@ class TestFlextSingerIntegration:
         # Add to catalog
         add_result = catalog.flext_singer_add_stream(
             "users",
-            schema_result.data["schema"] if schema_result.data else {},
-            schema_result.data["key_properties"] if schema_result.data else [],
+            schema_result.value["schema"] if schema_result.value else {},
+            schema_result.value["key_properties"] if schema_result.value else [],
         )
         assert add_result.success
 
@@ -361,10 +361,10 @@ class TestFlextSingerIntegration:
         assert record_result.success
 
         # Validate messages
-        assert schema_result.data is not None
-        assert record_result.data is not None
-        schema_valid = bridge.flext_singer_validate_message(schema_result.data)
-        record_valid = bridge.flext_singer_validate_message(record_result.data)
+        assert schema_result.value is not None
+        assert record_result.value is not None
+        schema_valid = bridge.flext_singer_validate_message(schema_result.value)
+        record_valid = bridge.flext_singer_validate_message(record_result.value)
         assert schema_valid.success
         assert record_valid.success
 
@@ -398,8 +398,8 @@ class TestFlextSingerIntegration:
             parsed = bridge.flext_singer_parse_message_line(line)
             assert parsed.success
 
-            assert parsed.data is not None
-            validated = bridge.flext_singer_validate_message(parsed.data)
+            assert parsed.value is not None
+            validated = bridge.flext_singer_validate_message(parsed.value)
             assert validated.success
 
 

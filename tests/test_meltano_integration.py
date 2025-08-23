@@ -76,7 +76,7 @@ class TestMeltanoProjectOperations:
         result = validator.validate_project()
 
         assert result.success
-        validation_result = result.data
+        validation_result = result.value
         assert validation_result is not None
         assert not validation_result.is_valid
         if not any(
@@ -105,7 +105,7 @@ environments:
         result = validator.validate_project()
 
         assert result.success
-        validation_result = result.data
+        validation_result = result.value
         assert validation_result is not None
         assert validation_result.is_valid
         if not (validation_result.details["meltano_yml_exists"]):
@@ -163,9 +163,9 @@ class TestMeltanoCommandExecution:
         result = executor.get_health_status()
 
         assert result.success
-        assert result.data is not None
-        if result.data["service"] != "execution":
-            msg: str = f"Expected {'execution'}, got {result.data['service']}"
+        assert result.value is not None
+        if result.value["service"] != "execution":
+            msg: str = f"Expected {'execution'}, got {result.value['service']}"
             raise AssertionError(
                 msg,
             )
@@ -199,9 +199,9 @@ class TestMeltanoPluginDiscovery:
         result = discoverer.get_health_status()
 
         assert result.success
-        assert result.data is not None
-        if result.data["service"] != "discovery":
-            msg: str = f"Expected {'discovery'}, got {result.data['service']}"
+        assert result.value is not None
+        if result.value["service"] != "discovery":
+            msg: str = f"Expected {'discovery'}, got {result.value['service']}"
             raise AssertionError(
                 msg,
             )
@@ -220,7 +220,7 @@ class TestMeltanoPluginDiscovery:
             result = discoverer.discover_plugins()
 
             # Accept either success or failure for discovery since we're testing fallback
-            plugins = result.data if result.success else []
+            plugins = result.value if result.success else []
             assert isinstance(plugins, list)
 
         # Check default plugins are present
@@ -239,7 +239,7 @@ class TestMeltanoPluginDiscovery:
         try:
             result = discoverer.discover_plugins("extractors")
             assert result.success
-            plugins = result.data
+            plugins = result.value
             assert plugins is not None
 
             # All plugins should be extractors
@@ -341,10 +341,10 @@ class TestMeltanoLegacyCompatibility:
 
         assert hasattr(result, "success")
         if result.success:
-            assert result.data is not None
-        assert result.data is not None
-        if "plugins" not in result.data:
-            msg: str = f"Expected {'plugins'} in {result.data}"
+            assert result.value is not None
+        assert result.value is not None
+        if "plugins" not in result.value:
+            msg: str = f"Expected {'plugins'} in {result.value}"
             raise AssertionError(msg)
 
     def test_legacy_validation_functions(self) -> None:

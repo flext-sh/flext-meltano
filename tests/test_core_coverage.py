@@ -290,7 +290,7 @@ class TestFlextMeltanoPipelineEvent:
         assert event.pipeline_id == pipeline_id
         assert event.event_type == PipelineEventType.STARTED.value
         assert event.timestamp is not None
-        assert event.data["pipeline_name"] == "test-pipeline"
+        assert event.value["pipeline_name"] == "test-pipeline"
 
     def test_pipeline_event_different_types(self) -> None:
         """Test FlextMeltanoPipelineEvent with different event types."""
@@ -312,7 +312,7 @@ class TestFlextMeltanoPipelineEvent:
             )
 
             assert event.event_type == event_type.value
-            assert event.data == data
+            assert event.value == data
 
     def test_pipeline_event_domain_rules(self) -> None:
         """Test FlextMeltanoPipelineEvent domain rule validation."""

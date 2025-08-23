@@ -77,7 +77,7 @@ class TestFlextSingerUnifiedConfig:
 
         result = config.validate_business_rules()
         assert result.success
-        assert result.data is None
+        assert result.value is None
 
     def test_validate_domain_rules_empty_name_failure(self) -> None:
         """Test domain rule validation failure with empty name."""
@@ -217,7 +217,7 @@ class TestFlextSingerUnifiedService:
         if hasattr(result, "success"):
             assert isinstance(result.success, bool)
             if result.success:
-                assert isinstance(result.data, dict)
+                assert isinstance(result.value, dict)
 
     def test_validate_all_components(self) -> None:
         """Test validating all registered components."""
@@ -226,7 +226,7 @@ class TestFlextSingerUnifiedService:
         if hasattr(result, "success"):
             assert isinstance(result.success, bool)
             if result.success:
-                assert isinstance(result.data, dict)
+                assert isinstance(result.value, dict)
 
     def test_service_execute_method(self) -> None:
         """Test general service execute method."""

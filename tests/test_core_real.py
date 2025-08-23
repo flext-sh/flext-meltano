@@ -223,7 +223,7 @@ class TestFlextMeltanoPipelineResult:
         validation_result = result.validate_business_rules()
 
         assert validation_result.success
-        assert validation_result.data is None
+        assert validation_result.value is None
 
     def test_pipeline_result_validate_domain_rules_empty_name(self) -> None:
         """Test pipeline result domain validation fails with empty name."""

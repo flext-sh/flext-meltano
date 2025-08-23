@@ -64,7 +64,7 @@ extractors:
         # Should handle discovery gracefully (may fail if meltano not available)
         if result.success:
             # Validate catalog structure
-            catalog = result.data
+            catalog = result.value
             assert isinstance(catalog, dict)
 
             # Should have streams if discovery succeeded
@@ -145,7 +145,7 @@ extractors:
 
         # Should return plugin list
         assert result.success
-        data = result.data
+        data = result.value
         assert isinstance(data, dict)
         if "plugins" not in data:
             msg: str = f"Expected {'plugins'} in {data}"
@@ -239,7 +239,7 @@ extractors:
 
         # Should succeed but return empty list
         assert result.success
-        data = result.data
+        data = result.value
         assert data is not None
         plugins = data["plugins"]
         assert isinstance(plugins, list)
@@ -290,7 +290,7 @@ extractors:
 
         # Should handle connection test gracefully
         if result.success:
-            data = result.data
+            data = result.value
             assert isinstance(data, dict)
             if "connection_successful" not in data:
                 msg: str = f"Expected {'connection_successful'} in {data}"
@@ -350,7 +350,7 @@ extractors:
 
         # Should validate CSV config successfully
         assert result.success
-        data = result.data
+        data = result.value
         assert data is not None
         if not (data["config_valid"]):
             msg: str = f"Expected True, got {data['config_valid']}"
@@ -382,7 +382,7 @@ extractors:
 
         # Should validate database config successfully
         assert result.success
-        data = result.data
+        data = result.value
         assert data is not None
         if not (data["config_valid"]):
             msg: str = f"Expected True, got {data['config_valid']}"
@@ -411,7 +411,7 @@ extractors:
 
         # Should validate API config successfully
         assert result.success
-        data = result.data
+        data = result.value
         assert data is not None
         if not (data["config_valid"]):
             msg: str = f"Expected True, got {data['config_valid']}"
@@ -431,7 +431,7 @@ extractors:
 
         # Should fail validation for empty config
         assert result.success  # Function succeeds but config is invalid
-        data = result.data
+        data = result.value
         assert data is not None
         if data["config_valid"]:
             msg: str = f"Expected False, got {data['config_valid']}"
@@ -455,7 +455,7 @@ extractors:
 
         # Should succeed but indicate config issues
         assert result.success
-        data = result.data
+        data = result.value
         assert data is not None
         if data["config_valid"]:
             msg: str = f"Expected False, got {data['config_valid']}"
@@ -505,13 +505,13 @@ class TestFlextMeltanoCatalogIntegration:
         # Plugin discovery may fail without network access or proper Meltano setup
         if (
             not plugins_result.success
-            or not plugins_result.data
-            or not plugins_result.data.get("plugins")
+            or not plugins_result.value
+            or not plugins_result.value.get("plugins")
         ):
             # Use fallback test data
             extractors = [{"name": "tap-csv", "namespace": "tap_csv"}]
         else:
-            extractors = plugins_result.data["plugins"]
+            extractors = plugins_result.value["plugins"]
 
         assert len(extractors) > 0
 
@@ -531,7 +531,7 @@ class TestFlextMeltanoCatalogIntegration:
 
         # Should validate config structure
         assert config_result.success
-        config_data = config_result.data
+        config_data = config_result.value
         assert config_data is not None
         if "config_valid" not in config_data:
             msg: str = f"Expected {'config_valid'} in {config_data}"
@@ -548,7 +548,7 @@ class TestFlextMeltanoCatalogIntegration:
             # Discovery may succeed or fail depending on environment
             # Both outcomes are acceptable for this integration test
             if discovery_result.success:
-                catalog = discovery_result.data
+                catalog = discovery_result.value
                 assert isinstance(catalog, dict)
             else:
                 assert discovery_result.error
@@ -581,8 +581,8 @@ class TestFlextMeltanoCatalogIntegration:
             {},  # Empty config
         )
         assert result3.success  # Function succeeds
-        assert result3.data is not None
-        assert not result3.data["config_valid"]  # But config is invalid
+        assert result3.value is not None
+        assert not result3.value["config_valid"]  # But config is invalid
 
 
 if __name__ == "__main__":

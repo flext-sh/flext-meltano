@@ -82,9 +82,9 @@ class TestSingerUnifiedMissingCoverage:
         # Test basic execute method
         result = service.execute()
         assert result.success
-        assert isinstance(result.data, FlextSingerUnifiedResult)
-        assert result.data.success is True
-        assert result.data.records_processed == 0
+        assert isinstance(result.value, FlextSingerUnifiedResult)
+        assert result.value.success is True
+        assert result.value.records_processed == 0
 
     def test_execute_pipeline_operation_private_method(self) -> None:
         """Test private _execute_pipeline_operation method."""
@@ -124,22 +124,22 @@ class TestSingerUnifiedMissingCoverage:
         # Test initialize
         result = interface.initialize({"test": "config"})
         assert result.success
-        assert result.data is True
+        assert result.value is True
 
         # Test discover_catalog
         result = interface.discover_catalog()
         assert result.success
-        assert result.data == {"streams": []}
+        assert result.value == {"streams": []}
 
         # Test execute
         result = interface.execute("test")
         assert result.success
-        assert result.data == "executed"
+        assert result.value == "executed"
 
         # Test validate_configuration
         result = interface.validate_configuration({"test": "config"})
         assert result.success
-        assert result.data is True
+        assert result.value is True
 
     def test_result_serialization_methods(self) -> None:
         """Test result serialization methods for coverage."""

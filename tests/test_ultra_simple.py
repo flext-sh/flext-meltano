@@ -29,13 +29,13 @@ def test_flext_core_import() -> None:
     # Test FlextResult creation
     success_result = FlextResult.ok("success")
     assert success_result.success is True
-    assert success_result.data == "success"
+    assert success_result.value == "success"
     assert success_result.error is None
 
     # Test FlextResult failure
     failure_result = FlextResult.fail("error message")
     assert failure_result.success is False
-    assert failure_result.data is None
+    assert failure_result.value is None
     assert failure_result.error == "error message"
 
 

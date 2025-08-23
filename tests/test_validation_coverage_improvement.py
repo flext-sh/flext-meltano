@@ -64,14 +64,14 @@ class TestValidationCoverageImprovement:
         config = FlextMeltanoConfig()
         result = create_validation_service(config)
         assert result.success
-        assert isinstance(result.data, FlextMeltanoValidationService)
+        assert isinstance(result.value, FlextMeltanoValidationService)
 
         # Test with configuration
         config_dict = {"project_root": str(Path(tempfile.gettempdir()) / "test")}
         config_with_params = FlextMeltanoConfig(**config_dict)
         result = create_validation_service(config_with_params)
         assert result.success
-        assert isinstance(result.data, FlextMeltanoValidationService)
+        assert isinstance(result.value, FlextMeltanoValidationService)
 
     def test_project_validation_function(self) -> None:
         """Test standalone project validation function."""

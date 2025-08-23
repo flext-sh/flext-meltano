@@ -12,7 +12,7 @@ from pathlib import Path
 
 # Importar DBT Core REAL - bibliotecas instaladas
 from dbt.cli.main import dbtRunner
-from flext_core import FlextDomainService, FlextResult, get_logger
+from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 
 DBT_AVAILABLE = True
 
@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 # =============================================================================
 
 
-class MeltanoDbtWrapper(FlextDomainService):
+class MeltanoDbtWrapper(FlextDomainService[object]):
     """Wrapper principal para DBT Core → flext-core.
 
     Adapta DBT Core execution para flext-core patterns, usando FlextResult
@@ -38,19 +38,18 @@ class MeltanoDbtWrapper(FlextDomainService):
             logger.warning("DBT Core not available - some functions will fail")
 
     @property
-    def logger(self) -> object:
+    def logger(self) -> FlextLogger:
         """Get logger instance."""
         return get_logger(self.__class__.__name__)
 
-    def execute(self) -> FlextResult[dict[str, object]]:
+    def execute(self) -> FlextResult[object]:
         """Execute DBT service operation (required by FlextDomainService).
 
         Returns:
             FlextResult contendo informações do serviço
 
         """
-        return FlextResult.ok(
-            {
+        return FlextResult[object].ok({
                 "service": "MeltanoDbtWrapper",
                 "status": "ready",
                 "dbt_available": DBT_AVAILABLE,
@@ -61,10 +60,9 @@ class MeltanoDbtWrapper(FlextDomainService):
                     "compile_project",
                     "generate_docs",
                 ],
-            }
-        )
+            })
 
-    def create_runner(self, project_dir: Path | None = None) -> FlextResult[object]:
+    def create_runner(self, project_dir: Path | None = None) -> FlextResult[dbtRunner]:
         """Cria dbtRunner usando FlextResult pattern.
 
         Args:
@@ -76,7 +74,7 @@ class MeltanoDbtWrapper(FlextDomainService):
         """
         try:
             if not DBT_AVAILABLE:
-                return FlextResult.fail("DBT Core not available - install dbt-core")
+                    return FlextResult[dbtRunner].fail("DBT Core not available - install dbt-core")
 
             self.logger.info(
                 "Creating DBT runner",
@@ -87,83 +85,126 @@ class MeltanoDbtWrapper(FlextDomainService):
             runner = dbtRunner()
 
             if project_dir and not project_dir.exists():
-                return FlextResult.fail(
+                return FlextResult[dbtRunner].fail(
                     f"DBT project directory not found: {project_dir}"
                 )
 
             self.logger.info("DBT runner created successfully")
-            return FlextResult.ok(runner)
+            return FlextResult[dbtRunner].ok(runner)
 
         except Exception as e:
             error_msg = f"Failed to create DBT runner: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[dbtRunner].fail(error_msg)
 
-    def run_models(
+    # Using FlextDecorators for performance monitoring - real DBT API execution
+    def run_models_real(
         self,
-        runner: object,
+        project_dir: Path,
         models: list[str] | None = None,
-        project_dir: Path | None = None,
+        profiles_dir: Path | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Executa modelos DBT com observabilidade flext-core.
+        """Executa modelos DBT usando API nativa real dbtRunner.invoke().
 
         Args:
-            runner: Instância dbtRunner
-            models: Lista de modelos para executar (None = todos)
             project_dir: Diretório do projeto DBT
+            models: Lista de modelos para executar (None = todos)
+            profiles_dir: Diretório dos profiles DBT (opcional)
 
         Returns:
-            FlextResult contendo resultado da execução
+            FlextResult contendo resultado da execução com estrutura real
 
         """
         try:
             self.logger.info(
-                "Running DBT models",
+                "Running DBT models via native dbtRunner.invoke API",
                 models=models,
-                project_dir=str(project_dir) if project_dir else None,
+                project_dir=str(project_dir),
+                profiles_dir=str(profiles_dir) if profiles_dir else None,
             )
 
-            # Construir comando DBT
-            cmd = ["run"]
+            if not DBT_AVAILABLE:
+                return FlextResult[dict[str, object]].fail("DBT Core not available")
 
-            # Adicionar modelos específicos
-            if models:
-                cmd.extend(["--models", *models])
-
-            # Adicionar diretório do projeto
-            if project_dir:
-                cmd.extend(["--project-dir", str(project_dir)])
-
-            # Executar comando
-            self.logger.info("Executing DBT command", command=cmd)
-            result = runner.invoke(cmd)
-
-            # Processar resultado
-            if result.is_success:
-                execution_result = {
-                    "success": True,
-                    "command": cmd,
-                    "models_processed": len(models) if models else "all",
-                    "result": result.result if hasattr(result, "result") else None,
-                }
-
-                self.logger.info(
-                    "DBT models executed successfully",
-                    models_count=len(models) if models else "all",
+            # Validar diretório do projeto
+            if not project_dir.exists():
+                return FlextResult[dict[str, object]].fail(
+                    f"DBT project directory not found: {project_dir}"
                 )
-                return FlextResult.ok(execution_result)
-            error_msg = f"DBT run failed with exit code {result.exit_code}"
-            self.logger.exception(error_msg, exit_code=result.exit_code)
-            return FlextResult.fail(error_msg)
+
+            # Verificar se é um projeto DBT válido
+            dbt_project_yml = project_dir / "dbt_project.yml"
+            if not dbt_project_yml.exists():
+                return FlextResult[dict[str, object]].fail(
+                    f"Not a DBT project: dbt_project.yml not found in {project_dir}"
+                )
+
+            # Criar dbtRunner usando API real
+            runner = dbtRunner()
+
+            # Construir comando DBT usando argumentos reais
+            cmd_args = ["run"]
+
+            # Adicionar modelos específicos usando sintaxe real DBT
+            if models:
+                cmd_args.extend(["--models", *models])
+
+            # Adicionar diretório do projeto usando sintaxe real DBT
+            cmd_args.extend(["--project-dir", str(project_dir)])
+
+            # Adicionar profiles-dir se especificado
+            if profiles_dir:
+                cmd_args.extend(["--profiles-dir", str(profiles_dir)])
+
+            self.logger.info(
+                "Invoking dbtRunner with real API",
+                command_args=cmd_args,
+            )
+
+            # Executar usando API nativa real dbtRunner.invoke()
+            result = runner.invoke(cmd_args)
+
+            # Processar resultado usando estrutura real do DBT
+            execution_result = {
+                "success": result.success,
+                "command": cmd_args,
+                "models_processed": len(models) if models else "all",
+                "result_data": result.result if hasattr(result, "result") else None,
+                "exception": str(result.exception) if result.exception else None,
+                "execution_method": "dbt_runner_invoke",
+            }
+
+            # Adicionar informações extras do resultado se disponíveis
+            if hasattr(result, "args"):
+                execution_result["parsed_args"] = str(result.args)
+
+            if result.success:
+                self.logger.info(
+                    "DBT models executed successfully via dbtRunner.invoke",
+                    models_count=len(models) if models else "all",
+                    result_success=result.success,
+                )
+                return FlextResult[dict[str, object]].ok(execution_result)
+
+            # Se não teve sucesso, incluir detalhes do erro
+            error_msg = f"DBT run failed via dbtRunner.invoke: {result.exception}"
+            execution_result["error_details"] = error_msg
+
+            self.logger.exception(
+                error_msg,
+                exception=str(result.exception) if result.exception else "Unknown error",
+                result_success=result.success,
+            )
+            return FlextResult[dict[str, object]].ok(execution_result)
 
         except Exception as e:
-            error_msg = f"Failed to run DBT models: {e}"
+            error_msg = f"Failed to run DBT models via dbtRunner.invoke: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def test_models(
         self,
-        runner: object,
+        runner: dbtRunner,
         models: list[str] | None = None,
         project_dir: Path | None = None,
     ) -> FlextResult[dict[str, object]]:
@@ -202,14 +243,14 @@ class MeltanoDbtWrapper(FlextDomainService):
 
             # Processar resultado
             test_result = {
-                "success": result.is_success,
+                "success": result.success,
                 "command": cmd,
                 "models_tested": len(models) if models else "all",
-                "exit_code": result.exit_code,
+                "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
                 "result": result.result if hasattr(result, "result") else None,
             }
 
-            if result.is_success:
+            if result.success:
                 self.logger.info(
                     "DBT tests passed successfully",
                     models_count=len(models) if models else "all",
@@ -217,19 +258,19 @@ class MeltanoDbtWrapper(FlextDomainService):
             else:
                 self.logger.warning(
                     "DBT tests failed",
-                    exit_code=result.exit_code,
+                    exit_code=getattr(result, "exit_code", 1),
                     models_count=len(models) if models else "all",
                 )
 
-            return FlextResult.ok(test_result)
+            return FlextResult[dict[str, object]].ok(test_result)
 
         except Exception as e:
             error_msg = f"Failed to test DBT models: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def compile_project(
-        self, runner: object, project_dir: Path | None = None
+        self, runner: dbtRunner, project_dir: Path | None = None
     ) -> FlextResult[dict[str, object]]:
         """Compila projeto DBT.
 
@@ -260,28 +301,28 @@ class MeltanoDbtWrapper(FlextDomainService):
 
             # Processar resultado
             compile_result = {
-                "success": result.is_success,
+                "success": result.success,
                 "command": cmd,
-                "exit_code": result.exit_code,
+                "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
                 "result": result.result if hasattr(result, "result") else None,
             }
 
-            if result.is_success:
+            if result.success:
                 self.logger.info("DBT project compiled successfully")
             else:
                 self.logger.exception(
-                    "DBT compilation failed", exit_code=result.exit_code
+                    "DBT compilation failed", exit_code=getattr(result, "exit_code", 1)
                 )
 
-            return FlextResult.ok(compile_result)
+            return FlextResult[dict[str, object]].ok(compile_result)
 
         except Exception as e:
             error_msg = f"Failed to compile DBT project: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def generate_docs(
-        self, runner: object, project_dir: Path | None = None
+        self, runner: dbtRunner, project_dir: Path | None = None
     ) -> FlextResult[dict[str, object]]:
         """Gera documentação DBT.
 
@@ -312,25 +353,25 @@ class MeltanoDbtWrapper(FlextDomainService):
 
             # Processar resultado
             docs_result = {
-                "success": result.is_success,
+                "success": result.success,
                 "command": cmd,
-                "exit_code": result.exit_code,
+                "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
                 "result": result.result if hasattr(result, "result") else None,
             }
 
-            if result.is_success:
+            if result.success:
                 self.logger.info("DBT documentation generated successfully")
             else:
                 self.logger.exception(
-                    "DBT docs generation failed", exit_code=result.exit_code
+                    "DBT docs generation failed", exit_code=getattr(result, "exit_code", 1)
                 )
 
-            return FlextResult.ok(docs_result)
+            return FlextResult[dict[str, object]].ok(docs_result)
 
         except Exception as e:
             error_msg = f"Failed to generate DBT docs: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
 
 # =============================================================================
@@ -356,7 +397,7 @@ class FlextDbtAdapter:
         """
         try:
             # Adaptar para formato FlextDbtResults
-            flext_results = {
+            flext_results: dict[str, object] = {
                 "version": "1.0",
                 "execution_time": dbt_results.get("execution_time"),
                 "success": dbt_results.get("success", False),
@@ -368,20 +409,25 @@ class FlextDbtAdapter:
             }
 
             # Processar resultados individuais
-            for result in dbt_results.get("results", []):
-                flext_result = {
-                    "unique_id": result.get("unique_id"),
-                    "status": result.get("status"),
-                    "execution_time": result.get("execution_time"),
-                    "message": result.get("message"),
-                    "compiled_code": result.get("compiled_code"),
-                }
-                flext_results["results"].append(flext_result)
+            results_data = dbt_results.get("results", [])
+            if isinstance(results_data, list):
+                results_list = flext_results["results"]
+                if isinstance(results_list, list):
+                    for result in results_data:
+                        if isinstance(result, dict):
+                            flext_result = {
+                                "unique_id": result.get("unique_id"),
+                                "status": result.get("status"),
+                                "execution_time": result.get("execution_time"),
+                                "message": result.get("message"),
+                                "compiled_code": result.get("compiled_code"),
+                            }
+                            results_list.append(flext_result)
 
-            return FlextResult.ok(flext_results)
+            return FlextResult[dict[str, object]].ok(flext_results)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to adapt DBT results: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to adapt DBT results: {e}")
 
     @staticmethod
     def adapt_manifest(
@@ -398,7 +444,7 @@ class FlextDbtAdapter:
         """
         try:
             # Adaptar para formato FlextDbtManifest
-            flext_manifest = {
+            flext_manifest: dict[str, object] = {
                 "version": "1.0",
                 "nodes": {},
                 "sources": {},
@@ -411,30 +457,45 @@ class FlextDbtAdapter:
             }
 
             # Processar nodes (models, tests, etc.)
-            for node_id, node in dbt_manifest.get("nodes", {}).items():
-                flext_node = {
-                    "name": node.get("name"),
-                    "resource_type": node.get("resource_type"),
-                    "database": node.get("database"),
-                    "schema": node.get("schema"),
-                    "depends_on": node.get("depends_on", {}).get("nodes", []),
-                }
-                flext_manifest["nodes"][node_id] = flext_node
+            nodes_data = dbt_manifest.get("nodes", {})
+            if isinstance(nodes_data, dict):
+                nodes_dict = flext_manifest["nodes"]
+                if isinstance(nodes_dict, dict):
+                    for node_id, node in nodes_data.items():
+                        if isinstance(node, dict):
+                            depends_on_data = node.get("depends_on", {})
+                            depends_on_nodes = []
+                            if isinstance(depends_on_data, dict):
+                                depends_on_nodes = depends_on_data.get("nodes", [])
+
+                            flext_node = {
+                                "name": node.get("name"),
+                                "resource_type": node.get("resource_type"),
+                                "database": node.get("database"),
+                                "schema": node.get("schema"),
+                                "depends_on": depends_on_nodes,
+                            }
+                            nodes_dict[node_id] = flext_node
 
             # Processar sources
-            for source_id, source in dbt_manifest.get("sources", {}).items():
-                flext_source = {
-                    "name": source.get("name"),
-                    "source_name": source.get("source_name"),
-                    "database": source.get("database"),
-                    "schema": source.get("schema"),
-                }
-                flext_manifest["sources"][source_id] = flext_source
+            sources_data = dbt_manifest.get("sources", {})
+            if isinstance(sources_data, dict):
+                sources_dict = flext_manifest["sources"]
+                if isinstance(sources_dict, dict):
+                    for source_id, source in sources_data.items():
+                        if isinstance(source, dict):
+                            flext_source = {
+                                "name": source.get("name"),
+                                "source_name": source.get("source_name"),
+                                "database": source.get("database"),
+                                "schema": source.get("schema"),
+                            }
+                            sources_dict[source_id] = flext_source
 
-            return FlextResult.ok(flext_manifest)
+            return FlextResult[dict[str, object]].ok(flext_manifest)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to adapt DBT manifest: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to adapt DBT manifest: {e}")
 
 
 # =============================================================================
