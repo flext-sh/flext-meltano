@@ -16,7 +16,6 @@ from flext_meltano import (
     FlextMeltanoExecutor,
     MeltanoBridge,
     MeltanoDbtWrapper,
-    MeltanoSingerWrapper,
 )
 
 
@@ -144,7 +143,7 @@ class TestRealIntegrationPatterns:
     def test_flext_result_integration(self) -> None:
         """Test that all components properly use FlextResult pattern."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            config = FlextMeltanoConfig(
+            FlextMeltanoConfig(
                 project_root=str(temp_dir),
                 environment="test",
             )

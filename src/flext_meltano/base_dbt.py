@@ -48,18 +48,20 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
             FlextResult contendo informações do serviço
 
         """
-        return FlextResult[object].ok({
-            "service": "MeltanoDbtWrapper",
-            "status": "ready",
-            "dbt_available": DBT_AVAILABLE,
-            "capabilities": [
-                "create_runner",
-                "run_models",
-                "test_models",
-                "compile_project",
-                "generate_docs",
-            ],
-        })
+        return FlextResult[object].ok(
+            {
+                "service": "MeltanoDbtWrapper",
+                "status": "ready",
+                "dbt_available": DBT_AVAILABLE,
+                "capabilities": [
+                    "create_runner",
+                    "run_models",
+                    "test_models",
+                    "compile_project",
+                    "generate_docs",
+                ],
+            }
+        )
 
     def create_runner(self, project_dir: Path | None = None) -> FlextResult[dbtRunner]:
         """Cria dbtRunner usando FlextResult pattern.
@@ -191,7 +193,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
             error_msg = f"DBT run failed via dbtRunner.invoke: {result.exception}"
             execution_result["error_details"] = error_msg
 
-            self.logger.exception(
+            self.logger.error(
                 error_msg,
                 exception=str(result.exception)
                 if result.exception
@@ -313,7 +315,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
             if result.success:
                 self.logger.info("DBT project compiled successfully")
             else:
-                self.logger.exception(
+                self.logger.error(
                     "DBT compilation failed", exit_code=getattr(result, "exit_code", 1)
                 )
 
@@ -365,7 +367,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
             if result.success:
                 self.logger.info("DBT documentation generated successfully")
             else:
-                self.logger.exception(
+                self.logger.error(
                     "DBT docs generation failed",
                     exit_code=getattr(result, "exit_code", 1),
                 )

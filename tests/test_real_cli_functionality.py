@@ -18,16 +18,12 @@ Tests REAL functionality using installed libraries:
 
 Tests the 3 core functions:
 1. **Wrapper**: Real adaption of Meltano/Singer/DBT APIs to flext-core
-2. **Runtime**: Real Go bridge execution capabilities  
+2. **Runtime**: Real Go bridge execution capabilities
 3. **Base**: Real foundation for flext-(tap|target|dbt) projects
 """
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
-import pytest
 from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoCli, flext_meltano_run_cli
@@ -43,17 +39,17 @@ class TestRealFlextMeltanoCli:
     def test_cli_initialization_real(self) -> None:
         """Test CLI initializes with real dependencies."""
         assert self.cli is not None
-        assert hasattr(self.cli, 'logger')
-        
+        assert hasattr(self.cli, "logger")
+
         # Test that CLI has access to real methods
-        assert hasattr(self.cli, 'flext_meltano_version')
-        assert hasattr(self.cli, 'list_plugins')
-        assert hasattr(self.cli, 'flext_meltano_install')
+        assert hasattr(self.cli, "flext_meltano_version")
+        assert hasattr(self.cli, "list_plugins")
+        assert hasattr(self.cli, "flext_meltano_install")
 
     def test_version_real_meltano_api(self) -> None:
         """Test version retrieval using real Meltano API."""
         result = self.cli.flext_meltano_version()
-        
+
         assert result.success is True, f"Version failed: {result.error}"
         assert isinstance(result.value, str)
         assert "Meltano" in result.value
@@ -62,21 +58,21 @@ class TestRealFlextMeltanoCli:
     def test_health_check_real_dependencies(self) -> None:
         """Test health check validates real installed dependencies."""
         result = self.cli.health()
-        
+
         assert result.success is True, f"Health check failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         health_data = result.value
         assert "status" in health_data
-        assert health_data["status"] in ["healthy", "degraded", "unhealthy"]
+        assert health_data["status"] in {"healthy", "degraded", "unhealthy"}
 
     def test_list_commands_real_cli(self) -> None:
         """Test listing real CLI commands available."""
         result = self.cli.list_commands()
-        
+
         assert result.success is True, f"List commands failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         commands_data = result.value
         assert "commands" in commands_data
         assert len(commands_data["commands"]) > 0
@@ -84,7 +80,7 @@ class TestRealFlextMeltanoCli:
     def test_install_operation_real_api(self) -> None:
         """Test install operation using real Meltano API patterns."""
         result = self.cli.flext_meltano_install()
-        
+
         # Should succeed as it uses real API patterns
         assert result.success is True, f"Install failed: {result.error}"
         assert isinstance(result.value, bool)
@@ -93,10 +89,10 @@ class TestRealFlextMeltanoCli:
     def test_list_plugins_real_meltano_hub(self) -> None:
         """Test plugin listing using real Meltano Hub API."""
         result = self.cli.list_plugins()
-        
+
         assert result.success is True, f"List plugins failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         plugins_data = result.value
         assert "plugins" in plugins_data
         # Real Meltano Hub should have plugins available
@@ -106,11 +102,11 @@ class TestRealFlextMeltanoCli:
         """Test plugin invocation with real validation patterns."""
         # Test with a common plugin name that should be recognizable
         result = self.cli.flext_meltano_invoke("tap-csv", "--help")
-        
+
         # Should handle the invocation attempt properly
         assert result.success is True, f"Plugin invoke failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         invoke_data = result.value
         assert "plugin_name" in invoke_data
         assert invoke_data["plugin_name"] == "tap-csv"
@@ -122,29 +118,29 @@ class TestRealCliFactoryFunction:
     def test_cli_factory_function_real(self) -> None:
         """Test CLI factory function with real argument processing."""
         result = flext_meltano_run_cli(["--version"])
-        
+
         assert result.success is True, f"CLI factory failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         cli_data = result.value
         assert "command" in cli_data
-        assert cli_data["command"] in ["version", "--version"]  # Accept both formats
+        assert cli_data["command"] in {"version", "--version"}  # Accept both formats
 
     def test_cli_factory_help_real(self) -> None:
         """Test CLI factory help command with real processing."""
         result = flext_meltano_run_cli(["--help"])
-        
+
         assert result.success is True, f"CLI help failed: {result.error}"
         assert isinstance(result.value, dict)
-        
+
         help_data = result.value
         assert "command" in help_data
-        assert help_data["command"] in ["help", "--help"]  # Accept both formats
+        assert help_data["command"] in {"help", "--help"}  # Accept both formats
 
     def test_cli_factory_empty_args_real(self) -> None:
         """Test CLI factory with empty args using real defaults."""
         result = flext_meltano_run_cli([])
-        
+
         # Should handle empty args gracefully
         assert result.success is True, f"CLI empty args failed: {result.error}"
         assert isinstance(result.value, dict)
@@ -152,8 +148,8 @@ class TestRealCliFactoryFunction:
     def test_cli_factory_none_args_real(self) -> None:
         """Test CLI factory with None args using real defaults."""
         result = flext_meltano_run_cli(None)
-        
-        # Should handle None args gracefully  
+
+        # Should handle None args gracefully
         assert result.success is True, f"CLI None args failed: {result.error}"
         assert isinstance(result.value, dict)
 
@@ -169,11 +165,11 @@ class TestRealMeltanoIntegration:
         """Test direct integration with real Meltano version API."""
         # This should use MeltanoBridge internally, not subprocess
         result = self.cli.flext_meltano_version()
-        
+
         assert result.success is True
         version_str = result.value
         assert isinstance(version_str, str)
-        
+
         # Verify it's using real API, not subprocess fallback
         assert "Meltano, version" in version_str
         assert "3.9.1" in version_str
@@ -182,17 +178,17 @@ class TestRealMeltanoIntegration:
         """Test that CLI uses real MeltanoBridge, not subprocess."""
         # Import the bridge directly to test integration
         from flext_meltano.funcao1_wrapper_meltano import MeltanoBridge
-        
+
         bridge = MeltanoBridge()
         bridge_result = bridge.get_version()
-        
+
         assert bridge_result.success is True
         bridge_version = bridge_result.value
-        
+
         # Now test CLI uses same bridge
         cli_result = self.cli.flext_meltano_version()
         assert cli_result.success is True
-        
+
         # Both should indicate real API usage (not subprocess)
         assert isinstance(bridge_version, dict)
         assert "version" in bridge_version
@@ -202,10 +198,10 @@ class TestRealMeltanoIntegration:
         """Test real Singer SDK integration available via CLI."""
         # CLI should have access to Singer SDK functionality
         # This tests the wrapper function integration
-        
+
         result = self.cli.list_plugins()
         assert result.success is True
-        
+
         plugins_data = result.value
         # Should be able to access Singer-related plugins through real API
         assert isinstance(plugins_data, dict)
@@ -214,11 +210,11 @@ class TestRealMeltanoIntegration:
     def test_real_dbt_integration_available(self) -> None:
         """Test that real DBT integration is available via CLI."""
         # CLI should have access to DBT functionality through wrappers
-        
+
         # Health check should validate DBT availability
         result = self.cli.health()
         assert result.success is True
-        
+
         health_data = result.value
         assert isinstance(health_data, dict)
         # Health check validates real dependencies are available
@@ -234,12 +230,12 @@ class TestFlextResultPatterns:
     def test_flext_result_value_property(self) -> None:
         """Test FlextResult uses .value property, not .data."""
         result = self.cli.flext_meltano_version()
-        
+
         assert result.success is True
         # Test .value property (NEW pattern)
         version_value = result.value
         assert isinstance(version_value, str)
-        
+
         # Ensure .data is not used (OLD pattern)
         # Note: We won't test hasattr(.data) as it might exist for backwards compat
         # But we ensure code uses .value
@@ -261,9 +257,9 @@ class TestFlextResultPatterns:
         """Test error handling uses unwrap_or() instead of manual checking."""
         # Test pattern: result.unwrap_or(default) instead of:
         # if result.success: return result.value else: return default
-        
+
         result = self.cli.health()
-        
+
         # Modern pattern with unwrap_or
         health_status = result.unwrap_or({"status": "unknown"})
         assert isinstance(health_status, dict)
@@ -274,9 +270,9 @@ class TestFlextResultPatterns:
         # Test that all methods return FlextResult for chaining
         version_result = self.cli.flext_meltano_version()
         assert isinstance(version_result, FlextResult)
-        
-        health_result = self.cli.health()  
+
+        health_result = self.cli.health()
         assert isinstance(health_result, FlextResult)
-        
+
         plugins_result = self.cli.list_plugins()
         assert isinstance(plugins_result, FlextResult)

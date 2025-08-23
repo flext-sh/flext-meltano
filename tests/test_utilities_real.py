@@ -10,6 +10,7 @@ Este módulo testa as funcionalidades REAIS das utilidades:
 
 from __future__ import annotations
 
+import math
 import tempfile
 from pathlib import Path
 
@@ -27,7 +28,7 @@ class TestFlextMeltanoUtilitiesReal:
     def test_utilities_save_yaml_config(self) -> None:
         """Testa salvamento de configuração YAML real."""
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
+            encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as temp_file:
             config = {"test_key": "test_value", "nested": {"key": "value"}}
             temp_path = Path(temp_file.name)
@@ -57,7 +58,7 @@ class TestFlextMeltanoUtilitiesReal:
     def test_utilities_load_yaml_config_real(self) -> None:
         """Testa carregamento de configuração YAML real."""
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
+            encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as temp_file:
             temp_file.write("test_key: test_value\nnested:\n  key: value\n")
             temp_path = Path(temp_file.name)
@@ -137,7 +138,7 @@ class TestValidateConfigValueReal:
 
         assert result.success is True
         validated_value = result.value
-        assert validated_value == 3.14
+        assert validated_value == math.pi
         assert isinstance(validated_value, float)
 
     def test_validate_config_value_none_required(self) -> None:

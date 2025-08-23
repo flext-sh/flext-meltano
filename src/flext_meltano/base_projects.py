@@ -139,11 +139,13 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute tap service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoTapService",
-                "status": "ready",
-                "initialized": self._initialized,
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoTapService",
+                    "status": "ready",
+                    "initialized": self._initialized,
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -163,11 +165,13 @@ class FlextMeltanoTapService(FlextDomainService[dict[str, object]]):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get tap health status."""
-        return FlextResult[dict[str, object]].ok({
-            "service": "tap",
-            "tap_configured": self.tap_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "tap",
+                "tap_configured": self.tap_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_tap_class(self, tap_class: type[Tap]) -> FlextResult[None]:
         """Set Singer tap class - MANDATORY for operation."""
@@ -214,11 +218,13 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute target service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoTargetService",
-                "status": "ready",
-                "initialized": self._initialized,
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoTargetService",
+                    "status": "ready",
+                    "initialized": self._initialized,
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -238,11 +244,13 @@ class FlextMeltanoTargetService(FlextDomainService[dict[str, object]]):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get target health status."""
-        return FlextResult[dict[str, object]].ok({
-            "service": "target",
-            "target_configured": self.target_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "target",
+                "target_configured": self.target_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_target_class(self, target_class: type[Target]) -> FlextResult[None]:
         """Set Singer target class - MANDATORY for operation."""
@@ -272,11 +280,13 @@ class FlextMeltanoExtensionService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute extension service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoExtensionService",
-                "status": "ready",
-                "initialized": self._initialized,
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoExtensionService",
+                    "status": "ready",
+                    "initialized": self._initialized,
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -294,11 +304,13 @@ class FlextMeltanoExtensionService(FlextDomainService[dict[str, object]]):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get extension health status."""
-        return FlextResult[dict[str, object]].ok({
-            "service": "extension",
-            "extension_configured": self.extension_class is not None,
-            "initialized": self._initialized,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "extension",
+                "extension_configured": self.extension_class is not None,
+                "initialized": self._initialized,
+            }
+        )
 
     def set_extension_class(
         self,
@@ -330,12 +342,14 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
     def execute(self) -> FlextResult[dict[str, object]]:
         """Execute DBT service operation (required by FlextDomainService)."""
         try:
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoDbtService",
-                "status": "ready",
-                "project_dir": str(self.project_dir) if self.project_dir else None,
-                "initialized": self._initialized,
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoDbtService",
+                    "status": "ready",
+                    "project_dir": str(self.project_dir) if self.project_dir else None,
+                    "initialized": self._initialized,
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -356,11 +370,13 @@ class FlextMeltanoDbtService(FlextDomainService[dict[str, object]]):
 
     def get_health_status(self) -> FlextResult[dict[str, object]]:
         """Get DBT health status."""
-        return FlextResult[dict[str, object]].ok({
-            "service": "dbt",
-            "project_dir": str(self.project_dir) if self.project_dir else None,
-            "initialized": self._initialized,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "service": "dbt",
+                "project_dir": str(self.project_dir) if self.project_dir else None,
+                "initialized": self._initialized,
+            }
+        )
 
     async def _execute_dbt_command(
         self,
