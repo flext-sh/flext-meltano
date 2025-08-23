@@ -16,9 +16,9 @@ from flext_core import FlextResult, get_logger
 from rich.console import Console
 from rich.table import Table
 
-from .funcao2_runtime_bridge import FlextMeltanoBridge
-from .funcao2_runtime_executor import FlextMeltanoExecutor
-from .funcao1_wrapper_meltano import MeltanoBridge
+from flext_meltano.base_meltano import MeltanoBridge
+from flext_meltano.executors_bridge import FlextMeltanoBridge
+from flext_meltano.executors_meltano import FlextMeltanoExecutor
 
 logger = get_logger(__name__)
 
@@ -78,7 +78,9 @@ class FlextMeltanoCli:
                     # Extract version from result data
                     result_data = result.get("data", {})
                     if isinstance(result_data, dict):
-                        meltano_version = result_data.get("meltano", "3.8.0")  # Default to expected test value
+                        meltano_version = result_data.get(
+                            "meltano", "3.8.0"
+                        )  # Default to expected test value
                     else:
                         meltano_version = "3.8.0"
 
@@ -111,7 +113,9 @@ class FlextMeltanoCli:
                     # Extract version from result data
                     result_data = result.get("data", {})
                     if isinstance(result_data, dict):
-                        meltano_version = result_data.get("meltano", "3.8.0")  # Default to expected test value
+                        meltano_version = result_data.get(
+                            "meltano", "3.8.0"
+                        )  # Default to expected test value
                     else:
                         meltano_version = "3.8.0"
 
@@ -252,7 +256,9 @@ class FlextMeltanoCli:
                 "cli_type": [],  # Empty list to match expected type
             })
         except Exception as e:
-            return FlextResult[dict[str, list[str]]].fail(f"Command listing failed: {e}")
+            return FlextResult[dict[str, list[str]]].fail(
+                f"Command listing failed: {e}"
+            )
 
     def list_plugins(self) -> FlextResult[dict[str, object]]:
         """List available Meltano plugins using native API."""
@@ -311,7 +317,9 @@ class FlextMeltanoCli:
             logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)
 
-    def execute(self, command: str, options: list[str] | None = None) -> FlextResult[dict[str, str]]:
+    def execute(
+        self, command: str, options: list[str] | None = None
+    ) -> FlextResult[dict[str, str]]:
         """Execute CLI command with options."""
         try:
             logger.info("Executing command", command=command, options=options)
@@ -375,9 +383,6 @@ class FlextMeltanoCli:
 
             if result.success:
                 version_data = result.value
-                if not isinstance(version_data, dict):
-                    return FlextResult[str].fail("Invalid version data format")  # type: ignore[unreachable]
-
                 version_str = version_data.get("version", "3.9.1")
                 return FlextResult[str].ok(f"Meltano, version {version_str}")
 
@@ -391,20 +396,23 @@ class FlextMeltanoCli:
             # Note: install_plugin requires plugin type and name, but install command installs all
             # For now, return success as this would need project-specific plugin installation
             self.logger.info("Install operation completed using native API")
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult[bool].fail(f"Install operation failed: {e}")
 
-
-    def flext_meltano_invoke(self, plugin_name: str, *args: str) -> FlextResult[dict[str, object]]:
+    def flext_meltano_invoke(
+        self, plugin_name: str, *args: str
+    ) -> FlextResult[dict[str, object]]:
         """Invoke Meltano plugin using native API."""
         try:
             # Note: run_plugin_async is async, for now return success with plugin info
-            self.logger.info("Plugin invocation using native API", plugin=plugin_name, args=args)
+            self.logger.info(
+                "Plugin invocation using native API", plugin=plugin_name, args=args
+            )
             return FlextResult[dict[str, object]].ok({
                 "plugin_name": plugin_name,
                 "args": list(args),
-                "status": "invoked_via_native_api"
+                "status": "invoked_via_native_api",
             })
         except Exception as e:
             return FlextResult[dict[str, object]].fail(f"Plugin invocation error: {e}")
@@ -490,7 +498,9 @@ def flext_meltano_run_cli(args: list[str] | None = None) -> FlextResult[dict[str
                 "exit_code": str(exit_code),
             })
         except Exception as run_error:
-            logger.warning("CLI command execution failed", error=str(run_error), args=args)
+            logger.warning(
+                "CLI command execution failed", error=str(run_error), args=args
+            )
             return FlextResult[dict[str, str]].ok({
                 "command": " ".join(args),
                 "args": str(args),  # Convert to string
@@ -517,6 +527,7 @@ def flext_meltano_run_cli(args: list[str] | None = None) -> FlextResult[dict[str
 # =============================================================================
 # CLICK COMMAND DEFINITIONS using flext-cli patterns
 # =============================================================================
+
 
 @click.group(
     context_settings={"help_option_names": ["-h", "--help"]},
@@ -677,7 +688,9 @@ def run(
     output_format = ctx.obj["output"]
 
     # Run pipeline
-    result: FlextResult[dict[str, object]] = service.run_pipeline(tap_name, target_name, project)
+    result: FlextResult[dict[str, object]] = service.run_pipeline(
+        tap_name, target_name, project
+    )
 
     if result.success:
         if output_format == "json":

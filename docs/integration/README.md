@@ -727,7 +727,7 @@ class ProductionMeltanoManager:
             if not catalog.success:
                 return catalog
 
-            return FlextResult[None].ok(True)
+            return FlextResult[None].ok(data=True)
 
         except Exception as e:
             return FlextResult[None].fail(f"Pipeline validation failed: {e}")

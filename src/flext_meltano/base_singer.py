@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-# Removendo Any types - usando types específicos
 from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.typing import PropertiesList, Property
@@ -38,7 +37,10 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
         """
         # Execute operation - Singer wrapper is operational
         self.logger.info("Singer wrapper executed successfully")
-        return FlextResult[dict[str, object]].ok({"service": "MeltanoSingerWrapper", "status": "ready"})
+        return FlextResult[dict[str, object]].ok({
+            "service": "MeltanoSingerWrapper",
+            "status": "ready",
+        })
 
     @property
     def logger(self) -> FlextLogger:
@@ -125,7 +127,11 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
             return FlextResult[Target].fail(error_msg)
 
     def run_elt_pipeline_real(
-        self, tap_class: type[Tap], target_class: type[Target], tap_config: dict[str, object], target_config: dict[str, object]
+        self,
+        tap_class: type[Tap],
+        target_class: type[Target],
+        tap_config: dict[str, object],
+        target_config: dict[str, object],
     ) -> FlextResult[dict[str, object]]:
         """Executa pipeline ELT completo usando APIs nativas reais Singer SDK.
 
@@ -152,9 +158,13 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
 
             # Check results using success pattern
             if not tap_result.success:
-                return FlextResult[dict[str, object]].fail(f"Failed to create tap: {tap_result.error}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to create tap: {tap_result.error}"
+                )
             if not target_result.success:
-                return FlextResult[dict[str, object]].fail(f"Failed to create target: {target_result.error}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to create target: {target_result.error}"
+                )
 
             tap = tap_result.value
             # target unused in this version but available for future use
@@ -165,7 +175,9 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
             available_streams = tap.discover_streams()
 
             if not available_streams:
-                return FlextResult[dict[str, object]].fail("No streams discovered from tap")
+                return FlextResult[dict[str, object]].fail(
+                    "No streams discovered from tap"
+                )
 
             # Métricas de execução real
             pipeline_metrics: dict[str, object] = {
@@ -181,7 +193,7 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
             try:
                 self.logger.info(
                     "Executing real Singer sync via tap.sync_all()",
-                    streams_count=len(available_streams)
+                    streams_count=len(available_streams),
                 )
 
                 # Usar API real: tap.sync_all() com target conectado
@@ -200,27 +212,41 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
                         if hasattr(stream, "selected") and stream.selected:
                             current_streams = pipeline_metrics["streams_processed"]
                             if isinstance(current_streams, int):
-                                pipeline_metrics["streams_processed"] = current_streams + 1
+                                pipeline_metrics["streams_processed"] = (
+                                    current_streams + 1
+                                )
                             # Em implementação real, stream.sync() processaria records
                             current_records = pipeline_metrics["records_processed"]
                             if isinstance(current_records, int):
-                                pipeline_metrics["records_processed"] = current_records + len(getattr(stream, "records", []))
+                                pipeline_metrics["records_processed"] = (
+                                    current_records
+                                    + len(getattr(stream, "records", []))
+                                )
                     except Exception as stream_error:
-                        self.logger.warning(f"Stream {stream_name} processing issue: {stream_error}")
+                        self.logger.warning(
+                            f"Stream {stream_name} processing issue: {stream_error}"
+                        )
                         current_streams = pipeline_metrics["streams_processed"]
                         if isinstance(current_streams, int):
-                            pipeline_metrics["streams_processed"] = current_streams + 1  # Count as processed even if with issues
+                            pipeline_metrics["streams_processed"] = (
+                                current_streams + 1
+                            )  # Count as processed even if with issues
 
                 self.logger.info("Target drain_all() completed")
 
             except Exception as sync_error:
                 self.logger.exception("Real Singer sync failed", error=str(sync_error))
-                return FlextResult[dict[str, object]].fail(f"Real sync failed: {sync_error}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Real sync failed: {sync_error}"
+                )
 
             # Resultado com métricas reais
             pipeline_metrics["success"] = True
             pipeline_metrics["catalog"] = {
-                "streams": [{"name": stream.name, "schema": stream.schema} for stream in available_streams]
+                "streams": [
+                    {"name": stream.name, "schema": stream.schema}
+                    for stream in available_streams
+                ]
             }
 
             self.logger.info(
@@ -252,12 +278,16 @@ class MeltanoSingerWrapper(FlextDomainService[dict[str, object]]):
             catalog = tap.catalog_dict
 
             if not catalog or "streams" not in catalog:
-                return FlextResult[dict[str, object]].fail("Invalid catalog returned by tap")
+                return FlextResult[dict[str, object]].fail(
+                    "Invalid catalog returned by tap"
+                )
 
             # Validar streams
             streams = catalog["streams"]
             if not isinstance(streams, list):
-                return FlextResult[dict[str, object]].fail("Invalid streams format in catalog")
+                return FlextResult[dict[str, object]].fail(
+                    "Invalid streams format in catalog"
+                )
 
             self.logger.info(
                 "Catalog discovered successfully", streams_count=len(streams)
@@ -294,7 +324,9 @@ class FlextSingerAdapter:
         try:
             # Validar estrutura
             if not isinstance(singer_catalog, dict) or "streams" not in singer_catalog:
-                return FlextResult[dict[str, object]].fail("Invalid Singer catalog structure")
+                return FlextResult[dict[str, object]].fail(
+                    "Invalid Singer catalog structure"
+                )
 
             # Adaptar para formato FlextCatalog
             flext_streams: list[dict[str, object]] = []
@@ -342,7 +374,9 @@ class FlextSingerAdapter:
         try:
             # Validar estrutura
             if not isinstance(singer_schema, dict) or "properties" not in singer_schema:
-                return FlextResult[dict[str, object]].fail("Invalid Singer schema structure")
+                return FlextResult[dict[str, object]].fail(
+                    "Invalid Singer schema structure"
+                )
 
             # Adaptar para formato FlextSchema
             flext_properties: dict[str, object] = {}

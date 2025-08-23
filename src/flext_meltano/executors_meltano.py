@@ -19,10 +19,8 @@ import yaml
 from dbt.cli.main import dbtRunner
 from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 
-from .funcao1_wrapper_dbt import MeltanoDbtWrapper
-
-# Import real native execution modules instead of legacy CLI
-from .funcao1_wrapper_meltano import MeltanoBridge
+from flext_meltano.base_dbt import MeltanoDbtWrapper
+from flext_meltano.base_meltano import MeltanoBridge
 
 T = TypeVar("T")
 
@@ -57,16 +55,16 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
 
         """
         return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoExecutor",
-                "status": "ready",
-                "capabilities": [
-                    "execute_meltano_command",
-                    "execute_dbt_command",
-                    "run_elt_pipeline",
-                    "install_plugin",
-                    "get_project_info",
-                ],
-            })
+            "service": "FlextMeltanoExecutor",
+            "status": "ready",
+            "capabilities": [
+                "execute_meltano_command",
+                "execute_dbt_command",
+                "run_elt_pipeline",
+                "install_plugin",
+                "get_project_info",
+            ],
+        })
 
     def execute_meltano_command(
         self, project_root: Path, command: list[str], timeout: int = 300
@@ -92,16 +90,23 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
 
             # Validar projeto Meltano
             if not (project_root / "meltano.yml").exists():
-                return FlextResult[dict[str, object]].fail(f"Not a Meltano project: {project_root}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Not a Meltano project: {project_root}"
+                )
 
             # Usar MeltanoBridge para execução nativa
             bridge = MeltanoBridge()
             # Use native project execution instead of command
             project_result = bridge.initialize_project(project_root)
             if project_result.success:
-                result = FlextResult[dict[str, str]].ok({"success": "true", "command": " ".join(command)})
+                result = FlextResult[dict[str, str]].ok({
+                    "success": "true",
+                    "command": " ".join(command),
+                })
             else:
-                result = FlextResult[dict[str, str]].fail(f"Project error: {project_result.error}")
+                result = FlextResult[dict[str, str]].fail(
+                    f"Project error: {project_result.error}"
+                )
 
             if result.success:
                 # Adaptar resultado do bridge para formato Go
@@ -143,7 +148,11 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
     ) -> FlextResult[dict[str, object]]:
         """Executa comando DBT usando API nativa com resultado estruturado."""
         try:
-            self.logger.info("Executing DBT command natively", command=command, project_root=str(project_root))
+            self.logger.info(
+                "Executing DBT command natively",
+                command=command,
+                project_root=str(project_root),
+            )
 
             # Validar projeto DBT
             validation_result = self._validate_dbt_project(project_root)
@@ -156,22 +165,30 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 return FlextResult.fail(runner_result.error or "Unknown error")
 
             # Executar comando específico
-            execution_result = self._execute_dbt_command_type(runner_result.value, command, project_root)
+            execution_result = self._execute_dbt_command_type(
+                runner_result.value, command, project_root
+            )
             if not execution_result.success:
                 return execution_result
 
             # Formatar resultado para Go
-            return self._format_dbt_result(execution_result.value, command, project_root, timeout)
+            return self._format_dbt_result(
+                execution_result.value, command, project_root, timeout
+            )
 
         except Exception as e:
             error_msg = f"Failed to execute DBT command {command}: {e}"
             self.logger.exception(error_msg, error=str(e))
             return FlextResult[dict[str, object]].fail(error_msg)
 
-    def _validate_dbt_project(self, project_root: Path) -> FlextResult[dict[str, object]]:
+    def _validate_dbt_project(
+        self, project_root: Path
+    ) -> FlextResult[dict[str, object]]:
         """Valida se é um projeto DBT válido."""
         if not (project_root / "dbt_project.yml").exists():
-            return FlextResult[dict[str, object]].fail(f"Not a DBT project: {project_root}")
+            return FlextResult[dict[str, object]].fail(
+                f"Not a DBT project: {project_root}"
+            )
         return FlextResult.ok({})
 
     def _create_dbt_runner(self, project_root: Path) -> FlextResult[dbtRunner]:
@@ -179,7 +196,9 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         wrapper_dbt = MeltanoDbtWrapper()
         return wrapper_dbt.create_runner(project_root)
 
-    def _execute_dbt_command_type(self, runner: dbtRunner, command: list[str], project_root: Path) -> FlextResult[dict[str, object]]:
+    def _execute_dbt_command_type(
+        self, runner: dbtRunner, command: list[str], project_root: Path
+    ) -> FlextResult[dict[str, object]]:
         """Executa comando DBT específico."""
         wrapper_dbt = MeltanoDbtWrapper()
 
@@ -193,7 +212,9 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
             return wrapper_dbt.compile_project(runner, project_root)
         if command[0] == "docs" and len(command) > 1 and command[1] == "generate":
             return wrapper_dbt.generate_docs(runner, project_root)
-        return FlextResult[dict[str, object]].fail(f"Unsupported DBT command: {command[0]}")
+        return FlextResult[dict[str, object]].fail(
+            f"Unsupported DBT command: {command[0]}"
+        )
 
     def _extract_models_from_command(self, command: list[str]) -> list[str] | None:
         """Extrai modelos do comando se especificados."""
@@ -205,7 +226,13 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
             return command[models_index + 1].split(",")
         return None
 
-    def _format_dbt_result(self, dbt_result: dict[str, object], command: list[str], project_root: Path, timeout: int) -> FlextResult[dict[str, object]]:
+    def _format_dbt_result(
+        self,
+        dbt_result: dict[str, object],
+        command: list[str],
+        project_root: Path,
+        timeout: int,
+    ) -> FlextResult[dict[str, object]]:
         """Formata resultado DBT para Go bridge."""
         execution_result = {
             "success": dbt_result.get("success", False),
@@ -339,7 +366,9 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 project_info["valid"] = True
 
             if not project_info["valid"]:
-                return FlextResult[dict[str, object]].fail(f"No valid project found in {project_root}")
+                return FlextResult[dict[str, object]].fail(
+                    f"No valid project found in {project_root}"
+                )
 
             self.logger.info(
                 "Project info retrieved", project_type=project_info["project_type"]
@@ -430,7 +459,9 @@ class FlextExecutionResult:
 class SimpleResult[T]:
     """Simple result pattern similar to FlextResult for executor compatibility."""
 
-    def __init__(self, *, success: bool, value: T | None = None, error: str | None = None) -> None:
+    def __init__(
+        self, *, success: bool, value: T | None = None, error: str | None = None
+    ) -> None:
         self.success = success
         self.value = value
         self.error = error
@@ -450,7 +481,9 @@ class SimpleResult[T]:
 class SimpleMeltanoExecutor:
     """Simple Meltano executor with real API calls - NO SUBPROCESS."""
 
-    def create_test_project(self, project_name: str = "simple_test") -> SimpleResult[Path]:
+    def create_test_project(
+        self, project_name: str = "simple_test"
+    ) -> SimpleResult[Path]:
         """Create temporary Meltano project with real plugins."""
         try:
             temp_dir = tempfile.mkdtemp(prefix=f"meltano_{project_name}_")
@@ -462,21 +495,25 @@ class SimpleMeltanoExecutor:
                 "project_id": project_name,
                 "environments": [{"name": "dev"}],
                 "plugins": {
-                    "extractors": [{
-                        "name": "tap-csv",
-                        "namespace": "tap_csv",
-                        "pip_url": "git+https://github.com/MeltanoLabs/tap-csv.git",
-                        "config": {
-                            "files": [{"path": "test.csv", "entity": "test_data"}]
+                    "extractors": [
+                        {
+                            "name": "tap-csv",
+                            "namespace": "tap_csv",
+                            "pip_url": "git+https://github.com/MeltanoLabs/tap-csv.git",
+                            "config": {
+                                "files": [{"path": "test.csv", "entity": "test_data"}]
+                            },
                         }
-                    }],
-                    "loaders": [{
-                        "name": "target-csv",
-                        "namespace": "target_csv",
-                        "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
-                        "config": {"destination_path": "output"}
-                    }]
-                }
+                    ],
+                    "loaders": [
+                        {
+                            "name": "target-csv",
+                            "namespace": "target_csv",
+                            "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
+                            "config": {"destination_path": "output"},
+                        }
+                    ],
+                },
             }
 
             # Save meltano.yml
@@ -511,23 +548,26 @@ class SimpleMeltanoExecutor:
                     "success": "false",
                     "error": f"Project init failed: {project_result.error}",
                     "extractor": extractor,
-                    "loader": loader
+                    "loader": loader,
                 }
                 return SimpleResult.ok(error_result)
 
-
             # Execute ELT pipeline using real Meltano Core API - CORRECTED args
-            pipeline_result_data = bridge.run_elt_pipeline(extractor, loader, project_path, transform=False)
+            pipeline_result_data = bridge.run_elt_pipeline(
+                extractor, loader, project_path, transform=False
+            )
 
             if pipeline_result_data.success:
                 result_data = pipeline_result_data.value
 
                 pipeline_result = {
                     "success": "true",
-                    "execution_method": str(result_data.get("execution_method", "native_meltano_core")),
+                    "execution_method": str(
+                        result_data.get("execution_method", "native_meltano_core")
+                    ),
                     "extractor": extractor,
                     "loader": loader,
-                    "stages": str(len(result_data.get("pipeline_stages", [])))
+                    "stages": str(len(result_data.get("pipeline_stages", []))),
                 }
 
                 return SimpleResult.ok(pipeline_result)
@@ -537,7 +577,7 @@ class SimpleMeltanoExecutor:
                 "success": "false",
                 "error": str(pipeline_result_data.error)[:200],
                 "extractor": extractor,
-                "loader": loader
+                "loader": loader,
             }
             return SimpleResult.ok(error_result)  # Still return result for analysis
 
@@ -548,7 +588,9 @@ class SimpleMeltanoExecutor:
 class SimpleDbtExecutor:
     """Simple DBT executor using dbtRunner native API - NO SUBPROCESS."""
 
-    def create_test_dbt_project(self, project_name: str = "simple_dbt") -> SimpleResult[Path]:
+    def create_test_dbt_project(
+        self, project_name: str = "simple_dbt"
+    ) -> SimpleResult[Path]:
         """Create temporary DBT project."""
         try:
             temp_dir = tempfile.mkdtemp(prefix=f"dbt_{project_name}_")
@@ -561,7 +603,7 @@ class SimpleDbtExecutor:
                 "profile": project_name,
                 "model-paths": ["models"],
                 "target-path": "target",
-                "models": {project_name: {"materialized": "table"}}
+                "models": {project_name: {"materialized": "table"}},
             }
 
             dbt_project_file = temp_path / "dbt_project.yml"
@@ -577,10 +619,10 @@ class SimpleDbtExecutor:
                             "database": str(temp_path / "test.db"),
                             "schema": "main",
                             "schema_directory": str(temp_path),
-                            "schemas_and_paths": {"main": str(temp_path / "test.db")}
+                            "schemas_and_paths": {"main": str(temp_path / "test.db")},
                         }
                     },
-                    "target": "dev"
+                    "target": "dev",
                 }
             }
 
@@ -619,7 +661,13 @@ class SimpleDbtExecutor:
             runner = dbtRunner()
 
             # Add project-dir and profiles-dir
-            full_command = [*command, "--project-dir", str(project_path), "--profiles-dir", str(project_path)]
+            full_command = [
+                *command,
+                "--project-dir",
+                str(project_path),
+                "--profiles-dir",
+                str(project_path),
+            ]
 
             # Execute real DBT command
             result = runner.invoke(full_command)
@@ -627,7 +675,7 @@ class SimpleDbtExecutor:
             command_result = {
                 "command": " ".join(command),
                 "success": str(getattr(result, "success", False)),
-                "project_path": str(project_path)
+                "project_path": str(project_path),
             }
 
             if getattr(result, "success", False):
@@ -636,8 +684,6 @@ class SimpleDbtExecutor:
 
         except Exception as e:
             return SimpleResult.fail(f"DBT execution error: {e}")
-
-
 
 
 # =============================================================================

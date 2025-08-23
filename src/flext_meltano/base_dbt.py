@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# Importar DBT Core REAL - bibliotecas instaladas
 from dbt.cli.main import dbtRunner
 from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 
@@ -50,17 +49,17 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
 
         """
         return FlextResult[object].ok({
-                "service": "MeltanoDbtWrapper",
-                "status": "ready",
-                "dbt_available": DBT_AVAILABLE,
-                "capabilities": [
-                    "create_runner",
-                    "run_models",
-                    "test_models",
-                    "compile_project",
-                    "generate_docs",
-                ],
-            })
+            "service": "MeltanoDbtWrapper",
+            "status": "ready",
+            "dbt_available": DBT_AVAILABLE,
+            "capabilities": [
+                "create_runner",
+                "run_models",
+                "test_models",
+                "compile_project",
+                "generate_docs",
+            ],
+        })
 
     def create_runner(self, project_dir: Path | None = None) -> FlextResult[dbtRunner]:
         """Cria dbtRunner usando FlextResult pattern.
@@ -74,7 +73,9 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
         """
         try:
             if not DBT_AVAILABLE:
-                    return FlextResult[dbtRunner].fail("DBT Core not available - install dbt-core")
+                return FlextResult[dbtRunner].fail(
+                    "DBT Core not available - install dbt-core"
+                )
 
             self.logger.info(
                 "Creating DBT runner",
@@ -192,7 +193,9 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
 
             self.logger.exception(
                 error_msg,
-                exception=str(result.exception) if result.exception else "Unknown error",
+                exception=str(result.exception)
+                if result.exception
+                else "Unknown error",
                 result_success=result.success,
             )
             return FlextResult[dict[str, object]].ok(execution_result)
@@ -363,7 +366,8 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 self.logger.info("DBT documentation generated successfully")
             else:
                 self.logger.exception(
-                    "DBT docs generation failed", exit_code=getattr(result, "exit_code", 1)
+                    "DBT docs generation failed",
+                    exit_code=getattr(result, "exit_code", 1),
                 )
 
             return FlextResult[dict[str, object]].ok(docs_result)
@@ -427,7 +431,9 @@ class FlextDbtAdapter:
             return FlextResult[dict[str, object]].ok(flext_results)
 
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to adapt DBT results: {e}")
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to adapt DBT results: {e}"
+            )
 
     @staticmethod
     def adapt_manifest(
@@ -495,7 +501,9 @@ class FlextDbtAdapter:
             return FlextResult[dict[str, object]].ok(flext_manifest)
 
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to adapt DBT manifest: {e}")
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to adapt DBT manifest: {e}"
+            )
 
 
 # =============================================================================
