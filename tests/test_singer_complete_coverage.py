@@ -7,10 +7,13 @@
 
 from __future__ import annotations
 
+import tempfile
+from typing import ClassVar
+
 from flext_core import FlextResult
 from singer_sdk import Stream, Tap, Target
 
-from flext_meltano.base_singer import FlextSingerAdapter, MeltanoSingerWrapper
+from flext_meltano.singer_adapters import FlextSingerAdapter, MeltanoSingerWrapper
 
 
 # Create minimal Singer tap/target classes for testing
@@ -18,7 +21,7 @@ class TestTap(Tap):
     """Minimal Singer tap for testing."""
 
     name = "test_tap"
-    config_jsonschema = {
+    config_jsonschema: ClassVar[dict[str, object]] = {
         "type": "object",
         "properties": {"test_param": {"type": "string"}},
     }
@@ -32,17 +35,17 @@ class TestTarget(Target):
     """Minimal Singer target for testing."""
 
     name = "test_target"
-    config_jsonschema = {
+    config_jsonschema: ClassVar[dict[str, object]] = {
         "type": "object",
         "properties": {"test_param": {"type": "string"}},
     }
 
     default_sink_class = None
 
-    def process_messages(self, messages) -> None:
+    def process_messages(self, messages: object) -> None:
         """Process Singer messages (required by Singer SDK)."""
         # This is the real interface expected by Singer SDK
-        for message in messages:
+        for _message in messages:
             pass  # Process each message
 
 
@@ -113,7 +116,7 @@ class TestMeltanoSingerWrapperComplete:
                 pass
 
         config = {"test_param": "test_value"}
-        result = wrapper.create_tap(InvalidTap, config)  # type: ignore[arg-type]
+        result = wrapper.create_tap(InvalidTap, config)
 
         assert isinstance(result, FlextResult)
         assert not result.success
@@ -162,7 +165,7 @@ class TestMeltanoSingerWrapperComplete:
                 pass
 
         config = {"test_param": "test_value"}
-        result = wrapper.create_target(InvalidTarget, config)  # type: ignore[arg-type]
+        result = wrapper.create_target(InvalidTarget, config)
 
         assert isinstance(result, FlextResult)
         assert not result.success
@@ -263,7 +266,7 @@ class TestFlextSingerAdapterComplete:
 
     def test_adapt_catalog_with_none_catalog(self) -> None:
         """Test adapting None catalog."""
-        result = FlextSingerAdapter.adapt_catalog(None)  # type: ignore[arg-type]
+        result = FlextSingerAdapter.adapt_catalog(None)
 
         assert isinstance(result, FlextResult)
         assert not result.success
@@ -312,10 +315,10 @@ class TestFlextSingerAdapterComplete:
         """Test target configuration validation patterns."""
         # Check if validate_target_config method exists
         if hasattr(FlextSingerAdapter, "validate_target_config"):
-            config = {"destination_path": "/tmp/output", "file_format": "jsonl"}
-
-            result = FlextSingerAdapter.validate_target_config(config)
-            assert isinstance(result, FlextResult)
+            with tempfile.TemporaryDirectory(prefix="flext_singer_test_") as temp_dir:
+                config = {"destination_path": temp_dir, "file_format": "jsonl"}
+                result = FlextSingerAdapter.validate_target_config(config)
+                assert isinstance(result, FlextResult)
 
 
 class TestSingerIntegrationPatterns:
@@ -423,18 +426,19 @@ class TestSingerRealWorldUsage:
         """Test typical target creation workflow."""
         wrapper = MeltanoSingerWrapper()
 
-        # Step 1: Prepare configuration
-        config = {
-            "destination_path": "/tmp/output",
-            "file_format": "jsonl",
-            "batch_size": 1000,
-        }
+        # Step 1: Prepare configuration with secure temporary directory
+        with tempfile.TemporaryDirectory(prefix="flext_singer_etl_") as temp_dir:
+            config = {
+                "destination_path": temp_dir,
+                "file_format": "jsonl",
+                "batch_size": 1000,
+            }
 
-        # Step 2: Create target
-        target_result = wrapper.create_target(TestTarget, config)
+            # Step 2: Create target
+            target_result = wrapper.create_target(TestTarget, config)
 
-        # Step 3: Validate result
-        assert isinstance(target_result, FlextResult)
+            # Step 3: Validate result
+            assert isinstance(target_result, FlextResult)
 
         if target_result.success:
             target_instance = target_result.data

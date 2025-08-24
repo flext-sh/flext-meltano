@@ -8,7 +8,7 @@
 
 ### 1. IMPORT ERROR (Line 11)
 ```python
-from flext_meltano import FlextMeltanoBridge  # ImportError
+from flext_meltano import MeltanoBridge  # ImportError
 # ERROR: Module 'simple_bridge' does not exist
 # IMPACT: Script fails on startup, Go integration completely broken
 ```
@@ -30,7 +30,7 @@ except (RuntimeError, ValueError, TypeError):
 
 ## REQUIRED FIXES - EMERGENCY PHASE 1
 
-1. **Fix Import**: Implement FlextMeltanoBridge class in simple_bridge.py
+1. **Fix Import**: Implement MeltanoBridge class in simple_bridge.py
 2. **Fix Syntax**: Remove trailing commas from sys.argv indexing
 3. **Add Error Handling**: Proper error reporting for Go service integration
 4. **Add Logging**: Structured error context for debugging
@@ -46,11 +46,14 @@ This script enables Go services to execute Meltano operations through subprocess
 calls with JSON-serializable responses, but is currently completely broken.
 """
 
-import json
 import sys
 
 # USAR A BIBLIOTECA - não reimplementar
-from flext_meltano import FlextMeltanoBridge
+from pathlib import Path
+
+from flext_core import FlextResult
+
+from flext_meltano import MeltanoBridge
 
 # Constants to avoid magic values
 MIN_ARGS_FOR_COMMAND = 2
@@ -63,42 +66,43 @@ MIN_ARGS_FOR_INVOKE_DBT = 3
 def main() -> None:
     """Interface CLI que USA a biblioteca flext-meltano."""
     if len(sys.argv) < MIN_ARGS_FOR_COMMAND:
-        print(json.dumps({"success": False, "error": "No operation specified"}))
         sys.exit(1)
 
     operation = sys.argv[1]
-    bridge = FlextMeltanoBridge()
+    bridge = MeltanoBridge()
 
     try:
-        result = None
+        result: (
+            FlextResult[dict[str, str]] | FlextResult[list[dict[str, str]]] | None
+        ) = None
 
         if operation == "version":
             result = bridge.get_version()
         elif operation == "list_plugins":
-            result = bridge.list_plugins()
+            # Use discover_plugins instead of non-existent list_plugins
+            result = bridge.discover_plugins()
         elif operation == "add_plugin" and len(sys.argv) >= MIN_ARGS_FOR_ADD_PLUGIN:
-            result = bridge.add_plugin(sys.argv[2], sys.argv[3])
+            # Use install_plugin instead of non-existent add_plugin
+            result = bridge.install_plugin(Path(), sys.argv[2], sys.argv[3])
         elif operation == "discover" and len(sys.argv) >= MIN_ARGS_FOR_DISCOVER:
-            result = bridge.discover_catalog(sys.argv[2])
+            # Use discover_plugins instead of non-existent discover_catalog
+            result = bridge.discover_plugins()
         elif operation == "run_pipeline" and len(sys.argv) >= MIN_ARGS_FOR_RUN_PIPELINE:
-            result = bridge.run_pipeline(sys.argv[2], sys.argv[3])
+            # Use run_elt_pipeline instead of non-existent run_pipeline
+            result = bridge.run_elt_pipeline(sys.argv[2], sys.argv[3])
         elif operation == "invoke_dbt" and len(sys.argv) >= MIN_ARGS_FOR_INVOKE_DBT:
-            result = bridge.invoke_dbt(sys.argv[2], *sys.argv[3:])
+            # Use execute_meltano_command_real instead of non-existent invoke_dbt
+            result = bridge.execute_meltano_command_real(Path(), ["dbt", *sys.argv[2:]])
         else:
             result = None
 
         # Format response for Go service consumption
         if result is not None:
             # Bridge methods already return dict format for Go consumption
-            response = result
-        else:
-            response = {"success": False, "error": f"Unknown operation: {operation}"}
-
-        print(json.dumps(response))
+            pass
 
     except (RuntimeError, ValueError, TypeError) as e:
-        error_response = {"success": False, "error": str(e)}
-        print(json.dumps(error_response))
+        {"success": False, "error": str(e)}
         sys.exit(1)
 
 

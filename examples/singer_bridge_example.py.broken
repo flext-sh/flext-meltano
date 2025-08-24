@@ -17,400 +17,468 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Iterator
+from typing import Any, ClassVar
 
-     from flext_core import TAnyObject
-
-from flext_core import FlextResult, get_logger
+from singer_sdk import Stream, Tap, Target, typing as singer_typing
 
 from flext_meltano import (
-    FlextIncrementalTap,
-    # Bridge Singer
-    FlextStreamingTarget,
-    # Implementações específicas
-    FlextTapBase,
-    FlextTargetBase,
-    create_singer_bridge,
-    create_singer_catalog,
-    create_singer_service,
-    # Utilitários
-    create_tap,
-    create_target,
-    validate_tap_config,
-    validate_target_config,
+    FlextMeltanoBridge,
+    FlextMeltanoConfig,
+    create_flext_meltano_bridge,
 )
-from flext_meltano._base import Stream
-
-     from collections.abc import Iterator
-
-logger = get_logger(__name__)
-
 
 # =============================================================================
-# EXEMPLO 1: USO BÁSICO DO BRIDGE SINGER
+# EXAMPLE 1: Basic Bridge Integration
 # =============================================================================
 
 
-def basic_bridge_example() -> None:
-    """Demonstrates basic Singer SDK bridge usage."""
-    # Criar bridge
-    bridge = create_singer_bridge()
+def basic_bridge_example() -> dict[str, Any]:
+    """Demonstrates basic Singer SDK bridge usage with REAL APIs."""
+    # Create REAL bridge
+    bridge = create_flext_meltano_bridge()
 
-    # Converter flext-core para Singer SDK
-    record_data = {"id": 1, "name": "Test Record", "value": 42.5}
+    try:
+        # Test bridge health
+        health_result = bridge.validate_bridge_health()
 
-    # Criar mensagem Singer RECORD
-    singer_record = bridge.flext_to_singer_record(
-        stream="test_stream",
-        record=record_data,
-        time_extracted="2025-01-01T12:00:00Z",
+        # Get service information
+        service_info = bridge.get_service_info()
+
+        return {
+            "bridge_healthy": health_result.success,
+            "service_available": service_info.success,
+            "bridge_version": bridge.get_bridge_version(),
+            "status": "bridge_integration_successful",
+        }
+    except Exception as e:
+        return {
+            "bridge_healthy": False,
+            "error": str(e),
+            "status": "bridge_integration_failed",
+        }
+
+
+# =============================================================================
+# EXAMPLE 2: Professional Singer Tap Implementation
+# =============================================================================
+
+
+class ProfessionalExampleTap(Tap):
+    """Professional Singer tap using real Singer SDK patterns."""
+
+    name = "professional-example-tap"
+
+    # Configuration schema using Singer SDK typing
+    config_jsonschema = singer_typing.PropertiesList(
+        singer_typing.Property(
+            "host",
+            singer_typing.StringType,
+            required=True,
+            description="Database host",
+        ),
+        singer_typing.Property(
+            "port",
+            singer_typing.IntegerType,
+            default=5432,
+            description="Database port",
+        ),
+        singer_typing.Property(
+            "username",
+            singer_typing.StringType,
+            required=True,
+            description="Database username",
+        ),
+        singer_typing.Property(
+            "password",
+            singer_typing.StringType,
+            required=True,
+            secret=True,
+            description="Database password",
+        ),
+        singer_typing.Property(
+            "database",
+            singer_typing.StringType,
+            required=True,
+            description="Database name",
+        ),
+    ).to_dict()
+
+    def discover_streams(self) -> list[Stream]:
+        """Discover available streams using Singer SDK patterns."""
+        return [
+            ExampleUsersStream(self),
+            ExampleOrdersStream(self),
+        ]
+
+
+class ExampleUsersStream(Stream):
+    """Example users stream using Singer SDK patterns."""
+
+    name: ClassVar[str] = "users"
+    primary_keys: ClassVar[list[str]] = ["id"]
+    replication_key: ClassVar[str] = "updated_at"
+
+    # Schema definition using Singer SDK typing
+    schema = singer_typing.PropertiesList(
+        singer_typing.Property(
+            "id",
+            singer_typing.IntegerType,
+            description="User ID",
+        ),
+        singer_typing.Property(
+            "name",
+            singer_typing.StringType,
+            description="User name",
+        ),
+        singer_typing.Property(
+            "email",
+            singer_typing.StringType,
+            description="User email",
+        ),
+        singer_typing.Property(
+            "updated_at",
+            singer_typing.DateTimeType,
+            description="Last updated timestamp",
+        ),
+    ).to_dict()
+
+    def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
+        """Generate sample user records.
+
+        When provided, "context" can be used to filter or adjust the output
+        (e.g., by replication bookmark). Here, respect a trivial filter if passed.
+        """
+        # Simulate data extraction
+        sample_users = [
+            {
+                "id": 1,
+                "name": "Alice Johnson",
+                "email": "alice@example.com",
+                "updated_at": "2025-01-01T10:00:00Z",
+            },
+            {
+                "id": 2,
+                "name": "Bob Smith",
+                "email": "bob@example.com",
+                "updated_at": "2025-01-01T11:00:00Z",
+            },
+            {
+                "id": 3,
+                "name": "Carol Davis",
+                "email": "carol@example.com",
+                "updated_at": "2025-01-01T12:00:00Z",
+            },
+        ]
+        # If a context with a "min_id" is provided, filter accordingly
+        min_id = None
+        if isinstance(context, dict):
+            raw_min = context.get("min_id")
+            if isinstance(raw_min, (int, str)):
+                try:
+                    min_id = int(raw_min)
+                except ValueError:
+                    min_id = None
+
+        filtered = (
+            (u for u in sample_users if (min_id is None or int(u["id"]) >= min_id))
+            if min_id is not None
+            else iter(sample_users)
+        )
+
+        yield from filtered
+
+
+class ExampleOrdersStream(Stream):
+    """Example orders stream using Singer SDK patterns."""
+
+    name: ClassVar[str] = "orders"
+    primary_keys: ClassVar[list[str]] = ["id"]
+    replication_key: ClassVar[str] = "created_at"
+
+    # Schema definition
+    schema = singer_typing.PropertiesList(
+        singer_typing.Property(
+            "id",
+            singer_typing.IntegerType,
+            description="Order ID",
+        ),
+        singer_typing.Property(
+            "user_id",
+            singer_typing.IntegerType,
+            description="User ID",
+        ),
+        singer_typing.Property(
+            "total",
+            singer_typing.NumberType,
+            description="Order total",
+        ),
+        singer_typing.Property(
+            "created_at",
+            singer_typing.DateTimeType,
+            description="Order creation timestamp",
+        ),
+    ).to_dict()
+
+    def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
+        """Generate sample order records.
+
+        Uses optional context to filter by "user_id" when provided.
+        """
+        sample_orders = [
+            {
+                "id": 101,
+                "user_id": 1,
+                "total": 29.99,
+                "created_at": "2025-01-01T13:00:00Z",
+            },
+            {
+                "id": 102,
+                "user_id": 2,
+                "total": 49.99,
+                "created_at": "2025-01-01T14:00:00Z",
+            },
+            {
+                "id": 103,
+                "user_id": 1,
+                "total": 19.99,
+                "created_at": "2025-01-01T15:00:00Z",
+            },
+        ]
+        user_id_filter = None
+        if isinstance(context, dict):
+            raw_uid = context.get("user_id")
+            if isinstance(raw_uid, (int, str)):
+                try:
+                    user_id_filter = int(raw_uid)
+                except ValueError:
+                    user_id_filter = None
+
+        filtered = (
+            (
+                o
+                for o in sample_orders
+                if (user_id_filter is None or int(o["user_id"]) == user_id_filter)
+            )
+            if user_id_filter is not None
+            else iter(sample_orders)
+        )
+
+        yield from filtered
+
+
+def professional_tap_example() -> dict[str, Any]:
+    """Demonstrates professional tap implementation."""
+    # Configuration
+    config = {
+        "host": "localhost",
+        "port": 5432,
+        "username": "user",
+        "password": "password",
+        "database": "example_db",
+    }
+
+    try:
+        # Create tap instance
+        tap = ProfessionalExampleTap(config=config)
+
+        # Discover streams
+        streams = tap.discover_streams()
+
+        # Get catalog
+        catalog = tap.catalog
+
+        return {
+            "tap_created": True,
+            "streams_discovered": len(streams),
+            "stream_names": [stream.name for stream in streams],
+            "catalog_available": catalog is not None,
+            "status": "professional_tap_successful",
+        }
+    except Exception as e:
+        return {
+            "tap_created": False,
+            "error": str(e),
+            "status": "professional_tap_failed",
+        }
+
+
+# =============================================================================
+# EXAMPLE 3: Professional Singer Target Implementation
+# =============================================================================
+
+
+class ExampleSink:
+    """Example sink for the professional target."""
+
+    def __init__(
+        self,
+        target: Target,
+        stream_name: str,
+        schema: dict[str, Any],
+        key_properties: list[str],
+    ) -> None:
+        """Initialize sink."""
+        self.target = target
+        self.stream_name = stream_name
+        self.schema = schema
+        self.key_properties = key_properties
+        self.records_processed = 0
+
+    def process_record(self, record: dict[str, Any], context: dict[str, Any]) -> None:
+        """Process a single record respecting context flags when present."""
+        # Example: skip records when context requests dry-run
+        if isinstance(context, dict) and context.get("dry_run") is True:
+            return
+
+        # Simulate record processing
+        if isinstance(record, dict):
+            self.records_processed += 1
+
+        # In real implementation, this would write to destination
+
+    def process_batch(self, context: dict[str, Any]) -> None:
+        """Process a batch of records."""
+        # Simulate batch processing
+
+
+class ProfessionalExampleTarget(Target):
+    """Professional Singer target using real Singer SDK patterns."""
+
+    name = "professional-example-target"
+
+    # Configuration schema
+    config_jsonschema = singer_typing.PropertiesList(
+        singer_typing.Property(
+            "output_path",
+            singer_typing.StringType,
+            required=True,
+            description="Output file path",
+        ),
+        singer_typing.Property(
+            "batch_size",
+            singer_typing.IntegerType,
+            default=1000,
+            description="Batch size for processing",
+        ),
+    ).to_dict()
+
+    default_sink_class = ExampleSink
+
+
+def professional_target_example() -> dict[str, Any]:
+    """Demonstrates professional target implementation."""
+    # Configuration
+    config = {
+        "output_path": "./.tmp_target_output",
+        "batch_size": 100,
+    }
+
+    try:
+        # Create target instance
+        ProfessionalExampleTarget(config=config)
+
+        # Simulate processing some records
+        sample_records = [
+            {"type": "RECORD", "stream": "users", "record": {"id": 1, "name": "Alice"}},
+            {"type": "RECORD", "stream": "users", "record": {"id": 2, "name": "Bob"}},
+            {
+                "type": "RECORD",
+                "stream": "orders",
+                "record": {"id": 101, "user_id": 1, "total": 29.99},
+            },
+        ]
+
+        records_processed = len(sample_records)
+
+        return {
+            "target_created": True,
+            "records_processed": records_processed,
+            "output_path": config["output_path"],
+            "batch_size": config["batch_size"],
+            "status": "professional_target_successful",
+        }
+    except Exception as e:
+        return {
+            "target_created": False,
+            "error": str(e),
+            "status": "professional_target_failed",
+        }
+
+
+# =============================================================================
+# EXAMPLE 4: Bridge-Integrated Pipeline
+# =============================================================================
+
+
+def bridge_integrated_pipeline_example() -> dict[str, Any]:
+    """Demonstrates complete pipeline using bridge integration."""
+    # Create FLEXT Meltano configuration
+    FlextMeltanoConfig(
+        project_root="./demo_project",
+        environment="development",
     )
 
-    if singer_record.success:
-        # Escrever mensagem Singer
-        write_result = bridge.write_singer_message(singer_record.data)
-        if write_result.success:
-            pass
+    # Create bridge
+    bridge = FlextMeltanoBridge()
+
+    try:
+        # Validate bridge health
+        health_result = bridge.validate_bridge_health()
+        if not health_result.success:
+            return {
+                "pipeline_executed": False,
+                "error": f"Bridge health check failed: {health_result.error}",
+                "status": "bridge_unhealthy",
+            }
+
+        # Execute professional tap
+        tap_result = professional_tap_example()
+
+        # Execute professional target
+        target_result = professional_target_example()
+
+        # Get service information
+        service_info = bridge.get_service_info()
+
+        return {
+            "pipeline_executed": True,
+            "bridge_healthy": True,
+            "tap_result": tap_result,
+            "target_result": target_result,
+            "service_info": service_info.data
+            if service_info.success
+            else "Not available",
+            "status": "complete_pipeline_successful",
+        }
+    except Exception as e:
+        return {
+            "pipeline_executed": False,
+            "error": str(e),
+            "status": "complete_pipeline_failed",
+        }
 
 
 # =============================================================================
-# EXEMPLO 2: CATALOG MANAGEMENT
-# =============================================================================
-
-
-def catalog_management_example() -> None:
-    """Demonstrates catalog management."""
-    # Criar catalog
-    catalog = create_singer_catalog()
-
-    # Adicionar streams
-    schema = {
-        "type": "object",
-        "properties": {
-            "id": {"type": "integer"},
-            "name": {"type": "string"},
-            "created_at": {"type": "string", "format": "date-time"},
-        },
-    }
-
-    result = catalog.add_stream(
-        stream_name="users",
-        schema=schema,
-        key_properties=["id"],
-    )
-
-    if result.success:
-        # Obter catalog completo
-        catalog_data = catalog.get_catalog()
-        if catalog_data.success:
-            pass
-
-
-# =============================================================================
-# EXEMPLO 3: TAP PERSONALIZADO
-# =============================================================================
-
-
-class ExemploTap(FlextTapBase):
-    """Custom tap example."""
-
-    name = "example-tap"
-
-    def discover_streams(self) -> list[TAnyObject]:
-        """Discover available streams."""
-        # Simulate stream discovery
-
-        class ExampleStream(Stream):
-            def __init__(self, tap: TAnyObject, name: str) -> None:
-                schema = {
-                    "type": "object",
-                    "properties": {
-                        "id": {"type": "integer"},
-                        "data": {"type": "string"},
-                    },
-                }
-                super().__init__(tap, schema=schema, name=name)
-                self._key_properties = ["id"]
-
-            def get_records(
-                self,
-                context: dict[str, object] | None,
-            ) -> Iterator[dict[str, object]]:
-                """Get records from stream."""
-                # Simular dados
-                yield {"id": 1, "data": "Record 1"}
-                yield {"id": 2, "data": "Record 2"}
-                yield {"id": 3, "data": "Record 3"}
-
-        return [ExemploStream(self, "exemplo_stream")]
-
-    def _test_connection_impl(self) -> bool:
-        """Testar conexão."""
-        return True
-
-    def _process_stream(self, stream_name: str, stream_info: dict[str, object]) -> None:
-        """Processar stream durante sync."""
-        # Simular extração de dados
-        self._records_extracted += 10
-
-
-def custom_tap_example() -> None:
-    """Demonstrates custom tap creation."""
-    # Configuração do tap
-    config = {
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "pass",
-        "database": "testdb",
-    }
-
-    # Validar configuração
-    validation = validate_tap_config(ExemploTap, config)
-    if not validation.success:
-        return
-
-    # Criar tap
-    tap = create_tap(ExemploTap, config)
-
-    # Descobrir streams
-    discovery = tap.discover()
-    if discovery.success:
-        # Sync
-        catalog = discovery.data["catalog"]
-        sync_result = tap.sync(catalog)
-        if sync_result.success:
-            pass
-
-
-# =============================================================================
-# EXEMPLO 4: TARGET PERSONALIZADO
-# =============================================================================
-
-
-class ExemploTarget(FlextTargetBase):
-    """Custom target example."""
-
-    def _write_records_impl(
-        self,
-        records: list[dict[str, object]],
-    ) -> FlextResult[None]:
-        """Implementação de escrita de records."""
-        try:
-            for _record in records:
-                pass
-            return FlextResult.ok(None)
-        except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult.error(f"Erro ao escrever records: {e}")
-
-    def _test_connection_impl(self) -> bool:
-        """Testar conexão."""
-        return True
-
-
-def custom_target_example() -> None:
-    """Demonstrates custom target creation."""
-    # Configuração do target
-    config = {
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "pass",
-        "database": "targetdb",
-    }
-
-    # Validar configuração
-    validation = validate_target_config(ExemploTarget, config)
-    if not validation.success:
-        return
-
-    # Criar target
-    target = create_target(ExemploTarget, config)
-
-    # Escrever records
-    records = [
-        {"id": 1, "name": "Record 1"},
-        {"id": 2, "name": "Record 2"},
-        {"id": 3, "name": "Record 3"},
-    ]
-
-    write_result = target.write_records(records)
-    if write_result.success:
-        # Obter métricas
-        target.get_target_metrics()
-
-
-# =============================================================================
-# EXEMPLO 5: SERVIÇO SINGER SDK
-# =============================================================================
-
-
-def exemplo_servico_singer() -> None:
-    """Demonstra uso do serviço Singer SDK."""
-    # Criar serviço
-    service = create_singer_service()
-
-    # Obter informações do Singer SDK
-    info = service.get_singer_sdk_info()
-    if info.success:
-        pass
-
-    # Validar configuração de tap
-    tap_config = {
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "pass",
-    }
-
-    validation = service.validate_tap_config("example-tap", tap_config)
-    if validation.success:
-        pass
-
-    # Descobrir streams
-    discovery = service.discover_streams("exemplo-tap", tap_config)
-    if discovery.success:
-        pass
-
-
-# =============================================================================
-# EXEMPLO 6: TAP INCREMENTAL
-# =============================================================================
-
-
-class ExemploIncrementalTap(FlextIncrementalTap):
-    """Exemplo de tap incremental."""
-
-    name = "exemplo-incremental-tap"
-
-    def discover_streams(self) -> list[TAnyObject]:
-        """Descobrir streams disponíveis."""
-
-        class IncrementalStream(Stream):
-            def __init__(self, tap: TAnyObject, name: str) -> None:
-                super().__init__(tap, name=name)
-                self.schema = {
-                    "type": "object",
-                    "properties": {
-                        "id": {"type": "integer"},
-                        "data": {"type": "string"},
-                        "updated_at": {"type": "string", "format": "date-time"},
-                    },
-                }
-                self.key_properties = ["id"]
-
-        return [IncrementalStream(self, "incremental_stream")]
-
-    def _test_connection_impl(self) -> bool:
-        """Testar conexão."""
-        return True
-
-    def _load_state(self) -> FlextResult[dict[str, object]]:
-        """Load current state."""
-        # Simular carregamento de estado
-        state = {"incremental_stream": {"updated_at": "2025-01-01T00:00:00Z"}}
-        return FlextResult.ok(state)
-
-    def _save_state(self) -> FlextResult[bool]:
-        """Save current state."""
-        # Simular salvamento de estado
-        return FlextResult.ok(data=True)
-
-
-def exemplo_tap_incremental() -> None:
-    """Demonstra tap incremental."""
-    config = {
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "pass",
-        "replication_key": "updated_at",
-    }
-
-    tap = create_tap(ExemploIncrementalTap, config)
-
-    # Descobrir e sync
-    discovery = tap.discover()
-    if discovery.success:
-        catalog = discovery.data["catalog"]
-        sync_result = tap.sync(catalog)
-        if sync_result.success:
-            pass
-
-
-# =============================================================================
-# EXEMPLO 7: TARGET STREAMING
-# =============================================================================
-
-
-class ExemploStreamingTarget(FlextStreamingTarget):
-    """Exemplo de target streaming."""
-
-    def _write_records_impl(
-        self,
-        records: list[dict[str, object]],
-    ) -> FlextResult[None]:
-        """Implementação de escrita de records."""
-        try:
-            for _record in records:
-                pass
-            return FlextResult.ok(None)
-        except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult.error(f"Erro no streaming: {e}")
-
-    def _test_connection_impl(self) -> bool:
-        """Testar conexão."""
-        return True
-
-
-def exemplo_target_streaming() -> None:
-    """Demonstra target streaming."""
-    config = {
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "pass",
-        "batch_size": 2,  # Buffer pequeno para demonstração
-    }
-
-    target = create_target(ExemploStreamingTarget, config)
-
-    # Escrever records em lotes pequenos
-    records_batch1 = [{"id": 1, "data": "batch1"}]
-    records_batch2 = [{"id": 2, "data": "batch2"}]
-    records_batch3 = [{"id": 3, "data": "batch3"}]
-
-    # Primeiro lote (fica no buffer)
-    target.write_records(records_batch1)
-
-    # Segundo lote (processa buffer + novo lote)
-    target.write_records(records_batch2)
-
-    # Terceiro lote (fica no buffer)
-    target.write_records(records_batch3)
-
-    # Flush final
-    target.flush()
-
-
-# =============================================================================
-# FUNÇÃO PRINCIPAL
+# MAIN EXECUTION
 # =============================================================================
 
 
 def main() -> None:
-    """Executar todos os exemplos."""
-    try:
-        exemplo_bridge_basico()
-        exemplo_catalog_management()
-        exemplo_tap_personalizado()
-        exemplo_target_personalizado()
-        exemplo_servico_singer()
-        exemplo_tap_incremental()
-        exemplo_target_streaming()
+    """Execute all examples."""
+    # Example 1: Basic bridge integration
+    basic_bridge_example()
 
-    except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Erro durante execução dos exemplos: {e}")
+    # Example 2: Professional tap
+    tap_result = professional_tap_example()
+    if tap_result.get("streams_discovered"):
+        pass
+
+    # Example 3: Professional target
+    professional_target_example()
+
+    # Example 4: Complete pipeline
+    bridge_integrated_pipeline_example()
 
 
 if __name__ == "__main__":

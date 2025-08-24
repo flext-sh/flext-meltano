@@ -1,6 +1,6 @@
 """Execution Engine - Runtime execution via Go bridge for Meltano and DBT.
 
-FUNÇÃO 2: Runtime execution via Go bridge
+FUNCTION 2: Runtime execution via Go bridge
 - FlextMeltanoExecutor: Direct API execution for Go calls using real Meltano/DBT APIs
 - SimpleMeltanoExecutor: Simple executors with real API calls
 - SimpleDbtExecutor: Direct DBT execution using dbtRunner
@@ -19,8 +19,7 @@ import yaml
 from dbt.cli.main import dbtRunner
 from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
 
-from flext_meltano.base_dbt import MeltanoDbtWrapper
-from flext_meltano.base_meltano import MeltanoBridge
+from flext_meltano import MeltanoBridge, MeltanoDbtWrapper
 
 T = TypeVar("T")
 
@@ -32,15 +31,17 @@ logger = get_logger(__name__)
 
 
 class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
-    """Executor principal para runtime via Go bridge.
+    """Main executor for runtime via Go bridge.
 
-    Executa comandos Meltano e DBT via APIs nativas para integração com FlexCore Go,
-    fornecendo resultados estruturados em JSON para consumo pelos serviços Go.
+    Executes Meltano and DBT commands via native APIs for FlexCore Go integration,
+    providing structured JSON results for Go service consumption.
     """
 
     def __init__(self, config: dict[str, object] | None = None) -> None:
-        # Use config as kwargs for parent if provided, otherwise empty dict
-        super().__init__(**(config or {}))
+        # Initialize parent without passing config as kwargs
+        super().__init__()
+        # Store config as instance variable if needed
+        self._config = config or {}
 
     @property
     def logger(self) -> FlextLogger:
@@ -51,7 +52,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         """Execute Meltano executor operation (required by FlextDomainService).
 
         Returns:
-            FlextResult contendo informações do serviço
+            FlextResult containing service information
 
         """
         return FlextResult[dict[str, object]].ok(
@@ -71,15 +72,15 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
     def execute_meltano_command(
         self, project_root: Path, command: list[str], timeout: int = 300
     ) -> FlextResult[dict[str, object]]:
-        """Executa comando Meltano usando API nativa com resultado estruturado.
+        """Execute Meltano command using native API with structured result.
 
         Args:
-            project_root: Diretório do projeto Meltano
-            command: Comando meltano para executar (ex: ["run", "tap-csv", "target-csv"])
-            timeout: Timeout em segundos (padrão 5 minutos) - não usado na API nativa
+            project_root: Meltano project directory
+            command: Meltano command to execute (e.g.: ["run", "tap-csv", "target-csv"])
+            timeout: Timeout in seconds (default 5 minutes) - not used in native API
 
         Returns:
-            FlextResult contendo resultado estruturado para Go
+            FlextResult containing structured result for Go
 
         """
         try:
@@ -90,13 +91,13 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 timeout=timeout,
             )
 
-            # Validar projeto Meltano
+            # Validate Meltano project
             if not (project_root / "meltano.yml").exists():
                 return FlextResult[dict[str, object]].fail(
                     f"Not a Meltano project: {project_root}"
                 )
 
-            # Usar MeltanoBridge para execução nativa
+            # Use MeltanoBridge for native execution
             bridge = MeltanoBridge()
             # Use native project execution instead of command
             project_result = bridge.initialize_project(project_root)
@@ -113,7 +114,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 )
 
             if result.success:
-                # Adaptar resultado do bridge para formato Go
+                # Adapt bridge result for Go format
                 bridge_result = result.value
                 execution_result: dict[str, object] = {
                     "success": bridge_result.get("success", False),
@@ -150,7 +151,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
     def execute_dbt_command(
         self, project_root: Path, command: list[str], timeout: int = 300
     ) -> FlextResult[dict[str, object]]:
-        """Executa comando DBT usando API nativa com resultado estruturado."""
+        """Execute DBT command using native API with structured result."""
         try:
             self.logger.info(
                 "Executing DBT command natively",
@@ -158,24 +159,24 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 project_root=str(project_root),
             )
 
-            # Validar projeto DBT
+            # Validate DBT project
             validation_result = self._validate_dbt_project(project_root)
             if not validation_result.success:
                 return validation_result
 
-            # Criar runner DBT
+            # Create DBT runner
             runner_result = self._create_dbt_runner(project_root)
             if not runner_result.success:
                 return FlextResult.fail(runner_result.error or "Unknown error")
 
-            # Executar comando específico
+            # Execute specific command
             execution_result = self._execute_dbt_command_type(
                 runner_result.value, command, project_root
             )
             if not execution_result.success:
                 return execution_result
 
-            # Formatar resultado para Go
+            # Format result for Go
             return self._format_dbt_result(
                 execution_result.value, command, project_root, timeout
             )
@@ -188,7 +189,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
     def _validate_dbt_project(
         self, project_root: Path
     ) -> FlextResult[dict[str, object]]:
-        """Valida se é um projeto DBT válido."""
+        """Validate if it's a valid DBT project."""
         if not (project_root / "dbt_project.yml").exists():
             return FlextResult[dict[str, object]].fail(
                 f"Not a DBT project: {project_root}"
@@ -196,14 +197,14 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         return FlextResult.ok({})
 
     def _create_dbt_runner(self, project_root: Path) -> FlextResult[dbtRunner]:
-        """Cria runner DBT."""
+        """Create DBT runner."""
         wrapper_dbt = MeltanoDbtWrapper()
         return wrapper_dbt.create_runner(project_root)
 
     def _execute_dbt_command_type(
         self, runner: dbtRunner, command: list[str], project_root: Path
     ) -> FlextResult[dict[str, object]]:
-        """Executa comando DBT específico."""
+        """Execute specific DBT command."""
         wrapper_dbt = MeltanoDbtWrapper()
 
         if command[0] == "run":
@@ -221,7 +222,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         )
 
     def _extract_models_from_command(self, command: list[str]) -> list[str] | None:
-        """Extrai modelos do comando se especificados."""
+        """Extract models from command if specified."""
         if "--models" not in command:
             return None
 
@@ -237,7 +238,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         project_root: Path,
         timeout: int,
     ) -> FlextResult[dict[str, object]]:
-        """Formata resultado DBT para Go bridge."""
+        """Format DBT result for Go bridge."""
         execution_result = {
             "success": dbt_result.get("success", False),
             "exit_code": dbt_result.get("exit_code", 0),
@@ -266,12 +267,12 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
 
         Args:
             project_root: Diretório do projeto Meltano
-            tap_name: Nome do tap (ex: "tap-csv")
-            target_name: Nome do target (ex: "target-csv")
-            timeout: Timeout em segundos (padrão 10 minutos)
+            tap_name: Tap name (e.g.: "tap-csv")
+            target_name: Target name (e.g.: "target-csv")
+            timeout: Timeout in seconds (default 10 minutes)
 
         Returns:
-            FlextResult contendo resultado do pipeline
+            FlextResult containing pipeline result
 
         """
         try:
@@ -282,7 +283,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 project_root=str(project_root),
             )
 
-            # Executar pipeline via meltano run
+            # Execute pipeline via meltano run
             command = ["run", tap_name, target_name]
             return self.execute_meltano_command(project_root, command, timeout)
 
@@ -294,16 +295,16 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
     def install_plugin(
         self, project_root: Path, plugin_type: str, plugin_name: str, timeout: int = 300
     ) -> FlextResult[dict[str, object]]:
-        """Instala plugin Meltano via CLI.
+        """Install Meltano plugin via CLI.
 
         Args:
-            project_root: Diretório do projeto Meltano
-            plugin_type: Tipo do plugin (extractor, loader, transformer)
-            plugin_name: Nome do plugin
-            timeout: Timeout em segundos
+            project_root: Meltano project directory
+            plugin_type: Plugin type (extractor, loader, transformer)
+            plugin_name: Plugin name
+            timeout: Timeout in seconds
 
         Returns:
-            FlextResult contendo resultado da instalação
+            FlextResult containing installation result
 
         """
         try:
@@ -314,7 +315,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 project_root=str(project_root),
             )
 
-            # Executar instalação via meltano add
+            # Execute installation via meltano add
             command = ["add", plugin_type, plugin_name]
             return self.execute_meltano_command(project_root, command, timeout)
 
@@ -327,10 +328,10 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
         """Obtém informações do projeto Meltano/DBT.
 
         Args:
-            project_root: Diretório do projeto
+            project_root: Project directory
 
         Returns:
-            FlextResult contendo informações do projeto
+            FlextResult containing project information
 
         """
         try:
@@ -344,7 +345,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                 "valid": False,
             }
 
-            # Detectar tipo de projeto
+            # Detect project type
             if (project_root / "meltano.yml").exists():
                 project_info["project_type"] = "meltano"
                 config_files = project_info["config_files"]
@@ -352,7 +353,7 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
                     config_files.append("meltano.yml")
                 project_info["valid"] = True
 
-                # Obter informações de plugins via meltano config
+                # Get plugin information via meltano config
                 config_result = self.execute_meltano_command(
                     project_root, ["config", "list"], 30
                 )
@@ -385,13 +386,13 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
             return FlextResult[dict[str, object]].fail(error_msg)
 
     def _parse_output(self, output: str) -> dict[str, object] | None:
-        """Tenta parsear output como JSON.
+        """Try to parse output as JSON.
 
         Args:
-            output: String de output para parsear
+            output: Output string to parse
 
         Returns:
-            Dict parseado ou None se não for JSON válido
+            Parsed dict or None if not valid JSON
 
         """
         if not output:
@@ -412,17 +413,17 @@ class FlextMeltanoExecutor(FlextDomainService[dict[str, object]]):
 
 
 class FlextExecutionResult:
-    """Wrapper para resultados de execução compatíveis com Go."""
+    """Wrapper for execution results compatible with Go."""
 
     @staticmethod
     def success(data: dict[str, object]) -> dict[str, object]:
-        """Cria resultado de sucesso para Go bridge.
+        """Create success result for Go bridge.
 
         Args:
-            data: Dados do resultado
+            data: Result data
 
         Returns:
-            Resultado estruturado para JSON
+            Structured result for JSON
 
         """
         return {
@@ -434,14 +435,14 @@ class FlextExecutionResult:
 
     @staticmethod
     def failure(error_message: str, error_code: str | None = None) -> dict[str, object]:
-        """Cria resultado de erro para Go bridge.
+        """Create error result for Go bridge.
 
         Args:
-            error_message: Mensagem de erro
-            error_code: Código de erro opcional
+            error_message: Error message
+            error_code: Optional error code
 
         Returns:
-            Resultado de erro estruturado para JSON
+            Structured error result for JSON
 
         """
         return {

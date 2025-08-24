@@ -5,7 +5,11 @@ validating real code execution, subprocess calls, and integration patterns.
 Tests focus on verifying that the production code actually works.
 """
 
+import tempfile
 from pathlib import Path
+
+import pytest
+from pydantic_core import ValidationError
 
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.executors_bridge import (
@@ -35,15 +39,16 @@ class TestFlextMeltanoBridgeRealFunctionality:
 
     def test_bridge_with_custom_config(self) -> None:
         """Test bridge factory function with custom configuration."""
-        config = FlextMeltanoConfig(
-            project_root="/tmp/custom", environment="production"
-        )
-        bridge = create_flext_meltano_bridge(config)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = FlextMeltanoConfig(
+                project_root=temp_dir + "/custom", environment="production"
+            )
+            bridge = create_flext_meltano_bridge(config)
 
-        # Factory function currently ignores config parameter for simplicity
-        # Bridge should still be created successfully
-        assert bridge is not None
-        assert isinstance(bridge, FlextMeltanoBridge)
+            # Factory function currently ignores config parameter for simplicity
+            # Bridge should still be created successfully
+            assert bridge is not None
+            assert isinstance(bridge, FlextMeltanoBridge)
 
     def test_version_info_structure(self) -> None:
         """Test version info returns correct structure."""
@@ -190,13 +195,16 @@ class TestFlextMeltanoBridgeRealFunctionality:
 
     def test_dbt_with_kwargs(self) -> None:
         """Test DBT command with additional kwargs."""
-        bridge = FlextMeltanoBridge()
-        result = bridge.invoke_dbt("test", project_dir="/tmp/dbt", target="dev")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            bridge = FlextMeltanoBridge()
+            result = bridge.invoke_dbt(
+                "test", project_dir=temp_dir + "/dbt", target="dev"
+            )
 
-        # Should return proper dict structure for Go integration
-        assert isinstance(result, dict)
-        assert "success" in result
-        assert "data" in result or "error" in result
+            # Should return proper dict structure for Go integration
+            assert isinstance(result, dict)
+            assert "success" in result
+            assert "data" in result or "error" in result
 
 
 class TestFlextMeltanoExecutorRealFunctionality:
@@ -237,23 +245,28 @@ class TestFlextMeltanoConfigurationRealFunctionality:
         """Test configuration creation with default values."""
         config = FlextMeltanoConfig()
 
-        assert config.environment == "development"  # From constants
+        assert config.environment == "dev"  # From constants
         assert str(config.project_root) == str(Path.cwd())
 
     def test_config_with_custom_values(self) -> None:
         """Test configuration with custom values."""
-        custom_path = "/tmp/custom_project"
-        config = FlextMeltanoConfig(project_root=custom_path, environment="production")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            custom_path = temp_dir + "/custom_project"
+            config = FlextMeltanoConfig(
+                project_root=custom_path, environment="production"
+            )
 
-        assert str(config.project_root) == custom_path
-        assert config.environment == "production"
+            assert str(config.project_root) == custom_path
+            assert config.environment == "production"
 
     def test_config_validation(self) -> None:
         """Test configuration validation."""
-        config = FlextMeltanoConfig(
-            project_root="/nonexistent/path", environment="invalid"
-        )
+        # Test that invalid environment raises validation error
+        with pytest.raises(ValidationError) as exc_info:
+            FlextMeltanoConfig(
+                project_root="/nonexistent/path", environment="invalid"
+            )
 
-        # Configuration should still be created (validation may be lenient)
-        assert config is not None
-        assert str(config.project_root) == "/nonexistent/path"
+        # Verify the validation error is for environment field
+        assert "environment" in str(exc_info.value)
+        assert "not supported" in str(exc_info.value)

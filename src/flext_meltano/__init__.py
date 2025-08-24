@@ -22,42 +22,44 @@ from singer_sdk.typing import PropertiesList, Property
 
 # === FUNÇÃO 1: BASE WRAPPERS FOR EXTERNAL LIBRARIES ===
 # Base wrapper modules adapting APIs to flext-core patterns
-from flext_meltano.base_meltano import MeltanoBridge, FlextMeltanoAdapter
-from flext_meltano.base_dbt import MeltanoDbtWrapper, FlextDbtAdapter
-from flext_meltano.base_singer import MeltanoSingerWrapper, FlextSingerAdapter
+from flext_meltano.meltano_adapters import MeltanoBridge, FlextMeltanoAdapter
+from flext_meltano.dbt_adapters import MeltanoDbtWrapper, FlextDbtAdapter
+from flext_meltano.singer_adapters import MeltanoSingerWrapper, FlextSingerAdapter
 
 # === FUNÇÃO 2: EXECUTORS FOR GO BRIDGE INTEGRATION ===
 from flext_meltano.executors_meltano import FlextMeltanoExecutor, FlextExecutionResult
-from flext_meltano.executors_bridge import FlextMeltanoBridge
+from flext_meltano.executors_bridge import (
+    FlextMeltanoBridge,
+    create_flext_meltano_bridge,
+)
 from flext_meltano.executors_cli import FlextMeltanoCli, flext_meltano_run_cli
 
-# === FUNÇÃO 3: BASE COMPONENTS FOR FLEXT-* PROJECTS ===
-from flext_meltano.base_services import (
+# === FUNÇÃO 3: SERVICE IMPLEMENTATIONS FOR FLEXT-* PROJECTS ===
+from flext_meltano.service_implementations import (
+    # Base service implementations (concrete classes using flext-core)
     FlextMeltanoTapService,
     FlextMeltanoTargetService,
     FlextMeltanoDbtService,
+    # Service protocols (typing.Protocol instead of @abstractmethod)
+    FlextTapServiceProtocol,
+    FlextTargetServiceProtocol,
+    FlextDbtServiceProtocol,
 )
-from flext_meltano.base_plugins import (
+from flext_meltano.plugin_protocols import (
     FlextTapPlugin,
     FlextTargetPlugin,
     FlextDbtPlugin,
 )
 
 # === UTILITIES AND CORE ===
-from .utilities import (
+from flext_meltano.utilities import (
     FlextMeltanoUtilities,
     validate_config_value_simple as validate_config_value,
     validate_directory_path,
     validate_file_path,
 )
-from .base_projects import (
-    FlextMeltanoConfig,
-    create_meltano_tap_service,
-    create_meltano_target_service,
-    create_meltano_dbt_service,
-)
-from .exceptions import FlextMeltanoError
-from .constants import FLEXT_MELTANO_VERSION
+from flext_meltano.config import FlextMeltanoConfig, FLEXT_MELTANO_VERSION
+from flext_meltano.exceptions import FlextMeltanoError
 
 # =============================================================================
 # PUBLIC API EXPORTS
@@ -87,6 +89,7 @@ __all__ = [
     "FlextMeltanoExecutor",
     "FlextExecutionResult",  # Runtime base
     "FlextMeltanoBridge",  # Go bridge JSON API
+    "create_flext_meltano_bridge",  # Bridge factory function
     "flext_meltano_run_cli",  # CLI factory function
     # === FUNÇÃO 3: BASE PARA PROJETOS FLEXT-* ===
     "FlextMeltanoTapService",  # Base para flext-tap-*
@@ -95,10 +98,6 @@ __all__ = [
     "FlextTapPlugin",
     "FlextTargetPlugin",
     "FlextDbtPlugin",
-    # Factory functions
-    "create_meltano_tap_service",
-    "create_meltano_target_service",
-    "create_meltano_dbt_service",
     # === UTILITIES ===
     "FlextMeltanoUtilities",  # Utilidades gerais
     # === CORE ===

@@ -10,7 +10,7 @@ Este módulo testa as funcionalidades REAIS das utilidades:
 
 from __future__ import annotations
 
-import math
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -88,8 +88,6 @@ class TestFlextMeltanoUtilitiesReal:
         assert temp_dir.is_dir()
 
         # Cleanup
-        import shutil
-
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
@@ -138,7 +136,7 @@ class TestValidateConfigValueReal:
 
         assert result.success is True
         validated_value = result.value
-        assert validated_value == math.pi
+        assert validated_value == 3.14
         assert isinstance(validated_value, float)
 
     def test_validate_config_value_none_required(self) -> None:

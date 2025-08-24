@@ -48,11 +48,12 @@ class TestFlextMeltanoCliComprehensive:
         assert cli.logger._name == "FlextMeltanoCli"
 
     def test_cli_initialization_with_project_root(self) -> None:
-        """Testa inicialização com project_root específico."""
-        test_path = Path("/tmp/test_project")
-        cli = FlextMeltanoCli(test_path)
+        """Test initialization with specific project_root."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_path = Path(temp_dir) / "test_project"
+            cli = FlextMeltanoCli(test_path)
 
-        assert cli.project_root == test_path
+            assert cli.project_root == test_path
 
     def test_cli_initialization_with_none_project_root(self) -> None:
         """Testa inicialização com project_root None."""

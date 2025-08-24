@@ -320,21 +320,21 @@ def mock_meltano_service() -> object:
     class MockMeltanoService:
         async def create_project(
             self,
-            config: dict[str, object],  # noqa: ARG002
+            _config: dict[str, object],
         ) -> dict[str, object]:
             return {"project_id": "test-project", "status": "created"}
 
         async def install_plugin(
             self,
-            plugin_type: str,  # noqa: ARG002
+            _plugin_type: str,
             plugin_name: str,
         ) -> dict[str, object]:
             return {"plugin": plugin_name, "status": "installed"}
 
         async def run_pipeline(
             self,
-            extractor: str,  # noqa: ARG002
-            loader: str,  # noqa: ARG002
+            _extractor: str,
+            _loader: str,
         ) -> dict[str, object]:
             return {"execution_id": "test-execution", "status": "running"}
 

@@ -1,8 +1,9 @@
-"""DBT Core Wrapper - Adapta DBT Core para padrões flext-core.
+"""DBT Adapters - PEP8-compliant DBT Core integration components.
 
-FUNÇÃO 1: Wrapper para DBT Core adaptando para flext-core
-- MeltanoDbtWrapper: Wrapper principal
-- FlextDbtAdapter: Adaptador de tipos
+✅ PEP8 COMPLIANT: dbt_adapters.py (renamed from base_dbt.py)
+FUNCTION 1: Wrapper for DBT Core adapting to flext-core
+- MeltanoDbtWrapper: Main wrapper
+- FlextDbtAdapter: Type adapter
 - Real DBT Core integration (NO MOCKS)
 """
 
@@ -23,16 +24,16 @@ logger = get_logger(__name__)
 
 
 class MeltanoDbtWrapper(FlextDomainService[object]):
-    """Wrapper principal para DBT Core → flext-core.
+    """Main wrapper for DBT Core → flext-core.
 
-    Adapta DBT Core execution para flext-core patterns, usando FlextResult
-    para error handling e integrando com flext-core observability.
+    Adapts DBT Core execution to flext-core patterns, using FlextResult
+    for error handling and integrating with flext-core observability.
     """
 
     def __init__(self) -> None:
         super().__init__()
 
-        # Validar disponibilidade do DBT
+        # Validate DBT availability
         if not DBT_AVAILABLE:
             logger.warning("DBT Core not available - some functions will fail")
 
@@ -45,7 +46,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
         """Execute DBT service operation (required by FlextDomainService).
 
         Returns:
-            FlextResult contendo informações do serviço
+            FlextResult containing service information
 
         """
         return FlextResult[object].ok(
@@ -64,13 +65,13 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
         )
 
     def create_runner(self, project_dir: Path | None = None) -> FlextResult[dbtRunner]:
-        """Cria dbtRunner usando FlextResult pattern.
+        """Create dbtRunner using FlextResult pattern.
 
         Args:
-            project_dir: Diretório do projeto DBT (opcional)
+            project_dir: DBT project directory (optional)
 
         Returns:
-            FlextResult contendo dbtRunner instance ou erro
+            FlextResult containing dbtRunner instance or error
 
         """
         try:
@@ -84,7 +85,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 project_dir=str(project_dir) if project_dir else None,
             )
 
-            # Criar instância do runner
+            # Create runner instance
             runner = dbtRunner()
 
             if project_dir and not project_dir.exists():
@@ -107,15 +108,15 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
         models: list[str] | None = None,
         profiles_dir: Path | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Executa modelos DBT usando API nativa real dbtRunner.invoke().
+        """Execute DBT models using real native dbtRunner.invoke() API.
 
         Args:
-            project_dir: Diretório do projeto DBT
-            models: Lista de modelos para executar (None = todos)
-            profiles_dir: Diretório dos profiles DBT (opcional)
+            project_dir: DBT project directory
+            models: List of models to execute (None = all)
+            profiles_dir: DBT profiles directory (optional)
 
         Returns:
-            FlextResult contendo resultado da execução com estrutura real
+            FlextResult containing execution result with real structure
 
         """
         try:
@@ -129,33 +130,33 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
             if not DBT_AVAILABLE:
                 return FlextResult[dict[str, object]].fail("DBT Core not available")
 
-            # Validar diretório do projeto
+            # Validate project directory
             if not project_dir.exists():
                 return FlextResult[dict[str, object]].fail(
                     f"DBT project directory not found: {project_dir}"
                 )
 
-            # Verificar se é um projeto DBT válido
+            # Check if it's a valid DBT project
             dbt_project_yml = project_dir / "dbt_project.yml"
             if not dbt_project_yml.exists():
                 return FlextResult[dict[str, object]].fail(
                     f"Not a DBT project: dbt_project.yml not found in {project_dir}"
                 )
 
-            # Criar dbtRunner usando API real
+            # Create dbtRunner using real API
             runner = dbtRunner()
 
-            # Construir comando DBT usando argumentos reais
+            # Build DBT command using real arguments
             cmd_args = ["run"]
 
-            # Adicionar modelos específicos usando sintaxe real DBT
+            # Add specific models using real DBT syntax
             if models:
                 cmd_args.extend(["--models", *models])
 
-            # Adicionar diretório do projeto usando sintaxe real DBT
+            # Add project directory using real DBT syntax
             cmd_args.extend(["--project-dir", str(project_dir)])
 
-            # Adicionar profiles-dir se especificado
+            # Add profiles-dir if specified
             if profiles_dir:
                 cmd_args.extend(["--profiles-dir", str(profiles_dir)])
 
@@ -164,10 +165,10 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 command_args=cmd_args,
             )
 
-            # Executar usando API nativa real dbtRunner.invoke()
+            # Execute using real native dbtRunner.invoke() API
             result = runner.invoke(cmd_args)
 
-            # Processar resultado usando estrutura real do DBT
+            # Process result using real DBT structure
             execution_result = {
                 "success": result.success,
                 "command": cmd_args,
@@ -177,9 +178,9 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 "execution_method": "dbt_runner_invoke",
             }
 
-            # Adicionar informações extras do resultado se disponíveis
+            # Add extra result information if available
             if hasattr(result, "args"):
-                execution_result["parsed_args"] = str(result.args)
+                execution_result["parsed_args"] = str(getattr(result, "args", None))
 
             if result.success:
                 self.logger.info(
@@ -213,15 +214,15 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
         models: list[str] | None = None,
         project_dir: Path | None = None,
     ) -> FlextResult[dict[str, object]]:
-        """Testa modelos DBT com resultado estruturado.
+        """Test DBT models with structured result.
 
         Args:
             runner: Instância dbtRunner
-            models: Lista de modelos para testar (None = todos)
-            project_dir: Diretório do projeto DBT
+            models: List of models to test (None = all)
+            project_dir: DBT project directory
 
         Returns:
-            FlextResult contendo resultado dos testes
+            FlextResult containing test results
 
         """
         try:
@@ -231,22 +232,22 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 project_dir=str(project_dir) if project_dir else None,
             )
 
-            # Construir comando DBT
+            # Build DBT command
             cmd = ["test"]
 
             # Adicionar modelos específicos
             if models:
                 cmd.extend(["--models", *models])
 
-            # Adicionar diretório do projeto
+            # Add project directory
             if project_dir:
                 cmd.extend(["--project-dir", str(project_dir)])
 
-            # Executar comando
+            # Execute command
             self.logger.info("Executing DBT test command", command=cmd)
             result = runner.invoke(cmd)
 
-            # Processar resultado
+            # Process result
             test_result = {
                 "success": result.success,
                 "command": cmd,
@@ -277,14 +278,14 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
     def compile_project(
         self, runner: dbtRunner, project_dir: Path | None = None
     ) -> FlextResult[dict[str, object]]:
-        """Compila projeto DBT.
+        """Compile DBT project.
 
         Args:
-            runner: Instância dbtRunner
-            project_dir: Diretório do projeto DBT
+            runner: dbtRunner instance
+            project_dir: DBT project directory
 
         Returns:
-            FlextResult contendo resultado da compilação
+            FlextResult containing compilation result
 
         """
         try:
@@ -293,18 +294,18 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 project_dir=str(project_dir) if project_dir else None,
             )
 
-            # Construir comando DBT
+            # Build DBT command
             cmd = ["compile"]
 
-            # Adicionar diretório do projeto
+            # Add project directory
             if project_dir:
                 cmd.extend(["--project-dir", str(project_dir)])
 
-            # Executar comando
+            # Execute command
             self.logger.info("Executing DBT compile command", command=cmd)
             result = runner.invoke(cmd)
 
-            # Processar resultado
+            # Process result
             compile_result = {
                 "success": result.success,
                 "command": cmd,
@@ -333,7 +334,7 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
 
         Args:
             runner: Instância dbtRunner
-            project_dir: Diretório do projeto DBT
+            project_dir: DBT project directory
 
         Returns:
             FlextResult contendo resultado da geração de docs
@@ -345,18 +346,18 @@ class MeltanoDbtWrapper(FlextDomainService[object]):
                 project_dir=str(project_dir) if project_dir else None,
             )
 
-            # Construir comando DBT
+            # Build DBT command
             cmd = ["docs", "generate"]
 
-            # Adicionar diretório do projeto
+            # Add project directory
             if project_dir:
                 cmd.extend(["--project-dir", str(project_dir)])
 
-            # Executar comando
+            # Execute command
             self.logger.info("Executing DBT docs generate command", command=cmd)
             result = runner.invoke(cmd)
 
-            # Processar resultado
+            # Process result
             docs_result = {
                 "success": result.success,
                 "command": cmd,
@@ -414,7 +415,7 @@ class FlextDbtAdapter:
                 },
             }
 
-            # Processar resultados individuais
+            # Process results individuais
             results_data = dbt_results.get("results", [])
             if isinstance(results_data, list):
                 results_list = flext_results["results"]

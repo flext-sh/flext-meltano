@@ -27,6 +27,7 @@ from __future__ import annotations
 from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoCli, flext_meltano_run_cli
+from flext_meltano.meltano_adapters import MeltanoBridge
 
 
 class TestRealFlextMeltanoCli:
@@ -176,9 +177,7 @@ class TestRealMeltanoIntegration:
 
     def test_real_meltano_bridge_integration(self) -> None:
         """Test that CLI uses real MeltanoBridge, not subprocess."""
-        # Import the bridge directly to test integration
-        from flext_meltano.funcao1_base_meltano import MeltanoBridge
-
+        # Bridge imported at top level for integration testing
         bridge = MeltanoBridge()
         bridge_result = bridge.get_version()
 
