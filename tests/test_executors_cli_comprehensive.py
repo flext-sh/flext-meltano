@@ -222,14 +222,14 @@ class TestConfigurationIntegration:
         """Test configuration validation across different components."""
         # Test valid configuration
         valid_config = FlextMeltanoConfig(
-            project_root=str(Path.cwd()), environment="development"
+            project_root=str(Path.cwd()), environment="production"
         )
 
-        assert valid_config.environment == "development"
+        assert valid_config.environment == "production"
         assert Path(valid_config.project_root).exists()
 
         # Test configuration with different environments
-        for env in ["development", "test", "staging", "production"]:
+        for env in ["dev", "test", "staging", "production"]:
             env_config = FlextMeltanoConfig(environment=env)
             assert env_config.environment == env
 

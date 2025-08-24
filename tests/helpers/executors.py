@@ -140,9 +140,9 @@ class FlextDbtInMemoryExecutor:
                 for name in data:
                     self.connection.unregister(name)
             logger.debug(f"Executed model, returned {len(result)} rows")
-            return FlextResult[None].ok(result)
+            return FlextResult[pd.DataFrame].ok(result)
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to execute model: {e}")
+            return FlextResult[pd.DataFrame].fail(f"Failed to execute model: {e}")
 
     def validate_transformations(
         self,
@@ -171,7 +171,7 @@ class FlextDbtInMemoryExecutor:
                 df = exec_result.value
                 validations: dict[str, object] = {}
                 if not isinstance(df, pd.DataFrame):
-                    validations["dataframe_type"] = {
+                    validations["dataframe_type"] = {  # type: ignore[unreachable]
                         "expected": "DataFrame",
                         "actual": type(df).__name__,
                         "passed": False,
@@ -217,9 +217,9 @@ class FlextDbtInMemoryExecutor:
                 f"Validation complete: {successful}/{total_models} models successful, "
                 f"all valid: {all_valid}",
             )
-            return FlextResult[None].ok(summary)
+            return FlextResult[dict[str, object]].ok(summary)
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to validate transformations: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to validate transformations: {e}")
 
     def _validate_row_count(
         self,
@@ -316,7 +316,7 @@ class FlextDbtInMemoryExecutor:
         """
         try:
             if table_name not in self.schemas:
-                return FlextResult[None].fail(
+                return FlextResult[pd.DataFrame].fail(
                     f"Schema not found for table: {table_name}"
                 )
             schema = self.schemas[table_name]
@@ -340,9 +340,9 @@ class FlextDbtInMemoryExecutor:
             df = pd.DataFrame(data)
             self.mock_data[table_name] = df
             logger.debug(f"Generated {rows} rows of test data for {table_name}")
-            return FlextResult[None].ok(df)
+            return FlextResult[pd.DataFrame].ok(df)
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to create test data: {e}")
+            return FlextResult[pd.DataFrame].fail(f"Failed to create test data: {e}")
 
     def export_results(
         self,

@@ -11,9 +11,7 @@ from pathlib import Path
 
 from flext_core import get_logger
 
-from flext_meltano.base_dbt import MeltanoDbtWrapper
-from flext_meltano.base_meltano import MeltanoBridge
-from flext_meltano.executors_meltano import FlextMeltanoExecutor
+from flext_meltano import FlextMeltanoExecutor, MeltanoBridge, MeltanoDbtWrapper
 
 logger = get_logger(__name__)
 
@@ -22,9 +20,9 @@ class FlextMeltanoBridge:
     """Bridge class for Go service integration via JSON API."""
 
     def __init__(self) -> None:
-        self.executor = FlextMeltanoExecutor()
-        self.meltano_bridge = MeltanoBridge()
-        self.wrapper_dbt = MeltanoDbtWrapper()
+        self.executor: FlextMeltanoExecutor = FlextMeltanoExecutor()
+        self.meltano_bridge: MeltanoBridge = MeltanoBridge()
+        self.wrapper_dbt: MeltanoDbtWrapper = MeltanoDbtWrapper()
 
     def get_version(self) -> dict[str, object]:
         """Get version information for Go service."""
@@ -47,9 +45,16 @@ class FlextMeltanoBridge:
         """List available Meltano plugins."""
         try:
             result = self.meltano_bridge.discover_plugins()
-            if result.success:
-                return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+
+            # Handle both FlextResult and direct value (when flext-cli decorator is active)
+            if hasattr(result, "success"):
+                # It's a FlextResult
+                if result.success:
+                    return {"success": True, "data": result.value}
+                return {"success": False, "error": result.error}
+            # It's the direct value (flext-cli decorator processed it)
+            return {"success": True, "data": result}
+
         except Exception as e:
             return {"success": False, "error": str(e)}
 

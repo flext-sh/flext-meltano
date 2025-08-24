@@ -10,10 +10,14 @@ Este módulo implementa testes REAIS para TODAS as funcionalidades do FlextMelta
 
 from __future__ import annotations
 
+import json
 import tempfile
 from pathlib import Path
 
-from flext_meltano.executors_bridge import FlextMeltanoBridge, create_flext_meltano_bridge
+from flext_meltano.executors_bridge import (
+    FlextMeltanoBridge,
+    create_flext_meltano_bridge,
+)
 
 
 class TestFlextMeltanoBridgeComprehensive:
@@ -319,17 +323,18 @@ plugins:
 
     def test_invoke_dbt_with_kwargs(self) -> None:
         """Testa invoke_dbt com argumentos nomeados."""
-        bridge = FlextMeltanoBridge()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            bridge = FlextMeltanoBridge()
 
-        result = bridge.invoke_dbt(
-            "compile",
-            project_dir="/tmp/test_project",
-            profiles_dir="/tmp/test_profiles",
-        )
+            result = bridge.invoke_dbt(
+                "compile",
+                project_dir=temp_dir + "/test_project",
+                profiles_dir=temp_dir + "/test_profiles",
+            )
 
-        # Deve tentar executar com argumentos
-        assert isinstance(result, dict)
-        assert "success" in result
+            # Deve tentar executar com argumentos
+            assert isinstance(result, dict)
+            assert "success" in result
 
     def test_invoke_dbt_with_underscore_args(self) -> None:
         """Testa invoke_dbt com argumentos com underscore."""
@@ -559,8 +564,6 @@ class TestFlextMeltanoBridgeJsonApiCompatibility:
 
     def test_json_serialization_compatibility(self) -> None:
         """Testa que responses são JSON-serializáveis para Go."""
-        import json
-
         bridge = FlextMeltanoBridge()
 
         # Testar que todas as responses são serializáveis

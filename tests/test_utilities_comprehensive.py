@@ -240,11 +240,11 @@ class TestFlextMeltanoUtilitiesComprehensive:
             assert result.success is True
             loaded_config = result.value
 
-            # Verificar que todos valores são strings (como esperado pelo tipo)
+            # Verificar que valores YAML preservam tipos nativos
             assert isinstance(loaded_config, dict)
             assert loaded_config["string_value"] == "test"
-            assert loaded_config["number_value"] == "42"  # Convertido para string
-            assert loaded_config["boolean_value"] == "True"  # Convertido para string
+            assert loaded_config["number_value"] == 42  # YAML preserva integer
+            assert loaded_config["boolean_value"] is True  # YAML preserva boolean
 
     def test_load_yaml_config_file_not_found(self) -> None:
         """Testa carregamento de arquivo inexistente."""

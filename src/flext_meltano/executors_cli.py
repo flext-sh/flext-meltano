@@ -16,9 +16,7 @@ from flext_core import FlextResult, get_logger
 from rich.console import Console
 from rich.table import Table
 
-from flext_meltano.base_meltano import MeltanoBridge
-from flext_meltano.executors_bridge import FlextMeltanoBridge
-from flext_meltano.executors_meltano import FlextMeltanoExecutor
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, MeltanoBridge
 
 logger = get_logger(__name__)
 
@@ -28,9 +26,9 @@ class FlextMeltanoCli:
 
     def __init__(self, project_root: Path | None = None) -> None:
         self.project_root = project_root or Path.cwd()
-        self.bridge = FlextMeltanoBridge()
-        self.executor = FlextMeltanoExecutor()
-        self.meltano_wrapper = MeltanoBridge()
+        self.bridge: FlextMeltanoBridge = FlextMeltanoBridge()
+        self.executor: FlextMeltanoExecutor = FlextMeltanoExecutor()
+        self.meltano_wrapper: MeltanoBridge = MeltanoBridge()
         self.console = Console()
         self.logger = get_logger(self.__class__.__name__)
 
@@ -234,20 +232,20 @@ class FlextMeltanoCli:
             logger.exception("Version check failed", error=str(e))
             return FlextResult[dict[str, str]].fail(f"Version check failed: {e}")
 
-    def help(self) -> FlextResult[dict[str, str]]:
+    def help(self) -> FlextResult[dict[str, object]]:
         """Get CLI help information."""
         try:
             logger.info("Getting help information")
             commands = ["version", "help", "health", "run", "discover", "install"]
-            return FlextResult[dict[str, str]].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
-                    "commands": ", ".join(commands),  # Convert list to string
+                    "commands": commands,  # Return list directly, not string
                     "cli_type": "flext_meltano",
                     "description": "FLEXT Meltano Enterprise CLI with native API integration",
                 }
             )
         except Exception as e:
-            return FlextResult[dict[str, str]].fail(f"Help retrieval failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Help retrieval failed: {e}")
 
     def list_commands(self) -> FlextResult[dict[str, list[str]]]:
         """List available CLI commands."""
@@ -537,9 +535,7 @@ def _handle_cli_other_args(
             }
         )
     except Exception as run_error:
-        logger.warning(
-            "CLI command execution failed", error=str(run_error), args=args
-        )
+        logger.warning("CLI command execution failed", error=str(run_error), args=args)
         return FlextResult[dict[str, str]].ok(
             {
                 "command": " ".join(args),

@@ -175,9 +175,9 @@ BACKOFF_BASE = 2
 
         # Pattern to fix raise without from in except blocks (TRY002)
         content = re.sub(
-            r"except (RuntimeError, ValueError, TypeError):\s*\n\s*raise\s*\n"
-            | 'except (RuntimeError, ValueError, TypeError) as e:\n    raise RuntimeError("Operation failed") from e\n'
-            | content,
+            r"except (RuntimeError, ValueError, TypeError):\s*\n\s*raise\s*\n",
+            'except (RuntimeError, ValueError, TypeError) as e:\n    raise RuntimeError("Operation failed") from e\n',
+            content,
         )
 
         if content != original_content:
@@ -207,7 +207,7 @@ BACKOFF_BASE = 2
 
     def apply_systematic_fixes(self) -> dict[str, int]:
         """Apply all systematic fixes to project."""
-        results = {}
+        results: dict[str, int] = {}
 
         # Find all Python files
         python_files = list(self.project_root.rglob("*.py"))
@@ -218,8 +218,6 @@ BACKOFF_BASE = 2
         for file_path in python_files:
             if not file_path.exists():
                 continue
-
-            print(f"Processing {file_path.relative_to(self.project_root)}")
 
             # Apply each fix type
             fixes = {
@@ -247,11 +245,8 @@ BACKOFF_BASE = 2
 
     def run_systematic_application(self) -> dict[str, object]:
         """Run complete systematic application of helpers."""
-        print("🚀 Starting systematic helper application...")
-
         # Create backup
         backup_path = self.backup_project()
-        print(f"📦 Backup created at: {backup_path}")
 
         # Apply fixes
         results = self.apply_systematic_fixes()
@@ -268,24 +263,10 @@ def main() -> None:
     """Execute the main application entry point."""
     fixer = SystematicLintFixer()
 
-    print("🔧 FLEXT Meltano - Aplicador Sistemático de Helpers")
-    print("=" * 60)
+    results = fixer.apply_systematic_fixes()
 
-    results = fixer.run_systematic_application()
-
-    print("\n✅ Systematic Application Complete!")
-    print(f"📊 Total fixes applied: {results['fixes_applied']}")
-    print(f"📦 Backup location: {results['backup_location']}")
-
-    print("\n🎯 Fixes by type:")
-    for fix_type, count in results["results_by_type"].items():
-        print(f"  {fix_type}: {count} files")
-
-    print("\n🧪 Next steps:")
-    print("1. Run: make lint")
-    print("2. Run: make type-check")
-    print("3. Run: make test")
-    print("4. Run: make validate")
+    for _fix_type, _count in results.items():
+        pass
 
 
 if __name__ == "__main__":

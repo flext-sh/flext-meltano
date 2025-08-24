@@ -67,7 +67,6 @@ def example_real_singer_processing() -> None:
     schema = {}  # Placeholder schema definition
 
     if singer_utils is None:
-        print("Singer utils not yet implemented - placeholder example")
         return
 
     schema_msg = singer_utils.flext_meltano_create_singer_schema(
@@ -159,10 +158,10 @@ def example_decorated_operation() -> dict[str, float | int | str]:
 
     # Simulate some ETL work that might fail
 
-    if random.random() < success_rate:  # noqa: S311 - non-crypto example
+    if random.random() < success_rate:
         return {
-            "records_processed": random.randint(100, 1000),  # noqa: S311 - example
-            "duration_seconds": random.uniform(5.0, 30.0),  # noqa: S311 - example
+            "records_processed": random.randint(100, 1000),
+            "duration_seconds": random.uniform(5.0, 30.0),
             "status": "completed",
         }
     # Simulate failure
@@ -204,7 +203,6 @@ async def example_async_pipeline() -> None:
     pipeline = None  # Placeholder for actual pipeline implementation
 
     if pipeline is None:
-        print("Pipeline implementation not yet available - placeholder example")
         return
 
     try:

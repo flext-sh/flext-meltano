@@ -15,13 +15,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
+from singer_sdk import Stream, Tap, Target
+from singer_sdk.typing import PropertiesList
 
-from flext_meltano.base_dbt import MeltanoDbtWrapper
-from flext_meltano.base_meltano import MeltanoBridge
-from flext_meltano.base_singer import MeltanoSingerWrapper
+from flext_meltano import FlextMeltanoConfig
+from flext_meltano.dbt_adapters import MeltanoDbtWrapper
 from flext_meltano.executors_bridge import FlextMeltanoBridge
 from flext_meltano.executors_meltano import FlextMeltanoExecutor
+from flext_meltano.meltano_adapters import MeltanoBridge
+from flext_meltano.singer_adapters import MeltanoSingerWrapper
+from flext_meltano.utilities import (
+    FlextMeltanoUtilities,
+    validate_directory_path,
+)
 
 
 class TestRealMeltanoIntegration:
@@ -77,9 +85,6 @@ class TestRealSingerSDKIntegration:
     def test_singer_sdk_imports_available(self) -> None:
         """Test that Singer SDK components are properly available."""
         # These imports should work with real Singer SDK 0.48.0
-        from singer_sdk import Stream, Tap, Target
-        from singer_sdk.typing import PropertiesList
-
         # Test that classes are actually the real SDK classes
         assert hasattr(Tap, "discover_streams")
         assert hasattr(Stream, "schema")
@@ -102,8 +107,6 @@ class TestRealDBTIntegration:
 
     def test_dbt_core_availability(self) -> None:
         """Test that DBT Core 1.10.5 is properly available."""
-        from dbt.cli.main import dbtRunner
-
         # Should be real DBT Core
         runner = dbtRunner()
         assert runner is not None
@@ -232,21 +235,14 @@ class TestRealConfigurationIntegration:
 
     def test_configuration_with_real_paths(self) -> None:
         """Test configuration handling with real file paths."""
-        from flext_meltano.base_projects import FlextMeltanoConfig
-
         config = FlextMeltanoConfig()
 
-        assert config.environment == "development"
+        assert config.environment == "dev"
         assert isinstance(config.project_root, str)
         assert Path(config.project_root).exists()
 
     def test_utilities_integration(self) -> None:
         """Test utilities with real functionality."""
-        from flext_meltano.utilities import (
-            FlextMeltanoUtilities,
-            validate_directory_path,
-        )
-
         # Test directory validation with real path
         current_dir = str(Path.cwd())
         result = validate_directory_path(current_dir)

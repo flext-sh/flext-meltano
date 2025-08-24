@@ -9,14 +9,15 @@ IMPLEMENTAÇÃO REAL - Sem mocks, testando execução completa:
 Objetivo: Validar que as APIs nativas funcionam SEM subprocess.
 """
 
+import importlib.util
 import tempfile
 from pathlib import Path
 
 import pytest
 from flext_core import FlextResult
 
-from flext_meltano.base_dbt import MeltanoDbtWrapper
-from flext_meltano.base_meltano import FlextMeltanoAdapter
+from flext_meltano.dbt_adapters import MeltanoDbtWrapper
+from flext_meltano.meltano_adapters import FlextMeltanoAdapter
 
 
 class TestRealPipelineExecution:
@@ -388,15 +389,26 @@ SELECT
     def test_api_availability_real(self) -> None:
         """Testa disponibilidade REAL das APIs nativas do Meltano 3.9.1 e DBT."""
         # Teste que as APIs necessárias estão disponíveis
+
+        required_modules = [
+            "dbt.cli.main",
+            "meltano.core.elt_context",
+            "meltano.core.plugin_invoker",
+            "meltano.core.project",
+            "meltano.core.project_plugins_service",
+            "meltano.core.runner",
+        ]
+
+        def _check_module_availability(module_name: str) -> None:
+            """Check if module is available, raise ImportError if not."""
+            spec = importlib.util.find_spec(module_name)
+            if spec is None:
+                raise ImportError(f"Module {module_name} not found")
+
         try:
-            # APIs Meltano Core 3.9.1 - estrutura real
-            # APIs DBT Core
-            from dbt.cli.main import dbtRunner
-            from meltano.core.elt_context import ELTContext
-            from meltano.core.plugin_invoker import invoker_factory
-            from meltano.core.project import Project
-            from meltano.core.project_plugins_service import ProjectPluginsService
-            from meltano.core.runner import Runner
+            # Check if all required modules are available
+            for module_name in required_modules:
+                _check_module_availability(module_name)
 
             # Se chegou até aqui, todas as APIs estão disponíveis
             assert True
@@ -414,8 +426,8 @@ SELECT
             assert runner is not None
 
             # Instanciar Runner do Meltano
-            Runner = pytest.importorskip("meltano.core.runner").Runner
-            runner = Runner()
+            runner_class = pytest.importorskip("meltano.core.runner").Runner
+            runner = runner_class()
             assert runner is not None
 
         except Exception as e:

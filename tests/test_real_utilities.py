@@ -30,7 +30,6 @@ from pathlib import Path
 from flext_core import FlextResult
 
 from flext_meltano.utilities import (
-    FlextBaseUtilities,
     FlextMeltanoUtilities,
     FlextResultHelpers,
     FlextRuntimeUtilities,
@@ -316,7 +315,7 @@ class TestRealConfigValidation:
         # From string
         result = validate_config_value("2.71", float)
         assert result.success is True
-        assert result.value == math.e
+        assert result.value == 2.71
 
     def test_validate_config_value_none_required(self) -> None:
         """Test None handling when required."""
@@ -531,15 +530,12 @@ class TestRealHelperClasses:
         assert command_result["output"] == "success output"
         assert command_result["command"] == "test command"
 
-        # Test FlextBaseUtilities
-        base_config = FlextBaseUtilities.create_base_service_config(
+        # Test FlextMeltanoUtilities plugin config creation
+        plugin_config = FlextMeltanoUtilities.create_plugin_config(
             "test-service", "tap"
         )
-        assert base_config["name"] == "test-service"
-        assert base_config["type"] == "tap"
-        assert base_config["framework"] == "flext_meltano"
-        assert base_config["version"] == "2.0.0"
-        assert base_config["status"] == "active"
+        assert plugin_config["name"] == "test-service"
+        assert plugin_config["type"] == "tap"
 
 
 class TestRealErrorHandlingPatterns:

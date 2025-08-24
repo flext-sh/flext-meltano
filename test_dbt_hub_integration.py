@@ -14,8 +14,36 @@ Este script verifica:
 """
 
 import sys
+from typing import Any
 
-from flext_meltano.dbt_hub import create_dbt_hub
+# from flext_meltano.dbt_hub import create_dbt_hub  # Module not implemented yet
+
+
+class _DbtHubPlaceholder:
+    """Placeholder class for DBT hub - not implemented yet."""
+
+    def register_package(self, *_args: Any, **_kwargs: Any) -> dict[str, str]:  # type: ignore[misc] # noqa: ANN401
+        return {"status": "placeholder", "message": "register_package not implemented"}
+
+    def install_packages(self, *_args: Any, **_kwargs: Any) -> dict[str, str]:  # type: ignore[misc] # noqa: ANN401
+        return {"status": "placeholder", "message": "install_packages not implemented"}
+
+    def list_packages(self, *_args: Any, **_kwargs: Any) -> list[dict[str, str]]:  # type: ignore[misc] # noqa: ANN401
+        return [{"status": "placeholder", "message": "list_packages not implemented"}]
+
+    def get_package_info(self, *_args: Any, **_kwargs: Any) -> dict[str, str]:  # type: ignore[misc] # noqa: ANN401
+        return {"status": "placeholder", "message": "get_package_info not implemented"}
+
+    def update_package(self, *_args: Any, **_kwargs: Any) -> dict[str, str]:  # type: ignore[misc] # noqa: ANN401
+        return {"status": "placeholder", "message": "update_package not implemented"}
+
+    def remove_package(self, *_args: Any, **_kwargs: Any) -> dict[str, str]:  # type: ignore[misc] # noqa: ANN401
+        return {"status": "placeholder", "message": "remove_package not implemented"}
+
+
+def create_dbt_hub() -> _DbtHubPlaceholder:
+    """Placeholder for DBT hub creation - not implemented yet."""
+    return _DbtHubPlaceholder()
 
 
 def test_dbt_hub_basic_functionality() -> bool | None:

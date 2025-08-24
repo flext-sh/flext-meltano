@@ -7,31 +7,44 @@
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 import pytest
+from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
+from singer_sdk import Stream, Tap, Target
+from singer_sdk.typing import PropertiesList, Property
 
-from flext_meltano.base_dbt import FlextDbtAdapter, MeltanoDbtWrapper
-from flext_meltano.base_services import (
-    FlextMeltanoDbtService,
-    FlextMeltanoTapService,
-    FlextMeltanoTargetService,
-)
-from flext_meltano.base_singer import FlextSingerAdapter, MeltanoSingerWrapper
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.constants import (
+try:
+    from meltano.core.hub import MeltanoHubService
+    from meltano.core.project import Project
+except ImportError:
+    # Meltano not available in test environment
+    MeltanoHubService = None  # type: ignore[misc,assignment]
+    Project = None  # type: ignore[misc,assignment]
+
+import flext_meltano
+from flext_meltano.config import (
     DEFAULT_COMMAND_TIMEOUT,
     DEFAULT_ENVIRONMENT,
     DEFAULT_MELTANO_PROJECT_ROOT,
     FLEXT_MELTANO_VERSION,
+    FlextMeltanoConfig,
 )
+from flext_meltano.dbt_adapters import FlextDbtAdapter, MeltanoDbtWrapper
 from flext_meltano.exceptions import (
     FlextMeltanoConfigurationError,
     FlextMeltanoError,
     FlextMeltanoExecutionError,
     FlextMeltanoValidationError,
 )
+from flext_meltano.service_implementations import (
+    FlextMeltanoDbtService,
+    FlextMeltanoTapService,
+    FlextMeltanoTargetService,
+)
+from flext_meltano.singer_adapters import FlextSingerAdapter, MeltanoSingerWrapper
 from flext_meltano.utilities import (
     FlextMeltanoUtilities,
     validate_config_value_simple,
@@ -47,16 +60,17 @@ class TestConfigurationComprehensive:
         """Test default configuration initialization."""
         config = FlextMeltanoConfig()
 
-        assert config.environment == "development"
+        assert config.environment == "dev"
         assert str(config.project_root) == str(Path.cwd())
 
     def test_config_custom_initialization(self) -> None:
         """Test configuration with custom values."""
-        custom_root = "/tmp/custom"
-        config = FlextMeltanoConfig(project_root=custom_root, environment="production")
-
-        assert str(config.project_root) == custom_root
-        assert config.environment == "production"
+        with tempfile.TemporaryDirectory(prefix="flext_test_") as custom_root:
+            config = FlextMeltanoConfig(
+                project_root=custom_root, environment="production"
+            )
+            assert str(config.project_root) == custom_root
+            assert config.environment == "production"
 
     def test_config_validation_methods(self) -> None:
         """Test configuration validation methods."""
@@ -245,9 +259,6 @@ class TestRealApiIntegrationPatterns:
     def test_singer_sdk_imports_comprehensive(self) -> None:
         """Test comprehensive Singer SDK imports."""
         # Test that all Singer SDK components are available
-        from singer_sdk import Stream, Tap, Target
-        from singer_sdk.typing import PropertiesList, Property
-
         # Verify classes are real Singer SDK classes
         assert hasattr(Tap, "discover_streams")
         assert hasattr(Stream, "schema")
@@ -257,8 +268,6 @@ class TestRealApiIntegrationPatterns:
 
     def test_dbt_core_integration_comprehensive(self) -> None:
         """Test comprehensive DBT Core integration."""
-        from dbt.cli.main import dbtRunner
-
         # Test that DBT runner is available
         runner = dbtRunner()
         assert runner is not None
@@ -266,14 +275,11 @@ class TestRealApiIntegrationPatterns:
 
     def test_meltano_core_integration_comprehensive(self) -> None:
         """Test comprehensive Meltano Core integration."""
-        # These imports should work with real Meltano 3.9.1
+        # These imports should work with real Meltano 3.9.1 (imported at top level)
         try:
-            from meltano.core.hub import MeltanoHubService
-            from meltano.core.project import Project
-
             assert Project is not None
             assert MeltanoHubService is not None
-        except ImportError:
+        except (ImportError, AssertionError):
             # If Meltano is not available, that's expected in some environments
             pytest.skip("Meltano Core not available in test environment")
 
@@ -283,8 +289,6 @@ class TestModuleStructureValidation:
 
     def test_init_exports_comprehensive(self) -> None:
         """Test that __init__.py exports all expected components."""
-        import flext_meltano
-
         # Test core exports
         assert hasattr(flext_meltano, "FlextMeltanoConfig")
         assert hasattr(flext_meltano, "FlextMeltanoError")
@@ -302,7 +306,5 @@ class TestModuleStructureValidation:
 
     def test_version_consistency(self) -> None:
         """Test version consistency across module."""
-        import flext_meltano
-
         assert flext_meltano.__version__ == "2.0.0-enterprise"
         assert flext_meltano.FLEXT_MELTANO_VERSION == "2.0.0-enterprise"

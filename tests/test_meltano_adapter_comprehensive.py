@@ -13,7 +13,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from flext_meltano.base_meltano import FlextMeltanoAdapter, MeltanoBridge
+from flext_meltano.meltano_adapters import FlextMeltanoAdapter, MeltanoBridge
 
 
 class TestMeltanoBridgeComprehensive:
@@ -373,11 +373,11 @@ class TestFlextMeltanoAdapterComprehensive:
     def test_adapter_error_handling_comprehensive(self) -> None:
         """Testa tratamento abrangente de erros."""
         # Teste com None
-        result = FlextMeltanoAdapter.adapt_plugin(None)  # type: ignore[arg-type]
+        result = FlextMeltanoAdapter.adapt_plugin(None)
         assert result.success is False
 
         # Teste com tipo errado
-        result = FlextMeltanoAdapter.adapt_plugin("invalid")  # type: ignore[arg-type]
+        result = FlextMeltanoAdapter.adapt_plugin("invalid")
         assert result.success is False
 
 
@@ -407,13 +407,15 @@ class TestMeltanoBridgeIntegration:
             # Obter projeto inicializado
             initialized_project = init_result.value
 
-            # 3. Listar plugins (deve funcionar com projeto inicializado)
-            list_result = bridge.list_installed_plugins(initialized_project)
-            assert list_result.success is True
+            # 3. Descobrir plugins disponíveis no hub (não plugins instalados)
+            discover_result = bridge.discover_plugins(initialized_project)
+            assert discover_result.success is True
 
             # Usar unwrap_or pattern
-            plugins = list_result.unwrap_or([])
+            plugins = discover_result.unwrap_or([])
             assert isinstance(plugins, list)
+            # Deve ter plugins descobertos no hub
+            assert len(plugins) > 0
 
     def test_version_and_discovery_integration(self) -> None:
         """Testa integração versão + descoberta."""
