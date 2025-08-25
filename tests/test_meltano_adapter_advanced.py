@@ -70,14 +70,13 @@ environments:
                 # Se sucesso, verificar estrutura do resultado
                 pipeline_data = result.value
                 assert "tap" in pipeline_data
-            else:
-                # Se falha, verificar que erro é relacionado a plugins ou arquivos
-                if result.error is not None:
-                    error_lower = result.error.lower()
-                    assert any(
-                        keyword in error_lower
-                        for keyword in ["block", "plugin", "no such file", "meltano.yml"]
-                    )
+            # Se falha, verificar que erro é relacionado a plugins ou arquivos
+            elif result.error is not None:
+                error_lower = result.error.lower()
+                assert any(
+                    keyword in error_lower
+                    for keyword in ["block", "plugin", "no such file", "meltano.yml"]
+                )
 
     def test_real_pipeline_execution_via_bridge(self) -> None:
         """Testa run_pipeline_real via MeltanoBridge."""
