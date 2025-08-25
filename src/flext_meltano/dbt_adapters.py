@@ -15,7 +15,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from dbt.cli.main import dbtRunner
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
@@ -91,7 +91,9 @@ class FlextMeltanoDbtAdapters:
                 }
             )
 
-        def create_runner(self, project_dir: Path | None = None) -> FlextResult[dbtRunner]:
+        def create_runner(
+            self, project_dir: Path | None = None
+        ) -> FlextResult[dbtRunner]:
             """Create dbtRunner using FlextResult pattern.
 
             Args:
@@ -279,7 +281,9 @@ class FlextMeltanoDbtAdapters:
                     "success": result.success,
                     "command": cmd,
                     "models_tested": len(models) if models else "all",
-                    "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
+                    "exit_code": getattr(
+                        result, "exit_code", 0 if result.success else 1
+                    ),
                     "result": result.result if hasattr(result, "result") else None,
                 }
 
@@ -336,7 +340,9 @@ class FlextMeltanoDbtAdapters:
                 compile_result = {
                     "success": result.success,
                     "command": cmd,
-                    "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
+                    "exit_code": getattr(
+                        result, "exit_code", 0 if result.success else 1
+                    ),
                     "result": result.result if hasattr(result, "result") else None,
                 }
 
@@ -344,7 +350,8 @@ class FlextMeltanoDbtAdapters:
                     self.logger.info("DBT project compiled successfully")
                 else:
                     self.logger.error(
-                        "DBT compilation failed", exit_code=getattr(result, "exit_code", 1)
+                        "DBT compilation failed",
+                        exit_code=getattr(result, "exit_code", 1),
                     )
 
                 return FlextResult[dict[str, object]].ok(compile_result)
@@ -388,7 +395,9 @@ class FlextMeltanoDbtAdapters:
                 docs_result = {
                     "success": result.success,
                     "command": cmd,
-                    "exit_code": getattr(result, "exit_code", 0 if result.success else 1),
+                    "exit_code": getattr(
+                        result, "exit_code", 0 if result.success else 1
+                    ),
                     "result": result.result if hasattr(result, "result") else None,
                 }
 

@@ -22,18 +22,14 @@ Architecture:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING
 
-# Import directly from flext-core root (MANDATORY pattern)
-from flext_core import FlextCoreTypes  # pyright: ignore[reportPrivateImportUsage]
-
-if TYPE_CHECKING:
-    from dbt.cli.main import dbtRunner
-    from singer_sdk import (
-        Stream as SingerStream,
-        Tap as SingerTap,
-        Target as SingerTarget,
-    )
+from dbt.cli.main import dbtRunner
+from flext_core import FlextCoreTypes
+from singer_sdk import (
+    Stream as SingerStream,
+    Tap as SingerTap,
+    Target as SingerTarget,
+)
 
 
 class FlextMeltanoTypes(FlextCoreTypes):
@@ -57,7 +53,7 @@ class FlextMeltanoTypes(FlextCoreTypes):
 
             plugin_config: FlextMeltanoTypes.Plugin.Config = {
                 "name": "tap-csv",
-                "variant": "meltanolabs"
+                "variant": "meltanolabs",
             }
 
             tap: FlextMeltanoTypes.Singer.Tap = csv_tap
@@ -253,7 +249,9 @@ class FlextMeltanoTypes(FlextCoreTypes):
         # Adapter operation types
         type OperationResult = dict[str, object]
         type AdapterResponse = dict[str, object]
-        type ServiceCall = Callable[[str], object]  # Specific signature for service calls
+        type ServiceCall = Callable[
+            [str], object
+        ]  # Specific signature for service calls
 
         # Integration patterns
         type WrapperResult = dict[str, object]

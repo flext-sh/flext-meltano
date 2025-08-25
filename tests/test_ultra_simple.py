@@ -39,7 +39,7 @@ def test_flext_core_import() -> None:
     assert success_result.error is None
 
     # Test FlextResult failure
-    failure_result = FlextResult.fail("error message")
+    failure_result: FlextResult[str] = FlextResult.fail("error message")
     assert failure_result.success is False
     # Don't access .value on failed result - it raises TypeError
     assert failure_result.error == "error message"

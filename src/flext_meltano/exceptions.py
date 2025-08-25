@@ -201,7 +201,9 @@ class FlextMeltanoExceptions:
             if exit_code is not None:
                 nested["exit_code"] = exit_code
             # Bypass nested context from processing error: set flat context as tests expect
-            FlextMeltanoExceptions.MeltanoError.__init__(self, f"Execution: {message}", context=nested)
+            FlextMeltanoExceptions.MeltanoError.__init__(
+                self, f"Execution: {message}", context=nested
+            )
 
     class MeltanoSingerError(MeltanoError):
         """Singer protocol-specific errors using DRY foundation."""

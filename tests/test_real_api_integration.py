@@ -14,6 +14,7 @@ This module tests the actual functionality that flext-meltano provides:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
@@ -127,11 +128,12 @@ class TestRealBridgeIntegration:
         assert "data" in result
 
         data = result["data"]
-        assert "flext_meltano" in data
-        assert "meltano" in data
-        assert "dbt_core" in data
-        assert "singer_sdk" in data
-        assert data["integration_method"] == "native_apis"
+        data_dict = cast("dict[str, object]", data)
+        assert "flext_meltano" in data_dict
+        assert "meltano" in data_dict
+        assert "dbt_core" in data_dict
+        assert "singer_sdk" in data_dict
+        assert data_dict["integration_method"] == "native_apis"
 
     def test_bridge_json_api_plugins(self) -> None:
         """Test Go bridge JSON API for plugin listing."""
@@ -199,12 +201,13 @@ class TestRealEndToEndWorkflow:
         assert plugins_result["success"] is True
 
         plugins = plugins_result["data"]
-        assert len(plugins) > 0
+        plugins_list = cast("list[dict[str, object]]", plugins)
+        assert len(plugins_list) > 0
 
         # Step 4: Verify real data
-        extractors = [p for p in plugins if p["type"] == "extractor"]
-        loaders = [p for p in plugins if p["type"] == "loader"]
-        transformers = [p for p in plugins if p["type"] == "transformer"]
+        extractors = [p for p in plugins_list if p["type"] == "extractor"]
+        loaders = [p for p in plugins_list if p["type"] == "loader"]
+        transformers = [p for p in plugins_list if p["type"] == "transformer"]
 
         assert len(extractors) > 0
         assert len(loaders) > 0
@@ -220,7 +223,8 @@ class TestRealEndToEndWorkflow:
         version_result = bridge.get_version()
         assert version_result["success"] is True
         assert "data" in version_result
-        assert "meltano" in version_result["data"]
+        data_dict = cast("dict[str, object]", version_result["data"])
+        assert "meltano" in data_dict
 
         # Test plugins endpoint (what Go service calls)
         plugins_result = bridge.list_plugins()

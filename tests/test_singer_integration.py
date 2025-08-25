@@ -38,6 +38,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from collections.abc import Iterable, Mapping
 from typing import ClassVar
 
 import pytest
@@ -380,7 +381,8 @@ class TestStreamProcessing:
                 },
             }
 
-            def get_records(self, _context: dict[str, object] | None = None) -> object:
+            def get_records(self, context: Mapping[str, object] | None = None) -> Iterable[dict[str, object] | tuple[dict[str, object], dict[str, object] | None]]:
+                _ = context  # Required by Singer SDK interface
                 yield {"id": "1", "name": "test"}
 
         tap = MockTap(config={})
@@ -408,8 +410,8 @@ class TestStreamProcessing:
         # Schema should be iterable
         fields = list(schema)
         if len(fields) != 4:
-            msg: str = f"Expected {4}, got {len(fields)}"
-            raise AssertionError(msg)
+            fields_msg: str = f"Expected {4}, got {len(fields)}"
+            raise AssertionError(fields_msg)
 
 
 if __name__ == "__main__":

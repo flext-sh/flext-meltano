@@ -11,7 +11,9 @@ Objetivo: Validar que as APIs nativas funcionam SEM subprocess.
 
 import importlib.util
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
+from typing import cast
 
 import pytest
 from flext_core import FlextResult
@@ -24,7 +26,7 @@ class TestRealPipelineExecution:
     """Testes de execução REAL de pipelines completos."""
 
     @pytest.fixture
-    def temp_project_dir(self) -> Path:
+    def temp_project_dir(self) -> Generator[Path]:
         """Cria diretório temporário para projeto de teste."""
         with tempfile.TemporaryDirectory(prefix="flext_meltano_test_") as temp_dir:
             yield Path(temp_dir)
@@ -298,7 +300,8 @@ models:
             assert isinstance(result_data, dict)
             assert "success" in result_data
             assert "command" in result_data
-            assert result_data["command"][0] == "compile"
+            command_list = cast("list[str]", result_data["command"])
+            assert command_list[0] == "compile"
 
     def test_full_elt_dbt_pipeline_integration(
         self,

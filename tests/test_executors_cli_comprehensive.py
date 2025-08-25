@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import contextlib
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextResult
 
@@ -97,7 +98,7 @@ class TestFlextMeltanoBridgeComprehensive:
     def test_bridge_factory_with_config(self) -> None:
         """Test bridge factory with custom configuration."""
         config = FlextMeltanoConfig(environment="test")
-        bridge = create_flext_meltano_bridge(config)
+        bridge = create_flext_meltano_bridge(config.to_dict())
 
         assert bridge is not None
         assert isinstance(bridge, FlextMeltanoBridge)
@@ -281,7 +282,9 @@ class TestExecutorsIntegrationPatterns:
 
         # Results should be similar (same system)
         if result1["success"] and result2["success"]:
-            assert result1["data"]["flext_meltano"] == result2["data"]["flext_meltano"]
+            data1 = cast("dict[str, object]", result1["data"])
+            data2 = cast("dict[str, object]", result2["data"])
+            assert data1["flext_meltano"] == data2["flext_meltano"]
 
     def test_bridge_method_consistency(self) -> None:
         """Test bridge method consistency across calls."""
@@ -299,9 +302,9 @@ class TestExecutorsIntegrationPatterns:
 
         if version1["success"] and version2["success"]:
             # Version should be same
-            assert (
-                version1["data"]["flext_meltano"] == version2["data"]["flext_meltano"]
-            )
+            data1 = cast("dict[str, object]", version1["data"])
+            data2 = cast("dict[str, object]", version2["data"])
+            assert data1["flext_meltano"] == data2["flext_meltano"]
 
 
 class TestRealWorldUsagePatterns:
@@ -349,7 +352,7 @@ class TestRealWorldUsagePatterns:
         bridges = [
             FlextMeltanoBridge(),
             create_flext_meltano_bridge(),
-            create_flext_meltano_bridge(FlextMeltanoConfig(environment="test")),
+            create_flext_meltano_bridge(FlextMeltanoConfig(environment="test").to_dict()),
         ]
 
         # All should work

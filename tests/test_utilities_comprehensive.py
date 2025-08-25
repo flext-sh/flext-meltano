@@ -119,7 +119,7 @@ class TestFlextMeltanoUtilitiesComprehensive:
         assert isinstance(models, dict)
         assert "test-dbt-project" in models
         assert isinstance(models["test-dbt-project"], dict)
-        project_config = cast(dict[str, object], models["test-dbt-project"])
+        project_config = cast("dict[str, object]", models["test-dbt-project"])
         assert project_config["+materialized"] == "view"
 
     def test_create_dbt_config_with_profile_name(self) -> None:
@@ -472,7 +472,7 @@ class TestFlextMeltanoUtilitiesIntegration:
         plugin_config_str = FlextMeltanoUtilities.create_plugin_config(
             "tap-test", "extractor"
         )
-        plugin_config = cast(dict[str, object], plugin_config_str)
+        plugin_config = cast("dict[str, object]", plugin_config_str)
 
         # 2. Validar config criada
         validation_result = FlextMeltanoUtilities.validate_plugin_config(plugin_config)
@@ -509,7 +509,7 @@ class TestFlextMeltanoUtilitiesIntegration:
         plugin_config_str = FlextMeltanoUtilities.create_plugin_config(
             sanitized, "extractor"
         )
-        plugin_config = cast(dict[str, object], plugin_config_str)
+        plugin_config = cast("dict[str, object]", plugin_config_str)
 
         # 3. Validar que config com nome sanitizado é válida
         validation_result = FlextMeltanoUtilities.validate_plugin_config(plugin_config)

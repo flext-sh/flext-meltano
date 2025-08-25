@@ -46,9 +46,7 @@ class FlextMeltanoConfigBuilders:
         """Single responsibility: DBT configuration building only."""
 
         @staticmethod
-        def create_dbt_config(
-            project_name: str, profile_name: str = ""
-        ) -> ConfigDict:
+        def create_dbt_config(project_name: str, profile_name: str = "") -> ConfigDict:
             """Cria configuração básica do DBT.
 
             Args:
@@ -109,7 +107,10 @@ class FlextMeltanoConfigBuilders:
 
         @staticmethod
         def create_singer_target_config(
-            target_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
+            target_name: str,
+            namespace: str = "",
+            pip_url: str = "",
+            executable: str = "",
         ) -> ConfigDict:
             """Cria configuração para Singer target.
 

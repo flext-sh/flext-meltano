@@ -7,6 +7,7 @@ Tests focus on verifying that the production code actually works.
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import pytest
 from pydantic_core import ValidationError
@@ -43,7 +44,7 @@ class TestFlextMeltanoBridgeRealFunctionality:
             config = FlextMeltanoConfig(
                 project_root=temp_dir + "/custom", environment="production"
             )
-            bridge = create_flext_meltano_bridge(config)
+            bridge = create_flext_meltano_bridge(config.to_dict())
 
             # Factory function currently ignores config parameter for simplicity
             # Bridge should still be created successfully
@@ -234,8 +235,10 @@ class TestFlextMeltanoExecutorRealFunctionality:
         version_result = bridge.get_version()
 
         assert version_result["success"] is True
-        assert "python" in version_result["data"]
-        assert "3.13+" in version_result["data"]["python"]
+        data_dict = cast("dict[str, object]", version_result["data"])
+        assert "python" in data_dict
+        python_version = cast("str", data_dict["python"])
+        assert "3.13+" in python_version
 
 
 class TestFlextMeltanoConfigurationRealFunctionality:

@@ -198,7 +198,8 @@ class TestRealFileSystemOperations:
 
             # Test that paths work with real file system
             assert Path(config.project_root).exists()
-            assert Path(config.dbt_project_dir).exists()
+            if config.dbt_project_dir is not None:
+                assert Path(config.dbt_project_dir).exists()
             assert Path(config.project_root).is_dir()
 
     def test_components_handle_real_paths(self) -> None:

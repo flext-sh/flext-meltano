@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
@@ -23,9 +23,6 @@ from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.typing import PropertiesList, Property
-
-# Removed unused flext-cli import - decorators are commented out
-
 
 logger = get_logger(__name__)
 
@@ -107,7 +104,9 @@ class FlextMeltanoAdapters:
 
                 # Validar se tap foi criado corretamente
                 if not hasattr(tap_instance, "discover_streams"):
-                    return FlextResult[Tap].fail(f"Invalid tap class: {tap_class.__name__}")
+                    return FlextResult[Tap].fail(
+                        f"Invalid tap class: {tap_class.__name__}"
+                    )
 
                 self.logger.info(
                     "Singer tap created successfully", tap_class=tap_class.__name__
@@ -139,7 +138,9 @@ class FlextMeltanoAdapters:
 
                 # Validar configuração obrigatória
                 if not config:
-                    return FlextResult[Target].fail("Target configuration cannot be empty")
+                    return FlextResult[Target].fail(
+                        "Target configuration cannot be empty"
+                    )
 
                 # Criar instância do target
                 target_instance = target_class(config=config)
@@ -151,7 +152,8 @@ class FlextMeltanoAdapters:
                     )
 
                 self.logger.info(
-                    "Singer target created successfully", target_class=target_class.__name__
+                    "Singer target created successfully",
+                    target_class=target_class.__name__,
                 )
                 return FlextResult[Target].ok(target_instance)
 
@@ -269,7 +271,9 @@ class FlextMeltanoAdapters:
                     self.logger.info("Target drain_all() completed")
 
                 except Exception as sync_error:
-                    self.logger.exception("Real Singer sync failed", error=str(sync_error))
+                    self.logger.exception(
+                        "Real Singer sync failed", error=str(sync_error)
+                    )
                     return FlextResult[dict[str, object]].fail(
                         f"Real sync failed: {sync_error}"
                     )
@@ -356,7 +360,10 @@ class FlextMeltanoAdapters:
             """
             try:
                 # Validar estrutura
-                if not isinstance(singer_catalog, dict) or "streams" not in singer_catalog:
+                if (
+                    not isinstance(singer_catalog, dict)
+                    or "streams" not in singer_catalog
+                ):
                     return FlextResult[dict[str, object]].fail(
                         "Invalid Singer catalog structure"
                     )
@@ -389,7 +396,9 @@ class FlextMeltanoAdapters:
                 return FlextResult[dict[str, object]].ok(flext_catalog)
 
             except Exception as e:
-                return FlextResult[dict[str, object]].fail(f"Failed to adapt catalog: {e}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to adapt catalog: {e}"
+                )
 
         @staticmethod
         def adapt_schema(
@@ -406,7 +415,10 @@ class FlextMeltanoAdapters:
             """
             try:
                 # Validar estrutura
-                if not isinstance(singer_schema, dict) or "properties" not in singer_schema:
+                if (
+                    not isinstance(singer_schema, dict)
+                    or "properties" not in singer_schema
+                ):
                     return FlextResult[dict[str, object]].fail(
                         "Invalid Singer schema structure"
                     )
@@ -433,7 +445,9 @@ class FlextMeltanoAdapters:
                 return FlextResult[dict[str, object]].ok(flext_schema)
 
             except Exception as e:
-                return FlextResult[dict[str, object]].fail(f"Failed to adapt schema: {e}")
+                return FlextResult[dict[str, object]].fail(
+                    f"Failed to adapt schema: {e}"
+                )
 
     @staticmethod
     def adapt_records(
@@ -486,11 +500,9 @@ FlextSingerAdapter = FlextMeltanoAdapters.TypeAdapter
 __all__ = [
     # Main hierarchical class
     "FlextMeltanoAdapters",
-
     # Legacy compatibility
     "FlextSingerAdapter",
     "MeltanoSingerWrapper",
-
     # Singer SDK re-exports for convenience
     "PropertiesList",
     "Property",

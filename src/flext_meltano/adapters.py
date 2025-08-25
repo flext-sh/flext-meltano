@@ -18,13 +18,11 @@ from pathlib import Path
 from typing import TypeVar
 
 from dbt.cli.main import dbtRunner
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextResult,
     get_logger,
 )
-
-# Note: FlextCoreAdapters not available in flext-core, using object as base
 from meltano.core.plugin.base import PluginType
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -72,10 +70,9 @@ class FlextMeltanoAdapters:
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
-            return FlextResult[object].ok({
-                "service": "MeltanoAdapter",
-                "status": "ready"
-            })
+            return FlextResult[object].ok(
+                {"service": "MeltanoAdapter", "status": "ready"}
+            )
 
         def discover_plugins(
             self,
@@ -97,13 +94,48 @@ class FlextMeltanoAdapters:
                 # Simplified plugin discovery without depending on specific Meltano APIs
                 # Return a mock set of common plugins for development purposes
                 all_plugins = [
-                    {"name": "tap-csv", "type": "extractors", "namespace": "tap_csv", "description": "CSV files"},
-                    {"name": "tap-postgres", "type": "extractors", "namespace": "tap_postgres", "description": "PostgreSQL database"},
-                    {"name": "tap-mysql", "type": "extractors", "namespace": "tap_mysql", "description": "MySQL database"},
-                    {"name": "target-csv", "type": "loaders", "namespace": "target_csv", "description": "CSV files"},
-                    {"name": "target-postgres", "type": "loaders", "namespace": "target_postgres", "description": "PostgreSQL database"},
-                    {"name": "target-snowflake", "type": "loaders", "namespace": "target_snowflake", "description": "Snowflake data warehouse"},
-                    {"name": "dbt-core", "type": "transformers", "namespace": "dbt", "description": "DBT transformations"},
+                    {
+                        "name": "tap-csv",
+                        "type": "extractors",
+                        "namespace": "tap_csv",
+                        "description": "CSV files",
+                    },
+                    {
+                        "name": "tap-postgres",
+                        "type": "extractors",
+                        "namespace": "tap_postgres",
+                        "description": "PostgreSQL database",
+                    },
+                    {
+                        "name": "tap-mysql",
+                        "type": "extractors",
+                        "namespace": "tap_mysql",
+                        "description": "MySQL database",
+                    },
+                    {
+                        "name": "target-csv",
+                        "type": "loaders",
+                        "namespace": "target_csv",
+                        "description": "CSV files",
+                    },
+                    {
+                        "name": "target-postgres",
+                        "type": "loaders",
+                        "namespace": "target_postgres",
+                        "description": "PostgreSQL database",
+                    },
+                    {
+                        "name": "target-snowflake",
+                        "type": "loaders",
+                        "namespace": "target_snowflake",
+                        "description": "Snowflake data warehouse",
+                    },
+                    {
+                        "name": "dbt-core",
+                        "type": "transformers",
+                        "namespace": "dbt",
+                        "description": "DBT transformations",
+                    },
                 ]
 
                 # Apply filters
@@ -111,7 +143,11 @@ class FlextMeltanoAdapters:
                 if plugin_type:
                     plugins = [p for p in plugins if p.get("type") == plugin_type]
                 if name_filter:
-                    plugins = [p for p in plugins if name_filter.lower() in p.get("name", "").lower()]
+                    plugins = [
+                        p
+                        for p in plugins
+                        if name_filter.lower() in p.get("name", "").lower()
+                    ]
 
                 # Limit for performance and return
                 limited_plugins = plugins[:50]
@@ -146,7 +182,7 @@ class FlextMeltanoAdapters:
                     "project_root": str(project_root),
                     "project_name": project_name,
                     "meltano_yml": str(project_root / "meltano.yml"),
-                    "status": "initialized"
+                    "status": "initialized",
                 }
 
                 return FlextResult[dict[str, str]].ok(project_info)
@@ -181,16 +217,14 @@ class FlextMeltanoAdapters:
                 # Add plugin to project
                 plugin_type_enum = PluginType(plugin_type)
                 plugin_def = add_service.add(
-                    plugin_type_enum,
-                    plugin_name,
-                    pip_url=pip_url
+                    plugin_type_enum, plugin_name, pip_url=pip_url
                 )
 
                 plugin_info = {
                     "name": plugin_def.name,
                     "type": plugin_def.type,
                     "namespace": plugin_def.namespace or "",
-                    "status": "added"
+                    "status": "added",
                 }
 
                 return FlextResult[dict[str, str]].ok(plugin_info)
@@ -208,10 +242,7 @@ class FlextMeltanoAdapters:
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
-            return FlextResult[object].ok({
-                "service": "DBTAdapter",
-                "status": "ready"
-            })
+            return FlextResult[object].ok({"service": "DBTAdapter", "status": "ready"})
 
         def run_dbt_command(
             self,
@@ -256,7 +287,7 @@ class FlextMeltanoAdapters:
                         "command": command,
                         "success": result.success,
                         "exit_code": 0 if result.success else 1,
-                        "project_dir": str(project_dir)
+                        "project_dir": str(project_dir),
                     }
 
                     return FlextResult[dict[str, object]].ok(execution_info)
@@ -303,10 +334,9 @@ class FlextMeltanoAdapters:
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
-            return FlextResult[object].ok({
-                "service": "SingerAdapter",
-                "status": "ready"
-            })
+            return FlextResult[object].ok(
+                {"service": "SingerAdapter", "status": "ready"}
+            )
 
         def create_tap_stream(
             self,
@@ -337,7 +367,7 @@ class FlextMeltanoAdapters:
                     "tap_name": tap.name,
                     "stream_count": len(streams),
                     "stream_names": [stream.name for stream in streams],
-                    "status": "configured"
+                    "status": "configured",
                 }
 
                 return FlextResult[dict[str, object]].ok(stream_info)
@@ -364,17 +394,16 @@ class FlextMeltanoAdapters:
                 # Initialize target with config
                 target = target_class(config=config)
 
-                target_info = {
-                    "target_name": target.name,
-                    "status": "configured"
-                }
+                target_info = {"target_name": target.name, "status": "configured"}
 
                 return FlextResult[dict[str, str]].ok(target_info)
 
             except Exception as e:
                 return FlextResult.fail(f"Target sink creation failed: {e}")
 
-        def get_schema_properties(self, stream: Stream) -> FlextResult[list[dict[str, object]]]:
+        def get_schema_properties(
+            self, stream: Stream
+        ) -> FlextResult[list[dict[str, object]]]:
             """Extract schema properties from a Singer stream.
 
             Args:
@@ -395,7 +424,7 @@ class FlextMeltanoAdapters:
                     prop_info = {
                         "name": prop_name,
                         "type": str(prop_def.get("type", "string")),
-                        "required": prop_name in stream.schema.get("required", [])
+                        "required": prop_name in stream.schema.get("required", []),
                     }
                     properties.append(prop_info)
 

@@ -9,9 +9,10 @@ Este módulo testa as funcionalidades REAIS dos serviços base:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import override
 
-from singer_sdk import Tap, Target
+from singer_sdk import Stream, Tap, Target
 
 from flext_meltano.service_implementations import (
     FlextMeltanoDbtService,
@@ -26,7 +27,8 @@ class TestTap(Tap):
 
     name = "test-tap"
 
-    def discover_streams(self) -> list[object]:
+    @override
+    def discover_streams(self) -> Sequence[Stream]:
         """Discover streams."""
         return []
 
@@ -102,7 +104,7 @@ class TestFlextMeltanoTapServiceReal:
         service = ConcreteTapService(tap_name="test-tap")
 
         # Teste com config válida
-        config = {"api_key": "test_key"}
+        config: dict[str, object] = {"api_key": "test_key"}
         result = service.validate_tap_config(config)
 
         # Usando unwrap_or pattern

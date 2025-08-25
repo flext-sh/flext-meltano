@@ -33,6 +33,7 @@ the Go ↔ Python bridge integration that all other modules depend upon.
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -79,8 +80,8 @@ class TestFlextMeltanoConfig:
                 raise AssertionError(msg)
             assert config.environment == "production"
             if config.dbt_project_dir != dbt_path:
-                msg: str = f"Expected {dbt_path}, got {config.dbt_project_dir}"
-                raise AssertionError(msg)
+                dbt_msg: str = f"Expected {dbt_path}, got {config.dbt_project_dir}"
+                raise AssertionError(dbt_msg)
 
 
 class TestFlextMeltanoServices:
@@ -115,7 +116,8 @@ class TestFlextMeltanoServices:
         # Test that DBT functionality is accessible through the bridge
         version_result = bridge.get_version()
         assert version_result["success"] is True
-        assert "dbt_core" in version_result["data"]
+        data_dict = cast("dict[str, object]", version_result["data"])
+        assert "dbt_core" in data_dict
 
 
 if __name__ == "__main__":

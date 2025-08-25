@@ -20,9 +20,7 @@ from pathlib import Path
 from typing import TypeVar, cast
 
 import yaml
-
-# Import directly from flext-core root (MANDATORY pattern)
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextResult,
     FlextUtilities,
     get_logger,
@@ -159,7 +157,11 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "version": 1,
                 "project_id": project_id,
                 "project_name": project_name or project_id,
-                "environments": [{"name": "dev"}, {"name": "staging"}, {"name": "prod"}],
+                "environments": [
+                    {"name": "dev"},
+                    {"name": "staging"},
+                    {"name": "prod"},
+                ],
                 "plugins": {
                     "extractors": [],
                     "loaders": [],
@@ -197,9 +199,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "snapshot-paths": ["snapshots"],
                 "target-path": "target",
                 "clean-targets": ["target", "dbt_packages"],
-                "models": {
-                    project_name: {"+materialized": "view"}
-                },
+                "models": {project_name: {"+materialized": "view"}},
             }
 
     class _SingerConfigBuilder:
@@ -232,7 +232,10 @@ class FlextMeltanoUtilities(FlextUtilities):
 
         @staticmethod
         def create_singer_target_config(
-            target_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
+            target_name: str,
+            namespace: str = "",
+            pip_url: str = "",
+            executable: str = "",
         ) -> dict[str, object]:
             """Create configuration for Singer target.
 
@@ -328,7 +331,9 @@ class FlextMeltanoUtilities(FlextUtilities):
                 Dict with plugin configuration
 
             """
-            sanitized_name = FlextMeltanoUtilities._PluginConfigBuilder.sanitize_plugin_name(name)
+            sanitized_name = (
+                FlextMeltanoUtilities._PluginConfigBuilder.sanitize_plugin_name(name)
+            )
 
             return {
                 "name": name,
@@ -401,16 +406,24 @@ class FlextMeltanoUtilities(FlextUtilities):
                     created_dirs[name] = str(dir_path)
 
                 # Create meltano.yml
-                meltano_config = FlextMeltanoUtilities._MeltanoConfigBuilder.create_meltano_config(
-                    project_name
+                meltano_config = (
+                    FlextMeltanoUtilities._MeltanoConfigBuilder.create_meltano_config(
+                        project_name
+                    )
                 )
                 meltano_yml = project_root / "meltano.yml"
-                FlextMeltanoUtilities._YamlFileManager.save_yaml_config(meltano_config, meltano_yml)
+                FlextMeltanoUtilities._YamlFileManager.save_yaml_config(
+                    meltano_config, meltano_yml
+                )
 
                 # Create dbt_project.yml
-                dbt_config = FlextMeltanoUtilities._DbtConfigBuilder.create_dbt_config(f"{project_name}_dbt")
+                dbt_config = FlextMeltanoUtilities._DbtConfigBuilder.create_dbt_config(
+                    f"{project_name}_dbt"
+                )
                 dbt_yml = project_root / "transform" / "dbt_project.yml"
-                FlextMeltanoUtilities._YamlFileManager.save_yaml_config(dbt_config, dbt_yml)
+                FlextMeltanoUtilities._YamlFileManager.save_yaml_config(
+                    dbt_config, dbt_yml
+                )
 
                 result_info = {
                     "project_root": str(project_root),
@@ -552,7 +565,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             return [item.strip() for item in text.split(",") if item.strip()]
 
         @staticmethod
-        def safe_get_string(data: dict[str, object], key: str, default: str = "") -> str:
+        def safe_get_string(
+            data: dict[str, object], key: str, default: str = ""
+        ) -> str:
             """Get string from dict safely.
 
             Args:
@@ -613,7 +628,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             return response
 
         @staticmethod
-        def format_command_result(exit_code: int, output: str, command: str) -> dict[str, str]:
+        def format_command_result(
+            exit_code: int, output: str, command: str
+        ) -> dict[str, str]:
             """Format command execution result.
 
             Args:
@@ -957,13 +974,11 @@ FlextWrapperUtilities = FlextMeltanoUtilities.FlextWrapperUtilities
 __all__ = [
     # Main utilities class (Flext[Area][Module] pattern)
     "FlextMeltanoUtilities",
-
     # Legacy classes for backward compatibility
     "FlextResultHelpers",
     "FlextRuntimeUtilities",
     "FlextTypeAdapters",
     "FlextWrapperUtilities",
-
     # Validation functions (required by tests)
     "validate_config_value",
     "validate_config_value_simple",

@@ -26,8 +26,6 @@ from __future__ import annotations
 import math
 import tempfile
 from pathlib import Path
-from typing import cast
-from collections.abc import Collection, Mapping
 
 from flext_core import FlextResult
 
@@ -318,7 +316,7 @@ class TestRealConfigValidation:
         # From string
         result = validate_config_value("2.71", float)
         assert result.success is True
-        assert result.value == 2.71
+        assert result.value == math.e
 
     def test_validate_config_value_none_required(self) -> None:
         """Test None handling when required."""
