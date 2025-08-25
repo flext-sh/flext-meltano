@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 import signal
 from types import FrameType
-from typing import NoReturn
+from typing import NoReturn, cast
 
 from dbt.cli.main import dbtRunner
 from singer_sdk import Stream, Tap, Target
@@ -83,7 +83,7 @@ class TestRealELTPipeline:
         version_result = bridge.get_version()
         assert version_result["success"] is True
 
-        system_info = version_result["data"]
+        system_info = cast(dict[str, object], version_result["data"])
         assert "meltano" in system_info
         assert "singer_sdk" in system_info
         assert "dbt_core" in system_info
@@ -93,7 +93,7 @@ class TestRealELTPipeline:
         plugins_result = bridge.list_plugins()
         assert plugins_result["success"] is True
 
-        plugins = plugins_result["data"]
+        plugins = cast(list[dict[str, object]], plugins_result["data"])
         assert len(plugins) > 0
 
         # Step 3: Simulate pipeline preparation
@@ -183,7 +183,8 @@ class TestRealELTPipeline:
         bridge = FlextMeltanoBridge()
         version_result = bridge.get_version()
 
-        dbt_version = version_result["data"]["dbt_core"]
+        version_data = cast(dict[str, object], version_result["data"])
+        dbt_version = version_data["dbt_core"]
         assert dbt_version == "1.10.5"  # As specified in requirements
 
     def test_complete_elt_workflow_simulation(self) -> None:
@@ -198,7 +199,7 @@ class TestRealELTPipeline:
         plugins_result = bridge.list_plugins()
         assert plugins_result["success"] is True
 
-        plugins = plugins_result["data"]
+        plugins = cast(list[dict[str, object]], plugins_result["data"])
         extractors = [p for p in plugins if p["type"] == "extractor"]
         loaders = [p for p in plugins if p["type"] == "loader"]
         transformers = [p for p in plugins if p["type"] == "transformer"]
@@ -210,19 +211,20 @@ class TestRealELTPipeline:
 
         # Phase 4: Verify integration components
         # All components needed for ELT pipeline are available:
+        version_data = cast(dict[str, object], version_result["data"])
 
         # - Extract: Meltano + Singer SDK taps ✅
-        assert version_result["data"]["meltano"] == "3.9.1"
-        assert version_result["data"]["singer_sdk"] == "0.48.0"
+        assert version_data["meltano"] == "3.9.1"
+        assert version_data["singer_sdk"] == "0.48.0"
 
         # - Load: Singer SDK targets ✅
         assert len(loaders) > 0
 
         # - Transform: DBT Core ✅
-        assert version_result["data"]["dbt_core"] == "1.10.5"
+        assert version_data["dbt_core"] == "1.10.5"
 
         # Phase 5: Integration method verification
-        assert version_result["data"]["integration_method"] == "native_apis"
+        assert version_data["integration_method"] == "native_apis"
 
         # This confirms: NO SUBPROCESS CALLS, ONLY NATIVE APIs
 
@@ -270,18 +272,19 @@ class TestRealELTPipeline:
         plugins_result = bridge.list_plugins()
 
         # Build ELT pipeline metadata
+        plugins_data = cast(list[dict[str, object]], plugins_result["data"])
         elt_metadata = {
             "system_info": version_result["data"],
             "available_plugins": {
-                "total": len(plugins_result["data"]),
+                "total": len(plugins_data),
                 "extractors": len(
-                    [p for p in plugins_result["data"] if p["type"] == "extractor"]
+                    [p for p in plugins_data if p["type"] == "extractor"]
                 ),
                 "loaders": len(
-                    [p for p in plugins_result["data"] if p["type"] == "loader"]
+                    [p for p in plugins_data if p["type"] == "loader"]
                 ),
                 "transformers": len(
-                    [p for p in plugins_result["data"] if p["type"] == "transformer"]
+                    [p for p in plugins_data if p["type"] == "transformer"]
                 ),
             },
             "capabilities": {
@@ -292,13 +295,16 @@ class TestRealELTPipeline:
         }
 
         # Verify ELT pipeline is fully capable
-        assert elt_metadata["available_plugins"]["total"] > 0
-        assert elt_metadata["available_plugins"]["extractors"] > 0
-        assert elt_metadata["available_plugins"]["loaders"] > 0
-        assert elt_metadata["available_plugins"]["transformers"] > 0
-        assert elt_metadata["capabilities"]["native_api_integration"] is True
-        assert elt_metadata["capabilities"]["subprocess_free"] is True
-        assert elt_metadata["capabilities"]["go_bridge_ready"] is True
+        available_plugins = cast(dict[str, object], elt_metadata["available_plugins"])
+        capabilities = cast(dict[str, object], elt_metadata["capabilities"])
+        
+        assert cast(int, available_plugins["total"]) > 0
+        assert cast(int, available_plugins["extractors"]) > 0
+        assert cast(int, available_plugins["loaders"]) > 0
+        assert cast(int, available_plugins["transformers"]) > 0
+        assert capabilities["native_api_integration"] is True
+        assert capabilities["subprocess_free"] is True
+        assert capabilities["go_bridge_ready"] is True
 
 
 class TestRealMeltanoProjectOperations:

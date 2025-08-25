@@ -12,11 +12,16 @@ import sys
 from pathlib import Path
 
 import click
-from flext_core import FlextResult, get_logger
+from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+    FlextResult,
+    get_logger,
+)
 from rich.console import Console
 from rich.table import Table
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, MeltanoBridge
+from .executors_bridge import FlextMeltanoBridge
+from .executors_meltano import FlextMeltanoExecutor
+from .meltano_adapters import MeltanoBridge
 
 logger = get_logger(__name__)
 

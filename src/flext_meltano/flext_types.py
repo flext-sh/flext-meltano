@@ -6,7 +6,7 @@ organizing all Meltano-related type aliases in a single hierarchical class.
 Usage:
     Import types directly from FlextMeltanoTypes::
 
-        from flext_meltano.types import FlextMeltanoTypes
+        from flext_meltano import FlextMeltanoTypes
 
         # Meltano-specific types
         plugin_config: FlextMeltanoTypes.Plugin.Config = {"name": "tap-csv"}
@@ -24,12 +24,16 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-# Import directly from typings to avoid circular imports
-from flext_core.typings import FlextCoreTypes
+# Import directly from flext-core root (MANDATORY pattern)
+from flext_core import FlextCoreTypes  # pyright: ignore[reportPrivateImportUsage]
 
 if TYPE_CHECKING:
     from dbt.cli.main import dbtRunner
-    from singer_sdk import Stream, Tap, Target
+    from singer_sdk import (
+        Stream as SingerStream,
+        Tap as SingerTap,
+        Target as SingerTarget,
+    )
 
 
 class FlextMeltanoTypes(FlextCoreTypes):
@@ -49,7 +53,7 @@ class FlextMeltanoTypes(FlextCoreTypes):
     Examples:
         Using Meltano-specific types::
 
-            from flext_meltano.types import FlextMeltanoTypes
+            from flext_meltano import FlextMeltanoTypes
 
             plugin_config: FlextMeltanoTypes.Plugin.Config = {
                 "name": "tap-csv",
@@ -58,6 +62,7 @@ class FlextMeltanoTypes(FlextCoreTypes):
 
             tap: FlextMeltanoTypes.Singer.Tap = csv_tap
             pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
+
     """
 
     # =========================================================================
@@ -101,9 +106,9 @@ class FlextMeltanoTypes(FlextCoreTypes):
         """
 
         # Core Singer components
-        type Tap = Tap
-        type Target = Target
-        type Stream = Stream
+        type Tap = SingerTap
+        type Target = SingerTarget
+        type Stream = SingerStream
 
         # Singer message system
         type MessageType = str
@@ -248,7 +253,7 @@ class FlextMeltanoTypes(FlextCoreTypes):
         # Adapter operation types
         type OperationResult = dict[str, object]
         type AdapterResponse = dict[str, object]
-        type ServiceCall = Callable[..., object]
+        type ServiceCall = Callable[[str], object]  # Specific signature for service calls
 
         # Integration patterns
         type WrapperResult = dict[str, object]
@@ -259,11 +264,14 @@ class FlextMeltanoTypes(FlextCoreTypes):
 # CONVENIENCE ALIASES - For backward compatibility and shorter names
 # =============================================================================
 
+# Universal config dictionary type for all configuration objects
+ConfigDict = dict[str, object]
+
 # Plugin aliases for easy access
 MeltanoPluginConfig = FlextMeltanoTypes.Plugin.Config
 MeltanoPluginInfo = FlextMeltanoTypes.Plugin.PluginInfo
 
-# Singer aliases for easy access  
+# Singer aliases for easy access
 SingerTapConfig = FlextMeltanoTypes.Singer.TapConfig
 SingerTargetConfig = FlextMeltanoTypes.Singer.TargetConfig
 SingerMessageData = FlextMeltanoTypes.Singer.MessageData
@@ -286,27 +294,24 @@ ELTExecutionMetrics = FlextMeltanoTypes.ELT.ExecutionMetrics
 # =============================================================================
 
 __all__ = [
-    # Main hierarchical class
-    "FlextMeltanoTypes",
-
-    # Plugin aliases
-    "MeltanoPluginConfig", 
-    "MeltanoPluginInfo",
-
-    # Singer aliases
-    "SingerTapConfig",
-    "SingerTargetConfig", 
-    "SingerMessageData",
-
+    # Bridge aliases
+    "BridgeRequest",
+    "BridgeResponse",
+    # Configuration dictionary type
+    "ConfigDict",
     # DBT aliases
     "DbtProjectConfig",
     "DbtRunResult",
-
-    # Bridge aliases  
-    "BridgeRequest",
-    "BridgeResponse",
-
+    "ELTExecutionMetrics",
     # ELT aliases
     "ELTPipelineResult",
-    "ELTExecutionMetrics",
+    # Main hierarchical class
+    "FlextMeltanoTypes",
+    # Plugin aliases
+    "MeltanoPluginConfig",
+    "MeltanoPluginInfo",
+    "SingerMessageData",
+    # Singer aliases
+    "SingerTapConfig",
+    "SingerTargetConfig",
 ]

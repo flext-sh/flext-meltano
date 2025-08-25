@@ -201,8 +201,8 @@ class TestFlextMeltanoExecutor:
 
     def test_executor_creation(self) -> None:
         """Test creating an executor with configuration."""
-        config = FlextMeltanoConfig(environment="test")
-        executor = FlextMeltanoExecutor(config)
+        config_dict: dict[str, object] = {"environment": "test"}
+        executor = FlextMeltanoExecutor(config_dict)
 
         # Executor should be created successfully
         assert executor is not None

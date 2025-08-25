@@ -19,7 +19,6 @@ from flext_core import (
     FlextValidationError,
 )
 
-
 # =============================================================================
 # MAIN EXCEPTIONS CLASS - Following Flext[Area][Module] pattern
 # =============================================================================
@@ -27,13 +26,13 @@ from flext_core import (
 
 class FlextMeltanoExceptions:
     """Single main exceptions class for all Meltano errors (Flext[Area][Module] pattern).
-    
+
     Architectural Compliance:
     - All Meltano exceptions organized under single class
     - Nested classes implement specific error types
     - Aliases for backward compatibility
     - Hierarchical inheritance from flext-core
-    
+
     SOLID Principles:
     - Single Responsibility: All Meltano error handling in one place
     - Open/Closed: Extensible through inheritance
@@ -242,7 +241,7 @@ class FlextMeltanoExceptions:
     # =================================================================
     # ALIASES FOR BACKWARD COMPATIBILITY - FlextMeltano[ErrorType]
     # =================================================================
-    
+
     # Main class aliases (preferred names)
     FlextMeltanoError = MeltanoError
     FlextMeltanoValidationError = MeltanoValidationError

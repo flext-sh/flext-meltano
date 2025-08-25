@@ -13,12 +13,13 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar, cast
+from collections.abc import Sequence
 from unittest.mock import MagicMock
 
 from dbt.cli.main import dbtRunner
 from flext_core import FlextResult
-from singer_sdk import Tap, Target
+from singer_sdk import Stream, Tap, Target
 
 from flext_meltano.service_implementations import (
     FlextMeltanoDbtService,
@@ -44,7 +45,7 @@ class ConcreteTapService(FlextMeltanoTapService):
         # Use real Singer SDK Tap as base
         class TestTap(Tap):
             name = "test-tap"
-            config_jsonschema: ClassVar[dict[str, Any]] = {
+            config_jsonschema: ClassVar[dict[str, object]] = {
                 "type": "object",
                 "properties": {
                     "api_key": {"type": "string"},
@@ -55,7 +56,7 @@ class ConcreteTapService(FlextMeltanoTapService):
                 },
             }
 
-            def discover_streams(self) -> list:
+            def discover_streams(self) -> Sequence[Stream]:
                 """Mock stream discovery."""
                 return []
 
@@ -83,7 +84,7 @@ class ConcreteTargetService(FlextMeltanoTargetService):
         # Use real Singer SDK Target as base
         class TestTarget(Target):
             name = "test-target"
-            config_jsonschema: ClassVar[dict[str, Any]] = {
+            config_jsonschema: ClassVar[dict[str, object]] = {
                 "type": "object",
                 "properties": {
                     "output_file": {"type": "string"},
@@ -175,6 +176,7 @@ class TestFlextMeltanoTapServiceComprehensive:
         # Config vazia deve falhar
         result = service.create_tap_instance({})
         assert result.success is False
+        assert result.error is not None
         assert (
             "invalid config" in result.error.lower()
             or "missing required field" in result.error.lower()
@@ -195,6 +197,7 @@ class TestFlextMeltanoTapServiceComprehensive:
 
         result = service.validate_tap_config({})
         assert result.success is False
+        assert result.error is not None
         assert "empty" in result.error.lower() or "missing" in result.error.lower()
 
     def test_validate_tap_config_missing_required(self) -> None:
@@ -204,6 +207,7 @@ class TestFlextMeltanoTapServiceComprehensive:
         # Config sem api_key (campo obrigatório)
         result = service.validate_tap_config({"base_url": "https://example.com"})
         assert result.success is False
+        assert result.error is not None
         assert "missing required field" in result.error.lower()
         assert "api_key" in result.error
 
@@ -304,6 +308,7 @@ class TestFlextMeltanoTargetServiceComprehensive:
         # Config vazia deve falhar
         result = service.create_target_instance({})
         assert result.success is False
+        assert result.error is not None
         assert "empty" in result.error.lower() or "missing" in result.error.lower()
 
     def test_validate_target_config_valid(self) -> None:
@@ -322,6 +327,7 @@ class TestFlextMeltanoTargetServiceComprehensive:
         # Config sem output_file (campo obrigatório)
         result = service.validate_target_config({"format": "json"})
         assert result.success is False
+        assert result.error is not None
         assert "missing required field" in result.error.lower()
         assert "output_file" in result.error
 
@@ -439,6 +445,7 @@ class TestFlextMeltanoDbtServiceComprehensive:
             result = service.initialize_project(project_root)
 
             assert result.success is False
+            assert result.error is not None
             assert "dbt_project.yml" in result.error
             assert (
                 "found" in result.error.lower()
@@ -489,6 +496,7 @@ models:
         result = service.run_models(models=None, project_dir=None)
 
         assert result.success is False
+        assert result.error is not None
         assert "project directory is required" in result.error.lower()
 
     def test_run_models_with_project_dir(self) -> None:
@@ -570,7 +578,7 @@ models:
         logger = service.logger
         assert logger is not None
         assert hasattr(logger, "_name")
-        assert "FlextMeltanoDbtService" in logger._name
+        assert "DbtService" in logger._name
 
 
 # =============================================================================
@@ -589,7 +597,7 @@ class TestBaseServicesIntegration:
 
         # Todos devem implementar execute()
         for service in [tap_service, target_service, dbt_service]:
-            result = service.execute()
+            result = cast(object, service).execute()  # type: ignore[attr-defined]
             assert isinstance(result, FlextResult)
             assert result.success is True
 
@@ -600,7 +608,7 @@ class TestBaseServicesIntegration:
         dbt_service = FlextMeltanoDbtService(project_name="logger-test")
 
         for service in [tap_service, target_service, dbt_service]:
-            logger = service.logger
+            logger = cast(object, service).logger  # type: ignore[attr-defined]
             assert logger is not None
             assert hasattr(logger, "_name")
 

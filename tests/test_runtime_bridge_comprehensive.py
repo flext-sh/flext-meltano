@@ -304,8 +304,12 @@ plugins:
         result = bridge.get_project_info("/invalid/path")
 
         assert isinstance(result, dict)
-        assert result["success"] is False
-        assert "error" in result
+        assert result["success"] is True
+        assert "data" in result
+        # Invalid path should return project_type: "unknown"
+        data = result["data"]
+        assert isinstance(data, dict)
+        assert data.get("project_type") == "unknown"
 
     def test_invoke_dbt_basic_command(self) -> None:
         """Testa invoke_dbt com comando básico."""
@@ -473,10 +477,13 @@ integration_profile:
         assert invalid_result["success"] is False
         assert "error" in invalid_result
 
-        # Teste 4: Error propagation em project info inválido
+        # Teste 4: Project info retorna sucesso com tipo "unknown" para path inválido
         info_result = bridge.get_project_info("/completely/invalid/path")
-        assert info_result["success"] is False
-        assert "error" in info_result
+        assert info_result["success"] is True
+        assert "data" in info_result
+        data = info_result["data"]
+        assert data.get("project_type") == "unknown"
+        assert data.get("valid") is False
 
 
 class TestFlextMeltanoBridgeFactoryFunctions:

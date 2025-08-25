@@ -11,7 +11,9 @@ from pathlib import Path
 
 from flext_core import get_logger
 
-from flext_meltano import FlextMeltanoExecutor, MeltanoBridge, MeltanoDbtWrapper
+from .dbt_adapters import MeltanoDbtWrapper
+from .executors_meltano import FlextMeltanoExecutor, FlextMeltanoExecutors
+from .meltano_adapters import MeltanoBridge
 
 logger = get_logger(__name__)
 
@@ -39,7 +41,7 @@ class FlextMeltanoBridge:
                 },
             }
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def list_plugins(self) -> dict[str, object]:
         """List available Meltano plugins."""
@@ -51,12 +53,12 @@ class FlextMeltanoBridge:
                 # It's a FlextResult
                 if result.success:
                     return {"success": True, "data": result.value}
-                return {"success": False, "error": result.error}
+                return {"success": False, "data": None, "error": result.error}
             # It's the direct value (flext-cli decorator processed it)
             return {"success": True, "data": result}
 
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def run_pipeline(
         self, tap_name: str, target_name: str, project_root: str = "."
@@ -64,13 +66,14 @@ class FlextMeltanoBridge:
         """Run ELT pipeline between tap and target."""
         try:
             project_path = Path(project_root)
-            result = self.executor.run_elt_pipeline(project_path, tap_name, target_name)
+            # Use SimpleMeltanoExecutor for pipeline operations
+            result = FlextMeltanoExecutors.SimpleMeltanoExecutor.run_pipeline(project_path, tap_name, target_name)
 
             if result.success:
-                return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+                return {"success": True, "data": result.data or {}}
+            return {"success": False, "data": None, "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def execute_meltano_command(
         self, command: list[str], project_root: str = "."
@@ -82,9 +85,9 @@ class FlextMeltanoBridge:
 
             if result.success:
                 return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+            return {"success": False, "data": None, "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def execute_dbt_command(
         self, command: list[str], project_root: str = "."
@@ -92,13 +95,15 @@ class FlextMeltanoBridge:
         """Execute arbitrary DBT command."""
         try:
             project_path = Path(project_root)
-            result = self.executor.execute_dbt_command(project_path, command)
+            # Use execute_meltano_command for DBT operations via Meltano
+            dbt_command = ["dbt", *command]
+            result = self.executor.execute_meltano_command(project_path, dbt_command)
 
             if result.success:
                 return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+            return {"success": False, "data": None, "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def install_plugin(
         self, plugin_type: str, plugin_name: str, project_root: str = "."
@@ -112,9 +117,9 @@ class FlextMeltanoBridge:
 
             if result.success:
                 return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+            return {"success": False, "data": None, "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def get_project_info(self, project_root: str = ".") -> dict[str, object]:
         """Get project information."""
@@ -124,9 +129,9 @@ class FlextMeltanoBridge:
 
             if result.success:
                 return {"success": True, "data": result.value}
-            return {"success": False, "error": result.error}
+            return {"success": False, "data": None, "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
     def invoke_dbt(self, command: str, **kwargs: object) -> dict[str, object]:
         """Invoke DBT command with additional arguments."""
@@ -144,7 +149,7 @@ class FlextMeltanoBridge:
             project_root = str(project_root_value) if project_root_value else "."
             return self.execute_dbt_command(cmd_list, project_root)
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": False, "data": None, "error": str(e)}
 
 
 # =============================================================================

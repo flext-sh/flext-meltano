@@ -18,7 +18,12 @@ from pathlib import Path
 import meltano
 import structlog
 import yaml
-from flext_core import FlextDomainService, FlextLogger, FlextResult, get_logger
+from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+    FlextDomainService,
+    FlextLogger,
+    FlextResult,
+    get_logger,
+)
 from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.elt_context import ELTContext, ELTContextBuilder
@@ -32,19 +37,7 @@ from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
-# Import flext-cli integration for handle_service_result decorator
-try:
-    from flext_cli import handle_service_result
-except ImportError:
-    # Fallback: identity decorator (no-op) with proper typing
-    from collections.abc import Callable
-    from typing import TypeVar
-
-    T = TypeVar("T")
-
-    def handle_service_result(func: Callable[..., object]) -> object:  # type: ignore[misc,explicit-any]
-        """Fallback decorator when flext-cli is not available."""
-        return func
+# Removed unused flext-cli import - decorators are commented out
 
 
 logger = get_logger(__name__)
