@@ -20,20 +20,15 @@ from typing import Protocol
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
-    FlextDomainService,
-    FlextLogger,
-    FlextResult,
+    FlextDomainService,  # pyright: ignore[reportPrivateImportUsage]
+    FlextResult,  # pyright: ignore[reportPrivateImportUsage]
     FlextServiceProcessor,
     get_logger,
 )
 from singer_sdk import Tap, Target
 
-from flext_meltano import (
-    FlextDbtAdapter,
-    FlextSingerAdapter,
-    MeltanoDbtWrapper,
-    MeltanoSingerWrapper,
-)
+from .dbt_adapters import FlextDbtAdapter, MeltanoDbtWrapper
+from .singer_adapters import FlextSingerAdapter, MeltanoSingerWrapper
 
 # Type aliases for service patterns (avoid explicit Any)
 ConfigDict = dict[str, object]
@@ -49,13 +44,13 @@ logger = get_logger(__name__)
 
 class FlextMeltanoServices:
     """Single main services class for all Meltano service implementations (Flext[Area][Module] pattern).
-    
+
     Architectural Compliance:
     - All Meltano services organized under single class
     - Nested classes implement specific service types
     - Aliases for backward compatibility
     - Hierarchical inheritance from flext-core
-    
+
     SOLID Principles:
     - Single Responsibility: All Meltano service implementations in one place
     - Open/Closed: Extensible through inheritance
@@ -116,17 +111,11 @@ class FlextMeltanoServices:
             self.tap_name: str = tap_name
             self.wrapper_singer: MeltanoSingerWrapper = MeltanoSingerWrapper()
             self.singer_adapter: FlextSingerAdapter = FlextSingerAdapter()
-            self._logger = get_logger(self.__class__.__name__)
-
-        @property
-        def logger(self) -> FlextLogger:
-            """Get logger instance."""
-            return self._logger
 
         def process(self, request: ConfigDict) -> FlextResult[Tap]:
             """Process tap configuration and create Singer Tap instance."""
             try:
-                self.logger.info("Processing tap configuration", tap_name=self.tap_name)
+                get_logger(__name__).info("Processing tap configuration", tap_name=self.tap_name)
 
                 # Validate configuration
                 config_result = self.validate_tap_config(request)
@@ -143,7 +132,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to process tap configuration: {e}"
-                self.logger.exception(error_msg, tap_name=self.tap_name, error=str(e))
+                get_logger(__name__).exception(error_msg, tap_name=self.tap_name, error=str(e))
                 return FlextResult[Tap].fail(error_msg)
 
         def build(self, domain: Tap, *, correlation_id: str) -> ResultDict:
@@ -208,7 +197,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info("Creating tap instance", tap_name=self.tap_name)
+                get_logger(__name__).info("Creating tap instance", tap_name=self.tap_name)
 
                 # Validate configuration using unwrap_or pattern
                 config_valid = self.validate_tap_config(config).unwrap_or(default=False)
@@ -224,7 +213,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to create tap {self.tap_name}: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[Tap].fail(error_msg)
 
         def discover_streams(self, tap: Tap) -> FlextResult[list[dict[str, object]]]:
@@ -238,7 +227,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info("Discovering streams", tap_name=self.tap_name)
+                get_logger(__name__).info("Discovering streams", tap_name=self.tap_name)
 
                 # Use wrapper for discovery
                 catalog_result = self.wrapper_singer.discover_catalog(tap)
@@ -262,12 +251,12 @@ class FlextMeltanoServices:
                     if isinstance(streams_data, list):
                         streams = streams_data
 
-                self.logger.info("Streams discovered", count=len(streams))
+                get_logger(__name__).info("Streams discovered", count=len(streams))
                 return FlextResult[list[dict[str, object]]].ok(streams)
 
             except Exception as e:
                 error_msg = f"Failed to discover streams: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[list[dict[str, object]]].fail(error_msg)
 
         def validate_tap_config(self, config: dict[str, object]) -> FlextResult[bool]:
@@ -317,11 +306,6 @@ class FlextMeltanoServices:
         target_name: str
         wrapper_singer: MeltanoSingerWrapper = MeltanoSingerWrapper()
         singer_adapter: FlextSingerAdapter = FlextSingerAdapter()
-
-        @property
-        def logger(self) -> FlextLogger:
-            """Get logger instance."""
-            return get_logger(self.__class__.__name__)
 
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute target service operation (required by FlextDomainService)."""
@@ -375,7 +359,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info("Creating target instance", target_name=self.target_name)
+                get_logger(__name__).info("Creating target instance", target_name=self.target_name)
 
                 # Validate configuration
                 validation_result = self.validate_target_config(config)
@@ -390,7 +374,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to create target {self.target_name}: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[Target].fail(error_msg)
 
         def process_records(
@@ -408,7 +392,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info(
+                get_logger(__name__).info(
                     "Processing records", target_name=self.target_name, stream=stream_name
                 )
 
@@ -434,7 +418,7 @@ class FlextMeltanoServices:
                             target._process_record_message(singer_message)
                         records_processed += 1
                     except Exception as e:
-                        self.logger.warning("Failed to process record", error=str(e))
+                        get_logger(__name__).warning("Failed to process record", error=str(e))
 
                 # Processing finished - in real implementations,
                 # subclasses may need specific finalization logic
@@ -445,12 +429,12 @@ class FlextMeltanoServices:
                     "target": self.target_name,
                 }
 
-                self.logger.info("Records processed successfully", count=records_processed)
+                get_logger(__name__).info("Records processed successfully", count=records_processed)
                 return FlextResult[dict[str, object]].ok(result)
 
             except Exception as e:
                 error_msg = f"Failed to process records: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def validate_target_config(self, config: dict[str, object]) -> FlextResult[bool]:
@@ -500,11 +484,6 @@ class FlextMeltanoServices:
         project_name: str
         wrapper_dbt: MeltanoDbtWrapper = MeltanoDbtWrapper()
         dbt_adapter: FlextDbtAdapter = FlextDbtAdapter()
-
-        @property
-        def logger(self) -> FlextLogger:
-            """Get logger instance."""
-            return get_logger(self.__class__.__name__)
 
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute DBT service operation (required by FlextDomainService)."""
@@ -575,7 +554,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info(
+                get_logger(__name__).info(
                     "Initializing DBT project",
                     project_name=self.project_name,
                     project_root=str(project_root),
@@ -592,7 +571,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to initialize DBT project: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dbtRunner].fail(error_msg)
 
         def run_models(
@@ -611,7 +590,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info(
+                get_logger(__name__).info(
                     "Running DBT models", project_name=self.project_name, models=models
                 )
 
@@ -632,7 +611,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to run DBT models: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def test_models(
@@ -653,7 +632,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info(
+                get_logger(__name__).info(
                     "Testing DBT models", project_name=self.project_name, models=models
                 )
 
@@ -662,7 +641,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to test DBT models: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def get_model_lineage(self, project_dir: Path) -> FlextResult[dict[str, object]]:
@@ -676,7 +655,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                self.logger.info("Getting model lineage", project_name=self.project_name)
+                get_logger(__name__).info("Getting model lineage", project_name=self.project_name)
 
                 # Compilar projeto para gerar manifest
                 runner_result = self.wrapper_dbt.create_runner(project_dir)
@@ -711,13 +690,121 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to get model lineage: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                get_logger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
     # =================================================================
-    # ALIASES FOR BACKWARD COMPATIBILITY - FlextMeltano[ServiceType] 
+    # FACTORY METHODS - Implementing Factory Pattern for SOLID compliance
     # =================================================================
-    
+
+    @classmethod
+    def create_tap_service(
+        cls,
+        tap_class: type[Tap],
+        _tap_config: ConfigDict,
+        service_name: str = "default_tap"
+    ) -> FlextResult[TapService]:
+        """Factory method for creating TAP services with dependency injection.
+
+        Implements Factory Pattern and Dependency Inversion Principle:
+        - Encapsulates service creation complexity
+        - Allows for easy testing and configuration
+        - Reduces coupling between service creation and usage
+
+        Args:
+            tap_class: Singer Tap class to instantiate
+            tap_config: Configuration for the tap
+            service_name: Name for the service instance
+
+        Returns:
+            FlextResult containing configured TapService
+
+        """
+        try:
+            logger.info("Creating TAP service via factory",
+                       tap_class=tap_class.__name__, service_name=service_name)
+
+            # Create service with dependency injection - TapService only takes tap_name
+            service = cls.TapService(tap_name=service_name)
+
+            logger.info("TAP service created successfully via factory")
+            return FlextResult[TapService].ok(service)
+
+        except Exception as e:
+            error_msg = f"Factory failed to create TAP service: {e}"
+            logger.exception(error_msg, error=str(e))
+            return FlextResult[TapService].fail(error_msg)
+
+    @classmethod
+    def create_target_service(
+        cls,
+        target_class: type[Target],
+        _target_config: ConfigDict,
+        service_name: str = "default_target"
+    ) -> FlextResult[TargetService]:
+        """Factory method for creating TARGET services with dependency injection.
+
+        Args:
+            target_class: Singer Target class to instantiate
+            target_config: Configuration for the target
+            service_name: Name for the service instance
+
+        Returns:
+            FlextResult containing configured TargetService
+
+        """
+        try:
+            logger.info("Creating TARGET service via factory",
+                       target_class=target_class.__name__, service_name=service_name)
+
+            # Create service with dependency injection - TargetService takes target_name field
+            service = cls.TargetService(target_name=service_name)
+
+            logger.info("TARGET service created successfully via factory")
+            return FlextResult[TargetService].ok(service)
+
+        except Exception as e:
+            error_msg = f"Factory failed to create TARGET service: {e}"
+            logger.exception(error_msg, error=str(e))
+            return FlextResult[TargetService].fail(error_msg)
+
+    @classmethod
+    def create_dbt_service(
+        cls,
+        project_name: str,
+        _dbt_config: ConfigDict,
+        service_name: str = "default_dbt"
+    ) -> FlextResult[DbtService]:
+        """Factory method for creating DBT services with dependency injection.
+
+        Args:
+            project_name: Name of the DBT project
+            dbt_config: Configuration for DBT
+            service_name: Name for the service instance
+
+        Returns:
+            FlextResult containing configured DbtService
+
+        """
+        try:
+            logger.info("Creating DBT service via factory",
+                       project_name=project_name, service_name=service_name)
+
+            # Create service with dependency injection - DbtService takes project_name field
+            service = cls.DbtService(project_name=project_name)
+
+            logger.info("DBT service created successfully via factory")
+            return FlextResult[DbtService].ok(service)
+
+        except Exception as e:
+            error_msg = f"Factory failed to create DBT service: {e}"
+            logger.exception(error_msg, error=str(e))
+            return FlextResult[DbtService].fail(error_msg)
+
+    # =================================================================
+    # ALIASES FOR BACKWARD COMPATIBILITY - FlextMeltano[ServiceType]
+    # =================================================================
+
     # Main class aliases (preferred names)
     FlextMeltanoTapService = TapService
     FlextMeltanoTargetService = TargetService
@@ -733,13 +820,34 @@ FlextMeltanoTapService = FlextMeltanoServices.TapService
 FlextMeltanoTargetService = FlextMeltanoServices.TargetService
 FlextMeltanoDbtService = FlextMeltanoServices.DbtService
 
+# Export service classes for direct import in factory methods
+TapService = FlextMeltanoServices.TapService
+TargetService = FlextMeltanoServices.TargetService
+DbtService = FlextMeltanoServices.DbtService
+
+# Export protocol classes for type checking
+TapServiceProtocol = FlextMeltanoServices.TapServiceProtocol
+TargetServiceProtocol = FlextMeltanoServices.TargetServiceProtocol
+DbtServiceProtocol = FlextMeltanoServices.DbtServiceProtocol
+
 
 # =============================================================================
 # PUBLIC API EXPORTS
 # =============================================================================
 
 __all__ = [
+    "DbtService",
+    "DbtServiceProtocol",
     "FlextMeltanoDbtService",
+    # Main service class
+    "FlextMeltanoServices",
+    # Legacy service aliases
     "FlextMeltanoTapService",
     "FlextMeltanoTargetService",
+    # Direct service imports
+    "TapService",
+    # Service protocols
+    "TapServiceProtocol",
+    "TargetService",
+    "TargetServiceProtocol",
 ]

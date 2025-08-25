@@ -26,6 +26,8 @@ from __future__ import annotations
 import math
 import tempfile
 from pathlib import Path
+from typing import cast
+from collections.abc import Collection, Mapping
 
 from flext_core import FlextResult
 
@@ -67,11 +69,12 @@ class TestRealFlextMeltanoUtilities:
 
     def test_validate_plugin_config_real(self) -> None:
         """Test plugin config validation with real data."""
-        config_data = {
+        config_data: dict[str, object] = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "executable": "tap-csv",
             "pip_url": "pipelinewise-tap-csv",
+            "type": "extractors",
         }
 
         result = FlextMeltanoUtilities.validate_plugin_config(config_data)
@@ -200,7 +203,7 @@ class TestRealFlextMeltanoUtilities:
     def test_yaml_config_operations_real(self) -> None:
         """Test YAML config save and load operations."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            config_data = {
+            config_data: dict[str, object] = {
                 "test_key": "test_value",
                 "nested": {"inner_key": "inner_value"},
             }
@@ -333,13 +336,13 @@ class TestRealConfigValidation:
         """Test unwrap_or usage in config validation."""
         # Successful validation
         success_result = validate_config_value("test", str)
-        value = success_result.unwrap_or("default")
-        assert value == "test"
+        str_value = success_result.unwrap_or("default")
+        assert str_value == "test"
 
         # Failed validation
         fail_result = validate_config_value("not_int", int)
-        value = fail_result.unwrap_or(999)
-        assert value == 999
+        int_value = fail_result.unwrap_or(999)
+        assert int_value == 999
 
 
 class TestRealPathValidation:
@@ -434,7 +437,7 @@ class TestRealHelperClasses:
         result3 = validate_config_value(True, bool)
 
         # Test chaining successful results
-        chained = FlextResultHelpers.chain_results(result1, result2, result3)
+        chained = FlextResultHelpers.chain_results(result1, result2, result3)  # type: ignore[misc]
         assert chained.success is True
         assert isinstance(chained.value, list)
         assert len(chained.value) == 3
@@ -450,7 +453,7 @@ class TestRealHelperClasses:
         result3 = validate_config_value(True, bool)
 
         # Test collecting only successes
-        successes = FlextResultHelpers.collect_successes(result1, result2, result3)
+        successes = FlextResultHelpers.collect_successes(result1, result2, result3)  # type: ignore[misc]
         assert successes.success is True
         assert isinstance(successes.value, list)
         assert len(successes.value) == 2  # Only 2 successful results
@@ -465,7 +468,7 @@ class TestRealHelperClasses:
         result3 = validate_config_value(True, bool)  # This will also succeed
 
         # Test getting first success
-        first = FlextResultHelpers.first_success(result1, result2, result3)
+        first = FlextResultHelpers.first_success(result1, result2, result3)  # type: ignore[misc]
         assert first.success is True
         assert first.value == "test"  # Should be the first successful result
 
@@ -502,7 +505,7 @@ class TestRealHelperClasses:
     def test_specialized_utilities(self) -> None:
         """Test specialized utility classes."""
         # Test FlextWrapperUtilities
-        meltano_plugin = {
+        meltano_plugin: dict[str, object] = {
             "name": "tap-csv",
             "type": "extractor",
             "namespace": "tap_csv",
@@ -544,14 +547,14 @@ class TestRealErrorHandlingPatterns:
     def test_error_handling_with_unwrap_or(self) -> None:
         """Test error handling uses unwrap_or instead of manual checking."""
         # Test successful operation
-        result = validate_config_value("valid", str)
-        value = result.unwrap_or("default")
-        assert value == "valid"
+        str_result = validate_config_value("valid", str)
+        str_value = str_result.unwrap_or("default")
+        assert str_value == "valid"
 
         # Test failed operation
-        result = validate_config_value("invalid", int)
-        value = result.unwrap_or(0)
-        assert value == 0
+        int_result = validate_config_value("invalid", int)
+        int_value = int_result.unwrap_or(0)
+        assert int_value == 0
 
     def test_chaining_operations_with_flext_result(self) -> None:
         """Test chaining multiple utility operations."""

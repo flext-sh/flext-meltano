@@ -124,6 +124,7 @@ environments:
 
             # Deve falhar
             assert result.success is False
+            assert result.error is not None
             assert "meltano.yml not found" in result.error
 
     def test_discover_plugins_real(self) -> None:
@@ -203,6 +204,7 @@ environments:
 
         # Deve falhar por diretório não existir
         assert result.success is False
+        assert result.error is not None
         assert "not found" in result.error.lower() or "failed" in result.error.lower()
 
     def test_execute_meltano_command_invalid_command(self) -> None:
@@ -225,6 +227,7 @@ project_id: test
 
             # Deve falhar
             assert result.success is False
+            assert result.error is not None
             assert (
                 "invalid_command" in result.error.lower()
                 or "failed" in result.error.lower()
@@ -261,6 +264,7 @@ project_id: test
 
         # Deve falhar
         assert result.success is False
+        assert result.error is not None
         assert "failed" in result.error.lower() or "create" in result.error.lower()
 
     def test_run_elt_pipeline_without_project(self) -> None:
@@ -271,6 +275,7 @@ project_id: test
 
         # Deve falhar por não ter projeto
         assert result.success is False
+        assert result.error is not None
         assert "project" in result.error.lower() or "not found" in result.error.lower()
 
 
@@ -328,7 +333,7 @@ class TestFlextMeltanoAdapterComprehensive:
         assert adapted["name"] == "tap-csv"
 
         # Plugin vazio - ainda retorna sucesso com campos vazios
-        empty_plugin = {}
+        empty_plugin: dict[str, str] = {}
         result_empty = FlextMeltanoAdapter.adapt_plugin(empty_plugin)
         adapted_empty = result_empty.unwrap_or({"fallback": "true"})
         assert result_empty.success is True
@@ -359,7 +364,7 @@ class TestFlextMeltanoAdapterComprehensive:
 
     def test_adapt_project_config_missing_project_id(self) -> None:
         """Testa adaptação sem project_id - não deve falhar pois project_id é opcional."""
-        config = {"version": 1}
+        config: dict[str, object] = {"version": 1}
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
@@ -373,11 +378,11 @@ class TestFlextMeltanoAdapterComprehensive:
     def test_adapter_error_handling_comprehensive(self) -> None:
         """Testa tratamento abrangente de erros."""
         # Teste com None
-        result = FlextMeltanoAdapter.adapt_plugin(None)
+        result = FlextMeltanoAdapter.adapt_plugin(None)  # type: ignore[arg-type]
         assert result.success is False
 
         # Teste com tipo errado
-        result = FlextMeltanoAdapter.adapt_plugin("invalid")
+        result = FlextMeltanoAdapter.adapt_plugin("invalid")  # type: ignore[arg-type]
         assert result.success is False
 
 

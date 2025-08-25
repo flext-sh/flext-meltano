@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_core import FlextResult
+from flext_core import FlextResult  # pyright: ignore[reportPrivateImportUsage]
 
 
 class FlextMeltanoProtocols:
@@ -81,8 +81,8 @@ FlextDbtPlugin = FlextMeltanoProtocols.DbtPlugin
 # =============================================================================
 
 __all__ = [
+    "FlextDbtPlugin",         # Backward compatibility
     "FlextMeltanoProtocols",  # Main class
     "FlextTapPlugin",         # Backward compatibility
     "FlextTargetPlugin",      # Backward compatibility
-    "FlextDbtPlugin",         # Backward compatibility
 ]

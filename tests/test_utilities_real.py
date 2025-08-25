@@ -30,7 +30,7 @@ class TestFlextMeltanoUtilitiesReal:
         with tempfile.NamedTemporaryFile(
             encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as temp_file:
-            config = {"test_key": "test_value", "nested": {"key": "value"}}
+            config: dict[str, object] = {"test_key": "test_value", "nested": {"key": "value"}}
             temp_path = Path(temp_file.name)
 
         try:
@@ -69,11 +69,14 @@ class TestFlextMeltanoUtilitiesReal:
             # Deve retornar sucesso
             assert result.success is True
 
-            # Usar padrão .value
+            # Usar padrão .value com type assertion segura
             config = result.value
             assert isinstance(config, dict)
-            assert config["test_key"] == "test_value"
-            assert config["nested"]["key"] == "value"
+            config_dict: dict[str, object] = config
+            assert config_dict["test_key"] == "test_value"
+            nested = config_dict["nested"]
+            assert isinstance(nested, dict)
+            assert nested["key"] == "value"
 
         finally:
             temp_path.unlink(missing_ok=True)
@@ -144,6 +147,7 @@ class TestValidateConfigValueReal:
         result = validate_config_value(None, str, required=True)
 
         assert result.success is False
+        assert result.error is not None
         assert "Required config value is None" in result.error
 
     def test_validate_config_value_none_optional(self) -> None:

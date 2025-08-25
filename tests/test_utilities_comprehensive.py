@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import yaml
 from flext_core import FlextResult
@@ -72,9 +73,11 @@ class TestFlextMeltanoUtilitiesComprehensive:
 
         # Verificar plugins structure
         plugins = config["plugins"]
-        assert "extractors" in plugins
-        assert "loaders" in plugins
-        assert "transformers" in plugins
+        assert isinstance(plugins, dict)
+        plugins_dict: dict[str, object] = plugins
+        assert "extractors" in plugins_dict
+        assert "loaders" in plugins_dict
+        assert "transformers" in plugins_dict
 
     def test_create_meltano_config_with_project_name(self) -> None:
         """Testa criação de config Meltano com nome específico."""
@@ -113,8 +116,11 @@ class TestFlextMeltanoUtilitiesComprehensive:
         # Verificar models structure
         assert "models" in config
         models = config["models"]
+        assert isinstance(models, dict)
         assert "test-dbt-project" in models
-        assert models["test-dbt-project"]["+materialized"] == "view"
+        assert isinstance(models["test-dbt-project"], dict)
+        project_config = cast(dict[str, object], models["test-dbt-project"])
+        assert project_config["+materialized"] == "view"
 
     def test_create_dbt_config_with_profile_name(self) -> None:
         """Testa criação de config DBT com profile específico."""
@@ -140,6 +146,7 @@ class TestFlextMeltanoUtilitiesComprehensive:
         # Verificar capabilities
         assert "capabilities" in config
         capabilities = config["capabilities"]
+        assert isinstance(capabilities, list)
         assert "discover" in capabilities
         assert "catalog" in capabilities
         assert "properties" in capabilities
@@ -211,12 +218,13 @@ class TestFlextMeltanoUtilitiesComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Testa salvamento YAML em path inválido."""
-        config = {"test": "value"}
+        config: dict[str, object] = {"test": "value"}
         invalid_path = Path("/invalid/path/config.yml")
 
         result = FlextMeltanoUtilities.save_yaml_config(config, invalid_path)
 
         assert result.success is False
+        assert result.error is not None
         assert "failed to save yaml config" in result.error.lower()
 
     def test_load_yaml_config_success(self) -> None:
@@ -253,7 +261,8 @@ class TestFlextMeltanoUtilitiesComprehensive:
         result = FlextMeltanoUtilities.load_yaml_config(nonexistent_path)
 
         assert result.success is False
-        assert "config file not found" in result.error.lower()
+        assert result.error is not None
+        assert "no such file or directory" in result.error.lower()
 
     def test_load_yaml_config_empty_file(self) -> None:
         """Testa carregamento de arquivo YAML vazio."""
@@ -384,8 +393,9 @@ class TestFlextMeltanoUtilitiesComprehensive:
 
     def test_validate_plugin_config_valid(self) -> None:
         """Testa validação de configuração válida de plugin."""
-        valid_config = {
+        valid_config: dict[str, object] = {
             "name": "tap-csv",
+            "type": "extractor",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
@@ -399,7 +409,7 @@ class TestFlextMeltanoUtilitiesComprehensive:
     def test_validate_plugin_config_missing_fields(self) -> None:
         """Testa validação com campos obrigatórios ausentes."""
         # Config sem campo 'name'
-        invalid_config = {
+        invalid_config: dict[str, object] = {
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
@@ -408,17 +418,19 @@ class TestFlextMeltanoUtilitiesComprehensive:
         result = FlextMeltanoUtilities.validate_plugin_config(invalid_config)
 
         assert result.success is False
+        assert result.error is not None
         assert "missing required field" in result.error.lower()
         assert "name" in result.error
 
     def test_validate_plugin_config_multiple_missing_fields(self) -> None:
         """Testa validação com múltiplos campos ausentes."""
         # Config com apenas um campo
-        minimal_config = {"name": "tap-csv"}
+        minimal_config: dict[str, object] = {"name": "tap-csv"}
 
         result = FlextMeltanoUtilities.validate_plugin_config(minimal_config)
 
         assert result.success is False
+        assert result.error is not None
         assert "missing required field" in result.error.lower()
         # Deve falhar no primeiro campo ausente
 
@@ -427,6 +439,7 @@ class TestFlextMeltanoUtilitiesComprehensive:
         result = FlextMeltanoUtilities.validate_plugin_config({})
 
         assert result.success is False
+        assert result.error is not None
         assert "missing required field" in result.error.lower()
 
 
@@ -456,9 +469,10 @@ class TestFlextMeltanoUtilitiesIntegration:
     def test_config_creation_and_validation_workflow(self) -> None:
         """Testa workflow de criação e validação de config."""
         # 1. Criar config de plugin
-        plugin_config = FlextMeltanoUtilities.create_plugin_config(
+        plugin_config_str = FlextMeltanoUtilities.create_plugin_config(
             "tap-test", "extractor"
         )
+        plugin_config = cast(dict[str, object], plugin_config_str)
 
         # 2. Validar config criada
         validation_result = FlextMeltanoUtilities.validate_plugin_config(plugin_config)
@@ -492,9 +506,10 @@ class TestFlextMeltanoUtilitiesIntegration:
         assert sanitized == "my_complex_plugin_name_2024!"
 
         # 2. Usar nome sanitizado em config
-        plugin_config = FlextMeltanoUtilities.create_plugin_config(
+        plugin_config_str = FlextMeltanoUtilities.create_plugin_config(
             sanitized, "extractor"
         )
+        plugin_config = cast(dict[str, object], plugin_config_str)
 
         # 3. Validar que config com nome sanitizado é válida
         validation_result = FlextMeltanoUtilities.validate_plugin_config(plugin_config)
@@ -526,7 +541,7 @@ class TestFlextMeltanoUtilitiesIntegration:
         temp_dir = FlextMeltanoUtilities.create_temp_directory()
         config_path = temp_dir / "test_config.yml"
 
-        test_config = {"test": "value"}
+        test_config: dict[str, object] = {"test": "value"}
 
         # Save config
         save_result = FlextMeltanoUtilities.save_yaml_config(test_config, config_path)

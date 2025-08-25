@@ -7,7 +7,7 @@ The main class FlextMeltanoConfig serves as the facade providing access to all
 configuration functionality through internal aliases and nested classes.
 
 Inheritance Hierarchy:
-    FlextMeltanoConfig -> FlextBaseConfigModel (from flext-core)
+    FlextMeltanoConfig -> FlextModel (from flext-core)
     All constants and enums as internal aliases, no implementation
 
 SOLID Principles:
@@ -21,10 +21,10 @@ from __future__ import annotations
 import contextlib
 from enum import StrEnum
 from pathlib import Path
-from typing import Final
+from typing import ClassVar, Final
 
 # Import directly from flext-core root (MANDATORY pattern)
-from flext_core import FlextBaseConfigModel
+from flext_core import FlextModel
 from pydantic import Field, field_validator
 
 # =============================================================================
@@ -57,7 +57,6 @@ class _FlextMeltanoConstants:
     SINGER_TAP_TYPE: Final[str] = "extractors"
     SINGER_TARGET_TYPE: Final[str] = "loaders"
     SINGER_TRANSFORM_TYPE: Final[str] = "transformers"
-
 
     # Meltano configuration
     DEFAULT_MELTANO_PROJECT_ROOT: Final[str] = "."
@@ -104,7 +103,6 @@ class _FlextMeltanoConstants:
     DEFAULT_LOG_LEVEL: Final[str] = "INFO"
     LOG_FORMAT_JSON: Final[str] = "json"
     LOG_FORMAT_TEXT: Final[str] = "text"
-
 
 
 class _FlextMeltanoEnums:
@@ -158,11 +156,11 @@ class _FlextMeltanoEnums:
 # =============================================================================
 
 
-class FlextMeltanoConfig(FlextBaseConfigModel):
+class FlextMeltanoConfig(FlextModel):
     """Single main configuration class inheriting from FlextCore (Flext[Area][Module] pattern).
 
     Architectural Compliance:
-    - Inherits from FlextBaseConfigModel (flext-core)
+    - Inherits from FlextModel (flext-core)
     - All constants and enums available as class aliases
     - Facade pattern: delegates to internal classes, implements nothing directly
 
@@ -177,68 +175,68 @@ class FlextMeltanoConfig(FlextBaseConfigModel):
     # =================================================================
 
     # Version and metadata aliases
-    FLEXT_MELTANO_VERSION = _FlextMeltanoConstants.VERSION
-    FLEXT_MELTANO_NAME = _FlextMeltanoConstants.NAME
+    FLEXT_MELTANO_VERSION: ClassVar[object] = _FlextMeltanoConstants.VERSION
+    FLEXT_MELTANO_NAME: ClassVar[object] = _FlextMeltanoConstants.NAME
 
     # Environment aliases
-    DEFAULT_ENVIRONMENT = _FlextMeltanoConstants.DEFAULT_ENVIRONMENT
-    SUPPORTED_ENVIRONMENTS = _FlextMeltanoConstants.SUPPORTED_ENVIRONMENTS
+    DEFAULT_ENVIRONMENT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_ENVIRONMENT
+    SUPPORTED_ENVIRONMENTS: ClassVar[object] = _FlextMeltanoConstants.SUPPORTED_ENVIRONMENTS
 
     # Singer protocol aliases
-    SINGER_MESSAGE_TYPES = _FlextMeltanoConstants.SINGER_MESSAGE_TYPES
-    SINGER_SPEC_VERSION = _FlextMeltanoConstants.SINGER_SPEC_VERSION
-    SINGER_RECORD_TYPE = _FlextMeltanoConstants.SINGER_RECORD_TYPE
-    SINGER_SCHEMA_TYPE = _FlextMeltanoConstants.SINGER_SCHEMA_TYPE
-    SINGER_STATE_TYPE = _FlextMeltanoConstants.SINGER_STATE_TYPE
-    SINGER_TAP_TYPE = _FlextMeltanoConstants.SINGER_TAP_TYPE
-    SINGER_TARGET_TYPE = _FlextMeltanoConstants.SINGER_TARGET_TYPE
-    SINGER_TRANSFORM_TYPE = _FlextMeltanoConstants.SINGER_TRANSFORM_TYPE
+    SINGER_MESSAGE_TYPES: ClassVar[object] = _FlextMeltanoConstants.SINGER_MESSAGE_TYPES
+    SINGER_SPEC_VERSION: ClassVar[object] = _FlextMeltanoConstants.SINGER_SPEC_VERSION
+    SINGER_RECORD_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_RECORD_TYPE
+    SINGER_SCHEMA_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_SCHEMA_TYPE
+    SINGER_STATE_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_STATE_TYPE
+    SINGER_TAP_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TAP_TYPE
+    SINGER_TARGET_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TARGET_TYPE
+    SINGER_TRANSFORM_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TRANSFORM_TYPE
 
     # Meltano configuration aliases
-    DEFAULT_MELTANO_PROJECT_ROOT = _FlextMeltanoConstants.DEFAULT_MELTANO_PROJECT_ROOT
-    DEFAULT_MELTANO_DATABASE = _FlextMeltanoConstants.DEFAULT_MELTANO_DATABASE
-    DEFAULT_MELTANO_UI_PORT = _FlextMeltanoConstants.DEFAULT_MELTANO_UI_PORT
-    MELTANO_PLUGIN_TYPES = _FlextMeltanoConstants.MELTANO_PLUGIN_TYPES
+    DEFAULT_MELTANO_PROJECT_ROOT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_PROJECT_ROOT
+    DEFAULT_MELTANO_DATABASE: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_DATABASE
+    DEFAULT_MELTANO_UI_PORT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_UI_PORT
+    MELTANO_PLUGIN_TYPES: ClassVar[object] = _FlextMeltanoConstants.MELTANO_PLUGIN_TYPES
 
     # DBT configuration aliases
-    DEFAULT_DBT_PROFILES_DIR = _FlextMeltanoConstants.DEFAULT_DBT_PROFILES_DIR
-    DEFAULT_DBT_PROJECT_DIR = _FlextMeltanoConstants.DEFAULT_DBT_PROJECT_DIR
-    DEFAULT_DBT_TARGET = _FlextMeltanoConstants.DEFAULT_DBT_TARGET
+    DEFAULT_DBT_PROFILES_DIR: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_PROFILES_DIR
+    DEFAULT_DBT_PROJECT_DIR: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_PROJECT_DIR
+    DEFAULT_DBT_TARGET: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_TARGET
 
     # Bridge integration aliases
-    BRIDGE_SUCCESS_KEY = _FlextMeltanoConstants.BRIDGE_SUCCESS_KEY
-    BRIDGE_DATA_KEY = _FlextMeltanoConstants.BRIDGE_DATA_KEY
-    BRIDGE_ERROR_KEY = _FlextMeltanoConstants.BRIDGE_ERROR_KEY
-    BRIDGE_MESSAGE_KEY = _FlextMeltanoConstants.BRIDGE_MESSAGE_KEY
-    BRIDGE_VERSION_OP = _FlextMeltanoConstants.BRIDGE_VERSION_OP
-    BRIDGE_LIST_PLUGINS_OP = _FlextMeltanoConstants.BRIDGE_LIST_PLUGINS_OP
-    BRIDGE_RUN_PIPELINE_OP = _FlextMeltanoConstants.BRIDGE_RUN_PIPELINE_OP
-    BRIDGE_DISCOVER_CATALOG_OP = _FlextMeltanoConstants.BRIDGE_DISCOVER_CATALOG_OP
+    BRIDGE_SUCCESS_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_SUCCESS_KEY
+    BRIDGE_DATA_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_DATA_KEY
+    BRIDGE_ERROR_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_ERROR_KEY
+    BRIDGE_MESSAGE_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_MESSAGE_KEY
+    BRIDGE_VERSION_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_VERSION_OP
+    BRIDGE_LIST_PLUGINS_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_LIST_PLUGINS_OP
+    BRIDGE_RUN_PIPELINE_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_RUN_PIPELINE_OP
+    BRIDGE_DISCOVER_CATALOG_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_DISCOVER_CATALOG_OP
 
     # Timeout and performance aliases
-    DEFAULT_COMMAND_TIMEOUT = _FlextMeltanoConstants.DEFAULT_COMMAND_TIMEOUT
-    DEFAULT_CONNECTION_TIMEOUT = _FlextMeltanoConstants.DEFAULT_CONNECTION_TIMEOUT
-    DEFAULT_DISCOVERY_TIMEOUT = _FlextMeltanoConstants.DEFAULT_DISCOVERY_TIMEOUT
+    DEFAULT_COMMAND_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_COMMAND_TIMEOUT
+    DEFAULT_CONNECTION_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_CONNECTION_TIMEOUT
+    DEFAULT_DISCOVERY_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DISCOVERY_TIMEOUT
 
     # Error codes aliases
-    ERROR_CODE_CONFIGURATION = _FlextMeltanoConstants.ERROR_CODE_CONFIGURATION
-    ERROR_CODE_CONNECTION = _FlextMeltanoConstants.ERROR_CODE_CONNECTION
-    ERROR_CODE_EXECUTION = _FlextMeltanoConstants.ERROR_CODE_EXECUTION
-    ERROR_CODE_PLUGIN = _FlextMeltanoConstants.ERROR_CODE_PLUGIN
-    ERROR_CODE_SINGER = _FlextMeltanoConstants.ERROR_CODE_SINGER
-    ERROR_CODE_DBT = _FlextMeltanoConstants.ERROR_CODE_DBT
+    ERROR_CODE_CONFIGURATION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_CONFIGURATION
+    ERROR_CODE_CONNECTION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_CONNECTION
+    ERROR_CODE_EXECUTION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_EXECUTION
+    ERROR_CODE_PLUGIN: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_PLUGIN
+    ERROR_CODE_SINGER: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_SINGER
+    ERROR_CODE_DBT: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_DBT
 
     # Logging configuration aliases
-    DEFAULT_LOG_LEVEL = _FlextMeltanoConstants.DEFAULT_LOG_LEVEL
-    LOG_FORMAT_JSON = _FlextMeltanoConstants.LOG_FORMAT_JSON
-    LOG_FORMAT_TEXT = _FlextMeltanoConstants.LOG_FORMAT_TEXT
+    DEFAULT_LOG_LEVEL: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_LOG_LEVEL
+    LOG_FORMAT_JSON: ClassVar[object] = _FlextMeltanoConstants.LOG_FORMAT_JSON
+    LOG_FORMAT_TEXT: ClassVar[object] = _FlextMeltanoConstants.LOG_FORMAT_TEXT
 
     # Enum aliases - Available as nested classes
-    Environment = _FlextMeltanoEnums.Environment
-    SingerMessageType = _FlextMeltanoEnums.SingerMessageType
-    PluginType = _FlextMeltanoEnums.PluginType
-    BridgeOperation = _FlextMeltanoEnums.BridgeOperation
-    LogLevel = _FlextMeltanoEnums.LogLevel
+    Environment: ClassVar[object] = _FlextMeltanoEnums.Environment
+    SingerMessageType: ClassVar[object] = _FlextMeltanoEnums.SingerMessageType
+    PluginType: ClassVar[object] = _FlextMeltanoEnums.PluginType
+    BridgeOperation: ClassVar[object] = _FlextMeltanoEnums.BridgeOperation
+    LogLevel: ClassVar[object] = _FlextMeltanoEnums.LogLevel
 
     # =================================================================
     # PYDANTIC FIELDS - Actual configuration model implementation
