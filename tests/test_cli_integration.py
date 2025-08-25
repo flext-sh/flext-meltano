@@ -39,8 +39,8 @@ class TestFlextMeltanoCli:
             msg: str = f"Expected {'status'} in {result.value}"
             raise AssertionError(msg)
         if result.value["status"] != "healthy":
-            msg: str = f"Expected {'healthy'}, got {result.value['status']}"
-            raise AssertionError(msg)
+            health_msg: str = f"Expected {'healthy'}, got {result.value['status']}"
+            raise AssertionError(health_msg)
 
     def test_cli_version_info(self) -> None:
         """Test CLI version information."""
@@ -109,12 +109,12 @@ class TestFlextMeltanoCli:
             raise AssertionError(msg)
         commands = result.value["commands"]
         if "version" not in commands:
-            msg: str = f"Expected {'version'} in {commands}"
-            raise AssertionError(msg)
+            version_msg: str = f"Expected {'version'} in {commands}"
+            raise AssertionError(version_msg)
         assert "help" in commands
         if "health" not in commands:
-            msg: str = f"Expected {'health'} in {commands}"
-            raise AssertionError(msg)
+            health_msg: str = f"Expected {'health'} in {commands}"
+            raise AssertionError(health_msg)
 
 
 class TestFlextMeltanoRunCli:

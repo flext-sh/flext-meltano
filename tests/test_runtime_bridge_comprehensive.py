@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from flext_meltano.executors_bridge import (
     FlextMeltanoBridge,
@@ -309,7 +310,8 @@ plugins:
         # Invalid path should return project_type: "unknown"
         data = result["data"]
         assert isinstance(data, dict)
-        assert data.get("project_type") == "unknown"
+        data_dict = cast("dict[str, object]", data)
+        assert data_dict.get("project_type") == "unknown"
 
     def test_invoke_dbt_basic_command(self) -> None:
         """Testa invoke_dbt com comando básico."""
@@ -482,8 +484,9 @@ integration_profile:
         assert info_result["success"] is True
         assert "data" in info_result
         data = info_result["data"]
-        assert data.get("project_type") == "unknown"
-        assert data.get("valid") is False
+        data_dict = cast("dict[str, object]", data)
+        assert data_dict.get("project_type") == "unknown"
+        assert data_dict.get("valid") is False
 
 
 class TestFlextMeltanoBridgeFactoryFunctions:
@@ -544,7 +547,8 @@ class TestFlextMeltanoBridgeJsonApiCompatibility:
         ]
 
         for method, args in methods_to_test:
-            result = method(*args)
+            # Type ignore needed for dynamic method calls in testing
+            result = method(*args)  # type: ignore[operator]
 
             # Deve ser dict
             assert isinstance(result, dict), (
@@ -592,9 +596,10 @@ class TestFlextMeltanoBridgeJsonApiCompatibility:
         version_result = bridge.get_version()
         if version_result["success"]:
             data = version_result["data"]
+            data_dict = cast("dict[str, object]", data)
 
             # Todos os valores devem ser tipos básicos (string, number, bool)
-            for key, value in data.items():
+            for key, value in data_dict.items():
                 assert isinstance(value, (str, int, float, bool)), (
                     f"Value for {key} is not Go-compatible type: {type(value)}"
                 )

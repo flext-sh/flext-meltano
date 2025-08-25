@@ -15,21 +15,16 @@ from __future__ import annotations
 import shutil
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import yaml
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextResult,
     get_logger,
 )
 
 from flext_meltano.flext_types import ConfigDict
 
-if TYPE_CHECKING:
-    PathDict = dict[str, str]
-else:
-    # Runtime type aliases
-    type PathDict = dict[str, str]
+PathDict = dict[str, str]
 
 logger = get_logger(__name__)
 
@@ -61,9 +56,7 @@ class FlextMeltanoFileManagers:
         """Single responsibility: YAML file operations only."""
 
         @staticmethod
-        def save_yaml_config(
-            config: ConfigDict, file_path: Path
-        ) -> FlextResult[bool]:
+        def save_yaml_config(config: ConfigDict, file_path: Path) -> FlextResult[bool]:
             """Salva configuração YAML em arquivo.
 
             Args:
@@ -166,20 +159,33 @@ class FlextMeltanoFileManagers:
                     created_dirs[name] = str(dir_path)
 
                 # Create meltano.yml using basic config structure
-                meltano_config: ConfigDict = {"version": 1, "project_id": project_name, "project_name": project_name}
+                meltano_config: ConfigDict = {
+                    "version": 1,
+                    "project_id": project_name,
+                    "project_name": project_name,
+                }
                 meltano_yml = project_root / "meltano.yml"
 
                 # Create dbt_project.yml using basic config structure
-                dbt_config: ConfigDict = {"name": f"{project_name}_dbt", "version": "1.0.0"}
+                dbt_config: ConfigDict = {
+                    "name": f"{project_name}_dbt",
+                    "version": "1.0.0",
+                }
                 dbt_yml = project_root / "transform" / "dbt_project.yml"
 
                 # Save configs using YAML manager static methods directly
                 # Try to save configs, but don't fail structure creation if save fails
                 try:
-                    FlextMeltanoFileManagers.YamlFileManager.save_yaml_config(meltano_config, meltano_yml)
-                    FlextMeltanoFileManagers.YamlFileManager.save_yaml_config(dbt_config, dbt_yml)
+                    FlextMeltanoFileManagers.YamlFileManager.save_yaml_config(
+                        meltano_config, meltano_yml
+                    )
+                    FlextMeltanoFileManagers.YamlFileManager.save_yaml_config(
+                        dbt_config, dbt_yml
+                    )
                 except Exception as e:
-                    logger.debug(f"Config save warning: {e}")  # Non-critical for structure setup
+                    logger.debug(
+                        f"Config save warning: {e}"
+                    )  # Non-critical for structure setup
 
                 result_info = {
                     "project_root": str(project_root),
@@ -273,7 +279,7 @@ class FlextMeltanoFileManagers:
 
         @staticmethod
         def create_temp_directory_with_result(
-            prefix: str = "flext_meltano_"
+            prefix: str = "flext_meltano_",
         ) -> FlextResult[Path]:
             """Create temporary directory with FlextResult wrapping.
 
@@ -313,6 +319,7 @@ class FlextMeltanoFileManagers:
 # MODULE-LEVEL ALIASES FOR BACKWARD COMPATIBILITY
 # =============================================================================
 
+
 class FlextTempDirectoryManager:
     """Legacy alias for FlextMeltanoFileManagers.TempDirectoryManager.
 
@@ -320,9 +327,15 @@ class FlextTempDirectoryManager:
     """
 
     # Delegate to internal class
-    create_temp_directory = FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory
-    create_temp_directory_with_result = FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory_with_result
-    cleanup_temp_directory = FlextMeltanoFileManagers.TempDirectoryManager.cleanup_temp_directory
+    create_temp_directory = (
+        FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory
+    )
+    create_temp_directory_with_result = (
+        FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory_with_result
+    )
+    cleanup_temp_directory = (
+        FlextMeltanoFileManagers.TempDirectoryManager.cleanup_temp_directory
+    )
 
 
 # =============================================================================

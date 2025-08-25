@@ -18,7 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypeVar
 
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextResult,
     get_logger,
@@ -26,11 +26,7 @@ from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
 from rich.console import Console
 from rich.table import Table
 
-# Import for avoiding circular dependencies issues
-try:
-    from .adapters import FlextMeltanoAdapters
-except ImportError:
-    FlextMeltanoAdapters = None  # type: ignore[misc,assignment]
+from flext_meltano.adapters import FlextMeltanoAdapters
 
 T = TypeVar("T")
 
@@ -72,11 +68,13 @@ class FlextMeltanoExecutors:
 
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute operation (required by FlextDomainService)."""
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoExecutor",
-                "status": "ready",
-                "config": self.config
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    "service": "FlextMeltanoExecutor",
+                    "status": "ready",
+                    "config": self.config,
+                }
+            )
 
         def discover_plugins(self) -> FlextResult[dict[str, object]]:
             """Discover available Meltano plugins."""
@@ -86,22 +84,18 @@ class FlextMeltanoExecutors:
                 result = adapter.discover_plugins()
 
                 if result.success:
-                    return FlextResult[dict[str, object]].ok({
-                        "success": True,
-                        "data": {"plugins": result.value}
-                    })
-                return FlextResult[dict[str, object]].ok({
-                    "success": False,
-                    "error": result.error
-                })
+                    return FlextResult[dict[str, object]].ok(
+                        {"success": True, "data": {"plugins": result.value}}
+                    )
+                return FlextResult[dict[str, object]].ok(
+                    {"success": False, "error": result.error}
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Plugin discovery execution failed: {e}")
 
         def run_meltano_command(
-            self,
-            command: str,
-            args: list[str] | None = None
+            self, command: str, args: list[str] | None = None
         ) -> FlextResult[dict[str, object]]:
             """Execute Meltano command using native APIs."""
             try:
@@ -111,13 +105,12 @@ class FlextMeltanoExecutors:
                     "args": args or [],
                     "execution_time": datetime.now(UTC).isoformat(),
                     "success": True,
-                    "output": f"Executed Meltano command: {command}"
+                    "output": f"Executed Meltano command: {command}",
                 }
 
-                return FlextResult[dict[str, object]].ok({
-                    "success": True,
-                    "data": result_data
-                })
+                return FlextResult[dict[str, object]].ok(
+                    {"success": True, "data": result_data}
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Meltano command execution failed: {e}")
@@ -179,14 +172,22 @@ class FlextMeltanoExecutors:
                         nested_data = data.get("data", {})
                         if isinstance(nested_data, dict):
                             plugins = nested_data.get("plugins", [])
-                            self.console.print(f"[green]Found {len(plugins)} plugins[/green]")
+                            self.console.print(
+                                f"[green]Found {len(plugins)} plugins[/green]"
+                            )
                             for plugin in plugins[:10]:  # Show first 10
                                 if isinstance(plugin, dict):
-                                    self.console.print(f"  - {plugin.get('name')} ({plugin.get('type')})")
+                                    self.console.print(
+                                        f"  - {plugin.get('name')} ({plugin.get('type')})"
+                                    )
                         else:
                             self.console.print("[red]No plugin data available[/red]")
                         return 0
-                    error_msg = data.get("error", "Unknown error") if isinstance(data, dict) else "Unknown error"
+                    error_msg = (
+                        data.get("error", "Unknown error")
+                        if isinstance(data, dict)
+                        else "Unknown error"
+                    )
                     self.console.print(f"[red]Discovery failed: {error_msg}[/red]")
                     return 1
                 self.console.print(f"[red]Discovery failed: {result.error}[/red]")
@@ -278,12 +279,11 @@ class FlextMeltanoExecutors:
                     },
                 }
             except Exception as e:
-                return {
-                    "success": False,
-                    "error": f"Version retrieval failed: {e}"
-                }
+                return {"success": False, "error": f"Version retrieval failed: {e}"}
 
-        def execute_command(self, command: str, args: dict[str, object] | None = None) -> dict[str, object]:
+        def execute_command(
+            self, command: str, args: dict[str, object] | None = None
+        ) -> dict[str, object]:
             """Execute command via bridge interface."""
             try:
                 args = args or {}
@@ -294,10 +294,7 @@ class FlextMeltanoExecutors:
 
                     if result.success:
                         return result.value
-                    return {
-                        "success": False,
-                        "error": result.error
-                    }
+                    return {"success": False, "error": result.error}
 
                 if command == "run_meltano":
                     executor = FlextMeltanoExecutors._MeltanoExecutor()
@@ -312,21 +309,12 @@ class FlextMeltanoExecutors:
 
                     if result.success:
                         return result.value
-                    return {
-                        "success": False,
-                        "error": result.error
-                    }
+                    return {"success": False, "error": result.error}
 
-                return {
-                    "success": False,
-                    "error": f"Unknown command: {command}"
-                }
+                return {"success": False, "error": f"Unknown command: {command}"}
 
             except Exception as e:
-                return {
-                    "success": False,
-                    "error": f"Bridge execution failed: {e}"
-                }
+                return {"success": False, "error": f"Bridge execution failed: {e}"}
 
         def health_check(self) -> dict[str, object]:
             """Perform health check for Go service."""
@@ -339,15 +327,12 @@ class FlextMeltanoExecutors:
                     "data": {
                         "status": "healthy",
                         "timestamp": datetime.now(UTC).isoformat(),
-                        "version_check": version_result.get("success", False)
-                    }
+                        "version_check": version_result.get("success", False),
+                    },
                 }
 
             except Exception as e:
-                return {
-                    "success": False,
-                    "error": f"Health check failed: {e}"
-                }
+                return {"success": False, "error": f"Health check failed: {e}"}
 
     # =================================================================
     # ALIASES FOR BACKWARD COMPATIBILITY - All methods as class methods
@@ -372,6 +357,7 @@ FlextMeltanoBridge = FlextMeltanoExecutors.BridgeExecutor
 # =============================================================================
 # CLI ENTRY POINT FUNCTION
 # =============================================================================
+
 
 def flext_meltano() -> None:
     """Entry point for the flext-meltano CLI."""

@@ -17,7 +17,7 @@ import tempfile
 from pathlib import Path
 from typing import TypeVar, cast
 
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextResult,
     get_logger,
 )
@@ -186,7 +186,9 @@ class FlextMeltanoValidators:
                     if temp_path in file_path.parents:
                         return str(file_path)
                 except Exception as e:
-                    logger.debug("Failed to check temp directory for file", error=str(e))
+                    logger.debug(
+                        "Failed to check temp directory for file", error=str(e)
+                    )
 
                 # Check if file actually exists
                 if not file_path.exists() or not file_path.is_file():
@@ -264,7 +266,12 @@ class FlextMeltanoValidators:
                         return cast("FlextResult[T]", result)
 
                 # Final fallback: constructor validation
-                return cast("FlextResult[T]", FlextMeltanoValidators._ValueValidator._handle_constructor_validation(value, value_type))
+                return cast(
+                    "FlextResult[T]",
+                    FlextMeltanoValidators._ValueValidator._handle_constructor_validation(
+                        value, value_type
+                    ),
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Config validation failed: {e}")
@@ -291,7 +298,9 @@ class FlextMeltanoValidators:
 
                 # Try conversion with error handling
                 try:
-                    return FlextMeltanoValidators._ValueValidator._try_convert_value(value, value_type, default)
+                    return FlextMeltanoValidators._ValueValidator._try_convert_value(
+                        value, value_type, default
+                    )
                 except (ValueError, TypeError):
                     return default
 
@@ -303,7 +312,9 @@ class FlextMeltanoValidators:
         # =================================================================
 
         @staticmethod
-        def _handle_boolean_validation(value: object, value_type: type) -> FlextResult[object] | None:
+        def _handle_boolean_validation(
+            value: object, value_type: type
+        ) -> FlextResult[object] | None:
             """Handle boolean type validation."""
             if value_type is bool:
                 if isinstance(value, str):
@@ -314,7 +325,9 @@ class FlextMeltanoValidators:
             return None
 
         @staticmethod
-        def _handle_numeric_validation(value: object, value_type: type) -> FlextResult[object] | None:
+        def _handle_numeric_validation(
+            value: object, value_type: type
+        ) -> FlextResult[object] | None:
             """Handle numeric type validation."""
             if value_type in {int, float}:
                 if isinstance(value, str):
@@ -322,17 +335,23 @@ class FlextMeltanoValidators:
                         converted = value_type(value)
                         return FlextResult.ok(converted)
                     except (ValueError, TypeError):
-                        return FlextResult.fail(f"Cannot convert '{value}' to {value_type.__name__}")
+                        return FlextResult.fail(
+                            f"Cannot convert '{value}' to {value_type.__name__}"
+                        )
                 if isinstance(value, (int, float)):
                     try:
                         converted = value_type(value)
                         return FlextResult.ok(converted)
                     except (ValueError, TypeError):
-                        return FlextResult.fail(f"Cannot convert {value} to {value_type.__name__}")
+                        return FlextResult.fail(
+                            f"Cannot convert {value} to {value_type.__name__}"
+                        )
             return None
 
         @staticmethod
-        def _handle_string_validation(value: object, value_type: type) -> FlextResult[object] | None:
+        def _handle_string_validation(
+            value: object, value_type: type
+        ) -> FlextResult[object] | None:
             """Handle string type validation."""
             if value_type is str:
                 if isinstance(value, str):
@@ -346,14 +365,18 @@ class FlextMeltanoValidators:
             return None
 
         @staticmethod
-        def _handle_direct_type_validation(value: object, value_type: type) -> FlextResult[object] | None:
+        def _handle_direct_type_validation(
+            value: object, value_type: type
+        ) -> FlextResult[object] | None:
             """Handle direct type validation."""
             if isinstance(value, value_type):
                 return FlextResult.ok(value)
             return None
 
         @staticmethod
-        def _handle_constructor_validation(value: object, value_type: type) -> FlextResult[object]:
+        def _handle_constructor_validation(
+            value: object, value_type: type
+        ) -> FlextResult[object]:
             """Handle constructor-based validation as fallback."""
             try:
                 converted = value_type(value)
@@ -371,7 +394,9 @@ class FlextMeltanoValidators:
             if value_type is type(None):
                 return default
             if callable(value_type) and value_type is not type(None):
-                converted: object = value_type(value)  # Type annotation to fix Any return
+                converted: object = value_type(
+                    value
+                )  # Type annotation to fix Any return
                 return converted
             return default
 
@@ -410,14 +435,22 @@ class FlextMeltanoValidators:
         return cls._PathValidator.validate_path_writable(path)
 
     @classmethod
-    def validate_config_value(cls, value: str | float | None, value_type: type[T], *, required: bool = True) -> FlextResult[T]:
+    def validate_config_value(
+        cls, value: str | float | None, value_type: type[T], *, required: bool = True
+    ) -> FlextResult[T]:
         """Validate config value (delegated method)."""
-        return cls._ValueValidator.validate_config_value(value, value_type, required=required)
+        return cls._ValueValidator.validate_config_value(
+            value, value_type, required=required
+        )
 
     @classmethod
-    def validate_config_value_simple(cls, value: object, value_type: type, default: object | None = None) -> object | None:
+    def validate_config_value_simple(
+        cls, value: object, value_type: type, default: object | None = None
+    ) -> object | None:
         """Validate config value with simple interface (delegated method)."""
-        return cls._ValueValidator.validate_config_value_simple(value, value_type, default)
+        return cls._ValueValidator.validate_config_value_simple(
+            value, value_type, default
+        )
 
 
 # =============================================================================
@@ -428,6 +461,7 @@ class FlextMeltanoValidators:
 FlextConfigValidator = FlextMeltanoValidators._ConfigValidator
 FlextPathValidator = FlextMeltanoValidators._PathValidator
 FlextValueValidator = FlextMeltanoValidators._ValueValidator
+
 
 # Module-level convenience functions
 def validate_directory_path(path: str | Path | None) -> str | None:
@@ -447,14 +481,18 @@ def validate_config_value[T](
     required: bool = True,
 ) -> FlextResult[T]:
     """Convenience function delegating to FlextMeltanoValidators."""
-    return FlextMeltanoValidators.validate_config_value(value, value_type, required=required)
+    return FlextMeltanoValidators.validate_config_value(
+        value, value_type, required=required
+    )
 
 
 def validate_config_value_simple(
     value: object, value_type: type, default: object | None = None
 ) -> object | None:
     """Convenience function delegating to FlextMeltanoValidators."""
-    return FlextMeltanoValidators.validate_config_value_simple(value, value_type, default)
+    return FlextMeltanoValidators.validate_config_value_simple(
+        value, value_type, default
+    )
 
 
 __all__ = [

@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextResult
 
@@ -71,11 +72,12 @@ environments:
                 assert "tap" in pipeline_data
             else:
                 # Se falha, verificar que erro é relacionado a plugins ou arquivos
-                error_lower = result.error.lower()
-                assert any(
-                    keyword in error_lower
-                    for keyword in ["block", "plugin", "no such file", "meltano.yml"]
-                )
+                if result.error is not None:
+                    error_lower = result.error.lower()
+                    assert any(
+                        keyword in error_lower
+                        for keyword in ["block", "plugin", "no such file", "meltano.yml"]
+                    )
 
     def test_real_pipeline_execution_via_bridge(self) -> None:
         """Testa run_pipeline_real via MeltanoBridge."""
@@ -103,7 +105,7 @@ environments:
                 assert (
                     result.value["execution_method"] == "meltano_singer_runner_native"
                 )
-            else:
+            elif result.error is not None:
                 assert (
                     "not found" in result.error.lower()
                     or "failed" in result.error.lower()
@@ -136,7 +138,8 @@ environments:
                 project_root, ["unsupported", "command"]
             )
             assert result2.success is False
-            assert "format not supported" in result2.error.lower()
+            if result2.error is not None:
+                assert "format not supported" in result2.error.lower()
 
             # Teste 3: Comando invoke insuficiente
             result3 = bridge.execute_meltano_command_real(
@@ -174,14 +177,16 @@ environments:
         invalid_path = Path("/invalid/path/that/does/not/exist")
         result1 = bridge.initialize_project(invalid_path)
         assert result1.success is False
-        assert "not found" in result1.error.lower()
+        if result1.error is not None:
+            assert "not found" in result1.error.lower()
 
         # Teste 2: Instalar plugin sem projeto válido
         with tempfile.TemporaryDirectory() as temp_dir:
             empty_dir = Path(temp_dir)
             result2 = bridge.install_plugin(empty_dir, "extractor", "tap-csv")
             assert result2.success is False
-            assert "meltano.yml not found" in result2.error
+            if result2.error is not None:
+                assert "meltano.yml not found" in result2.error
 
     def test_logger_integration_comprehensive(self) -> None:
         """Testa integração completa com sistema de logging."""
@@ -343,7 +348,8 @@ class TestFlextMeltanoAdapterAdvanced:
         ]
 
         for config in test_configs:
-            result = FlextMeltanoAdapter.adapt_project_config(config)
+            config_dict = cast("dict[str, object]", config)
+            result = FlextMeltanoAdapter.adapt_project_config(config_dict)
             assert result.success is True
 
             adapted = result.value

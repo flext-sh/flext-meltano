@@ -19,14 +19,14 @@ from pathlib import Path
 from typing import TypeVar
 
 import yaml
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
     get_logger,
 )
 
-from .meltano_adapters import MeltanoBridge
+from flext_meltano.meltano_adapters import MeltanoBridge
 
 T = TypeVar("T")
 
@@ -126,7 +126,9 @@ class FlextMeltanoExecutors:
                 execution_result: dict[str, object] = {
                     "success": True,
                     "command": command,
-                    "execution_time": (datetime.now(UTC) - execution_start).total_seconds(),
+                    "execution_time": (
+                        datetime.now(UTC) - execution_start
+                    ).total_seconds(),
                     "result_type": "meltano_command",
                     "timestamp": execution_start.isoformat(),
                 }
@@ -144,7 +146,9 @@ class FlextMeltanoExecutors:
                 self.logger.exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
-        def get_project_info(self, project_root: Path) -> FlextResult[dict[str, object]]:
+        def get_project_info(
+            self, project_root: Path
+        ) -> FlextResult[dict[str, object]]:
             """Get comprehensive project information using native APIs.
 
             Args:
@@ -155,7 +159,9 @@ class FlextMeltanoExecutors:
 
             """
             try:
-                self.logger.info("Getting project information", project_root=str(project_root))
+                self.logger.info(
+                    "Getting project information", project_root=str(project_root)
+                )
 
                 project_info: dict[str, object] = {
                     "project_root": str(project_root),
@@ -190,8 +196,12 @@ class FlextMeltanoExecutors:
                 # Set project type based on findings
                 meltano_dict = project_info["meltano"]
                 dbt_dict = project_info["dbt"]
-                if (isinstance(meltano_dict, dict) and meltano_dict.get("present") and
-                    isinstance(dbt_dict, dict) and dbt_dict.get("present")):
+                if (
+                    isinstance(meltano_dict, dict)
+                    and meltano_dict.get("present")
+                    and isinstance(dbt_dict, dict)
+                    and dbt_dict.get("present")
+                ):
                     project_info["project_type"] = "meltano_with_dbt"
                 elif isinstance(dbt_dict, dict) and dbt_dict.get("present"):
                     project_info["project_type"] = "dbt_only"
@@ -202,8 +212,12 @@ class FlextMeltanoExecutors:
                 self.logger.info(
                     "Project information collected",
                     project_type=project_info["project_type"],
-                    meltano_present=meltano_dict.get("present") if isinstance(meltano_dict, dict) else False,
-                    dbt_present=dbt_dict.get("present") if isinstance(dbt_dict, dict) else False,
+                    meltano_present=meltano_dict.get("present")
+                    if isinstance(meltano_dict, dict)
+                    else False,
+                    dbt_present=dbt_dict.get("present")
+                    if isinstance(dbt_dict, dict)
+                    else False,
                 )
 
                 return FlextResult[dict[str, object]].ok(project_info)
@@ -261,7 +275,7 @@ class FlextMeltanoExecutors:
     # NESTED SIMPLE RESULT CLASS
     # =================================================================
 
-# SimpleResult[T] is now an alias to FlextResult[T] for compatibility
+    # SimpleResult[T] is now an alias to FlextResult[T] for compatibility
     # Eliminated local Result class duplication - using flext-core FlextResult
 
     # =================================================================
@@ -293,9 +307,7 @@ class FlextMeltanoExecutors:
                 )
 
             except Exception as e:
-                return FlextResult.fail(
-                    f"Pipeline execution failed: {e}"
-                )
+                return FlextResult.fail(f"Pipeline execution failed: {e}")
 
         @staticmethod
         def install_plugin(
@@ -319,9 +331,7 @@ class FlextMeltanoExecutors:
                 )
 
             except Exception as e:
-                return FlextResult.fail(
-                    f"Plugin installation failed: {e}"
-                )
+                return FlextResult.fail(f"Plugin installation failed: {e}")
 
     class SimpleDbtExecutor:
         """Simple DBT executor using tempfile projects."""
@@ -369,14 +379,10 @@ class FlextMeltanoExecutors:
 
                 logger.info(f"Created temporary DBT project at {project_dir}")
 
-                return FlextResult.ok(
-                    project_dir
-                )
+                return FlextResult.ok(project_dir)
 
             except Exception as e:
-                return FlextResult.fail(
-                    f"Failed to create temp DBT project: {e}"
-                )
+                return FlextResult.fail(f"Failed to create temp DBT project: {e}")
 
     # =================================================================
     # BACKWARD COMPATIBILITY ALIASES

@@ -23,7 +23,6 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar, Final
 
-# Import directly from flext-core root (MANDATORY pattern)
 from flext_core import FlextModel
 from pydantic import Field, field_validator
 
@@ -180,7 +179,9 @@ class FlextMeltanoConfig(FlextModel):
 
     # Environment aliases
     DEFAULT_ENVIRONMENT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_ENVIRONMENT
-    SUPPORTED_ENVIRONMENTS: ClassVar[object] = _FlextMeltanoConstants.SUPPORTED_ENVIRONMENTS
+    SUPPORTED_ENVIRONMENTS: ClassVar[object] = (
+        _FlextMeltanoConstants.SUPPORTED_ENVIRONMENTS
+    )
 
     # Singer protocol aliases
     SINGER_MESSAGE_TYPES: ClassVar[object] = _FlextMeltanoConstants.SINGER_MESSAGE_TYPES
@@ -190,17 +191,29 @@ class FlextMeltanoConfig(FlextModel):
     SINGER_STATE_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_STATE_TYPE
     SINGER_TAP_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TAP_TYPE
     SINGER_TARGET_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TARGET_TYPE
-    SINGER_TRANSFORM_TYPE: ClassVar[object] = _FlextMeltanoConstants.SINGER_TRANSFORM_TYPE
+    SINGER_TRANSFORM_TYPE: ClassVar[object] = (
+        _FlextMeltanoConstants.SINGER_TRANSFORM_TYPE
+    )
 
     # Meltano configuration aliases
-    DEFAULT_MELTANO_PROJECT_ROOT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_PROJECT_ROOT
-    DEFAULT_MELTANO_DATABASE: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_DATABASE
-    DEFAULT_MELTANO_UI_PORT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_MELTANO_UI_PORT
+    DEFAULT_MELTANO_PROJECT_ROOT: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_MELTANO_PROJECT_ROOT
+    )
+    DEFAULT_MELTANO_DATABASE: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_MELTANO_DATABASE
+    )
+    DEFAULT_MELTANO_UI_PORT: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_MELTANO_UI_PORT
+    )
     MELTANO_PLUGIN_TYPES: ClassVar[object] = _FlextMeltanoConstants.MELTANO_PLUGIN_TYPES
 
     # DBT configuration aliases
-    DEFAULT_DBT_PROFILES_DIR: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_PROFILES_DIR
-    DEFAULT_DBT_PROJECT_DIR: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_PROJECT_DIR
+    DEFAULT_DBT_PROFILES_DIR: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_DBT_PROFILES_DIR
+    )
+    DEFAULT_DBT_PROJECT_DIR: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_DBT_PROJECT_DIR
+    )
     DEFAULT_DBT_TARGET: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DBT_TARGET
 
     # Bridge integration aliases
@@ -209,18 +222,34 @@ class FlextMeltanoConfig(FlextModel):
     BRIDGE_ERROR_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_ERROR_KEY
     BRIDGE_MESSAGE_KEY: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_MESSAGE_KEY
     BRIDGE_VERSION_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_VERSION_OP
-    BRIDGE_LIST_PLUGINS_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_LIST_PLUGINS_OP
-    BRIDGE_RUN_PIPELINE_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_RUN_PIPELINE_OP
-    BRIDGE_DISCOVER_CATALOG_OP: ClassVar[object] = _FlextMeltanoConstants.BRIDGE_DISCOVER_CATALOG_OP
+    BRIDGE_LIST_PLUGINS_OP: ClassVar[object] = (
+        _FlextMeltanoConstants.BRIDGE_LIST_PLUGINS_OP
+    )
+    BRIDGE_RUN_PIPELINE_OP: ClassVar[object] = (
+        _FlextMeltanoConstants.BRIDGE_RUN_PIPELINE_OP
+    )
+    BRIDGE_DISCOVER_CATALOG_OP: ClassVar[object] = (
+        _FlextMeltanoConstants.BRIDGE_DISCOVER_CATALOG_OP
+    )
 
     # Timeout and performance aliases
-    DEFAULT_COMMAND_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_COMMAND_TIMEOUT
-    DEFAULT_CONNECTION_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_CONNECTION_TIMEOUT
-    DEFAULT_DISCOVERY_TIMEOUT: ClassVar[object] = _FlextMeltanoConstants.DEFAULT_DISCOVERY_TIMEOUT
+    DEFAULT_COMMAND_TIMEOUT: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_COMMAND_TIMEOUT
+    )
+    DEFAULT_CONNECTION_TIMEOUT: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_CONNECTION_TIMEOUT
+    )
+    DEFAULT_DISCOVERY_TIMEOUT: ClassVar[object] = (
+        _FlextMeltanoConstants.DEFAULT_DISCOVERY_TIMEOUT
+    )
 
     # Error codes aliases
-    ERROR_CODE_CONFIGURATION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_CONFIGURATION
-    ERROR_CODE_CONNECTION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_CONNECTION
+    ERROR_CODE_CONFIGURATION: ClassVar[object] = (
+        _FlextMeltanoConstants.ERROR_CODE_CONFIGURATION
+    )
+    ERROR_CODE_CONNECTION: ClassVar[object] = (
+        _FlextMeltanoConstants.ERROR_CODE_CONNECTION
+    )
     ERROR_CODE_EXECUTION: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_EXECUTION
     ERROR_CODE_PLUGIN: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_PLUGIN
     ERROR_CODE_SINGER: ClassVar[object] = _FlextMeltanoConstants.ERROR_CODE_SINGER

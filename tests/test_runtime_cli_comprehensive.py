@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextResult
 
@@ -250,7 +251,7 @@ class TestFlextMeltanoCliComprehensive:
         assert "description" in help_data
 
         # Verificar comandos listados
-        commands_str = help_data["commands"]
+        commands_str = cast("str", help_data["commands"])
         expected_commands = ["version", "help", "health", "run", "discover", "install"]
         for cmd in expected_commands:
             assert cmd in commands_str
@@ -286,8 +287,8 @@ class TestFlextMeltanoCliComprehensive:
             assert "plugins" in plugins_data
             assert "count" in plugins_data
             assert plugins_data["cli_type"] == "flext_meltano"
-        else:
-            # Falha é OK - pode ser problema de rede/hub
+        # Falha é OK - pode ser problema de rede/hub
+        elif result.error is not None:
             assert "Failed to list plugins" in result.error
 
     def test_run_pipeline_without_project(self) -> None:
@@ -301,8 +302,8 @@ class TestFlextMeltanoCliComprehensive:
             pipeline_data = result.value
             assert pipeline_data["tap"] == "tap-csv"
             assert pipeline_data["target"] == "target-csv"
-        else:
-            # Falha esperada sem projeto válido
+        # Falha esperada sem projeto válido
+        elif result.error is not None:
             assert "failed" in result.error.lower()
 
     def test_run_pipeline_with_project_root(self) -> None:
@@ -412,8 +413,8 @@ environments:
         if result.success:
             version_str = result.value
             assert "Meltano, version" in version_str
-        else:
-            # Falha é OK - pode ser problema de API
+        # Falha é OK - pode ser problema de API
+        elif result.error is not None:
             assert "failed" in result.error.lower()
 
     def test_flext_meltano_install(self) -> None:
@@ -436,8 +437,9 @@ environments:
         invoke_data = result.value
 
         assert invoke_data["plugin_name"] == "tap-csv"
-        assert "describe" in invoke_data["args"]
-        assert "--format=json" in invoke_data["args"]
+        args_list = cast("list[str]", invoke_data["args"])
+        assert "describe" in args_list
+        assert "--format=json" in args_list
         assert invoke_data["status"] == "invoked_via_native_api"
 
 

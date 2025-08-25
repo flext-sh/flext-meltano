@@ -13,7 +13,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_core import FlextResult  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
+    FlextProtocols,
+    FlextResult,
+)
 
 
 class FlextMeltanoProtocols:
@@ -31,7 +34,7 @@ class FlextMeltanoProtocols:
     """
 
     @runtime_checkable
-    class TapPlugin(Protocol):
+    class TapPlugin(FlextProtocols.Extensions.Plugin, Protocol):
         """Protocol for flext-tap-* plugins using flext-core patterns."""
 
         def extract_data(
@@ -41,7 +44,7 @@ class FlextMeltanoProtocols:
             ...
 
     @runtime_checkable
-    class TargetPlugin(Protocol):
+    class TargetPlugin(FlextProtocols.Extensions.Plugin, Protocol):
         """Protocol for flext-target-* plugins using flext-core patterns."""
 
         def load_data(
@@ -51,7 +54,7 @@ class FlextMeltanoProtocols:
             ...
 
     @runtime_checkable
-    class DbtPlugin(Protocol):
+    class DbtPlugin(FlextProtocols.Extensions.Plugin, Protocol):
         """Protocol for flext-dbt-* plugins using flext-core patterns."""
 
         def run_models(
@@ -81,8 +84,8 @@ FlextDbtPlugin = FlextMeltanoProtocols.DbtPlugin
 # =============================================================================
 
 __all__ = [
-    "FlextDbtPlugin",         # Backward compatibility
+    "FlextDbtPlugin",  # Backward compatibility
     "FlextMeltanoProtocols",  # Main class
-    "FlextTapPlugin",         # Backward compatibility
-    "FlextTargetPlugin",      # Backward compatibility
+    "FlextTapPlugin",  # Backward compatibility
+    "FlextTargetPlugin",  # Backward compatibility
 ]

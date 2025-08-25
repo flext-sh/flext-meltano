@@ -18,7 +18,7 @@ from pathlib import Path
 import meltano
 import structlog
 import yaml
-from flext_core import (  # pyright: ignore[reportPrivateImportUsage]
+from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
@@ -36,9 +36,6 @@ from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
-
-# Removed unused flext-cli import - decorators are commented out
-
 
 logger = get_logger(__name__)
 

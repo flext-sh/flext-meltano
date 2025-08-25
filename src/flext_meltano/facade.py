@@ -13,11 +13,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# Import all specialized classes for delegation
-from .adapters import FlextMeltanoAdapters
-from .config import FlextMeltanoConfig
-from .executors import FlextMeltanoExecutors
-from .utilities import FlextMeltanoUtilities
+from flext_meltano.adapters import FlextMeltanoAdapters
+from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.executors import FlextMeltanoExecutors
+from flext_meltano.utilities import FlextMeltanoUtilities
 
 # =============================================================================
 # MAIN FACADE CLASS - NO IMPLEMENTATION, ONLY DELEGATION
@@ -98,7 +97,6 @@ MeltanoExecutors = FlextMeltanoExecutors
 __all__ = [
     # Main facade class (entry point)
     "FlextMeltano",
-
     # Specialized classes (direct access)
     "MeltanoAdapters",
     "MeltanoConfig",
