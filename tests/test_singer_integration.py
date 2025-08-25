@@ -38,7 +38,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from typing import ClassVar
 
 import pytest
@@ -371,15 +371,24 @@ class TestStreamProcessing:
         class MockStream(Stream):
             name = "test_stream"
             path = "/test"
-            primary_keys: ClassVar = ["id"]
 
-            schema: ClassVar = {
-                "type": "object",
-                "properties": {
-                    "id": {"type": "string"},
-                    "name": {"type": "string"},
-                },
-            }
+            @property
+            def primary_keys(self) -> list[str]:
+                return ["id"]
+
+            @primary_keys.setter
+            def primary_keys(self, new_value: Sequence[str]) -> None:
+                pass  # Not needed for mock
+
+            @property
+            def schema(self) -> dict[str, object]:
+                return {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "string"},
+                        "name": {"type": "string"},
+                    },
+                }
 
             def get_records(self, context: Mapping[str, object] | None = None) -> Iterable[dict[str, object] | tuple[dict[str, object], dict[str, object] | None]]:
                 _ = context  # Required by Singer SDK interface

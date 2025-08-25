@@ -316,7 +316,7 @@ class TestRealConfigValidation:
         # From string
         result = validate_config_value("2.71", float)
         assert result.success is True
-        assert result.value == math.e
+        assert result.value == 2.71
 
     def test_validate_config_value_none_required(self) -> None:
         """Test None handling when required."""
