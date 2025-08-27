@@ -13,12 +13,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 
@@ -451,19 +453,23 @@ class FlextMeltanoDbtAdapters:
 
                 # Process results individuais
                 results_data = dbt_results.get("results", [])
-                if isinstance(results_data, list):
+                if FlextUtilities.is_list(results_data):
                     results_list = flext_results["results"]
-                    if isinstance(results_list, list):
-                        for result in results_data:
-                            if isinstance(result, dict):
+                    if FlextUtilities.is_list(results_list):
+                        results_list = list(cast("list[object]", results_list))  # Create mutable copy
+                        typed_results_data = cast("list[object]", results_data)
+                        for result in typed_results_data:
+                            if FlextUtilities.is_dict(result):
+                                typed_result = cast("dict[str, object]", result)
                                 flext_result = {
-                                    "unique_id": result.get("unique_id"),
-                                    "status": result.get("status"),
-                                    "execution_time": result.get("execution_time"),
-                                    "message": result.get("message"),
-                                    "compiled_code": result.get("compiled_code"),
+                                    "unique_id": FlextUtilities.safe_dict_get(typed_result, "unique_id", str, ""),
+                                    "status": FlextUtilities.safe_dict_get(typed_result, "status", str, ""),
+                                    "execution_time": FlextUtilities.safe_dict_get(typed_result, "execution_time", float, 0.0),
+                                    "message": FlextUtilities.safe_dict_get(typed_result, "message", str, ""),
+                                    "compiled_code": FlextUtilities.safe_dict_get(typed_result, "compiled_code", str, ""),
                                 }
                                 results_list.append(flext_result)
+                        flext_results["results"] = results_list
 
                 return FlextResult[dict[str, object]].ok(flext_results)
 
@@ -501,39 +507,55 @@ class FlextMeltanoDbtAdapters:
 
                 # Processar nodes (models, tests, etc.)
                 nodes_data = dbt_manifest.get("nodes", {})
-                if isinstance(nodes_data, dict):
+                if FlextUtilities.is_dict(nodes_data):
                     nodes_dict = flext_manifest["nodes"]
-                    if isinstance(nodes_dict, dict):
-                        for node_id, node in nodes_data.items():
-                            if isinstance(node, dict):
-                                depends_on_data = node.get("depends_on", {})
-                                depends_on_nodes = []
-                                if isinstance(depends_on_data, dict):
-                                    depends_on_nodes = depends_on_data.get("nodes", [])
+                    if FlextUtilities.is_dict(nodes_dict):
+                        typed_nodes_dict = cast("dict[str, object]", nodes_dict)
+                        nodes_dict_copy = dict(typed_nodes_dict)  # Create mutable copy
 
-                                flext_node = {
-                                    "name": node.get("name"),
-                                    "resource_type": node.get("resource_type"),
-                                    "database": node.get("database"),
-                                    "schema": node.get("schema"),
-                                    "depends_on": depends_on_nodes,
-                                }
-                                nodes_dict[node_id] = flext_node
+                        # Type safe iteration over nodes_data
+                        if FlextUtilities.is_dict(nodes_data):
+                            typed_nodes_data = cast("dict[str, object]", nodes_data)
+                            for node_id, node in typed_nodes_data.items():
+                                if FlextUtilities.is_dict(node):
+                                    typed_node = cast("dict[str, object]", node)
+                                    depends_on_data = FlextUtilities.safe_dict_get(typed_node, "depends_on", dict, {})
+                                    depends_on_nodes = []
+                                    if FlextUtilities.is_dict(depends_on_data):
+                                        depends_on_nodes = FlextUtilities.safe_dict_get(depends_on_data, "nodes", list, [])
+
+                                    flext_node = {
+                                        "name": FlextUtilities.safe_dict_get(typed_node, "name", str, ""),
+                                        "resource_type": FlextUtilities.safe_dict_get(typed_node, "resource_type", str, ""),
+                                        "database": FlextUtilities.safe_dict_get(typed_node, "database", str, ""),
+                                        "schema": FlextUtilities.safe_dict_get(typed_node, "schema", str, ""),
+                                        "depends_on": depends_on_nodes,
+                                    }
+                                    nodes_dict_copy[node_id] = flext_node
+                        flext_manifest["nodes"] = nodes_dict_copy
 
                 # Processar sources
                 sources_data = dbt_manifest.get("sources", {})
-                if isinstance(sources_data, dict):
+                if FlextUtilities.is_dict(sources_data):
                     sources_dict = flext_manifest["sources"]
-                    if isinstance(sources_dict, dict):
-                        for source_id, source in sources_data.items():
-                            if isinstance(source, dict):
-                                flext_source = {
-                                    "name": source.get("name"),
-                                    "source_name": source.get("source_name"),
-                                    "database": source.get("database"),
-                                    "schema": source.get("schema"),
-                                }
-                                sources_dict[source_id] = flext_source
+                    if FlextUtilities.is_dict(sources_dict):
+                        typed_sources_dict = cast("dict[str, object]", sources_dict)
+                        sources_dict_copy = dict(typed_sources_dict)  # Create mutable copy
+
+                        # Type safe iteration over sources_data
+                        if FlextUtilities.is_dict(sources_data):
+                            typed_sources_data = cast("dict[str, object]", sources_data)
+                            for source_id, source in typed_sources_data.items():
+                                if FlextUtilities.is_dict(source):
+                                    typed_source = cast("dict[str, object]", source)
+                                    flext_source = {
+                                        "name": FlextUtilities.safe_dict_get(typed_source, "name", str, ""),
+                                        "source_name": FlextUtilities.safe_dict_get(typed_source, "source_name", str, ""),
+                                        "database": FlextUtilities.safe_dict_get(typed_source, "database", str, ""),
+                                        "schema": FlextUtilities.safe_dict_get(typed_source, "schema", str, ""),
+                                    }
+                                    sources_dict_copy[source_id] = flext_source
+                        flext_manifest["sources"] = sources_dict_copy
 
                 return FlextResult[dict[str, object]].ok(flext_manifest)
 

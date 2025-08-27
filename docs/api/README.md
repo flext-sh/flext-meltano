@@ -532,19 +532,19 @@ from flext_meltano.exceptions import (
     FlextTapError,            # Tap-specific errors
     FlextTargetError,         # Target-specific errors
     FlextBridgeError,         # Bridge communication errors
-    FlextValidationError,     # Validation errors
-    FlextConfigurationError,  # Configuration errors
+    FlextExceptions.ValidationError,     # Validation errors
+    FlextExceptions.ConfigurationError,  # Configuration errors
 )
 
 # Comprehensive error handling
 try:
     result = some_flext_operation()
 
-except FlextConfigurationError as e:
+except FlextExceptions.ConfigurationError as e:
     print(f"Configuration error: {e}")
     print(f"Fix: {e.suggested_fix}")
 
-except FlextValidationError as e:
+except FlextExceptions.ValidationError as e:
     print(f"Validation error: {e}")
     print(f"Validation details: {e.validation_results}")
 

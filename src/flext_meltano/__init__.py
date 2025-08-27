@@ -52,14 +52,18 @@ from .plugin_protocols import (
 )
 
 # === UTILITIES AND CORE ===
-from .utilities import (
-    FlextMeltanoUtilities,
+from .utilities import FlextMeltanoUtilities
+from .validators import (
     validate_config_value_simple as validate_config_value,
     validate_directory_path,
     validate_file_path,
 )
 from .config import FlextMeltanoConfig, FLEXT_MELTANO_VERSION
 from .exceptions import FlextMeltanoError
+
+# === TYPES AND FILE MANAGEMENT ===
+from .flext_types import FlextMeltanoTypes, ConfigDict
+from .file_managers import FlextMeltanoFileManagers
 
 # =============================================================================
 # PUBLIC API EXPORTS
@@ -108,6 +112,10 @@ __all__ = [
     "FlextMeltanoError",
     "FLEXT_MELTANO_VERSION",
     "FlextMeltanoCli",
+    # === TYPES AND FILE MANAGEMENT ===
+    "FlextMeltanoTypes",  # Type definitions
+    "ConfigDict",  # Configuration dictionary type
+    "FlextMeltanoFileManagers",  # File management utilities
     # === VALIDATION FUNCTIONS ===
     "validate_config_value",
     "validate_directory_path",

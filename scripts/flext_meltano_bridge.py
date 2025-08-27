@@ -46,9 +46,8 @@ This script enables Go services to execute Meltano operations through subprocess
 calls with JSON-serializable responses, but is currently completely broken.
 """
 
+import json
 import sys
-
-# USAR A BIBLIOTECA - não reimplementar
 from pathlib import Path
 
 from flext_core import FlextResult
@@ -102,7 +101,8 @@ def main() -> None:
             pass
 
     except (RuntimeError, ValueError, TypeError) as e:
-        {"success": False, "error": str(e)}
+        error_result = {"success": False, "error": str(e)}
+        print(json.dumps(error_result))
         sys.exit(1)
 
 

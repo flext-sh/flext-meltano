@@ -8,11 +8,10 @@
 from __future__ import annotations
 
 import tempfile
-from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import pytest
-from flext_core import FlextDomainService, FlextResult, FlextServiceProcessor
+from flext_core import FlextResult, FlextServiceProcessor
 from singer_sdk import Stream, Tap, Target
 
 from flext_meltano.service_implementations import (
@@ -82,8 +81,6 @@ class TestTarget(Target):
         "required": ["output_path"],
     }
 
-    default_sink_class = None
-
     def process_messages(self, messages: list[dict[str, object]]) -> None:
         """Process Singer messages."""
         for _message in messages:
@@ -139,7 +136,9 @@ class TestFlextMeltanoTapServiceComplete:
         """Test creating tap instance with valid config."""
         service = TestFlextTapService(tap_name="test_tap")
 
-        config = {"required_field": "test_value", "test_param": "test"}
+        config = cast(
+            "dict[str, object]", {"required_field": "test_value", "test_param": "test"}
+        )
         result = service.create_tap_instance(config)
 
         assert isinstance(result, FlextResult)
@@ -245,7 +244,9 @@ class TestFlextMeltanoTargetServiceComplete:
         service = TestFlextTargetService(target_name="test_target")
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            config = {"output_path": temp_dir, "test_param": "test"}
+            config = cast(
+                "dict[str, object]", {"output_path": temp_dir, "test_param": "test"}
+            )
             result = service.create_target_instance(config)
 
             assert isinstance(result, FlextResult)
@@ -284,7 +285,9 @@ class TestFlextMeltanoTargetServiceComplete:
 
             for config in valid_configs:
                 if hasattr(service, "validate_target_config"):
-                    result = service.validate_target_config(config)
+                    result = service.validate_target_config(
+                        cast("dict[str, object]", config)
+                    )
                     assert isinstance(result, FlextResult)
 
 
@@ -313,48 +316,84 @@ class TestFlextMeltanoDbtServiceComplete:
         assert data["service"] == "FlextMeltanoDbtService"
         assert data["status"] == "ready"
 
-    def test_run_dbt_command_patterns(self) -> None:
-        """Test DBT command execution patterns."""
+    def test_dbt_service_basic_functionality(self) -> None:
+        """Test DBT service basic functionality."""
         service = FlextMeltanoDbtService(project_name="test_project")
 
-        if hasattr(service, "run_dbt_command"):
-            # Test basic command patterns
-            commands = ["--version", "--help"]
+        # Test basic service execution
+        result = service.execute()
+        assert isinstance(result, FlextResult)
 
-            for command in commands:
-                result = service.run_dbt_command(command)
-                assert isinstance(result, FlextResult)
-                # Should handle gracefully regardless of success/failure
+        if result.success:
+            data = result.data
+            assert isinstance(data, dict)
+            assert data["service"] == "FlextMeltanoDbtService"
+            assert data["project_name"] == "test_project"
+            assert data["status"] == "ready"
 
-    def test_dbt_project_operations(self) -> None:
-        """Test DBT project operations."""
+    def test_dbt_project_configuration(self) -> None:
+        """Test DBT project configuration."""
         service = FlextMeltanoDbtService(project_name="test_project")
 
-        # Test project initialization if available
-        if hasattr(service, "initialize_dbt_project"):
-            with tempfile.TemporaryDirectory() as temp_dir:
-                project_path = Path(temp_dir) / "test_project"
-                result = service.initialize_dbt_project(project_path)
-                assert isinstance(result, FlextResult)
+        # Test project configuration retrieval
+        config = service.get_project_config()
+        assert isinstance(config, dict)
+        assert "name" in config
+        assert config["name"] == "test_project"
 
-    def test_dbt_model_operations(self) -> None:
-        """Test DBT model operations."""
+    def test_dbt_service_properties(self) -> None:
+        """Test DBT service properties."""
         service = FlextMeltanoDbtService(project_name="test_project")
 
-        # Test model execution if available
-        if hasattr(service, "run_models"):
-            models = ["model1", "model2"]
-            result = service.run_models(models)
-            assert isinstance(result, FlextResult)
+        # Test service properties
+        assert service.project_name == "test_project"
+        assert hasattr(service, "wrapper_dbt")
+        assert hasattr(service, "dbt_adapter")
+        assert hasattr(service, "logger")
 
-    def test_dbt_test_operations(self) -> None:
-        """Test DBT test operations."""
+    def test_dbt_service_integration(self) -> None:
+        """Test DBT service integration patterns."""
         service = FlextMeltanoDbtService(project_name="test_project")
 
-        # Test running DBT tests if available
-        if hasattr(service, "run_tests"):
-            result = service.run_tests()
-            assert isinstance(result, FlextResult)
+        # Test service integration with wrappers
+        assert service.wrapper_dbt is not None
+        assert service.dbt_adapter is not None
+
+        # Test logger access
+        logger = service.logger
+        assert logger is not None
+
+    def test_dbt_service_profiles_config(self) -> None:
+        """Test DBT profiles configuration."""
+        service = FlextMeltanoDbtService(project_name="test_project")
+
+        # Test profiles configuration retrieval
+        profiles = service.get_profiles_config()
+        assert isinstance(profiles, dict)
+        assert "test_project" in profiles
+        # Type cast to satisfy pyright since we verified it's a dict
+        profiles_dict = cast("dict[str, object]", profiles)
+        project_config = cast("dict[str, object]", profiles_dict["test_project"])
+        assert project_config["target"] == "dev"
+
+    def test_dbt_service_models_directory(self) -> None:
+        """Test DBT models directory."""
+        service = FlextMeltanoDbtService(project_name="test_project")
+
+        # Test models directory retrieval
+        models_dir = service.get_models_directory()
+        assert str(models_dir) == "models"
+
+    def test_dbt_service_run_models(self) -> None:
+        """Test DBT run models functionality."""
+        service = FlextMeltanoDbtService(project_name="test_project")
+
+        # Test run_models method exists and handles missing project_dir
+        result = service.run_models(models=["test_model"])
+        assert isinstance(result, FlextResult)
+        # Should fail due to missing project_dir but handle gracefully
+        assert not result.success
+        assert "Project directory is required" in str(result.error)
 
 
 class TestBaseServicesIntegration:
@@ -366,12 +405,11 @@ class TestBaseServicesIntegration:
         target_service = TestFlextTargetService(target_name="test_target")
         dbt_service = FlextMeltanoDbtService(project_name="test_project")
 
-        # DUAL ARCHITECTURE: Different services use different base classes
-        # Tap service uses FlextServiceProcessor architecture
+        # UNIFIED ARCHITECTURE: All services use FlextServiceProcessor architecture
+        # All services inherit from FlextServiceProcessor for consistency
         assert isinstance(tap_service, FlextServiceProcessor)
-        # Target and DBT services use FlextDomainService architecture
-        assert isinstance(target_service, FlextDomainService)
-        assert isinstance(dbt_service, FlextDomainService)
+        assert isinstance(target_service, FlextServiceProcessor)
+        assert isinstance(dbt_service, FlextServiceProcessor)
 
     def test_service_execution_consistency(self) -> None:
         """Test execution method consistency across services."""

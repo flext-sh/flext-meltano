@@ -14,6 +14,7 @@ from pathlib import Path
 import click
 from flext_core import (
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 from rich.console import Console
@@ -55,9 +56,9 @@ class FlextMeltanoCli:
         result = self.bridge.get_version()
         if result.get("success", False):
             # Extract version from result data
-            result_data = result.get("data", {})
-            if isinstance(result_data, dict):
-                meltano_version = result_data.get("meltano", "3.8.0")
+            result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
+            if FlextUtilities.is_dict(result_data):
+                meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.8.0")
             else:
                 meltano_version = "3.8.0"
 
@@ -332,9 +333,9 @@ class FlextMeltanoCli:
         """Execute version command."""
         result = self.bridge.get_version()
         if result.get("success", False):
-            result_data = result.get("data", {})
-            if isinstance(result_data, dict):
-                meltano_version = result_data.get("meltano", "3.9.1")
+            result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
+            if FlextUtilities.is_dict(result_data):
+                meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.9.1")
             else:
                 meltano_version = "3.9.1"
             return FlextResult[dict[str, str]].ok(
@@ -489,9 +490,9 @@ def _handle_cli_version_args(cli: FlextMeltanoCli) -> FlextResult[dict[str, str]
     """Handle CLI factory version arguments."""
     result = cli.bridge.get_version()
     if result.get("success", False):
-        result_data = result.get("data", {})
-        if isinstance(result_data, dict):
-            meltano_version = result_data.get("meltano", "3.9.1")
+        result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
+        if FlextUtilities.is_dict(result_data):
+            meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.9.1")
         else:
             meltano_version = "3.9.1"
 

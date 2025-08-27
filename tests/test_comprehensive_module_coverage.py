@@ -198,8 +198,10 @@ class TestDbtWrapperComprehensive:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            assert result.value["service"] == "MeltanoDbtWrapper"
-            assert result.value["status"] == "ready"
+            value = result.value
+            assert isinstance(value, dict)
+            assert value["service"] == "MeltanoDbtWrapper"
+            assert value["status"] == "ready"
 
     def test_dbt_adapter_static_methods(self) -> None:
         """Test DBT adapter static methods."""
@@ -225,8 +227,10 @@ class TestSingerWrapperComprehensive:
         assert isinstance(result, FlextResult)
 
         if result.success:
-            assert result.value["service"] == "MeltanoSingerWrapper"
-            assert result.value["status"] == "ready"
+            value = result.value
+            assert isinstance(value, dict)
+            assert value["service"] == "MeltanoSingerWrapper"
+            assert value["status"] == "ready"
 
     def test_singer_adapter_static_methods(self) -> None:
         """Test Singer adapter static methods."""

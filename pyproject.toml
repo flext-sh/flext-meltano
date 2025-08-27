@@ -60,6 +60,7 @@ Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 [tool.ruff]
 extend = "../ruff-shared.toml"
 lint.isort.known-first-party = ["flext_meltano"]
+
 [tool.mypy]
 # Strict mode - enables all recommended checks
 strict = true
@@ -68,7 +69,7 @@ strict = true
 check_untyped_defs = true
 disallow_any_decorated = false
 disallow_any_explicit = true
-disallow_any_expr = false          # Too restrictive for real-world usage
+disallow_any_expr = false           # Too restrictive for real-world usage
 disallow_any_generics = true
 disallow_any_unimported = true
 disallow_incomplete_defs = true
@@ -127,7 +128,7 @@ local_partial_types = true
 no_implicit_reexport = true
 
 # Performance
-incremental = true 
+incremental = true
 warn_incomplete_stub = true
 
 exclude = [

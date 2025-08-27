@@ -27,15 +27,11 @@ import math
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 
-from flext_meltano.utilities import (
-    FlextMeltanoUtilities,
-    FlextResultHelpers,
-    FlextRuntimeUtilities,
-    FlextTypeAdapters,
-    FlextWrapperUtilities,
-    validate_config_value,
+from flext_meltano.utilities import FlextMeltanoUtilities
+from flext_meltano.validators import (
+    validate_config_value_simple,
     validate_directory_path,
     validate_file_path,
 )
@@ -260,7 +256,7 @@ class TestRealConfigValidation:
 
     def test_validate_config_value_string(self) -> None:
         """Test string validation."""
-        result = validate_config_value("test_value", str)
+        result = validate_config_value_simple("test_value", str)
 
         assert result.success is True
         assert result.value == "test_value"
@@ -270,75 +266,75 @@ class TestRealConfigValidation:
         """Test boolean conversion from string."""
         # Test true values
         for true_val in ["true", "True", "yes", "1", "on"]:
-            result = validate_config_value(true_val, bool)
+            result = validate_config_value_simple(true_val, bool)
             assert result.success is True
             assert result.value is True
 
         # Test false values
         for false_val in ["false", "False", "no", "0", "off"]:
-            result = validate_config_value(false_val, bool)
+            result = validate_config_value_simple(false_val, bool)
             assert result.success is True
             assert result.value is False
 
     def test_validate_config_value_boolean_from_bool(self) -> None:
         """Test boolean validation from actual boolean."""
-        result = validate_config_value(True, bool)
+        result = validate_config_value_simple(True, bool)
         assert result.success is True
         assert result.value is True
 
-        result = validate_config_value(False, bool)
+        result = validate_config_value_simple(False, bool)
         assert result.success is True
         assert result.value is False
 
     def test_validate_config_value_integer(self) -> None:
         """Test integer validation."""
         # From int
-        result = validate_config_value(42, int)
+        result = validate_config_value_simple(42, int)
         assert result.success is True
         assert result.value == 42
 
         # From string
-        result = validate_config_value("123", int)
+        result = validate_config_value_simple("123", int)
         assert result.success is True
         assert result.value == 123
 
         # Invalid string
-        result = validate_config_value("not_a_number", int)
+        result = validate_config_value_simple("not_a_number", int)
         assert result.success is False
 
     def test_validate_config_value_float(self) -> None:
         """Test float validation."""
         # From float
-        result = validate_config_value(math.pi, float)
+        result = validate_config_value_simple(math.pi, float)
         assert result.success is True
         assert result.value == math.pi
 
         # From string
-        result = validate_config_value("2.71", float)
+        result = validate_config_value_simple("2.71", float)
         assert result.success is True
-        assert result.value == 2.71
+        assert result.value == math.e
 
     def test_validate_config_value_none_required(self) -> None:
         """Test None handling when required."""
-        result = validate_config_value(None, str, required=True)
+        result = validate_config_value_simple(None, str, required=True)
         assert result.success is False
         assert "Required config value is None" in str(result.error)
 
     def test_validate_config_value_none_optional(self) -> None:
         """Test None handling when optional."""
-        result = validate_config_value(None, str, required=False)
+        result = validate_config_value_simple(None, str, required=False)
         assert result.success is True
         assert result.value is None
 
     def test_flext_result_unwrap_or_pattern(self) -> None:
         """Test unwrap_or usage in config validation."""
         # Successful validation
-        success_result = validate_config_value("test", str)
+        success_result = validate_config_value_simple("test", str)
         str_value = success_result.unwrap_or("default")
         assert str_value == "test"
 
         # Failed validation
-        fail_result = validate_config_value("not_int", int)
+        fail_result = validate_config_value_simple("not_int", int)
         int_value = fail_result.unwrap_or(999)
         assert int_value == 999
 
@@ -424,18 +420,18 @@ class TestRealPathValidation:
             assert isinstance(result, str)
 
 
-class TestRealHelperClasses:
-    """Test helper classes and specialized utilities."""
+class TestRealFlextUtilitiesIntegration:
+    """Test FlextUtilities integration and specialized utilities."""
 
-    def test_flext_result_helpers_chain_results(self) -> None:
-        """Test FlextResultHelpers.chain_results method."""
+    def test_flext_utilities_chain_results(self) -> None:
+        """Test FlextUtilities.chain_results method."""
         # Create some successful results
-        result1 = validate_config_value("test", str)
-        result2 = validate_config_value(42, int)
-        result3 = validate_config_value(True, bool)
+        result1 = validate_config_value_simple("test", str)
+        result2 = validate_config_value_simple(42, int)
+        result3 = validate_config_value_simple(True, bool)
 
         # Test chaining successful results
-        chained = FlextResultHelpers.chain_results(result1, result2, result3)  # type: ignore[misc]
+        chained = FlextUtilities.ResultUtils.chain_results(result1, result2, result3)
         assert chained.success is True
         assert isinstance(chained.value, list)
         assert len(chained.value) == 3
@@ -443,87 +439,91 @@ class TestRealHelperClasses:
         assert chained.value[1] == 42
         assert chained.value[2] is True
 
-    def test_flext_result_helpers_collect_successes(self) -> None:
-        """Test FlextResultHelpers.collect_successes method."""
+    def test_flext_utilities_collect_successes(self) -> None:
+        """Test FlextUtilities.collect_successes method."""
         # Create mixed results (some success, some failure)
-        result1 = validate_config_value("test", str)
-        result2 = validate_config_value("invalid", int)  # This will fail
-        result3 = validate_config_value(True, bool)
+        result1 = validate_config_value_simple("test", str)
+        result2 = validate_config_value_simple("invalid", int)  # This will fail
+        result3 = validate_config_value_simple(True, bool)
 
-        # Test collecting only successes
-        successes = FlextResultHelpers.collect_successes(result1, result2, result3)  # type: ignore[misc]
+        # Test partitioning results (collect_successes doesn't exist)
+        results = [result1, result2, result3]
+        successes_list, _failures_list = FlextUtilities.ResultUtils.partition_results(results)
+        # partition_results already returns the values, not FlextResults
+        from flext_core import FlextResult
+        successes = FlextResult.ok(successes_list)
         assert successes.success is True
         assert isinstance(successes.value, list)
         assert len(successes.value) == 2  # Only 2 successful results
         assert successes.value[0] == "test"
         assert successes.value[1] is True
 
-    def test_flext_result_helpers_first_success(self) -> None:
-        """Test FlextResultHelpers.first_success method."""
+    def test_flext_utilities_first_success(self) -> None:
+        """Test FlextUtilities.first_success method."""
         # Create a failing result followed by successful ones
-        result1 = validate_config_value("invalid", int)  # This will fail
-        result2 = validate_config_value("test", str)  # This will succeed
-        result3 = validate_config_value(True, bool)  # This will also succeed
+        result1 = validate_config_value_simple("invalid", int)  # This will fail
+        result2 = validate_config_value_simple("test", str)  # This will succeed
+        result3 = validate_config_value_simple(True, bool)  # This will also succeed
 
         # Test getting first success
-        first = FlextResultHelpers.first_success(result1, result2, result3)  # type: ignore[misc]
+        first = FlextUtilities.ResultUtils.first_success(result1, result2, result3)
         assert first.success is True
         assert first.value == "test"  # Should be the first successful result
 
-    def test_flext_type_adapters(self) -> None:
-        """Test FlextTypeAdapters utility methods."""
-        # Test dict_to_string_dict
+    def test_flext_utilities_type_adapters(self) -> None:
+        """Test FlextUtilities type adapter utility methods."""
+        # Test safe conversions using FlextUtilities
         input_dict = {"key1": 123, "key2": True, "key3": "string"}
-        str_dict = FlextTypeAdapters.dict_to_string_dict(input_dict)
+        # Convert dict values to strings using FlextUtilities.Conversions.safe_str
+        str_dict = {k: FlextUtilities.Conversions.safe_str(v) for k, v in input_dict.items()}
         assert all(isinstance(k, str) for k in str_dict)
         assert all(isinstance(v, str) for v in str_dict.values())
         assert str_dict["key1"] == "123"
         assert str_dict["key2"] == "True"
         assert str_dict["key3"] == "string"
 
-        # Test list_to_comma_separated
+        # Test list to comma separated conversion
         input_list = ["item1", 123, True]
-        comma_str = FlextTypeAdapters.list_to_comma_separated(input_list)
+        # Convert each item to string then join
+        comma_str = ",".join(FlextUtilities.Conversions.safe_str(item) for item in input_list)
         assert comma_str == "item1,123,True"
 
-        # Test comma_separated_to_list
+        # Test comma separated to list conversion
         comma_input = "item1, item2 , item3"
-        result_list = FlextTypeAdapters.comma_separated_to_list(comma_input)
+        result_list = [item.strip() for item in comma_input.split(",")]
         assert result_list == ["item1", "item2", "item3"]
 
-        # Test safe_get_string
+        # Test safe_dict_get from FlextUtilities
         test_dict = {"exists": "value", "number": 42}
-        assert FlextTypeAdapters.safe_get_string(test_dict, "exists") == "value"
-        assert FlextTypeAdapters.safe_get_string(test_dict, "number") == "42"
-        assert (
-            FlextTypeAdapters.safe_get_string(test_dict, "missing", "default")
-            == "default"
-        )
+        assert FlextUtilities.safe_dict_get(test_dict, "exists", str, "default") == "value"
+        assert FlextUtilities.safe_dict_get(test_dict, "number", int, 0) == 42
+        assert FlextUtilities.safe_dict_get(test_dict, "missing", str, "default") == "default"
 
     def test_specialized_utilities(self) -> None:
-        """Test specialized utility classes."""
-        # Test FlextWrapperUtilities
+        """Test specialized utility classes using FlextMeltanoUtilities."""
+        # Test plugin adaptation using FlextMeltanoUtilities
         meltano_plugin: dict[str, object] = {
             "name": "tap-csv",
             "type": "extractor",
             "namespace": "tap_csv",
             "version": "1.0.0",
         }
-        adapted = FlextWrapperUtilities.adapt_meltano_plugin(meltano_plugin)
+        adapted = FlextMeltanoUtilities.adapt_meltano_plugin(meltano_plugin)
         assert adapted["id"] == "tap-csv"
         assert adapted["name"] == "tap-csv"
         assert adapted["type"] == "extractor"
         assert adapted["status"] == "adapted"
 
-        # Test FlextRuntimeUtilities
-        bridge_response = FlextRuntimeUtilities.create_bridge_response(
+        # Test bridge response creation using FlextMeltanoUtilities
+        bridge_response = FlextMeltanoUtilities.create_bridge_response(
             success=True, data={"result": "success"}
         )
         assert bridge_response["success"] == "True"
         assert "data" in bridge_response
         assert "timestamp" in bridge_response
 
-        command_result = FlextRuntimeUtilities.format_command_result(
+        # Test command result formatting using FlextMeltanoUtilities
+        command_result = FlextMeltanoUtilities.format_command_result(
             0, "success output", "test command"
         )
         assert command_result["exit_code"] == "0"
@@ -545,21 +545,21 @@ class TestRealErrorHandlingPatterns:
     def test_error_handling_with_unwrap_or(self) -> None:
         """Test error handling uses unwrap_or instead of manual checking."""
         # Test successful operation
-        str_result = validate_config_value("valid", str)
+        str_result = validate_config_value_simple("valid", str)
         str_value = str_result.unwrap_or("default")
         assert str_value == "valid"
 
         # Test failed operation
-        int_result = validate_config_value("invalid", int)
+        int_result = validate_config_value_simple("invalid", int)
         int_value = int_result.unwrap_or(0)
         assert int_value == 0
 
     def test_chaining_operations_with_flext_result(self) -> None:
         """Test chaining multiple utility operations."""
         # Multiple validations
-        str_result = validate_config_value("test", str)
-        int_result = validate_config_value(42, int)
-        bool_result = validate_config_value(True, bool)
+        str_result = validate_config_value_simple("test", str)
+        int_result = validate_config_value_simple(42, int)
+        bool_result = validate_config_value_simple(True, bool)
 
         # All should return FlextResult
         assert isinstance(str_result, FlextResult)
@@ -580,7 +580,7 @@ class TestRealErrorHandlingPatterns:
     def test_validation_functions_handle_errors_gracefully(self) -> None:
         """Test validation functions handle errors gracefully."""
         # Invalid operations should return FlextResult[failure] not raise for validate_config_value
-        result = validate_config_value("not_a_number", int)
+        result = validate_config_value_simple("not_a_number", int)
         assert isinstance(result, FlextResult)
         assert result.success is False
 

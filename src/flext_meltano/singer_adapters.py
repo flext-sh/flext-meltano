@@ -14,11 +14,13 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import cast
 
 from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
@@ -323,7 +325,7 @@ class FlextMeltanoAdapters:
 
                 # Validar streams
                 streams = catalog["streams"]
-                if not isinstance(streams, list):
+                if not FlextUtilities.is_list(streams):
                     return FlextResult[dict[str, object]].fail(
                         "Invalid streams format in catalog"
                     )
@@ -361,7 +363,7 @@ class FlextMeltanoAdapters:
             try:
                 # Validar estrutura
                 if (
-                    not isinstance(singer_catalog, dict)
+                    not FlextUtilities.is_dict(singer_catalog)
                     or "streams" not in singer_catalog
                 ):
                     return FlextResult[dict[str, object]].fail(
@@ -378,18 +380,22 @@ class FlextMeltanoAdapters:
 
                 # Processar streams
                 streams = singer_catalog.get("streams", [])
-                if isinstance(streams, list):
-                    for stream in streams:
-                        if isinstance(stream, dict):
+                if FlextUtilities.is_list(streams):
+                    # Type narrowing: we know streams is a list after is_list check
+                    streams_list = cast("list[object]", streams)
+                    for stream in streams_list:
+                        if FlextUtilities.is_dict(stream):
+                            # Type narrowing: we know stream is a dict after is_dict check
+                            stream_dict = cast("dict[str, object]", stream)
                             flext_stream = {
-                                "name": stream.get("stream"),
-                                "schema": stream.get("schema", {}),
-                                "key_properties": stream.get("key_properties", []),
-                                "replication_method": stream.get(
+                                "name": stream_dict.get("stream"),
+                                "schema": stream_dict.get("schema", {}),
+                                "key_properties": stream_dict.get("key_properties", []),
+                                "replication_method": stream_dict.get(
                                     "replication_method", "FULL_TABLE"
                                 ),
-                                "replication_key": stream.get("replication_key"),
-                                "selected": stream.get("selected", True),
+                                "replication_key": stream_dict.get("replication_key"),
+                                "selected": stream_dict.get("selected", True),
                             }
                             flext_streams.append(flext_stream)
 
@@ -416,7 +422,7 @@ class FlextMeltanoAdapters:
             try:
                 # Validar estrutura
                 if (
-                    not isinstance(singer_schema, dict)
+                    not FlextUtilities.is_dict(singer_schema)
                     or "properties" not in singer_schema
                 ):
                     return FlextResult[dict[str, object]].fail(
@@ -433,13 +439,17 @@ class FlextMeltanoAdapters:
 
                 # Processar propriedades
                 properties = singer_schema.get("properties", {})
-                if isinstance(properties, dict):
-                    for prop_name, prop_def in properties.items():
-                        if isinstance(prop_def, dict):
+                if FlextUtilities.is_dict(properties):
+                    # Type narrowing: we know properties is a dict after is_dict check
+                    properties_dict = cast("dict[str, object]", properties)
+                    for prop_name, prop_def in properties_dict.items():
+                        if FlextUtilities.is_dict(prop_def):
+                            # Type narrowing: we know prop_def is a dict after is_dict check
+                            prop_def_dict = cast("dict[str, object]", prop_def)
                             flext_properties[prop_name] = {
-                                "type": prop_def.get("type", "string"),
-                                "format": prop_def.get("format"),
-                                "description": prop_def.get("description"),
+                                "type": prop_def_dict.get("type", "string"),
+                                "format": prop_def_dict.get("format"),
+                                "description": prop_def_dict.get("description"),
                             }
 
                 return FlextResult[dict[str, object]].ok(flext_schema)

@@ -235,8 +235,9 @@ class TestTargetServiceIntegration:
 
         target_service = TestTargetService(target_name="test")
 
-        # Test basic validation using proper FlextDomainService method
-        validation_result = target_service.validate_business_rules()
+        # Test basic validation - using available validate method from FlextValidatableMixin
+        # Note: validate_business_rules is specific to FlextModel, use validate() instead
+        validation_result = target_service.validate()
         assert isinstance(validation_result, FlextResult)
 
         # Test execution
@@ -263,7 +264,7 @@ class TestTargetServiceIntegration:
         assert isinstance(result, FlextResult)
 
         # Test validation using proper FlextDomainService method
-        validation_result = target_service.validate_business_rules()
+        validation_result = target_service.validate()
         assert isinstance(validation_result, FlextResult)
 
     def test_target_class_setting(self) -> None:
@@ -390,7 +391,11 @@ class TestStreamProcessing:
                     },
                 }
 
-            def get_records(self, context: Mapping[str, object] | None = None) -> Iterable[dict[str, object] | tuple[dict[str, object], dict[str, object] | None]]:
+            def get_records(
+                self, context: Mapping[str, object] | None = None
+            ) -> Iterable[
+                dict[str, object] | tuple[dict[str, object], dict[str, object] | None]
+            ]:
                 _ = context  # Required by Singer SDK interface
                 yield {"id": "1", "name": "test"}
 

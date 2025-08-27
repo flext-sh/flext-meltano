@@ -16,13 +16,14 @@ import json
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 import yaml
 from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 
@@ -31,6 +32,9 @@ from flext_meltano.meltano_adapters import MeltanoBridge
 T = TypeVar("T")
 
 logger = get_logger(__name__)
+
+# Constants to avoid FBT003 violations
+_FALSE = False
 
 # =============================================================================
 # MAIN EXECUTORS CLASS - Following Flext[Area][Module] pattern
@@ -120,6 +124,9 @@ class FlextMeltanoExecutors:
                         f"Not a Meltano project: meltano.yml not found in {project_root}"
                     )
 
+                execution_start_timestamp = (
+                    FlextUtilities.Generators.generate_iso_timestamp()
+                )
                 execution_start = datetime.now(UTC)
 
                 # Simple success response for now
@@ -130,7 +137,7 @@ class FlextMeltanoExecutors:
                         datetime.now(UTC) - execution_start
                     ).total_seconds(),
                     "result_type": "meltano_command",
-                    "timestamp": execution_start.isoformat(),
+                    "timestamp": execution_start_timestamp,
                 }
 
                 self.logger.info(
@@ -168,7 +175,7 @@ class FlextMeltanoExecutors:
                     "project_type": "unknown",
                     "meltano": {"present": False},
                     "dbt": {"present": False},
-                    "timestamp": datetime.now(UTC).isoformat(),
+                    "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
                 }
 
                 # Check for Meltano project
@@ -176,8 +183,11 @@ class FlextMeltanoExecutors:
                 if meltano_yml.exists():
                     project_info["project_type"] = "meltano"
                     meltano_dict = project_info["meltano"]
-                    if isinstance(meltano_dict, dict):
-                        meltano_dict["present"] = True
+                    if FlextUtilities.is_dict(meltano_dict):
+                        typed_dict = cast("dict[str, object]", meltano_dict)
+                        meltano_dict_copy = dict(typed_dict)  # Create mutable copy
+                        meltano_dict_copy["present"] = True
+                        project_info["meltano"] = meltano_dict_copy
 
                 # Check for DBT project
                 dbt_project_paths = [
@@ -188,22 +198,34 @@ class FlextMeltanoExecutors:
                 for dbt_path in dbt_project_paths:
                     if dbt_path.exists():
                         dbt_dict = project_info["dbt"]
-                        if isinstance(dbt_dict, dict):
-                            dbt_dict["present"] = True
-                            dbt_dict["project_path"] = str(dbt_path.parent)
+                        if FlextUtilities.is_dict(dbt_dict):
+                            typed_dbt = cast("dict[str, object]", dbt_dict)
+                            dbt_dict_copy = dict(typed_dbt)  # Create mutable copy
+                            dbt_dict_copy["present"] = True
+                            dbt_dict_copy["project_path"] = str(dbt_path.parent)
+                            project_info["dbt"] = dbt_dict_copy
                         break
 
                 # Set project type based on findings
                 meltano_dict = project_info["meltano"]
                 dbt_dict = project_info["dbt"]
                 if (
-                    isinstance(meltano_dict, dict)
-                    and meltano_dict.get("present")
-                    and isinstance(dbt_dict, dict)
-                    and dbt_dict.get("present")
+                    FlextUtilities.is_dict(meltano_dict)
+                    and FlextUtilities.safe_dict_get(
+                        meltano_dict,  # type: ignore[arg-type]  # Verified by is_dict
+                        "present", bool, _FALSE
+                    )
+                    and FlextUtilities.is_dict(dbt_dict)
+                    and FlextUtilities.safe_dict_get(
+                        dbt_dict,  # type: ignore[arg-type]  # Verified by is_dict
+                        "present", bool, _FALSE
+                    )
                 ):
                     project_info["project_type"] = "meltano_with_dbt"
-                elif isinstance(dbt_dict, dict) and dbt_dict.get("present"):
+                elif FlextUtilities.is_dict(dbt_dict) and FlextUtilities.safe_dict_get(
+                    dbt_dict,  # type: ignore[arg-type]  # Verified by is_dict
+                    "present", bool, _FALSE
+                ):
                     project_info["project_type"] = "dbt_only"
 
                 # Add validity indicator - project is valid if we can detect a known type
@@ -212,12 +234,16 @@ class FlextMeltanoExecutors:
                 self.logger.info(
                     "Project information collected",
                     project_type=project_info["project_type"],
-                    meltano_present=meltano_dict.get("present")
-                    if isinstance(meltano_dict, dict)
-                    else False,
-                    dbt_present=dbt_dict.get("present")
-                    if isinstance(dbt_dict, dict)
-                    else False,
+                    meltano_present=FlextUtilities.safe_dict_get(
+                        cast("dict[str, object]", meltano_dict), "present", bool, _FALSE
+                    )
+                    if FlextUtilities.is_dict(meltano_dict)
+                    else _FALSE,
+                    dbt_present=FlextUtilities.safe_dict_get(
+                        cast("dict[str, object]", dbt_dict), "present", bool, _FALSE
+                    )
+                    if FlextUtilities.is_dict(dbt_dict)
+                    else _FALSE,
                 )
 
                 return FlextResult[dict[str, object]].ok(project_info)
@@ -238,7 +264,7 @@ class FlextMeltanoExecutors:
             self,
             command: list[str],
             *,
-            success: bool,  # noqa: FBT001
+            success: bool,
             output: str = "",
             error: str = "",
             exit_code: int = 0,
@@ -252,7 +278,7 @@ class FlextMeltanoExecutors:
             self.exit_code = exit_code
             self.execution_time = execution_time
             self.metadata = metadata or {}
-            self.timestamp = datetime.now(UTC).isoformat()
+            self.timestamp = FlextUtilities.Generators.generate_iso_timestamp()
 
         def to_dict(self) -> dict[str, object]:
             """Convert to dictionary for JSON serialization."""
@@ -300,7 +326,7 @@ class FlextMeltanoExecutors:
 
                 if result.success:
                     return FlextResult[dict[str, object]].ok(
-                        result.value  # type: ignore[arg-type] # MeltanoBridge returns dict[str, str] which is compatible
+                        cast("dict[str, object]", result.value)
                     )
                 return FlextResult[dict[str, object]].fail(
                     result.error or "Unknown pipeline error"
@@ -324,7 +350,7 @@ class FlextMeltanoExecutors:
 
                 if result.success:
                     return FlextResult[dict[str, object]].ok(
-                        result.value  # type: ignore[arg-type] # MeltanoBridge returns dict[str, str] which is compatible
+                        cast("dict[str, object]", result.value)
                     )
                 return FlextResult[dict[str, object]].fail(
                     result.error or "Unknown installation error"

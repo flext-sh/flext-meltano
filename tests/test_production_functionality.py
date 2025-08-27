@@ -333,7 +333,7 @@ class TestFlextCoreIntegration:
         def stringify_value(x: int) -> str:
             return f"Value: {x}"
 
-        result = FlextResult[int].ok(5).map(double_value).map(stringify_value)
+        result: FlextResult[str] = FlextResult[int].ok(5).map(double_value).map(stringify_value)
 
         assert result.success
         assert result.value == "Value: 10"

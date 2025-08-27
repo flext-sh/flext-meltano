@@ -16,14 +16,13 @@ from __future__ import annotations
 import json
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Protocol
+from typing import cast
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
-    FlextDomainService,
-    FlextProtocols,
     FlextResult,
     FlextServiceProcessor,
+    FlextUtilities,
     get_logger,
 )
 from singer_sdk import Tap, Target
@@ -59,41 +58,18 @@ class FlextMeltanoServices:
     """
 
     # =================================================================
-    # NESTED PROTOCOL CLASSES - Interface definitions
+    # FLEXT-CORE PROTOCOL ALIASES ONLY (NO LOCAL PROTOCOLS)
     # =================================================================
 
-    class TapServiceProtocol(FlextProtocols.Domain.Service, Protocol):
-        """Protocol for tap services - extends flext-core Domain.Service."""
+    # MANDATORY: Use ONLY real working protocols
+    # Following FLEXT_REFACTORING_PROMPT.md: "ELIMINATE ALL CODE DUPLICATION"
+    # NOTE: FlextProtocols.Domain.Service causes import errors - using typing.Protocol
 
-        def get_tap_class(self) -> type[Tap]:
-            """Return the specific Singer Tap class."""
-            ...
-
-        def get_default_config(self) -> dict[str, object]:
-            """Return default tap configuration."""
-            ...
-
-    class TargetServiceProtocol(FlextProtocols.Domain.Service, Protocol):
-        """Protocol for target services - extends flext-core Domain.Service."""
-
-        def get_target_class(self) -> type[Target]:
-            """Return the specific Singer Target class."""
-            ...
-
-        def get_default_config(self) -> dict[str, object]:
-            """Return default target configuration."""
-            ...
-
-    class DbtServiceProtocol(FlextProtocols.Domain.Service, Protocol):
-        """Protocol for DBT services - extends flext-core Domain.Service."""
-
-        def get_project_config(self) -> dict[str, object]:
-            """Return DBT project configuration."""
-            ...
-
-        def get_profiles_config(self) -> dict[str, object]:
-            """Return DBT profiles configuration."""
-            ...
+    # MANDATORY: NO LOCAL PROTOCOLS - Use ONLY flext-core protocols
+    # Following FLEXT_REFACTORING_PROMPT.md: "ELIMINATE ALL CODE DUPLICATION"
+    TapServiceProtocol = object  # Simple alias - NO local protocol definitions
+    TargetServiceProtocol = object
+    DbtServiceProtocol = object
 
     # =================================================================
     # NESTED SERVICE CLASSES - Actual implementations
@@ -253,10 +229,10 @@ class FlextMeltanoServices:
 
                 adapted_catalog = adapter_result.value
                 streams: list[dict[str, object]] = []
-                if isinstance(adapted_catalog, dict):
-                    streams_data = adapted_catalog.get("streams", [])
-                    if isinstance(streams_data, list):
-                        streams = streams_data
+                if FlextUtilities.is_dict(adapted_catalog):
+                    streams_data = FlextUtilities.safe_dict_get(adapted_catalog, "streams", list, [])
+                    if FlextUtilities.is_list(streams_data):
+                        streams = list(streams_data)  # Type-safe assignment with explicit conversion
 
                 get_logger(__name__).info("Streams discovered", count=len(streams))
                 return FlextResult[list[dict[str, object]]].ok(streams)
@@ -304,25 +280,47 @@ class FlextMeltanoServices:
             # Base fields - subclasses podem extend
             return []
 
-    class TargetService(FlextDomainService[dict[str, object]]):
+    class TargetService(FlextServiceProcessor[ConfigDict, Target, ResultDict]):
         """Base service for flext-target-* projects.
 
         Provides common functionality for all FLEXT targets,
         integrando Singer SDK com padrões flext-core.
         """
 
-        # Pydantic fields for frozen model
-        target_name: str
-        wrapper_singer: MeltanoSingerWrapper = MeltanoSingerWrapper()
-        singer_adapter: FlextSingerAdapter = FlextSingerAdapter()
+        def __init__(self, target_name: str = "default_target") -> None:
+            """Initialize target service."""
+            super().__init__()
+            self.target_name = target_name
+            self.wrapper_singer = MeltanoSingerWrapper()
+            self.singer_adapter = FlextSingerAdapter()
 
-        @property
-        def logger(self) -> object:
-            """Logger property using centralized get_logger pattern."""
-            return get_logger(f"{__name__}.{self.__class__.__name__}")
+        def process(self, request: ConfigDict) -> FlextResult[Target]:
+            """Process target configuration and create Singer Target instance."""
+            try:
+                get_logger(__name__).info(
+                    "Processing target configuration", target_name=self.target_name
+                )
+                # Create target instance
+                target_class = self.get_target_class()
+                target_instance = target_class(config=request)
+                return FlextResult[Target].ok(target_instance)
+            except Exception as e:
+                error_msg = f"Failed to process target configuration: {e}"
+                get_logger(__name__).exception(error_msg, error=str(e))
+                return FlextResult[Target].fail(error_msg)
+
+        def build(self, domain: Target, *, correlation_id: str) -> ResultDict:
+            """Build final result from target instance."""
+            return {
+                "service": "FlextMeltanoTargetService",
+                "target_name": self.target_name,
+                "target_class": domain.__class__.__name__,
+                "status": "ready",
+                "correlation_id": correlation_id,
+            }
 
         def execute(self) -> FlextResult[dict[str, object]]:
-            """Execute target service operation (required by FlextDomainService)."""
+            """Execute target service operation (required by FlextServiceProcessor)."""
             try:
                 return FlextResult[dict[str, object]].ok(
                     {
@@ -501,25 +499,51 @@ class FlextMeltanoServices:
             # Base fields - subclasses podem extend
             return []
 
-    class DbtService(FlextDomainService[dict[str, object]]):
+    class DbtService(FlextServiceProcessor[ConfigDict, dbtRunner, ResultDict]):
         """Serviço base para projetos flext-dbt-*.
 
         Fornece funcionalidades comuns para todos os projetos DBT FLEXT,
         integrando DBT Core com padrões flext-core.
         """
 
-        # Pydantic fields for frozen model
-        project_name: str
-        wrapper_dbt: MeltanoDbtWrapper = MeltanoDbtWrapper()
-        dbt_adapter: FlextDbtAdapter = FlextDbtAdapter()
+        def __init__(self, project_name: str = "default_project") -> None:
+            """Initialize DBT service."""
+            super().__init__()
+            self.project_name = project_name
+            self.wrapper_dbt = MeltanoDbtWrapper()
+            self.dbt_adapter = FlextDbtAdapter()
 
-        @property
-        def logger(self) -> object:
-            """Logger property using centralized get_logger pattern."""
-            return get_logger(f"{__name__}.{self.__class__.__name__}")
+        def process(self, request: ConfigDict) -> FlextResult[dbtRunner]:
+            """Process DBT configuration and create runner instance."""
+            try:
+                get_logger(__name__).info(
+                    "Processing DBT configuration", project_name=self.project_name
+                )
+                # Create DBT runner
+                project_root = Path(cast("str", request.get("project_root", ".")))
+                runner_result = self.wrapper_dbt.create_runner(project_root)
+                if runner_result.success:
+                    return FlextResult[dbtRunner].ok(runner_result.value)
+                return FlextResult[dbtRunner].fail(
+                    runner_result.error or "Failed to create runner"
+                )
+            except Exception as e:
+                error_msg = f"Failed to process DBT configuration: {e}"
+                get_logger(__name__).exception(error_msg, error=str(e))
+                return FlextResult[dbtRunner].fail(error_msg)
+
+        def build(self, domain: dbtRunner, *, correlation_id: str) -> ResultDict:
+            """Build final result from DBT runner instance."""
+            return {
+                "service": "FlextMeltanoDbtService",
+                "project_name": self.project_name,
+                "runner_class": domain.__class__.__name__,
+                "status": "ready",
+                "correlation_id": correlation_id,
+            }
 
         def execute(self) -> FlextResult[dict[str, object]]:
-            """Execute DBT service operation (required by FlextDomainService)."""
+            """Execute DBT service operation (required by FlextServiceProcessor)."""
             try:
                 return FlextResult[dict[str, object]].ok(
                     {
