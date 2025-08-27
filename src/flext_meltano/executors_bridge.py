@@ -11,9 +11,9 @@ from pathlib import Path
 
 from flext_core import get_logger
 
-from .dbt_adapters import MeltanoDbtWrapper
-from .executors_meltano import FlextMeltanoExecutor, FlextMeltanoExecutors
-from .meltano_adapters import MeltanoBridge
+from flext_meltano.dbt_adapters import MeltanoDbtWrapper
+from flext_meltano.executors_meltano import FlextMeltanoExecutor, FlextMeltanoExecutors
+from flext_meltano.meltano_adapters import MeltanoBridge
 
 logger = get_logger(__name__)
 
@@ -67,7 +67,9 @@ class FlextMeltanoBridge:
         try:
             project_path = Path(project_root)
             # Use SimpleMeltanoExecutor for pipeline operations
-            result = FlextMeltanoExecutors.SimpleMeltanoExecutor.run_pipeline(project_path, tap_name, target_name)
+            result = FlextMeltanoExecutors.SimpleMeltanoExecutor.run_pipeline(
+                project_path, tap_name, target_name
+            )
 
             if result.success:
                 return {"success": True, "data": result.data or {}}

@@ -14,9 +14,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_core import (
-    FlextConfigurationError,
-    FlextError,
-    FlextValidationError,
+    FlextExceptions.ConfigurationError,
+    FlextExceptions.Error,
+    FlextExceptions.ValidationError,
 )
 
 # =============================================================================
@@ -43,10 +43,10 @@ class FlextMeltanoExceptions:
     # NESTED EXCEPTION CLASSES - Actual implementations
     # =================================================================
 
-    class MeltanoError(FlextError):
+    class MeltanoError(FlextExceptions.Error):
         """Base Meltano error inheriting from flext-core generic error."""
 
-    class MeltanoValidationError(MeltanoError, FlextValidationError):
+    class MeltanoValidationError(MeltanoError, FlextExceptions.ValidationError):
         """Validation error for Meltano domain inheriting from Meltano base and core validation error."""
 
         def __init__(self, message: str = "Validation error", **kwargs: object) -> None:
@@ -54,7 +54,7 @@ class FlextMeltanoExceptions:
             context = dict(kwargs) if kwargs else None
             super().__init__(message, context=context)
 
-    class MeltanoConfigurationError(MeltanoError, FlextConfigurationError):
+    class MeltanoConfigurationError(MeltanoError, FlextExceptions.ConfigurationError):
         """Configuration error for Meltano domain."""
 
         def __init__(

@@ -14,13 +14,13 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 from flext_core import (
     FlextDomainService,
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 from rich.console import Console
@@ -80,19 +80,23 @@ class FlextMeltanoExecutors:
             """Discover available Meltano plugins."""
             try:
                 # FlextMeltanoAdapters is guaranteed available or ImportError would have occurred
-                adapter = FlextMeltanoAdapters.MeltanoAdapter()  # pyright: ignore[reportOptionalMemberAccess]
+                adapter = FlextMeltanoAdapters.MeltanoAdapter()
                 result = adapter.discover_plugins()
 
                 if result.success:
+                    plugins_data: dict[str, object] = {"plugins": result.value}
                     return FlextResult[dict[str, object]].ok(
-                        {"success": True, "data": {"plugins": result.value}}
+                        {"success": True, "data": plugins_data}
                     )
-                return FlextResult[dict[str, object]].ok(
-                    {"success": False, "error": result.error}
-                )
+                error_data: dict[str, object] = {
+                    "success": False,
+                    "error": result.error,
+                }
+                return FlextResult[dict[str, object]].ok(error_data)
 
             except Exception as e:
-                return FlextResult.fail(f"Plugin discovery execution failed: {e}")
+                error_msg = f"Plugin discovery execution failed: {e}"
+                return FlextResult[dict[str, object]].fail(error_msg)
 
         def run_meltano_command(
             self, command: str, args: list[str] | None = None
@@ -100,20 +104,23 @@ class FlextMeltanoExecutors:
             """Execute Meltano command using native APIs."""
             try:
                 # Create structured response for Go bridge
-                result_data = {
+                result_data: dict[str, object] = {
                     "command": command,
                     "args": args or [],
-                    "execution_time": datetime.now(UTC).isoformat(),
+                    "execution_time": FlextUtilities.Generators.generate_iso_timestamp(),
                     "success": True,
                     "output": f"Executed Meltano command: {command}",
                 }
 
-                return FlextResult[dict[str, object]].ok(
-                    {"success": True, "data": result_data}
-                )
+                response_data: dict[str, object] = {
+                    "success": True,
+                    "data": result_data,
+                }
+                return FlextResult[dict[str, object]].ok(response_data)
 
             except Exception as e:
-                return FlextResult.fail(f"Meltano command execution failed: {e}")
+                error_msg = f"Meltano command execution failed: {e}"
+                return FlextResult[dict[str, object]].fail(error_msg)
 
     class _CLIExecutor:
         """Internal CLI executor for command-line interface operations."""
@@ -168,24 +175,34 @@ class FlextMeltanoExecutors:
 
                 if result.success:
                     data = result.value
-                    if isinstance(data, dict) and data.get("success"):
-                        nested_data = data.get("data", {})
-                        if isinstance(nested_data, dict):
-                            plugins = nested_data.get("plugins", [])
-                            self.console.print(
-                                f"[green]Found {len(plugins)} plugins[/green]"
+                    if FlextUtilities.is_dict(data) and data.get("success"):
+                        nested_data = FlextUtilities.safe_dict_get(data, "data", dict, {})
+                        if FlextUtilities.is_dict(nested_data):
+                            plugins = FlextUtilities.safe_dict_get(nested_data, "plugins", list, [])
+                            plugin_count = (
+                                len(plugins) if hasattr(plugins, "__len__") else 0
                             )
-                            for plugin in plugins[:10]:  # Show first 10
-                                if isinstance(plugin, dict):
-                                    self.console.print(
-                                        f"  - {plugin.get('name')} ({plugin.get('type')})"
+                            self.console.print(
+                                f"[green]Found {plugin_count} plugins[/green]"
+                            )
+                            # Type ignore for dynamic plugin data iteration
+                            for plugin in (
+                                plugins[:10] if hasattr(plugins, "__getitem__") else []
+                            ):
+                                if FlextUtilities.is_dict(plugin):
+                                    name = FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                                        plugin.get("name", "Unknown")
                                     )
+                                    plugin_type = FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                                        plugin.get("type", "Unknown")
+                                    )
+                                    self.console.print(f"  - {name} ({plugin_type})")
                         else:
                             self.console.print("[red]No plugin data available[/red]")
                         return 0
                     error_msg = (
                         data.get("error", "Unknown error")
-                        if isinstance(data, dict)
+                        if FlextUtilities.is_dict(data)
                         else "Unknown error"
                     )
                     self.console.print(f"[red]Discovery failed: {error_msg}[/red]")
@@ -206,9 +223,12 @@ class FlextMeltanoExecutors:
                 if version_info.get("success"):
                     data = version_info.get("data", {})
                     self.console.print("[green]Version Information:[/green]")
-                    if isinstance(data, dict):
-                        for key, value in data.items():
-                            self.console.print(f"  {key}: {value}")
+                    if FlextUtilities.is_dict(data):
+                        typed_data = cast("dict[str, object]", data)
+                        for key, value in typed_data.items():
+                            key_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(key)
+                            value_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(value)
+                            self.console.print(f"  {key_str}: {value_str}")
                     else:
                         self.console.print("[red]Invalid version data format[/red]")
                         return 1
@@ -237,13 +257,14 @@ class FlextMeltanoExecutors:
 
                 if result.success:
                     data = result.value
-                    if isinstance(data, dict) and data.get("success"):
+                    if FlextUtilities.is_dict(data) and data.get("success"):
                         self.console.print("[green]Plugin execution completed[/green]")
-                        nested_data = data.get("data", {})
-                        if isinstance(nested_data, dict):
-                            output = nested_data.get("output")
+                        nested_data = FlextUtilities.safe_dict_get(data, "data", dict, {})
+                        if FlextUtilities.is_dict(nested_data):
+                            output = FlextUtilities.safe_dict_get(nested_data, "output", str, "")
                             if output:
-                                self.console.print(f"Output: {output}")
+                                output_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(output)
+                                self.console.print(f"Output: {output_str}")
                     else:
                         self.console.print("[red]Plugin execution failed[/red]")
                         return 1
@@ -298,10 +319,11 @@ class FlextMeltanoExecutors:
 
                 if command == "run_meltano":
                     executor = FlextMeltanoExecutors._MeltanoExecutor()
-                    meltano_command = str(args.get("meltano_command", ""))
-                    meltano_args = args.get("args", [])
-                    if isinstance(meltano_args, list):
-                        meltano_args = [str(arg) for arg in meltano_args]
+                    meltano_command = FlextUtilities.LdapConverters.safe_convert_value_to_str(args.get("meltano_command", ""))
+                    meltano_args = FlextUtilities.safe_dict_get(args, "args", list, [])
+                    if FlextUtilities.is_list(meltano_args):
+                        # Type-safe argument conversion
+                        meltano_args = FlextUtilities.LdapConverters.safe_convert_list_to_strings(list(meltano_args))
                     else:
                         meltano_args = []
 
@@ -326,7 +348,7 @@ class FlextMeltanoExecutors:
                     "success": True,
                     "data": {
                         "status": "healthy",
-                        "timestamp": datetime.now(UTC).isoformat(),
+                        "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
                         "version_check": version_result.get("success", False),
                     },
                 }

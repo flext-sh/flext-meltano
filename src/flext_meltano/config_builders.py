@@ -12,7 +12,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import get_logger
+from typing import cast
+
+from flext_core import FlextUtilities, get_logger
 
 from flext_meltano.flext_types import ConfigDict
 
@@ -289,10 +291,16 @@ class FlextMeltanoConfigBuilders:
             updated_config = meltano_config.copy()
             plugins = updated_config.setdefault("plugins", {})
 
-            if isinstance(plugins, dict):
-                plugin_list = plugins.setdefault(plugin_type, [])
-                if isinstance(plugin_list, list):
-                    plugin_list.append(plugin_config)
+            if FlextUtilities.is_dict(plugins):
+                typed_plugins = cast("dict[str, object]", plugins)
+                if plugin_type not in typed_plugins:
+                    typed_plugins[plugin_type] = []
+                plugin_list = typed_plugins[plugin_type]
+                if FlextUtilities.is_list(plugin_list):
+                    typed_list = cast("list[object]", plugin_list)
+                    plugin_list_copy = list(typed_list)  # Create mutable copy
+                    plugin_list_copy.append(plugin_config)
+                    typed_plugins[plugin_type] = plugin_list_copy
 
             return updated_config
 

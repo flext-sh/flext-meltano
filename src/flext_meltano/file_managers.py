@@ -22,8 +22,8 @@ from flext_core import (
     get_logger,
 )
 
-from flext_meltano.flext_types import ConfigDict
-
+# Type definitions for file management operations
+ConfigDict = dict[str, object]
 PathDict = dict[str, str]
 
 logger = get_logger(__name__)

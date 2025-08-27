@@ -31,7 +31,10 @@ class TestFlextMeltanoUtilitiesReal:
         with tempfile.NamedTemporaryFile(
             encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as temp_file:
-            config: dict[str, object] = {"test_key": "test_value", "nested": {"key": "value"}}
+            config: dict[str, object] = {
+                "test_key": "test_value",
+                "nested": {"key": "value"},
+            }
             temp_path = Path(temp_file.name)
 
         try:
@@ -140,7 +143,7 @@ class TestValidateConfigValueReal:
 
         assert result.success is True
         validated_value = result.value
-        assert validated_value == 3.14
+        assert validated_value == math.pi
         assert isinstance(validated_value, float)
 
     def test_validate_config_value_none_required(self) -> None:

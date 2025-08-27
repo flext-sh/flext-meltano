@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import meltano
 import structlog
@@ -22,6 +23,7 @@ from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextUtilities,
     get_logger,
 )
 from meltano.core._state import StateStrategy
@@ -1001,10 +1003,18 @@ class FlextMeltanoAdapter:
         try:
             # Adaptar para formato FlextProjectConfig
             plugins_data = meltano_config.get("plugins", {})
-            if isinstance(plugins_data, dict):
-                extractors_list = plugins_data.get("extractors", [])
-                loaders_list = plugins_data.get("loaders", [])
-                transformers_list = plugins_data.get("transformers", [])
+            if FlextUtilities.is_dict(plugins_data):
+                # Type cast after dict verification
+                typed_plugins_dict = cast("dict[str, object]", plugins_data)
+                extractors_list = FlextUtilities.safe_dict_get(
+                    typed_plugins_dict, "extractors", list, []
+                )
+                loaders_list = FlextUtilities.safe_dict_get(
+                    typed_plugins_dict, "loaders", list, []
+                )
+                transformers_list = FlextUtilities.safe_dict_get(
+                    typed_plugins_dict, "transformers", list, []
+                )
             else:
                 extractors_list = []
                 loaders_list = []

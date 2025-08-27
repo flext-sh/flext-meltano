@@ -14,7 +14,7 @@ import json
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 from unittest.mock import MagicMock
 
 from dbt.cli.main import dbtRunner
@@ -247,7 +247,7 @@ class TestFlextMeltanoTapServiceComprehensive:
         logger = service.logger
         assert logger is not None
         assert hasattr(logger, "_name")
-        assert "ConcreteTapService" in logger._name
+        assert "ConcreteTapService" in getattr(logger, "_name", "")
 
 
 # =============================================================================
@@ -578,7 +578,7 @@ models:
         logger = service.logger
         assert logger is not None
         assert hasattr(logger, "_name")
-        assert "DbtService" in logger._name
+        assert "DbtService" in getattr(logger, "_name", "")
 
 
 # =============================================================================
@@ -597,7 +597,7 @@ class TestBaseServicesIntegration:
 
         # Todos devem implementar execute()
         for service in [tap_service, target_service, dbt_service]:
-            result = cast("object", service).execute()  # type: ignore[attr-defined]
+            result = service.execute()  # type: ignore[attr-defined]
             assert isinstance(result, FlextResult)
             assert result.success is True
 
@@ -608,7 +608,7 @@ class TestBaseServicesIntegration:
         dbt_service = FlextMeltanoDbtService(project_name="logger-test")
 
         for service in [tap_service, target_service, dbt_service]:
-            logger = cast("object", service).logger  # type: ignore[attr-defined]
+            logger = service.logger  # type: ignore[attr-defined]
             assert logger is not None
             assert hasattr(logger, "_name")
 
