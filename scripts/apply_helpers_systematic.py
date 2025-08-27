@@ -71,12 +71,14 @@ class SystematicLintFixer:
         if content != original_content:
             # Add constants after imports
             constants = """
-# Timeout constants to avoid magic numbers
-DEFAULT_TIMEOUT = 300
-DISCOVERY_TIMEOUT = 60
-DEFAULT_POSTGRES_PORT = 5432
-DEFAULT_ORACLE_PORT = 1521
-DEFAULT_MYSQL_PORT = 3306
+# Use centralized constants from flext-core
+from flext_core import FlextConstants
+
+DEFAULT_TIMEOUT = FlextConstants.Meltano.DEFAULT_TIMEOUT
+DISCOVERY_TIMEOUT = FlextConstants.Meltano.DISCOVERY_TIMEOUT
+DEFAULT_POSTGRES_PORT = FlextConstants.Meltano.DEFAULT_POSTGRES_PORT
+DEFAULT_ORACLE_PORT = FlextConstants.Meltano.DEFAULT_ORACLE_PORT
+DEFAULT_MYSQL_PORT = FlextConstants.Meltano.DEFAULT_MYSQL_PORT
 BACKOFF_BASE = 2
 
 """
