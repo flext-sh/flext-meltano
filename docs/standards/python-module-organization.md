@@ -536,10 +536,10 @@ class FlextMeltanoPipelineService:
 ### **Configuration Management Patterns**
 
 ```python
-from flext_core.config import FlextSettings
+from flext_core.config import FlextConfig
 from flext_meltano.base import FlextMeltanoConfig
 
-class FlextMeltanoSettings(FlextSettings):
+class FlextMeltanoSettings(FlextConfig):
     """FLEXT Meltano configuration with environment variables."""
 
     # Meltano configuration
@@ -559,7 +559,7 @@ class FlextMeltanoSettings(FlextSettings):
         env_prefix = "FLEXT_MELTANO_"
         env_file = ".env"
 
-class FlextMeltanoBridgeConfig(FlextSettings):
+class FlextMeltanoBridgeConfig(FlextConfig):
     """Bridge-specific configuration for Go integration."""
 
     # Subprocess configuration
@@ -585,9 +585,9 @@ class FlextMeltanoBridgeConfig(FlextSettings):
 # base.py - Foundation classes
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
-from flext_core import FlextResult, FlextSettings
+from flext_core import FlextResult, FlextConfig
 
-class FlextMeltanoConfig(FlextSettings):
+class FlextMeltanoConfig(FlextConfig):
     """Base configuration for all FLEXT Meltano services."""
 
     project_root: str = "."
@@ -924,7 +924,7 @@ def create_flext_meltano_bridge(
 
    ```python
    # config.py - Centralized configuration
-   class FlextMeltanoEnterpriseConfig(FlextSettings):
+   class FlextMeltanoEnterpriseConfig(FlextConfig):
        # Bridge settings
        bridge: FlextMeltanoBridgeConfig
 
