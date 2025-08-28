@@ -127,7 +127,7 @@ else:
 - `args` (List[str]): Meltano command arguments
 - `**kwargs`: Additional subprocess configuration
 
-**Returns**: `FlextResult[Dict[str, Any]]` with structured output
+**Returns**: `FlextResult[Dict[str, object]]` with structured output
 
 #### `run_pipeline(tap, target, **kwargs)` ✅
 
@@ -160,7 +160,7 @@ else:
 - `environment` (str, optional): Meltano environment
 - `dry_run` (bool, optional): Execute in dry-run mode
 
-**Returns**: `FlextResult[Dict[str, Any]]` with execution metrics
+**Returns**: `FlextResult[Dict[str, object]]` with execution metrics
 
 ## 🔍 Discovery & Installation APIs (✅ Production Ready)
 
@@ -490,7 +490,7 @@ from flext_core import FlextResult
 from flext_meltano.exceptions import FlextMeltanoError
 
 # Standard error handling pattern
-def example_operation() -> FlextResult[Dict[str, Any]]:
+def example_operation() -> FlextResult[Dict[str, object]]:
     """Example of FlextResult usage."""
     try:
         # Perform operation
@@ -622,7 +622,7 @@ class ProductionPipelineManager:
         self.bridge = FlextMeltanoBridge(self.config)
         self.orchestrator = FlextMeltanoOrchestrationService(self.config)
 
-    def execute_daily_pipeline(self) -> FlextResult[Dict[str, Any]]:
+    def execute_daily_pipeline(self) -> FlextResult[Dict[str, object]]:
         """Execute daily data pipeline with monitoring."""
         try:
             # Validate configuration
@@ -651,7 +651,7 @@ class ProductionPipelineManager:
             self._log_error(error_msg)
             return FlextResult[None].fail(error_msg)
 
-    def _log_success(self, metrics: Dict[str, Any]) -> None:
+    def _log_success(self, metrics: Dict[str, object]) -> None:
         """Log successful pipeline execution."""
         print(f"✅ Pipeline completed: {metrics['record_count']} records")
 

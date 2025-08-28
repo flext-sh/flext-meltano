@@ -219,7 +219,9 @@ class FlextDbtInMemoryExecutor:
             )
             return FlextResult[dict[str, object]].ok(summary)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to validate transformations: {e}")
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to validate transformations: {e}"
+            )
 
     def _validate_row_count(
         self,

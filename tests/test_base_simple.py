@@ -12,7 +12,7 @@ Migration path:
 
 import warnings
 
-from .test_service_simple import *  # noqa: F403,F401
+from .test_service_simple import *
 
 warnings.warn(
     "test_base_simple.py is deprecated, use test_service_simple.py instead",

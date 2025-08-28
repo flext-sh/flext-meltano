@@ -352,7 +352,9 @@ class TestRealWorldUsagePatterns:
         bridges = [
             FlextMeltanoBridge(),
             create_flext_meltano_bridge(),
-            create_flext_meltano_bridge(FlextMeltanoConfig(environment="test").to_dict()),
+            create_flext_meltano_bridge(
+                FlextMeltanoConfig(environment="test").to_dict()
+            ),
         ]
 
         # All should work

@@ -378,11 +378,11 @@ class TestFlextMeltanoAdapterComprehensive:
     def test_adapter_error_handling_comprehensive(self) -> None:
         """Testa tratamento abrangente de erros."""
         # Teste com None
-        result = FlextMeltanoAdapter.adapt_plugin(None)  # type: ignore[arg-type]
+        result = FlextMeltanoAdapter.adapt_plugin(None)
         assert result.success is False
 
         # Teste com tipo errado
-        result = FlextMeltanoAdapter.adapt_plugin("invalid")  # type: ignore[arg-type]
+        result = FlextMeltanoAdapter.adapt_plugin("invalid")
         assert result.success is False
 
 

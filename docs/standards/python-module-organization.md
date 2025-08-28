@@ -139,7 +139,7 @@ class FlextMeltanoBridge:
         """Get Meltano version information."""
         # Implementation needed
 
-    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, Any]]:
+    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, object]]:
         """Execute pipeline between tap and target."""
         # Implementation needed
 ```
@@ -584,7 +584,8 @@ class FlextMeltanoBridgeConfig(FlextConfig):
 ```python
 # base.py - Foundation classes
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
+
 from flext_core import FlextResult, FlextConfig
 
 class FlextMeltanoConfig(FlextConfig):
@@ -618,12 +619,12 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
     """Base class for tap services."""
 
     @abstractmethod
-    def discover_streams(self) -> FlextResult[List[Any]]:
+    def discover_streams(self) -> FlextResult[List[object]]:
         """Discover available streams."""
         pass
 
     @abstractmethod
-    def read_stream(self, stream_name: str) -> FlextResult[Any]:
+    def read_stream(self, stream_name: str) -> FlextResult[object]:
         """Read data from specific stream."""
         pass
 ```
@@ -633,7 +634,8 @@ class FlextMeltanoTapService(FlextMeltanoBaseService):
 ```python
 # execution.py - Core execution functionality
 import subprocess
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
+
 from flext_core import FlextResult
 
 class FlextMeltanoExecutor:
@@ -643,7 +645,7 @@ class FlextMeltanoExecutor:
         self._config = config
         self._timeout = config.subprocess_timeout
 
-    async def execute_command(self, args: List[str]) -> FlextResult[Dict[str, Any]]:
+    async def execute_command(self, args: List[str]) -> FlextResult[Dict[str, object]]:
         """Execute Meltano command with error handling using asyncio."""
         try:
             process = await asyncio.create_subprocess_exec(
@@ -672,18 +674,18 @@ class FlextMeltanoExecutor:
         except Exception as e:
             return FlextResult[None].fail(f"Command execution failed: {e}")
 
-    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, Any]]:
+    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, object]]:
         """Execute pipeline between tap and target."""
         return self.execute_command(["run", f"{tap}:{target}"])
 
 # Convenience functions for direct usage
-def execute_meltano_command(args: List[str]) -> FlextResult[Dict[str, Any]]:
+def execute_meltano_command(args: List[str]) -> FlextResult[Dict[str, object]]:
     """Execute Meltano command with default configuration."""
     config = FlextMeltanoConfig()
     executor = FlextMeltanoExecutor(config)
     return executor.execute_command(args)
 
-def run_pipeline(tap: str, target: str) -> FlextResult[Dict[str, Any]]:
+def run_pipeline(tap: str, target: str) -> FlextResult[Dict[str, object]]:
     """Execute pipeline with default configuration."""
     config = FlextMeltanoConfig()
     executor = FlextMeltanoExecutor(config)
@@ -695,7 +697,8 @@ def run_pipeline(tap: str, target: str) -> FlextResult[Dict[str, Any]]:
 ```python
 # simple_bridge.py - Go ↔ Python bridge (MISSING)
 import json
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
+
 from flext_core import FlextResult
 from flext_meltano.execution import FlextMeltanoExecutor
 from flext_meltano.base import FlextMeltanoConfig
@@ -728,7 +731,7 @@ class FlextMeltanoBridge:
             })
         return result
 
-    def list_plugins(self) -> FlextResult[List[Dict[str, Any]]]:
+    def list_plugins(self) -> FlextResult[List[Dict[str, object]]]:
         """List all available plugins."""
         result = self._executor.execute_command(["discover", "all"])
         if result.success:
@@ -757,7 +760,7 @@ class FlextMeltanoBridge:
             return FlextResult[None].ok(f"Plugin {name} added successfully")
         return result
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, Any]]:
+    def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, object]]:
         """Discover catalog from tap."""
         result = self._executor.execute_command(["invoke", tap_name, "--discover"])
         if result.success:
@@ -775,7 +778,7 @@ class FlextMeltanoBridge:
         *,
         environment: Optional[str] = None,
         job_id: Optional[str] = None
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute pipeline between tap and target."""
         args = ["run"]
         if environment:
@@ -798,8 +801,8 @@ class FlextMeltanoBridge:
         self,
         command: str,
         *args: str,
-        **kwargs: Any
-    ) -> FlextResult[Dict[str, Any]]:
+        **kwargs: object
+    ) -> FlextResult[Dict[str, object]]:
         """Execute DBT command."""
         dbt_args = ["invoke", "dbt", command] + list(args)
         result = self._executor.execute_command(dbt_args)
@@ -812,12 +815,12 @@ class FlextMeltanoBridge:
             })
         return result
 
-    def _parse_plugin_list(self, output: str) -> List[Dict[str, Any]]:
+    def _parse_plugin_list(self, output: str) -> List[Dict[str, object]]:
         """Parse plugin list from Meltano output."""
         # Implementation to parse plugin information
         return []
 
-    def _extract_execution_time(self, result_data: Dict[str, Any]) -> Optional[str]:
+    def _extract_execution_time(self, result_data: Dict[str, object]) -> Optional[str]:
         """Extract execution time from command output."""
         # Implementation to extract timing information
         return None
@@ -1090,7 +1093,7 @@ def execute_meltano_command(
     timeout: Optional[int] = None,
     cwd: Optional[str] = None,
     env: Optional[Dict[str, str]] = None
-) -> FlextResult[Dict[str, Any]]:
+) -> FlextResult[Dict[str, object]]:
     """
     Execute Meltano command via subprocess with comprehensive error handling.
 
@@ -1106,7 +1109,7 @@ def execute_meltano_command(
         env: Additional environment variables for command execution
 
     Returns:
-        FlextResult[Dict[str, Any]]: Success contains execution details including
+        FlextResult[Dict[str, object]]: Success contains execution details including
         stdout, stderr, and return code. Failure contains detailed error message
         with execution context for debugging.
 

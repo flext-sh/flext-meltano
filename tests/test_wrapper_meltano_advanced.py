@@ -12,7 +12,7 @@ Migration path:
 
 import warnings
 
-from .test_meltano_adapter_advanced import *  # noqa: F403,F401
+from .test_meltano_adapter_advanced import *
 
 warnings.warn(
     "test_wrapper_meltano_advanced.py is deprecated, use test_meltano_adapter_advanced.py instead",

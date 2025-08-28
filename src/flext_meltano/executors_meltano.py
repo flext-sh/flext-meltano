@@ -85,16 +85,14 @@ class FlextMeltanoExecutors:
                 FlextResult containing service information
 
             """
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "FlextMeltanoExecutor",
-                    "status": "ready",
-                    "capabilities": [
-                        "execute_meltano_command",
-                        "get_project_info",
-                    ],
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                "service": "FlextMeltanoExecutor",
+                "status": "ready",
+                "capabilities": [
+                    "execute_meltano_command",
+                    "get_project_info",
+                ],
+            })
 
         def execute_meltano_command(
             self, project_root: Path, command: list[str], timeout: int = 300
@@ -212,19 +210,25 @@ class FlextMeltanoExecutors:
                 if (
                     FlextUtilities.is_dict(meltano_dict)
                     and FlextUtilities.safe_dict_get(
-                        meltano_dict,  # type: ignore[arg-type]  # Verified by is_dict
-                        "present", bool, _FALSE
+                        meltano_dict,  # Verified by is_dict
+                        "present",
+                        bool,
+                        _FALSE,
                     )
                     and FlextUtilities.is_dict(dbt_dict)
                     and FlextUtilities.safe_dict_get(
-                        dbt_dict,  # type: ignore[arg-type]  # Verified by is_dict
-                        "present", bool, _FALSE
+                        dbt_dict,  # Verified by is_dict
+                        "present",
+                        bool,
+                        _FALSE,
                     )
                 ):
                     project_info["project_type"] = "meltano_with_dbt"
                 elif FlextUtilities.is_dict(dbt_dict) and FlextUtilities.safe_dict_get(
-                    dbt_dict,  # type: ignore[arg-type]  # Verified by is_dict
-                    "present", bool, _FALSE
+                    dbt_dict,  # Verified by is_dict
+                    "present",
+                    bool,
+                    _FALSE,
                 ):
                     project_info["project_type"] = "dbt_only"
 
