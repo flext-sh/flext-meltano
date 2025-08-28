@@ -152,7 +152,7 @@ class FlextMeltanoBridge:
         """Get comprehensive version information."""
         # ✅ FUNCTIONAL - Returns Meltano, Python, Singer SDK versions
 
-    def list_plugins(self) -> FlextResult[List[Dict[str, Any]]]:
+    def list_plugins(self) -> FlextResult[List[Dict[str, object]]]:
         """List all available plugins with metadata."""
         # ✅ FUNCTIONAL - Complete plugin discovery
 
@@ -160,15 +160,15 @@ class FlextMeltanoBridge:
         """Add plugin to project with configuration."""
         # ✅ FUNCTIONAL - Plugin installation and configuration
 
-    def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, Any]]:
+    def discover_catalog(self, tap_name: str) -> FlextResult[Dict[str, object]]:
         """Discover catalog from tap with schema metadata."""
         # ✅ FUNCTIONAL - Complete catalog discovery
 
-    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, Any]]:
+    def run_pipeline(self, tap: str, target: str) -> FlextResult[Dict[str, object]]:
         """Execute pipeline with comprehensive monitoring."""
         # ✅ FUNCTIONAL - Full pipeline execution with metrics
 
-    def invoke_dbt(self, command: str, *args: str) -> FlextResult[Dict[str, Any]]:
+    def invoke_dbt(self, command: str, *args: str) -> FlextResult[Dict[str, object]]:
         """Execute DBT command with result handling."""
         # ✅ FUNCTIONAL - Complete DBT integration
 ```

@@ -10,7 +10,7 @@ Usage:
 Resolve:
 - PT017: pytest fixture problems
 - PLR2004: magic numbers
-- ANN401: Any type annotations
+- ANN401: object type annotations
 - UP007: Union typing syntax
 - TRY301/TRY300/TRY002: exception handling
 - SIM115: simplification issues
@@ -101,16 +101,16 @@ BACKOFF_BASE = 2
         return False
 
     def fix_ann401_any_annotations(self, file_path: Path) -> bool:
-        """Fix ANN401 - Any type annotations."""
+        """Fix ANN401 - object type annotations."""
         content = file_path.read_text(encoding="utf-8")
 
-        # Replace common Any usages with more specific types
+        # Replace common object usages with more specific types
         replacements = {
-            r"\bAny\b(?=\s*=\s*None)": "Any | None",
-            r"dict\[str,\s*Any\]": "dict[str, object,]",  # Already correct format
-            r"Dict\[str,\s*Any\]": "dict[str, object,]",  # Convert old style
-            r"List\[Any\]": "list[Any,]",  # Convert old style
-            r": Any\s*=\s*None": ": Any | None = None",
+            r"\bAny\b(?=\s*=\s*None)": "object | None",
+            r"dict\[str,\s*object\]": "dict[str, object,]",  # Already correct format
+            r"Dict\[str,\s*object\]": "dict[str, object,]",  # Convert old style
+            r"List\[object\]": "list[object,]",  # Convert old style
+            r": object\s*=\s*None": ": object | None = None",
         }
 
         original_content = content

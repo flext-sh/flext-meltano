@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import tempfile
-from typing import Any, ClassVar, cast
+from typing import ClassVar, cast, object
 
 import pytest
 from flext_core import FlextResult, FlextServiceProcessor
@@ -54,7 +54,7 @@ class TestTap(Tap):
     """Test tap implementation."""
 
     name = "test_tap"
-    config_jsonschema: ClassVar[dict[str, Any]] = {
+    config_jsonschema: ClassVar[dict[str, object]] = {
         "type": "object",
         "properties": {
             "test_param": {"type": "string"},
@@ -72,7 +72,7 @@ class TestTarget(Target):
     """Test target implementation."""
 
     name = "test_target"
-    config_jsonschema: ClassVar[dict[str, Any]] = {
+    config_jsonschema: ClassVar[dict[str, object]] = {
         "type": "object",
         "properties": {
             "test_param": {"type": "string"},

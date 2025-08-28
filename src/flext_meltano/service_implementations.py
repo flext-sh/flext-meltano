@@ -30,7 +30,7 @@ from singer_sdk import Tap, Target
 from flext_meltano.dbt_adapters import FlextDbtAdapter, MeltanoDbtWrapper
 from flext_meltano.singer_adapters import FlextSingerAdapter, MeltanoSingerWrapper
 
-# Type aliases for service patterns (avoid explicit Any)
+# Type aliases for service patterns (avoid explicit object)
 ConfigDict = dict[str, object]
 ResultDict = dict[str, object]
 
@@ -129,13 +129,11 @@ class FlextMeltanoServices:
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute tap service operation (for test compatibility)."""
             try:
-                return FlextResult[dict[str, object]].ok(
-                    {
-                        "service": "FlextMeltanoTapService",
-                        "tap_name": self.tap_name,
-                        "status": "ready",
-                    }
-                )
+                return FlextResult[dict[str, object]].ok({
+                    "service": "FlextMeltanoTapService",
+                    "tap_name": self.tap_name,
+                    "status": "ready",
+                })
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -230,9 +228,13 @@ class FlextMeltanoServices:
                 adapted_catalog = adapter_result.value
                 streams: list[dict[str, object]] = []
                 if FlextUtilities.is_dict(adapted_catalog):
-                    streams_data = FlextUtilities.safe_dict_get(adapted_catalog, "streams", list, [])
+                    streams_data = FlextUtilities.safe_dict_get(
+                        adapted_catalog, "streams", list, []
+                    )
                     if FlextUtilities.is_list(streams_data):
-                        streams = list(streams_data)  # Type-safe assignment with explicit conversion
+                        streams = list(
+                            streams_data
+                        )  # Type-safe assignment with explicit conversion
 
                 get_logger(__name__).info("Streams discovered", count=len(streams))
                 return FlextResult[list[dict[str, object]]].ok(streams)
@@ -322,13 +324,11 @@ class FlextMeltanoServices:
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute target service operation (required by FlextServiceProcessor)."""
             try:
-                return FlextResult[dict[str, object]].ok(
-                    {
-                        "service": "FlextMeltanoTargetService",
-                        "target_name": getattr(self, "target_name", "unknown"),
-                        "status": "ready",
-                    }
-                )
+                return FlextResult[dict[str, object]].ok({
+                    "service": "FlextMeltanoTargetService",
+                    "target_name": getattr(self, "target_name", "unknown"),
+                    "status": "ready",
+                })
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 
@@ -545,13 +545,11 @@ class FlextMeltanoServices:
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute DBT service operation (required by FlextServiceProcessor)."""
             try:
-                return FlextResult[dict[str, object]].ok(
-                    {
-                        "service": "FlextMeltanoDbtService",
-                        "project_name": self.project_name,
-                        "status": "ready",
-                    }
-                )
+                return FlextResult[dict[str, object]].ok({
+                    "service": "FlextMeltanoDbtService",
+                    "project_name": self.project_name,
+                    "status": "ready",
+                })
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(f"Execution failed: {e}")
 

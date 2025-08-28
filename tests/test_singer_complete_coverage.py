@@ -110,7 +110,7 @@ class TestMeltanoSingerWrapperComplete:
                 pass
 
         config = cast("dict[str, object]", {"test_param": "test_value"})
-        result = wrapper.create_tap(InvalidTap, config)  # type: ignore[arg-type]
+        result = wrapper.create_tap(InvalidTap, config)
 
         assert isinstance(result, FlextResult)
         assert not result.success
@@ -169,7 +169,7 @@ class TestMeltanoSingerWrapperComplete:
                 pass
 
         config = cast("dict[str, object]", {"test_param": "test_value"})
-        result = wrapper.create_target(InvalidTarget, config)  # type: ignore[arg-type]
+        result = wrapper.create_target(InvalidTarget, config)
 
         assert isinstance(result, FlextResult)
         assert not result.success

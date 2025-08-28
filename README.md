@@ -90,7 +90,7 @@ else:
 ```bash
 # Current Status (2025-08-23)
 Lint Errors: 11/0           # PLR0911, FBT001, E721, F821 violations
-Type Errors: 7/0            # FlextDomainService undefined, explicit Any issues
+Type Errors: 7/0            # FlextDomainService undefined, explicit object issues
 Test Coverage: 35%/100%     # 116 real API tests, systematic improvement needed
 Architecture: Major Violations/SOLID Clean  # Complete reorganization required
 ```
@@ -112,7 +112,7 @@ class MyTapService(FlextMeltanoTapService):
     def get_tap_class(self) -> type[Tap]:
         return MyCustomTap
 
-    def get_default_config(self) -> dict[str, Any]:
+    def get_default_config(self) -> dict[str, object]:
         return {"api_key": "required"}
 
 # Usage with dependency injection
@@ -158,7 +158,7 @@ make test-pipeline           # Run basic CSV test pipeline
 ```bash
 # Status as of 2025-08-23 (requires fixing before proceeding)
 make lint                    # ❌ 11 errors (PLR0911, FBT001, E721, F821)
-make type-check              # ❌ 7 errors (FlextDomainService undefined, explicit Any)
+make type-check              # ❌ 7 errors (FlextDomainService undefined, explicit object)
 make test                    # ❌ NameError: FlextDomainService not defined
 ```
 

@@ -173,7 +173,7 @@ import sys
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, object
 
 def main() -> None:
     """Main script execution with enterprise patterns."""

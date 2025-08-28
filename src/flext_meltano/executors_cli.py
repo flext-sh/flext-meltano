@@ -58,7 +58,9 @@ class FlextMeltanoCli:
             # Extract version from result data
             result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
             if FlextUtilities.is_dict(result_data):
-                meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.8.0")
+                meltano_version = FlextUtilities.safe_dict_get(
+                    result_data, "meltano", str, "3.8.0"
+                )
             else:
                 meltano_version = "3.8.0"
 
@@ -335,7 +337,9 @@ class FlextMeltanoCli:
         if result.get("success", False):
             result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
             if FlextUtilities.is_dict(result_data):
-                meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.9.1")
+                meltano_version = FlextUtilities.safe_dict_get(
+                    result_data, "meltano", str, "3.9.1"
+                )
             else:
                 meltano_version = "3.9.1"
             return FlextResult[dict[str, str]].ok(
@@ -492,7 +496,9 @@ def _handle_cli_version_args(cli: FlextMeltanoCli) -> FlextResult[dict[str, str]
     if result.get("success", False):
         result_data = FlextUtilities.safe_dict_get(result, "data", dict, {})
         if FlextUtilities.is_dict(result_data):
-            meltano_version = FlextUtilities.safe_dict_get(result_data, "meltano", str, "3.9.1")
+            meltano_version = FlextUtilities.safe_dict_get(
+                result_data, "meltano", str, "3.9.1"
+            )
         else:
             meltano_version = "3.9.1"
 

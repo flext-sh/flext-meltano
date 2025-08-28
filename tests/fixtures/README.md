@@ -289,11 +289,12 @@ def cached_data(expensive_fixture):
 
 ```python
 # Quality standards for fixture implementation
-from typing import Dict, Any, Iterator
+from typing import Dict, Iterator
+
 import pytest
 
 @pytest.fixture
-def typed_fixture() -> Dict[str, Any]:
+def typed_fixture() -> Dict[str, object]:
     """Properly typed fixture with clear return type."""
     return {
         "key": "value",

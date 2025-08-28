@@ -176,9 +176,13 @@ class FlextMeltanoExecutors:
                 if result.success:
                     data = result.value
                     if FlextUtilities.is_dict(data) and data.get("success"):
-                        nested_data = FlextUtilities.safe_dict_get(data, "data", dict, {})
+                        nested_data = FlextUtilities.safe_dict_get(
+                            data, "data", dict, {}
+                        )
                         if FlextUtilities.is_dict(nested_data):
-                            plugins = FlextUtilities.safe_dict_get(nested_data, "plugins", list, [])
+                            plugins = FlextUtilities.safe_dict_get(
+                                nested_data, "plugins", list, []
+                            )
                             plugin_count = (
                                 len(plugins) if hasattr(plugins, "__len__") else 0
                             )
@@ -226,8 +230,16 @@ class FlextMeltanoExecutors:
                     if FlextUtilities.is_dict(data):
                         typed_data = cast("dict[str, object]", data)
                         for key, value in typed_data.items():
-                            key_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(key)
-                            value_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(value)
+                            key_str = (
+                                FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                                    key
+                                )
+                            )
+                            value_str = (
+                                FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                                    value
+                                )
+                            )
                             self.console.print(f"  {key_str}: {value_str}")
                     else:
                         self.console.print("[red]Invalid version data format[/red]")
@@ -259,11 +271,17 @@ class FlextMeltanoExecutors:
                     data = result.value
                     if FlextUtilities.is_dict(data) and data.get("success"):
                         self.console.print("[green]Plugin execution completed[/green]")
-                        nested_data = FlextUtilities.safe_dict_get(data, "data", dict, {})
+                        nested_data = FlextUtilities.safe_dict_get(
+                            data, "data", dict, {}
+                        )
                         if FlextUtilities.is_dict(nested_data):
-                            output = FlextUtilities.safe_dict_get(nested_data, "output", str, "")
+                            output = FlextUtilities.safe_dict_get(
+                                nested_data, "output", str, ""
+                            )
                             if output:
-                                output_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(output)
+                                output_str = FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                                    output
+                                )
                                 self.console.print(f"Output: {output_str}")
                     else:
                         self.console.print("[red]Plugin execution failed[/red]")
@@ -319,11 +337,19 @@ class FlextMeltanoExecutors:
 
                 if command == "run_meltano":
                     executor = FlextMeltanoExecutors._MeltanoExecutor()
-                    meltano_command = FlextUtilities.LdapConverters.safe_convert_value_to_str(args.get("meltano_command", ""))
+                    meltano_command = (
+                        FlextUtilities.LdapConverters.safe_convert_value_to_str(
+                            args.get("meltano_command", "")
+                        )
+                    )
                     meltano_args = FlextUtilities.safe_dict_get(args, "args", list, [])
                     if FlextUtilities.is_list(meltano_args):
                         # Type-safe argument conversion
-                        meltano_args = FlextUtilities.LdapConverters.safe_convert_list_to_strings(list(meltano_args))
+                        meltano_args = (
+                            FlextUtilities.LdapConverters.safe_convert_list_to_strings(
+                                list(meltano_args)
+                            )
+                        )
                     else:
                         meltano_args = []
 

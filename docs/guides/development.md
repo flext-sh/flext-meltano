@@ -23,7 +23,7 @@ make validate                 # ❌ FAILING - must fix before proceeding
 | ----------- | ------- | ----------- | -------------------------- |
 | **Python**  | 3.13+   | ✅ Required | Strict version requirement |
 | **Poetry**  | 1.8+    | ✅ Required | Dependency management      |
-| **Make**    | Any     | ✅ Required | Development commands       |
+| **Make**    | object     | ✅ Required | Development commands       |
 | **Git**     | 2.0+    | ✅ Required | Pre-commit hooks           |
 
 ### **Initial Setup**
@@ -501,7 +501,7 @@ class ExampleService:
     def __init__(self, config: FlextMeltanoConfig) -> None:
         self._config = config
 
-    def process_data(self, data: dict[str, Any]) -> FlextResult[str]:
+    def process_data(self, data: dict[str, object]) -> FlextResult[str]:
         """Process data with proper error handling."""
         try:
             # Process data

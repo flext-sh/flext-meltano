@@ -157,11 +157,11 @@ python example_module.py
 Description of what users should see when running the example.
 """
 
-from typing import Any
+object
 
 from flext_meltano import FlextMeltanoConfig
 
-def demonstrate_pattern() -> dict[str, Any]:
+def demonstrate_pattern() -> dict[str, object]:
     """Demonstrate specific pattern with clear documentation.
 
     Returns:

@@ -83,11 +83,13 @@ class FlextMeltanoValidators(FlextUtilities):
             validation_result = cls.validate_and_create(
                 cls.is_non_empty_string,
                 field_value,
-                f"Field '{field}' must be a non-empty string"
+                f"Field '{field}' must be a non-empty string",
             )
 
             if not validation_result.success:
-                return FlextResult.fail(validation_result.error or f"Invalid field: {field}")
+                return FlextResult.fail(
+                    validation_result.error or f"Invalid field: {field}"
+                )
 
         return FlextResult.ok(_SUCCESS)
 
@@ -116,7 +118,7 @@ class FlextMeltanoValidators(FlextUtilities):
         version_result = cls.validate_and_convert(
             version_value,
             lambda v: int(str(v)) if v is not None else 0,
-            "Meltano version must be an integer"
+            "Meltano version must be an integer",
         )
 
         if not version_result.success:
@@ -159,7 +161,9 @@ class FlextMeltanoValidators(FlextUtilities):
         for field in required_fields:
             field_value = cls.safe_dict_get(config, field, str, "")
             if not cls.is_non_empty_string(field_value):
-                return FlextResult.fail(f"DBT field '{field}' must be a non-empty string")
+                return FlextResult.fail(
+                    f"DBT field '{field}' must be a non-empty string"
+                )
 
         return FlextResult.ok(_SUCCESS)
 
@@ -206,7 +210,11 @@ class FlextMeltanoValidators(FlextUtilities):
             exists_validator = cls.create_validator(lambda p: Path(str(p)).exists())
             exists_result = exists_validator(path_str)
 
-            return str(dir_path.resolve()) if exists_result.success and exists_result.value else None
+            return (
+                str(dir_path.resolve())
+                if exists_result.success and exists_result.value
+                else None
+            )
 
         except Exception:
             return None
@@ -295,7 +303,7 @@ class FlextMeltanoValidators(FlextUtilities):
                 bool_result = cls.Conversions.to_bool(str(value))
 
             # Cast to T since we know expected_type is bool
-            return FlextResult.ok(bool_result)  # type: ignore[arg-type]
+            return FlextResult.ok(bool_result)
 
         # Use FlextUtilities for safe type casting for other types
         cast_result = cls.safe_cast_to_type(value, expected_type)
@@ -310,6 +318,7 @@ class FlextMeltanoValidators(FlextUtilities):
 # =============================================================================
 # BACKWARD COMPATIBILITY - Delegating functions (ZERO duplication)
 # =============================================================================
+
 
 def validate_directory_path(path: str | Path | None) -> str | None:
     """Convenience function delegating to FlextMeltanoValidators."""

@@ -266,9 +266,7 @@ class TestFlextMeltanoConfigurationRealFunctionality:
         """Test configuration validation."""
         # Test that invalid environment raises validation error
         with pytest.raises(ValidationError) as exc_info:
-            FlextMeltanoConfig(
-                project_root="/nonexistent/path", environment="invalid"
-            )
+            FlextMeltanoConfig(project_root="/nonexistent/path", environment="invalid")
 
         # Verify the validation error is for environment field
         assert "environment" in str(exc_info.value)

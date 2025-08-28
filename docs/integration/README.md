@@ -63,7 +63,8 @@ from flext_meltano import FlextMeltanoBridge, FlextMeltanoConfig
 # IMPLEMENTED: src/flext_meltano/ (accessible via __init__.py)
 """Production-ready bridge interface for Go ↔ Python integration."""
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
+
 from flext_core import FlextResult
 
 class FlextMeltanoBridge:
@@ -95,7 +96,7 @@ class FlextMeltanoBridge:
         """
         # ✅ PRODUCTION IMPLEMENTATION AVAILABLE
 
-    def list_plugins(self) -> FlextResult[List[Dict[str, Any]]]:
+    def list_plugins(self) -> FlextResult[List[Dict[str, object]]]:
         """List all available plugins with comprehensive metadata.
 
         Returns:
@@ -122,8 +123,8 @@ class FlextMeltanoBridge:
         *,
         variant: Optional[str] = None,
         pip_url: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None
-    ) -> FlextResult[Dict[str, Any]]:
+        config: Optional[Dict[str, object]] = None
+    ) -> FlextResult[Dict[str, object]]:
         """Add plugin to Meltano project with configuration.
 
         Args:
@@ -141,8 +142,8 @@ class FlextMeltanoBridge:
     def discover_catalog(
         self,
         tap_name: str,
-        config_override: Optional[Dict[str, Any]] = None
-    ) -> FlextResult[Dict[str, Any]]:
+        config_override: Optional[Dict[str, object]] = None
+    ) -> FlextResult[Dict[str, object]]:
         """Discover catalog from tap with comprehensive schema metadata.
 
         Args:
@@ -163,7 +164,7 @@ class FlextMeltanoBridge:
         job_id: Optional[str] = None,
         dry_run: bool = False,
         timeout_seconds: int = 3600
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute pipeline between tap and target with comprehensive monitoring.
 
         Args:
@@ -186,7 +187,7 @@ class FlextMeltanoBridge:
         project_dir: Optional[str] = None,
         profiles_dir: Optional[str] = None,
         target: Optional[str] = None
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute DBT command with comprehensive result handling.
 
         Args:
@@ -450,7 +451,7 @@ logger = structlog.get_logger(__name__)
 class FlextMeltanoService:
     """Production-ready FLEXT Service Meltano integration."""
 
-    def __init__(self, config: Dict[str, Any], service_container: ServiceContainer) -> None:
+    def __init__(self, config: Dict[str, object], service_container: ServiceContainer) -> None:
         self.config = FlextMeltanoConfig.from_dict(config)
         self.bridge = FlextMeltanoBridge(self.config)
         self.orchestrator = FlextMeltanoOrchestrationService(self.config)
@@ -462,7 +463,7 @@ class FlextMeltanoService:
         tap: str,
         target: str,
         environment: str = "production"
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute pipeline asynchronously with comprehensive monitoring."""
 
         with self.tracing.trace("meltano_pipeline_execution") as span:
@@ -530,7 +531,7 @@ class FlextMeltanoService:
         self,
         tap: str,
         target: str
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Validate pipeline configuration before execution."""
 
         try:
@@ -683,7 +684,7 @@ class ProductionMeltanoManager:
         tap: str,
         target: str,
         environment: str = "production"
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute pipeline with enterprise patterns."""
 
         # Pre-execution validation
@@ -750,7 +751,7 @@ class ResilientPipelineExecutor:
         tap: str,
         target: str,
         **kwargs
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Execute pipeline with automatic retry and recovery."""
 
         last_error = None

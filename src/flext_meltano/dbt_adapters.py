@@ -456,17 +456,29 @@ class FlextMeltanoDbtAdapters:
                 if FlextUtilities.is_list(results_data):
                     results_list = flext_results["results"]
                     if FlextUtilities.is_list(results_list):
-                        results_list = list(cast("list[object]", results_list))  # Create mutable copy
+                        results_list = list(
+                            cast("list[object]", results_list)
+                        )  # Create mutable copy
                         typed_results_data = cast("list[object]", results_data)
                         for result in typed_results_data:
                             if FlextUtilities.is_dict(result):
                                 typed_result = cast("dict[str, object]", result)
                                 flext_result = {
-                                    "unique_id": FlextUtilities.safe_dict_get(typed_result, "unique_id", str, ""),
-                                    "status": FlextUtilities.safe_dict_get(typed_result, "status", str, ""),
-                                    "execution_time": FlextUtilities.safe_dict_get(typed_result, "execution_time", float, 0.0),
-                                    "message": FlextUtilities.safe_dict_get(typed_result, "message", str, ""),
-                                    "compiled_code": FlextUtilities.safe_dict_get(typed_result, "compiled_code", str, ""),
+                                    "unique_id": FlextUtilities.safe_dict_get(
+                                        typed_result, "unique_id", str, ""
+                                    ),
+                                    "status": FlextUtilities.safe_dict_get(
+                                        typed_result, "status", str, ""
+                                    ),
+                                    "execution_time": FlextUtilities.safe_dict_get(
+                                        typed_result, "execution_time", float, 0.0
+                                    ),
+                                    "message": FlextUtilities.safe_dict_get(
+                                        typed_result, "message", str, ""
+                                    ),
+                                    "compiled_code": FlextUtilities.safe_dict_get(
+                                        typed_result, "compiled_code", str, ""
+                                    ),
                                 }
                                 results_list.append(flext_result)
                         flext_results["results"] = results_list
@@ -519,16 +531,28 @@ class FlextMeltanoDbtAdapters:
                             for node_id, node in typed_nodes_data.items():
                                 if FlextUtilities.is_dict(node):
                                     typed_node = cast("dict[str, object]", node)
-                                    depends_on_data = FlextUtilities.safe_dict_get(typed_node, "depends_on", dict, {})
+                                    depends_on_data = FlextUtilities.safe_dict_get(
+                                        typed_node, "depends_on", dict, {}
+                                    )
                                     depends_on_nodes = []
                                     if FlextUtilities.is_dict(depends_on_data):
-                                        depends_on_nodes = FlextUtilities.safe_dict_get(depends_on_data, "nodes", list, [])
+                                        depends_on_nodes = FlextUtilities.safe_dict_get(
+                                            depends_on_data, "nodes", list, []
+                                        )
 
                                     flext_node = {
-                                        "name": FlextUtilities.safe_dict_get(typed_node, "name", str, ""),
-                                        "resource_type": FlextUtilities.safe_dict_get(typed_node, "resource_type", str, ""),
-                                        "database": FlextUtilities.safe_dict_get(typed_node, "database", str, ""),
-                                        "schema": FlextUtilities.safe_dict_get(typed_node, "schema", str, ""),
+                                        "name": FlextUtilities.safe_dict_get(
+                                            typed_node, "name", str, ""
+                                        ),
+                                        "resource_type": FlextUtilities.safe_dict_get(
+                                            typed_node, "resource_type", str, ""
+                                        ),
+                                        "database": FlextUtilities.safe_dict_get(
+                                            typed_node, "database", str, ""
+                                        ),
+                                        "schema": FlextUtilities.safe_dict_get(
+                                            typed_node, "schema", str, ""
+                                        ),
                                         "depends_on": depends_on_nodes,
                                     }
                                     nodes_dict_copy[node_id] = flext_node
@@ -540,7 +564,9 @@ class FlextMeltanoDbtAdapters:
                     sources_dict = flext_manifest["sources"]
                     if FlextUtilities.is_dict(sources_dict):
                         typed_sources_dict = cast("dict[str, object]", sources_dict)
-                        sources_dict_copy = dict(typed_sources_dict)  # Create mutable copy
+                        sources_dict_copy = dict(
+                            typed_sources_dict
+                        )  # Create mutable copy
 
                         # Type safe iteration over sources_data
                         if FlextUtilities.is_dict(sources_data):
@@ -549,10 +575,18 @@ class FlextMeltanoDbtAdapters:
                                 if FlextUtilities.is_dict(source):
                                     typed_source = cast("dict[str, object]", source)
                                     flext_source = {
-                                        "name": FlextUtilities.safe_dict_get(typed_source, "name", str, ""),
-                                        "source_name": FlextUtilities.safe_dict_get(typed_source, "source_name", str, ""),
-                                        "database": FlextUtilities.safe_dict_get(typed_source, "database", str, ""),
-                                        "schema": FlextUtilities.safe_dict_get(typed_source, "schema", str, ""),
+                                        "name": FlextUtilities.safe_dict_get(
+                                            typed_source, "name", str, ""
+                                        ),
+                                        "source_name": FlextUtilities.safe_dict_get(
+                                            typed_source, "source_name", str, ""
+                                        ),
+                                        "database": FlextUtilities.safe_dict_get(
+                                            typed_source, "database", str, ""
+                                        ),
+                                        "schema": FlextUtilities.safe_dict_get(
+                                            typed_source, "schema", str, ""
+                                        ),
                                     }
                                     sources_dict_copy[source_id] = flext_source
                         flext_manifest["sources"] = sources_dict_copy

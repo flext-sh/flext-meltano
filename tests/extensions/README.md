@@ -249,13 +249,14 @@ def enterprise_compliance_dataset():
 ```python
 # Enterprise extension implementation pattern
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
+
 from flext_meltano.base import FlextMeltanoBase
 
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: Dict[str, object]) -> None:
         """Initialize enterprise extension with configuration."""
         super().__init__(config)
         self.validate_enterprise_config()

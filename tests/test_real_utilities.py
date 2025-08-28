@@ -448,9 +448,12 @@ class TestRealFlextUtilitiesIntegration:
 
         # Test partitioning results (collect_successes doesn't exist)
         results = [result1, result2, result3]
-        successes_list, _failures_list = FlextUtilities.ResultUtils.partition_results(results)
+        successes_list, _failures_list = FlextUtilities.ResultUtils.partition_results(
+            results
+        )
         # partition_results already returns the values, not FlextResults
         from flext_core import FlextResult
+
         successes = FlextResult.ok(successes_list)
         assert successes.success is True
         assert isinstance(successes.value, list)
@@ -475,7 +478,9 @@ class TestRealFlextUtilitiesIntegration:
         # Test safe conversions using FlextUtilities
         input_dict = {"key1": 123, "key2": True, "key3": "string"}
         # Convert dict values to strings using FlextUtilities.Conversions.safe_str
-        str_dict = {k: FlextUtilities.Conversions.safe_str(v) for k, v in input_dict.items()}
+        str_dict = {
+            k: FlextUtilities.Conversions.safe_str(v) for k, v in input_dict.items()
+        }
         assert all(isinstance(k, str) for k in str_dict)
         assert all(isinstance(v, str) for v in str_dict.values())
         assert str_dict["key1"] == "123"
@@ -485,7 +490,9 @@ class TestRealFlextUtilitiesIntegration:
         # Test list to comma separated conversion
         input_list = ["item1", 123, True]
         # Convert each item to string then join
-        comma_str = ",".join(FlextUtilities.Conversions.safe_str(item) for item in input_list)
+        comma_str = ",".join(
+            FlextUtilities.Conversions.safe_str(item) for item in input_list
+        )
         assert comma_str == "item1,123,True"
 
         # Test comma separated to list conversion
@@ -495,9 +502,14 @@ class TestRealFlextUtilitiesIntegration:
 
         # Test safe_dict_get from FlextUtilities
         test_dict = {"exists": "value", "number": 42}
-        assert FlextUtilities.safe_dict_get(test_dict, "exists", str, "default") == "value"
+        assert (
+            FlextUtilities.safe_dict_get(test_dict, "exists", str, "default") == "value"
+        )
         assert FlextUtilities.safe_dict_get(test_dict, "number", int, 0) == 42
-        assert FlextUtilities.safe_dict_get(test_dict, "missing", str, "default") == "default"
+        assert (
+            FlextUtilities.safe_dict_get(test_dict, "missing", str, "default")
+            == "default"
+        )
 
     def test_specialized_utilities(self) -> None:
         """Test specialized utility classes using FlextMeltanoUtilities."""
