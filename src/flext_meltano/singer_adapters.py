@@ -14,11 +14,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Iterator
+from logging import Logger
 from typing import cast
 
 from flext_core import (
     FlextDomainService,
-    FlextLogger,
     FlextResult,
     FlextUtilities,
     get_logger,
@@ -76,7 +76,7 @@ class FlextMeltanoAdapters:
             )
 
         @property
-        def logger(self) -> FlextLogger:
+        def logger(self) -> Logger:
             """Get logger instance."""
             return get_logger(self.__class__.__name__)
 
