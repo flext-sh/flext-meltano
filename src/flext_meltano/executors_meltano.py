@@ -24,14 +24,13 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 
 from flext_meltano.meltano_adapters import MeltanoBridge
 
 T = TypeVar("T")
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Constants to avoid FBT003 violations
 _FALSE = False
@@ -76,7 +75,7 @@ class FlextMeltanoExecutors:
         @property
         def logger(self) -> FlextLogger:
             """Get logger instance."""
-            return get_logger(self.__class__.__name__)
+            return FlextLogger(self.__class__.__name__)
 
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute Meltano executor operation (required by FlextDomainService).

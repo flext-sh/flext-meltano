@@ -21,12 +21,11 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 
 DBT_AVAILABLE = True
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # =============================================================================
 # MAIN DBT ADAPTERS CLASS - Following Flext[Area][Module] pattern
@@ -69,7 +68,7 @@ class FlextMeltanoDbtAdapters:
         @property
         def logger(self) -> FlextLogger:
             """Get logger instance."""
-            return get_logger(self.__class__.__name__)
+            return FlextLogger(self.__class__.__name__)
 
         def execute(self) -> FlextResult[object]:
             """Execute DBT service operation (required by FlextDomainService).
@@ -78,20 +77,18 @@ class FlextMeltanoDbtAdapters:
                 FlextResult containing service information
 
             """
-            return FlextResult[object].ok(
-                {
-                    "service": "MeltanoDbtWrapper",
-                    "status": "ready",
-                    "dbt_available": DBT_AVAILABLE,
-                    "capabilities": [
-                        "create_runner",
-                        "run_models",
-                        "test_models",
-                        "compile_project",
-                        "generate_docs",
-                    ],
-                }
-            )
+            return FlextResult[object].ok({
+                "service": "MeltanoDbtWrapper",
+                "status": "ready",
+                "dbt_available": DBT_AVAILABLE,
+                "capabilities": [
+                    "create_runner",
+                    "run_models",
+                    "test_models",
+                    "compile_project",
+                    "generate_docs",
+                ],
+            })
 
         def create_runner(
             self, project_dir: Path | None = None

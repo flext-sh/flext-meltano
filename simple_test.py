@@ -1,6 +1,6 @@
 """Simple test to verify DBT Hub core functionality."""
 
-from flext_core import get_logger
+from flext_core import FlextLogger
 
 # from flext_meltano.dbt_packages.executor import FlextDbtInMemoryExecutor
 # from flext_meltano.dbt_packages.manager import FlextDbtPackageManager
@@ -23,7 +23,7 @@ class FlextDbtPackageManager:
 
 
 # Setup logging
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Test instantiation
 executor = FlextDbtInMemoryExecutor()

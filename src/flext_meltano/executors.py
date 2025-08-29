@@ -19,9 +19,9 @@ from typing import TypeVar, cast
 
 from flext_core import (
     FlextDomainService,
+    FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 from rich.console import Console
 from rich.table import Table
@@ -30,7 +30,7 @@ from flext_meltano.adapters import FlextMeltanoAdapters
 
 T = TypeVar("T")
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 # =============================================================================
@@ -64,17 +64,15 @@ class FlextMeltanoExecutors:
             """Initialize Meltano executor with optional configuration."""
             super().__init__()
             self.config = config or {}
-            self._logger = get_logger(__name__)
+            self._logger = FlextLogger(__name__)
 
         def execute(self) -> FlextResult[dict[str, object]]:
             """Execute operation (required by FlextDomainService)."""
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "FlextMeltanoExecutor",
-                    "status": "ready",
-                    "config": self.config,
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                "service": "FlextMeltanoExecutor",
+                "status": "ready",
+                "config": self.config,
+            })
 
         def discover_plugins(self) -> FlextResult[dict[str, object]]:
             """Discover available Meltano plugins."""
@@ -85,9 +83,10 @@ class FlextMeltanoExecutors:
 
                 if result.success:
                     plugins_data: dict[str, object] = {"plugins": result.value}
-                    return FlextResult[dict[str, object]].ok(
-                        {"success": True, "data": plugins_data}
-                    )
+                    return FlextResult[dict[str, object]].ok({
+                        "success": True,
+                        "data": plugins_data,
+                    })
                 error_data: dict[str, object] = {
                     "success": False,
                     "error": result.error,
@@ -129,7 +128,7 @@ class FlextMeltanoExecutors:
             """Initialize CLI executor."""
             self.project_root = project_root or Path.cwd()
             self.console = Console()
-            self.logger = get_logger(self.__class__.__name__)
+            self.logger = FlextLogger(self.__class__.__name__)
 
         def run_command(self, args: list[str]) -> int:
             """Run CLI command and return exit code."""
@@ -301,7 +300,7 @@ class FlextMeltanoExecutors:
 
         def __init__(self) -> None:
             """Initialize bridge executor."""
-            self._logger = get_logger(__name__)
+            self._logger = FlextLogger(__name__)
 
         def get_version(self) -> dict[str, object]:
             """Get version information for Go service."""

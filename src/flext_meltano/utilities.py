@@ -16,14 +16,14 @@ from typing import TypeVar
 
 import yaml
 from flext_core import (
+    FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 
 T = TypeVar("T")
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Constants to avoid FBT003 violations
 _SUCCESS = True
@@ -256,28 +256,26 @@ class FlextMeltanoUtilities:
 
         try:
             # Clean output using FlextUtilities
-            clean_output = FlextUtilities.TextProcessor.clean_text(output)  # From FlextUtilities
+            clean_output = FlextUtilities.TextProcessor.clean_text(
+                output
+            )  # From FlextUtilities
             lines = clean_output.split("\n")
 
             # Try JSON parsing first using FlextUtilities concept
             json_result = FlextUtilities.ProcessingUtils.parse_json_safe(clean_output)
             if json_result.success:
-                return FlextResult.ok(
-                    {
-                        "output": clean_output,
-                        "lines": lines,
-                        "parsed_json": json_result.value,
-                    }
-                )
-
-            # Fallback to structured text parsing
-            return FlextResult.ok(
-                {
+                return FlextResult.ok({
                     "output": clean_output,
                     "lines": lines,
-                    "line_count": len(lines),
-                }
-            )
+                    "parsed_json": json_result.value,
+                })
+
+            # Fallback to structured text parsing
+            return FlextResult.ok({
+                "output": clean_output,
+                "lines": lines,
+                "line_count": len(lines),
+            })
 
         except Exception as e:
             error_msg = f"Failed to parse Meltano output: {e}"
@@ -303,8 +301,12 @@ class FlextMeltanoUtilities:
                 "status": "failed",
             }
 
-        name = FlextUtilities.ProcessingUtils.safe_dict_get(plugin_data, "name", str, "unknown")
-        plugin_type = FlextUtilities.ProcessingUtils.safe_dict_get(plugin_data, "type", str, "unknown")
+        name = FlextUtilities.ProcessingUtils.safe_dict_get(
+            plugin_data, "name", str, "unknown"
+        )
+        plugin_type = FlextUtilities.ProcessingUtils.safe_dict_get(
+            plugin_data, "type", str, "unknown"
+        )
 
         return {
             "id": name,
@@ -314,7 +316,9 @@ class FlextMeltanoUtilities:
             "namespace": FlextUtilities.ProcessingUtils.safe_dict_get(
                 plugin_data, "namespace", str, f"{plugin_type}_{name}"
             ),
-            "version": FlextUtilities.ProcessingUtils.safe_dict_get(plugin_data, "version", str, "1.0.0"),
+            "version": FlextUtilities.ProcessingUtils.safe_dict_get(
+                plugin_data, "version", str, "1.0.0"
+            ),
             "metadata": {
                 "adapted_by": "flext-meltano",
                 "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -372,7 +376,11 @@ class FlextMeltanoUtilities:
     @classmethod
     def normalize_plugin_name(cls, name: str, plugin_type: str = "tap") -> str:
         """Normalize plugin name with type prefix."""
-        safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown").lower().replace(" ", "-")
+        safe_name = (
+            FlextUtilities.TextProcessor.safe_string(name, "unknown")
+            .lower()
+            .replace(" ", "-")
+        )
         if plugin_type in {"tap", "extractor"} and not safe_name.startswith("tap-"):
             return f"tap-{safe_name}"
         if plugin_type in {"target", "loader"} and not safe_name.startswith("target-"):
@@ -382,7 +390,12 @@ class FlextMeltanoUtilities:
     @classmethod
     def sanitize_plugin_name(cls, name: str) -> str:
         """Sanitize plugin name to safe format."""
-        return FlextUtilities.TextProcessor.safe_string(name, "unknown").lower().replace(" ", "_").replace("-", "_")
+        return (
+            FlextUtilities.TextProcessor.safe_string(name, "unknown")
+            .lower()
+            .replace(" ", "_")
+            .replace("-", "_")
+        )
 
     @classmethod
     def load_yaml_config(cls, path: Path) -> FlextResult[dict[str, object]]:
@@ -390,7 +403,9 @@ class FlextMeltanoUtilities:
         try:
             with path.open("r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
-            return FlextResult.ok(data if FlextUtilities.TypeGuards.is_dict(data) else {})
+            return FlextResult.ok(
+                data if FlextUtilities.TypeGuards.is_dict(data) else {}
+            )
         except Exception as e:
             return FlextResult.fail(f"Failed to load YAML: {e}")
 
@@ -417,13 +432,11 @@ class FlextMeltanoUtilities:
             cls.write_meltano_yml(meltano_config, meltano_yml)
             cls.write_meltano_yml(dbt_config, dbt_yml)  # Using same YAML writer
 
-            return FlextResult.ok(
-                {
-                    "project_root": str(project_root),
-                    "meltano_yml": str(meltano_yml),
-                    "dbt_yml": str(dbt_yml),
-                }
-            )
+            return FlextResult.ok({
+                "project_root": str(project_root),
+                "meltano_yml": str(meltano_yml),
+                "dbt_yml": str(dbt_yml),
+            })
         except Exception as e:
             return FlextResult.fail(f"Failed to setup project structure: {e}")
 

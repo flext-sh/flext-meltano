@@ -20,8 +20,8 @@ from typing import TypeVar
 from dbt.cli.main import dbtRunner
 from flext_core import (
     FlextDomainService,
+    FlextLogger,
     FlextResult,
-    get_logger,
 )
 from meltano.core.plugin.base import PluginType
 from meltano.core.project import Project
@@ -31,7 +31,7 @@ from singer_sdk import Stream, Tap, Target
 
 T = TypeVar("T")
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Removed unused flext-cli import - no decorators being used
 
@@ -66,13 +66,14 @@ class FlextMeltanoAdapters:
         def __init__(self) -> None:
             """Initialize Meltano adapter with proper logging."""
             super().__init__()
-            self._logger = get_logger(__name__)
+            self._logger = FlextLogger(__name__)
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
-            return FlextResult[object].ok(
-                {"service": "MeltanoAdapter", "status": "ready"}
-            )
+            return FlextResult[object].ok({
+                "service": "MeltanoAdapter",
+                "status": "ready",
+            })
 
         def discover_plugins(
             self,
@@ -238,7 +239,7 @@ class FlextMeltanoAdapters:
         def __init__(self) -> None:
             """Initialize DBT adapter with proper logging."""
             super().__init__()
-            self._logger = get_logger(__name__)
+            self._logger = FlextLogger(__name__)
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
@@ -330,13 +331,14 @@ class FlextMeltanoAdapters:
         def __init__(self) -> None:
             """Initialize Singer adapter with proper logging."""
             super().__init__()
-            self._logger = get_logger(__name__)
+            self._logger = FlextLogger(__name__)
 
         def execute(self) -> FlextResult[object]:
             """Execute adapter service operation (required by FlextDomainService)."""
-            return FlextResult[object].ok(
-                {"service": "SingerAdapter", "status": "ready"}
-            )
+            return FlextResult[object].ok({
+                "service": "SingerAdapter",
+                "status": "ready",
+            })
 
         def create_tap_stream(
             self,

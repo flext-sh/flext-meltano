@@ -446,7 +446,7 @@ from flext_observability import FlextMetrics, FlextTracing
 import structlog
 import asyncio
 
-logger = structlog.get_logger(__name__)
+logger = structlog.FlextLogger(__name__)
 
 class FlextMeltanoService:
     """Production-ready FLEXT Service Meltano integration."""

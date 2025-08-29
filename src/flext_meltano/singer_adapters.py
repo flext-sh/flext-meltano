@@ -19,14 +19,14 @@ from typing import cast
 
 from flext_core import (
     FlextDomainService,
+    FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.typing import PropertiesList, Property
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # =============================================================================
 # MAIN ADAPTERS CLASS - Following Flext[Area][Module] pattern
@@ -68,17 +68,15 @@ class FlextMeltanoAdapters:
             """
             # Execute operation - Singer wrapper is operational
             self.logger.info("Singer wrapper executed successfully")
-            return FlextResult[dict[str, object]].ok(
-                {
-                    "service": "MeltanoSingerWrapper",
-                    "status": "ready",
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                "service": "MeltanoSingerWrapper",
+                "status": "ready",
+            })
 
         @property
         def logger(self) -> Logger:
             """Get logger instance."""
-            return get_logger(self.__class__.__name__)
+            return FlextLogger(self.__class__.__name__)
 
         # Using FLEXT-CLI inspired patterns for service integration - enterprise patterns applied
         def create_tap(

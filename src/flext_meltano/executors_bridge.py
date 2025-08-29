@@ -9,13 +9,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import get_logger
+from flext_core import FlextLogger
 
 from flext_meltano.dbt_adapters import MeltanoDbtWrapper
 from flext_meltano.executors_meltano import FlextMeltanoExecutor, FlextMeltanoExecutors
 from flext_meltano.meltano_adapters import MeltanoBridge
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 class FlextMeltanoBridge:
