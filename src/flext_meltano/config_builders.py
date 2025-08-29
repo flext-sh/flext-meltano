@@ -14,11 +14,11 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextUtilities, get_logger
+from flext_core import FlextLogger, FlextUtilities
 
 from flext_meltano.flext_types import ConfigDict
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # =============================================================================
 # MAIN CONFIGURATION BUILDERS CLASS - Following Flext[Area][Module] pattern

@@ -4,7 +4,7 @@ This example demonstrates the actual working functionality that exists,
 using only classes and functions that are actually exported from flext_meltano.
 """
 
-from flext_core import get_logger
+from flext_core import FlextLogger
 
 # Import ONLY what actually exists
 from flext_meltano import (
@@ -13,7 +13,7 @@ from flext_meltano import (
     MeltanoBridge,
 )
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 def simple_bridge_example() -> None:

@@ -124,7 +124,7 @@ result = service.run_with_metrics("tap_processing", {"api_key": "test"})
 
 ```python
 # ✅ CORRECT: Root module imports only
-from flext_core import FlextResult, FlextServiceProcessor, get_logger
+from flext_core import FlextResult, FlextServiceProcessor, FlextLogger
 from flext_cli import CLICommand, FlextCliApi
 from flext_meltano import FlextMeltanoConfig, execute_meltano_command
 
@@ -192,7 +192,7 @@ from flext_core import (
     FlextResult,                # Railway-oriented programming
     FlextServiceProcessor,      # Service base classes
     FlextLogger,               # Structured logging
-    get_logger                 # Logger factory
+    FlextLogger                 # Logger factory
 )
 
 from flext_cli import (

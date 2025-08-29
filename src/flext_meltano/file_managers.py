@@ -18,15 +18,15 @@ from pathlib import Path
 
 import yaml
 from flext_core import (
+    FlextLogger,
     FlextResult,
-    get_logger,
 )
 
 # Type definitions for file management operations
 ConfigDict = dict[str, object]
 PathDict = dict[str, str]
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # =============================================================================
 # MAIN FILE MANAGERS CLASS - Following Flext[Area][Module] pattern

@@ -20,10 +20,10 @@ from typing import cast
 
 from dbt.cli.main import dbtRunner
 from flext_core import (
+    FlextLogger,
     FlextResult,
     FlextServiceProcessor,
     FlextUtilities,
-    get_logger,
 )
 from singer_sdk import Tap, Target
 
@@ -34,7 +34,7 @@ from flext_meltano.singer_adapters import FlextSingerAdapter, MeltanoSingerWrapp
 ConfigDict = dict[str, object]
 ResultDict = dict[str, object]
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 # =============================================================================
@@ -92,7 +92,7 @@ class FlextMeltanoServices:
         def process(self, request: ConfigDict) -> FlextResult[Tap]:
             """Process tap configuration and create Singer Tap instance."""
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Processing tap configuration", tap_name=self.tap_name
                 )
 
@@ -111,7 +111,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to process tap configuration: {e}"
-                get_logger(__name__).exception(
+                FlextLogger(__name__).exception(
                     error_msg, tap_name=self.tap_name, error=str(e)
                 )
                 return FlextResult[Tap].fail(error_msg)
@@ -176,7 +176,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Creating tap instance", tap_name=self.tap_name
                 )
 
@@ -194,7 +194,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to create tap {self.tap_name}: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[Tap].fail(error_msg)
 
         def discover_streams(self, tap: Tap) -> FlextResult[list[dict[str, object]]]:
@@ -208,7 +208,9 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info("Discovering streams", tap_name=self.tap_name)
+                FlextLogger(__name__).info(
+                    "Discovering streams", tap_name=self.tap_name
+                )
 
                 # Use wrapper for discovery
                 catalog_result = self.wrapper_singer.discover_catalog(tap)
@@ -236,12 +238,12 @@ class FlextMeltanoServices:
                             streams_data
                         )  # Type-safe assignment with explicit conversion
 
-                get_logger(__name__).info("Streams discovered", count=len(streams))
+                FlextLogger(__name__).info("Streams discovered", count=len(streams))
                 return FlextResult[list[dict[str, object]]].ok(streams)
 
             except Exception as e:
                 error_msg = f"Failed to discover streams: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[list[dict[str, object]]].fail(error_msg)
 
         def validate_tap_config(self, config: dict[str, object]) -> FlextResult[bool]:
@@ -299,7 +301,7 @@ class FlextMeltanoServices:
         def process(self, request: ConfigDict) -> FlextResult[Target]:
             """Process target configuration and create Singer Target instance."""
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Processing target configuration", target_name=self.target_name
                 )
                 # Create target instance
@@ -308,7 +310,7 @@ class FlextMeltanoServices:
                 return FlextResult[Target].ok(target_instance)
             except Exception as e:
                 error_msg = f"Failed to process target configuration: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[Target].fail(error_msg)
 
         def build(self, domain: Target, *, correlation_id: str) -> ResultDict:
@@ -373,7 +375,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Creating target instance", target_name=self.target_name
                 )
 
@@ -390,7 +392,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to create target {self.target_name}: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[Target].fail(error_msg)
 
         def process_records(
@@ -408,7 +410,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Processing records",
                     target_name=self.target_name,
                     stream=stream_name,
@@ -436,7 +438,7 @@ class FlextMeltanoServices:
                             target._process_record_message(singer_message)
                         records_processed += 1
                     except Exception as e:
-                        get_logger(__name__).warning(
+                        FlextLogger(__name__).warning(
                             "Failed to process record", error=str(e)
                         )
 
@@ -449,14 +451,14 @@ class FlextMeltanoServices:
                     "target": self.target_name,
                 }
 
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Records processed successfully", count=records_processed
                 )
                 return FlextResult[dict[str, object]].ok(result)
 
             except Exception as e:
                 error_msg = f"Failed to process records: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def validate_target_config(
@@ -516,7 +518,7 @@ class FlextMeltanoServices:
         def process(self, request: ConfigDict) -> FlextResult[dbtRunner]:
             """Process DBT configuration and create runner instance."""
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Processing DBT configuration", project_name=self.project_name
                 )
                 # Create DBT runner
@@ -529,7 +531,7 @@ class FlextMeltanoServices:
                 )
             except Exception as e:
                 error_msg = f"Failed to process DBT configuration: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dbtRunner].fail(error_msg)
 
         def build(self, domain: dbtRunner, *, correlation_id: str) -> ResultDict:
@@ -609,7 +611,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Initializing DBT project",
                     project_name=self.project_name,
                     project_root=str(project_root),
@@ -626,7 +628,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to initialize DBT project: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dbtRunner].fail(error_msg)
 
         def run_models(
@@ -645,7 +647,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Running DBT models", project_name=self.project_name, models=models
                 )
 
@@ -666,7 +668,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to run DBT models: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def test_models(
@@ -687,7 +689,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Testing DBT models", project_name=self.project_name, models=models
                 )
 
@@ -696,7 +698,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to test DBT models: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
         def get_model_lineage(
@@ -712,7 +714,7 @@ class FlextMeltanoServices:
 
             """
             try:
-                get_logger(__name__).info(
+                FlextLogger(__name__).info(
                     "Getting model lineage", project_name=self.project_name
                 )
 
@@ -749,7 +751,7 @@ class FlextMeltanoServices:
 
             except Exception as e:
                 error_msg = f"Failed to get model lineage: {e}"
-                get_logger(__name__).exception(error_msg, error=str(e))
+                FlextLogger(__name__).exception(error_msg, error=str(e))
                 return FlextResult[dict[str, object]].fail(error_msg)
 
     # =================================================================

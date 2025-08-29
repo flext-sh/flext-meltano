@@ -15,14 +15,14 @@ from pathlib import Path
 from typing import TypeVar
 
 from flext_core import (
+    FlextLogger,
     FlextResult,
     FlextUtilities,
-    get_logger,
 )
 
 T = TypeVar("T")
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Constants to avoid FBT003 violations
 _SUCCESS = True
