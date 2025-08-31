@@ -16,7 +16,9 @@ from typing import cast
 
 from flext_core import FlextLogger, FlextUtilities
 
-from flext_meltano.flext_types import ConfigDict
+from flext_meltano.typings import FlextMeltanoTypes
+
+ConfigDict = FlextMeltanoTypes.CLI.ProcessResult
 
 logger = FlextLogger(__name__)
 
@@ -291,12 +293,12 @@ class FlextMeltanoConfigBuilders:
             updated_config = meltano_config.copy()
             plugins = updated_config.setdefault("plugins", {})
 
-            if FlextUtilities.is_dict(plugins):
-                typed_plugins = cast("dict[str, object]", plugins)
+            if isinstance(plugins, dict):
+                typed_plugins = cast("FlextMeltanoTypes.CLI.ProcessResult", plugins)
                 if plugin_type not in typed_plugins:
                     typed_plugins[plugin_type] = []
                 plugin_list = typed_plugins[plugin_type]
-                if FlextUtilities.is_list(plugin_list):
+                if FlextUtilities.TypeGuards.is_list(plugin_list):
                     typed_list = cast("list[object]", plugin_list)
                     plugin_list_copy = list(typed_list)  # Create mutable copy
                     plugin_list_copy.append(plugin_config)

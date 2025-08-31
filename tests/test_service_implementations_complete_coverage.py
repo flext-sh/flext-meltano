@@ -8,10 +8,10 @@
 from __future__ import annotations
 
 import tempfile
-from typing import ClassVar, cast, object
+from typing import ClassVar, cast
 
 import pytest
-from flext_core import FlextResult, FlextServiceProcessor
+from flext_core import FlextResult
 from singer_sdk import Stream, Tap, Target
 
 from flext_meltano.service_implementations import (

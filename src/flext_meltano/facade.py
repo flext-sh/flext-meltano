@@ -13,9 +13,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano.adapters import FlextMeltanoAdapters
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.executors import FlextMeltanoExecutors
+from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 # =============================================================================
@@ -32,7 +32,7 @@ class FlextMeltano:
     - FlextMeltanoConfig: Configuration management
     - FlextMeltanoUtilities: Utility functions
     - FlextMeltanoAdapters: External service adapters
-    - FlextMeltanoExecutors: Execution engines
+    - FlextMeltanoExecutor: Execution engines
 
     SOLID Principles:
     - Single Responsibility: Single entry point for all functionality
@@ -45,8 +45,8 @@ class FlextMeltano:
         # Orchestrate specialized classes (FLEXT pattern)
         self._config = FlextMeltanoConfig
         self._utilities = FlextMeltanoUtilities
-        self._adapters = FlextMeltanoAdapters
-        self._executors = FlextMeltanoExecutors
+        self._adapters = FlextMeltanoAdapter
+        self._executors = FlextMeltanoExecutor
 
     # =================================================================
     # ORCHESTRATION METHODS - NO IMPLEMENTATION, ONLY DELEGATION
@@ -63,12 +63,12 @@ class FlextMeltano:
         return self._utilities
 
     @property
-    def adapters(self) -> type[FlextMeltanoAdapters]:
+    def adapters(self) -> type[FlextMeltanoAdapter]:
         """Access external service adapters."""
         return self._adapters
 
     @property
-    def executors(self) -> type[FlextMeltanoExecutors]:
+    def executors(self) -> type[FlextMeltanoExecutor]:
         """Access execution engines."""
         return self._executors
 
@@ -79,8 +79,8 @@ class FlextMeltano:
     # Class attributes for backward compatibility
     Config = FlextMeltanoConfig
     Utilities = FlextMeltanoUtilities
-    Adapters = FlextMeltanoAdapters
-    Executors = FlextMeltanoExecutors
+    Adapters = FlextMeltanoAdapter
+    Executors = FlextMeltanoExecutor
 
 
 # =============================================================================
@@ -90,8 +90,8 @@ class FlextMeltano:
 # Export specialized classes for direct usage
 MeltanoConfig = FlextMeltanoConfig
 MeltanoUtilities = FlextMeltanoUtilities
-MeltanoAdapters = FlextMeltanoAdapters
-MeltanoExecutors = FlextMeltanoExecutors
+MeltanoAdapters = FlextMeltanoAdapter
+MeltanoExecutors = FlextMeltanoExecutor
 
 
 __all__ = [

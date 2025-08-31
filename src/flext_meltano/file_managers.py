@@ -22,8 +22,10 @@ from flext_core import (
     FlextResult,
 )
 
+from flext_meltano.typings import FlextMeltanoTypes
+
 # Type definitions for file management operations
-ConfigDict = dict[str, object]
+ConfigDict = FlextMeltanoTypes.CLI.ProcessResult
 PathDict = dict[str, str]
 
 logger = FlextLogger(__name__)

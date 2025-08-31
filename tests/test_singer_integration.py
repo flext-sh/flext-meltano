@@ -235,9 +235,8 @@ class TestTargetServiceIntegration:
 
         target_service = TestTargetService(target_name="test")
 
-        # Test basic validation - using available validate method from FlextValidatableMixin
-        # Note: validate_business_rules is specific to FlextModel, use validate() instead
-        validation_result = target_service.validate()
+        # Test basic validation using validate_business_rules from FlextDomainService
+        validation_result = target_service.validate_business_rules()
         assert isinstance(validation_result, FlextResult)
 
         # Test execution

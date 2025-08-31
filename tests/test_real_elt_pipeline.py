@@ -277,13 +277,13 @@ class TestRealELTPipeline:
             "system_info": version_result["data"],
             "available_plugins": {
                 "total": len(plugins_data),
-                "extractors": len([
-                    p for p in plugins_data if p["type"] == "extractor"
-                ]),
+                "extractors": len(
+                    [p for p in plugins_data if p["type"] == "extractor"]
+                ),
                 "loaders": len([p for p in plugins_data if p["type"] == "loader"]),
-                "transformers": len([
-                    p for p in plugins_data if p["type"] == "transformer"
-                ]),
+                "transformers": len(
+                    [p for p in plugins_data if p["type"] == "transformer"]
+                ),
             },
             "capabilities": {
                 "native_api_integration": True,
