@@ -17,6 +17,8 @@ from flext_core import (
     FlextExceptions,
 )
 
+from flext_meltano.typings import FlextMeltanoTypes
+
 # =============================================================================
 # MAIN EXCEPTIONS CLASS - Following Flext[Area][Module] pattern
 # =============================================================================
@@ -65,7 +67,7 @@ class FlextMeltanoExceptions:
         ) -> None:
             """Initialize configuration error with nested context expected by tests."""
             super().__init__(f"Configuration: {message}", context={})
-            nested: dict[str, object] = dict(kwargs)
+            nested: FlextMeltanoTypes.CLI.ProcessResult = dict(kwargs)
             if config_file is not None:
                 nested["config_file"] = config_file
             if section is not None:
@@ -84,7 +86,7 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize connection error with network context."""
-            nested: dict[str, object] = {}
+            nested: FlextMeltanoTypes.CLI.ProcessResult = {}
             if host is not None:
                 nested["host"] = host
             if port is not None:
@@ -103,12 +105,12 @@ class FlextMeltanoExceptions:
             *,
             operation: str | None = None,
             records_processed: int | None = None,
-            context: dict[str, object] | None = None,
+            context: FlextMeltanoTypes.CLI.ProcessResult | None = None,
             **kwargs: object,
         ) -> None:
             """Initialize processing error with operation context."""
             super().__init__(f"Processing: {message}", context={})
-            nested_context: dict[str, object] = dict(context or {})
+            nested_context: FlextMeltanoTypes.CLI.ProcessResult = dict(context or {})
             if kwargs:
                 nested_context.update(dict(kwargs))
             if operation is not None:
@@ -150,7 +152,7 @@ class FlextMeltanoExceptions:
         ) -> None:
             """Initialize timeout error with timing context nested under 'context'."""
             super().__init__(f"Timeout: {message}", context={})
-            nested: dict[str, object] = {}
+            nested: FlextMeltanoTypes.CLI.ProcessResult = {}
             if timeout_seconds is not None:
                 nested["timeout"] = timeout_seconds
             if operation is not None:
@@ -193,7 +195,7 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize execution error with command context."""
-            nested: dict[str, object] = dict(kwargs)
+            nested: FlextMeltanoTypes.CLI.ProcessResult = dict(kwargs)
             if command is not None:
                 nested["command"] = command
             if exit_code is not None:

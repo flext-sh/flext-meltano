@@ -7,7 +7,7 @@ The main class FlextMeltanoConfig serves as the facade providing access to all
 configuration functionality through internal aliases and nested classes.
 
 Inheritance Hierarchy:
-    FlextMeltanoConfig -> FlextModel (from flext-core)
+    FlextMeltanoConfig -> FlextModels (from flext-core)
     All constants and enums as internal aliases, no implementation
 
 SOLID Principles:
@@ -23,7 +23,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar, Final
 
-from flext_core import FlextModel
+from flext_core import FlextModels
 from pydantic import Field, field_validator
 
 # =============================================================================
@@ -155,11 +155,11 @@ class _FlextMeltanoEnums:
 # =============================================================================
 
 
-class FlextMeltanoConfig(FlextModel):
+class FlextMeltanoConfig(FlextModels):
     """Single main configuration class inheriting from FlextCore (Flext[Area][Module] pattern).
 
     Architectural Compliance:
-    - Inherits from FlextModel (flext-core)
+    - Inherits from FlextModels (flext-core)
     - All constants and enums available as class aliases
     - Facade pattern: delegates to internal classes, implements nothing directly
 

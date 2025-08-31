@@ -26,7 +26,8 @@ from flext_core import (
     FlextUtilities,
 )
 
-from flext_meltano.meltano_adapters import MeltanoBridge
+from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.typings import FlextMeltanoTypes
 
 T = TypeVar("T")
 
@@ -59,14 +60,14 @@ class FlextMeltanoExecutors:
     # NESTED EXECUTOR CLASSES - Actual implementations
     # =================================================================
 
-    class MeltanoExecutor(FlextDomainService[dict[str, object]]):
-        """Main executor for runtime via Go bridge.
+    class MeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResult]):
+        """Main executor for runtime via FlextMeltanoAdapter.
 
         Executes Meltano and DBT commands via native APIs for FlexCore Go integration,
         providing structured JSON results for Go service consumption.
         """
 
-        def __init__(self, config: dict[str, object] | None = None) -> None:
+        def __init__(self, config: FlextMeltanoTypes.CLI.ProcessResult | None = None) -> None:
             # Initialize parent without passing config as kwargs
             super().__init__()
             # Store config as instance variable if needed
@@ -77,25 +78,27 @@ class FlextMeltanoExecutors:
             """Get logger instance."""
             return FlextLogger(self.__class__.__name__)
 
-        def execute(self) -> FlextResult[dict[str, object]]:
+        def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute Meltano executor operation (required by FlextDomainService).
 
             Returns:
                 FlextResult containing service information
 
             """
-            return FlextResult[dict[str, object]].ok({
-                "service": "FlextMeltanoExecutor",
-                "status": "ready",
-                "capabilities": [
-                    "execute_meltano_command",
-                    "get_project_info",
-                ],
-            })
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+                {
+                    "service": "FlextMeltanoExecutor",
+                    "status": "ready",
+                    "capabilities": [
+                        "execute_meltano_command",
+                        "get_project_info",
+                    ],
+                }
+            )
 
         def execute_meltano_command(
             self, project_root: Path, command: list[str], timeout: int = 300
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute Meltano command using native API with structured result.
 
             Args:
@@ -117,7 +120,7 @@ class FlextMeltanoExecutors:
 
                 # Validate Meltano project
                 if not (project_root / "meltano.yml").exists():
-                    return FlextResult[dict[str, object]].fail(
+                    return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
                         f"Not a Meltano project: meltano.yml not found in {project_root}"
                     )
 
@@ -127,7 +130,7 @@ class FlextMeltanoExecutors:
                 execution_start = datetime.now(UTC)
 
                 # Simple success response for now
-                execution_result: dict[str, object] = {
+                execution_result: FlextMeltanoTypes.CLI.ProcessResult = {
                     "success": True,
                     "command": command,
                     "execution_time": (
@@ -143,16 +146,16 @@ class FlextMeltanoExecutors:
                     execution_time=execution_result["execution_time"],
                 )
 
-                return FlextResult[dict[str, object]].ok(execution_result)
+                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(execution_result)
 
             except Exception as e:
                 error_msg = f"Failed to execute Meltano command {command}: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[dict[str, object]].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(error_msg)
 
         def get_project_info(
             self, project_root: Path
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Get comprehensive project information using native APIs.
 
             Args:
@@ -167,7 +170,7 @@ class FlextMeltanoExecutors:
                     "Getting project information", project_root=str(project_root)
                 )
 
-                project_info: dict[str, object] = {
+                project_info: FlextMeltanoTypes.CLI.ProcessResult = {
                     "project_root": str(project_root),
                     "project_type": "unknown",
                     "meltano": {"present": False},
@@ -180,8 +183,8 @@ class FlextMeltanoExecutors:
                 if meltano_yml.exists():
                     project_info["project_type"] = "meltano"
                     meltano_dict = project_info["meltano"]
-                    if FlextUtilities.is_dict(meltano_dict):
-                        typed_dict = cast("dict[str, object]", meltano_dict)
+                    if isinstance(meltano_dict, dict):
+                        typed_dict = cast("FlextMeltanoTypes.CLI.ProcessResult", meltano_dict)
                         meltano_dict_copy = dict(typed_dict)  # Create mutable copy
                         meltano_dict_copy["present"] = True
                         project_info["meltano"] = meltano_dict_copy
@@ -195,8 +198,8 @@ class FlextMeltanoExecutors:
                 for dbt_path in dbt_project_paths:
                     if dbt_path.exists():
                         dbt_dict = project_info["dbt"]
-                        if FlextUtilities.is_dict(dbt_dict):
-                            typed_dbt = cast("dict[str, object]", dbt_dict)
+                        if isinstance(dbt_dict, dict):
+                            typed_dbt = cast("FlextMeltanoTypes.CLI.ProcessResult", dbt_dict)
                             dbt_dict_copy = dict(typed_dbt)  # Create mutable copy
                             dbt_dict_copy["present"] = True
                             dbt_dict_copy["project_path"] = str(dbt_path.parent)
@@ -207,15 +210,15 @@ class FlextMeltanoExecutors:
                 meltano_dict = project_info["meltano"]
                 dbt_dict = project_info["dbt"]
                 if (
-                    FlextUtilities.is_dict(meltano_dict)
-                    and FlextUtilities.safe_dict_get(
+                    isinstance(meltano_dict, dict)
+                    and FlextUtilities.ProcessingUtils.safe_dict_get(
                         meltano_dict,  # Verified by is_dict
                         "present",
                         bool,
                         _FALSE,
                     )
-                    and FlextUtilities.is_dict(dbt_dict)
-                    and FlextUtilities.safe_dict_get(
+                    and isinstance(dbt_dict, dict)
+                    and FlextUtilities.ProcessingUtils.safe_dict_get(
                         dbt_dict,  # Verified by is_dict
                         "present",
                         bool,
@@ -223,7 +226,7 @@ class FlextMeltanoExecutors:
                     )
                 ):
                     project_info["project_type"] = "meltano_with_dbt"
-                elif FlextUtilities.is_dict(dbt_dict) and FlextUtilities.safe_dict_get(
+                elif isinstance(dbt_dict, dict) and FlextUtilities.ProcessingUtils.safe_dict_get(
                     dbt_dict,  # Verified by is_dict
                     "present",
                     bool,
@@ -237,24 +240,24 @@ class FlextMeltanoExecutors:
                 self.logger.info(
                     "Project information collected",
                     project_type=project_info["project_type"],
-                    meltano_present=FlextUtilities.safe_dict_get(
-                        cast("dict[str, object]", meltano_dict), "present", bool, _FALSE
+                    meltano_present=FlextUtilities.ProcessingUtils.safe_dict_get(
+                        cast("FlextMeltanoTypes.CLI.ProcessResult", meltano_dict), "present", bool, _FALSE
                     )
-                    if FlextUtilities.is_dict(meltano_dict)
+                    if isinstance(meltano_dict, dict)
                     else _FALSE,
-                    dbt_present=FlextUtilities.safe_dict_get(
-                        cast("dict[str, object]", dbt_dict), "present", bool, _FALSE
+                    dbt_present=FlextUtilities.ProcessingUtils.safe_dict_get(
+                        cast("FlextMeltanoTypes.CLI.ProcessResult", dbt_dict), "present", bool, _FALSE
                     )
-                    if FlextUtilities.is_dict(dbt_dict)
+                    if isinstance(dbt_dict, dict)
                     else _FALSE,
                 )
 
-                return FlextResult[dict[str, object]].ok(project_info)
+                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(project_info)
 
             except Exception as e:
                 error_msg = f"Failed to get project info: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[dict[str, object]].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(error_msg)
 
     # =================================================================
     # NESTED RESULT CLASSES
@@ -272,7 +275,7 @@ class FlextMeltanoExecutors:
             error: str = "",
             exit_code: int = 0,
             execution_time: float = 0.0,
-            metadata: dict[str, object] | None = None,
+            metadata: FlextMeltanoTypes.CLI.ProcessResult | None = None,
         ) -> None:
             self.success = success
             self.command = command
@@ -283,7 +286,7 @@ class FlextMeltanoExecutors:
             self.metadata = metadata or {}
             self.timestamp = FlextUtilities.Generators.generate_iso_timestamp()
 
-        def to_dict(self) -> dict[str, object]:
+        def to_dict(self) -> FlextMeltanoTypes.CLI.ProcessResult:
             """Convert to dictionary for JSON serialization."""
             return {
                 "success": self.success,
@@ -312,26 +315,26 @@ class FlextMeltanoExecutors:
     # =================================================================
 
     class SimpleMeltanoExecutor:
-        """Simple Meltano executor using MeltanoBridge."""
+        """Simple Meltano executor using FlextMeltanoAdapter."""
 
         @staticmethod
         def run_pipeline(
             project_root: Path, tap_name: str, target_name: str
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:
             """Run ELT pipeline using simplified interface."""
             try:
-                bridge = MeltanoBridge()
-                result = bridge.run_elt_pipeline(
+                adapter = FlextMeltanoAdapter()
+                result = adapter.run_elt_pipeline(
                     tap_name=tap_name,
                     target_name=target_name,
                     project_root=project_root,
                 )
 
                 if result.success:
-                    return FlextResult[dict[str, object]].ok(
-                        cast("dict[str, object]", result.value)
+                    return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(
+                        cast("FlextMeltanoTypes.ELT.PipelineResult", result.value)
                     )
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
                     result.error or "Unknown pipeline error"
                 )
 
@@ -341,21 +344,21 @@ class FlextMeltanoExecutors:
         @staticmethod
         def install_plugin(
             project_root: Path, plugin_type: str, plugin_name: str
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
             """Install plugin using simplified interface."""
             try:
-                bridge = MeltanoBridge()
-                result = bridge.install_plugin(
+                adapter = FlextMeltanoAdapter()
+                result = adapter.install_plugin(
                     project_root=project_root,
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                 )
 
                 if result.success:
-                    return FlextResult[dict[str, object]].ok(
-                        cast("dict[str, object]", result.value)
+                    return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(
+                        cast("FlextMeltanoTypes.Plugin.PluginInfo", result.value)
                     )
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].fail(
                     result.error or "Unknown installation error"
                 )
 

@@ -21,6 +21,13 @@ from flext_core import (
     FlextUtilities,
 )
 
+from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.validators import (
+    validate_config_value_simple,
+    validate_directory_path,
+    validate_file_path,
+)
+
 T = TypeVar("T")
 
 logger = FlextLogger(__name__)
@@ -87,10 +94,10 @@ class FlextMeltanoUtilities:
     @classmethod
     def create_meltano_config_dict(
         cls, project_id: str, project_name: str = ""
-    ) -> dict[str, object]:
+    ) -> FlextMeltanoTypes.DBT.ProjectConfig:
         """Create complete Meltano configuration dictionary.
 
-        Uses FlextUtilities.safe_dict_get() patterns for safe construction.
+        Uses FlextUtilities.ProcessingUtils.safe_dict_get() patterns for safe construction.
 
         Args:
             project_id: Project ID
@@ -128,7 +135,7 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def write_meltano_yml(
-        cls, config: dict[str, object], target_path: Path
+        cls, config: FlextMeltanoTypes.DBT.ProjectConfig, target_path: Path
     ) -> FlextResult[bool]:
         """Write Meltano YAML configuration safely.
 
@@ -144,7 +151,7 @@ class FlextMeltanoUtilities:
         """
         try:
             # Use FlextUtilities validation
-            if not FlextUtilities.TypeGuards.is_dict(config):
+            if not isinstance(config, dict):
                 return FlextResult.fail("Config must be a dictionary")
 
             # Safe YAML write
@@ -166,7 +173,7 @@ class FlextMeltanoUtilities:
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-    ) -> dict[str, object]:
+    ) -> FlextMeltanoTypes.Plugin.Config:
         """Create plugin configuration dictionary.
 
         Uses FlextUtilities safe string methods.
@@ -210,8 +217,8 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def format_meltano_command_result(
-        cls, *, success: bool, data: dict[str, object] | None = None
-    ) -> dict[str, object]:
+        cls, *, success: bool, data: FlextMeltanoTypes.CLI.ProcessResult | None = None
+    ) -> FlextMeltanoTypes.CLI.ProcessResult:
         """Format Meltano command result for bridge communication.
 
         Uses FlextUtilities.generate_iso_timestamp() and safe handling.
@@ -225,20 +232,20 @@ class FlextMeltanoUtilities:
 
         """
         # Use FlextUtilities for safe boolean and timestamp handling
-        response: dict[str, object] = {
+        response: FlextMeltanoTypes.CLI.ProcessResult = {
             "success": FlextUtilities.Conversions.safe_bool(
                 success
             ),  # From FlextUtilities
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
         }
 
-        if data and FlextUtilities.TypeGuards.is_dict(data):  # From FlextUtilities
+        if data and isinstance(data, dict):  # From FlextUtilities
             response["data"] = data
 
         return response
 
     @classmethod
-    def parse_meltano_output_safe(cls, output: str) -> FlextResult[dict[str, object]]:
+    def parse_meltano_output_safe(cls, output: str) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
         """Parse Meltano command output safely.
 
         Uses FlextUtilities.parse_json_safe() when applicable.
@@ -264,18 +271,22 @@ class FlextMeltanoUtilities:
             # Try JSON parsing first using FlextUtilities concept
             json_result = FlextUtilities.ProcessingUtils.parse_json_safe(clean_output)
             if json_result.success:
-                return FlextResult.ok({
-                    "output": clean_output,
-                    "lines": lines,
-                    "parsed_json": json_result.value,
-                })
+                return FlextResult.ok(
+                    {
+                        "output": clean_output,
+                        "lines": lines,
+                        "parsed_json": json_result.value,
+                    }
+                )
 
             # Fallback to structured text parsing
-            return FlextResult.ok({
-                "output": clean_output,
-                "lines": lines,
-                "line_count": len(lines),
-            })
+            return FlextResult.ok(
+                {
+                    "output": clean_output,
+                    "lines": lines,
+                    "line_count": len(lines),
+                }
+            )
 
         except Exception as e:
             error_msg = f"Failed to parse Meltano output: {e}"
@@ -283,7 +294,7 @@ class FlextMeltanoUtilities:
             return FlextResult.fail(error_msg)
 
     @classmethod
-    def adapt_meltano_plugin(cls, plugin_data: dict[str, object]) -> dict[str, object]:
+    def adapt_meltano_plugin(cls, plugin_data: FlextMeltanoTypes.Plugin.PluginInfo) -> FlextMeltanoTypes.Plugin.PluginInfo:
         """Adapt Meltano plugin data for unified processing.
 
         Args:
@@ -293,7 +304,7 @@ class FlextMeltanoUtilities:
             Adapted plugin data with standardized fields
 
         """
-        if not FlextUtilities.TypeGuards.is_dict(plugin_data):
+        if not isinstance(plugin_data, dict):
             return {
                 "id": "unknown",
                 "name": "unknown",
@@ -327,7 +338,7 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def create_bridge_response(
-        cls, *, success: bool, data: dict[str, object] | None = None
+        cls, *, success: bool, data: FlextMeltanoTypes.CLI.ProcessResult | None = None
     ) -> dict[str, str]:
         """Create bridge response for Go communication.
 
@@ -344,7 +355,7 @@ class FlextMeltanoUtilities:
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
         }
 
-        if data and FlextUtilities.TypeGuards.is_dict(data):
+        if data and isinstance(data, dict):
             response["data"] = FlextUtilities.ProcessingUtils.safe_json_stringify(data)
 
         return response
@@ -398,13 +409,13 @@ class FlextMeltanoUtilities:
         )
 
     @classmethod
-    def load_yaml_config(cls, path: Path) -> FlextResult[dict[str, object]]:
+    def load_yaml_config(cls, path: Path) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
         """Load YAML config safely."""
         try:
             with path.open("r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
             return FlextResult.ok(
-                data if FlextUtilities.TypeGuards.is_dict(data) else {}
+                data if isinstance(data, dict) else {}
             )
         except Exception as e:
             return FlextResult.fail(f"Failed to load YAML: {e}")
@@ -412,7 +423,7 @@ class FlextMeltanoUtilities:
     @classmethod
     def setup_project_structure(
         cls, project_root: Path, project_name: str
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
         """Setup complete project structure."""
         try:
             project_root.mkdir(parents=True, exist_ok=True)
@@ -432,18 +443,20 @@ class FlextMeltanoUtilities:
             cls.write_meltano_yml(meltano_config, meltano_yml)
             cls.write_meltano_yml(dbt_config, dbt_yml)  # Using same YAML writer
 
-            return FlextResult.ok({
-                "project_root": str(project_root),
-                "meltano_yml": str(meltano_yml),
-                "dbt_yml": str(dbt_yml),
-            })
+            return FlextResult.ok(
+                {
+                    "project_root": str(project_root),
+                    "meltano_yml": str(meltano_yml),
+                    "dbt_yml": str(dbt_yml),
+                }
+            )
         except Exception as e:
             return FlextResult.fail(f"Failed to setup project structure: {e}")
 
     @classmethod
     def create_singer_tap_config(
         cls, name: str, namespace: str, pip_url: str, executable: str
-    ) -> dict[str, object]:
+    ) -> FlextMeltanoTypes.Singer.TapConfig:
         """Create Singer tap configuration."""
         config = cls.create_plugin_config_dict(
             name, "extractor", namespace, pip_url, executable
@@ -455,7 +468,7 @@ class FlextMeltanoUtilities:
     @classmethod
     def create_singer_target_config(
         cls, name: str, namespace: str, pip_url: str, executable: str
-    ) -> dict[str, object]:
+    ) -> FlextMeltanoTypes.Singer.TargetConfig:
         """Create Singer target configuration."""
         config = cls.create_plugin_config_dict(
             name, "loader", namespace, pip_url, executable
@@ -464,7 +477,7 @@ class FlextMeltanoUtilities:
         return config
 
     @classmethod
-    def create_dbt_config(cls, name: str, profile: str) -> dict[str, object]:
+    def create_dbt_config(cls, name: str, profile: str) -> FlextMeltanoTypes.DBT.ProjectConfig:
         """Create DBT project configuration."""
         return {
             "name": FlextUtilities.TextProcessor.safe_string(name, "dbt_project"),
@@ -481,9 +494,9 @@ class FlextMeltanoUtilities:
         }
 
     @classmethod
-    def validate_plugin_config(cls, config: dict[str, object]) -> FlextResult[bool]:
+    def validate_plugin_config(cls, config: FlextMeltanoTypes.Plugin.Config) -> FlextResult[bool]:
         """Validate plugin configuration."""
-        if not FlextUtilities.TypeGuards.is_dict(config):
+        if not isinstance(config, dict):
             return FlextResult.fail("Config must be a dictionary")
 
         required_fields = ["name", "type"]
@@ -511,10 +524,24 @@ class FlextMeltanoUtilities:
 
 
 # =============================================================================
+# BACKWARD COMPATIBILITY ALIASES
+# =============================================================================
+
+# Validation functions already imported at top of file
+
+# =============================================================================
 # MODULE EXPORTS
 # =============================================================================
 
 __all__ = [
     # Main class
     "FlextMeltanoUtilities",
+    # Backward compatibility validation functions
+    "validate_config_value",
+    "validate_config_value_simple",
+    "validate_directory_path",
+    "validate_file_path",
 ]
+
+# Backward compatibility alias
+validate_config_value = validate_config_value_simple

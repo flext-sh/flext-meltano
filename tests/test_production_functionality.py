@@ -231,7 +231,7 @@ class TestFlextMeltanoConfiguration:
         config = FlextMeltanoConfig()
 
         assert config.project_root is not None
-        assert config.environment == "dev"  # FlextConfig.BaseConfigModel default value
+        assert config.environment == "dev"  # FlextConfig.BaseModel default value
 
     def test_custom_configuration(self) -> None:
         """Test creating custom configuration."""

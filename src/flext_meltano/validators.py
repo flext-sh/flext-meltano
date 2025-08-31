@@ -20,6 +20,8 @@ from flext_core import (
     FlextUtilities,
 )
 
+from flext_meltano.typings import FlextMeltanoTypes
+
 T = TypeVar("T")
 
 logger = FlextLogger(__name__)
@@ -52,7 +54,7 @@ class FlextMeltanoValidators(FlextUtilities):
     # =================================================================
 
     @classmethod
-    def validate_plugin_config(cls, config: dict[str, object]) -> FlextResult[bool]:
+    def validate_plugin_config(cls, config: object) -> FlextResult[bool]:
         """Valida configuração de plugin Meltano usando FlextUtilities.
 
         Uses:
@@ -68,7 +70,7 @@ class FlextMeltanoValidators(FlextUtilities):
 
         """
         # Use FlextUtilities for type validation
-        if not cls.is_dict(config):
+        if not isinstance(config, dict):
             return FlextResult.fail("Config must be a dictionary")
 
         # Required fields for Meltano plugins
@@ -77,10 +79,10 @@ class FlextMeltanoValidators(FlextUtilities):
         # Use FlextUtilities for field validation
         for field in required_fields:
             # Safe dict get with FlextUtilities
-            field_value = cls.safe_dict_get(config, field, str, "")
+            field_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, field, str, "")
 
             # Use FlextUtilities validator
-            validation_result = cls.validate_and_create(
+            validation_result = FlextUtilities.ProcessingUtils.validate_and_create(
                 cls.is_non_empty_string,
                 field_value,
                 f"Field '{field}' must be a non-empty string",
@@ -94,7 +96,7 @@ class FlextMeltanoValidators(FlextUtilities):
         return FlextResult.ok(_SUCCESS)
 
     @classmethod
-    def validate_meltano_config(cls, config: dict[str, object]) -> FlextResult[bool]:
+    def validate_meltano_config(cls, config: FlextMeltanoTypes.CLI.ProcessResult) -> FlextResult[bool]:
         """Valida configuração completa do Meltano usando FlextUtilities.
 
         Uses:
@@ -110,12 +112,12 @@ class FlextMeltanoValidators(FlextUtilities):
 
         """
         # Use FlextUtilities for type validation
-        if not cls.is_dict(config):
+        if not isinstance(config, dict):
             return FlextResult.fail("Meltano config must be a dictionary")
 
         # Use FlextUtilities to validate version field
-        version_value = cls.safe_dict_get(config, "version", object, None)
-        version_result = cls.validate_and_convert(
+        version_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, "version", object, None)
+        version_result = FlextUtilities.ProcessingUtils.validate_and_convert(
             version_value,
             lambda v: int(str(v)) if v is not None else 0,
             "Meltano version must be an integer",
@@ -128,14 +130,14 @@ class FlextMeltanoValidators(FlextUtilities):
             return FlextResult.fail("Meltano version must be 1")
 
         # Use FlextUtilities to validate project_id field
-        project_id = cls.safe_dict_get(config, "project_id", str, "")
+        project_id = FlextUtilities.ProcessingUtils.safe_dict_get(config, "project_id", str, "")
         if not cls.is_non_empty_string(project_id):
             return FlextResult.fail("project_id must be a non-empty string")
 
         return FlextResult.ok(_SUCCESS)
 
     @classmethod
-    def validate_dbt_config(cls, config: dict[str, object]) -> FlextResult[bool]:
+    def validate_dbt_config(cls, config: FlextMeltanoTypes.CLI.ProcessResult) -> FlextResult[bool]:
         """Valida configuração do DBT usando FlextUtilities.
 
         Uses:
@@ -151,7 +153,7 @@ class FlextMeltanoValidators(FlextUtilities):
 
         """
         # Use FlextUtilities for type validation
-        if not cls.is_dict(config):
+        if not isinstance(config, dict):
             return FlextResult.fail("DBT config must be a dictionary")
 
         # Required fields for DBT
@@ -159,7 +161,7 @@ class FlextMeltanoValidators(FlextUtilities):
 
         # Use FlextUtilities for field validation
         for field in required_fields:
-            field_value = cls.safe_dict_get(config, field, str, "")
+            field_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, field, str, "")
             if not cls.is_non_empty_string(field_value):
                 return FlextResult.fail(
                     f"DBT field '{field}' must be a non-empty string"
@@ -207,7 +209,7 @@ class FlextMeltanoValidators(FlextUtilities):
                 logger.debug(f"Failed to check temp directory for {path_str}")
 
             # Use FlextUtilities validator pattern for existence check
-            exists_validator = cls.create_validator(lambda p: Path(str(p)).exists())
+            exists_validator = FlextUtilities.ProcessingUtils.create_validator(lambda p: Path(str(p)).exists())
             exists_result = exists_validator(path_str)
 
             return (
@@ -251,7 +253,7 @@ class FlextMeltanoValidators(FlextUtilities):
                 return str(file_path.resolve())
 
             # Use FlextUtilities validator pattern for file existence check
-            file_validator = cls.create_validator(
+            file_validator = FlextUtilities.ProcessingUtils.create_validator(
                 lambda p: Path(str(p)).exists() and Path(str(p)).is_file()
             )
             file_result = file_validator(path_str)
@@ -298,21 +300,19 @@ class FlextMeltanoValidators(FlextUtilities):
         if expected_type is bool:
             # Type cast value for Conversions.to_bool signature compatibility
             if isinstance(value, (str, int, float, bool)) or value is None:
-                bool_result = cls.Conversions.to_bool(value)
+                bool_result = FlextUtilities.Conversions.safe_bool(value)
             else:
-                bool_result = cls.Conversions.to_bool(str(value))
+                bool_result = FlextUtilities.Conversions.safe_bool(str(value))
 
             # Cast to T since we know expected_type is bool
             return FlextResult.ok(bool_result)
 
-        # Use FlextUtilities for safe type casting for other types
-        cast_result = cls.safe_cast_to_type(value, expected_type)
-
-        if cast_result.success:
-            return FlextResult.ok(cast_result.value)
-
-        # Return error if conversion failed
-        return FlextResult.fail(f"Cannot convert {value} to {expected_type.__name__}")
+        # Simple type casting implementation
+        try:
+            converted_value = expected_type(value)
+            return FlextResult.ok(converted_value)
+        except (ValueError, TypeError) as e:
+            return FlextResult.fail(f"Cannot convert {value} to {expected_type.__name__}: {e}")
 
 
 # =============================================================================
