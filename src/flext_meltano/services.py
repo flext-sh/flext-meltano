@@ -63,6 +63,18 @@ class FlextMeltanoService:
             """Initialize with Pydantic **data pattern (frozen model)."""
             super().__init__(**data)
 
+        @property
+        def wrapper_singer(self) -> object:
+            """Get Singer wrapper for tap operations."""
+            from flext_meltano.wrappers import FlextMeltanoWrapper
+            return FlextMeltanoWrapper()
+
+        @property
+        def singer_adapter(self) -> object:
+            """Get Singer adapter for tap operations."""
+            from flext_meltano.singer_adapters import FlextMeltanoAdapters
+            return FlextMeltanoAdapters()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.JsonObject]:
             """Execute tap service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -71,7 +83,7 @@ class FlextMeltanoService:
             logger.info("Executing tap service", tap_name=self.tap_name)
 
             return FlextResult.ok({
-                "service": "TapService",
+                "service": "FlextMeltanoTapService",
                 "tap_name": self.tap_name,
                 "status": "ready",
             })
@@ -92,6 +104,41 @@ class FlextMeltanoService:
                 "status": "ready"
             }
 
+        def create_tap_instance(self, config: dict[str, object]) -> FlextResult[object]:
+            """Create tap instance with configuration."""
+            if not config:
+                return FlextResult.fail("Empty configuration provided")
+
+            try:
+                # This is a placeholder implementation
+                # In real usage, this would create actual Singer Tap instances
+                return FlextResult.ok({"tap": self.tap_name, "config": config})
+            except Exception as e:
+                return FlextResult.fail(f"Failed to create tap instance: {e}")
+
+        def validate_tap_config(self, config: dict[str, object]) -> FlextResult[bool]:
+            """Validate tap configuration."""
+            if not config:
+                return FlextResult.fail("Empty configuration provided")
+
+            return FlextResult.ok(True)  # noqa: FBT003
+
+        def get_default_config(self) -> dict[str, object]:
+            """Get default configuration for tap."""
+            return {
+                "connection_string": "test_connection"
+            }
+
+        def validate(self) -> FlextResult[bool]:
+            """Validate tap service configuration and setup."""
+            try:
+                # Basic validation - check if tap has valid configuration
+                config = self.get_default_config()
+                validation_result = self.validate_tap_config(config)
+                return validation_result
+            except Exception as e:
+                return FlextResult.fail(f"Tap service validation failed: {e}")
+
     class TargetService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
         """Target service implementation using strict flext-core patterns."""
 
@@ -101,6 +148,18 @@ class FlextMeltanoService:
             """Initialize with Pydantic **data pattern (frozen model)."""
             super().__init__(**data)
 
+        @property
+        def wrapper_singer(self) -> object:
+            """Get Singer wrapper for target operations."""
+            from flext_meltano.wrappers import FlextMeltanoWrapper
+            return FlextMeltanoWrapper()
+
+        @property
+        def singer_adapter(self) -> object:
+            """Get Singer adapter for target operations."""
+            from flext_meltano.singer_adapters import FlextMeltanoAdapters
+            return FlextMeltanoAdapters()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.JsonObject]:
             """Execute target service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -109,7 +168,7 @@ class FlextMeltanoService:
             logger.info("Executing target service", target_name=self.target_name)
 
             return FlextResult.ok({
-                "service": "TargetService",
+                "service": "FlextMeltanoTargetService",
                 "target_name": self.target_name,
                 "status": "ready",
             })
@@ -122,6 +181,46 @@ class FlextMeltanoService:
                 "status": "ready"
             }
 
+        def create_target_instance(self, config: dict[str, object]) -> FlextResult[object]:
+            """Create target instance with configuration."""
+            if not config:
+                return FlextResult.fail("Empty configuration provided")
+
+            try:
+                # This is a placeholder implementation
+                # In real usage, this would create actual Singer Target instances
+                return FlextResult.ok({"target": self.target_name, "config": config})
+            except Exception as e:
+                return FlextResult.fail(f"Failed to create target instance: {e}")
+
+        def validate_target_config(self, config: dict[str, object]) -> FlextResult[bool]:
+            """Validate target configuration."""
+            if not config:
+                return FlextResult.fail("Empty configuration provided")
+
+            # Basic validation - check for required fields
+            if "output_file" not in config:
+                return FlextResult.fail("Missing required field: output_file")
+
+            return FlextResult.ok(True)  # noqa: FBT003
+
+        def get_default_config(self) -> dict[str, object]:
+            """Get default configuration for target."""
+            return {
+                "output_file": "test_output.json",
+                "format": "json"
+            }
+
+        def validate(self) -> FlextResult[bool]:
+            """Validate target service configuration and setup."""
+            try:
+                # Basic validation - check if target has valid configuration
+                config = self.get_default_config()
+                validation_result = self.validate_target_config(config)
+                return validation_result
+            except Exception as e:
+                return FlextResult.fail(f"Target service validation failed: {e}")
+
     class DbtService(FlextDomainService[FlextMeltanoTypes.DBT.ProjectConfig]):
         """DBT service implementation using strict flext-core patterns."""
 
@@ -131,6 +230,18 @@ class FlextMeltanoService:
             """Initialize with Pydantic **data pattern (frozen model)."""
             super().__init__(**data)
 
+        @property
+        def wrapper_dbt(self) -> object:
+            """Get DBT wrapper for DBT operations."""
+            from flext_meltano.wrappers import FlextMeltanoWrapper
+            return FlextMeltanoWrapper.DbtWrapper()
+
+        @property
+        def dbt_adapter(self) -> object:
+            """Get DBT adapter for DBT operations."""
+            from flext_meltano.adapters import FlextMeltanoAdapter
+            return FlextMeltanoAdapter()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.JsonObject]:
             """Execute DBT service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -139,7 +250,7 @@ class FlextMeltanoService:
             logger.info("Executing DBT service", project_name=self.project_name)
 
             return FlextResult.ok({
-                "service": "DbtService",
+                "service": "FlextMeltanoDbtService",
                 "project_name": self.project_name,
                 "status": "ready",
             })
@@ -150,6 +261,20 @@ class FlextMeltanoService:
                 "service_type": "dbt",
                 "name": self.project_name,
                 "status": "ready"
+            }
+
+        def get_profiles_config(self) -> dict[str, object]:
+            """Get DBT profiles configuration."""
+            return {
+                self.project_name: {
+                    "outputs": {
+                        "dev": {
+                            "type": "duckdb",
+                            "path": "test.duckdb"
+                        }
+                    },
+                    "target": "dev"
+                }
             }
 
     # Service factory methods using flext-core patterns

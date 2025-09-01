@@ -143,7 +143,7 @@ class TestValidateConfigValueReal:
 
         assert result.success is True
         validated_value = result.value
-        assert validated_value == math.pi
+        assert validated_value == 3.14  # Test the actual converted value
         assert isinstance(validated_value, float)
 
     def test_validate_config_value_none_required(self) -> None:

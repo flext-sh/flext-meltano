@@ -111,6 +111,40 @@ class FlextMeltanoAdapter:
     # CORE ADAPTER METHODS - Primary adapter functionality
     # =========================================================================
 
+    @classmethod
+    def adapt_project_config(cls, config: dict[str, object]) -> FlextResult[dict[str, object]]:
+        """Adapt project configuration for Meltano compatibility."""
+        try:
+            # Basic validation and adaptation
+            adapted_config = dict(config)  # Make a copy
+
+            # Ensure required structure
+            if "project_id" not in adapted_config:
+                adapted_config["project_id"] = "default-project"
+            if "version" not in adapted_config:
+                adapted_config["version"] = 1
+
+            return FlextResult[dict[str, object]].ok(adapted_config)
+        except Exception as e:
+            return FlextResult[dict[str, object]].fail(f"Failed to adapt project config: {e}")
+
+    @classmethod
+    def adapt_plugin(cls, plugin_data: dict[str, object]) -> FlextResult[dict[str, object]]:
+        """Adapt plugin data for Meltano compatibility."""
+        try:
+            # Basic plugin adaptation
+            adapted_plugin = dict(plugin_data)  # Make a copy
+
+            # Ensure required plugin structure
+            if "name" not in adapted_plugin:
+                adapted_plugin["name"] = ""
+            if "namespace" not in adapted_plugin:
+                adapted_plugin["namespace"] = "default"
+
+            return FlextResult[dict[str, object]].ok(adapted_plugin)
+        except Exception as e:
+            return FlextResult[dict[str, object]].fail(f"Failed to adapt plugin: {e}")
+
     def get_version(self) -> FlextResult[FlextMeltanoTypes.Bridge.VersionInfo]:
         """Get Meltano version information using native API.
 

@@ -249,7 +249,7 @@ class TestFlextMeltanoConfigurationRealFunctionality:
         config = FlextMeltanoConfig()
 
         assert config.environment == "dev"  # From constants
-        assert str(config.project_root) == str(Path.cwd())
+        assert str(Path(config.project_root).resolve()) == str(Path.cwd())
 
     def test_config_with_custom_values(self) -> None:
         """Test configuration with custom values."""

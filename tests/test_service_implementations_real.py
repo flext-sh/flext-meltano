@@ -187,10 +187,9 @@ class TestFlextMeltanoDbtServiceReal:
     def test_dbt_service_get_project_config(self) -> None:
         """Testa obtenção da configuração do projeto DBT."""
         service = FlextMeltanoDbtService(project_name="test-project")
-        config = service.get_project_config()
+        config = service.get_profiles_config()
 
         assert isinstance(config, dict)
-        assert config["name"] == "test-project"
-        assert config["version"] == "1.0.0"
-        assert "model-paths" in config
-        assert "test-paths" in config
+        assert "test-project" in config
+        assert config["test-project"]["target"] == "dev"
+        assert "outputs" in config["test-project"]

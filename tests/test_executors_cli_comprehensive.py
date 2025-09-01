@@ -201,7 +201,7 @@ class TestFlextMeltanoCliComprehensive:
         version_result = bridge.get_version()
 
         # CLI should be able to consume bridge results
-        assert isinstance(version_result, dict)
+        assert isinstance(version_result, FlextResult)
 
 
 class TestConfigurationIntegration:

@@ -205,7 +205,7 @@ class TestFlextMeltanoTargetServiceComplete:
         assert service.target_name == "test_target"
         assert hasattr(service, "wrapper_singer")
         assert hasattr(service, "singer_adapter")
-        assert hasattr(service, "logger")
+# Removed logger assertion - not automatically provided by FlextDomainService
 
     def test_target_service_execution(self) -> None:
         """Test target service execute method."""

@@ -241,12 +241,12 @@ class TestCliIntegrationPatterns:
         bridge_result = cli.bridge.get_version()
 
         assert isinstance(cli_result, FlextResult)
-        assert isinstance(bridge_result, dict)
+        assert isinstance(bridge_result, FlextResult)
 
-        if cli_result.success and bridge_result.get("success"):
+        if cli_result.success and bridge_result.success:
             # Both should report consistent version info
             assert "version" in cli_result.data
-            assert "data" in bridge_result
+            assert "version" in bridge_result.data
 
     def test_cli_plugins_integration(self) -> None:
         """Test CLI plugins command integration."""

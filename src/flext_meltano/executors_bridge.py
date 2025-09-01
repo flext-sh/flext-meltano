@@ -29,13 +29,32 @@ class FlextMeltanoBridge:
         self.adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         self.wrapper: FlextMeltanoWrapper = FlextMeltanoWrapper()
         self._current_project: object | None = None
+        # Create logger with specific name expected by tests
+        self.logger = FlextLogger("MeltanoBridge")
 
     def get_version(self) -> object:
-        """Get version information for Go service."""
+        """Get version information - returns FlextResult for direct API usage."""
         from flext_core import FlextResult
         try:
             version_data = {
-                "version": "3.9.1",  # Main version for compatibility 
+                "version": "3.9.1",  # Main version for compatibility
+                "flext_meltano": "2.0.0-enterprise",
+                "meltano": "3.9.1",
+                "dbt_core": "1.10.5",
+                "singer_sdk": "0.48.0",
+                "python": "3.13+",
+                "integration_method": "native_apis",
+                "cli_type": "native_meltano_api"
+            }
+            return FlextResult.ok(version_data)
+        except Exception as e:
+            return FlextResult.fail(str(e))
+
+    def get_version_json(self) -> object:
+        """Get version information for Go service - returns JSON dict."""
+        try:
+            version_data = {
+                "version": "3.9.1",  # Main version for compatibility
                 "flext_meltano": "2.0.0-enterprise",
                 "meltano": "3.9.1",
                 "dbt_core": "1.10.5",
@@ -43,9 +62,9 @@ class FlextMeltanoBridge:
                 "python": "3.13+",
                 "integration_method": "native_apis",
             }
-            return FlextResult.ok(version_data)
+            return {"success": True, "data": version_data}
         except Exception as e:
-            return FlextResult.failure(str(e))
+            return {"success": False, "data": None, "error": str(e)}
 
     def list_plugins(self) -> FlextMeltanoTypes.Plugin.PluginList:
         """List available Meltano plugins."""
