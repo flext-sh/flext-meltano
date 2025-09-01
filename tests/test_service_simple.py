@@ -104,7 +104,7 @@ class TestFlextMeltanoServices:
         assert bridge is not None
         # Test that the bridge can access target functionality
         version_result = bridge.get_version()
-        assert version_result["success"] is True
+        assert version_result.success is True
 
     # FlextMeltanoExtensionService was removed in refactoring
 
@@ -115,8 +115,8 @@ class TestFlextMeltanoServices:
         assert bridge is not None
         # Test that DBT functionality is accessible through the bridge
         version_result = bridge.get_version()
-        assert version_result["success"] is True
-        data_dict = cast("dict[str, object]", version_result["data"])
+        assert version_result.success is True
+        data_dict = cast("dict[str, object]", version_result.data)
         assert "dbt_core" in data_dict
 
 

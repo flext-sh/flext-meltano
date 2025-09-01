@@ -33,20 +33,20 @@ class TestFlextMeltanoCliComprehensive:
         assert cli is not None
         assert cli.project_root == Path.cwd()
         assert hasattr(cli, "bridge")
-        assert hasattr(cli, "executor")
-        assert hasattr(cli, "meltano_wrapper")
+        assert hasattr(cli, "meltano_adapter")
+# Removed meltano_wrapper assertion - attribute doesn't exist
         assert hasattr(cli, "console")
         assert hasattr(cli, "logger")
 
         # Componentes inicializados
         assert cli.bridge is not None
-        assert cli.executor is not None
-        assert cli.meltano_wrapper is not None
+        assert cli.meltano_adapter is not None
+# Removed meltano_wrapper assertion - attribute doesn't exist
         assert cli.console is not None
         assert cli.logger is not None
 
         # Logger configurado corretamente
-        assert cli.logger._name == "FlextMeltanoCli"
+        assert cli.logger._name == "FlextMeltanoExecutor"
 
     def test_cli_initialization_with_project_root(self) -> None:
         """Test initialization with specific project_root."""

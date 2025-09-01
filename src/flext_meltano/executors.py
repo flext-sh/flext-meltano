@@ -53,7 +53,6 @@ import click
 from flext_core import (
     FlextLogger,
     FlextResult,
-    FlextUtilities,
 )
 from rich.console import Console
 from rich.table import Table
@@ -119,13 +118,11 @@ class FlextMeltanoExecutor:
     def _handle_version_command(self) -> FlextResult[dict[str, str]]:
         """Handle version command."""
         result = self.bridge.get_version()
-        if result.get("success", False):
+        if result.success:
             # Extract version from result data
-            result_data = FlextUtilities.ProcessingUtils.safe_dict_get(result, "data", dict, {})
+            result_data = result.value if result.value else {}
             if isinstance(result_data, dict):
-                meltano_version = FlextUtilities.ProcessingUtils.safe_dict_get(
-                    result_data, "meltano", str, "3.8.0"
-                )
+                meltano_version = result_data.get("meltano", "3.8.0")
             else:
                 meltano_version = "3.8.0"
 
@@ -167,8 +164,8 @@ class FlextMeltanoExecutor:
                 "command": "default",
                 "status": "success",
                 "args": str(args),
-                "success": str(result.get("success", False)),
-                "data": str(result.get("data", {})),
+                "success": str(result.success),
+                "data": str(result.value if result.success else {}),
             }
         )
 
@@ -344,7 +341,7 @@ class FlextMeltanoExecutor:
             plugins_result = self.meltano_adapter.discover_plugins()
 
             if plugins_result.success:
-                return FlextResult[FlextMeltanoTypes.Plugin.PluginList].ok(
+                return FlextResult[dict[str, object]].ok(
                     {
                         "plugins": plugins_result.value,
                         "count": len(plugins_result.value),
@@ -358,7 +355,7 @@ class FlextMeltanoExecutor:
         except Exception as e:
             error_msg = f"Plugin listing failed: {e}"
             logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Plugin.PluginList].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def run_pipeline(
         self,
@@ -399,12 +396,10 @@ class FlextMeltanoExecutor:
     def _execute_version_command(self) -> FlextResult[dict[str, str]]:
         """Execute version command."""
         result = self.bridge.get_version()
-        if result.get("success", False):
-            result_data = FlextUtilities.ProcessingUtils.safe_dict_get(result, "data", dict, {})
+        if result.success:
+            result_data = result.value if result.value else {}
             if isinstance(result_data, dict):
-                meltano_version = FlextUtilities.ProcessingUtils.safe_dict_get(
-                    result_data, "meltano", str, "3.9.1"
-                )
+                meltano_version = result_data.get("meltano", "3.9.1")
             else:
                 meltano_version = "3.9.1"
             return FlextResult[dict[str, str]].ok(
@@ -552,8 +547,8 @@ def _handle_cli_no_args(cli: FlextMeltanoCli) -> FlextResult[dict[str, str]]:
             "command": "default",
             "status": "success",
             "args": "[]",
-            "success": str(result.get("success", False)),
-            "data": str(result.get("data", {})),
+            "success": str(result.success),
+            "data": str(result.value if result.success else {}),
         }
     )
 
@@ -561,12 +556,10 @@ def _handle_cli_no_args(cli: FlextMeltanoCli) -> FlextResult[dict[str, str]]:
 def _handle_cli_version_args(cli: FlextMeltanoCli) -> FlextResult[dict[str, str]]:
     """Handle CLI factory version arguments."""
     result = cli.bridge.get_version()
-    if result.get("success", False):
-        result_data = FlextUtilities.ProcessingUtils.safe_dict_get(result, "data", dict, {})
+    if result.success:
+        result_data = result.value if result.value else {}
         if isinstance(result_data, dict):
-            meltano_version = FlextUtilities.ProcessingUtils.safe_dict_get(
-                result_data, "meltano", str, "3.9.1"
-            )
+            meltano_version = result_data.get("meltano", "3.9.1")
         else:
             meltano_version = "3.9.1"
 

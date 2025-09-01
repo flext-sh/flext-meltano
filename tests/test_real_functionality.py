@@ -60,24 +60,26 @@ class TestRealExecution:
 
     def test_executor_initialization_with_real_config(self) -> None:
         """Test executor initializes with real configuration."""
-        # Test executor with empty config
-        executor = FlextMeltanoExecutor({})
+        # Test executor with default config
+        executor = FlextMeltanoExecutor()
 
         # Test real functionality
-        assert hasattr(executor, "is_valid")
-        assert hasattr(executor, "execute")
+        assert hasattr(executor, "health")
+        assert hasattr(executor, "run")
 
-        # Test is_valid method works
-        is_valid_result = executor.is_valid()
-        assert isinstance(is_valid_result, bool)
+        # Test health check method works as validation
+        health_result = executor.health()
+        assert isinstance(health_result, FlextResult)
+        assert health_result.success is True
 
     def test_executor_validation_logic(self) -> None:
         """Test that executor validation has real logic."""
-        executor = FlextMeltanoExecutor({})
-        result = executor.is_valid()
+        executor = FlextMeltanoExecutor()
+        result = executor.health()
 
-        # Should return a boolean
-        assert isinstance(result, bool)
+        # Should return a FlextResult indicating health/validity
+        assert isinstance(result, FlextResult)
+        assert result.success is True
 
 
 class TestRealDiscovery:

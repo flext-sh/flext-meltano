@@ -169,6 +169,18 @@ class FlextMeltanoConfig(FlextModels):
     - Dependency Inversion: Depends on flext-core abstractions
     """
 
+    def __init__(
+        self,
+        project_root: str = ".",
+        environment: str = "dev",
+        dbt_project_dir: str | None = None,
+    ) -> None:
+        """Initialize configuration with provided parameters."""
+        super().__init__()
+        self.project_root = project_root
+        self.environment = environment
+        self.dbt_project_dir = dbt_project_dir or "./dbt"
+
     # =================================================================
     # INTERNAL ALIASES - All constants accessible through main class
     # =================================================================

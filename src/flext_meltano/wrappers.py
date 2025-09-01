@@ -54,7 +54,6 @@ from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
-    FlextUtilities,
 )
 
 from flext_meltano.typings import FlextMeltanoTypes
