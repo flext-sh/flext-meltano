@@ -20,10 +20,9 @@ from __future__ import annotations
 import warnings
 
 # Import everything from services for backward compatibility
-from flext_meltano.services import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-
-# Legacy aliases for backward compatibility
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano.services import (
+    FlextMeltanoService,  # noqa: F401
+)
 
 # Create legacy class aliases
 FlextMeltanoTapService = FlextMeltanoService.TapService
@@ -34,7 +33,7 @@ FlextMeltanoDbtService = FlextMeltanoService.DbtService
 warnings.warn(
     "service_implementations module is deprecated. Use flext_meltano.services instead.",
     DeprecationWarning,
-    stacklevel=2
+    stacklevel=2,
 )
 
 # Export legacy names for backward compatibility

@@ -14,14 +14,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Iterator
-from logging import Logger
 from typing import cast
 
 from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
-    FlextUtilities,
 )
 from singer_sdk import Stream, Tap, Target, typing as singer_typing
 from singer_sdk.typing import PropertiesList, Property
@@ -61,7 +59,11 @@ class FlextMeltanoAdapters:
         para error handling e integrando com flext-core observability.
         """
 
-        def execute(self) -> FlextResult[FlextMeltanoTypes.Singer.MessageData]:
+        def execute(
+            self,
+        ) -> FlextResult[
+            dict[str, str | int | float | bool | list[object] | dict[str, object]]
+        ]:
             """Execute Singer service operation (required by FlextDomainService).
 
             Returns:
@@ -70,7 +72,7 @@ class FlextMeltanoAdapters:
             """
             # Execute operation - Singer wrapper is operational
             self.logger.info("Singer wrapper executed successfully")
-            return FlextResult[FlextMeltanoTypes.Singer.MessageData].ok(
+            return FlextResult.ok(
                 {
                     "service": "MeltanoSingerWrapper",
                     "status": "ready",
@@ -78,8 +80,8 @@ class FlextMeltanoAdapters:
             )
 
         @property
-        def logger(self) -> Logger:
-            """Get logger instance."""
+        def logger(self) -> FlextLogger:
+            """Get logger instance with proper FlextLogger type compatibility."""
             return FlextLogger(self.__class__.__name__)
 
         # Using FLEXT-CLI inspired patterns for service integration - enterprise patterns applied
@@ -97,7 +99,7 @@ class FlextMeltanoAdapters:
 
             """
             try:
-                self.logger.info("Creating Singer tap", tap_class=tap_class.__name__)
+                self.logger.info(f"Creating Singer tap: {tap_class.__name__}")
 
                 # Validar configuração obrigatória
                 if not config:
@@ -113,17 +115,19 @@ class FlextMeltanoAdapters:
                     )
 
                 self.logger.info(
-                    "Singer tap created successfully", tap_class=tap_class.__name__
+                    f"Singer tap created successfully: {tap_class.__name__}"
                 )
                 return FlextResult[Tap].ok(tap_instance)
 
             except Exception as e:
                 error_msg = f"Failed to create tap {tap_class.__name__}: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                self.logger.exception(error_msg)
                 return FlextResult[Tap].fail(error_msg)
 
         def create_target(
-            self, target_class: type[Target], config: FlextMeltanoTypes.Singer.TargetConfig
+            self,
+            target_class: type[Target],
+            config: FlextMeltanoTypes.Singer.TargetConfig,
         ) -> FlextResult[Target]:
             """Cria target Singer usando FlextResult pattern with FLEXT-CLI integration.
 
@@ -136,9 +140,7 @@ class FlextMeltanoAdapters:
 
             """
             try:
-                self.logger.info(
-                    "Creating Singer target", target_class=target_class.__name__
-                )
+                self.logger.info(f"Creating Singer target: {target_class.__name__}")
 
                 # Validar configuração obrigatória
                 if not config:
@@ -156,14 +158,13 @@ class FlextMeltanoAdapters:
                     )
 
                 self.logger.info(
-                    "Singer target created successfully",
-                    target_class=target_class.__name__,
+                    f"Singer target created successfully: {target_class.__name__}"
                 )
                 return FlextResult[Target].ok(target_instance)
 
             except Exception as e:
                 error_msg = f"Failed to create target {target_class.__name__}: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                self.logger.exception(error_msg)
                 return FlextResult[Target].fail(error_msg)
 
         def run_elt_pipeline_real(
@@ -187,9 +188,7 @@ class FlextMeltanoAdapters:
             """
             try:
                 self.logger.info(
-                    "Starting real ELT pipeline via native Singer SDK",
-                    tap_class=tap_class.__name__,
-                    target_class=target_class.__name__,
+                    f"Starting real ELT pipeline via native Singer SDK - Tap: {tap_class.__name__}, Target: {target_class.__name__}"
                 )
 
                 # Criar instâncias usando APIs reais - usando railway-oriented programming
@@ -232,8 +231,7 @@ class FlextMeltanoAdapters:
                 # Executar sync usando API real Singer SDK
                 try:
                     self.logger.info(
-                        "Executing real Singer sync via tap.sync_all()",
-                        streams_count=len(available_streams),
+                        f"Executing real Singer sync via tap.sync_all() - Streams: {len(available_streams)}"
                     )
 
                     # Usar API real: tap.sync_all() com target conectado
@@ -275,9 +273,7 @@ class FlextMeltanoAdapters:
                     self.logger.info("Target drain_all() completed")
 
                 except Exception as sync_error:
-                    self.logger.exception(
-                        "Real Singer sync failed", error=str(sync_error)
-                    )
+                    self.logger.exception("Real Singer sync failed")
                     return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
                         f"Real sync failed: {sync_error}"
                     )
@@ -292,19 +288,21 @@ class FlextMeltanoAdapters:
                 }
 
                 self.logger.info(
-                    "Real ELT pipeline completed successfully via Singer SDK",
-                    records=pipeline_metrics["records_processed"],
-                    streams=pipeline_metrics["streams_processed"],
+                    f"Real ELT pipeline completed successfully via Singer SDK - Records: {pipeline_metrics['records_processed']}, Streams: {pipeline_metrics['streams_processed']}"
                 )
-                return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(pipeline_metrics)
+                return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(
+                    pipeline_metrics
+                )
 
             except Exception as e:
                 error_msg = f"Real ELT pipeline failed: {e}"
-                self.logger.exception(error_msg, error=str(e))
+                self.logger.exception(error_msg)
                 return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(error_msg)
 
         # @handle_service_result  # FLEXT-CLI integration for catalog discovery (disabled for type safety)
-        def discover_catalog(self, tap: Tap) -> FlextResult[FlextMeltanoTypes.Singer.CatalogResult]:
+        def discover_catalog(
+            self, tap: Tap
+        ) -> FlextResult[FlextMeltanoTypes.Core.JsonObject]:
             """Descobre catálogo do tap e adapta para tipos flext-core com FLEXT-CLI integration.
 
             Args:
@@ -315,32 +313,34 @@ class FlextMeltanoAdapters:
 
             """
             try:
-                self.logger.info("Discovering catalog", tap=tap.__class__.__name__)
+                self.logger.info(
+                    f"Discovering catalog for tap: {tap.__class__.__name__}"
+                )
 
                 # Executar descoberta do catálogo
                 catalog = tap.catalog_dict
 
                 if not catalog or "streams" not in catalog:
-                    return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].fail(
+                    return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                         "Invalid catalog returned by tap"
                     )
 
                 # Validar streams
                 streams = catalog["streams"]
-                if not FlextUtilities.TypeGuards.is_list(streams):
-                    return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].fail(
+                if not isinstance(streams, list):
+                    return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                         "Invalid streams format in catalog"
                     )
 
                 self.logger.info(
-                    "Catalog discovered successfully", streams_count=len(streams)
+                    f"Catalog discovered successfully - Streams: {len(streams)}"
                 )
-                return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].ok(catalog)
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].ok(catalog)
 
             except Exception as e:
                 error_msg = f"Failed to discover catalog: {e}"
-                self.logger.exception(error_msg, error=str(e))
-                return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].fail(error_msg)
+                self.logger.exception(error_msg)
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(error_msg)
 
     # =================================================================
     # NESTED TYPE ADAPTER CLASS
@@ -351,8 +351,8 @@ class FlextMeltanoAdapters:
 
         @staticmethod
         def adapt_catalog(
-            singer_catalog: FlextMeltanoTypes.Singer.CatalogResult,
-        ) -> FlextResult[FlextMeltanoTypes.Singer.CatalogResult]:
+            singer_catalog: FlextMeltanoTypes.Core.JsonObject,
+        ) -> FlextResult[FlextMeltanoTypes.Core.JsonObject]:
             """Converte singer catalog para FlextCatalog pattern.
 
             Args:
@@ -368,12 +368,12 @@ class FlextMeltanoAdapters:
                     not isinstance(singer_catalog, dict)
                     or "streams" not in singer_catalog
                 ):
-                    return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].fail(
+                    return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                         "Invalid Singer catalog structure"
                     )
 
                 # Adaptar para formato FlextCatalog
-                flext_streams: list[FlextMeltanoTypes.Singer.CatalogResult] = []
+                flext_streams: list[FlextMeltanoTypes.Core.JsonObject] = []
                 flext_catalog = {
                     "version": "1.0",
                     "streams": flext_streams,
@@ -382,13 +382,15 @@ class FlextMeltanoAdapters:
 
                 # Processar streams
                 streams = singer_catalog.get("streams", [])
-                if FlextUtilities.TypeGuards.is_list(streams):
+                if isinstance(streams, list):
                     # Type narrowing: we know streams is a list after is_list check
                     streams_list = cast("list[object]", streams)
                     for stream in streams_list:
                         if isinstance(stream, dict):
                             # Type narrowing: we know stream is a dict after is_dict check
-                            stream_dict = cast("FlextMeltanoTypes.Singer.CatalogResult", stream)
+                            stream_dict = cast(
+                                "FlextMeltanoTypes.Core.JsonObject", stream
+                            )
                             flext_stream = {
                                 "name": stream_dict.get("stream"),
                                 "schema": stream_dict.get("schema", {}),
@@ -401,17 +403,19 @@ class FlextMeltanoAdapters:
                             }
                             flext_streams.append(flext_stream)
 
-                return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].ok(flext_catalog)
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].ok(
+                    cast("FlextMeltanoTypes.Core.JsonObject", flext_catalog)
+                )
 
             except Exception as e:
-                return FlextResult[FlextMeltanoTypes.Singer.CatalogResult].fail(
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                     f"Failed to adapt catalog: {e}"
                 )
 
         @staticmethod
         def adapt_schema(
-            singer_schema: FlextMeltanoTypes.Singer.SchemaResult,
-        ) -> FlextResult[FlextMeltanoTypes.Singer.SchemaResult]:
+            singer_schema: FlextMeltanoTypes.Core.JsonObject,
+        ) -> FlextResult[FlextMeltanoTypes.Core.JsonObject]:
             """Converte singer schema para FlextSchema pattern.
 
             Args:
@@ -427,12 +431,12 @@ class FlextMeltanoAdapters:
                     not isinstance(singer_schema, dict)
                     or "properties" not in singer_schema
                 ):
-                    return FlextResult[FlextMeltanoTypes.Singer.SchemaResult].fail(
+                    return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                         "Invalid Singer schema structure"
                     )
 
                 # Adaptar para formato FlextSchema
-                flext_properties: FlextMeltanoTypes.Singer.SchemaResult = {}
+                flext_properties: FlextMeltanoTypes.Core.JsonObject = {}
                 flext_schema = {
                     "type": "object",
                     "properties": flext_properties,
@@ -443,21 +447,29 @@ class FlextMeltanoAdapters:
                 properties = singer_schema.get("properties", {})
                 if isinstance(properties, dict):
                     # Type narrowing: we know properties is a dict after is_dict check
-                    properties_dict = cast("FlextMeltanoTypes.Singer.SchemaResult", properties)
+                    properties_dict = cast(
+                        "FlextMeltanoTypes.Core.JsonObject", properties
+                    )
                     for prop_name, prop_def in properties_dict.items():
                         if isinstance(prop_def, dict):
                             # Type narrowing: we know prop_def is a dict after is_dict check
-                            prop_def_dict = cast("FlextMeltanoTypes.Singer.SchemaResult", prop_def)
+                            prop_def_dict = cast(
+                                "FlextMeltanoTypes.Core.JsonObject", prop_def
+                            )
                             flext_properties[prop_name] = {
-                                "type": prop_def_dict.get("type", "string"),
-                                "format": prop_def_dict.get("format"),
-                                "description": prop_def_dict.get("description"),
+                                "type": str(prop_def_dict.get("type", "string")),
+                                "format": str(prop_def_dict.get("format", "")),
+                                "description": str(
+                                    prop_def_dict.get("description", "")
+                                ),
                             }
 
-                return FlextResult[FlextMeltanoTypes.Singer.SchemaResult].ok(flext_schema)
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].ok(
+                    cast("FlextMeltanoTypes.Core.JsonObject", flext_schema)
+                )
 
             except Exception as e:
-                return FlextResult[FlextMeltanoTypes.Singer.SchemaResult].fail(
+                return FlextResult[FlextMeltanoTypes.Core.JsonObject].fail(
                     f"Failed to adapt schema: {e}"
                 )
 

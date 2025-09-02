@@ -32,7 +32,7 @@ MeltanoBridge = FlextMeltanoBridge
 warnings.warn(
     "meltano_adapters module is deprecated. Use flext_meltano.adapters and flext_meltano.executors_bridge instead.",
     DeprecationWarning,
-    stacklevel=2
+    stacklevel=2,
 )
 
 # Export legacy names for backward compatibility

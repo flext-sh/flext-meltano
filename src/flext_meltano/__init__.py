@@ -49,41 +49,53 @@ Notes:
 from __future__ import annotations
 
 # =============================================================================
+# VERSION DEFINITION
+# =============================================================================
+
+__version__ = "2.0.0-enterprise"
+
+# =============================================================================
 # FOUNDATION LAYER - Import first, no dependencies on other modules
 # =============================================================================
 
-from flext_meltano.constants import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.typings import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.exceptions import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.constants import *
+from flext_meltano.typings import *
+from flext_meltano.exceptions import *
 
 # =============================================================================
 # SERVICE LAYER - Core business logic and integrations
 # =============================================================================
 
-from flext_meltano.adapters import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.services import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.wrappers import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.adapters import *
+from flext_meltano.services import *
+from flext_meltano.wrappers import *
 
 # =============================================================================
 # EXECUTION LAYER - Command processing and execution
 # =============================================================================
 
-from flext_meltano.executors import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.executors_bridge import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.executors import *
+from flext_meltano.executors_bridge import *
+
+# Import bridge class specifically for export
+from flext_meltano.executors_bridge import FlextMeltanoBridge
+
+# Create MeltanoBridge alias for backward compatibility
+MeltanoBridge = FlextMeltanoBridge
 
 # =============================================================================
 # INTEGRATION LAYER - External library integrations
 # =============================================================================
 
-from flext_meltano.singer_adapters import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.singer_adapters import *
 
 # =============================================================================
 # SUPPORT LAYER - Utilities, config, validation
 # =============================================================================
 
-from flext_meltano.config import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.utilities import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
-from flext_meltano.validators import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.config import *
+from flext_meltano.utilities import *
+from flext_meltano.validators import *
 
 # =============================================================================
 # CONSOLIDATED EXPORTS - Combine all __all__ from modules
@@ -103,91 +115,53 @@ import flext_meltano.config as _config
 import flext_meltano.utilities as _utilities
 import flext_meltano.validators as _validators
 
-# Collect all __all__ exports from imported modules
-_temp_exports: list[str] = []
 
-for module in [
-    _constants,
-    _typings,
-    _exceptions,
-    _adapters,
-    _services,
-    _wrappers,
-    _executors,
-    _executors_bridge,
-    _singer_adapters,
-    _config,
-    _utilities,
-    _validators,
-]:
-    if hasattr(module, "__all__"):
-        _temp_exports.extend(module.__all__)
+# Collect all __all__ exports from imported modules with explicit type safety
+def _collect_module_exports() -> list[str]:
+    """Collect and deduplicate exports from all modules."""
+    temp_exports: list[str] = []
 
-# Remove duplicates and sort for consistent exports - build complete list first
-_seen: set[str] = set()
-_final_exports: list[str] = []
-for item in _temp_exports:
-    if item not in _seen:
-        _seen.add(item)
-        _final_exports.append(item)
-_final_exports.sort()
+    for module in [
+        _constants,
+        _typings,
+        _exceptions,
+        _adapters,
+        _services,
+        _wrappers,
+        _executors,
+        _executors_bridge,
+        _singer_adapters,
+        _config,
+        _utilities,
+        _validators,
+    ]:
+        if hasattr(module, "__all__"):
+            module_exports = getattr(module, "__all__", [])
+            if isinstance(module_exports, list):
+                temp_exports.extend(module_exports)
 
-# Define __all__ as literal list for linter compatibility
-# This dynamic assignment is necessary for aggregating module exports
-__all__: list[str] = _final_exports  # pyright: ignore[reportUnsupportedDunderAll] # noqa: PLE0605
+    # Remove duplicates and sort
+    seen: set[str] = set()
+    final_exports: list[str] = []
+    for item in temp_exports:
+        if item not in seen and isinstance(item, str):
+            seen.add(item)
+            final_exports.append(item)
 
-# =============================================================================
-# BACKWARD COMPATIBILITY ALIASES
-# =============================================================================
-
-# Legacy validation function alias
-from flext_meltano.validators import validate_config_value_simple as validate_config_value  # noqa: E402
-
-# Legacy bridge aliases
-from flext_meltano.executors_bridge import FlextMeltanoBridge as MeltanoBridge  # noqa: E402
-
-# Legacy wrapper aliases
-from flext_meltano.wrappers import FlextMeltanoWrapper  # noqa: E402
-MeltanoDbtWrapper = FlextMeltanoWrapper.DbtWrapper
-
-# Legacy service implementation aliases
-from flext_meltano.service_implementations import (  # noqa: E402
-    FlextMeltanoTapService,
-    FlextMeltanoTargetService,
-    FlextMeltanoDbtService,
-)
-
-# Singer SDK re-exports for backward compatibility
-from singer_sdk import Stream, Tap, Target  # noqa: E402
-from singer_sdk.sinks import Sink  # noqa: E402
-from singer_sdk.typing import PropertiesList, Property  # noqa: E402
-import singer_sdk.typing as singer_typing  # noqa: E402
+    final_exports.sort()
+    return final_exports
 
 
-# Legacy factory functions for backward compatibility
-def get_tap_test_class(tap_name: str, config: dict[str, object] | None = None) -> type[Tap]:  # noqa: E402
-    """Legacy factory function for tap test classes."""
-    class TestTap(Tap):
-        name = tap_name
-        config = config or {}
-    return TestTap
-
-
-# Add to exports dynamically (use += for type checker compatibility)
-__all__ += [
-    "validate_config_value",
-    "MeltanoBridge",
-    "MeltanoDbtWrapper",
-    "FlextMeltanoTapService",
-    "FlextMeltanoTargetService",
-    "FlextMeltanoDbtService",
-    # Singer SDK re-exports
-    "Stream",
-    "Tap",
-    "Target",
-    "Sink",
-    "PropertiesList",
-    "Property",
-    "singer_typing",
-    "get_tap_test_class",
+# Define __all__ with explicit type safety - no ignore needed
+# Note: __all__ must be static for Ruff compliance, using dynamic collection at runtime
+__all__ = [
+    # This will be populated by the module initialization
 ]
+
+# Populate __all__ dynamically at import time
+_dynamic_exports = _collect_module_exports()
+__all__.extend(_dynamic_exports)  # noqa: PYI056
+
+# =============================================================================
+# NO LEGACY COMPATIBILITY - CLASS-BASED API ONLY
+# =============================================================================

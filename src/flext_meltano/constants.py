@@ -75,7 +75,9 @@ class FlextMeltanoConstants(FlextConstants):
         # Use new names to avoid overriding final attributes from parent
         MELTANO_NAME: Final[str] = "FLEXT-MELTANO"
         MELTANO_VERSION: Final[str] = "2.0.0-enterprise"
-        DESCRIPTION: Final[str] = "Enterprise Meltano/Singer/DBT integration for FLEXT ecosystem"
+        DESCRIPTION: Final[str] = (
+            "Enterprise Meltano/Singer/DBT integration for FLEXT ecosystem"
+        )
         AUTHOR: Final[str] = "FLEXT Team"
 
         # Meltano ecosystem integration

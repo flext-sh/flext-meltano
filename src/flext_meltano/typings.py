@@ -92,11 +92,15 @@ class FlextMeltanoTypes(FlextTypes):
         """
 
         # Plugin identification and metadata (using flext-core base types)
-        type Name = FlextTypes.Core.Identifier  # Use Core.Identifier instead of plain str
+        type Name = (
+            FlextTypes.Core.Identifier
+        )  # Use Core.Identifier instead of plain str
         type Variant = FlextTypes.Core.Identifier  # Consistent with identifier pattern
         type Type = FlextTypes.Core.Identifier  # Plugin type as identifier
         type Version = str  # Keep as str since versions have specific format
-        type Config = FlextTypes.Config.ConfigDict  # Use Config.ConfigDict from flext-core
+        type Config = (
+            FlextTypes.Config.ConfigDict
+        )  # Use Config.ConfigDict from flext-core
         type Settings = FlextTypes.Config.ConfigDict  # Settings are configuration
 
         # Plugin discovery and installation (using flext-core patterns)
@@ -139,7 +143,9 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Configuration and settings (using flext-core config types)
         type TapConfig = FlextTypes.Config.ConfigDict  # Tap config from Config domain
-        type TargetConfig = FlextTypes.Config.ConfigDict  # Target config from Config domain
+        type TargetConfig = (
+            FlextTypes.Config.ConfigDict
+        )  # Target config from Config domain
         type PropertiesList = FlextTypes.Core.JsonObject  # Properties as JsonObject
 
     # =========================================================================
@@ -167,7 +173,9 @@ class FlextMeltanoTypes(FlextTypes):
         # Execution and results (using flext-core result patterns)
         type RunResult = FlextTypes.Core.JsonObject  # Run result as JsonObject
         type TestResult = FlextTypes.Core.JsonObject  # Test result as JsonObject
-        type ExecutionResult = FlextTypes.Core.JsonObject  # Execution result as JsonObject
+        type ExecutionResult = (
+            FlextTypes.Core.JsonObject
+        )  # Execution result as JsonObject
 
         # Configuration (using flext-core config types)
         type ProjectConfig = FlextTypes.Config.ConfigDict  # Project config
@@ -199,7 +207,9 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Error handling (using flext-core error patterns)
         type ErrorResponse = FlextTypes.Core.JsonObject  # Error response as JsonObject
-        type SuccessResponse = FlextTypes.Core.JsonObject  # Success response as JsonObject
+        type SuccessResponse = (
+            FlextTypes.Core.JsonObject
+        )  # Success response as JsonObject
 
     # =========================================================================
     # CLI TYPES - Command-line interface
@@ -213,12 +223,18 @@ class FlextMeltanoTypes(FlextTypes):
         """
 
         # Command structure (using flext-core command types)
-        type CommandName = FlextTypes.Commands.CommandName  # Command name from Commands domain
+        type CommandName = (
+            FlextTypes.Commands.CommandName
+        )  # Command name from Commands domain
         type CommandArgs = FlextTypes.Core.List  # Arguments as Core.List
-        type CommandResult = FlextTypes.Commands.CommandResult  # Result from Commands domain
+        type CommandResult = (
+            FlextTypes.Commands.CommandResult
+        )  # Result from Commands domain
 
         # Execution context (using flext-core handler types)
-        type ExecutionContext = FlextTypes.Handler.Context  # Context from Handler domain
+        type ExecutionContext = (
+            FlextTypes.Handler.Context
+        )  # Context from Handler domain
         type ProcessResult = FlextTypes.Core.JsonObject  # Process result as JsonObject
         type ExitCode = int  # Keep as int for exit codes
 
@@ -261,14 +277,18 @@ class FlextMeltanoTypes(FlextTypes):
         """
 
         # Adapter identification (using flext-core service types)
-        type AdapterName = FlextTypes.Service.ServiceName  # Adapter name as service name
+        type AdapterName = (
+            FlextTypes.Service.ServiceName
+        )  # Adapter name as service name
         type AdapterType = FlextTypes.Core.Identifier  # Adapter type as identifier
         type AdapterConfig = FlextTypes.Config.ConfigDict  # Adapter config
 
         # Adapter operation types (using basic FlextTypes.Core types)
         type OperationResult = FlextTypes.Core.JsonObject  # Operation result
         type AdapterResponse = FlextTypes.Core.JsonObject  # Response as JsonObject
-        type ServiceCall = FlextTypes.Core.FlextCallableType  # Service call as callable type
+        type ServiceCall = (
+            FlextTypes.Core.FlextCallableType
+        )  # Service call as callable type
 
         # Integration patterns (using basic FlextTypes.Core types)
         type WrapperResult = FlextTypes.Core.JsonObject  # Wrapper result as JsonObject

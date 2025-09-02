@@ -22,16 +22,17 @@ from __future__ import annotations
 import warnings
 
 # Import everything from executors for backward compatibility
-from flext_meltano.executors import *  # type: ignore[unused-ignore,reportWildcardImport,assignment] # noqa: F403
+from flext_meltano.executors import FlextMeltanoExecutor  # noqa: F401
 
-# Import specific items
-from flext_meltano.executors import FlextMeltanoCli, flext_meltano_run_cli
+# Create backward compatibility aliases
+FlextMeltanoCli = FlextMeltanoExecutor
+flext_meltano_run_cli = FlextMeltanoExecutor.create_cli_runner
 
 # Issue deprecation warning
 warnings.warn(
     "executors_cli module is deprecated. Use flext_meltano.executors instead.",
     DeprecationWarning,
-    stacklevel=2
+    stacklevel=2,
 )
 
 # Export legacy names for backward compatibility
