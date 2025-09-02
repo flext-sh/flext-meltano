@@ -317,34 +317,6 @@ class FlextMeltanoFileManagers:
                 return FlextResult.fail(f"Failed to cleanup temporary directory: {e}")
 
 
-# =============================================================================
-# MODULE-LEVEL ALIASES FOR BACKWARD COMPATIBILITY
-# =============================================================================
-
-
-class FlextTempDirectoryManager:
-    """Legacy alias for FlextMeltanoFileManagers.TempDirectoryManager.
-
-    DEPRECATED: Use FlextMeltanoFileManagers.TempDirectoryManager instead.
-    """
-
-    # Delegate to internal class
-    create_temp_directory = (
-        FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory
-    )
-    create_temp_directory_with_result = (
-        FlextMeltanoFileManagers.TempDirectoryManager.create_temp_directory_with_result
-    )
-    cleanup_temp_directory = (
-        FlextMeltanoFileManagers.TempDirectoryManager.cleanup_temp_directory
-    )
-
-
-# =============================================================================
-# PUBLIC API EXPORTS
-# =============================================================================
-
 __all__ = [
     "FlextMeltanoFileManagers",
-    "FlextTempDirectoryManager",
 ]

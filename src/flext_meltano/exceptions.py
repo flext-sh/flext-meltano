@@ -52,7 +52,9 @@ class FlextMeltanoExceptions:
         def __init__(self, message: str = "Validation error", **kwargs: object) -> None:
             """Allow arbitrary context kwargs and forward to base class."""
             context = dict(kwargs) if kwargs else None
-            super().__init__(message, context=context)
+            super().__init__()
+            self.message = message
+            self.context = {"context": context}
 
     class MeltanoConfigurationError(MeltanoError, FlextExceptions):
         """Configuration error for Meltano domain."""
@@ -66,8 +68,9 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize configuration error with nested context expected by tests."""
-            super().__init__(f"Configuration: {message}", context={})
-            nested: FlextMeltanoTypes.CLI.ProcessResult = dict(kwargs)
+            super().__init__()
+            self.message = f"Configuration: {message}"
+            nested: dict[str, object] = dict(kwargs)
             if config_file is not None:
                 nested["config_file"] = config_file
             if section is not None:
@@ -86,12 +89,13 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize connection error with network context."""
-            nested: FlextMeltanoTypes.CLI.ProcessResult = {}
+            nested: dict[str, object] = {}
             if host is not None:
                 nested["host"] = host
             if port is not None:
                 nested["port"] = port
-            super().__init__(f"Connection: {message}", context={})
+            super().__init__()
+            self.message = f"Connection: {message}"
             if kwargs:
                 nested.update(dict(kwargs))
             self.context = {"context": nested}
@@ -109,8 +113,9 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize processing error with operation context."""
-            super().__init__(f"Processing: {message}", context={})
-            nested_context: FlextMeltanoTypes.CLI.ProcessResult = dict(context or {})
+            super().__init__()
+            self.message = f"Processing: {message}"
+            nested_context: dict[str, object] = dict(context or {})
             if kwargs:
                 nested_context.update(dict(kwargs))
             if operation is not None:
@@ -131,7 +136,8 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize authentication error with auth context."""
-            super().__init__(f"Authentication: {message}", context={})
+            super().__init__()
+            self.message = f"Authentication: {message}"
             nested = dict(kwargs)
             if username is not None:
                 nested["user"] = username
@@ -151,8 +157,9 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize timeout error with timing context nested under 'context'."""
-            super().__init__(f"Timeout: {message}", context={})
-            nested: FlextMeltanoTypes.CLI.ProcessResult = {}
+            super().__init__()
+            self.message = f"Timeout: {message}"
+            nested: dict[str, object] = {}
             if timeout_seconds is not None:
                 nested["timeout"] = timeout_seconds
             if operation is not None:
@@ -181,7 +188,9 @@ class FlextMeltanoExceptions:
                 context["plugin_type"] = plugin_type
             if plugin_command is not None:
                 context["plugin_command"] = plugin_command
-            super().__init__(f"Plugin: {message}", context=context)
+            super().__init__()
+            self.message = f"Plugin: {message}"
+            self.context = {"context": context}
 
     class MeltanoExecutionError(MeltanoProcessingError):
         """Execution errors with command context using DRY foundation."""
@@ -195,15 +204,15 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize execution error with command context."""
-            nested: FlextMeltanoTypes.CLI.ProcessResult = dict(kwargs)
+            nested: dict[str, object] = dict(kwargs)
             if command is not None:
                 nested["command"] = command
             if exit_code is not None:
                 nested["exit_code"] = exit_code
             # Bypass nested context from processing error: set flat context as tests expect
-            FlextMeltanoExceptions.MeltanoError.__init__(
-                self, f"Execution: {message}", context=nested
-            )
+            FlextMeltanoExceptions.MeltanoError.__init__(self)
+            self.message = f"Execution: {message}"
+            self.context = {"context": nested}
 
     class MeltanoSingerError(MeltanoError):
         """Singer protocol-specific errors using DRY foundation."""
@@ -222,7 +231,9 @@ class FlextMeltanoExceptions:
                 context["stream_name"] = stream_name
             if record_count is not None:
                 context["record_count"] = record_count
-            super().__init__(f"Singer: {message}", context=context)
+            super().__init__()
+            self.message = f"Singer: {message}"
+            self.context = {"context": context}
 
     class MeltanoDBTError(MeltanoError):
         """DBT integration errors using DRY foundation."""
@@ -238,7 +249,9 @@ class FlextMeltanoExceptions:
             context = dict(kwargs)
             if model_name is not None:
                 context["model_name"] = model_name
-            super().__init__(f"DBT: {message}", context=context)
+            super().__init__()
+            self.message = f"DBT: {message}"
+            self.context = {"context": context}
 
     # =================================================================
     # ALIASES FOR BACKWARD COMPATIBILITY - FlextMeltano[ErrorType]

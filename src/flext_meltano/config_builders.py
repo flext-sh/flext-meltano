@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextUtilities
+from flext_core import FlextLogger, FlextTypes
 
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -181,7 +181,9 @@ class FlextMeltanoConfigBuilders:
                 plugin_config["variant"] = variant
 
             if config_defaults:
-                plugin_config["config"] = config_defaults
+                plugin_config["config"] = cast(
+                    "FlextTypes.Core.JsonValue", config_defaults
+                )
 
             return plugin_config
 
@@ -207,7 +209,7 @@ class FlextMeltanoConfigBuilders:
                 "namespace": f"tap_{tap_name.replace('-', '_')}",
                 "pip_url": pip_url,
                 "executable": tap_name,
-                "config": config_defaults or {},
+                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
                 "select": ["*.*"],  # Selecionar todas as tabelas por padrão
             }
 
@@ -233,7 +235,7 @@ class FlextMeltanoConfigBuilders:
                 "namespace": f"target_{target_name.replace('-', '_')}",
                 "pip_url": pip_url,
                 "executable": target_name,
-                "config": config_defaults or {},
+                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
             }
 
     class MeltanoConfigBuilder:
@@ -298,10 +300,9 @@ class FlextMeltanoConfigBuilders:
                 if plugin_type not in typed_plugins:
                     typed_plugins[plugin_type] = []
                 plugin_list = typed_plugins[plugin_type]
-                if FlextUtilities.TypeGuards.is_list(plugin_list):
-                    typed_list = cast("list[object]", plugin_list)
-                    plugin_list_copy = list(typed_list)  # Create mutable copy
-                    plugin_list_copy.append(plugin_config)
+                if isinstance(plugin_list, list):
+                    plugin_list_copy = list(plugin_list)  # Create mutable copy
+                    plugin_list_copy.append(cast("dict[str, object]", plugin_config))
                     typed_plugins[plugin_type] = plugin_list_copy
 
             return updated_config

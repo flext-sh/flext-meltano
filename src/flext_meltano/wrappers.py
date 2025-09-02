@@ -198,7 +198,9 @@ class FlextMeltanoWrapper:
                 )
 
                 if not DBT_AVAILABLE:
-                    return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail("DBT Core not available")
+                    return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
+                        "DBT Core not available"
+                    )
 
                 # Validate project directory
                 if not project_dir.exists():
@@ -280,7 +282,9 @@ class FlextMeltanoWrapper:
             except Exception as e:
                 error_msg = f"Failed to run DBT models via dbtRunner.invoke: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
+                    error_msg
+                )
 
         def test_models(
             self,
@@ -351,7 +355,9 @@ class FlextMeltanoWrapper:
             except Exception as e:
                 error_msg = f"Failed to test DBT models: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
+                    error_msg
+                )
 
         def compile_project(
             self, runner: dbtRunner, project_dir: Path | None = None
@@ -408,7 +414,9 @@ class FlextMeltanoWrapper:
             except Exception as e:
                 error_msg = f"Failed to compile DBT project: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
+                    error_msg
+                )
 
         def generate_docs(
             self, runner: dbtRunner, project_dir: Path | None = None
@@ -465,7 +473,9 @@ class FlextMeltanoWrapper:
             except Exception as e:
                 error_msg = f"Failed to generate DBT docs: {e}"
                 self.logger.exception(error_msg, error=str(e))
-                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
+                    error_msg
+                )
 
     # =================================================================
     # NESTED TYPE ADAPTER CLASS
@@ -491,12 +501,20 @@ class FlextMeltanoWrapper:
                 # Adaptar para formato FlextDbtResults
                 flext_results: FlextMeltanoTypes.DBT.ExecutionResult = {
                     "version": "1.0",
-                    "execution_time": cast("str | int | float | None", dbt_results.get("execution_time")),
+                    "execution_time": cast(
+                        "str | int | float | None", dbt_results.get("execution_time")
+                    ),
                     "success": dbt_results.get("success", False),
                     "results": [],
                     "metadata": {
-                        "dbt_version": cast("str | int | float | list[object] | dict[str, object] | None", dbt_results.get("dbt_version")),
-                        "generated_at": cast("str | int | float | list[object] | dict[str, object] | None", dbt_results.get("generated_at")),
+                        "dbt_version": cast(
+                            "str | int | float | list[object] | dict[str, object] | None",
+                            dbt_results.get("dbt_version"),
+                        ),
+                        "generated_at": cast(
+                            "str | int | float | list[object] | dict[str, object] | None",
+                            dbt_results.get("generated_at"),
+                        ),
                     },
                 }
 
@@ -509,18 +527,32 @@ class FlextMeltanoWrapper:
                         typed_results_data = cast("list[object]", results_data)
                         for result in typed_results_data:
                             if isinstance(result, dict):
-                                typed_result = cast("FlextMeltanoTypes.DBT.ExecutionResult", result)
+                                typed_result = cast(
+                                    "FlextMeltanoTypes.DBT.ExecutionResult", result
+                                )
                                 flext_result = {
-                                    "unique_id": cast("str", typed_result.get("unique_id", "")),
-                                    "status": cast("str", typed_result.get("status", "")),
-                                    "execution_time": cast("float", typed_result.get("execution_time", 0.0)),
-                                    "message": cast("str", typed_result.get("message", "")),
-                                    "compiled_code": cast("str", typed_result.get("compiled_code", "")),
+                                    "unique_id": cast(
+                                        "str", typed_result.get("unique_id", "")
+                                    ),
+                                    "status": cast(
+                                        "str", typed_result.get("status", "")
+                                    ),
+                                    "execution_time": cast(
+                                        "float", typed_result.get("execution_time", 0.0)
+                                    ),
+                                    "message": cast(
+                                        "str", typed_result.get("message", "")
+                                    ),
+                                    "compiled_code": cast(
+                                        "str", typed_result.get("compiled_code", "")
+                                    ),
                                 }
                                 results_list.append(flext_result)
                         flext_results["results"] = results_list
 
-                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].ok(flext_results)
+                return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].ok(
+                    flext_results
+                )
 
             except Exception as e:
                 return FlextResult[FlextMeltanoTypes.DBT.ExecutionResult].fail(
@@ -559,56 +591,99 @@ class FlextMeltanoWrapper:
                 if isinstance(nodes_data, dict):
                     nodes_dict = flext_manifest["nodes"]
                     if isinstance(nodes_dict, dict):
-                        typed_nodes_dict = cast("FlextMeltanoTypes.DBT.ProjectConfig", nodes_dict)
+                        typed_nodes_dict = cast(
+                            "FlextMeltanoTypes.DBT.ProjectConfig", nodes_dict
+                        )
                         nodes_dict_copy = dict(typed_nodes_dict)  # Create mutable copy
 
                         # Type safe iteration over nodes_data
                         if isinstance(nodes_data, dict):
-                            typed_nodes_data = cast("FlextMeltanoTypes.DBT.ProjectConfig", nodes_data)
+                            typed_nodes_data = cast(
+                                "FlextMeltanoTypes.DBT.ProjectConfig", nodes_data
+                            )
                             for node_id, node in typed_nodes_data.items():
                                 if isinstance(node, dict):
-                                    typed_node = cast("FlextMeltanoTypes.DBT.ProjectConfig", node)
+                                    typed_node = cast(
+                                        "FlextMeltanoTypes.DBT.ProjectConfig", node
+                                    )
                                     depends_on_data = typed_node.get("depends_on", {})
                                     depends_on_nodes: list[str] = []
                                     if isinstance(depends_on_data, dict):
-                                        depends_on_nodes = cast("list[str]", depends_on_data.get("nodes", []))
+                                        depends_on_nodes = cast(
+                                            "list[str]",
+                                            depends_on_data.get("nodes", []),
+                                        )
 
                                     flext_node: dict[str, str | list[str]] = {
                                         "name": cast("str", typed_node.get("name", "")),
-                                        "resource_type": cast("str", typed_node.get("resource_type", "")),
-                                        "database": cast("str", typed_node.get("database", "")),
-                                        "schema": cast("str", typed_node.get("schema", "")),
+                                        "resource_type": cast(
+                                            "str", typed_node.get("resource_type", "")
+                                        ),
+                                        "database": cast(
+                                            "str", typed_node.get("database", "")
+                                        ),
+                                        "schema": cast(
+                                            "str", typed_node.get("schema", "")
+                                        ),
                                         "depends_on": depends_on_nodes,
                                     }
-                                    nodes_dict_copy[node_id] = cast("str | int | float | list[object] | dict[str, object]", flext_node)
-                        flext_manifest["nodes"] = cast("str | int | float | list[object] | dict[str, object]", nodes_dict_copy)
+                                    nodes_dict_copy[node_id] = cast(
+                                        "str | int | float | list[object] | dict[str, object]",
+                                        flext_node,
+                                    )
+                        flext_manifest["nodes"] = cast(
+                            "str | int | float | list[object] | dict[str, object]",
+                            nodes_dict_copy,
+                        )
 
                 # Processar sources
                 sources_data = dbt_manifest.get("sources", {})
                 if isinstance(sources_data, dict):
                     sources_dict = flext_manifest["sources"]
                     if isinstance(sources_dict, dict):
-                        typed_sources_dict = cast("FlextMeltanoTypes.DBT.ProjectConfig", sources_dict)
+                        typed_sources_dict = cast(
+                            "FlextMeltanoTypes.DBT.ProjectConfig", sources_dict
+                        )
                         sources_dict_copy = dict(
                             typed_sources_dict
                         )  # Create mutable copy
 
                         # Type safe iteration over sources_data
                         if isinstance(sources_data, dict):
-                            typed_sources_data = cast("FlextMeltanoTypes.DBT.ProjectConfig", sources_data)
+                            typed_sources_data = cast(
+                                "FlextMeltanoTypes.DBT.ProjectConfig", sources_data
+                            )
                             for source_id, source in typed_sources_data.items():
                                 if isinstance(source, dict):
-                                    typed_source = cast("FlextMeltanoTypes.DBT.ProjectConfig", source)
+                                    typed_source = cast(
+                                        "FlextMeltanoTypes.DBT.ProjectConfig", source
+                                    )
                                     flext_source: dict[str, str] = {
-                                        "name": cast("str", typed_source.get("name", "")),
-                                        "source_name": cast("str", typed_source.get("source_name", "")),
-                                        "database": cast("str", typed_source.get("database", "")),
-                                        "schema": cast("str", typed_source.get("schema", "")),
+                                        "name": cast(
+                                            "str", typed_source.get("name", "")
+                                        ),
+                                        "source_name": cast(
+                                            "str", typed_source.get("source_name", "")
+                                        ),
+                                        "database": cast(
+                                            "str", typed_source.get("database", "")
+                                        ),
+                                        "schema": cast(
+                                            "str", typed_source.get("schema", "")
+                                        ),
                                     }
-                                    sources_dict_copy[source_id] = cast("str | int | float | list[object] | dict[str, object]", flext_source)
-                        flext_manifest["sources"] = cast("str | int | float | list[object] | dict[str, object]", sources_dict_copy)
+                                    sources_dict_copy[source_id] = cast(
+                                        "str | int | float | list[object] | dict[str, object]",
+                                        flext_source,
+                                    )
+                        flext_manifest["sources"] = cast(
+                            "str | int | float | list[object] | dict[str, object]",
+                            sources_dict_copy,
+                        )
 
-                return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(flext_manifest)
+                return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(
+                    flext_manifest
+                )
 
             except Exception as e:
                 return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].fail(

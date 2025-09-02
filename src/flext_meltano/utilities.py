@@ -12,21 +12,17 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 import yaml
 from flext_core import (
     FlextLogger,
     FlextResult,
+    FlextTypes,
     FlextUtilities,
 )
 
 from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.validators import (
-    validate_config_value_simple,
-    validate_directory_path,
-    validate_file_path,
-)
 
 T = TypeVar("T")
 
@@ -150,10 +146,7 @@ class FlextMeltanoUtilities:
 
         """
         try:
-            # Use FlextUtilities validation
-            if not isinstance(config, dict):
-                return FlextResult.fail("Config must be a dictionary")
-
+            # Config is typed as ConfigDict so isinstance check is unnecessary
             # Safe YAML write
             with target_path.open("w", encoding="utf-8") as f:
                 yaml.dump(config, f, default_flow_style=False, indent=2)
@@ -217,7 +210,7 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def format_meltano_command_result(
-        cls, *, success: bool, data: FlextMeltanoTypes.CLI.ProcessResult | None = None
+        cls, *, success: bool, data: FlextTypes.Core.JsonValue | None = None
     ) -> FlextMeltanoTypes.CLI.ProcessResult:
         """Format Meltano command result for bridge communication.
 
@@ -245,7 +238,9 @@ class FlextMeltanoUtilities:
         return response
 
     @classmethod
-    def parse_meltano_output_safe(cls, output: str) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+    def parse_meltano_output_safe(
+        cls, output: str
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
         """Parse Meltano command output safely.
 
         Uses FlextUtilities.parse_json_safe() when applicable.
@@ -257,33 +252,35 @@ class FlextMeltanoUtilities:
             FlextResult with parsed data
 
         """
-        # Use FlextUtilities for initial string validation
-        if not FlextUtilities.TextProcessor.is_non_empty_string(output):
+        # Check if output is non-empty
+        if not output or not output.strip():
             return FlextResult.ok({"output": "", "lines": []})
 
         try:
-            # Clean output using FlextUtilities
-            clean_output = FlextUtilities.TextProcessor.clean_text(
-                output
-            )  # From FlextUtilities
+            # Clean output - normalize whitespace
+            clean_output = output.strip()
             lines = clean_output.split("\n")
 
-            # Try JSON parsing first using FlextUtilities concept
-            json_result = FlextUtilities.ProcessingUtils.parse_json_safe(clean_output)
-            if json_result.success:
+            # Try JSON parsing first
+            try:
+                import json
+
+                parsed_json = json.loads(clean_output)
                 return FlextResult.ok(
                     {
                         "output": clean_output,
-                        "lines": lines,
-                        "parsed_json": json_result.value,
+                        "lines": cast("FlextTypes.Core.JsonValue", lines),
+                        "parsed_json": parsed_json,
                     }
                 )
+            except (json.JSONDecodeError, ValueError):
+                pass  # Fall through to text parsing
 
             # Fallback to structured text parsing
             return FlextResult.ok(
                 {
                     "output": clean_output,
-                    "lines": lines,
+                    "lines": cast("FlextTypes.Core.JsonValue", lines),
                     "line_count": len(lines),
                 }
             )
@@ -294,7 +291,9 @@ class FlextMeltanoUtilities:
             return FlextResult.fail(error_msg)
 
     @classmethod
-    def adapt_meltano_plugin(cls, plugin_data: FlextMeltanoTypes.Plugin.PluginInfo) -> FlextMeltanoTypes.Plugin.PluginInfo:
+    def adapt_meltano_plugin(
+        cls, plugin_data: FlextMeltanoTypes.Plugin.PluginInfo
+    ) -> FlextMeltanoTypes.Plugin.PluginInfo:
         """Adapt Meltano plugin data for unified processing.
 
         Args:
@@ -304,32 +303,17 @@ class FlextMeltanoUtilities:
             Adapted plugin data with standardized fields
 
         """
-        if not isinstance(plugin_data, dict):
-            return {
-                "id": "unknown",
-                "name": "unknown",
-                "type": "unknown",
-                "status": "failed",
-            }
-
-        name = FlextUtilities.ProcessingUtils.safe_dict_get(
-            plugin_data, "name", str, "unknown"
-        )
-        plugin_type = FlextUtilities.ProcessingUtils.safe_dict_get(
-            plugin_data, "type", str, "unknown"
-        )
+        # plugin_data is typed as PluginInfo so isinstance check is unnecessary
+        name = plugin_data.get("name", "unknown")
+        plugin_type = plugin_data.get("type", "unknown")
 
         return {
             "id": name,
             "name": name,
             "type": plugin_type,
             "status": "adapted",
-            "namespace": FlextUtilities.ProcessingUtils.safe_dict_get(
-                plugin_data, "namespace", str, f"{plugin_type}_{name}"
-            ),
-            "version": FlextUtilities.ProcessingUtils.safe_dict_get(
-                plugin_data, "version", str, "1.0.0"
-            ),
+            "namespace": plugin_data.get("namespace", f"{plugin_type}_{name}"),
+            "version": plugin_data.get("version", "1.0.0"),
             "metadata": {
                 "adapted_by": "flext-meltano",
                 "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -409,14 +393,14 @@ class FlextMeltanoUtilities:
         )
 
     @classmethod
-    def load_yaml_config(cls, path: Path) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
+    def load_yaml_config(
+        cls, path: Path
+    ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
         """Load YAML config safely."""
         try:
             with path.open("r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
-            return FlextResult.ok(
-                data if isinstance(data, dict) else {}
-            )
+            return FlextResult.ok(data if isinstance(data, dict) else {})
         except Exception as e:
             return FlextResult.fail(f"Failed to load YAML: {e}")
 
@@ -477,7 +461,9 @@ class FlextMeltanoUtilities:
         return config
 
     @classmethod
-    def create_dbt_config(cls, name: str, profile: str) -> FlextMeltanoTypes.DBT.ProjectConfig:
+    def create_dbt_config(
+        cls, name: str, profile: str
+    ) -> FlextMeltanoTypes.DBT.ProjectConfig:
         """Create DBT project configuration."""
         return {
             "name": FlextUtilities.TextProcessor.safe_string(name, "dbt_project"),
@@ -494,11 +480,11 @@ class FlextMeltanoUtilities:
         }
 
     @classmethod
-    def validate_plugin_config(cls, config: FlextMeltanoTypes.Plugin.Config) -> FlextResult[bool]:
+    def validate_plugin_config(
+        cls, config: FlextMeltanoTypes.Plugin.Config
+    ) -> FlextResult[bool]:
         """Validate plugin configuration."""
-        if not isinstance(config, dict):
-            return FlextResult.fail("Config must be a dictionary")
-
+        # Config is typed as Plugin.Config so isinstance check is unnecessary
         required_fields = ["name", "type"]
         for field in required_fields:
             if field not in config or not config.get(field):
@@ -534,14 +520,6 @@ class FlextMeltanoUtilities:
 # =============================================================================
 
 __all__ = [
-    # Main class
+    # Main class only - no helper functions
     "FlextMeltanoUtilities",
-    # Backward compatibility validation functions
-    "validate_config_value",
-    "validate_config_value_simple",
-    "validate_directory_path",
-    "validate_file_path",
 ]
-
-# Backward compatibility alias
-validate_config_value = validate_config_value_simple

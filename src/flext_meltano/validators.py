@@ -12,15 +12,13 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 from flext_core import (
     FlextLogger,
     FlextResult,
     FlextUtilities,
 )
-
-from flext_meltano.typings import FlextMeltanoTypes
 
 T = TypeVar("T")
 
@@ -40,7 +38,7 @@ class FlextMeltanoValidators(FlextUtilities):
     ARCHITECTURE:
     - Herda TODAS as funcionalidades de FlextUtilities (109+ métodos)
     - Adiciona APENAS validadores específicos do Meltano não cobertos por FlextUtilities
-    - USA FlextUtilities.create_validator() + FlextUtilities.validate_and_*() internamente
+    - USA FlextUtilities.is_non_empty_string() + built-in validation internamente
     - ZERO duplicação de funcionalidade já presente em flext-core
 
     SOLID Principles:
@@ -78,25 +76,19 @@ class FlextMeltanoValidators(FlextUtilities):
 
         # Use FlextUtilities for field validation
         for field in required_fields:
-            # Safe dict get with FlextUtilities
-            field_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, field, str, "")
+            # Safe dict get with built-in functionality
+            field_value = config.get(field, "")
+            if not isinstance(field_value, str):
+                field_value = str(field_value) if field_value is not None else ""
 
             # Use FlextUtilities validator
-            validation_result = FlextUtilities.ProcessingUtils.validate_and_create(
-                cls.is_non_empty_string,
-                field_value,
-                f"Field '{field}' must be a non-empty string",
-            )
-
-            if not validation_result.success:
-                return FlextResult.fail(
-                    validation_result.error or f"Invalid field: {field}"
-                )
+            if not cls.is_non_empty_string(field_value):
+                return FlextResult.fail(f"Field '{field}' must be a non-empty string")
 
         return FlextResult.ok(_SUCCESS)
 
     @classmethod
-    def validate_meltano_config(cls, config: FlextMeltanoTypes.CLI.ProcessResult) -> FlextResult[bool]:
+    def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
         """Valida configuração completa do Meltano usando FlextUtilities.
 
         Uses:
@@ -116,28 +108,26 @@ class FlextMeltanoValidators(FlextUtilities):
             return FlextResult.fail("Meltano config must be a dictionary")
 
         # Use FlextUtilities to validate version field
-        version_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, "version", object, None)
-        version_result = FlextUtilities.ProcessingUtils.validate_and_convert(
-            version_value,
-            lambda v: int(str(v)) if v is not None else 0,
-            "Meltano version must be an integer",
-        )
+        version_value = config.get("version", None)
+        try:
+            version_int = int(str(version_value)) if version_value is not None else 0
+        except (ValueError, TypeError):
+            return FlextResult.fail("Meltano version must be an integer")
 
-        if not version_result.success:
-            return FlextResult.fail(version_result.error or "Invalid version")
-
-        if version_result.value != 1:
+        if version_int != 1:
             return FlextResult.fail("Meltano version must be 1")
 
         # Use FlextUtilities to validate project_id field
-        project_id = FlextUtilities.ProcessingUtils.safe_dict_get(config, "project_id", str, "")
+        project_id = config.get("project_id", "")
+        if not isinstance(project_id, str):
+            project_id = str(project_id) if project_id is not None else ""
         if not cls.is_non_empty_string(project_id):
             return FlextResult.fail("project_id must be a non-empty string")
 
         return FlextResult.ok(_SUCCESS)
 
     @classmethod
-    def validate_dbt_config(cls, config: FlextMeltanoTypes.CLI.ProcessResult) -> FlextResult[bool]:
+    def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
         """Valida configuração do DBT usando FlextUtilities.
 
         Uses:
@@ -161,7 +151,9 @@ class FlextMeltanoValidators(FlextUtilities):
 
         # Use FlextUtilities for field validation
         for field in required_fields:
-            field_value = FlextUtilities.ProcessingUtils.safe_dict_get(config, field, str, "")
+            field_value = config.get(field, "")
+            if not isinstance(field_value, str):
+                field_value = str(field_value) if field_value is not None else ""
             if not cls.is_non_empty_string(field_value):
                 return FlextResult.fail(
                     f"DBT field '{field}' must be a non-empty string"
@@ -208,15 +200,10 @@ class FlextMeltanoValidators(FlextUtilities):
             except Exception:
                 logger.debug(f"Failed to check temp directory for {path_str}")
 
-            # Use FlextUtilities validator pattern for existence check
-            exists_validator = FlextUtilities.ProcessingUtils.create_validator(lambda p: Path(str(p)).exists())
-            exists_result = exists_validator(path_str)
-
-            return (
-                str(dir_path.resolve())
-                if exists_result.success and exists_result.value
-                else None
-            )
+            # Direct existence check - simpler and more reliable
+            if dir_path.exists() and dir_path.is_dir():
+                return str(dir_path.resolve())
+            return None
 
         except Exception:
             return None
@@ -267,12 +254,12 @@ class FlextMeltanoValidators(FlextUtilities):
     ) -> FlextResult[T | None]:
         """Valida valor de config usando FlextUtilities.safe_cast_to_type().
 
-        This method uses FlextUtilities.safe_cast_to_type() internally,
+        This method uses FlextUtilities.Conversions.safe_bool() for booleans,
         demonstrating how to extend FlextUtilities while avoiding duplication.
 
         Uses:
-        - FlextUtilities.safe_cast_to_type() for type conversion
-        - FlextUtilities.create_validator() for null validation
+        - FlextUtilities.Conversions.safe_bool() for boolean conversion
+        - Built-in type casting for other types
 
         Args:
             value: Valor para validar
@@ -283,55 +270,50 @@ class FlextMeltanoValidators(FlextUtilities):
             FlextResult with converted value or error
 
         """
-        # Check for None if required
-        if required and value is None:
-            return FlextResult.fail("Required config value is None")
-
-        # Allow None for optional values
-        if not required and value is None:
+        # Handle None values
+        if value is None:
+            if required:
+                return FlextResult.fail("Required config value is None")
             return FlextResult.ok(None)
 
-        # Special handling for boolean conversion using FlextUtilities.to_bool
-        if expected_type is bool:
-            # Type cast value for Conversions.to_bool signature compatibility
-            if isinstance(value, (str, int, float, bool)) or value is None:
-                bool_result = FlextUtilities.Conversions.safe_bool(value)
-            else:
-                bool_result = FlextUtilities.Conversions.safe_bool(str(value))
-
-            # Cast to T since we know expected_type is bool
-            return FlextResult.ok(bool_result)
-
-        # Simple type casting implementation
+        # Handle type conversion with proper generic type handling
         try:
-            converted_value = expected_type(value)
-            return FlextResult.ok(converted_value)
+            # Handle direct type compatibility first
+            if isinstance(value, expected_type):
+                return FlextResult.ok(value)
+
+            # Special handling for boolean conversion using FlextUtilities
+            if expected_type is bool:
+                bool_input = (
+                    value if isinstance(value, (str, int, float, bool)) else str(value)
+                )
+                bool_result = FlextUtilities.Conversions.safe_bool(bool_input)
+                return FlextResult.ok(cast("T", bool_result))
+
+            # For built-in types, use direct casting with proper type conversion
+            if expected_type is str:
+                return FlextResult.ok(cast("T", str(value)))
+            if expected_type is int:
+                # Safe casting for int conversion
+                if isinstance(value, (str, int, float)):
+                    return FlextResult.ok(cast("T", int(value)))
+                return FlextResult.ok(cast("T", int(str(value))))
+            if expected_type is float:
+                # Safe casting for float conversion
+                if isinstance(value, (str, int, float)):
+                    return FlextResult.ok(cast("T", float(value)))
+                return FlextResult.ok(cast("T", float(str(value))))
+            # For other types, convert to string as fallback
+            return FlextResult.ok(cast("T", str(value)))
         except (ValueError, TypeError) as e:
-            return FlextResult.fail(f"Cannot convert {value} to {expected_type.__name__}: {e}")
+            return FlextResult.fail(
+                f"Cannot convert {value} to {expected_type.__name__}: {e}"
+            )
 
 
 # =============================================================================
-# BACKWARD COMPATIBILITY - Delegating functions (ZERO duplication)
+# NO HELPER FUNCTIONS - ONLY CLASS-BASED API
 # =============================================================================
-
-
-def validate_directory_path(path: str | Path | None) -> str | None:
-    """Convenience function delegating to FlextMeltanoValidators."""
-    return FlextMeltanoValidators.validate_directory_path(path)
-
-
-def validate_file_path(path: str | Path | None) -> str | None:
-    """Convenience function delegating to FlextMeltanoValidators."""
-    return FlextMeltanoValidators.validate_file_path(path)
-
-
-def validate_config_value_simple[T](
-    value: object, expected_type: type[T], *, required: bool = True
-) -> FlextResult[T | None]:
-    """Convenience function delegating to FlextMeltanoValidators."""
-    return FlextMeltanoValidators.validate_config_value_simple(
-        value, expected_type, required=required
-    )
 
 
 # =============================================================================
@@ -339,10 +321,6 @@ def validate_config_value_simple[T](
 # =============================================================================
 
 __all__ = [
-    # Main class
+    # Main class only - no helper functions
     "FlextMeltanoValidators",
-    # Convenience functions (backward compatibility)
-    "validate_config_value_simple",
-    "validate_directory_path",
-    "validate_file_path",
 ]

@@ -35,11 +35,13 @@ def simple_bridge_example() -> None:
 
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
-    # Create executor with empty config
-    executor = FlextMeltanoExecutor({})
+    from pathlib import Path
 
-    # Execute - this actually works
-    result = executor.execute()
+    # Create executor with proper Path argument
+    executor = FlextMeltanoExecutor(Path.cwd())
+
+    # Execute with required command parameter (string, not list)
+    result = executor.execute("version")
     if result.success:
         logger.info(f"Executor result: {result.value}")
 
@@ -49,12 +51,11 @@ def simple_config_example() -> None:
     # Create config using real API
     config = FlextMeltanoConfig()
 
-    # Use FlextDomainService method instead of BaseModel validate
-    validation_result = config.validate_business_rules()
-    if validation_result.success:
-        logger.info("Configuration is valid")
-    else:
-        logger.error(f"Configuration error: {validation_result.error}")
+    # Use actual existing method from FlextMeltanoConfig
+    logger.info(f"Config created: {config}")
+
+    # Show environment value
+    logger.info(f"Environment: {config.environment}")
 
 
 if __name__ == "__main__":
