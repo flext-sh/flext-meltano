@@ -5,7 +5,7 @@ flext-target-* never need to import singer_sdk directly. All target functionalit
 is provided through FlextResult patterns with enterprise error handling.
 
 Architecture:
-    Target Layer: Complete target abstraction from Singer SDK  
+    Target Layer: Complete target abstraction from Singer SDK
     Loader Layer: Data loading abstractions with FlextResult integration
     Config Layer: Configuration abstractions without Singer SDK dependency
     Message Layer: Singer message handling abstracted through FlextResult
@@ -39,8 +39,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 from flext_core import FlextLogger, FlextResult
@@ -94,7 +92,7 @@ class FlextTargetBase(Protocol):
 
 class FlextTargetConfig:
     """Base configuration abstraction for FlextTarget implementations.
-    
+
     Provides configuration management without requiring Singer SDK imports.
     """
 
@@ -112,7 +110,7 @@ class FlextTargetConfig:
         self.batch_size = batch_size
         self.max_batches = max_batches
         self.additional_config = kwargs
-        
+
     def to_dict(self) -> dict[str, Any]:
         """Convert configuration to dictionary format."""
         return {
@@ -127,13 +125,13 @@ class FlextTargetConfig:
         """Validate target configuration."""
         if not self.target_type:
             return FlextResult[bool].fail("Target type is required")
-            
+
         if not self.connection_config:
             return FlextResult[bool].fail("Connection configuration is required")
-            
+
         if self.batch_size <= 0:
             return FlextResult[bool].fail("Batch size must be positive")
-            
+
         return FlextResult[bool].ok(True)
 
 
@@ -163,13 +161,13 @@ class FlextTargetStream:
 
             # Track record
             self._records_loaded += 1
-            
+
             self._logger.debug(
                 "Record added to stream",
                 stream_name=self.stream_name,
                 records_loaded=self._records_loaded
             )
-            
+
             return FlextResult[bool].ok(True)
 
         except Exception as e:
@@ -198,7 +196,7 @@ class FlextTargetStream:
 
 class FlextTarget:
     """Complete FlextTarget abstraction for Singer target functionality.
-    
+
     Provides enterprise-grade target functionality without requiring Singer SDK:
     - FlextResult railway-oriented programming for all operations
     - Type-safe message processing (SCHEMA, RECORD, STATE)
@@ -280,7 +278,7 @@ class FlextTarget:
             # Add record to stream
             stream = self._streams[stream_name]
             result = stream.add_record(record)
-            
+
             if result.failure:
                 return result
 
@@ -333,7 +331,7 @@ class FlextTarget:
             # Collect statistics from all streams
             stream_stats = {}
             total_records = 0
-            
+
             for stream_name, stream in self._streams.items():
                 stats = stream.get_stats()
                 stream_stats[stream_name] = stats
@@ -369,7 +367,7 @@ class FlextTarget:
         """Get stream by name with error handling."""
         if stream_name not in self._streams:
             return FlextResult[FlextTargetStream].fail(f"Stream {stream_name} not found")
-        
+
         return FlextResult[FlextTargetStream].ok(self._streams[stream_name])
 
     def list_streams(self) -> list[str]:
@@ -401,13 +399,13 @@ def create_flext_target_config(
             batch_size=batch_size,
             **kwargs,
         )
-        
+
         validation_result = config.validate()
         if validation_result.failure:
             return FlextResult[FlextTargetConfig].fail(validation_result.error)
-        
+
         return FlextResult[FlextTargetConfig].ok(config)
-        
+
     except Exception as e:
         error_msg = f"Failed to create FlextTarget config: {e}"
         logger.exception(error_msg)
@@ -421,13 +419,11 @@ def create_flext_target_config(
 __all__ = [
     # Main classes
     "FlextTarget",
-    "FlextTargetConfig", 
-    "FlextTargetStream",
-    
     # Protocols
     "FlextTargetBase",
+    "FlextTargetConfig",
     "FlextTargetLoader",
-    
+    "FlextTargetStream",
     # Factory functions
     "create_flext_target_config",
 ]

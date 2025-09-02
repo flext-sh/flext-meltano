@@ -124,7 +124,7 @@ from flext_meltano.flext_tap_abstractions import (
 )
 
 from flext_meltano.flext_target_abstractions import (
-    FlextTarget as FlextTargetAbstract, 
+    FlextTarget as FlextTargetAbstract,
     FlextTargetConfig,
     FlextTargetStream,
     create_flext_target_config,
@@ -191,7 +191,7 @@ __all__ = [
     "FlextSingerTypes",
     "StringType",
     "IntegerType",
-    "NumberType", 
+    "NumberType",
     "BooleanType",
     "DateTimeType",
     "ArrayType",
@@ -200,16 +200,16 @@ __all__ = [
     "FlextSingerRecord",
     "FlextSingerState",
     "FlextPropertiesList",
-    
+
     # Tap Abstractions - Complete Singer Tap functionality
     "FlextTapAbstract",
     "FlextTapConfig",
     "FlextTapStream",
     "create_flext_tap_config",
-    
+
     # Target Abstractions - Complete Singer Target functionality
     "FlextTargetAbstract",
-    "FlextTargetConfig", 
+    "FlextTargetConfig",
     "FlextTargetStream",
     "create_flext_target_config",
 

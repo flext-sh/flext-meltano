@@ -45,8 +45,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any, Protocol, runtime_checkable
+from abc import abstractmethod
+from typing import Any
 
 from flext_core import FlextLogger, FlextResult
 
@@ -60,7 +60,7 @@ logger = FlextLogger(__name__)
 
 class FlextSingerType:
     """Base class for all FlextSinger type definitions.
-    
+
     Provides a complete abstraction over singer_sdk typing without direct imports.
     """
 
@@ -289,7 +289,7 @@ class FlextSingerSchema:
     def to_catalog_entry(self) -> dict[str, Any]:
         """Convert to Singer catalog entry format."""
         metadata: list[dict[str, Any]] = []
-        
+
         # Add table-level metadata
         table_metadata = {
             "breadcrumb": [],
@@ -323,7 +323,7 @@ class FlextSingerSchema:
 
 
 # =============================================================================
-# FLEXT SINGER MESSAGE ABSTRACTIONS  
+# FLEXT SINGER MESSAGE ABSTRACTIONS
 # =============================================================================
 
 
@@ -409,24 +409,24 @@ class FlextPropertiesList:
         """Convert to Singer schema format."""
         schema_properties = {}
         required = []
-        
+
         for prop in self.properties:
             name = prop["name"]
             prop_type = prop["type"]
             is_required = prop.get("required", False)
-            
+
             schema_properties[name] = prop_type
             if is_required:
                 required.append(name)
-        
+
         result = {
             "type": "object",
             "properties": schema_properties,
         }
-        
+
         if required:
             result["required"] = required
-            
+
         return result
 
 
@@ -437,8 +437,8 @@ class FlextPropertiesList:
 
 class FlextSingerTypes:
     """Main class providing complete Singer type abstractions.
-    
-    This class provides all typing functionality needed by flext-tap-*, 
+
+    This class provides all typing functionality needed by flext-tap-*,
     flext-target-*, and flext-dbt-* projects without requiring direct
     singer_sdk imports.
     """
@@ -564,9 +564,9 @@ class FlextSingerTypes:
     # Utility methods
     # Schema property methods (Singer SDK compatibility)
     def Property(
-        self, 
-        name: str, 
-        property_type: FlextSingerType, 
+        self,
+        name: str,
+        property_type: FlextSingerType,
         required: bool = False,
         description: str | None = None
     ) -> dict[str, Any]:
@@ -574,14 +574,14 @@ class FlextSingerTypes:
         prop_def = property_type.to_singer_dict()
         if description:
             prop_def["description"] = description
-        
+
         return {
             "name": name,
             "type": prop_def,
             "required": required,
         }
-    
-    def PropertiesList(self, *properties: dict[str, Any]) -> "FlextPropertiesList":
+
+    def PropertiesList(self, *properties: dict[str, Any]) -> FlextPropertiesList:
         """Create a properties list (Singer SDK compatibility)."""
         return FlextPropertiesList(properties)
 
@@ -618,27 +618,23 @@ class FlextSingerTypes:
 # =============================================================================
 
 __all__ = [
-    # Main interface
-    "FlextSingerTypes",
-    
-    # Base types
-    "FlextSingerType",
-    "StringType",
-    "IntegerType", 
-    "NumberType",
+    "ArrayType",
     "BooleanType",
     "DateTimeType",
-    "ArrayType",
-    "ObjectType",
-    
-    # Schema types
-    "FlextSingerSchema",
-    
-    # Message types  
-    "FlextSingerMessage",
-    "FlextSingerRecord",
-    "FlextSingerState",
-    
     # Singer SDK compatibility
     "FlextPropertiesList",
+    # Message types
+    "FlextSingerMessage",
+    "FlextSingerRecord",
+    # Schema types
+    "FlextSingerSchema",
+    "FlextSingerState",
+    # Base types
+    "FlextSingerType",
+    # Main interface
+    "FlextSingerTypes",
+    "IntegerType",
+    "NumberType",
+    "ObjectType",
+    "StringType",
 ]
