@@ -6,7 +6,7 @@ is provided through FlextResult patterns with enterprise error handling.
 
 Architecture:
     Tap Layer: Complete tap abstraction from Singer SDK
-    Stream Layer: Stream abstractions with FlextResult integration  
+    Stream Layer: Stream abstractions with FlextResult integration
     Discovery Layer: Schema discovery abstractions without Singer SDK dependency
     Config Layer: Configuration abstractions for tap implementations
 
@@ -39,8 +39,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any, Generator, Protocol, runtime_checkable
+from collections.abc import Generator
+from typing import Any, Protocol, runtime_checkable
 
 from flext_core import FlextLogger, FlextResult
 
@@ -56,7 +56,7 @@ logger = FlextLogger(__name__)
 class FlextStreamExtractor(Protocol):
     """Protocol for FlextStream data extraction operations."""
 
-    def extract_records(self, config: dict[str, Any] | None = None) -> FlextResult[Generator[dict[str, Any], None, None]]:
+    def extract_records(self, config: dict[str, Any] | None = None) -> FlextResult[Generator[dict[str, Any]]]:
         """Extract records from stream."""
         ...
 
@@ -93,7 +93,7 @@ class FlextTapDiscovery(Protocol):
 
 class FlextTapConfig:
     """Base configuration abstraction for FlextTap implementations.
-    
+
     Provides configuration management without requiring Singer SDK imports.
     """
 
@@ -109,7 +109,7 @@ class FlextTapConfig:
         self.connection_config = connection_config
         self.stream_config = stream_config or {}
         self.additional_config = kwargs
-        
+
     def to_dict(self) -> dict[str, Any]:
         """Convert configuration to dictionary format."""
         return {
@@ -123,10 +123,10 @@ class FlextTapConfig:
         """Validate tap configuration."""
         if not self.tap_type:
             return FlextResult[bool].fail("Tap type is required")
-            
+
         if not self.connection_config:
             return FlextResult[bool].fail("Connection configuration is required")
-            
+
         return FlextResult[bool].ok(True)
 
     def get_stream_config(self, stream_name: str) -> dict[str, Any]:
@@ -143,9 +143,9 @@ class FlextTapStream:
     """FlextTap stream abstraction with FlextResult error handling."""
 
     def __init__(
-        self, 
-        stream_name: str, 
-        schema: dict[str, Any], 
+        self,
+        stream_name: str,
+        schema: dict[str, Any],
         tap_config: FlextTapConfig,
         adapter: FlextMeltanoTypeAdapters,
     ) -> None:
@@ -189,10 +189,10 @@ class FlextTapStream:
             # This would be implemented by concrete stream classes
             # For now, return empty result as placeholder
             records: list[dict[str, Any]] = []
-            
+
             # Update extraction count
             self._records_extracted = len(records)
-            
+
             self._logger.info(
                 "Record extraction completed",
                 stream_name=self.stream_name,
@@ -275,7 +275,7 @@ class FlextTapStream:
 
 class FlextTap:
     """Complete FlextTap abstraction for Singer tap functionality.
-    
+
     Provides enterprise-grade tap functionality without requiring Singer SDK:
     - FlextResult railway-oriented programming for all operations
     - Type-safe stream discovery and data extraction
@@ -310,7 +310,7 @@ class FlextTap:
             # This would be implemented by concrete tap classes
             # For now, create empty streams list as placeholder
             streams: list[FlextTapStream] = []
-            
+
             # Update internal streams registry
             self._streams = {stream.name: stream for stream in streams}
             self._discovered = True
@@ -343,7 +343,7 @@ class FlextTap:
 
             stream = self._streams[stream_name]
             self._logger.debug("Stream retrieved", stream_name=stream_name)
-            
+
             return FlextResult[FlextTapStream].ok(stream)
 
         except Exception as e:
@@ -484,13 +484,13 @@ def create_flext_tap_config(
             stream_config=stream_config,
             **kwargs,
         )
-        
+
         validation_result = config.validate()
         if validation_result.failure:
             return FlextResult[FlextTapConfig].fail(validation_result.error)
-        
+
         return FlextResult[FlextTapConfig].ok(config)
-        
+
     except Exception as e:
         error_msg = f"Failed to create FlextTap config: {e}"
         logger.exception(error_msg)
@@ -506,15 +506,13 @@ from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
 # =============================================================================
 
 __all__ = [
+    "FlextStreamExtractor",
     # Main classes
     "FlextTap",
-    "FlextTapConfig", 
-    "FlextTapStream",
-    
+    "FlextTapConfig",
     # Protocols
     "FlextTapDiscovery",
-    "FlextStreamExtractor",
-    
+    "FlextTapStream",
     # Factory functions
     "create_flext_tap_config",
 ]

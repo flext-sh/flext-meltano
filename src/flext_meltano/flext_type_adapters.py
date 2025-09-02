@@ -103,39 +103,39 @@ class FlextStreamAdapter(Protocol):
         ...
 
 
-# =============================================================================  
+# =============================================================================
 # FLEXT ABSTRACT BASE CLASSES - Complete abstractions for TAP/TARGET/DBT
 # =============================================================================
 
 @runtime_checkable
 class FlextStream(Protocol):
     """Protocol for FlextStream implementations."""
-    
+
     def get_name(self) -> str:
         """Get stream name."""
         ...
-        
+
     def get_schema(self) -> FlextResult[dict[str, object]]:
         """Get stream schema."""
         ...
-        
+
     def get_records(self, config: dict[str, object] | None = None) -> FlextResult[list[dict[str, object]]]:
         """Get stream records."""
         ...
 
 
-@runtime_checkable  
+@runtime_checkable
 class FlextTapBase(Protocol):
     """Protocol for FlextTap implementations."""
-    
+
     def discover_streams(self) -> FlextResult[list[FlextStream]]:
         """Discover available streams."""
         ...
-        
+
     def get_stream_by_name(self, name: str) -> FlextResult[FlextStream]:
         """Get specific stream by name."""
         ...
-        
+
     def sync_stream(self, stream_name: str, config: dict[str, object] | None = None) -> FlextResult[dict[str, object]]:
         """Sync specific stream data."""
         ...
@@ -176,7 +176,7 @@ class FlextTap:
 
         """
         try:
-            tap_name = getattr(self._native_tap, 'tap_type', 'unknown-tap')
+            tap_name = getattr(self._native_tap, "tap_type", "unknown-tap")
             self._logger.debug("Discovering streams from tap", tap_name=tap_name)
 
             # Use native tap discovery
@@ -201,7 +201,7 @@ class FlextTap:
             return FlextResult[list[FlextSingerStream]].ok(flext_streams)
 
         except Exception as e:
-            tap_name = getattr(self._native_tap, 'tap_type', 'unknown-tap')
+            tap_name = getattr(self._native_tap, "tap_type", "unknown-tap")
             error_msg = f"Stream discovery failed for tap {tap_name}: {e}"
             self._logger.exception(error_msg)
             return FlextResult[list[FlextSingerStream]].fail(error_msg)
@@ -222,17 +222,17 @@ class FlextTap:
             config = self._native_tap.config
 
             if not config:
-                tap_name = getattr(self._native_tap, 'tap_type', 'unknown-tap')
+                tap_name = getattr(self._native_tap, "tap_type", "unknown-tap")
                 return FlextResult[dict[str, object]].fail(
                     f"No configuration found for tap {tap_name}"
                 )
 
-            tap_name = getattr(self._native_tap, 'tap_type', 'unknown-tap')
+            tap_name = getattr(self._native_tap, "tap_type", "unknown-tap")
             self._logger.debug("Tap configuration validated", tap_name=tap_name)
             return FlextResult[dict[str, object]].ok(dict(config))
 
         except Exception as e:
-            tap_name = getattr(self._native_tap, 'tap_type', 'unknown-tap')
+            tap_name = getattr(self._native_tap, "tap_type", "unknown-tap")
             error_msg = f"Configuration validation failed for tap {tap_name}: {e}"
             self._logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)
