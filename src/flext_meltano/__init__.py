@@ -160,7 +160,7 @@ __all__ = [
 
 # Populate __all__ dynamically at import time
 _dynamic_exports = _collect_module_exports()
-__all__.extend(_dynamic_exports)  # noqa: PYI056
+__all__ += _dynamic_exports
 
 # =============================================================================
 # NO LEGACY COMPATIBILITY - CLASS-BASED API ONLY

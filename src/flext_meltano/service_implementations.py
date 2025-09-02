@@ -21,7 +21,7 @@ import warnings
 
 # Import everything from services for backward compatibility
 from flext_meltano.services import (
-    FlextMeltanoService,  # noqa: F401
+    FlextMeltanoService,
 )
 
 # Create legacy class aliases

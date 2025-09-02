@@ -33,7 +33,7 @@ Usage Examples:
         timeout = FlextMeltanoConstants.Plugin.DISCOVERY_TIMEOUT
 
     Singer message processing:
-        if message_type == FlextMeltanoConstants.Singer.MESSAGE_TYPE_RECORD:
+        if message_type == FlextMeltanoConstants.SingerSDK.MESSAGE_TYPE_RECORD:
             process_record(message)
 
 Integration:
@@ -109,7 +109,7 @@ class FlextMeltanoConstants(FlextConstants):
     # SINGER DOMAIN - Singer SDK integration constants
     # =========================================================================
 
-    class Singer:
+    class SingerSDK:
         """Singer SDK integration constants."""
 
         # Message types
@@ -130,7 +130,7 @@ class FlextMeltanoConstants(FlextConstants):
     # DBT DOMAIN - DBT Core integration constants
     # =========================================================================
 
-    class DBT:
+    class DBTCore:
         """DBT Core integration constants."""
 
         # Project structure
