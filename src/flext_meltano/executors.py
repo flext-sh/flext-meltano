@@ -103,18 +103,21 @@ class FlextMeltanoExecutor:
             self._bridge = FlextMeltanoBridge()
         return self._bridge
 
-    def run_command(self, args: list[str]) -> int:
-        """Run CLI command and return exit code."""
-        if not args:
-            self._print_help()
-            return 1
-
-        command = args[0]
-
+    def run_command(self, args: list[str]) -> FlextResult[int]:
+        """Run CLI command and return exit code using FlextResult patterns."""
         try:
-            return self._execute_command(command, args)
-        except Exception:
-            return 1
+            if not args:
+                self._print_help()
+                return FlextResult[int].ok(1)
+
+            command = args[0]
+
+            exit_code_result = self._execute_command(command, args)
+            if exit_code_result.success:
+                return FlextResult[int].ok(exit_code_result.value)
+            return FlextResult[int].fail(exit_code_result.error or "Command execution failed")
+        except Exception as e:
+            return FlextResult[int].fail(f"Command execution failed: {e}")
 
     def _handle_version_command(self) -> FlextResult[dict[str, str]]:
         """Handle version command."""
@@ -220,34 +223,43 @@ class FlextMeltanoExecutor:
             logger.exception(error_msg, error=str(e))
             return FlextResult[dict[str, str]].fail(error_msg)
 
-    def _execute_command(self, command: str, args: list[str]) -> int:
-        """Execute specific command."""
-        if command == "version":
-            result = self.bridge.get_version()
-            return 0 if result.success else 1
+    def _execute_command(self, command: str, args: list[str]) -> FlextResult[int]:
+        """Execute specific command using FlextResult patterns."""
+        try:
+            if command == "version":
+                result = self.bridge.get_version()
+                exit_code = 0 if result.success else 1
+                return FlextResult[int].ok(exit_code)
 
-        if command == "plugins":
-            plugins_result = self.bridge.list_plugins()
-            return 0 if plugins_result else 1
+            if command == "plugins":
+                plugins_result = self.bridge.list_plugins()
+                exit_code = 0 if plugins_result else 1
+                return FlextResult[int].ok(exit_code)
 
-        if command == "run":
-            return self._handle_run_command(args)
+            if command == "run":
+                return self._handle_run_command(args)
 
-        self._print_help()
-        return 1
-
-    def _handle_run_command(self, args: list[str]) -> int:
-        """Handle run command."""
-        min_run_args = 3
-        if len(args) < min_run_args:
             self._print_help()
-            return 1
+            return FlextResult[int].ok(1)
+        except Exception as e:
+            return FlextResult[int].fail(f"Command execution failed: {e}")
 
-        tap_name, target_name = args[1], args[2]
-        project_root = args[3] if len(args) > min_run_args else "."
+    def _handle_run_command(self, args: list[str]) -> FlextResult[int]:
+        """Handle run command using FlextResult patterns."""
+        try:
+            min_run_args = 3
+            if len(args) < min_run_args:
+                self._print_help()
+                return FlextResult[int].ok(1)
 
-        result = self.bridge.run_pipeline(tap_name, target_name, project_root)
-        return 0 if result["success"] else 1
+            tap_name, target_name = args[1], args[2]
+            project_root = args[3] if len(args) > min_run_args else "."
+
+            result = self.bridge.run_pipeline(tap_name, target_name, project_root)
+            exit_code = 0 if result["success"] else 1
+            return FlextResult[int].ok(exit_code)
+        except Exception as e:
+            return FlextResult[int].fail(f"Run command failed: {e}")
 
     def _print_help(self) -> None:
         """Print CLI help."""
@@ -675,6 +687,9 @@ class FlextMeltanoExecutor:
     def create_click_cli() -> object:
         """Create complete Click CLI interface as static method."""
         import click
+
+        # Import FlextCli abstractions for modern CLI patterns
+        from flext_cli import FlextCliApiFunctions, flext_cli_create_helper
         from rich.console import Console
 
         @click.group(
@@ -710,8 +725,8 @@ class FlextMeltanoExecutor:
             debug: bool,
         ) -> None:
             """FLEXT Meltano - Enterprise Meltano/Singer/DBT Integration."""
-            # Setup CLI context
-            console = Console(quiet=False)
+            # Setup CLI context with FlextCli helpers
+            cli_helper = flext_cli_create_helper(console=Console(quiet=False), quiet=False)
 
             # Create service instance
             service = FlextMeltanoExecutor(project_root=Path(project_root))
@@ -719,7 +734,7 @@ class FlextMeltanoExecutor:
             # Store in Click context
             ctx.ensure_object(dict)
             ctx.obj["service"] = service
-            ctx.obj["console"] = console
+            ctx.obj["cli_helper"] = cli_helper
             ctx.obj["output"] = output
             ctx.obj["debug"] = debug
 
@@ -732,39 +747,65 @@ class FlextMeltanoExecutor:
         def version(ctx: click.Context) -> None:
             """Show version information."""
             service = ctx.obj["service"]
-            console = ctx.obj["console"]
+            cli_helper = ctx.obj["cli_helper"]
+            output_format = ctx.obj["output"]
 
             result = service.execute("version")
             if result.success:
-                console.print(f"[green]FLEXT Meltano: {result.value}[/green]")
+                # Use FlextCli for modern output formatting
+                format_result = FlextCliApiFunctions.format(result.value, output_format)
+                if format_result.success:
+                    cli_helper.console.print(f"[green]{format_result.value}[/green]")
+                else:
+                    cli_helper.console.print(f"[green]FLEXT Meltano: {result.value}[/green]")
             else:
-                console.print(f"[red]Version error: {result.error}[/red]")
+                cli_helper.console.print(f"[red]Version error: {result.error}[/red]")
 
         @cli_main.command()
         @click.pass_context
         def health(ctx: click.Context) -> None:
             """Show health status."""
             service = ctx.obj["service"]
-            console = ctx.obj["console"]
+            cli_helper = ctx.obj["cli_helper"]
+            output_format = ctx.obj["output"]
 
             result = service.execute("health")
             if result.success:
-                console.print("[green]Health: OK[/green]")
+                # Use FlextCli for modern output formatting
+                health_data = {"status": "OK", "details": result.value}
+                format_result = FlextCliApiFunctions.format(health_data, output_format)
+                if format_result.success:
+                    cli_helper.console.print(f"[green]{format_result.value}[/green]")
+                else:
+                    cli_helper.console.print("[green]Health: OK[/green]")
             else:
-                console.print(f"[red]Health Error: {result.error}[/red]")
+                cli_helper.console.print(f"[red]Health Error: {result.error}[/red]")
 
         @cli_main.command()
         @click.pass_context
         def plugins(ctx: click.Context) -> None:
             """List available plugins."""
             service = ctx.obj["service"]
-            console = ctx.obj["console"]
+            cli_helper = ctx.obj["cli_helper"]
+            output_format = ctx.obj["output"]
 
             result = service.execute("plugins")
             if result.success:
-                console.print(f"[green]Plugins: {result.value}[/green]")
+                # Use FlextCli for modern table/format output
+                if output_format == "table":
+                    table_result = FlextCliApiFunctions.table(result.value, "Available Plugins")
+                    if table_result.success:
+                        cli_helper.console.print(table_result.value)
+                    else:
+                        cli_helper.console.print(f"[green]Plugins: {result.value}[/green]")
+                else:
+                    format_result = FlextCliApiFunctions.format(result.value, output_format)
+                    if format_result.success:
+                        cli_helper.console.print(format_result.value)
+                    else:
+                        cli_helper.console.print(f"[green]Plugins: {result.value}[/green]")
             else:
-                console.print(f"[red]Plugins error: {result.error}[/red]")
+                cli_helper.console.print(f"[red]Plugins error: {result.error}[/red]")
 
         @cli_main.command()
         @click.argument("tap_name")
@@ -777,13 +818,20 @@ class FlextMeltanoExecutor:
         ) -> None:
             """Run ELT pipeline."""
             service = ctx.obj["service"]
-            console = ctx.obj["console"]
+            cli_helper = ctx.obj["cli_helper"]
+            output_format = ctx.obj["output"]
 
             result = service.execute("run", [tap_name, target_name])
             if result.success:
-                console.print(f"[green]Pipeline success: {result.value}[/green]")
+                # Use FlextCli for modern output formatting
+                pipeline_data = {"tap": tap_name, "target": target_name, "result": result.value}
+                format_result = FlextCliApiFunctions.format(pipeline_data, output_format)
+                if format_result.success:
+                    cli_helper.console.print(f"[green]{format_result.value}[/green]")
+                else:
+                    cli_helper.console.print(f"[green]Pipeline success: {result.value}[/green]")
             else:
-                console.print(f"[red]Pipeline failed: {result.error}[/red]")
+                cli_helper.console.print(f"[red]Pipeline failed: {result.error}[/red]")
                 ctx.exit(1)
 
         return cli_main

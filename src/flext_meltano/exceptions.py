@@ -290,11 +290,14 @@ FlextMeltanoDBTError = FlextMeltanoExceptions.MeltanoDBTError
 
 
 __all__: list[str] = [
+    # Individual exception types
     "FlextMeltanoAuthenticationError",
     "FlextMeltanoConfigurationError",
     "FlextMeltanoConnectionError",
     "FlextMeltanoDBTError",
     "FlextMeltanoError",
+    # Main exceptions class
+    "FlextMeltanoExceptions",
     "FlextMeltanoExecutionError",
     "FlextMeltanoPluginError",
     "FlextMeltanoProcessingError",

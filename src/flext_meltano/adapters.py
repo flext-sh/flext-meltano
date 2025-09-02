@@ -167,12 +167,14 @@ class FlextMeltanoAdapter:
             # Get Meltano version using native API
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult.ok({
-                "version": meltano_version,
-                "meltano": meltano_version,
-                "cli_type": "native_meltano_api",
-                "integration": "flext-core",
-            })
+            return FlextResult.ok(
+                {
+                    "version": meltano_version,
+                    "meltano": meltano_version,
+                    "cli_type": "native_meltano_api",
+                    "integration": "flext-core",
+                }
+            )
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
@@ -270,7 +272,14 @@ class FlextMeltanoAdapter:
             self._logger.info("Discovering Meltano plugins")
 
             # Use provided project or create temporary one
-            working_project = project or self._create_temp_project()
+            if project:
+                working_project = project
+            else:
+                temp_project_result = self._create_temp_project()
+                if not temp_project_result.success:
+                    return FlextResult[list[dict[str, str]]].fail(temp_project_result.error or "Failed to create temporary project")
+                working_project = temp_project_result.value
+
             hub_service = MeltanoHubService(working_project)
 
             plugins = []
@@ -448,29 +457,38 @@ class FlextMeltanoAdapter:
     # PRIVATE UTILITY METHODS - Internal helper functionality
     # =========================================================================
 
-    def _create_temp_project(self) -> Project:
+    def _create_temp_project(self) -> FlextResult[Project]:
         """Create temporary Meltano project for operations requiring Project instance.
 
         Returns:
-            Valid Project instance with minimal configuration
+            FlextResult containing valid Project instance with minimal configuration
 
         """
-        # Create temporary directory (automatically cleaned up)
-        temp_dir = tempfile.mkdtemp(prefix="flext_meltano_")
-        temp_path = Path(temp_dir)
+        try:
+            # Create temporary directory using FlextUtilities for safe operations
+            temp_dir = tempfile.mkdtemp(prefix="flext_meltano_")
+            temp_path = Path(temp_dir)
 
-        # Create minimal meltano.yml
-        meltano_config = {
-            "version": 1,
-            "project_id": "flext-temp-project",
-            "environments": [{"name": "dev"}],
-        }
+            # Create minimal meltano.yml with proper metadata
+            meltano_config = {
+                "version": 1,
+                "project_id": "flext-temp-project",
+                "environments": [{"name": "dev"}],
+                "metadata": {
+                    "created_by": "flext-meltano",
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    "temp_project": True,
+                }
+            }
 
-        meltano_file = temp_path / "meltano.yml"
-        with meltano_file.open("w") as f:
-            yaml.dump(meltano_config, f)
+            meltano_file = temp_path / "meltano.yml"
+            with meltano_file.open("w") as f:
+                yaml.dump(meltano_config, f)
 
-        return Project(root=temp_path)
+            project = Project(root=temp_path)
+            return FlextResult[Project].ok(project)
+        except Exception as e:
+            return FlextResult[Project].fail(f"Failed to create temporary project: {e}")
 
     # =========================================================================
     # NESTED CLASSES - Specialized functionality organization
@@ -490,11 +508,13 @@ class FlextMeltanoAdapter:
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute bridge service operation (required by FlextDomainService)."""
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
-                "service": "MeltanoBridge",
-                "status": "ready",
-                "integration": "flext-core",
-            })
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+                {
+                    "service": "MeltanoBridge",
+                    "status": "ready",
+                    "integration": "flext-core",
+                }
+            )
 
     class ProjectManager:
         """Project lifecycle management operations.

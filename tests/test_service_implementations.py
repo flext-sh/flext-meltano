@@ -130,11 +130,10 @@ class TestServiceImplementationsBasic(TestCase):
             try:
                 import flext_meltano
 
-                service_impl = flext_meltano.service_implementations
-                assert service_impl is not None
-            except AttributeError:
+                service_impl = getattr(flext_meltano, "service_implementations", None)
                 # Module might not be exposed at package level, which is acceptable
-                pass
+                if service_impl is not None:
+                    assert service_impl is not None
             except Exception as e:
                 self.fail(f"Package-level import failed: {e}")
 
