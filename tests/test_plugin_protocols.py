@@ -43,7 +43,7 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
         # Should be a class or type
         assert protocol is not None
         # Minimal plugin type - should exist
-        assert protocol == object
+        assert protocol is object
 
     def test_target_plugin_protocol(self) -> None:
         """Test TargetPlugin protocol definition."""
@@ -52,7 +52,7 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
         # Should be a class or type
         assert protocol is not None
         # Minimal plugin type - should exist
-        assert protocol == object
+        assert protocol is object
 
     def test_dbt_plugin_protocol(self) -> None:
         """Test DbtPlugin protocol definition."""
@@ -61,7 +61,7 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
         # Should be a class or type
         assert protocol is not None
         # Minimal plugin type - should exist
-        assert protocol == object
+        assert protocol is object
 
     def test_service_protocol_aliases(self) -> None:
         """Test service protocol aliases exist."""

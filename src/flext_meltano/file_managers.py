@@ -267,17 +267,21 @@ class FlextMeltanoFileManagers:
         """Single responsibility: Temporary directory management only."""
 
         @staticmethod
-        def create_temp_directory(prefix: str = "flext_meltano_") -> Path:
-            """Create temporary directory with default prefix.
+        def create_temp_directory(prefix: str = "flext_meltano_") -> FlextResult[Path]:
+            """Create temporary directory with default prefix using FlextResult patterns.
 
             Args:
                 prefix: Prefix for temporary directory
 
             Returns:
-                Path of created directory
+                FlextResult containing Path of created directory or error
 
             """
-            return Path(tempfile.mkdtemp(prefix=prefix))
+            try:
+                temp_path = Path(tempfile.mkdtemp(prefix=prefix))
+                return FlextResult[Path].ok(temp_path)
+            except Exception as e:
+                return FlextResult[Path].fail(f"Failed to create temporary directory: {e}")
 
         @staticmethod
         def create_temp_directory_with_result(

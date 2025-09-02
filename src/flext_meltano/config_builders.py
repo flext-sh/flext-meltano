@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -50,31 +50,48 @@ class FlextMeltanoConfigBuilders:
         """Single responsibility: DBT configuration building only."""
 
         @staticmethod
-        def create_dbt_config(project_name: str, profile_name: str = "") -> ConfigDict:
-            """Cria configuração básica do DBT.
+        def create_dbt_config(project_name: str, profile_name: str = "") -> FlextResult[ConfigDict]:
+            """Cria configuração básica do DBT usando FlextResult patterns.
 
             Args:
                 project_name: Nome do projeto DBT
                 profile_name: Nome do profile (opcional)
 
             Returns:
-                Dict com configuração do DBT
+                FlextResult contendo Dict com configuração do DBT ou erro
 
             """
-            return {
-                "name": project_name,
-                "version": "1.0.0",
-                "profile": profile_name or project_name,
-                "model-paths": ["models"],
-                "analysis-paths": ["analysis"],
-                "test-paths": ["tests"],
-                "seed-paths": ["data"],
-                "macro-paths": ["macros"],
-                "snapshot-paths": ["snapshots"],
-                "target-path": "target",
-                "clean-targets": ["target", "dbt_packages"],
-                "models": {project_name: {"+materialized": "view"}},
-            }
+            try:
+                # Validate input using FlextUtilities
+                safe_project_name = FlextUtilities.TextProcessor.safe_string(
+                    project_name, "default-dbt-project"
+                )
+                safe_profile_name = FlextUtilities.TextProcessor.safe_string(
+                    profile_name, safe_project_name
+                )
+
+                config: ConfigDict = {
+                    "name": safe_project_name,
+                    "version": "1.0.0",
+                    "profile": safe_profile_name,
+                    "model-paths": ["models"],
+                    "analysis-paths": ["analysis"],
+                    "test-paths": ["tests"],
+                    "seed-paths": ["data"],
+                    "macro-paths": ["macros"],
+                    "snapshot-paths": ["snapshots"],
+                    "target-path": "target",
+                    "clean-targets": ["target", "dbt_packages"],
+                    "models": {safe_project_name: {"+materialized": "view"}},
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    },
+                }
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create DBT config: {e}")
 
     class SingerConfigBuilder:
         """Single responsibility: Singer configuration building only."""
@@ -82,8 +99,8 @@ class FlextMeltanoConfigBuilders:
         @staticmethod
         def create_singer_tap_config(
             tap_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
-        ) -> ConfigDict:
-            """Cria configuração para Singer tap.
+        ) -> FlextResult[ConfigDict]:
+            """Cria configuração para Singer tap usando FlextResult patterns.
 
             Args:
                 tap_name: Nome do tap
@@ -92,22 +109,40 @@ class FlextMeltanoConfigBuilders:
                 executable: Nome do executável
 
             Returns:
-                Dict com configuração do tap
+                FlextResult contendo Dict com configuração do tap ou erro
 
             """
-            config: ConfigDict = {
-                "name": tap_name,
-                "namespace": namespace or "tap_" + tap_name.replace("-", "_"),
-                "executable": executable or tap_name,
-            }
+            try:
+                # Validate and sanitize inputs using FlextUtilities
+                safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name, "unknown-tap")
+                safe_namespace = FlextUtilities.TextProcessor.safe_string(
+                    namespace, "tap_" + safe_tap_name.replace("-", "_")
+                )
+                safe_executable = FlextUtilities.TextProcessor.safe_string(
+                    executable, safe_tap_name
+                )
 
-            if pip_url:
-                config["pip_url"] = pip_url
-            else:
-                # Default pip_url para taps conhecidos
-                config["pip_url"] = f"pipelinewise-{tap_name}"
+                config: ConfigDict = {
+                    "name": safe_tap_name,
+                    "namespace": safe_namespace,
+                    "executable": safe_executable,
+                    "type": "extractor",
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    },
+                }
 
-            return config
+                # Handle pip_url with validation
+                if pip_url:
+                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(pip_url)
+                else:
+                    # Default pip_url para taps conhecidos
+                    config["pip_url"] = f"pipelinewise-{safe_tap_name}"
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create Singer tap config: {e}")
 
         @staticmethod
         def create_singer_target_config(
@@ -115,8 +150,8 @@ class FlextMeltanoConfigBuilders:
             namespace: str = "",
             pip_url: str = "",
             executable: str = "",
-        ) -> ConfigDict:
-            """Cria configuração para Singer target.
+        ) -> FlextResult[ConfigDict]:
+            """Cria configuração para Singer target usando FlextResult patterns.
 
             Args:
                 target_name: Nome do target
@@ -125,22 +160,40 @@ class FlextMeltanoConfigBuilders:
                 executable: Nome do executável
 
             Returns:
-                Dict com configuração do target
+                FlextResult contendo Dict com configuração do target ou erro
 
             """
-            config: ConfigDict = {
-                "name": target_name,
-                "namespace": namespace or "target_" + target_name.replace("-", "_"),
-                "executable": executable or target_name,
-            }
+            try:
+                # Validate and sanitize inputs using FlextUtilities
+                safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name, "unknown-target")
+                safe_namespace = FlextUtilities.TextProcessor.safe_string(
+                    namespace, "target_" + safe_target_name.replace("-", "_")
+                )
+                safe_executable = FlextUtilities.TextProcessor.safe_string(
+                    executable, safe_target_name
+                )
 
-            if pip_url:
-                config["pip_url"] = pip_url
-            else:
-                # Default pip_url para targets conhecidos
-                config["pip_url"] = f"pipelinewise-{target_name}"
+                config: ConfigDict = {
+                    "name": safe_target_name,
+                    "namespace": safe_namespace,
+                    "executable": safe_executable,
+                    "type": "loader",
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    },
+                }
 
-            return config
+                # Handle pip_url with validation
+                if pip_url:
+                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(pip_url)
+                else:
+                    # Default pip_url para targets conhecidos
+                    config["pip_url"] = f"pipelinewise-{safe_target_name}"
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create Singer target config: {e}")
 
     class PluginConfigBuilder:
         """Single responsibility: Meltano plugin configuration building only."""
@@ -153,8 +206,8 @@ class FlextMeltanoConfigBuilders:
             executable: str = "",
             variant: str = "",
             config_defaults: ConfigDict | None = None,
-        ) -> ConfigDict:
-            """Cria configuração completa para plugin Meltano.
+        ) -> FlextResult[ConfigDict]:
+            """Cria configuração completa para plugin Meltano usando FlextResult patterns.
 
             Args:
                 name: Nome do plugin
@@ -165,35 +218,45 @@ class FlextMeltanoConfigBuilders:
                 config_defaults: Configurações padrão (opcional)
 
             Returns:
-                Dict com configuração completa do plugin
+                FlextResult contendo Dict com configuração completa do plugin ou erro
 
             """
-            plugin_config: ConfigDict = {
-                "name": name,
-                "namespace": namespace,
-                "pip_url": pip_url,
-            }
+            try:
+                # Validate and sanitize inputs using FlextUtilities
+                safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
+                safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace, safe_name)
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_name}")
 
-            if executable:
-                plugin_config["executable"] = executable
+                plugin_config: ConfigDict = {
+                    "name": safe_name,
+                    "namespace": safe_namespace,
+                    "pip_url": safe_pip_url,
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    },
+                }
 
-            if variant:
-                plugin_config["variant"] = variant
+                if executable:
+                    plugin_config["executable"] = FlextUtilities.TextProcessor.safe_string(executable)
 
-            if config_defaults:
-                plugin_config["config"] = cast(
-                    "FlextTypes.Core.JsonValue", config_defaults
-                )
+                if variant:
+                    plugin_config["variant"] = FlextUtilities.TextProcessor.safe_string(variant)
 
-            return plugin_config
+                if config_defaults:
+                    plugin_config["config"] = cast("FlextTypes.Core.JsonValue", config_defaults)
+
+                return FlextResult[ConfigDict].ok(plugin_config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create plugin config: {e}")
 
         @staticmethod
         def create_extractor_config(
             tap_name: str,
             pip_url: str,
             config_defaults: ConfigDict | None = None,
-        ) -> ConfigDict:
-            """Cria configuração específica para extractors (taps).
+        ) -> FlextResult[ConfigDict]:
+            """Cria configuração específica para extractors (taps) usando FlextResult patterns.
 
             Args:
                 tap_name: Nome do tap
@@ -201,25 +264,39 @@ class FlextMeltanoConfigBuilders:
                 config_defaults: Configurações padrão do tap
 
             Returns:
-                Dict com configuração do extractor
+                FlextResult contendo Dict com configuração do extractor ou erro
 
             """
-            return {
-                "name": tap_name,
-                "namespace": f"tap_{tap_name.replace('-', '_')}",
-                "pip_url": pip_url,
-                "executable": tap_name,
-                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
-                "select": ["*.*"],  # Selecionar todas as tabelas por padrão
-            }
+            try:
+                # Validate inputs using FlextUtilities
+                safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name, "unknown-tap")
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_tap_name}")
+
+                config: ConfigDict = {
+                    "name": safe_tap_name,
+                    "namespace": f"tap_{safe_tap_name.replace('-', '_')}",
+                    "pip_url": safe_pip_url,
+                    "executable": safe_tap_name,
+                    "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
+                    "select": ["*.*"],  # Selecionar todas as tabelas por padrão
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                        "type": "extractor",
+                    },
+                }
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create extractor config: {e}")
 
         @staticmethod
         def create_loader_config(
             target_name: str,
             pip_url: str,
             config_defaults: ConfigDict | None = None,
-        ) -> ConfigDict:
-            """Cria configuração específica para loaders (targets).
+        ) -> FlextResult[ConfigDict]:
+            """Cria configuração específica para loaders (targets) usando FlextResult patterns.
 
             Args:
                 target_name: Nome do target
@@ -227,16 +304,30 @@ class FlextMeltanoConfigBuilders:
                 config_defaults: Configurações padrão do target
 
             Returns:
-                Dict com configuração do loader
+                FlextResult contendo Dict com configuração do loader ou erro
 
             """
-            return {
-                "name": target_name,
-                "namespace": f"target_{target_name.replace('-', '_')}",
-                "pip_url": pip_url,
-                "executable": target_name,
-                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
-            }
+            try:
+                # Validate inputs using FlextUtilities
+                safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name, "unknown-target")
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_target_name}")
+
+                config: ConfigDict = {
+                    "name": safe_target_name,
+                    "namespace": f"target_{safe_target_name.replace('-', '_')}",
+                    "pip_url": safe_pip_url,
+                    "executable": safe_target_name,
+                    "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                        "type": "loader",
+                    },
+                }
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create loader config: {e}")
 
     class MeltanoConfigBuilder:
         """Single responsibility: Complete Meltano project configuration building."""
@@ -244,43 +335,61 @@ class FlextMeltanoConfigBuilders:
         @staticmethod
         def create_meltano_config(
             project_id: str, project_name: str = ""
-        ) -> ConfigDict:
-            """Create complete Meltano configuration with real structure.
+        ) -> FlextResult[ConfigDict]:
+            """Create complete Meltano configuration with real structure using FlextResult patterns.
 
             Args:
                 project_id: Project ID
                 project_name: Project name (optional)
 
             Returns:
-                Dict with complete Meltano configuration
+                FlextResult contendo Dict with complete Meltano configuration ou erro
 
             """
-            return {
-                "version": 1,
-                "project_id": project_id,
-                "project_name": project_name or project_id,
-                "environments": [
-                    {"name": "dev", "config": {"plugins": {}}},
-                    {"name": "staging", "config": {"plugins": {}}},
-                    {"name": "prod", "config": {"plugins": {}}},
-                ],
-                "plugins": {
-                    "extractors": [],
-                    "loaders": [],
-                    "transformers": [],
-                    "orchestrators": [],
-                },
-                "schedules": [],
-                "jobs": [],
-            }
+            try:
+                # Validate inputs using FlextUtilities
+                safe_project_id = FlextUtilities.TextProcessor.safe_string(
+                    project_id, "default-meltano-project"
+                )
+                safe_project_name = FlextUtilities.TextProcessor.safe_string(
+                    project_name, safe_project_id
+                )
+
+                config: ConfigDict = {
+                    "version": 1,
+                    "project_id": safe_project_id,
+                    "project_name": safe_project_name,
+                    "environments": [
+                        {"name": "dev", "config": {"plugins": {}}},
+                        {"name": "staging", "config": {"plugins": {}}},
+                        {"name": "prod", "config": {"plugins": {}}},
+                    ],
+                    "plugins": {
+                        "extractors": [],
+                        "loaders": [],
+                        "transformers": [],
+                        "orchestrators": [],
+                    },
+                    "schedules": [],
+                    "jobs": [],
+                    "metadata": {
+                        "created_by": "flext-meltano",
+                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                        "flext_version": "2.0.0-enterprise",
+                    },
+                }
+
+                return FlextResult[ConfigDict].ok(config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to create Meltano config: {e}")
 
         @staticmethod
         def add_plugin_to_config(
             meltano_config: ConfigDict,
             plugin_type: str,
             plugin_config: ConfigDict,
-        ) -> ConfigDict:
-            """Adiciona plugin à configuração Meltano.
+        ) -> FlextResult[ConfigDict]:
+            """Adiciona plugin à configuração Meltano usando FlextResult patterns.
 
             Args:
                 meltano_config: Configuração Meltano existente
@@ -288,24 +397,51 @@ class FlextMeltanoConfigBuilders:
                 plugin_config: Configuração do plugin
 
             Returns:
-                Configuração Meltano atualizada
+                FlextResult contendo Configuração Meltano atualizada ou erro
 
             """
-            # Create copy to avoid mutation
-            updated_config = meltano_config.copy()
-            plugins = updated_config.setdefault("plugins", {})
+            try:
+                # Validate inputs using FlextUtilities
+                safe_plugin_type = FlextUtilities.TextProcessor.safe_string(
+                    plugin_type, "extractors"
+                )
 
-            if isinstance(plugins, dict):
-                typed_plugins = cast("FlextMeltanoTypes.CLI.ProcessResult", plugins)
-                if plugin_type not in typed_plugins:
-                    typed_plugins[plugin_type] = []
-                plugin_list = typed_plugins[plugin_type]
-                if isinstance(plugin_list, list):
-                    plugin_list_copy = list(plugin_list)  # Create mutable copy
-                    plugin_list_copy.append(cast("dict[str, object]", plugin_config))
-                    typed_plugins[plugin_type] = plugin_list_copy
+                # Validate plugin type
+                valid_types = ["extractors", "loaders", "transformers", "orchestrators"]
+                if safe_plugin_type not in valid_types:
+                    return FlextResult[ConfigDict].fail(
+                        f"Invalid plugin type: {safe_plugin_type}. "
+                        f"Valid types: {valid_types}"
+                    )
 
-            return updated_config
+                # Create copy to avoid mutation
+                updated_config = dict(meltano_config)
+                plugins = updated_config.setdefault("plugins", {})
+
+                if isinstance(plugins, dict):
+                    typed_plugins = cast("FlextMeltanoTypes.CLI.ProcessResult", plugins)
+                    if safe_plugin_type not in typed_plugins:
+                        typed_plugins[safe_plugin_type] = []
+                    plugin_list = typed_plugins[safe_plugin_type]
+                    if isinstance(plugin_list, list):
+                        plugin_list_copy = list(plugin_list)  # Create mutable copy
+                        plugin_list_copy.append(cast("dict[str, object]", plugin_config))
+                        typed_plugins[safe_plugin_type] = plugin_list_copy
+
+                # Add metadata about the operation
+                metadata = updated_config.get("metadata", {})
+                if isinstance(metadata, dict):
+                    metadata = dict(metadata)
+                    metadata["last_plugin_added"] = {
+                        "type": safe_plugin_type,
+                        "name": plugin_config.get("name", "unknown"),
+                        "added_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                    }
+                    updated_config["metadata"] = metadata
+
+                return FlextResult[ConfigDict].ok(updated_config)
+            except Exception as e:
+                return FlextResult[ConfigDict].fail(f"Failed to add plugin to config: {e}")
 
     # =================================================================
     # BACKWARD COMPATIBILITY ALIASES

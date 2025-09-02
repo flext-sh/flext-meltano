@@ -26,7 +26,7 @@ Usage:
 
 from __future__ import annotations
 
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextDomainService, FlextResult, FlextUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -80,6 +80,13 @@ class FlextMeltanoService:
 
             return FlextMeltanoAdapters()
 
+        @property
+        def type_adapters(self) -> object:
+            """Get modern type adapters for tap operations."""
+            from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
+
+            return FlextMeltanoTypeAdapters()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
             """Execute tap service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -103,9 +110,9 @@ class FlextMeltanoService:
 
             return FlextResult.ok(None)
 
-        def get_info(self) -> FlextMeltanoTypes.Plugin.PluginInfo:
+        def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
             """Get service information."""
-            return {"service_type": "tap", "name": self.tap_name, "status": "ready"}
+            return FlextResult.ok({"service_type": "tap", "name": self.tap_name, "status": "ready"})
 
         def create_tap_instance(self, config: dict[str, object]) -> FlextResult[object]:
             """Create tap instance with configuration."""
@@ -126,16 +133,18 @@ class FlextMeltanoService:
 
             return FlextResult.ok(_VALIDATION_SUCCESS)
 
-        def get_default_config(self) -> dict[str, object]:
+        def get_default_config(self) -> FlextResult[dict[str, object]]:
             """Get default configuration for tap."""
-            return {"connection_string": "test_connection"}
+            return FlextResult.ok({"connection_string": "test_connection"})
 
         def validate_service(self) -> FlextResult[bool]:
             """Validate tap service configuration and setup (renamed to avoid Pydantic conflict)."""
             try:
                 # Basic validation - check if tap has valid configuration
-                config = self.get_default_config()
-                return self.validate_tap_config(config)
+                config_result = self.get_default_config()
+                if config_result.failure:
+                    return FlextResult.fail(f"Default config failed: {config_result.error}")
+                return self.validate_tap_config(config_result.value)
             except Exception as e:
                 return FlextResult.fail(f"Tap service validation failed: {e}")
 
@@ -162,6 +171,13 @@ class FlextMeltanoService:
 
             return FlextMeltanoAdapters()
 
+        @property
+        def type_adapters(self) -> object:
+            """Get modern type adapters for target operations."""
+            from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
+
+            return FlextMeltanoTypeAdapters()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
             """Execute target service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -177,13 +193,13 @@ class FlextMeltanoService:
                 }
             )
 
-        def get_info(self) -> FlextMeltanoTypes.Plugin.PluginInfo:
+        def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
             """Get service information."""
-            return {
+            return FlextResult.ok({
                 "service_type": "target",
                 "name": self.target_name,
                 "status": "ready",
-            }
+            })
 
         def create_target_instance(
             self, config: dict[str, object]
@@ -212,16 +228,18 @@ class FlextMeltanoService:
 
             return FlextResult.ok(_VALIDATION_SUCCESS)
 
-        def get_default_config(self) -> dict[str, object]:
+        def get_default_config(self) -> FlextResult[dict[str, object]]:
             """Get default configuration for target."""
-            return {"output_file": "test_output.json", "format": "json"}
+            return FlextResult.ok({"output_file": "test_output.json", "format": "json"})
 
         def validate_service(self) -> FlextResult[bool]:
             """Validate target service configuration and setup (renamed to avoid Pydantic conflict)."""
             try:
                 # Basic validation - check if target has valid configuration
-                config = self.get_default_config()
-                return self.validate_target_config(config)
+                config_result = self.get_default_config()
+                if config_result.failure:
+                    return FlextResult.fail(f"Default config failed: {config_result.error}")
+                return self.validate_target_config(config_result.value)
             except Exception as e:
                 return FlextResult.fail(f"Target service validation failed: {e}")
 
@@ -248,6 +266,13 @@ class FlextMeltanoService:
 
             return FlextMeltanoAdapter()
 
+        @property
+        def type_adapters(self) -> object:
+            """Get modern type adapters for DBT operations."""
+            from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
+
+            return FlextMeltanoTypeAdapters()
+
         def execute(self) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
             """Execute DBT service operation (required by FlextDomainService)."""
             from flext_core import FlextLogger
@@ -263,34 +288,61 @@ class FlextMeltanoService:
                 }
             )
 
-        def get_info(self) -> FlextMeltanoTypes.DBT.ExecutionResult:
+        def get_info(self) -> FlextResult[FlextMeltanoTypes.DBT.ExecutionResult]:
             """Get service information."""
-            return {"service_type": "dbt", "name": self.project_name, "status": "ready"}
+            return FlextResult.ok({"service_type": "dbt", "name": self.project_name, "status": "ready"})
 
-        def get_profiles_config(self) -> dict[str, object]:
+        def get_profiles_config(self) -> FlextResult[dict[str, object]]:
             """Get DBT profiles configuration."""
-            return {
+            return FlextResult.ok({
                 self.project_name: {
                     "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
                     "target": "dev",
                 }
-            }
+            })
 
     # Service factory methods using flext-core patterns
     @staticmethod
-    def create_tap_service(tap_name: str) -> FlextMeltanoService.TapService:
-        """Create tap service instance."""
-        return FlextMeltanoService.TapService(tap_name=tap_name)
+    def create_tap_service(tap_name: str) -> FlextResult[FlextMeltanoService.TapService]:
+        """Create tap service instance with FlextResult error handling."""
+        try:
+            # Validate tap name using FlextUtilities
+            safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name, "tap-default")
+            if not safe_tap_name or safe_tap_name == "tap-default":
+                return FlextResult[FlextMeltanoService.TapService].fail(f"Invalid tap name: {tap_name}")
+
+            service_instance = FlextMeltanoService.TapService(tap_name=safe_tap_name)
+            return FlextResult[FlextMeltanoService.TapService].ok(service_instance)
+        except Exception as e:
+            return FlextResult[FlextMeltanoService.TapService].fail(f"Failed to create tap service: {e}")
 
     @staticmethod
-    def create_target_service(target_name: str) -> FlextMeltanoService.TargetService:
-        """Create target service instance."""
-        return FlextMeltanoService.TargetService(target_name=target_name)
+    def create_target_service(target_name: str) -> FlextResult[FlextMeltanoService.TargetService]:
+        """Create target service instance with FlextResult error handling."""
+        try:
+            # Validate target name using FlextUtilities
+            safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name, "target-default")
+            if not safe_target_name or safe_target_name == "target-default":
+                return FlextResult[FlextMeltanoService.TargetService].fail(f"Invalid target name: {target_name}")
+
+            service_instance = FlextMeltanoService.TargetService(target_name=safe_target_name)
+            return FlextResult[FlextMeltanoService.TargetService].ok(service_instance)
+        except Exception as e:
+            return FlextResult[FlextMeltanoService.TargetService].fail(f"Failed to create target service: {e}")
 
     @staticmethod
-    def create_dbt_service(project_name: str) -> FlextMeltanoService.DbtService:
-        """Create DBT service instance."""
-        return FlextMeltanoService.DbtService(project_name=project_name)
+    def create_dbt_service(project_name: str) -> FlextResult[FlextMeltanoService.DbtService]:
+        """Create DBT service instance with FlextResult error handling."""
+        try:
+            # Validate project name using FlextUtilities
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name, "dbt-default")
+            if not safe_project_name or safe_project_name == "dbt-default":
+                return FlextResult[FlextMeltanoService.DbtService].fail(f"Invalid project name: {project_name}")
+
+            service_instance = FlextMeltanoService.DbtService(project_name=safe_project_name)
+            return FlextResult[FlextMeltanoService.DbtService].ok(service_instance)
+        except Exception as e:
+            return FlextResult[FlextMeltanoService.DbtService].fail(f"Failed to create DBT service: {e}")
 
 
 # =============================================================================

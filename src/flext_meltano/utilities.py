@@ -61,8 +61,8 @@ class FlextMeltanoUtilities:
     # =================================================================
 
     @classmethod
-    def create_meltano_temp_directory(cls, prefix: str = "flext_meltano_") -> Path:
-        """Create Meltano temp directory usando FlextUtilities + Meltano specifics.
+    def create_meltano_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+        """Create Meltano temp directory usando FlextUtilities + Meltano specifics with FlextResult.
 
         Uses FlextUtilities infrastructure but adds Meltano-specific setup.
 
@@ -70,27 +70,32 @@ class FlextMeltanoUtilities:
             prefix: Prefix for temporary directory
 
         Returns:
-            Path of created directory with Meltano structure
+            FlextResult containing Path of created directory with Meltano structure or error
 
         """
-        # Use FlextUtilities for basic temp directory creation pattern
-        temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-
-        # Add Meltano-specific directory structure
         try:
-            (temp_dir / ".meltano").mkdir(exist_ok=True)
-            (temp_dir / "extract").mkdir(exist_ok=True)
-            (temp_dir / "load").mkdir(exist_ok=True)
-            (temp_dir / "transform").mkdir(exist_ok=True)
-        except Exception as e:
-            logger.warning(f"Failed to create Meltano structure: {e}")
+            # Use FlextUtilities for safe string handling
+            safe_prefix = FlextUtilities.TextProcessor.safe_string(prefix, "flext_meltano_")
 
-        return temp_dir
+            # Use FlextUtilities for basic temp directory creation pattern
+            temp_dir = Path(tempfile.mkdtemp(prefix=safe_prefix))
+
+            # Add Meltano-specific directory structure
+            meltano_dirs = [".meltano", "extract", "load", "transform"]
+            for dir_name in meltano_dirs:
+                (temp_dir / dir_name).mkdir(exist_ok=True)
+
+            logger.info(f"Created Meltano temp directory: {temp_dir}")
+            return FlextResult[Path].ok(temp_dir)
+        except Exception as e:
+            error_msg = f"Failed to create Meltano temp directory: {e}"
+            logger.exception(error_msg)
+            return FlextResult[Path].fail(error_msg)
 
     @classmethod
     def create_meltano_config_dict(
         cls, project_id: str, project_name: str = ""
-    ) -> FlextMeltanoTypes.DBT.ProjectConfig:
+    ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
         """Create complete Meltano configuration dictionary.
 
         Uses FlextUtilities.ProcessingUtils.safe_dict_get() patterns for safe construction.
@@ -100,34 +105,40 @@ class FlextMeltanoUtilities:
             project_name: Project name (optional)
 
         Returns:
-            Complete Meltano configuration dictionary
+            FlextResult containing complete Meltano configuration dictionary
 
         """
-        # Use FlextUtilities.TextProcessor.safe_string() for safe string handling
-        safe_project_id = FlextUtilities.TextProcessor.safe_string(
-            project_id, "flext-meltano-project"
-        )
-        safe_project_name = FlextUtilities.TextProcessor.safe_string(
-            project_name, safe_project_id
-        )
+        try:
+            # Use FlextUtilities.TextProcessor.safe_string() for safe string handling
+            safe_project_id = FlextUtilities.TextProcessor.safe_string(
+                project_id, "flext-meltano-project"
+            )
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(
+                project_name, safe_project_id
+            )
 
-        return {
-            "version": 1,
-            "project_id": safe_project_id,
-            "project_name": safe_project_name,
-            "environments": [{"name": "dev"}, {"name": "staging"}, {"name": "prod"}],
-            "plugins": {
-                "extractors": [],
-                "loaders": [],
-                "transformers": [],
-                "orchestrators": [],
-            },
-            "metadata": {
-                "created_by": "flext-meltano",
-                "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
-                "flext_version": "2.0.0-enterprise",
-            },
-        }
+            config_dict = {
+                "version": 1,
+                "project_id": safe_project_id,
+                "project_name": safe_project_name,
+                "environments": [{"name": "dev"}, {"name": "staging"}, {"name": "prod"}],
+                "plugins": {
+                    "extractors": [],
+                    "loaders": [],
+                    "transformers": [],
+                    "orchestrators": [],
+                },
+                "metadata": {
+                    "created_by": "flext-meltano",
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+                    "flext_version": "2.0.0-enterprise",
+                },
+            }
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(cast("FlextMeltanoTypes.DBT.ProjectConfig", config_dict))
+        except Exception as e:
+            error_msg = f"Failed to create Meltano config dict: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].fail(error_msg)
 
     @classmethod
     def write_meltano_yml(
@@ -166,7 +177,7 @@ class FlextMeltanoUtilities:
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-    ) -> FlextMeltanoTypes.Plugin.Config:
+    ) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
         """Create plugin configuration dictionary.
 
         Uses FlextUtilities safe string methods.
@@ -179,39 +190,45 @@ class FlextMeltanoUtilities:
             executable: Executable name
 
         Returns:
-            Plugin configuration dictionary
+            FlextResult containing plugin configuration dictionary
 
         """
-        # Use FlextUtilities for safe string handling
-        safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
-        safe_namespace = FlextUtilities.TextProcessor.safe_string(
-            namespace, f"tap_{safe_name}"
-        )
-        safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-            pip_url, f"tap-{safe_name}"
-        )
-        safe_executable = FlextUtilities.TextProcessor.safe_string(
-            executable, f"tap-{safe_name}"
-        )
+        try:
+            # Use FlextUtilities for safe string handling
+            safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
+            safe_namespace = FlextUtilities.TextProcessor.safe_string(
+                namespace, f"tap_{safe_name}"
+            )
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(
+                pip_url, f"tap-{safe_name}"
+            )
+            safe_executable = FlextUtilities.TextProcessor.safe_string(
+                executable, f"tap-{safe_name}"
+            )
 
-        return {
-            "name": safe_name,
-            "namespace": safe_namespace,
-            "pip_url": safe_pip_url,
-            "executable": safe_executable,
-            "type": FlextUtilities.TextProcessor.safe_string(plugin_type, "extractor"),
-            "settings": {},
-            "config": {},
-            "metadata": {
-                "created_by": "flext-meltano",
-                "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
-            },
-        }
+            config_dict = {
+                "name": safe_name,
+                "namespace": safe_namespace,
+                "pip_url": safe_pip_url,
+                "executable": safe_executable,
+                "type": FlextUtilities.TextProcessor.safe_string(plugin_type, "extractor"),
+                "settings": {},
+                "config": {},
+                "metadata": {
+                    "created_by": "flext-meltano",
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+                },
+            }
+            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(cast("FlextMeltanoTypes.Plugin.Config", config_dict))
+        except Exception as e:
+            error_msg = f"Failed to create plugin config dict: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.Plugin.Config].fail(error_msg)
 
     @classmethod
     def format_meltano_command_result(
         cls, *, success: bool, data: FlextTypes.Core.JsonValue | None = None
-    ) -> FlextMeltanoTypes.CLI.ProcessResult:
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
         """Format Meltano command result for bridge communication.
 
         Uses FlextUtilities.generate_iso_timestamp() and safe handling.
@@ -221,21 +238,26 @@ class FlextMeltanoUtilities:
             data: Optional result data
 
         Returns:
-            Formatted response for bridge communication
+            FlextResult containing formatted response for bridge communication
 
         """
-        # Use FlextUtilities for safe boolean and timestamp handling
-        response: FlextMeltanoTypes.CLI.ProcessResult = {
-            "success": FlextUtilities.Conversions.safe_bool(
-                success
-            ),  # From FlextUtilities
-            "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
-        }
+        try:
+            # Use FlextUtilities for safe boolean and timestamp handling
+            response: FlextMeltanoTypes.CLI.ProcessResult = {
+                "success": FlextUtilities.Conversions.safe_bool(
+                    success
+                ),  # From FlextUtilities
+                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+            }
 
-        if data and isinstance(data, dict):  # From FlextUtilities
-            response["data"] = data
+            if data and isinstance(data, dict):  # From FlextUtilities
+                response["data"] = data
 
-        return response
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(response)
+        except Exception as e:
+            error_msg = f"Failed to format Meltano command result: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(error_msg)
 
     @classmethod
     def parse_meltano_output_safe(
@@ -293,32 +315,38 @@ class FlextMeltanoUtilities:
     @classmethod
     def adapt_meltano_plugin(
         cls, plugin_data: FlextMeltanoTypes.Plugin.PluginInfo
-    ) -> FlextMeltanoTypes.Plugin.PluginInfo:
+    ) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
         """Adapt Meltano plugin data for unified processing.
 
         Args:
             plugin_data: Original plugin data
 
         Returns:
-            Adapted plugin data with standardized fields
+            FlextResult containing adapted plugin data with standardized fields
 
         """
-        # plugin_data is typed as PluginInfo so isinstance check is unnecessary
-        name = plugin_data.get("name", "unknown")
-        plugin_type = plugin_data.get("type", "unknown")
+        try:
+            # plugin_data is typed as PluginInfo so isinstance check is unnecessary
+            name = plugin_data.get("name", "unknown")
+            plugin_type = plugin_data.get("type", "unknown")
 
-        return {
-            "id": name,
-            "name": name,
-            "type": plugin_type,
-            "status": "adapted",
-            "namespace": plugin_data.get("namespace", f"{plugin_type}_{name}"),
-            "version": plugin_data.get("version", "1.0.0"),
-            "metadata": {
-                "adapted_by": "flext-meltano",
-                "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
-            },
-        }
+            adapted_data = {
+                "id": name,
+                "name": name,
+                "type": plugin_type,
+                "status": "adapted",
+                "namespace": plugin_data.get("namespace", f"{plugin_type}_{name}"),
+                "version": plugin_data.get("version", "1.0.0"),
+                "metadata": {
+                    "adapted_by": "flext-meltano",
+                    "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                },
+            }
+            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(adapted_data)
+        except Exception as e:
+            error_msg = f"Failed to adapt Meltano plugin: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].fail(error_msg)
 
     @classmethod
     def create_bridge_response(
@@ -369,28 +397,42 @@ class FlextMeltanoUtilities:
 
     # Legacy method aliases for backward compatibility using proper lambda syntax
     @classmethod
-    def normalize_plugin_name(cls, name: str, plugin_type: str = "tap") -> str:
-        """Normalize plugin name with type prefix."""
-        safe_name = (
-            FlextUtilities.TextProcessor.safe_string(name, "unknown")
-            .lower()
-            .replace(" ", "-")
-        )
-        if plugin_type in {"tap", "extractor"} and not safe_name.startswith("tap-"):
-            return f"tap-{safe_name}"
-        if plugin_type in {"target", "loader"} and not safe_name.startswith("target-"):
-            return f"target-{safe_name}"
-        return safe_name
+    def normalize_plugin_name(cls, name: str, plugin_type: str = "tap") -> FlextResult[str]:
+        """Normalize plugin name with type prefix using FlextResult patterns."""
+        try:
+            # Validate inputs using FlextUtilities
+            safe_name = (
+                FlextUtilities.TextProcessor.safe_string(name, "unknown")
+                .lower()
+                .replace(" ", "-")
+            )
+            safe_plugin_type = FlextUtilities.TextProcessor.safe_string(plugin_type, "tap")
+
+            # Apply type-specific prefixes
+            if safe_plugin_type in {"tap", "extractor"} and not safe_name.startswith("tap-"):
+                normalized_name = f"tap-{safe_name}"
+            elif safe_plugin_type in {"target", "loader"} and not safe_name.startswith("target-"):
+                normalized_name = f"target-{safe_name}"
+            else:
+                normalized_name = safe_name
+
+            return FlextResult[str].ok(normalized_name)
+        except Exception as e:
+            return FlextResult[str].fail(f"Failed to normalize plugin name: {e}")
 
     @classmethod
-    def sanitize_plugin_name(cls, name: str) -> str:
-        """Sanitize plugin name to safe format."""
-        return (
-            FlextUtilities.TextProcessor.safe_string(name, "unknown")
-            .lower()
-            .replace(" ", "_")
-            .replace("-", "_")
-        )
+    def sanitize_plugin_name(cls, name: str) -> FlextResult[str]:
+        """Sanitize plugin name to safe format using FlextResult patterns."""
+        try:
+            sanitized_name = (
+                FlextUtilities.TextProcessor.safe_string(name, "unknown")
+                .lower()
+                .replace(" ", "_")
+                .replace("-", "_")
+            )
+            return FlextResult[str].ok(sanitized_name)
+        except Exception as e:
+            return FlextResult[str].fail(f"Failed to sanitize plugin name: {e}")
 
     @classmethod
     def load_yaml_config(
@@ -421,11 +463,21 @@ class FlextMeltanoUtilities:
             dbt_yml = project_root / "transform" / "dbt_project.yml"
 
             # Write configs
-            meltano_config = cls.create_meltano_config_dict(project_name, project_name)
-            dbt_config = cls.create_dbt_config(project_name, project_name)
+            meltano_config_result = cls.create_meltano_config_dict(project_name, project_name)
+            if not meltano_config_result.success:
+                return FlextResult.fail(meltano_config_result.error or "Failed to create Meltano config")
 
-            cls.write_meltano_yml(meltano_config, meltano_yml)
-            cls.write_meltano_yml(dbt_config, dbt_yml)  # Using same YAML writer
+            dbt_config_result = cls.create_dbt_config(project_name, project_name)
+            if not dbt_config_result.success:
+                return FlextResult.fail(dbt_config_result.error or "Failed to create DBT config")
+
+            write_meltano_result = cls.write_meltano_yml(meltano_config_result.value, meltano_yml)
+            if not write_meltano_result.success:
+                return FlextResult.fail(write_meltano_result.error or "Failed to write meltano.yml")
+
+            write_dbt_result = cls.write_meltano_yml(dbt_config_result.value, dbt_yml)
+            if not write_dbt_result.success:
+                return FlextResult.fail(write_dbt_result.error or "Failed to write dbt_project.yml")
 
             return FlextResult.ok(
                 {
@@ -440,44 +492,72 @@ class FlextMeltanoUtilities:
     @classmethod
     def create_singer_tap_config(
         cls, name: str, namespace: str, pip_url: str, executable: str
-    ) -> FlextMeltanoTypes.Singer.TapConfig:
+    ) -> FlextResult[FlextMeltanoTypes.Singer.TapConfig]:
         """Create Singer tap configuration."""
-        config = cls.create_plugin_config_dict(
-            name, "extractor", namespace, pip_url, executable
-        )
-        config["capabilities"] = ["discover", "properties", "catalog", "schema"]
-        config["settings"] = {}
-        return config
+        try:
+            config_result = cls.create_plugin_config_dict(
+                name, "extractor", namespace, pip_url, executable
+            )
+            if not config_result.success:
+                return FlextResult[FlextMeltanoTypes.Singer.TapConfig].fail(
+                    config_result.error or "Failed to create plugin config"
+                )
+
+            config = config_result.value
+            config["capabilities"] = ["discover", "properties", "catalog", "schema"]
+            config["settings"] = {}
+            return FlextResult[FlextMeltanoTypes.Singer.TapConfig].ok(config)
+        except Exception as e:
+            error_msg = f"Failed to create Singer tap config: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.Singer.TapConfig].fail(error_msg)
 
     @classmethod
     def create_singer_target_config(
         cls, name: str, namespace: str, pip_url: str, executable: str
-    ) -> FlextMeltanoTypes.Singer.TargetConfig:
+    ) -> FlextResult[FlextMeltanoTypes.Singer.TargetConfig]:
         """Create Singer target configuration."""
-        config = cls.create_plugin_config_dict(
-            name, "loader", namespace, pip_url, executable
-        )
-        config["settings"] = {}
-        return config
+        try:
+            config_result = cls.create_plugin_config_dict(
+                name, "loader", namespace, pip_url, executable
+            )
+            if not config_result.success:
+                return FlextResult[FlextMeltanoTypes.Singer.TargetConfig].fail(
+                    config_result.error or "Failed to create plugin config"
+                )
+
+            config = config_result.value
+            config["settings"] = {}
+            return FlextResult[FlextMeltanoTypes.Singer.TargetConfig].ok(config)
+        except Exception as e:
+            error_msg = f"Failed to create Singer target config: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.Singer.TargetConfig].fail(error_msg)
 
     @classmethod
     def create_dbt_config(
         cls, name: str, profile: str
-    ) -> FlextMeltanoTypes.DBT.ProjectConfig:
+    ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
         """Create DBT project configuration."""
-        return {
-            "name": FlextUtilities.TextProcessor.safe_string(name, "dbt_project"),
-            "version": "1.0.0",
-            "profile": FlextUtilities.TextProcessor.safe_string(profile, name),
-            "model-paths": ["models"],
-            "test-paths": ["tests"],
-            "seed-paths": ["data"],
-            "macro-paths": ["macros"],
-            "snapshot-paths": ["snapshots"],
-            "analysis-paths": ["analysis"],
-            "target-path": "target",
-            "clean-targets": ["target", "dbt_packages"],
-        }
+        try:
+            config = {
+                "name": FlextUtilities.TextProcessor.safe_string(name, "dbt_project"),
+                "version": "1.0.0",
+                "profile": FlextUtilities.TextProcessor.safe_string(profile, name),
+                "model-paths": ["models"],
+                "test-paths": ["tests"],
+                "seed-paths": ["data"],
+                "macro-paths": ["macros"],
+                "snapshot-paths": ["snapshots"],
+                "analysis-paths": ["analysis"],
+                "target-path": "target",
+                "clean-targets": ["target", "dbt_packages"],
+            }
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(cast("FlextMeltanoTypes.DBT.ProjectConfig", config))
+        except Exception as e:
+            error_msg = f"Failed to create DBT config: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(
@@ -494,8 +574,8 @@ class FlextMeltanoUtilities:
 
     # Legacy aliases for backward compatibility
     @classmethod
-    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> Path:
-        """Create temporary directory (legacy alias)."""
+    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+        """Create temporary directory (legacy alias) using FlextResult patterns."""
         return cls.create_meltano_temp_directory(prefix)
 
     create_meltano_config = create_meltano_config_dict
