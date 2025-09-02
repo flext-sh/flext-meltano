@@ -257,14 +257,14 @@ class FlextMeltanoUtilities:
             return FlextResult.ok({"output": "", "lines": []})
 
         try:
+            import json
+
             # Clean output - normalize whitespace
             clean_output = output.strip()
             lines = clean_output.split("\n")
 
             # Try JSON parsing first
             try:
-                import json
-
                 parsed_json = json.loads(clean_output)
                 return FlextResult.ok(
                     {

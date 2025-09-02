@@ -225,20 +225,20 @@ class FlextMeltanoBridge:
         """Create temporary Meltano project."""
         try:
             result = self.adapter._create_temp_project()
-            # Wrap in FlextResult if not already
+            # Check if result is already a FlextResult
             if (
                 hasattr(result, "success")
                 and hasattr(result, "value")
                 and hasattr(result, "error")
             ):
                 # It's already a FlextResult
-                if result.success:
+                if getattr(result, "success", False):
                     temp_dict: dict[str, object] = {
-                        "project": str(result.value),
+                        "project": str(getattr(result, "value", "")),
                         "status": "created",
                     }
                     return FlextResult.ok(temp_dict)
-                return FlextResult.fail(result.error or "Project creation failed")
+                return FlextResult.fail(str(getattr(result, "error", "Project creation failed")))
             # Direct Project object - convert to dict representation
             project_dict: dict[str, object] = {
                 "project": str(result),

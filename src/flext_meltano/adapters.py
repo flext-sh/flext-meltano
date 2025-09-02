@@ -167,14 +167,12 @@ class FlextMeltanoAdapter:
             # Get Meltano version using native API
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult.ok(
-                {
-                    "version": meltano_version,
-                    "meltano": meltano_version,
-                    "cli_type": "native_meltano_api",
-                    "integration": "flext-core",
-                }
-            )
+            return FlextResult.ok({
+                "version": meltano_version,
+                "meltano": meltano_version,
+                "cli_type": "native_meltano_api",
+                "integration": "flext-core",
+            })
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
@@ -237,8 +235,8 @@ class FlextMeltanoAdapter:
             )
             # Convert Meltano Project to dict representation
             project_dict = {
-                "name": project.name or "meltano_project",
-                "root": str(project.root),
+                "name": getattr(project, "name", "meltano_project"),
+                "root": str(getattr(project, "root", ".")),
                 "settings": getattr(project, "settings", {}),
                 "meltano_version": getattr(project, "meltano_version", ""),
             }
@@ -492,13 +490,11 @@ class FlextMeltanoAdapter:
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute bridge service operation (required by FlextDomainService)."""
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                {
-                    "service": "MeltanoBridge",
-                    "status": "ready",
-                    "integration": "flext-core",
-                }
-            )
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
+                "service": "MeltanoBridge",
+                "status": "ready",
+                "integration": "flext-core",
+            })
 
     class ProjectManager:
         """Project lifecycle management operations.
@@ -653,6 +649,7 @@ class FlextMeltanoAdapter:
                 import subprocess
 
                 # Execute pipeline using meltano CLI for simplicity
+                # Security: Using list format with controlled inputs - no shell injection risk
                 cmd = ["meltano", "run", extractor_name, loader_name]
                 result = subprocess.run(  # noqa: S603
                     cmd,

@@ -22,7 +22,7 @@ from __future__ import annotations
 import warnings
 
 # Import everything from executors for backward compatibility
-from flext_meltano.executors import FlextMeltanoExecutor  # noqa: F401
+from flext_meltano.executors import FlextMeltanoExecutor
 
 # Create backward compatibility aliases
 FlextMeltanoCli = FlextMeltanoExecutor
