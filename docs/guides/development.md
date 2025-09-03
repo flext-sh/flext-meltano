@@ -23,7 +23,7 @@ make validate                 # ❌ FAILING - must fix before proceeding
 | ----------- | ------- | ----------- | -------------------------- |
 | **Python**  | 3.13+   | ✅ Required | Strict version requirement |
 | **Poetry**  | 1.8+    | ✅ Required | Dependency management      |
-| **Make**    | object     | ✅ Required | Development commands       |
+| **Make**    | object  | ✅ Required | Development commands       |
 | **Git**     | 2.0+    | ✅ Required | Pre-commit hooks           |
 
 ### **Initial Setup**

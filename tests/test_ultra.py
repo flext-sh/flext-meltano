@@ -55,7 +55,7 @@ def test_simple_config_creation() -> None:
                 environment="test",
             )
 
-            assert config.project_root == str(temp_dir)
+            assert str(config.project_root) == str(temp_dir)
             assert config.environment == "test"
 
     except ImportError as e:

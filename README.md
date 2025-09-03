@@ -302,4 +302,4 @@ from flext_meltano import (
 
 ---
 
-**flext-meltano** - *Enterprise data integration foundation for the FLEXT ecosystem*
+**flext-meltano** - _Enterprise data integration foundation for the FLEXT ecosystem_

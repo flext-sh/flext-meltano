@@ -281,7 +281,9 @@ class FlextMeltanoFileManagers:
                 temp_path = Path(tempfile.mkdtemp(prefix=prefix))
                 return FlextResult[Path].ok(temp_path)
             except Exception as e:
-                return FlextResult[Path].fail(f"Failed to create temporary directory: {e}")
+                return FlextResult[Path].fail(
+                    f"Failed to create temporary directory: {e}"
+                )
 
         @staticmethod
         def create_temp_directory_with_result(

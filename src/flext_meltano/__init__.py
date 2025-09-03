@@ -55,172 +55,108 @@ from __future__ import annotations
 __version__ = "2.0.0-enterprise"
 
 # =============================================================================
-# FOUNDATION LAYER - Import using modern aggregation pattern
+# FOUNDATION LAYER - Import first, no dependencies on other modules
 # =============================================================================
 
-# Import specific classes to avoid F405 errors
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.exceptions import FlextMeltanoExceptions
+from flext_meltano.constants import *
+from flext_meltano.typings import *
+from flext_meltano.exceptions import *
 
 # =============================================================================
 # SERVICE LAYER - Core business logic and integrations
 # =============================================================================
 
-from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.services import FlextMeltanoService
-from flext_meltano.wrappers import FlextMeltanoWrapper
+from flext_meltano.adapters import *
+from flext_meltano.services import *
+# All adapter functionality consolidated in adapters.py
 
 # =============================================================================
 # EXECUTION LAYER - Command processing and execution
 # =============================================================================
 
-from flext_meltano.executors import FlextMeltanoExecutor
-from flext_meltano.executors_bridge import FlextMeltanoBridge
-
-# Import bridge class specifically for export
-
-# Create MeltanoBridge alias for backward compatibility
-MeltanoBridge = FlextMeltanoBridge
+from flext_meltano.executors import *
+from flext_meltano.executors_bridge import *
 
 # =============================================================================
 # INTEGRATION LAYER - External library integrations
 # =============================================================================
 
-from flext_meltano.singer_adapters import FlextMeltanoAdapters
-from flext_meltano.flext_type_adapters import (
-    FlextMeltanoTypeAdapters,
-    FlextTap,
-    FlextTarget,
-    FlextSingerStream,
-    FlextMeltanoProject,
-    FlextDbt,
-)
 
 # =============================================================================
 # COMPLETE ABSTRACTION LAYER - Zero dependency on singer_sdk/meltano/dbt
 # =============================================================================
 
-from flext_meltano.flext_singer_types import (
-    FlextSingerTypes,
-    StringType,
-    IntegerType,
-    NumberType,
-    BooleanType,
-    DateTimeType,
-    ArrayType,
-    ObjectType,
-    FlextSingerSchema,
-    FlextSingerRecord,
-    FlextSingerState,
-    FlextPropertiesList,
-)
-
-from flext_meltano.flext_tap_abstractions import (
-    FlextTap as FlextTapAbstract,
-    FlextTapConfig,
-    FlextTapStream,
-    create_flext_tap_config,
-)
-
-from flext_meltano.flext_target_abstractions import (
-    FlextTarget as FlextTargetAbstract,
-    FlextTargetConfig,
-    FlextTargetStream,
-    create_flext_target_config,
-)
+from flext_meltano.singer_types import *
+from flext_meltano.tap_abstractions import *
+from flext_meltano.target_abstractions import *
 
 # =============================================================================
 # SUPPORT LAYER - Utilities, config, validation
 # =============================================================================
 
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.utilities import FlextMeltanoUtilities
-from flext_meltano.validators import FlextMeltanoValidators
-from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
+from flext_meltano.config import *
+from flext_meltano.utilities import *
+from flext_meltano.validators import *
+from flext_meltano.file_managers import *
+from flext_meltano.config_builders import *
 
 # =============================================================================
 # CONSOLIDATED EXPORTS - Combine all __all__ from modules
 # =============================================================================
 
-# Combine all __all__ exports from imported modules
+# Import all modules for __all__ aggregation
 import flext_meltano.constants as _constants
 import flext_meltano.typings as _typings
 import flext_meltano.exceptions as _exceptions
 import flext_meltano.adapters as _adapters
 import flext_meltano.services as _services
-import flext_meltano.wrappers as _wrappers
 import flext_meltano.executors as _executors
 import flext_meltano.executors_bridge as _executors_bridge
-import flext_meltano.singer_adapters as _singer_adapters
+import flext_meltano.singer_types as _singer_types
+import flext_meltano.tap_abstractions as _tap_abstractions
+import flext_meltano.target_abstractions as _target_abstractions
 import flext_meltano.config as _config
 import flext_meltano.utilities as _utilities
 import flext_meltano.validators as _validators
+import flext_meltano.file_managers as _file_managers
+import flext_meltano.config_builders as _config_builders
 
+# Collect all __all__ exports from imported modules
+_temp_exports: list[str] = []
 
-# Define __all__ with static exports - Ruff compliance
-__all__ = [
-    # Foundation Layer exports - REAL CLASSES
-    "FlextMeltanoConstants",
-    "FlextMeltanoTypes",
-    "FlextMeltanoExceptions",  # This is the real class name
+for module in [
+    _constants,
+    _typings,
+    _exceptions,
+    _adapters,
+    _services,
+    _executors,
+    _executors_bridge,
+    _singer_types,
+    _tap_abstractions,
+    _target_abstractions,
+    _config,
+    _utilities,
+    _validators,
+    _file_managers,
+    _config_builders,
+]:
+    if hasattr(module, "__all__"):
+        _temp_exports.extend(module.__all__)
 
-    # Service Layer exports - REAL CLASSES
-    "FlextMeltanoAdapter",
-    "FlextMeltanoService",
-    "FlextMeltanoWrapper",
+# Remove duplicates and sort for consistent exports - build complete list first
+_seen: set[str] = set()
+_final_exports: list[str] = []
+for item in _temp_exports:
+    if item not in _seen:
+        _seen.add(item)
+        _final_exports.append(item)
+_final_exports.sort()
 
-    # Execution Layer exports - REAL CLASSES
-    "FlextMeltanoExecutor",
-    "FlextMeltanoBridge",
-    "MeltanoBridge",  # Backward compatibility alias
-
-    # Integration Layer exports - REAL CLASSES
-    "FlextMeltanoAdapters",  # This is the real class name from singer_adapters
-
-    # Modern Type Adapters exports - REAL CLASSES
-    "FlextMeltanoTypeAdapters",
-    "FlextTap",
-    "FlextTarget",
-    "FlextSingerStream",
-    "FlextMeltanoProject",
-    "FlextDbt",
-
-    # Complete Abstraction Layer - ZERO DEPENDENCY on singer_sdk/meltano/dbt
-    "FlextSingerTypes",
-    "StringType",
-    "IntegerType",
-    "NumberType",
-    "BooleanType",
-    "DateTimeType",
-    "ArrayType",
-    "ObjectType",
-    "FlextSingerSchema",
-    "FlextSingerRecord",
-    "FlextSingerState",
-    "FlextPropertiesList",
-
-    # Tap Abstractions - Complete Singer Tap functionality
-    "FlextTapAbstract",
-    "FlextTapConfig",
-    "FlextTapStream",
-    "create_flext_tap_config",
-
-    # Target Abstractions - Complete Singer Target functionality
-    "FlextTargetAbstract",
-    "FlextTargetConfig",
-    "FlextTargetStream",
-    "create_flext_target_config",
-
-    # Support Layer exports - REAL CLASSES
-    "FlextMeltanoConfig",
-    "FlextMeltanoUtilities",
-    "FlextMeltanoValidators",  # This is the real class name
-    "FlextMeltanoFileManagers",
-    "FlextMeltanoConfigBuilders",
-]
+# Define __all__ as literal list for linter compatibility
+# This dynamic assignment is necessary for aggregating module exports
+__all__: list[str] = _final_exports  # noqa: PLE0605 # type: ignore[reportUnsupportedDunderAll]
 
 # =============================================================================
-# NO LEGACY COMPATIBILITY - CLASS-BASED API ONLY
+# COMPLETE MODULE AGGREGATION - All exports collected dynamically
 # =============================================================================
