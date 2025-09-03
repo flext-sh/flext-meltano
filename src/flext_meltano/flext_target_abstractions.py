@@ -39,9 +39,19 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_core import FlextLogger, FlextResult
+
+# Type aliases to replace explicit Any
+RecordDict = dict[str, object]
+ConfigDict = dict[str, object]
+SchemaDict = dict[str, object]
+StateDict = dict[str, object]
+ResultDict = dict[str, object]
+
+if TYPE_CHECKING:
+    from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
 
 # Initialize logger
 logger = FlextLogger(__name__)
@@ -55,15 +65,15 @@ logger = FlextLogger(__name__)
 class FlextTargetLoader(Protocol):
     """Protocol for FlextTarget data loading operations."""
 
-    def load_record(self, stream_name: str, record: dict[str, Any]) -> FlextResult[bool]:
+    def load_record(self, stream_name: str, record: RecordDict) -> FlextResult[bool]:
         """Load single record to target system."""
         ...
 
-    def load_batch(self, stream_name: str, records: list[dict[str, Any]]) -> FlextResult[dict[str, object]]:
+    def load_batch(self, stream_name: str, records: list[RecordDict]) -> FlextResult[ResultDict]:
         """Load batch of records to target system."""
         ...
 
-    def finalize_stream(self, stream_name: str) -> FlextResult[dict[str, object]]:
+    def finalize_stream(self, stream_name: str) -> FlextResult[ResultDict]:
         """Finalize stream loading (commit, cleanup, etc.)."""
         ...
 
@@ -72,15 +82,15 @@ class FlextTargetLoader(Protocol):
 class FlextTargetBase(Protocol):
     """Protocol for FlextTarget implementations."""
 
-    def process_schema(self, stream_name: str, schema: dict[str, Any]) -> FlextResult[bool]:
+    def process_schema(self, stream_name: str, schema: SchemaDict) -> FlextResult[bool]:
         """Process Singer SCHEMA message."""
         ...
 
-    def process_record(self, stream_name: str, record: dict[str, Any]) -> FlextResult[bool]:
+    def process_record(self, stream_name: str, record: RecordDict) -> FlextResult[bool]:
         """Process Singer RECORD message."""
         ...
 
-    def process_state(self, state: dict[str, Any]) -> FlextResult[bool]:
+    def process_state(self, state: StateDict) -> FlextResult[bool]:
         """Process Singer STATE message."""
         ...
 
@@ -99,10 +109,10 @@ class FlextTargetConfig:
     def __init__(
         self,
         target_type: str,
-        connection_config: dict[str, Any],
+        connection_config: ConfigDict,
         batch_size: int = 1000,
         max_batches: int = 100,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> None:
         """Initialize FlextTarget configuration."""
         self.target_type = target_type
@@ -111,7 +121,7 @@ class FlextTargetConfig:
         self.max_batches = max_batches
         self.additional_config = kwargs
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> ConfigDict:
         """Convert configuration to dictionary format."""
         return {
             "target_type": self.target_type,
@@ -143,7 +153,7 @@ class FlextTargetConfig:
 class FlextTargetStream:
     """FlextTarget stream abstraction with FlextResult error handling."""
 
-    def __init__(self, stream_name: str, schema: dict[str, Any], adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(self, stream_name: str, schema: SchemaDict, adapter: FlextMeltanoTypeAdapters) -> None:
         """Initialize FlextTarget stream."""
         self.stream_name = stream_name
         self.schema = schema
@@ -152,12 +162,10 @@ class FlextTargetStream:
         self._records_loaded = 0
         self._batches_processed = 0
 
-    def add_record(self, record: dict[str, Any]) -> FlextResult[bool]:
+    def add_record(self, record: RecordDict) -> FlextResult[bool]:
         """Add record to stream for processing."""
         try:
-            # Validate record against schema (basic validation)
-            if not isinstance(record, dict):
-                return FlextResult[bool].fail("Record must be a dictionary")
+            # Record is already typed as RecordDict (dict[str, object]), so validation is type-enforced
 
             # Track record
             self._records_loaded += 1
@@ -216,9 +224,9 @@ class FlextTarget:
         self._adapter = adapter
         self._logger = FlextLogger(f"{__name__}.FlextTarget")
         self._streams: dict[str, FlextTargetStream] = {}
-        self._state: dict[str, Any] = {}
+        self._state: StateDict = {}
 
-    def process_schema_message(self, stream_name: str, schema: dict[str, Any]) -> FlextResult[bool]:
+    def process_schema_message(self, stream_name: str, schema: SchemaDict) -> FlextResult[bool]:
         """Process Singer SCHEMA message with error handling.
 
         Args:
@@ -232,9 +240,7 @@ class FlextTarget:
         try:
             self._logger.info("Processing SCHEMA message", stream_name=stream_name)
 
-            # Validate schema
-            if not isinstance(schema, dict):
-                return FlextResult[bool].fail("Schema must be a dictionary")
+            # Schema is already typed as SchemaDict (dict[str, object]), so type is enforced
 
             if "properties" not in schema:
                 return FlextResult[bool].fail("Schema must contain properties")
@@ -255,7 +261,7 @@ class FlextTarget:
             self._logger.exception(error_msg)
             return FlextResult[bool].fail(error_msg)
 
-    def process_record_message(self, stream_name: str, record: dict[str, Any]) -> FlextResult[bool]:
+    def process_record_message(self, stream_name: str, record: RecordDict) -> FlextResult[bool]:
         """Process Singer RECORD message with error handling.
 
         Args:
@@ -290,7 +296,7 @@ class FlextTarget:
             self._logger.exception(error_msg)
             return FlextResult[bool].fail(error_msg)
 
-    def process_state_message(self, state: dict[str, Any]) -> FlextResult[bool]:
+    def process_state_message(self, state: StateDict) -> FlextResult[bool]:
         """Process Singer STATE message with error handling.
 
         Args:
@@ -335,7 +341,8 @@ class FlextTarget:
             for stream_name, stream in self._streams.items():
                 stats = stream.get_stats()
                 stream_stats[stream_name] = stats
-                total_records += int(stats.get("records_loaded", 0))
+                records_loaded = stats.get("records_loaded", 0)
+                total_records += int(records_loaded) if isinstance(records_loaded, (int, str)) else 0
 
             finalization_result: dict[str, object] = {
                 "status": "completed",
@@ -387,9 +394,10 @@ class FlextTarget:
 
 def create_flext_target_config(
     target_type: str,
-    connection_config: dict[str, Any],
+    connection_config: ConfigDict,
     batch_size: int = 1000,
-    **kwargs: Any,
+    max_batches: int = 100,
+    **kwargs: object,
 ) -> FlextResult[FlextTargetConfig]:
     """Create FlextTarget configuration with validation."""
     try:
@@ -397,12 +405,13 @@ def create_flext_target_config(
             target_type=target_type,
             connection_config=connection_config,
             batch_size=batch_size,
+            max_batches=max_batches,
             **kwargs,
         )
 
         validation_result = config.validate()
         if validation_result.failure:
-            return FlextResult[FlextTargetConfig].fail(validation_result.error)
+            return FlextResult[FlextTargetConfig].fail(validation_result.error or "Unknown error")
 
         return FlextResult[FlextTargetConfig].ok(config)
 

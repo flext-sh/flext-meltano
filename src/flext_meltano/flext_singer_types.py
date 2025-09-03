@@ -68,9 +68,9 @@ class FlextSingerType:
         """Initialize FlextSinger type."""
         self.description = description
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer SDK compatible dictionary format."""
-        result: dict[str, Any] = {"type": self.get_type_name()}
+        result: dict[str, object] = {"type": self.get_type_name()}
         if self.description:
             result["description"] = self.description
         return result
@@ -99,7 +99,7 @@ class StringType(FlextSingerType):
         """Get type name for string."""
         return "string"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with string-specific properties."""
         result = super().to_singer_dict()
         if self.max_length is not None:
@@ -127,7 +127,7 @@ class IntegerType(FlextSingerType):
         """Get type name for integer."""
         return "integer"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with integer-specific properties."""
         result = super().to_singer_dict()
         if self.minimum is not None:
@@ -155,7 +155,7 @@ class NumberType(FlextSingerType):
         """Get type name for number."""
         return "number"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with number-specific properties."""
         result = super().to_singer_dict()
         if self.minimum is not None:
@@ -185,7 +185,7 @@ class DateTimeType(FlextSingerType):
         """Get type name for datetime."""
         return "string"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with datetime format."""
         result = super().to_singer_dict()
         result["format"] = self.format
@@ -212,7 +212,7 @@ class ArrayType(FlextSingerType):
         """Get type name for array."""
         return "array"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with array-specific properties."""
         result = super().to_singer_dict()
         result["items"] = self.items.to_singer_dict()
@@ -241,7 +241,7 @@ class ObjectType(FlextSingerType):
         """Get type name for object."""
         return "object"
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer dictionary with object-specific properties."""
         result = super().to_singer_dict()
         result["properties"] = {
@@ -257,7 +257,7 @@ class ObjectType(FlextSingerType):
 # =============================================================================
 
 
-class FlextSingerSchema:
+class FlextSingerSchemaDefinition:
     """Complete abstraction of Singer schema definitions."""
 
     def __init__(
@@ -275,7 +275,7 @@ class FlextSingerSchema:
         self.replication_keys = replication_keys or []
         self.description = description
 
-    def to_singer_schema(self) -> dict[str, Any]:
+    def to_singer_schema(self) -> dict[str, object]:
         """Convert to Singer schema dictionary format."""
         return {
             "type": "object",
@@ -286,31 +286,33 @@ class FlextSingerSchema:
             "additionalProperties": True,
         }
 
-    def to_catalog_entry(self) -> dict[str, Any]:
+    def to_catalog_entry(self) -> dict[str, object]:
         """Convert to Singer catalog entry format."""
-        metadata: list[dict[str, Any]] = []
+        metadata: list[dict[str, object]] = []
 
         # Add table-level metadata
-        table_metadata = {
-            "breadcrumb": [],
-            "metadata": {
-                "replication-method": "FULL_TABLE",
-                "selected": True,
-            },
+        table_metadata_dict: dict[str, object] = {
+            "replication-method": "FULL_TABLE",
+            "selected": True,
         }
         if self.replication_keys:
-            table_metadata["metadata"]["replication-method"] = "INCREMENTAL"
-            table_metadata["metadata"]["replication-key"] = self.replication_keys[0]
+            table_metadata_dict["replication-method"] = "INCREMENTAL"
+            table_metadata_dict["replication-key"] = self.replication_keys[0]
 
+        table_metadata: dict[str, object] = {
+            "breadcrumb": [],
+            "metadata": table_metadata_dict,
+        }
         metadata.append(table_metadata)
 
         # Add field-level metadata
         for field_name in self.properties:
-            field_metadata = {
+            field_metadata_dict: dict[str, object] = {
+                "inclusion": "automatic" if field_name in self.primary_keys else "available",
+            }
+            field_metadata: dict[str, object] = {
                 "breadcrumb": ["properties", field_name],
-                "metadata": {
-                    "inclusion": "automatic" if field_name in self.primary_keys else "available",
-                },
+                "metadata": field_metadata_dict,
             }
             metadata.append(field_metadata)
 
@@ -334,7 +336,7 @@ class FlextSingerMessage:
         """Initialize Singer message."""
         self.type = message_type
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer message dictionary format."""
         return {"type": self.type}
 
@@ -342,14 +344,14 @@ class FlextSingerMessage:
 class FlextSingerRecord(FlextSingerMessage):
     """FlextSinger RECORD message abstraction."""
 
-    def __init__(self, stream: str, record: dict[str, Any], time_extracted: str | None = None) -> None:
+    def __init__(self, stream: str, record: dict[str, object], time_extracted: str | None = None) -> None:
         """Initialize Singer RECORD message."""
         super().__init__("RECORD")
         self.stream = stream
         self.record = record
         self.time_extracted = time_extracted
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer RECORD message format."""
         result = super().to_singer_dict()
         result["stream"] = self.stream
@@ -362,14 +364,14 @@ class FlextSingerRecord(FlextSingerMessage):
 class FlextSingerSchema(FlextSingerMessage):
     """FlextSinger SCHEMA message abstraction."""
 
-    def __init__(self, stream: str, schema: FlextSingerSchema, key_properties: list[str] | None = None) -> None:
+    def __init__(self, stream: str, schema: FlextSingerSchemaDefinition, key_properties: list[str] | None = None) -> None:
         """Initialize Singer SCHEMA message."""
         super().__init__("SCHEMA")
         self.stream = stream
         self.schema = schema
         self.key_properties = key_properties or []
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer SCHEMA message format."""
         result = super().to_singer_dict()
         result["stream"] = self.stream
@@ -381,12 +383,12 @@ class FlextSingerSchema(FlextSingerMessage):
 class FlextSingerState(FlextSingerMessage):
     """FlextSinger STATE message abstraction."""
 
-    def __init__(self, value: dict[str, Any]) -> None:
+    def __init__(self, value: dict[str, object]) -> None:
         """Initialize Singer STATE message."""
         super().__init__("STATE")
         self.value = value
 
-    def to_singer_dict(self) -> dict[str, Any]:
+    def to_singer_dict(self) -> dict[str, object]:
         """Convert to Singer STATE message format."""
         result = super().to_singer_dict()
         result["value"] = self.value
@@ -401,25 +403,30 @@ class FlextSingerState(FlextSingerMessage):
 class FlextPropertiesList:
     """Singer SDK PropertiesList compatibility class."""
 
-    def __init__(self, properties: tuple[dict[str, Any], ...]) -> None:
+    def __init__(self, properties: tuple[dict[str, object], ...]) -> None:
         """Initialize properties list."""
         self.properties = properties
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert to Singer schema format."""
-        schema_properties = {}
-        required = []
+        schema_properties: dict[str, object] = {}
+        required: list[str] = []
 
         for prop in self.properties:
-            name = prop["name"]
+            name_obj = prop["name"]
             prop_type = prop["type"]
             is_required = prop.get("required", False)
 
+            # Type-safe extraction with proper validation
+            if not isinstance(name_obj, str):
+                continue
+            name = name_obj
+            
             schema_properties[name] = prop_type
             if is_required:
                 required.append(name)
 
-        result = {
+        result: dict[str, object] = {
             "type": "object",
             "properties": schema_properties,
         }
@@ -520,9 +527,9 @@ class FlextSingerTypes:
         primary_keys: list[str] | None = None,
         replication_keys: list[str] | None = None,
         description: str | None = None,
-    ) -> FlextSingerSchema:
+    ) -> FlextSingerSchemaDefinition:
         """Create a complete stream schema definition."""
-        return FlextSingerSchema(
+        return FlextSingerSchemaDefinition(
             stream_name=stream_name,
             properties=properties,
             primary_keys=primary_keys,
@@ -534,7 +541,7 @@ class FlextSingerTypes:
     def create_record_message(
         self,
         stream: str,
-        record: dict[str, Any],
+        record: dict[str, object],
         time_extracted: str | None = None,
     ) -> FlextSingerRecord:
         """Create a Singer RECORD message."""
@@ -547,7 +554,7 @@ class FlextSingerTypes:
     def create_schema_message(
         self,
         stream: str,
-        schema: FlextSingerSchema,
+        schema: FlextSingerSchemaDefinition,
         key_properties: list[str] | None = None,
     ) -> FlextSingerSchema:
         """Create a Singer SCHEMA message."""
@@ -557,7 +564,7 @@ class FlextSingerTypes:
             key_properties=key_properties,
         )
 
-    def create_state_message(self, value: dict[str, Any]) -> FlextSingerState:
+    def create_state_message(self, value: dict[str, object]) -> FlextSingerState:
         """Create a Singer STATE message."""
         return FlextSingerState(value=value)
 
@@ -569,7 +576,7 @@ class FlextSingerTypes:
         property_type: FlextSingerType,
         required: bool = False,
         description: str | None = None
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Create a Singer schema property (Singer SDK compatibility)."""
         prop_def = property_type.to_singer_dict()
         if description:
@@ -581,11 +588,11 @@ class FlextSingerTypes:
             "required": required,
         }
 
-    def PropertiesList(self, *properties: dict[str, Any]) -> FlextPropertiesList:
+    def PropertiesList(self, *properties: dict[str, object]) -> FlextPropertiesList:
         """Create a properties list (Singer SDK compatibility)."""
         return FlextPropertiesList(properties)
 
-    def validate_schema(self, schema: FlextSingerSchema) -> FlextResult[bool]:
+    def validate_schema(self, schema: FlextSingerSchemaDefinition) -> FlextResult[bool]:
         """Validate a FlextSinger schema definition."""
         try:
             if not schema.stream_name:
