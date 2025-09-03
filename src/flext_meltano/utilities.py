@@ -169,7 +169,7 @@ class FlextMeltanoUtilities:
             with target_path.open("w", encoding="utf-8") as f:
                 yaml.dump(config, f, default_flow_style=False, indent=2)
 
-            return FlextResult.ok(True)
+            return FlextResult.ok(data=True)
 
         except Exception as e:
             error_msg = f"Failed to write meltano.yml: {e}"
@@ -345,7 +345,7 @@ class FlextMeltanoUtilities:
             name = plugin_data.get("name", "unknown")
             plugin_type = plugin_data.get("type", "unknown")
 
-            adapted_data = {
+            adapted_data: dict[str, object] = {
                 "id": name,
                 "name": name,
                 "type": plugin_type,
@@ -357,7 +357,7 @@ class FlextMeltanoUtilities:
                     "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 },
             }
-            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(adapted_data)
+            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(adapted_data)  # type: ignore[arg-type]  # Complex nested dict type conversion
         except Exception as e:
             error_msg = f"Failed to adapt Meltano plugin: {e}"
             logger.exception(error_msg)
@@ -607,7 +607,7 @@ class FlextMeltanoUtilities:
             if field not in config or not config.get(field):
                 return FlextResult.fail(f"Missing required field: {field}")
 
-        return FlextResult.ok(True)
+        return FlextResult.ok(data=True)
 
     # Legacy aliases for backward compatibility
     @classmethod

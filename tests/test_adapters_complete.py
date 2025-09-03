@@ -205,11 +205,11 @@ class TestFlextMeltanoAdapterComplete:
         bridge_class = getattr(adapter, "Bridge")
         assert bridge_class is not None
 
-        # Test Bridge instantiation - may require parameters
-        import pytest
-
-        with pytest.raises((TypeError, AttributeError)):
-            bridge_class()
+        # Test Bridge instantiation - should work after consolidation
+        bridge_instance = bridge_class()
+        assert bridge_instance is not None
+        # Bridge should have execute method (FlextDomainService requirement)
+        assert hasattr(bridge_instance, "execute")
 
     def test_nested_project_manager_class_access(self) -> None:
         """Test access to nested ProjectManager class."""
@@ -220,11 +220,12 @@ class TestFlextMeltanoAdapterComplete:
         pm_class = getattr(adapter, "ProjectManager")
         assert pm_class is not None
 
-        # Test ProjectManager instantiation - may require parameters
-        import pytest
+        # Test ProjectManager instantiation - should work without parameters
+        project_manager = pm_class()
+        assert project_manager is not None
 
-        with pytest.raises((TypeError, AttributeError)):
-            pm_class()
+        # Verify it has the expected methods
+        assert hasattr(project_manager, "validate_project")
 
     def test_nested_plugin_discovery_class_access(self) -> None:
         """Test access to nested PluginDiscovery class."""
@@ -235,11 +236,12 @@ class TestFlextMeltanoAdapterComplete:
         pd_class = getattr(adapter, "PluginDiscovery")
         assert pd_class is not None
 
-        # Test PluginDiscovery instantiation - may require parameters
-        import pytest
+        # Test PluginDiscovery instantiation - should work without parameters
+        plugin_discovery = pd_class()
+        assert plugin_discovery is not None
 
-        with pytest.raises((TypeError, AttributeError)):
-            pd_class()
+        # Verify it has the expected methods
+        assert hasattr(plugin_discovery, "get_plugin_info")
 
     def test_nested_elt_coordinator_class_access(self) -> None:
         """Test access to nested ELTCoordinator class."""
@@ -250,11 +252,12 @@ class TestFlextMeltanoAdapterComplete:
         elt_class = getattr(adapter, "ELTCoordinator")
         assert elt_class is not None
 
-        # Test ELTCoordinator instantiation - may require parameters
-        import pytest
+        # Test ELTCoordinator instantiation - should work without parameters
+        elt_coordinator = elt_class()
+        assert elt_coordinator is not None
 
-        with pytest.raises((TypeError, AttributeError)):
-            elt_class()
+        # Verify it has the expected methods
+        assert hasattr(elt_coordinator, "_logger")
 
     def test_error_handling_invalid_project_path(self) -> None:
         """Test error handling with invalid paths."""

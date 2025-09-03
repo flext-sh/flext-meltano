@@ -63,28 +63,15 @@ class FlextMeltanoService:
 
         def __init__(self, /, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            super().__init__(**data)
+            # Pass data directly to Pydantic - it handles type conversion
+            super().__init__(**data)  # type: ignore[arg-type]  # Pydantic handles object->field type conversion
 
         @property
-        def wrapper_singer(self) -> object:
-            """Get Singer wrapper for tap operations."""
-            from flext_meltano.adapters import FlextMeltanoWrapper
+        def adapter(self) -> object:
+            """Get unified Meltano adapter for all operations."""
+            from flext_meltano.adapters import FlextMeltanoAdapter
 
-            return FlextMeltanoWrapper()
-
-        @property
-        def singer_adapter(self) -> object:
-            """Get Singer adapter for tap operations."""
-            from flext_meltano.adapters import FlextMeltanoAdapters
-
-            return FlextMeltanoAdapters()
-
-        @property
-        def type_adapters(self) -> object:
-            """Get modern type adapters for tap operations."""
-            from flext_meltano.adapters import FlextMeltanoTypeAdapters
-
-            return FlextMeltanoTypeAdapters()
+            return FlextMeltanoAdapter()
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
             """Execute tap service operation (required by FlextDomainService)."""
@@ -93,13 +80,11 @@ class FlextMeltanoService:
             logger = FlextLogger(__name__)
             logger.info("Executing tap service", tap_name=self.tap_name)
 
-            return FlextResult.ok(
-                {
-                    "service": "FlextMeltanoTapService",
-                    "tap_name": self.tap_name,
-                    "status": "ready",
-                }
-            )
+            return FlextResult.ok({
+                "service": "FlextMeltanoTapService",
+                "tap_name": self.tap_name,
+                "status": "ready",
+            })
 
         def validate_config(self) -> FlextResult[None]:
             """Validate tap configuration using local types."""
@@ -111,9 +96,11 @@ class FlextMeltanoService:
 
         def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
             """Get service information."""
-            return FlextResult.ok(
-                {"service_type": "tap", "name": self.tap_name, "status": "ready"}
-            )
+            return FlextResult.ok({
+                "service_type": "tap",
+                "name": self.tap_name,
+                "status": "ready",
+            })
 
         def create_tap_instance(self, config: dict[str, object]) -> FlextResult[object]:
             """Create tap instance with configuration."""
@@ -132,7 +119,7 @@ class FlextMeltanoService:
             if not config:
                 return FlextResult.fail("Empty configuration provided")
 
-            return FlextResult.ok(True)
+            return FlextResult.ok(data=True)
 
         def get_default_config(self) -> FlextResult[dict[str, object]]:
             """Get default configuration for tap."""
@@ -158,28 +145,15 @@ class FlextMeltanoService:
 
         def __init__(self, /, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            super().__init__(**data)
+            # Pass data directly to Pydantic - it handles type conversion
+            super().__init__(**data)  # type: ignore[arg-type]  # Pydantic handles object->field type conversion
 
         @property
-        def wrapper_singer(self) -> object:
-            """Get Singer wrapper for target operations."""
-            from flext_meltano.adapters import FlextMeltanoWrapper
+        def adapter(self) -> object:
+            """Get unified Meltano adapter for all operations."""
+            from flext_meltano.adapters import FlextMeltanoAdapter
 
-            return FlextMeltanoWrapper()
-
-        @property
-        def singer_adapter(self) -> object:
-            """Get Singer adapter for target operations."""
-            from flext_meltano.adapters import FlextMeltanoAdapters
-
-            return FlextMeltanoAdapters()
-
-        @property
-        def type_adapters(self) -> object:
-            """Get modern type adapters for target operations."""
-            from flext_meltano.adapters import FlextMeltanoTypeAdapters
-
-            return FlextMeltanoTypeAdapters()
+            return FlextMeltanoAdapter()
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
             """Execute target service operation (required by FlextDomainService)."""
@@ -188,23 +162,19 @@ class FlextMeltanoService:
             logger = FlextLogger(__name__)
             logger.info("Executing target service", target_name=self.target_name)
 
-            return FlextResult.ok(
-                {
-                    "service": "FlextMeltanoTargetService",
-                    "target_name": self.target_name,
-                    "status": "ready",
-                }
-            )
+            return FlextResult.ok({
+                "service": "FlextMeltanoTargetService",
+                "target_name": self.target_name,
+                "status": "ready",
+            })
 
         def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
             """Get service information."""
-            return FlextResult.ok(
-                {
-                    "service_type": "target",
-                    "name": self.target_name,
-                    "status": "ready",
-                }
-            )
+            return FlextResult.ok({
+                "service_type": "target",
+                "name": self.target_name,
+                "status": "ready",
+            })
 
         def create_target_instance(
             self, config: dict[str, object]
@@ -231,7 +201,7 @@ class FlextMeltanoService:
             if "output_file" not in config:
                 return FlextResult.fail("Missing required field: output_file")
 
-            return FlextResult.ok(True)
+            return FlextResult.ok(data=True)
 
         def get_default_config(self) -> FlextResult[dict[str, object]]:
             """Get default configuration for target."""
@@ -257,28 +227,15 @@ class FlextMeltanoService:
 
         def __init__(self, /, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            super().__init__(**data)
+            # Pass data directly to Pydantic - it handles type conversion
+            super().__init__(**data)  # type: ignore[arg-type]  # Pydantic handles object->field type conversion
 
         @property
-        def wrapper_dbt(self) -> object:
-            """Get DBT wrapper for DBT operations."""
-            from flext_meltano.adapters import FlextMeltanoWrapper
-
-            return FlextMeltanoWrapper()
-
-        @property
-        def dbt_adapter(self) -> object:
-            """Get DBT adapter for DBT operations."""
+        def adapter(self) -> object:
+            """Get unified Meltano adapter for all operations."""
             from flext_meltano.adapters import FlextMeltanoAdapter
 
             return FlextMeltanoAdapter()
-
-        @property
-        def type_adapters(self) -> object:
-            """Get modern type adapters for DBT operations."""
-            from flext_meltano.adapters import FlextMeltanoTypeAdapters
-
-            return FlextMeltanoTypeAdapters()
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
             """Execute DBT service operation (required by FlextDomainService)."""
@@ -287,30 +244,28 @@ class FlextMeltanoService:
             logger = FlextLogger(__name__)
             logger.info("Executing DBT service", project_name=self.project_name)
 
-            return FlextResult.ok(
-                {
-                    "service": "FlextMeltanoDbtService",
-                    "project_name": self.project_name,
-                    "status": "ready",
-                }
-            )
+            return FlextResult.ok({
+                "service": "FlextMeltanoDbtService",
+                "project_name": self.project_name,
+                "status": "ready",
+            })
 
         def get_info(self) -> FlextResult[FlextMeltanoTypes.DBT.ExecutionResult]:
             """Get service information."""
-            return FlextResult.ok(
-                {"service_type": "dbt", "name": self.project_name, "status": "ready"}
-            )
+            return FlextResult.ok({
+                "service_type": "dbt",
+                "name": self.project_name,
+                "status": "ready",
+            })
 
         def get_profiles_config(self) -> FlextResult[dict[str, object]]:
             """Get DBT profiles configuration."""
-            return FlextResult.ok(
-                {
-                    self.project_name: {
-                        "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
-                        "target": "dev",
-                    }
+            return FlextResult.ok({
+                self.project_name: {
+                    "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
+                    "target": "dev",
                 }
-            )
+            })
 
     # Service factory methods using flext-core patterns
     @staticmethod

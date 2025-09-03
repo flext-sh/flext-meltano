@@ -14,14 +14,14 @@ import tempfile
 from pathlib import Path
 from typing import TypeVar, cast
 
-# Type variables
-T = TypeVar("T")
-
 from flext_core import (
     FlextLogger,
     FlextResult,
     FlextUtilities,
 )
+
+# Type variables
+T = TypeVar("T")
 
 logger = FlextLogger(__name__)
 
@@ -85,7 +85,7 @@ class FlextMeltanoValidators(FlextUtilities):
             if not cls.is_non_empty_string(field_value):
                 return FlextResult.fail(f"Field '{field}' must be a non-empty string")
 
-        return FlextResult.ok(True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
@@ -124,7 +124,7 @@ class FlextMeltanoValidators(FlextUtilities):
         if not cls.is_non_empty_string(project_id):
             return FlextResult.fail("project_id must be a non-empty string")
 
-        return FlextResult.ok(True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
@@ -159,7 +159,7 @@ class FlextMeltanoValidators(FlextUtilities):
                     f"DBT field '{field}' must be a non-empty string"
                 )
 
-        return FlextResult.ok(True)
+        return FlextResult.ok(data=True)
 
     # =================================================================
     # PATH VALIDATION (Meltano-specific extensions of FlextUtilities)
