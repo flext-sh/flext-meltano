@@ -689,10 +689,13 @@ class FlextMeltanoExecutor:
         class MeltanoCliHandler:
             """CLI handler using flext-cli patterns."""
 
+            name = "flext-meltano"  # Required by Click testing
+
             def __init__(
                 self,
                 project_root: str = ".",
                 output: str = "table",
+                *,
                 debug: bool = False,
             ) -> None:
                 self.project_root = Path(project_root)

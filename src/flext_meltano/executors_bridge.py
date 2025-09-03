@@ -11,7 +11,7 @@ from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult
 
-from flext_meltano.adapters import FlextMeltanoAdapter, FlextMeltanoWrapper
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
 
 logger = FlextLogger(__name__)
@@ -23,7 +23,7 @@ class FlextMeltanoBridge:
     def __init__(self) -> None:
         # Avoid circular dependency - don't create FlextMeltanoExecutor here
         self.adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
-        self.wrapper: FlextMeltanoWrapper = FlextMeltanoWrapper()
+# Unified adapter - no need for separate wrapper
         self._current_project: object | None = None
         # Create logger with specific name expected by tests
         self.logger = FlextLogger("MeltanoBridge")

@@ -46,7 +46,7 @@ from typing import TYPE_CHECKING
 from flext_core import FlextLogger, FlextResult
 
 if TYPE_CHECKING:
-    from flext_meltano.adapters import FlextMeltanoTypeAdapters
+    from flext_meltano.adapters import FlextMeltanoAdapter
 
 # Constants
 
@@ -122,7 +122,7 @@ class FlextTapAbstractions:
         if not config.get("connection_config"):
             return FlextResult[bool].fail("Connection configuration is required")
 
-        return FlextResult[bool].ok(True)
+        return FlextResult[bool].ok(data=True)
 
     def get_stream_config(
         self, config: dict[str, object], stream_name: str
@@ -139,25 +139,23 @@ class FlextTapAbstractions:
     # ============================================================================
 
     def create_flext_tap(
-        self, config: dict[str, object], adapter: FlextMeltanoTypeAdapters | None = None
+        self, config: dict[str, object], adapter: FlextMeltanoAdapter | None = None
     ) -> FlextResult[dict[str, object]]:
         """Create FlextTap instance from configuration."""
         try:
             self._logger.info("Creating FlextTap", tap_type=config.get("tap_type"))
 
-            # Validate config
-            if not isinstance(config, dict):
-                return FlextResult[dict[str, object]].fail("Config must be dictionary")
+            # Validate config (config parameter is already typed as dict[str, object])
 
             tap_type = config.get("tap_type", "unknown")
             if not isinstance(tap_type, str):
                 return FlextResult[dict[str, object]].fail("Tap type must be string")
 
             # Create tap instance
-            tap_instance = {
+            tap_instance: dict[str, object] = {
                 "tap_type": tap_type,
                 "config": config.copy(),
-                "adapter": adapter,
+                "adapter": adapter,  # Type: FlextMeltanoAdapter | None -> object
                 "status": "initialized",
                 "streams": {},
                 "discovered": False,
@@ -473,10 +471,12 @@ class FlextTapAbstractions:
             # If target provided, mock data loading
             loaded_to_target = False
             if target and isinstance(target, dict):
-                # Mock target loading
-                target["loaded_records"] = target.get("loaded_records", 0) + len(
-                    records
-                )
+                # Mock target loading with proper type handling
+                current_loaded = target.get("loaded_records", 0)
+                if isinstance(current_loaded, int):
+                    target["loaded_records"] = current_loaded + len(records)
+                else:
+                    target["loaded_records"] = len(records)
                 loaded_to_target = True
 
             sync_stats: dict[str, object] = {

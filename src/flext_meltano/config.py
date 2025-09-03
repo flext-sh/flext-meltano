@@ -232,7 +232,7 @@ class FlextMeltanoConfig(BaseModel):
 
     @field_validator("project_root", "config_dir", "logs_dir", "venv_dir")
     @classmethod
-    def validate_paths(cls, v: Path) -> Path:
+    def validate_paths(cls, v: Path | str) -> Path:
         """Validate and convert path fields."""
         if isinstance(v, str):
             v = Path(v)
@@ -377,7 +377,7 @@ class FlextMeltanoConfig(BaseModel):
 
     @classmethod
     def create_for_environment(
-        cls, environment: str, **kwargs
+        cls, environment: str, **kwargs: object
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration for specific environment."""
         try:
@@ -392,7 +392,7 @@ class FlextMeltanoConfig(BaseModel):
             # Filter kwargs to valid fields only
             valid_fields = cls.model_fields.keys()
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_fields}
-            config = cls(environment=env_type, **filtered_kwargs)
+            config = cls(environment=env_type, **filtered_kwargs)  # type: ignore[arg-type]  # Pydantic handles type conversion
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
         except Exception as e:

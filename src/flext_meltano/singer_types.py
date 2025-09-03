@@ -205,7 +205,7 @@ class FlextSingerTypes:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer schema definition."""
         try:
-            schema = {"type": "object", "properties": properties}
+            schema: dict[str, object] = {"type": "object", "properties": properties}
 
             # Add optional metadata
             for key in ["required", "additionalProperties", "description"]:
@@ -227,7 +227,7 @@ class FlextSingerTypes:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer RECORD message."""
         try:
-            message = {"type": "RECORD", "stream": stream, "record": record}
+            message: dict[str, object] = {"type": "RECORD", "stream": stream, "record": record}
 
             # Add optional fields
             for key in ["time_extracted", "version"]:
@@ -249,7 +249,7 @@ class FlextSingerTypes:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer SCHEMA message."""
         try:
-            message = {
+            message: dict[str, object] = {
                 "type": "SCHEMA",
                 "stream": stream,
                 "schema": schema,
@@ -272,7 +272,7 @@ class FlextSingerTypes:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer STATE message."""
         try:
-            message = {"type": "STATE", "value": value}
+            message: dict[str, object] = {"type": "STATE", "value": value}
             return FlextResult[dict[str, object]].ok(message)
         except Exception as e:
             return FlextResult[dict[str, object]].fail(
@@ -295,10 +295,8 @@ class FlextSingerTypes:
                         f"Invalid property definition for {prop_name}"
                     )
 
-            # Convert nested dict to match return type
-            properties_flat: dict[str, object] = {}
-            for key, value in properties.items():
-                properties_flat[key] = value
+            # Convert nested dict to match return type using dict()
+            properties_flat: dict[str, object] = dict(properties.items())
             return FlextResult[dict[str, object]].ok(properties_flat)
         except Exception as e:
             return FlextResult[dict[str, object]].fail(
