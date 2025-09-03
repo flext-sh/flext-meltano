@@ -40,9 +40,19 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Generator
-from typing import Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_core import FlextLogger, FlextResult
+
+# Type aliases to replace explicit Any
+RecordDict = dict[str, object]
+ConfigDict = dict[str, object]
+SchemaDict = dict[str, object]
+StateDict = dict[str, object]
+ResultDict = dict[str, object]
+
+if TYPE_CHECKING:
+    from flext_meltano.flext_type_adapters import FlextMeltanoTypeAdapters
 
 # Initialize logger
 logger = FlextLogger(__name__)
@@ -56,7 +66,7 @@ logger = FlextLogger(__name__)
 class FlextStreamExtractor(Protocol):
     """Protocol for FlextStream data extraction operations."""
 
-    def extract_records(self, config: dict[str, Any] | None = None) -> FlextResult[Generator[dict[str, Any]]]:
+    def extract_records(self, config: dict[str, object] | None = None) -> FlextResult[Generator[dict[str, object]]]:
         """Extract records from stream."""
         ...
 
@@ -77,7 +87,7 @@ class FlextTapDiscovery(Protocol):
         """Discover available streams."""
         ...
 
-    def generate_catalog(self) -> FlextResult[dict[str, Any]]:
+    def generate_catalog(self) -> FlextResult[dict[str, object]]:
         """Generate Singer catalog."""
         ...
 
@@ -100,9 +110,9 @@ class FlextTapConfig:
     def __init__(
         self,
         tap_type: str,
-        connection_config: dict[str, Any],
-        stream_config: dict[str, Any] | None = None,
-        **kwargs: Any,
+        connection_config: dict[str, object],
+        stream_config: dict[str, object] | None = None,
+        **kwargs: object,
     ) -> None:
         """Initialize FlextTap configuration."""
         self.tap_type = tap_type
@@ -110,7 +120,7 @@ class FlextTapConfig:
         self.stream_config = stream_config or {}
         self.additional_config = kwargs
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert configuration to dictionary format."""
         return {
             "tap_type": self.tap_type,
@@ -129,9 +139,10 @@ class FlextTapConfig:
 
         return FlextResult[bool].ok(True)
 
-    def get_stream_config(self, stream_name: str) -> dict[str, Any]:
+    def get_stream_config(self, stream_name: str) -> dict[str, object]:
         """Get configuration for specific stream."""
-        return self.stream_config.get(stream_name, {})
+        config = self.stream_config.get(stream_name, {})
+        return config if isinstance(config, dict) else {}
 
 
 # =============================================================================
@@ -145,7 +156,7 @@ class FlextTapStream:
     def __init__(
         self,
         stream_name: str,
-        schema: dict[str, Any],
+        schema: dict[str, object],
         tap_config: FlextTapConfig,
         adapter: FlextMeltanoTypeAdapters,
     ) -> None:
@@ -157,23 +168,23 @@ class FlextTapStream:
         self._logger = FlextLogger(f"{__name__}.FlextTapStream")
         self._records_extracted = 0
 
-    def get_schema(self) -> FlextResult[dict[str, Any]]:
+    def get_schema(self) -> FlextResult[dict[str, object]]:
         """Get stream schema with error handling."""
         try:
             if not self.schema:
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"No schema available for stream {self.stream_name}"
                 )
 
             self._logger.debug("Schema retrieved for stream", stream_name=self.stream_name)
-            return FlextResult[dict[str, Any]].ok(self.schema)
+            return FlextResult[dict[str, object]].ok(self.schema)
 
         except Exception as e:
             error_msg = f"Failed to get schema for stream {self.stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
-    def extract_records(self, limit: int | None = None) -> FlextResult[list[dict[str, Any]]]:
+    def extract_records(self, limit: int | None = None) -> FlextResult[list[dict[str, object]]]:
         """Extract records from stream with error handling.
 
         Args:
@@ -188,7 +199,7 @@ class FlextTapStream:
 
             # This would be implemented by concrete stream classes
             # For now, return empty result as placeholder
-            records: list[dict[str, Any]] = []
+            records: list[dict[str, object]] = []
 
             # Update extraction count
             self._records_extracted = len(records)
@@ -199,23 +210,25 @@ class FlextTapStream:
                 records_extracted=self._records_extracted
             )
 
-            return FlextResult[list[dict[str, Any]]].ok(records)
+            return FlextResult[list[dict[str, object]]].ok(records)
 
         except Exception as e:
             error_msg = f"Failed to extract records from stream {self.stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[list[dict[str, Any]]].fail(error_msg)
+            return FlextResult[list[dict[str, object]]].fail(error_msg)
 
-    def get_catalog_entry(self) -> FlextResult[dict[str, Any]]:
+    def get_catalog_entry(self) -> FlextResult[dict[str, object]]:
         """Generate Singer catalog entry for this stream."""
         try:
             # Extract primary keys from schema
             primary_keys = []
             if "properties" in self.schema:
-                # This is a simple heuristic - real implementations would be more sophisticated
-                for prop_name, prop_def in self.schema["properties"].items():
-                    if isinstance(prop_def, dict) and prop_def.get("primary_key"):
-                        primary_keys.append(prop_name)
+                properties = self.schema["properties"]
+                if isinstance(properties, dict):
+                    # This is a simple heuristic - real implementations would be more sophisticated
+                    for prop_name, prop_def in properties.items():
+                        if isinstance(prop_def, dict) and prop_def.get("primary_key"):
+                            primary_keys.append(prop_name)
 
             # Create metadata entries
             metadata = [
@@ -228,16 +241,18 @@ class FlextTapStream:
                 }
             ]
 
-            # Add field-level metadata
+            # Add field-level metadata  
             if "properties" in self.schema:
-                for field_name in self.schema["properties"]:
-                    field_metadata = {
-                        "breadcrumb": ["properties", field_name],
-                        "metadata": {
-                            "inclusion": "automatic" if field_name in primary_keys else "available",
-                        },
-                    }
-                    metadata.append(field_metadata)
+                properties = self.schema["properties"]
+                if isinstance(properties, dict):
+                    for field_name in properties:
+                        field_metadata = {
+                            "breadcrumb": ["properties", field_name],
+                            "metadata": {
+                                "inclusion": "automatic" if field_name in primary_keys else "available",
+                            },
+                        }
+                        metadata.append(field_metadata)
 
             catalog_entry = {
                 "tap_stream_id": self.stream_name,
@@ -246,12 +261,12 @@ class FlextTapStream:
                 "metadata": metadata,
             }
 
-            return FlextResult[dict[str, Any]].ok(catalog_entry)
+            return FlextResult[dict[str, object]].ok(catalog_entry)
 
         except Exception as e:
             error_msg = f"Failed to generate catalog entry for stream {self.stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def get_stats(self) -> dict[str, object]:
         """Get stream extraction statistics."""
@@ -351,7 +366,7 @@ class FlextTap:
             self._logger.exception(error_msg)
             return FlextResult[FlextTapStream].fail(error_msg)
 
-    def generate_catalog(self) -> FlextResult[dict[str, Any]]:
+    def generate_catalog(self) -> FlextResult[dict[str, object]]:
         """Generate Singer catalog with all discovered streams."""
         try:
             self._logger.info("Generating Singer catalog")
@@ -359,7 +374,7 @@ class FlextTap:
             if not self._discovered:
                 discovery_result = self.discover_streams()
                 if discovery_result.failure:
-                    return FlextResult[dict[str, Any]].fail(
+                    return FlextResult[dict[str, object]].fail(
                         f"Stream discovery failed: {discovery_result.error}"
                     )
 
@@ -368,7 +383,7 @@ class FlextTap:
             for stream in self._streams.values():
                 entry_result = stream.get_catalog_entry()
                 if entry_result.failure:
-                    return FlextResult[dict[str, Any]].fail(
+                    return FlextResult[dict[str, object]].fail(
                         f"Failed to generate catalog entry for {stream.name}: {entry_result.error}"
                     )
                 streams_catalog.append(entry_result.value)
@@ -379,12 +394,12 @@ class FlextTap:
             }
 
             self._logger.info("Singer catalog generated successfully", stream_count=len(streams_catalog))
-            return FlextResult[dict[str, Any]].ok(catalog)
+            return FlextResult[dict[str, object]].ok(catalog)
 
         except Exception as e:
             error_msg = f"Failed to generate catalog: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     def sync_stream(self, stream_name: str, target: FlextTarget | None = None) -> FlextResult[dict[str, object]]:
         """Sync stream data to target or return extraction results.
@@ -403,14 +418,14 @@ class FlextTap:
             # Get stream
             stream_result = self.get_stream_by_name(stream_name)
             if stream_result.failure:
-                return FlextResult[dict[str, object]].fail(stream_result.error)
+                return FlextResult[dict[str, object]].fail(stream_result.error or "Unknown error")
 
             stream = stream_result.value
 
             # Extract records
             records_result = stream.extract_records()
             if records_result.failure:
-                return FlextResult[dict[str, object]].fail(records_result.error)
+                return FlextResult[dict[str, object]].fail(records_result.error or "Unknown error")
 
             records = records_result.value
 
@@ -419,17 +434,17 @@ class FlextTap:
                 # Process schema message
                 schema_result = stream.get_schema()
                 if schema_result.failure:
-                    return FlextResult[dict[str, object]].fail(schema_result.error)
+                    return FlextResult[dict[str, object]].fail(schema_result.error or "Unknown error")
 
                 schema_process_result = target.process_schema_message(stream_name, schema_result.value)
                 if schema_process_result.failure:
-                    return FlextResult[dict[str, object]].fail(schema_process_result.error)
+                    return FlextResult[dict[str, object]].fail(schema_process_result.error or "Unknown error")
 
                 # Process records
                 for record in records:
                     record_process_result = target.process_record_message(stream_name, record)
                     if record_process_result.failure:
-                        return FlextResult[dict[str, object]].fail(record_process_result.error)
+                        return FlextResult[dict[str, object]].fail(record_process_result.error or "Unknown error")
 
             sync_stats: dict[str, object] = {
                 "stream_name": stream_name,
@@ -472,9 +487,9 @@ class FlextTap:
 
 def create_flext_tap_config(
     tap_type: str,
-    connection_config: dict[str, Any],
-    stream_config: dict[str, Any] | None = None,
-    **kwargs: Any,
+    connection_config: dict[str, object],
+    stream_config: dict[str, object] | None = None,
+    **kwargs: object,
 ) -> FlextResult[FlextTapConfig]:
     """Create FlextTap configuration with validation."""
     try:
@@ -487,7 +502,7 @@ def create_flext_tap_config(
 
         validation_result = config.validate()
         if validation_result.failure:
-            return FlextResult[FlextTapConfig].fail(validation_result.error)
+            return FlextResult[FlextTapConfig].fail(validation_result.error or "Unknown error")
 
         return FlextResult[FlextTapConfig].ok(config)
 

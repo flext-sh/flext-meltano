@@ -107,6 +107,7 @@ class FlextStreamAdapter(Protocol):
 # FLEXT ABSTRACT BASE CLASSES - Complete abstractions for TAP/TARGET/DBT
 # =============================================================================
 
+
 @runtime_checkable
 class FlextStream(Protocol):
     """Protocol for FlextStream implementations."""
@@ -119,7 +120,9 @@ class FlextStream(Protocol):
         """Get stream schema."""
         ...
 
-    def get_records(self, config: dict[str, object] | None = None) -> FlextResult[list[dict[str, object]]]:
+    def get_records(
+        self, config: dict[str, object] | None = None
+    ) -> FlextResult[list[dict[str, object]]]:
         """Get stream records."""
         ...
 
@@ -136,7 +139,9 @@ class FlextTapBase(Protocol):
         """Get specific stream by name."""
         ...
 
-    def sync_stream(self, stream_name: str, config: dict[str, object] | None = None) -> FlextResult[dict[str, object]]:
+    def sync_stream(
+        self, stream_name: str, config: dict[str, object] | None = None
+    ) -> FlextResult[dict[str, object]]:
         """Sync specific stream data."""
         ...
 
@@ -156,7 +161,9 @@ class FlextTap:
     - Integration with flext-core patterns
     """
 
-    def __init__(self, native_tap: SingerTap, adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(
+        self, native_tap: SingerTap, adapter: FlextMeltanoTypeAdapters
+    ) -> None:
         """Initialize FlextTap wrapper.
 
         Args:
@@ -195,7 +202,7 @@ class FlextTap:
             self._logger.info(
                 "Successfully discovered streams",
                 tap_name=tap_name,
-                stream_count=len(flext_streams)
+                stream_count=len(flext_streams),
             )
 
             return FlextResult[list[FlextSingerStream]].ok(flext_streams)
@@ -241,7 +248,9 @@ class FlextTap:
 class FlextTarget:
     """Modern Flext* wrapper for Singer SDK Target with FlextResult error handling."""
 
-    def __init__(self, native_target: SingerTarget, adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(
+        self, native_target: SingerTarget, adapter: FlextMeltanoTypeAdapters
+    ) -> None:
         """Initialize FlextTarget wrapper."""
         self._native_target = native_target
         self._adapter = adapter
@@ -272,7 +281,9 @@ class FlextTarget:
 class FlextSingerStream:
     """Modern Flext* wrapper for Singer SDK Stream with FlextResult error handling."""
 
-    def __init__(self, native_stream: SingerStream, adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(
+        self, native_stream: SingerStream, adapter: FlextMeltanoTypeAdapters
+    ) -> None:
         """Initialize FlextSingerStream wrapper."""
         self._native_stream = native_stream
         self._adapter = adapter
@@ -290,14 +301,16 @@ class FlextSingerStream:
 
             # Convert schema to dict if it's not already
             if hasattr(schema, "to_dict") and callable(getattr(schema, "to_dict")):
-                schema_dict = schema.to_dict()  # type: ignore[attr-defined]
+                schema_dict = schema.to_dict()
             else:
                 schema_dict = dict(schema) if schema else {}
 
             return FlextResult[dict[str, object]].ok(schema_dict)
 
         except Exception as e:
-            error_msg = f"Failed to get schema for stream {self._native_stream.name}: {e}"
+            error_msg = (
+                f"Failed to get schema for stream {self._native_stream.name}: {e}"
+            )
             self._logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)
 
@@ -314,7 +327,9 @@ class FlextSingerStream:
 class FlextMeltanoProject:
     """Modern Flext* wrapper for Meltano Project with FlextResult error handling."""
 
-    def __init__(self, native_project: MeltanoProject, adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(
+        self, native_project: MeltanoProject, adapter: FlextMeltanoTypeAdapters
+    ) -> None:
         """Initialize FlextMeltanoProject wrapper."""
         self._native_project = native_project
         self._adapter = adapter
@@ -328,7 +343,9 @@ class FlextMeltanoProject:
             for plugin in self._native_project.plugins.plugins():
                 plugin_info: dict[str, object] = {
                     "name": plugin.name,
-                    "type": plugin.type.value if hasattr(plugin.type, "value") else str(plugin.type),
+                    "type": plugin.type.value
+                    if hasattr(plugin.type, "value")
+                    else str(plugin.type),
                     "namespace": plugin.namespace,
                 }
                 plugins.append(plugin_info)
@@ -336,7 +353,9 @@ class FlextMeltanoProject:
             return FlextResult[list[dict[str, object]]].ok(plugins)
 
         except Exception as e:
-            error_msg = f"Failed to list plugins for project {self._native_project.root}: {e}"
+            error_msg = (
+                f"Failed to list plugins for project {self._native_project.root}: {e}"
+            )
             self._logger.exception(error_msg)
             return FlextResult[list[dict[str, object]]].fail(error_msg)
 
@@ -360,7 +379,9 @@ class FlextDbt:
     - Integration with flext-core patterns
     """
 
-    def __init__(self, project_path: Path | str, adapter: FlextMeltanoTypeAdapters) -> None:
+    def __init__(
+        self, project_path: Path | str, adapter: FlextMeltanoTypeAdapters
+    ) -> None:
         """Initialize FlextDbt wrapper.
 
         Args:
@@ -368,11 +389,15 @@ class FlextDbt:
             adapter: Parent type adapter for context
 
         """
-        self._project_path = Path(project_path) if isinstance(project_path, str) else project_path
+        self._project_path = (
+            Path(project_path) if isinstance(project_path, str) else project_path
+        )
         self._adapter = adapter
         self._logger = FlextLogger(f"{__name__}.FlextDbt")
 
-    def run_models(self, model_names: list[str] | None = None) -> FlextResult[dict[str, object]]:
+    def run_models(
+        self, model_names: list[str] | None = None
+    ) -> FlextResult[dict[str, object]]:
         """Run dBT models with error handling.
 
         Args:
@@ -383,7 +408,9 @@ class FlextDbt:
 
         """
         try:
-            self._logger.info("Starting dBT model execution", project_path=str(self._project_path))
+            self._logger.info(
+                "Starting dBT model execution", project_path=str(self._project_path)
+            )
 
             # Prepare dBT command arguments
             args = ["run"]
@@ -413,7 +440,9 @@ class FlextDbt:
     def test_models(self) -> FlextResult[dict[str, object]]:
         """Run dBT tests with error handling."""
         try:
-            self._logger.info("Starting dBT test execution", project_path=str(self._project_path))
+            self._logger.info(
+                "Starting dBT test execution", project_path=str(self._project_path)
+            )
 
             # Execute dBT test with correct instantiation
             dbt = dbtRunner()
@@ -502,7 +531,9 @@ class FlextMeltanoTypeAdapters:
         try:
             # Type annotations guarantee SingerTap type - no runtime check needed in strict mode
             flext_tap = FlextTap(native_tap, self)
-            self._logger.debug("Successfully wrapped Singer tap", tap_name=native_tap.name)
+            self._logger.debug(
+                "Successfully wrapped Singer tap", tap_name=native_tap.name
+            )
 
             return FlextResult[FlextTap].ok(flext_tap)
 
@@ -511,7 +542,9 @@ class FlextMeltanoTypeAdapters:
             self._logger.exception(error_msg)
             return FlextResult[FlextTap].fail(error_msg)
 
-    def wrap_singer_target(self, native_target: SingerTarget) -> FlextResult[FlextTarget]:
+    def wrap_singer_target(
+        self, native_target: SingerTarget
+    ) -> FlextResult[FlextTarget]:
         """Wrap native Singer target in FlextTarget with validation.
 
         Args:
@@ -524,7 +557,9 @@ class FlextMeltanoTypeAdapters:
         try:
             # Type annotations guarantee SingerTarget type - no runtime check needed in strict mode
             flext_target = FlextTarget(native_target, self)
-            self._logger.debug("Successfully wrapped Singer target", target_name=native_target.name)
+            self._logger.debug(
+                "Successfully wrapped Singer target", target_name=native_target.name
+            )
 
             return FlextResult[FlextTarget].ok(flext_target)
 
@@ -533,7 +568,9 @@ class FlextMeltanoTypeAdapters:
             self._logger.exception(error_msg)
             return FlextResult[FlextTarget].fail(error_msg)
 
-    def wrap_singer_stream(self, native_stream: SingerStream) -> FlextResult[FlextSingerStream]:
+    def wrap_singer_stream(
+        self, native_stream: SingerStream
+    ) -> FlextResult[FlextSingerStream]:
         """Wrap native Singer stream in FlextSingerStream with validation.
 
         Args:
@@ -546,7 +583,9 @@ class FlextMeltanoTypeAdapters:
         try:
             # Type annotations guarantee SingerStream type - no runtime check needed in strict mode
             flext_stream = FlextSingerStream(native_stream, self)
-            self._logger.debug("Successfully wrapped Singer stream", stream_name=native_stream.name)
+            self._logger.debug(
+                "Successfully wrapped Singer stream", stream_name=native_stream.name
+            )
 
             return FlextResult[FlextSingerStream].ok(flext_stream)
 
@@ -555,7 +594,9 @@ class FlextMeltanoTypeAdapters:
             self._logger.exception(error_msg)
             return FlextResult[FlextSingerStream].fail(error_msg)
 
-    def wrap_meltano_project(self, native_project: MeltanoProject) -> FlextResult[FlextMeltanoProject]:
+    def wrap_meltano_project(
+        self, native_project: MeltanoProject
+    ) -> FlextResult[FlextMeltanoProject]:
         """Wrap native Meltano project in FlextMeltanoProject with validation.
 
         Args:
@@ -570,7 +611,7 @@ class FlextMeltanoTypeAdapters:
             flext_project = FlextMeltanoProject(native_project, self)
             self._logger.debug(
                 "Successfully wrapped Meltano project",
-                project_root=str(native_project.root)
+                project_root=str(native_project.root),
             )
 
             return FlextResult[FlextMeltanoProject].ok(flext_project)
@@ -591,7 +632,9 @@ class FlextMeltanoTypeAdapters:
 
         """
         try:
-            path_obj = Path(project_path) if isinstance(project_path, str) else project_path
+            path_obj = (
+                Path(project_path) if isinstance(project_path, str) else project_path
+            )
 
             if not path_obj.exists():
                 return FlextResult[FlextDbt].fail(
@@ -612,7 +655,9 @@ class FlextMeltanoTypeAdapters:
                     f"Invalid dBT project: {validation_result.error}"
                 )
 
-            self._logger.debug("Successfully created FlextDbt", project_path=str(path_obj))
+            self._logger.debug(
+                "Successfully created FlextDbt", project_path=str(path_obj)
+            )
             return FlextResult[FlextDbt].ok(flext_dbt)
 
         except Exception as e:
@@ -620,7 +665,9 @@ class FlextMeltanoTypeAdapters:
             self._logger.exception(error_msg)
             return FlextResult[FlextDbt].fail(error_msg)
 
-    def create_flext_tap_from_config(self, _tap_config: dict[str, object]) -> FlextResult[FlextTap]:
+    def create_flext_tap_from_config(
+        self, _tap_config: dict[str, object]
+    ) -> FlextResult[FlextTap]:
         """Create FlextTap from configuration dict with validation.
 
         Args:

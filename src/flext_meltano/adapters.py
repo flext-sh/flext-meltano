@@ -277,7 +277,10 @@ class FlextMeltanoAdapter:
             else:
                 temp_project_result = self._create_temp_project()
                 if not temp_project_result.success:
-                    return FlextResult[list[dict[str, str]]].fail(temp_project_result.error or "Failed to create temporary project")
+                    return FlextResult[list[dict[str, str]]].fail(
+                        temp_project_result.error
+                        or "Failed to create temporary project"
+                    )
                 working_project = temp_project_result.value
 
             hub_service = MeltanoHubService(working_project)
@@ -478,7 +481,7 @@ class FlextMeltanoAdapter:
                     "created_by": "flext-meltano",
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "temp_project": True,
-                }
+                },
             }
 
             meltano_file = temp_path / "meltano.yml"
@@ -671,7 +674,7 @@ class FlextMeltanoAdapter:
                 # Execute pipeline using meltano CLI for simplicity
                 # Security: Using list format with controlled inputs - no shell injection risk
                 cmd = ["meltano", "run", extractor_name, loader_name]
-                result = subprocess.run(  # noqa: S603
+                result = subprocess.run(
                     cmd,
                     check=False,
                     cwd=project.root,
