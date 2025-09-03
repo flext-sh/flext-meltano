@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -29,13 +28,6 @@ from flext_core import (
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.typings import FlextMeltanoTypes
-
-T = TypeVar("T")
-
-logger = FlextLogger(__name__)
-
-# Constants to avoid FBT003 violations
-_FALSE = False
 
 # =============================================================================
 # MAIN EXECUTORS CLASS - Following Flext[Area][Module] pattern
@@ -58,6 +50,17 @@ class FlextMeltanoExecutors:
     """
 
     # =================================================================
+    # CONSTANTS - Consolidated from module level
+    # =================================================================
+    T = TypeVar("T")
+    _FALSE = False  # Constants to avoid FBT003 violations
+
+    # =================================================================
+    # CLASS VARIABLES - Shared across all instances
+    # =================================================================
+    _logger = FlextLogger(__name__)
+
+    # =================================================================
     # NESTED EXECUTOR CLASSES - Actual implementations
     # =================================================================
 
@@ -75,6 +78,7 @@ class FlextMeltanoExecutors:
             super().__init__()
             # Store config as instance variable if needed
             self._config = config or {}
+            self._logger = FlextMeltanoExecutors._logger
 
         @property
         def logger(self) -> FlextLogger:
@@ -294,8 +298,10 @@ class FlextMeltanoExecutors:
             }
 
         def to_json(self) -> str:
-            """Convert to JSON string."""
-            return json.dumps(self.to_dict(), indent=2)
+            """Convert to JSON string using FlextUtilities.safe_json_stringify()."""
+            from flext_core import FlextUtilities
+
+            return FlextUtilities.safe_json_stringify(self.to_dict(), "{}")
 
     # =================================================================
     # NESTED SIMPLE RESULT CLASS
@@ -407,7 +413,9 @@ class FlextMeltanoExecutors:
                 simple_model = models_dir / "simple_model.sql"
                 simple_model.write_text("SELECT 1 as test_column")
 
-                logger.info(f"Created temporary DBT project at {project_dir}")
+                FlextMeltanoExecutors._logger.info(
+                    f"Created temporary DBT project at {project_dir}"
+                )
 
                 return FlextResult.ok(project_dir)
 

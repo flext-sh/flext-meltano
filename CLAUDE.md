@@ -10,12 +10,14 @@ Development guidance for Claude Code working with the flext-meltano enterprise d
 ### ✅ VERIFIED Working Components
 
 **Quality Gates Status:**
+
 - **MyPy**: ✅ **0 errors** (strict mode) - Infrastructure imports fixed, type aliases implemented
 - **Ruff**: 🔄 **7 errors remaining** (down from 11) - Complexity issues to address
 - **Tests**: ✅ **76/77 passing** - Real API integration functional, import issues resolved
 - **Bridge Integration**: ✅ **Go ↔ Python JSON API operational** via scripts/flext_meltano_bridge.py
 
 **Functional Validation:**
+
 - **Core APIs**: Native Meltano 3.9.1, Singer SDK 0.48.0, DBT Core 1.10.5 integration working
 - **Test Coverage**: 35% with 76 tests using 100% real APIs (zero mocks)
 - **ELT Pipelines**: Complete data processing workflow validated through test suite
@@ -24,21 +26,25 @@ Development guidance for Claude Code working with the flext-meltano enterprise d
 ### 🚨 CRITICAL Lessons Learned from Refactoring Session
 
 #### **Lesson 1: Documentation vs Reality Gap**
+
 - **Problem**: README/CLAUDE.md claimed "MyPy 100% clean" when there were 7 critical errors
 - **Fix Applied**: Always validate with actual commands before trusting documentation
 - **Takeaway**: `make validate` is source of truth, not documentation claims
 
 #### **Lesson 2: Orphaned Tests Masquerading as Coverage**
+
 - **Problem**: Multiple test files importing non-existent classes (`FlextSingerUnifiedConfig`, etc.)
 - **Fix Applied**: Removed broken test files, fixed import errors systematically
 - **Takeaway**: Tests that don't execute = technical debt, not coverage
 
 #### **Lesson 3: Import Architecture Chaos**
-- **Problem**: Missing critical imports (FlextDomainService), wrong module names (wrapper_* vs base_*)
-- **Fix Applied**: Added missing exports to __init__.py, fixed module name inconsistencies
+
+- **Problem**: Missing critical imports (FlextDomainService), wrong module names (wrapper*\*vs base*\*)
+- **Fix Applied**: Added missing exports to **init**.py, fixed module name inconsistencies
 - **Takeaway**: Import infrastructure must work before any feature development
 
 #### **Lesson 4: Type Safety is Non-Negotiable**
+
 - **Problem**: Explicit `Any` usage forbidden in MyPy strict mode
 - **Fix Applied**: Type aliases (`ConfigDict`, `ResultDict`) for clean type safety
 - **Takeaway**: Python 3.13+ type system requires discipline, not shortcuts
@@ -75,11 +81,13 @@ PYTHONPATH=src /home/marlonsc/flext/.venv/bin/python -m pytest tests/ -x --tb=li
 ### ✅ SOLID Foundation Partially Implemented
 
 **Working Service Patterns:**
+
 - `FlextMeltanoTapService`: ✅ **Successfully refactored** to FlextServiceProcessor with proper type aliases
 - `FlextMeltanoTargetService`: ✅ **Fixed imports** but still uses FlextDomainService pattern
 - `FlextMeltanoDbtService`: ✅ **Fixed imports** but still uses FlextDomainService pattern
 
 **Import Structure:**
+
 ```python
 # ✅ WORKING: Proper imports from flext-core
 from flext_core import FlextDomainService, FlextResult, FlextServiceProcessor
@@ -92,6 +100,7 @@ ResultDict = dict[str, object]  # Instead of dict[str, Any]
 ### 🔄 Architecture Debt Remaining
 
 **Complexity Violations to Address:**
+
 - **PLR0911**: Functions with too many return statements (4 functions)
 - **PLR0912**: Functions with too many branches (1 function)
 - **FBT001**: Boolean positional arguments (1 function)
@@ -103,12 +112,14 @@ ResultDict = dict[str, object]  # Instead of dict[str, Any]
 ### ✅ PROVEN Real API Integration
 
 **Test Architecture:**
+
 - **76 tests**: 100% real Meltano/Singer/DBT API integration
 - **Zero mocks**: All functionality validated with actual library calls
 - **Bridge validation**: Go ↔ Python JSON communication working
 - **Error scenarios**: Comprehensive failure mode testing
 
 **Working Test Pattern:**
+
 ```python
 def test_meltano_plugin_discovery_real(self) -> None:
     """Test real Meltano Hub API integration."""
@@ -122,6 +133,7 @@ def test_meltano_plugin_discovery_real(self) -> None:
 ```
 
 **Validated Coverage Areas:**
+
 - **CLI Integration**: Comprehensive command-line interface testing
 - **Singer SDK**: Complete tap/target/stream processing validation
 - **Meltano Core**: Plugin discovery, configuration, execution testing
@@ -151,6 +163,7 @@ PYTHONPATH=src /home/marlonsc/flext/.venv/bin/python -m ruff check src
 ### Bridge Integration Testing
 
 **Go ↔ Python Communication:**
+
 ```bash
 # VALIDATED working bridge commands
 python scripts/flext_meltano_bridge.py version
@@ -165,6 +178,7 @@ python scripts/flext_meltano_bridge.py list_plugins
 ### Phase 1: Complete Quality Gate Resolution (IN PROGRESS)
 
 **Remaining Work:**
+
 1. **Fix 7 Ruff complexity errors** (PLR0911, PLR0912, FBT001)
 2. **Fix 1 Pydantic validation error** in test suite
 3. **Address function complexity** through proper refactoring
@@ -172,6 +186,7 @@ python scripts/flext_meltano_bridge.py list_plugins
 ### Phase 2: Coverage Expansion (35% → 90%)
 
 **Focus Areas:**
+
 - **utilities.py**: Multiple complexity violations need proper refactoring
 - **base_services.py**: Complete service pattern implementation
 - **executors_cli.py**: CLI complexity reduction
@@ -179,6 +194,7 @@ python scripts/flext_meltano_bridge.py list_plugins
 ### Phase 3: SOLID Architecture Implementation
 
 **After quality gates pass:**
+
 1. Complete migration to FlextServiceProcessor patterns
 2. Eliminate remaining code duplication with flext-core
 3. Implement proper PEP8 naming throughout
@@ -199,11 +215,13 @@ Import Structure: Fixed     # ✅ Critical infrastructure operational
 ### Production Readiness Assessment
 
 **NOT production ready** due to:
+
 - 7 remaining complexity violations
 - 1 test validation error
 - Coverage needs improvement (35% → 90%+)
 
 **BUT foundation is solid** with:
+
 - Quality gates mostly functional
 - Test suite operational with real APIs
 - Core functionality validated
@@ -212,11 +230,13 @@ Import Structure: Fixed     # ✅ Critical infrastructure operational
 ## 📚 Reference Documentation
 
 **For project information, architecture, and usage patterns:**
+
 - **[README.md](README.md)** - Complete project documentation and current status
 - **[../README.md](../README.md)** - FLEXT ecosystem architecture and integration
 - **[../CLAUDE.md](../CLAUDE.md)** - FLEXT ecosystem development standards
 
 **Development-specific validation:**
+
 - **Quality Gates**: Use actual command execution, not documentation claims
 - **Testing Strategy**: 100% real API integration, systematic coverage improvement
 - **Architecture Compliance**: FLEXT Level 3 dependency hierarchy rules

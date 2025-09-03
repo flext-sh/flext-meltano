@@ -11,11 +11,8 @@ from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult
 
-from flext_meltano.adapters import FlextMeltanoAdapter
-
-# Removed circular import - FlextMeltanoExecutor imported locally when needed
+from flext_meltano.adapters import FlextMeltanoAdapter, FlextMeltanoWrapper
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
-from flext_meltano.wrappers import FlextMeltanoWrapper
 
 logger = FlextLogger(__name__)
 
@@ -238,7 +235,9 @@ class FlextMeltanoBridge:
                         "status": "created",
                     }
                     return FlextResult.ok(temp_dict)
-                return FlextResult.fail(str(getattr(result, "error", "Project creation failed")))
+                return FlextResult.fail(
+                    str(getattr(result, "error", "Project creation failed"))
+                )
             # Direct Project object - convert to dict representation
             project_dict: dict[str, object] = {
                 "project": str(result),

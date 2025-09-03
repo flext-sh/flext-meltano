@@ -7,7 +7,7 @@ All scripts must:
 - Use FlextResult[T] for error handling
 - Follow FlextMeltano[Module] class patterns
 - Have 100% type safety (MyPy strict, PyRight, Ruff)
-- Zero ignore hints or Any types
+- Zero ignore hints or object types
 
 Scripts:
     FlextMeltanoScripts.DevelopmentTools: Development utilities

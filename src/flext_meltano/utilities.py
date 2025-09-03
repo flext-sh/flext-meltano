@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import cast
 
 import yaml
 from flext_core import (
@@ -24,12 +24,9 @@ from flext_core import (
 
 from flext_meltano.typings import FlextMeltanoTypes
 
-T = TypeVar("T")
-
 logger = FlextLogger(__name__)
 
 # Constants to avoid FBT003 violations
-_SUCCESS = True
 
 # =============================================================================
 # FLEXT MELTANO UTILITIES - EXTENDING FlextUtilities (ZERO DUPLICATION)
@@ -61,7 +58,9 @@ class FlextMeltanoUtilities:
     # =================================================================
 
     @classmethod
-    def create_meltano_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+    def create_meltano_temp_directory(
+        cls, prefix: str = "flext_meltano_"
+    ) -> FlextResult[Path]:
         """Create Meltano temp directory usando FlextUtilities + Meltano specifics with FlextResult.
 
         Uses FlextUtilities infrastructure but adds Meltano-specific setup.
@@ -75,7 +74,9 @@ class FlextMeltanoUtilities:
         """
         try:
             # Use FlextUtilities for safe string handling
-            safe_prefix = FlextUtilities.TextProcessor.safe_string(prefix, "flext_meltano_")
+            safe_prefix = FlextUtilities.TextProcessor.safe_string(
+                prefix, "flext_meltano_"
+            )
 
             # Use FlextUtilities for basic temp directory creation pattern
             temp_dir = Path(tempfile.mkdtemp(prefix=safe_prefix))
@@ -121,7 +122,11 @@ class FlextMeltanoUtilities:
                 "version": 1,
                 "project_id": safe_project_id,
                 "project_name": safe_project_name,
-                "environments": [{"name": "dev"}, {"name": "staging"}, {"name": "prod"}],
+                "environments": [
+                    {"name": "dev"},
+                    {"name": "staging"},
+                    {"name": "prod"},
+                ],
                 "plugins": {
                     "extractors": [],
                     "loaders": [],
@@ -134,7 +139,9 @@ class FlextMeltanoUtilities:
                     "flext_version": "2.0.0-enterprise",
                 },
             }
-            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(cast("FlextMeltanoTypes.DBT.ProjectConfig", config_dict))
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(
+                cast("FlextMeltanoTypes.DBT.ProjectConfig", config_dict)
+            )
         except Exception as e:
             error_msg = f"Failed to create Meltano config dict: {e}"
             logger.exception(error_msg)
@@ -162,7 +169,7 @@ class FlextMeltanoUtilities:
             with target_path.open("w", encoding="utf-8") as f:
                 yaml.dump(config, f, default_flow_style=False, indent=2)
 
-            return FlextResult.ok(_SUCCESS)
+            return FlextResult.ok(True)
 
         except Exception as e:
             error_msg = f"Failed to write meltano.yml: {e}"
@@ -211,7 +218,9 @@ class FlextMeltanoUtilities:
                 "namespace": safe_namespace,
                 "pip_url": safe_pip_url,
                 "executable": safe_executable,
-                "type": FlextUtilities.TextProcessor.safe_string(plugin_type, "extractor"),
+                "type": FlextUtilities.TextProcessor.safe_string(
+                    plugin_type, "extractor"
+                ),
                 "settings": {},
                 "config": {},
                 "metadata": {
@@ -219,7 +228,9 @@ class FlextMeltanoUtilities:
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
                 },
             }
-            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(cast("FlextMeltanoTypes.Plugin.Config", config_dict))
+            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(
+                cast("FlextMeltanoTypes.Plugin.Config", config_dict)
+            )
         except Exception as e:
             error_msg = f"Failed to create plugin config dict: {e}"
             logger.exception(error_msg)
@@ -279,24 +290,28 @@ class FlextMeltanoUtilities:
             return FlextResult.ok({"output": "", "lines": []})
 
         try:
-            import json
-
             # Clean output - normalize whitespace
             clean_output = output.strip()
             lines = clean_output.split("\n")
 
-            # Try JSON parsing first
+            # Try JSON parsing first using FlextUtilities.safe_json_parse
             try:
-                parsed_json = json.loads(clean_output)
-                return FlextResult.ok(
-                    {
-                        "output": clean_output,
-                        "lines": cast("FlextTypes.Core.JsonValue", lines),
-                        "parsed_json": parsed_json,
-                    }
-                )
-            except (json.JSONDecodeError, ValueError):
-                pass  # Fall through to text parsing
+                parsed_json = FlextUtilities.safe_json_parse(clean_output, None)
+                if parsed_json is not None:  # Safe parse succeeded
+                    return FlextResult.ok(
+                        {
+                            "output": clean_output,
+                            "lines": cast("FlextTypes.Core.JsonValue", lines),
+                            "parsed_json": cast(
+                                "FlextTypes.Core.JsonValue", parsed_json
+                            ),
+                        }
+                    )
+            except Exception as e:
+                logger.debug(
+                    f"JSON parsing failed for Meltano output: {e}"
+                )  # Log for debugging
+            # Fall through to text parsing
 
             # Fallback to structured text parsing
             return FlextResult.ok(
@@ -397,7 +412,9 @@ class FlextMeltanoUtilities:
 
     # Legacy method aliases for backward compatibility using proper lambda syntax
     @classmethod
-    def normalize_plugin_name(cls, name: str, plugin_type: str = "tap") -> FlextResult[str]:
+    def normalize_plugin_name(
+        cls, name: str, plugin_type: str = "tap"
+    ) -> FlextResult[str]:
         """Normalize plugin name with type prefix using FlextResult patterns."""
         try:
             # Validate inputs using FlextUtilities
@@ -406,12 +423,18 @@ class FlextMeltanoUtilities:
                 .lower()
                 .replace(" ", "-")
             )
-            safe_plugin_type = FlextUtilities.TextProcessor.safe_string(plugin_type, "tap")
+            safe_plugin_type = FlextUtilities.TextProcessor.safe_string(
+                plugin_type, "tap"
+            )
 
             # Apply type-specific prefixes
-            if safe_plugin_type in {"tap", "extractor"} and not safe_name.startswith("tap-"):
+            if safe_plugin_type in {"tap", "extractor"} and not safe_name.startswith(
+                "tap-"
+            ):
                 normalized_name = f"tap-{safe_name}"
-            elif safe_plugin_type in {"target", "loader"} and not safe_name.startswith("target-"):
+            elif safe_plugin_type in {"target", "loader"} and not safe_name.startswith(
+                "target-"
+            ):
                 normalized_name = f"target-{safe_name}"
             else:
                 normalized_name = safe_name
@@ -463,21 +486,33 @@ class FlextMeltanoUtilities:
             dbt_yml = project_root / "transform" / "dbt_project.yml"
 
             # Write configs
-            meltano_config_result = cls.create_meltano_config_dict(project_name, project_name)
+            meltano_config_result = cls.create_meltano_config_dict(
+                project_name, project_name
+            )
             if not meltano_config_result.success:
-                return FlextResult.fail(meltano_config_result.error or "Failed to create Meltano config")
+                return FlextResult.fail(
+                    meltano_config_result.error or "Failed to create Meltano config"
+                )
 
             dbt_config_result = cls.create_dbt_config(project_name, project_name)
             if not dbt_config_result.success:
-                return FlextResult.fail(dbt_config_result.error or "Failed to create DBT config")
+                return FlextResult.fail(
+                    dbt_config_result.error or "Failed to create DBT config"
+                )
 
-            write_meltano_result = cls.write_meltano_yml(meltano_config_result.value, meltano_yml)
+            write_meltano_result = cls.write_meltano_yml(
+                meltano_config_result.value, meltano_yml
+            )
             if not write_meltano_result.success:
-                return FlextResult.fail(write_meltano_result.error or "Failed to write meltano.yml")
+                return FlextResult.fail(
+                    write_meltano_result.error or "Failed to write meltano.yml"
+                )
 
             write_dbt_result = cls.write_meltano_yml(dbt_config_result.value, dbt_yml)
             if not write_dbt_result.success:
-                return FlextResult.fail(write_dbt_result.error or "Failed to write dbt_project.yml")
+                return FlextResult.fail(
+                    write_dbt_result.error or "Failed to write dbt_project.yml"
+                )
 
             return FlextResult.ok(
                 {
@@ -553,7 +588,9 @@ class FlextMeltanoUtilities:
                 "target-path": "target",
                 "clean-targets": ["target", "dbt_packages"],
             }
-            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(cast("FlextMeltanoTypes.DBT.ProjectConfig", config))
+            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(
+                cast("FlextMeltanoTypes.DBT.ProjectConfig", config)
+            )
         except Exception as e:
             error_msg = f"Failed to create DBT config: {e}"
             logger.exception(error_msg)
@@ -570,7 +607,7 @@ class FlextMeltanoUtilities:
             if field not in config or not config.get(field):
                 return FlextResult.fail(f"Missing required field: {field}")
 
-        return FlextResult.ok(_SUCCESS)
+        return FlextResult.ok(True)
 
     # Legacy aliases for backward compatibility
     @classmethod

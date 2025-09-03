@@ -50,7 +50,9 @@ class FlextMeltanoConfigBuilders:
         """Single responsibility: DBT configuration building only."""
 
         @staticmethod
-        def create_dbt_config(project_name: str, profile_name: str = "") -> FlextResult[ConfigDict]:
+        def create_dbt_config(
+            project_name: str, profile_name: str = ""
+        ) -> FlextResult[ConfigDict]:
             """Cria configuração básica do DBT usando FlextResult patterns.
 
             Args:
@@ -114,7 +116,9 @@ class FlextMeltanoConfigBuilders:
             """
             try:
                 # Validate and sanitize inputs using FlextUtilities
-                safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name, "unknown-tap")
+                safe_tap_name = FlextUtilities.TextProcessor.safe_string(
+                    tap_name, "unknown-tap"
+                )
                 safe_namespace = FlextUtilities.TextProcessor.safe_string(
                     namespace, "tap_" + safe_tap_name.replace("-", "_")
                 )
@@ -135,14 +139,18 @@ class FlextMeltanoConfigBuilders:
 
                 # Handle pip_url with validation
                 if pip_url:
-                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(pip_url)
+                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
+                        pip_url
+                    )
                 else:
                     # Default pip_url para taps conhecidos
                     config["pip_url"] = f"pipelinewise-{safe_tap_name}"
 
                 return FlextResult[ConfigDict].ok(config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create Singer tap config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create Singer tap config: {e}"
+                )
 
         @staticmethod
         def create_singer_target_config(
@@ -165,7 +173,9 @@ class FlextMeltanoConfigBuilders:
             """
             try:
                 # Validate and sanitize inputs using FlextUtilities
-                safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name, "unknown-target")
+                safe_target_name = FlextUtilities.TextProcessor.safe_string(
+                    target_name, "unknown-target"
+                )
                 safe_namespace = FlextUtilities.TextProcessor.safe_string(
                     namespace, "target_" + safe_target_name.replace("-", "_")
                 )
@@ -186,14 +196,18 @@ class FlextMeltanoConfigBuilders:
 
                 # Handle pip_url with validation
                 if pip_url:
-                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(pip_url)
+                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
+                        pip_url
+                    )
                 else:
                     # Default pip_url para targets conhecidos
                     config["pip_url"] = f"pipelinewise-{safe_target_name}"
 
                 return FlextResult[ConfigDict].ok(config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create Singer target config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create Singer target config: {e}"
+                )
 
     class PluginConfigBuilder:
         """Single responsibility: Meltano plugin configuration building only."""
@@ -223,9 +237,15 @@ class FlextMeltanoConfigBuilders:
             """
             try:
                 # Validate and sanitize inputs using FlextUtilities
-                safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
-                safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace, safe_name)
-                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_name}")
+                safe_name = FlextUtilities.TextProcessor.safe_string(
+                    name, "unknown-plugin"
+                )
+                safe_namespace = FlextUtilities.TextProcessor.safe_string(
+                    namespace, safe_name
+                )
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(
+                    pip_url, f"unknown-{safe_name}"
+                )
 
                 plugin_config: ConfigDict = {
                     "name": safe_name,
@@ -238,17 +258,25 @@ class FlextMeltanoConfigBuilders:
                 }
 
                 if executable:
-                    plugin_config["executable"] = FlextUtilities.TextProcessor.safe_string(executable)
+                    plugin_config["executable"] = (
+                        FlextUtilities.TextProcessor.safe_string(executable)
+                    )
 
                 if variant:
-                    plugin_config["variant"] = FlextUtilities.TextProcessor.safe_string(variant)
+                    plugin_config["variant"] = FlextUtilities.TextProcessor.safe_string(
+                        variant
+                    )
 
                 if config_defaults:
-                    plugin_config["config"] = cast("FlextTypes.Core.JsonValue", config_defaults)
+                    plugin_config["config"] = cast(
+                        "FlextTypes.Core.JsonValue", config_defaults
+                    )
 
                 return FlextResult[ConfigDict].ok(plugin_config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create plugin config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create plugin config: {e}"
+                )
 
         @staticmethod
         def create_extractor_config(
@@ -269,8 +297,12 @@ class FlextMeltanoConfigBuilders:
             """
             try:
                 # Validate inputs using FlextUtilities
-                safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name, "unknown-tap")
-                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_tap_name}")
+                safe_tap_name = FlextUtilities.TextProcessor.safe_string(
+                    tap_name, "unknown-tap"
+                )
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(
+                    pip_url, f"unknown-{safe_tap_name}"
+                )
 
                 config: ConfigDict = {
                     "name": safe_tap_name,
@@ -288,7 +320,9 @@ class FlextMeltanoConfigBuilders:
 
                 return FlextResult[ConfigDict].ok(config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create extractor config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create extractor config: {e}"
+                )
 
         @staticmethod
         def create_loader_config(
@@ -309,8 +343,12 @@ class FlextMeltanoConfigBuilders:
             """
             try:
                 # Validate inputs using FlextUtilities
-                safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name, "unknown-target")
-                safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, f"unknown-{safe_target_name}")
+                safe_target_name = FlextUtilities.TextProcessor.safe_string(
+                    target_name, "unknown-target"
+                )
+                safe_pip_url = FlextUtilities.TextProcessor.safe_string(
+                    pip_url, f"unknown-{safe_target_name}"
+                )
 
                 config: ConfigDict = {
                     "name": safe_target_name,
@@ -327,7 +365,9 @@ class FlextMeltanoConfigBuilders:
 
                 return FlextResult[ConfigDict].ok(config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create loader config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create loader config: {e}"
+                )
 
     class MeltanoConfigBuilder:
         """Single responsibility: Complete Meltano project configuration building."""
@@ -381,7 +421,9 @@ class FlextMeltanoConfigBuilders:
 
                 return FlextResult[ConfigDict].ok(config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to create Meltano config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to create Meltano config: {e}"
+                )
 
         @staticmethod
         def add_plugin_to_config(
@@ -425,7 +467,9 @@ class FlextMeltanoConfigBuilders:
                     plugin_list = typed_plugins[safe_plugin_type]
                     if isinstance(plugin_list, list):
                         plugin_list_copy = list(plugin_list)  # Create mutable copy
-                        plugin_list_copy.append(cast("dict[str, object]", plugin_config))
+                        plugin_list_copy.append(
+                            cast("dict[str, object]", plugin_config)
+                        )
                         typed_plugins[safe_plugin_type] = plugin_list_copy
 
                 # Add metadata about the operation
@@ -441,7 +485,9 @@ class FlextMeltanoConfigBuilders:
 
                 return FlextResult[ConfigDict].ok(updated_config)
             except Exception as e:
-                return FlextResult[ConfigDict].fail(f"Failed to add plugin to config: {e}")
+                return FlextResult[ConfigDict].fail(
+                    f"Failed to add plugin to config: {e}"
+                )
 
     # =================================================================
     # BACKWARD COMPATIBILITY ALIASES
