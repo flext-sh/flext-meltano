@@ -51,6 +51,7 @@ Integration:
 
 from __future__ import annotations
 
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -167,14 +168,12 @@ class FlextMeltanoAdapter:
             # Get Meltano version using native API
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult.ok(
-                {
-                    "version": meltano_version,
-                    "meltano": meltano_version,
-                    "cli_type": "native_meltano_api",
-                    "integration": "flext-core",
-                }
-            )
+            return FlextResult.ok({
+                "version": meltano_version,
+                "meltano": meltano_version,
+                "cli_type": "native_meltano_api",
+                "integration": "flext-core",
+            })
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
@@ -511,13 +510,11 @@ class FlextMeltanoAdapter:
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute bridge service operation (required by FlextDomainService)."""
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                {
-                    "service": "MeltanoBridge",
-                    "status": "ready",
-                    "integration": "flext-core",
-                }
-            )
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
+                "service": "MeltanoBridge",
+                "status": "ready",
+                "integration": "flext-core",
+            })
 
     class ProjectManager:
         """Project lifecycle management operations.
@@ -669,8 +666,6 @@ class FlextMeltanoAdapter:
 
                 # Create a minimal ELT execution without complex context
                 # This is a simplified approach for type safety
-                import subprocess
-
                 # Execute pipeline using meltano CLI for simplicity
                 # Security: Using list format with controlled inputs - no shell injection risk
                 cmd = ["meltano", "run", extractor_name, loader_name]
@@ -709,40 +704,41 @@ class FlextMeltanoAdapter:
                 return FlextResult[dict[str, str]].fail(error_msg)
 
     # =================================================================
-    # SINGER SDK INTEGRATION - Direct integration without wrappers  
+    # SINGER SDK INTEGRATION - Direct integration without wrappers
     # =================================================================
-    
+
     def create_tap_stream_catalog(self) -> FlextResult[dict[str, object]]:
         """Create tap stream catalog using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok(
-            {"streams": [], "catalog_type": "singer_tap"}
-        )
+        return FlextResult[dict[str, object]].ok({
+            "streams": [],
+            "catalog_type": "singer_tap",
+        })
 
     def create_target_config(self) -> FlextResult[dict[str, object]]:
         """Create target configuration using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok(
-            {"target_schema": "default", "batch_config": {}}
-        )
-        
+        return FlextResult[dict[str, object]].ok({
+            "target_schema": "default",
+            "batch_config": {},
+        })
+
     def convert_singer_schema(self) -> FlextResult[dict[str, object]]:
         """Convert Singer schema types using native APIs."""
-        return FlextResult[dict[str, object]].ok(
-            {"schema_version": "1.0", "properties": {}}
-        )
+        return FlextResult[dict[str, object]].ok({
+            "schema_version": "1.0",
+            "properties": {},
+        })
 
     def validate_stream_schema(self) -> FlextResult[bool]:
         """Validate stream schema using native validation."""
         return FlextResult[bool].ok(data=True)
-        
+
     # =================================================================
     # DBT INTEGRATION - Direct integration without wrappers
     # =================================================================
-    
+
     def execute_dbt_operation(self) -> FlextResult[dict[str, object]]:
         """Execute DBT operation using native DBT Core API."""
-        return FlextResult[dict[str, object]].ok(
-            {"dbt_status": "ready", "models": []}
-        )
+        return FlextResult[dict[str, object]].ok({"dbt_status": "ready", "models": []})
 
 
 # =============================================================================
