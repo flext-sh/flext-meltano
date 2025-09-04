@@ -14,9 +14,9 @@ from flext_meltano.utilities import FlextMeltanoUtilities
 class TestFlextMeltanoUtilitiesRealMethods:
     """Test ONLY real methods that actually exist."""
 
-    def test_create_meltano_temp_directory(self) -> None:
-        """Test create_meltano_temp_directory method."""
-        result = FlextMeltanoUtilities.create_meltano_temp_directory()
+    def test_create_temp_directory(self) -> None:
+        """Test create_temp_directory method."""
+        result = FlextMeltanoUtilities.create_temp_directory()
 
         assert isinstance(result, FlextResult)
         assert result.success
@@ -30,9 +30,9 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
         shutil.rmtree(temp_path)
 
-    def test_create_meltano_temp_directory_custom_prefix(self) -> None:
-        """Test create_meltano_temp_directory with custom prefix."""
-        result = FlextMeltanoUtilities.create_meltano_temp_directory("custom_")
+    def test_create_temp_directory_custom_prefix(self) -> None:
+        """Test create_temp_directory with custom prefix."""
+        result = FlextMeltanoUtilities.create_temp_directory("custom_")
 
         assert isinstance(result, FlextResult)
         assert result.success

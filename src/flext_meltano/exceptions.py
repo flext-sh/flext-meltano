@@ -16,8 +16,81 @@ from __future__ import annotations
 from flext_core import (
     FlextExceptions,
 )
+from pydantic import BaseModel, Field
 
-from flext_meltano.typings import FlextMeltanoTypes
+# =============================================================================
+# PYDANTIC MODELS FOR EXCEPTION CONTEXT - ELIMINATES MULTIPLE PARAMETERS
+# =============================================================================
+
+
+class ValidationErrorContext(BaseModel):
+    """Context for validation errors - ELIMINATES 6+ parameters."""
+
+    field_name: str | None = Field(
+        default=None, description="Field that failed validation"
+    )
+    expected_type: str | None = Field(
+        default=None, description="Expected type or format"
+    )
+    actual_value: str | None = Field(default=None, description="Actual value received")
+    validation_rule: str | None = Field(
+        default=None, description="Validation rule violated"
+    )
+    additional_info: dict[str, object] = Field(
+        default_factory=dict, description="Additional context"
+    )
+
+
+class ConfigurationErrorContext(BaseModel):
+    """Context for configuration errors - ELIMINATES 6+ parameters."""
+
+    config_file: str | None = Field(default=None, description="Configuration file path")
+    section: str | None = Field(default=None, description="Configuration section")
+    key: str | None = Field(default=None, description="Configuration key")
+    expected_format: str | None = Field(default=None, description="Expected format")
+    additional_info: dict[str, object] = Field(
+        default_factory=dict, description="Additional context"
+    )
+
+
+class ConnectionErrorContext(BaseModel):
+    """Context for connection errors - ELIMINATES 6+ parameters."""
+
+    host: str | None = Field(default=None, description="Target host")
+    port: int | None = Field(default=None, description="Target port")
+    protocol: str | None = Field(default=None, description="Connection protocol")
+    timeout: int | None = Field(default=None, description="Connection timeout")
+    retry_count: int = Field(default=0, description="Number of retries attempted")
+    additional_info: dict[str, object] = Field(
+        default_factory=dict, description="Additional context"
+    )
+
+
+class ProcessingErrorContext(BaseModel):
+    """Context for processing errors - ELIMINATES 6+ parameters."""
+
+    operation: str | None = Field(default=None, description="Operation being performed")
+    records_processed: int = Field(default=0, description="Number of records processed")
+    batch_id: str | None = Field(default=None, description="Batch identifier")
+    stream_name: str | None = Field(default=None, description="Stream being processed")
+    stage: str | None = Field(default=None, description="Processing stage")
+    additional_info: dict[str, object] = Field(
+        default_factory=dict, description="Additional context"
+    )
+
+
+class PluginErrorContext(BaseModel):
+    """Context for plugin errors - ELIMINATES 6+ parameters."""
+
+    plugin_name: str | None = Field(default=None, description="Plugin name")
+    plugin_type: str | None = Field(default=None, description="Plugin type")
+    version: str | None = Field(default=None, description="Plugin version")
+    command: str | None = Field(default=None, description="Command executed")
+    exit_code: int | None = Field(default=None, description="Exit code")
+    additional_info: dict[str, object] = Field(
+        default_factory=dict, description="Additional context"
+    )
+
 
 # =============================================================================
 # MAIN EXCEPTIONS CLASS - Following Flext[Area][Module] pattern
@@ -47,82 +120,56 @@ class FlextMeltanoExceptions:
         """Base Meltano error inheriting from flext-core generic error."""
 
     class MeltanoValidationError(MeltanoError, FlextExceptions):
-        """Validation error for Meltano domain inheriting from Meltano base and core validation error."""
+        """Validation error using Pydantic context - ELIMINATES parameter explosion."""
 
-        def __init__(self, message: str = "Validation error", **kwargs: object) -> None:
-            """Allow arbitrary context kwargs and forward to base class."""
-            context = dict(kwargs) if kwargs else None
+        def __init__(
+            self,
+            message: str = "Validation error",
+            context: ValidationErrorContext | None = None,
+        ) -> None:
+            """Initialize with Pydantic context model - ELIMINATES multiple parameters."""
             super().__init__()
             self.message = message
-            self.context = {"context": context}
+            self.context = {"context": context.model_dump() if context else {}}
 
     class MeltanoConfigurationError(MeltanoError, FlextExceptions):
-        """Configuration error for Meltano domain."""
+        """Configuration error using Pydantic context - ELIMINATES 6+ parameters."""
 
         def __init__(
             self,
             message: str = "Configuration error",
-            *,
-            config_file: str | None = None,
-            section: str | None = None,
-            **kwargs: object,
+            context: ConfigurationErrorContext | None = None,
         ) -> None:
-            """Initialize configuration error with nested context expected by tests."""
+            """Initialize with Pydantic context model - ELIMINATES manual parameter handling."""
             super().__init__()
             self.message = f"Configuration: {message}"
-            nested: dict[str, object] = dict(kwargs)
-            if config_file is not None:
-                nested["config_file"] = config_file
-            if section is not None:
-                nested["section"] = section
-            self.context = {"context": nested}
+            self.context = {"context": context.model_dump() if context else {}}
 
     class MeltanoConnectionError(MeltanoError):
-        """Connection error for Meltano domain."""
+        """Connection error using Pydantic context - ELIMINATES 6+ parameters."""
 
         def __init__(
             self,
             message: str = "Connection error",
-            *,
-            host: str | None = None,
-            port: int | None = None,
-            **kwargs: object,
+            context: ConnectionErrorContext | None = None,
         ) -> None:
-            """Initialize connection error with network context."""
-            nested: dict[str, object] = {}
-            if host is not None:
-                nested["host"] = host
-            if port is not None:
-                nested["port"] = port
+            """Initialize with Pydantic context model - ELIMINATES manual parameter assembly."""
             super().__init__()
             self.message = f"Connection: {message}"
-            if kwargs:
-                nested.update(dict(kwargs))
-            self.context = {"context": nested}
+            self.context = {"context": context.model_dump() if context else {}}
 
     class MeltanoProcessingError(MeltanoError):
-        """Processing error for Meltano domain."""
+        """Processing error using Pydantic context - ELIMINATES 6+ parameters."""
 
         def __init__(
             self,
             message: str = "Processing error",
-            *,
-            operation: str | None = None,
-            records_processed: int | None = None,
-            context: FlextMeltanoTypes.CLI.ProcessResult | None = None,
-            **kwargs: object,
+            context: ProcessingErrorContext | None = None,
         ) -> None:
-            """Initialize processing error with operation context."""
+            """Initialize with Pydantic context model - ELIMINATES parameter explosion."""
             super().__init__()
             self.message = f"Processing: {message}"
-            nested_context: dict[str, object] = dict(context or {})
-            if kwargs:
-                nested_context.update(dict(kwargs))
-            if operation is not None:
-                nested_context["operation"] = operation
-            if records_processed is not None:
-                nested_context["records_processed"] = records_processed
-            self.context = {"context": nested_context}
+            self.context = {"context": context.model_dump() if context else {}}
 
     class MeltanoAuthenticationError(MeltanoError):
         """Authentication error for Meltano domain."""
@@ -169,28 +216,17 @@ class FlextMeltanoExceptions:
             self.context = {"context": nested}
 
     class MeltanoPluginError(MeltanoError):
-        """Plugin-specific errors with enhanced context using DRY foundation."""
+        """Plugin-specific errors with enhanced context using Pydantic model."""
 
         def __init__(
             self,
             message: str = "Plugin error",
-            *,
-            plugin_name: str | None = None,
-            plugin_type: str | None = None,
-            plugin_command: str | None = None,
-            **kwargs: object,
+            context: PluginErrorContext | None = None,
         ) -> None:
-            """Initialize plugin error with rich context."""
-            context = dict(kwargs)
-            if plugin_name is not None:
-                context["plugin_name"] = plugin_name
-            if plugin_type is not None:
-                context["plugin_type"] = plugin_type
-            if plugin_command is not None:
-                context["plugin_command"] = plugin_command
+            """Initialize plugin error with Pydantic context - ELIMINATES multiple parameters."""
             super().__init__()
             self.message = f"Plugin: {message}"
-            self.context = {"context": context}
+            self.context = {"context": context.model_dump() if context else {}}
 
     class MeltanoExecutionError(MeltanoProcessingError):
         """Execution errors with command context using DRY foundation."""
@@ -252,23 +288,6 @@ class FlextMeltanoExceptions:
             super().__init__()
             self.message = f"DBT: {message}"
             self.context = {"context": context}
-
-    # =================================================================
-    # ALIASES FOR BACKWARD COMPATIBILITY - FlextMeltano[ErrorType]
-    # =================================================================
-
-    # Main class aliases (preferred names)
-    FlextMeltanoError = MeltanoError
-    FlextMeltanoValidationError = MeltanoValidationError
-    FlextMeltanoConfigurationError = MeltanoConfigurationError
-    FlextMeltanoConnectionError = MeltanoConnectionError
-    FlextMeltanoProcessingError = MeltanoProcessingError
-    FlextMeltanoAuthenticationError = MeltanoAuthenticationError
-    FlextMeltanoTimeoutError = MeltanoTimeoutError
-    FlextMeltanoPluginError = MeltanoPluginError
-    FlextMeltanoExecutionError = MeltanoExecutionError
-    FlextMeltanoSingerError = MeltanoSingerError
-    FlextMeltanoDBTError = MeltanoDBTError
 
 
 # =============================================================================

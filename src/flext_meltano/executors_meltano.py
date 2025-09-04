@@ -27,6 +27,7 @@ from flext_core import (
 )
 
 from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
 # =============================================================================
@@ -81,7 +82,7 @@ class FlextMeltanoExecutors:
             self._logger = FlextMeltanoExecutors._logger
 
         @property
-        def logger(self) -> FlextLogger:
+        def logger(self) -> object:
             """Get logger instance."""
             return FlextLogger(self.__class__.__name__)
 
@@ -92,19 +93,20 @@ class FlextMeltanoExecutors:
                 FlextResult containing service information
 
             """
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                {
-                    "service": "FlextMeltanoExecutor",
-                    "status": "ready",
-                    "capabilities": [
-                        "execute_meltano_command",
-                        "get_project_info",
-                    ],
-                }
-            )
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
+                "service": "FlextMeltanoExecutor",
+                "status": "ready",
+                "capabilities": [
+                    "execute_meltano_command",
+                    "get_project_info",
+                ],
+            })
 
         def execute_meltano_command(
-            self, project_root: Path, command: list[str], timeout: int = 300
+            self,
+            project_root: Path,
+            command: list[str],
+            timeout: int = FlextMeltanoConstants.SingerSDK.DEFAULT_REQUEST_TIMEOUT,
         ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute Meltano command using native API with structured result.
 
@@ -299,8 +301,6 @@ class FlextMeltanoExecutors:
 
         def to_json(self) -> str:
             """Convert to JSON string using FlextUtilities.safe_json_stringify()."""
-            from flext_core import FlextUtilities
-
             return FlextUtilities.safe_json_stringify(self.to_dict(), "{}")
 
     # =================================================================
@@ -325,14 +325,12 @@ class FlextMeltanoExecutors:
             try:
                 FlextMeltanoAdapter()
                 # ELT pipeline execution placeholder - would coordinate tap and target
-                result = FlextResult.ok(
-                    {
-                        "tap": tap_name,
-                        "target": target_name,
-                        "status": "pipeline_executed",
-                        "project": str(project_root),
-                    }
-                )
+                result = FlextResult.ok({
+                    "tap": tap_name,
+                    "target": target_name,
+                    "status": "pipeline_executed",
+                    "project": str(project_root),
+                })
 
                 if result.success:
                     return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(

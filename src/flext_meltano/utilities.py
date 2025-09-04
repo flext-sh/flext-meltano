@@ -1,8 +1,4 @@
-"""FLEXT Meltano Utilities - Extending FlextUtilities (Zero Duplication Pattern).
-
-**ZERO DUPLICATION**: Este módulo APENAS estende FlextUtilities com utilities específicas do Meltano
-**ARCHITECTURE**: Single class FlextMeltanoUtilities(FlextUtilities) seguindo padrão flext-core
-**MASSIVE REDUCTION**: Reduzido de 987 linhas para ~150 linhas eliminando TODAS as duplicações
+"""FLEXT Meltano Utilities - Extending FlextUtilities.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -26,52 +22,13 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 logger = FlextLogger(__name__)
 
-# Constants to avoid FBT003 violations
-
-# =============================================================================
-# FLEXT MELTANO UTILITIES - EXTENDING FlextUtilities (ZERO DUPLICATION)
-# =============================================================================
-
 
 class FlextMeltanoUtilities:
-    """FLEXT Meltano Utilities using FlextUtilities composition with Meltano-specific functionality.
-
-    MASSIVE COMPLEXITY REDUCTION:
-    - Uses composition with all 109+ FlextUtilities functionalities
-    - Adiciona APENAS utilities específicas do Meltano não cobertas por FlextUtilities
-    - ZERO duplicação de funcionalidade já presente em flext-core
-    - Redução de 987 linhas → ~150 linhas (85%+ redução)
-
-    SOLID Principles:
-    - Single Responsibility: Apenas utilities específicas do Meltano
-    - Open/Closed: Composition with FlextUtilities, não modificação
-    - Dependency Inversion: Depende de abstrações do flext-core
-
-    Architectural Pattern:
-    - Uses composition instead of inheritance for better control
-    - Direct access to FlextUtilities via static methods
-    - Meltano-specific extensions maintained separately
-    """
-
-    # =================================================================
-    # MELTANO-SPECIFIC UTILITIES (Only what's NOT in FlextUtilities)
-    # =================================================================
+    """FLEXT Meltano Utilities using FlextUtilities composition with Meltano-specific functionality."""
 
     @classmethod
-    def create_meltano_temp_directory(
-        cls, prefix: str = "flext_meltano_"
-    ) -> FlextResult[Path]:
-        """Create Meltano temp directory usando FlextUtilities + Meltano specifics with FlextResult.
-
-        Uses FlextUtilities infrastructure but adds Meltano-specific setup.
-
-        Args:
-            prefix: Prefix for temporary directory
-
-        Returns:
-            FlextResult containing Path of created directory with Meltano structure or error
-
-        """
+    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+        """Create Meltano temp directory usando FlextUtilities + Meltano specifics with FlextResult."""
         try:
             # Use FlextUtilities for safe string handling
             safe_prefix = FlextUtilities.TextProcessor.safe_string(
@@ -97,18 +54,7 @@ class FlextMeltanoUtilities:
     def create_meltano_config_dict(
         cls, project_id: str, project_name: str = ""
     ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
-        """Create complete Meltano configuration dictionary.
-
-        Uses FlextUtilities.ProcessingUtils.safe_dict_get() patterns for safe construction.
-
-        Args:
-            project_id: Project ID
-            project_name: Project name (optional)
-
-        Returns:
-            FlextResult containing complete Meltano configuration dictionary
-
-        """
+        """Create complete Meltano configuration dictionary."""
         try:
             # Use FlextUtilities.TextProcessor.safe_string() for safe string handling
             safe_project_id = FlextUtilities.TextProcessor.safe_string(
@@ -135,7 +81,7 @@ class FlextMeltanoUtilities:
                 },
                 "metadata": {
                     "created_by": "flext-meltano",
-                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "flext_version": "2.0.0-enterprise",
                 },
             }
@@ -151,21 +97,9 @@ class FlextMeltanoUtilities:
     def write_meltano_yml(
         cls, config: FlextMeltanoTypes.DBT.ProjectConfig, target_path: Path
     ) -> FlextResult[bool]:
-        """Write Meltano YAML configuration safely.
-
-        Uses FlextUtilities.safe_json_stringify() concepts for YAML.
-
-        Args:
-            config: Configuration dictionary
-            target_path: Target file path
-
-        Returns:
-            FlextResult indicating success
-
-        """
+        """Write Meltano YAML configuration safely."""
         try:
             # Config is typed as ConfigDict so isinstance check is unnecessary
-            # Safe YAML write
             with target_path.open("w", encoding="utf-8") as f:
                 yaml.dump(config, f, default_flow_style=False, indent=2)
 
@@ -185,23 +119,8 @@ class FlextMeltanoUtilities:
         pip_url: str = "",
         executable: str = "",
     ) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
-        """Create plugin configuration dictionary.
-
-        Uses FlextUtilities safe string methods.
-
-        Args:
-            name: Plugin name
-            plugin_type: Type of plugin
-            namespace: Plugin namespace
-            pip_url: PyPI URL
-            executable: Executable name
-
-        Returns:
-            FlextResult containing plugin configuration dictionary
-
-        """
+        """Create plugin configuration dictionary."""
         try:
-            # Use FlextUtilities for safe string handling
             safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
             safe_namespace = FlextUtilities.TextProcessor.safe_string(
                 namespace, f"tap_{safe_name}"
@@ -225,7 +144,7 @@ class FlextMeltanoUtilities:
                 "config": {},
                 "metadata": {
                     "created_by": "flext-meltano",
-                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 },
             }
             return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(
@@ -240,28 +159,15 @@ class FlextMeltanoUtilities:
     def format_meltano_command_result(
         cls, *, success: bool, data: FlextTypes.Core.JsonValue | None = None
     ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
-        """Format Meltano command result for bridge communication.
-
-        Uses FlextUtilities.generate_iso_timestamp() and safe handling.
-
-        Args:
-            success: Command success status
-            data: Optional result data
-
-        Returns:
-            FlextResult containing formatted response for bridge communication
-
-        """
+        """Format Meltano command result for bridge communication."""
         try:
             # Use FlextUtilities for safe boolean and timestamp handling
             response: FlextMeltanoTypes.CLI.ProcessResult = {
-                "success": FlextUtilities.Conversions.safe_bool(
-                    success
-                ),  # From FlextUtilities
-                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),  # From FlextUtilities
+                "success": FlextUtilities.Conversions.safe_bool(success),
+                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
 
-            if data and isinstance(data, dict):  # From FlextUtilities
+            if data and isinstance(data, dict):
                 response["data"] = data
 
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(response)
@@ -274,17 +180,7 @@ class FlextMeltanoUtilities:
     def parse_meltano_output_safe(
         cls, output: str
     ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
-        """Parse Meltano command output safely.
-
-        Uses FlextUtilities.parse_json_safe() when applicable.
-
-        Args:
-            output: Raw command output
-
-        Returns:
-            FlextResult with parsed data
-
-        """
+        """Parse Meltano command output safely."""
         # Check if output is non-empty
         if not output or not output.strip():
             return FlextResult.ok({"output": "", "lines": []})
@@ -298,29 +194,20 @@ class FlextMeltanoUtilities:
             try:
                 parsed_json = FlextUtilities.safe_json_parse(clean_output, None)
                 if parsed_json is not None:  # Safe parse succeeded
-                    return FlextResult.ok(
-                        {
-                            "output": clean_output,
-                            "lines": cast("FlextTypes.Core.JsonValue", lines),
-                            "parsed_json": cast(
-                                "FlextTypes.Core.JsonValue", parsed_json
-                            ),
-                        }
-                    )
+                    return FlextResult.ok({
+                        "output": clean_output,
+                        "lines": cast("FlextTypes.Core.JsonValue", lines),
+                        "parsed_json": cast("FlextTypes.Core.JsonValue", parsed_json),
+                    })
             except Exception as e:
-                logger.debug(
-                    f"JSON parsing failed for Meltano output: {e}"
-                )  # Log for debugging
-            # Fall through to text parsing
+                logger.debug(f"JSON parsing failed for Meltano output: {e}")
 
-            # Fallback to structured text parsing
-            return FlextResult.ok(
-                {
-                    "output": clean_output,
-                    "lines": cast("FlextTypes.Core.JsonValue", lines),
-                    "line_count": len(lines),
-                }
-            )
+            # Fall through to text parsing
+            return FlextResult.ok({
+                "output": clean_output,
+                "lines": cast("FlextTypes.Core.JsonValue", lines),
+                "line_count": len(lines),
+            })
 
         except Exception as e:
             error_msg = f"Failed to parse Meltano output: {e}"
@@ -331,15 +218,7 @@ class FlextMeltanoUtilities:
     def adapt_meltano_plugin(
         cls, plugin_data: FlextMeltanoTypes.Plugin.PluginInfo
     ) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
-        """Adapt Meltano plugin data for unified processing.
-
-        Args:
-            plugin_data: Original plugin data
-
-        Returns:
-            FlextResult containing adapted plugin data with standardized fields
-
-        """
+        """Adapt Meltano plugin data for unified processing."""
         try:
             # plugin_data is typed as PluginInfo so isinstance check is unnecessary
             name = plugin_data.get("name", "unknown")
@@ -367,16 +246,7 @@ class FlextMeltanoUtilities:
     def create_bridge_response(
         cls, *, success: bool, data: FlextMeltanoTypes.CLI.ProcessResult | None = None
     ) -> dict[str, str]:
-        """Create bridge response for Go communication.
-
-        Args:
-            success: Success status
-            data: Optional data
-
-        Returns:
-            Bridge response with string values for Go compatibility
-
-        """
+        """Create bridge response for Go communication."""
         response: dict[str, str] = {
             "success": FlextUtilities.TextProcessor.safe_string(str(success)),
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -391,17 +261,7 @@ class FlextMeltanoUtilities:
     def format_command_result(
         cls, exit_code: int, output: str, command: str
     ) -> dict[str, str]:
-        """Format command execution result.
-
-        Args:
-            exit_code: Command exit code
-            output: Command output
-            command: Executed command
-
-        Returns:
-            Formatted command result with string values
-
-        """
+        """Format command execution result."""
         return {
             "exit_code": FlextUtilities.TextProcessor.safe_string(str(exit_code)),
             "success": FlextUtilities.TextProcessor.safe_string(str(exit_code == 0)),
@@ -473,7 +333,7 @@ class FlextMeltanoUtilities:
     def setup_project_structure(
         cls, project_root: Path, project_name: str
     ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
-        """Setup complete project structure."""
+        """Setup complete project structure using chain-of-operations pattern."""
         try:
             project_root.mkdir(parents=True, exist_ok=True)
 
@@ -485,42 +345,56 @@ class FlextMeltanoUtilities:
             meltano_yml = project_root / "meltano.yml"
             dbt_yml = project_root / "transform" / "dbt_project.yml"
 
-            # Write configs
-            meltano_config_result = cls.create_meltano_config_dict(
-                project_name, project_name
-            )
-            if not meltano_config_result.success:
+            # Chain operations using bind for railway-oriented programming
+            def setup_operation(_: None) -> FlextResult[tuple]:
+                """Setup operation chain using FlextResult.bind() pattern."""
+                # Create configs
+                meltano_config_result = cls.create_meltano_config_dict(
+                    project_name, project_name
+                )
+                if not meltano_config_result.success:
+                    return FlextResult.fail(
+                        meltano_config_result.error or "Failed to create Meltano config"
+                    )
+
+                dbt_config_result = cls.create_dbt_config(project_name, project_name)
+                if not dbt_config_result.success:
+                    return FlextResult.fail(
+                        dbt_config_result.error or "Failed to create DBT config"
+                    )
+
+                # Write configs
+                write_meltano_result = cls.write_meltano_yml(
+                    meltano_config_result.value, meltano_yml
+                )
+                if not write_meltano_result.success:
+                    return FlextResult.fail(
+                        write_meltano_result.error or "Failed to write meltano.yml"
+                    )
+
+                write_dbt_result = cls.write_meltano_yml(
+                    dbt_config_result.value, dbt_yml
+                )
+                if not write_dbt_result.success:
+                    return FlextResult.fail(
+                        write_dbt_result.error or "Failed to write dbt_project.yml"
+                    )
+
+                return FlextResult.ok((meltano_yml, dbt_yml))
+
+            # Execute operation chain
+            operation_result = setup_operation(None)
+            if not operation_result.success:
                 return FlextResult.fail(
-                    meltano_config_result.error or "Failed to create Meltano config"
+                    operation_result.error or "Setup operation failed"
                 )
 
-            dbt_config_result = cls.create_dbt_config(project_name, project_name)
-            if not dbt_config_result.success:
-                return FlextResult.fail(
-                    dbt_config_result.error or "Failed to create DBT config"
-                )
-
-            write_meltano_result = cls.write_meltano_yml(
-                meltano_config_result.value, meltano_yml
-            )
-            if not write_meltano_result.success:
-                return FlextResult.fail(
-                    write_meltano_result.error or "Failed to write meltano.yml"
-                )
-
-            write_dbt_result = cls.write_meltano_yml(dbt_config_result.value, dbt_yml)
-            if not write_dbt_result.success:
-                return FlextResult.fail(
-                    write_dbt_result.error or "Failed to write dbt_project.yml"
-                )
-
-            return FlextResult.ok(
-                {
-                    "project_root": str(project_root),
-                    "meltano_yml": str(meltano_yml),
-                    "dbt_yml": str(dbt_yml),
-                }
-            )
+            # Single success return point
+            return FlextResult.ok({
+                "project_root": str(project_root),
+                "meltano_yml": str(meltano_yml),
+                "dbt_yml": str(dbt_yml),
+            })
         except Exception as e:
             return FlextResult.fail(f"Failed to setup project structure: {e}")
 
@@ -608,12 +482,6 @@ class FlextMeltanoUtilities:
                 return FlextResult.fail(f"Missing required field: {field}")
 
         return FlextResult.ok(data=True)
-
-    # Legacy aliases for backward compatibility
-    @classmethod
-    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
-        """Create temporary directory (legacy alias) using FlextResult patterns."""
-        return cls.create_meltano_temp_directory(prefix)
 
     create_meltano_config = create_meltano_config_dict
     create_plugin_config = create_plugin_config_dict

@@ -1,38 +1,8 @@
-"""Target Abstractions - Unified Singer Target functionality abstraction.
+"""Target Abstractions - Singer Target functionality abstraction.
 
 This module provides complete FlextTarget abstractions following flext-core
 single-class-per-module pattern. Consolidates all target functionality so that
 projects never need to import singer_sdk directly.
-
-Architecture:
-    Core: Unified FlextTargetAbstractions class handling all functionality
-    Target Layer: Complete target abstraction from Singer SDK
-    Loader Layer: Data loading abstractions with FlextResult integration
-    Config Layer: Configuration abstractions without Singer SDK dependency
-    Message Layer: Singer message handling abstracted through FlextResult
-
-Features:
-    - Single unified class following flext-core patterns
-    - Complete target abstraction from singer_sdk.Target
-    - Data loading operations with FlextResult error handling
-    - Configuration management without Singer SDK dependency
-    - Message processing (SCHEMA, RECORD, STATE) abstracted
-    - Zero dependency on singer_sdk for consuming projects
-
-Examples:
-    Basic target usage:
-        >>> target_abs = FlextTargetAbstractions()
-        >>> target_result = target_abs.create_flext_target(target_config)
-        >>> if target_result.success:
-        ...     target = target_result.value
-        ...     result = target_abs.process_record(
-        ...         target, "stream_name", {"id": 1, "name": "John"}
-        ...     )
-
-    Batch loading:
-        >>> batch_result = target_abs.load_batch(
-        ...     target, "users", [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
-        ... )
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -41,11 +11,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from datetime import UTC
+import uuid
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from flext_core import FlextLogger, FlextModels, FlextResult
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from flext_meltano.constants import FlextMeltanoConstants
 
 if TYPE_CHECKING:
     from flext_meltano.adapters import FlextMeltanoAdapter
@@ -70,7 +43,8 @@ class FlextTargetConfig(BaseModel):
         ..., description="Connection configuration dictionary"
     )
     batch_size: int = Field(
-        default=1000, description="Batch size for record processing"
+        default=FlextMeltanoConstants.SingerSDK.DEFAULT_BATCH_SIZE,
+        description="Batch size for record processing",
     )
     max_batches: int = Field(
         default=100, description="Maximum number of batches to process"
@@ -150,8 +124,6 @@ class FlextTargetAbstractions(FlextModels.Entity):
 
     def __init__(self, target_id: str | None = None) -> None:
         """Initialize unified target abstractions."""
-        import uuid
-
         entity_id = target_id or f"target_abstractions_{uuid.uuid4().hex[:8]}"
         super().__init__(id=entity_id)
         self._logger = FlextLogger(f"{__name__}.FlextTargetAbstractions")
@@ -176,8 +148,8 @@ class FlextTargetAbstractions(FlextModels.Entity):
         self,
         target_type: str,
         connection_config: ConnectionConfig,
-        batch_size: int = 1000,
-        max_batches: int = 100,
+        batch_size: int = FlextMeltanoConstants.SingerSDK.DEFAULT_BATCH_SIZE,
+        max_batches: int = 100,  # No specific constant for max_batches yet
         **kwargs: object,
     ) -> FlextResult[dict[str, object]]:
         """Create FlextTarget configuration with Pydantic validation."""
@@ -253,12 +225,10 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 target_type=target_type,
                 target_id=target_id,
             )
-            return FlextResult[dict[str, object]].ok(
-                {
-                    **target_instance,
-                    "target_id": target_id,
-                }
-            )
+            return FlextResult[dict[str, object]].ok({
+                **target_instance,
+                "target_id": target_id,
+            })
 
         except Exception as e:
             error_msg = f"Failed to create FlextTarget: {e}"
@@ -324,7 +294,12 @@ class FlextTargetAbstractions(FlextModels.Entity):
 
             # Log record for debugging (fulfilling ARG002 requirement)
             # Use basic debug logging without level comparison
-            self._logger.debug("Record data received", record_keys=list(record.keys()) if isinstance(record, dict) else "non-dict")
+            self._logger.debug(
+                "Record data received",
+                record_keys=list(record.keys())
+                if isinstance(record, dict)
+                else "non-dict",
+            )
 
             # Parameter validation is handled by business logic, not field validation
 
@@ -609,8 +584,6 @@ class FlextTargetAbstractions(FlextModels.Entity):
 
     def _get_current_timestamp(self) -> str:
         """Get current timestamp as ISO string."""
-        from datetime import datetime
-
         return datetime.now(tz=UTC).isoformat()
 
     def get_active_targets(self) -> list[str]:

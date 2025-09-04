@@ -4,34 +4,6 @@ This module provides complete Singer type functionality following flext-core
 single-class-per-module pattern. Consolidates all type definitions, schema management,
 message handling, and properties management in a unified class.
 
-Architecture:
-    Core: Unified FlextSingerTypes class handling all Singer functionality
-    Types: String, Integer, Number, Boolean, DateTime, Array, Object types
-    Schema: Schema definition and validation
-    Messages: RECORD, SCHEMA, STATE message creation
-    Properties: Properties list management and validation
-
-Features:
-    - Single unified class following flext-core patterns
-    - Complete Singer type system abstraction
-    - FlextResult railway-oriented programming
-    - Type-safe schema and message handling
-    - Enterprise error handling and validation
-
-Examples:
-    Create types:
-        >>> singer_types = FlextSingerTypes()
-        >>> string_result = singer_types.create_string_type(maxLength=255)
-        >>> array_result = singer_types.create_array_type({"type": "string"})
-
-    Create messages:
-        >>> record_result = singer_types.create_record_message(
-        ...     "users", {"id": 1, "name": "John"}
-        ... )
-        >>> schema_result = singer_types.create_schema_message(
-        ...     "users", {"type": "object", "properties": {...}}
-        ... )
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 
@@ -163,34 +135,31 @@ class FlextSingerTypes:
     def validate_value(
         self, value: object, type_def: dict[str, object]
     ) -> FlextResult[object]:
-        """Validate value against type definition."""
+        """Validate value against type definition using lookup table pattern.
+
+        Eliminates multiple return statements using validation dispatch table
+        following advanced Python 3.13+ patterns and clean architecture.
+        """
         try:
             type_name = type_def.get("type")
 
-            if type_name == "string" and not isinstance(value, str):
-                return FlextResult[object].fail(
-                    f"Expected string, got {type(value).__name__}"
-                )
-            if type_name == "integer" and not isinstance(value, int):
-                return FlextResult[object].fail(
-                    f"Expected integer, got {type(value).__name__}"
-                )
-            if type_name == "number" and not isinstance(value, (int, float)):
-                return FlextResult[object].fail(
-                    f"Expected number, got {type(value).__name__}"
-                )
-            if type_name == "boolean" and not isinstance(value, bool):
-                return FlextResult[object].fail(
-                    f"Expected boolean, got {type(value).__name__}"
-                )
-            if type_name == "array" and not isinstance(value, list):
-                return FlextResult[object].fail(
-                    f"Expected array, got {type(value).__name__}"
-                )
-            if type_name == "object" and not isinstance(value, dict):
-                return FlextResult[object].fail(
-                    f"Expected object, got {type(value).__name__}"
-                )
+            # Validation dispatch table eliminating multiple if/return statements
+            validation_rules = {
+                "string": (str, "string"),
+                "integer": (int, "integer"),
+                "number": ((int, float), "number"),
+                "boolean": (bool, "boolean"),
+                "array": (list, "array"),
+                "object": (dict, "object"),
+            }
+
+            # Single validation logic with dispatch table
+            if type_name in validation_rules:
+                expected_type, type_display = validation_rules[type_name]
+                if not isinstance(value, expected_type):
+                    return FlextResult[object].fail(
+                        f"Expected {type_display}, got {type(value).__name__}"
+                    )
 
             return FlextResult[object].ok(value)
         except Exception as e:
@@ -227,7 +196,11 @@ class FlextSingerTypes:
     ) -> FlextResult[dict[str, object]]:
         """Create Singer RECORD message."""
         try:
-            message: dict[str, object] = {"type": "RECORD", "stream": stream, "record": record}
+            message: dict[str, object] = {
+                "type": "RECORD",
+                "stream": stream,
+                "record": record,
+            }
 
             # Add optional fields
             for key in ["time_extracted", "version"]:

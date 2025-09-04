@@ -3,41 +3,6 @@
 Provides comprehensive Meltano-specific types following the FlextTypes pattern with
 domain organization, Python 3.13+ type alias syntax, and hierarchical structure.
 All types related to Meltano, Singer SDK, DBT, and ELT pipelines are organized under single class.
-
-Module Role in Architecture:
-    FlextMeltanoTypes extends FlextTypes providing Meltano-specific type definitions for
-    plugin management, Singer SDK integration, DBT transformations, ELT pipelines, and
-    bridge communication with hierarchical organization and type safety.
-
-Classes and Methods:
-    FlextMeltanoTypes:                      # Single types class following flext-core pattern
-        # Plugin Domain - Meltano Plugin Types:
-        Plugin.Config = FlextMeltanoTypes.CLI.ProcessResult   # Plugin configuration type
-        Plugin.Name = str                   # Plugin name type
-        Plugin.Type = str                   # Plugin type identifier
-
-        # Singer Domain - Singer SDK Types:
-        Singer.Tap = SingerTap              # Singer tap type
-        Singer.Target = SingerTarget        # Singer target type
-        Singer.Stream = SingerStream        # Singer stream type
-
-        # DBT Domain - DBT Core Types:
-        DBT.Runner = dbtRunner              # DBT runner type
-        DBT.Project = FlextMeltanoTypes.CLI.ProcessResult     # DBT project configuration
-
-Usage Examples:
-    Using Meltano-specific types:
-        plugin_config: FlextMeltanoTypes.Plugin.Config = {"name": "tap-csv"}
-        tap: FlextMeltanoTypes.Singer.Tap = csv_tap
-
-    Type annotations:
-        def process_plugin(config: FlextMeltanoTypes.Plugin.Config) -> FlextResult[dict]:
-            return FlextResult.ok({"status": "processed"})
-
-Integration:
-    FlextMeltanoTypes extends the FlextTypes system providing Meltano-specific
-    types while maintaining consistency with the broader FLEXT ecosystem type
-    architecture and safety patterns.
 """
 
 from __future__ import annotations
@@ -102,7 +67,9 @@ class FlextMeltanoTypes(FlextTypes):
         type Settings = FlextTypes.Config.ConfigDict  # Settings are configuration
 
         # Plugin discovery and installation (using flext-core patterns)
-        type DiscoveryResult = list[FlextTypes.Core.JsonObject]  # List of Core.JsonObject
+        type DiscoveryResult = list[
+            FlextTypes.Core.JsonObject
+        ]  # List of Core.JsonObject
         type InstallationResult = FlextTypes.Core.JsonObject  # Single JsonObject result
         type PluginInfo = FlextTypes.Core.JsonObject  # Plugin info as JsonObject
 

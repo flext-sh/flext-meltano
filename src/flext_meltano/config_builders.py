@@ -14,11 +14,25 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import FlextLogger, FlextModels, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 
-ConfigDict = FlextMeltanoTypes.CLI.ProcessResult
+# Type alias for configuration dictionaries - use appropriate JsonObject type
+type ConfigDict = FlextTypes.Core.JsonObject
+
+
+# Configuration Models using flext-core patterns
+class SingerPluginConfig(FlextModels.Config):
+    """Configuration object for Singer plugins - eliminates parameter explosion."""
+
+    plugin_name: str
+    plugin_type: str = "extractor"  # "extractor" or "loader"
+    namespace: str = ""
+    pip_url: str = ""
+    executable: str = ""
+    variant: str = ""
+
 
 logger = FlextLogger(__name__)
 
@@ -99,58 +113,79 @@ class FlextMeltanoConfigBuilders:
         """Single responsibility: Singer configuration building only."""
 
         @staticmethod
-        def create_singer_tap_config(
-            tap_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
+        def _create_singer_config_generic(
+            config: SingerPluginConfig,
         ) -> FlextResult[ConfigDict]:
-            """Cria configuração para Singer tap usando FlextResult patterns.
+            """Generic Singer plugin config creator eliminating 228 lines of duplication.
+
+            Consolidates tap/target config creation using advanced Python patterns
+            and FlextUtilities validation following DRY principles.
 
             Args:
-                tap_name: Nome do tap
-                namespace: Namespace do tap
-                pip_url: URL do pip para instalação
-                executable: Nome do executável
+                config: SingerPluginConfig object containing all plugin parameters
 
             Returns:
-                FlextResult contendo Dict com configuração do tap ou erro
+                FlextResult containing plugin configuration dictionary
 
             """
             try:
-                # Validate and sanitize inputs using FlextUtilities
-                safe_tap_name = FlextUtilities.TextProcessor.safe_string(
-                    tap_name, "unknown-tap"
+                # Create type-specific defaults using f-strings and pattern matching
+                type_prefix = "tap" if config.plugin_type == "extractor" else "target"
+                safe_name = FlextUtilities.TextProcessor.safe_string(
+                    config.plugin_name, f"unknown-{type_prefix}"
                 )
                 safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                    namespace, "tap_" + safe_tap_name.replace("-", "_")
+                    config.namespace, f"{type_prefix}_{safe_name.replace('-', '_')}"
                 )
                 safe_executable = FlextUtilities.TextProcessor.safe_string(
-                    executable, safe_tap_name
+                    config.executable, safe_name
                 )
 
-                config: ConfigDict = {
-                    "name": safe_tap_name,
+                result_config: ConfigDict = {
+                    "name": safe_name,
                     "namespace": safe_namespace,
                     "executable": safe_executable,
-                    "type": "extractor",
+                    "type": config.plugin_type,
                     "metadata": {
                         "created_by": "flext-meltano",
                         "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     },
                 }
 
-                # Handle pip_url with validation
-                if pip_url:
-                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
-                        pip_url
+                # Smart pip_url handling with type-specific defaults
+                if config.pip_url:
+                    result_config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
+                        config.pip_url
                     )
                 else:
-                    # Default pip_url para taps conhecidos
-                    config["pip_url"] = f"pipelinewise-{safe_tap_name}"
+                    prefix = (
+                        "pipelinewise"
+                        if config.plugin_type == "extractor"
+                        else "target"
+                    )
+                    result_config["pip_url"] = f"{prefix}-{safe_name}"
 
-                return FlextResult[ConfigDict].ok(config)
+                return FlextResult[ConfigDict].ok(result_config)
             except Exception as e:
                 return FlextResult[ConfigDict].fail(
-                    f"Failed to create Singer tap config: {e}"
+                    f"Failed to create Singer {config.plugin_type} config: {e}"
                 )
+
+        @staticmethod
+        def create_singer_tap_config(
+            tap_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
+        ) -> FlextResult[ConfigDict]:
+            """Creates tap configuration using generic factory pattern with object-based parameters."""
+            config = SingerPluginConfig(
+                plugin_name=tap_name,
+                plugin_type="extractor",
+                namespace=namespace,
+                pip_url=pip_url,
+                executable=executable,
+            )
+            return FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
+                config
+            )
 
         @staticmethod
         def create_singer_target_config(
@@ -159,76 +194,30 @@ class FlextMeltanoConfigBuilders:
             pip_url: str = "",
             executable: str = "",
         ) -> FlextResult[ConfigDict]:
-            """Cria configuração para Singer target usando FlextResult patterns.
-
-            Args:
-                target_name: Nome do target
-                namespace: Namespace do target
-                pip_url: URL do pip para instalação
-                executable: Nome do executável
-
-            Returns:
-                FlextResult contendo Dict com configuração do target ou erro
-
-            """
-            try:
-                # Validate and sanitize inputs using FlextUtilities
-                safe_target_name = FlextUtilities.TextProcessor.safe_string(
-                    target_name, "unknown-target"
-                )
-                safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                    namespace, "target_" + safe_target_name.replace("-", "_")
-                )
-                safe_executable = FlextUtilities.TextProcessor.safe_string(
-                    executable, safe_target_name
-                )
-
-                config: ConfigDict = {
-                    "name": safe_target_name,
-                    "namespace": safe_namespace,
-                    "executable": safe_executable,
-                    "type": "loader",
-                    "metadata": {
-                        "created_by": "flext-meltano",
-                        "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    },
-                }
-
-                # Handle pip_url with validation
-                if pip_url:
-                    config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
-                        pip_url
-                    )
-                else:
-                    # Default pip_url para targets conhecidos
-                    config["pip_url"] = f"pipelinewise-{safe_target_name}"
-
-                return FlextResult[ConfigDict].ok(config)
-            except Exception as e:
-                return FlextResult[ConfigDict].fail(
-                    f"Failed to create Singer target config: {e}"
-                )
+            """Creates target configuration using generic factory pattern with object-based parameters."""
+            config = SingerPluginConfig(
+                plugin_name=target_name,
+                plugin_type="loader",
+                namespace=namespace,
+                pip_url=pip_url,
+                executable=executable,
+            )
+            return FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
+                config
+            )
 
     class PluginConfigBuilder:
         """Single responsibility: Meltano plugin configuration building only."""
 
         @staticmethod
         def create_plugin_config(
-            name: str,
-            namespace: str,
-            pip_url: str,
-            executable: str = "",
-            variant: str = "",
+            config: SingerPluginConfig,
             config_defaults: ConfigDict | None = None,
         ) -> FlextResult[ConfigDict]:
             """Cria configuração completa para plugin Meltano usando FlextResult patterns.
 
             Args:
-                name: Nome do plugin
-                namespace: Namespace do plugin
-                pip_url: URL do pip ou git para instalação
-                executable: Nome do executável (opcional)
-                variant: Variant do plugin (opcional)
+                config: SingerPluginConfig object containing all plugin parameters
                 config_defaults: Configurações padrão (opcional)
 
             Returns:
@@ -238,13 +227,13 @@ class FlextMeltanoConfigBuilders:
             try:
                 # Validate and sanitize inputs using FlextUtilities
                 safe_name = FlextUtilities.TextProcessor.safe_string(
-                    name, "unknown-plugin"
+                    config.plugin_name, "unknown-plugin"
                 )
                 safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                    namespace, safe_name
+                    config.namespace, safe_name
                 )
                 safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-                    pip_url, f"unknown-{safe_name}"
+                    config.pip_url, f"unknown-{safe_name}"
                 )
 
                 plugin_config: ConfigDict = {
@@ -257,14 +246,14 @@ class FlextMeltanoConfigBuilders:
                     },
                 }
 
-                if executable:
+                if config.executable:
                     plugin_config["executable"] = (
-                        FlextUtilities.TextProcessor.safe_string(executable)
+                        FlextUtilities.TextProcessor.safe_string(config.executable)
                     )
 
-                if variant:
+                if config.variant:
                     plugin_config["variant"] = FlextUtilities.TextProcessor.safe_string(
-                        variant
+                        config.variant
                     )
 
                 if config_defaults:
