@@ -43,14 +43,17 @@ class TestFlextSingerTypesUnified:
 
         assert result.success
         message = result.value
+        assert isinstance(message, dict)
         assert message["type"] == "RECORD"
         assert message["stream"] == "users"
-        assert message["record"]["id"] == 1
+        record = message["record"]
+        assert isinstance(record, dict)
+        assert record["id"] == 1
 
     def test_schema_message_creation(self) -> None:
         """Test Singer SCHEMA message creation."""
         singer_types = FlextSingerTypes()
-        schema = {"type": "object", "properties": {"id": {"type": "integer"}}}
+        schema: dict[str, object] = {"type": "object", "properties": {"id": {"type": "integer"}}}
         result = singer_types.create_schema_message("users", schema, ["id"])
 
         assert result.success
@@ -62,7 +65,7 @@ class TestFlextSingerTypesUnified:
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
         singer_types = FlextSingerTypes()
-        string_type = {"type": "string"}
+        string_type: dict[str, object] = {"type": "string"}
 
         # Valid string
         result = singer_types.validate_value("test", string_type)
@@ -71,7 +74,9 @@ class TestFlextSingerTypesUnified:
         # Invalid type
         result = singer_types.validate_value(123, string_type)
         assert result.failure
-        assert "Expected string" in result.error
+        error_msg = result.error
+        assert error_msg is not None
+        assert "Expected string" in error_msg
 
     def test_get_registered_types(self) -> None:
         """Test getting registered types."""

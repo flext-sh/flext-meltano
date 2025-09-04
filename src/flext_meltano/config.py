@@ -389,10 +389,25 @@ class FlextMeltanoConfig(BaseModel):
                     f"Invalid environment: {environment}"
                 )
 
-            # Filter kwargs to valid fields only
+            # Filter and type-cast kwargs to valid fields only
             valid_fields = cls.model_fields.keys()
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_fields}
-            config = cls(environment=env_type, **filtered_kwargs)  # type: ignore[arg-type]  # Pydantic handles type conversion
+            filtered_kwargs: dict[str, object] = {k: v for k, v in kwargs.items() if k in valid_fields}
+
+            # Create config with proper type conversions
+            project_root_value = filtered_kwargs.get("project_root", ".")
+            if isinstance(project_root_value, str):
+                project_root = Path(project_root_value)
+            elif isinstance(project_root_value, Path):
+                project_root = project_root_value
+            else:
+                project_root = Path()
+
+            config = cls(
+                environment=env_type,
+                project_root=project_root,
+                log_level=cls.LogLevel(str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))),
+                run_mode=cls.RunMode(str(filtered_kwargs.get("run_mode", cls.RunMode.FULL))),
+            )
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
         except Exception as e:

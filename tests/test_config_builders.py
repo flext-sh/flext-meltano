@@ -58,8 +58,6 @@ class TestFlextMeltanoConfigBuildersBasic(unittest.TestCase):
 
     def test_all_exports_available(self) -> None:
         """Test all expected exports are available."""
-        from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-
         # Main class should be importable
         assert FlextMeltanoConfigBuilders is not None
 

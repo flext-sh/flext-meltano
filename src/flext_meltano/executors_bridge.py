@@ -11,6 +11,7 @@ import asyncio
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import meltano
 from flext_core import FlextLogger, FlextResult
@@ -41,8 +42,8 @@ class FlextMeltanoBridge:
         self._current_project: object | None = None
         # Create logger with specific name expected by tests
         self.logger = FlextLogger("MeltanoBridge")
-        # Add executor for methods that need it
-        self.executor = FlextMeltanoExecutors.SimpleMeltanoExecutor
+        # Add executor instance for methods that need it
+        self.executor = FlextMeltanoExecutors.SimpleMeltanoExecutor()
 
     def _execute_with_json_response(
         self, operation: OperationType
@@ -115,13 +116,8 @@ class FlextMeltanoBridge:
             }
             return FlextResult[dict[str, str]].ok(version_info)
         except Exception as e:
-            # Fallback version info on import errors
-            fallback_info = {
-                "version": "3.9.1",
-                "flext_meltano": "2.0.0-enterprise",
-                "error": str(e),
-            }
-            return FlextResult[dict[str, str]].ok(fallback_info)
+            # Return error result instead of fallback - fail fast for debugging
+            return FlextResult[dict[str, str]].fail(f"Version detection failed: {e}")
 
     def get_version_json(self) -> dict[str, object]:
         """Get version for Go service using consolidated version method."""
@@ -142,9 +138,10 @@ class FlextMeltanoBridge:
             result = FlextMeltanoExecutors.SimpleMeltanoExecutor.run_pipeline(
                 project_path, tap_name, target_name
             )
-            # Ensure we return a compatible type
-            if hasattr(result, "success"):
-                return result  # type: ignore[return-value]
+            # Ensure we return a compatible type - check for FlextResult interface
+            if hasattr(result, "success") and hasattr(result, "value"):
+                # Cast to expected FlextResult type since we know it matches
+                return cast("FlextResult[dict[str, object]]", result)
             return FlextResult[dict[str, object]].ok({"result": str(result)})
 
         return self._execute_with_json_response(_run_pipeline)
@@ -338,9 +335,12 @@ class FlextMeltanoBridge:
     ) -> dict[str, object]:
         """Execute real Meltano command using native API."""
         try:
-            # Delegate to adapter's method
-            # Use available methods - placeholder for command execution
-            result = FlextResult.ok({"command": command, "status": "executed"})
+            # Execute real Meltano command using the adapter
+            adapter_result = self.executor.run_plugin_command("meltano", "command", command)
+            if adapter_result.success:
+                result = FlextResult.ok(adapter_result.value)
+            else:
+                result = FlextResult.fail(adapter_result.error or "Command failed")
 
             if result.success:
                 return {"success": True, "data": result.value}
@@ -392,14 +392,13 @@ class FlextMeltanoBridge:
     ) -> object:
         """Synchronous plugin execution."""
         try:
-            # For now, just return a placeholder result
-            # This would need proper Meltano API integration
-            data = {
-                "plugin": plugin_name,
-                "command": command,
-                "args": args,
-                "output": "Plugin command executed",
-            }
+            # Execute real plugin command using executor
+            execution_result = self.executor.run_plugin_command(plugin_name, command, args)
+            if execution_result.success:
+                data = execution_result.value
+            else:
+                return {"success": False, "error": execution_result.error}
+
             return FlextResult.ok(data)
         except Exception as e:
             return FlextResult.fail(str(e))

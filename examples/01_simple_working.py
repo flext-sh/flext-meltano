@@ -4,13 +4,15 @@ This example demonstrates the actual working functionality that exists,
 using only classes and functions that are actually exported from flext_meltano.
 """
 
+from pathlib import Path
+
 from flext_core import FlextLogger
 
 # Import ONLY what actually exists
 from flext_meltano import (
     FlextMeltanoConfig,
     FlextMeltanoExecutor,
-    MeltanoBridge,
+    FlextMeltanoBridge,
 )
 
 logger = FlextLogger(__name__)
@@ -19,7 +21,7 @@ logger = FlextLogger(__name__)
 def simple_bridge_example() -> None:
     """Example using real MeltanoBridge functionality."""
     # Create bridge using real API
-    bridge = MeltanoBridge()
+    bridge = FlextMeltanoBridge()
 
     # Get version - this actually works
     version_result = bridge.get_version()
@@ -35,8 +37,6 @@ def simple_bridge_example() -> None:
 
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
-    from pathlib import Path
-
     # Create executor with proper Path argument
     executor = FlextMeltanoExecutor(Path.cwd())
 

@@ -3,6 +3,7 @@
 Tests ONLY the actual methods listed by inspection.
 """
 
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -26,8 +27,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
         assert temp_path.exists()
 
         # Cleanup
-        import shutil
-
         shutil.rmtree(temp_path)
 
     def test_create_temp_directory_custom_prefix(self) -> None:
@@ -41,8 +40,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
         assert "custom_" in temp_path.name
 
         # Cleanup
-        import shutil
-
         shutil.rmtree(temp_path)
 
     def test_create_meltano_config_dict(self) -> None:
@@ -67,8 +64,8 @@ class TestFlextMeltanoUtilitiesRealMethods:
         config = result.value
         assert isinstance(config, dict)
 
-    def test_create_temp_directory(self) -> None:
-        """Test create_temp_directory method."""
+    def test_create_temp_directory_second(self) -> None:
+        """Test create_temp_directory method second time."""
         result = FlextMeltanoUtilities.create_temp_directory()
 
         assert isinstance(result, FlextResult)
@@ -79,13 +76,11 @@ class TestFlextMeltanoUtilitiesRealMethods:
         assert temp_path.exists()
 
         # Cleanup
-        import shutil
-
         shutil.rmtree(temp_path)
 
     def test_create_plugin_config(self) -> None:
         """Test create_plugin_config method."""
-        result = FlextMeltanoUtilities.create_plugin_config("tap-csv")
+        result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
 
         assert isinstance(result, FlextResult)
         assert result.success
@@ -95,7 +90,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_create_plugin_config_full_params(self) -> None:
         """Test create_plugin_config with all parameters."""
-        result = FlextMeltanoUtilities.create_plugin_config(
+        result = FlextMeltanoUtilities.create_plugin_config_dict(
             name="tap-csv",
             plugin_type="extractor",
             namespace="tap_csv",
@@ -270,12 +265,18 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_save_yaml_config(self) -> None:
         """Test save_yaml_config method."""
-        config = {"version": 1, "project_id": "test"}
+        # Create proper Meltano config for testing
+        from flext_meltano.typings import FlextMeltanoTypes
+        config: FlextMeltanoTypes.DBT.ProjectConfig = {
+            "version": 1,
+            "project_id": "test",
+            "plugins": {"extractors": [], "loaders": [], "transformers": []}
+        }
 
         with tempfile.TemporaryDirectory() as temp_dir:
             target_path = Path(temp_dir) / "test_config.yml"
 
-            result = FlextMeltanoUtilities.save_yaml_config(config, target_path)
+            result = FlextMeltanoUtilities.write_meltano_yml(config, target_path)
 
             assert isinstance(result, FlextResult)
             if result.success:
@@ -286,7 +287,13 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_write_meltano_yml(self) -> None:
         """Test write_meltano_yml method."""
-        config = {"version": 1, "project_id": "test-project"}
+        # Create proper Meltano config for testing
+        from flext_meltano.typings import FlextMeltanoTypes
+        config: FlextMeltanoTypes.DBT.ProjectConfig = {
+            "version": 1,
+            "project_id": "test-project",
+            "plugins": {"extractors": [], "loaders": [], "transformers": []}
+        }
 
         with tempfile.TemporaryDirectory() as temp_dir:
             target_path = Path(temp_dir) / "meltano.yml"
@@ -321,7 +328,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_validate_plugin_config(self) -> None:
         """Test validate_plugin_config method."""
         # Create a basic plugin config
-        config_result = FlextMeltanoUtilities.create_plugin_config("tap-csv")
+        config_result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
         assert config_result.success
 
         config = config_result.value

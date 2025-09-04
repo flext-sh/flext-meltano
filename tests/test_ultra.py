@@ -51,8 +51,8 @@ def test_simple_config_creation() -> None:
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = FlextMeltanoConfig(
-                project_root=str(temp_dir),
-                environment="test",
+                project_root=Path(temp_dir),
+                environment=FlextMeltanoConfig.EnvironmentType.TEST,
             )
 
             assert str(config.project_root) == str(temp_dir)

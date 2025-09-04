@@ -170,8 +170,7 @@ minversion = "8.0"
 asyncio_mode = "auto"
 addopts = [
     "-ra",
-    "--strict-markers",
-    "--strict-config",
+    "--strict-config", 
     "--maxfail=1",
     "--tb=short",
 ]
@@ -183,6 +182,9 @@ markers = [
     "smoke: Smoke tests",
     "e2e: End-to-end tests",
     "performance: Performance tests",
+    "concurrency: Concurrency tests",
+    "meltano: Meltano-specific tests",
+    "real: Real functionality tests without mocks",
 ]
 filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
 

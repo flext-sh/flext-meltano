@@ -9,7 +9,16 @@ from __future__ import annotations
 import unittest
 from unittest import TestCase
 
-from flext_meltano.plugin_protocols import FlextMeltanoPluginTypes
+import flext_meltano.plugin_protocols as protocols_module
+from flext_meltano.plugin_protocols import (
+    DbtServiceProtocol,
+    FlextDbtPlugin,
+    FlextMeltanoPluginTypes,
+    FlextTapPlugin,
+    FlextTargetPlugin,
+    TapServiceProtocol,
+    TargetServiceProtocol,
+)
 
 
 class TestFlextMeltanoPluginTypesBasic(TestCase):
@@ -103,15 +112,6 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
 
     def test_module_level_aliases(self) -> None:
         """Test module-level backward compatibility aliases."""
-        from flext_meltano.plugin_protocols import (
-            DbtServiceProtocol,
-            FlextDbtPlugin,
-            FlextTapPlugin,
-            FlextTargetPlugin,
-            TapServiceProtocol,
-            TargetServiceProtocol,
-        )
-
         # All should be importable
         assert FlextTapPlugin is not None
         assert FlextTargetPlugin is not None
@@ -122,8 +122,6 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
 
     def test_import_works(self) -> None:
         """Test importing from module works."""
-        from flext_meltano.plugin_protocols import FlextMeltanoPluginTypes
-
         # Should be importable without errors
         assert FlextMeltanoPluginTypes is not None
 
@@ -136,8 +134,6 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
         assert FlextMeltanoPluginTypes.__doc__ is not None
 
         # Should have module docstring
-        import flext_meltano.plugin_protocols as protocols_module
-
         assert protocols_module.__doc__ is not None
 
 

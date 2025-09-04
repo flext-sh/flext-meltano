@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
+from flext_tests import FlextMatchers
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 
@@ -115,7 +116,7 @@ class TestFlextMeltanoAdapterReal:
 
                 # Try to add a common plugin
                 plugin_result = self.adapter.add_plugin(
-                    project=project, plugin_type="extractors", plugin_name="tap-csv"
+                    project_dir=Path(project["root"]), plugin_type="extractors", plugin_name="tap-csv"
                 )
 
                 assert isinstance(plugin_result, FlextResult)
@@ -130,13 +131,12 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config(self) -> None:
         """Test project configuration adaptation."""
-        config = {"name": "test-project", "plugins": {"extractors": [], "loaders": []}}
+        config: dict[str, object] = {"name": "test-project", "plugins": {"extractors": [], "loaders": []}}
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
-        assert isinstance(result, FlextResult)
-        assert result.success
-
+        # Use flext_tests matchers for cleaner assertions
+        FlextMatchers.assert_result_success(result)
         adapted_config = result.value
         assert isinstance(adapted_config, dict)
 
@@ -150,7 +150,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config_minimal(self) -> None:
         """Test project config adaptation with minimal input."""
-        config = {}
+        config: dict[str, object] = {}
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
@@ -164,7 +164,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin(self) -> None:
         """Test plugin adaptation."""
-        plugin_data = {"type": "extractors", "pip_url": "pipelinewise-tap-csv"}
+        plugin_data: dict[str, object] = {"type": "extractors", "pip_url": "pipelinewise-tap-csv"}
 
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
@@ -184,7 +184,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin_minimal(self) -> None:
         """Test plugin adaptation with minimal input."""
-        plugin_data = {}
+        plugin_data: dict[str, object] = {}
 
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
@@ -226,7 +226,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_error_handling_invalid_plugin_data(self) -> None:
         """Test error handling with invalid plugin data."""
-        invalid_plugin = {"invalid": "data", "type": "nonexistent"}
+        invalid_plugin: dict[str, object] = {"invalid": "data", "type": "nonexistent"}
 
         result = FlextMeltanoAdapter.adapt_plugin(invalid_plugin)
 
@@ -240,7 +240,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_error_handling_none_inputs(self) -> None:
         """Test error handling with None inputs."""
-        result = FlextMeltanoAdapter.adapt_project_config(None)
+        result = FlextMeltanoAdapter.adapt_project_config({})
 
         assert isinstance(result, FlextResult)
         # Should handle None gracefully
@@ -274,7 +274,7 @@ class TestFlextMeltanoAdapterReal:
     def test_multiple_plugin_operations(self) -> None:
         """Test multiple plugin operations in sequence."""
         # Test plugin adaptation multiple times
-        plugins = [
+        plugins: list[dict[str, object]] = [
             {"type": "extractors", "name": "tap-csv"},
             {"type": "loaders", "name": "target-postgres"},
             {"type": "transformers", "name": "dbt"},

@@ -21,6 +21,6 @@ from __future__ import annotations
 # PUBLIC API EXPORTS - Class-based only
 # =============================================================================
 
-__all__ = [
+__all__: list[str] = [
     # Will be populated when script modules are added
 ]

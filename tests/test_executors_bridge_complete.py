@@ -3,6 +3,7 @@
 Tests all bridge functionality with 100% real operations.
 """
 
+import asyncio
 import tempfile
 from pathlib import Path
 
@@ -224,9 +225,6 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_run_plugin_async(self) -> None:
         """Test run_plugin_async method."""
-        import asyncio
-        import tempfile
-        from pathlib import Path
 
         async def run_async_test() -> None:
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -369,8 +367,6 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_error_scenarios_for_coverage(self) -> None:
         """Test error scenarios to increase coverage on exception handling."""
-        from pathlib import Path
-
         # Test with invalid paths to trigger error handling
         invalid_path = Path("/nonexistent/invalid/path/that/does/not/exist")
 
@@ -392,9 +388,6 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_parameter_validation_coverage(self) -> None:
         """Test various parameter combinations to increase branch coverage."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
@@ -422,9 +415,6 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_additional_method_coverage(self) -> None:
         """Test additional methods to increase coverage."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             Path(temp_dir)
 
@@ -448,21 +438,16 @@ class TestFlextMeltanoBridgeComplete:
             # Test different combinations to hit unused branches
             try:
                 # Test edge cases that might trigger different code paths
-                import tempfile
-
                 with tempfile.TemporaryDirectory() as temp_dir_inner:
                     nonexistent_path = f"{temp_dir_inner}/nonexistent_project"
                     edge_result = self.bridge.get_project_info(nonexistent_path)
                 assert isinstance(edge_result, dict)
-            except Exception:
+            except Exception as e:
                 # Some edge cases may raise exceptions, which is acceptable
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_internal_methods_for_coverage(self) -> None:
         """Test internal methods to achieve higher coverage."""
-        import tempfile
-        from pathlib import Path
-
         # Test _create_temp_project internal method
         temp_project_result = self.bridge._create_temp_project()
         assert isinstance(temp_project_result, FlextResult)
@@ -487,24 +472,24 @@ class TestFlextMeltanoBridgeComplete:
         try:
             empty_result = self.bridge.install_plugin("", "")
             assert isinstance(empty_result, FlextResult)
-        except Exception:
+        except Exception as e:
             # May raise exception for invalid empty inputs
-            pass
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
         # Test with None-like values (as string)
         try:
             none_result = self.bridge.execute_dbt_command(["none"])
             assert isinstance(none_result, dict)
-        except Exception:
+        except Exception as e:
             # May fail for invalid commands
-            pass
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
         # Test invoke_dbt with special characters
         try:
             special_result = self.bridge.invoke_dbt("--help")
             assert isinstance(special_result, dict)
-        except Exception:
-            pass
+        except Exception as e:
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_error_recovery_patterns(self) -> None:
         """Test error recovery and resilience patterns."""
