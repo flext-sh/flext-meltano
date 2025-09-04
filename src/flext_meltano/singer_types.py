@@ -144,7 +144,7 @@ class FlextSingerTypes:
             type_name = type_def.get("type")
 
             # Validation dispatch table eliminating multiple if/return statements
-            validation_rules = {
+            validation_rules: dict[str, tuple[type | tuple[type, ...], str]] = {
                 "string": (str, "string"),
                 "integer": (int, "integer"),
                 "number": ((int, float), "number"),
@@ -154,9 +154,17 @@ class FlextSingerTypes:
             }
 
             # Single validation logic with dispatch table
-            if type_name in validation_rules:
-                expected_type, type_display = validation_rules[type_name]
-                if not isinstance(value, expected_type):
+            if isinstance(type_name, str) and type_name in validation_rules:
+                expected_type_info, type_display = validation_rules[type_name]
+                # Type narrowing for isinstance check - proper union handling
+                if isinstance(expected_type_info, tuple):
+                    # Handle tuple case like (int, float) for "number"
+                    if not isinstance(value, expected_type_info):
+                        return FlextResult[object].fail(
+                            f"Expected {type_display}, got {type(value).__name__}"
+                        )
+                # Handle single type case
+                elif not isinstance(value, expected_type_info):
                     return FlextResult[object].fail(
                         f"Expected {type_display}, got {type(value).__name__}"
                     )

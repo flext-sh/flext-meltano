@@ -46,12 +46,15 @@ Integration:
 
 from __future__ import annotations
 
+import json
 import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-# from flext_cli import FlextCliApi  # TODO(@marlonsc): Fix syntax error in flext-cli # noqa: TD003, FIX002
+import click
+
+# FlextCliApi is not available - implementing direct CLI functionality
 from flext_core import (
     FlextDecorators,
     FlextLogger,
@@ -393,15 +396,25 @@ class FlextMeltanoExecutor:
         try:
             logger.info("Running ELT pipeline", tap=tap_name, target=target_name)
 
-            # ELT pipeline execution placeholder - would coordinate tap and target execution
-            pipeline_result = FlextResult.ok({
-                "status": "completed",
-                "tap": tap_name,
-                "target": target_name,
-                "project": str(
-                    Path(project_root) if project_root else self.project_root
-                ),
-            })
+            # Execute real ELT pipeline using Meltano integration
+            try:
+                # Use bridge for executing pipeline through Meltano
+                if project_root:
+                    self.bridge.executor.project_root = Path(project_root)
+
+                run_result = self.bridge.run_pipeline(tap_name, target_name)
+                if run_result["success"]:
+                    pipeline_result = FlextResult.ok({
+                        "status": "completed",
+                        "tap": tap_name,
+                        "target": target_name,
+                        "project": str(Path(project_root) if project_root else self.project_root),
+                        "execution_details": run_result,
+                    })
+                else:
+                    pipeline_result = FlextResult.fail(f"Pipeline failed: {run_result.get('error', 'Unknown error')}")
+            except Exception as e:
+                pipeline_result = FlextResult.fail(f"Pipeline execution error: {e}")
 
             if pipeline_result.success:
                 return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok({
@@ -688,8 +701,23 @@ class FlextMeltanoExecutor:
                 self.output = output
                 self.debug = debug
                 self.executor = FlextMeltanoExecutor(project_root=self.project_root)
-                # self.cli_cmd = FlextCliApi()  # TODO(@marlonsc): Fix syntax error in flext-cli # noqa: TD002, TD003, FIX002
-                self.cli_cmd = None  # Temporary placeholder
+                self.logger = FlextLogger(self.__class__.__name__)
+                # CLI command interface - initialize with Click integration
+                self.cli_cmd = self._create_cli_command()
+
+            def _create_cli_command(self) -> object:
+                """Create CLI command structure using Click."""
+                try:
+                    # Click already imported at module level
+
+                    @click.group()
+                    def cli() -> None:
+                        """FLEXT Meltano CLI interface."""
+
+                    return cli
+                except ImportError:
+                    # Fallback for environments without Click
+                    return None
 
             @FlextDecorators.Reliability.safe_result
             def _handle_command_generic(
@@ -722,10 +750,17 @@ class FlextMeltanoExecutor:
                 formatted_data = (
                     data_formatter(result.value) if data_formatter else result.value
                 )
-                # self.cli_cmd.format_data(formatted_data)  # TODO(@marlonsc): Fix syntax error in flext-cli # noqa: TD002, TD003, FIX002
-                # Temporary formatting placeholder
+                # Format data directly since FlextCliApi is not available
+                self.logger.info("Formatting command result data", data=formatted_data)
+                # Direct data formatting implementation
                 if formatted_data:
-                    pass  # Would format data here
+                    try:
+                        # Try to format as JSON for structured output
+                        formatted_output = json.dumps(formatted_data, indent=2)
+                        self.logger.debug("Formatted output", output=formatted_output)
+                    except (TypeError, ValueError):
+                        # Fallback to string representation
+                        self.logger.debug("Raw output", output=str(formatted_data))
                 return success_message
 
             @FlextDecorators.Reliability.safe_result

@@ -3,9 +3,12 @@
 Tests all major executor functionality with 100% real API integration.
 """
 
+import sys
 import tempfile
 from pathlib import Path
+from unittest import mock
 
+from click.testing import CliRunner
 from flext_core import FlextResult
 
 from flext_meltano.executors import FlextMeltanoExecutor
@@ -418,8 +421,6 @@ class TestFlextMeltanoExecutorComplete:
         """Test error scenarios to hit uncovered exception handling lines."""
         # Test scenario to hit lines 118-120 (command execution failure)
         # Create executor that might fail command execution
-        import sys
-        from unittest import mock
 
         # Temporarily patch sys.argv to force error scenarios
         with mock.patch.object(sys, "exit", side_effect=SystemExit(1)):
@@ -449,9 +450,10 @@ class TestFlextMeltanoExecutorComplete:
                 if not result.success:
                     assert result.error_message
                     assert len(result.error_message) > 0
-            except Exception:
-                # Some scenarios may raise exceptions, which is acceptable
-                pass
+            except Exception as e:
+                # Some scenarios may raise exceptions, which is acceptable for edge cases
+                # Verify it's a reasonable exception type
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_click_cli_infrastructure_invocation(self) -> None:
         """Test Click CLI infrastructure to hit uncovered lines 689-837."""
@@ -485,12 +487,12 @@ class TestFlextMeltanoExecutorComplete:
                 # CLI execution may succeed or fail, both acceptable
                 if not result.success:
                     assert result.error_message
-            except SystemExit:
+            except SystemExit as e:
                 # Click CLI may call sys.exit, which is normal behavior
-                pass
-            except Exception:
+                assert isinstance(e.code, (int, type(None)))
+            except Exception as e:
                 # Other exceptions may occur in CLI context
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, ImportError))
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases to increase coverage."""
@@ -507,9 +509,9 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor._execute_command(command, args)
                 assert isinstance(result, FlextResult)
                 # Should handle all command scenarios
-            except Exception:
+            except Exception as e:
                 # Some edge cases may raise exceptions
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_pipeline_execution_error_scenarios(self) -> None:
         """Test pipeline execution with error scenarios."""
@@ -528,9 +530,9 @@ class TestFlextMeltanoExecutorComplete:
                 if not result.success:
                     assert result.error_message
                     assert isinstance(result.error_message, str)
-            except Exception:
+            except Exception as e:
                 # Some scenarios may raise exceptions
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_internal_method_direct_invocation(self) -> None:
         """Test internal methods directly to increase coverage."""
@@ -547,23 +549,20 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor._handle_run_command(args)
                 assert isinstance(result, FlextResult)
                 # May succeed or fail depending on arguments
-            except Exception:
+            except Exception as e:
                 # Some combinations may raise exceptions
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
         # Test _print_help method (should not return anything)
         try:
             self.executor._print_help()
             # Method returns None, just ensure it doesn't crash
-        except Exception:
+        except Exception as e:
             # May fail in some environments
-            pass
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
 
     def test_cli_execution_exception_handling(self) -> None:
         """Test CLI execution exception handling to hit lines 209-224."""
-        import sys
-        from unittest import mock
-
         # Test scenarios that trigger CLI execution failures
         try:
             # Mock sys.exit to force exceptions during CLI execution
@@ -577,9 +576,9 @@ class TestFlextMeltanoExecutorComplete:
                     # Exception should be caught and converted to error result
                     assert result.error_message
                     assert "CLI run failed" in result.error_message
-        except Exception:
+        except Exception as e:
             # Some scenarios may raise exceptions beyond our control
-            pass
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError, SystemExit))
 
         # Test with command that causes internal CLI failure
         try:
@@ -590,16 +589,12 @@ class TestFlextMeltanoExecutorComplete:
             # Should either succeed or fail with proper error message
             if not result.success and result.error_message:
                 assert len(result.error_message) > 0
-        except Exception:
+        except Exception as e:
             # CLI exceptions are acceptable for invalid commands
-            pass
+            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError, SystemExit))
 
     def test_click_cli_main_command_infrastructure(self) -> None:
         """Test Click CLI main command infrastructure to hit lines 729-743."""
-        import tempfile
-
-        from click.testing import CliRunner
-
         # Create CLI app to test main infrastructure
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
@@ -625,8 +620,6 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_click_version_command_infrastructure(self) -> None:
         """Test Click version command infrastructure to hit lines 745-762."""
-        from click.testing import CliRunner
-
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
@@ -643,8 +636,6 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_click_health_command_infrastructure(self) -> None:
         """Test Click health command infrastructure to hit lines 768-782."""
-        from click.testing import CliRunner
-
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
@@ -667,8 +658,6 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_click_run_command_infrastructure(self) -> None:
         """Test Click run command infrastructure to hit lines 820-835."""
-        from click.testing import CliRunner
-
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
@@ -691,10 +680,6 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_cli_command_error_paths(self) -> None:
         """Test CLI command error paths to hit lines 760-762, 780-782, 800-808, 832-835."""
-        from unittest import mock
-
-        from click.testing import CliRunner
-
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
@@ -744,10 +729,6 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_cli_format_result_paths(self) -> None:
         """Test CLI format result paths to hit lines 802-806."""
-        from unittest import mock
-
-        from click.testing import CliRunner
-
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
@@ -798,6 +779,6 @@ class TestFlextMeltanoExecutorComplete:
                     assert isinstance(result.value, dict)
                 else:
                     assert result.error_message
-            except Exception:
+            except Exception as e:
                 # Some edge cases may raise exceptions, which is acceptable
-                pass
+                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError, SystemExit))

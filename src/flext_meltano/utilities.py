@@ -236,7 +236,9 @@ class FlextMeltanoUtilities:
                     "adapted_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 },
             }
-            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(adapted_data)  # type: ignore[arg-type]  # Complex nested dict type conversion
+            # Cast to expected type - we know the structure matches PluginInfo
+            typed_data = cast("FlextMeltanoTypes.Plugin.PluginInfo", adapted_data)
+            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(typed_data)
         except Exception as e:
             error_msg = f"Failed to adapt Meltano plugin: {e}"
             logger.exception(error_msg)
@@ -346,7 +348,7 @@ class FlextMeltanoUtilities:
             dbt_yml = project_root / "transform" / "dbt_project.yml"
 
             # Chain operations using bind for railway-oriented programming
-            def setup_operation(_: None) -> FlextResult[tuple]:
+            def setup_operation(_: None) -> FlextResult[tuple[Path, Path]]:
                 """Setup operation chain using FlextResult.bind() pattern."""
                 # Create configs
                 meltano_config_result = cls.create_meltano_config_dict(

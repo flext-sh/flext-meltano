@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 from flext_core import (
     FlextLogger,
@@ -68,7 +68,7 @@ class FlextMeltanoValidators(FlextUtilities):
                 def validate_project_id(cls, v: str) -> str:
                     if not v.strip():
                         msg = "Project ID cannot be empty or whitespace"
-                        raise ValueError(msg)
+                        raise ValueError(msg)  # noqa: TRY301
                     return v
 
             # Validate using Pydantic
@@ -146,11 +146,25 @@ class FlextMeltanoValidators(FlextUtilities):
             # Attempt type conversion with proper casting
             if expected_type is bool and isinstance(value, str):
                 # Handle string to bool conversion
-                converted_value = value.lower() in {"true", "1", "yes", "on"}
-                return FlextResult[T | None].ok(converted_value)
-            # Standard type conversion
-            converted_value = expected_type(value)
-            return FlextResult[T | None].ok(converted_value)
+                bool_value: bool = value.lower() in {"true", "1", "yes", "on"}
+                return FlextResult[T | None].ok(cast("T", bool_value))
+
+            # Standard type conversion - handle constructor pattern for common types
+            if expected_type is str:
+                str_result = str(value)
+                return FlextResult[T | None].ok(cast("T", str_result))
+            if expected_type is int:
+                int_result = int(value) if isinstance(value, (int, str)) else int(str(value))
+                return FlextResult[T | None].ok(cast("T", int_result))
+            if expected_type is float:
+                float_result = float(value) if isinstance(value, (int, float, str)) else float(str(value))
+                return FlextResult[T | None].ok(cast("T", float_result))
+            if expected_type is bool:
+                bool_result = bool(value)
+                return FlextResult[T | None].ok(cast("T", bool_result))
+
+            # For other types, return failure
+            return FlextResult[T | None].fail(f"Cannot convert to {expected_type}")
         except Exception as e:
             return FlextResult[T | None].fail(f"Type conversion failed: {e}")
 

@@ -115,7 +115,7 @@ class TestFlextMeltanoAdapterComplete:
 
                 # Try to add a common plugin
                 plugin_result = self.adapter.add_plugin(
-                    project=project, plugin_type="extractors", plugin_name="tap-csv"
+                    project_dir=Path(project["root"]), plugin_type="extractors", plugin_name="tap-csv"
                 )
 
                 assert isinstance(plugin_result, FlextResult)

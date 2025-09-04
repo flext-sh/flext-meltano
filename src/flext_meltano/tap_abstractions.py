@@ -11,7 +11,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import UTC, datetime
+from typing import cast
 
 from flext_core import FlextResult, FlextServices, FlextUtilities
 from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field
@@ -117,7 +119,7 @@ class FlextTapAbstractions(
     # SERVICEPROCESSOR IMPLEMENTATION - REPLACES ~100 LINES OF BOILERPLATE
     # ============================================================================
 
-    def process(self, config: TapConfig) -> FlextResult[TapInstance]:
+    def process(self, request: TapConfig) -> FlextResult[TapInstance]:
         """Process tap configuration into TapInstance using ServiceProcessor pattern.
 
         ELIMINATES: Manual validation, error handling, state management, logging.
@@ -126,16 +128,16 @@ class FlextTapAbstractions(
         try:
             # Pydantic validation is automatic - no manual validation needed
             # Create TapInstance using Pydantic model
-            tap_id = f"{config.tap_type}_{id(config)}"
+            tap_id = f"{request.tap_type}_{id(request)}"
 
             tap_instance = TapInstance(
-                tap_type=config.tap_type,
-                config=config,
+                tap_type=request.tap_type,
+                config=request,
                 status="initialized",
                 tap_id=tap_id,
                 metadata={
                     "created_at": datetime.now(tz=UTC).isoformat(),
-                    "version": config.version,
+                    "version": request.version,
                 },
             )
 
@@ -145,20 +147,20 @@ class FlextTapAbstractions(
             return FlextResult[TapInstance].fail(f"Failed to process tap config: {e}")
 
     def build(
-        self, tap_instance: TapInstance, *, correlation_id: str
+        self, domain: TapInstance, *, correlation_id: str
     ) -> dict[str, object]:
         """Build final result from TapInstance - pure function.
 
         ELIMINATES: Manual result building, error handling, metadata assembly.
         """
         return {
-            "tap_id": tap_instance.tap_id,
-            "tap_type": tap_instance.tap_type,
-            "status": tap_instance.status,
-            "discovered": tap_instance.discovered,
-            "streams_count": len(tap_instance.streams),
+            "tap_id": domain.tap_id,
+            "tap_type": domain.tap_type,
+            "status": domain.status,
+            "discovered": domain.discovered,
+            "streams_count": len(domain.streams),
             "correlation_id": correlation_id,
-            "created_at": tap_instance.metadata.get("created_at"),
+            "created_at": domain.metadata.get("created_at"),
         }
 
     def get_stream_config(
@@ -193,10 +195,8 @@ class FlextTapAbstractions(
             }
             # Type-safe merging of kwargs avoiding dict.update type issues
             config_data.update(dict(kwargs.items()))
-            # Pydantic BaseModel validation with proper typing
-            from typing import Any
-            typed_config_data: dict[str, Any] = dict(config_data)
-            config = TapConfig(**typed_config_data)
+            # Pydantic BaseModel validation - use model_validate for proper typing
+            config = TapConfig.model_validate(config_data)
 
             # Use ServiceProcessor template method pattern
             return self.run_with_metrics("tap_creation", config)
@@ -255,10 +255,12 @@ class FlextTapAbstractions(
             "default": self._default_stream_strategy,
         }
         strategy = strategies.get(tap_type, strategies["default"])
-        return FlextResult[dict[str, object]].ok({
-            "strategy": strategy,
-            "tap_type": tap_type,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "strategy": strategy,
+                "tap_type": tap_type,
+            }
+        )
 
     def _execute_discovery_strategy(
         self, strategy_config: dict[str, object], tap_instance: TapInstance
@@ -266,9 +268,11 @@ class FlextTapAbstractions(
         """Execute discovery strategy - ELIMINATES try/catch boilerplate."""
         strategy = strategy_config["strategy"]
         # Cast strategy to proper callable type for production code
-        from collections.abc import Callable
         if callable(strategy):
-            typed_strategy: Callable[[TapInstance], FlextResult[list[StreamDefinition]]] = strategy
+            # Use cast to satisfy PyRight - we've validated it's callable
+            typed_strategy = cast(
+                "Callable[[TapInstance], FlextResult[list[StreamDefinition]]]", strategy
+            )
             return typed_strategy(tap_instance)
         return FlextResult[list[StreamDefinition]].fail(
             "Invalid strategy - not callable"
@@ -479,7 +483,8 @@ class FlextTapAbstractions(
                 "schema": stream.stream_schema,  # Use correct field name
                 "metadata": self._generate_stream_metadata(stream),
             }
-            return FlextResult[dict[str, object]].ok(catalog_entry)
+            catalog_entry_typed: dict[str, object] = dict(catalog_entry)
+            return FlextResult[dict[str, object]].ok(catalog_entry_typed)
         except Exception as e:
             return FlextResult[dict[str, object]].fail(
                 f"Catalog entry creation failed: {e}"
@@ -489,7 +494,7 @@ class FlextTapAbstractions(
         self, stream: StreamDefinition
     ) -> list[dict[str, object]]:
         """Generate metadata for stream - ELIMINATES hardcoded metadata."""
-        metadata = [
+        metadata: list[dict[str, object]] = [
             {
                 "breadcrumb": [],
                 "metadata": {
@@ -500,11 +505,14 @@ class FlextTapAbstractions(
         ]
 
         # Add field-level metadata
-        if isinstance(stream.stream_schema, dict) and "properties" in stream.stream_schema:
+        if (
+            isinstance(stream.stream_schema, dict)
+            and "properties" in stream.stream_schema
+        ):
             properties = stream.stream_schema["properties"]
             if isinstance(properties, dict):
                 for field_name in properties:
-                    field_metadata = {
+                    field_metadata: dict[str, object] = {
                         "breadcrumb": ["properties", field_name],
                         "metadata": {"inclusion": "available"},
                     }
@@ -557,11 +565,13 @@ class FlextTapAbstractions(
         """Create extraction strategy based on stream type."""
         stream, limit = params
         strategy = self._get_extraction_strategy(stream.stream_name)
-        return FlextResult[dict[str, object]].ok({
-            "strategy": strategy,
-            "stream": stream,
-            "limit": limit,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "strategy": strategy,
+                "stream": stream,
+                "limit": limit,
+            }
+        )
 
     def _execute_record_extraction(
         self, strategy_config: dict[str, object]
@@ -571,15 +581,26 @@ class FlextTapAbstractions(
         stream = strategy_config["stream"]
         limit = strategy_config["limit"]
 
-        records_result = strategy(stream)
-        if records_result.failure:
+        # Type the strategy callable properly for production
+        if callable(strategy) and isinstance(stream, StreamDefinition):
+            # Use cast to satisfy PyRight - we've validated it's callable
+            typed_strategy = cast(
+                "Callable[[StreamDefinition], FlextResult[list[dict[str, object]]]]", strategy
+            )
+            records_result = typed_strategy(stream)
+            if records_result.failure:
+                return FlextResult[
+                    tuple[list[dict[str, object]], StreamDefinition, int | None]
+                ].fail(records_result.error or "Record extraction failed")
+
+            typed_limit = int(limit) if limit is not None and isinstance(limit, (int, str)) else None
             return FlextResult[
                 tuple[list[dict[str, object]], StreamDefinition, int | None]
-            ].fail(records_result.error or "Record extraction failed")
+            ].ok((records_result.value, stream, typed_limit))
 
         return FlextResult[
             tuple[list[dict[str, object]], StreamDefinition, int | None]
-        ].ok((records_result.value, stream, limit))
+        ].fail("Invalid strategy or stream configuration")
 
     def _apply_extraction_limit(
         self, data: tuple[list[dict[str, object]], StreamDefinition, int | None]
@@ -587,10 +608,12 @@ class FlextTapAbstractions(
         """Apply limit to extracted records."""
         records, stream, limit = data
         limited_records = records[:limit] if limit else records
-        return FlextResult[tuple[list[dict[str, object]], StreamDefinition]].ok((
-            limited_records,
-            stream,
-        ))
+        return FlextResult[tuple[list[dict[str, object]], StreamDefinition]].ok(
+            (
+                limited_records,
+                stream,
+            )
+        )
 
     def _update_stream_extraction_count(
         self, data: tuple[list[dict[str, object]], StreamDefinition]
@@ -600,9 +623,13 @@ class FlextTapAbstractions(
         stream.records_extracted = len(records)
         return records
 
-    def _get_extraction_strategy(self, stream_name: str) -> callable:
+    def _get_extraction_strategy(
+        self, stream_name: str
+    ) -> Callable[[StreamDefinition], FlextResult[list[dict[str, object]]]]:
         """Get extraction strategy based on stream name."""
-        strategies = {
+        strategies: dict[
+            str, Callable[[StreamDefinition], FlextResult[list[dict[str, object]]]]
+        ] = {
             "users": self._extract_user_records,
             "orders": self._extract_order_records,
             "products": self._extract_product_records,
@@ -620,15 +647,20 @@ class FlextTapAbstractions(
                 "id": 1,
                 "name": "John",
                 "email": "john@example.com",
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
             {
                 "id": 2,
                 "name": "Jane",
                 "email": "jane@example.com",
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
-            {"id": 3, "name": "Bob", "email": "bob@example.com", "stream": stream.name},
+            {
+                "id": 3,
+                "name": "Bob",
+                "email": "bob@example.com",
+                "stream": stream.stream_name,
+            },
         ]
         return FlextResult[list[dict[str, object]]].ok(records)
 
@@ -642,13 +674,13 @@ class FlextTapAbstractions(
                 "order_id": "ORD001",
                 "user_id": 1,
                 "amount": 99.99,
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
             {
                 "order_id": "ORD002",
                 "user_id": 2,
                 "amount": 149.99,
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
         ]
         return FlextResult[list[dict[str, object]]].ok(records)
@@ -663,13 +695,13 @@ class FlextTapAbstractions(
                 "product_id": "PROD001",
                 "name": "Widget",
                 "price": 29.99,
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
             {
                 "product_id": "PROD002",
                 "name": "Gadget",
                 "price": 49.99,
-                "stream": stream.name,
+                "stream": stream.stream_name,
             },
         ]
         return FlextResult[list[dict[str, object]]].ok(records)
@@ -679,9 +711,9 @@ class FlextTapAbstractions(
     ) -> FlextResult[list[dict[str, object]]]:
         """Default record extraction strategy."""
         # Generate default records based on stream configuration
-        records = [
-            {"id": "1", "data": "sample data 1", "stream": stream.name},
-            {"id": "2", "data": "sample data 2", "stream": stream.name},
+        records: list[dict[str, object]] = [
+            {"id": "1", "data": "sample data 1", "stream": stream.stream_name},
+            {"id": "2", "data": "sample data 2", "stream": stream.stream_name},
         ]
         return FlextResult[list[dict[str, object]]].ok(records)
 
@@ -727,10 +759,12 @@ class FlextTapAbstractions(
             return FlextResult[tuple[StreamDefinition, dict[str, object] | None]].fail(
                 stream_result.error or "Stream not found"
             )
-        return FlextResult[tuple[StreamDefinition, dict[str, object] | None]].ok((
-            stream_result.value,
-            target,
-        ))
+        return FlextResult[tuple[StreamDefinition, dict[str, object] | None]].ok(
+            (
+                stream_result.value,
+                target,
+            )
+        )
 
     def _extract_stream_records(
         self, params: tuple[StreamDefinition, dict[str, object] | None]
@@ -768,11 +802,13 @@ class FlextTapAbstractions(
                 target["loaded_records"] = len(records)
             loaded_to_target = True
 
-        return FlextResult[tuple[list[dict[str, object]], StreamDefinition, bool]].ok((
-            records,
-            stream,
-            loaded_to_target,
-        ))
+        return FlextResult[tuple[list[dict[str, object]], StreamDefinition, bool]].ok(
+            (
+                records,
+                stream,
+                loaded_to_target,
+            )
+        )
 
     def _create_sync_statistics(
         self, params: tuple[list[dict[str, object]], StreamDefinition, bool]
@@ -805,7 +841,11 @@ class FlextTapAbstractions(
     @classmethod
     def create_instance(cls) -> FlextResult[FlextTapAbstractions]:
         """Factory method using FlextResult - ELIMINATES try/catch."""
-        return FlextResult[FlextTapAbstractions].of(cls)
+        try:
+            instance = cls()
+            return FlextResult[FlextTapAbstractions].ok(instance)
+        except Exception as e:
+            return FlextResult[FlextTapAbstractions].fail(f"Failed to create instance: {e}")
 
 
 # =============================================================================
