@@ -41,7 +41,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
             "validate_yaml_file",
             "create_directory_structure",
             "create_temp_directory",
-            "cleanup_temp_directory"
+            "cleanup_temp_directory",
         ]
 
         for method_name in expected_methods:
@@ -55,7 +55,11 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
     def test_yaml_file_manager(self) -> None:
         """Test YAML file manager functionality with class methods."""
         # Test class methods directly since FlextMeltanoFileManagers uses class methods
-        expected_methods = ["save_yaml_config", "load_yaml_config", "validate_yaml_file"]
+        expected_methods = [
+            "save_yaml_config",
+            "load_yaml_config",
+            "validate_yaml_file",
+        ]
 
         for method_name in expected_methods:
             assert hasattr(FlextMeltanoFileManagers, method_name), (
@@ -94,7 +98,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
             "validate_yaml_file",
             "create_directory_structure",
             "create_temp_directory",
-            "cleanup_temp_directory"
+            "cleanup_temp_directory",
         ]
 
         for method_name in all_methods:

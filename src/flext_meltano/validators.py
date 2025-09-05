@@ -68,7 +68,7 @@ class FlextMeltanoValidators(FlextUtilities):
                 def validate_project_id(cls, v: str) -> str:
                     if not v.strip():
                         msg = "Project ID cannot be empty or whitespace"
-                        raise ValueError(msg)  # noqa: TRY301
+                        raise ValueError(msg)
                     return v
 
             # Validate using Pydantic
@@ -154,10 +154,16 @@ class FlextMeltanoValidators(FlextUtilities):
                 str_result = str(value)
                 return FlextResult[T | None].ok(cast("T", str_result))
             if expected_type is int:
-                int_result = int(value) if isinstance(value, (int, str)) else int(str(value))
+                int_result = (
+                    int(value) if isinstance(value, (int, str)) else int(str(value))
+                )
                 return FlextResult[T | None].ok(cast("T", int_result))
             if expected_type is float:
-                float_result = float(value) if isinstance(value, (int, float, str)) else float(str(value))
+                float_result = (
+                    float(value)
+                    if isinstance(value, (int, float, str))
+                    else float(str(value))
+                )
                 return FlextResult[T | None].ok(cast("T", float_result))
             if expected_type is bool:
                 bool_result = bool(value)

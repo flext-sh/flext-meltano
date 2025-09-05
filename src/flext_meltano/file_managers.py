@@ -19,9 +19,9 @@ from pathlib import Path
 import yaml
 from flext_core import FlextLogger, FlextResult
 
-# Python 3.13+ type aliases - NO object usage
-type ConfigDict = dict[str, str | int | list[str] | dict[str, str | list[str]]]
-type PathDict = dict[str, Path | str]
+# Type aliases (MyPy compatible)
+ConfigDict = dict[str, str | int | list[str] | dict[str, str | list[str]]]
+PathDict = dict[str, Path | str]
 
 logger = FlextLogger(__name__)
 
@@ -48,7 +48,9 @@ class FlextMeltanoFileManagers:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
             with file_path.open("w", encoding="utf-8") as f:
-                yaml.dump(config, f, indent=2, default_flow_style=False, sort_keys=False)
+                yaml.dump(
+                    config, f, indent=2, default_flow_style=False, sort_keys=False
+                )
             return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult[bool].fail(f"Failed to save YAML config: {e}")
@@ -104,7 +106,9 @@ class FlextMeltanoFileManagers:
 
             return FlextResult[dict[str, str]].ok(created_paths)
         except Exception as e:
-            return FlextResult[dict[str, str]].fail(f"Failed to create directories: {e}")
+            return FlextResult[dict[str, str]].fail(
+                f"Failed to create directories: {e}"
+            )
 
     @classmethod
     def setup_project_structure(
@@ -195,7 +199,9 @@ class FlextMeltanoFileManagers:
 
             for dirname in required_dirs:
                 if not (project_root / dirname).is_dir():
-                    return FlextResult[bool].fail(f"Missing required directory: {dirname}")
+                    return FlextResult[bool].fail(
+                        f"Missing required directory: {dirname}"
+                    )
 
             return FlextResult[bool].ok(data=True)
         except Exception as e:

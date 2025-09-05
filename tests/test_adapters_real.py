@@ -116,7 +116,9 @@ class TestFlextMeltanoAdapterReal:
 
                 # Try to add a common plugin
                 plugin_result = self.adapter.add_plugin(
-                    project_dir=Path(project["root"]), plugin_type="extractors", plugin_name="tap-csv"
+                    project_dir=Path(project["root"]),
+                    plugin_type="extractors",
+                    plugin_name="tap-csv",
                 )
 
                 assert isinstance(plugin_result, FlextResult)
@@ -131,7 +133,10 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config(self) -> None:
         """Test project configuration adaptation."""
-        config: dict[str, object] = {"name": "test-project", "plugins": {"extractors": [], "loaders": []}}
+        config: dict[str, object] = {
+            "name": "test-project",
+            "plugins": {"extractors": [], "loaders": []},
+        }
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
@@ -164,7 +169,10 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin(self) -> None:
         """Test plugin adaptation."""
-        plugin_data: dict[str, object] = {"type": "extractors", "pip_url": "pipelinewise-tap-csv"}
+        plugin_data: dict[str, object] = {
+            "type": "extractors",
+            "pip_url": "pipelinewise-tap-csv",
+        }
 
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 

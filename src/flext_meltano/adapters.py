@@ -51,8 +51,9 @@ Integration:
 
 from __future__ import annotations
 
-import subprocess
+import asyncio
 import tempfile
+import uuid
 from pathlib import Path
 
 import meltano
@@ -63,12 +64,16 @@ from flext_core import (
     FlextResult,
     FlextUtilities,
 )
+from meltano.core.elt_context import ELTContext
 from meltano.core.hub import MeltanoHubService
+from meltano.core.job.job import Job
 from meltano.core.plugin.base import PluginType
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.runner import RunnerError
+from meltano.core.runner.singer import SingerRunner
 
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -168,12 +173,14 @@ class FlextMeltanoAdapter:
             # Get Meltano version using native API
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult.ok({
-                "version": meltano_version,
-                "meltano": meltano_version,
-                "cli_type": "native_meltano_api",
-                "integration": "flext-core",
-            })
+            return FlextResult.ok(
+                {
+                    "version": meltano_version,
+                    "meltano": meltano_version,
+                    "cli_type": "native_meltano_api",
+                    "integration": "flext-core",
+                }
+            )
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
@@ -510,11 +517,13 @@ class FlextMeltanoAdapter:
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute bridge service operation (required by FlextDomainService)."""
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
-                "service": "MeltanoBridge",
-                "status": "ready",
-                "integration": "flext-core",
-            })
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+                {
+                    "service": "MeltanoBridge",
+                    "status": "ready",
+                    "integration": "flext-core",
+                }
+            )
 
     class ProjectManager:
         """Project lifecycle management operations.
@@ -664,26 +673,51 @@ class FlextMeltanoAdapter:
                     loader=loader_name,
                 )
 
-                # Create a minimal ELT execution without complex context
-                # This is a simplified approach for type safety
-                # Execute pipeline using meltano CLI for simplicity
-                # Security: Using list format with controlled inputs - no shell injection risk
-                cmd = ["meltano", "run", extractor_name, loader_name]
-                result = subprocess.run(  # noqa: S603
-                    cmd,
-                    check=False,
-                    cwd=project.root,
-                    capture_output=True,
-                    text=True,
-                    timeout=300,
+                # Find plugins in project
+                extractor_plugin = None
+                loader_plugin = None
+
+                for plugin in project.plugins.plugins():
+                    if plugin.name == extractor_name:
+                        extractor_plugin = plugin
+                    elif plugin.name == loader_name:
+                        loader_plugin = plugin
+
+                if not extractor_plugin or not loader_plugin:
+                    error_msg = (
+                        f"Required plugins not found: {extractor_name}, {loader_name}"
+                    )
+                    self._logger.error(error_msg)
+                    return FlextResult[dict[str, str]].fail(error_msg)
+
+                # Create job for ELT context
+                job = Job(job_name=f"{extractor_name}-to-{loader_name}")
+
+                # Create ELT context for native Meltano execution (simplified)
+                elt_context = ELTContext(
+                    project=project,
+                    job=job,
+                    run_id=uuid.uuid4(),
+                    dry_run=False,
                 )
 
+                # Create SingerRunner for native API execution
+                runner = SingerRunner(elt_context)
+
+                # Create plugin invokers for extractor and loader
+                extractor_invoker = PluginInvoker(project, extractor_plugin)
+                loader_invoker = PluginInvoker(project, loader_plugin)
+
+                # Execute the pipeline using native Meltano APIs (await since it's async)
+                asyncio.run(runner.run(extractor_invoker, loader_invoker))
+
                 pipeline_result = {
-                    "success": str(result.returncode == 0),
+                    "success": "true",
                     "extractor": extractor_name,
                     "loader": loader_name,
                     "execution_method": "singer_runner_native",
                     "project_root": str(project.root),
+                    "run_id": str(elt_context.run_id),
                 }
 
                 self._logger.info(
@@ -709,24 +743,30 @@ class FlextMeltanoAdapter:
 
     def create_tap_stream_catalog(self) -> FlextResult[dict[str, object]]:
         """Create tap stream catalog using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok({
-            "streams": [],
-            "catalog_type": "singer_tap",
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "streams": [],
+                "catalog_type": "singer_tap",
+            }
+        )
 
     def create_target_config(self) -> FlextResult[dict[str, object]]:
         """Create target configuration using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok({
-            "target_schema": "default",
-            "batch_config": {},
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "target_schema": "default",
+                "batch_config": {},
+            }
+        )
 
     def convert_singer_schema(self) -> FlextResult[dict[str, object]]:
         """Convert Singer schema types using native APIs."""
-        return FlextResult[dict[str, object]].ok({
-            "schema_version": "1.0",
-            "properties": {},
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "schema_version": "1.0",
+                "properties": {},
+            }
+        )
 
     def validate_stream_schema(self) -> FlextResult[bool]:
         """Validate stream schema using native validation."""

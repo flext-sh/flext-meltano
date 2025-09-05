@@ -18,12 +18,12 @@ from typing import cast
 from flext_core import FlextResult, FlextServices, FlextUtilities
 from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field
 
-# Python 3.13+ type aliases
-type RecordDict = dict[str, object]
-type ConfigDict = dict[str, object]
-type SchemaDict = dict[str, object]
-type StateDict = dict[str, object]
-type ResultDict = dict[str, object]
+# Type aliases (MyPy compatible)
+RecordDict = dict[str, object]
+ConfigDict = dict[str, object]
+SchemaDict = dict[str, object]
+StateDict = dict[str, object]
+ResultDict = dict[str, object]
 
 # =============================================================================
 # PYDANTIC MODELS FOR TYPE SAFETY
@@ -112,8 +112,8 @@ class FlextTapAbstractions(
         self.service_name = "FlextTapAbstractions"
 
         # Initialize ServiceProcessor dependencies
-        self._performance_tracker = FlextUtilities()
-        self._correlation_generator = FlextUtilities()
+        self._performance_tracker = FlextUtilities.Performance()
+        self._correlation_generator = FlextUtilities.Generators()
 
     # ============================================================================
     # SERVICEPROCESSOR IMPLEMENTATION - REPLACES ~100 LINES OF BOILERPLATE
@@ -146,9 +146,7 @@ class FlextTapAbstractions(
         except Exception as e:
             return FlextResult[TapInstance].fail(f"Failed to process tap config: {e}")
 
-    def build(
-        self, domain: TapInstance, *, correlation_id: str
-    ) -> dict[str, object]:
+    def build(self, domain: TapInstance, *, correlation_id: str) -> dict[str, object]:
         """Build final result from TapInstance - pure function.
 
         ELIMINATES: Manual result building, error handling, metadata assembly.
@@ -585,7 +583,8 @@ class FlextTapAbstractions(
         if callable(strategy) and isinstance(stream, StreamDefinition):
             # Use cast to satisfy PyRight - we've validated it's callable
             typed_strategy = cast(
-                "Callable[[StreamDefinition], FlextResult[list[dict[str, object]]]]", strategy
+                "Callable[[StreamDefinition], FlextResult[list[dict[str, object]]]]",
+                strategy,
             )
             records_result = typed_strategy(stream)
             if records_result.failure:
@@ -593,7 +592,11 @@ class FlextTapAbstractions(
                     tuple[list[dict[str, object]], StreamDefinition, int | None]
                 ].fail(records_result.error or "Record extraction failed")
 
-            typed_limit = int(limit) if limit is not None and isinstance(limit, (int, str)) else None
+            typed_limit = (
+                int(limit)
+                if limit is not None and isinstance(limit, (int, str))
+                else None
+            )
             return FlextResult[
                 tuple[list[dict[str, object]], StreamDefinition, int | None]
             ].ok((records_result.value, stream, typed_limit))
@@ -845,7 +848,9 @@ class FlextTapAbstractions(
             instance = cls()
             return FlextResult[FlextTapAbstractions].ok(instance)
         except Exception as e:
-            return FlextResult[FlextTapAbstractions].fail(f"Failed to create instance: {e}")
+            return FlextResult[FlextTapAbstractions].fail(
+                f"Failed to create instance: {e}"
+            )
 
 
 # =============================================================================

@@ -225,10 +225,12 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 target_type=target_type,
                 target_id=target_id,
             )
-            return FlextResult[dict[str, object]].ok({
-                **target_instance,
-                "target_id": target_id,
-            })
+            return FlextResult[dict[str, object]].ok(
+                {
+                    **target_instance,
+                    "target_id": target_id,
+                }
+            )
 
         except Exception as e:
             error_msg = f"Failed to create FlextTarget: {e}"

@@ -19,7 +19,7 @@ from flext_core import FlextLogger, FlextModels, FlextResult, FlextTypes, FlextU
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Type alias for configuration dictionaries - use appropriate JsonObject type
-type ConfigDict = FlextTypes.Core.JsonObject
+ConfigDict = FlextTypes.Core.JsonObject
 
 
 # Configuration Models using flext-core patterns

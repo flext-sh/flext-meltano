@@ -4,7 +4,6 @@ Tests all validator functionality with real validation scenarios,
 no mocks, using flext_tests for improved assertions and test builders.
 """
 
-
 import pytest
 from flext_tests import FlextMatchers
 
@@ -20,7 +19,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv"
+            "executable": "tap-csv",
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
@@ -39,7 +38,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "name": "",  # Empty name should fail
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv"
+            "executable": "tap-csv",
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
@@ -51,7 +50,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "name": 123,  # Should be string
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv"
+            "executable": "tap-csv",
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
@@ -69,10 +68,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_meltano_config_valid(self) -> None:
         """Test Meltano config validation with valid configuration."""
-        config = {
-            "version": 1,
-            "project_id": "test-project"
-        }
+        config = {"version": 1, "project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
         FlextMatchers.assert_result_success(result, True)
@@ -88,7 +84,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         """Test Meltano config validation with invalid version."""
         config = {
             "version": 2,  # Invalid version (must be 1)
-            "project_id": "test-project"
+            "project_id": "test-project",
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
@@ -98,7 +94,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         """Test Meltano config validation with empty project_id."""
         config = {
             "version": 1,
-            "project_id": ""  # Empty project_id should fail
+            "project_id": "",  # Empty project_id should fail
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
@@ -106,10 +102,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_dbt_config_valid(self) -> None:
         """Test DBT config validation with valid configuration."""
-        dbt_config = {
-            "name": "analytics",
-            "version": "1.0.0"
-        }
+        dbt_config = {"name": "analytics", "version": "1.0.0"}
 
         result = FlextMeltanoValidators.validate_dbt_config(dbt_config)
         FlextMatchers.assert_result_success(result, True)
@@ -121,14 +114,12 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_dbt_config(dbt_config)
         FlextMatchers.assert_result_failure(result)
 
-    @pytest.mark.parametrize("invalid_config", [
-        None,
-        "not a dict",
-        [],
-        123,
-        {"invalid": "structure"}
-    ])
-    def test_validate_plugin_config_parametrized_invalid(self, invalid_config: object) -> None:
+    @pytest.mark.parametrize(
+        "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
+    )
+    def test_validate_plugin_config_parametrized_invalid(
+        self, invalid_config: object
+    ) -> None:
         """Test plugin config validation with various invalid inputs."""
         result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
         FlextMatchers.assert_result_failure(result)
@@ -136,28 +127,22 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_complex_validation_scenario(self) -> None:
         """Test complex validation scenario combining multiple validators."""
         # Test combining multiple validations
-        meltano_config = {
-            "version": 1,
-            "project_id": "integration-test"
-        }
+        meltano_config = {"version": 1, "project_id": "integration-test"}
 
-        dbt_config = {
-            "name": "analytics",
-            "version": "1.0.0"
-        }
+        dbt_config = {"name": "analytics", "version": "1.0.0"}
 
         tap_config = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv"
+            "executable": "tap-csv",
         }
 
         target_config = {
             "name": "target-postgres",
             "namespace": "target_postgres",
             "pip_url": "pipelinewise-target-postgres",
-            "executable": "target-postgres"
+            "executable": "target-postgres",
         }
 
         # Validate all configs

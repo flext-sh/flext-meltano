@@ -391,7 +391,9 @@ class FlextMeltanoConfig(BaseModel):
 
             # Filter and type-cast kwargs to valid fields only
             valid_fields = cls.model_fields.keys()
-            filtered_kwargs: dict[str, object] = {k: v for k, v in kwargs.items() if k in valid_fields}
+            filtered_kwargs: dict[str, object] = {
+                k: v for k, v in kwargs.items() if k in valid_fields
+            }
 
             # Create config with proper type conversions
             project_root_value = filtered_kwargs.get("project_root", ".")
@@ -405,8 +407,12 @@ class FlextMeltanoConfig(BaseModel):
             config = cls(
                 environment=env_type,
                 project_root=project_root,
-                log_level=cls.LogLevel(str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))),
-                run_mode=cls.RunMode(str(filtered_kwargs.get("run_mode", cls.RunMode.FULL))),
+                log_level=cls.LogLevel(
+                    str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))
+                ),
+                run_mode=cls.RunMode(
+                    str(filtered_kwargs.get("run_mode", cls.RunMode.FULL))
+                ),
             )
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
