@@ -1,0 +1,971 @@
+[
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 189
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 189
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 189,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 313
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 313
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 313,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 426
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 426
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 426,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "ANN001",
+    "end_location": {
+      "column": 64,
+      "row": 475
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 55,
+      "row": 475
+    },
+    "message": "Missing type annotation for function argument `benchmark`",
+    "noqa_row": 475,
+    "url": "https://docs.astral.sh/ruff/rules/missing-type-function-argument"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 34,
+      "row": 495
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 495
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 495,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "ANN202",
+    "end_location": {
+      "column": 26,
+      "row": 497
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_config_builders_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 497
+    },
+    "message": "Missing return type annotation for private function `create_config`",
+    "noqa_row": 497,
+    "url": "https://docs.astral.sh/ruff/rules/missing-return-type-private-function"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 92,
+      "row": 447
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_bridge_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 447
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 447,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 88,
+      "row": 477
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_bridge_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 477
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 477,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 88,
+      "row": 485
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_bridge_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 485
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 485,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 88,
+      "row": 492
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_bridge_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 492
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 492,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 92,
+      "row": 456
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 456
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 456,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 61,
+      "row": 492
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 492
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 492,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 89,
+      "row": 495
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 495
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 495,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 92,
+      "row": 514
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 514
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 514,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 92,
+      "row": 535
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 535
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 535,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 92,
+      "row": 554
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 554
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 554,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 88,
+      "row": 562
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 562
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 562,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 100,
+      "row": 581
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 581
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 581,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 100,
+      "row": 594
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 594
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 594,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 104,
+      "row": 784
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 784
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 784,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 24
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_file_managers_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 24
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 24,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 78,
+      "row": 236
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_file_managers_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 33,
+      "row": 236
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/definitely_does_not_exist_cleanup_test\"",
+    "noqa_row": 236,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "PGH003",
+    "end_location": {
+      "column": 89,
+      "row": 330
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_file_managers_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 75,
+      "row": 330
+    },
+    "message": "Use specific rule codes when ignoring type issues",
+    "noqa_row": 330,
+    "url": "https://docs.astral.sh/ruff/rules/blanket-type-ignore"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 95,
+      "row": 75
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 75
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 75,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 95,
+      "row": 75
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 75
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 75,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 95,
+      "row": 75
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 75
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 75,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 98,
+      "row": 89
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 89
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 89,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 98,
+      "row": 89
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 89
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 89,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 98,
+      "row": 89
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 89
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 89,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 99,
+      "row": 103
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 103
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 103,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 99,
+      "row": 103
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 103
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 103,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "PT017",
+    "end_location": {
+      "column": 99,
+      "row": 103
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_services_complete.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 103
+    },
+    "message": "Found assertion on exception `e` in `except` block, use `pytest.raises()` instead",
+    "noqa_row": 103,
+    "url": "https://docs.astral.sh/ruff/rules/pytest-assert-in-except"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 66,
+      "row": 55
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 51,
+      "row": 55
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/test.csv\"",
+    "noqa_row": 55,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 66,
+      "row": 189
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 51,
+      "row": 189
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/test.csv\"",
+    "noqa_row": 189,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 245
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 245
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 245,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 45,
+      "row": 257
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 257
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 257,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 34,
+      "row": 576
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 576
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 576,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "ANN202",
+    "end_location": {
+      "column": 35,
+      "row": 578
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 578
+    },
+    "message": "Missing return type annotation for private function `create_and_process_tap`",
+    "noqa_row": 578,
+    "url": "https://docs.astral.sh/ruff/rules/missing-return-type-private-function"
+  },
+  {
+    "cell": null,
+    "code": "ANN001",
+    "end_location": {
+      "column": 58,
+      "row": 595
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 49,
+      "row": 595
+    },
+    "message": "Missing type annotation for function argument `benchmark`",
+    "noqa_row": 595,
+    "url": "https://docs.astral.sh/ruff/rules/missing-type-function-argument"
+  },
+  {
+    "cell": null,
+    "code": "ANN202",
+    "end_location": {
+      "column": 24,
+      "row": 602
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 602
+    },
+    "message": "Missing return type annotation for private function `process_tap`",
+    "noqa_row": 602,
+    "url": "https://docs.astral.sh/ruff/rules/missing-return-type-private-function"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 56,
+      "row": 698
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_tap_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 41,
+      "row": 698
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/test.csv\"",
+    "noqa_row": 698,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 42,
+      "row": 103
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 27,
+      "row": 103
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/test.csv\"",
+    "noqa_row": 103,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 43,
+      "row": 128
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 128
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 128,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 43,
+      "row": 149
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 149
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 149,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 43,
+      "row": 159
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 159
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 159,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 22,
+      "row": 196
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 196
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 196,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 43,
+      "row": 325
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 325
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 325,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "ANN001",
+    "end_location": {
+      "column": 61,
+      "row": 363
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 52,
+      "row": 363
+    },
+    "message": "Missing type annotation for function argument `benchmark`",
+    "noqa_row": 363,
+    "url": "https://docs.astral.sh/ruff/rules/missing-type-function-argument"
+  },
+  {
+    "cell": null,
+    "code": "ANN202",
+    "end_location": {
+      "column": 26,
+      "row": 370
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 370
+    },
+    "message": "Missing return type annotation for private function `create_target`",
+    "noqa_row": 370,
+    "url": "https://docs.astral.sh/ruff/rules/missing-return-type-private-function"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 43,
+      "row": 408
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 408
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 408,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 34,
+      "row": 516
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 516
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 516,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "ANN202",
+    "end_location": {
+      "column": 33,
+      "row": 518
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 518
+    },
+    "message": "Missing return type annotation for private function `create_target_config`",
+    "noqa_row": 518,
+    "url": "https://docs.astral.sh/ruff/rules/missing-return-type-private-function"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 47,
+      "row": 568
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 33,
+      "row": 568
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/test.db\"",
+    "noqa_row": 568,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 48,
+      "row": 569
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 31,
+      "row": 569
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/output.csv\"",
+    "noqa_row": 569,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 50,
+      "row": 570
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+    "fix": null,
+    "location": {
+      "column": 32,
+      "row": 570
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/output.json\"",
+    "noqa_row": 570,
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 60,
+      "row": 269
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_utilities_real_fixed.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 269
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 269,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  },
+  {
+    "cell": null,
+    "code": "PLC0415",
+    "end_location": {
+      "column": 60,
+      "row": 291
+    },
+    "filename": "/home/marlonsc/flext/flext-meltano/tests/test_utilities_real_fixed.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 291
+    },
+    "message": "`import` should be at the top-level of a file",
+    "noqa_row": 291,
+    "url": "https://docs.astral.sh/ruff/rules/import-outside-top-level"
+  }
+]

@@ -53,7 +53,10 @@ class TestFlextSingerTypesUnified:
     def test_schema_message_creation(self) -> None:
         """Test Singer SCHEMA message creation."""
         singer_types = FlextSingerTypes()
-        schema: dict[str, object] = {"type": "object", "properties": {"id": {"type": "integer"}}}
+        schema: dict[str, object] = {
+            "type": "object",
+            "properties": {"id": {"type": "integer"}},
+        }
         result = singer_types.create_schema_message("users", schema, ["id"])
 
         assert result.success

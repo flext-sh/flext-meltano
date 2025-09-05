@@ -194,20 +194,26 @@ class FlextMeltanoUtilities:
             try:
                 parsed_json = FlextUtilities.safe_json_parse(clean_output, None)
                 if parsed_json is not None:  # Safe parse succeeded
-                    return FlextResult.ok({
-                        "output": clean_output,
-                        "lines": cast("FlextTypes.Core.JsonValue", lines),
-                        "parsed_json": cast("FlextTypes.Core.JsonValue", parsed_json),
-                    })
+                    return FlextResult.ok(
+                        {
+                            "output": clean_output,
+                            "lines": cast("FlextTypes.Core.JsonValue", lines),
+                            "parsed_json": cast(
+                                "FlextTypes.Core.JsonValue", parsed_json
+                            ),
+                        }
+                    )
             except Exception as e:
                 logger.debug(f"JSON parsing failed for Meltano output: {e}")
 
             # Fall through to text parsing
-            return FlextResult.ok({
-                "output": clean_output,
-                "lines": cast("FlextTypes.Core.JsonValue", lines),
-                "line_count": len(lines),
-            })
+            return FlextResult.ok(
+                {
+                    "output": clean_output,
+                    "lines": cast("FlextTypes.Core.JsonValue", lines),
+                    "line_count": len(lines),
+                }
+            )
 
         except Exception as e:
             error_msg = f"Failed to parse Meltano output: {e}"
@@ -392,11 +398,13 @@ class FlextMeltanoUtilities:
                 )
 
             # Single success return point
-            return FlextResult.ok({
-                "project_root": str(project_root),
-                "meltano_yml": str(meltano_yml),
-                "dbt_yml": str(dbt_yml),
-            })
+            return FlextResult.ok(
+                {
+                    "project_root": str(project_root),
+                    "meltano_yml": str(meltano_yml),
+                    "dbt_yml": str(dbt_yml),
+                }
+            )
         except Exception as e:
             return FlextResult.fail(f"Failed to setup project structure: {e}")
 

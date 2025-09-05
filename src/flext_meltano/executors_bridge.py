@@ -336,7 +336,9 @@ class FlextMeltanoBridge:
         """Execute real Meltano command using native API."""
         try:
             # Execute real Meltano command using the adapter
-            adapter_result = self.executor.run_plugin_command("meltano", "command", command)
+            adapter_result = self.executor.run_plugin_command(
+                "meltano", "command", command
+            )
             if adapter_result.success:
                 result = FlextResult.ok(adapter_result.value)
             else:
@@ -393,7 +395,9 @@ class FlextMeltanoBridge:
         """Synchronous plugin execution."""
         try:
             # Execute real plugin command using executor
-            execution_result = self.executor.run_plugin_command(plugin_name, command, args)
+            execution_result = self.executor.run_plugin_command(
+                plugin_name, command, args
+            )
             if execution_result.success:
                 data = execution_result.value
             else:

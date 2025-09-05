@@ -442,9 +442,9 @@ class TestFlextMeltanoBridgeComplete:
                     nonexistent_path = f"{temp_dir_inner}/nonexistent_project"
                     edge_result = self.bridge.get_project_info(nonexistent_path)
                 assert isinstance(edge_result, dict)
-            except Exception as e:
+            except (ValueError, TypeError, RuntimeError, AttributeError):
                 # Some edge cases may raise exceptions, which is acceptable
-                assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
+                pass
 
     def test_internal_methods_for_coverage(self) -> None:
         """Test internal methods to achieve higher coverage."""
@@ -472,24 +472,24 @@ class TestFlextMeltanoBridgeComplete:
         try:
             empty_result = self.bridge.install_plugin("", "")
             assert isinstance(empty_result, FlextResult)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, AttributeError):
             # May raise exception for invalid empty inputs
-            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
+            pass
 
         # Test with None-like values (as string)
         try:
             none_result = self.bridge.execute_dbt_command(["none"])
             assert isinstance(none_result, dict)
-        except Exception as e:
+        except (ValueError, TypeError, RuntimeError, AttributeError):
             # May fail for invalid commands
-            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
+            pass
 
         # Test invoke_dbt with special characters
         try:
             special_result = self.bridge.invoke_dbt("--help")
             assert isinstance(special_result, dict)
-        except Exception as e:
-            assert isinstance(e, (ValueError, TypeError, RuntimeError, AttributeError))
+        except (ValueError, TypeError, RuntimeError, AttributeError):
+            pass
 
     def test_error_recovery_patterns(self) -> None:
         """Test error recovery and resilience patterns."""

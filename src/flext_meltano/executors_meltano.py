@@ -93,14 +93,16 @@ class FlextMeltanoExecutors:
                 FlextResult containing service information
 
             """
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
-                "service": "FlextMeltanoExecutor",
-                "status": "ready",
-                "capabilities": [
-                    "execute_meltano_command",
-                    "get_project_info",
-                ],
-            })
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+                {
+                    "service": "FlextMeltanoExecutor",
+                    "status": "ready",
+                    "capabilities": [
+                        "execute_meltano_command",
+                        "get_project_info",
+                    ],
+                }
+            )
 
         def execute_meltano_command(
             self,
@@ -346,12 +348,14 @@ class FlextMeltanoExecutors:
             try:
                 FlextMeltanoAdapter()
                 # ELT pipeline execution placeholder - would coordinate tap and target
-                result = FlextResult.ok({
-                    "tap": tap_name,
-                    "target": target_name,
-                    "status": "pipeline_executed",
-                    "project": str(project_root),
-                })
+                result = FlextResult.ok(
+                    {
+                        "tap": tap_name,
+                        "target": target_name,
+                        "status": "pipeline_executed",
+                        "project": str(project_root),
+                    }
+                )
 
                 if result.success:
                     return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(

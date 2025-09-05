@@ -9,6 +9,7 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
+from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 
@@ -266,11 +267,10 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_save_yaml_config(self) -> None:
         """Test save_yaml_config method."""
         # Create proper Meltano config for testing
-        from flext_meltano.typings import FlextMeltanoTypes
         config: FlextMeltanoTypes.DBT.ProjectConfig = {
             "version": 1,
             "project_id": "test",
-            "plugins": {"extractors": [], "loaders": [], "transformers": []}
+            "plugins": {"extractors": [], "loaders": [], "transformers": []},
         }
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -288,11 +288,10 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_write_meltano_yml(self) -> None:
         """Test write_meltano_yml method."""
         # Create proper Meltano config for testing
-        from flext_meltano.typings import FlextMeltanoTypes
         config: FlextMeltanoTypes.DBT.ProjectConfig = {
             "version": 1,
             "project_id": "test-project",
-            "plugins": {"extractors": [], "loaders": [], "transformers": []}
+            "plugins": {"extractors": [], "loaders": [], "transformers": []},
         }
 
         with tempfile.TemporaryDirectory() as temp_dir:

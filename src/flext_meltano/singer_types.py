@@ -143,6 +143,10 @@ class FlextSingerTypes:
         try:
             type_name = type_def.get("type")
 
+            # Check for missing type definition
+            if type_name is None:
+                return FlextResult[object].fail("Type definition missing 'type' field")
+
             # Validation dispatch table eliminating multiple if/return statements
             validation_rules: dict[str, tuple[type | tuple[type, ...], str]] = {
                 "string": (str, "string"),
@@ -178,18 +182,33 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_schema_definition(
-        self, properties: dict[str, dict[str, object]], **kwargs: object
+        self, stream_name: str | None = None, properties: dict[str, dict[str, object]] | None = None, key_properties: list[str] | None = None, **kwargs: object
     ) -> FlextResult[dict[str, object]]:
-        """Create Singer schema definition."""
+        """Create Singer schema definition or SCHEMA message."""
         try:
-            schema: dict[str, object] = {"type": "object", "properties": properties}
+            # Handle legacy call with just properties
+            if stream_name is None and properties is not None:
+                schema: dict[str, object] = {"type": "object", "properties": properties}
+                # Add optional metadata
+                for key in ["required", "additionalProperties", "description"]:
+                    if key in kwargs:
+                        schema[key] = kwargs[key]
+                return FlextResult[dict[str, object]].ok(schema)
 
-            # Add optional metadata
-            for key in ["required", "additionalProperties", "description"]:
-                if key in kwargs:
-                    schema[key] = kwargs[key]
+            # Handle Singer SCHEMA message creation
+            if stream_name is not None:
+                schema_obj: dict[str, object] = {"type": "object", "properties": properties or {}}
+                message: dict[str, object] = {
+                    "type": "SCHEMA",
+                    "stream": stream_name,
+                    "schema": schema_obj,
+                    "key_properties": key_properties or []
+                }
+                return FlextResult[dict[str, object]].ok(message)
 
-            return FlextResult[dict[str, object]].ok(schema)
+            return FlextResult[dict[str, object]].fail(
+                "Either properties (for schema) or stream_name (for SCHEMA message) must be provided"
+            )
         except Exception as e:
             return FlextResult[dict[str, object]].fail(
                 f"Schema definition creation failed: {e}"

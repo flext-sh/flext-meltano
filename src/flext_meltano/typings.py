@@ -8,15 +8,25 @@ All types related to Meltano, Singer SDK, DBT, and ELT pipelines are organized u
 from __future__ import annotations
 
 from dbt.cli.main import dbtRunner
-from flext_core import FlextTypes
 from singer_sdk import (
     Stream as SingerStream,
     Tap as SingerTap,
     Target as SingerTarget,
 )
 
+# Direct type aliases to avoid MyPy unfollowed import issues with FlextTypes.X.Y
+type ConfigValue = str | int | float | bool | list[object] | dict[str, object]
+type ConfigDict = dict[str, ConfigValue]
+type JsonValue = str | int | float | bool | None | list[str | int | float | bool | None | list[object] | dict[str, object]] | dict[str, str | int | float | bool | None | list[object] | dict[str, object]]
+type JsonObject = dict[str, JsonValue]
+type MessageType = str
+type MessageData = dict[str, object]
+type CommandName = str
+type CommandResult = object
+type HandlerContext = dict[str, object]
 
-class FlextMeltanoTypes(FlextTypes):
+
+class FlextMeltanoTypes:
     """Meltano-specific hierarchical type system extending FlextTypes.
 
     This class inherits all core FLEXT types and adds Meltano-specific
@@ -61,17 +71,13 @@ class FlextMeltanoTypes(FlextTypes):
         type Variant = str  # Plugin variant identifier
         type Type = str  # Plugin type identifier
         type Version = str  # Keep as str since versions have specific format
-        type Config = (
-            FlextTypes.Config.ConfigDict
-        )  # Use Config.ConfigDict from flext-core
-        type Settings = FlextTypes.Config.ConfigDict  # Settings are configuration
+        type Config = ConfigDict  # ConfigDict type
+        type Settings = ConfigDict  # Settings are configuration
 
         # Plugin discovery and installation (using flext-core patterns)
-        type DiscoveryResult = list[
-            FlextTypes.Core.JsonObject
-        ]  # List of Core.JsonObject
-        type InstallationResult = FlextTypes.Core.JsonObject  # Single JsonObject result
-        type PluginInfo = FlextTypes.Core.JsonObject  # Plugin info as JsonObject
+        type DiscoveryResult = list[JsonObject]  # List of JsonObject
+        type InstallationResult = JsonObject  # Single JsonObject result
+        type PluginInfo = JsonObject  # Plugin info as JsonObject
 
         # Plugin execution (using flext-core patterns)
         type Command = list[str]  # Command as list of strings
@@ -95,23 +101,23 @@ class FlextMeltanoTypes(FlextTypes):
         type Stream = SingerStream
 
         # Singer message system (using flext-core message types)
-        type MessageType = FlextTypes.Payload.MessageType  # Use Payload.MessageType
-        type MessageData = FlextTypes.Payload.MessageData  # Consistent message data
-        type SchemaMessage = FlextTypes.Core.JsonObject  # Schema as JsonObject
-        type RecordMessage = FlextTypes.Core.JsonObject  # Record as JsonObject
-        type StateMessage = FlextTypes.Core.JsonObject  # State as JsonObject
+        type MessageType = MessageType  # Use Payload.MessageType
+        type MessageData = MessageData  # Consistent message data
+        type SchemaMessage = JsonObject  # Schema as JsonObject
+        type RecordMessage = JsonObject  # Record as JsonObject
+        type StateMessage = JsonObject  # State as JsonObject
 
         # Stream processing (using flext-core identifiers)
         type StreamName = str  # Stream name as identifier
-        type StreamSchema = FlextTypes.Core.JsonObject  # Schema as JsonObject
-        type StreamMetadata = FlextTypes.Core.JsonObject  # Metadata as JsonObject
+        type StreamSchema = JsonObject  # Schema as JsonObject
+        type StreamMetadata = JsonObject  # Metadata as JsonObject
 
         # Configuration and settings (using flext-core config types)
-        type TapConfig = FlextTypes.Config.ConfigDict  # Tap config from Config domain
+        type TapConfig = ConfigDict  # Tap config from Config domain
         type TargetConfig = (
-            FlextTypes.Config.ConfigDict
+            ConfigDict
         )  # Target config from Config domain
-        type PropertiesList = FlextTypes.Core.JsonObject  # Properties as JsonObject
+        type PropertiesList = JsonObject  # Properties as JsonObject
 
     # =========================================================================
     # DBT TYPES - DBT Core transformation
@@ -126,26 +132,26 @@ class FlextMeltanoTypes(FlextTypes):
 
         # DBT Core components (keep external DBT types)
         type Runner = dbtRunner
-        type Project = FlextTypes.Config.ConfigDict  # Project as ConfigDict
-        type Profile = FlextTypes.Config.ConfigDict  # Profile as ConfigDict
+        type Project = ConfigDict  # Project as ConfigDict
+        type Profile = ConfigDict  # Profile as ConfigDict
 
         # Model and transformation types (using flext-core identifiers and JSON)
         type Model = str  # Model name as identifier
         type ModelPath = str  # Keep as str for file paths
         type SqlQuery = str  # Keep as str for SQL content
-        type CompilationResult = FlextTypes.Core.JsonObject  # Result as JsonObject
+        type CompilationResult = JsonObject  # Result as JsonObject
 
         # Execution and results (using flext-core result patterns)
-        type RunResult = FlextTypes.Core.JsonObject  # Run result as JsonObject
-        type TestResult = FlextTypes.Core.JsonObject  # Test result as JsonObject
+        type RunResult = JsonObject  # Run result as JsonObject
+        type TestResult = JsonObject  # Test result as JsonObject
         type ExecutionResult = (
-            FlextTypes.Core.JsonObject
+            JsonObject
         )  # Execution result as JsonObject
 
         # Configuration (using flext-core config types)
-        type ProjectConfig = FlextTypes.Config.ConfigDict  # Project config
-        type ProfileConfig = FlextTypes.Config.ConfigDict  # Profile config
-        type TargetConfig = FlextTypes.Config.ConfigDict  # Target config
+        type ProjectConfig = ConfigDict  # Project config
+        type ProfileConfig = ConfigDict  # Profile config
+        type TargetConfig = ConfigDict  # Target config
 
     # =========================================================================
     # BRIDGE TYPES - Go service integration
@@ -160,20 +166,20 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Bridge communication (using flext-core network and payload types)
         type Operation = str  # Operation as identifier
-        type Request = FlextTypes.Payload.MessageData  # Request as message data
-        type Response = FlextTypes.Payload.MessageData  # Response as message data
-        type JsonPayload = FlextTypes.Core.JsonObject  # Payload as JsonObject
+        type Request = MessageData  # Request as message data
+        type Response = MessageData  # Response as message data
+        type JsonPayload = JsonObject  # Payload as JsonObject
 
         # Service integration (using flext-core service types)
         type ServiceStatus = str  # Status as identifier
-        type ServiceInfo = FlextTypes.Core.JsonObject  # Service info as JsonObject
-        type VersionInfo = FlextTypes.Core.JsonObject  # Version info as JsonObject
-        type CapabilityInfo = FlextTypes.Core.JsonObject  # Capability as JsonObject
+        type ServiceInfo = JsonObject  # Service info as JsonObject
+        type VersionInfo = JsonObject  # Version info as JsonObject
+        type CapabilityInfo = JsonObject  # Capability as JsonObject
 
         # Error handling (using flext-core error patterns)
-        type ErrorResponse = FlextTypes.Core.JsonObject  # Error response as JsonObject
+        type ErrorResponse = JsonObject  # Error response as JsonObject
         type SuccessResponse = (
-            FlextTypes.Core.JsonObject
+            JsonObject
         )  # Success response as JsonObject
 
     # =========================================================================
@@ -189,18 +195,18 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Command structure (using flext-core command types)
         type CommandName = (
-            FlextTypes.Commands.CommandName
+            CommandName
         )  # Command name from Commands domain
         type CommandArgs = list[str]  # Arguments as list of strings
         type CommandResult = (
-            FlextTypes.Commands.CommandResult
+            CommandResult
         )  # Result from Commands domain
 
         # Execution context (using flext-core handler types)
         type ExecutionContext = (
-            FlextTypes.Handler.Context
+            HandlerContext
         )  # Context from Handler domain
-        type ProcessResult = FlextTypes.Core.JsonObject  # Process result as JsonObject
+        type ProcessResult = JsonObject  # Process result as JsonObject
         type ExitCode = int  # Keep as int for exit codes
 
     # =========================================================================
@@ -215,19 +221,19 @@ class FlextMeltanoTypes(FlextTypes):
         """
 
         # Pipeline structure (using flext-core config types)
-        type Pipeline = FlextTypes.Config.ConfigDict  # Pipeline as config dict
+        type Pipeline = ConfigDict  # Pipeline as config dict
         type PipelineStage = str  # Stage as identifier
-        type PipelineConfig = FlextTypes.Config.ConfigDict  # Pipeline config
+        type PipelineConfig = ConfigDict  # Pipeline config
 
         # Execution and results (using basic FlextTypes.Core types)
-        type ExtractResult = FlextTypes.Core.JsonObject  # Extract result
-        type LoadResult = FlextTypes.Core.JsonObject  # Load result
-        type TransformResult = FlextTypes.Core.JsonObject  # Transform result
-        type PipelineResult = FlextTypes.Core.JsonObject  # Pipeline result
+        type ExtractResult = JsonObject  # Extract result
+        type LoadResult = JsonObject  # Load result
+        type TransformResult = JsonObject  # Transform result
+        type PipelineResult = JsonObject  # Pipeline result
 
         # Monitoring and observability (using basic FlextTypes.Core types)
-        type ExecutionMetrics = FlextTypes.Core.JsonObject  # Metrics data
-        type PerformanceData = FlextTypes.Core.JsonObject  # Performance as JsonObject
+        type ExecutionMetrics = JsonObject  # Metrics data
+        type PerformanceData = JsonObject  # Performance as JsonObject
         type PipelineStatus = str  # Status as identifier
 
     # =========================================================================
@@ -244,16 +250,16 @@ class FlextMeltanoTypes(FlextTypes):
         # Adapter identification (using flext-core service types)
         type AdapterName = str  # Adapter name as service identifier
         type AdapterType = str  # Adapter type as identifier
-        type AdapterConfig = FlextTypes.Config.ConfigDict  # Adapter config
+        type AdapterConfig = ConfigDict  # Adapter config
 
         # Adapter operation types (using basic FlextTypes.Core types)
-        type OperationResult = FlextTypes.Core.JsonObject  # Operation result
-        type AdapterResponse = FlextTypes.Core.JsonObject  # Response as JsonObject
+        type OperationResult = JsonObject  # Operation result
+        type AdapterResponse = JsonObject  # Response as JsonObject
         type ServiceCall = object  # Service call as callable type
 
         # Integration patterns (using basic FlextTypes.Core types)
-        type WrapperResult = FlextTypes.Core.JsonObject  # Wrapper result as JsonObject
-        type BridgeResult = FlextTypes.Core.JsonObject  # Bridge result as JsonObject
+        type WrapperResult = JsonObject  # Wrapper result as JsonObject
+        type BridgeResult = JsonObject  # Bridge result as JsonObject
 
 
 # =============================================================================

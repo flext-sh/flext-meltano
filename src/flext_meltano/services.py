@@ -61,15 +61,15 @@ class FlextMeltanoService:
 
         # Pydantic fields using local types directly
         tap_name: FlextMeltanoTypes.Plugin.Name
+        file_path: str | None = None
+        database: str | None = None
+        host: str | None = None
+        port: int | None = None
 
         def __init__(self, *, tap_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            # FlextDomainService uses Pydantic and doesn't accept arbitrary parameters
-            # Initialize with empty base and store tap_name separately
-            super().__init__()
-            object.__setattr__(self, "_tap_name", tap_name)
-            # Store additional data as private attribute
-            object.__setattr__(self, "_data", data)
+            # Pass tap_name to parent Pydantic model via **data
+            super().__init__(tap_name=tap_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -157,15 +157,14 @@ class FlextMeltanoService:
         """Target service implementation using strict flext-core patterns."""
 
         target_name: FlextMeltanoTypes.Plugin.Name
+        output_path: str | None = None
+        database: str | None = None
+        host: str | None = None
 
         def __init__(self, *, target_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            # FlextDomainService uses Pydantic and doesn't accept arbitrary parameters
-            # Initialize with empty base and store target_name separately
-            super().__init__()
-            object.__setattr__(self, "_target_name", target_name)
-            # Store additional data as private attribute
-            object.__setattr__(self, "_data", data)
+            # Pass target_name to parent Pydantic model via **data
+            super().__init__(target_name=target_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -253,15 +252,13 @@ class FlextMeltanoService:
         """DBT service implementation using strict flext-core patterns."""
 
         project_name: FlextMeltanoTypes.DBT.Model
+        profile_name: str | None = None
+        target: str | None = None
 
         def __init__(self, *, project_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
-            # FlextDomainService uses Pydantic and doesn't accept arbitrary parameters
-            # Initialize with empty base and store project_name separately
-            super().__init__()
-            object.__setattr__(self, "_project_name", project_name)
-            # Store additional data as private attribute
-            object.__setattr__(self, "_data", data)
+            # Pass project_name to parent Pydantic model via **data
+            super().__init__(project_name=project_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -310,6 +307,7 @@ class FlextMeltanoService:
         name: str,
         field_name: str,
         service_prefix: str,
+        **config: object,
     ) -> FlextResult[T_Service]:
         """Generic factory method for all Meltano service types.
 
@@ -338,7 +336,8 @@ class FlextMeltanoService:
                 )
 
             # Dynamic service instance creation using **kwargs pattern
-            service_kwargs: dict[str, str] = {field_name: safe_name}
+            service_kwargs: dict[str, object] = {field_name: safe_name}
+            service_kwargs.update(config)  # Add additional configuration
             # Service instantiation - Pydantic services accept kwargs
             service_instance = service_type(**service_kwargs)
 
@@ -351,29 +350,29 @@ class FlextMeltanoService:
 
     @staticmethod
     def create_tap_service(
-        tap_name: str,
+        tap_name: str, **config: object
     ) -> FlextResult[FlextMeltanoService.TapService]:
         """Create tap service using generic factory pattern."""
         return FlextMeltanoService._create_service_generic(
-            FlextMeltanoService.TapService, tap_name, "tap_name", "tap"
+            FlextMeltanoService.TapService, tap_name, "tap_name", "tap", **config
         )
 
     @staticmethod
     def create_target_service(
-        target_name: str,
+        target_name: str, **config: object
     ) -> FlextResult[FlextMeltanoService.TargetService]:
         """Create target service using generic factory pattern."""
         return FlextMeltanoService._create_service_generic(
-            FlextMeltanoService.TargetService, target_name, "target_name", "target"
+            FlextMeltanoService.TargetService, target_name, "target_name", "target", **config
         )
 
     @staticmethod
     def create_dbt_service(
-        project_name: str,
+        project_name: str, **config: object
     ) -> FlextResult[FlextMeltanoService.DbtService]:
         """Create DBT service using generic factory pattern."""
         return FlextMeltanoService._create_service_generic(
-            FlextMeltanoService.DbtService, project_name, "project_name", "dbt"
+            FlextMeltanoService.DbtService, project_name, "project_name", "dbt", **config
         )
 
 

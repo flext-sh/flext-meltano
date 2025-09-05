@@ -131,40 +131,48 @@ class FlextMeltanoExecutor:
                 "meltano", FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED
             )
 
-            return FlextResult[dict[str, str]].ok({
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": "version",
+                    "version": meltano_version,
+                    "success": "true",
+                    "cli_type": "flext_meltano",
+                }
+            )
+        return FlextResult[dict[str, str]].ok(
+            {
                 "command": "version",
-                "version": meltano_version,
-                "success": "true",
+                "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
+                "success": "false",
                 "cli_type": "flext_meltano",
-            })
-        return FlextResult[dict[str, str]].ok({
-            "command": "version",
-            "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
-            "success": "false",
-            "cli_type": "flext_meltano",
-            "error": "Version retrieval failed",
-        })
+                "error": "Version retrieval failed",
+            }
+        )
 
     def _handle_help_command(self) -> FlextResult[dict[str, str]]:
         """Handle help command."""
         commands = ["version", "help", "health", "run", "discover", "install"]
-        return FlextResult[dict[str, str]].ok({
-            "command": "help",
-            "commands": ", ".join(commands),
-            "success": "true",
-            "data": "FLEXT Meltano CLI Help",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": "help",
+                "commands": ", ".join(commands),
+                "success": "true",
+                "data": "FLEXT Meltano CLI Help",
+            }
+        )
 
     def _handle_default_command(self, args: list[str]) -> FlextResult[dict[str, str]]:
         """Handle default command (empty args)."""
         result = self.bridge.get_version()
-        return FlextResult[dict[str, str]].ok({
-            "command": "default",
-            "status": "success",
-            "args": str(args),
-            "success": str(result.success),
-            "data": str(result.value if result.success else {}),
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": "default",
+                "status": "success",
+                "args": str(args),
+                "success": str(result.success),
+                "data": str(result.value if result.success else {}),
+            }
+        )
 
     def run(self, args: list[str]) -> FlextResult[dict[str, str]]:
         """Run CLI command with FlextResult pattern using command dispatch strategy.
@@ -225,22 +233,26 @@ class FlextMeltanoExecutor:
         """
         try:
             exit_code = self.run_command(args)
-            return FlextResult[dict[str, str]].ok({
-                "command": " ".join(args),
-                "status": "success",
-                "args": str(args),
-                "success": str(exit_code == 0),
-                "exit_code": str(exit_code),
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": " ".join(args),
+                    "status": "success",
+                    "args": str(args),
+                    "success": str(exit_code == 0),
+                    "exit_code": str(exit_code),
+                }
+            )
         except Exception as run_error:
             logger.warning("CLI execution failed", error=str(run_error), args=args)
-            return FlextResult[dict[str, str]].ok({
-                "command": " ".join(args),
-                "status": "error",
-                "args": str(args),
-                "success": "false",
-                "error": str(run_error),
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": " ".join(args),
+                    "status": "error",
+                    "args": str(args),
+                    "success": "false",
+                    "error": str(run_error),
+                }
+            )
 
     def _execute_command(self, command: str, args: list[str]) -> FlextResult[int]:
         """Execute specific command using FlextResult patterns."""
@@ -292,12 +304,14 @@ class FlextMeltanoExecutor:
             version_result = self.meltano_adapter.get_version()
             meltano_status = "healthy" if version_result.success else "degraded"
 
-            return FlextResult[dict[str, str]].ok({
-                "status": "healthy",
-                "meltano_status": meltano_status,
-                "project_root": str(self.project_root),
-                "cli_type": "flext_meltano",
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "status": "healthy",
+                    "meltano_status": meltano_status,
+                    "project_root": str(self.project_root),
+                    "cli_type": "flext_meltano",
+                }
+            )
         except Exception as e:
             logger.exception("Health check failed", error=str(e))
             return FlextResult[dict[str, str]].fail(f"Health check failed: {e}")
@@ -321,12 +335,14 @@ class FlextMeltanoExecutor:
             # Get Python version
             python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
-            return FlextResult[dict[str, str]].ok({
-                "version": meltano_version,
-                "python": python_version,
-                "flext_meltano": "2.0.0-enterprise",
-                "cli_type": "flext_meltano",
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "version": meltano_version,
+                    "python": python_version,
+                    "flext_meltano": "2.0.0-enterprise",
+                    "cli_type": "flext_meltano",
+                }
+            )
         except Exception as e:
             logger.exception("Version check failed", error=str(e))
             return FlextResult[dict[str, str]].fail(f"Version check failed: {e}")
@@ -336,11 +352,13 @@ class FlextMeltanoExecutor:
         try:
             logger.info("Getting help information")
             commands = ["version", "help", "health", "run", "discover", "install"]
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok({
-                "commands": cast("FlextTypes.Core.JsonValue", commands),
-                "cli_type": "flext_meltano",
-                "description": "FLEXT Meltano Enterprise CLI with native API integration",
-            })
+            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+                {
+                    "commands": cast("FlextTypes.Core.JsonValue", commands),
+                    "cli_type": "flext_meltano",
+                    "description": "FLEXT Meltano Enterprise CLI with native API integration",
+                }
+            )
         except Exception as e:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
                 f"Help retrieval failed: {e}"
@@ -350,10 +368,12 @@ class FlextMeltanoExecutor:
         """List available CLI commands."""
         try:
             commands = ["version", "help", "health", "run", "discover", "install"]
-            return FlextResult[dict[str, list[str]]].ok({
-                "commands": commands,
-                "cli_type": [],  # Empty list to match expected type
-            })
+            return FlextResult[dict[str, list[str]]].ok(
+                {
+                    "commands": commands,
+                    "cli_type": [],  # Empty list to match expected type
+                }
+            )
         except Exception as e:
             return FlextResult[dict[str, list[str]]].fail(
                 f"Command listing failed: {e}"
@@ -404,26 +424,38 @@ class FlextMeltanoExecutor:
 
                 run_result = self.bridge.run_pipeline(tap_name, target_name)
                 if run_result["success"]:
-                    pipeline_result = FlextResult.ok({
-                        "status": "completed",
-                        "tap": tap_name,
-                        "target": target_name,
-                        "project": str(Path(project_root) if project_root else self.project_root),
-                        "execution_details": run_result,
-                    })
+                    pipeline_result = FlextResult.ok(
+                        {
+                            "status": "completed",
+                            "tap": tap_name,
+                            "target": target_name,
+                            "project": str(
+                                Path(project_root)
+                                if project_root
+                                else self.project_root
+                            ),
+                            "execution_details": run_result,
+                        }
+                    )
                 else:
-                    pipeline_result = FlextResult.fail(f"Pipeline failed: {run_result.get('error', 'Unknown error')}")
+                    pipeline_result = FlextResult.fail(
+                        f"Pipeline failed: {run_result.get('error', 'Unknown error')}"
+                    )
             except Exception as e:
                 pipeline_result = FlextResult.fail(f"Pipeline execution error: {e}")
 
             if pipeline_result.success:
-                return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok({
-                    "status": "completed",
-                    "tap": tap_name,
-                    "target": target_name,
-                    "result": cast("FlextTypes.Core.JsonValue", pipeline_result.value),
-                    "cli_type": "flext_meltano",
-                })
+                return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(
+                    {
+                        "status": "completed",
+                        "tap": tap_name,
+                        "target": target_name,
+                        "result": cast(
+                            "FlextTypes.Core.JsonValue", pipeline_result.value
+                        ),
+                        "cli_type": "flext_meltano",
+                    }
+                )
             return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
                 f"Pipeline execution failed: {pipeline_result.error}"
             )
@@ -441,51 +473,63 @@ class FlextMeltanoExecutor:
             meltano_version = result_data.get(
                 "meltano", FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED
             )
-            return FlextResult[dict[str, str]].ok({
-                "version": meltano_version,
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "version": meltano_version,
+                    "cli_type": "flext_meltano",
+                }
+            )
+        return FlextResult[dict[str, str]].ok(
+            {
+                "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
                 "cli_type": "flext_meltano",
-            })
-        return FlextResult[dict[str, str]].ok({
-            "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
-            "cli_type": "flext_meltano",
-        })
+            }
+        )
 
     def _execute_help_command(self) -> FlextResult[dict[str, str]]:
         """Execute help command."""
         commands = ["version", "help", "health", "run", "discover", "install"]
-        return FlextResult[dict[str, str]].ok({
-            "commands": ", ".join(commands),
-            "cli_type": "flext_meltano",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "commands": ", ".join(commands),
+                "cli_type": "flext_meltano",
+            }
+        )
 
     def _execute_health_command(self) -> FlextResult[dict[str, str]]:
         """Execute health command."""
-        return FlextResult[dict[str, str]].ok({
-            "status": "healthy",
-            "project_root": str(self.project_root),
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "status": "healthy",
+                "project_root": str(self.project_root),
+            }
+        )
 
     def _execute_action_command(
         self, command: str, options: list[str] | None
     ) -> FlextResult[dict[str, str]]:
         """Execute action commands (discover, install, run)."""
-        return FlextResult[dict[str, str]].ok({
-            "command": command,
-            "options": str(options or []),
-            "status": "success",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": command,
+                "options": str(options or []),
+                "status": "success",
+            }
+        )
 
     def _route_command(
         self, command: str, options: list[str] | None
     ) -> FlextResult[dict[str, str]]:
         """Route command to appropriate handler."""
         if not command or command.strip() == "":
-            return FlextResult[dict[str, str]].ok({
-                "cli_type": "flext_meltano",
-                "project_root": str(self.project_root),
-                "command": "default",
-                "status": "success",
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "cli_type": "flext_meltano",
+                    "project_root": str(self.project_root),
+                    "command": "default",
+                    "status": "success",
+                }
+            )
 
         # Command routing using single return point
         command_handlers = {
@@ -498,10 +542,12 @@ class FlextMeltanoExecutor:
             return command_handlers[command]()
         if command in {"discover", "install", "run"}:
             return self._execute_action_command(command, options)
-        return FlextResult[dict[str, str]].ok({
-            "command": command,
-            "status": "unknown_command",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": command,
+                "status": "unknown_command",
+            }
+        )
 
     def execute(
         self, command: str, options: list[str] | None = None
@@ -550,11 +596,13 @@ class FlextMeltanoExecutor:
             self.logger.info(
                 "Plugin invocation using native API", plugin=plugin_name, args=args
             )
-            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok({
-                "plugin_name": plugin_name,
-                "args": list(args),
-                "status": "invoked_via_native_api",
-            })
+            return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(
+                {
+                    "plugin_name": plugin_name,
+                    "args": list(args),
+                    "status": "invoked_via_native_api",
+                }
+            )
         except Exception as e:
             return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].fail(
                 f"Plugin invocation error: {e}"
@@ -567,13 +615,15 @@ class FlextMeltanoExecutor:
     def _handle_cli_no_args(self) -> FlextResult[dict[str, str]]:
         """Handle CLI factory with no arguments."""
         result = self.bridge.get_version()
-        return FlextResult[dict[str, str]].ok({
-            "command": "default",
-            "status": "success",
-            "args": "[]",
-            "success": str(result.success),
-            "data": str(result.value if result.success else {}),
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": "default",
+                "status": "success",
+                "args": "[]",
+                "success": str(result.success),
+                "data": str(result.value if result.success else {}),
+            }
+        )
 
     def _handle_cli_version_args(self) -> FlextResult[dict[str, str]]:
         """Handle CLI factory version arguments."""
@@ -584,48 +634,58 @@ class FlextMeltanoExecutor:
                 "meltano", FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED
             )
 
-            return FlextResult[dict[str, str]].ok({
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": "version",
+                    "version": meltano_version,
+                    "success": "true",
+                    "cli_type": "flext_meltano",
+                }
+            )
+        return FlextResult[dict[str, str]].ok(
+            {
                 "command": "version",
-                "version": meltano_version,
-                "success": "true",
+                "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
+                "success": "false",
                 "cli_type": "flext_meltano",
-            })
-        return FlextResult[dict[str, str]].ok({
-            "command": "version",
-            "version": FlextMeltanoConstants.Core.MELTANO_VERSION_REQUIRED,
-            "success": "false",
-            "cli_type": "flext_meltano",
-            "error": "Version retrieval failed",
-        })
+                "error": "Version retrieval failed",
+            }
+        )
 
     def _handle_cli_help_args(self) -> FlextResult[dict[str, str]]:
         """Handle CLI factory help arguments."""
-        return FlextResult[dict[str, str]].ok({
-            "command": "help",
-            "success": "true",
-            "data": "FLEXT Meltano CLI Help",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "command": "help",
+                "success": "true",
+                "data": "FLEXT Meltano CLI Help",
+            }
+        )
 
     def _handle_cli_other_args(self, args: list[str]) -> FlextResult[dict[str, str]]:
         """Handle CLI factory other arguments."""
         try:
             exit_code = self.run_command(args)
-            return FlextResult[dict[str, str]].ok({
-                "command": " ".join(args),
-                "args": str(args),
-                "success": str(exit_code == 0),
-                "exit_code": str(exit_code),
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": " ".join(args),
+                    "args": str(args),
+                    "success": str(exit_code == 0),
+                    "exit_code": str(exit_code),
+                }
+            )
         except Exception as run_error:
             logger.warning(
                 "CLI command execution failed", error=str(run_error), args=args
             )
-            return FlextResult[dict[str, str]].ok({
-                "command": " ".join(args),
-                "args": str(args),
-                "success": "false",
-                "error": str(run_error),
-            })
+            return FlextResult[dict[str, str]].ok(
+                {
+                    "command": " ".join(args),
+                    "args": str(args),
+                    "success": "false",
+                    "error": str(run_error),
+                }
+            )
 
     def run_cli(self, args: list[str] | None = None) -> FlextResult[dict[str, str]]:
         """Run CLI operations with FlextResult pattern.
@@ -719,7 +779,6 @@ class FlextMeltanoExecutor:
                     # Fallback for environments without Click
                     return None
 
-            @FlextDecorators.Reliability.safe_result
             def _handle_command_generic(
                 self,
                 command: str,
@@ -771,13 +830,9 @@ class FlextMeltanoExecutor:
                     return {"version": "2.0.0-enterprise", "details": data}
 
                 # Decorator automatically handles FlextResult unwrapping
-                result = self._handle_command_generic(
+                return self._handle_command_generic(
                     "version", "Version displayed", version_formatter
                 )
-                if result.success:
-                    return result.value
-                error_msg = "Version command failed"
-                raise ValueError(error_msg)
 
             @FlextDecorators.Reliability.safe_result
             def handle_health(self) -> str:
@@ -786,17 +841,17 @@ class FlextMeltanoExecutor:
                 def health_formatter(data: object) -> dict[str, object]:
                     return {"status": "OK", "details": data}
 
-                result = self._handle_command_generic(
+                return self._handle_command_generic(
                     "health", "Health checked", health_formatter
                 )
-                if result.success:
-                    return result.value
-                error_msg = "Health command failed"
-                raise ValueError(error_msg)
 
             def handle_plugins(self) -> FlextResult[str]:
                 """Handle plugins command using generic pattern."""
-                return self._handle_command_generic("plugins", "Plugins listed")
+                try:
+                    result = self._handle_command_generic("plugins", "Plugins listed")
+                    return FlextResult[str].ok(result)
+                except Exception as e:
+                    return FlextResult[str].fail(f"Plugins command failed: {e}")
 
         try:
             handler = MeltanoCliHandler()
