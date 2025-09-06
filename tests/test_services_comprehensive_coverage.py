@@ -319,7 +319,7 @@ class TestServiceGenericMethods:
         """Test generic service creation with additional configuration."""
         result = self.service._create_service_generic(
             self.service.TapService,
-            "tap-postgres", 
+            "tap-postgres",
             "tap_name",
             "tap",
             tap_name="tap-postgres",

@@ -99,7 +99,7 @@ class TestTapConfigComprehensive:
             "another_extra": 123,
         }
 
-        config = TapConfig(**config_dict)  # type: ignore[arg-type]
+        config = TapConfig(**config_dict)
 
         assert config.tap_type == "tap-mysql"
 
@@ -112,11 +112,11 @@ class TestTapConfigComprehensive:
         """Test validation of required fields."""
         # Missing tap_type
         with pytest.raises(ValidationError):
-            TapConfig(connection_config={"host": "localhost"})  # type: ignore[call-arg]
+            TapConfig(connection_config={"host": "localhost"})
 
         # Missing connection_config
         with pytest.raises(ValidationError):
-            TapConfig(tap_type="tap-postgres")  # type: ignore[call-arg]
+            TapConfig(tap_type="tap-postgres")
 
     @pytest.mark.parametrize(
         ("tap_type", "expected_type"),
@@ -155,7 +155,7 @@ class TestStreamDefinitionComprehensive:
             "tap_type": "tap-postgres",
         }
 
-        stream = StreamDefinition(**stream_data)  # type: ignore[arg-type]
+        stream = StreamDefinition(**stream_data)
         assert stream.stream_name == "users"
         assert stream.stream_schema["type"] == "object"
         assert stream.tap_type == "tap-postgres"
@@ -223,7 +223,7 @@ class TestTapInstanceComprehensive:
             "tap_id": "tap_postgres_001",
         }
 
-        instance = TapInstance(**instance_data)  # type: ignore[arg-type]
+        instance = TapInstance(**instance_data)
         assert instance.tap_type == "tap-postgres"
         assert instance.config.tap_type == "tap-postgres"
         assert instance.tap_id == "tap_postgres_001"
@@ -472,7 +472,7 @@ class TestFlextTapAbstractionsComprehensive:
         }
 
         # Create StreamDefinition from generated data
-        stream = StreamDefinition(**stream_data)  # type: ignore[arg-type]
+        stream = StreamDefinition(**stream_data)
         assert stream.stream_name == "products"
         assert stream.tap_type == "tap-postgres"
         schema_properties = cast(
@@ -632,7 +632,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         }
 
         try:
-            invalid_config = TapConfig(**invalid_config_data)  # type: ignore[arg-type]
+            invalid_config = TapConfig(**invalid_config_data)
             # If it doesn't raise an error, test the processing
             result = self.tap_abstractions.process(invalid_config)
             # Should handle gracefully
