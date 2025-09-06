@@ -319,6 +319,7 @@ class FlextMeltanoService:
             name: The service name to validate and use
             field_name: The field name for the service (tap_name, target_name, etc.)
             service_prefix: The default prefix for validation (tap, target, dbt)
+            **config: Additional configuration parameters passed to the service constructor
 
         Returns:
             FlextResult containing the created service instance or error
