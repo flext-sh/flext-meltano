@@ -4,31 +4,6 @@ This module provides complete Meltano configuration functionality following flex
 single-class-per-module pattern. Consolidates all configuration, constants, and enums
 in a unified class.
 
-Architecture:
-    Core: Unified FlextMeltanoConfig class handling all functionality
-    Constants: All Meltano constants and configuration values
-    Enums: All enumerated types and status definitions
-    Configuration: Pydantic-based configuration models
-    Validation: Configuration validation and type checking
-
-Features:
-    - Single unified class following flext-core patterns
-    - Complete Meltano configuration abstraction
-    - Pydantic-based validation and type safety
-    - Comprehensive constants and enums management
-    - FlextResult integration for error handling
-
-Examples:
-    Create configuration:
-        >>> config = FlextMeltanoConfig(
-        ...     project_root="/path/to/project", meltano_version="3.9.1"
-        ... )
-        >>> validation_result = config.validate()
-
-    Access constants:
-        >>> version = config.get_version()
-        >>> default_timeout = config.get_default_timeout()
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 
@@ -41,7 +16,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextExceptions, FlextResult
+from flext_core import FlextExceptions, FlextResult, FlextTypes
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -241,7 +216,12 @@ class FlextMeltanoConfig(BaseModel):
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
     @classmethod
     def validate_versions(cls, v: str) -> str:
-        """Validate version strings."""
+        """Validate version strings.
+
+        Returns:
+            Path: Validated version string.
+
+        """
         if not v or not isinstance(v, str):
             error_msg = "Version must be non-empty string"
             raise FlextExceptions.FlextValidationError(error_msg)
@@ -256,7 +236,12 @@ class FlextMeltanoConfig(BaseModel):
         return self.project_root / self.DEFAULT_PROJECT_FILE
 
     def get_absolute_config_dir(self) -> Path:
-        """Get absolute path to config directory."""
+        """Get absolute path to config directory.
+
+        Returns:
+            Path: Absolute config directory path.
+
+        """
         if self.config_dir.is_absolute():
             return self.config_dir
         return self.project_root / self.config_dir
@@ -268,7 +253,12 @@ class FlextMeltanoConfig(BaseModel):
         return self.project_root / self.logs_dir
 
     def get_absolute_venv_dir(self) -> Path:
-        """Get absolute path to virtual environment directory."""
+        """Get absolute path to virtual environment directory.
+
+        Returns:
+            Path: Absolute virtual environment directory path.
+
+        """
         if self.venv_dir.is_absolute():
             return self.venv_dir
         return self.project_root / self.venv_dir
@@ -303,8 +293,13 @@ class FlextMeltanoConfig(BaseModel):
         except Exception as e:
             return FlextResult[bool].fail(f"Project validation failed: {e}")
 
-    def get_environment_variables(self) -> dict[str, str]:
-        """Get environment variables for Meltano operations."""
+    def get_environment_variables(self) -> FlextTypes.Core.Headers:
+        """Get environment variables for Meltano operations.
+
+        Returns:
+            FlextTypes.Core.Headers: Environment variables dictionary.
+
+        """
         return {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
             self.MELTANO_ENVIRONMENT_ENV: self.environment.value,
@@ -322,7 +317,12 @@ class FlextMeltanoConfig(BaseModel):
 
     @classmethod
     def get_name(cls) -> str:
-        """Get FlextMeltano name."""
+        """Get FlextMeltano name.
+
+        Returns:
+            str: FlextMeltano name.
+
+        """
         return cls.NAME
 
     @classmethod
@@ -332,21 +332,31 @@ class FlextMeltanoConfig(BaseModel):
 
     @classmethod
     def get_default_batch_size(cls) -> int:
-        """Get default batch size."""
+        """Get default batch size.
+
+        Returns:
+            int:: Description of return value.
+
+        """
         return cls.DEFAULT_BATCH_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls) -> list[str]:
+    def get_supported_plugin_types(cls) -> FlextTypes.Core.StringList:
         """Get list of supported plugin types."""
         return [plugin_type.value for plugin_type in cls.PluginType]
 
     @classmethod
-    def get_supported_environments(cls) -> list[str]:
-        """Get list of supported environments."""
+    def get_supported_environments(cls) -> FlextTypes.Core.StringList:
+        """Get list of supported environments.
+
+        Returns:
+            FlextTypes.Core.StringList:: Description of return value.
+
+        """
         return [env.value for env in cls.EnvironmentType]
 
     @classmethod
-    def get_supported_log_levels(cls) -> list[str]:
+    def get_supported_log_levels(cls) -> FlextTypes.Core.StringList:
         """Get list of supported log levels."""
         return [level.value for level in cls.LogLevel]
 
@@ -358,7 +368,12 @@ class FlextMeltanoConfig(BaseModel):
     def create_from_project_root(
         cls, project_root: str | Path
     ) -> FlextResult[FlextMeltanoConfig]:
-        """Create configuration from project root directory."""
+        """Create configuration from project root directory.
+
+        Returns:
+            FlextTypes.Core.StringList:: Description of return value.
+
+        """
         try:
             config = cls(project_root=Path(project_root))
             validation_result = config.validate_project_structure()
@@ -391,7 +406,7 @@ class FlextMeltanoConfig(BaseModel):
 
             # Filter and type-cast kwargs to valid fields only
             valid_fields = cls.model_fields.keys()
-            filtered_kwargs: dict[str, object] = {
+            filtered_kwargs: FlextTypes.Core.Dict = {
                 k: v for k, v in kwargs.items() if k in valid_fields
             }
 

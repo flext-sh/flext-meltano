@@ -1,6 +1,10 @@
 """Test FlextSingerTypes - Unified class functionality.
 
 Tests the new unified FlextSingerTypes class with real API behavior.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from flext_meltano.singer_types import FlextSingerTypes
@@ -53,7 +57,7 @@ class TestFlextSingerTypesUnified:
     def test_schema_message_creation(self) -> None:
         """Test Singer SCHEMA message creation."""
         singer_types = FlextSingerTypes()
-        schema: dict[str, object] = {
+        schema: FlextTypes.Core.Dict = {
             "type": "object",
             "properties": {"id": {"type": "integer"}},
         }
@@ -68,7 +72,7 @@ class TestFlextSingerTypesUnified:
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
         singer_types = FlextSingerTypes()
-        string_type: dict[str, object] = {"type": "string"}
+        string_type: FlextTypes.Core.Dict = {"type": "string"}
 
         # Valid string
         result = singer_types.validate_value("test", string_type)

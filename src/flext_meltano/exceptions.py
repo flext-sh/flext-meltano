@@ -1,3 +1,11 @@
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
+"""
+
+from __future__ import annotations
+
+from flext_core import FlextTypes
+
 """FLEXT Meltano Exceptions - Single Class Architecture (Flext[Area][Module] pattern).
 
 **Architecture Compliance**: Single main class FlextMeltanoExceptions following Flext[Area][Module] pattern
@@ -10,8 +18,11 @@ Domain-specific exceptions using facade pattern to eliminate duplication while m
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
-from __future__ import annotations
 
 from flext_core import (
     FlextExceptions,
@@ -36,7 +47,7 @@ class ValidationErrorContext(BaseModel):
     validation_rule: str | None = Field(
         default=None, description="Validation rule violated"
     )
-    additional_info: dict[str, object] = Field(
+    additional_info: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional context"
     )
 
@@ -48,7 +59,7 @@ class ConfigurationErrorContext(BaseModel):
     section: str | None = Field(default=None, description="Configuration section")
     key: str | None = Field(default=None, description="Configuration key")
     expected_format: str | None = Field(default=None, description="Expected format")
-    additional_info: dict[str, object] = Field(
+    additional_info: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional context"
     )
 
@@ -61,7 +72,7 @@ class ConnectionErrorContext(BaseModel):
     protocol: str | None = Field(default=None, description="Connection protocol")
     timeout: int | None = Field(default=None, description="Connection timeout")
     retry_count: int = Field(default=0, description="Number of retries attempted")
-    additional_info: dict[str, object] = Field(
+    additional_info: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional context"
     )
 
@@ -74,7 +85,7 @@ class ProcessingErrorContext(BaseModel):
     batch_id: str | None = Field(default=None, description="Batch identifier")
     stream_name: str | None = Field(default=None, description="Stream being processed")
     stage: str | None = Field(default=None, description="Processing stage")
-    additional_info: dict[str, object] = Field(
+    additional_info: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional context"
     )
 
@@ -87,7 +98,7 @@ class PluginErrorContext(BaseModel):
     version: str | None = Field(default=None, description="Plugin version")
     command: str | None = Field(default=None, description="Command executed")
     exit_code: int | None = Field(default=None, description="Exit code")
-    additional_info: dict[str, object] = Field(
+    additional_info: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional context"
     )
 
@@ -206,7 +217,7 @@ class FlextMeltanoExceptions:
             """Initialize timeout error with timing context nested under 'context'."""
             super().__init__()
             self.message = f"Timeout: {message}"
-            nested: dict[str, object] = {}
+            nested: FlextTypes.Core.Dict = {}
             if timeout_seconds is not None:
                 nested["timeout"] = timeout_seconds
             if operation is not None:
@@ -240,7 +251,7 @@ class FlextMeltanoExceptions:
             **kwargs: object,
         ) -> None:
             """Initialize execution error with command context."""
-            nested: dict[str, object] = dict(kwargs)
+            nested: FlextTypes.Core.Dict = dict(kwargs)
             if command is not None:
                 nested["command"] = command
             if exit_code is not None:
@@ -308,7 +319,7 @@ FlextMeltanoSingerError = FlextMeltanoExceptions.MeltanoSingerError
 FlextMeltanoDBTError = FlextMeltanoExceptions.MeltanoDBTError
 
 
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     # Individual exception types
     "FlextMeltanoAuthenticationError",
     "FlextMeltanoConfigurationError",

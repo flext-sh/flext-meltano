@@ -1,6 +1,10 @@
 """Test FlextMeltanoExecutor - Complete real functionality testing.
 
 Tests all major executor functionality with 100% real API integration.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import sys

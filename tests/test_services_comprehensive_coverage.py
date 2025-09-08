@@ -3,6 +3,8 @@
 Comprehensive tests for FlextMeltanoService using real service functionality.
 Focuses on achieving 90%+ coverage with meaningful functional tests.
 
+
+
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -304,14 +306,22 @@ class TestServiceGenericMethods:
     def test_create_service_generic_target(self) -> None:
         """Test generic service creation for target services."""
         result = self.service._create_service_generic(
-            self.service.TargetService, "target-csv", "target_name", "target", target_name="target-csv"
+            self.service.TargetService,
+            "target-csv",
+            "target_name",
+            "target",
+            target_name="target-csv",
         )
         assert isinstance(result, FlextResult)
 
     def test_create_service_generic_dbt(self) -> None:
         """Test generic service creation for dbt services."""
         result = self.service._create_service_generic(
-            self.service.DbtService, "my_project", "project_name", "dbt", project_name="my_project"
+            self.service.DbtService,
+            "my_project",
+            "project_name",
+            "dbt",
+            project_name="my_project",
         )
         assert isinstance(result, FlextResult)
 

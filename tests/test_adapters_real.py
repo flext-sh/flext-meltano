@@ -1,6 +1,10 @@
 """Test FlextMeltanoAdapter - Real functionality only.
 
 Tests only methods that actually exist and work.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import tempfile
@@ -133,7 +137,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config(self) -> None:
         """Test project configuration adaptation."""
-        config: dict[str, object] = {
+        config: FlextTypes.Core.Dict = {
             "name": "test-project",
             "plugins": {"extractors": [], "loaders": []},
         }
@@ -155,7 +159,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config_minimal(self) -> None:
         """Test project config adaptation with minimal input."""
-        config: dict[str, object] = {}
+        config: FlextTypes.Core.Dict = {}
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
@@ -169,7 +173,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin(self) -> None:
         """Test plugin adaptation."""
-        plugin_data: dict[str, object] = {
+        plugin_data: FlextTypes.Core.Dict = {
             "type": "extractors",
             "pip_url": "pipelinewise-tap-csv",
         }
@@ -192,7 +196,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin_minimal(self) -> None:
         """Test plugin adaptation with minimal input."""
-        plugin_data: dict[str, object] = {}
+        plugin_data: FlextTypes.Core.Dict = {}
 
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
@@ -234,7 +238,10 @@ class TestFlextMeltanoAdapterReal:
 
     def test_error_handling_invalid_plugin_data(self) -> None:
         """Test error handling with invalid plugin data."""
-        invalid_plugin: dict[str, object] = {"invalid": "data", "type": "nonexistent"}
+        invalid_plugin: FlextTypes.Core.Dict = {
+            "invalid": "data",
+            "type": "nonexistent",
+        }
 
         result = FlextMeltanoAdapter.adapt_plugin(invalid_plugin)
 
@@ -282,7 +289,7 @@ class TestFlextMeltanoAdapterReal:
     def test_multiple_plugin_operations(self) -> None:
         """Test multiple plugin operations in sequence."""
         # Test plugin adaptation multiple times
-        plugins: list[dict[str, object]] = [
+        plugins: list[FlextTypes.Core.Dict] = [
             {"type": "extractors", "name": "tap-csv"},
             {"type": "loaders", "name": "target-postgres"},
             {"type": "transformers", "name": "dbt"},

@@ -9,6 +9,10 @@
 
 Provides pytest fixtures and configuration for testing Meltano integration functionality
 using real Meltano projects and flext-core patterns with enterprise testing standards.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -21,6 +25,7 @@ from pathlib import Path
 import pytest
 import yaml
 from click.testing import CliRunner
+from flext_core import FlextTypes
 
 
 # Test environment setup
@@ -48,7 +53,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> dict[str, object]:
+def meltano_yml_config() -> FlextTypes.Core.Dict:
     """Sample meltano.yml configuration for testing."""
     return {
         "version": 1,
@@ -111,8 +116,8 @@ def meltano_yml_config() -> dict[str, object]:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: dict[str, object],
-) -> dict[str, object]:
+    meltano_yml_config: FlextTypes.Core.Dict,
+) -> FlextTypes.Core.Dict:
     """Meltano project for testing."""
     # Create meltano.yml
 
@@ -133,7 +138,7 @@ def meltano_project(
 
 # Plugin fixtures
 @pytest.fixture
-def tap_csv_config() -> dict[str, object]:
+def tap_csv_config() -> FlextTypes.Core.Dict:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -148,7 +153,7 @@ def tap_csv_config() -> dict[str, object]:
 
 
 @pytest.fixture
-def target_csv_config() -> dict[str, object]:
+def target_csv_config() -> FlextTypes.Core.Dict:
     """Target CSV configuration for testing."""
     return {
         "destination_path": "output",
@@ -174,14 +179,14 @@ def meltano_cli_runner() -> object:
 
 
 @pytest.fixture
-def meltano_invoke_args() -> list[str]:
+def meltano_invoke_args() -> FlextTypes.Core.StringList:
     """Common Meltano invoke arguments."""
     return ["--log-level", "debug", "--environment", "test"]
 
 
 # Singer protocol fixtures
 @pytest.fixture
-def singer_schema() -> dict[str, object]:
+def singer_schema() -> FlextTypes.Core.Dict:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -200,7 +205,7 @@ def singer_schema() -> dict[str, object]:
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, object]]:
+def singer_records() -> list[FlextTypes.Core.Dict]:
     """Sample Singer records for testing."""
     return [
         {
@@ -227,7 +232,7 @@ def singer_records() -> list[dict[str, object]]:
 
 
 @pytest.fixture
-def singer_state() -> dict[str, object]:
+def singer_state() -> FlextTypes.Core.Dict:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -244,7 +249,7 @@ def singer_state() -> dict[str, object]:
 
 # Pipeline execution fixtures
 @pytest.fixture
-def pipeline_execution_config() -> dict[str, object]:
+def pipeline_execution_config() -> FlextTypes.Core.Dict:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -258,7 +263,7 @@ def pipeline_execution_config() -> dict[str, object]:
 
 # Environment fixtures
 @pytest.fixture
-def test_environment_config() -> dict[str, object]:
+def test_environment_config() -> FlextTypes.Core.Dict:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -274,7 +279,7 @@ def test_environment_config() -> dict[str, object]:
 
 # Schedule fixtures
 @pytest.fixture
-def sample_schedule_config() -> dict[str, object]:
+def sample_schedule_config() -> FlextTypes.Core.Dict:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -288,7 +293,7 @@ def sample_schedule_config() -> dict[str, object]:
 
 # Job fixtures
 @pytest.fixture
-def job_run_config() -> dict[str, object]:
+def job_run_config() -> FlextTypes.Core.Dict:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -320,22 +325,22 @@ def mock_meltano_service() -> object:
     class MockMeltanoService:
         async def create_project(
             self,
-            _config: dict[str, object],
-        ) -> dict[str, object]:
+            _config: FlextTypes.Core.Dict,
+        ) -> FlextTypes.Core.Dict:
             return {"project_id": "test-project", "status": "created"}
 
         async def install_plugin(
             self,
             _plugin_type: str,
             plugin_name: str,
-        ) -> dict[str, object]:
+        ) -> FlextTypes.Core.Dict:
             return {"plugin": plugin_name, "status": "installed"}
 
         async def run_pipeline(
             self,
             _extractor: str,
             _loader: str,
-        ) -> dict[str, object]:
+        ) -> FlextTypes.Core.Dict:
             return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()
@@ -346,13 +351,13 @@ def mock_singer_tap() -> type[object]:
     """Mock Singer tap for testing."""
 
     class MockSingerTap:
-        def __init__(self, config: dict[str, object]) -> None:
+        def __init__(self, config: FlextTypes.Core.Dict) -> None:
             self.config = config
 
-        async def discover(self) -> dict[str, object]:
+        async def discover(self) -> FlextTypes.Core.Dict:
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-        async def extract(self) -> list[dict[str, object]]:
+        async def extract(self) -> list[FlextTypes.Core.Dict]:
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
@@ -363,10 +368,12 @@ def mock_singer_target() -> object:
     """Mock Singer target for testing."""
 
     class MockSingerTarget:
-        def __init__(self, config: dict[str, object]) -> None:
+        def __init__(self, config: FlextTypes.Core.Dict) -> None:
             self.config = config
 
-        async def load(self, records: list[dict[str, object]]) -> dict[str, object]:
+        async def load(
+            self, records: list[FlextTypes.Core.Dict]
+        ) -> FlextTypes.Core.Dict:
             return {"records_loaded": len(records), "status": "success"}
 
     return MockSingerTarget

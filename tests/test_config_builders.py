@@ -2,6 +2,10 @@
 
 Tests FlextMeltanoConfigBuilders class and nested builder classes.
 Zero mock usage - all real function testing.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

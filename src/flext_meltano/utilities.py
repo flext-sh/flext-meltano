@@ -54,7 +54,12 @@ class FlextMeltanoUtilities:
     def create_meltano_config_dict(
         cls, project_id: str, project_name: str = ""
     ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
-        """Create complete Meltano configuration dictionary."""
+        """Create complete Meltano configuration dictionary.
+
+        Returns:
+            FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]: Project configuration result.
+
+        """
         try:
             # Use FlextUtilities.TextProcessor.safe_string() for safe string handling
             safe_project_id = FlextUtilities.TextProcessor.safe_string(
@@ -230,7 +235,7 @@ class FlextMeltanoUtilities:
             name = plugin_data.get("name", "unknown")
             plugin_type = plugin_data.get("type", "unknown")
 
-            adapted_data: dict[str, object] = {
+            adapted_data: FlextTypes.Core.Dict = {
                 "id": name,
                 "name": name,
                 "type": plugin_type,
@@ -253,9 +258,9 @@ class FlextMeltanoUtilities:
     @classmethod
     def create_bridge_response(
         cls, *, success: bool, data: FlextMeltanoTypes.CLI.ProcessResult | None = None
-    ) -> dict[str, str]:
+    ) -> FlextTypes.Core.Headers:
         """Create bridge response for Go communication."""
-        response: dict[str, str] = {
+        response: FlextTypes.Core.Headers = {
             "success": FlextUtilities.TextProcessor.safe_string(str(success)),
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
         }
@@ -268,7 +273,7 @@ class FlextMeltanoUtilities:
     @classmethod
     def format_command_result(
         cls, exit_code: int, output: str, command: str
-    ) -> dict[str, str]:
+    ) -> FlextTypes.Core.Headers:
         """Format command execution result."""
         return {
             "exit_code": FlextUtilities.TextProcessor.safe_string(str(exit_code)),
@@ -329,7 +334,12 @@ class FlextMeltanoUtilities:
     def load_yaml_config(
         cls, path: Path
     ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
-        """Load YAML config safely."""
+        """Load YAML config safely.
+
+        Returns:
+            FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]: Configuration loading result.
+
+        """
         try:
             with path.open("r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
@@ -412,7 +422,12 @@ class FlextMeltanoUtilities:
     def create_singer_tap_config(
         cls, name: str, namespace: str, pip_url: str, executable: str
     ) -> FlextResult[FlextMeltanoTypes.Singer.TapConfig]:
-        """Create Singer tap configuration."""
+        """Create Singer tap configuration.
+
+        Returns:
+            FlextResult[FlextMeltanoTypes.Singer.TapConfig]: Singer tap config creation result.
+
+        """
         try:
             config_result = cls.create_plugin_config_dict(
                 name, "extractor", namespace, pip_url, executable

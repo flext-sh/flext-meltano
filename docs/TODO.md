@@ -45,7 +45,7 @@ if result.data and isinstance(result.data, dict):
     version = stdout.strip() if isinstance(stdout, str) else "unknown"
 
 # validation.py - Strict type annotations
-details: dict[str, object] = {
+details: FlextTypes.Core.Dict = {
     "tap_name": tap_name,
     "config_type": "unknown",
 }

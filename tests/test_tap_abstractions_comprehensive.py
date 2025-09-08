@@ -2,6 +2,10 @@
 
 Tests all tap functionality with real Singer protocol operations,
 no mocks, using flext_tests for improved assertions and test builders.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import concurrent.futures
@@ -40,7 +44,7 @@ class TestTapConfigComprehensive:
 
     def test_tap_config_valid_creation(self) -> None:
         """Test creating valid tap configuration."""
-        config_data: dict[str, object] = {
+        config_data: FlextTypes.Core.Dict = {
             "tap_type": "tap-postgres",
             "connection_config": {
                 "host": "localhost",
@@ -62,9 +66,9 @@ class TestTapConfigComprehensive:
         config = TapConfig(
             tap_type=str(config_data["tap_type"]),
             connection_config=cast(
-                "dict[str, object]", config_data["connection_config"]
+                "FlextTypes.Core.Dict", config_data["connection_config"]
             ),
-            stream_config=cast("dict[str, object]", config_data["stream_config"]),
+            stream_config=cast("FlextTypes.Core.Dict", config_data["stream_config"]),
             version=str(config_data["version"]),
         )
 
@@ -74,7 +78,7 @@ class TestTapConfigComprehensive:
         # Type-safe nested dict access
         users_stream = config.stream_config.get("users")
         assert users_stream is not None
-        users_config = cast("dict[str, object]", users_stream)
+        users_config = cast("FlextTypes.Core.Dict", users_stream)
         assert users_config["replication_method"] == "FULL_TABLE"
 
         assert config.version == "1.2.3"
@@ -476,7 +480,7 @@ class TestFlextTapAbstractionsComprehensive:
         assert stream.stream_name == "products"
         assert stream.tap_type == "tap-postgres"
         schema_properties = cast(
-            "dict[str, object]", stream.stream_schema.get("properties", {})
+            "FlextTypes.Core.Dict", stream.stream_schema.get("properties", {})
         )
         assert "product_id" in schema_properties
 
@@ -592,7 +596,10 @@ class TestFlextTapAbstractionsOracleIntegration:
         tap_instance = result.value
         assert tap_instance.tap_type == "tap-oracle"
         assert "tables" in tap_instance.config.connection_config
-        tables = cast("list[str]", tap_instance.config.connection_config["tables"])
+        tables = cast(
+            "FlextTypes.Core.StringList",
+            tap_instance.config.connection_config["tables"],
+        )
         assert len(tables) == 3
 
     def test_oracle_error_handling_real(self) -> None:
@@ -781,7 +788,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         ],
     )
     def test_tap_abstractions_parametrized_tap_types(
-        self, tap_type: str, connection_config: dict[str, object]
+        self, tap_type: str, connection_config: FlextTypes.Core.Dict
     ) -> None:
         """Test tap abstractions with various tap types."""
         config = TapConfig(tap_type=tap_type, connection_config=connection_config)

@@ -1,6 +1,10 @@
 """Test FlextMeltanoBridge - Complete real functionality testing.
 
 Tests all bridge functionality with 100% real operations.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import asyncio

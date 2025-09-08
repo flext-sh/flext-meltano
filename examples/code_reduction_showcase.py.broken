@@ -58,7 +58,7 @@ class MeltanoProject:
         self.root_dir = root_dir
 
 
-def batch_process_tables(tables: list[str]) -> None:
+def batch_process_tables(tables: FlextTypes.Core.StringList) -> None:
     """Mock batch processing for examples."""
 
 

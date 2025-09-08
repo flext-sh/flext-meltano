@@ -3,6 +3,8 @@
 Comprehensive tests for FlextMeltanoExceptions using real functionality and error scenarios.
 Focuses on achieving 95%+ coverage with meaningful functional tests.
 
+
+
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

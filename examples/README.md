@@ -161,7 +161,7 @@ object
 
 from flext_meltano import FlextMeltanoConfig
 
-def demonstrate_pattern() -> dict[str, object]:
+def demonstrate_pattern() -> FlextTypes.Core.Dict:
     """Demonstrate specific pattern with clear documentation.
 
     Returns:

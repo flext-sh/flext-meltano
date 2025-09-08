@@ -1,52 +1,7 @@
 """FLEXT Meltano Adapters - Single class architecture following flext-core patterns.
 
-Provides comprehensive Meltano Core integration with FLEXT patterns using single class
-architecture. All Meltano adapter functionality is organized under FlextMeltanoAdapter
-with nested classes for specific adapter types and operations.
-
-Module Role in Architecture:
-    FlextMeltanoAdapter serves as the single adapter class for all Meltano Core integration,
-    providing bridge functionality, project management, plugin discovery, and ELT pipeline
-    coordination following flext-core architectural patterns.
-
-Classes and Methods:
-    FlextMeltanoAdapter:                           # Single adapter class following flext-core pattern
-        # Nested Classes:
-        Bridge                                     # Meltano Core bridge operations
-        ProjectManager                             # Project lifecycle management
-        PluginDiscovery                           # Plugin discovery and installation
-        ELTCoordinator                            # ELT pipeline coordination
-
-        # Core Methods:
-        get_version() -> FlextResult[dict]         # Get Meltano version information
-        initialize_project(path) -> FlextResult[Project]  # Initialize Meltano project
-        discover_plugins() -> FlextResult[list]    # Discover available plugins
-        create_project(name, dir) -> FlextResult[dict]    # Create new Meltano project
-        add_plugin(project, type, name) -> FlextResult[dict]  # Add plugin to project
-        run_elt_pipeline(config) -> FlextResult[dict]     # Execute ELT pipeline
-
-Usage Examples:
-    Basic adapter usage:
-        adapter = FlextMeltanoAdapter()
-        version_result = adapter.get_version()
-        if version_result.success:
-            print(f"Meltano version: {version_result.value['version']}")
-
-    Project management:
-        project_result = adapter.create_project("my-project", Path("/tmp"))
-        if project_result.success:
-            project_path = project_result.value["project_path"]
-
-    Plugin discovery:
-        plugins_result = adapter.discover_plugins()
-        if plugins_result.success:
-            for plugin in plugins_result.value:
-                print(f"Plugin: {plugin['name']} (type: {plugin['type']})")
-
-Integration:
-    FlextMeltanoAdapter integrates with FlextResult for error handling, FlextDomainService
-    for service patterns, FlextLogger for logging, and native Meltano Core APIs for
-    all operations ensuring compatibility and type safety.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -62,6 +17,7 @@ from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextTypes,
     FlextUtilities,
 )
 from meltano.core.elt_context import ELTContext
@@ -79,33 +35,17 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoAdapter:
-    """Single adapter class for all Meltano Core integration following flext-core patterns.
-
-    This class implements the complete FLEXT Meltano adapter architecture following
-    strict flext-core requirements:
-        - Single consolidated class per module with nested organization
-        - Massive integration with flext-core patterns (FlextResult, FlextLogger, etc.)
-        - Zero duplication with flext-core functionality
-        - Python 3.13+ syntax with proper generic type annotations
-        - Railway-oriented programming via FlextResult integration
-        - Native Meltano Core API integration without subprocess calls
-
-    The adapter architecture provides:
-        - Bridge functionality for Meltano Core operations
-        - Project lifecycle management (create, initialize, configure)
-        - Plugin discovery and installation from Meltano Hub
-        - ELT pipeline coordination and execution
-        - Type-safe error handling throughout
-
-    All nested classes follow Clean Architecture principles with proper
-    layering and separation of concerns through protocol-based interfaces.
-    """
+    """Single adapter class for all Meltano Core integration following flext-core patterns."""
 
     def __init__(self) -> None:
         """Initialize FlextMeltanoAdapter with flext-core patterns.
 
         Sets up the adapter with proper flext-core integration including
         logging, utilities, and error handling patterns.
+
+        Returns:
+            object: Description of return value.
+
         """
         self._logger = FlextLogger(__name__)
         self._utilities = FlextUtilities()
@@ -117,8 +57,8 @@ class FlextMeltanoAdapter:
 
     @classmethod
     def adapt_project_config(
-        cls, config: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        cls, config: FlextTypes.Core.Dict
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Adapt project configuration for Meltano compatibility."""
         try:
             # Basic validation and adaptation
@@ -130,16 +70,16 @@ class FlextMeltanoAdapter:
             if "version" not in adapted_config:
                 adapted_config["version"] = 1
 
-            return FlextResult[dict[str, object]].ok(adapted_config)
+            return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Failed to adapt project config: {e}"
             )
 
     @classmethod
     def adapt_plugin(
-        cls, plugin_data: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        cls, plugin_data: FlextTypes.Core.Dict
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Adapt plugin data for Meltano compatibility."""
         try:
             # Basic plugin adaptation
@@ -151,9 +91,11 @@ class FlextMeltanoAdapter:
             if "namespace" not in adapted_plugin:
                 adapted_plugin["namespace"] = "default"
 
-            return FlextResult[dict[str, object]].ok(adapted_plugin)
+            return FlextResult[FlextTypes.Core.Dict].ok(adapted_plugin)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to adapt plugin: {e}")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                f"Failed to adapt plugin: {e}"
+            )
 
     def get_version(self) -> FlextResult[FlextMeltanoTypes.Bridge.VersionInfo]:
         """Get Meltano version information using native API.
@@ -257,7 +199,7 @@ class FlextMeltanoAdapter:
 
     def discover_plugins(
         self, project: Project | None = None
-    ) -> FlextResult[list[dict[str, str]]]:
+    ) -> FlextResult[list[FlextTypes.Core.Headers]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -283,7 +225,7 @@ class FlextMeltanoAdapter:
             else:
                 temp_project_result = self._create_temp_project()
                 if not temp_project_result.success:
-                    return FlextResult[list[dict[str, str]]].fail(
+                    return FlextResult[list[FlextTypes.Core.Headers]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project"
                     )
@@ -322,16 +264,16 @@ class FlextMeltanoAdapter:
                 plugins.append(plugin_info)
 
             self._logger.info(f"Discovered {len(plugins)} plugins")
-            return FlextResult[list[dict[str, str]]].ok(plugins)
+            return FlextResult[list[FlextTypes.Core.Headers]].ok(plugins)
 
         except Exception as e:
             error_msg = f"Failed to discover plugins: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult[list[dict[str, str]]].fail(error_msg)
+            return FlextResult[list[FlextTypes.Core.Headers]].fail(error_msg)
 
     def create_project(
         self, project_name: str, project_dir: Path
-    ) -> FlextResult[dict[str, str]]:
+    ) -> FlextResult[FlextTypes.Core.Headers]:
         """Create new Meltano project using ProjectInitService native API.
 
         Args:
@@ -340,12 +282,6 @@ class FlextMeltanoAdapter:
 
         Returns:
             FlextResult containing project creation information
-
-        Example:
-            >>> adapter = FlextMeltanoAdapter()
-            >>> result = adapter.create_project("my-project", Path("/tmp"))
-            >>> if result.success:
-            ...     print(f"Project created at: {result.value['project_path']}")
 
         """
         try:
@@ -381,16 +317,16 @@ class FlextMeltanoAdapter:
                 project_path=str(full_project_path),
             )
 
-            return FlextResult[dict[str, str]].ok(project_result)
+            return FlextResult[FlextTypes.Core.Headers].ok(project_result)
 
         except Exception as e:
             error_msg = f"Failed to create Meltano project: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult[dict[str, str]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     def add_plugin(
         self, project_dir: Path, plugin_type: str, plugin_name: str
-    ) -> FlextResult[dict[str, str]]:
+    ) -> FlextResult[FlextTypes.Core.Headers]:
         """Add plugin to Meltano project using ProjectAddService native API.
 
         Args:
@@ -400,14 +336,6 @@ class FlextMeltanoAdapter:
 
         Returns:
             FlextResult containing plugin addition information
-
-        Example:
-            >>> adapter = FlextMeltanoAdapter()
-            >>> result = adapter.add_plugin(
-            ...     Path("/path/to/project"), "extractors", "tap-csv"
-            ... )
-            >>> if result.success:
-            ...     print(f"Plugin added: {result.value['plugin_name']}")
 
         """
         try:
@@ -429,7 +357,7 @@ class FlextMeltanoAdapter:
             }
 
             if plugin_type not in type_map:
-                return FlextResult[dict[str, str]].fail(
+                return FlextResult[FlextTypes.Core.Headers].fail(
                     f"Invalid plugin type: {plugin_type}. "
                     f"Valid types: {list(type_map.keys())}"
                 )
@@ -455,12 +383,12 @@ class FlextMeltanoAdapter:
                 plugin_type=plugin_type,
             )
 
-            return FlextResult[dict[str, str]].ok(plugin_result)
+            return FlextResult[FlextTypes.Core.Headers].ok(plugin_result)
 
         except Exception as e:
             error_msg = f"Failed to add plugin: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult[dict[str, str]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     # =========================================================================
     # PRIVATE UTILITY METHODS - Internal helper functionality
@@ -516,7 +444,12 @@ class FlextMeltanoAdapter:
             self._logger = FlextLogger(__name__)
 
         def execute(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
-            """Execute bridge service operation (required by FlextDomainService)."""
+            """Execute bridge service operation (required by FlextDomainService).
+
+            Returns:
+                FlextResult[FlextMeltanoTypes.CLI.ProcessResult]: Bridge execution result.
+
+            """
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
                 {
                     "service": "MeltanoBridge",
@@ -584,7 +517,7 @@ class FlextMeltanoAdapter:
 
         def get_plugin_info(
             self, plugin_name: str, plugin_type: PluginType
-        ) -> FlextResult[dict[str, str]]:
+        ) -> FlextResult[FlextTypes.Core.Headers]:
             """Get detailed information about specific plugin.
 
             Args:
@@ -618,7 +551,7 @@ class FlextMeltanoAdapter:
                 plugins_dict = hub_service.get_plugins_of_type(plugin_type)
 
                 if plugin_name not in plugins_dict:
-                    return FlextResult[dict[str, str]].fail(
+                    return FlextResult[FlextTypes.Core.Headers].fail(
                         f"Plugin '{plugin_name}' not found in {plugin_type.value}"
                     )
 
@@ -634,12 +567,12 @@ class FlextMeltanoAdapter:
                     "logo_url": getattr(indexed_plugin, "logo_url", ""),
                 }
 
-                return FlextResult[dict[str, str]].ok(plugin_info)
+                return FlextResult[FlextTypes.Core.Headers].ok(plugin_info)
 
             except Exception as e:
                 error_msg = f"Failed to get plugin info: {e}"
                 self._logger.exception(error_msg)
-                return FlextResult[dict[str, str]].fail(error_msg)
+                return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     class ELTCoordinator:
         """ELT pipeline coordination and execution operations.
@@ -654,7 +587,7 @@ class FlextMeltanoAdapter:
 
         def execute_pipeline(
             self, project: Project, extractor_name: str, loader_name: str
-        ) -> FlextResult[dict[str, str]]:
+        ) -> FlextResult[FlextTypes.Core.Headers]:
             """Execute ELT pipeline using native Meltano APIs.
 
             Args:
@@ -688,7 +621,7 @@ class FlextMeltanoAdapter:
                         f"Required plugins not found: {extractor_name}, {loader_name}"
                     )
                     self._logger.error(error_msg)
-                    return FlextResult[dict[str, str]].fail(error_msg)
+                    return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
                 # Create job for ELT context
                 job = Job(job_name=f"{extractor_name}-to-{loader_name}")
@@ -726,42 +659,42 @@ class FlextMeltanoAdapter:
                     loader=loader_name,
                 )
 
-                return FlextResult[dict[str, str]].ok(pipeline_result)
+                return FlextResult[FlextTypes.Core.Headers].ok(pipeline_result)
 
             except RunnerError as runner_error:
                 error_msg = f"ELT pipeline execution failed: {runner_error}"
                 self._logger.exception(error_msg)
-                return FlextResult[dict[str, str]].fail(error_msg)
+                return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
             except Exception as e:
                 error_msg = f"Unexpected error in ELT pipeline: {e}"
                 self._logger.exception(error_msg)
-                return FlextResult[dict[str, str]].fail(error_msg)
+                return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     # =================================================================
     # SINGER SDK INTEGRATION - Direct integration without wrappers
     # =================================================================
 
-    def create_tap_stream_catalog(self) -> FlextResult[dict[str, object]]:
+    def create_tap_stream_catalog(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Create tap stream catalog using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok(
+        return FlextResult[FlextTypes.Core.Dict].ok(
             {
                 "streams": [],
                 "catalog_type": "singer_tap",
             }
         )
 
-    def create_target_config(self) -> FlextResult[dict[str, object]]:
+    def create_target_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Create target configuration using native Singer SDK."""
-        return FlextResult[dict[str, object]].ok(
+        return FlextResult[FlextTypes.Core.Dict].ok(
             {
                 "target_schema": "default",
                 "batch_config": {},
             }
         )
 
-    def convert_singer_schema(self) -> FlextResult[dict[str, object]]:
+    def convert_singer_schema(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Convert Singer schema types using native APIs."""
-        return FlextResult[dict[str, object]].ok(
+        return FlextResult[FlextTypes.Core.Dict].ok(
             {
                 "schema_version": "1.0",
                 "properties": {},
@@ -769,16 +702,23 @@ class FlextMeltanoAdapter:
         )
 
     def validate_stream_schema(self) -> FlextResult[bool]:
-        """Validate stream schema using native validation."""
+        """Validate stream schema using native validation.
+
+        Returns:
+            FlextResult[FlextTypes.Core.Dict]:: Description of return value.
+
+        """
         return FlextResult[bool].ok(data=True)
 
     # =================================================================
     # DBT INTEGRATION - Direct integration without wrappers
     # =================================================================
 
-    def execute_dbt_operation(self) -> FlextResult[dict[str, object]]:
+    def execute_dbt_operation(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute DBT operation using native DBT Core API."""
-        return FlextResult[dict[str, object]].ok({"dbt_status": "ready", "models": []})
+        return FlextResult[FlextTypes.Core.Dict].ok(
+            {"dbt_status": "ready", "models": []}
+        )
 
 
 # =============================================================================

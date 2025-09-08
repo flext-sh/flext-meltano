@@ -112,7 +112,7 @@ class MyTapService(FlextMeltanoTapService):
     def get_tap_class(self) -> type[Tap]:
         return MyCustomTap
 
-    def get_default_config(self) -> dict[str, object]:
+    def get_default_config(self) -> FlextTypes.Core.Dict:
         return {"api_key": "required"}
 
 # Usage with dependency injection

@@ -2,6 +2,10 @@
 
 Tests all executors functionality with real Meltano execution scenarios,
 using flext_tests for advanced testing patterns and comprehensive coverage.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import shutil
