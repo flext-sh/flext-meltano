@@ -1,12 +1,15 @@
-"""Meltano Plugin Protocols - MINIMAL NECESSARY PROTOCOLS.
+"""Meltano Plugin Protocols.
 
-⚠️ REALITY CHECK: flext-core FlextProtocols imports cause NameError in validation.py
-HONEST SOLUTION: Use minimal typing.Protocol until flext-core is fixed
-
-Following FLEXT_REFACTORING_PROMPT.md but adapting to REAL working constraints.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 
 class FlextMeltanoPluginTypes:

@@ -2,6 +2,10 @@
 
 Tests all target functionality with real Singer protocol operations,
 no mocks, using flext_tests for improved assertions and test builders.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 import concurrent.futures

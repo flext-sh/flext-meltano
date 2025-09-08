@@ -112,7 +112,7 @@ class FlextMeltanoBridge:
                     "variant": "transferwise",
                     "pip_url": "pipelinewise-tap-postgres"
                 }
-            ]
+            ]:
         """
         # ✅ PRODUCTION IMPLEMENTATION AVAILABLE
 

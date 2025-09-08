@@ -1,3 +1,11 @@
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
+"""
+
+from __future__ import annotations
+
+from flext_core import FlextTypes
+
 """FLEXT Meltano Configuration Builders - Single Class Architecture (Flext[Area][Module] pattern).
 
 **Architecture Compliance**: Single main class FlextMeltanoConfigBuilders following Flext[Area][Module] pattern
@@ -10,11 +18,10 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextModels, FlextResult, FlextTypes, FlextUtilities
+from flext_core import FlextLogger, FlextModels, FlextResult, FlextUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -175,7 +182,12 @@ class FlextMeltanoConfigBuilders:
         def create_singer_tap_config(
             tap_name: str, namespace: str = "", pip_url: str = "", executable: str = ""
         ) -> FlextResult[ConfigDict]:
-            """Creates tap configuration using generic factory pattern with object-based parameters."""
+            """Creates tap configuration using generic factory pattern with object-based parameters.
+
+            Returns:
+                FlextResult[ConfigDict]: Configuration result with tap settings.
+
+            """
             config = SingerPluginConfig(
                 plugin_name=tap_name,
                 plugin_type="extractor",
@@ -194,7 +206,12 @@ class FlextMeltanoConfigBuilders:
             pip_url: str = "",
             executable: str = "",
         ) -> FlextResult[ConfigDict]:
-            """Creates target configuration using generic factory pattern with object-based parameters."""
+            """Creates target configuration using generic factory pattern with object-based parameters.
+
+            Returns:
+                FlextResult[ConfigDict]: Configuration result with target settings.
+
+            """
             config = SingerPluginConfig(
                 plugin_name=target_name,
                 plugin_type="loader",
@@ -457,7 +474,7 @@ class FlextMeltanoConfigBuilders:
                     if isinstance(plugin_list, list):
                         plugin_list_copy = list(plugin_list)  # Create mutable copy
                         plugin_list_copy.append(
-                            cast("dict[str, object]", plugin_config)
+                            cast("FlextTypes.Core.Dict", plugin_config)
                         )
                         typed_plugins[safe_plugin_type] = plugin_list_copy
 

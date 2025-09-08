@@ -10,17 +10,21 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from __future__ import annotations
-
 import shutil
 import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 # Type aliases (MyPy compatible)
-ConfigDict = dict[str, str | int | list[str] | dict[str, str | list[str]]]
+ConfigDict = dict[
+    str,
+    str
+    | int
+    | FlextTypes.Core.StringList
+    | dict[str, str | FlextTypes.Core.StringList],
+]
 PathDict = dict[str, Path | str]
 
 logger = FlextLogger(__name__)
@@ -57,7 +61,12 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def load_yaml_config(cls, file_path: Path) -> FlextResult[ConfigDict]:
-        """Load YAML config using direct implementation."""
+        """Load YAML config using direct implementation.
+
+        Returns:
+            FlextResult[ConfigDict]: YAML config loading result.
+
+        """
         try:
             if not file_path.exists():
                 return FlextResult[ConfigDict].fail(f"YAML file not found: {file_path}")
@@ -93,20 +102,20 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def create_directory_structure(
-        cls, base_path: Path, directories: list[str]
-    ) -> FlextResult[dict[str, str]]:
+        cls, base_path: Path, directories: FlextTypes.Core.StringList
+    ) -> FlextResult[FlextTypes.Core.Headers]:
         """Create directory structure using direct pathlib implementation."""
         try:
-            created_paths: dict[str, str] = {}
+            created_paths: FlextTypes.Core.Headers = {}
 
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return FlextResult[dict[str, str]].ok(created_paths)
+            return FlextResult[FlextTypes.Core.Headers].ok(created_paths)
         except Exception as e:
-            return FlextResult[dict[str, str]].fail(
+            return FlextResult[FlextTypes.Core.Headers].fail(
                 f"Failed to create directories: {e}"
             )
 

@@ -5,6 +5,10 @@ Este módulo testa a integração REAL com Meltano 3.9.1:
 - ELTContext, Project, SingerRunner
 - Execução SEM subprocess
 - FlextResult patterns com .value e .unwrap_or()
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

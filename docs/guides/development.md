@@ -193,10 +193,10 @@ version = result.data["stdout"].strip() if result.data else "unknown"
 # Error: "object" has no attribute "strip"
 
 # src/flext_meltano/validation.py:250
-dict[str, str | int | None] vs dict[str, object]
+dict[str, str | int | None] vs FlextTypes.Core.Dict
 
 # src/flext_meltano/validation.py:344
-dict[str, Sequence[str]] vs dict[str, object]
+dict[str, Sequence[str]] vs FlextTypes.Core.Dict
 ```
 
 #### **2. Test Failure** 🔴
@@ -501,7 +501,7 @@ class ExampleService:
     def __init__(self, config: FlextMeltanoConfig) -> None:
         self._config = config
 
-    def process_data(self, data: dict[str, object]) -> FlextResult[str]:
+    def process_data(self, data: FlextTypes.Core.Dict) -> FlextResult[str]:
         """Process data with proper error handling."""
         try:
             # Process data

@@ -1,3 +1,11 @@
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
+"""
+
+from __future__ import annotations
+
+from flext_core import FlextTypes
+
 """Target Abstractions - Singer Target functionality abstraction.
 
 This module provides complete FlextTarget abstractions following flext-core
@@ -9,7 +17,6 @@ SPDX-License-Identifier: MIT
 
 """
 
-from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
@@ -26,11 +33,11 @@ if TYPE_CHECKING:
 # Constants
 
 # Type aliases to replace explicit object (avoid shadowing Pydantic ConfigDict)
-RecordDict = dict[str, object]
-ConnectionConfig = dict[str, object]
-SchemaDict = dict[str, object]
-StateDict = dict[str, object]
-ResultDict = dict[str, object]
+RecordDict = FlextTypes.Core.Dict
+ConnectionConfig = FlextTypes.Core.Dict
+SchemaDict = FlextTypes.Core.Dict
+StateDict = FlextTypes.Core.Dict
+ResultDict = FlextTypes.Core.Dict
 
 
 class FlextTargetConfig(BaseModel):
@@ -39,7 +46,7 @@ class FlextTargetConfig(BaseModel):
     model_config = ConfigDict(frozen=True, extra="allow")
 
     target_type: str = Field(..., description="Target type identifier")
-    connection_config: dict[str, object] = Field(
+    connection_config: FlextTypes.Core.Dict = Field(
         ..., description="Connection configuration dictionary"
     )
     batch_size: int = Field(
@@ -60,7 +67,9 @@ class FlextTargetConfig(BaseModel):
 
     @field_validator("connection_config")
     @classmethod
-    def validate_connection_config(cls, v: dict[str, object]) -> dict[str, object]:
+    def validate_connection_config(
+        cls, v: FlextTypes.Core.Dict
+    ) -> FlextTypes.Core.Dict:
         if not v or not isinstance(v, dict):
             msg = "Connection configuration is required and must be dictionary"
             raise ValueError(msg)
@@ -89,7 +98,7 @@ class FlextStreamInfo(BaseModel):
     model_config = ConfigDict(frozen=False, extra="allow")
 
     stream_name: str = Field(..., description="Stream name identifier")
-    stream_schema: dict[str, object] = Field(
+    stream_schema: FlextTypes.Core.Dict = Field(
         ..., description="Stream schema definition", alias="schema"
     )
     status: str = Field(default="initialized", description="Stream processing status")
@@ -107,7 +116,7 @@ class FlextStreamInfo(BaseModel):
 
     @field_validator("stream_schema")
     @classmethod
-    def validate_stream_schema(cls, v: dict[str, object]) -> dict[str, object]:
+    def validate_stream_schema(cls, v: FlextTypes.Core.Dict) -> FlextTypes.Core.Dict:
         if "properties" not in v:
             msg = "Schema must contain properties"
             raise ValueError(msg)
@@ -127,7 +136,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
         entity_id = target_id or f"target_abstractions_{uuid.uuid4().hex[:8]}"
         super().__init__(id=entity_id)
         self._logger = FlextLogger(f"{__name__}.FlextTargetAbstractions")
-        self._active_targets: dict[str, dict[str, object]] = {}
+        self._active_targets: dict[str, FlextTypes.Core.Dict] = {}
         self._target_configs: dict[str, FlextTargetConfig] = {}
         self._stream_registry: dict[str, FlextStreamInfo] = {}
 
@@ -151,7 +160,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
         batch_size: int = FlextMeltanoConstants.SingerSDK.DEFAULT_BATCH_SIZE,
         max_batches: int = 100,  # No specific constant for max_batches yet
         **kwargs: object,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create FlextTarget configuration with Pydantic validation."""
         try:
             # Use Pydantic model for validation - all validation is automatic
@@ -176,12 +185,12 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 target_type=target_type,
                 config_id=config_id,
             )
-            return FlextResult[dict[str, object]].ok(config_dict)
+            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
 
         except Exception as e:
             error_msg = f"Failed to create FlextTarget config: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     # Removed _validate_target_config - validation now handled by Pydantic FlextTargetConfig model
 
@@ -190,8 +199,8 @@ class FlextTargetAbstractions(FlextModels.Entity):
     # ============================================================================
 
     def create_flext_target(
-        self, config: dict[str, object], adapter: FlextMeltanoAdapter | None = None
-    ) -> FlextResult[dict[str, object]]:
+        self, config: FlextTypes.Core.Dict, adapter: FlextMeltanoAdapter | None = None
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create FlextTarget instance from configuration."""
         try:
             # Extract target_type for logging
@@ -201,7 +210,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
             # Config validation is handled by Pydantic models during usage
 
             # Create target instance
-            target_instance: dict[str, object] = {
+            target_instance: FlextTypes.Core.Dict = {
                 "target_type": target_type,
                 "config": dict(config),
                 "adapter": adapter,
@@ -225,7 +234,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 target_type=target_type,
                 target_id=target_id,
             )
-            return FlextResult[dict[str, object]].ok(
+            return FlextResult[FlextTypes.Core.Dict].ok(
                 {
                     **target_instance,
                     "target_id": target_id,
@@ -235,14 +244,14 @@ class FlextTargetAbstractions(FlextModels.Entity):
         except Exception as e:
             error_msg = f"Failed to create FlextTarget: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     # ============================================================================
     # MESSAGE PROCESSING METHODS
     # ============================================================================
 
     def process_schema_message(
-        self, target: dict[str, object], stream_name: str, schema: SchemaDict
+        self, target: FlextTypes.Core.Dict, stream_name: str, schema: SchemaDict
     ) -> FlextResult[bool]:
         """Process Singer SCHEMA message with error handling."""
         try:
@@ -288,7 +297,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
             return FlextResult[bool].fail(error_msg)
 
     def process_record_message(
-        self, target: dict[str, object], stream_name: str, record: RecordDict
+        self, target: FlextTypes.Core.Dict, stream_name: str, record: RecordDict
     ) -> FlextResult[bool]:
         """Process Singer RECORD message with error handling."""
         try:
@@ -340,7 +349,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
             return FlextResult[bool].fail(error_msg)
 
     def process_state_message(
-        self, target: dict[str, object], state: StateDict
+        self, target: FlextTypes.Core.Dict, state: StateDict
     ) -> FlextResult[bool]:
         """Process Singer STATE message with error handling."""
         try:
@@ -369,7 +378,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
     # ============================================================================
 
     def load_record(
-        self, target: dict[str, object], stream_name: str, record: RecordDict
+        self, target: FlextTypes.Core.Dict, stream_name: str, record: RecordDict
     ) -> FlextResult[bool]:
         """Load single record to target system."""
         try:
@@ -382,8 +391,8 @@ class FlextTargetAbstractions(FlextModels.Entity):
             return FlextResult[bool].fail(error_msg)
 
     def load_batch(
-        self, target: dict[str, object], stream_name: str, records: list[RecordDict]
-    ) -> FlextResult[dict[str, object]]:
+        self, target: FlextTypes.Core.Dict, stream_name: str, records: list[RecordDict]
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Load batch of records to target system."""
         try:
             self._logger.info(
@@ -432,16 +441,16 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 failed_count=failed_count,
             )
 
-            return FlextResult[dict[str, object]].ok(batch_result)
+            return FlextResult[FlextTypes.Core.Dict].ok(batch_result)
 
         except Exception as e:
             error_msg = f"Failed to load batch to stream {stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     def finalize_stream(
-        self, target: dict[str, object], stream_name: str
-    ) -> FlextResult[dict[str, object]]:
+        self, target: FlextTypes.Core.Dict, stream_name: str
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize stream loading (commit, cleanup, etc.)."""
         try:
             self._logger.info("Finalizing stream", stream_name=stream_name)
@@ -452,7 +461,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
             ):
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Stream {stream_name} not found"
                 )
 
@@ -471,20 +480,22 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 self._logger.info(
                     "Stream finalized successfully", stream_name=stream_name
                 )
-                return FlextResult[dict[str, object]].ok(finalization_result)
+                return FlextResult[FlextTypes.Core.Dict].ok(finalization_result)
 
-            return FlextResult[dict[str, object]].fail("Invalid stream info")
+            return FlextResult[FlextTypes.Core.Dict].fail("Invalid stream info")
 
         except Exception as e:
             error_msg = f"Failed to finalize stream {stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     # ============================================================================
     # TARGET FINALIZATION METHODS
     # ============================================================================
 
-    def finalize(self, target: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def finalize(
+        self, target: FlextTypes.Core.Dict
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize target operations with comprehensive reporting."""
         try:
             self._logger.info("Finalizing target operations")
@@ -513,7 +524,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
                             else 0
                         )
 
-            finalization_result: dict[str, object] = {
+            finalization_result: FlextTypes.Core.Dict = {
                 "status": "completed",
                 "total_streams": len(target_streams)
                 if isinstance(target_streams, dict)
@@ -543,20 +554,20 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 total_records=total_records,
             )
 
-            return FlextResult[dict[str, object]].ok(finalization_result)
+            return FlextResult[FlextTypes.Core.Dict].ok(finalization_result)
 
         except Exception as e:
             error_msg = f"Failed to finalize target operations: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     # ============================================================================
     # QUERY AND UTILITY METHODS
     # ============================================================================
 
     def get_stream_by_name(
-        self, target: dict[str, object], stream_name: str
-    ) -> FlextResult[dict[str, object]]:
+        self, target: FlextTypes.Core.Dict, stream_name: str
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Get stream by name with error handling."""
         try:
             target_streams = target.get("streams", {})
@@ -564,23 +575,23 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
             ):
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Stream {stream_name} not found"
                 )
 
-            return FlextResult[dict[str, object]].ok(target_streams[stream_name])
+            return FlextResult[FlextTypes.Core.Dict].ok(target_streams[stream_name])
 
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Failed to get stream {stream_name}: {e}"
             )
 
-    def list_streams(self, target: dict[str, object]) -> list[str]:
+    def list_streams(self, target: FlextTypes.Core.Dict) -> FlextTypes.Core.StringList:
         """List all active stream names."""
         target_streams = target.get("streams", {})
         return list(target_streams.keys()) if isinstance(target_streams, dict) else []
 
-    def get_target_type(self, target: dict[str, object]) -> str:
+    def get_target_type(self, target: FlextTypes.Core.Dict) -> str:
         """Get target type."""
         return str(target.get("target_type", "unknown"))
 
@@ -588,16 +599,19 @@ class FlextTargetAbstractions(FlextModels.Entity):
         """Get current timestamp as ISO string."""
         return datetime.now(tz=UTC).isoformat()
 
-    def get_active_targets(self) -> list[str]:
+    def get_active_targets(self) -> FlextTypes.Core.StringList:
         """Get list of active target IDs."""
         return list(self._active_targets.keys())
 
-    def get_registered_streams(self) -> list[str]:
+    def get_registered_streams(self) -> FlextTypes.Core.StringList:
         """Get list of registered stream keys."""
         return list(self._stream_registry.keys())
 
     def _safe_get_nested(
-        self, data: dict[str, object], keys: list[str], default: object = None
+        self,
+        data: FlextTypes.Core.Dict,
+        keys: FlextTypes.Core.StringList,
+        default: object = None,
     ) -> object:
         """Safely get nested dictionary value with proper type handling."""
         current: object = data

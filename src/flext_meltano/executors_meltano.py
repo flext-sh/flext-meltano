@@ -1,9 +1,5 @@
 """FLEXT Meltano Executors - Single Class Architecture (Flext[Area][Module] pattern).
 
-**Architecture Compliance**: Single main class FlextMeltanoExecutors following Flext[Area][Module] pattern
-**Single Responsibility**: All Meltano execution organized under one class
-**SOLID Compliance**: Nested classes for specific execution needs
-
 Single class containing all executors as nested internal classes.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -107,7 +103,7 @@ class FlextMeltanoExecutors:
         def execute_meltano_command(
             self,
             project_root: Path,
-            command: list[str],
+            command: FlextTypes.Core.StringList,
             timeout: int = FlextMeltanoConstants.SingerSDK.DEFAULT_REQUEST_TIMEOUT,
         ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute Meltano command using native API with structured result.
@@ -270,7 +266,7 @@ class FlextMeltanoExecutors:
 
         def __init__(
             self,
-            command: list[str],
+            command: FlextTypes.Core.StringList,
             *,
             success: bool,
             output: str = "",
@@ -325,12 +321,17 @@ class FlextMeltanoExecutors:
             self.project_root = Path()
 
         def run_plugin_command(
-            self, plugin_name: str, command: str, args: list[str]
-        ) -> FlextResult[dict[str, object]]:
-            """Run plugin command using adapter."""
+            self, plugin_name: str, command: str, args: FlextTypes.Core.StringList
+        ) -> FlextResult[FlextTypes.Core.Dict]:
+            """Run plugin command using adapter.
+
+            Returns:
+                FlextResult[FlextTypes.Core.Dict]:: Description of return value.
+
+            """
             try:
                 # Create result dict for plugin command execution
-                result_data: dict[str, object] = {
+                result_data: FlextTypes.Core.Dict = {
                     "plugin": plugin_name,
                     "command": command,
                     "args": args,
@@ -344,7 +345,12 @@ class FlextMeltanoExecutors:
         def run_pipeline(
             project_root: Path, tap_name: str, target_name: str
         ) -> FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:
-            """Run ELT pipeline using simplified interface."""
+            """Run ELT pipeline using simplified interface.
+
+            Returns:
+            FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:: Description of return value.
+
+            """
             try:
                 FlextMeltanoAdapter()
                 # ELT pipeline execution placeholder - would coordinate tap and target

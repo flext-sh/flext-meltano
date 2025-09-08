@@ -1,3 +1,11 @@
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
+"""
+
+from __future__ import annotations
+
+from flext_core import FlextTypes
+
 """Singer Types - Unified Singer types and schema handling with enterprise patterns.
 
 This module provides complete Singer type functionality following flext-core
@@ -9,17 +17,16 @@ SPDX-License-Identifier: MIT
 
 """
 
-from __future__ import annotations
 
 from flext_core import FlextLogger, FlextResult
 
 # Constants
 
 # Type aliases to replace explicit object
-ConfigDict = dict[str, object]
-SchemaDict = dict[str, object]
-MessageDict = dict[str, object]
-PropertiesDict = dict[str, object]
+ConfigDict = FlextTypes.Core.Dict
+SchemaDict = FlextTypes.Core.Dict
+MessageDict = FlextTypes.Core.Dict
+PropertiesDict = FlextTypes.Core.Dict
 
 
 class FlextSingerTypes:
@@ -33,7 +40,7 @@ class FlextSingerTypes:
     def __init__(self) -> None:
         """Initialize unified Singer types manager."""
         self._logger = FlextLogger(f"{__name__}.FlextSingerTypes")
-        self._type_registry: dict[str, dict[str, object]] = {
+        self._type_registry: dict[str, FlextTypes.Core.Dict] = {
             "string": {"type": "string"},
             "integer": {"type": "integer"},
             "number": {"type": "number"},
@@ -47,93 +54,104 @@ class FlextSingerTypes:
     # TYPE CREATION AND VALIDATION METHODS
     # ============================================================================
 
-    def create_string_type(self, **kwargs: object) -> FlextResult[dict[str, object]]:
-        """Create string type with optional constraints."""
+    def create_string_type(self, **kwargs: object) -> FlextResult[FlextTypes.Core.Dict]:
+        """Create string type with optional constraints.
+
+        Returns:
+            FlextResult[FlextTypes.Core.Dict]: String type creation result.
+
+        """
         try:
-            type_def: dict[str, object] = {"type": "string"}
+            type_def: FlextTypes.Core.Dict = {"type": "string"}
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"String type creation failed: {e}"
             )
 
-    def create_integer_type(self, **kwargs: object) -> FlextResult[dict[str, object]]:
+    def create_integer_type(
+        self, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create integer type with optional constraints."""
         try:
-            type_def: dict[str, object] = {"type": "integer"}
+            type_def: FlextTypes.Core.Dict = {"type": "integer"}
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Integer type creation failed: {e}"
             )
 
-    def create_number_type(self, **kwargs: object) -> FlextResult[dict[str, object]]:
+    def create_number_type(self, **kwargs: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Create number type with optional constraints."""
         try:
-            type_def: dict[str, object] = {"type": "number"}
+            type_def: FlextTypes.Core.Dict = {"type": "number"}
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Number type creation failed: {e}"
             )
 
-    def create_boolean_type(self, **kwargs: object) -> FlextResult[dict[str, object]]:
+    def create_boolean_type(
+        self, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create boolean type."""
         try:
-            type_def: dict[str, object] = {"type": "boolean"}
+            type_def: FlextTypes.Core.Dict = {"type": "boolean"}
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Boolean type creation failed: {e}"
             )
 
-    def create_datetime_type(self, **kwargs: object) -> FlextResult[dict[str, object]]:
+    def create_datetime_type(
+        self, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create date-time type."""
         try:
-            type_def: dict[str, object] = {"type": "string", "format": "date-time"}
+            type_def: FlextTypes.Core.Dict = {"type": "string", "format": "date-time"}
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"DateTime type creation failed: {e}"
             )
 
     def create_array_type(
-        self, items: dict[str, object] | None = None, **kwargs: object
-    ) -> FlextResult[dict[str, object]]:
+        self, items: FlextTypes.Core.Dict | None = None, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create array type with optional item type."""
         try:
-            type_def: dict[str, object] = {"type": "array"}
+            type_def: FlextTypes.Core.Dict = {"type": "array"}
             if items:
                 type_def["items"] = items
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Array type creation failed: {e}"
             )
 
     def create_object_type(
-        self, properties: dict[str, object] | None = None, **kwargs: object
-    ) -> FlextResult[dict[str, object]]:
+        self, properties: FlextTypes.Core.Dict | None = None, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create object type with optional properties."""
         try:
-            type_def: dict[str, object] = {"type": "object"}
+            type_def: FlextTypes.Core.Dict = {"type": "object"}
             if properties:
                 type_def["properties"] = properties
             type_def.update(kwargs)
-            return FlextResult[dict[str, object]].ok(type_def)
+            return FlextResult[FlextTypes.Core.Dict].ok(type_def)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Object type creation failed: {e}"
             )
 
     def validate_value(
-        self, value: object, type_def: dict[str, object]
+        self, value: object, type_def: FlextTypes.Core.Dict
     ) -> FlextResult[object]:
         """Validate value against type definition using lookup table pattern.
 
@@ -182,35 +200,45 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_schema_definition(
-        self, stream_name: str | None = None, properties: dict[str, dict[str, object]] | None = None, key_properties: list[str] | None = None, **kwargs: object
-    ) -> FlextResult[dict[str, object]]:
+        self,
+        stream_name: str | None = None,
+        properties: dict[str, FlextTypes.Core.Dict] | None = None,
+        key_properties: FlextTypes.Core.StringList | None = None,
+        **kwargs: object,
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer schema definition or SCHEMA message."""
         try:
             # Handle legacy call with just properties
             if stream_name is None and properties is not None:
-                schema: dict[str, object] = {"type": "object", "properties": properties}
+                schema: FlextTypes.Core.Dict = {
+                    "type": "object",
+                    "properties": properties,
+                }
                 # Add optional metadata
                 for key in ["required", "additionalProperties", "description"]:
                     if key in kwargs:
                         schema[key] = kwargs[key]
-                return FlextResult[dict[str, object]].ok(schema)
+                return FlextResult[FlextTypes.Core.Dict].ok(schema)
 
             # Handle Singer SCHEMA message creation
             if stream_name is not None:
-                schema_obj: dict[str, object] = {"type": "object", "properties": properties or {}}
-                message: dict[str, object] = {
+                schema_obj: FlextTypes.Core.Dict = {
+                    "type": "object",
+                    "properties": properties or {},
+                }
+                message: FlextTypes.Core.Dict = {
                     "type": "SCHEMA",
                     "stream": stream_name,
                     "schema": schema_obj,
-                    "key_properties": key_properties or []
+                    "key_properties": key_properties or [],
                 }
-                return FlextResult[dict[str, object]].ok(message)
+                return FlextResult[FlextTypes.Core.Dict].ok(message)
 
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 "Either properties (for schema) or stream_name (for SCHEMA message) must be provided"
             )
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Schema definition creation failed: {e}"
             )
 
@@ -219,11 +247,11 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_record_message(
-        self, stream: str, record: dict[str, object], **kwargs: object
-    ) -> FlextResult[dict[str, object]]:
+        self, stream: str, record: FlextTypes.Core.Dict, **kwargs: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer RECORD message."""
         try:
-            message: dict[str, object] = {
+            message: FlextTypes.Core.Dict = {
                 "type": "RECORD",
                 "stream": stream,
                 "record": record,
@@ -234,22 +262,22 @@ class FlextSingerTypes:
                 if key in kwargs:
                     message[key] = kwargs[key]
 
-            return FlextResult[dict[str, object]].ok(message)
+            return FlextResult[FlextTypes.Core.Dict].ok(message)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Record message creation failed: {e}"
             )
 
     def create_schema_message(
         self,
         stream: str,
-        schema: dict[str, object],
-        key_properties: list[str] | None = None,
+        schema: FlextTypes.Core.Dict,
+        key_properties: FlextTypes.Core.StringList | None = None,
         **kwargs: object,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer SCHEMA message."""
         try:
-            message: dict[str, object] = {
+            message: FlextTypes.Core.Dict = {
                 "type": "SCHEMA",
                 "stream": stream,
                 "schema": schema,
@@ -261,21 +289,21 @@ class FlextSingerTypes:
                 if key in kwargs:
                     message[key] = kwargs[key]
 
-            return FlextResult[dict[str, object]].ok(message)
+            return FlextResult[FlextTypes.Core.Dict].ok(message)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Schema message creation failed: {e}"
             )
 
     def create_state_message(
-        self, value: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        self, value: FlextTypes.Core.Dict
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer STATE message."""
         try:
-            message: dict[str, object] = {"type": "STATE", "value": value}
-            return FlextResult[dict[str, object]].ok(message)
+            message: FlextTypes.Core.Dict = {"type": "STATE", "value": value}
+            return FlextResult[FlextTypes.Core.Dict].ok(message)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"State message creation failed: {e}"
             )
 
@@ -284,53 +312,58 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_properties_list(
-        self, properties: dict[str, dict[str, object]]
-    ) -> FlextResult[dict[str, object]]:
+        self, properties: dict[str, FlextTypes.Core.Dict]
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create and validate properties list."""
         try:
             # Validate each property
             for prop_name, prop_def in properties.items():
                 if not isinstance(prop_def, dict) or "type" not in prop_def:
-                    return FlextResult[dict[str, object]].fail(
+                    return FlextResult[FlextTypes.Core.Dict].fail(
                         f"Invalid property definition for {prop_name}"
                     )
 
             # Convert nested dict to match return type using dict()
-            properties_flat: dict[str, object] = dict(properties.items())
-            return FlextResult[dict[str, object]].ok(properties_flat)
+            properties_flat: FlextTypes.Core.Dict = dict(properties.items())
+            return FlextResult[FlextTypes.Core.Dict].ok(properties_flat)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Properties list creation failed: {e}"
             )
 
     def add_property(
-        self, properties: dict[str, object], name: str, type_def: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        self,
+        properties: FlextTypes.Core.Dict,
+        name: str,
+        type_def: FlextTypes.Core.Dict,
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Add property to properties collection."""
         try:
             updated_properties = properties.copy()
             updated_properties[name] = type_def
-            return FlextResult[dict[str, object]].ok(updated_properties)
+            return FlextResult[FlextTypes.Core.Dict].ok(updated_properties)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Property addition failed: {e}")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                f"Property addition failed: {e}"
+            )
 
-    def convert_to_dict(self, data: object) -> FlextResult[dict[str, object]]:
+    def convert_to_dict(self, data: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Convert data to dictionary format."""
         try:
             if isinstance(data, dict):
-                return FlextResult[dict[str, object]].ok(data)
+                return FlextResult[FlextTypes.Core.Dict].ok(data)
             if hasattr(data, "to_dict") and callable(getattr(data, "to_dict")):
                 result = getattr(data, "to_dict")()
                 if isinstance(result, dict):
-                    return FlextResult[dict[str, object]].ok(result)
+                    return FlextResult[FlextTypes.Core.Dict].ok(result)
             elif hasattr(data, "__dict__"):
-                return FlextResult[dict[str, object]].ok(data.__dict__)
+                return FlextResult[FlextTypes.Core.Dict].ok(data.__dict__)
 
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Cannot convert {type(data)} to dict"
             )
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Dictionary conversion failed: {e}"
             )
 
@@ -338,17 +371,17 @@ class FlextSingerTypes:
     # UTILITY METHODS
     # ============================================================================
 
-    def get_registered_types(self) -> list[str]:
+    def get_registered_types(self) -> FlextTypes.Core.StringList:
         """Get list of registered type names."""
         return list(self._type_registry.keys())
 
-    def get_type_definition(self, type_name: str) -> FlextResult[dict[str, object]]:
+    def get_type_definition(self, type_name: str) -> FlextResult[FlextTypes.Core.Dict]:
         """Get type definition by name."""
         if type_name in self._type_registry:
-            return FlextResult[dict[str, object]].ok(
+            return FlextResult[FlextTypes.Core.Dict].ok(
                 self._type_registry[type_name].copy()
             )
-        return FlextResult[dict[str, object]].fail(f"Type {type_name} not found")
+        return FlextResult[FlextTypes.Core.Dict].fail(f"Type {type_name} not found")
 
     @classmethod
     def create_instance(cls) -> FlextResult[FlextSingerTypes]:

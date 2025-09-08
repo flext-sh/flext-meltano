@@ -1,51 +1,17 @@
-"""FLEXT Meltano - Enterprise Meltano/Singer SDK/DBT integration library.
-
-This module provides enterprise-grade integration with Meltano Core, Singer SDK, and DBT Core
-using FLEXT patterns and FlextResult error handling. All operations return FlextResult[T]
-for composable and type-safe error handling following railway-oriented programming patterns.
-
-Architecture:
-    Foundation Layer: FlextMeltanoConstants, FlextMeltanoTypes, exceptions
-    Service Layer: FlextMeltanoService, FlextMeltanoAdapter
-    Execution Layer: FlextMeltanoExecutor for CLI and command processing
-    Integration Layer: Singer SDK and DBT Core native API integration
-
-Core Components:
-    FlextMeltanoAdapter: Meltano Core integration with project management and plugin operations
-    FlextMeltanoService: Service layer for tap/target/DBT service implementations
-    FlextMeltanoExecutor: CLI executor for command processing and bridge coordination
-    FlextMeltanoConstants: Meltano-specific constants extending FlextConstants
-    FlextMeltanoTypes: Meltano-specific types extending FlextTypes
-
-Examples:
-    Basic adapter usage:
-        >>> from flext_meltano import FlextMeltanoAdapter
-        >>> adapter = FlextMeltanoAdapter()
-        >>> result = adapter.get_version()
-        >>> if result.success:
-        ...     print(f"Meltano version: {result.value['version']}")
-
-    Service usage:
-        >>> from flext_meltano import FlextMeltanoService
-        >>> service = FlextMeltanoService()
-        >>> tap_service = service.TapService("tap-csv")
-        >>> result = tap_service.process(config)
-
-    Executor usage:
-        >>> from flext_meltano import FlextMeltanoExecutor
-        >>> executor = FlextMeltanoExecutor()
-        >>> result = executor.execute_command(["discover", "plugins"])
-
-Notes:
-    - All business operations return FlextResult[T] for composability
-    - Native API integration without subprocess calls
-    - Enterprise-grade error handling and logging
-    - Type-safe operations with proper generic parameters
-    - Clean Architecture patterns with layered imports
-
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes
+
+
+"""FLEXT Meltano - Enterprise Meltano/Singer SDK/DBT integration library.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 # =============================================================================
 # VERSION DEFINITION

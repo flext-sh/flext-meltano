@@ -16,11 +16,12 @@ Scripts:
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes
 
 # =============================================================================
 # PUBLIC API EXPORTS - Class-based only
 # =============================================================================
 
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     # Will be populated when script modules are added
 ]

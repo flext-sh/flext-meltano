@@ -1,8 +1,7 @@
 """Go Bridge - JSON API para integração Go ↔ Python.
 
-FUNÇÃO 2: Runtime Go Bridge
-- FlextMeltanoBridge: API JSON para Go services
-- Structured responses for Go consumption
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -14,17 +13,17 @@ from pathlib import Path
 from typing import cast
 
 import meltano
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
 
 # Type aliases for complex types to satisfy MyPy strict mode
 ResultType = (
-    FlextResult[dict[str, object]]
-    | dict[str, object]
-    | FlextResult[list[dict[str, str]]]
-    | FlextResult[dict[str, str]]
+    FlextResult[FlextTypes.Core.Dict]
+    | FlextTypes.Core.Dict
+    | FlextResult[list[FlextTypes.Core.Headers]]
+    | FlextResult[FlextTypes.Core.Headers]
 )
 # Simplified callable type - operations executed by bridge
 OperationType = Callable[[], ResultType]
@@ -47,7 +46,7 @@ class FlextMeltanoBridge:
 
     def _execute_with_json_response(
         self, operation: OperationType
-    ) -> dict[str, object]:
+    ) -> FlextTypes.Core.Dict:
         """Generic execution wrapper for all bridge operations.
 
         Centralizes JSON response formatting and error handling to eliminate
@@ -97,11 +96,15 @@ class FlextMeltanoBridge:
                 "error": str(e),
             }
 
-    def get_version(self) -> FlextResult[dict[str, str]]:
+    def get_version(self) -> FlextResult[FlextTypes.Core.Headers]:
         """Get version information with real version detection - ELIMINATES non-existent wrapper.
 
         REAL IMPLEMENTATION: Uses actual version detection instead of non-existent
         FlextUtilities.SystemInfo wrapper method.
+
+        Returns:
+            FlextResult[FlextTypes.Core.Headers]:: Description of return value.
+
         """
         try:
             version_info = {
@@ -114,22 +117,29 @@ class FlextMeltanoBridge:
                 "integration_method": "native_apis",
                 "cli_type": "native_meltano_api",
             }
-            return FlextResult[dict[str, str]].ok(version_info)
+            return FlextResult[FlextTypes.Core.Headers].ok(version_info)
         except Exception as e:
             # Return error result instead of fallback - fail fast for debugging
-            return FlextResult[dict[str, str]].fail(f"Version detection failed: {e}")
+            return FlextResult[FlextTypes.Core.Headers].fail(
+                f"Version detection failed: {e}"
+            )
 
-    def get_version_json(self) -> dict[str, object]:
+    def get_version_json(self) -> FlextTypes.Core.Dict:
         """Get version for Go service using consolidated version method."""
         return self._execute_with_json_response(self.get_version)
 
-    def list_plugins(self) -> dict[str, object]:
-        """List available Meltano plugins using generic pattern."""
+    def list_plugins(self) -> FlextTypes.Core.Dict:
+        """List available Meltano plugins using generic pattern.
+
+        Returns:
+            FlextTypes.Core.Dict: Plugins list result.
+
+        """
         return self._execute_with_json_response(self.adapter.discover_plugins)
 
     def run_pipeline(
         self, tap_name: str, target_name: str, project_root: str = "."
-    ) -> dict[str, object]:
+    ) -> FlextTypes.Core.Dict:
         """Run ELT pipeline between tap and target using generic pattern."""
 
         def _run_pipeline() -> ResultType:
@@ -141,28 +151,33 @@ class FlextMeltanoBridge:
             # Ensure we return a compatible type - check for FlextResult interface
             if hasattr(result, "success") and hasattr(result, "value"):
                 # Cast to expected FlextResult type since we know it matches
-                return cast("FlextResult[dict[str, object]]", result)
-            return FlextResult[dict[str, object]].ok({"result": str(result)})
+                return cast("FlextResult[FlextTypes.Core.Dict]", result)
+            return FlextResult[FlextTypes.Core.Dict].ok({"result": str(result)})
 
         return self._execute_with_json_response(_run_pipeline)
 
     def execute_meltano_command(
-        self, command: list[str], project_root: str = "."
-    ) -> dict[str, object]:
+        self, command: FlextTypes.Core.StringList, project_root: str = "."
+    ) -> FlextTypes.Core.Dict:
         """Execute arbitrary Meltano command using generic pattern."""
 
-        def _execute_command() -> FlextResult[dict[str, object]]:
+        def _execute_command() -> FlextResult[FlextTypes.Core.Dict]:
             _ = Path(project_root)  # Validate path exists
             return FlextResult.ok({"command": command, "status": "executed"})
 
         return self._execute_with_json_response(_execute_command)
 
     def execute_dbt_command(
-        self, command: list[str], project_root: str = "."
-    ) -> dict[str, object]:
-        """Execute arbitrary DBT command using generic pattern."""
+        self, command: FlextTypes.Core.StringList, project_root: str = "."
+    ) -> FlextTypes.Core.Dict:
+        """Execute arbitrary DBT command using generic pattern.
 
-        def _execute_dbt() -> FlextResult[dict[str, object]]:
+        Returns:
+            ResultType:: Description of return value.
+
+        """
+
+        def _execute_dbt() -> FlextResult[FlextTypes.Core.Dict]:
             _ = Path(project_root)  # Validate path exists
             dbt_command = ["dbt", *command]
             return FlextResult.ok({"command": dbt_command, "status": "executed"})
@@ -180,6 +195,10 @@ class FlextMeltanoBridge:
         Supports both call formats:
         - install_plugin(plugin_type, plugin_name, project_root)
         - install_plugin(project_root, plugin_type, plugin_name)
+
+        Returns:
+            FlextResult[FlextTypes.Core.Dict]:: Description of return value.
+
         """
         try:
             # Detect call format based on first argument type
@@ -211,7 +230,7 @@ class FlextMeltanoBridge:
         except Exception as e:
             return FlextResult.fail(str(e))
 
-    def get_project_info(self, project_root: str = ".") -> dict[str, object]:
+    def get_project_info(self, project_root: str = ".") -> FlextTypes.Core.Dict:
         """Get project information."""
         try:
             project_path = Path(project_root)
@@ -224,8 +243,13 @@ class FlextMeltanoBridge:
         except Exception as e:
             return {"success": False, "data": None, "error": str(e)}
 
-    def invoke_dbt(self, command: str, **kwargs: object) -> dict[str, object]:
-        """Invoke DBT command with additional arguments."""
+    def invoke_dbt(self, command: str, **kwargs: object) -> FlextTypes.Core.Dict:
+        """Invoke DBT command with additional arguments.
+
+        Returns:
+            FlextTypes.Core.Dict:: Description of return value.
+
+        """
         try:
             cmd_list = [command]
             for key, value in kwargs.items():
@@ -242,7 +266,9 @@ class FlextMeltanoBridge:
         except Exception as e:
             return {"success": False, "data": None, "error": str(e)}
 
-    def initialize_project(self, project_root: Path) -> FlextResult[dict[str, object]]:
+    def initialize_project(
+        self, project_root: Path
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Initialize Meltano project."""
         try:
             result = self.adapter.initialize_project(project_root)
@@ -258,8 +284,13 @@ class FlextMeltanoBridge:
         except Exception as e:
             return FlextResult.fail(str(e))
 
-    def _create_temp_project(self) -> FlextResult[dict[str, object]]:
-        """Create temporary Meltano project."""
+    def _create_temp_project(self) -> FlextResult[FlextTypes.Core.Dict]:
+        """Create temporary Meltano project.
+
+        Returns:
+            FlextResult[FlextTypes.Core.Dict]:: Description of return value.
+
+        """
         try:
             result = self.adapter._create_temp_project()
             # Check if result is already a FlextResult
@@ -270,7 +301,7 @@ class FlextMeltanoBridge:
             ):
                 # It's already a FlextResult
                 if getattr(result, "success", False):
-                    temp_dict: dict[str, object] = {
+                    temp_dict: FlextTypes.Core.Dict = {
                         "project": str(getattr(result, "value", "")),
                         "status": "created",
                     }
@@ -279,7 +310,7 @@ class FlextMeltanoBridge:
                     str(getattr(result, "error", "Project creation failed"))
                 )
             # Direct Project object - convert to dict representation
-            project_dict: dict[str, object] = {
+            project_dict: FlextTypes.Core.Dict = {
                 "project": str(result),
                 "status": "created",
             }
@@ -331,8 +362,8 @@ class FlextMeltanoBridge:
             return FlextResult.fail(str(e))
 
     def execute_meltano_command_real(
-        self, _project_root: Path, command: list[str]
-    ) -> dict[str, object]:
+        self, _project_root: Path, command: FlextTypes.Core.StringList
+    ) -> FlextTypes.Core.Dict:
         """Execute real Meltano command using native API."""
         try:
             # Execute real Meltano command using the adapter
@@ -352,12 +383,12 @@ class FlextMeltanoBridge:
 
     def discover_plugins(
         self, _project: object = None
-    ) -> FlextResult[dict[str, list[dict[str, str]]]]:
+    ) -> FlextResult[dict[str, list[FlextTypes.Core.Headers]]]:
         """Discover available plugins."""
         try:
             result = self.adapter.discover_plugins()
 
-            # Result is always a FlextResult[list[dict[str, str]]] from adapter
+            # Result is always a FlextResult[list[FlextTypes.Core.Headers]] from adapter
             if result.success:
                 return FlextResult.ok({"plugins": result.value or []})
             return FlextResult.fail(result.error or "Discovery failed")
@@ -369,7 +400,7 @@ class FlextMeltanoBridge:
         project: object,
         plugin_name: str,
         command: str,
-        args: list[str] | None = None,
+        args: FlextTypes.Core.StringList | None = None,
     ) -> object:
         """Run plugin command asynchronously."""
         try:
@@ -390,7 +421,7 @@ class FlextMeltanoBridge:
         _project: object,
         plugin_name: str,
         command: str,
-        args: list[str],
+        args: FlextTypes.Core.StringList,
     ) -> object:
         """Synchronous plugin execution."""
         try:
@@ -413,7 +444,7 @@ class FlextMeltanoBridge:
 
     @classmethod
     def create_bridge(
-        cls, _config: dict[str, object] | None = None
+        cls, _config: FlextTypes.Core.Dict | None = None
     ) -> FlextMeltanoBridge:
         """Factory method to create FlextMeltanoBridge instance.
 

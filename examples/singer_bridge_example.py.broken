@@ -28,28 +28,33 @@ from flext_meltano import (
     create_flext_meltano_bridge,
 )
 
+
 # ELIMINATED DUPLICATION: Schema Builder Pattern using flext-core principles
 class SchemaBuilder:
     """Consolidated schema builder eliminating 22+ lines of duplicate Singer schema code."""
-    
+
     @staticmethod
     def create_entity_schema(fields: list[tuple[str, type, str]]) -> dict:
         """Create Singer schema from field definitions using Builder Pattern.
-        
+
         Args:
             fields: List of (name, type, description) tuples
-            
+
         Returns:
             Singer schema dictionary
+
         """
         properties = []
         for name, field_type, description in fields:
-            properties.append(singer_typing.Property(
-                name,
-                field_type,
-                description=description,
-            ))
+            properties.append(
+                singer_typing.Property(
+                    name,
+                    field_type,
+                    description=description,
+                )
+            )
         return singer_typing.PropertiesList(*properties).to_dict()
+
 
 # =============================================================================
 # EXAMPLE 1: Basic Bridge Integration
@@ -139,16 +144,18 @@ class ExampleUsersStream(Stream):
     """Example users stream using Singer SDK patterns."""
 
     name: ClassVar[str] = "users"
-    primary_keys: ClassVar[list[str]] = ["id"]
+    primary_keys: ClassVar[FlextTypes.Core.StringList] = ["id"]
     replication_key: ClassVar[str] = "updated_at"
 
     # Schema definition using consolidated schema builder pattern - ELIMINATES DUPLICATION
-    schema = SchemaBuilder.create_entity_schema([
-        ("id", singer_typing.IntegerType, "User ID"),
-        ("name", singer_typing.StringType, "User name"), 
-        ("email", singer_typing.StringType, "User email"),
-        ("updated_at", singer_typing.DateTimeType, "Last updated timestamp"),
-    ])
+    schema = SchemaBuilder.create_entity_schema(
+        [
+            ("id", singer_typing.IntegerType, "User ID"),
+            ("name", singer_typing.StringType, "User name"),
+            ("email", singer_typing.StringType, "User email"),
+            ("updated_at", singer_typing.DateTimeType, "Last updated timestamp"),
+        ]
+    )
 
     def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
         """Generate sample user records.
@@ -200,16 +207,18 @@ class ExampleOrdersStream(Stream):
     """Example orders stream using Singer SDK patterns."""
 
     name: ClassVar[str] = "orders"
-    primary_keys: ClassVar[list[str]] = ["id"]
+    primary_keys: ClassVar[FlextTypes.Core.StringList] = ["id"]
     replication_key: ClassVar[str] = "created_at"
 
-    # Schema definition using consolidated schema builder pattern - ELIMINATES DUPLICATION  
-    schema = SchemaBuilder.create_entity_schema([
-        ("id", singer_typing.IntegerType, "Order ID"),
-        ("user_id", singer_typing.IntegerType, "User ID"),
-        ("total", singer_typing.NumberType, "Order total"), 
-        ("created_at", singer_typing.DateTimeType, "Order creation timestamp"),
-    ])
+    # Schema definition using consolidated schema builder pattern - ELIMINATES DUPLICATION
+    schema = SchemaBuilder.create_entity_schema(
+        [
+            ("id", singer_typing.IntegerType, "Order ID"),
+            ("user_id", singer_typing.IntegerType, "User ID"),
+            ("total", singer_typing.NumberType, "Order total"),
+            ("created_at", singer_typing.DateTimeType, "Order creation timestamp"),
+        ]
+    )
 
     def get_records(self, context: dict[str, Any] | None) -> Iterator[dict[str, Any]]:
         """Generate sample order records.
@@ -307,7 +316,7 @@ class ExampleSink:
         target: Target,
         stream_name: str,
         schema: dict[str, Any],
-        key_properties: list[str],
+        key_properties: FlextTypes.Core.StringList,
     ) -> None:
         """Initialize sink."""
         self.target = target

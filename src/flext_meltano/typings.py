@@ -1,11 +1,17 @@
-"""FLEXT Meltano Types - Meltano-specific type system extending FlextTypes hierarchical system.
-
-Provides comprehensive Meltano-specific types following the FlextTypes pattern with
-domain organization, Python 3.13+ type alias syntax, and hierarchical structure.
-All types related to Meltano, Singer SDK, DBT, and ELT pipelines are organized under single class.
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
 """
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""FLEXT Meltano Types - Meltano-specific type system extending FlextTypes hierarchical system.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 from dbt.cli.main import dbtRunner
 from singer_sdk import (
@@ -15,15 +21,30 @@ from singer_sdk import (
 )
 
 # Direct type aliases to avoid MyPy unfollowed import issues with FlextTypes.X.Y
-type ConfigValue = str | int | float | bool | list[object] | dict[str, object]
+type ConfigValue = (
+    str | int | float | bool | FlextTypes.Core.List | FlextTypes.Core.Dict
+)
 type ConfigDict = dict[str, ConfigValue]
-type JsonValue = str | int | float | bool | None | list[str | int | float | bool | None | list[object] | dict[str, object]] | dict[str, str | int | float | bool | None | list[object] | dict[str, object]]
+type JsonValue = (
+    str
+    | int
+    | float
+    | bool
+    | None
+    | list[
+        str | int | float | bool | None | FlextTypes.Core.List | FlextTypes.Core.Dict
+    ]
+    | dict[
+        str,
+        str | int | float | bool | None | FlextTypes.Core.List | FlextTypes.Core.Dict,
+    ]
+)
 type JsonObject = dict[str, JsonValue]
 type MessageType = str
-type MessageData = dict[str, object]
+type MessageData = FlextTypes.Core.Dict
 type CommandName = str
 type CommandResult = object
-type HandlerContext = dict[str, object]
+type HandlerContext = FlextTypes.Core.Dict
 
 
 class FlextMeltanoTypes:
@@ -80,9 +101,9 @@ class FlextMeltanoTypes:
         type PluginInfo = JsonObject  # Plugin info as JsonObject
 
         # Plugin execution (using flext-core patterns)
-        type Command = list[str]  # Command as list of strings
-        type Arguments = list[str]  # Arguments as list of strings
-        type Environment = dict[str, str]  # Keep specific str->str mapping
+        type Command = FlextTypes.Core.StringList  # Command as list of strings
+        type Arguments = FlextTypes.Core.StringList  # Arguments as list of strings
+        type Environment = FlextTypes.Core.Headers  # Keep specific str->str mapping
 
     # =========================================================================
     # SINGER TYPES - Singer SDK integration
@@ -114,9 +135,7 @@ class FlextMeltanoTypes:
 
         # Configuration and settings (using flext-core config types)
         type TapConfig = ConfigDict  # Tap config from Config domain
-        type TargetConfig = (
-            ConfigDict
-        )  # Target config from Config domain
+        type TargetConfig = ConfigDict  # Target config from Config domain
         type PropertiesList = JsonObject  # Properties as JsonObject
 
     # =========================================================================
@@ -144,9 +163,7 @@ class FlextMeltanoTypes:
         # Execution and results (using flext-core result patterns)
         type RunResult = JsonObject  # Run result as JsonObject
         type TestResult = JsonObject  # Test result as JsonObject
-        type ExecutionResult = (
-            JsonObject
-        )  # Execution result as JsonObject
+        type ExecutionResult = JsonObject  # Execution result as JsonObject
 
         # Configuration (using flext-core config types)
         type ProjectConfig = ConfigDict  # Project config
@@ -178,9 +195,7 @@ class FlextMeltanoTypes:
 
         # Error handling (using flext-core error patterns)
         type ErrorResponse = JsonObject  # Error response as JsonObject
-        type SuccessResponse = (
-            JsonObject
-        )  # Success response as JsonObject
+        type SuccessResponse = JsonObject  # Success response as JsonObject
 
     # =========================================================================
     # CLI TYPES - Command-line interface
@@ -194,18 +209,12 @@ class FlextMeltanoTypes:
         """
 
         # Command structure (using flext-core command types)
-        type CommandName = (
-            CommandName
-        )  # Command name from Commands domain
-        type CommandArgs = list[str]  # Arguments as list of strings
-        type CommandResult = (
-            CommandResult
-        )  # Result from Commands domain
+        type CommandName = CommandName  # Command name from Commands domain
+        type CommandArgs = FlextTypes.Core.StringList  # Arguments as list of strings
+        type CommandResult = CommandResult  # Result from Commands domain
 
         # Execution context (using flext-core handler types)
-        type ExecutionContext = (
-            HandlerContext
-        )  # Context from Handler domain
+        type ExecutionContext = HandlerContext  # Context from Handler domain
         type ProcessResult = JsonObject  # Process result as JsonObject
         type ExitCode = int  # Keep as int for exit codes
 

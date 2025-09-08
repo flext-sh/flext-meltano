@@ -860,7 +860,7 @@ def create_flext_meltano_bridge(
    # Target: Organized exports by functional area
 
    # Bridge integration
-   __all__: list[str] = [
+   __all__: FlextTypes.Core.StringList = [
        "FlextMeltanoBridge",  # After implementation
 
        # Core execution

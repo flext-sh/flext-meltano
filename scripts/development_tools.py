@@ -9,7 +9,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 logger = FlextLogger(__name__)
 
@@ -48,7 +48,7 @@ class FlextMeltanoDevelopmentTools:
             return FlextResult.fail(f"Project validation failed: {e}")
 
     @staticmethod
-    def run_quality_gates() -> FlextResult[dict[str, object]]:
+    def run_quality_gates() -> FlextResult[FlextTypes.Core.Dict]:
         """Run all quality gates (MyPy, Ruff, PyRight, tests).
 
         Returns:
@@ -113,7 +113,7 @@ class FlextMeltanoDevelopmentTools:
             return FlextResult.fail(f"Server startup failed: {e}")
 
     @classmethod
-    def run_cli_tool(cls, args: list[str]) -> FlextResult[str]:
+    def run_cli_tool(cls, args: FlextTypes.Core.StringList) -> FlextResult[str]:
         """CLI entry point for development tools.
 
         Args:

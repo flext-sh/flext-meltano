@@ -3,6 +3,10 @@
 This module provides Meltano/Singer/DBT service implementations using strict flext-core
 architecture with nested service classes, Pydantic BaseConfig inheritance,
 and FlextResult railway-oriented programming.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -13,6 +17,7 @@ from flext_core import (
     FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextTypes,
     FlextUtilities,
     get_flext_container,
 )
@@ -22,7 +27,6 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 T_Service = TypeVar("T_Service")
 
-# Constants to avoid boolean positional arguments
 
 # =============================================================================
 # MAIN SERVICES CLASS - Following FlextServices pattern
@@ -30,18 +34,7 @@ T_Service = TypeVar("T_Service")
 
 
 class FlextMeltanoService:
-    """Unified service class following flext-core FlextServices pattern.
-
-    Provides Meltano/Singer/DBT service implementations using strict flext-core
-    architecture with nested service classes, Pydantic BaseConfig inheritance,
-    and FlextResult railway-oriented programming.
-
-    Architecture:
-        - Nested service classes inherit from FlextDomainService[ConfigDict]
-        - No legacy protocols or backwards compatibility
-        - Strict Pydantic validation with Python 3.13+ features
-        - FlextResult[T] for all operations
-    """
+    """Unified service class following flext-core FlextServices pattern."""
 
     def __init__(self) -> None:
         """Initialize FlextMeltanoService with FlextContainer dependency injection."""
@@ -69,7 +62,7 @@ class FlextMeltanoService:
         def __init__(self, *, tap_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
             # Pass tap_name to parent Pydantic model via **data
-            super().__init__(tap_name=tap_name, **data)
+            super().__init__(app_name=tap_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -107,7 +100,9 @@ class FlextMeltanoService:
                 }
             )
 
-        def create_tap_instance(self, config: dict[str, object]) -> FlextResult[object]:
+        def create_tap_instance(
+            self, config: FlextTypes.Core.Dict
+        ) -> FlextResult[object]:
             """Create tap instance with configuration."""
             if not config:
                 return FlextResult.fail("Empty configuration provided")
@@ -129,14 +124,16 @@ class FlextMeltanoService:
             except Exception as e:
                 return FlextResult.fail(f"Failed to create tap instance: {e}")
 
-        def validate_tap_config(self, config: dict[str, object]) -> FlextResult[bool]:
+        def validate_tap_config(
+            self, config: FlextTypes.Core.Dict
+        ) -> FlextResult[bool]:
             """Validate tap configuration."""
             if not config:
                 return FlextResult.fail("Empty configuration provided")
 
             return FlextResult.ok(data=True)
 
-        def get_default_config(self) -> FlextResult[dict[str, object]]:
+        def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
             """Get default configuration for tap."""
             return FlextResult.ok({"connection_string": "test_connection"})
 
@@ -164,7 +161,7 @@ class FlextMeltanoService:
         def __init__(self, *, target_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
             # Pass target_name to parent Pydantic model via **data
-            super().__init__(target_name=target_name, **data)
+            super().__init__(app_name=target_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -195,7 +192,7 @@ class FlextMeltanoService:
             )
 
         def create_target_instance(
-            self, config: dict[str, object]
+            self, config: FlextTypes.Core.Dict
         ) -> FlextResult[object]:
             """Create target instance with configuration."""
             if not config:
@@ -219,7 +216,7 @@ class FlextMeltanoService:
                 return FlextResult.fail(f"Failed to create target instance: {e}")
 
         def validate_target_config(
-            self, config: dict[str, object]
+            self, config: FlextTypes.Core.Dict
         ) -> FlextResult[bool]:
             """Validate target configuration."""
             if not config:
@@ -231,7 +228,7 @@ class FlextMeltanoService:
 
             return FlextResult.ok(data=True)
 
-        def get_default_config(self) -> FlextResult[dict[str, object]]:
+        def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
             """Get default configuration for target."""
             return FlextResult.ok({"output_file": "test_output.json", "format": "json"})
 
@@ -258,7 +255,7 @@ class FlextMeltanoService:
         def __init__(self, *, project_name: str, **data: object) -> None:
             """Initialize with Pydantic **data pattern (frozen model)."""
             # Pass project_name to parent Pydantic model via **data
-            super().__init__(project_name=project_name, **data)
+            super().__init__(app_name=project_name, **data)
 
         @property
         def adapter(self) -> object:
@@ -288,7 +285,7 @@ class FlextMeltanoService:
                 }
             )
 
-        def get_profiles_config(self) -> FlextResult[dict[str, object]]:
+        def get_profiles_config(self) -> FlextResult[FlextTypes.Core.Dict]:
             """Get DBT profiles configuration."""
             return FlextResult.ok(
                 {
@@ -337,7 +334,7 @@ class FlextMeltanoService:
                 )
 
             # Dynamic service instance creation using **kwargs pattern
-            service_kwargs: dict[str, object] = {field_name: safe_name}
+            service_kwargs: FlextTypes.Core.Dict = {field_name: safe_name}
             service_kwargs.update(config)  # Add additional configuration
             # Service instantiation - Pydantic services accept kwargs
             service_instance = service_type(**service_kwargs)
@@ -364,7 +361,11 @@ class FlextMeltanoService:
     ) -> FlextResult[FlextMeltanoService.TargetService]:
         """Create target service using generic factory pattern."""
         return FlextMeltanoService._create_service_generic(
-            FlextMeltanoService.TargetService, target_name, "target_name", "target", **config
+            FlextMeltanoService.TargetService,
+            target_name,
+            "target_name",
+            "target",
+            **config,
         )
 
     @staticmethod
@@ -373,7 +374,11 @@ class FlextMeltanoService:
     ) -> FlextResult[FlextMeltanoService.DbtService]:
         """Create DBT service using generic factory pattern."""
         return FlextMeltanoService._create_service_generic(
-            FlextMeltanoService.DbtService, project_name, "project_name", "dbt", **config
+            FlextMeltanoService.DbtService,
+            project_name,
+            "project_name",
+            "dbt",
+            **config,
         )
 
 

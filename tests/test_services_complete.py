@@ -1,6 +1,10 @@
 """Test FlextMeltanoService - Complete real functionality testing.
 
 Tests all service functionality with 100% real operations.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from flext_core import FlextResult

@@ -56,7 +56,12 @@ class FlextMeltanoValidators(FlextUtilities):
 
     @classmethod
     def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
-        """Valida Meltano config usando Pydantic validation."""
+        """Valida Meltano config usando Pydantic validation.
+
+        Returns:
+            FlextResult[bool]: Meltano config validation result.
+
+        """
         try:
 
             class MeltanoConfigSchema(BaseModel):

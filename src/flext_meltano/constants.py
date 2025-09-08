@@ -4,45 +4,18 @@ Provides comprehensive Meltano-specific constants following the FlextConstants p
 domain organization, type-safe Final annotations, and hierarchical structure. All constants
 related to Meltano, Singer SDK, DBT, and ELT pipelines are organized under single class.
 
-Module Role in Architecture:
-    FlextMeltanoConstants extends FlextConstants providing Meltano-specific constants for
-    plugin management, Singer SDK integration, DBT transformations, ELT pipelines, and
-    bridge communication with hierarchical organization and type safety.
 
-Classes and Methods:
-    FlextMeltanoConstants:                  # Single constants class following flext-core pattern
-        # Core Domain - Meltano System Constants:
-        Core.NAME: Final[str] = "FLEXT-MELTANO"    # System identification
-        Core.VERSION: Final[str] = "2.0.0"         # Current version
-
-        # Plugin Domain - Meltano Plugin Management:
-        Plugin.DEFAULT_VARIANT: Final[str] = "meltanolabs"     # Default plugin variant
-        Plugin.DISCOVERY_TIMEOUT: Final[int] = 30              # Plugin discovery timeout
-
-        # Singer Domain - Singer SDK Integration:
-        Singer.MESSAGE_TYPE_RECORD: Final[str] = "RECORD"      # Record message type
-        Singer.MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"      # Schema message type
-
-        # DBT Domain - DBT Core Integration:
-        DBT.DEFAULT_PROFILES_DIR: Final[str] = "~/.dbt"        # Default profiles directory
-        DBT.PROJECT_FILE: Final[str] = "dbt_project.yml"       # Project file name
-
-Usage Examples:
-    Using Meltano-specific constants:
-        plugin_variant = FlextMeltanoConstants.Plugin.DEFAULT_VARIANT
-        timeout = FlextMeltanoConstants.Plugin.DISCOVERY_TIMEOUT
-
-    Singer message processing:
-        if message_type == FlextMeltanoConstants.SingerSDK.MESSAGE_TYPE_RECORD:
-            process_record(message)
-
-Integration:
-    FlextMeltanoConstants extends the FlextConstants system providing Meltano-specific
-    constants while maintaining consistency with the broader FLEXT ecosystem constants
-    architecture and type safety patterns.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 from typing import Final
 
@@ -55,14 +28,6 @@ class FlextMeltanoConstants(FlextConstants):
     This class inherits all core FLEXT constants and adds Meltano-specific
     constant definitions organized by domain functionality following the
     same hierarchical pattern as FlextConstants.
-
-    The constants system adds the following Meltano domains:
-        - Core: Basic Meltano system identification and metadata
-        - Plugin: Meltano plugin management and discovery constants
-        - Singer: Singer SDK message types and processing constants
-        - DBT: DBT Core project and execution constants
-        - ELT: Extract-Load-Transform pipeline stage constants
-        - Bridge: Go service integration and communication constants
     """
 
     # =========================================================================
