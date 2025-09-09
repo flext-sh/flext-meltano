@@ -9,7 +9,7 @@ from pathlib import Path
 from flext_core import FlextLogger
 
 # Import ONLY what actually exists
-from ..flext_meltano import (
+from flext_meltano import (
     FlextMeltanoConfig,
     FlextMeltanoExecutor,
     FlextMeltanoBridge,

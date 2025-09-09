@@ -1,11 +1,3 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
-
-from __future__ import annotations
-
-from flext_core import FlextTypes
-
 """Singer Types - Unified Singer types and schema handling with enterprise patterns.
 
 This module provides complete Singer type functionality following flext-core
@@ -14,11 +6,11 @@ message handling, and properties management in a unified class.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
+from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 # Constants
 

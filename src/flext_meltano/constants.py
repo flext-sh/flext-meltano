@@ -4,18 +4,11 @@ Provides comprehensive Meltano-specific constants following the FlextConstants p
 domain organization, type-safe Final annotations, and hierarchical structure. All constants
 related to Meltano, Singer SDK, DBT, and ELT pipelines are organized under single class.
 
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 
 from typing import Final
 

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextResult
-from flext_tests import FlextMatchers
+from flext_tests import FlextTestsMatchers
 
 from flext_meltano.target_abstractions import (
     FlextStreamInfo,
@@ -230,7 +230,7 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_validate_business_rules_success(self) -> None:
         """Test business rules validation success."""
         result = self.target_abstractions.validate_business_rules()
-        FlextMatchers.assert_result_success(result, None)
+        FlextTestsMatchers.assert_result_success(result, None)
 
     def test_create_flext_target_config_basic(self) -> None:
         """Test creating basic target configuration."""
@@ -247,7 +247,7 @@ class TestFlextTargetAbstractionsComprehensive:
             target_type=target_type, connection_config=connection_config
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
         assert isinstance(config, dict)
         assert config["target_type"] == target_type
@@ -264,7 +264,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config_extras={"delimiter": ",", "quoting": "minimal"},
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
         assert config["batch_size"] == 500
         assert config["max_batches"] == 25
@@ -277,7 +277,7 @@ class TestFlextTargetAbstractionsComprehensive:
             connection_config={"host": "localhost"},
         )
 
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_create_flext_target_config_invalid_connection(self) -> None:
         """Test creating target config with invalid connection config."""
@@ -286,7 +286,7 @@ class TestFlextTargetAbstractionsComprehensive:
             connection_config={},  # Empty connection config should fail
         )
 
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_create_flext_target_postgres(self) -> None:
         """Test creating PostgreSQL target instance."""
@@ -306,7 +306,7 @@ class TestFlextTargetAbstractionsComprehensive:
             adapter=None,  # No adapter for basic test
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
         assert isinstance(target_instance, dict)
         assert target_instance["target_type"] == "postgres"
@@ -326,7 +326,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config=config, adapter=None
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
         assert target_instance["target_type"] == "csv"
         assert str(csv_file) in str(
@@ -371,7 +371,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config=config, adapter=None
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
         assert target_instance["target_type"] == "json"
         assert isinstance(
@@ -391,7 +391,7 @@ class TestFlextTargetAbstractionsComprehensive:
             )
 
         result = benchmark(create_target)
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
 
     def test_complex_target_workflow_integration(self) -> None:
         """Test complex workflow integrating multiple target operations."""
@@ -415,7 +415,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config_extras={"ssl_mode": "require", "connection_timeout": 30},
         )
 
-        FlextMatchers.assert_result_success(postgres_config_result)
+        FlextTestsMatchers.assert_result_success(postgres_config_result)
         postgres_config = postgres_config_result.value
 
         # Create stream definitions
@@ -473,7 +473,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config=postgres_config, adapter=None
         )
 
-        FlextMatchers.assert_result_success(target_result)
+        FlextTestsMatchers.assert_result_success(target_result)
         target_instance = target_result.value
 
         # Verify complete target setup
@@ -503,7 +503,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
         for scenario in invalid_scenarios:
             result = self.target_abstractions.create_flext_target_config(**scenario)
-            FlextMatchers.assert_result_failure(result)
+            FlextTestsMatchers.assert_result_failure(result)
 
     def test_target_abstractions_edge_cases(self) -> None:
         """Test edge cases and boundary conditions."""
@@ -517,7 +517,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config=minimal_config, adapter=None
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
         assert target_instance["target_type"] == "csv"
         assert isinstance(target_instance["streams"], dict)
@@ -542,7 +542,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
         # All should succeed
         for result in results:
-            FlextMatchers.assert_result_success(result)
+            FlextTestsMatchers.assert_result_success(result)
             assert isinstance(result.value, dict)
 
     def test_target_memory_usage_tracking(self) -> None:
@@ -558,7 +558,7 @@ class TestFlextTargetAbstractionsComprehensive:
             config_extras={f"param_{i}": f"value_{i}" for i in range(100)},
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
 
         # Verify large configuration was created
         config = result.value
@@ -594,7 +594,7 @@ class TestFlextTargetAbstractionsComprehensive:
             target_type=target_type, connection_config=connection_config
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
         assert config["target_type"] == target_type
         assert config["connection_config"] == connection_config

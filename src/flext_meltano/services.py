@@ -14,12 +14,12 @@ from __future__ import annotations
 from typing import TypeVar
 
 from flext_core import (
+    FlextContainer,
     FlextDomainService,
     FlextLogger,
     FlextResult,
     FlextTypes,
     FlextUtilities,
-    get_flext_container,
 )
 
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -38,7 +38,7 @@ class FlextMeltanoService:
 
     def __init__(self) -> None:
         """Initialize FlextMeltanoService with FlextContainer dependency injection."""
-        self._container = get_flext_container()
+        self._container = FlextContainer()
 
         # Register service types in container for dependency injection
         self._container.register("tap_service_class", self.TapService)

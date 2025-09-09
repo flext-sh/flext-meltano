@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_tests import FlextMatchers
+from flext_tests import FlextTestsMatchers
 
 from flext_meltano.config_builders import (
     FlextMeltanoConfigBuilders,
@@ -87,7 +87,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             project_name="test_project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert isinstance(config, dict)
@@ -103,7 +103,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             project_name="analytics_project", profile_name="prod_analytics"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert config["name"] == "analytics_project"
@@ -115,7 +115,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             project_name=""
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Should handle empty project name gracefully
@@ -129,7 +129,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             project_name="project@#$%^&*()", profile_name="profile!@#$%^&*()"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Should handle special characters safely
@@ -144,7 +144,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             "complete_project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Verify all essential DBT configuration keys
@@ -183,7 +183,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
             project_name=project_name, profile_name=profile_name
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert isinstance(config["name"], str)
@@ -212,7 +212,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert isinstance(config, dict)
@@ -232,7 +232,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert config["name"] == "tap-postgres"
@@ -248,7 +248,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Should handle empty name gracefully
@@ -264,7 +264,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert config["name"] == "target-postgres"
@@ -283,7 +283,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert config["name"] == "target-snowflake"
@@ -300,7 +300,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Should handle empty name gracefully
@@ -326,7 +326,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Name should be preserved as-is after safe_string processing
@@ -352,7 +352,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id="test_project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert isinstance(config, dict)
@@ -367,7 +367,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id="analytics_project", project_name="Analytics Project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert config["project_id"] == "analytics_project"
@@ -381,7 +381,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id="env_project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert "environments" in config
@@ -401,7 +401,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id="complete_project"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Essential meltano config keys
@@ -420,7 +420,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id="metadata_test"
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         assert "metadata" in config
@@ -436,7 +436,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
             project_id=""
         )
 
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         config = result.value
 
         # Should handle empty string gracefully
@@ -463,7 +463,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         dbt_result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
             project_name="analytics_project", profile_name="prod_analytics"
         )
-        FlextMatchers.assert_result_success(dbt_result)
+        FlextTestsMatchers.assert_result_success(dbt_result)
 
         # Create tap configuration
         tap_result = (
@@ -471,7 +471,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
                 tap_name="tap-postgres", pip_url="pipelinewise-tap-postgres"
             )
         )
-        FlextMatchers.assert_result_success(tap_result)
+        FlextTestsMatchers.assert_result_success(tap_result)
 
         # Create target configuration
         target_result = (
@@ -479,7 +479,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
                 target_name="target-postgres", pip_url="pipelinewise-target-postgres"
             )
         )
-        FlextMatchers.assert_result_success(target_result)
+        FlextTestsMatchers.assert_result_success(target_result)
 
         # Create Meltano project configuration
         meltano_result = (
@@ -487,7 +487,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
                 project_id="analytics_project", project_name="Analytics Project"
             )
         )
-        FlextMatchers.assert_result_success(meltano_result)
+        FlextTestsMatchers.assert_result_success(meltano_result)
 
         # Verify all configurations are consistent
         dbt_config = dbt_result.value
@@ -540,7 +540,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
 
         # All should succeed
         for result in results:
-            FlextMatchers.assert_result_success(result)
+            FlextTestsMatchers.assert_result_success(result)
             assert isinstance(result.value, dict)
             assert "name" in result.value
 
@@ -558,8 +558,8 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
             )
         )
 
-        FlextMatchers.assert_result_success(dbt_result)
-        FlextMatchers.assert_result_success(meltano_result)
+        FlextTestsMatchers.assert_result_success(dbt_result)
+        FlextTestsMatchers.assert_result_success(meltano_result)
 
         # Names should be consistent
         assert (
@@ -606,5 +606,5 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         method = getattr(builder_class, method_name)
 
         result = method(*args)
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         assert isinstance(result.value, dict)

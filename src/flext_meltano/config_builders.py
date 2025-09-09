@@ -1,27 +1,17 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
+"""FLEXT Meltano Configuration Builders - Single Class Architecture.
 
-from __future__ import annotations
-
-from flext_core import FlextTypes
-
-"""FLEXT Meltano Configuration Builders - Single Class Architecture (Flext[Area][Module] pattern).
-
-**Architecture Compliance**: Single main class FlextMeltanoConfigBuilders following Flext[Area][Module] pattern
-**Single Responsibility**: All configuration building organized under one class
-**SOLID Compliance**: Nested classes for specific configuration building needs
-
-Single class containing all configuration builders as nested internal classes.
+Single class containing all configuration builders as nested internal classes following
+the Flext[Area][Module] pattern with type-safe FlextResult operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextModels, FlextResult, FlextUtilities
+from flext_core import FlextLogger, FlextModels, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 

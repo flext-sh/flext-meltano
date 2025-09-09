@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 """
 
 import pytest
-from flext_tests import FlextMatchers
+from flext_tests import FlextTestsMatchers
 
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -27,14 +27,14 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextMatchers.assert_result_success(result, True)
+        FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_plugin_config_missing_fields(self) -> None:
         """Test plugin config validation with missing required fields."""
         config = {"name": "tap-csv"}  # Missing required fields
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_plugin_config_empty_fields(self) -> None:
         """Test plugin config validation with empty fields."""
@@ -46,7 +46,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_plugin_config_invalid_types(self) -> None:
         """Test plugin config validation with invalid types."""
@@ -58,31 +58,31 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
         result = FlextMeltanoValidators.validate_plugin_config("not a dict")
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin config validation with None input."""
         result = FlextMeltanoValidators.validate_plugin_config(None)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_meltano_config_valid(self) -> None:
         """Test Meltano config validation with valid configuration."""
         config = {"version": 1, "project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextMatchers.assert_result_success(result, True)
+        FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_meltano_config_missing_version(self) -> None:
         """Test Meltano config validation with missing version."""
         config = {"project_id": "test-project"}  # Missing version
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         """Test Meltano config validation with invalid version."""
@@ -92,7 +92,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test Meltano config validation with empty project_id."""
@@ -102,21 +102,21 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_validate_dbt_config_valid(self) -> None:
         """Test DBT config validation with valid configuration."""
         dbt_config = {"name": "analytics", "version": "1.0.0"}
 
         result = FlextMeltanoValidators.validate_dbt_config(dbt_config)
-        FlextMatchers.assert_result_success(result, True)
+        FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_dbt_config_missing_required(self) -> None:
         """Test DBT config validation with missing required fields."""
         dbt_config = {"name": "analytics"}  # Missing version
 
         result = FlextMeltanoValidators.validate_dbt_config(dbt_config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     @pytest.mark.parametrize(
         "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
@@ -126,7 +126,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     ) -> None:
         """Test plugin config validation with various invalid inputs."""
         result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
-        FlextMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(result)
 
     def test_complex_validation_scenario(self) -> None:
         """Test complex validation scenario combining multiple validators."""
@@ -156,10 +156,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         target_result = FlextMeltanoValidators.validate_plugin_config(target_config)
 
         # All should pass
-        FlextMatchers.assert_result_success(meltano_result, True)
-        FlextMatchers.assert_result_success(dbt_result, True)
-        FlextMatchers.assert_result_success(tap_result, True)
-        FlextMatchers.assert_result_success(target_result, True)
+        FlextTestsMatchers.assert_result_success(meltano_result, True)
+        FlextTestsMatchers.assert_result_success(dbt_result, True)
+        FlextTestsMatchers.assert_result_success(tap_result, True)
+        FlextTestsMatchers.assert_result_success(target_result, True)
 
     def test_validator_inheritance_from_flext_utilities(self) -> None:
         """Test that FlextMeltanoValidators properly inherits from FlextUtilities."""
