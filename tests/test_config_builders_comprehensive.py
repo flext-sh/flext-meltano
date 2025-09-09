@@ -16,10 +16,7 @@ from pathlib import Path
 import pytest
 from flext_tests import FlextTestsMatchers
 
-from flext_meltano.config_builders import (
-    FlextMeltanoConfigBuilders,
-    SingerPluginConfig,
-)
+from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 
 
 class TestSingerPluginConfigComprehensive:
@@ -27,7 +24,7 @@ class TestSingerPluginConfigComprehensive:
 
     def test_singer_plugin_config_valid_creation(self) -> None:
         """Test creating valid singer plugin configuration."""
-        config = SingerPluginConfig(
+        config = FlextMeltanoConfigBuilders.SingerPluginConfig(
             plugin_name="tap-csv",
             plugin_type="extractor",
             namespace="tap_csv",
@@ -44,7 +41,7 @@ class TestSingerPluginConfigComprehensive:
 
     def test_singer_plugin_config_defaults(self) -> None:
         """Test default values for singer plugin configuration."""
-        config = SingerPluginConfig(plugin_name="tap-postgres")
+        config = FlextMeltanoConfigBuilders.SingerPluginConfig(plugin_name="tap-postgres")
         assert config.plugin_name == "tap-postgres"
         assert config.plugin_type == "extractor"  # default
         assert config.namespace == ""  # default
@@ -54,7 +51,7 @@ class TestSingerPluginConfigComprehensive:
 
     def test_singer_plugin_config_loader_type(self) -> None:
         """Test creating loader plugin configuration."""
-        config = SingerPluginConfig(
+        config = FlextMeltanoConfigBuilders.SingerPluginConfig(
             plugin_name="target-postgres",
             plugin_type="loader",
             namespace="target_postgres",
@@ -68,11 +65,11 @@ class TestSingerPluginConfigComprehensive:
         """Test plugin configuration validation."""
         # Plugin name is required
         with pytest.raises((ValueError, TypeError)):
-            SingerPluginConfig()
+            FlextMeltanoConfigBuilders.SingerPluginConfig()
 
         # Valid plugin types
         for plugin_type in ["extractor", "loader"]:
-            config = SingerPluginConfig(
+            config = FlextMeltanoConfigBuilders.SingerPluginConfig(
                 plugin_name="test-plugin", plugin_type=plugin_type
             )
             assert config.plugin_type == plugin_type

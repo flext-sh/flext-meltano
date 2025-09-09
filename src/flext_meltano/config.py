@@ -16,64 +16,36 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextExceptions, FlextResult, FlextTypes
-from pydantic import BaseModel, Field, field_validator
+from flext_core import FlextConfig, FlextConstants, FlextExceptions, FlextResult, FlextTypes
+from pydantic import Field, field_validator
 
 
-class FlextMeltanoConfig(BaseModel):
-    """Unified Meltano configuration management.
+class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
+    """Meltano configuration extending FlextConfig.
 
-    Consolidated class providing complete FlextMeltano configuration functionality
-    following flext-core single-class-per-module pattern. Includes constants, enums,
-    configuration models, and validation.
+    Extends flext-core FlextConfig with ONLY Meltano-specific settings.
+    Common configuration functionality comes from FlextConfig (SOURCE OF TRUTH).
     """
 
     # ============================================================================
-    # CONSTANTS - All Meltano constants as class attributes
+    # MELTANO-SPECIFIC CONSTANTS - ONLY what's unique to Meltano
     # ============================================================================
+    # NOTE: Use FlextConfig.VERSION, FlextConstants.* for common values (SOURCE OF TRUTH)
 
-    # Version and metadata
-    VERSION: ClassVar[str] = "2.0.0-enterprise"
-    NAME: ClassVar[str] = "flext-meltano"
-    DESCRIPTION: ClassVar[str] = "Enterprise Meltano/Singer SDK/DBT integration library"
-    AUTHOR: ClassVar[str] = "FLEXT Team"
-    LICENSE: ClassVar[str] = "MIT"
+    # Meltano ecosystem versions (Meltano-specific)
+    MELTANO_VERSION: ClassVar[str] = "3.9.1"
+    SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
+    DBT_VERSION: ClassVar[str] = "1.10.5"
 
-    # Meltano-specific constants
-    DEFAULT_MELTANO_VERSION: ClassVar[str] = "3.9.1"
-    DEFAULT_SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
-    DEFAULT_DBT_VERSION: ClassVar[str] = "1.10.5"
+    # Meltano files (Meltano-specific)
+    PROJECT_FILE: ClassVar[str] = "meltano.yml"
+    STATE_DIR: ClassVar[str] = ".meltano"
+    VENV_DIR: ClassVar[str] = ".meltano/python"
 
-    # File and directory constants
-    DEFAULT_PROJECT_FILE: ClassVar[str] = "meltano.yml"
-    DEFAULT_CONFIG_DIR: ClassVar[str] = ".meltano"
-    DEFAULT_LOGS_DIR: ClassVar[str] = "logs"
-    DEFAULT_VENV_DIR: ClassVar[str] = ".meltano/python"
-
-    # Command and operation constants
-    DEFAULT_TIMEOUT_SECONDS: ClassVar[int] = 300
-    DEFAULT_RETRY_COUNT: ClassVar[int] = 3
-    DEFAULT_BATCH_SIZE: ClassVar[int] = 1000
-    MAX_CONCURRENT_JOBS: ClassVar[int] = 4
-
-    # Environment constants
+    # Meltano environment variables (Meltano-specific)
     MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = "MELTANO_PROJECT_ROOT"
     MELTANO_ENVIRONMENT_ENV: ClassVar[str] = "MELTANO_ENVIRONMENT"
     MELTANO_LOG_LEVEL_ENV: ClassVar[str] = "MELTANO_LOG_LEVEL"
-
-    # Plugin type constants
-    PLUGIN_TYPE_EXTRACTORS: ClassVar[str] = "extractors"
-    PLUGIN_TYPE_LOADERS: ClassVar[str] = "loaders"
-    PLUGIN_TYPE_TRANSFORMERS: ClassVar[str] = "transformers"
-    PLUGIN_TYPE_ORCHESTRATORS: ClassVar[str] = "orchestrators"
-    PLUGIN_TYPE_FILES: ClassVar[str] = "files"
-
-    # Status constants
-    STATUS_SUCCESS: ClassVar[str] = "success"
-    STATUS_ERROR: ClassVar[str] = "error"
-    STATUS_RUNNING: ClassVar[str] = "running"
-    STATUS_COMPLETED: ClassVar[str] = "completed"
-    STATUS_FAILED: ClassVar[str] = "failed"
 
     # ============================================================================
     # ENUMS - All enumerated types as class enums
@@ -134,15 +106,15 @@ class FlextMeltanoConfig(BaseModel):
     )
 
     meltano_version: str = Field(
-        default=DEFAULT_MELTANO_VERSION, description="Meltano version to use"
+        default=MELTANO_VERSION, description="Meltano version to use"
     )
 
     singer_sdk_version: str = Field(
-        default=DEFAULT_SINGER_SDK_VERSION, description="Singer SDK version to use"
+        default=SINGER_SDK_VERSION, description="Singer SDK version to use"
     )
 
     dbt_version: str = Field(
-        default=DEFAULT_DBT_VERSION, description="DBT version to use"
+        default=DBT_VERSION, description="DBT version to use"
     )
 
     # Environment and execution configuration
@@ -155,21 +127,21 @@ class FlextMeltanoConfig(BaseModel):
     )
 
     timeout_seconds: int = Field(
-        default=DEFAULT_TIMEOUT_SECONDS,
+        default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
         ge=1,
         le=3600,
         description="Timeout for operations in seconds",
     )
 
     retry_count: int = Field(
-        default=DEFAULT_RETRY_COUNT,
+        default=FlextConstants.Reliability.DEFAULT_RETRY_COUNT,  # SOURCE OF TRUTH
         ge=0,
         le=10,
         description="Number of retries for failed operations",
     )
 
     batch_size: int = Field(
-        default=DEFAULT_BATCH_SIZE,
+        default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
         ge=1,
         le=10000,
         description="Batch size for data processing",

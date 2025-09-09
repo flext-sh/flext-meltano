@@ -9,6 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import (
+    Protocol,
+    TypeVar,
+    runtime_checkable,
+)
+
 from dbt.cli.main import dbtRunner
 from flext_core import FlextTypes
 from singer_sdk import (
@@ -17,31 +23,45 @@ from singer_sdk import (
     Target as SingerTarget,
 )
 
-# Direct type aliases to avoid MyPy unfollowed import issues with FlextTypes.X.Y
-type ConfigValue = (
-    str | int | float | bool | FlextTypes.Core.List | FlextTypes.Core.Dict
-)
-type ConfigDict = dict[str, ConfigValue]
-type JsonValue = (
-    str
-    | int
-    | float
-    | bool
-    | None
-    | list[
-        str | int | float | bool | None | FlextTypes.Core.List | FlextTypes.Core.Dict
-    ]
-    | dict[
-        str,
-        str | int | float | bool | None | FlextTypes.Core.List | FlextTypes.Core.Dict,
-    ]
-)
-type JsonObject = dict[str, JsonValue]
+# Python 3.13+ Advanced Generic Type Variables with covariance
+T_co = TypeVar("T_co", covariant=True)
+U = TypeVar("U")
+V = TypeVar("V")
+
+# Python 3.13+ Type aliases - USE FlextTypes directly (eliminate duplication)
+type ConfigValue = FlextTypes.Core.ConfigValue  # ✅ ALIAS to eliminate duplication
+type ConfigDict = FlextTypes.Core.ConfigDict   # ✅ ALIAS to eliminate duplication
+type JsonValue = FlextTypes.Core.JsonValue     # ✅ ALIAS to eliminate duplication
+type JsonObject = FlextTypes.Core.JsonObject   # ✅ ALIAS to eliminate duplication
+
+# Advanced Python 3.13+ Union and Intersection Types
 type MessageType = str
 type MessageData = FlextTypes.Core.Dict
 type CommandName = str
 type CommandResult = object
 type HandlerContext = FlextTypes.Core.Dict
+
+
+# Modern Protocol definitions for structural typing
+@runtime_checkable
+class MeltanoPluginProtocol(Protocol[T_co]):
+    """Advanced protocol for Meltano plugin interface with covariant constraints."""
+
+    def get_config(self) -> ConfigDict: ...
+    def validate_config(self, config: ConfigDict) -> bool: ...
+    def execute(self, *args: object) -> T_co: ...
+
+
+@runtime_checkable
+class SingerStreamProtocol(Protocol):
+    """Protocol for Singer stream implementations with type safety."""
+
+    name: str
+    tap_stream_id: str
+    schema: JsonObject
+
+    def sync_records(self) -> JsonValue: ...
+    def get_records(self) -> JsonValue: ...
 
 
 class FlextMeltanoTypes:

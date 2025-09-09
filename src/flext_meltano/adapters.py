@@ -52,50 +52,8 @@ class FlextMeltanoAdapter:
         self._current_project: Project | None = None
 
     # =========================================================================
-    # CORE ADAPTER METHODS - Primary adapter functionality
+    # MELTANO DIRECT INTEGRATION - NO WRAPPERS, DIRECT MELTANO CORE USAGE
     # =========================================================================
-
-    @classmethod
-    def adapt_project_config(
-        cls, config: FlextTypes.Core.Dict
-    ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Adapt project configuration for Meltano compatibility."""
-        try:
-            # Basic validation and adaptation
-            adapted_config = dict(config)  # Make a copy
-
-            # Ensure required structure
-            if "project_id" not in adapted_config:
-                adapted_config["project_id"] = "default-project"
-            if "version" not in adapted_config:
-                adapted_config["version"] = 1
-
-            return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
-        except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Failed to adapt project config: {e}"
-            )
-
-    @classmethod
-    def adapt_plugin(
-        cls, plugin_data: FlextTypes.Core.Dict
-    ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Adapt plugin data for Meltano compatibility."""
-        try:
-            # Basic plugin adaptation
-            adapted_plugin = dict(plugin_data)  # Make a copy
-
-            # Ensure required plugin structure
-            if "name" not in adapted_plugin:
-                adapted_plugin["name"] = ""
-            if "namespace" not in adapted_plugin:
-                adapted_plugin["namespace"] = "default"
-
-            return FlextResult[FlextTypes.Core.Dict].ok(adapted_plugin)
-        except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Failed to adapt plugin: {e}"
-            )
 
     def get_version(self) -> FlextResult[FlextMeltanoTypes.Bridge.VersionInfo]:
         """Get Meltano version information using native API.
@@ -184,11 +142,12 @@ class FlextMeltanoAdapter:
                 project_root=str(project.root),
             )
             # Convert Meltano Project to dict representation
-            project_dict = {
-                "name": getattr(project, "name", "meltano_project"),
+            # ✅ TYPE SAFETY: ConfigValue supports dict[str, object] per flext-core
+            project_dict: FlextMeltanoTypes.DBT.Project = {
+                "name": str(getattr(project, "name", "meltano_project")),
                 "root": str(getattr(project, "root", ".")),
-                "settings": getattr(project, "settings", {}),
-                "meltano_version": getattr(project, "meltano_version", ""),
+                "settings": dict(getattr(project, "settings", {})),  # type: ignore[dict-item]
+                "meltano_version": str(getattr(project, "meltano_version", "")),
             }
             return FlextResult.ok(project_dict)
 
@@ -719,6 +678,35 @@ class FlextMeltanoAdapter:
         return FlextResult[FlextTypes.Core.Dict].ok(
             {"dbt_status": "ready", "models": []}
         )
+
+    # =================================================================
+    # COMPATIBILITY ALIASES - Simple aliases for test compatibility
+    # =================================================================
+
+    @classmethod
+    def adapt_plugin(cls, plugin_config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+        """Simple alias for plugin adaptation - returns adapted config directly."""
+        # Use SOURCE OF TRUTH - return adapted plugin config with required fields
+        adapted_config = dict(plugin_config)
+        adapted_config.update({
+            "type": plugin_config.get("type", "extractors"),
+            "name": plugin_config.get("name", "unknown"),
+            "namespace": plugin_config.get("namespace", str(plugin_config.get("name", "unknown")).replace("-", "_")),
+            "pip_url": plugin_config.get("pip_url", plugin_config.get("name", "unknown"))
+        })
+        return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
+
+    @classmethod
+    def adapt_project_config(cls, project_config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+        """Simple alias for project config adaptation."""
+        # Use SOURCE OF TRUTH - return enhanced config with required fields
+        enhanced_config = dict(project_config)
+        enhanced_config.update({
+            "project_id": project_config.get("name", "default_project"),
+            "version": 1,
+            "environments": enhanced_config.get("environments", [{"name": "dev"}])
+        })
+        return FlextResult[FlextTypes.Core.Dict].ok(enhanced_config)
 
 
 # =============================================================================
