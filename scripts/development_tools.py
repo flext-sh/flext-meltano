@@ -48,7 +48,7 @@ class FlextMeltanoDevelopmentTools:
             return FlextResult.fail(f"Project validation failed: {e}")
 
     @staticmethod
-    def run_quality_gates() -> FlextResult[FlextTypes.Core.Dict]:
+    def run_quality_gates() -> FlextResult[dict[str, dict[str, object]]]:
         """Run all quality gates (MyPy, Ruff, PyRight, tests).
 
         Returns:
@@ -61,7 +61,7 @@ class FlextMeltanoDevelopmentTools:
                 return FlextResult.fail("Project structure not found")
 
             # Simulate quality gate execution
-            results = {
+            results: dict[str, dict[str, object]] = {
                 "mypy": {"status": "passed", "errors": 0},
                 "ruff": {"status": "passed", "warnings": 6},  # Acceptable warnings
                 "pyright": {"status": "passed", "errors": 0},
@@ -131,16 +131,16 @@ class FlextMeltanoDevelopmentTools:
             project_root = Path.cwd()
 
             if command == "validate":
-                result = cls.validate_project_structure(project_root)
-                if result.success:
-                    return FlextResult.ok(f"Validation results: {result.value}")
-                return FlextResult.fail(result.error or "Validation failed")
+                validation_result = cls.validate_project_structure(project_root)
+                if validation_result.success:
+                    return FlextResult.ok(f"Validation results: {validation_result.value}")
+                return FlextResult.fail(validation_result.error or "Validation failed")
 
             if command == "quality":
-                result = cls.run_quality_gates()
-                if result.success:
-                    return FlextResult.ok(f"Quality gates: {result.value}")
-                return FlextResult.fail(result.error or "Quality gates failed")
+                quality_result = cls.run_quality_gates()
+                if quality_result.success:
+                    return FlextResult.ok(f"Quality gates: {quality_result.value}")
+                return FlextResult.fail(quality_result.error or "Quality gates failed")
 
             if command == "bridge":
                 return cls.create_bridge_test()

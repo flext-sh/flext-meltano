@@ -431,10 +431,10 @@ class TestServiceIntegration:
     def test_service_configuration_validation(self) -> None:
         """Test service configuration validation across different service types."""
         # Test different configuration scenarios
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as input_file:
-            with tempfile.NamedTemporaryFile(
-                suffix=".csv", delete=False
-            ) as output_file:
+        with (
+            tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as input_file,
+            tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as output_file,
+        ):
                 services_to_test = [
                     (
                         "tap-csv",

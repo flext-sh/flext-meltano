@@ -12,9 +12,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-import click
-
-# FlextCliApi is not available - implementing direct CLI functionality
+# CLI functionality using flext-core patterns exclusively - no Click dependency
 from flext_core import (
     FlextDecorators,
     FlextLogger,
@@ -758,21 +756,28 @@ class FlextMeltanoExecutor:
                 self.debug = debug
                 self.executor = FlextMeltanoExecutor(project_root=self.project_root)
                 self.logger = FlextLogger(self.__class__.__name__)
-                # CLI command interface - initialize with Click integration
+                # CLI command interface - initialize with flext-core patterns
                 self.cli_cmd = self._create_cli_command()
 
             def _create_cli_command(self) -> object:
-                """Create CLI command structure using Click."""
+                """Create CLI command structure using flext-core patterns."""
                 try:
-                    # Click already imported at module level
+                    # Use flext-core patterns instead of Click
+                    class MeltanoCliInterface:
+                        """FLEXT Meltano CLI interface using flext-core patterns."""
 
-                    @click.group()
-                    def cli() -> None:
-                        """FLEXT Meltano CLI interface."""
+                        name = "flext-meltano"
 
-                    return cli
-                except ImportError:
-                    # Fallback for environments without Click
+                        def __init__(self) -> None:
+                            self.executor = FlextMeltanoExecutor()
+
+                        def execute_command(self, command: str, *args: str) -> FlextResult[dict]:
+                            """Execute CLI command through FLEXT executor."""
+                            return self.executor.execute(command, list(args))
+
+                    return MeltanoCliInterface()
+                except Exception:
+                    # Fallback for initialization issues
                     return None
 
             def _handle_command_generic(

@@ -1,11 +1,3 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
-
-from __future__ import annotations
-
-from flext_core import FlextTypes
-
 """Target Abstractions - Singer Target functionality abstraction.
 
 This module provides complete FlextTarget abstractions following flext-core
@@ -14,15 +6,15 @@ projects never need to import singer_sdk directly.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
+from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from flext_core import FlextLogger, FlextModels, FlextResult
+from flext_core import FlextLogger, FlextModels, FlextResult, FlextTypes
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from flext_meltano.constants import FlextMeltanoConstants

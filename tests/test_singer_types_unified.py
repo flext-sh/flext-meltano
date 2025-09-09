@@ -2,10 +2,11 @@
 
 Tests the new unified FlextSingerTypes class with real API behavior.
 
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
+
+from flext_core import FlextTypes
 
 from flext_meltano.singer_types import FlextSingerTypes
 

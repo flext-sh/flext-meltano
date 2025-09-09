@@ -10,8 +10,8 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
-from flext_tests import FlextMatchers
+from flext_core import FlextResult, FlextTypes
+from flext_tests import FlextTestsMatchers
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 
@@ -145,7 +145,7 @@ class TestFlextMeltanoAdapterReal:
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
         # Use flext_tests matchers for cleaner assertions
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
         adapted_config = result.value
         assert isinstance(adapted_config, dict)
 

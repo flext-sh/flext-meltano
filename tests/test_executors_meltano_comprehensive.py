@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
-from flext_tests import FlextMatchers, FlextTestUtilities, TestBuilders
+from flext_tests import FlextTestsMatchers, FlextTestUtilities, TestBuilders
 
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
 
@@ -138,7 +138,7 @@ class TestFlextMeltanoExecutorsComprehensive:
 
         # Test temp project directory creation
         temp_project_result = simple_dbt.create_temp_dbt_project()
-        FlextMatchers.assert_result_success(temp_project_result)
+        FlextTestsMatchers.assert_result_success(temp_project_result)
 
         temp_path = temp_project_result.value
         assert isinstance(temp_path, Path)
@@ -156,7 +156,7 @@ class TestFlextMeltanoExecutorsComprehensive:
         result = executor.execute()
         assert isinstance(result, FlextResult)
         # Test the structure of service info
-        FlextMatchers.assert_result_success(result)
+        FlextTestsMatchers.assert_result_success(result)
 
     def test_meltano_executor_project_info_mock(self) -> None:
         """Test MeltanoExecutor get_project_info method."""
@@ -289,12 +289,14 @@ class TestFlextMeltanoExecutorsComprehensive:
         success_result = (
             TestBuilders.ResultBuilder().with_success_data("test data").build()
         )
-        FlextMatchers.assert_result_success(success_result, "test data")
+        FlextTestsMatchers.assert_result_success(success_result, "test data")
 
         failure_result = (
             TestBuilders.ResultBuilder().with_failure("test error", "TEST_001").build()
         )
-        FlextMatchers.assert_result_failure(failure_result, "test error", "TEST_001")
+        FlextTestsMatchers.assert_result_failure(
+            failure_result, "test error", "TEST_001"
+        )
 
     def test_flext_tests_integration_with_utilities(self) -> None:
         """Test integration with flext_tests utilities."""

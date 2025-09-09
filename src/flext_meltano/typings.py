@@ -1,19 +1,16 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
-
-from __future__ import annotations
-
-from flext_core import FlextTypes
-
 """FLEXT Meltano Types - Meltano-specific type system extending FlextTypes hierarchical system.
+
+Provides comprehensive Meltano-specific types following the FlextTypes pattern with
+domain organization, hierarchical structure, and type-safe annotations for Meltano operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from __future__ import annotations
 
 from dbt.cli.main import dbtRunner
+from flext_core import FlextTypes
 from singer_sdk import (
     Stream as SingerStream,
     Tap as SingerTap,

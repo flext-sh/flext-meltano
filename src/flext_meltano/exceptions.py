@@ -1,32 +1,15 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
+"""FLEXT Meltano Exceptions - Single Class Architecture.
+
+Domain-specific exceptions using facade pattern to eliminate duplication while maintaining
+compatibility with the Flext[Area][Module] pattern and hierarchical inheritance from flext-core.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""FLEXT Meltano Exceptions - Single Class Architecture (Flext[Area][Module] pattern).
-
-**Architecture Compliance**: Single main class FlextMeltanoExceptions following Flext[Area][Module] pattern
-**Hierarchical Inheritance**: Inherits from flext-core exception hierarchies
-**SOLID Principles**: Single Responsibility - All Meltano exceptions organized under one class
-**ZERO Duplication**: Uses internal classes with aliases, delegates to base implementations
-
-Domain-specific exceptions using facade pattern to eliminate duplication while maintaining compatibility.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
-from flext_core import (
-    FlextExceptions,
-)
+from flext_core import FlextExceptions, FlextTypes
 from pydantic import BaseModel, Field
 
 # =============================================================================

@@ -1,11 +1,3 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
-
-from __future__ import annotations
-
-from flext_core import FlextTypes
-
 """Tap Abstractions - Unified Singer Tap functionality abstraction.
 
 This module provides complete FlextTap abstractions following flext-core
@@ -14,15 +6,15 @@ projects never need to import singer_sdk directly.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
+from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import cast
 
-from flext_core import FlextResult, FlextServices, FlextUtilities
+from flext_core import FlextResult, FlextServices, FlextTypes, FlextUtilities
 from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field
 
 # Type aliases (MyPy compatible)
