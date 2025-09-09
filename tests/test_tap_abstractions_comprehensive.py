@@ -19,7 +19,7 @@ from typing import cast
 
 import pytest
 from flext_core import FlextResult, FlextServices, FlextTypes, FlextUtilities
-from flext_tests import FlextTestsMatchers, PerformanceProfiler
+from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 from pydantic import ValidationError
 
 from flext_meltano.tap_abstractions import (
@@ -559,7 +559,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         TapConfig(tap_type="tap-oracle", connection_config=self.oracle_config)
 
         # Performance test: measure tap creation time
-        profiler = PerformanceProfiler()
+        profiler = FlextTestsPerformance.PerformanceProfiler()
 
         # Use memory profiling to measure Oracle tap creation
         with profiler.profile_memory("oracle_tap_creation"):

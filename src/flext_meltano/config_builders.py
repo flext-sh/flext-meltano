@@ -19,18 +19,6 @@ from flext_meltano.typings import FlextMeltanoTypes
 ConfigDict = FlextTypes.Core.JsonObject
 
 
-# Configuration Models using flext-core patterns
-class SingerPluginConfig(FlextModels.Config):
-    """Configuration object for Singer plugins - eliminates parameter explosion."""
-
-    plugin_name: str
-    plugin_type: str = "extractor"  # "extractor" or "loader"
-    namespace: str = ""
-    pip_url: str = ""
-    executable: str = ""
-    variant: str = ""
-
-
 logger = FlextLogger(__name__)
 
 # =============================================================================
@@ -52,6 +40,20 @@ class FlextMeltanoConfigBuilders:
     - Open/Closed: Extensible through inheritance
     - Interface Segregation: Specialized nested classes
     """
+
+    # =================================================================
+    # NESTED CONFIG MODELS - Configuration data structures
+    # =================================================================
+
+    class SingerPluginConfig(FlextModels.Config):
+        """Configuration object for Singer plugins - eliminates parameter explosion."""
+
+        plugin_name: str
+        plugin_type: str = "extractor"  # "extractor" or "loader"
+        namespace: str = ""
+        pip_url: str = ""
+        executable: str = ""
+        variant: str = ""
 
     # =================================================================
     # NESTED BUILDER CLASSES - Actual implementations
@@ -111,7 +113,7 @@ class FlextMeltanoConfigBuilders:
 
         @staticmethod
         def _create_singer_config_generic(
-            config: SingerPluginConfig,
+            config: FlextMeltanoConfigBuilders.SingerPluginConfig,
         ) -> FlextResult[ConfigDict]:
             """Generic Singer plugin config creator eliminating 228 lines of duplication.
 
@@ -119,7 +121,7 @@ class FlextMeltanoConfigBuilders:
             and FlextUtilities validation following DRY principles.
 
             Args:
-                config: SingerPluginConfig object containing all plugin parameters
+                config: FlextMeltanoConfigBuilders.SingerPluginConfig object containing all plugin parameters
 
             Returns:
                 FlextResult containing plugin configuration dictionary
@@ -178,7 +180,7 @@ class FlextMeltanoConfigBuilders:
                 FlextResult[ConfigDict]: Configuration result with tap settings.
 
             """
-            config = SingerPluginConfig(
+            config = FlextMeltanoConfigBuilders.SingerPluginConfig(
                 plugin_name=tap_name,
                 plugin_type="extractor",
                 namespace=namespace,
@@ -202,7 +204,7 @@ class FlextMeltanoConfigBuilders:
                 FlextResult[ConfigDict]: Configuration result with target settings.
 
             """
-            config = SingerPluginConfig(
+            config = FlextMeltanoConfigBuilders.SingerPluginConfig(
                 plugin_name=target_name,
                 plugin_type="loader",
                 namespace=namespace,
@@ -218,13 +220,13 @@ class FlextMeltanoConfigBuilders:
 
         @staticmethod
         def create_plugin_config(
-            config: SingerPluginConfig,
+            config: FlextMeltanoConfigBuilders.SingerPluginConfig,
             config_defaults: ConfigDict | None = None,
         ) -> FlextResult[ConfigDict]:
             """Cria configuração completa para plugin Meltano usando FlextResult patterns.
 
             Args:
-                config: SingerPluginConfig object containing all plugin parameters
+                config: FlextMeltanoConfigBuilders.SingerPluginConfig object containing all plugin parameters
                 config_defaults: Configurações padrão (opcional)
 
             Returns:

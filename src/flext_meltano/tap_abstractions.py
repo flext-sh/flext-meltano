@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from typing import cast
 
 from flext_core import FlextResult, FlextServices, FlextTypes, FlextUtilities
-from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field
+from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field, field_validator
 
 # Type aliases (MyPy compatible)
 RecordDict = FlextTypes.Core.Dict
@@ -42,6 +42,24 @@ class TapConfig(BaseModel):
         default_factory=dict, description="Stream-specific configuration"
     )
     version: str = Field(default="latest", description="Tap version")
+
+    @field_validator("tap_type")
+    @classmethod
+    def validate_tap_type(cls, v: str) -> str:
+        """Validate tap_type is not empty."""
+        if not v or not v.strip():
+            msg = "tap_type cannot be empty"
+            raise ValueError(msg)
+        return v
+
+    @field_validator("connection_config")
+    @classmethod
+    def validate_connection_config(cls, v: FlextTypes.Core.Dict) -> FlextTypes.Core.Dict:
+        """Validate connection_config is not empty."""
+        if not v:
+            msg = "connection_config cannot be empty"
+            raise ValueError(msg)
+        return v
 
 
 class StreamDefinition(BaseModel):

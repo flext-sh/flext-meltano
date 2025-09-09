@@ -329,14 +329,17 @@ class TestFlextMeltanoUtilitiesRealMethods:
                 assert result.error_message
 
     def test_validate_plugin_config(self) -> None:
-        """Test validate_plugin_config method."""
+        """Test validate_plugin_config method - now using validators.py (SOLID compliance)."""
+        # ✅ SOLID COMPLIANCE: Use FlextMeltanoValidators instead of utilities
+        from flext_meltano.validators import FlextMeltanoValidators
+
         # Create a basic plugin config
         config_result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
         assert config_result.success
 
         config = config_result.value
 
-        result = FlextMeltanoUtilities.validate_plugin_config(config)
+        result = FlextMeltanoValidators.validate_plugin_config(config)
 
         assert isinstance(result, FlextResult)
         if result.success:

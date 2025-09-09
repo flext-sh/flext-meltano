@@ -771,7 +771,7 @@ class FlextMeltanoExecutor:
                         def __init__(self) -> None:
                             self.executor = FlextMeltanoExecutor()
 
-                        def execute_command(self, command: str, *args: str) -> FlextResult[dict]:
+                        def execute_command(self, command: str, *args: str) -> FlextResult[FlextTypes.Core.Headers]:
                             """Execute CLI command through FLEXT executor."""
                             return self.executor.execute(command, list(args))
 

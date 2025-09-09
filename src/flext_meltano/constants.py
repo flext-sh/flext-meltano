@@ -1,8 +1,7 @@
-"""FLEXT Meltano Constants - Meltano-specific constants extending FlextConstants hierarchical system.
+"""FLEXT Meltano Constants - Meltano-specific constants ONLY.
 
-Provides comprehensive Meltano-specific constants following the FlextConstants pattern with
-domain organization, type-safe Final annotations, and hierarchical structure. All constants
-related to Meltano, Singer SDK, DBT, and ELT pipelines are organized under single class.
+Provides ONLY Meltano-specific constants that extend FlextConstants.
+Follows SOURCE OF TRUTH principle - use FlextConstants for common values.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,148 +9,126 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Final
+from enum import StrEnum, auto
+from typing import Final, Literal
 
 from flext_core import FlextConstants
 
+# Python 3.13+ Type Aliases - ONLY Meltano-specific
+type PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
+type ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
+type SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
+
 
 class FlextMeltanoConstants(FlextConstants):
-    """Meltano-specific hierarchical constants system extending FlextConstants.
+    """Meltano-specific constants ONLY extending FlextConstants.
 
-    This class inherits all core FLEXT constants and adds Meltano-specific
-    constant definitions organized by domain functionality following the
-    same hierarchical pattern as FlextConstants.
+    SOURCE OF TRUTH: Use FlextConstants for common values.
+    This class contains ONLY Meltano/Singer/DBT specific constants.
     """
 
     # =========================================================================
-    # CORE DOMAIN - Meltano system identification and metadata
+    # MELTANO DOMAIN - Meltano-specific constants ONLY
     # =========================================================================
 
-    class Core(FlextConstants.Core):
-        """Meltano core system constants extending FlextConstants.Core."""
+    class Meltano:
+        """Meltano-specific constants - NOT duplicating FlextConstants."""
 
-        # Use new names to avoid overriding final attributes from parent
-        MELTANO_NAME: Final[str] = "FLEXT-MELTANO"
-        MELTANO_VERSION: Final[str] = "2.0.0-enterprise"
-        DESCRIPTION: Final[str] = (
-            "Enterprise Meltano/Singer/DBT integration for FLEXT ecosystem"
-        )
-        AUTHOR: Final[str] = "FLEXT Team"
-
-        # Meltano ecosystem integration
-        MELTANO_VERSION_REQUIRED: Final[str] = "3.9.1"
-        SINGER_SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
-        DBT_VERSION_REQUIRED: Final[str] = "1.10.5"
+        # Meltano ecosystem versions (Meltano-specific)
+        VERSION_REQUIRED: Final[str] = "3.9.1"
+        PROJECT_FILE: Final[str] = "meltano.yml"
+        STATE_DIR: Final[str] = ".meltano"
+        
+        # Meltano CLI commands (Meltano-specific)
+        COMMAND_INSTALL: Final[str] = "install"
+        COMMAND_RUN: Final[str] = "run"
+        COMMAND_ELT: Final[str] = "elt"
 
     # =========================================================================
-    # PLUGIN DOMAIN - Meltano plugin management constants
+    # SINGER SDK DOMAIN - Singer-specific constants ONLY
     # =========================================================================
 
-    class Plugin:
-        """Meltano plugin management constants."""
+    class Singer:
+        """Singer SDK constants - ONLY Singer-specific values."""
 
-        # Plugin types
-        TYPE_TAP: Final[str] = "extractors"
-        TYPE_TARGET: Final[str] = "loaders"
-        TYPE_TRANSFORM: Final[str] = "transformers"
-
-        # Plugin variants and sources
-        DEFAULT_VARIANT: Final[str] = "meltanolabs"
-        HUB_URL: Final[str] = "https://hub.meltano.com"
-
-        # Plugin discovery and installation
-        DISCOVERY_TIMEOUT: Final[int] = 30
-        INSTALLATION_TIMEOUT: Final[int] = 300
-
-    # =========================================================================
-    # SINGER DOMAIN - Singer SDK integration constants
-    # =========================================================================
-
-    class SingerSDK:
-        """Singer SDK integration constants."""
-
-        # Message types
+        # Singer-specific versions
+        SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
+        
+        # Singer message types (Singer-specific)
         MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
         MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
         MESSAGE_TYPE_STATE: Final[str] = "STATE"
         MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
-
-        # Stream processing
-        DEFAULT_BATCH_SIZE: Final[int] = 1000
-        MAX_BATCH_SIZE: Final[int] = 10000
-
-        # Performance and limits
-        DEFAULT_REQUEST_TIMEOUT: Final[int] = 300
+        
+        # Singer stream processing (Singer-specific)
         MAX_CONCURRENT_STREAMS: Final[int] = 10
 
     # =========================================================================
-    # DBT DOMAIN - DBT Core integration constants
+    # DBT DOMAIN - DBT-specific constants ONLY
     # =========================================================================
 
-    class DBTCore:
-        """DBT Core integration constants."""
+    class DBT:
+        """DBT constants - ONLY DBT-specific values."""
 
-        # Project structure
-        DEFAULT_PROFILES_DIR: Final[str] = "~/.dbt"
-        DEFAULT_PROJECT_DIR: Final[str] = "./dbt_project"
+        # DBT-specific versions
+        VERSION_REQUIRED: Final[str] = "1.10.5"
+        
+        # DBT files (DBT-specific)
         PROJECT_FILE: Final[str] = "dbt_project.yml"
         PROFILES_FILE: Final[str] = "profiles.yml"
         MANIFEST_FILE: Final[str] = "manifest.json"
-
-        # Commands
+        
+        # DBT commands (DBT-specific)
         COMMAND_RUN: Final[str] = "run"
         COMMAND_TEST: Final[str] = "test"
         COMMAND_BUILD: Final[str] = "build"
         COMMAND_COMPILE: Final[str] = "compile"
-
-        # Model materialization
+        
+        # DBT materializations (DBT-specific)
         MATERIALIZATION_TABLE: Final[str] = "table"
         MATERIALIZATION_VIEW: Final[str] = "view"
         MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"
 
     # =========================================================================
-    # ELT DOMAIN - Extract-Load-Transform pipeline constants
+    # PLUGIN DOMAIN - Meltano plugin constants ONLY
     # =========================================================================
 
-    class ELT:
-        """Extract-Load-Transform pipeline constants."""
+    class Plugin:
+        """Meltano plugin constants - ONLY plugin-specific values."""
 
-        # Pipeline stages
-        EXTRACT_STAGE: Final[str] = "extract"
-        LOAD_STAGE: Final[str] = "load"
-        TRANSFORM_STAGE: Final[str] = "transform"
+        # Plugin types (Meltano-specific)
+        TYPE_TAP: Final[PluginType] = "extractors"
+        TYPE_TARGET: Final[PluginType] = "loaders"
+        TYPE_TRANSFORM: Final[PluginType] = "transforms"
+        
+        # Plugin sources (Meltano-specific)
+        DEFAULT_VARIANT: Final[str] = "meltanolabs"
+        HUB_URL: Final[str] = "https://hub.meltano.com"
+        
+        # Plugin timeouts (use FlextConstants.Network.DEFAULT_TIMEOUT where possible)
+        INSTALLATION_TIMEOUT: Final[int] = 300  # 5 minutes - plugin-specific
 
-        # Pipeline status
-        STATUS_PENDING: Final[str] = "pending"
-        STATUS_RUNNING: Final[str] = "running"
-        STATUS_SUCCESS: Final[str] = "success"
-        STATUS_FAILED: Final[str] = "failed"
 
-        # Performance
-        DEFAULT_PIPELINE_TIMEOUT: Final[int] = 3600  # 1 hour
-        DEFAULT_RETRY_ATTEMPTS: Final[int] = 3
+# =========================================================================
+# ENUMS - Modern Python 3.13+ StrEnum for type safety
+# =========================================================================
 
-    # =========================================================================
-    # BRIDGE DOMAIN - Go service integration constants
-    # =========================================================================
+class PluginTypes(StrEnum):
+    """Meltano plugin types - Modern StrEnum."""
+    EXTRACTORS = auto()
+    LOADERS = auto()
+    TRANSFORMS = auto()
+    ORCHESTRATORS = auto()
 
-    class Bridge:
-        """Go service integration constants."""
-
-        # Service configuration
-        DEFAULT_HOST: Final[str] = "localhost"
-        DEFAULT_PORT: Final[int] = 8081
-        API_VERSION: Final[str] = "v1"
-
-        # Endpoints
-        HEALTH_ENDPOINT: Final[str] = "/health"
-        VERSION_ENDPOINT: Final[str] = "/version"
-
-        # Communication
-        DEFAULT_TIMEOUT: Final[int] = 30
-        JSON_CONTENT_TYPE: Final[str] = "application/json"
+class ReplicationMethods(StrEnum):
+    """Singer replication methods - Modern StrEnum."""
+    FULL_TABLE = auto()
+    INCREMENTAL = auto()
+    LOG_BASED = auto()
 
 
 __all__ = [
     "FlextMeltanoConstants",
+    "PluginTypes", 
+    "ReplicationMethods",
 ]

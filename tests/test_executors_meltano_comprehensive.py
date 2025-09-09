@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
-from flext_tests import FlextTestsMatchers, FlextTestUtilities, TestBuilders
+from flext_tests import FlextTestsBuilders, FlextTestsMatchers, FlextTestsUtilities
 
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
 
@@ -285,14 +285,14 @@ class TestFlextMeltanoExecutorsComprehensive:
 
     def test_flext_tests_integration_with_builders(self) -> None:
         """Test integration with flext_tests TestBuilders."""
-        # Use TestBuilders for result creation
+        # Use FlextTestsBuilders for result creation
         success_result = (
-            TestBuilders.ResultBuilder().with_success_data("test data").build()
+            FlextTestsBuilders.ResultBuilder().with_success_data("test data").build()
         )
         FlextTestsMatchers.assert_result_success(success_result, "test data")
 
         failure_result = (
-            TestBuilders.ResultBuilder().with_failure("test error", "TEST_001").build()
+            FlextTestsBuilders.ResultBuilder().with_failure("test error", "TEST_001").build()
         )
         FlextTestsMatchers.assert_result_failure(
             failure_result, "test error", "TEST_001"
@@ -300,8 +300,8 @@ class TestFlextMeltanoExecutorsComprehensive:
 
     def test_flext_tests_integration_with_utilities(self) -> None:
         """Test integration with flext_tests utilities."""
-        # Use FlextTestUtilities for test data creation
-        test_utilities = FlextTestUtilities()
+        # Use FlextTestsUtilities for test data creation
+        test_utilities = FlextTestsUtilities()
 
         # Create test data structure using utilities
         test_data = {
@@ -311,8 +311,8 @@ class TestFlextMeltanoExecutorsComprehensive:
         }
 
         # Validate the test utilities integration works correctly using actual methods
-        success_result = test_utilities.create_test_result(success=True, data=test_data)
-        test_utilities.assert_result_success(success_result)
+        success_result = test_utilities.TestUtilities.create_test_result(success=True, data=test_data)
+        FlextTestsUtilities.TestUtilities.assert_result_success(success_result)
 
         # Test data validation
         assert isinstance(test_data["project"], str)

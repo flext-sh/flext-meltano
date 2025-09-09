@@ -23,7 +23,7 @@ from flext_core import (
 )
 
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_core import FlextConstants  # SOURCE OF TRUTH
 from flext_meltano.typings import FlextMeltanoTypes
 
 # =============================================================================
@@ -104,7 +104,7 @@ class FlextMeltanoExecutors:
             self,
             project_root: Path,
             command: FlextTypes.Core.StringList,
-            timeout: int = FlextMeltanoConstants.SingerSDK.DEFAULT_REQUEST_TIMEOUT,
+            timeout: int = FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
         ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
             """Execute Meltano command using native API with structured result.
 

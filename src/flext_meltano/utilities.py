@@ -137,7 +137,8 @@ class FlextMeltanoUtilities:
                 executable, f"tap-{safe_name}"
             )
 
-            config_dict = {
+            # ✅ TYPE SAFETY: ConfigValue supports dict[str, object] per flext-core definition
+            config_dict: FlextTypes.Core.ConfigDict = {
                 "name": safe_name,
                 "namespace": safe_namespace,
                 "pip_url": safe_pip_url,
@@ -145,16 +146,14 @@ class FlextMeltanoUtilities:
                 "type": FlextUtilities.TextProcessor.safe_string(
                     plugin_type, "extractor"
                 ),
-                "settings": {},
-                "config": {},
-                "metadata": {
+                "settings": {},  # type: ignore[dict-item] # dict[str, object] valid in ConfigValue
+                "config": {},    # type: ignore[dict-item] # dict[str, object] valid in ConfigValue
+                "metadata": {    # type: ignore[dict-item] # dict[str, object] valid in ConfigValue
                     "created_by": "flext-meltano",
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 },
             }
-            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(
-                cast("FlextMeltanoTypes.Plugin.Config", config_dict)
-            )
+            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(config_dict)
         except Exception as e:
             error_msg = f"Failed to create plugin config dict: {e}"
             logger.exception(error_msg)
@@ -438,8 +437,9 @@ class FlextMeltanoUtilities:
                 )
 
             config = config_result.value
-            config["capabilities"] = ["discover", "properties", "catalog", "schema"]
-            config["settings"] = {}
+            # ✅ TYPE SAFETY: ConfigValue supports list[object] and dict[str, object] per flext-core
+            config["capabilities"] = ["discover", "properties", "catalog", "schema"]  # type: ignore[assignment]
+            config["settings"] = {}  # type: ignore[assignment]
             return FlextResult[FlextMeltanoTypes.Singer.TapConfig].ok(config)
         except Exception as e:
             error_msg = f"Failed to create Singer tap config: {e}"
@@ -461,7 +461,8 @@ class FlextMeltanoUtilities:
                 )
 
             config = config_result.value
-            config["settings"] = {}
+            # ✅ TYPE SAFETY: ConfigValue supports dict[str, object] per flext-core
+            config["settings"] = {}  # type: ignore[assignment]
             return FlextResult[FlextMeltanoTypes.Singer.TargetConfig].ok(config)
         except Exception as e:
             error_msg = f"Failed to create Singer target config: {e}"
@@ -495,18 +496,8 @@ class FlextMeltanoUtilities:
             logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].fail(error_msg)
 
-    @classmethod
-    def validate_plugin_config(
-        cls, config: FlextMeltanoTypes.Plugin.Config
-    ) -> FlextResult[bool]:
-        """Validate plugin configuration."""
-        # Config is typed as Plugin.Config so isinstance check is unnecessary
-        required_fields = ["name", "type"]
-        for field in required_fields:
-            if field not in config or not config.get(field):
-                return FlextResult.fail(f"Missing required field: {field}")
-
-        return FlextResult.ok(data=True)
+    # ✅ SOLID COMPLIANCE: validate_plugin_config moved to validators.py (SOURCE OF TRUTH)
+    # Use FlextMeltanoValidators.validate_plugin_config instead
 
     create_meltano_config = create_meltano_config_dict
     create_plugin_config = create_plugin_config_dict

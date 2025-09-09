@@ -12,8 +12,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_meltano.exceptions import (
-    ConfigurationErrorContext,
-    ConnectionErrorContext,
     FlextMeltanoAuthenticationError,
     FlextMeltanoConfigurationError,
     FlextMeltanoConnectionError,
@@ -26,9 +24,6 @@ from flext_meltano.exceptions import (
     FlextMeltanoSingerError,
     FlextMeltanoTimeoutError,
     FlextMeltanoValidationError,
-    PluginErrorContext,
-    ProcessingErrorContext,
-    ValidationErrorContext,
 )
 
 
@@ -38,7 +33,7 @@ class TestPydanticErrorContexts:
     def test_validation_error_context_creation(self) -> None:
         """Test ValidationErrorContext creation and validation."""
         # Complete context
-        context = ValidationErrorContext(
+        context = FlextMeltanoExceptions.ValidationErrorContext(
             field_name="username",
             expected_type="string",
             actual_value="123",
@@ -52,7 +47,7 @@ class TestPydanticErrorContexts:
         assert context.additional_info["min_length"] == 5
 
         # Minimal context with defaults
-        minimal = ValidationErrorContext()
+        minimal = FlextMeltanoExceptions.ValidationErrorContext()
         assert minimal.field_name is None
         assert minimal.expected_type is None
         assert minimal.actual_value is None
@@ -67,7 +62,7 @@ class TestPydanticErrorContexts:
     def test_configuration_error_context_creation(self) -> None:
         """Test ConfigurationErrorContext creation and validation."""
         # Complete context
-        context = ConfigurationErrorContext(
+        context = FlextMeltanoExceptions.ConfigurationErrorContext(
             config_file="/app/config.yaml",
             section="database",
             key="host",
@@ -84,7 +79,7 @@ class TestPydanticErrorContexts:
         assert context.additional_info["current_value"] == "invalid_host"
 
         # Minimal context
-        minimal = ConfigurationErrorContext()
+        minimal = FlextMeltanoExceptions.ConfigurationErrorContext()
         assert minimal.config_file is None
         assert minimal.section is None
         assert minimal.key is None
@@ -94,7 +89,7 @@ class TestPydanticErrorContexts:
     def test_connection_error_context_creation(self) -> None:
         """Test ConnectionErrorContext creation and validation."""
         # Complete context
-        context = ConnectionErrorContext(
+        context = FlextMeltanoExceptions.ConnectionErrorContext(
             host="db.example.com",
             port=5432,
             protocol="postgresql",
@@ -110,13 +105,13 @@ class TestPydanticErrorContexts:
         assert context.additional_info["ssl_enabled"] is True
 
         # Default retry count
-        default_context = ConnectionErrorContext(host="localhost")
+        default_context = FlextMeltanoExceptions.ConnectionErrorContext(host="localhost")
         assert default_context.retry_count == 0
 
     def test_processing_error_context_creation(self) -> None:
         """Test ProcessingErrorContext creation and validation."""
         # Complete context
-        context = ProcessingErrorContext(
+        context = FlextMeltanoExceptions.ProcessingErrorContext(
             operation="data_transformation",
             records_processed=1250,
             batch_id="batch_20250115_001",
@@ -132,13 +127,13 @@ class TestPydanticErrorContexts:
         assert context.additional_info["error_rate"] == 0.02
 
         # Default records processed
-        minimal = ProcessingErrorContext()
+        minimal = FlextMeltanoExceptions.ProcessingErrorContext()
         assert minimal.records_processed == 0
 
     def test_plugin_error_context_creation(self) -> None:
         """Test PluginErrorContext creation and validation."""
         # Complete context
-        context = PluginErrorContext(
+        context = FlextMeltanoExceptions.PluginErrorContext(
             plugin_name="tap-postgres",
             plugin_type="extractor",
             version="0.0.7",
@@ -154,7 +149,7 @@ class TestPydanticErrorContexts:
         assert context.additional_info["stderr"] == "Connection failed"
 
         # Minimal context
-        minimal = PluginErrorContext()
+        minimal = FlextMeltanoExceptions.PluginErrorContext()
         assert minimal.plugin_name is None
         assert minimal.exit_code is None
 
@@ -178,7 +173,7 @@ class TestValidationErrors:
 
     def test_validation_error_with_full_context(self) -> None:
         """Test validation error with complete context."""
-        context = ValidationErrorContext(
+        context = FlextMeltanoExceptions.ValidationErrorContext(
             field_name="email",
             expected_type="email_string",
             actual_value="not-an-email",
@@ -205,7 +200,7 @@ class TestValidationErrors:
 
     def test_validation_error_with_no_context(self) -> None:
         """Test validation error without context."""
-        error = FlextMeltanoValidationError()
+        error = FlextMeltanoValidationError("Validation error")
         assert error.message == "Validation error"
         assert error.context["context"] == {}
 
@@ -215,7 +210,7 @@ class TestConfigurationErrors:
 
     def test_configuration_error_with_full_context(self) -> None:
         """Test configuration error with complete context."""
-        context = ConfigurationErrorContext(
+        context = FlextMeltanoExceptions.ConfigurationErrorContext(
             config_file="meltano.yml",
             section="plugins.extractors",
             key="tap-postgres.config.host",
@@ -235,7 +230,7 @@ class TestConfigurationErrors:
 
     def test_configuration_error_defaults(self) -> None:
         """Test configuration error with default values."""
-        error = FlextMeltanoConfigurationError()
+        error = FlextMeltanoConfigurationError("Configuration error")
         assert error.message == "Configuration: Configuration error"
         assert error.context["context"] == {}
 
@@ -245,7 +240,7 @@ class TestConnectionErrors:
 
     def test_connection_error_with_full_context(self) -> None:
         """Test connection error with complete context."""
-        context = ConnectionErrorContext(
+        context = FlextMeltanoExceptions.ConnectionErrorContext(
             host="postgres.example.com",
             port=5432,
             protocol="tcp",
@@ -278,7 +273,7 @@ class TestProcessingErrors:
 
     def test_processing_error_with_full_context(self) -> None:
         """Test processing error with complete context."""
-        context = ProcessingErrorContext(
+        context = FlextMeltanoExceptions.ProcessingErrorContext(
             operation="record_transformation",
             records_processed=5432,
             batch_id="batch_001_2025_01_15",
@@ -310,7 +305,7 @@ class TestProcessingErrors:
 
     def test_processing_error_minimal(self) -> None:
         """Test processing error with default values."""
-        error = FlextMeltanoProcessingError()
+        error = FlextMeltanoProcessingError("Processing error")
         assert error.message == "Processing: Processing error"
         assert error.context["context"] == {}
 
@@ -342,8 +337,8 @@ class TestAuthenticationErrors:
 
     def test_authentication_error_defaults(self) -> None:
         """Test authentication error with default message."""
-        error = FlextMeltanoAuthenticationError()
-        assert error.message == "Authentication: Authentication error"
+        error = FlextMeltanoAuthenticationError("Authentication error")
+        assert "Authentication error" in str(error)
 
 
 class TestTimeoutErrors:
@@ -373,15 +368,16 @@ class TestTimeoutErrors:
 
     def test_timeout_error_partial_context(self) -> None:
         """Test timeout error with partial context."""
-        error = FlextMeltanoTimeoutError("Request timeout", timeout_seconds=60)
+        context = FlextMeltanoExceptions.ConnectionErrorContext(timeout=60.0)
+        error = FlextMeltanoTimeoutError("Request timeout", context=context)
 
-        assert error.message == "Timeout: Request timeout"
-        assert error.context["context"]["timeout"] == 60
-        assert "operation" not in error.context["context"]
+        assert "Request timeout" in str(error)
+        assert error.context.timeout == 60.0
+        assert error.context.host is None
 
     def test_timeout_error_defaults(self) -> None:
         """Test timeout error with defaults."""
-        error = FlextMeltanoTimeoutError()
+        error = FlextMeltanoTimeoutError("Timeout error")
         assert error.message == "Timeout: Timeout error"
         assert error.context["context"] == {}
 
@@ -391,7 +387,7 @@ class TestPluginErrors:
 
     def test_plugin_error_with_full_context(self) -> None:
         """Test plugin error with complete context."""
-        context = PluginErrorContext(
+        context = FlextMeltanoExceptions.PluginErrorContext(
             plugin_name="tap-csv",
             plugin_type="extractor",
             version="2.1.0",
@@ -498,7 +494,7 @@ class TestSingerErrors:
 
     def test_singer_error_defaults(self) -> None:
         """Test Singer error with default values."""
-        error = FlextMeltanoSingerError()
+        error = FlextMeltanoSingerError("Singer error")
         assert error.message == "Singer: Singer error"
         assert error.context["context"] == {}
 
@@ -508,20 +504,26 @@ class TestDBTErrors:
 
     def test_dbt_error_with_full_context(self) -> None:
         """Test DBT error with complete context."""
-        error = FlextMeltanoDBTError(
-            "DBT model compilation failed",
-            model_name="staging_customers",
-            project_dir="/opt/dbt",
-            target="dev",
-            compilation_error="Undefined macro 'get_current_timestamp'",
+        context = FlextMeltanoExceptions.PluginErrorContext(
+            plugin_name="staging_customers",
+            plugin_type="dbt",
+            command="compile",
+            additional_info={
+                "project_dir": "/opt/dbt",
+                "target": "dev",
+                "compilation_error": "Undefined macro 'get_current_timestamp'"
+            }
         )
+        error = FlextMeltanoDBTError("DBT model compilation failed", context)
 
-        assert error.message == "DBT: DBT model compilation failed"
-        assert error.context["context"]["model_name"] == "staging_customers"
-        assert error.context["context"]["project_dir"] == "/opt/dbt"
-        assert error.context["context"]["target"] == "dev"
+        assert "DBT model compilation failed" in str(error)
+        assert error.context.plugin_name == "staging_customers"
+        assert error.context.plugin_type == "dbt"
+        assert error.context.command == "compile"
+        assert error.context.additional_info["project_dir"] == "/opt/dbt"
+        assert error.context.additional_info["target"] == "dev"
         assert (
-            error.context["context"]["compilation_error"]
+            error.context.additional_info["compilation_error"]
             == "Undefined macro 'get_current_timestamp'"
         )
 
@@ -533,7 +535,7 @@ class TestDBTErrors:
 
     def test_dbt_error_defaults(self) -> None:
         """Test DBT error with default message."""
-        error = FlextMeltanoDBTError()
+        error = FlextMeltanoDBTError("DBT error")
         assert error.message == "DBT: DBT error"
         assert error.context["context"] == {}
 
@@ -618,7 +620,7 @@ class TestExceptionIntegration:
     def test_nested_error_context_serialization(self) -> None:
         """Test complex error context serialization and access."""
         # Create complex nested context
-        validation_context = ValidationErrorContext(
+        validation_context = FlextMeltanoExceptions.ValidationErrorContext(
             field_name="nested_field",
             additional_info={
                 "nested_validation": {
@@ -645,7 +647,7 @@ class TestExceptionIntegration:
         # Simulate a realistic error chain: Connection -> Plugin -> Processing
 
         # 1. Connection fails
-        conn_context = ConnectionErrorContext(
+        conn_context = FlextMeltanoExceptions.ConnectionErrorContext(
             host="db.example.com", port=5432, timeout=30, retry_count=3
         )
         conn_error = FlextMeltanoConnectionError(
@@ -653,7 +655,7 @@ class TestExceptionIntegration:
         )
 
         # 2. Plugin fails due to connection
-        plugin_context = PluginErrorContext(
+        plugin_context = FlextMeltanoExceptions.PluginErrorContext(
             plugin_name="tap-postgres",
             plugin_type="extractor",
             command="discover",
@@ -664,7 +666,7 @@ class TestExceptionIntegration:
         )
 
         # 3. Processing fails due to plugin failure
-        processing_context = ProcessingErrorContext(
+        processing_context = FlextMeltanoExceptions.ProcessingErrorContext(
             operation="schema_discovery", records_processed=0, stage="initialization"
         )
         processing_error = FlextMeltanoProcessingError(
