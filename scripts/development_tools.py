@@ -133,7 +133,9 @@ class FlextMeltanoDevelopmentTools:
             if command == "validate":
                 validation_result = cls.validate_project_structure(project_root)
                 if validation_result.success:
-                    return FlextResult.ok(f"Validation results: {validation_result.value}")
+                    return FlextResult.ok(
+                        f"Validation results: {validation_result.value}"
+                    )
                 return FlextResult.fail(validation_result.error or "Validation failed")
 
             if command == "quality":
@@ -167,10 +169,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-
-# =============================================================================
-# PUBLIC API EXPORTS
-# =============================================================================
 
 __all__ = [
     "FlextMeltanoDevelopmentTools",

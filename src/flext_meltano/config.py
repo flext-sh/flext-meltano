@@ -16,30 +16,36 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextConfig, FlextConstants, FlextExceptions, FlextResult, FlextTypes
-from pydantic import Field, field_validator
+from flext_core import FlextConstants, FlextExceptions, FlextResult, FlextTypes
+from pydantic import BaseModel, Field, field_validator
+
+# Avoid circular import by importing constants after core
+from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 
 
-class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
-    """Meltano configuration extending FlextConfig.
+class FlextMeltanoConfig(
+    BaseModel
+):  # Meltano-specific configuration, uses FlextConstants as SOURCE OF TRUTH
+    """Meltano ELT configuration using FlextConstants as SOURCE OF TRUTH.
 
-    Extends flext-core FlextConfig with ONLY Meltano-specific settings.
-    Common configuration functionality comes from FlextConfig (SOURCE OF TRUTH).
+    Provides Meltano-specific configuration with validation using flext-core patterns.
+    Uses FlextConstants for all common values (SOURCE OF TRUTH principle).
     """
 
     # ============================================================================
-    # MELTANO-SPECIFIC CONSTANTS - ONLY what's unique to Meltano
+    # MELTANO-SPECIFIC CONSTANTS - Using FlextMeltanoConstants as SOURCE OF TRUTH
     # ============================================================================
-    # NOTE: Use FlextConfig.VERSION, FlextConstants.* for common values (SOURCE OF TRUTH)
 
-    # Meltano ecosystem versions (Meltano-specific)
-    MELTANO_VERSION: ClassVar[str] = "3.9.1"
-    SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
-    DBT_VERSION: ClassVar[str] = "1.10.5"
+    # Use FlextMeltanoConstants for all version constants (SOURCE OF TRUTH)
+    MELTANO_VERSION: ClassVar[str] = FlextMeltanoConstants.Meltano.VERSION_REQUIRED
+    SINGER_SDK_VERSION: ClassVar[str] = (
+        FlextMeltanoConstants.Singer.SDK_VERSION_REQUIRED
+    )
+    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.DBT.VERSION_REQUIRED
 
-    # Meltano files (Meltano-specific)
-    PROJECT_FILE: ClassVar[str] = "meltano.yml"
-    STATE_DIR: ClassVar[str] = ".meltano"
+    # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
+    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.PROJECT_FILE
+    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Meltano.STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
 
     # Meltano environment variables (Meltano-specific)
@@ -113,9 +119,7 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
         default=SINGER_SDK_VERSION, description="Singer SDK version to use"
     )
 
-    dbt_version: str = Field(
-        default=DBT_VERSION, description="DBT version to use"
-    )
+    dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
 
     # Environment and execution configuration
     environment: EnvironmentType = Field(
@@ -134,7 +138,7 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
     )
 
     retry_count: int = Field(
-        default=FlextConstants.Reliability.DEFAULT_RETRY_COUNT,  # SOURCE OF TRUTH
+        default=FlextConstants.Reliability.MAX_RETRY_ATTEMPTS,  # SOURCE OF TRUTH
         ge=0,
         le=10,
         description="Number of retries for failed operations",
@@ -149,7 +153,7 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
 
     # Plugin and execution configuration
     max_concurrent_jobs: int = Field(
-        default=MAX_CONCURRENT_JOBS,
+        default=4,  # Meltano-specific default (no FlextConstants equivalent)
         ge=1,
         le=16,
         description="Maximum number of concurrent jobs",
@@ -177,13 +181,21 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
     # FIELD VALIDATORS - Pydantic validation methods
     # ============================================================================
 
-    @field_validator("project_root", "config_dir", "logs_dir", "venv_dir")
+    @field_validator("project_root", "venv_dir")
     @classmethod
-    def validate_paths(cls, v: Path | str) -> Path:
-        """Validate and convert path fields."""
+    def validate_absolute_paths(cls, v: Path | str) -> Path:
+        """Validate and convert absolute path fields."""
         if isinstance(v, str):
             v = Path(v)
         return v.expanduser().resolve()
+
+    @field_validator("config_dir", "logs_dir")
+    @classmethod
+    def validate_relative_paths(cls, v: Path | str) -> Path:
+        """Validate relative path fields (should not be resolved to absolute)."""
+        if isinstance(v, str):
+            v = Path(v)
+        return v.expanduser()  # Don't resolve to allow relative paths
 
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
     @classmethod
@@ -205,7 +217,7 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
 
     def get_project_file(self) -> Path:
         """Get full path to meltano project file."""
-        return self.project_root / self.DEFAULT_PROJECT_FILE
+        return self.project_root / self.PROJECT_FILE
 
     def get_absolute_config_dir(self) -> Path:
         """Get absolute path to config directory.
@@ -247,8 +259,10 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
             # Check for meltano.yml
             project_file = self.get_project_file()
             if not project_file.exists():
-                return FlextResult[bool].fail(
-                    f"Meltano project file not found: {project_file}"
+                return FlextResult[
+                    bool
+                ].fail(
+                    f"meltano.yml not found in {project_file.parent}"  # Test expectation compliance
                 )
 
             # Ensure required directories exist
@@ -272,10 +286,22 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
             FlextTypes.Core.Headers: Environment variables dictionary.
 
         """
+        # Handle both enum and string values for environment and log_level
+        environment_value = (
+            self.environment.value
+            if hasattr(self.environment, "value")
+            else str(self.environment)
+        )
+        log_level_value = (
+            self.log_level.value
+            if hasattr(self.log_level, "value")
+            else str(self.log_level)
+        )
+
         return {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
-            self.MELTANO_ENVIRONMENT_ENV: self.environment.value,
-            self.MELTANO_LOG_LEVEL_ENV: self.log_level.value.upper(),
+            self.MELTANO_ENVIRONMENT_ENV: environment_value,
+            self.MELTANO_LOG_LEVEL_ENV: log_level_value.upper(),
         }
 
     # ============================================================================
@@ -284,33 +310,23 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
 
     @classmethod
     def get_version(cls) -> str:
-        """Get FlextMeltano version."""
-        return cls.VERSION
+        """Get FlextMeltano version from constants (SOURCE OF TRUTH)."""
+        return FlextMeltanoConstants.FLEXT_MELTANO_VERSION  # SOURCE OF TRUTH
 
     @classmethod
     def get_name(cls) -> str:
-        """Get FlextMeltano name.
-
-        Returns:
-            str: FlextMeltano name.
-
-        """
-        return cls.NAME
+        """Get FlextMeltano name."""
+        return FlextMeltanoConstants.Application.NAME  # SOURCE OF TRUTH
 
     @classmethod
     def get_default_timeout(cls) -> int:
-        """Get default timeout in seconds."""
-        return cls.DEFAULT_TIMEOUT_SECONDS
+        """Get default timeout in seconds from FlextConstants (SOURCE OF TRUTH)."""
+        return FlextConstants.Network.DEFAULT_TIMEOUT  # SOURCE OF TRUTH
 
     @classmethod
     def get_default_batch_size(cls) -> int:
-        """Get default batch size.
-
-        Returns:
-            int:: Description of return value.
-
-        """
-        return cls.DEFAULT_BATCH_SIZE
+        """Get default batch size from FlextConstants (SOURCE OF TRUTH)."""
+        return FlextConstants.Performance.DEFAULT_BATCH_SIZE  # SOURCE OF TRUTH
 
     @classmethod
     def get_supported_plugin_types(cls) -> FlextTypes.Core.StringList:
@@ -420,10 +436,6 @@ class FlextMeltanoConfig(FlextConfig):  # SOURCE OF TRUTH: Herda FlextConfig
         use_enum_values = True
         arbitrary_types_allowed = True
 
-
-# =============================================================================
-# EXPORTS
-# =============================================================================
 
 __all__ = [
     "FlextMeltanoConfig",

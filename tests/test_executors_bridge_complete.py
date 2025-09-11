@@ -452,8 +452,8 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_internal_methods_for_coverage(self) -> None:
         """Test internal methods to achieve higher coverage."""
-        # Test _create_temp_project internal method
-        temp_project_result = self.bridge._create_temp_project()
+        # Test adapter _create_temporary_meltano_project method directly (no wrappers)
+        temp_project_result = self.bridge.adapter._create_temporary_meltano_project()
         assert isinstance(temp_project_result, FlextResult)
         # May succeed or fail depending on adapter implementation
 

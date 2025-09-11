@@ -1,4 +1,7 @@
-"""FLEXT Meltano Validators - Extending FlextUtilities.
+"""FLEXT Meltano Validators - DOMAIN-SPECIFIC Meltano business rules using flext-core.
+
+This module provides ONLY Meltano/Singer/DBT-specific business rule validations that cannot
+be generalized to flext-core. ALL generic validation operations MUST use FlextValidations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,181 +9,171 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import TypeVar, cast
-
-from flext_core import (
-    FlextLogger,
-    FlextResult,
-    FlextUtilities,
-)
+from flext_core import FlextLogger, FlextResult, FlextValidations
 from pydantic import BaseModel, Field, field_validator
 
-# Type variables
-T = TypeVar("T")
+from flext_meltano.constants import FlextMeltanoConstants
 
 logger = FlextLogger(__name__)
 
-# Constants to avoid FBT003 violations
 
-# =============================================================================
-# FLEXT MELTANO VALIDATORS - EXTENDING FlextUtilities (ZERO DUPLICATION)
-# =============================================================================
+class FlextMeltanoValidators:
+    """DOMAIN-SPECIFIC Meltano business rule validators using FlextValidations foundation.
 
+    ZERO DUPLICATION PRINCIPLE:
+    - Uses FlextValidations.Core for ALL generic validation operations
+    - Contains ONLY Meltano/Singer/DBT business rule validations
+    - NO generic validation logic - delegate to flext-core
+    """
 
-class FlextMeltanoValidators(FlextUtilities):
-    """FLEXT Meltano Validators extending FlextUtilities with Meltano-specific validation."""
+    @classmethod
+    def validate_meltano_plugin_business_rules(
+        cls, config: object
+    ) -> FlextResult[bool]:
+        """Validate MELTANO-SPECIFIC plugin business rules."""
+        # Delegate generic dict validation to flext-core
+        dict_result = FlextValidations.Core.TypeValidators.validate_dict(config)
+        if dict_result.is_failure:
+            return FlextResult[bool].fail(
+                f"Plugin config validation failed: {dict_result.error}"
+            )
+
+        config_dict = dict_result.unwrap()
+
+        # DOMAIN-SPECIFIC: Meltano plugin business rules
+        class MeltanoPluginBusinessRules(BaseModel):
+            name: str = Field(min_length=1, description="Plugin name required")
+            namespace: str = Field(description="Plugin namespace (optional)")
+            pip_url: str = Field(description="Plugin pip URL (optional)")
+            executable: str = Field(description="Plugin executable (optional)")
+
+            @field_validator("name")
+            @classmethod
+            def validate_plugin_name_business_rules(cls, v: str) -> str:
+                """MELTANO-SPECIFIC: Plugin name business rules."""
+                if not v or not v.strip():
+                    msg = "Plugin name cannot be empty"
+                    raise ValueError(msg)
+                # Meltano business rule: names with special prefixes
+                if (
+                    v.startswith("target-")
+                    and len(v)
+                    < FlextMeltanoConstants.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+                ):
+                    msg = "Target plugin names must be at least 8 characters"
+                    raise ValueError(msg)
+                if (
+                    v.startswith("tap-")
+                    and len(v) < FlextMeltanoConstants.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+                ):
+                    msg = "Tap plugin names must be at least 5 characters"
+                    raise ValueError(msg)
+                return v
+
+        # Delegate Pydantic validation to flext-core
+        return FlextValidations.Core.validate_with_pydantic_schema(
+            config_dict, MeltanoPluginBusinessRules
+        ).map(lambda _: True)
+
+    @classmethod
+    def validate_meltano_project_business_rules(
+        cls, config: object
+    ) -> FlextResult[bool]:
+        """Validate MELTANO-SPECIFIC project business rules."""
+        # Delegate generic dict validation to flext-core
+        dict_result = FlextValidations.Core.TypeValidators.validate_dict(config)
+        if dict_result.is_failure:
+            return FlextResult[bool].fail(
+                f"Project config validation failed: {dict_result.error}"
+            )
+
+        config_dict = dict_result.unwrap()
+
+        # DOMAIN-SPECIFIC: Meltano project business rules
+        class MeltanoProjectBusinessRules(BaseModel):
+            version: int = Field(
+                ge=1, le=1, description="Meltano supports only version 1"
+            )
+            project_id: str = Field(min_length=1, description="Project ID required")
+
+            @field_validator("project_id")
+            @classmethod
+            def validate_project_id_business_rules(cls, v: str) -> str:
+                """MELTANO-SPECIFIC: Project ID business rules."""
+                if not v.strip():
+                    msg = "Project ID cannot be empty or whitespace"
+                    raise ValueError(msg)
+                # Meltano business rule: project ID format restrictions
+                if " " in v:
+                    msg = "Project ID cannot contain spaces"
+                    raise ValueError(msg)
+                if not v.replace("-", "").replace("_", "").isalnum():
+                    msg = "Project ID can only contain letters, numbers, hyphens, and underscores"
+                    raise ValueError(msg)
+                return v
+
+        # Delegate Pydantic validation to flext-core
+        return FlextValidations.Core.validate_with_pydantic_schema(
+            config_dict, MeltanoProjectBusinessRules
+        ).map(lambda _: True)
+
+    @classmethod
+    def validate_dbt_business_rules(cls, config: object) -> FlextResult[bool]:
+        """Validate DBT-SPECIFIC business rules."""
+        # Delegate generic dict validation to flext-core
+        dict_result = FlextValidations.Core.TypeValidators.validate_dict(config)
+        if dict_result.is_failure:
+            return FlextResult[bool].fail(
+                f"DBT config validation failed: {dict_result.error}"
+            )
+
+        config_dict = dict_result.unwrap()
+
+        # DOMAIN-SPECIFIC: DBT business rules
+        class DbtBusinessRules(BaseModel):
+            name: str = Field(min_length=1, description="DBT project name required")
+            version: str = Field(
+                min_length=1, description="DBT project version required"
+            )
+
+            @field_validator("name")
+            @classmethod
+            def validate_dbt_name_business_rules(cls, v: str) -> str:
+                """DBT-SPECIFIC: DBT project name business rules."""
+                if not v or not v.strip():
+                    msg = "DBT project name cannot be empty"
+                    raise ValueError(msg)
+                # DBT business rule: no spaces in project names
+                if " " in v:
+                    msg = "DBT project names cannot contain spaces"
+                    raise ValueError(msg)
+                return v
+
+        # Delegate Pydantic validation to flext-core
+        return FlextValidations.Core.validate_with_pydantic_schema(
+            config_dict, DbtBusinessRules
+        ).map(lambda _: True)
 
     # =================================================================
-    # MELTANO-SPECIFIC VALIDATORS (Only what's NOT in FlextUtilities)
+    # COMPATIBILITY ALIASES - For existing tests ONLY
     # =================================================================
 
     @classmethod
     def validate_plugin_config(cls, config: object) -> FlextResult[bool]:
-        """Valida plugin config usando Pydantic validation."""
-        try:
-
-            class PluginConfigSchema(BaseModel):
-                name: str = Field(min_length=1)
-                namespace: str = Field(min_length=1)
-                pip_url: str = Field(min_length=1)
-                executable: str = Field(min_length=1)
-
-            # Validate using Pydantic - automatic type and constraint validation
-            if isinstance(config, dict):
-                PluginConfigSchema(**config)
-                return FlextResult[bool].ok(data=True)
-            return FlextResult[bool].fail("Config must be a dictionary")
-        except Exception as e:
-            return FlextResult[bool].fail(f"Plugin config validation failed: {e}")
+        """DEPRECATED: Use validate_meltano_plugin_business_rules instead."""
+        return cls.validate_meltano_plugin_business_rules(config)
 
     @classmethod
     def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
-        """Valida Meltano config usando Pydantic validation.
-
-        Returns:
-            FlextResult[bool]: Meltano config validation result.
-
-        """
-        try:
-
-            class MeltanoConfigSchema(BaseModel):
-                version: int = Field(ge=1, le=1)  # Must be exactly version 1
-                project_id: str = Field(min_length=1)
-
-                @field_validator("project_id")
-                @classmethod
-                def validate_project_id(cls, v: str) -> str:
-                    if not v.strip():
-                        msg = "Project ID cannot be empty or whitespace"
-                        raise ValueError(msg)
-                    return v
-
-            # Validate using Pydantic
-            if isinstance(config, dict):
-                MeltanoConfigSchema(**config)
-                return FlextResult[bool].ok(data=True)
-            return FlextResult[bool].fail("Config must be a dictionary")
-        except Exception as e:
-            return FlextResult[bool].fail(f"Meltano config validation failed: {e}")
+        """DEPRECATED: Use validate_meltano_project_business_rules instead."""
+        return cls.validate_meltano_project_business_rules(config)
 
     @classmethod
     def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
-        """Valida DBT config usando Pydantic validation."""
-        try:
-
-            class DbtConfigSchema(BaseModel):
-                name: str = Field(min_length=1)
-                version: str = Field(min_length=1)
-
-            # Validate using Pydantic
-            if isinstance(config, dict):
-                DbtConfigSchema(**config)
-                return FlextResult[bool].ok(data=True)
-            return FlextResult[bool].fail("Config must be a dictionary")
-        except Exception as e:
-            return FlextResult[bool].fail(f"DBT config validation failed: {e}")
-
-    # =================================================================
-    # PATH VALIDATION (Meltano-specific extensions of FlextUtilities)
-    # =================================================================
-
-    @classmethod
-    def validate_directory_path(cls, path: str | Path | None) -> str | None:
-        """Valida diretório usando validação real de sistema de arquivos."""
-        if path is None:
-            return None
-
-        try:
-            path_obj = Path(path)
-            # Validate that path exists and is a directory
-            if path_obj.exists() and path_obj.is_dir():
-                return str(path_obj.absolute())
-            return None
-        except Exception:
-            return None
-
-    @classmethod
-    def validate_file_path(cls, path: str | Path | None) -> str | None:
-        """Valida arquivo usando validação real de sistema de arquivos."""
-        if path is None:
-            return None
-
-        try:
-            path_obj = Path(path)
-            # Validate that path exists and is a file
-            if path_obj.exists() and path_obj.is_file():
-                return str(path_obj.absolute())
-            return None
-        except Exception:
-            return None
-
-    @classmethod
-    def validate_config_value_simple(
-        cls, value: object, expected_type: type[T], *, required: bool = True
-    ) -> FlextResult[T | None]:
-        """Valida config usando type conversion real."""
-        try:
-            if value is None:
-                return (
-                    FlextResult[T | None].ok(None)
-                    if not required
-                    else FlextResult[T | None].fail("Required value is None")
-                )
-
-            # Attempt type conversion with proper casting
-            if expected_type is bool and isinstance(value, str):
-                # Handle string to bool conversion
-                bool_value: bool = value.lower() in {"true", "1", "yes", "on"}
-                return FlextResult[T | None].ok(cast("T", bool_value))
-
-            # Standard type conversion - handle constructor pattern for common types
-            if expected_type is str:
-                str_result = str(value)
-                return FlextResult[T | None].ok(cast("T", str_result))
-            if expected_type is int:
-                int_result = (
-                    int(value) if isinstance(value, (int, str)) else int(str(value))
-                )
-                return FlextResult[T | None].ok(cast("T", int_result))
-            if expected_type is float:
-                float_result = (
-                    float(value)
-                    if isinstance(value, (int, float, str))
-                    else float(str(value))
-                )
-                return FlextResult[T | None].ok(cast("T", float_result))
-            if expected_type is bool:
-                bool_result = bool(value)
-                return FlextResult[T | None].ok(cast("T", bool_result))
-
-            # For other types, return failure
-            return FlextResult[T | None].fail(f"Cannot convert to {expected_type}")
-        except Exception as e:
-            return FlextResult[T | None].fail(f"Type conversion failed: {e}")
+        """DEPRECATED: Use validate_dbt_business_rules instead."""
+        return cls.validate_dbt_business_rules(config)
 
 
 __all__ = [
-    # Main class only - no helper functions
     "FlextMeltanoValidators",
 ]

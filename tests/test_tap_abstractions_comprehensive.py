@@ -18,20 +18,15 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from flext_core import FlextResult, FlextServices, FlextTypes, FlextUtilities
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 from pydantic import ValidationError
 
-from flext_meltano.tap_abstractions import (
-    FlextTapAbstractions,
-    StreamDefinition,
-    TapConfig,
-    TapInstance,
-)
+from flext_meltano.tap_abstractions import FlextTapAbstractions
 
 
 class TestTapConfigComprehensive:
-    """Comprehensive tests for TapConfig Pydantic model."""
+    """Comprehensive tests for FlextTapAbstractions.TapConfig Pydantic model."""
 
     def setup_method(self) -> None:
         """Setup for each test."""
@@ -63,7 +58,7 @@ class TestTapConfigComprehensive:
             "version": "1.2.3",
         }
 
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type=str(config_data["tap_type"]),
             connection_config=cast(
                 "FlextTypes.Core.Dict", config_data["connection_config"]
@@ -75,7 +70,6 @@ class TestTapConfigComprehensive:
         assert config.tap_type == "tap-postgres"
         assert config.connection_config["host"] == "localhost"
 
-        # Type-safe nested dict access
         users_stream = config.stream_config.get("users")
         assert users_stream is not None
         users_config = cast("FlextTypes.Core.Dict", users_stream)
@@ -85,7 +79,7 @@ class TestTapConfigComprehensive:
 
     def test_tap_config_defaults(self) -> None:
         """Test default values for tap configuration."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-csv",
             connection_config={"files": [{"path": str(self.temp_dir / "test.csv")}]},
         )
@@ -103,7 +97,7 @@ class TestTapConfigComprehensive:
             "another_extra": 123,
         }
 
-        config = TapConfig(**config_dict)
+        config = FlextTapAbstractions.TapConfig(**config_dict)
 
         assert config.tap_type == "tap-mysql"
 
@@ -116,11 +110,15 @@ class TestTapConfigComprehensive:
         """Test validation of required fields."""
         # Missing tap_type
         with pytest.raises(ValidationError):
-            TapConfig(tap_type="", connection_config={"host": "localhost"})
+            FlextTapAbstractions.TapConfig(
+                tap_type="", connection_config={"host": "localhost"}
+            )
 
         # Missing connection_config
         with pytest.raises(ValidationError):
-            TapConfig(tap_type="tap-postgres", connection_config={})
+            FlextTapAbstractions.TapConfig(
+                tap_type="tap-postgres", connection_config={}
+            )
 
     @pytest.mark.parametrize(
         ("tap_type", "expected_type"),
@@ -136,12 +134,14 @@ class TestTapConfigComprehensive:
         self, tap_type: str, expected_type: str
     ) -> None:
         """Test tap configuration with various tap types."""
-        config = TapConfig(tap_type=tap_type, connection_config={"host": "localhost"})
+        config = FlextTapAbstractions.TapConfig(
+            tap_type=tap_type, connection_config={"host": "localhost"}
+        )
         assert config.tap_type == expected_type
 
 
 class TestStreamDefinitionComprehensive:
-    """Comprehensive tests for StreamDefinition Pydantic model."""
+    """Comprehensive tests for FlextTapAbstractions.StreamDefinition Pydantic model."""
 
     def test_stream_definition_valid_creation(self) -> None:
         """Test creating valid stream definition."""
@@ -159,7 +159,9 @@ class TestStreamDefinitionComprehensive:
             "tap_type": "tap-postgres",
         }
 
-        stream = StreamDefinition(**cast("dict[str, object]", stream_data))
+        stream = FlextTapAbstractions.StreamDefinition(
+            **cast("dict[str, object]", stream_data)
+        )
         assert stream.stream_name == "users"
         assert stream.stream_schema["type"] == "object"
         assert stream.tap_type == "tap-postgres"
@@ -168,7 +170,7 @@ class TestStreamDefinitionComprehensive:
 
     def test_stream_definition_defaults(self) -> None:
         """Test default values for stream definition."""
-        stream = StreamDefinition(
+        stream = FlextTapAbstractions.StreamDefinition(
             stream_name="orders",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             tap_type="tap-mysql",
@@ -178,7 +180,7 @@ class TestStreamDefinitionComprehensive:
 
     def test_stream_definition_with_status_updates(self) -> None:
         """Test stream definition with various status updates."""
-        stream = StreamDefinition(
+        stream = FlextTapAbstractions.StreamDefinition(
             stream_name="products",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             tap_type="tap-postgres",
@@ -193,7 +195,7 @@ class TestStreamDefinitionComprehensive:
     )
     def test_stream_definition_parametrized_statuses(self, status: str) -> None:
         """Test stream definition with various statuses."""
-        stream = StreamDefinition(
+        stream = FlextTapAbstractions.StreamDefinition(
             stream_name="test_stream",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             tap_type="tap-test",
@@ -203,7 +205,7 @@ class TestStreamDefinitionComprehensive:
 
 
 class TestTapInstanceComprehensive:
-    """Comprehensive tests for TapInstance Pydantic model."""
+    """Comprehensive tests for FlextTapAbstractions.TapInstance Pydantic model."""
 
     def setup_method(self) -> None:
         """Setup for each test."""
@@ -216,7 +218,7 @@ class TestTapInstanceComprehensive:
 
     def test_tap_instance_valid_creation(self) -> None:
         """Test creating valid tap instance."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost", "port": 5432, "database": "test"},
         )
@@ -227,7 +229,9 @@ class TestTapInstanceComprehensive:
             "tap_id": "tap_postgres_001",
         }
 
-        instance = TapInstance(**cast("dict[str, object]", instance_data))
+        instance = FlextTapAbstractions.TapInstance(
+            **cast("dict[str, object]", instance_data)
+        )
         assert instance.tap_type == "tap-postgres"
         assert instance.config.tap_type == "tap-postgres"
         assert instance.tap_id == "tap_postgres_001"
@@ -237,18 +241,18 @@ class TestTapInstanceComprehensive:
 
     def test_tap_instance_with_streams(self) -> None:
         """Test tap instance with discovered streams."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-csv",
             connection_config={"files": [{"path": str(self.temp_dir / "test.csv")}]},
         )
 
-        users_stream = StreamDefinition(
+        users_stream = FlextTapAbstractions.StreamDefinition(
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             tap_type="tap-csv",
         )
 
-        instance = TapInstance(
+        instance = FlextTapAbstractions.TapInstance(
             tap_type="tap-csv",
             config=config,
             tap_id="tap_csv_001",
@@ -264,11 +268,11 @@ class TestTapInstanceComprehensive:
 
     def test_tap_instance_metadata_handling(self) -> None:
         """Test tap instance with metadata."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-oracle", connection_config={"host": "oracle.example.com"}
         )
 
-        instance = TapInstance(
+        instance = FlextTapAbstractions.TapInstance(
             tap_type="tap-oracle",
             config=config,
             tap_id="tap_oracle_001",
@@ -303,20 +307,20 @@ class TestFlextTapAbstractionsComprehensive:
         assert tap_abs is not None
         assert hasattr(tap_abs, "process")  # Should have ServiceProcessor methods
 
-    def test_tap_abstractions_service_processor_inheritance(self) -> None:
-        """Test that FlextTapAbstractions properly inherits from ServiceProcessor."""
-        assert isinstance(self.tap_abstractions, FlextServices.ServiceProcessor)
-
-        # Should have ServiceProcessor methods
+    def test_tap_abstractions_unified_functionality(self) -> None:
+        """Test that FlextTapAbstractions has unified tap functionality."""
+        # Check for core tap processing methods (current architecture)
         assert hasattr(self.tap_abstractions, "process")
-        assert hasattr(self.tap_abstractions, "build")
-        assert hasattr(self.tap_abstractions, "get_service_name")
-        assert hasattr(self.tap_abstractions, "is_valid")
-        assert hasattr(self.tap_abstractions, "validate_required_fields")
+        assert hasattr(self.tap_abstractions, "validate_tap_instance")
+        assert hasattr(self.tap_abstractions, "list_streams")
+        assert hasattr(self.tap_abstractions, "get_tap_type")
+
+        # Verify the process method works correctly
+        assert callable(self.tap_abstractions.process)
 
     def test_process_tap_config_basic(self) -> None:
         """Test processing basic tap configuration."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-csv",
             connection_config={"files": [{"path": str(self.temp_dir / "test.csv")}]},
         )
@@ -325,13 +329,13 @@ class TestFlextTapAbstractionsComprehensive:
         FlextTestsMatchers.assert_result_success(result)
 
         tap_instance = result.value
-        assert isinstance(tap_instance, TapInstance)
+        assert isinstance(tap_instance, FlextTapAbstractions.TapInstance)
         assert tap_instance.tap_type == "tap-csv"
         assert tap_instance.config.tap_type == "tap-csv"
 
     def test_process_tap_config_postgres(self) -> None:
         """Test processing PostgreSQL tap configuration."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-postgres",
             connection_config={
                 "host": "localhost",
@@ -355,13 +359,13 @@ class TestFlextTapAbstractionsComprehensive:
         assert "users" in tap_instance.config.stream_config
 
     def test_build_tap_output_basic(self) -> None:
-        """Test building tap output from TapInstance."""
-        config = TapConfig(
+        """Test building tap output from FlextTapAbstractions.TapInstance."""
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-mysql",
             connection_config={"host": "mysql.example.com", "port": 3306},
         )
 
-        tap_instance = TapInstance(
+        tap_instance = FlextTapAbstractions.TapInstance(
             tap_type="tap-mysql", config=config, tap_id="tap_mysql_001", status="ready"
         )
 
@@ -377,19 +381,19 @@ class TestFlextTapAbstractionsComprehensive:
 
     def test_build_tap_output_with_streams(self) -> None:
         """Test building tap output with discovered streams."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-snowflake",
             connection_config={"account": "test", "warehouse": "compute"},
         )
 
-        users_stream = StreamDefinition(
+        users_stream = FlextTapAbstractions.StreamDefinition(
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             tap_type="tap-snowflake",
             status="discovered",
         )
 
-        orders_stream = StreamDefinition(
+        orders_stream = FlextTapAbstractions.StreamDefinition(
             stream_name="orders",
             stream_schema={
                 "type": "object",
@@ -399,7 +403,7 @@ class TestFlextTapAbstractionsComprehensive:
             status="discovered",
         )
 
-        tap_instance = TapInstance(
+        tap_instance = FlextTapAbstractions.TapInstance(
             tap_type="tap-snowflake",
             config=config,
             tap_id="tap_snowflake_001",
@@ -416,8 +420,8 @@ class TestFlextTapAbstractionsComprehensive:
         assert result["streams_count"] == 2
 
     def test_validate_business_rules_success(self) -> None:
-        """Test validation using TapConfig Pydantic validation."""
-        # TapConfig uses Pydantic validation - test that valid config creates successfully
+        """Test validation using FlextTapAbstractions.TapConfig Pydantic validation."""
+        # FlextTapAbstractions.TapConfig uses Pydantic validation - test that valid config creates successfully
         # Create a secure temporary file for testing
         with tempfile.NamedTemporaryFile(
             encoding="utf-8", mode="w", suffix=".csv", delete=False
@@ -426,7 +430,7 @@ class TestFlextTapAbstractionsComprehensive:
             temp_file_path = temp_file.name
 
         try:
-            config = TapConfig(
+            config = FlextTapAbstractions.TapConfig(
                 tap_type="tap-csv",
                 connection_config={"file_path": temp_file_path},
                 stream_config={},
@@ -443,9 +447,11 @@ class TestFlextTapAbstractionsComprehensive:
 
         except Exception as e:
             # If creation fails, validation failed
-            result = FlextResult[None].fail(f"TapConfig validation failed: {e}")
+            result = FlextResult[None].fail(
+                f"FlextTapAbstractions.TapConfig validation failed: {e}"
+            )
             FlextTestsMatchers.assert_result_failure(
-                result, f"TapConfig validation failed: {e}"
+                result, f"FlextTapAbstractions.TapConfig validation failed: {e}"
             )
         finally:
             # Clean up temporary file using Path
@@ -475,8 +481,10 @@ class TestFlextTapAbstractionsComprehensive:
             "records_extracted": 0,
         }
 
-        # Create StreamDefinition from generated data
-        stream = StreamDefinition(**cast("dict[str, object]", stream_data))
+        # Create FlextTapAbstractions.StreamDefinition from generated data
+        stream = FlextTapAbstractions.StreamDefinition(
+            **cast("dict[str, object]", stream_data)
+        )
         assert stream.stream_name == "products"
         assert stream.tap_type == "tap-postgres"
         schema_properties = cast(
@@ -509,7 +517,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         if not os.getenv("ORACLE_HOST"):
             pytest.skip("Oracle container not available - set ORACLE_HOST to run")
 
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-oracle", connection_config=self.oracle_config, version="1.0.0"
         )
 
@@ -528,10 +536,14 @@ class TestFlextTapAbstractionsOracleIntegration:
         if not os.getenv("ORACLE_HOST"):
             pytest.skip("Oracle container not available - set ORACLE_HOST to run")
 
-        config = TapConfig(tap_type="tap-oracle", connection_config=self.oracle_config)
+        config = FlextTapAbstractions.TapConfig(
+            tap_type="tap-oracle", connection_config=self.oracle_config
+        )
 
-        # Create config and process it to get TapInstance
-        config = TapConfig(tap_type="tap-oracle", connection_config=self.oracle_config)
+        # Create config and process it to get FlextTapAbstractions.TapInstance
+        config = FlextTapAbstractions.TapConfig(
+            tap_type="tap-oracle", connection_config=self.oracle_config
+        )
 
         result = self.tap_abstractions.process(config)
         FlextTestsMatchers.assert_result_success(result)
@@ -547,7 +559,9 @@ class TestFlextTapAbstractionsOracleIntegration:
         # If connection succeeds, verify stream structure
         if streams_result.is_success:
             streams = streams_result.value
-            assert isinstance(streams, list)  # Should be list of StreamDefinition
+            assert isinstance(
+                streams, list
+            )  # Should be list of FlextTapAbstractions.StreamDefinition
             if len(streams) > 0:
                 assert hasattr(streams[0], "stream_name")
 
@@ -556,7 +570,9 @@ class TestFlextTapAbstractionsOracleIntegration:
         if not os.getenv("ORACLE_HOST"):
             pytest.skip("Oracle container not available - set ORACLE_HOST to run")
 
-        TapConfig(tap_type="tap-oracle", connection_config=self.oracle_config)
+        FlextTapAbstractions.TapConfig(
+            tap_type="tap-oracle", connection_config=self.oracle_config
+        )
 
         # Performance test: measure tap creation time
         profiler = FlextTestsPerformance.PerformanceProfiler()
@@ -587,7 +603,9 @@ class TestFlextTapAbstractionsOracleIntegration:
             {"table_name": "HR.JOBS", "schema": "HR"},
         ]
 
-        config = TapConfig(tap_type="tap-oracle", connection_config=oracle_config)
+        config = FlextTapAbstractions.TapConfig(
+            tap_type="tap-oracle", connection_config=oracle_config
+        )
 
         # Process configuration
         result = self.tap_abstractions.process(config)
@@ -613,7 +631,9 @@ class TestFlextTapAbstractionsOracleIntegration:
             "password": "invalid_pass",
         }
 
-        config = TapConfig(tap_type="tap-oracle", connection_config=invalid_config)
+        config = FlextTapAbstractions.TapConfig(
+            tap_type="tap-oracle", connection_config=invalid_config
+        )
 
         # Process with invalid config - should handle errors gracefully
         result = self.tap_abstractions.process(config)
@@ -639,7 +659,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         }
 
         try:
-            invalid_config = TapConfig(**invalid_config_data)
+            invalid_config = FlextTapAbstractions.TapConfig(**invalid_config_data)
             # If it doesn't raise an error, test the processing
             result = self.tap_abstractions.process(invalid_config)
             # Should handle gracefully
@@ -651,8 +671,10 @@ class TestFlextTapAbstractionsOracleIntegration:
     def test_tap_abstractions_concurrent_processing(self) -> None:
         """Test concurrent tap processing doesn't interfere."""
 
-        def create_and_process_tap(tap_num: int) -> FlextResult[TapInstance]:
-            config = TapConfig(
+        def create_and_process_tap(
+            tap_num: int,
+        ) -> FlextResult[FlextTapAbstractions.TapInstance]:
+            config = FlextTapAbstractions.TapConfig(
                 tap_type=f"tap-test-{tap_num}",
                 connection_config={"host": f"test{tap_num}.example.com"},
             )
@@ -668,13 +690,13 @@ class TestFlextTapAbstractionsOracleIntegration:
         # All should succeed
         for result in results:
             FlextTestsMatchers.assert_result_success(result)
-            assert isinstance(result.value, TapInstance)
+            assert isinstance(result.value, FlextTapAbstractions.TapInstance)
 
     def test_tap_abstractions_performance(
         self, benchmark: Callable[[Callable[[], object]], object]
     ) -> None:
         """Test tap abstractions performance using pytest-benchmark."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-performance-test",
             connection_config={"host": "perf.example.com"},
         )
@@ -688,7 +710,7 @@ class TestFlextTapAbstractionsOracleIntegration:
     def test_complex_tap_workflow_integration(self) -> None:
         """Test complex workflow integrating multiple tap operations."""
         # Create comprehensive tap configuration
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-postgres",
             connection_config={
                 "host": "integration.db.com",
@@ -725,7 +747,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         tap_instance = process_result.value
 
         # Add discovered streams
-        users_stream = StreamDefinition(
+        users_stream = FlextTapAbstractions.StreamDefinition(
             stream_name="users",
             stream_schema={
                 "type": "object",
@@ -742,7 +764,7 @@ class TestFlextTapAbstractionsOracleIntegration:
             records_extracted=0,
         )
 
-        orders_stream = StreamDefinition(
+        orders_stream = FlextTapAbstractions.StreamDefinition(
             stream_name="orders",
             stream_schema={
                 "type": "object",
@@ -791,7 +813,9 @@ class TestFlextTapAbstractionsOracleIntegration:
         self, tap_type: str, connection_config: FlextTypes.Core.Dict
     ) -> None:
         """Test tap abstractions with various tap types."""
-        config = TapConfig(tap_type=tap_type, connection_config=connection_config)
+        config = FlextTapAbstractions.TapConfig(
+            tap_type=tap_type, connection_config=connection_config
+        )
 
         result = self.tap_abstractions.process(config)
         FlextTestsMatchers.assert_result_success(result)
@@ -812,7 +836,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         assert isinstance(safe_name, str)
 
         # Create config with processed values
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type=safe_name, connection_config={"host": "localhost"}, version="1.0.0"
         )
 
@@ -825,7 +849,7 @@ class TestFlextTapAbstractionsOracleIntegration:
 
     def test_tap_abstractions_large_scale_streams(self) -> None:
         """Test handling large numbers of streams efficiently."""
-        config = TapConfig(
+        config = FlextTapAbstractions.TapConfig(
             tap_type="tap-large-db", connection_config={"host": "large.db.com"}
         )
 
@@ -837,7 +861,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         # Create large number of stream definitions
         streams = {}
         for i in range(100):  # 100 streams
-            stream = StreamDefinition(
+            stream = FlextTapAbstractions.StreamDefinition(
                 stream_name=f"table_{i:03d}",
                 stream_schema={
                     "type": "object",

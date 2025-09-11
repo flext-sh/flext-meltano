@@ -47,7 +47,7 @@ class TestFlextSingerTypesComplete:
         )
 
     # =========================================================================
-    # TYPE CREATION METHODS TESTING - Comprehensive coverage for lines 49-143
+
     # =========================================================================
 
     def test_create_string_type_success(self) -> None:

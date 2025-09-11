@@ -1,10 +1,7 @@
-"""FLEXT Meltano File Managers - Real file operations without wrappers.
+"""FLEXT Meltano File Managers - DOMAIN-SPECIFIC file operations using flext-core as SOURCE OF TRUTH.
 
-This module provides file management operations using direct pathlib and yaml
-implementations following flext-core single-class-per-module pattern.
-
-ELIMINATES: FlextUtilities wrapper dependencies
-USES: Direct pathlib, yaml, and tempfile operations for production code
+This module provides ONLY Meltano-specific file operations that cannot be generalized.
+ALL general file operations MUST use FlextUtilities from flext-core directly.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -15,7 +12,9 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import FlextLogger, FlextResult, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+
+from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 
 # Type aliases (MyPy compatible)
 ConfigDict = dict[
@@ -31,18 +30,52 @@ logger = FlextLogger(__name__)
 
 
 class FlextMeltanoFileManagers:
-    """FLEXT Meltano File Managers using direct implementation - NO wrappers.
+    """DOMAIN-SPECIFIC Meltano file managers using flext-core as SOURCE OF TRUTH.
 
-    ELIMINATED PATTERNS:
-    - FlextUtilities.FileOps wrapper dependencies
-    - Abstract method calls to non-existent utilities
-    - Complex error handling chains
+    Contains ONLY Meltano-specific file operations that cannot be generalized to flext-core.
+    ALL general file operations MUST use FlextUtilities from flext-core directly.
 
-    DIRECT IMPLEMENTATIONS:
-    - pathlib for file system operations
-    - yaml for configuration handling
-    - tempfile for temporary directory management
+    ZERO DUPLICATION PRINCIPLE:
+    - FlextUtilities.Files is SOURCE OF TRUTH for general file operations
+    - Contains ONLY Meltano-specific operations (YAML configs, project structure)
+    - Uses tempfile standard library with FlextUtilities validation
     """
+
+    @classmethod
+    def create_temp_directory(
+        cls, prefix: str = "flext_meltano_", *, meltano_structure: bool = False
+    ) -> FlextResult[Path]:
+        """Create temporary directory with optional Meltano structure.
+
+        CONSOLIDATED: Single method for temp directory creation with optional Meltano-specific structure.
+        ZERO DUPLICATION: Uses tempfile standard library + FlextUtilities validation.
+        """
+        try:
+            # Use Python tempfile standard library for temp directory creation
+            temp_dir_str = tempfile.mkdtemp(prefix=prefix)
+            temp_dir = Path(temp_dir_str)
+
+            # Delegate to FlextUtilities.EnvironmentUtils for path validation - NO DUPLICATION
+            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(temp_dir)):
+                return FlextResult[Path].fail(
+                    f"Invalid temp directory path: {temp_dir}"
+                )
+
+            # Add MELTANO-SPECIFIC directory structure if requested (DOMAIN-SPECIFIC)
+            if meltano_structure:
+                meltano_dirs = [".meltano", "extract", "load", "transform"]
+                for dir_name in meltano_dirs:
+                    (temp_dir / dir_name).mkdir(exist_ok=True)
+
+            logger.info(
+                "Created temp directory",
+                extra={"path": str(temp_dir), "meltano_structure": meltano_structure},
+            )
+            return FlextResult[Path].ok(temp_dir)
+        except Exception as e:
+            error_msg = f"Failed to create temp directory: {e}"
+            logger.exception(error_msg)
+            return FlextResult[Path].fail(error_msg)
 
     @classmethod
     def save_yaml_config(cls, config: ConfigDict, file_path: Path) -> FlextResult[bool]:
@@ -61,13 +94,17 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def load_yaml_config(cls, file_path: Path) -> FlextResult[ConfigDict]:
-        """Load YAML config using direct implementation.
+        """Load YAML config using FlextUtilities.Files validation + direct YAML.
 
-        Returns:
-            FlextResult[ConfigDict]: YAML config loading result.
-
+        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
         """
         try:
+            # Delegate path validation to FlextUtilities.EnvironmentUtils - NO DUPLICATION
+            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(file_path)):
+                return FlextResult[ConfigDict].fail(
+                    f"Invalid YAML file path: {file_path}"
+                )
+
             if not file_path.exists():
                 return FlextResult[ConfigDict].fail(f"YAML file not found: {file_path}")
 
@@ -86,8 +123,15 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def validate_yaml_file(cls, file_path: Path) -> FlextResult[bool]:
-        """Validate YAML using direct implementation."""
+        """Validate YAML using FlextUtilities.Files + direct YAML parsing.
+
+        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
+        """
         try:
+            # Delegate path validation to FlextUtilities.EnvironmentUtils - NO DUPLICATION
+            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(file_path)):
+                return FlextResult[bool].fail(f"Invalid YAML file path: {file_path}")
+
             if not file_path.exists():
                 return FlextResult[bool].fail(f"YAML file not found: {file_path}")
 
@@ -145,7 +189,7 @@ class FlextMeltanoFileManagers:
 
             # Create essential config files
             configs: dict[str, ConfigDict] = {
-                "meltano.yml": {
+                FlextMeltanoConstants.Meltano.PROJECT_FILE: {
                     "version": 1,
                     "project_id": project_name,
                     "project_name": project_name,
@@ -177,15 +221,6 @@ class FlextMeltanoFileManagers:
             return FlextResult[PathDict].fail(f"Failed to setup project structure: {e}")
 
     @classmethod
-    def create_temp_directory(cls, prefix: str = "flext_meltano") -> FlextResult[Path]:
-        """Create temporary directory using direct tempfile implementation."""
-        try:
-            temp_dir = Path(tempfile.mkdtemp(prefix=f"{prefix}_"))
-            return FlextResult[Path].ok(temp_dir)
-        except Exception as e:
-            return FlextResult[Path].fail(f"Failed to create temp directory: {e}")
-
-    @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> FlextResult[bool]:
         """Cleanup temporary directory using direct implementation."""
         try:
@@ -197,17 +232,34 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def validate_project_structure(cls, project_root: Path) -> FlextResult[bool]:
-        """Validate project structure using direct path checking."""
+        """Validate Meltano project structure using FlextUtilities.Files validation.
+
+        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for path validation.
+        """
         try:
-            required_files = ["meltano.yml"]
+            # Delegate to FlextUtilities.EnvironmentUtils for path validation - NO DUPLICATION
+            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(project_root)):
+                return FlextResult[bool].fail(
+                    f"Invalid project root path: {project_root}"
+                )
+
+            if not project_root.exists():
+                return FlextResult[bool].fail(
+                    f"Project root does not exist: {project_root}"
+                )
+
+            # DOMAIN-SPECIFIC: Meltano project requirements
+            required_files = [FlextMeltanoConstants.Meltano.PROJECT_FILE]
             required_dirs = ["extract", "load", "transform", "analyze"]
 
             for filename in required_files:
-                if not (project_root / filename).exists():
+                file_path = project_root / filename
+                if not file_path.exists():
                     return FlextResult[bool].fail(f"Missing required file: {filename}")
 
             for dirname in required_dirs:
-                if not (project_root / dirname).is_dir():
+                dir_path = project_root / dirname
+                if not dir_path.is_dir():
                     return FlextResult[bool].fail(
                         f"Missing required directory: {dirname}"
                     )
@@ -216,9 +268,5 @@ class FlextMeltanoFileManagers:
         except Exception as e:
             return FlextResult[bool].fail(f"Failed to validate project structure: {e}")
 
-
-# =============================================================================
-# EXPORTS
-# =============================================================================
 
 __all__ = ["FlextMeltanoFileManagers"]

@@ -24,10 +24,10 @@ class TestFlextMeltanoServiceComplete:
         service = FlextMeltanoService()
         assert service is not None
 
-        # Check nested classes are available
-        assert hasattr(service, "TapService")
-        assert hasattr(service, "TargetService")
-        assert hasattr(service, "DbtService")
+        # Check service methods are available (snake_case after ruff fixes)
+        assert hasattr(service, "tap_service")
+        assert hasattr(service, "target_service")
+        assert hasattr(service, "dbt_service")
 
     def test_create_tap_service(self) -> None:
         """Test create_tap_service method."""
@@ -66,45 +66,49 @@ class TestFlextMeltanoServiceComplete:
             assert result.error_message
 
     def test_tap_service_class_access(self) -> None:
-        """Test access to TapService nested class."""
-        tap_service_class = self.service.TapService
-        assert tap_service_class is not None
+        """Test access to tap service property (snake_case after ruff fixes)."""
+        tap_service_method = self.service.tap_service
+        assert tap_service_method is not None
+        assert callable(tap_service_method)
 
-        # Try to instantiate (may require parameters)
+        # Test that the property method returns a type
         try:
-            tap_instance = tap_service_class(tap_name="tap-csv")
-            assert tap_instance is not None
+            service_type = tap_service_method()
+            assert service_type is not None
         except (ValueError, TypeError, RuntimeError, AttributeError):
             # Service instantiation failed - this is expected without proper setup
-            # Test passes - we validated the class exists and has proper constructor signature
+            # Test passes - we validated the method exists and is callable
             pass
 
     def test_target_service_class_access(self) -> None:
-        """Test access to TargetService nested class."""
-        target_service_class = self.service.TargetService
-        assert target_service_class is not None
+        """Test target service creation through service factory methods."""
+        # Test creating target service through proper factory method
+        result = self.service.create_target_service("target-jsonl")
+        assert isinstance(result, FlextResult)
 
-        # Try to instantiate (may require parameters)
+        # Validate result structure
+        if result.is_success:
+            target_service = result.data
+            assert isinstance(target_service, FlextMeltanoService)
+        else:
+            # Service creation may fail without proper Meltano setup - this is expected
+            assert result.error is not None
+
+    def test_dbt_service_unified_access(self) -> None:
+        """Test unified service access for DBT operations."""
+        # Test that the service can be configured for DBT operations
+        assert self.service is not None
+
+        # Test that service_type can be set to dbt
         try:
-            target_instance = target_service_class(target_name="target-jsonl")
-            assert target_instance is not None
+            dbt_service = FlextMeltanoService(
+                service_type="dbt", project_name="dbt-project"
+            )
+            assert dbt_service is not None
+            assert dbt_service._service_type == "dbt"
         except (ValueError, TypeError, RuntimeError, AttributeError):
             # Service instantiation failed - this is expected without proper setup
-            # Test passes - we validated the class exists and has proper constructor signature
-            pass
-
-    def test_dbt_service_class_access(self) -> None:
-        """Test access to DbtService nested class."""
-        dbt_service_class = self.service.DbtService
-        assert dbt_service_class is not None
-
-        # Try to instantiate (may require parameters)
-        try:
-            dbt_instance = dbt_service_class(project_name="dbt-project")
-            assert dbt_instance is not None
-        except (ValueError, TypeError, RuntimeError, AttributeError):
-            # Service instantiation failed - this is expected without proper setup
-            # Test passes - we validated the class exists and has proper constructor signature
+            # Test passes - we validated the unified service exists and has proper constructor signature
             pass
 
     def test_multiple_service_creation(self) -> None:
@@ -181,12 +185,12 @@ class TestFlextMeltanoServiceComplete:
 
     def test_nested_class_hierarchy(self) -> None:
         """Test nested class structure and hierarchy."""
-        nested_classes = ["TapService", "TargetService", "DbtService"]
+        nested_methods = ["tap_service", "target_service", "dbt_service"]
 
-        for class_name in nested_classes:
-            nested_class = getattr(self.service, class_name)
-            assert nested_class is not None
-            assert callable(nested_class)
+        for method_name in nested_methods:
+            nested_method = getattr(self.service, method_name)
+            assert nested_method is not None
+            assert callable(nested_method)
 
     def test_service_type_validation(self) -> None:
         """Test service creation with type validation."""

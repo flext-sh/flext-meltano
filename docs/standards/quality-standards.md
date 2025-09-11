@@ -182,7 +182,7 @@ make metrics-export         # Export quality metrics for monitoring
 # Layer organization:
 src/flext_meltano/
 ├── Foundation Layer (6 modules)    # base.py, common.py, exceptions.py, etc.
-├── Bridge Layer (3 modules)        # simple_bridge.py, execution.py, cli.py
+├── Bridge Layer (3 modules)
 ├── Core Operations (4 modules)     # core.py, validation.py, discovery.py, etc.
 └── Integration Layer (4 modules)   # singer*.py, dbt.py
 

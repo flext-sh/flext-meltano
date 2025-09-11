@@ -161,13 +161,26 @@ class TestFlextMeltanoValidatorsComprehensive:
         FlextTestsMatchers.assert_result_success(tap_result, True)
         FlextTestsMatchers.assert_result_success(target_result, True)
 
-    def test_validator_inheritance_from_flext_utilities(self) -> None:
-        """Test that FlextMeltanoValidators properly inherits from FlextUtilities."""
-        # Should have access to parent class methods
-        assert hasattr(FlextMeltanoValidators, "safe_json_stringify")
-        assert hasattr(FlextMeltanoValidators, "TextProcessor")
+    def test_validator_architecture_compliance(self) -> None:
+        """Test that FlextMeltanoValidators follows SOLID principles without inheritance violations."""
+        # FlextMeltanoValidators should NOT inherit from FlextUtilities (SOLID violation)
+        # Instead, it should have its own validation methods without inheritance
 
-        # Test that we can use inherited functionality
-        test_data = {"test": "data"}
-        json_result = FlextMeltanoValidators.safe_json_stringify(test_data)
-        assert '"test": "data"' in json_result
+        # Verify it has the core Meltano-specific validation methods
+        assert hasattr(FlextMeltanoValidators, "validate_plugin_config")
+        assert hasattr(FlextMeltanoValidators, "validate_meltano_config")
+        assert hasattr(FlextMeltanoValidators, "validate_dbt_config")
+
+        # Verify it does NOT have utility methods (should be separate concerns)
+        assert not hasattr(FlextMeltanoValidators, "safe_json_stringify")
+        assert not hasattr(FlextMeltanoValidators, "TextProcessor")
+
+        # Test core validation functionality works independently
+        config = {
+            "name": "test-plugin",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert result.success

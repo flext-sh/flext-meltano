@@ -16,6 +16,7 @@ import meltano
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
 from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.executors_meltano import FlextMeltanoExecutors
 
 # Type aliases for complex types to satisfy MyPy strict mode
@@ -108,11 +109,15 @@ class FlextMeltanoBridge:
         """
         try:
             version_info = {
-                "version": "3.9.1",
-                "flext_meltano": "2.0.0-enterprise",
-                "meltano": getattr(meltano, "__version__", "3.9.1"),
-                "dbt_core": "1.10.5",
-                "singer_sdk": "0.48.0",
+                "version": FlextMeltanoConstants.Meltano.VERSION_REQUIRED,  # SOURCE OF TRUTH
+                "flext_meltano": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,  # SOURCE OF TRUTH
+                "meltano": getattr(
+                    meltano,
+                    "__version__",
+                    FlextMeltanoConstants.Meltano.VERSION_REQUIRED,
+                ),  # SOURCE OF TRUTH
+                "dbt_core": FlextMeltanoConstants.DBT.VERSION_REQUIRED,  # SOURCE OF TRUTH
+                "singer_sdk": FlextMeltanoConstants.Singer.SDK_VERSION_REQUIRED,  # SOURCE OF TRUTH
                 "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
                 "integration_method": "native_apis",
                 "cli_type": "native_meltano_api",
@@ -216,9 +221,11 @@ class FlextMeltanoBridge:
                 project_path = Path(plugin_name_or_root)
 
             # Check if meltano.yml exists
-            meltano_yml = project_path / "meltano.yml"
+            meltano_yml = project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
             if not meltano_yml.exists():
-                return FlextResult.fail("meltano.yml not found")
+                return FlextResult.fail(
+                    f"{FlextMeltanoConstants.Meltano.PROJECT_FILE} not found"
+                )
 
             result = FlextMeltanoExecutors.SimpleMeltanoExecutor.install_plugin(
                 project_path, plugin_type, plugin_name
@@ -281,40 +288,6 @@ class FlextMeltanoBridge:
             # Direct value - wrap in FlextResult
             # Direct value - convert to dict format
             return FlextResult.ok({"result": str(result)} if result else {})
-        except Exception as e:
-            return FlextResult.fail(str(e))
-
-    def _create_temp_project(self) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create temporary Meltano project.
-
-        Returns:
-            FlextResult[FlextTypes.Core.Dict]:: Description of return value.
-
-        """
-        try:
-            result = self.adapter._create_temp_project()
-            # Check if result is already a FlextResult
-            if (
-                hasattr(result, "success")
-                and hasattr(result, "value")
-                and hasattr(result, "error")
-            ):
-                # It's already a FlextResult
-                if getattr(result, "success", False):
-                    temp_dict: FlextTypes.Core.Dict = {
-                        "project": str(getattr(result, "value", "")),
-                        "status": "created",
-                    }
-                    return FlextResult.ok(temp_dict)
-                return FlextResult.fail(
-                    str(getattr(result, "error", "Project creation failed"))
-                )
-            # Direct Project object - convert to dict representation
-            project_dict: FlextTypes.Core.Dict = {
-                "project": str(result),
-                "status": "created",
-            }
-            return FlextResult.ok(project_dict)
         except Exception as e:
             return FlextResult.fail(str(e))
 
@@ -458,9 +431,5 @@ class FlextMeltanoBridge:
         # For now, ignore config parameter for compatibility
         return cls()
 
-
-# =============================================================================
-# PUBLIC API EXPORTS - Class-based only, no factory functions
-# =============================================================================
 
 __all__ = ["FlextMeltanoBridge"]
