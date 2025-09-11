@@ -11,24 +11,21 @@ from __future__ import annotations
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import cast
 
 import yaml
 from flext_core import (
+    FlextConstants,  # SOURCE OF TRUTH
     FlextDomainService,
     FlextLogger,
     FlextResult,
     FlextTypes,
-    FlextUtilities,
+    FlextUtilities,  # Use flext-core type variable
 )
 
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_core import FlextConstants  # SOURCE OF TRUTH
+from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.typings import FlextMeltanoTypes
-
-# =============================================================================
-# MAIN EXECUTORS CLASS - Following Flext[Area][Module] pattern
-# =============================================================================
 
 
 class FlextMeltanoExecutors:
@@ -49,7 +46,6 @@ class FlextMeltanoExecutors:
     # =================================================================
     # CONSTANTS - Consolidated from module level
     # =================================================================
-    T = TypeVar("T")
     _FALSE = False  # Constants to avoid FBT003 violations
 
     # =================================================================
@@ -126,9 +122,11 @@ class FlextMeltanoExecutors:
                 )
 
                 # Validate Meltano project
-                if not (project_root / "meltano.yml").exists():
+                if not (
+                    project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
+                ).exists():
                     return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                        f"Not a Meltano project: meltano.yml not found in {project_root}"
+                        f"Not a Meltano project: {FlextMeltanoConstants.Meltano.PROJECT_FILE} not found in {project_root}"
                     )
 
                 execution_start_timestamp = (
@@ -136,7 +134,6 @@ class FlextMeltanoExecutors:
                 )
                 execution_start = datetime.now(UTC)
 
-                # Simple success response for now
                 execution_result: FlextMeltanoTypes.CLI.ProcessResult = {
                     "success": True,
                     "command": cast("FlextTypes.Core.JsonValue", command),
@@ -188,7 +185,7 @@ class FlextMeltanoExecutors:
                 }
 
                 # Check for Meltano project
-                meltano_yml = project_root / "meltano.yml"
+                meltano_yml = project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
                 if meltano_yml.exists():
                     project_info["project_type"] = "meltano"
                     meltano_dict = project_info["meltano"]
@@ -204,8 +201,8 @@ class FlextMeltanoExecutors:
 
                 # Check for DBT project
                 dbt_project_paths = [
-                    project_root / "dbt_project.yml",
-                    project_root / "transform" / "dbt_project.yml",
+                    project_root / FlextMeltanoConstants.DBT.PROJECT_FILE,
+                    project_root / "transform" / FlextMeltanoConstants.DBT.PROJECT_FILE,
                 ]
 
                 for dbt_path in dbt_project_paths:
@@ -305,7 +302,6 @@ class FlextMeltanoExecutors:
     # NESTED SIMPLE RESULT CLASS
     # =================================================================
 
-    # SimpleResult[T] is now an alias to FlextResult[T] for compatibility
     # Eliminated local Result class duplication - using flext-core FlextResult
 
     # =================================================================
@@ -429,7 +425,7 @@ class FlextMeltanoExecutors:
                     "models": {project_name: {"+materialized": "view"}},
                 }
 
-                dbt_project_file = project_dir / "dbt_project.yml"
+                dbt_project_file = project_dir / FlextMeltanoConstants.DBT.PROJECT_FILE
                 with dbt_project_file.open("w") as f:
                     yaml.dump(dbt_config, f)
 
@@ -460,10 +456,6 @@ class FlextMeltanoExecutors:
     FlextExecutionResult = ExecutionResult
 
 
-# =============================================================================
-# MODULE-LEVEL ALIASES FOR BACKWARD COMPATIBILITY
-# =============================================================================
-
 # Export nested classes as module-level aliases for backward compatibility
 FlextMeltanoExecutor = FlextMeltanoExecutors.MeltanoExecutor
 FlextExecutionResult = FlextMeltanoExecutors.ExecutionResult
@@ -471,10 +463,6 @@ FlextExecutionResult = FlextMeltanoExecutors.ExecutionResult
 SimpleMeltanoExecutor = FlextMeltanoExecutors.SimpleMeltanoExecutor
 SimpleDbtExecutor = FlextMeltanoExecutors.SimpleDbtExecutor
 
-
-# =============================================================================
-# PUBLIC API EXPORTS
-# =============================================================================
 
 __all__ = [
     "FlextExecutionResult",

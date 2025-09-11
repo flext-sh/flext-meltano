@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
 from flext_core import FlextTypes
 
 # This file makes tests/helpers/ a proper Python package

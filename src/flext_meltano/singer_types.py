@@ -43,7 +43,7 @@ class FlextSingerTypes:
         }
 
     # ============================================================================
-    # TYPE CREATION AND VALIDATION METHODS
+
     # ============================================================================
 
     def create_string_type(self, **kwargs: object) -> FlextResult[FlextTypes.Core.Dict]:
@@ -170,7 +170,7 @@ class FlextSingerTypes:
             # Single validation logic with dispatch table
             if isinstance(type_name, str) and type_name in validation_rules:
                 expected_type_info, type_display = validation_rules[type_name]
-                # Type narrowing for isinstance check - proper union handling
+
                 if isinstance(expected_type_info, tuple):
                     # Handle tuple case like (int, float) for "number"
                     if not isinstance(value, expected_type_info):
@@ -385,10 +385,6 @@ class FlextSingerTypes:
                 f"Instance creation failed: {e}"
             )
 
-
-# =============================================================================
-# EXPORTS
-# =============================================================================
 
 __all__ = [
     "FlextSingerTypes",

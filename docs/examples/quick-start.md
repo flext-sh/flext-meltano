@@ -137,7 +137,7 @@ make validate
 
 # Individual checks
 make lint                    # Code linting
-make type-check              # Type checking
+make type-check
 make test                    # Run tests with coverage
 make security                # Security scanning
 ```

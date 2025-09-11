@@ -11,6 +11,9 @@ from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
+from flext_meltano.constants import (  # SOURCE OF TRUTH
+    PluginTypes,
+)
 
 
 class TestFlextMeltanoConfigBuildersComplete:
@@ -28,86 +31,86 @@ class TestFlextMeltanoConfigBuildersComplete:
     # SINGER PLUGIN CONFIG MODEL TESTING - Using flext_tests patterns
     # =========================================================================
 
-    def test_singer_plugin_config_creation(self) -> None:
-        """Test SingerPluginConfig model creation using flext_tests."""
-        # Create config with all parameters
-        config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="tap-csv",
-            plugin_type="extractor",
+    def test_singer_tap_config_creation_with_parameters(self) -> None:
+        """Test Singer tap config creation with parameters using flext_tests."""
+        # Create tap config with all parameters
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_tap_config(
+            tap_name="tap-csv",
             namespace="tap_csv",
             pip_url="pipelinewise-tap-csv",
             executable="tap-csv",
-            variant="pipelinewise",
         )
 
         # Use flext_tests assertions
+        self.test_assertions.assert_true(
+            condition=result.is_success,
+            message="Tap config creation should succeed",
+        )
+
+        config = result.unwrap()
         self.test_assertions.assert_equals(
-            actual=config.plugin_name,
+            actual=config["name"],
             expected="tap-csv",
             message="Plugin name should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.plugin_type,
-            expected="extractor",
-            message="Plugin type should match",
+            actual=config["type"],
+            expected=PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
+            message="Plugin type should be extractor",
         )
         self.test_assertions.assert_equals(
-            actual=config.namespace,
+            actual=config["namespace"],
             expected="tap_csv",
             message="Namespace should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.pip_url,
+            actual=config["pip_url"],
             expected="pipelinewise-tap-csv",
             message="Pip URL should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.executable,
+            actual=config["executable"],
             expected="tap-csv",
             message="Executable should match",
         )
-        self.test_assertions.assert_equals(
-            actual=config.variant,
-            expected="pipelinewise",
-            message="Variant should match",
+
+    def test_singer_tap_config_defaults(self) -> None:
+        """Test Singer tap config creation with default values using flext_tests."""
+        # Create tap config with minimal parameters
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_tap_config("tap-postgres")
+
+        self.test_assertions.assert_true(
+            condition=result.is_success,
+            message="Tap config creation should succeed",
         )
 
-    def test_singer_plugin_config_defaults(self) -> None:
-        """Test SingerPluginConfig default values using flext_tests."""
-        # Create config with minimal parameters
-        config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="tap-postgres"
-        )
-
+        config = result.unwrap()
         self.test_assertions.assert_equals(
-            actual=config.plugin_name,
+            actual=config["name"],
             expected="tap-postgres",
             message="Plugin name should be set",
         )
         self.test_assertions.assert_equals(
-            actual=config.plugin_type,
-            expected="extractor",
+            actual=config["type"],
+            expected=PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
             message="Should default to extractor",
         )
         self.test_assertions.assert_equals(
-            actual=config.namespace,
-            expected="",
-            message="Should default to empty namespace",
+            actual=config["namespace"],
+            expected="tap_tap_postgres",  # Generated namespace pattern when not provided
+            message="Should generate default namespace pattern",
         )
         self.test_assertions.assert_equals(
-            actual=config.pip_url,
-            expected="",
-            message="Should default to empty pip_url",
+            actual=config["pip_url"],
+            expected="pipelinewise-tap-postgres",
+            message="Should generate default pip_url",
         )
         self.test_assertions.assert_equals(
-            actual=config.executable,
+            actual=config["executable"],
             expected="",
             message="Should default to empty executable",
-        )
-        self.test_assertions.assert_equals(
-            actual=config.variant,
-            expected="",
-            message="Should default to empty variant",
         )
 
     # =========================================================================
@@ -117,9 +120,7 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_dbt_config_builder_basic_success(self) -> None:
         """Test successful DBT config creation using flext_tests."""
         # Test basic DBT config creation (lines 79-107)
-        result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
-            "my_dbt_project"
-        )
+        result = FlextMeltanoConfigBuilders().create_dbt_config("my_dbt_project")
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),
@@ -171,7 +172,7 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_dbt_config_builder_with_profile(self) -> None:
         """Test DBT config creation with custom profile using flext_tests."""
         # Test with custom profile name (lines 84-86)
-        result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
+        result = FlextMeltanoConfigBuilders().create_dbt_config(
             "analytics_project", "custom_profile"
         )
 
@@ -206,7 +207,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         # This is difficult to trigger directly, but we can test the structure
 
         # Test with empty project name to exercise safe_string functionality
-        result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config("")
+        result = FlextMeltanoConfigBuilders().create_dbt_config("")
 
         # Should still succeed due to safe_string providing default only for None
         self.test_assertions.assert_true(
@@ -226,18 +227,13 @@ class TestFlextMeltanoConfigBuildersComplete:
 
     def test_create_singer_config_generic_extractor(self) -> None:
         """Test generic Singer config creation for extractor using flext_tests."""
-        # Create config object for extractor type
-        plugin_config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="tap-postgres",
-            plugin_type="extractor",
+        # Test generic config creation for extractor using unified class pattern
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_tap_config(
+            tap_name="tap-postgres",
             namespace="postgres_tap",
             pip_url="pipelinewise-tap-postgres",
             executable="tap-postgres",
-        )
-
-        # Test generic config creation (lines 130-167)
-        result = FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
-            plugin_config
         )
 
         self.test_assertions.assert_true(
@@ -264,7 +260,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
         self.test_assertions.assert_equals(
             actual=config["type"],
-            expected="extractor",
+            expected=PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
             message="Type should be extractor",
         )
 
@@ -285,16 +281,12 @@ class TestFlextMeltanoConfigBuildersComplete:
 
     def test_create_singer_config_generic_loader(self) -> None:
         """Test generic Singer config creation for loader using flext_tests."""
-        # Create config object for loader type
-        plugin_config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="target-jsonl",
-            plugin_type="loader",
+        # Test generic config creation for loader using unified class pattern
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_target_config(
+            target_name="target-jsonl",
             namespace="jsonl_target",
             executable="target-jsonl",
-        )
-
-        result = FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
-            plugin_config
         )
 
         self.test_assertions.assert_true(
@@ -303,7 +295,9 @@ class TestFlextMeltanoConfigBuildersComplete:
 
         config = result.unwrap()
         self.test_assertions.assert_equals(
-            actual=config["type"], expected="loader", message="Type should be loader"
+            actual=config["type"],
+            expected=PluginTypes.LOADERS.value,
+            message="Type should be loader (SOURCE OF TRUTH)",
         )
 
         # Test type-specific pip_url default (lines 159-166)
@@ -315,13 +309,11 @@ class TestFlextMeltanoConfigBuildersComplete:
 
     def test_create_singer_config_generic_no_pip_url_extractor(self) -> None:
         """Test generic Singer config creation without pip_url for extractor using flext_tests."""
-        # Test pip_url default generation for extractor (lines 159-166)
-        plugin_config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="tap-csv", plugin_type="extractor"
-        )
-
-        result = FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
-            plugin_config
+        # Test pip_url default generation for extractor using unified class pattern
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_tap_config(
+            tap_name="tap-csv"
+            # No pip_url provided - should generate default
         )
 
         self.test_assertions.assert_true(
@@ -339,13 +331,11 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_create_singer_tap_config_success(self) -> None:
         """Test Singer tap config creation using flext_tests."""
         # Test tap config creation (lines 183-192)
-        result = (
-            FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_tap_config(
-                "tap-github",
-                namespace="github_tap",
-                pip_url="pipelinewise-tap-github",
-                executable="tap-github",
-            )
+        result = FlextMeltanoConfigBuilders().create_singer_tap_config(
+            "tap-github",
+            namespace="github_tap",
+            pip_url="pipelinewise-tap-github",
+            executable="tap-github",
         )
 
         self.test_assertions.assert_true(
@@ -364,7 +354,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
         self.test_assertions.assert_equals(
             actual=config["type"],
-            expected="extractor",
+            expected=PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
             message="Should set type to extractor",
         )
         self.test_assertions.assert_equals(
@@ -376,13 +366,11 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_create_singer_target_config_success(self) -> None:
         """Test Singer target config creation using flext_tests."""
         # Test target config creation (lines 195-221)
-        result = (
-            FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_target_config(
-                "target-postgres",
-                namespace="postgres_target",
-                pip_url="target-postgres",
-                executable="target-postgres",
-            )
+        result = FlextMeltanoConfigBuilders().create_singer_target_config(
+            "target-postgres",
+            namespace="postgres_target",
+            pip_url="target-postgres",
+            executable="target-postgres",
         )
 
         self.test_assertions.assert_true(
@@ -401,7 +389,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
         self.test_assertions.assert_equals(
             actual=config["type"],
-            expected="loader",
+            expected=PluginTypes.LOADERS.value,  # SOURCE OF TRUTH
             message="Should set type to loader",
         )
         self.test_assertions.assert_equals(
@@ -412,16 +400,10 @@ class TestFlextMeltanoConfigBuildersComplete:
 
     def test_singer_config_error_handling(self) -> None:
         """Test Singer config builder error handling using flext_tests."""
-        # Test the error handling branch (lines 168-171)
-        # Create an unusual configuration to potentially trigger edge cases
-
-        plugin_config = FlextMeltanoConfigBuilders.SingerPluginConfig(
-            plugin_name="",  # Empty name might exercise error handling
-            plugin_type="extractor",
-        )
-
-        result = FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
-            plugin_config
+        # Test error handling with edge cases using unified class pattern
+        builder = FlextMeltanoConfigBuilders()
+        result = builder.create_singer_tap_config(
+            tap_name=""  # Empty name to test error handling
         )
 
         # Should still succeed due to safe_string preserving empty values
@@ -440,7 +422,7 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_complete_meltano_project_config_workflow(self) -> None:
         """Test complete Meltano project configuration workflow using flext_tests."""
         # Create DBT configuration
-        dbt_result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
+        dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(
             "analytics_project", "analytics_profile"
         )
         self.test_assertions.assert_true(
@@ -448,24 +430,20 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
 
         # Create tap configuration
-        tap_result = (
-            FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_tap_config(
-                "tap-postgres",
-                namespace="postgres_source",
-                pip_url="pipelinewise-tap-postgres",
-            )
+        tap_result = FlextMeltanoConfigBuilders().create_singer_tap_config(
+            "tap-postgres",
+            namespace="postgres_source",
+            pip_url="pipelinewise-tap-postgres",
         )
         self.test_assertions.assert_true(
             condition=tap_result.is_success, message="Tap config should be created"
         )
 
         # Create target configuration
-        target_result = (
-            FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_target_config(
-                "target-snowflake",
-                namespace="snowflake_destination",
-                pip_url="target-snowflake",
-            )
+        target_result = FlextMeltanoConfigBuilders().create_singer_target_config(
+            "target-snowflake",
+            namespace="snowflake_destination",
+            pip_url="target-snowflake",
         )
         self.test_assertions.assert_true(
             condition=target_result.is_success,
@@ -498,20 +476,14 @@ class TestFlextMeltanoConfigBuildersComplete:
 
         for name in special_names:
             # Test DBT config with special name
-            dbt_result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
-                name
-            )
+            dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(name)
             self.test_assertions.assert_true(
                 condition=dbt_result.is_success,
                 message=f"DBT config should handle special name: {name}",
             )
 
             # Test Singer tap config with special name
-            tap_result = (
-                FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_tap_config(
-                    name
-                )
-            )
+            tap_result = FlextMeltanoConfigBuilders().create_singer_tap_config(name)
             self.test_assertions.assert_true(
                 condition=tap_result.is_success,
                 message=f"Tap config should handle special name: {name}",
@@ -527,19 +499,15 @@ class TestFlextMeltanoConfigBuildersComplete:
                 continue  # Skip None as it would cause type errors
 
             # Test DBT config with edge case
-            dbt_result = FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
-                edge_case
-            )
+            dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(edge_case)
             self.test_assertions.assert_true(
                 condition=dbt_result.is_success,
                 message=f"DBT config should handle edge case: {edge_case!r}",
             )
 
             # Test Singer config with edge case
-            tap_result = (
-                FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_tap_config(
-                    edge_case
-                )
+            tap_result = FlextMeltanoConfigBuilders().create_singer_tap_config(
+                edge_case
             )
             self.test_assertions.assert_true(
                 condition=tap_result.is_success,
@@ -550,13 +518,9 @@ class TestFlextMeltanoConfigBuildersComplete:
         """Test type safety and constraints using flext_tests."""
         # Test that all methods return proper FlextResult types
         methods_to_test = [
-            lambda: FlextMeltanoConfigBuilders.DbtConfigBuilder.create_dbt_config(
-                "test_project"
-            ),
-            lambda: FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_tap_config(
-                "test_tap"
-            ),
-            lambda: FlextMeltanoConfigBuilders.SingerConfigBuilder.create_singer_target_config(
+            lambda: FlextMeltanoConfigBuilders().create_dbt_config("test_project"),
+            lambda: FlextMeltanoConfigBuilders().create_singer_tap_config("test_tap"),
+            lambda: FlextMeltanoConfigBuilders().create_singer_target_config(
                 "test_target"
             ),
         ]
@@ -582,17 +546,13 @@ class TestFlextMeltanoConfigBuildersComplete:
 
     def test_advanced_plugin_config_scenarios(self) -> None:
         """Test advanced plugin configuration scenarios using flext_tests."""
-        # Test loader type with complex configuration
-        loader_config = FlextMeltanoConfigBuilders.SingerPluginConfig(
+        # Test loader type with complex configuration using direct method call
+        builder = FlextMeltanoConfigBuilders()
+        result = builder._create_singer_config_generic(
             plugin_name="target-bigquery",
-            plugin_type="loader",  # This should trigger "target" prefix logic
+            plugin_type=PluginTypes.LOADERS.value,  # SOURCE OF TRUTH
             namespace="bigquery_warehouse",
             executable="target-bigquery",
-            variant="transferwise",
-        )
-
-        result = FlextMeltanoConfigBuilders.SingerConfigBuilder._create_singer_config_generic(
-            loader_config
         )
 
         self.test_assertions.assert_true(

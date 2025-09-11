@@ -10,11 +10,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import uuid
-from datetime import UTC, datetime
+import os
 from typing import TYPE_CHECKING
 
-from flext_core import FlextConstants, FlextLogger, FlextModels, FlextResult, FlextTypes
+from flext_core import (
+    FlextConstants,
+    FlextLogger,
+    FlextResult,
+    FlextTypes,
+    FlextUtilities,
+)
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 if TYPE_CHECKING:
@@ -30,105 +35,146 @@ StateDict = FlextTypes.Core.Dict
 ResultDict = FlextTypes.Core.Dict
 
 
-class FlextTargetConfig(BaseModel):
-    """Pydantic model for target configuration with field validation."""
+class FlextTargetAbstractions:
+    """UNIFIED Target Abstractions - SINGLE RESPONSIBILITY PATTERN.
 
-    model_config = ConfigDict(frozen=True, extra="allow")
-
-    target_type: str = Field(..., description="Target type identifier")
-    connection_config: FlextTypes.Core.Dict = Field(
-        ..., description="Connection configuration dictionary"
-    )
-    batch_size: int = Field(
-        default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
-        description="Batch size for record processing",
-    )
-    max_batches: int = Field(
-        default=100, description="Maximum number of batches to process"
-    )
-
-    @field_validator("target_type")
-    @classmethod
-    def validate_target_type(cls, v: str) -> str:
-        if not v or not isinstance(v, str):
-            msg = "Target type must be non-empty string"
-            raise ValueError(msg)
-        return v
-
-    @field_validator("connection_config")
-    @classmethod
-    def validate_connection_config(
-        cls, v: FlextTypes.Core.Dict
-    ) -> FlextTypes.Core.Dict:
-        if not v or not isinstance(v, dict):
-            msg = "Connection configuration is required and must be dictionary"
-            raise ValueError(msg)
-        return v
-
-    @field_validator("batch_size")
-    @classmethod
-    def validate_batch_size(cls, v: int) -> int:
-        if not isinstance(v, int) or v <= 0:
-            msg = "Batch size must be positive integer"
-            raise ValueError(msg)
-        return v
-
-    @field_validator("max_batches")
-    @classmethod
-    def validate_max_batches(cls, v: int) -> int:
-        if not isinstance(v, int) or v <= 0:
-            msg = "Max batches must be positive integer"
-            raise ValueError(msg)
-        return v
-
-
-class FlextStreamInfo(BaseModel):
-    """Pydantic model for stream information with validation."""
-
-    model_config = ConfigDict(frozen=False, extra="allow")
-
-    stream_name: str = Field(..., description="Stream name identifier")
-    stream_schema: FlextTypes.Core.Dict = Field(
-        ..., description="Stream schema definition", alias="schema"
-    )
-    status: str = Field(default="initialized", description="Stream processing status")
-    records_loaded: int = Field(default=0, description="Number of records loaded")
-    batches_processed: int = Field(default=0, description="Number of batches processed")
-    created_at: str = Field(..., description="Creation timestamp")
-
-    @field_validator("stream_name")
-    @classmethod
-    def validate_stream_name(cls, v: str) -> str:
-        if not v or not isinstance(v, str):
-            msg = "Stream name must be non-empty string"
-            raise ValueError(msg)
-        return v
-
-    @field_validator("stream_schema")
-    @classmethod
-    def validate_stream_schema(cls, v: FlextTypes.Core.Dict) -> FlextTypes.Core.Dict:
-        if "properties" not in v:
-            msg = "Schema must contain properties"
-            raise ValueError(msg)
-        return v
-
-
-class FlextTargetAbstractions(FlextModels.Entity):
-    """Unified Singer Target functionality abstraction.
-
-    Consolidated class providing complete FlextTarget abstractions following flext-core
-    single-class-per-module pattern. Includes target configuration, data loading,
-    message processing, and stream management.
+    CORRECTED ARCHITECTURE:
+    - NO longer inherits from FlextModels.Entity (inappropriate for abstractions)
+    - Simple class focused on target functionality abstraction
+    - Follows single responsibility principle
+    - Consolidates all target functionality: FlextTargetConfig, FlextStreamInfo nested classes
     """
+
+    # =========================================================================
+    # NESTED PYDANTIC MODELS - Domain-specific data validation
+    # =========================================================================
+
+    class FlextTargetConfig(BaseModel):
+        """Pydantic model for target configuration with field validation."""
+
+        model_config = ConfigDict(frozen=True, extra="allow")
+
+        target_type: str = Field(..., description="Target type identifier")
+        connection_config: FlextTypes.Core.Dict = Field(
+            ..., description="Connection configuration dictionary"
+        )
+        batch_size: int = Field(
+            default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
+            description="Batch size for record processing",
+        )
+        max_batches: int = Field(
+            default=100, description="Maximum number of batches to process"
+        )
+
+        @field_validator("target_type")
+        @classmethod
+        def validate_target_type(cls, v: str) -> str:
+            if not v or not isinstance(v, str):
+                msg = "Target type must be non-empty string"
+                raise ValueError(msg)
+            return v
+
+        @field_validator("connection_config")
+        @classmethod
+        def validate_connection_config(
+            cls, v: FlextTypes.Core.Dict
+        ) -> FlextTypes.Core.Dict:
+            if not v or not isinstance(v, dict):
+                msg = "Connection configuration is required and must be dictionary"
+                raise ValueError(msg)
+            return v
+
+        @field_validator("batch_size")
+        @classmethod
+        def validate_batch_size(cls, v: int) -> int:
+            if not isinstance(v, int) or v <= 0:
+                msg = "Batch size must be positive integer"
+                raise ValueError(msg)
+            return v
+
+        @field_validator("max_batches")
+        @classmethod
+        def validate_max_batches(cls, v: int) -> int:
+            if not isinstance(v, int) or v <= 0:
+                msg = "Max batches must be positive integer"
+                raise ValueError(msg)
+            return v
+
+    class FlextStreamInfo(BaseModel):
+        """Pydantic model for stream information with validation."""
+
+        model_config = ConfigDict(frozen=False, extra="allow")
+
+        stream_name: str = Field(..., description="Stream name identifier")
+        stream_schema: FlextTypes.Core.Dict = Field(
+            ..., description="Stream schema definition", alias="schema"
+        )
+        status: str = Field(
+            default="initialized", description="Stream processing status"
+        )
+        records_loaded: int = Field(default=0, description="Number of records loaded")
+        batches_processed: int = Field(
+            default=0, description="Number of batches processed"
+        )
+        created_at: str = Field(..., description="Creation timestamp")
+
+        @field_validator("stream_name")
+        @classmethod
+        def validate_stream_name(cls, v: str) -> str:
+            if not v or not isinstance(v, str):
+                msg = "Stream name must be non-empty string"
+                raise ValueError(msg)
+            return v
+
+        @field_validator("stream_schema")
+        @classmethod
+        def validate_stream_schema(
+            cls, v: FlextTypes.Core.Dict
+        ) -> FlextTypes.Core.Dict:
+            if "properties" not in v:
+                msg = "Schema must contain properties"
+                raise ValueError(msg)
+            return v
+
+    # =========================================================================
+    # UNIFIED CLASS INSTANCE METHODS
+    # =========================================================================
 
     def __init__(self, target_id: str | None = None) -> None:
         """Initialize unified target abstractions."""
-        entity_id = target_id or f"target_abstractions_{uuid.uuid4().hex[:8]}"
-        super().__init__(id=entity_id)
+        self.target_id = (
+            target_id
+            or f"target_abstractions_{FlextUtilities.Generators.generate_uuid()[:8]}"
+        )
         self._logger = FlextLogger(f"{__name__}.FlextTargetAbstractions")
         self._active_targets: dict[str, FlextTypes.Core.Dict] = {}
-        self._target_configs: dict[str, FlextTargetConfig] = {}
-        self._stream_registry: dict[str, FlextStreamInfo] = {}
+        self._target_configs: dict[str, FlextTargetAbstractions.FlextTargetConfig] = {}
+        self._stream_registry: dict[str, FlextTargetAbstractions.FlextStreamInfo] = {}
+
+        # Compatibility attributes for test methods
+        self.validation_count: int = 0
+        self.cache_hits: int = 0
+
+    @property
+    def id(self) -> str:
+        """Compatibility property for tests - returns target_id."""
+        return self.target_id
+
+    # Compatibility methods for test compatibility (previously inherited from Entity)
+    def is_development(self) -> bool:
+        """Check if development environment - compatibility method."""
+        env = os.getenv("FLEXT_ENVIRONMENT", "development")
+        return env in {"development", "local"}
+
+    def is_test(self) -> bool:
+        """Check if test environment - compatibility method."""
+        env = os.getenv("FLEXT_ENVIRONMENT", "development")
+        return env == "test"
+
+    def is_production(self) -> bool:
+        """Check if production environment - compatibility method."""
+        env = os.getenv("FLEXT_ENVIRONMENT", "development")
+        return env == "production"
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate target abstractions business rules (required by FlextModels.Entity)."""
@@ -154,7 +200,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
         """Create FlextTarget configuration with Pydantic validation."""
         try:
             # Use Pydantic model for validation - all validation is automatic
-            config_model = FlextTargetConfig(
+            config_model = self.FlextTargetConfig(
                 target_type=target_type,
                 connection_config=connection_config,
                 batch_size=batch_size,
@@ -210,7 +256,7 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 "loaded_records": 0,
                 "batches_processed": 0,
                 "metadata": {
-                    "created_at": self._get_current_timestamp(),
+                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "version": str(config.get("version", "latest")),
                 },
             }
@@ -249,11 +295,11 @@ class FlextTargetAbstractions(FlextModels.Entity):
 
             # Create stream info with Pydantic validation
             try:
-                stream_info_model = FlextStreamInfo(
+                stream_info_model = self.FlextStreamInfo(
                     stream_name=stream_name,
                     schema=schema,  # Use alias parameter
                     status="schema_processed",
-                    created_at=self._get_current_timestamp(),
+                    created_at=FlextUtilities.Generators.generate_iso_timestamp(),
                 )
             except Exception as e:
                 return FlextResult[bool].fail(f"Stream validation failed: {e}")
@@ -458,7 +504,9 @@ class FlextTargetAbstractions(FlextModels.Entity):
             stream_info = target_streams[stream_name]
             if isinstance(stream_info, dict):
                 stream_info["status"] = "finalized"
-                stream_info["finalized_at"] = self._get_current_timestamp()
+                stream_info["finalized_at"] = (
+                    FlextUtilities.Generators.generate_iso_timestamp()
+                )
 
                 finalization_result = {
                     "stream_name": stream_name,
@@ -524,19 +572,23 @@ class FlextTargetAbstractions(FlextModels.Entity):
                 "final_state": target.get("state", {}),
                 "config_summary": {
                     "target_type": target.get("target_type", "unknown"),
-                    "batch_size": self._safe_get_nested(
-                        target, ["config", "batch_size"], 0
+                    "batch_size": FlextUtilities.Conversions.safe_dict_get(
+                        FlextUtilities.Conversions.safe_dict_get(target, "config", {}),
+                        "batch_size",
+                        0,
                     ),
-                    "max_batches": self._safe_get_nested(
-                        target, ["config", "max_batches"], 0
+                    "max_batches": FlextUtilities.Conversions.safe_dict_get(
+                        FlextUtilities.Conversions.safe_dict_get(target, "config", {}),
+                        "max_batches",
+                        0,
                     ),
                 },
-                "finalized_at": self._get_current_timestamp(),
+                "finalized_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }
 
             # Update target status
             target["status"] = "finalized"
-            target["finalized_at"] = finalization_result["finalized_at"]
+            target["finalized_at"] = FlextUtilities.Generators.generate_iso_timestamp()
 
             self._logger.info(
                 "Target operations finalized successfully",
@@ -585,10 +637,6 @@ class FlextTargetAbstractions(FlextModels.Entity):
         """Get target type."""
         return str(target.get("target_type", "unknown"))
 
-    def _get_current_timestamp(self) -> str:
-        """Get current timestamp as ISO string."""
-        return datetime.now(tz=UTC).isoformat()
-
     def get_active_targets(self) -> FlextTypes.Core.StringList:
         """Get list of active target IDs."""
         return list(self._active_targets.keys())
@@ -596,21 +644,6 @@ class FlextTargetAbstractions(FlextModels.Entity):
     def get_registered_streams(self) -> FlextTypes.Core.StringList:
         """Get list of registered stream keys."""
         return list(self._stream_registry.keys())
-
-    def _safe_get_nested(
-        self,
-        data: FlextTypes.Core.Dict,
-        keys: FlextTypes.Core.StringList,
-        default: object = None,
-    ) -> object:
-        """Safely get nested dictionary value with proper type handling."""
-        current: object = data
-        for key in keys:
-            if isinstance(current, dict) and key in current:
-                current = current[key]
-            else:
-                return default
-        return current
 
     @classmethod
     def create_instance(cls) -> FlextResult[FlextTargetAbstractions]:
@@ -623,8 +656,12 @@ class FlextTargetAbstractions(FlextModels.Entity):
             )
 
     # =============================================================================
-    # ALIASES FOR TEST COMPATIBILITY (using simplest possible aliases)
+
     # =============================================================================
+
+    def increment_validation_count(self) -> None:
+        """Increment validation count for compatibility."""
+        self.validation_count += 1
 
     def increment_cache_hits(self) -> None:
         """Alias for increment_validation_count for test compatibility."""
@@ -636,10 +673,13 @@ class FlextTargetAbstractions(FlextModels.Entity):
         return self.validation_count
 
 
-# =============================================================================
-# EXPORTS
-# =============================================================================
+# Module-level aliases for nested classes to support imports
+FlextTargetConfig = FlextTargetAbstractions.FlextTargetConfig
+FlextStreamInfo = FlextTargetAbstractions.FlextStreamInfo
+
 
 __all__ = [
+    "FlextStreamInfo",
     "FlextTargetAbstractions",
+    "FlextTargetConfig",
 ]

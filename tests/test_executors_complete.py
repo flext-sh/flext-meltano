@@ -598,29 +598,38 @@ class TestFlextMeltanoExecutorComplete:
             pass
 
     def test_click_cli_main_command_infrastructure(self) -> None:
-        """Test Click CLI main command infrastructure to hit lines 729-743."""
+        """Test CLI main command infrastructure to hit lines 738-760 (updated for unified CLI)."""
         # Create CLI app to test main infrastructure
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
         assert cli_app is not None
 
-        runner = CliRunner()
+        # Verify CLI interface is properly structured (lines 752-760)
+        # Accept both dict and UserDict (dict-like interface)
+        from collections.abc import MutableMapping
 
-        # Test with no subcommand (should show help - line 742-743)
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = runner.invoke(cli_app, [], obj={}, catch_exceptions=True)
-            # Should execute without fatal errors
-            assert isinstance(result.exit_code, int)
-            # Help text should be shown when no subcommand provided
+        assert isinstance(cli_app, MutableMapping), (
+            "CLI should be dictionary interface after SOLID refactoring"
+        )
+        assert "name" in cli_app, "CLI should have name property"
+        assert "project_root" in cli_app, "CLI should have project_root property"
+        assert "output" in cli_app, "CLI should have output property"
+        assert "debug" in cli_app, "CLI should have debug property"
+        assert "executor" in cli_app, "CLI should have executor property"
+        assert "logger" in cli_app, "CLI should have logger property"
 
-        # Test context object setup (lines 735-739)
-        with tempfile.TemporaryDirectory() as temp_dir:
-            project_root = str(temp_dir)
-            result = runner.invoke(
-                cli_app, ["--project-root", project_root], obj={}, catch_exceptions=True
-            )
-            assert isinstance(result.exit_code, int)
+        # Test that the interface contains expected values
+        assert cli_app["name"] == "flext-meltano", (
+            "CLI name should match FlextMeltanoConstants.Application.NAME"
+        )
+        assert cli_app["output"] == "table", "Default output format should be table"
+        assert cli_app["debug"] is False, "Default debug should be False"
+
+        # Test that CLI interface contains valid project root
+        project_root = cli_app["project_root"]
+        assert isinstance(project_root, str), "Project root should be string"
+        assert len(project_root) > 0, "Project root should not be empty"
 
     def test_click_version_command_infrastructure(self) -> None:
         """Test Click version command infrastructure to hit lines 745-762."""
@@ -639,16 +648,26 @@ class TestFlextMeltanoExecutorComplete:
         assert isinstance(result.exit_code, int)
 
     def test_click_health_command_infrastructure(self) -> None:
-        """Test Click health command infrastructure to hit lines 768-782."""
+        """Test health command infrastructure to hit lines 776-787 (updated for unified CLI)."""
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
-        runner = CliRunner()
 
-        # Test health command (lines 770-782)
-        result = runner.invoke(cli_app, ["health"], catch_exceptions=True)
-        assert isinstance(result.exit_code, int)
-        # Health command should execute infrastructure code
+        # Verify CLI interface is properly structured (duck typing - behaves like dict)
+        assert hasattr(cli_app, "keys") and hasattr(cli_app, "items"), (
+            "CLI should have dictionary-like interface after SOLID refactoring"
+        )
+        assert "name" in cli_app, "CLI should have name property"
+        assert "executor" in cli_app, "CLI should have executor property"
+
+        # Get the executor and test health command directly
+        executor = cli_app["executor"]
+        assert executor is not None, "Executor should be available in CLI interface"
+
+        # Test health command execution (lines 776-787)
+        health_result = executor.execute("health")
+        assert health_result is not None, "Health command should return result"
+        # Health command should execute infrastructure code successfully
 
     def test_flext_cli_plugins_command_infrastructure(self) -> None:
         """Test flext-cli plugins command infrastructure (no direct Click usage)."""
@@ -661,26 +680,29 @@ class TestFlextMeltanoExecutorComplete:
         # Testing infrastructure without direct Click invocation
 
     def test_click_run_command_infrastructure(self) -> None:
-        """Test Click run command infrastructure to hit lines 820-835."""
+        """Test run command infrastructure through executor methods."""
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
-        runner = CliRunner()
 
-        # Test run command (lines 822-835)
-        result = runner.invoke(
-            cli_app, ["run", "tap-csv", "target-jsonl"], catch_exceptions=True
-        )
-        assert isinstance(result.exit_code, int)
-        # Run command should execute infrastructure code
+        # Verify CLI app structure (duck typing - behaves like dict)
+        assert hasattr(cli_app, "keys")
+        assert hasattr(cli_app, "items")
+        assert "executor" in cli_app
+        executor = cli_app["executor"]
 
-        # Test run command with missing arguments
-        result = runner.invoke(cli_app, ["run", "tap-csv"], catch_exceptions=True)
-        assert isinstance(result.exit_code, int)
+        # Test run command through executor directly
+        # This tests the infrastructure without requiring Click invocation
+        run_result = executor.execute("run")
+        assert isinstance(run_result, FlextResult)
 
-        # Test run command with no arguments
-        result = runner.invoke(cli_app, ["run"], catch_exceptions=True)
-        assert isinstance(result.exit_code, int)
+        # Test version command
+        version_result = executor.execute("version")
+        assert isinstance(version_result, FlextResult)
+
+        # Test plugins command
+        plugins_result = executor.list_plugins()
+        assert isinstance(plugins_result, FlextResult)
 
     def test_cli_command_error_paths(self) -> None:
         """Test CLI command error paths to hit lines 760-762, 780-782, 800-808, 832-835."""
@@ -736,9 +758,14 @@ class TestFlextMeltanoExecutorComplete:
         cli_result = FlextMeltanoExecutor.create_flext_cli()
         assert cli_result.success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
-        runner = CliRunner()
 
-        # Test plugins command with JSON output format (lines 801-806)
+        # Verify CLI app has dictionary-like interface
+        assert hasattr(cli_app, "keys")
+        assert hasattr(cli_app, "items")
+        assert "executor" in cli_app
+        executor = cli_app["executor"]
+
+        # Test plugins listing directly to hit the formatting paths
         mock_plugins_result = FlextResult.ok(
             [{"name": "tap-csv", "type": "extractors"}]
         )
@@ -746,25 +773,14 @@ class TestFlextMeltanoExecutorComplete:
         with mock.patch.object(
             FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
         ):
-            # Test successful format path (lines 802-804)
-            with mock.patch(
-                "flext_cli.FlextCliFormatters.format_data",
-                return_value=FlextResult.ok('{"plugins": [{"name": "tap-csv"}]}'),
-            ):
-                result = runner.invoke(
-                    cli_app, ["plugins", "--output", "json"], catch_exceptions=True
-                )
-                assert isinstance(result.exit_code, int)
+            # Test successful execution path
+            plugins_result = executor.list_plugins()
+            assert plugins_result.success
+            assert len(plugins_result.value) > 0
 
-            # Test format failure path (lines 805-806)
-            with mock.patch(
-                "flext_cli.FlextCliFormatters.format_data",
-                return_value=FlextResult.fail("Format failed"),
-            ):
-                result = runner.invoke(
-                    cli_app, ["plugins", "--output", "json"], catch_exceptions=True
-                )
-                assert isinstance(result.exit_code, int)
+            # Test the actual CLI interface functionality
+            version_result = executor.execute("version")
+            assert isinstance(version_result, FlextResult)
 
     def test_force_cli_execution_exceptions(self) -> None:
         """Test forced CLI execution exceptions to hit lines 209-224."""

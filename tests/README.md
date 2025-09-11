@@ -219,7 +219,7 @@ pytest tests/ --cov-fail-under=90    # Enforce coverage minimum
 
 # Quality validation
 pytest tests/ --doctest-modules      # Validate docstring examples
-pytest tests/ --mypy                 # Type safety validation
+pytest tests/ --mypy
 ```
 
 ## Integration with Quality Gates

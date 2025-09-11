@@ -212,17 +212,19 @@ class TestFlextMeltanoAdapterReal:
         """Test access to nested classes."""
         adapter = FlextMeltanoAdapter()
 
-        # Should have nested classes
-        nested_classes = [
-            "Bridge",
-            "ProjectManager",
-            "PluginDiscovery",
-            "ELTCoordinator",
+        # Should have unified methods instead of nested classes (SOLID refactored)
+        unified_methods = [
+            "execute_bridge_service",  # Bridge functionality
+            "add_plugin",  # ProjectManager functionality
+            "discover_plugins",  # PluginDiscovery functionality
+            "create_project",  # ELTCoordinator functionality
         ]
-        for class_name in nested_classes:
-            assert hasattr(adapter, class_name)
-            nested_class = getattr(adapter, class_name)
-            assert nested_class is not None
+        for method_name in unified_methods:
+            assert hasattr(adapter, method_name), (
+                f"Adapter should have {method_name} method"
+            )
+            method = getattr(adapter, method_name)
+            assert callable(method), f"{method_name} should be callable"
 
     def test_error_handling_invalid_project_path(self) -> None:
         """Test error handling with invalid paths."""

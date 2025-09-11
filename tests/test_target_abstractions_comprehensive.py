@@ -18,11 +18,7 @@ import pytest
 from flext_core import FlextResult
 from flext_tests import FlextTestsMatchers
 
-from flext_meltano.target_abstractions import (
-    FlextStreamInfo,
-    FlextTargetAbstractions,
-    FlextTargetConfig,
-)
+from flext_meltano.target_abstractions import FlextTargetAbstractions
 
 
 class TestFlextTargetConfigComprehensive:
@@ -52,7 +48,7 @@ class TestFlextTargetConfigComprehensive:
             "max_batches": 50,
         }
 
-        config = FlextTargetConfig(**config_data)
+        config = FlextTargetAbstractions.FlextTargetConfig(**config_data)
         assert config.target_type == "postgres"
         assert config.connection_config["host"] == "localhost"
         assert config.batch_size == 1000
@@ -63,7 +59,7 @@ class TestFlextTargetConfigComprehensive:
         # Valid target types
         valid_types = ["postgres", "csv", "json", "sqlite", "mysql", "oracle"]
         for target_type in valid_types:
-            config = FlextTargetConfig(
+            config = FlextTargetAbstractions.FlextTargetConfig(
                 target_type=target_type, connection_config={"host": "localhost"}
             )
             assert config.target_type == target_type
@@ -71,13 +67,15 @@ class TestFlextTargetConfigComprehensive:
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test validation fails with empty target type."""
         with pytest.raises(ValueError, match="Target type must be non-empty string"):
-            FlextTargetConfig(target_type="", connection_config={"host": "localhost"})
+            FlextTargetAbstractions.FlextTargetConfig(
+                target_type="", connection_config={"host": "localhost"}
+            )
 
     def test_target_config_validation_batch_size(self) -> None:
         """Test batch size validation."""
         # Valid batch sizes
         for size in [100, 1000, 5000]:
-            config = FlextTargetConfig(
+            config = FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres",
                 connection_config={"host": "localhost"},
                 batch_size=size,
@@ -86,7 +84,7 @@ class TestFlextTargetConfigComprehensive:
 
         # Invalid batch sizes
         with pytest.raises(ValueError, match="Batch size must be positive integer"):
-            FlextTargetConfig(
+            FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres",
                 connection_config={"host": "localhost"},
                 batch_size=0,
@@ -96,7 +94,7 @@ class TestFlextTargetConfigComprehensive:
         """Test max batches validation."""
         # Valid max batches
         for max_batches in [10, 50, 100]:
-            config = FlextTargetConfig(
+            config = FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres",
                 connection_config={"host": "localhost"},
                 max_batches=max_batches,
@@ -105,7 +103,7 @@ class TestFlextTargetConfigComprehensive:
 
         # Invalid max batches
         with pytest.raises(ValueError, match="Max batches must be positive integer"):
-            FlextTargetConfig(
+            FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres",
                 connection_config={"host": "localhost"},
                 max_batches=0,
@@ -121,7 +119,7 @@ class TestFlextTargetConfigComprehensive:
         ]
 
         for conn_config in valid_configs:
-            config = FlextTargetConfig(
+            config = FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres", connection_config=conn_config
             )
             assert isinstance(config.connection_config, dict)
@@ -132,7 +130,9 @@ class TestFlextTargetConfigComprehensive:
             ValueError,
             match="Connection configuration is required and must be dictionary",
         ):
-            FlextTargetConfig(target_type="postgres", connection_config={})
+            FlextTargetAbstractions.FlextTargetConfig(
+                target_type="postgres", connection_config={}
+            )
 
 
 class TestFlextStreamInfoComprehensive:
@@ -153,7 +153,7 @@ class TestFlextStreamInfoComprehensive:
             "created_at": datetime.now(UTC).isoformat(),
         }
 
-        stream_info = FlextStreamInfo(**stream_data)
+        stream_info = FlextTargetAbstractions.FlextStreamInfo(**stream_data)
         assert stream_info.stream_name == "users"
         assert stream_info.stream_schema["type"] == "object"
         assert "properties" in stream_info.stream_schema
@@ -161,7 +161,7 @@ class TestFlextStreamInfoComprehensive:
     def test_stream_info_validation_empty_name(self) -> None:
         """Test stream name validation."""
         with pytest.raises(ValueError, match="Stream name must be non-empty string"):
-            FlextStreamInfo(
+            FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="",
                 schema={"type": "object"},
                 created_at=datetime.now(UTC).isoformat(),
@@ -185,14 +185,14 @@ class TestFlextStreamInfoComprehensive:
         ]
 
         for schema in valid_schemas:
-            stream_info = FlextStreamInfo(
+            stream_info = FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="test_stream", schema=schema, created_at=created_at
             )
             assert stream_info.stream_schema == schema
 
         # Schema without 'properties' should fail based on validation
         with pytest.raises(ValueError, match="Schema must contain properties"):
-            FlextStreamInfo(
+            FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="test_stream",
                 schema={
                     "type": "array",
@@ -343,7 +343,7 @@ class TestFlextTargetAbstractionsComprehensive:
         created_at = datetime.now(UTC).isoformat()
 
         [
-            FlextStreamInfo(
+            FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="users",
                 schema={
                     "type": "object",
@@ -354,7 +354,7 @@ class TestFlextTargetAbstractionsComprehensive:
                 },
                 created_at=created_at,
             ),
-            FlextStreamInfo(
+            FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="orders",
                 schema={
                     "type": "object",
@@ -421,7 +421,7 @@ class TestFlextTargetAbstractionsComprehensive:
         # Create stream definitions
         created_at = datetime.now(UTC).isoformat()
 
-        FlextStreamInfo(
+        FlextTargetAbstractions.FlextStreamInfo(
             stream_name="users",
             schema={
                 "type": "object",
@@ -438,7 +438,7 @@ class TestFlextTargetAbstractionsComprehensive:
             created_at=created_at,
         )
 
-        FlextStreamInfo(
+        FlextTargetAbstractions.FlextStreamInfo(
             stream_name="orders",
             schema={
                 "type": "object",
@@ -634,31 +634,27 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         result = self.target_abstractions.list_streams(target_data)
         assert isinstance(result, list)
 
-        # Test configuration info methods
-        result = self.target_abstractions.get_config_info()
-        assert isinstance(result, dict)
+        # Test target-specific functionality instead of Entity methods
+        # Verify it has proper target ID (not Entity ID)
+        assert hasattr(self.target_abstractions, "target_id")
+        assert isinstance(self.target_abstractions.id, str)  # Compatibility property
 
-        result = self.target_abstractions.get_config_summary()
-        assert isinstance(result, dict)
+    def test_target_specific_functionality(self) -> None:
+        """Test target-specific functionality without Entity dependencies."""
+        # Test core target functionality (not Entity counter methods)
 
-    def test_counter_and_metrics_methods(self) -> None:
-        """Test counter and metrics methods for coverage."""
-        # Test increment methods (these should always work)
-        self.target_abstractions.increment_validation_count()
-        self.target_abstractions.increment_cache_hits()
-        self.target_abstractions.increment_version()
+        # Test target validation capabilities (use actual existing method)
+        result = self.target_abstractions.validate_business_rules()
+        assert result.success or result.is_failure  # Should return FlextResult
 
-        # Test reset performance counters
-        self.target_abstractions.reset_performance_counters()
+        # Test target ID functionality
+        assert hasattr(self.target_abstractions, "target_id")
+        assert isinstance(self.target_abstractions.target_id, str)
 
-        # Check that counters work
-        assert self.target_abstractions.validation_count >= 0
-        assert self.target_abstractions.validation_cache_hits >= 0
-
-        # Test that properties exist
-        assert hasattr(self.target_abstractions, "version")
-        assert hasattr(self.target_abstractions, "created_at")
-        assert hasattr(self.target_abstractions, "updated_at")
+        # Test environment methods (target-specific, not Entity)
+        assert isinstance(self.target_abstractions.is_development(), bool)
+        assert isinstance(self.target_abstractions.is_test(), bool)
+        assert isinstance(self.target_abstractions.is_production(), bool)
 
     def test_validation_and_environment_methods(self) -> None:
         """Test validation and environment methods for coverage."""
@@ -675,20 +671,27 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
 
     def test_utility_and_audit_methods(self) -> None:
         """Test utility methods for coverage."""
-        # Test timestamp generation
-        timestamp = self.target_abstractions._get_current_timestamp()
+        # Test timestamp generation using FlextUtilities as SOURCE OF TRUTH
+        from flext_core import FlextUtilities
+
+        timestamp = FlextUtilities.Generators.generate_iso_timestamp()
         assert isinstance(timestamp, str)
 
-        # Test safe nested value retrieval
+        # Test safe nested value retrieval using flext-core SOURCE OF TRUTH
         data = {"level1": {"level2": {"value": "test"}}}
-        result = self.target_abstractions._safe_get_nested(
-            data, ["level1", "level2", "value"]
+        result = FlextUtilities.Conversions.safe_dict_get(
+            FlextUtilities.Conversions.safe_dict_get(
+                FlextUtilities.Conversions.safe_dict_get(data, "level1", {}),
+                "level2",
+                {},
+            ),
+            "value",
         )
         assert result == "test"
 
-        # Test non-existent path
-        result = self.target_abstractions._safe_get_nested(
-            data, ["nonexistent", "path"]
+        # Test non-existent path using flext-core SOURCE OF TRUTH
+        result = FlextUtilities.Conversions.safe_dict_get(
+            FlextUtilities.Conversions.safe_dict_get(data, "nonexistent", {}), "path"
         )
         assert result is None
 

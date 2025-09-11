@@ -412,7 +412,7 @@ from flext_meltano import FlextMeltanoBridge as Bridge
 ```python
 # Clear architectural boundaries
 ┌─────────────────────────────────────┐
-│      Bridge Integration Layer       │  # simple_bridge.py
+│      Bridge Integration Layer       │
 │   (Go ↔ Python Communication)       │
 ├─────────────────────────────────────┤
 │       Application Layer             │  # core.py, cli.py
@@ -695,7 +695,7 @@ def run_pipeline(tap: str, target: str) -> FlextResult[Dict[str, object]]:
 ### **Bridge Implementation Pattern** (TO BE IMPLEMENTED)
 
 ```python
-# simple_bridge.py - Go ↔ Python bridge (MISSING)
+
 import json
 from typing import Dict, List, Optional
 
@@ -1061,7 +1061,7 @@ def test_bridge_subprocess_simulation():
 class ModuleQualityStandards:
     """Quality requirements for FLEXT Meltano modules."""
 
-    # Type safety
+
     mypy_compliance: bool = True          # Strict MyPy validation
     type_annotation_coverage: float = 1.0 # 100% type annotations
 
@@ -1075,7 +1075,7 @@ class ModuleQualityStandards:
     api_documentation: bool = True        # API docs required
 
     # Code quality
-    linting_compliance: bool = True       # Ruff ALL rules
+    linting_compliance: bool = True
     security_scanning: bool = True        # Bandit + pip-audit
 
     # Module-specific requirements
@@ -1211,7 +1211,7 @@ FlextMeltanoResult = FlextResult  # Use FlextResult from flext-core
 
 ```bash
 # Required before module acceptance
-make lint                   # Ruff with ALL rules enabled
+make lint
 make type-check            # MyPy strict mode validation
 make test                  # 90% coverage requirement
 make security              # Bandit + pip-audit scanning

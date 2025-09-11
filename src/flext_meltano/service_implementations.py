@@ -18,12 +18,25 @@ from __future__ import annotations
 
 import warnings
 
+# Create legacy class aliases using partial with service_type
+from functools import partial
+
 from flext_meltano.services import FlextMeltanoService
 
-# Create legacy class aliases
-FlextMeltanoTapService = FlextMeltanoService.TapService
-FlextMeltanoTargetService = FlextMeltanoService.TargetService
-FlextMeltanoDbtService = FlextMeltanoService.DbtService
+
+def _create_service_with_type(
+    service_type: str, name: str, **kwargs: object
+) -> FlextMeltanoService:
+    """Create service with specific type."""
+    return FlextMeltanoService(
+        service_type=service_type, **{f"{service_type}_name": name}, **kwargs
+    )
+
+
+# Legacy compatibility classes
+FlextMeltanoTapService = partial(_create_service_with_type, "tap")
+FlextMeltanoTargetService = partial(_create_service_with_type, "target")
+FlextMeltanoDbtService = partial(_create_service_with_type, "dbt")
 
 # Issue deprecation warning
 warnings.warn(

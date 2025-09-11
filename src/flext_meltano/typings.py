@@ -16,23 +16,22 @@ from typing import (
 )
 
 from dbt.cli.main import dbtRunner
-from flext_core import FlextTypes
+from flext_core import FlextTypes  # Use flext-core type variables
 from singer_sdk import (
     Stream as SingerStream,
     Tap as SingerTap,
     Target as SingerTarget,
 )
 
-# Python 3.13+ Advanced Generic Type Variables with covariance
-T_co = TypeVar("T_co", covariant=True)
-U = TypeVar("U")
-V = TypeVar("V")
+# Use flext-core type variables - eliminate duplication
+T_co = TypeVar("T_co", covariant=True)  # Keep this one as it needs covariance
+# U and V now come from flext-core
 
 # Python 3.13+ Type aliases - USE FlextTypes directly (eliminate duplication)
 type ConfigValue = FlextTypes.Core.ConfigValue  # ✅ ALIAS to eliminate duplication
-type ConfigDict = FlextTypes.Core.ConfigDict   # ✅ ALIAS to eliminate duplication
-type JsonValue = FlextTypes.Core.JsonValue     # ✅ ALIAS to eliminate duplication
-type JsonObject = FlextTypes.Core.JsonObject   # ✅ ALIAS to eliminate duplication
+type ConfigDict = FlextTypes.Core.ConfigDict  # ✅ ALIAS to eliminate duplication
+type JsonValue = FlextTypes.Core.JsonValue  # ✅ ALIAS to eliminate duplication
+type JsonObject = FlextTypes.Core.JsonObject  # ✅ ALIAS to eliminate duplication
 
 # Advanced Python 3.13+ Union and Intersection Types
 type MessageType = str
@@ -42,30 +41,10 @@ type CommandResult = object
 type HandlerContext = FlextTypes.Core.Dict
 
 
-# Modern Protocol definitions for structural typing
-@runtime_checkable
-class MeltanoPluginProtocol(Protocol[T_co]):
-    """Advanced protocol for Meltano plugin interface with covariant constraints."""
-
-    def get_config(self) -> ConfigDict: ...
-    def validate_config(self, config: ConfigDict) -> bool: ...
-    def execute(self, *args: object) -> T_co: ...
-
-
-@runtime_checkable
-class SingerStreamProtocol(Protocol):
-    """Protocol for Singer stream implementations with type safety."""
-
-    name: str
-    tap_stream_id: str
-    schema: JsonObject
-
-    def sync_records(self) -> JsonValue: ...
-    def get_records(self) -> JsonValue: ...
-
-
 class FlextMeltanoTypes:
-    """Meltano-specific hierarchical type system extending FlextTypes.
+    """UNIFIED Meltano Types - SINGLE RESPONSIBILITY PATTERN.
+
+    Meltano-specific hierarchical type system extending FlextTypes with consolidated protocols.
 
     This class inherits all core FLEXT types and adds Meltano-specific
     type definitions organized by domain functionality.
@@ -92,6 +71,33 @@ class FlextMeltanoTypes:
             pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
 
     """
+
+    # =========================================================================
+    # NESTED PROTOCOL DEFINITIONS - Domain-specific structural typing
+    # =========================================================================
+
+    @runtime_checkable
+    class MeltanoPluginProtocol(Protocol[T_co]):
+        """Advanced protocol for Meltano plugin interface with covariant constraints."""
+
+        def get_config(self) -> ConfigDict: ...
+        def validate_config(self, config: ConfigDict) -> bool: ...
+        def execute(self, *args: object) -> T_co: ...
+
+    @runtime_checkable
+    class SingerStreamProtocol(Protocol):
+        """Protocol for Singer stream implementations with type safety."""
+
+        name: str
+        tap_stream_id: str
+        schema: JsonObject
+
+        def sync_records(self) -> JsonValue: ...
+        def get_records(self) -> JsonValue: ...
+
+    # =========================================================================
+    # DOMAIN TYPE CLASSES
+    # =========================================================================
 
     # =========================================================================
     # PLUGIN TYPES - Meltano plugin management
@@ -287,10 +293,6 @@ class FlextMeltanoTypes:
         type WrapperResult = JsonObject  # Wrapper result as JsonObject
         type BridgeResult = JsonObject  # Bridge result as JsonObject
 
-
-# =============================================================================
-# PUBLIC API EXPORTS
-# =============================================================================
 
 __all__ = [
     "FlextMeltanoTypes",

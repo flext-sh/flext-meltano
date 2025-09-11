@@ -292,7 +292,9 @@ class TestFlextMeltanoExecutorsComprehensive:
         FlextTestsMatchers.assert_result_success(success_result, "test data")
 
         failure_result = (
-            FlextTestsBuilders.ResultBuilder().with_failure("test error", "TEST_001").build()
+            FlextTestsBuilders.ResultBuilder()
+            .with_failure("test error", "TEST_001")
+            .build()
         )
         FlextTestsMatchers.assert_result_failure(
             failure_result, "test error", "TEST_001"
@@ -311,7 +313,9 @@ class TestFlextMeltanoExecutorsComprehensive:
         }
 
         # Validate the test utilities integration works correctly using actual methods
-        success_result = test_utilities.TestUtilities.create_test_result(success=True, data=test_data)
+        success_result = test_utilities.TestUtilities.create_test_result(
+            success=True, data=test_data
+        )
         FlextTestsUtilities.TestUtilities.assert_result_success(success_result)
 
         # Test data validation

@@ -27,48 +27,64 @@ class TestFlextMeltanoConfigBuildersBasic(unittest.TestCase):
         builders = FlextMeltanoConfigBuilders()
         assert isinstance(builders, FlextMeltanoConfigBuilders)
 
-    def test_nested_dbt_builder_exists(self) -> None:
-        """Test DbtConfigBuilder nested class exists."""
-        assert hasattr(FlextMeltanoConfigBuilders, "DbtConfigBuilder")
-        builder = FlextMeltanoConfigBuilders.DbtConfigBuilder()
-        assert isinstance(builder, FlextMeltanoConfigBuilders.DbtConfigBuilder)
+    def test_unified_builder_has_dbt_functionality(self) -> None:
+        """Test unified builder has DBT functionality (SOLID refactored)."""
+        builder = FlextMeltanoConfigBuilders()
+        assert hasattr(builder, "create_dbt_config")
+        assert callable(getattr(builder, "create_dbt_config"))
 
-    def test_nested_singer_builder_exists(self) -> None:
-        """Test SingerConfigBuilder nested class exists."""
-        assert hasattr(FlextMeltanoConfigBuilders, "SingerConfigBuilder")
-        builder = FlextMeltanoConfigBuilders.SingerConfigBuilder()
-        assert isinstance(builder, FlextMeltanoConfigBuilders.SingerConfigBuilder)
+    def test_unified_builder_has_singer_functionality(self) -> None:
+        """Test unified builder has Singer functionality (SOLID refactored)."""
+        builder = FlextMeltanoConfigBuilders()
+        assert hasattr(builder, "create_singer_tap_config")
+        assert hasattr(builder, "create_singer_target_config")
+        assert callable(getattr(builder, "create_singer_tap_config"))
 
-    def test_nested_meltano_builder_exists(self) -> None:
-        """Test MeltanoConfigBuilder nested class exists."""
-        assert hasattr(FlextMeltanoConfigBuilders, "MeltanoConfigBuilder")
-        builder = FlextMeltanoConfigBuilders.MeltanoConfigBuilder()
-        assert isinstance(builder, FlextMeltanoConfigBuilders.MeltanoConfigBuilder)
+    def test_unified_builder_has_meltano_functionality(self) -> None:
+        """Test unified builder has Meltano functionality (SOLID refactored)."""
+        builder = FlextMeltanoConfigBuilders()
+        assert hasattr(builder, "create_meltano_config")
+        assert hasattr(builder, "add_plugin_to_config")
+        assert callable(getattr(builder, "create_meltano_config"))
 
     def test_dbt_config_builder_has_build_method(self) -> None:
-        """Test DbtConfigBuilder has build functionality."""
-        builder = FlextMeltanoConfigBuilders.DbtConfigBuilder()
+        """Test unified builder has DBT functionality."""
+        builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_dbt_config")
 
     def test_singer_config_builder_has_build_method(self) -> None:
-        """Test SingerConfigBuilder has build functionality."""
-        builder = FlextMeltanoConfigBuilders.SingerConfigBuilder()
+        """Test unified builder has Singer functionality."""
+        builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_singer_tap_config")
 
     def test_meltano_config_builder_has_build_method(self) -> None:
-        """Test MeltanoConfigBuilder has build functionality."""
-        builder = FlextMeltanoConfigBuilders.MeltanoConfigBuilder()
+        """Test unified builder has Meltano functionality."""
+        builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_meltano_config")
 
     def test_all_exports_available(self) -> None:
-        """Test all expected exports are available."""
+        """Test all expected exports are available (updated for unified architecture)."""
         # Main class should be importable
         assert FlextMeltanoConfigBuilders is not None
 
-        # Should be able to access nested classes
-        assert hasattr(FlextMeltanoConfigBuilders, "DbtConfigBuilder")
-        assert hasattr(FlextMeltanoConfigBuilders, "SingerConfigBuilder")
-        assert hasattr(FlextMeltanoConfigBuilders, "MeltanoConfigBuilder")
+        # Create instance and verify all unified methods are available
+        builder = FlextMeltanoConfigBuilders()
+
+        # DBT configuration methods
+        assert hasattr(builder, "create_dbt_config")
+
+        # Singer configuration methods
+        assert hasattr(builder, "create_singer_tap_config")
+        assert hasattr(builder, "create_singer_target_config")
+
+        # Plugin configuration methods
+        assert hasattr(builder, "create_plugin_config")
+        assert hasattr(builder, "create_extractor_config")
+        assert hasattr(builder, "create_loader_config")
+
+        # Meltano configuration methods
+        assert hasattr(builder, "create_meltano_config")
+        assert hasattr(builder, "add_plugin_to_config")
 
 
 if __name__ == "__main__":
