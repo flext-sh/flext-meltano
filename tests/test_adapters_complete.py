@@ -419,7 +419,6 @@ class TestFlextMeltanoAdapterComplete:
         """Test unified adapter execute_pipeline using flext_tests."""
         # Create a temporary project for testing pipeline execution
         with tempfile.TemporaryDirectory() as temp_dir:
-
             project_result = self.adapter.create_project(
                 project_name="test_pipeline_project", project_dir=Path(temp_dir)
             )
@@ -509,11 +508,6 @@ class TestFlextMeltanoAdapterComplete:
             condition=adapter1 is not self.adapter,
             message="New adapter instance should be independent from fixture",
         )
-
-
-
-
-
 
     def test_adapter_with_different_configurations(self) -> None:
         """Test adapter behavior with different plugin configurations."""

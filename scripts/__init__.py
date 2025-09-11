@@ -16,8 +16,8 @@ Scripts:
 """
 
 from __future__ import annotations
-from flext_core import FlextTypes
 
+from flext_core import FlextTypes
 
 __all__: FlextTypes.Core.StringList = [
     # Will be populated when script modules are added
