@@ -105,7 +105,8 @@ class TestFlextTapAbstractionsComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create TapConfig first
             config = TapConfig(
-                tap_type="tap-csv", connection_config={"file_path": f"{temp_dir}/data.csv"}
+                tap_type="tap-csv",
+                connection_config={"file_path": f"{temp_dir}/data.csv"},
             )
 
             # Create test tap instance
@@ -132,7 +133,8 @@ class TestFlextTapAbstractionsComplete:
                 message="Tap ID should match",
             )
             self.test_assertions.assert_true(
-                condition=tap_instance.discovered, message="Should be marked as discovered"
+                condition=tap_instance.discovered,
+                message="Should be marked as discovered",
             )
 
     # =========================================================================
