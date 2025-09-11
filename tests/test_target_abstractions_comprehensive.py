@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 from flext_tests import FlextTestsMatchers
 
 from flext_meltano.target_abstractions import FlextTargetAbstractions
@@ -672,7 +672,6 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
     def test_utility_and_audit_methods(self) -> None:
         """Test utility methods for coverage."""
         # Test timestamp generation using FlextUtilities as SOURCE OF TRUTH
-        from flext_core import FlextUtilities
 
         timestamp = FlextUtilities.Generators.generate_iso_timestamp()
         assert isinstance(timestamp, str)

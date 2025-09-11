@@ -9,8 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
 from flext_meltano.constants import FlextMeltanoConstants
 
 __version__ = FlextMeltanoConstants.FLEXT_MELTANO_VERSION  # SOURCE OF TRUTH
@@ -130,63 +128,55 @@ def create_flext_tap_config(**kwargs: object) -> dict[str, object]:
 
 
 __all__ = [
-    # Foundation Layer
-    "FlextMeltanoConstants",
-    "FlextMeltanoTypes",
-    # Ultra-simple aliases
-    "FlextMeltanoTypeAdapters",
-    "FlextTap",
-    "FlextTapAbstract",
-    "FlextTapStream",
-    "FlextSingerStream",
+    "DbtServiceProtocol",
     "FlextDbt",
-    "FlextTarget",
-    "create_flext_tap_config",
-    # Exception handling
+    "FlextDbtPlugin",
+    "FlextExecutionResult",
+    "FlextMeltanoAdapter",
     "FlextMeltanoAuthenticationError",
     "FlextMeltanoBaseError",
-    "FlextMeltanoConfigurationError",
-    "FlextMeltanoConnectionError",
-    "FlextMeltanoError",
-    "FlextMeltanoProcessingError",
-    "FlextMeltanoTimeoutError",
-    "FlextMeltanoValidationError",
-    # Service Layer
-    "FlextMeltanoAdapter",
-    "FlextMeltanoService",
-    "FlextMeltanoDbtService",
-    "FlextMeltanoTapService",
-    "FlextMeltanoTargetService",
-    # Plugin protocols
-    "DbtServiceProtocol",
-    "FlextDbtPlugin",
-    "FlextMeltanoPluginTypes",
-    "FlextTapPlugin",
-    "FlextTargetPlugin",
-    "TapServiceProtocol",
-    "TargetServiceProtocol",
-    # Execution Layer
-    "FlextMeltanoExecutor",
     "FlextMeltanoBridge",
     "FlextMeltanoCli",
-    "flext_meltano_run_cli",
-    "FlextExecutionResult",
+    "FlextMeltanoConfig",
+    "FlextMeltanoConfigBuilders",
+    "FlextMeltanoConfigurationError",
+    "FlextMeltanoConnectionError",
+    "FlextMeltanoConstants",
+    "FlextMeltanoDbtService",
+    "FlextMeltanoError",
+    "FlextMeltanoExecutor",
     "FlextMeltanoExecutors",
+    "FlextMeltanoFileManagers",
+    "FlextMeltanoPluginTypes",
+    "FlextMeltanoProcessingError",
+    "FlextMeltanoService",
+    "FlextMeltanoTapService",
+    "FlextMeltanoTargetService",
+    "FlextMeltanoTimeoutError",
+    "FlextMeltanoTypeAdapters",
+    "FlextMeltanoTypes",
+    "FlextMeltanoUtilities",
+    "FlextMeltanoValidationError",
+    "FlextMeltanoValidators",
+    "FlextSingerStream",
+    "FlextSingerTypes",
+    "FlextStreamInfo",
+    "FlextTap",
+    "FlextTapAbstract",
+    "FlextTapAbstractions",
+    "FlextTapPlugin",
+    "FlextTapStream",
+    "FlextTarget",
+    "FlextTargetAbstractions",
+    "FlextTargetConfig",
+    "FlextTargetPlugin",
     "SimpleDbtExecutor",
     "SimpleMeltanoExecutor",
-    # Integration Layer
-    "FlextSingerTypes",
-    "FlextTapAbstractions",
     "StreamDefinition",
     "TapConfig",
     "TapInstance",
-    "FlextTargetAbstractions",
-    "FlextTargetConfig",
-    "FlextStreamInfo",
-    # Support Layer
-    "FlextMeltanoConfig",
-    "FlextMeltanoConfigBuilders",
-    "FlextMeltanoUtilities",
-    "FlextMeltanoValidators",
-    "FlextMeltanoFileManagers",
+    "TapServiceProtocol",
+    "TargetServiceProtocol",
+    "create_flext_tap_config",
+    "flext_meltano_run_cli",
 ]

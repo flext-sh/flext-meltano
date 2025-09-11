@@ -69,6 +69,7 @@ class FlextTargetAbstractions:
         @field_validator("target_type")
         @classmethod
         def validate_target_type(cls, v: str) -> str:
+            """Validate target type is non-empty string."""
             if not v or not isinstance(v, str):
                 msg = "Target type must be non-empty string"
                 raise ValueError(msg)
@@ -79,6 +80,7 @@ class FlextTargetAbstractions:
         def validate_connection_config(
             cls, v: FlextTypes.Core.Dict
         ) -> FlextTypes.Core.Dict:
+            """Validate connection config is non-empty dictionary."""
             if not v or not isinstance(v, dict):
                 msg = "Connection configuration is required and must be dictionary"
                 raise ValueError(msg)
@@ -87,6 +89,7 @@ class FlextTargetAbstractions:
         @field_validator("batch_size")
         @classmethod
         def validate_batch_size(cls, v: int) -> int:
+            """Validate batch size is positive integer."""
             if not isinstance(v, int) or v <= 0:
                 msg = "Batch size must be positive integer"
                 raise ValueError(msg)
@@ -95,6 +98,7 @@ class FlextTargetAbstractions:
         @field_validator("max_batches")
         @classmethod
         def validate_max_batches(cls, v: int) -> int:
+            """Validate max batches is positive integer."""
             if not isinstance(v, int) or v <= 0:
                 msg = "Max batches must be positive integer"
                 raise ValueError(msg)
@@ -121,6 +125,7 @@ class FlextTargetAbstractions:
         @field_validator("stream_name")
         @classmethod
         def validate_stream_name(cls, v: str) -> str:
+            """Validate stream name is non-empty string."""
             if not v or not isinstance(v, str):
                 msg = "Stream name must be non-empty string"
                 raise ValueError(msg)
@@ -131,6 +136,7 @@ class FlextTargetAbstractions:
         def validate_stream_schema(
             cls, v: FlextTypes.Core.Dict
         ) -> FlextTypes.Core.Dict:
+            """Validate stream schema contains properties."""
             if "properties" not in v:
                 msg = "Schema must contain properties"
                 raise ValueError(msg)

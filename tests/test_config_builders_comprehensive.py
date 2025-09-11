@@ -312,6 +312,10 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
+        # Verify the tap name is preserved in the configuration
+        assert config["name"] == tap_name
+        # Verify the normalized name matches expected
+        assert config["name"] == expected_normalized
 
         # Name should be preserved as-is after safe_string processing
         assert isinstance(config["name"], str)

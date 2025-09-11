@@ -32,6 +32,7 @@ class FlextMeltanoExecutor:
     """Single executor class for all Meltano command execution following flext-core patterns."""
 
     def __init__(self, project_root: Path | None = None) -> None:
+        """Initialize executor with project root and dependencies."""
         self.project_root = project_root or Path.cwd()
         self._bridge: MeltanoBridge | None = None
         self.meltano_adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
@@ -217,8 +218,10 @@ class FlextMeltanoExecutor:
                     "error": exit_code_result.error,
                 }
 
-            # Use FlextUtilities.ProcessingUtils.extract_model_data for standardized extraction
-            processed_headers = FlextUtilities.ProcessingUtils.extract_model_data(result_data)
+            # Convert result data to Headers format (dict[str, str])
+            processed_headers: FlextTypes.Core.Headers = {
+                key: str(value) for key, value in result_data.items()
+            }
             return FlextResult[FlextTypes.Core.Headers].ok(processed_headers)
 
         except Exception as e:
@@ -230,7 +233,10 @@ class FlextMeltanoExecutor:
                 "success": False,
                 "error": str(e),
             }
-            processed_error = FlextUtilities.ProcessingUtils.extract_model_data(error_data)
+            # Convert error data to Headers format (dict[str, str])
+            processed_error: FlextTypes.Core.Headers = {
+                key: str(value) for key, value in error_data.items()
+            }
             return FlextResult[FlextTypes.Core.Headers].ok(processed_error)
 
     def _execute_command(
@@ -416,7 +422,7 @@ class FlextMeltanoExecutor:
         try:
             logger.info("Running ELT pipeline", tap=tap_name, target=target_name)
 
-            # Execute real ELT pipeline using Meltano integration
+            # Execute ELT pipeline using Meltano integration
             try:
                 # Use bridge for executing pipeline through Meltano
                 if project_root:

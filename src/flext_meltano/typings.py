@@ -80,9 +80,17 @@ class FlextMeltanoTypes:
     class MeltanoPluginProtocol(Protocol[T_co]):
         """Advanced protocol for Meltano plugin interface with covariant constraints."""
 
-        def get_config(self) -> ConfigDict: ...
-        def validate_config(self, config: ConfigDict) -> bool: ...
-        def execute(self, *args: object) -> T_co: ...
+        def get_config(self) -> ConfigDict:
+            """Get plugin configuration."""
+            ...
+
+        def validate_config(self, config: ConfigDict) -> bool:
+            """Validate plugin configuration."""
+            ...
+
+        def execute(self, *args: object) -> T_co:
+            """Execute plugin with given arguments."""
+            ...
 
     @runtime_checkable
     class SingerStreamProtocol(Protocol):
@@ -92,8 +100,13 @@ class FlextMeltanoTypes:
         tap_stream_id: str
         schema: JsonObject
 
-        def sync_records(self) -> JsonValue: ...
-        def get_records(self) -> JsonValue: ...
+        def sync_records(self) -> JsonValue:
+            """Sync records from the stream."""
+            ...
+
+        def get_records(self) -> JsonValue:
+            """Get records from the stream."""
+            ...
 
     # =========================================================================
     # DOMAIN TYPE CLASSES

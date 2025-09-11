@@ -1,4 +1,4 @@
-"""FLEXT Meltano Services - UNIFIED service implementation following SOLID principles.
+"""FLEXT Meltano Services - UNIFIED service implementation.
 
 This module provides a SINGLE UNIFIED Meltano/Singer/DBT service implementation using
 strict flext-core architecture with SOLID compliance:

@@ -14,6 +14,7 @@ from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 
 from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.constants import FlextMeltanoConstants
 
 
 class TestFlextMeltanoAdapterComplete:
@@ -132,62 +133,64 @@ class TestFlextMeltanoAdapterComplete:
         FlextTestsFixtures()
 
         # Configure functional service for project initialization
-        project_data = {
-            "root": "/tmp/test_project",
-            "name": "test-project",
-            "version": 1,
-        }
-        self.functional_service.configure_method(
-            "initialize_project", return_value=project_data
-        )
-
-        # Create test path using flext_tests utilities
-        test_path = Path("/tmp/test_flext_project")
-        result = self.adapter.initialize_project(test_path)
-
-        self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
-        )
-        if result.success:
-            project = result.value
-            self.test_assertions.assert_true(
-                condition=project is not None, message="Project should not be None"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_data = {
+                "root": temp_dir,
+                "name": "test-project",
+                "version": 1,
+            }
+            self.functional_service.configure_method(
+                "initialize_project", return_value=project_data
             )
+
+            # Create test path using flext_tests utilities
+            test_path = Path(temp_dir)
+            result = self.adapter.initialize_project(test_path)
+
+            self.test_assertions.assert_true(
+                condition=isinstance(result, FlextResult),
+                message="Should return FlextResult",
+            )
+            if result.success:
+                project = result.value
+                self.test_assertions.assert_true(
+                    condition=project is not None, message="Project should not be None"
+                )
 
     def test_create_project_functional(self) -> None:
         """Test project creation using functional service patterns."""
-        # Use flext_tests test data creation
-        project_info = self.test_utils.create_test_data(size=1, prefix="project")[0]
-        project_info.update(
-            {"project_path": "/tmp/test-flext-project", "name": "test-flext-project"}
-        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Use flext_tests test data creation
+            project_info = self.test_utils.create_test_data(size=1, prefix="project")[0]
+            project_info.update(
+                {"project_path": temp_dir, "name": "test-flext-project"}
+            )
 
-        # Configure functional service
-        self.functional_service.configure_method(
-            "create_project", return_value=project_info
-        )
+            # Configure functional service
+            self.functional_service.configure_method(
+                "create_project", return_value=project_info
+            )
 
-        project_name = "test-flext-project"
-        test_path = Path("/tmp/test_projects")
+            project_name = "test-flext-project"
+            test_path = Path(temp_dir)
 
-        result = self.adapter.create_project(project_name, test_path)
+            result = self.adapter.create_project(project_name, test_path)
 
-        self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
-        )
-        if result.success:
-            created_info = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(created_info, dict),
-                message="Project info should be dict",
+                condition=isinstance(result, FlextResult),
+                message="Should return FlextResult",
             )
-            self.test_assertions.assert_in(
-                item="project_path",
-                container=created_info,
-                message="Should contain project_path",
-            )
+            if result.success:
+                created_info = result.value
+                self.test_assertions.assert_true(
+                    condition=isinstance(created_info, dict),
+                    message="Project info should be dict",
+                )
+                self.test_assertions.assert_in(
+                    item="project_path",
+                    container=created_info,
+                    message="Should contain project_path",
+                )
 
     def test_add_plugin_functional(self) -> None:
         """Test adding plugin using functional service."""
@@ -199,37 +202,40 @@ class TestFlextMeltanoAdapterComplete:
             "namespace": "tap_csv",
         }
 
-        # Configure functional service for both initialization and plugin addition
-        self.functional_service.configure_method(
-            "initialize_project", return_value={"root": "/tmp/test"}
-        )
-        self.functional_service.configure_method("add_plugin", return_value=plugin_info)
-
-        # Test the plugin addition workflow
-        init_result = self.adapter.initialize_project(Path("/tmp/test"))
-
-        if init_result.success:
-            project = init_result.value
-            plugin_result = self.adapter.add_plugin(
-                project_dir=Path(project["root"]),
-                plugin_type="extractors",
-                plugin_name="tap-csv",
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Configure functional service for both initialization and plugin addition
+            self.functional_service.configure_method(
+                "initialize_project", return_value={"root": temp_dir}
+            )
+            self.functional_service.configure_method(
+                "add_plugin", return_value=plugin_info
             )
 
-            self.test_assertions.assert_true(
-                condition=isinstance(plugin_result, FlextResult),
-                message="Should return FlextResult",
-            )
-            if plugin_result.success:
-                result_info = plugin_result.value
-                self.test_assertions.assert_true(
-                    condition=isinstance(result_info, dict),
-                    message="Plugin info should be dict",
+            # Test the plugin addition workflow
+            init_result = self.adapter.initialize_project(Path(temp_dir))
+
+            if init_result.success:
+                project = init_result.value
+                plugin_result = self.adapter.add_plugin(
+                    project_dir=Path(project["root"]),
+                    plugin_type="extractors",
+                    plugin_name="tap-csv",
                 )
-                has_name = "name" in result_info or "plugin_name" in result_info
+
                 self.test_assertions.assert_true(
-                    condition=has_name, message="Should contain plugin name"
+                    condition=isinstance(plugin_result, FlextResult),
+                    message="Should return FlextResult",
                 )
+                if plugin_result.success:
+                    result_info = plugin_result.value
+                    self.test_assertions.assert_true(
+                        condition=isinstance(result_info, dict),
+                        message="Plugin info should be dict",
+                    )
+                    has_name = "name" in result_info or "plugin_name" in result_info
+                    self.test_assertions.assert_true(
+                        condition=has_name, message="Should contain plugin name"
+                    )
 
     def test_get_version_functional(self) -> None:
         """Test get_version functional capability using flext_tests."""
@@ -300,18 +306,20 @@ class TestFlextMeltanoAdapterComplete:
             message="Target config should be dict",
         )
         self.test_assertions.assert_in(
-            item="config_type",
+            item="target_schema",
             container=result.value,
-            message="Should have config_type",
+            message="Should have target_schema",
+        )
+        self.test_assertions.assert_in(
+            item="batch_config",
+            container=result.value,
+            message="Should have batch_config",
         )
 
     def test_convert_singer_schema(self) -> None:
         """Test convert_singer_schema method using flext_tests."""
-        # Create test schema using flext_tests data
-        test_schema = self.test_utils.create_test_data(size=1, prefix="schema")[0]
-        test_schema.update({"type": "object", "properties": {"id": {"type": "string"}}})
-
-        result = self.adapter.convert_singer_schema(test_schema)
+        # Test the method without arguments as per its signature
+        result = self.adapter.convert_singer_schema()
 
         self.test_assertions.assert_true(
             condition=result.success, message="convert_singer_schema should succeed"
@@ -323,13 +331,8 @@ class TestFlextMeltanoAdapterComplete:
 
     def test_validate_stream_schema(self) -> None:
         """Test validate_stream_schema method using flext_tests."""
-        # Create test stream schema using flext_tests
-        test_stream = {
-            "stream_name": "test_stream",
-            "schema": {"type": "object", "properties": {"id": {"type": "string"}}},
-        }
-
-        result = self.adapter.validate_stream_schema(test_stream)
+        # Test the method without arguments as per its signature
+        result = self.adapter.validate_stream_schema()
 
         self.test_assertions.assert_true(
             condition=result.success, message="validate_stream_schema should succeed"
@@ -341,20 +344,20 @@ class TestFlextMeltanoAdapterComplete:
 
     def test_execute_dbt_operation(self) -> None:
         """Test execute_dbt_operation method using flext_tests."""
-        result = self.adapter.execute_dbt_operation("run", models=["model1"])
+        result = self.adapter.execute_dbt_operation()
 
         self.test_assertions.assert_true(
             condition=result.success, message="execute_dbt_operation should succeed"
         )
         self.test_assertions.assert_equals(
-            actual=result.value["operation"],
-            expected="run",
-            message="Operation should be run",
+            actual=result.value["dbt_status"],
+            expected="ready",
+            message="Should have dbt_status field",
         )
         self.test_assertions.assert_equals(
             actual=result.value["models"],
-            expected=["model1"],
-            message="Models should match",
+            expected=[],
+            message="Models should be empty list",
         )
 
     # =========================================================================
@@ -380,24 +383,23 @@ class TestFlextMeltanoAdapterComplete:
         """Test project validation functionality in unified adapter (SOLID refactored)."""
         # Test project validation functionality now integrated into unified adapter
 
-        # Test with non-existent path
-        non_existent_path = Path("/tmp/non_existent_flext_test")
-        result = self.adapter.initialize_project(project_root=non_existent_path)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Test with non-existent path
+            non_existent_path = Path(temp_dir) / "non_existent_flext_test"
+            result = self.adapter.initialize_project(project_root=non_existent_path)
 
-        # Test should either fail (if validation occurs) or succeed (if it creates the path)
-        # Either way, the method should return a valid FlextResult
-        self.test_assertions.assert_true(
-            condition=result is not None, message="Should return FlextResult"
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(result, "is_failure"),
-            message="Should have is_failure attribute",
-        )
+            # Test should either fail (if validation occurs) or succeed (if it creates the path)
+            # Either way, the method should return a valid FlextResult
+            self.test_assertions.assert_true(
+                condition=result is not None, message="Should return FlextResult"
+            )
+            self.test_assertions.assert_true(
+                condition=hasattr(result, "is_failure"),
+                message="Should have is_failure attribute",
+            )
 
     def test_plugin_discovery_get_plugin_info(self) -> None:
         """Test PluginDiscovery get_plugin_info using flext_tests."""
-        from flext_meltano.constants import FlextMeltanoConstants
-
         plugin_discovery = self.adapter.plugin_discovery()
 
         # Test with invalid plugin (should handle error gracefully)
@@ -416,10 +418,7 @@ class TestFlextMeltanoAdapterComplete:
     def test_elt_coordinator_execute_pipeline(self) -> None:
         """Test unified adapter execute_pipeline using flext_tests."""
         # Create a temporary project for testing pipeline execution
-        import tempfile
-
         with tempfile.TemporaryDirectory() as temp_dir:
-            from pathlib import Path
 
             project_result = self.adapter.create_project(
                 project_name="test_pipeline_project", project_dir=Path(temp_dir)
@@ -446,9 +445,6 @@ class TestFlextMeltanoAdapterComplete:
 
     def test_create_project(self) -> None:
         """Test create_project using flext_tests."""
-        import tempfile
-        from pathlib import Path
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_dir = Path(temp_dir)
             result = self.adapter.create_project(
@@ -492,10 +488,10 @@ class TestFlextMeltanoAdapterComplete:
             message="Should create timeout error",
         )
 
-        connection_error = error_factory.create_connection_error()
+        validation_error = error_factory.create_validation_error()
         self.test_assertions.assert_true(
-            condition=isinstance(connection_error, Exception),
-            message="Should create connection error",
+            condition=isinstance(validation_error, Exception),
+            message="Should create validation error",
         )
 
     def test_nested_classes_independence(self) -> None:
@@ -514,65 +510,10 @@ class TestFlextMeltanoAdapterComplete:
             message="New adapter instance should be independent from fixture",
         )
 
-    def test_create_target_config(self) -> None:
-        """Test create_target_config method."""
-        adapter = FlextMeltanoAdapter()
-        result = adapter.create_target_config()
 
-        assert isinstance(result, FlextResult)
-        assert result.success
-        config = result.value
-        assert isinstance(config, dict)
-        assert "target_schema" in config
-        assert "batch_config" in config
-        assert config["target_schema"] == "default"
-        assert isinstance(config["batch_config"], dict)
 
-    def test_convert_singer_schema(self) -> None:
-        """Test convert_singer_schema method."""
-        adapter = FlextMeltanoAdapter()
-        result = adapter.convert_singer_schema()
 
-        assert isinstance(result, FlextResult)
-        assert result.success
-        schema = result.value
-        assert isinstance(schema, dict)
-        assert "schema_version" in schema
-        assert "properties" in schema
-        assert schema["schema_version"] == "1.0"
-        assert isinstance(schema["properties"], dict)
 
-    def test_validate_stream_schema(self) -> None:
-        """Test validate_stream_schema method."""
-        adapter = FlextMeltanoAdapter()
-        result = adapter.validate_stream_schema()
-
-        assert isinstance(result, FlextResult)
-        assert result.success
-        assert result.value is True
-
-    def test_execute_dbt_operation(self) -> None:
-        """Test execute_dbt_operation method."""
-        adapter = FlextMeltanoAdapter()
-        result = adapter.execute_dbt_operation()
-
-        assert isinstance(result, FlextResult)
-        assert result.success
-        operation_result = result.value
-        assert isinstance(operation_result, dict)
-        assert "dbt_status" in operation_result
-        assert "models" in operation_result
-        assert operation_result["dbt_status"] == "ready"
-        assert isinstance(operation_result["models"], list)
-
-        # Test get_version works independently
-        version_result = adapter.get_version()
-
-        assert isinstance(version_result, FlextResult)
-
-        # Version should be successful
-        if version_result.success:
-            assert isinstance(version_result.value, dict)
 
     def test_adapter_with_different_configurations(self) -> None:
         """Test adapter behavior with different plugin configurations."""

@@ -98,19 +98,19 @@ class TestFlextMeltanoExceptions:
     def test_exception_raising_and_catching(self) -> None:
         """Test raising and catching exceptions in realistic scenarios."""
         # Test specific exception catching
+        validation_msg = "Validation failed"
         with pytest.raises(FlextMeltanoValidationError):
-            msg = "Validation failed"
-            raise FlextMeltanoValidationError(msg)
+            raise FlextMeltanoValidationError(validation_msg)
 
         # Test base exception catching
+        config_msg = "Config error"
         with pytest.raises(FlextMeltanoBaseError):
-            msg = "Config error"
-            raise FlextMeltanoConfigurationError(msg)
+            raise FlextMeltanoConfigurationError(config_msg)
 
         # Test Exception base catching
+        timeout_msg = "Timeout"
         with pytest.raises(Exception):
-            msg = "Timeout"
-            raise FlextMeltanoTimeoutError(msg)
+            raise FlextMeltanoTimeoutError(timeout_msg)
 
     def test_all_exceptions_are_available(self) -> None:
         """Test that all expected exceptions are available and properly defined."""

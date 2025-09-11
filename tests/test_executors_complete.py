@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 import sys
 import tempfile
+from collections.abc import MutableMapping
 from pathlib import Path
 from unittest import mock
 
@@ -607,7 +608,6 @@ class TestFlextMeltanoExecutorComplete:
 
         # Verify CLI interface is properly structured (lines 752-760)
         # Accept both dict and UserDict (dict-like interface)
-        from collections.abc import MutableMapping
 
         assert isinstance(cli_app, MutableMapping), (
             "CLI should be dictionary interface after SOLID refactoring"
@@ -654,9 +654,8 @@ class TestFlextMeltanoExecutorComplete:
         cli_app = cli_result.value
 
         # Verify CLI interface is properly structured (duck typing - behaves like dict)
-        assert hasattr(cli_app, "keys") and hasattr(cli_app, "items"), (
-            "CLI should have dictionary-like interface after SOLID refactoring"
-        )
+        assert hasattr(cli_app, "keys"), "CLI should have keys method"
+        assert hasattr(cli_app, "items"), "CLI should have items method"
         assert "name" in cli_app, "CLI should have name property"
         assert "executor" in cli_app, "CLI should have executor property"
 

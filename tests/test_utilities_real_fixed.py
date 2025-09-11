@@ -11,11 +11,13 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 
+from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
+from flext_meltano.validators import FlextMeltanoValidators
 
 
 class TestFlextMeltanoUtilitiesRealMethods:
@@ -122,8 +124,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_create_singer_tap_config(self) -> None:
         """Test create_singer_tap_config method using ConfigBuilders (real implementation)."""
-        from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_singer_tap_config(
             "tap-csv", "tap_csv", "pipelinewise-tap-csv", "tap-csv"
@@ -137,8 +137,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_create_singer_target_config(self) -> None:
         """Test create_singer_target_config method using FlextMeltanoConfigBuilders."""
-        from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_singer_target_config(
             target_name="target-postgres",
@@ -155,8 +153,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_create_dbt_config(self) -> None:
         """Test create_dbt_config method."""
-        from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-
         result = FlextMeltanoConfigBuilders().create_dbt_config(
             "dbt-project", "analytics"
         )
@@ -170,7 +166,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_normalize_plugin_name(self) -> None:
         """Test plugin name normalization using flext-core utilities (duplication eliminated)."""
         # Use flext-core FlextUtilities instead of duplicated functionality
-        from flext_core import FlextUtilities
 
         result = FlextUtilities.TextProcessor.safe_string("tap_csv", "default-plugin")
 
@@ -181,7 +176,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_normalize_plugin_name_with_type(self) -> None:
         """Test plugin name normalization using flext-core utilities (duplication eliminated)."""
         # Use flext-core FlextUtilities for text processing instead of duplicated functionality
-        from flext_core import FlextUtilities
 
         # Test text normalization using flext-core - eliminating code duplication
         normalized_name = FlextUtilities.TextProcessor.safe_string(
@@ -203,7 +197,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_sanitize_plugin_name_with_special_chars(self) -> None:
         """Test plugin name sanitization using FlextUtilities (NO DUPLICATION)."""
         # Use FlextUtilities.TextProcessor.clean_text instead of duplicated method
-        from flext_core import FlextUtilities
 
         result = FlextUtilities.TextProcessor.clean_text("tap-csv@!#$")
         assert isinstance(result, str)
@@ -294,7 +287,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_validate_plugin_config(self) -> None:
         """Test validate_plugin_config method - now using validators.py (SOLID compliance)."""
         # ✅ SOLID COMPLIANCE: Use FlextMeltanoValidators instead of utilities
-        from flext_meltano.validators import FlextMeltanoValidators
 
         # Create a basic plugin config
         config_result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
