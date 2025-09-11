@@ -7,11 +7,13 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 
+from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 
@@ -32,8 +34,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_temp_directory_success(self) -> None:
         """Test create_temp_directory success using flext_tests."""
-        from flext_meltano.file_managers import FlextMeltanoFileManagers
-
         result = FlextMeltanoFileManagers.create_temp_directory(
             prefix="flext_test_", meltano_structure=True
         )
@@ -62,8 +62,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_temp_directory_default_prefix(self) -> None:
         """Test create_temp_directory with default prefix using flext_tests."""
-        from flext_meltano.file_managers import FlextMeltanoFileManagers
-
         result = FlextMeltanoFileManagers.create_temp_directory()
 
         self.test_assertions.assert_true(
@@ -193,7 +191,6 @@ class TestFlextMeltanoUtilitiesComplete:
         }
 
         # Use flext_tests temporary directory pattern
-        import tempfile
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -346,20 +343,16 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_utilities_error_handling(self) -> None:
         """Test utilities error handling using flext_tests error simulation."""
-        # Use flext_tests error simulation
-        error_factory = FlextTestsFixtures.ErrorSimulationFactory()
+        # Test error handling with FlextResult patterns
+        failure_result = FlextTestsFixtures.create_failure_result("Test error")
 
-        # Test various error scenarios
-        timeout_error = error_factory.create_timeout_error()
         self.test_assertions.assert_true(
-            condition=isinstance(timeout_error, Exception),
-            message="Should create timeout error",
+            condition=isinstance(failure_result, FlextResult),
+            message="Should create failure result",
         )
-
-        connection_error = error_factory.create_connection_error()
         self.test_assertions.assert_true(
-            condition=isinstance(connection_error, Exception),
-            message="Should create connection error",
+            condition=failure_result.is_failure,
+            message="Should be failure result",
         )
 
     # =========================================================================
@@ -369,7 +362,6 @@ class TestFlextMeltanoUtilitiesComplete:
     def test_complete_meltano_setup_workflow(self) -> None:
         """Test complete Meltano setup workflow using flext_tests."""
         # Step 1: Create temp directory
-        from flext_meltano.file_managers import FlextMeltanoFileManagers
 
         temp_result = FlextMeltanoFileManagers.create_temp_directory("workflow_test_")
         self.test_assertions.assert_true(
@@ -434,7 +426,6 @@ class TestFlextMeltanoUtilitiesComplete:
     def test_utilities_type_safety(self) -> None:
         """Test utilities type safety using flext_tests."""
         # All methods should return proper FlextResult types
-        from flext_meltano.file_managers import FlextMeltanoFileManagers
 
         temp_result = FlextMeltanoFileManagers.create_temp_directory()
         self.test_assertions.assert_true(

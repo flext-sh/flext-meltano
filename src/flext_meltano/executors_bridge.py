@@ -36,6 +36,7 @@ class FlextMeltanoBridge:
     """Bridge class for Go service integration via JSON API with generic error handling."""
 
     def __init__(self) -> None:
+        """Initialize bridge with adapter and logger."""
         # Avoid circular dependency - don't create FlextMeltanoExecutor here
         self.adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         # Unified adapter - no need for separate wrapper
@@ -337,9 +338,9 @@ class FlextMeltanoBridge:
     def execute_meltano_command_real(
         self, _project_root: Path, command: FlextTypes.Core.StringList
     ) -> FlextTypes.Core.Dict:
-        """Execute real Meltano command using native API."""
+        """Execute Meltano command using native API."""
         try:
-            # Execute real Meltano command using the adapter
+            # Execute Meltano command using the adapter
             adapter_result = self.executor.run_plugin_command(
                 "meltano", "command", command
             )
@@ -398,7 +399,7 @@ class FlextMeltanoBridge:
     ) -> object:
         """Synchronous plugin execution."""
         try:
-            # Execute real plugin command using executor
+            # Execute plugin command using executor
             execution_result = self.executor.run_plugin_command(
                 plugin_name, command, args
             )

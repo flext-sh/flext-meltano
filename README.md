@@ -142,7 +142,7 @@ from flext_core.internal.services import InternalService       # Forbidden patte
 make validate                # Complete validation (all quality gates)
 make check                   # Quick health check (lint + type-check)
 make lint
-make type-check              # MyPy strict type checking
+make type-check            
 make test                    # Test suite with coverage
 make format                  # Auto-format code
 

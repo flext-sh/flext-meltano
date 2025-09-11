@@ -67,6 +67,7 @@ class FlextMeltanoExecutors:
         def __init__(
             self, config: FlextMeltanoTypes.CLI.ProcessResult | None = None
         ) -> None:
+            """Initialize CLI with configuration."""
             # Initialize parent without passing config as kwargs
             super().__init__()
             # Store config as instance variable if needed
@@ -272,6 +273,7 @@ class FlextMeltanoExecutors:
             execution_time: float = 0.0,
             metadata: FlextMeltanoTypes.CLI.ProcessResult | None = None,
         ) -> None:
+            """Initialize execution result with command and outcome data."""
             self.success = success
             self.command = command
             self.output = output

@@ -7,6 +7,8 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+import tempfile
+
 from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 from pydantic_core import ValidationError
@@ -100,37 +102,38 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_instance_validation(self) -> None:
         """Test TapInstance Pydantic validation using flext_tests."""
-        # Create TapConfig first
-        config = TapConfig(
-            tap_type="tap-csv", connection_config={"file_path": "/tmp/data.csv"}
-        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create TapConfig first
+            config = TapConfig(
+                tap_type="tap-csv", connection_config={"file_path": f"{temp_dir}/data.csv"}
+            )
 
-        # Create test tap instance
-        test_instance_data = {
-            "tap_type": "tap-csv",
-            "config": config,
-            "status": "initialized",
-            "tap_id": "tap_csv_123",
-            "discovered": True,
-            "metadata": {"created_at": "2025-01-01T00:00:00Z"},
-        }
+            # Create test tap instance
+            test_instance_data = {
+                "tap_type": "tap-csv",
+                "config": config,
+                "status": "initialized",
+                "tap_id": "tap_csv_123",
+                "discovered": True,
+                "metadata": {"created_at": "2025-01-01T00:00:00Z"},
+            }
 
-        tap_instance = TapInstance(**test_instance_data)
+            tap_instance = TapInstance(**test_instance_data)
 
-        # Use flext_tests assertions
-        self.test_assertions.assert_equals(
-            actual=tap_instance.tap_type,
-            expected="tap-csv",
-            message="Tap type should match",
-        )
-        self.test_assertions.assert_equals(
-            actual=tap_instance.tap_id,
-            expected="tap_csv_123",
-            message="Tap ID should match",
-        )
-        self.test_assertions.assert_true(
-            condition=tap_instance.discovered, message="Should be marked as discovered"
-        )
+            # Use flext_tests assertions
+            self.test_assertions.assert_equals(
+                actual=tap_instance.tap_type,
+                expected="tap-csv",
+                message="Tap type should match",
+            )
+            self.test_assertions.assert_equals(
+                actual=tap_instance.tap_id,
+                expected="tap_csv_123",
+                message="Tap ID should match",
+            )
+            self.test_assertions.assert_true(
+                condition=tap_instance.discovered, message="Should be marked as discovered"
+            )
 
     # =========================================================================
     # SERVICEPROCESSOR IMPLEMENTATION TESTING - Using flext_tests exclusively
@@ -838,10 +841,10 @@ class TestFlextTapAbstractionsComplete:
             message="Should create timeout error",
         )
 
-        connection_error = error_factory.create_connection_error()
+        validation_error = error_factory.create_validation_error()
         self.test_assertions.assert_true(
-            condition=isinstance(connection_error, Exception),
-            message="Should create connection error",
+            condition=isinstance(validation_error, Exception),
+            message="Should create validation error",
         )
 
     def test_invalid_tap_config_creation(self) -> None:

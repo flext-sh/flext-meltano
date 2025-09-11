@@ -7,8 +7,9 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from pydantic import ValidationError
 
 from flext_meltano.target_abstractions import FlextTargetAbstractions
 
@@ -34,7 +35,7 @@ class TestFlextTargetAbstractionsComplete:
         # Create test config using flext_tests utilities
         test_config_data = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test_output.jsonl"},
+            "connection_config": {"output_path": "test_output.jsonl"},
             "batch_size": 1000,
             "max_batches": 50,
         }
@@ -56,8 +57,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_flext_target_config_validation_errors(self) -> None:
         """Test FlextTargetConfig validation errors using flext_tests."""
-        from pydantic import ValidationError
-
         # Test invalid target_type using flext_tests error patterns
         try:
             FlextTargetAbstractions.FlextTargetConfig(
@@ -126,7 +125,7 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_create_flext_target_config(self) -> None:
         """Test create_flext_target_config method using flext_tests."""
-        connection_config = {"output_path": "/tmp/test.jsonl"}
+        connection_config = {"output_path": "test.jsonl"}
 
         result = self.target_abstractions.create_flext_target_config(
             target_type="jsonl",
@@ -157,7 +156,7 @@ class TestFlextTargetAbstractionsComplete:
         # Create test config using flext_tests utilities
         test_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
             "batch_size": 100,
         }
 
@@ -186,20 +185,16 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
-        # Use flext_tests error simulation
-        error_factory = FlextTestsFixtures.ErrorSimulationFactory()
+        # Test error handling with FlextResult patterns
+        failure_result = FlextTestsFixtures.create_failure_result("Target error")
 
-        # Test various error scenarios
-        timeout_error = error_factory.create_timeout_error()
         self.test_assertions.assert_true(
-            condition=isinstance(timeout_error, Exception),
-            message="Should create timeout error",
+            condition=isinstance(failure_result, FlextResult),
+            message="Should create failure result",
         )
-
-        connection_error = error_factory.create_connection_error()
         self.test_assertions.assert_true(
-            condition=isinstance(connection_error, Exception),
-            message="Should create connection error",
+            condition=failure_result.is_failure,
+            message="Should be failure result",
         )
 
     def test_invalid_target_config_creation(self) -> None:
@@ -263,7 +258,7 @@ class TestFlextTargetAbstractionsComplete:
     def test_target_workflow_integration(self) -> None:
         """Test complete target workflow using flext_tests."""
         # Create comprehensive test data
-        connection_config = {"output_path": "/tmp/flext_test.jsonl"}
+        connection_config = {"output_path": "flext_test.jsonl"}
 
         # Test workflow: create config then create target
         config_result = self.target_abstractions.create_flext_target_config(
@@ -289,8 +284,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_field_validators_error_coverage(self) -> None:
         """Test field validation errors to cover lines 105-106, 113-114."""
-        from pydantic import ValidationError
-
         # Test FlextStreamInfo stream_name validation error (line 105-106)
         try:
             FlextTargetAbstractions.FlextStreamInfo(
@@ -330,7 +323,7 @@ class TestFlextTargetAbstractionsComplete:
         # Setup target
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         self.test_assertions.assert_true(
@@ -387,7 +380,7 @@ class TestFlextTargetAbstractionsComplete:
         """Test message processing error scenarios."""
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
@@ -416,7 +409,7 @@ class TestFlextTargetAbstractionsComplete:
         # Setup target with schema
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
@@ -481,7 +474,7 @@ class TestFlextTargetAbstractionsComplete:
         # Setup complete target workflow
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
@@ -530,7 +523,7 @@ class TestFlextTargetAbstractionsComplete:
         # Setup target with stream
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
@@ -608,7 +601,6 @@ class TestFlextTargetAbstractionsComplete:
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core SOURCE OF TRUTH."""
         # Test timestamp generation using flext-core directly - NO DUPLICATION
-        from flext_core import FlextUtilities
 
         timestamp = FlextUtilities.Generators.generate_iso_timestamp()
 
@@ -678,7 +670,7 @@ class TestFlextTargetAbstractionsComplete:
         # Test finalize_stream with non-existent stream (lines 456-458)
         target_config = {
             "target_type": "jsonl",
-            "connection_config": {"output_path": "/tmp/test.jsonl"},
+            "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
