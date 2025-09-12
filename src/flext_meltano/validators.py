@@ -9,7 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextValidations
+from pathlib import Path
+
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextValidations
 from pydantic import BaseModel, Field, field_validator
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -172,6 +174,56 @@ class FlextMeltanoValidators:
     def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
         """DEPRECATED: Use validate_dbt_business_rules instead."""
         return cls.validate_dbt_business_rules(config)
+
+    @classmethod
+    def validate_meltano_project_structure(cls, project_path: Path) -> FlextResult[bool]:
+        """Validate Meltano project structure - DOMAIN-SPECIFIC business rules."""
+        try:
+            # Check if path exists and is directory
+            if not project_path.exists():
+                return FlextResult[bool].fail(f"Project path does not exist: {project_path}")
+
+            if not project_path.is_dir():
+                return FlextResult[bool].fail(f"Project path is not a directory: {project_path}")
+
+            # Check for required Meltano files
+            meltano_yml = project_path / "meltano.yml"
+            if not meltano_yml.exists():
+                return FlextResult[bool].fail(f"Missing meltano.yml in project: {project_path}")
+
+            # Check for transform directory (DBT)
+            transform_dir = project_path / "transform"
+            if not transform_dir.exists():
+                return FlextResult[bool].fail(f"Missing transform directory in project: {project_path}")
+
+            return FlextResult[bool].ok(data=True)
+        except Exception as e:
+            error_msg = f"Failed to validate project structure: {e}"
+            logger.exception(error_msg)
+            return FlextResult[bool].fail(error_msg)
+
+    @classmethod
+    def validate_connection_config(cls, config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+        """Validate connection configuration - DOMAIN-SPECIFIC business rules."""
+        try:
+            # Delegate generic dict validation to flext-core
+            dict_result = FlextValidations.Core.TypeValidators.validate_dict(config)
+            if dict_result.is_failure:
+                return FlextResult[FlextTypes.Core.Dict].fail(
+                    f"Connection config validation failed: {dict_result.error}"
+                )
+
+            config_dict = dict_result.unwrap()
+
+            # DOMAIN-SPECIFIC: Connection config business rules
+            if not config_dict:
+                return FlextResult[FlextTypes.Core.Dict].fail("Connection configuration cannot be empty")
+
+            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
+        except Exception as e:
+            error_msg = f"Failed to validate connection config: {e}"
+            logger.exception(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
 
 __all__ = [

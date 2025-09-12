@@ -10,14 +10,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 import yaml
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoUtilities:
@@ -26,7 +24,7 @@ class FlextMeltanoUtilities:
     @classmethod
     def create_meltano_config_dict(
         cls, project_id: str, project_name: str = ""
-    ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         logger = FlextLogger(__name__)
         try:
@@ -59,17 +57,15 @@ class FlextMeltanoUtilities:
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
             }
-            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].ok(
-                cast("FlextMeltanoTypes.DBT.ProjectConfig", config_dict)
-            )
+            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
         except Exception as e:
             error_msg = f"Failed to create Meltano config dict: {e}"
             logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.DBT.ProjectConfig].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     @classmethod
     def write_meltano_yml(
-        cls, config: FlextMeltanoTypes.DBT.ProjectConfig, target_path: Path
+        cls, config: FlextTypes.Core.Dict, target_path: Path
     ) -> FlextResult[bool]:
         """Write MELTANO-SPECIFIC YAML configuration - DOMAIN-SPECIFIC ONLY."""
         try:
@@ -94,7 +90,7 @@ class FlextMeltanoUtilities:
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-    ) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
             # Delegate to FlextUtilities for ALL text processing - NO DUPLICATION
@@ -123,18 +119,16 @@ class FlextMeltanoUtilities:
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }
-            return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(
-                cast("FlextMeltanoTypes.Plugin.Config", config_dict)
-            )
+            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
         except Exception as e:
             error_msg = f"Failed to create plugin config: {e}"
             FlextLogger(__name__).exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Plugin.Config].fail(error_msg)
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     @classmethod
     def load_yaml_config(
         cls, path: Path
-    ) -> FlextResult[FlextMeltanoTypes.DBT.ProjectConfig]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Load YAML config - DELEGATES to FlextMeltanoFileManagers as SOURCE OF TRUTH.
 
         ZERO DUPLICATION: Uses FlextMeltanoFileManagers.load_yaml_config.
@@ -142,11 +136,9 @@ class FlextMeltanoUtilities:
         # Delegate to FlextMeltanoFileManagers - NO DUPLICATION
         result = FlextMeltanoFileManagers.load_yaml_config(path)
         if result.is_failure:
-            return FlextResult.fail(result.error or "Failed to load YAML config")
+            return FlextResult[FlextTypes.Core.Dict].fail(result.error or "Failed to load YAML config")
 
-        return FlextResult.ok(
-            cast("FlextMeltanoTypes.DBT.ProjectConfig", result.unwrap())
-        )
+        return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
 
 
 __all__ = ["FlextMeltanoUtilities"]

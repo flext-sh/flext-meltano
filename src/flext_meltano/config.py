@@ -1,8 +1,8 @@
-"""Flext Meltano Configuration - Unified configuration management.
+"""Flext Meltano Configuration - Unified configuration management using FlextConfig.
 
-This module provides complete Meltano configuration functionality following flext-core
-single-class-per-module pattern. Consolidates all configuration, constants, and enums
-in a unified class.
+This module provides complete Meltano configuration functionality using flext-core
+FlextConfig as the single source of truth, eliminating duplication and following
+SOLID principles.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -16,20 +16,27 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextConstants, FlextExceptions, FlextResult, FlextTypes
-from pydantic import BaseModel, Field, field_validator
+from flext_core import (
+    FlextConfig,
+    FlextConstants,
+    FlextExceptions,
+    FlextResult,
+    FlextTypes,
+)
+from pydantic import Field, field_validator
 
 # Avoid circular import by importing constants after core
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 
 
-class FlextMeltanoConfig(
-    BaseModel
-):  # Meltano-specific configuration, uses FlextConstants as SOURCE OF TRUTH
-    """Meltano ELT configuration using FlextConstants as SOURCE OF TRUTH.
+class FlextMeltanoConfig(FlextConfig):
+    """Meltano ELT configuration using FlextConfig as SOURCE OF TRUTH.
 
-    Provides Meltano-specific configuration with validation using flext-core patterns.
-    Uses FlextConstants for all common values (SOURCE OF TRUTH principle).
+    Extends FlextConfig to provide Meltano-specific configuration with validation
+    using flext-core patterns. Uses FlextConstants for all common values.
+
+    This class uses FlextConfig as singleton and adds only Meltano-specific fields.
+    Implements singleton pattern through FlextConfig's global instance.
     """
 
     # ============================================================================
@@ -70,19 +77,20 @@ class FlextMeltanoConfig(
     class EnvironmentType(StrEnum):
         """Environment type enumeration."""
 
-        DEV = "dev"
+        DEV = "development"
         STAGING = "staging"
-        PROD = "prod"
+        PROD = "production"
         TEST = "test"
+        LOCAL = "local"
 
     class LogLevel(StrEnum):
         """Log level enumeration."""
 
-        DEBUG = "debug"
-        INFO = "info"
-        WARNING = "warning"
-        ERROR = "error"
-        CRITICAL = "critical"
+        DEBUG = "DEBUG"
+        INFO = "INFO"
+        WARNING = "WARNING"
+        ERROR = "ERROR"
+        CRITICAL = "CRITICAL"
 
     class OperationStatus(StrEnum):
         """Operation status enumeration."""
@@ -103,12 +111,12 @@ class FlextMeltanoConfig(
         TEST = "test"
 
     # ============================================================================
-    # CONFIGURATION FIELDS - Pydantic model fields
+    # MELTANO-SPECIFIC CONFIGURATION FIELDS - Additional to FlextConfig
     # ============================================================================
 
     # Core project configuration
     project_root: Path = Field(
-        default_factory=Path.cwd, description="Root directory of the Meltano project"
+        default=Path(), description="Root directory of the Meltano project"
     )
 
     meltano_version: str = Field(
@@ -121,13 +129,10 @@ class FlextMeltanoConfig(
 
     dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
 
-    # Environment and execution configuration
-    environment: EnvironmentType = Field(
-        default=EnvironmentType.DEV, description="Target environment for operations"
-    )
+    # Environment and execution configuration - environment field inherited from FlextConfig
 
-    log_level: LogLevel = Field(
-        default=LogLevel.INFO, description="Logging level for operations"
+    log_level: str = Field(
+        default="INFO", description="Logging level for operations"
     )
 
     timeout_seconds: int = Field(
@@ -259,9 +264,7 @@ class FlextMeltanoConfig(
             # Check for meltano.yml
             project_file = self.get_project_file()
             if not project_file.exists():
-                return FlextResult[
-                    bool
-                ].fail(
+                return FlextResult[bool].fail(
                     f"meltano.yml not found in {project_file.parent}"  # Test expectation compliance
                 )
 
@@ -282,27 +285,13 @@ class FlextMeltanoConfig(
     def get_environment_variables(self) -> FlextTypes.Core.Headers:
         """Get environment variables for Meltano operations.
 
+        This method uses FlextConfig as the base and adds Meltano-specific variables.
+
         Returns:
             FlextTypes.Core.Headers: Environment variables dictionary.
 
         """
-        # Handle both enum and string values for environment and log_level
-        environment_value = (
-            self.environment.value
-            if hasattr(self.environment, "value")
-            else str(self.environment)
-        )
-        log_level_value = (
-            self.log_level.value
-            if hasattr(self.log_level, "value")
-            else str(self.log_level)
-        )
-
-        return {
-            self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
-            self.MELTANO_ENVIRONMENT_ENV: environment_value,
-            self.MELTANO_LOG_LEVEL_ENV: log_level_value.upper(),
-        }
+        return self.get_meltano_environment_variables()
 
     # ============================================================================
     # CONSTANTS ACCESS METHODS - Utility methods for constants
@@ -408,7 +397,7 @@ class FlextMeltanoConfig(
                 project_root = Path()
 
             config = cls(
-                environment=env_type,
+                environment=str(env_type),  # type: ignore[arg-type]
                 project_root=project_root,
                 log_level=cls.LogLevel(
                     str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))
@@ -425,13 +414,218 @@ class FlextMeltanoConfig(
             )
 
     # ============================================================================
+    # SINGLETON METHODS - Global instance management using FlextConfig as SOURCE OF TRUTH
+    # ============================================================================
+
+    @classmethod
+    def get_global_instance(cls, **overrides: object) -> FlextMeltanoConfig:
+        """Get the SINGLETON GLOBAL Meltano configuration instance.
+
+        This method ensures a single source of truth for Meltano configuration across
+        the entire application. It uses FlextConfig.get_global_instance() as the base
+        and adds Meltano-specific fields. Parameters passed will override existing values.
+
+        Args:
+            **overrides: Configuration overrides that will be applied with highest priority
+
+        Returns:
+            FlextMeltanoConfig: The global configuration instance (created if needed)
+
+        """
+        # Always get fresh base configuration from FlextConfig singleton
+        base_config = FlextConfig.get_global_instance()
+
+        # Convert base config to dict for processing
+        base_data = base_config.model_dump()
+
+        # Apply overrides with highest priority
+        base_data.update(overrides)
+
+        # Create Meltano config instance with all data
+        return cls(**base_data)
+
+    @classmethod
+    def set_global_instance(cls, config: FlextConfig) -> None:
+        """Set the SINGLETON GLOBAL Meltano configuration instance.
+
+        This method delegates to FlextConfig.set_global_instance() since FlextConfig
+        is the source of truth for all configuration.
+
+        Args:
+            config: The configuration to set as global
+
+        """
+        if not isinstance(config, FlextMeltanoConfig):
+            error_msg = "config must be a FlextMeltanoConfig instance"
+            raise TypeError(error_msg)
+
+        # Delegate to FlextConfig since it's the source of truth
+        FlextConfig.set_global_instance(config)
+
+    @classmethod
+    def clear_global_instance(cls) -> None:
+        """Clear the global instance (useful for testing)."""
+        # Delegate to FlextConfig since it's the source of truth
+        FlextConfig.clear_global_instance()
+        cls._global_instance = None
+
+    @classmethod
+    def create_with_overrides(cls, **overrides: object) -> FlextResult[FlextMeltanoConfig]:
+        """Create Meltano configuration with specific overrides.
+
+        This method creates a new configuration instance using FlextConfig as the base
+        and applying the specified overrides. It follows the same pattern as FlextConfig.create().
+
+        Args:
+            **overrides: Configuration overrides to apply
+
+        Returns:
+            FlextResult containing configured FlextMeltanoConfig instance or error details
+
+        """
+        try:
+            # Use FlextConfig.create() as the source of truth
+            base_result = FlextConfig.create(constants=overrides)
+            if base_result.is_failure:
+                return FlextResult[FlextMeltanoConfig].fail(
+                    f"Failed to create base configuration: {base_result.error}",
+                    error_code="CONFIG_CREATION_ERROR",
+                )
+
+            # Convert base config to Meltano config
+            base_data = base_result.unwrap().model_dump()
+            config = cls(**base_data)
+            return FlextResult[FlextMeltanoConfig].ok(config)
+
+        except Exception as error:
+            return FlextResult[FlextMeltanoConfig].fail(
+                f"Failed to create Meltano configuration: {error}",
+                error_code="CONFIG_CREATION_ERROR",
+            )
+
+    @classmethod
+    def create_for_environment_with_overrides(
+        cls, environment: str, **overrides: object
+    ) -> FlextResult[FlextMeltanoConfig]:
+        """Create Meltano configuration for specific environment with overrides.
+
+        Args:
+            environment: Target environment (development, staging, production, test, local)
+            **overrides: Additional configuration overrides
+
+        Returns:
+            FlextResult containing configured FlextMeltanoConfig instance or error details
+
+        """
+        try:
+            # Validate environment
+            try:
+                env_type = cls.EnvironmentType(environment)
+            except ValueError:
+                return FlextResult[FlextMeltanoConfig].fail(
+                    f"Invalid environment: {environment}"
+                )
+
+            # Prepare configuration data
+            config_data = {
+                "environment": str(env_type),
+                **overrides,
+            }
+
+            return cls.create_with_overrides(**config_data)
+
+        except Exception as error:
+            return FlextResult[FlextMeltanoConfig].fail(
+                f"Failed to create environment configuration: {error}",
+                error_code="ENVIRONMENT_CONFIG_ERROR",
+            )
+
+    def apply_overrides(self, **overrides: object) -> FlextResult[None]:
+        """Apply configuration overrides to this instance.
+
+        This method allows runtime modification of configuration values,
+        following the same pattern as FlextConfig.apply_environment_overrides().
+
+        Args:
+            **overrides: Configuration overrides to apply
+
+        Returns:
+            FlextResult indicating success or failure
+
+        """
+        # Check if configuration is sealed
+        if self.is_sealed():
+            return FlextResult[None].fail(
+                "Cannot apply overrides to sealed configuration",
+                error_code="CONFIG_SEALED_ERROR",
+            )
+
+        try:
+            for key, value in overrides.items():
+                if hasattr(self, key) and key in self.model_fields:
+                    setattr(self, key, value)
+
+            # Track the override in metadata (initialize if not exists)
+            if not hasattr(self, "_metadata"):
+                self._metadata = {}
+            self._metadata["overrides_applied"] = "true"
+            self._metadata["override_count"] = str(len(overrides))
+
+            return FlextResult[None].ok(None)
+
+        except Exception as error:
+            return FlextResult[None].fail(
+                f"Failed to apply configuration overrides: {error}",
+                error_code="OVERRIDE_APPLICATION_ERROR",
+            )
+
+    def seal(self) -> None:
+        """Seal the configuration to prevent further modifications."""
+        self._sealed = True
+
+    def is_sealed(self) -> bool:
+        """Check if the configuration is sealed."""
+        return getattr(self, "_sealed", False)
+
+    def get_meltano_environment_variables(self) -> FlextTypes.Core.Headers:
+        """Get Meltano-specific environment variables.
+
+        This method provides Meltano-specific environment variables using FlextConfig
+        as the source of truth for base configuration.
+
+        Returns:
+            FlextTypes.Core.Headers: Environment variables dictionary
+
+        """
+        # Get base configuration from FlextConfig singleton
+        base_config = FlextConfig.get_global_instance()
+
+        # Create base environment variables from FlextConfig fields
+        base_env_vars = {
+            "FLEXT_APP_NAME": base_config.app_name,
+            "FLEXT_ENVIRONMENT": str(base_config.environment),
+            "FLEXT_LOG_LEVEL": str(base_config.log_level).upper(),
+            "FLEXT_VERSION": "0.9.0",  # Use FlextConstants.Core.VERSION
+        }
+
+        # Add Meltano-specific environment variables
+        meltano_env_vars = {
+            self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
+            self.MELTANO_ENVIRONMENT_ENV: str(self.environment),
+            self.MELTANO_LOG_LEVEL_ENV: str(self.log_level).upper(),
+        }
+
+        # Merge base and Meltano environment variables
+        return {**base_env_vars, **meltano_env_vars}
+
+    # ============================================================================
     # CLASS CONFIGURATION - Pydantic model configuration
     # ============================================================================
 
     class Config:
         """Pydantic model configuration."""
 
-        extra = "forbid"
+        extra = "ignore"  # Allow extra fields from environment variables
         validate_assignment = True
         use_enum_values = True
         arbitrary_types_allowed = True

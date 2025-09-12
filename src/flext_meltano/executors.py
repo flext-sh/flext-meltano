@@ -60,8 +60,8 @@ class FlextMeltanoExecutor:
             command = args[0]
 
             exit_code_result = self._execute_command(command, args)
-            if exit_code_result.success:
-                return FlextResult[int].ok(exit_code_result.value)
+            if exit_code_result.is_success:
+                return FlextResult[int].ok(exit_code_result.unwrap())
             return FlextResult[int].fail(
                 exit_code_result.error or "Command execution failed"
             )
@@ -71,9 +71,9 @@ class FlextMeltanoExecutor:
     def _handle_version_command(self) -> FlextResult[FlextTypes.Core.Headers]:
         """Handle version command."""
         result = self.bridge.get_version()
-        if result.success:
+        if result.is_success:
             # Extract version from result data
-            result_data = result.value or {}
+            result_data = result.unwrap() or {}
             meltano_version = result_data.get(
                 "meltano", FlextMeltanoConstants.Meltano.VERSION_REQUIRED
             )

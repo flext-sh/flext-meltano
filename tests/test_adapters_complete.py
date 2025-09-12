@@ -329,18 +329,27 @@ class TestFlextMeltanoAdapterComplete:
             message="Converted schema should be dict",
         )
 
-    def test_validate_stream_schema(self) -> None:
-        """Test validate_stream_schema method using flext_tests."""
-        # Test the method without arguments as per its signature
-        result = self.adapter.validate_stream_schema()
+    def test_validate_project(self) -> None:
+        """Test validate_project method using flext_tests."""
+        # Test the method with a temporary project path
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a complete meltano project structure
+            meltano_file = Path(temp_dir) / "meltano.yml"
+            meltano_file.write_text("version: 1\n")
 
-        self.test_assertions.assert_true(
-            condition=result.success, message="validate_stream_schema should succeed"
-        )
-        self.test_assertions.assert_true(
-            condition=isinstance(result.value, bool),
-            message="Validation should return bool",
-        )
+            # Create transform directory
+            transform_dir = Path(temp_dir) / "transform"
+            transform_dir.mkdir()
+
+            result = self.adapter.validate_project(Path(temp_dir))
+
+            self.test_assertions.assert_true(
+                condition=result.is_success, message="validate_project should succeed"
+            )
+            self.test_assertions.assert_true(
+                condition=isinstance(result.unwrap(), bool),
+                message="Validation should return bool",
+            )
 
     def test_execute_dbt_operation(self) -> None:
         """Test execute_dbt_operation method using flext_tests."""

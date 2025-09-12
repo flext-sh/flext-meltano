@@ -226,14 +226,6 @@ class FlextTapAbstractions:
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to create tap: {e}")
 
-    def validate_tap_instance(
-        self, tap_instance: FlextTapAbstractions.TapInstance
-    ) -> FlextResult[bool]:
-        """Validate tap instance using Pydantic - ELIMINATES manual validation."""
-        # Pydantic models are self-validating, validate instance is properly structured
-        is_valid = tap_instance.tap_type and tap_instance.tap_id and tap_instance.config
-        return FlextResult[bool].ok(bool(is_valid))
-
     # ============================================================================
     # STREAM DISCOVERY USING STRATEGY PATTERN - ELIMINATES 60+ LINES OF COMPLEXITY
     # ============================================================================

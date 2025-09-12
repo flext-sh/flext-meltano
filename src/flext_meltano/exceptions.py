@@ -7,14 +7,14 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_core import create_module_exception_classes
+from flext_core import FlextExceptions
 
 # ============================================================================
 # DIRECT FLEXT-CORE USAGE - Generated exceptions only, no duplications
 # ============================================================================
 
 # Generate ALL module exceptions using flext-core SOURCE OF TRUTH
-_exceptions = create_module_exception_classes("flext_meltano")
+_exceptions = FlextExceptions.create_module_exception_classes("flext_meltano")
 
 # Use generated exceptions directly - NO additional aliases or wrappers
 FlextMeltanoBaseError = _exceptions["FLEXT_MELTANOBaseError"]
