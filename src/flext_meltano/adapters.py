@@ -14,6 +14,7 @@ from uuid import UUID
 import meltano
 import yaml
 from flext_core import (
+    FlextConfig,
     FlextLogger,
     FlextResult,
     FlextTypes,
@@ -32,21 +33,20 @@ from meltano.core.runner.singer import SingerRunner
 
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.validators import FlextMeltanoValidators
 
 
 class FlextMeltanoAdapter:
     """Single adapter class for all Meltano Core integration following flext-core patterns."""
 
     def __init__(self) -> None:
-        """Initialize FlextMeltanoAdapter with flext-core patterns.
+        """Initialize FlextMeltanoAdapter with flext-core patterns using FlextConfig.
 
         Sets up the adapter with proper flext-core integration including
-        logging, utilities, and error handling patterns.
-
-        Returns:
-            object: Description of return value.
-
+        logging, utilities, and error handling patterns using FlextConfig.
         """
+        # Get configuration using FlextConfig singleton
+        self._config = FlextConfig.get_global_instance()
         self._logger = FlextLogger(__name__)
         self._initialize_attributes()
 
@@ -118,31 +118,31 @@ class FlextMeltanoAdapter:
         Example:
             >>> adapter = FlextMeltanoAdapter()
             >>> version_result = adapter.get_version()
-            >>> if version_result.success:
-            ...     print(f"Version: {version_result.value['version']}")
+            >>> if version_result.is_success:
+            ...     print(f"Version: {version_result.unwrap()['version']}")
 
         """
         try:
             # Get Meltano version using native API
             meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            return FlextResult.ok(
-                {
-                    "version": meltano_version,
-                    "meltano": meltano_version,
-                    "cli_type": "native_meltano_api",
-                    "integration": "flext-core",
-                }
-            )
+            version_info: FlextMeltanoTypes.Bridge.VersionInfo = {
+                "version": meltano_version,
+                "meltano": meltano_version,
+                "cli_type": "native_meltano_api",
+                "integration": "flext-core",
+            }
+
+            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].ok(version_info)
 
         except ImportError as import_error:
             error_msg = f"Meltano not available: {import_error}"
             self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].fail(error_msg)
         except Exception as e:
             error_msg = f"Failed to get Meltano version: {e}"
             self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].fail(error_msg)
 
     def initialize_project(
         self, project_root: Path
@@ -159,8 +159,8 @@ class FlextMeltanoAdapter:
             >>> adapter = FlextMeltanoAdapter()
             >>> project_path = Path("/path/to/meltano-project")
             >>> result = adapter.initialize_project(project_path)
-            >>> if result.success:
-            ...     project = result.value
+            >>> if result.is_success:
+            ...     project = result.unwrap()
 
         """
         try:
@@ -170,12 +170,12 @@ class FlextMeltanoAdapter:
 
             # Verify directory exists
             if not project_root.exists():
-                return FlextResult.fail(f"Project directory not found: {project_root}")
+                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(f"Project directory not found: {project_root}")
 
             # Verify it's a valid Meltano project
             meltano_yml = project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
             if not meltano_yml.exists():
-                return FlextResult.fail(
+                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
                     f"Not a Meltano project: meltano.yml not found in {project_root}"
                 )
 
@@ -183,7 +183,7 @@ class FlextMeltanoAdapter:
             project = Project.find(project_root)
 
             if project is None:
-                return FlextResult.fail(
+                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
                     f"Failed to load Meltano project from {project_root}"
                 )
 
@@ -202,12 +202,12 @@ class FlextMeltanoAdapter:
                 "settings": str(getattr(project, "settings", "")),
                 "meltano_version": str(getattr(project, "meltano_version", "")),
             }
-            return FlextResult.ok(project_dict)
+            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(project_dict)
 
         except Exception as e:
             error_msg = f"Failed to initialize Meltano project: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult.fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.DBT.Project].fail(error_msg)
 
     def discover_plugins(
         self, project: Project | None = None
@@ -223,8 +223,8 @@ class FlextMeltanoAdapter:
         Example:
             >>> adapter = FlextMeltanoAdapter()
             >>> plugins_result = adapter.discover_plugins()
-            >>> if plugins_result.success:
-            ...     for plugin in plugins_result.value:
+            >>> if plugins_result.is_success:
+            ...     for plugin in plugins_result.unwrap():
             ...         print(f"{plugin['name']} ({plugin['type']})")
 
         """
@@ -236,12 +236,12 @@ class FlextMeltanoAdapter:
                 working_project = project
             else:
                 temp_project_result = self._create_temporary_meltano_project()
-                if not temp_project_result.success:
+                if temp_project_result.is_failure:
                     return FlextResult[list[FlextTypes.Core.Headers]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project"
                     )
-                working_project = temp_project_result.value
+                working_project = temp_project_result.unwrap()
 
             hub_service = MeltanoHubService(working_project)
 
@@ -447,26 +447,8 @@ class FlextMeltanoAdapter:
             FlextResult containing validation result
 
         """
-        try:
-            if not project_path.exists():
-                return FlextResult[bool].fail(f"Path does not exist: {project_path}")
-
-            meltano_yml = project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
-            if not meltano_yml.exists():
-                return FlextResult[bool].fail(f"No meltano.yml found in {project_path}")
-
-            # Try to load project to validate structure
-            project = Project.find(project_path)
-            if project is None:
-                return FlextResult[bool].fail(
-                    f"Invalid Meltano project structure: {project_path}"
-                )
-
-            success_value = True
-            return FlextResult[bool].ok(success_value)
-
-        except Exception as e:
-            return FlextResult[bool].fail(f"Project validation failed: {e}")
+        # Delegate to FlextMeltanoValidators - NO DUPLICATION
+        return FlextMeltanoValidators.validate_meltano_project_structure(project_path)
 
     def get_plugin_info(
         self, plugin_name: str, plugin_type: PluginType
@@ -642,15 +624,6 @@ class FlextMeltanoAdapter:
                 "properties": {},
             }
         )
-
-    def validate_stream_schema(self) -> FlextResult[bool]:
-        """Validate stream schema using native validation.
-
-        Returns:
-            FlextResult[FlextTypes.Core.Dict]:: Description of return value.
-
-        """
-        return FlextResult[bool].ok(data=True)
 
     # =================================================================
     # DBT INTEGRATION - Direct integration without wrappers

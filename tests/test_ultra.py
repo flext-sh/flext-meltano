@@ -54,10 +54,9 @@ def test_simple_config_creation() -> None:
     # Try to import just the config (imported at top level)
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-            config = FlextMeltanoConfig(
-                project_root=Path(temp_dir),
-                environment=FlextMeltanoConfig.EnvironmentType.TEST,
-            )
+            config = FlextMeltanoConfig()
+            config.project_root = Path(temp_dir)
+            config.environment = "test"
 
             assert str(config.project_root) == str(temp_dir)
             assert config.environment == "test"

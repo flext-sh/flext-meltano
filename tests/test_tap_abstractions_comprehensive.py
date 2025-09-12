@@ -311,7 +311,7 @@ class TestFlextTapAbstractionsComprehensive:
         """Test that FlextTapAbstractions has unified tap functionality."""
         # Check for core tap processing methods (current architecture)
         assert hasattr(self.tap_abstractions, "process")
-        assert hasattr(self.tap_abstractions, "validate_tap_instance")
+        assert hasattr(self.tap_abstractions, "discover_streams")
         assert hasattr(self.tap_abstractions, "list_streams")
         assert hasattr(self.tap_abstractions, "get_tap_type")
 

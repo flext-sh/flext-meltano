@@ -10,7 +10,6 @@ import asyncio
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from typing import cast
 
 import meltano
 from flext_core import FlextLogger, FlextResult, FlextTypes
@@ -156,8 +155,8 @@ class FlextMeltanoBridge:
             )
             # Ensure we return a compatible type - check for FlextResult interface
             if hasattr(result, "success") and hasattr(result, "value"):
-                # Cast to expected FlextResult type since we know it matches
-                return cast("FlextResult[FlextTypes.Core.Dict]", result)
+                # Return as expected FlextResult type since we know it matches
+                return result  # type: ignore[return-value]
             return FlextResult[FlextTypes.Core.Dict].ok({"result": str(result)})
 
         return self._execute_with_json_response(_run_pipeline)

@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar, TypeVar, cast
+from typing import ClassVar, TypeVar
 
 from flext_core import (
     FlextContainer,
@@ -30,7 +30,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 T_Service = TypeVar("T_Service", bound="FlextMeltanoService")
 
 
-class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
+class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
     """UNIFIED Meltano service implementation - SINGLE RESPONSIBILITY.
 
     Handles ALL Meltano operations (tap, target, dbt) in one cohesive service
@@ -58,7 +58,7 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
     _dbt_service_class: ClassVar[type[FlextMeltanoService] | None] = None
 
     def __init__(self, *, service_type: str = "tap", **data: object) -> None:
-        """Initialize unified Meltano service."""
+        """Initialize unified Meltano service using FlextConfig."""
         # Convert data to mutable dict and extract service-specific fields
         mutable_data = dict(data)
         service_specific_fields = {
@@ -67,29 +67,8 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
             "project_name": mutable_data.pop("project_name", None),
         }
 
-        # Provide required FlextDomainService fields with defaults
-        # Extract only the fields that FlextModels.Config expects
-        config_fields = {
-            "app_name": str(mutable_data.get("app_name", f"{service_type}-default")),
-            "environment": str(mutable_data.get("environment", "development")),
-            "debug": bool(mutable_data.get("debug")),
-            "log_level": str(mutable_data.get("log_level", "INFO")),
-            "max_workers": FlextUtilities.Conversions.safe_int(
-                mutable_data.get("max_workers"), 4
-            ),
-            "timeout_seconds": FlextUtilities.Conversions.safe_int(
-                mutable_data.get("timeout_seconds"), 30
-            ),
-        }
-
-        super().__init__(
-            app_name=str(config_fields["app_name"]),
-            environment=str(config_fields["environment"]),
-            debug=bool(config_fields["debug"]),
-            log_level=str(config_fields["log_level"]),
-            max_workers=cast("int", config_fields["max_workers"]),
-            timeout_seconds=cast("int", config_fields["timeout_seconds"]),
-        )
+        # Initialize parent with empty data - let BaseModel handle timestamps
+        super().__init__()
         self._service_type = service_type
         self._logger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
@@ -139,14 +118,14 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
             FlextMeltanoService._dbt_service_class = DbtService
         return FlextMeltanoService._dbt_service_class
 
-    def execute(self) -> FlextResult[FlextMeltanoTypes.Plugin.Config]:
+    def execute(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute service operation based on type - UNIFIED IMPLEMENTATION."""
         self._logger.info(
             "Executing Meltano service", extra={"service_type": self._service_type}
         )
 
         # Convert to proper type for FlextResult
-        config_data: FlextMeltanoTypes.Plugin.Config = {
+        config_data: FlextTypes.Core.Dict = {
             "name": f"FlextMeltano{self._service_type.title()}Service",
             "variant": "flext",
             "type": self._service_type,
@@ -154,19 +133,19 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
         }
 
-        return FlextResult[FlextMeltanoTypes.Plugin.Config].ok(config_data)
+        return FlextResult[FlextTypes.Core.Dict].ok(config_data)
 
     def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
         """Get service information for any service type."""
-        return FlextResult.ok(
-            {
-                "service_type": self._service_type,
-                "name": getattr(
-                    self, f"{self._service_type}_name", f"default-{self._service_type}"
-                ),
-                "status": "ready",
-            }
+        service_name = getattr(
+            self, f"{self._service_type}_name", f"default-{self._service_type}"
         )
+        info: FlextMeltanoTypes.Plugin.PluginInfo = {
+            "service_type": self._service_type,
+            "name": service_name,
+            "status": "ready",
+        }
+        return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(info)
 
     def validate_config(self) -> FlextResult[None]:
         """Validate service configuration based on type."""
@@ -185,16 +164,17 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
 
         return FlextResult.ok(None)
 
-    def create_instance(self, config: FlextTypes.Core.Dict) -> FlextResult[object]:
+    def create_instance(self, config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
         """Create service instance with configuration based on type."""
         if not config:
-            return FlextResult.fail("Empty configuration provided")
+            return FlextResult[FlextTypes.Core.Dict].fail("Empty configuration provided")
 
         try:
             service_name = getattr(
                 self, f"{self._service_type}_name", f"default-{self._service_type}"
             )
 
+            instance: FlextTypes.Core.Dict
             if self._service_type == "tap":
                 instance = {
                     "name": service_name,
@@ -219,11 +199,11 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
                     "executable": "dbt",
                 }
             else:
-                return FlextResult.fail(f"Unknown service type: {self._service_type}")
+                return FlextResult[FlextTypes.Core.Dict].fail(f"Unknown service type: {self._service_type}")
 
-            return FlextResult.ok(instance)
+            return FlextResult[FlextTypes.Core.Dict].ok(instance)
         except Exception as e:
-            return FlextResult.fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Failed to create {self._service_type} instance: {e}"
             )
 
@@ -232,40 +212,42 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
     ) -> FlextResult[bool]:
         """Validate service configuration based on type."""
         if not config:
-            return FlextResult.fail("Empty configuration provided")
+            return FlextResult[bool].fail("Empty configuration provided")
 
         if self._service_type == "target" and "output_file" not in config:
-            return FlextResult.fail("Missing required field: output_file")
+            return FlextResult[bool].fail("Missing required field: output_file")
 
-        return FlextResult.ok(data=True)
+        return FlextResult[bool].ok(data=True)
 
     def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type."""
         if self._service_type == "tap":
-            return FlextResult.ok({"connection_string": "test_connection"})
+            tap_config: FlextTypes.Core.Dict = {"connection_string": "test_connection"}
+            return FlextResult[FlextTypes.Core.Dict].ok(tap_config)
         if self._service_type == "target":
-            return FlextResult.ok({"output_file": "test_output.json", "format": "json"})
+            target_config: FlextTypes.Core.Dict = {"output_file": "test_output.json", "format": "json"}
+            return FlextResult[FlextTypes.Core.Dict].ok(target_config)
         if self._service_type == "dbt":
             project_name = getattr(self, "project_name", "default_project")
-            return FlextResult.ok(
-                {
-                    project_name: {
-                        "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
-                        "target": "dev",
-                    }
+            dbt_config: FlextTypes.Core.Dict = {
+                project_name: {
+                    "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
+                    "target": "dev",
                 }
-            )
-        return FlextResult.ok({})
+            }
+            return FlextResult[FlextTypes.Core.Dict].ok(dbt_config)
+        empty_config: FlextTypes.Core.Dict = {}
+        return FlextResult[FlextTypes.Core.Dict].ok(empty_config)
 
     def validate_service(self) -> FlextResult[bool]:
         """Validate service configuration and setup."""
         try:
             config_result = self.get_default_config()
-            if config_result.failure:
-                return FlextResult.fail(f"Default config failed: {config_result.error}")
-            return self.validate_service_config(config_result.value)
+            if config_result.is_failure:
+                return FlextResult[bool].fail(f"Default config failed: {config_result.error}")
+            return self.validate_service_config(config_result.unwrap())
         except Exception as e:
-            return FlextResult.fail(
+            return FlextResult[bool].fail(
                 f"{self._service_type.title()} service validation failed: {e}"
             )
 
@@ -273,7 +255,7 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
     def get_profiles_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get DBT profiles configuration (only for DBT service type)."""
         if self._service_type != "dbt":
-            return FlextResult.fail(
+            return FlextResult[FlextTypes.Core.Dict].fail(
                 "Profiles config only available for DBT service type"
             )
 
@@ -281,7 +263,7 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
 
     # Compatibility alias for test compatibility
     @property
-    def adapter(self) -> FlextDomainService[FlextMeltanoTypes.Plugin.Config] | None:
+    def adapter(self) -> FlextDomainService[FlextTypes.Core.Dict] | None:
         """Adapter property alias for test compatibility."""
         return self
 
@@ -298,7 +280,7 @@ class FlextMeltanoService(FlextDomainService[FlextMeltanoTypes.Plugin.Config]):
             )
 
             # Create unified configuration using flext-core patterns
-            service_kwargs = {
+            service_kwargs: FlextTypes.Core.Dict = {
                 "service_type": service_type,
                 field_name: safe_name,
                 "entity_id": FlextUtilities.Generators.generate_entity_id(),

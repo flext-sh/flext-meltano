@@ -9,8 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.constants import (  # SOURCE OF TRUTH
@@ -123,13 +121,6 @@ class FlextMeltanoConfigBuilders:
 
         """
         try:
-            # Use flext-core configuration factory - NO DUPLICATION
-            base_config_result = FlextUtilities.Configuration.create_default_config()
-            if base_config_result.is_failure:
-                return FlextResult[ConfigDict].fail(
-                    f"Base config creation failed: {base_config_result.error}"
-                )
-
             # Create type-specific configuration using flext-core patterns
             type_prefix = (
                 FlextMeltanoConstants.Plugin.PREFIX_TAP
@@ -280,9 +271,7 @@ class FlextMeltanoConfigBuilders:
                 )
 
             if config_defaults:
-                plugin_config["config"] = cast(
-                    "FlextTypes.Core.JsonValue", config_defaults
-                )
+                plugin_config["config"] = config_defaults  # type: ignore[assignment]
 
             return FlextResult[ConfigDict].ok(plugin_config)
         except Exception as e:
@@ -319,7 +308,7 @@ class FlextMeltanoConfigBuilders:
                 "namespace": f"tap_{safe_tap_name.replace('-', '_')}",
                 "pip_url": safe_pip_url,
                 "executable": safe_tap_name,
-                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
+                "config": config_defaults or {},  # type: ignore[dict-item]
                 "select": ["*.*"],  # Selecionar todas as tabelas por padrão
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
@@ -365,7 +354,7 @@ class FlextMeltanoConfigBuilders:
                 "namespace": f"target_{safe_target_name.replace('-', '_')}",
                 "pip_url": safe_pip_url,
                 "executable": safe_target_name,
-                "config": cast("FlextTypes.Core.JsonValue", config_defaults or {}),
+                "config": config_defaults or {},  # type: ignore[dict-item]
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -465,13 +454,13 @@ class FlextMeltanoConfigBuilders:
             plugins = updated_config.setdefault("plugins", {})
 
             if isinstance(plugins, dict):
-                typed_plugins = cast("FlextMeltanoTypes.CLI.ProcessResult", plugins)
+                typed_plugins: FlextMeltanoTypes.CLI.ProcessResult = plugins  # type: ignore[assignment]
                 if safe_plugin_type not in typed_plugins:
                     typed_plugins[safe_plugin_type] = []
                 plugin_list = typed_plugins[safe_plugin_type]
                 if isinstance(plugin_list, list):
                     plugin_list_copy = list(plugin_list)  # Create mutable copy
-                    plugin_list_copy.append(cast("FlextTypes.Core.Dict", plugin_config))
+                    plugin_list_copy.append(plugin_config)  # type: ignore[arg-type]
                     typed_plugins[safe_plugin_type] = plugin_list_copy
 
             # Add metadata about the operation
