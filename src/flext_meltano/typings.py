@@ -1,7 +1,4 @@
-"""FLEXT Meltano Types - Meltano-specific type system extending FlextTypes hierarchical system.
-
-Provides comprehensive Meltano-specific types following the FlextTypes pattern with
-domain organization, hierarchical structure, and type-safe annotations for Meltano operations.
+"""FLEXT Meltano Types - Unified Meltano type definitions.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -15,13 +12,7 @@ from typing import (
     runtime_checkable,
 )
 
-from dbt.cli.main import dbtRunner
 from flext_core import FlextTypes  # Use flext-core type variables
-from singer_sdk import (
-    Stream as SingerStream,
-    Tap as SingerTap,
-    Target as SingerTarget,
-)
 
 # Use flext-core type variables - eliminate duplication
 T_co = TypeVar("T_co", covariant=True)  # Keep this one as it needs covariance
@@ -44,31 +35,34 @@ type HandlerContext = FlextTypes.Core.Dict
 class FlextMeltanoTypes:
     """UNIFIED Meltano Types - SINGLE RESPONSIBILITY PATTERN.
 
-    Meltano-specific hierarchical type system extending FlextTypes with consolidated protocols.
+        Meltano-specific hierarchical type system extending FlextTypes with consolidated protocols.
 
-    This class inherits all core FLEXT types and adds Meltano-specific
-    type definitions organized by domain functionality.
+        This class inherits all core FLEXT types and adds Meltano-specific
+        type definitions organized by domain functionality.
 
-    The type system adds the following Meltano domains:
-        - Plugin: Meltano plugin management types
-        - Singer: Singer SDK tap/target types
-        - DBT: DBT Core transformation types
-        - Bridge: Go service integration types
-        - CLI: Command-line interface types
-        - ELT: Extract-Load-Transform pipeline types
+        The type system adds the following Meltano domains:
+            - Plugin: Meltano plugin management types
+            - Singer: Singer SDK tap/target types
+            - DBT: DBT Core transformation types
+            - Bridge: Go service integration types
+            - CLI: Command-line interface types
+            - ELT: Extract-Load-Transform pipeline types
 
     Examples:
-        Using Meltano-specific types::
+            Using Meltano-specific types::
 
-            from flext_meltano import FlextMeltanoTypes
+                from flext_meltano import FlextMeltanoTypes
+    from typing import Dict
+    from typing import List
+    from typing import Type
 
-            plugin_config: FlextMeltanoTypes.Plugin.Config = {
-                "name": "tap-csv",
-                "variant": "meltanolabs",
-            }
+                plugin_config: FlextMeltanoTypes.Plugin.Config = {
+                    "name": "tap-csv",
+                    "variant": "meltanolabs",
+                }
 
-            tap: FlextMeltanoTypes.Singer.Tap = csv_tap
-            pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
+                tap: FlextMeltanoTypes.Singer.Tap = csv_tap
+                pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
 
     """
 
@@ -152,10 +146,10 @@ class FlextMeltanoTypes:
         leveraging FlextTypes.Core and FlextTypes.Payload for message processing.
         """
 
-        # Core Singer components (keep external Singer SDK types)
-        type Tap = SingerTap
-        type Target = SingerTarget
-        type Stream = SingerStream
+        # Core Singer components (use object for external types)
+        type Tap = object
+        type Target = object
+        type Stream = object
 
         # Singer message system (using flext-core message types)
         type MessageType = MessageType  # Use Payload.MessageType
@@ -185,8 +179,8 @@ class FlextMeltanoTypes:
         leveraging FlextTypes.Core and FlextTypes.Config for configuration management.
         """
 
-        # DBT Core components (keep external DBT types)
-        type Runner = dbtRunner
+        # DBT Core components (use object for external types)
+        type Runner = object
         type Project = ConfigDict  # Project as ConfigDict
         type Profile = ConfigDict  # Profile as ConfigDict
 
@@ -213,7 +207,7 @@ class FlextMeltanoTypes:
     class Bridge:
         """Go service integration types extending flext-core base types.
 
-        This class contains types used in the Go ↔ Python bridge,
+        This class contains types used in the Go <-> Python bridge,
         leveraging FlextTypes.Network and FlextTypes.Payload for communication.
         """
 

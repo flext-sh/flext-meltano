@@ -1,20 +1,17 @@
-"""Flext Meltano Configuration - Unified configuration management using FlextConfig.
+"""FLEXT Meltano Configuration Management - Enterprise ELT configuration patterns.
 
-This module provides complete Meltano configuration functionality using flext-core
-FlextConfig as the single source of truth, eliminating duplication and following
-SOLID principles.
+This module provides configuration management for Meltano ELT operations
+following FLEXT architectural patterns with Pydantic validation.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
-import contextlib
 from enum import StrEnum
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from flext_core import (
     FlextConfig,
@@ -23,10 +20,11 @@ from flext_core import (
     FlextResult,
     FlextTypes,
 )
-from pydantic import Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 # Avoid circular import by importing constants after core
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.validators import FlextMeltanoValidators
 
 
 class FlextMeltanoConfig(FlextConfig):
@@ -131,9 +129,7 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Environment and execution configuration - environment field inherited from FlextConfig
 
-    log_level: str = Field(
-        default="INFO", description="Logging level for operations"
-    )
+    log_level: str = Field(default="INFO", description="Logging level for operations")
 
     timeout_seconds: int = Field(
         default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
@@ -254,33 +250,11 @@ class FlextMeltanoConfig(FlextConfig):
 
     def validate_project_structure(self) -> FlextResult[bool]:
         """Validate Meltano project directory structure."""
-        try:
-            # Check if project root exists
-            if not self.project_root.exists():
-                return FlextResult[bool].fail(
-                    f"Project root does not exist: {self.project_root}"
-                )
+        # Use centralized validator to eliminate duplication
 
-            # Check for meltano.yml
-            project_file = self.get_project_file()
-            if not project_file.exists():
-                return FlextResult[bool].fail(
-                    f"meltano.yml not found in {project_file.parent}"  # Test expectation compliance
-                )
-
-            # Ensure required directories exist
-            config_dir = self.get_absolute_config_dir()
-            logs_dir = self.get_absolute_logs_dir()
-
-            with contextlib.suppress(OSError):
-                config_dir.mkdir(parents=True, exist_ok=True)
-                logs_dir.mkdir(parents=True, exist_ok=True)
-
-            success = True
-            return FlextResult[bool].ok(success)
-
-        except Exception as e:
-            return FlextResult[bool].fail(f"Project validation failed: {e}")
+        return FlextMeltanoValidators.validate_meltano_project_structure(
+            self.project_root
+        )
 
     def get_environment_variables(self) -> FlextTypes.Core.Headers:
         """Get environment variables for Meltano operations.
@@ -397,7 +371,7 @@ class FlextMeltanoConfig(FlextConfig):
                 project_root = Path()
 
             config = cls(
-                environment=str(env_type),  # type: ignore[arg-type]
+                environment=env_type.value,
                 project_root=project_root,
                 log_level=cls.LogLevel(
                     str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))
@@ -467,10 +441,13 @@ class FlextMeltanoConfig(FlextConfig):
         """Clear the global instance (useful for testing)."""
         # Delegate to FlextConfig since it's the source of truth
         FlextConfig.clear_global_instance()
-        cls._global_instance = None
+        if hasattr(cls, "_global_instance"):
+            cls._global_instance = None
 
     @classmethod
-    def create_with_overrides(cls, **overrides: object) -> FlextResult[FlextMeltanoConfig]:
+    def create_with_overrides(
+        cls, **overrides: object
+    ) -> FlextResult[FlextMeltanoConfig]:
         """Create Meltano configuration with specific overrides.
 
         This method creates a new configuration instance using FlextConfig as the base
@@ -484,17 +461,13 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         try:
-            # Use FlextConfig.create() as the source of truth
-            base_result = FlextConfig.create(constants=overrides)
-            if base_result.is_failure:
-                return FlextResult[FlextMeltanoConfig].fail(
-                    f"Failed to create base configuration: {base_result.error}",
-                    error_code="CONFIG_CREATION_ERROR",
-                )
-
-            # Convert base config to Meltano config
-            base_data = base_result.unwrap().model_dump()
-            config = cls(**base_data)
+            # Create Meltano config directly with overrides
+            # Filter overrides to only include valid fields
+            valid_fields = cls.model_fields.keys()
+            filtered_overrides = {
+                k: v for k, v in overrides.items() if k in valid_fields
+            }
+            config = cls(**filtered_overrides)  # type: ignore[arg-type]
             return FlextResult[FlextMeltanoConfig].ok(config)
 
         except Exception as error:
@@ -579,9 +552,10 @@ class FlextMeltanoConfig(FlextConfig):
                 error_code="OVERRIDE_APPLICATION_ERROR",
             )
 
-    def seal(self) -> None:
+    def seal(self) -> FlextResult[None]:
         """Seal the configuration to prevent further modifications."""
         self._sealed = True
+        return FlextResult[None].ok(None)
 
     def is_sealed(self) -> bool:
         """Check if the configuration is sealed."""
@@ -619,16 +593,15 @@ class FlextMeltanoConfig(FlextConfig):
         return {**base_env_vars, **meltano_env_vars}
 
     # ============================================================================
-    # CLASS CONFIGURATION - Pydantic model configuration
+    # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    class Config:
-        """Pydantic model configuration."""
-
-        extra = "ignore"  # Allow extra fields from environment variables
-        validate_assignment = True
-        use_enum_values = True
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "ignore",  # Allow extra fields from environment variables
+        "validate_assignment": True,
+        "use_enum_values": True,
+        "arbitrary_types_allowed": True,
+    }
 
 
 __all__ = [

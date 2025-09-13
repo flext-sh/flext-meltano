@@ -1,19 +1,15 @@
-"""Test FlextMeltanoBridge - Complete real functionality testing.
-
-Tests all bridge functionality with 100% real operations.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
 
 import asyncio
 import tempfile
 from pathlib import Path
-
 from flext_core import FlextResult
-
 from flext_meltano.executors_bridge import FlextMeltanoBridge
+
+SPDX-License-Identifier: MIT
+"""
+
+
+
 
 
 class TestFlextMeltanoBridgeComplete:
@@ -21,16 +17,20 @@ class TestFlextMeltanoBridgeComplete:
 
     def setup_method(self) -> None:
         """Setup for each test."""
+
         self.bridge = FlextMeltanoBridge()
 
     def test_bridge_initialization(self) -> None:
         """Test bridge initialization."""
+
         bridge = FlextMeltanoBridge()
         assert bridge is not None
-        assert hasattr(bridge, "executor")
+        assert hasattr(bridge, "adapter")
+        assert hasattr(bridge, "logger")
 
     def test_get_version(self) -> None:
         """Test get_version method."""
+
         result = self.bridge.get_version()
 
         assert isinstance(result, FlextResult)
@@ -47,14 +47,17 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_get_version_json(self) -> None:
         """Test get_version_json method."""
+
         version_json = self.bridge.get_version_json()
 
-        assert isinstance(version_json, dict)
-        # Should be a valid dictionary structure
-        assert len(version_json) >= 0
+        assert isinstance(version_json, str)
+        # Should be a valid JSON string
+        assert len(version_json) > 0
+        assert "meltano" in version_json
 
     def test_discover_plugins(self) -> None:
         """Test discover_plugins method."""
+
         result = self.bridge.discover_plugins()
 
         assert isinstance(result, FlextResult)
@@ -73,13 +76,12 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_list_plugins(self) -> None:
         """Test list_plugins method."""
+
         result = self.bridge.list_plugins()
 
-        assert isinstance(result, dict)
-        assert "success" in result
-        assert "data" in result
-        if result["success"]:
-            plugins = result["data"]
+        assert isinstance(result, FlextResult)
+        if result.is_success:
+            plugins = result.value
             assert isinstance(plugins, list)
             # Validate real plugin structure
             if plugins:
@@ -93,6 +95,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_initialize_project(self) -> None:
         """Test initialize_project method."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
@@ -108,6 +111,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_get_project_info(self) -> None:
         """Test get_project_info method."""
+
         result = self.bridge.get_project_info()
 
         assert isinstance(result, dict)
@@ -122,6 +126,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_install_plugin(self) -> None:
         """Test install_plugin method."""
+
         result = self.bridge.install_plugin("extractors", "tap-csv")
 
         assert isinstance(result, FlextResult)
@@ -134,6 +139,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_execute_meltano_command(self) -> None:
         """Test execute_meltano_command method."""
+
         result = self.bridge.execute_meltano_command(["--version"])
 
         assert isinstance(result, dict)
@@ -148,10 +154,11 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_execute_meltano_command_real(self) -> None:
         """Test execute_meltano_command_real method."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            result = self.bridge.execute_meltano_command_real(
-                project_path, ["--version"]
+            result = self.bridge.execute_meltano_command(
+                ["--version"], str(project_path)
             )
 
             assert isinstance(result, dict)
@@ -162,6 +169,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_execute_dbt_command(self) -> None:
         """Test execute_dbt_command method."""
+
         result = self.bridge.execute_dbt_command(["--version"])
 
         assert isinstance(result, dict)
@@ -176,6 +184,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_invoke_dbt(self) -> None:
         """Test invoke_dbt method."""
+
         result = self.bridge.invoke_dbt("--version")
 
         assert isinstance(result, dict)
@@ -186,6 +195,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_run_pipeline(self) -> None:
         """Test run_pipeline method."""
+
         result = self.bridge.run_pipeline("tap-csv", "target-jsonl")
 
         assert isinstance(result, dict)
@@ -199,33 +209,29 @@ class TestFlextMeltanoBridgeComplete:
             assert "error" in result
 
     def test_run_pipeline_real(self) -> None:
-        """Test run_pipeline_real method."""
+        """Test run_pipeline method."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            result = self.bridge.run_pipeline_real(
-                project_path, "tap-csv", "target-jsonl"
+            result = self.bridge.run_pipeline(
+                "tap-csv", "target-jsonl", str(project_path)
             )
 
-            assert isinstance(result, FlextResult)
+            assert isinstance(result, dict)
             # Real pipeline execution may succeed or fail
-            if not result.success:
-                assert result.error_message
+            assert "success" in result
 
     def test_run_elt_pipeline(self) -> None:
         """Test run_elt_pipeline method."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
             result = self.bridge.run_elt_pipeline(
-                project_path, "tap-csv", "target-jsonl"
+                "tap-csv", "target-jsonl", str(project_path)
             )
 
-            assert isinstance(result, FlextResult)
-            if result.success:
-                elt_result = result.value
-                assert isinstance(elt_result, dict)
-            else:
-                # ELT pipeline may fail without proper setup
-                assert result.error_message
+            assert isinstance(result, dict)
+            assert "success" in result
 
     def test_run_plugin_async(self) -> None:
         """Test run_plugin_async method."""
@@ -246,21 +252,24 @@ class TestFlextMeltanoBridgeComplete:
         assert result is not None
 
     def test_create_bridge(self) -> None:
-        """Test create_bridge method."""
-        result = FlextMeltanoBridge.create_bridge()
+        """Test bridge creation."""
+
+        result = FlextMeltanoBridge()
 
         assert isinstance(result, FlextMeltanoBridge)
         assert result is not None
-        assert hasattr(result, "executor")
+        assert hasattr(result, "adapter")
 
     def test_executor_property(self) -> None:
-        """Test executor property access."""
-        executor = self.bridge.executor
-        assert executor is not None
-        # Executor should be accessible
+        """Test adapter property access."""
+
+        adapter = self.bridge.adapter
+        assert adapter is not None
+        # Adapter should be accessible
 
     def test_multiple_bridge_operations(self) -> None:
         """Test multiple bridge operations in sequence."""
+
         # Test FlextResult operations
         flext_result_operations = [
             self.bridge.get_version,
@@ -272,19 +281,19 @@ class TestFlextMeltanoBridgeComplete:
             assert isinstance(result, FlextResult)
             # Each operation should return FlextResult
 
-        # Test dict operations
-        dict_operations = [
+        # Test FlextResult operations
+        flext_result_operations_2 = [
             self.bridge.list_plugins,
         ]
 
-        for operation in dict_operations:
+        for operation in flext_result_operations_2:
             result = operation()
-            assert isinstance(result, dict)
-            assert "success" in result
-            # Each operation should return dict with success key
+            assert isinstance(result, FlextResult)
+            # Each operation should return FlextResult
 
     def test_error_handling_invalid_commands(self) -> None:
         """Test error handling with invalid commands."""
+
         invalid_commands = [["--invalid-flag"], ["nonexistent-command"], []]
 
         for cmd in invalid_commands:
@@ -296,6 +305,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_concurrent_bridge_instances(self) -> None:
         """Test multiple bridge instances work independently."""
+
         bridge1 = FlextMeltanoBridge()
         bridge2 = FlextMeltanoBridge()
 
@@ -311,6 +321,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_bridge_with_different_plugins(self) -> None:
         """Test bridge operations with different plugin types."""
+
         plugin_configs = [
             ("extractors", "tap-csv"),
             ("loaders", "target-jsonl"),
@@ -324,6 +335,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_pipeline_execution_patterns(self) -> None:
         """Test different pipeline execution patterns."""
+
         pipeline_configs = [
             ("tap-csv", "target-jsonl"),
             ("tap-postgres", "target-postgres"),
@@ -338,6 +350,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_command_result_consistency(self) -> None:
         """Test command result format consistency."""
+
         commands = [
             ["--version"],
             ["--help"],
@@ -356,8 +369,9 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_bridge_lifecycle_operations(self) -> None:
         """Test bridge lifecycle and state management."""
+
         # Test bridge creation and initialization
-        create_result = FlextMeltanoBridge.create_bridge()
+        create_result = FlextMeltanoBridge()
         assert isinstance(create_result, FlextMeltanoBridge)
 
         # Test version information after creation
@@ -371,6 +385,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_error_scenarios_for_coverage(self) -> None:
         """Test error scenarios to increase coverage on exception handling."""
+
         # Test with invalid paths to trigger error handling
         invalid_path = Path("/nonexistent/invalid/path/that/does/not/exist")
 
@@ -392,6 +407,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_parameter_validation_coverage(self) -> None:
         """Test various parameter combinations to increase branch coverage."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
@@ -411,26 +427,25 @@ class TestFlextMeltanoBridgeComplete:
             assert "success" in dbt_result
 
             # Test with different project roots
-            real_result = self.bridge.execute_meltano_command_real(
-                project_path, ["version"]
+            real_result = self.bridge.execute_meltano_command(
+                ["version"], str(project_path)
             )
             assert isinstance(real_result, dict)
             assert "success" in real_result
 
     def test_additional_method_coverage(self) -> None:
         """Test additional methods to increase coverage."""
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            Path(temp_dir)
+            project_path = Path(temp_dir)
 
             # Test invoke_dbt with different parameter combinations
             dbt_result1 = self.bridge.invoke_dbt("version")
             assert isinstance(dbt_result1, dict)
             assert "success" in dbt_result1
 
-            # Test invoke_dbt with keyword arguments
-            dbt_result2 = self.bridge.invoke_dbt(
-                "compile", models="test", vars="key:value"
-            )
+            # Test invoke_dbt with positional arguments
+            dbt_result2 = self.bridge.invoke_dbt("compile", str(project_path))
             assert isinstance(dbt_result2, dict)
             assert "success" in dbt_result2
 
@@ -452,6 +467,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_internal_methods_for_coverage(self) -> None:
         """Test internal methods to achieve higher coverage."""
+
         # Test adapter _create_temporary_meltano_project method directly (no wrappers)
         temp_project_result = self.bridge.adapter._create_temporary_meltano_project()
         assert isinstance(temp_project_result, FlextResult)
@@ -470,6 +486,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_edge_cases_and_error_paths(self) -> None:
         """Test edge cases and error paths to maximize coverage."""
+
         # Test with extreme/invalid inputs to trigger error handling
 
         # Test with empty strings
@@ -497,6 +514,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_error_recovery_patterns(self) -> None:
         """Test error recovery and resilience patterns."""
+
         # Test FlextResult operations
         flext_result_operations = [
             lambda: self.bridge.install_plugin("extractors", "invalid@plugin#name"),

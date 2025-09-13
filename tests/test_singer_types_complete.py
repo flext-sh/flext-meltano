@@ -1,18 +1,16 @@
-"""Test FlextSingerTypes - Complete real functionality testing using flext_tests.
 
-Tests all Singer type functionality with 100% flext-tests infrastructure.
-NO DUPLICATION - Uses exclusively flext_tests patterns and utilities.
+import math
+from flext_core import FlextResult
+from flext_tests import FlextTestsUtilities
+from flext_meltano.singer_types import FlextSingerTypes
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-import math
 
-from flext_core import FlextResult
-from flext_tests import FlextTestsUtilities
 
-from flext_meltano.singer_types import FlextSingerTypes
+from typing import Type
 
 
 class TestFlextSingerTypesComplete:
@@ -20,6 +18,7 @@ class TestFlextSingerTypesComplete:
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
+
         self.singer_types = FlextSingerTypes()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
@@ -31,6 +30,7 @@ class TestFlextSingerTypesComplete:
 
     def test_singer_types_initialization(self) -> None:
         """Test FlextSingerTypes initialization using flext_tests."""
+
         singer_types = FlextSingerTypes()
 
         # Use flext_tests assertions
@@ -52,6 +52,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_string_type_success(self) -> None:
         """Test successful string type creation using flext_tests."""
+
         # Test basic string type creation (lines 56-59)
         result = self.singer_types.create_string_type()
 
@@ -93,6 +94,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_integer_type_success(self) -> None:
         """Test successful integer type creation using flext_tests."""
+
         # Test basic integer type creation (lines 69-72)
         result = self.singer_types.create_integer_type()
 
@@ -130,6 +132,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_number_type_success(self) -> None:
         """Test successful number type creation using flext_tests."""
+
         # Test basic number type creation (lines 80-83)
         result = self.singer_types.create_number_type()
 
@@ -150,6 +153,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_boolean_type_success(self) -> None:
         """Test successful boolean type creation using flext_tests."""
+
         # Test basic boolean type creation (lines 93-96)
         result = self.singer_types.create_boolean_type()
 
@@ -170,6 +174,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_datetime_type_success(self) -> None:
         """Test successful datetime type creation using flext_tests."""
+
         # Test datetime type creation (lines 106-109)
         result = self.singer_types.create_datetime_type()
 
@@ -195,6 +200,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_array_type_success(self) -> None:
         """Test successful array type creation using flext_tests."""
+
         # Test basic array type creation (lines 119-124)
         result = self.singer_types.create_array_type()
 
@@ -214,7 +220,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test array type with item type specification (line 121-122)
-        item_type = {"type": "string"}
+        item_type: dict[str, object] = {"type": "string"}
         result_with_items = self.singer_types.create_array_type(items=item_type)
 
         array_with_items = result_with_items.unwrap()
@@ -226,6 +232,7 @@ class TestFlextSingerTypesComplete:
 
     def test_create_object_type_success(self) -> None:
         """Test successful object type creation using flext_tests."""
+
         # Test basic object type creation (lines 134-138)
         result = self.singer_types.create_object_type()
 
@@ -245,7 +252,10 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test object type with properties specification (line 136-137)
-        properties = {"id": {"type": "string"}, "name": {"type": "string"}}
+        properties: dict[str, object] = {
+            "id": {"type": "string"},
+            "name": {"type": "string"},
+        }
         result_with_properties = self.singer_types.create_object_type(
             properties=properties
         )
@@ -263,7 +273,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_string_type(self) -> None:
         """Test value validation for string type using flext_tests."""
-        string_type_def = {"type": "string"}
+
+        string_type_def: dict[str, object] = {"type": "string"}
 
         # Test valid string value (lines 171-184)
         valid_result = self.singer_types.validate_value("hello world", string_type_def)
@@ -301,7 +312,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_integer_type(self) -> None:
         """Test value validation for integer type using flext_tests."""
-        integer_type_def = {"type": "integer"}
+
+        integer_type_def: dict[str, object] = {"type": "integer"}
 
         # Test valid integer value
         valid_result = self.singer_types.validate_value(42, integer_type_def)
@@ -333,7 +345,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_number_type(self) -> None:
         """Test value validation for number type using flext_tests."""
-        number_type_def = {"type": "number"}
+
+        number_type_def: dict[str, object] = {"type": "number"}
 
         # Test valid number values (lines 174-179 - tuple case)
         valid_int_result = self.singer_types.validate_value(42, number_type_def)
@@ -365,7 +378,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_boolean_type(self) -> None:
         """Test value validation for boolean type using flext_tests."""
-        boolean_type_def = {"type": "boolean"}
+
+        boolean_type_def: dict[str, object] = {"type": "boolean"}
 
         # Test valid boolean values
         valid_true_result = self.singer_types.validate_value(True, boolean_type_def)
@@ -390,7 +404,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_array_type(self) -> None:
         """Test value validation for array type using flext_tests."""
-        array_type_def = {"type": "array"}
+
+        array_type_def: dict[str, object] = {"type": "array"}
 
         # Test valid array value
         valid_result = self.singer_types.validate_value([1, 2, 3], array_type_def)
@@ -412,7 +427,8 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_object_type(self) -> None:
         """Test value validation for object type using flext_tests."""
-        object_type_def = {"type": "object"}
+
+        object_type_def: dict[str, object] = {"type": "object"}
 
         # Test valid object value
         valid_result = self.singer_types.validate_value(
@@ -436,8 +452,9 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_missing_type(self) -> None:
         """Test value validation with missing type definition using flext_tests."""
+
         # Test missing type field (lines 157-158)
-        missing_type_def = {"description": "No type field"}
+        missing_type_def: dict[str, object] = {"description": "No type field"}
 
         result = self.singer_types.validate_value("any_value", missing_type_def)
 
@@ -456,8 +473,9 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_unknown_type(self) -> None:
         """Test value validation with unknown type using flext_tests."""
+
         # Test unknown type (not in validation_rules)
-        unknown_type_def = {"type": "unknown_type"}
+        unknown_type_def: dict[str, object] = {"type": "unknown_type"}
 
         result = self.singer_types.validate_value("any_value", unknown_type_def)
 
@@ -473,6 +491,7 @@ class TestFlextSingerTypesComplete:
 
     def test_type_creation_error_coverage(self) -> None:
         """Test type creation error handling using flext_tests."""
+
         # The error branches (lines 60-61, 73-75, 84-86, 97-99, 110-112, 125-127, 140-142)
         # are difficult to trigger directly since they only occur on exception during dict operations
         # But we can ensure the exception handling path is covered by the structure
@@ -498,6 +517,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_exception_handling(self) -> None:
         """Test validate_value exception handling using flext_tests."""
+
         # Test the exception handling branch (lines 187-188)
         # This should be covered by the try/except structure
 
@@ -520,6 +540,7 @@ class TestFlextSingerTypesComplete:
 
     def test_comprehensive_workflow_integration(self) -> None:
         """Test comprehensive Singer types workflow using flext_tests."""
+
         # Create a complete schema with multiple types
         string_result = self.singer_types.create_string_type(minLength=1)
         integer_result = self.singer_types.create_integer_type(minimum=0)
@@ -580,6 +601,7 @@ class TestFlextSingerTypesComplete:
 
     def test_edge_cases_and_boundary_conditions(self) -> None:
         """Test edge cases and boundary conditions using flext_tests."""
+
         # Test array type with complex item types
         string_type = self.singer_types.create_string_type().unwrap()
         array_of_strings = self.singer_types.create_array_type(items=string_type)

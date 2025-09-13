@@ -1,13 +1,3 @@
-"""Comprehensive tests for Tap Abstractions using flext_tests.
-
-Tests all tap functionality with real Singer protocol operations,
-no mocks, using flext_tests for improved assertions and test builders.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 import concurrent.futures
 import os
 import shutil

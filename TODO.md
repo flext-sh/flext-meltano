@@ -31,7 +31,6 @@
   - Pipeline management scenarios missing
   - Integration patterns need validation
 - [ ] **exceptions.py**: 55% → 90% (+35% needed)
-
   - Exception hierarchy not completely tested
   - Error message formatting validation missing
   - Exception chaining scenarios not covered

@@ -1,7 +1,4 @@
-"""FLEXT Meltano Utilities - DOMAIN-SPECIFIC Meltano utilities using flext-core foundation.
-
-This module provides ONLY Meltano-specific utility functions that cannot be generalized
-to flext-core. ALL general utilities MUST use FlextUtilities from flext-core directly.
+"""FLEXT Meltano Utilities - Domain-specific Meltano utilities.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -29,12 +26,8 @@ class FlextMeltanoUtilities:
         logger = FlextLogger(__name__)
         try:
             # Delegate to FlextUtilities for text processing - NO DUPLICATION
-            safe_project_id = FlextUtilities.TextProcessor.safe_string(
-                project_id, "flext-meltano-project"
-            )
-            safe_project_name = FlextUtilities.TextProcessor.safe_string(
-                project_name, ""
-            )
+            safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
             config_dict = {
@@ -94,17 +87,12 @@ class FlextMeltanoUtilities:
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
             # Delegate to FlextUtilities for ALL text processing - NO DUPLICATION
-            safe_name = FlextUtilities.TextProcessor.safe_string(name, "unknown-plugin")
-            safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace, "")
+            safe_name = FlextUtilities.TextProcessor.safe_string(name)
+            safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace)
 
             # DOMAIN-SPECIFIC: Meltano plugin-specific defaults
-            type_prefix = "tap" if plugin_type == "extractor" else "target"
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-                pip_url, f"{type_prefix}-{safe_name}"
-            )
-            safe_executable = FlextUtilities.TextProcessor.safe_string(
-                executable, f"{type_prefix}-{safe_name}"
-            )
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
+            safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
 
             config_dict: FlextTypes.Core.Dict = {
                 "name": safe_name,
@@ -126,9 +114,7 @@ class FlextMeltanoUtilities:
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     @classmethod
-    def load_yaml_config(
-        cls, path: Path
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    def load_yaml_config(cls, path: Path) -> FlextResult[FlextTypes.Core.Dict]:
         """Load YAML config - DELEGATES to FlextMeltanoFileManagers as SOURCE OF TRUTH.
 
         ZERO DUPLICATION: Uses FlextMeltanoFileManagers.load_yaml_config.
@@ -136,7 +122,9 @@ class FlextMeltanoUtilities:
         # Delegate to FlextMeltanoFileManagers - NO DUPLICATION
         result = FlextMeltanoFileManagers.load_yaml_config(path)
         if result.is_failure:
-            return FlextResult[FlextTypes.Core.Dict].fail(result.error or "Failed to load YAML config")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                result.error or "Failed to load YAML config"
+            )
 
         return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
 

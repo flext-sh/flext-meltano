@@ -1,8 +1,5 @@
 """FLEXT Meltano Service Implementations - Backward compatibility module.
 
-DEPRECATED: This module is deprecated. Use flext_meltano.services instead.
-
-This module provides backward compatibility for legacy code that expects
 service_implementations module. All functionality has been moved to services.py
 following flext-core single class per module patterns.
 
@@ -17,8 +14,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import warnings
-
-# Create legacy class aliases using partial with service_type
 from functools import partial
 
 from flext_meltano.services import FlextMeltanoService

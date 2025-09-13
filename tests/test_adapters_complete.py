@@ -1,7 +1,7 @@
-"""Test FlextMeltanoAdapter - Complete real functionality testing using flext_tests.
+"""FLEXT Meltano Adapter Complete Tests - Enterprise ELT testing patterns.
 
-Tests all major adapter functionality with 100% flext-tests infrastructure.
-NO DUPLICATION - Uses exclusively flext_tests patterns and utilities.
+This module provides comprehensive tests for FlextMeltanoAdapter using
+flext_tests patterns and real Meltano API integration.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

@@ -1,7 +1,4 @@
-"""FLEXT Meltano Constants - DOMAIN-SPECIFIC Meltano constants using FlextConstants as SOURCE OF TRUTH.
-
-This module contains ONLY Meltano-specific constants that cannot be found in FlextConstants.
-ALL general constants MUST use FlextConstants as the single source of truth.
+"""FLEXT Meltano Constants - Domain-specific Meltano constants.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

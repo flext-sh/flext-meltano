@@ -1,7 +1,7 @@
-"""FLEXT Meltano File Managers - DOMAIN-SPECIFIC file operations using flext-core as SOURCE OF TRUTH.
+"""FLEXT Meltano File Management - Enterprise ELT file operations.
 
-This module provides ONLY Meltano-specific file operations that cannot be generalized.
-ALL general file operations MUST use FlextUtilities from flext-core directly.
+This module provides file management utilities for Meltano ELT operations
+following FLEXT architectural patterns with proper error handling.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -15,6 +15,7 @@ import yaml
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
 ConfigDict = dict[
@@ -55,8 +56,8 @@ class FlextMeltanoFileManagers:
             temp_dir_str = tempfile.mkdtemp(prefix=prefix)
             temp_dir = Path(temp_dir_str)
 
-            # Delegate to FlextUtilities.EnvironmentUtils for path validation - NO DUPLICATION
-            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(temp_dir)):
+            # Basic path validation using flext-core utilities
+            if not FlextUtilities.TypeGuards.is_string_non_empty(str(temp_dir)):
                 return FlextResult[Path].fail(
                     f"Invalid temp directory path: {temp_dir}"
                 )
@@ -99,8 +100,8 @@ class FlextMeltanoFileManagers:
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
         """
         try:
-            # Delegate path validation to FlextUtilities.EnvironmentUtils - NO DUPLICATION
-            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(file_path)):
+            # Basic path validation using flext-core utilities
+            if not FlextUtilities.TypeGuards.is_string_non_empty(str(file_path)):
                 return FlextResult[ConfigDict].fail(
                     f"Invalid YAML file path: {file_path}"
                 )
@@ -128,8 +129,8 @@ class FlextMeltanoFileManagers:
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
         """
         try:
-            # Delegate path validation to FlextUtilities.EnvironmentUtils - NO DUPLICATION
-            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(file_path)):
+            # Basic path validation using flext-core utilities
+            if not FlextUtilities.TypeGuards.is_string_non_empty(str(file_path)):
                 return FlextResult[bool].fail(f"Invalid YAML file path: {file_path}")
 
             if not file_path.exists():
@@ -232,41 +233,10 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def validate_project_structure(cls, project_root: Path) -> FlextResult[bool]:
-        """Validate Meltano project structure using FlextUtilities.Files validation.
+        """Validate Meltano project structure using centralized validator."""
+        # Use centralized validator to eliminate duplication
 
-        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for path validation.
-        """
-        try:
-            # Delegate to FlextUtilities.EnvironmentUtils for path validation - NO DUPLICATION
-            if not FlextUtilities.EnvironmentUtils.is_valid_path(str(project_root)):
-                return FlextResult[bool].fail(
-                    f"Invalid project root path: {project_root}"
-                )
-
-            if not project_root.exists():
-                return FlextResult[bool].fail(
-                    f"Project root does not exist: {project_root}"
-                )
-
-            # DOMAIN-SPECIFIC: Meltano project requirements
-            required_files = [FlextMeltanoConstants.Meltano.PROJECT_FILE]
-            required_dirs = ["extract", "load", "transform", "analyze"]
-
-            for filename in required_files:
-                file_path = project_root / filename
-                if not file_path.exists():
-                    return FlextResult[bool].fail(f"Missing required file: {filename}")
-
-            for dirname in required_dirs:
-                dir_path = project_root / dirname
-                if not dir_path.is_dir():
-                    return FlextResult[bool].fail(
-                        f"Missing required directory: {dirname}"
-                    )
-
-            return FlextResult[bool].ok(data=True)
-        except Exception as e:
-            return FlextResult[bool].fail(f"Failed to validate project structure: {e}")
+        return FlextMeltanoValidators.validate_meltano_project_structure(project_root)
 
 
 __all__ = ["FlextMeltanoFileManagers"]

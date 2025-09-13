@@ -79,7 +79,7 @@ services:
     image: gvenzl/oracle-xe:21-slim
     container_name: flext-meltano-oracle-test
     ports:
-      - "1522:1521"  # Using different port to avoid conflicts
+      - "1522:1521" # Using different port to avoid conflicts
     environment:
       - ORACLE_PASSWORD=Oracle123Test
       - ORACLE_DATABASE=XEPDB1
@@ -87,7 +87,14 @@ services:
     volumes:
       - oracle_test_data:/opt/oracle/oradata
     healthcheck:
-      test: ["CMD", "sqlplus", "-L", "system/Oracle123Test@//localhost:1521/XE", "@/dev/null"]
+      test:
+        [
+          "CMD",
+          "sqlplus",
+          "-L",
+          "system/Oracle123Test@//localhost:1521/XE",
+          "@/dev/null",
+        ]
       interval: 30s
       timeout: 10s
       retries: 10

@@ -184,3 +184,73 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert result.success
+
+    def test_validate_plugin_name_empty(self) -> None:
+        """Test plugin name validation with empty name."""
+        config = {
+            "name": "",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert not result.success
+        assert "String should have at least 1 character" in result.error
+
+    def test_validate_plugin_name_whitespace(self) -> None:
+        """Test plugin name validation with whitespace only."""
+        config = {
+            "name": "   ",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert not result.success
+        assert "Plugin name cannot be empty" in result.error
+
+    def test_validate_target_plugin_name_too_short(self) -> None:
+        """Test target plugin name validation with too short name."""
+        config = {
+            "name": "target-",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert not result.success
+        assert "Target plugin names must be at least 8 characters" in result.error
+
+    def test_validate_tap_plugin_name_too_short(self) -> None:
+        """Test tap plugin name validation with too short name."""
+        config = {
+            "name": "tap-",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert not result.success
+        assert "Tap plugin names must be at least 5 characters" in result.error
+
+    def test_validate_target_plugin_name_valid(self) -> None:
+        """Test target plugin name validation with valid name."""
+        config = {
+            "name": "target-postgres",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert result.success
+
+    def test_validate_tap_plugin_name_valid(self) -> None:
+        """Test tap plugin name validation with valid name."""
+        config = {
+            "name": "tap-csv",
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
+        }
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        assert result.success

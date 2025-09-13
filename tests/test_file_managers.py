@@ -1,12 +1,3 @@
-"""Test file_managers module - Basic functionality tests.
-
-Tests FlextMeltanoFileManagers class functionality.
-Zero mock usage - all real function testing.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
 
 from __future__ import annotations
 
@@ -15,8 +6,13 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest import TestCase
-
 from flext_meltano.file_managers import FlextMeltanoFileManagers
+
+"""
+
+from __future__ import annotations
+
+
 
 
 class TestFlextMeltanoFileManagersBasic(TestCase):
@@ -24,21 +20,25 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def setUp(self) -> None:
         """Set up test fixtures."""
+
         self.file_managers = FlextMeltanoFileManagers()
         self.temp_dir = Path(tempfile.mkdtemp())
 
     def tearDown(self) -> None:
         """Clean up test fixtures."""
+
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir)
 
     def test_class_instantiation(self) -> None:
         """Test FlextMeltanoFileManagers instantiation."""
+
         managers = FlextMeltanoFileManagers()
         assert isinstance(managers, FlextMeltanoFileManagers)
 
     def test_class_methods_exist(self) -> None:
         """Test all required file manager methods exist."""
+
         expected_methods = [
             "save_yaml_config",
             "load_yaml_config",
@@ -58,6 +58,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def test_yaml_file_manager(self) -> None:
         """Test YAML file manager functionality with class methods."""
+
         # Test class methods directly since FlextMeltanoFileManagers uses class methods
         expected_methods = [
             "save_yaml_config",
@@ -75,6 +76,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def test_project_structure_manager(self) -> None:
         """Test project structure management functionality."""
+
         # Test directory structure creation method
         assert hasattr(FlextMeltanoFileManagers, "create_directory_structure"), (
             "FlextMeltanoFileManagers missing create_directory_structure method"
@@ -85,6 +87,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def test_temp_directory_manager(self) -> None:
         """Test temporary directory management functionality."""
+
         # Test temp directory methods
         temp_methods = ["create_temp_directory", "cleanup_temp_directory"]
 
@@ -95,6 +98,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def test_all_methods_callable(self) -> None:
         """Test all manager class methods are callable."""
+
         # FlextMeltanoFileManagers uses class methods, not nested classes
         all_methods = [
             "save_yaml_config",
@@ -115,6 +119,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
 
     def test_all_exports_available(self) -> None:
         """Test all expected exports are available."""
+
         # Main class should be importable
         assert FlextMeltanoFileManagers is not None
 

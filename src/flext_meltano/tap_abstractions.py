@@ -17,6 +17,8 @@ from typing import cast
 from flext_core import FlextResult, FlextTypes, FlextUtilities
 from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field, field_validator
 
+from flext_meltano.validators import FlextMeltanoValidators
+
 # Type aliases (MyPy compatible)
 RecordDict = FlextTypes.Core.Dict
 ConfigDict = FlextTypes.Core.Dict
@@ -64,10 +66,11 @@ class FlextTapAbstractions:
         def validate_connection_config(
             cls, v: FlextTypes.Core.Dict
         ) -> FlextTypes.Core.Dict:
-            """Validate connection_config is not empty."""
-            if not v:
-                msg = "connection_config cannot be empty"
-                raise ValueError(msg)
+            """Validate connection_config using centralized validator."""
+            # Use centralized validator to eliminate duplication
+            result = FlextMeltanoValidators.validate_connection_config(v)
+            if result.is_failure:
+                raise ValueError(result.error or "Connection config validation failed")
             return v
 
     class StreamDefinition(BaseModel):
@@ -115,7 +118,6 @@ class FlextTapAbstractions:
         self.service_name = "FlextTapAbstractions"
 
         # Initialize dependencies using FlextUtilities
-        self._performance_tracker = FlextUtilities.Performance()
         self._correlation_generator = FlextUtilities.Generators()
 
     # ============================================================================
