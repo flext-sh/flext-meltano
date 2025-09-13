@@ -1,20 +1,16 @@
-"""Comprehensive tests for FlextMeltanoFileManagers using flext_tests.
 
-Tests all file management functionality with real file operations,
-no mocks, using flext_tests for improved assertions and test builders.
-
+import shutil
+import tempfile
+from pathlib import Path
+from flext_tests import FlextTestsMatchers
+from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-import shutil
-import tempfile
-from pathlib import Path
 
-from flext_tests import FlextTestsMatchers
 
-from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 
 class TestFlextMeltanoFileManagersComprehensive:
@@ -22,15 +18,18 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def setup_method(self) -> None:
         """Setup for each test."""
+
         self.temp_dir = Path(tempfile.mkdtemp())
 
     def teardown_method(self) -> None:
         """Cleanup after each test."""
+
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir)
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
+
         config = {
             "project_id": "test-project",
             "version": 1,
@@ -47,6 +46,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
+
         config = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
 
@@ -55,6 +55,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
+
         # First create a valid YAML file
         config = {
             "project_id": "test-load-project",
@@ -78,6 +79,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_load_yaml_config_nonexistent_file(self) -> None:
         """Test loading YAML config from nonexistent file."""
+
         nonexistent_path = self.temp_dir / "does_not_exist.yml"
 
         result = FlextMeltanoFileManagers.load_yaml_config(nonexistent_path)
@@ -85,6 +87,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_load_yaml_config_invalid_yaml(self) -> None:
         """Test loading invalid YAML configuration."""
+
         invalid_yaml_path = self.temp_dir / "invalid.yml"
 
         # Create file with invalid YAML content
@@ -95,6 +98,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
+
         # Create valid YAML file
         config = {"valid": "yaml", "content": {"nested": "value"}}
         yaml_path = self.temp_dir / "valid.yml"
@@ -108,6 +112,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_invalid(self) -> None:
         """Test validating invalid YAML file."""
+
         invalid_yaml_path = self.temp_dir / "invalid_validate.yml"
         invalid_yaml_path.write_text("invalid: yaml: [content")
 
@@ -116,6 +121,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_nonexistent(self) -> None:
         """Test validating nonexistent YAML file."""
+
         nonexistent_path = self.temp_dir / "nonexistent_validate.yml"
 
         result = FlextMeltanoFileManagers.validate_yaml_file(nonexistent_path)
@@ -123,6 +129,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_create_directory_structure_valid(self) -> None:
         """Test creating valid directory structure."""
+
         base_path = self.temp_dir / "test_project"
         directories = ["config", "data", "logs", "extract", "load"]
 
@@ -142,6 +149,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
+
         base_path = self.temp_dir / "empty_project"
         empty_directories = []
 
@@ -157,6 +165,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_setup_project_structure_valid(self) -> None:
         """Test setting up complete project structure."""
+
         project_root = self.temp_dir / "complete_project"
 
         result = FlextMeltanoFileManagers.setup_project_structure(
@@ -175,6 +184,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_setup_project_structure_no_defaults(self) -> None:
         """Test setting up project structure without default files."""
+
         project_root = self.temp_dir / "minimal_project"
 
         result = FlextMeltanoFileManagers.setup_project_structure(
@@ -188,6 +198,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_create_temp_directory_default_prefix(self) -> None:
         """Test creating temporary directory with default prefix."""
+
         result = FlextMeltanoFileManagers.create_temp_directory()
         FlextTestsMatchers.assert_result_success(result)
 
@@ -203,6 +214,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_create_temp_directory_custom_prefix(self) -> None:
         """Test creating temporary directory with custom prefix."""
+
         custom_prefix = "test_custom_prefix"
 
         result = FlextMeltanoFileManagers.create_temp_directory(prefix=custom_prefix)
@@ -220,6 +232,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_cleanup_temp_directory_valid(self) -> None:
         """Test cleaning up valid temporary directory."""
+
         # First create a temp directory
         create_result = FlextMeltanoFileManagers.create_temp_directory(
             prefix="cleanup_test"
@@ -238,6 +251,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_cleanup_temp_directory_nonexistent(self) -> None:
         """Test cleaning up nonexistent directory."""
+
         nonexistent_path = self.temp_dir / "definitely_does_not_exist_cleanup_test"
 
         result = FlextMeltanoFileManagers.cleanup_temp_directory(nonexistent_path)
@@ -246,6 +260,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_project_structure_valid(self) -> None:
         """Test validating valid project structure."""
+
         # First create a project structure
         project_root = self.temp_dir / "validation_project"
 
@@ -262,6 +277,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_project_structure_invalid(self) -> None:
         """Test validating invalid project structure."""
+
         # Empty directory should be invalid project structure
         empty_project_root = self.temp_dir / "empty_validation"
         empty_project_root.mkdir()
@@ -271,6 +287,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_project_structure_nonexistent(self) -> None:
         """Test validating nonexistent project."""
+
         nonexistent_path = self.temp_dir / "does_not_exist_validation"
 
         result = FlextMeltanoFileManagers.validate_project_structure(nonexistent_path)
@@ -278,6 +295,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_complex_workflow_integration(self) -> None:
         """Test complex workflow integrating multiple file manager operations."""
+
         # Create temp directory
         temp_result = FlextMeltanoFileManagers.create_temp_directory(
             prefix="integration_test"
@@ -336,6 +354,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_error_handling_edge_cases(self) -> None:
         """Test error handling for various edge cases."""
+
         # Test with None paths should return failure result instead of raising
         try:
             result = FlextMeltanoFileManagers.save_yaml_config({}, None)
@@ -360,6 +379,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
+
         # Create multiple configs simultaneously
         configs = [
             {"id": "config1", "data": "value1"},
@@ -385,6 +405,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_file_managers_inheritance_methods(self) -> None:
         """Test that FlextMeltanoFileManagers has all expected methods."""
+
         expected_methods = [
             "save_yaml_config",
             "load_yaml_config",

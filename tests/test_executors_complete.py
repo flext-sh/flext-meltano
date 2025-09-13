@@ -1,12 +1,3 @@
-"""Test FlextMeltanoExecutor - Complete real functionality testing.
-
-Tests all major executor functionality with 100% real API integration.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 import sys
 import tempfile
 from collections.abc import MutableMapping
@@ -269,7 +260,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_execute_method(self) -> None:
         """Test execute method."""
-        result = self.executor.execute("version")
+        result = self.executor.execute()
 
         assert isinstance(result, FlextResult)
         assert result.success

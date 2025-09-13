@@ -1,6 +1,4 @@
-"""FLEXT Meltano CLI Executors - Backward compatibility module.
-
-DEPRECATED: This module is deprecated. Use flext_meltano.executors instead.
+"""FLEXT Meltano Executors CLI - Backward compatibility module.
 
 This module provides backward compatibility for legacy code that expects
 executors_cli module. All functionality has been moved to executors.py

@@ -1,8 +1,10 @@
-"""Services Comprehensive Coverage Tests - Real Service Testing Without Mocks.
 
-Comprehensive tests for FlextMeltanoService using real service functionality.
-Focuses on achieving 90%+ coverage with meaningful functional tests.
+from __future__ import annotations
 
+import tempfile
+import pytest
+from flext_core import FlextDomainService, FlextResult
+from flext_meltano.services import FlextMeltanoService
 
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -11,12 +13,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import tempfile
 
-import pytest
-from flext_core import FlextDomainService, FlextResult
 
-from flext_meltano.services import FlextMeltanoService
+from flext_core import FlextResult
 
 
 class TestFlextMeltanoServiceInitialization:
@@ -24,10 +23,12 @@ class TestFlextMeltanoServiceInitialization:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_service_initialization(self) -> None:
         """Test proper service initialization."""
+
         assert isinstance(self.service, FlextMeltanoService)
         assert hasattr(self.service, "_container")
 
@@ -44,6 +45,7 @@ class TestFlextMeltanoServiceInitialization:
 
     def test_container_registration(self) -> None:
         """Test that services are registered in the container."""
+
         # The container should have service classes registered
         assert hasattr(self.service, "_container")
         # Container registration happens during __init__
@@ -54,12 +56,14 @@ class TestTapService:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
         # Use factory method for tap services - unified architecture
         self.create_tap_service = FlextMeltanoService.create_tap_service
 
     def test_tap_service_creation(self) -> None:
         """Test TapService creation and initialization."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -68,6 +72,7 @@ class TestTapService:
 
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
+
         service_result = self.create_tap_service(
             "tap-postgres", database="testdb", host="localhost"
         )
@@ -77,6 +82,7 @@ class TestTapService:
 
     def test_tap_service_adapter_property(self) -> None:
         """Test TapService adapter property."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -86,6 +92,7 @@ class TestTapService:
 
     def test_tap_service_execute_method(self) -> None:
         """Test TapService execute method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -95,6 +102,7 @@ class TestTapService:
 
     def test_tap_service_validate_config(self) -> None:
         """Test TapService validate_config method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -103,6 +111,7 @@ class TestTapService:
 
     def test_tap_service_get_info(self) -> None:
         """Test TapService get_info method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -111,6 +120,7 @@ class TestTapService:
 
     def test_tap_service_create_tap_instance(self) -> None:
         """Test TapService create_tap_instance method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -121,6 +131,7 @@ class TestTapService:
 
     def test_tap_service_validate_tap_config(self) -> None:
         """Test TapService validate_tap_config method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -131,6 +142,7 @@ class TestTapService:
 
     def test_tap_service_get_default_config(self) -> None:
         """Test TapService get_default_config method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -139,6 +151,7 @@ class TestTapService:
 
     def test_tap_service_validate_service(self) -> None:
         """Test TapService validate_service method."""
+
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -151,12 +164,14 @@ class TestTargetService:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
         # Use factory method for target services - unified architecture
         self.create_target_service = FlextMeltanoService.create_target_service
 
     def test_target_service_creation(self) -> None:
         """Test TargetService creation and initialization."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -165,6 +180,7 @@ class TestTargetService:
 
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
+
         service_result = self.create_target_service(
             "target-postgres", database="outputdb", host="localhost"
         )
@@ -174,6 +190,7 @@ class TestTargetService:
 
     def test_target_service_adapter_property(self) -> None:
         """Test TargetService adapter property."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -182,6 +199,7 @@ class TestTargetService:
 
     def test_target_service_execute_method(self) -> None:
         """Test TargetService execute method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -190,6 +208,7 @@ class TestTargetService:
 
     def test_target_service_get_info(self) -> None:
         """Test TargetService get_info method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -198,6 +217,7 @@ class TestTargetService:
 
     def test_target_service_create_target_instance(self) -> None:
         """Test TargetService create_target_instance method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -208,6 +228,7 @@ class TestTargetService:
 
     def test_target_service_validate_target_config(self) -> None:
         """Test TargetService validate_target_config method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -218,6 +239,7 @@ class TestTargetService:
 
     def test_target_service_get_default_config(self) -> None:
         """Test TargetService get_default_config method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -226,6 +248,7 @@ class TestTargetService:
 
     def test_target_service_validate_service(self) -> None:
         """Test TargetService validate_service method."""
+
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -238,12 +261,14 @@ class TestDbtService:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
         # Use factory method for DBT services - unified architecture
         self.create_dbt_service = FlextMeltanoService.create_dbt_service
 
     def test_dbt_service_creation(self) -> None:
         """Test DbtService creation and initialization."""
+
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -252,6 +277,7 @@ class TestDbtService:
 
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""
+
         service_result = self.create_dbt_service(
             "analytics_project", profile_name="dev", target="dev"
         )
@@ -261,6 +287,7 @@ class TestDbtService:
 
     def test_dbt_service_adapter_property(self) -> None:
         """Test DbtService adapter property."""
+
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -269,6 +296,7 @@ class TestDbtService:
 
     def test_dbt_service_execute_method(self) -> None:
         """Test DbtService execute method."""
+
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -277,6 +305,7 @@ class TestDbtService:
 
     def test_dbt_service_get_info(self) -> None:
         """Test DbtService get_info method."""
+
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -285,6 +314,7 @@ class TestDbtService:
 
     def test_dbt_service_get_profiles_config(self) -> None:
         """Test DbtService get_profiles_config method."""
+
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -297,10 +327,12 @@ class TestServiceFactoryMethods:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_create_tap_service(self) -> None:
         """Test create_tap_service factory method."""
+
         result = self.service.create_tap_service("tap-csv")
         assert isinstance(result, FlextResult)
         if result.is_success:
@@ -309,6 +341,7 @@ class TestServiceFactoryMethods:
 
     def test_create_tap_service_with_config(self) -> None:
         """Test create_tap_service with additional configuration."""
+
         result = self.service.create_tap_service(
             "tap-postgres", database="testdb", host="localhost"
         )
@@ -316,6 +349,7 @@ class TestServiceFactoryMethods:
 
     def test_create_target_service(self) -> None:
         """Test create_target_service factory method."""
+
         result = self.service.create_target_service("target-csv")
         assert isinstance(result, FlextResult)
         if result.is_success:
@@ -324,6 +358,7 @@ class TestServiceFactoryMethods:
 
     def test_create_target_service_with_config(self) -> None:
         """Test create_target_service with additional configuration."""
+
         result = self.service.create_target_service(
             "target-postgres", database="outputdb", host="localhost"
         )
@@ -331,6 +366,7 @@ class TestServiceFactoryMethods:
 
     def test_create_dbt_service(self) -> None:
         """Test create_dbt_service factory method."""
+
         result = self.service.create_dbt_service("my_dbt_project")
         assert isinstance(result, FlextResult)
         if result.is_success:
@@ -339,6 +375,7 @@ class TestServiceFactoryMethods:
 
     def test_create_dbt_service_with_config(self) -> None:
         """Test create_dbt_service with project name."""
+
         result = self.service.create_dbt_service("analytics_project")
         assert isinstance(result, FlextResult)
 
@@ -348,10 +385,12 @@ class TestServiceGenericMethods:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_create_service_generic_tap(self) -> None:
         """Test generic service creation for tap services."""
+
         result = self.service._create_service_generic(
             self.service.tap_service, "tap-csv", "tap_name", "tap", tap_name="tap-csv"
         )
@@ -359,6 +398,7 @@ class TestServiceGenericMethods:
 
     def test_create_service_generic_target(self) -> None:
         """Test generic service creation for target services."""
+
         result = self.service._create_service_generic(
             self.service.target_service,
             "target-csv",
@@ -370,6 +410,7 @@ class TestServiceGenericMethods:
 
     def test_create_service_generic_dbt(self) -> None:
         """Test generic service creation for dbt services."""
+
         result = self.service._create_service_generic(
             self.service.dbt_service,
             "my_project",
@@ -381,6 +422,7 @@ class TestServiceGenericMethods:
 
     def test_create_service_generic_with_additional_config(self) -> None:
         """Test generic service creation with additional configuration."""
+
         result = self.service._create_service_generic(
             self.service.tap_service,
             "tap-postgres",
@@ -399,10 +441,12 @@ class TestServiceIntegration:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_full_tap_workflow(self) -> None:
         """Test complete tap service workflow."""
+
         # Create tap service
         tap_result = self.service.create_tap_service("tap-csv")
         assert isinstance(tap_result, FlextResult)
@@ -424,6 +468,7 @@ class TestServiceIntegration:
 
     def test_full_target_workflow(self) -> None:
         """Test complete target service workflow."""
+
         # Create target service
         target_result = self.service.create_target_service("target-csv")
         assert isinstance(target_result, FlextResult)
@@ -441,6 +486,7 @@ class TestServiceIntegration:
 
     def test_full_dbt_workflow(self) -> None:
         """Test complete DBT service workflow."""
+
         # Create dbt service
         dbt_result = self.service.create_dbt_service("analytics_project")
         assert isinstance(dbt_result, FlextResult)
@@ -458,6 +504,7 @@ class TestServiceIntegration:
 
     def test_multiple_service_creation(self) -> None:
         """Test creating multiple services simultaneously."""
+
         # Create multiple services
         tap_result = self.service.create_tap_service("tap-csv")
         target_result = self.service.create_target_service("target-csv")
@@ -485,6 +532,7 @@ class TestServiceIntegration:
 
     def test_service_configuration_validation(self) -> None:
         """Test service configuration validation across different service types."""
+
         # Test different configuration scenarios
         with (
             tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as input_file,
@@ -519,10 +567,12 @@ class TestServiceErrorHandling:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_empty_service_names(self) -> None:
         """Test service creation with empty names."""
+
         # Empty names should be handled gracefully
         tap_result = self.service.create_tap_service("")
         target_result = self.service.create_target_service("")
@@ -535,6 +585,7 @@ class TestServiceErrorHandling:
 
     def test_invalid_service_configurations(self) -> None:
         """Test service creation with potentially invalid configurations."""
+
         # Test with None values
         tap_result = self.service.create_tap_service("tap-test", invalid_param=None)
         assert isinstance(tap_result, FlextResult)
@@ -547,6 +598,7 @@ class TestServiceErrorHandling:
 
     def test_service_method_error_handling(self) -> None:
         """Test error handling in service methods."""
+
         # Create a service and test its methods even if they might fail
         tap_result = self.service.create_tap_service("tap-test")
 
@@ -578,10 +630,12 @@ class TestServiceArchitecture:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
+
         self.service = FlextMeltanoService()
 
     def test_service_inheritance_hierarchy(self) -> None:
         """Test that unified service properly inherits from FlextDomainService."""
+
         # Test unified service inheritance in SOLID architecture
         assert issubclass(FlextMeltanoService, FlextDomainService)
 
@@ -596,6 +650,7 @@ class TestServiceArchitecture:
 
     def test_service_type_annotations(self) -> None:
         """Test service type annotations and generics."""
+
         # Services should be properly typed with unified architecture
         tap_service = FlextMeltanoService(service_type="tap", tap_name="test")
         target_service = FlextMeltanoService(service_type="target", target_name="test")
@@ -613,6 +668,7 @@ class TestServiceArchitecture:
 
     def test_dependency_injection_container(self) -> None:
         """Test dependency injection container usage."""
+
         # Container should be properly initialized
         assert hasattr(self.service, "_container")
         assert self.service._container is not None
@@ -622,6 +678,7 @@ class TestServiceArchitecture:
 
     def test_service_adapter_pattern(self) -> None:
         """Test that unified services implement the adapter pattern."""
+
         services = [
             FlextMeltanoService(service_type="tap", tap_name="test"),
             FlextMeltanoService(service_type="target", target_name="test"),

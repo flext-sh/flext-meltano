@@ -1212,7 +1212,7 @@ FlextMeltanoResult = FlextResult  # Use FlextResult from flext-core
 ```bash
 # Required before module acceptance
 make lint
-make type-check          
+make type-check
 make test                  # 90% coverage requirement
 make security              # Bandit + pip-audit scanning
 make validate              # Complete quality gate validation

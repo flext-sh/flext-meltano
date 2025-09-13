@@ -1,15 +1,7 @@
-"""FLEXT Meltano Test Configuration - Enterprise Testing Framework Setup.
+"""FLEXT Meltano Test Configuration - Enterprise testing standards.
 
-**Test Framework**: Pytest with comprehensive fixture management
-**Coverage Target**: Support for 90%+ test coverage across all modules
-**Dependencies**: Meltano projects, flext-core patterns, enterprise test standards
-**Execution Time**: Optimized fixture loading for fast test execution
-
-## Test Configuration Scope
-
-Provides pytest fixtures and configuration for testing Meltano integration functionality
+This module provides pytest fixtures and configuration for testing flext-meltano
 using real Meltano projects and flext-core patterns with enterprise testing standards.
-
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -352,6 +344,7 @@ def mock_singer_tap() -> type[object]:
 
     class MockSingerTap:
         def __init__(self, config: FlextTypes.Core.Dict) -> None:
+            """Initialize the instance."""
             self.config = config
 
         async def discover(self) -> FlextTypes.Core.Dict:
@@ -369,6 +362,7 @@ def mock_singer_target() -> object:
 
     class MockSingerTarget:
         def __init__(self, config: FlextTypes.Core.Dict) -> None:
+            """Initialize the instance."""
             self.config = config
 
         async def load(

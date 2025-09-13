@@ -1,6 +1,6 @@
 version: 1
 default_environment: dev
-project_id: 01990fd6-0948-79ac-9f10-fa6015a40196
+project_id: .
 environments:
   - name: dev
   - name: staging

@@ -460,7 +460,6 @@ which python               # Should point to poetry venv
 ### **Code Contribution Workflow**
 
 1. **Pre-contribution checklist**:
-
    - [ ] All critical issues from TODO.md resolved
    - [ ] `make validate` passes completely
    - [ ] Feature/bugfix branch created

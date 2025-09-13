@@ -167,7 +167,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         """Test plugin name normalization using flext-core utilities (duplication eliminated)."""
         # Use flext-core FlextUtilities instead of duplicated functionality
 
-        result = FlextUtilities.TextProcessor.safe_string("tap_csv", "default-plugin")
+        result = FlextUtilities.TextProcessor.safe_string("tap_csv")
 
         # FlextUtilities.TextProcessor.safe_string returns string directly
         assert isinstance(result, str)
@@ -178,15 +178,13 @@ class TestFlextMeltanoUtilitiesRealMethods:
         # Use flext-core FlextUtilities for text processing instead of duplicated functionality
 
         # Test text normalization using flext-core - eliminating code duplication
-        normalized_name = FlextUtilities.TextProcessor.safe_string(
-            "target_postgres", "unknown"
-        )
+        normalized_name = FlextUtilities.TextProcessor.safe_string("target_postgres")
         assert isinstance(normalized_name, str)
         assert normalized_name == "target_postgres"
 
         # Test with plugin type prefix handling
         normalized_with_prefix = FlextUtilities.TextProcessor.safe_string(
-            "target-postgres", "unknown"
+            "target-postgres"
         )
         assert isinstance(normalized_with_prefix, str)
         assert normalized_with_prefix == "target-postgres"

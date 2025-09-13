@@ -164,14 +164,12 @@ class FlextDbtInMemoryExecutor:
 ### 3.1 TODO List - Fase 1: Foundation (Sprint 1-2)
 
 - [ ] **Criar DBT Package Manager**
-
   - [ ] Implementar `FlextDbtPackageManager` class
   - [ ] Criar sistema de registro de packages
   - [ ] Implementar resolução de dependências
   - [ ] Adicionar versionamento semântico
 
 - [ ] **Estabelecer DBT Model Registry**
-
   - [ ] Implementar `FlextDbtModelRegistry` class
   - [ ] Criar catálogo de modelos reutilizáveis
   - [ ] Desenvolver sistema de descoberta de modelos
@@ -186,21 +184,18 @@ class FlextDbtInMemoryExecutor:
 ### 3.2 TODO List - Fase 2: Integration (Sprint 3-4)
 
 - [ ] **Integrar com flext-dbt-ldap**
-
   - [ ] Extrair modelos reutilizáveis
   - [ ] Criar macros LDAP genéricos
   - [ ] Desenvolver seeds para dados LDAP comuns
   - [ ] Implementar testes sem LDAP real
 
 - [ ] **Integrar com flext-dbt-oracle**
-
   - [ ] Abstrair adapter Oracle para uso genérico
   - [ ] Criar modelos Oracle reutilizáveis
   - [ ] Desenvolver macros Oracle específicos
   - [ ] Implementar mock Oracle para testes
 
 - [ ] **Integrar com flext-dbt-oracle-wms**
-
   - [ ] Extrair modelos WMS específicos
   - [ ] Criar biblioteca de transformações WMS
   - [ ] Desenvolver seeds para dados WMS
@@ -214,14 +209,12 @@ class FlextDbtInMemoryExecutor:
 ### 3.3 TODO List - Fase 3: Enhancement (Sprint 5-6)
 
 - [ ] **Melhorar CLI Integration**
-
   - [ ] Adicionar comandos DBT ao FlextMeltanoCli
   - [ ] Implementar `flext-meltano dbt list-packages`
   - [ ] Criar `flext-meltano dbt run-model <model>`
   - [ ] Desenvolver `flext-meltano dbt test-local`
 
 - [ ] **Adicionar Observability**
-
   - [ ] Integrar métricas de execução DBT
   - [ ] Adicionar traces para transformações
   - [ ] Implementar alertas para falhas DBT
@@ -236,7 +229,6 @@ class FlextDbtInMemoryExecutor:
 ### 3.4 TODO List - Fase 4: Optimization (Sprint 7-8)
 
 - [ ] **Otimizar Performance**
-
   - [ ] Implementar caching de modelos compilados
   - [ ] Adicionar paralelização de execução
   - [ ] Otimizar uso de memória em DuckDB

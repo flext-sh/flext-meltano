@@ -25,6 +25,7 @@ from flext_core import (
 from pydantic import ConfigDict
 
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.validators import FlextMeltanoValidators
 
 # Type variable for generic service factory
 T_Service = TypeVar("T_Service", bound="FlextMeltanoService")
@@ -149,25 +150,29 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
     def validate_config(self) -> FlextResult[None]:
         """Validate service configuration based on type."""
-        if self._service_type == "tap":
-            tap_name = getattr(self, "tap_name", None)
-            if not tap_name:
-                return FlextResult.fail("Empty tap_name configuration")
-        elif self._service_type == "target":
-            target_name = getattr(self, "target_name", None)
-            if not target_name:
-                return FlextResult.fail("Empty target_name configuration")
-        elif self._service_type == "dbt":
-            project_name = getattr(self, "project_name", None)
-            if not project_name:
-                return FlextResult.fail("Empty project_name configuration")
+        # Use centralized validator to eliminate duplication
+
+        config = {
+            "service_type": self._service_type,
+            "tap_name": getattr(self, "tap_name", None),
+            "target_name": getattr(self, "target_name", None),
+            "project_name": getattr(self, "project_name", None),
+        }
+
+        result = FlextMeltanoValidators.validate_plugin_config(config)
+        if result.is_failure:
+            return FlextResult.fail(result.error or "Configuration validation failed")
 
         return FlextResult.ok(None)
 
-    def create_instance(self, config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+    def create_instance(
+        self, config: FlextTypes.Core.Dict
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create service instance with configuration based on type."""
         if not config:
-            return FlextResult[FlextTypes.Core.Dict].fail("Empty configuration provided")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                "Empty configuration provided"
+            )
 
         try:
             service_name = getattr(
@@ -199,7 +204,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                     "executable": "dbt",
                 }
             else:
-                return FlextResult[FlextTypes.Core.Dict].fail(f"Unknown service type: {self._service_type}")
+                return FlextResult[FlextTypes.Core.Dict].fail(
+                    f"Unknown service type: {self._service_type}"
+                )
 
             return FlextResult[FlextTypes.Core.Dict].ok(instance)
         except Exception as e:
@@ -211,13 +218,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         self, config: FlextTypes.Core.Dict
     ) -> FlextResult[bool]:
         """Validate service configuration based on type."""
-        if not config:
-            return FlextResult[bool].fail("Empty configuration provided")
+        # Use centralized validator to eliminate duplication
 
-        if self._service_type == "target" and "output_file" not in config:
-            return FlextResult[bool].fail("Missing required field: output_file")
-
-        return FlextResult[bool].ok(data=True)
+        return FlextMeltanoValidators.validate_plugin_config(config)
 
     def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type."""
@@ -225,7 +228,10 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             tap_config: FlextTypes.Core.Dict = {"connection_string": "test_connection"}
             return FlextResult[FlextTypes.Core.Dict].ok(tap_config)
         if self._service_type == "target":
-            target_config: FlextTypes.Core.Dict = {"output_file": "test_output.json", "format": "json"}
+            target_config: FlextTypes.Core.Dict = {
+                "output_file": "test_output.json",
+                "format": "json",
+            }
             return FlextResult[FlextTypes.Core.Dict].ok(target_config)
         if self._service_type == "dbt":
             project_name = getattr(self, "project_name", "default_project")
@@ -244,7 +250,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         try:
             config_result = self.get_default_config()
             if config_result.is_failure:
-                return FlextResult[bool].fail(f"Default config failed: {config_result.error}")
+                return FlextResult[bool].fail(
+                    f"Default config failed: {config_result.error}"
+                )
             return self.validate_service_config(config_result.unwrap())
         except Exception as e:
             return FlextResult[bool].fail(
@@ -275,15 +283,13 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         """Consolidated factory using flext-core extensively - ELIMINATES 150+ lines duplication."""
         try:
             # Use flext-core validation and text processing extensively
-            safe_name = FlextUtilities.TextProcessor.safe_string(
-                name, f"default-{service_type}"
-            )
+            safe_name = FlextUtilities.TextProcessor.safe_string(name)
 
             # Create unified configuration using flext-core patterns
             service_kwargs: FlextTypes.Core.Dict = {
                 "service_type": service_type,
                 field_name: safe_name,
-                "entity_id": FlextUtilities.Generators.generate_entity_id(),
+                "entity_id": FlextUtilities.Generators.generate_id(),
                 **{k: v for k, v in config.items() if k != "service_type"},
             }
 
@@ -324,7 +330,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         try:
             # Use FlextUtilities for name validation - consolidated pattern
             default_name = f"{service_prefix}-default"
-            safe_name = FlextUtilities.TextProcessor.safe_string(name, default_name)
+            safe_name = FlextUtilities.TextProcessor.safe_string(name)
 
             # Consolidated validation logic
             if not safe_name or safe_name == default_name:
@@ -346,10 +352,10 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 "debug": bool(service_kwargs.get("debug", False)),
                 "log_level": str(service_kwargs.get("log_level", "INFO")),
                 "max_workers": FlextUtilities.Conversions.safe_int(
-                    service_kwargs.get("max_workers"), 4
+                    str(service_kwargs.get("max_workers", 4))
                 ),
                 "timeout_seconds": FlextUtilities.Conversions.safe_int(
-                    service_kwargs.get("timeout_seconds"), 30
+                    str(service_kwargs.get("timeout_seconds", 30))
                 ),
             }
 

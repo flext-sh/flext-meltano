@@ -1,18 +1,17 @@
-"""Test config_builders module - Basic functionality tests.
-
-Tests FlextMeltanoConfigBuilders class and nested builder classes.
-Zero mock usage - all real function testing.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 from __future__ import annotations
 
 import unittest
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
+
+"""FLEXT Meltano Config Builders Tests - Enterprise ELT configuration testing.
+
+This module provides tests for FlextMeltanoConfigBuilders following
+FLEXT patterns with comprehensive configuration validation.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 
 class TestFlextMeltanoConfigBuildersBasic(unittest.TestCase):

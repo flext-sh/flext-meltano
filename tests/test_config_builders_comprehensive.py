@@ -1,12 +1,3 @@
-"""Comprehensive tests for Config Builders using flext_tests.
-
-Tests all configuration building functionality with real operations,
-no mocks, using flext_tests for improved assertions and test builders.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
 
 import concurrent.futures
 import shutil
@@ -17,9 +8,16 @@ import pytest
 from flext_tests import FlextTestsMatchers
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-from flext_meltano.constants import (  # SOURCE OF TRUTH
-    PluginTypes,
-)
+from flext_meltano.constants import PluginTypes
+
+"""FLEXT Meltano Config Builders Comprehensive Tests - Advanced testing patterns.
+
+This module provides comprehensive tests for FlextMeltanoConfigBuilders using
+advanced testing patterns and comprehensive ELT configuration validation.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 
 class TestSingerConfigComprehensive:

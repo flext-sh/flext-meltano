@@ -1,8 +1,4 @@
-"""Target Abstractions - Singer Target functionality abstraction.
-
-This module provides complete FlextTarget abstractions following flext-core
-single-class-per-module pattern. Consolidates all target functionality so that
-projects never need to import singer_sdk directly.
+"""FLEXT Meltano Target Abstractions - Singer target protocol abstractions.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -21,6 +17,8 @@ from flext_core import (
     FlextUtilities,
 )
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from flext_meltano.validators import FlextMeltanoValidators
 
 if TYPE_CHECKING:
     from flext_meltano.adapters import FlextMeltanoAdapter
@@ -80,10 +78,11 @@ class FlextTargetAbstractions:
         def validate_connection_config(
             cls, v: FlextTypes.Core.Dict
         ) -> FlextTypes.Core.Dict:
-            """Validate connection config is non-empty dictionary."""
-            if not v or not isinstance(v, dict):
-                msg = "Connection configuration is required and must be dictionary"
-                raise ValueError(msg)
+            """Validate connection config using centralized validator."""
+            # Use centralized validator to eliminate duplication
+            result = FlextMeltanoValidators.validate_connection_config(v)
+            if result.is_failure:
+                raise ValueError(result.error or "Connection config validation failed")
             return v
 
         @field_validator("batch_size")
@@ -578,16 +577,8 @@ class FlextTargetAbstractions:
                 "final_state": target.get("state", {}),
                 "config_summary": {
                     "target_type": target.get("target_type", "unknown"),
-                    "batch_size": FlextUtilities.Conversions.safe_dict_get(
-                        FlextUtilities.Conversions.safe_dict_get(target, "config", {}),
-                        "batch_size",
-                        0,
-                    ),
-                    "max_batches": FlextUtilities.Conversions.safe_dict_get(
-                        FlextUtilities.Conversions.safe_dict_get(target, "config", {}),
-                        "max_batches",
-                        0,
-                    ),
+                    "batch_size": 0,
+                    "max_batches": 0,
                 },
                 "finalized_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }

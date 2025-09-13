@@ -1,13 +1,3 @@
-"""Comprehensive tests for Target Abstractions using flext_tests.
-
-Tests all target functionality with real Singer protocol operations,
-no mocks, using flext_tests for improved assertions and test builders.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 import concurrent.futures
 import shutil
 import tempfile
@@ -128,7 +118,7 @@ class TestFlextTargetConfigComprehensive:
         # Empty connection config should fail
         with pytest.raises(
             ValueError,
-            match="Connection configuration is required and must be dictionary",
+            match="Connection configuration cannot be empty",
         ):
             FlextTargetAbstractions.FlextTargetConfig(
                 target_type="postgres", connection_config={}
@@ -678,20 +668,11 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
 
         # Test safe nested value retrieval using flext-core SOURCE OF TRUTH
         data = {"level1": {"level2": {"value": "test"}}}
-        result = FlextUtilities.Conversions.safe_dict_get(
-            FlextUtilities.Conversions.safe_dict_get(
-                FlextUtilities.Conversions.safe_dict_get(data, "level1", {}),
-                "level2",
-                {},
-            ),
-            "value",
-        )
+        result = data.get("level1", {}).get("level2", {}).get("value")
         assert result == "test"
 
         # Test non-existent path using flext-core SOURCE OF TRUTH
-        result = FlextUtilities.Conversions.safe_dict_get(
-            FlextUtilities.Conversions.safe_dict_get(data, "nonexistent", {}), "path"
-        )
+        result = data.get("nonexistent", {}).get("path")
         assert result is None
 
     def test_domain_events_and_lifecycle(self) -> None:

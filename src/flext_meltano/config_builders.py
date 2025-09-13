@@ -1,7 +1,6 @@
-"""FLEXT Meltano Configuration Builders - Single Class Architecture.
+"""FLEXT Meltano Config Builders - Configuration building utilities.
 
-Single class containing all configuration builders as nested internal classes following
-the Flext[Area][Module] pattern with type-safe FlextResult operations.
+SOURCE OF TRUTH: All configuration through FlextMeltanoConstants.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,19 +8,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import FlextLogger, FlextResult, FlextUtilities
 
-from flext_meltano.constants import (  # SOURCE OF TRUTH
-    FlextMeltanoConstants,
-    PluginTypes,
-)
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
 
-# Type alias for configuration dictionaries - use appropriate JsonObject type
-ConfigDict = FlextTypes.Core.JsonObject
-
-
-logger = FlextLogger(__name__)
+# Type alias for configuration dictionaries
+ConfigDict = dict[str, object]
 
 
 class FlextMeltanoConfigBuilders:
@@ -63,12 +55,8 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Validate input using FlextUtilities
-            safe_project_name = FlextUtilities.TextProcessor.safe_string(
-                project_name, "default-dbt-project"
-            )
-            safe_profile_name = FlextUtilities.TextProcessor.safe_string(
-                profile_name, safe_project_name
-            )
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
+            safe_profile_name = FlextUtilities.TextProcessor.safe_string(profile_name)
 
             config: ConfigDict = {
                 "name": safe_project_name,
@@ -86,7 +74,7 @@ class FlextMeltanoConfigBuilders:
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "entity_id": FlextUtilities.Generators.generate_entity_id(),
+                    "entity_id": FlextUtilities.Generators.generate_id(),
                 },
             }
 
@@ -129,16 +117,11 @@ class FlextMeltanoConfigBuilders:
             )
 
             # Use flext-core text processing - EXTENSIVE REUSE
-            safe_name = FlextUtilities.TextProcessor.safe_string(
-                plugin_name, f"unknown-{type_prefix}"
-            )
+            safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
             safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                namespace or f"{type_prefix}_{safe_name.replace('-', '_')}",
-                f"{type_prefix}_default",
+                namespace or f"{type_prefix}_{safe_name.replace('-', '_')}"
             )
-            safe_executable = FlextUtilities.TextProcessor.safe_string(
-                executable, safe_name
-            )
+            safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
 
             # Use flext-core configuration template - NO CUSTOM IMPLEMENTATION
             result_config: ConfigDict = {
@@ -149,7 +132,7 @@ class FlextMeltanoConfigBuilders:
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "entity_id": FlextUtilities.Generators.generate_entity_id(),
+                    "entity_id": FlextUtilities.Generators.generate_id(),
                 },
             }
 
@@ -241,15 +224,11 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Use flext-core text processing extensively - NO CUSTOM LOGIC
-            safe_name = FlextUtilities.TextProcessor.safe_string(
-                plugin_name, "unknown-plugin"
-            )
+            safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
             safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                namespace or safe_name, f"{safe_name}_namespace"
+                namespace or safe_name
             )
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-                pip_url, f"unknown-{safe_name}"
-            )
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
 
             plugin_config: ConfigDict = {
                 "name": safe_name,
@@ -271,7 +250,7 @@ class FlextMeltanoConfigBuilders:
                 )
 
             if config_defaults:
-                plugin_config["config"] = config_defaults  # type: ignore[assignment]
+                plugin_config["config"] = config_defaults
 
             return FlextResult[ConfigDict].ok(plugin_config)
         except Exception as e:
@@ -296,19 +275,15 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Validate inputs using FlextUtilities
-            safe_tap_name = FlextUtilities.TextProcessor.safe_string(
-                tap_name, "unknown-tap"
-            )
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-                pip_url, f"unknown-{safe_tap_name}"
-            )
+            safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name)
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
 
             config: ConfigDict = {
                 "name": safe_tap_name,
                 "namespace": f"tap_{safe_tap_name.replace('-', '_')}",
                 "pip_url": safe_pip_url,
                 "executable": safe_tap_name,
-                "config": config_defaults or {},  # type: ignore[dict-item]
+                "config": config_defaults or {},
                 "select": ["*.*"],  # Selecionar todas as tabelas por padrão
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
@@ -342,19 +317,15 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Validate inputs using FlextUtilities
-            safe_target_name = FlextUtilities.TextProcessor.safe_string(
-                target_name, "unknown-target"
-            )
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(
-                pip_url, f"unknown-{safe_target_name}"
-            )
+            safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name)
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
 
             config: ConfigDict = {
                 "name": safe_target_name,
                 "namespace": f"target_{safe_target_name.replace('-', '_')}",
                 "pip_url": safe_pip_url,
                 "executable": safe_target_name,
-                "config": config_defaults or {},  # type: ignore[dict-item]
+                "config": config_defaults or {},
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -371,33 +342,29 @@ class FlextMeltanoConfigBuilders:
     def create_meltano_config(
         self, project_id: str, project_name: str = ""
     ) -> FlextResult[ConfigDict]:
-        """Create complete Meltano configuration with real structure using FlextResult patterns.
+        """Create complete Meltano configuration - ZERO DUPLICATION using flext-core.
 
         Args:
             project_id: Project ID
             project_name: Project name (optional)
 
         Returns:
-            FlextResult contendo Dict with complete Meltano configuration ou erro
+            FlextResult[ConfigDict]: Complete Meltano configuration
 
         """
         try:
-            # Validate inputs using FlextUtilities
-            safe_project_id = FlextUtilities.TextProcessor.safe_string(
-                project_id, "default-meltano-project"
-            )
-            safe_project_name = FlextUtilities.TextProcessor.safe_string(
-                project_name, safe_project_id
-            )
+            # Use flext-core utilities directly - NO DUPLICATION
+            safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
 
-            config: ConfigDict = {
+            # DOMAIN-SPECIFIC: Meltano configuration structure
+            config_dict: ConfigDict = {
                 "version": 1,
                 "project_id": safe_project_id,
                 "project_name": safe_project_name,
                 "environments": [
-                    {"name": "dev", "config": {"plugins": {}}},
-                    {"name": "staging", "config": {"plugins": {}}},
-                    {"name": "prod", "config": {"plugins": {}}},
+                    {"name": env}
+                    for env in FlextMeltanoConstants.Metadata.DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
                     "extractors": [],
@@ -405,16 +372,13 @@ class FlextMeltanoConfigBuilders:
                     "transformers": [],
                     "orchestrators": [],
                 },
-                "schedules": [],
-                "jobs": [],
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "flext_version": "2.0.0-enterprise",
+                    "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
             }
-
-            return FlextResult[ConfigDict].ok(config)
+            return FlextResult[ConfigDict].ok(config_dict)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to create Meltano config: {e}")
 
@@ -437,9 +401,7 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Validate inputs using FlextUtilities
-            safe_plugin_type = FlextUtilities.TextProcessor.safe_string(
-                plugin_type, "extractors"
-            )
+            safe_plugin_type = FlextUtilities.TextProcessor.safe_string(plugin_type)
 
             # Validate plugin type
             valid_types = ["extractors", "loaders", "transformers", "orchestrators"]
@@ -454,13 +416,13 @@ class FlextMeltanoConfigBuilders:
             plugins = updated_config.setdefault("plugins", {})
 
             if isinstance(plugins, dict):
-                typed_plugins: FlextMeltanoTypes.CLI.ProcessResult = plugins  # type: ignore[assignment]
+                typed_plugins = plugins
                 if safe_plugin_type not in typed_plugins:
                     typed_plugins[safe_plugin_type] = []
                 plugin_list = typed_plugins[safe_plugin_type]
                 if isinstance(plugin_list, list):
                     plugin_list_copy = list(plugin_list)  # Create mutable copy
-                    plugin_list_copy.append(plugin_config)  # type: ignore[arg-type]
+                    plugin_list_copy.append(plugin_config)
                     typed_plugins[safe_plugin_type] = plugin_list_copy
 
             # Add metadata about the operation

@@ -13,13 +13,7 @@ from uuid import UUID
 
 import meltano
 import yaml
-from flext_core import (
-    FlextConfig,
-    FlextLogger,
-    FlextResult,
-    FlextTypes,
-    FlextUtilities,
-)
+from flext_core import FlextConfig, FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from meltano.core.elt_context import ELTContext
 from meltano.core.hub import MeltanoHubService
 from meltano.core.job.job import Job
@@ -27,7 +21,6 @@ from meltano.core.plugin.base import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.project_init_service import ProjectInitService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
@@ -170,7 +163,9 @@ class FlextMeltanoAdapter:
 
             # Verify directory exists
             if not project_root.exists():
-                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(f"Project directory not found: {project_root}")
+                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
+                    f"Project directory not found: {project_root}"
+                )
 
             # Verify it's a valid Meltano project
             meltano_yml = project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
@@ -286,7 +281,7 @@ class FlextMeltanoAdapter:
     def create_project(
         self, project_name: str, project_dir: Path
     ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Create new Meltano project using ProjectInitService native API.
+        """Create new Meltano project using manual file creation approach.
 
         Args:
             project_name: Name of the new project
@@ -298,28 +293,23 @@ class FlextMeltanoAdapter:
         """
         try:
             self._logger.info(
-                "Creating Meltano project using ProjectInitService",
+                "Creating Meltano project using manual file creation",
                 project_name=project_name,
                 project_dir=str(project_dir),
             )
 
             # Create project directory
-            full_project_path = project_dir / project_name
+            full_project_path = Path(project_dir) / project_name
+            full_project_path.mkdir(parents=True, exist_ok=True)
 
-            # Use ProjectInitService native API
-            init_service = ProjectInitService(full_project_path)
-
-            # Execute initialization using correct API
-            init_service.init(
-                activate=False,  # Don't activate automatically
-                force=False,  # Don't force if already exists
-            )
+            # Create basic Meltano project structure manually
+            self._create_project_structure(full_project_path, project_name)
 
             project_result = {
                 "success": "true",
                 "project_name": project_name,
                 "project_path": str(full_project_path),
-                "creation_method": "project_init_service_native",
+                "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
                     (
                         full_project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
@@ -708,6 +698,123 @@ class FlextMeltanoAdapter:
                 )
 
         return MockPluginDiscovery()
+
+    def _create_project_structure(self, project_path: Path, project_name: str) -> None:
+        """Create basic Meltano project structure manually.
+
+        Args:
+            project_path: Path where project will be created
+            project_name: Name of the project
+
+        """
+        # Create basic directories
+        directories = [
+            "extract",
+            "load",
+            "transform",
+            "analyze",
+            "notebook",
+            "orchestrate",
+            "output",
+        ]
+
+        for directory in directories:
+            (project_path / directory).mkdir(exist_ok=True)
+            # Create .gitkeep files
+            (project_path / directory / ".gitkeep").touch()
+
+        # Create .meltano directory
+        meltano_dir = project_path / ".meltano"
+        meltano_dir.mkdir(exist_ok=True)
+
+        # Create basic meltano.yml
+        meltano_yml_content = f"""version: 1
+default_environment: dev
+project_id: {project_name}
+environments:
+- name: dev
+- name: staging
+- name: prod
+"""
+
+        meltano_yml_path = project_path / "meltano.yml"
+        meltano_yml_path.write_text(meltano_yml_content)
+
+        # Create basic README.md
+        readme_content = f"""# {project_name}
+
+This is a Meltano project.
+
+## Getting Started
+
+Follow the [Getting Started guide](https://docs.meltano.com/getting-started.html) to get up and running.
+
+## Project Structure
+
+This project follows the standard Meltano project structure:
+
+```
+{project_name}/
+├── extract/           # Extractors
+├── load/             # Loaders
+├── transform/        # Transformations
+├── analyze/          # Analysis
+├── notebook/         # Jupyter notebooks
+├── orchestrate/      # Orchestration
+├── output/           # Output
+└── meltano.yml       # Project file
+```
+
+## Learn More
+
+- [Meltano Documentation](https://docs.meltano.com/)
+- [Meltano Hub](https://hub.meltano.com/)
+"""
+
+        readme_path = project_path / "README.md"
+        readme_path.write_text(readme_content)
+
+        # Create basic requirements.txt
+        requirements_content = """# Meltano requirements
+meltano>=3.0.0
+"""
+
+        requirements_path = project_path / "requirements.txt"
+        requirements_path.write_text(requirements_content)
+
+        # Create .gitignore
+        gitignore_content = """# Meltano
+.meltano/
+output/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+"""
+
+        gitignore_path = project_path / ".gitignore"
+        gitignore_path.write_text(gitignore_content)
 
 
 __all__ = [

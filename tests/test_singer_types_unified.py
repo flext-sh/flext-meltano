@@ -1,14 +1,14 @@
-"""Test FlextSingerTypes - Unified class functionality.
 
-Tests the new unified FlextSingerTypes class with real API behavior.
+from flext_core import FlextTypes
+from flext_meltano.singer_types import FlextSingerTypes
+
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_core import FlextTypes
 
-from flext_meltano.singer_types import FlextSingerTypes
+from typing import Dict
 
 
 class TestFlextSingerTypesUnified:
@@ -16,6 +16,7 @@ class TestFlextSingerTypesUnified:
 
     def test_create_instance(self) -> None:
         """Test FlextSingerTypes instance creation."""
+
         result = FlextSingerTypes.create_instance()
 
         assert result.success
@@ -23,6 +24,7 @@ class TestFlextSingerTypesUnified:
 
     def test_string_type_creation(self) -> None:
         """Test string type creation."""
+
         singer_types = FlextSingerTypes()
         result = singer_types.create_string_type(maxLength=255)
 
@@ -33,6 +35,7 @@ class TestFlextSingerTypesUnified:
 
     def test_integer_type_creation(self) -> None:
         """Test integer type creation."""
+
         singer_types = FlextSingerTypes()
         result = singer_types.create_integer_type(minimum=0)
 
@@ -43,6 +46,7 @@ class TestFlextSingerTypesUnified:
 
     def test_record_message_creation(self) -> None:
         """Test Singer RECORD message creation."""
+
         singer_types = FlextSingerTypes()
         result = singer_types.create_record_message("users", {"id": 1, "name": "John"})
 
@@ -57,6 +61,7 @@ class TestFlextSingerTypesUnified:
 
     def test_schema_message_creation(self) -> None:
         """Test Singer SCHEMA message creation."""
+
         singer_types = FlextSingerTypes()
         schema: FlextTypes.Core.Dict = {
             "type": "object",
@@ -72,6 +77,7 @@ class TestFlextSingerTypesUnified:
 
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
+
         singer_types = FlextSingerTypes()
         string_type: FlextTypes.Core.Dict = {"type": "string"}
 
@@ -88,6 +94,7 @@ class TestFlextSingerTypesUnified:
 
     def test_get_registered_types(self) -> None:
         """Test getting registered types."""
+
         singer_types = FlextSingerTypes()
         types = singer_types.get_registered_types()
 
