@@ -109,7 +109,7 @@ class TestFlextMeltanoServiceComplete:
 
     def test_multiple_service_creation(self) -> None:
         """Test creating multiple services of different types."""
-        service_configs = [
+        service_configs: list[dict[str, object]] = [
             ("tap-csv", "create_tap_service"),
             ("target-jsonl", "create_target_service"),
             ("dbt-test", "create_dbt_service"),

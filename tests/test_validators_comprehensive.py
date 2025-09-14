@@ -22,7 +22,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_config_valid(self) -> None:
         """Test plugin config validation with valid configuration."""
-        config = {
+        config: dict[str, object] = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -34,14 +34,14 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_config_missing_fields(self) -> None:
         """Test plugin config validation with missing required fields."""
-        config = {"name": "tap-csv"}  # Missing required fields
+        config: dict[str, object] = {"name": "tap-csv"}  # Missing required fields
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_empty_fields(self) -> None:
         """Test plugin config validation with empty fields."""
-        config = {
+        config: dict[str, object] = {
             "name": "",  # Empty name should fail
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -53,7 +53,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_config_invalid_types(self) -> None:
         """Test plugin config validation with invalid types."""
-        config = {
+        config: dict[str, object] = {
             "name": 123,  # Should be string
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -75,21 +75,21 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_meltano_config_valid(self) -> None:
         """Test Meltano config validation with valid configuration."""
-        config = {"version": 1, "project_id": "test-project"}
+        config: dict[str, object] = {"version": 1, "project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
         FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_meltano_config_missing_version(self) -> None:
         """Test Meltano config validation with missing version."""
-        config = {"project_id": "test-project"}  # Missing version
+        config: dict[str, object] = {"project_id": "test-project"}  # Missing version
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         """Test Meltano config validation with invalid version."""
-        config = {
+        config: dict[str, object] = {
             "version": 2,  # Invalid version (must be 1)
             "project_id": "test-project",
         }
@@ -99,7 +99,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test Meltano config validation with empty project_id."""
-        config = {
+        config: dict[str, object] = {
             "version": 1,
             "project_id": "",  # Empty project_id should fail
         }
@@ -179,7 +179,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         assert not hasattr(FlextMeltanoValidators, "TextProcessor")
 
         # Test core validation functionality works independently
-        config = {
+        config: dict[str, object] = {
             "name": "test-plugin",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -190,7 +190,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_name_empty(self) -> None:
         """Test plugin name validation with empty name."""
-        config = {
+        config: dict[str, object] = {
             "name": "",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -203,7 +203,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_name_whitespace(self) -> None:
         """Test plugin name validation with whitespace only."""
-        config = {
+        config: dict[str, object] = {
             "name": "   ",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -216,7 +216,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         """Test target plugin name validation with too short name."""
-        config = {
+        config: dict[str, object] = {
             "name": "target-",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -229,7 +229,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
         """Test tap plugin name validation with too short name."""
-        config = {
+        config: dict[str, object] = {
             "name": "tap-",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -242,7 +242,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_target_plugin_name_valid(self) -> None:
         """Test target plugin name validation with valid name."""
-        config = {
+        config: dict[str, object] = {
             "name": "target-postgres",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -253,7 +253,7 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_tap_plugin_name_valid(self) -> None:
         """Test tap plugin name validation with valid name."""
-        config = {
+        config: dict[str, object] = {
             "name": "tap-csv",
             "namespace": "test_ns",
             "pip_url": "test",

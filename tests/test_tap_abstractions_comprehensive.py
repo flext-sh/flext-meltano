@@ -89,7 +89,7 @@ class TestTapConfigComprehensive:
             "another_extra": 123,
         }
 
-        config = FlextTapAbstractions.TapConfig(**config_dict)
+        config = FlextTapAbstractions.TapConfig.model_validate(config_dict)
 
         assert config.tap_type == "tap-mysql"
 
@@ -151,9 +151,7 @@ class TestStreamDefinitionComprehensive:
             "tap_type": "tap-postgres",
         }
 
-        stream = FlextTapAbstractions.StreamDefinition(
-            **cast("dict[str, object]", stream_data)
-        )
+        stream = FlextTapAbstractions.StreamDefinition.model_validate(stream_data)
         assert stream.stream_name == "users"
         assert stream.stream_schema["type"] == "object"
         assert stream.tap_type == "tap-postgres"
@@ -221,9 +219,7 @@ class TestTapInstanceComprehensive:
             "tap_id": "tap_postgres_001",
         }
 
-        instance = FlextTapAbstractions.TapInstance(
-            **cast("dict[str, object]", instance_data)
-        )
+        instance = FlextTapAbstractions.TapInstance.model_validate(instance_data)
         assert instance.tap_type == "tap-postgres"
         assert instance.config.tap_type == "tap-postgres"
         assert instance.tap_id == "tap_postgres_001"
@@ -474,9 +470,7 @@ class TestFlextTapAbstractionsComprehensive:
         }
 
         # Create FlextTapAbstractions.StreamDefinition from generated data
-        stream = FlextTapAbstractions.StreamDefinition(
-            **cast("dict[str, object]", stream_data)
-        )
+        stream = FlextTapAbstractions.StreamDefinition.model_validate(stream_data)
         assert stream.stream_name == "products"
         assert stream.tap_type == "tap-postgres"
         schema_properties = cast(
@@ -651,7 +645,9 @@ class TestFlextTapAbstractionsOracleIntegration:
         }
 
         try:
-            invalid_config = FlextTapAbstractions.TapConfig(**invalid_config_data)
+            invalid_config = FlextTapAbstractions.TapConfig.model_validate(
+                invalid_config_data
+            )
             # If it doesn't raise an error, test the processing
             result = self.tap_abstractions.process(invalid_config)
             # Should handle gracefully
@@ -693,11 +689,13 @@ class TestFlextTapAbstractionsOracleIntegration:
             connection_config={"host": "perf.example.com"},
         )
 
-        def process_tap() -> object:
+        def process_tap() -> FlextResult[FlextTapAbstractions.TapInstance]:
             return self.tap_abstractions.process(config)
 
         result = benchmark(process_tap)
-        FlextTestsMatchers.assert_result_success(result)
+        # Cast the benchmark result to the expected type
+        typed_result = cast("FlextResult[FlextTapAbstractions.TapInstance]", result)
+        FlextTestsMatchers.assert_result_success(typed_result)
 
     def test_complex_tap_workflow_integration(self) -> None:
         """Test complex workflow integrating multiple tap operations."""
