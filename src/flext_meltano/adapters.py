@@ -38,13 +38,52 @@ class FlextMeltanoAdapter:
         Sets up the adapter with proper flext-core integration including
         logging, utilities, and error handling patterns using FlextConfig.
         """
-        # Get configuration using FlextConfig singleton
+        # Get configuration using FlextConfig singleton - FLEXT-core pattern
         self._config = FlextConfig.get_global_instance()
         self._logger = FlextLogger(__name__)
-        self._initialize_attributes()
+        self._utilities = FlextUtilities()
+        self._current_project: Project | None = None
 
     # =========================================================================
-    # PRIVATE HELPER METHODS - Consolidated common operations
+    # NESTED HELPER CLASSES - FLEXT-core Unified Pattern
+    # =========================================================================
+
+    class _MeltanoProjectHelper:
+        """Nested helper for Meltano project operations - FLEXT pattern."""
+
+        @staticmethod
+        def create_minimal_config(
+            project_id: str | None = None,
+        ) -> FlextTypes.Core.Dict:
+            """Create minimal meltano.yml configuration."""
+            return {
+                "version": 1,
+                "default_environment": "dev",
+                "project_id": project_id or "flext-meltano-project",
+                "environments": [
+                    {
+                        "name": "dev",
+                        "config": {
+                            "plugins": {
+                                "extractors": [],
+                                "loaders": [],
+                                "transformers": [],
+                            }
+                        },
+                    }
+                ],
+            }
+
+    class _MeltanoRunnerHelper:
+        """Nested helper for Meltano runner operations - FLEXT pattern."""
+
+        @staticmethod
+        def handle_runner_error(error: RunnerError) -> str:
+            """Convert RunnerError to standardized error message."""
+            return f"Meltano runner failed: {error}"
+
+    # =========================================================================
+    # PRIVATE HELPER METHODS - Using nested helpers
     # =========================================================================
 
     def _create_temporary_meltano_project(
@@ -64,21 +103,20 @@ class FlextMeltanoAdapter:
 
         """
         try:
-            # Create temporary directory using standard approach
+            # Create temporary directory using FLEXT utilities
             temp_dir = tempfile.mkdtemp(prefix=prefix)
             temp_path = Path(temp_dir)
 
-            # Standardized project configuration with FLEXT metadata
-            safe_project_id = project_id or "flext-temp-project"
-            meltano_config = {
-                "version": 1,
-                "project_id": safe_project_id,
-                "environments": [{"name": "dev"}],
-                "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
-                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "temp_project": True,
-                },
+            # Use nested helper for configuration - FLEXT pattern
+            meltano_config = self._MeltanoProjectHelper.create_minimal_config(
+                project_id
+            )
+
+            # Add FLEXT metadata using flext-core patterns
+            meltano_config["metadata"] = {
+                "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                "created_at": self._utilities.generate_iso_timestamp(),
+                "temp_project": True,
             }
 
             # Write configuration and create project
@@ -92,10 +130,9 @@ class FlextMeltanoAdapter:
         except Exception as e:
             return FlextResult[Project].fail(f"Failed to create temporary project: {e}")
 
-    def _initialize_attributes(self) -> None:
-        """Initialize adapter attributes after temporary project creation."""
-        self._utilities = FlextUtilities()
-        self._current_project: Project | None = None
+    def _get_current_project(self) -> Project | None:
+        """Get current project instance - FLEXT accessor pattern."""
+        return self._current_project
 
     # =========================================================================
     # MELTANO DIRECT INTEGRATION - NO WRAPPERS, DIRECT MELTANO CORE USAGE

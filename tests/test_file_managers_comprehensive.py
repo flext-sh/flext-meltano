@@ -6,7 +6,7 @@ from pathlib import Path
 
 from flext_tests import FlextTestsMatchers
 
-from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT
@@ -26,7 +26,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
-        config = {
+        config: ConfigDict = {
             "project_id": "test-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"], "loaders": ["target-csv"]},
@@ -34,7 +34,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         file_path = self.temp_dir / "test_config.yml"
 
         result = FlextMeltanoFileManagers.save_yaml_config(config, file_path)
-        FlextTestsMatchers.assert_result_success(result, True)
+        FlextTestsMatchers.assert_result_success(result)
 
         # Verify file was created and contains expected content
         assert file_path.exists()
@@ -42,7 +42,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config = {"test": "data"}
+        config: dict[str, object] = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
 
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
@@ -51,7 +51,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config = {
+        config: dict[str, object] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -91,7 +91,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config = {"valid": "yaml", "content": {"nested": "value"}}
+        config: dict[str, object] = {"valid": "yaml", "content": {"nested": "value"}}
         yaml_path = self.temp_dir / "valid.yml"
 
         save_result = FlextMeltanoFileManagers.save_yaml_config(config, yaml_path)
@@ -237,7 +237,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
         result = FlextMeltanoFileManagers.cleanup_temp_directory(nonexistent_path)
         # Implementation succeeds even if directory doesn't exist (graceful handling)
-        FlextTestsMatchers.assert_result_success(result, True)
+        FlextTestsMatchers.assert_result_success(result)
 
     def test_validate_project_structure_valid(self) -> None:
         """Test validating valid project structure."""
@@ -289,7 +289,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             FlextTestsMatchers.assert_result_success(setup_result)
 
             # Create and save config
-            config = {
+            config: dict[str, object] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -366,7 +366,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         for i, config in enumerate(configs):
             file_path = self.temp_dir / f"concurrent_{i}.yml"
             result = FlextMeltanoFileManagers.save_yaml_config(config, file_path)
-            FlextTestsMatchers.assert_result_success(result, True)
+            FlextTestsMatchers.assert_result_success(result)
 
         # Load all configs back and verify
         for i, expected_config in enumerate(configs):

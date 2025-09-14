@@ -36,7 +36,9 @@ class TestFlextTargetAbstractionsComplete:
             "max_batches": 50,
         }
 
-        config = FlextTargetAbstractions.FlextTargetConfig(**test_config_data)
+        config = FlextTargetAbstractions.FlextTargetConfig.model_validate(
+            test_config_data
+        )
 
         # Use flext_tests assertions
         self.test_assertions.assert_equals(
@@ -84,7 +86,9 @@ class TestFlextTargetAbstractionsComplete:
             "created_at": "2025-01-01T00:00:00Z",
         }
 
-        stream_info = FlextTargetAbstractions.FlextStreamInfo(**test_stream_data)
+        stream_info = FlextTargetAbstractions.FlextStreamInfo.model_validate(
+            test_stream_data
+        )
 
         # Use flext_tests assertions
         self.test_assertions.assert_equals(

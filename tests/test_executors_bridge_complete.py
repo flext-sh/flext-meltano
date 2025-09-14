@@ -294,7 +294,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_bridge_with_different_plugins(self) -> None:
         """Test bridge operations with different plugin types."""
-        plugin_configs = [
+        plugin_configs: list[dict[str, object]] = [
             ("extractors", "tap-csv"),
             ("loaders", "target-jsonl"),
             ("transformers", "dbt"),
@@ -307,7 +307,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_pipeline_execution_patterns(self) -> None:
         """Test different pipeline execution patterns."""
-        pipeline_configs = [
+        pipeline_configs: list[dict[str, object]] = [
             ("tap-csv", "target-jsonl"),
             ("tap-postgres", "target-postgres"),
             ("tap-github", "target-bigquery"),

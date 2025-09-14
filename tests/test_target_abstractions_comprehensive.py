@@ -5,6 +5,7 @@ import shutil
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 import pytest
 from flext_core import FlextResult, FlextUtilities
@@ -40,7 +41,7 @@ class TestFlextTargetConfigComprehensive:
             "max_batches": 50,
         }
 
-        config = FlextTargetAbstractions.FlextTargetConfig(**config_data)
+        config = FlextTargetAbstractions.FlextTargetConfig.model_validate(config_data)
         assert config.target_type == "postgres"
         assert config.connection_config["host"] == "localhost"
         assert config.batch_size == 1000
@@ -104,7 +105,7 @@ class TestFlextTargetConfigComprehensive:
     def test_target_config_connection_validation(self) -> None:
         """Test connection config validation."""
         # Valid connection configs
-        valid_configs = [
+        valid_configs: list[dict[str, object]] = [
             {"host": "localhost", "port": 5432},
             {"file_path": str(self.temp_dir / "test.csv")},
             {"url": "sqlite:///test.db"},
@@ -145,7 +146,9 @@ class TestFlextStreamInfoComprehensive:
             "created_at": datetime.now(UTC).isoformat(),
         }
 
-        stream_info = FlextTargetAbstractions.FlextStreamInfo(**stream_data)
+        stream_info = FlextTargetAbstractions.FlextStreamInfo.model_validate(
+            stream_data
+        )
         assert stream_info.stream_name == "users"
         assert stream_info.stream_schema["type"] == "object"
         assert "properties" in stream_info.stream_schema
@@ -164,7 +167,7 @@ class TestFlextStreamInfoComprehensive:
         created_at = datetime.now(UTC).isoformat()
 
         # Valid schemas (must have 'properties' based on validation)
-        valid_schemas = [
+        valid_schemas: list[dict[str, object]] = [
             {"type": "object", "properties": {"id": {"type": "integer"}}},
             {
                 "type": "object",
@@ -282,7 +285,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_create_flext_target_postgres(self) -> None:
         """Test creating PostgreSQL target instance."""
-        config = {
+        config: dict[str, object] = {
             "target_type": "postgres",
             "connection_config": {
                 "host": "localhost",
@@ -299,17 +302,20 @@ class TestFlextTargetAbstractionsComprehensive:
         )
 
         FlextTestsMatchers.assert_result_success(result)
-        target_instance = result.value
+        target_instance = cast("dict[str, object]", result.value)
         assert isinstance(target_instance, dict)
         assert target_instance["target_type"] == "postgres"
         assert "target_id" in target_instance
         assert "config" in target_instance
-        assert target_instance["config"]["connection_config"]["host"] == "localhost"
+        # Cast nested dictionaries for type safety
+        config_dict = cast("dict[str, object]", target_instance["config"])
+        connection_config = cast("dict[str, object]", config_dict["connection_config"])
+        assert connection_config["host"] == "localhost"
 
     def test_create_flext_target_csv(self) -> None:
         """Test creating CSV target instance."""
         csv_file = self.temp_dir / "test_output.csv"
-        config = {
+        config: dict[str, object] = {
             "target_type": "csv",
             "connection_config": {"file_path": str(csv_file)},
         }
@@ -327,7 +333,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_create_flext_target_with_streams(self) -> None:
         """Test creating target with stream information."""
-        config = {
+        config: dict[str, object] = {
             "target_type": "json",
             "connection_config": {"file_path": str(self.temp_dir / "output.json")},
         }
@@ -372,7 +378,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_create_flext_target_performance(self, benchmark: object) -> None:
         """Test target creation performance using pytest-benchmark."""
-        config = {
+        config: dict[str, object] = {
             "target_type": "sqlite",
             "connection_config": {"database": str(self.temp_dir / "test.db")},
         }

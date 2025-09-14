@@ -1,137 +1,350 @@
-# TODO.md - FLEXT Meltano Development Priorities
+# TODO.md - FLEXT-MELTANO Advanced ELT Foundation Implementation
 
-**Last Updated**: 2025-08-04
-**Project Status**: 🚧 IN PROGRESS - Coverage Gap Blocking Production Release
+**Last Updated**: 2025-01-08
+**Project Status**: 🚨 CRITICAL VIOLATIONS - Architecture Non-Compliance Blocking Production
+**Authority**: MELTANO ELT PIPELINE FOUNDATION for entire FLEXT ecosystem (32+ projects)
 
-## 🚨 CRITICAL PRIORITIES (BLOCKING PRODUCTION)
+## 🚨 ZERO TOLERANCE VIOLATIONS (IMMEDIATE ACTION REQUIRED)
 
-### 1. Test Coverage Deficit Resolution - TARGET: +16% coverage
+### 1. CRITICAL: Direct Meltano/Singer Library Imports ⛔
 
-**Current**: 74.04% | **Required**: 90% | **Gap**: 15.96%
+**VIOLATION LOCATION**: `src/flext_meltano/adapters.py` lines 14, 17-25
 
-#### HIGH PRIORITY MODULES (Major Coverage Gaps)
-
-- [ ] **singer_base.py**: 22% → 90% (+68% needed)
-  - Missing comprehensive base class testing
-  - Singer protocol compliance validation required
-  - Error handling scenarios not covered
-- [ ] **singer_unified.py**: 45% → 90% (+45% needed)
-  - Unified interface functionality not tested
-  - Stream handling scenarios missing
-  - Configuration validation gaps
-- [ ] **container.py**: 61% → 90% (+29% needed)
-  - Dependency injection container scenarios missing
-  - Service registration and resolution tests needed
-  - Lifecycle management not validated
-
-#### MEDIUM PRIORITY MODULES (Moderate Coverage Gaps)
-
-- [ ] **core.py**: 55% → 90% (+35% needed)
-  - Core service orchestration not fully tested
-  - Pipeline management scenarios missing
-  - Integration patterns need validation
-- [ ] **exceptions.py**: 55% → 90% (+35% needed)
-  - Exception hierarchy not completely tested
-  - Error message formatting validation missing
-  - Exception chaining scenarios not covered
-
-- [ ] **validation.py**: 69% → 90% (+21% needed)
-  - Pipeline validation scenarios incomplete
-  - Configuration validation edge cases missing
-
-#### LOWER PRIORITY MODULES (Minor Coverage Gaps)
-
-- [ ] **base.py**: 85% → 90% (+5% needed) - Nearly compliant
-- [ ] \***\*init**.py\*\*: 69% → 90% (+21% needed) - Export validation
-- [ ] **discovery.py**: 79% → 90% (+11% needed) - Plugin discovery edge cases
-
-## ✅ COMPLETED (Zero Tolerance Quality Standards)
-
-### Code Quality Achievements
-
-- [x] **Lint Errors**: 0/0 (100% clean - all ruff rules passing)
-- [x] **Type Errors**: 0/0 (100% clean - strict MyPy passing)
-- [x] **Test Success Rate**: 742/744 tests passing (99.7%)
-- [x] **Security Scan**: No security vulnerabilities detected
-- [x] **Import Resolution**: All module imports working correctly
-
-### Functionality Achievements
-
-- [x] **Go ↔ Python Bridge**: Fully functional JSON API integration
-- [x] **Singer Protocol**: Basic compliance and stream handling
-- [x] **Meltano Integration**: Subprocess execution working
-- [x] **DBT Integration**: Basic project management functional
-- [x] **Plugin Discovery**: Hub integration and catalog discovery working
-
-## 📋 NEXT PHASE PRIORITIES (Post-Coverage Resolution)
-
-### Architecture Improvements
-
-- [ ] **Module Consolidation**: Reduce **init**.py complexity (440+ exports)
-- [ ] **Performance Optimization**: Bridge communication tuning
-- [ ] **Documentation Accuracy**: Remove aspirational claims, keep factual status
-- [ ] **Dependency Optimization**: Review and consolidate external dependencies
-
-### Extended Testing
-
-- [ ] **Integration Testing**: End-to-end pipeline validation
-- [ ] **Performance Testing**: Benchmark critical paths
-- [ ] **Error Recovery Testing**: Failure scenario validation
-- [ ] **Bridge Stress Testing**: High-volume Go ↔ Python communication
-
-### Production Readiness
-
-- [ ] **Monitoring Integration**: Add observability patterns
-- [ ] **Configuration Management**: Environment-specific settings
-- [ ] **Deployment Validation**: Container and service deployment testing
-- [ ] **Documentation Completion**: User guides and API references
-
-## 🎯 SUCCESS CRITERIA
-
-### Immediate (Coverage Resolution)
-
-- [ ] Achieve 90%+ test coverage across all modules
-- [ ] `make validate` passes without errors
-- [ ] All quality gates passing consistently
-- [ ] Production-ready release candidate
-
-### Medium Term (Production Deployment)
-
-- [ ] Complete integration testing with FLEXT ecosystem
-- [ ] Performance benchmarks meeting SLA requirements
-- [ ] Full observability and monitoring implementation
-- [ ] Documentation suitable for enterprise deployment
-
-## 📊 CURRENT METRICS (2025-08-04)
-
-```
-Quality Gates Status:
-✅ Lint Errors: 0
-✅ Type Errors: 0
-❌ Test Coverage: 74.04% (< 90% requirement)
-✅ Test Success Rate: 99.7%
-✅ Security Scan: PASS
-✅ Import Resolution: PASS
-
-Module Coverage Status:
-❌ singer_base.py: 22% (CRITICAL)
-❌ singer_unified.py: 45% (HIGH)
-❌ container.py: 61% (MEDIUM)
-❌ core.py: 55% (MEDIUM)
-❌ exceptions.py: 55% (MEDIUM)
-⚠️ validation.py: 69% (LOW)
-⚠️ discovery.py: 79% (LOW)
-✅ cli.py: 97% (COMPLIANT)
-✅ common.py: 100% (COMPLIANT)
-✅ common_schemas.py: 98% (COMPLIANT)
+```python
+# ❌ ABSOLUTELY FORBIDDEN - Direct imports found:
+import meltano                                    # LINE 14
+from meltano.core.elt_context import ELTContext  # LINE 17
+from meltano.core.hub import MeltanoHubService   # LINE 18
+from meltano.core.job.job import Job             # LINE 19
+from meltano.core.plugin.base import PluginType # LINE 20
+from meltano.core.plugin_invoker import PluginInvoker # LINE 21
+from meltano.core.project import Project        # LINE 22
+from meltano.core.project_add_service import ProjectAddService # LINE 23
+from meltano.core.runner import RunnerError     # LINE 24
+from meltano.core.runner.singer import SingerRunner # LINE 25
 ```
 
-## 🔄 UPDATE SCHEDULE
+**MANDATORY REMEDIATION**:
+- [ ] **REMOVE ALL direct meltano imports** from adapters.py
+- [ ] **IMPLEMENT FlextMeltanoLibraryAdapter** following flext-core patterns
+- [ ] **USE ONLY library APIs** through FLEXT abstractions
+- [ ] **VALIDATE ZERO direct imports** across entire codebase
 
-- **Daily**: Coverage progress tracking during active development
-- **Weekly**: Priority reassessment and metric updates
-- **Release**: Complete update with final metrics and achievements
+### 2. CRITICAL: pyproject.toml Duplicate Dependencies
+
+**VIOLATION**: Dependencies declared in both `[project.dependencies]` and `[tool.poetry.dependencies]`
+
+**MANDATORY REMEDIATION**:
+- [ ] **REMOVE duplicate entries** from `[project.dependencies]` section
+- [ ] **KEEP ONLY** `[tool.poetry.dependencies]` declarations
+- [ ] **VALIDATE** no conflicting version constraints
+
+## 🏗️ ADVANCED MELTANO RUNNER ARCHITECTURE (LIBRARY-BASED FOUNDATION)
+
+### 1. FlextMeltanoLibraryAdapter - Replace Direct Imports ⚠️
+
+**PURPOSE**: Advanced meltano runner functionality through library APIs (not CLI runtime)
+
+```python
+# ✅ CORRECT - Library API Integration Pattern
+from flext_core import FlextDomainService, FlextResult, FlextLogger
+from flext_meltano.constants import FlextMeltanoConstants
+
+class FlextMeltanoLibraryAdapter(FlextDomainService):
+    """Advanced Meltano runner using library APIs exclusively."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._logger = FlextLogger(__name__)
+
+    class _MeltanoProjectManager:
+        """Nested helper for Meltano Project API integration."""
+
+        @staticmethod
+        def create_project_instance(project_dir: Path) -> FlextResult[object]:
+            """Create Meltano Project using library API."""
+            # IMPLEMENTATION: Use meltano library API patterns
+            pass
+
+    class _PluginManager:
+        """Nested helper for Meltano Plugin API integration."""
+
+        @staticmethod
+        def invoke_plugin(plugin_name: str, args: list) -> FlextResult[dict]:
+            """Invoke plugin using library API."""
+            # IMPLEMENTATION: Use PluginInvoker library patterns
+            pass
+
+    async def run_elt_pipeline(
+        self,
+        tap_name: str,
+        target_name: str,
+        **config: object
+    ) -> FlextResult[dict]:
+        """Execute ELT pipeline using advanced library integration."""
+        # IMPLEMENTATION: Full library API integration
+        pass
+```
+
+**TASKS**:
+- [ ] **IMPLEMENT** FlextMeltanoLibraryAdapter with proper library API usage
+- [ ] **ABSTRACT** all meltano.core.* usage behind FlextResult patterns
+- [ ] **PROVIDE** advanced meltano runner functionality for ecosystem
+- [ ] **ENSURE** complete singer plugin compatibility
+
+### 2. FlextDbtLibraryRunner - Programmatic DBT Integration 🔧
+
+**PURPOSE**: DBT runner by library (not CLI runtime) using dbtRunner
+
+```python
+# ✅ CORRECT - DBT Library Integration Pattern
+from flext_core import FlextDomainService, FlextResult
+from flext_meltano.constants import FlextMeltanoConstants
+
+class FlextDbtLibraryRunner(FlextDomainService):
+    """Advanced DBT runner using library APIs exclusively."""
+
+    class _DbtProjectManager:
+        """Nested helper for DBT project management."""
+
+        @staticmethod
+        def create_runner_instance() -> FlextResult[object]:
+            """Create dbtRunner for programmatic execution."""
+            # IMPLEMENTATION: from dbt.cli.main import dbtRunner
+            pass
+
+    class _DbtCommandExecutor:
+        """Nested helper for DBT command execution."""
+
+        @staticmethod
+        def execute_models(
+            runner: object,
+            models: list[str],
+            **options: object
+        ) -> FlextResult[dict]:
+            """Execute DBT models programmatically."""
+            # IMPLEMENTATION: dbtRunner.invoke(cli_args) patterns
+            pass
+
+    async def run_transformations(
+        self,
+        project_dir: Path,
+        models: list[str],
+        **config: object
+    ) -> FlextResult[dict]:
+        """Execute DBT transformations using advanced library integration."""
+        # IMPLEMENTATION: Full dbtRunner library integration
+        pass
+```
+
+**TASKS**:
+- [ ] **IMPLEMENT** FlextDbtLibraryRunner with dbtRunner API
+- [ ] **USE** pre-loaded profile and project patterns for performance
+- [ ] **PROVIDE** advanced DBT runner functionality for ecosystem
+- [ ] **ENSURE** complete DBT transformation compatibility
+
+### 3. FlextSingerLibraryProtocol - Singer SDK Integration 🎵
+
+**PURPOSE**: Singer protocol foundation using singer-sdk library patterns
+
+```python
+# ✅ CORRECT - Singer SDK Library Integration Pattern
+from flext_core import FlextDomainService, FlextResult
+from flext_meltano.typings import FlextMeltanoTypes
+
+class FlextSingerLibraryProtocol(FlextDomainService):
+    """Advanced Singer protocol using library APIs exclusively."""
+
+    class _TapManager:
+        """Nested helper for Singer Tap integration."""
+
+        @staticmethod
+        def create_tap_instance(tap_config: dict) -> FlextResult[object]:
+            """Create Singer Tap using SDK library patterns."""
+            # IMPLEMENTATION: from singer_sdk.singerlib import SingerTap
+            pass
+
+    class _TargetManager:
+        """Nested helper for Singer Target integration."""
+
+        @staticmethod
+        def create_target_instance(target_config: dict) -> FlextResult[object]:
+            """Create Singer Target using SDK library patterns."""
+            # IMPLEMENTATION: singer-sdk library target patterns
+            pass
+
+    async def execute_tap_target_pipeline(
+        self,
+        tap_config: FlextMeltanoTypes.TapConfig,
+        target_config: FlextMeltanoTypes.TargetConfig
+    ) -> FlextResult[dict]:
+        """Execute tap-target pipeline using advanced library integration."""
+        # IMPLEMENTATION: Full singer-sdk library integration
+        pass
+```
+
+**TASKS**:
+- [ ] **IMPLEMENT** FlextSingerLibraryProtocol with singer-sdk.singerlib
+- [ ] **MAINTAIN** strict singer protocol compatibility
+- [ ] **PROVIDE** tap/target foundation patterns for ecosystem
+- [ ] **ENSURE** complete stream processing capabilities
+
+## 🌐 FLEXT ECOSYSTEM FOUNDATION PATTERNS
+
+### 1. Unified ELT Interface Architecture 🏢
+
+**PURPOSE**: Single interface for all FLEXT projects requiring ELT operations
+
+```python
+# ✅ CORRECT - Unified ELT Foundation Pattern
+class FlextMeltanoUnifiedService(FlextDomainService):
+    """Unified ELT service providing all ecosystem foundation patterns."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._meltano_adapter = FlextMeltanoLibraryAdapter()
+        self._dbt_runner = FlextDbtLibraryRunner()
+        self._singer_protocol = FlextSingerLibraryProtocol()
+
+    async def execute_complete_elt_pipeline(
+        self,
+        extraction_config: FlextMeltanoTypes.ExtractionConfig,
+        transformation_config: FlextMeltanoTypes.TransformationConfig,
+        loading_config: FlextMeltanoTypes.LoadingConfig
+    ) -> FlextResult[FlextMeltanoTypes.ELTPipelineResult]:
+        """Execute complete ELT pipeline for FLEXT ecosystem projects."""
+        # IMPLEMENTATION: Orchestrate E-L-T phases using library APIs
+        pass
+```
+
+**ECOSYSTEM INTEGRATION TASKS**:
+- [ ] **DESIGN** unified interface for 32+ FLEXT projects
+- [ ] **IMPLEMENT** complete ELT orchestration patterns
+- [ ] **PROVIDE** flext-core alike interfaces for all operations
+- [ ] **ENSURE** foundation for flext-tap-*, flext-target-*, flext-dbt-*
+
+### 2. flext-cli Integration for All Output Operations 💻
+
+**TASKS**:
+- [ ] **REMOVE** any direct click/rich usage (verified: none found - ✅)
+- [ ] **USE ONLY** flext-cli for all CLI operations and file manipulation
+- [ ] **IMPLEMENT** CLI command patterns through FlextCliApi
+- [ ] **ENSURE** consistent output formatting across ecosystem
+
+### 3. Advanced Plugin Architecture 🔌
+
+**PURPOSE**: Foundation for all FLEXT tap/target/dbt plugins
+
+```python
+# ✅ CORRECT - Plugin Foundation Pattern
+class FlextMeltanoPluginFoundation(FlextDomainService):
+    """Foundation patterns for all FLEXT ecosystem plugins."""
+
+    class _PluginRegistry:
+        """Nested helper for plugin registration and discovery."""
+
+        @staticmethod
+        def register_plugin(
+            plugin_type: FlextMeltanoTypes.PluginType,
+            plugin_config: dict
+        ) -> FlextResult[FlextMeltanoTypes.PluginInstance]:
+            """Register plugin with ecosystem foundation."""
+            pass
+
+    async def create_ecosystem_plugin(
+        self,
+        plugin_spec: FlextMeltanoTypes.PluginSpecification
+    ) -> FlextResult[FlextMeltanoTypes.EcosystemPlugin]:
+        """Create ecosystem plugin following FLEXT patterns."""
+        # IMPLEMENTATION: Plugin factory with flext-core integration
+        pass
+```
+
+**PLUGIN FOUNDATION TASKS**:
+- [ ] **IMPLEMENT** plugin architecture for ecosystem consumption
+- [ ] **PROVIDE** base classes for flext-tap-*, flext-target-*, flext-dbt-*
+- [ ] **ENSURE** consistent plugin patterns across ecosystem
+- [ ] **MAINTAIN** backward compatibility with existing plugins
+
+## 🧪 COMPREHENSIVE TESTING STRATEGY (REAL API INTEGRATION)
+
+### 1. Real Meltano API Testing (NO MOCKS) ✅
+
+**CURRENT STATUS**: Need to expand real API testing coverage
+
+**TASKS**:
+- [ ] **IMPLEMENT** comprehensive Meltano Project API tests
+- [ ] **TEST** complete plugin lifecycle with real APIs
+- [ ] **VALIDATE** ELT pipeline execution with sample projects
+- [ ] **ENSURE** 90%+ coverage with meaningful functionality tests
+
+### 2. Real DBT Library Testing 🧪
+
+**TASKS**:
+- [ ] **IMPLEMENT** dbtRunner programmatic execution tests
+- [ ] **TEST** pre-loaded profile and project scenarios
+- [ ] **VALIDATE** complete transformation lifecycle
+- [ ] **ENSURE** real SQL transformation execution
+
+### 3. Singer Protocol Compliance Testing 🎵
+
+**TASKS**:
+- [ ] **IMPLEMENT** singer-sdk.singerlib integration tests
+- [ ] **TEST** catalog discovery and stream processing
+- [ ] **VALIDATE** tap-target communication protocols
+- [ ] **ENSURE** strict Singer specification compliance
+
+## 📋 IMPLEMENTATION PRIORITY SEQUENCE
+
+### PHASE 1: CRITICAL VIOLATIONS (IMMEDIATE - Week 1)
+1. [ ] **Remove direct meltano imports** from adapters.py
+2. [ ] **Fix pyproject.toml** duplicate dependencies
+3. [ ] **Implement FlextMeltanoLibraryAdapter** basic structure
+4. [ ] **Validate zero forbidden imports** across codebase
+
+### PHASE 2: LIBRARY INTEGRATION (Week 2-3)
+1. [ ] **Complete FlextMeltanoLibraryAdapter** implementation
+2. [ ] **Implement FlextDbtLibraryRunner** with dbtRunner
+3. [ ] **Implement FlextSingerLibraryProtocol** with singer-sdk
+4. [ ] **Create unified ELT interface** architecture
+
+### PHASE 3: ECOSYSTEM FOUNDATION (Week 4-5)
+1. [ ] **Design plugin foundation** patterns
+2. [ ] **Implement ecosystem integration** interfaces
+3. [ ] **Create comprehensive testing** with real APIs
+4. [ ] **Validate foundation** for all FLEXT projects
+
+### PHASE 4: PRODUCTION READINESS (Week 6)
+1. [ ] **Achieve 90%+ test coverage** with real API tests
+2. [ ] **Complete quality gate validation**
+3. [ ] **Documentation and examples** for ecosystem consumption
+4. [ ] **Release production-ready** ELT foundation
+
+## 🎯 SUCCESS CRITERIA (PRODUCTION DEPLOYMENT)
+
+### IMMEDIATE (Zero Tolerance Compliance)
+- [ ] **ZERO** direct meltano/singer/dbt imports outside abstractions
+- [ ] **100%** FlextResult pattern usage for error handling
+- [ ] **90%+** test coverage with real library API integration
+- [ ] **ALL** quality gates passing (lint, type, security, test)
+
+### ECOSYSTEM READINESS
+- [ ] **Complete ELT foundation** for 32+ FLEXT projects
+- [ ] **Advanced meltano runner** functionality by library (not CLI)
+- [ ] **Advanced dbt runner** functionality with dbtRunner API
+- [ ] **Strict singer protocol** compatibility maintained
+- [ ] **Foundation patterns** for flext-tap-*, flext-target-*, flext-dbt-*
+
+### PRODUCTION AUTHORITY
+- [ ] **FLEXT-MELTANO** recognized as ELT foundation authority
+- [ ] **ALL** FLEXT ecosystem projects using flext-meltano patterns
+- [ ] **ZERO** custom ELT implementations across ecosystem
+- [ ] **COMPLETE** library integration (not mere facade architecture)
 
 ---
 
-**Note**: This TODO reflects the ACTUAL current state based on real measurements, not aspirational goals. All percentages and metrics are based on concrete test results and quality gate outputs.
+**ARCHITECTURAL PRINCIPLE**: flext-meltano MUST USE meltano, dbt, and singer libraries to provide core functionality with flext-core alike interfaces, NOT be merely a facade using FLEXT-CORE architecture to simplify development.
+
+**ECOSYSTEM AUTHORITY**: These requirements are specific to flext-meltano's role as the MANDATORY ELT pipeline foundation for the entire FLEXT ecosystem.
+
+**ZERO TOLERANCE**: Direct library imports outside FLEXT abstractions are ABSOLUTELY FORBIDDEN and block production deployment.
