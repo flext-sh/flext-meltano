@@ -8,7 +8,10 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from typing import cast
+
 import pytest
+from flext_core import FlextResult
 from flext_tests import FlextTestsMatchers
 
 from flext_meltano.validators import FlextMeltanoValidators
@@ -34,7 +37,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         config = {"name": "tap-csv"}  # Missing required fields
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_empty_fields(self) -> None:
         """Test plugin config validation with empty fields."""
@@ -46,7 +49,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_invalid_types(self) -> None:
         """Test plugin config validation with invalid types."""
@@ -58,17 +61,17 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
         result = FlextMeltanoValidators.validate_plugin_config("not a dict")
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin config validation with None input."""
         result = FlextMeltanoValidators.validate_plugin_config(None)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_valid(self) -> None:
         """Test Meltano config validation with valid configuration."""
@@ -82,7 +85,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         config = {"project_id": "test-project"}  # Missing version
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         """Test Meltano config validation with invalid version."""
@@ -92,7 +95,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test Meltano config validation with empty project_id."""
@@ -102,7 +105,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_meltano_config(config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_dbt_config_valid(self) -> None:
         """Test DBT config validation with valid configuration."""
@@ -116,7 +119,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         dbt_config = {"name": "analytics"}  # Missing version
 
         result = FlextMeltanoValidators.validate_dbt_config(dbt_config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     @pytest.mark.parametrize(
         "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
@@ -126,7 +129,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     ) -> None:
         """Test plugin config validation with various invalid inputs."""
         result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
-        FlextTestsMatchers.assert_result_failure(result)
+        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_complex_validation_scenario(self) -> None:
         """Test complex validation scenario combining multiple validators."""
@@ -195,6 +198,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.success
+        assert result.error is not None
         assert "String should have at least 1 character" in result.error
 
     def test_validate_plugin_name_whitespace(self) -> None:
@@ -207,6 +211,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.success
+        assert result.error is not None
         assert "Plugin name cannot be empty" in result.error
 
     def test_validate_target_plugin_name_too_short(self) -> None:
@@ -219,6 +224,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.success
+        assert result.error is not None
         assert "Target plugin names must be at least 8 characters" in result.error
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
@@ -231,6 +237,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.success
+        assert result.error is not None
         assert "Tap plugin names must be at least 5 characters" in result.error
 
     def test_validate_target_plugin_name_valid(self) -> None:

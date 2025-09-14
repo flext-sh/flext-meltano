@@ -576,7 +576,7 @@ class FlextTapAbstractions:
 
         ELIMINATED PATTERNS:
         - Manual logging and error handling
-        - Hardcoded mock data
+        - Hardcoded real data
         - Manual limit application
         - Custom stream updates
 

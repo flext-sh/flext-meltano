@@ -556,7 +556,7 @@ func (m *MeltanoService) ExecutePipeline(tap, target string) (*PipelineResult, e
 
 ## Architecture Status: Active Development
 
-**Current State**: Architecture is **fully implemented and operational** with enterprise-grade patterns.
+**Current State**: Architecture is **fully implemented and operational** with patterns.
 
 ### **Production Features** ✅
 

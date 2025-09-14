@@ -1,9 +1,17 @@
+"""Test module for flext-meltano."""
 
 import tempfile
+
 from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 from pydantic_core import ValidationError
-from flext_meltano.tap_abstractions import ( SPDX-License-Identifier: MIT """ FlextTapAbstractions, StreamDefinition, TapConfig, TapInstance, )
+
+from flext_meltano.tap_abstractions import (
+    FlextTapAbstractions,
+    StreamDefinition,
+    TapConfig,
+    TapInstance,
+)
 
 
 class TestFlextTapAbstractionsComplete:
@@ -11,7 +19,6 @@ class TestFlextTapAbstractionsComplete:
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-
         self.tap_abstractions = FlextTapAbstractions()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
@@ -25,7 +32,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test TapConfig Pydantic validation using flext_tests."""
-
         # Create test config using flext_tests utilities
         test_config_data = {
             "tap_type": "tap-postgres",
@@ -56,7 +62,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test StreamDefinition Pydantic validation using flext_tests."""
-
         # Create test stream definition
         test_stream_data = {
             "stream_name": "users",
@@ -90,7 +95,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_instance_validation(self) -> None:
         """Test TapInstance Pydantic validation using flext_tests."""
-
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create TapConfig first
             config = TapConfig(
@@ -132,7 +136,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_abstractions_initialization(self) -> None:
         """Test FlextTapAbstractions initialization using flext_tests."""
-
         tap_abs = FlextTapAbstractions()
 
         self.test_assertions.assert_true(
@@ -151,7 +154,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_serviceprocessor_process_method(self) -> None:
         """Test ServiceProcessor process method using flext_tests."""
-
         # Create test TapConfig
         config = TapConfig(
             tap_type="tap-postgres",
@@ -184,7 +186,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
-
         # Create test TapInstance
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
@@ -218,7 +219,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_get_stream_config(self) -> None:
         """Test get_stream_config method using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -253,7 +253,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
-
         connection_config = {
             "host": "localhost",
             "port": 5432,
@@ -281,7 +280,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_validate_tap_instance(self) -> None:
         """Test validate_tap_instance method using flext_tests."""
-
         # Create valid tap instance
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         valid_instance = TapInstance(
@@ -328,7 +326,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_discover_streams_postgres(self) -> None:
         """Test discover_streams with PostgreSQL strategy using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -367,7 +364,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_discover_streams_csv(self) -> None:
         """Test discover_streams with CSV strategy using flext_tests."""
-
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
             tap_type="tap-csv", config=config, tap_id="csv_tap_123"
@@ -395,7 +391,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_discover_streams_default(self) -> None:
         """Test discover_streams with default strategy using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-unknown",
             connection_config={"endpoint": "http://api.example.com"},
@@ -431,7 +426,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_get_stream_by_name(self) -> None:
         """Test get_stream_by_name method using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -481,7 +475,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_generate_catalog_success(self) -> None:
         """Test generate_catalog success using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -519,7 +512,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_catalog_entry_structure(self) -> None:
         """Test catalog entry structure using flext_tests."""
-
         # Create stream definition
         stream = StreamDefinition(
             stream_name="users",
@@ -561,7 +553,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_extract_records_users(self) -> None:
         """Test extract_records for users stream using flext_tests."""
-
         stream = StreamDefinition(
             stream_name="users",
             stream_schema={
@@ -610,7 +601,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_extract_records_with_limit(self) -> None:
         """Test extract_records with limit using flext_tests."""
-
         stream = StreamDefinition(
             stream_name="orders",
             stream_schema={
@@ -637,7 +627,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_extract_records_products(self) -> None:
         """Test extract_records for products stream using flext_tests."""
-
         stream = StreamDefinition(
             stream_name="products",
             stream_schema={
@@ -686,7 +675,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_sync_stream_success(self) -> None:
         """Test sync_stream success using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -726,7 +714,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_sync_stream_without_target(self) -> None:
         """Test sync_stream without target using flext_tests."""
-
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
             tap_type="tap-csv", config=config, tap_id="csv_tap_123"
@@ -756,7 +743,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_list_streams(self) -> None:
         """Test list_streams method using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -781,7 +767,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
-
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
             tap_type="tap-csv", config=config, tap_id="csv_tap_123"
@@ -794,7 +779,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_get_registered_streams(self) -> None:
         """Test get_registered_streams method using flext_tests."""
-
         # Initially should be empty
         initial_streams = self.tap_abstractions.get_registered_streams()
         self.test_assertions.assert_true(
@@ -819,7 +803,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_create_instance_factory(self) -> None:
         """Test create_instance factory method using flext_tests."""
-
         result = FlextTapAbstractions.create_instance()
 
         self.test_assertions.assert_true(
@@ -844,7 +827,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_abstractions_error_handling(self) -> None:
         """Test tap abstractions error handling using flext_tests error simulation."""
-
         # Use flext_tests error simulation
         error_factory = FlextTestsFixtures.ErrorSimulationFactory()
 
@@ -863,7 +845,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_invalid_tap_config_creation(self) -> None:
         """Test invalid tap config creation using flext_tests."""
-
         # Test creating tap with invalid data should be handled gracefully
         try:
             result = self.tap_abstractions.create_tap_from_config(
@@ -882,7 +863,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_missing_stream_handling(self) -> None:
         """Test missing stream handling using flext_tests."""
-
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -908,7 +888,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-
         # Step 1: Create tap from config
         connection_config = {"host": "localhost", "database": "test_db"}
         stream_config = {"users": {"selected": True}}
@@ -954,7 +933,6 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_abstractions_performance(self) -> None:
         """Test tap abstractions performance using flext_tests."""
-
         # Test with multiple streams and operations
         config = TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}

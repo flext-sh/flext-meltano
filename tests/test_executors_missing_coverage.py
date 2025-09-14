@@ -4,6 +4,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -19,7 +20,14 @@ class TestExecutorsMissingCoverage:
     def setup_method(self) -> None:
         """Setup test utilities."""
         self.test_assertions = FlextTestsUtilities.assertion()
-        self.executor = FlextMeltanoExecutor()
+        # Create temporary project root for testing
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.project_root = Path(self.temp_dir.name)
+        self.executor = FlextMeltanoExecutor(project_root=self.project_root)
+
+    def teardown_method(self) -> None:
+        """Cleanup test resources."""
+        self.temp_dir.cleanup()
 
     def test_run_command_failure_scenario(self) -> None:
         """Test run_command with failure scenario."""
@@ -192,7 +200,7 @@ class TestExecutorsMissingCoverage:
     def test_execute_meltano_command_success_path(self) -> None:
         """Test execute_meltano_command success path to cover missing lines."""
         # Create a temporary directory with meltano.yml
-        temp_dir = Path("/tmp/test_meltano_project")
+        temp_dir = Path(tempfile.mkdtemp())
 
         with mock.patch.object(Path, "exists", return_value=True):
             result = self.executor.execute_meltano_command(
@@ -218,7 +226,7 @@ class TestExecutorsMissingCoverage:
 
     def test_get_project_info_success_path(self) -> None:
         """Test get_project_info success path to cover missing lines."""
-        temp_dir = Path("/tmp/test_meltano_project")
+        temp_dir = Path(tempfile.mkdtemp())
 
         with mock.patch.object(Path, "exists", return_value=True):
             result = self.executor.get_project_info(temp_dir)

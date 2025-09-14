@@ -1,3 +1,5 @@
+"""Test module for flext-meltano."""
+
 import sys
 import tempfile
 from collections.abc import MutableMapping

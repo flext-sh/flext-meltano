@@ -1,14 +1,13 @@
+"""Test module for flext-meltano."""
 
 from flext_core import FlextResult, FlextUtilities
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 from pydantic import ValidationError
+
 from flext_meltano.target_abstractions import FlextTargetAbstractions
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
+# Copyright (c) 2025 FLEXT Team. All rights reserved.
+# SPDX-License-Identifier: MIT
 
 
 class TestFlextTargetAbstractionsComplete:
@@ -16,7 +15,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-
         self.target_abstractions = FlextTargetAbstractions()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
@@ -30,7 +28,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_flext_target_config_validation(self) -> None:
         """Test FlextTargetConfig validation using flext_tests."""
-
         # Create test config using flext_tests utilities
         test_config_data = {
             "target_type": "jsonl",
@@ -56,7 +53,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_flext_target_config_validation_errors(self) -> None:
         """Test FlextTargetConfig validation errors using flext_tests."""
-
         # Test invalid target_type using flext_tests error patterns
         try:
             FlextTargetAbstractions.FlextTargetConfig(
@@ -78,7 +74,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_flext_stream_info_validation(self) -> None:
         """Test FlextStreamInfo validation using flext_tests."""
-
         # Create test stream info using flext_tests data
         test_stream_data = {
             "stream_name": "test_stream",
@@ -114,7 +109,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_target_abstractions_initialization(self) -> None:
         """Test FlextTargetAbstractions initialization using flext_tests."""
-
         target_abs = FlextTargetAbstractions()
 
         self.test_assertions.assert_true(
@@ -127,7 +121,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_create_flext_target_config(self) -> None:
         """Test create_flext_target_config method using flext_tests."""
-
         connection_config = {"output_path": "test.jsonl"}
 
         result = self.target_abstractions.create_flext_target_config(
@@ -156,7 +149,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_create_flext_target(self) -> None:
         """Test create_flext_target method using flext_tests."""
-
         # Create test config using flext_tests utilities
         test_config = {
             "target_type": "jsonl",
@@ -173,7 +165,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_validate_business_rules(self) -> None:
         """Test validate_business_rules method using flext_tests."""
-
         result = self.target_abstractions.validate_business_rules()
 
         self.test_assertions.assert_true(
@@ -190,7 +181,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
-
         # Test error handling with FlextResult patterns
         failure_result = FlextTestsFixtures.create_failure_result("Target error")
 
@@ -205,7 +195,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_invalid_target_config_creation(self) -> None:
         """Test invalid target config creation using flext_tests."""
-
         # Test with invalid target_type (empty string should fail Pydantic validation)
         try:
             result = self.target_abstractions.create_flext_target_config(
@@ -223,7 +212,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_invalid_target_creation(self) -> None:
         """Test invalid target creation using flext_tests."""
-
         # Test with empty config
         result = self.target_abstractions.create_flext_target({})
 
@@ -239,7 +227,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_nested_classes_if_exist(self) -> None:
         """Test nested classes if they exist in FlextTargetAbstractions."""
-
         target_abs = FlextTargetAbstractions()
 
         # Check if there are nested classes and test them
@@ -266,7 +253,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_target_workflow_integration(self) -> None:
         """Test complete target workflow using flext_tests."""
-
         # Create comprehensive test data
         connection_config = {"output_path": "flext_test.jsonl"}
 
@@ -294,7 +280,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_field_validators_error_coverage(self) -> None:
         """Test field validation errors to cover lines 105-106, 113-114."""
-
         # Test FlextStreamInfo stream_name validation error (line 105-106)
         try:
             FlextTargetAbstractions.FlextStreamInfo(
@@ -331,7 +316,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_message_processing_comprehensive(self) -> None:
         """Test message processing methods to cover lines 249-366."""
-
         # Setup target
         target_config = {
             "target_type": "jsonl",
@@ -390,7 +374,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_message_processing_errors(self) -> None:
         """Test message processing error scenarios."""
-
         target_config = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
@@ -419,7 +402,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_data_loading_methods(self) -> None:
         """Test data loading methods to cover lines 376-482."""
-
         # Setup target with schema
         target_config = {
             "target_type": "jsonl",
@@ -485,7 +467,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_target_finalization(self) -> None:
         """Test target finalization to cover lines 492-554."""
-
         # Setup complete target workflow
         target_config = {
             "target_type": "jsonl",
@@ -535,7 +516,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_query_and_utility_methods(self) -> None:
         """Test query and utility methods to cover lines 564-625."""
-
         # Setup target with stream
         target_config = {
             "target_type": "jsonl",
@@ -616,7 +596,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core SOURCE OF TRUTH."""
-
         # Test timestamp generation using flext-core directly - NO DUPLICATION
 
         timestamp = FlextUtilities.Generators.generate_iso_timestamp()
@@ -670,7 +649,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_error_handling_edge_cases(self) -> None:
         """Test error handling edge cases to cover exception branches."""
-
         # Test finalize_stream with non-existent stream (lines 456-458)
         target_config = {
             "target_type": "jsonl",
@@ -697,7 +675,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_business_rules_validation_exception_case(self) -> None:
         """Test business rules validation exception case to cover line 141-142."""
-
         # The business rules validation should normally succeed, but test the error path
         result = self.target_abstractions.validate_business_rules()
 

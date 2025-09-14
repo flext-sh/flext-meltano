@@ -1,19 +1,10 @@
+"""FLEXT Meltano Config Builders Complete Tests - Comprehensive testing patterns."""
 
 from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.constants import PluginTypes
-
-"""FLEXT Meltano Config Builders Complete Tests - Comprehensive testing patterns.
-
-This module provides complete tests for FlextMeltanoConfigBuilders using
-flext_tests patterns and comprehensive ELT configuration validation.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 
 
 class TestFlextMeltanoConfigBuildersComplete:
