@@ -1,3 +1,5 @@
+"""Test module for flext-meltano."""
+
 import concurrent.futures
 import os
 import shutil

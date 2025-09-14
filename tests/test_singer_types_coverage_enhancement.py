@@ -1,20 +1,13 @@
+"""Test module for flext-meltano."""
 
 from __future__ import annotations
 
 import math
 from unittest import mock
+
 from flext_core import FlextResult
+
 from flext_meltano.singer_types import FlextSingerTypes
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-from __future__ import annotations
-
-
-
 
 
 class TestFlextSingerTypesCoverage:
@@ -22,12 +15,10 @@ class TestFlextSingerTypesCoverage:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-
         self.singer_types = FlextSingerTypes()
 
     def test_initialization_and_basic_state(self) -> None:
         """Test initialization and basic state access."""
-
         # Test successful initialization
         assert isinstance(self.singer_types, FlextSingerTypes)
         assert hasattr(self.singer_types, "_logger")
@@ -47,7 +38,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_create_instance_class_method(self) -> None:
         """Test the create_instance class method."""
-
         result = FlextSingerTypes.create_instance()
         assert isinstance(result, FlextResult)
         assert result.is_success
@@ -58,7 +48,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_primitive_type_creation(self) -> None:
         """Test creation of all primitive types."""
-
         # String type
         result = self.singer_types.create_string_type()
         assert result.is_success
@@ -107,7 +96,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_complex_type_creation(self) -> None:
         """Test creation of complex types (array, object)."""
-
         # Array type with item type
         result = self.singer_types.create_array_type(items={"type": "string"})
         assert result.is_success
@@ -145,7 +133,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
-
         # Valid string validation
         string_type = {"type": "string"}
         result = self.singer_types.validate_value("hello world", string_type)
@@ -183,7 +170,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_schema_definition_creation(self) -> None:
         """Test complete schema definition creation."""
-
         properties = {
             "id": {"type": "integer", "minimum": 1},
             "name": {"type": "string", "maxLength": 100},
@@ -208,7 +194,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_message_creation(self) -> None:
         """Test creation of all Singer message types."""
-
         # Record message
         record_data = {"id": 1, "name": "John Doe", "email": "john@example.com"}
         result = self.singer_types.create_record_message("users", record_data)
@@ -252,7 +237,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_properties_management(self) -> None:
         """Test properties list creation and manipulation."""
-
         properties = {
             "user_id": {"type": "integer"},
             "username": {"type": "string"},
@@ -274,7 +258,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_add_property_functionality(self) -> None:
         """Test adding properties to existing property lists."""
-
         # Start with basic properties
         initial_props = {"id": {"type": "integer"}, "name": {"type": "string"}}
         result = self.singer_types.create_properties_list(initial_props)
@@ -296,7 +279,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_type_registry_management(self) -> None:
         """Test type registry access and management."""
-
         # Get all registered types
         types = self.singer_types.get_registered_types()
         assert isinstance(types, list)
@@ -326,7 +308,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_data_conversion_functionality(self) -> None:
         """Test data conversion to dictionary format."""
-
         # Test valid dictionary conversion
         data = {"key": "value", "number": 42, "nested": {"inner": "data"}}
         result = self.singer_types.convert_to_dict(data)
@@ -345,7 +326,6 @@ class TestFlextSingerTypesCoverage:
 
     def test_error_handling_and_edge_cases(self) -> None:
         """Test error handling and edge cases."""
-
         # Test validation with malformed type definition
         malformed_type = {"invalid": "definition"}  # Missing "type" key
         result = self.singer_types.validate_value("test", malformed_type)
@@ -372,12 +352,10 @@ class TestFlextSingerTypesIntegration:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-
         self.singer_types = FlextSingerTypes()
 
     def test_complete_schema_workflow(self) -> None:
         """Test complete workflow from type creation to message generation."""
-
         # Create complex schema with multiple types
         properties = {
             "user_id": {"type": "integer", "minimum": 1},
@@ -427,7 +405,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_properties_list_complete_workflow(self) -> None:
         """Test complete properties list creation and manipulation."""
-
         # Start with base properties
         base_properties = {"id": {"type": "integer"}, "name": {"type": "string"}}
 
@@ -457,7 +434,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_all_message_types_integration(self) -> None:
         """Test creation and integration of all Singer message types."""
-
         stream_name = "integration_test"
 
         # Create schema message
@@ -495,7 +471,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_exception_paths_coverage(self) -> None:
         """Test exception paths to achieve 100% coverage."""
-
         # Test create_string_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
             mock_ok.side_effect = Exception("Test exception")
@@ -554,7 +529,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_create_schema_message_exception_path(self) -> None:
         """Test create_schema_message exception path."""
-
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
             mock_ok.side_effect = Exception("Test exception")
 
@@ -564,7 +538,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_create_record_message_exception_path(self) -> None:
         """Test create_record_message exception path."""
-
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
             mock_ok.side_effect = Exception("Test exception")
 
@@ -574,7 +547,6 @@ class TestFlextSingerTypesIntegration:
 
     def test_create_state_message_exception_path(self) -> None:
         """Test create_state_message exception path."""
-
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
             mock_ok.side_effect = Exception("Test exception")
 

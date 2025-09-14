@@ -1,14 +1,11 @@
+"""Test module for flext-meltano."""
 
 from flext_core import FlextResult
+
 from flext_meltano.services import FlextMeltanoService
 
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
+# Copyright (c) 2025 FLEXT Team. All rights reserved.
+# SPDX-License-Identifier: MIT
 
 
 class TestFlextMeltanoServiceComplete:
@@ -16,12 +13,10 @@ class TestFlextMeltanoServiceComplete:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-
         self.service = FlextMeltanoService()
 
     def test_service_initialization(self) -> None:
         """Test service initialization."""
-
         service = FlextMeltanoService()
         assert service is not None
 
@@ -32,7 +27,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_create_tap_service(self) -> None:
         """Test create_tap_service method."""
-
         result = self.service.create_tap_service("tap-csv")
 
         assert isinstance(result, FlextResult)
@@ -45,7 +39,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_create_target_service(self) -> None:
         """Test create_target_service method."""
-
         result = self.service.create_target_service("target-jsonl")
 
         assert isinstance(result, FlextResult)
@@ -58,7 +51,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_create_dbt_service(self) -> None:
         """Test create_dbt_service method."""
-
         result = self.service.create_dbt_service("dbt-project")
 
         assert isinstance(result, FlextResult)
@@ -71,7 +63,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_tap_service_class_access(self) -> None:
         """Test access to tap service property (snake_case after ruff fixes)."""
-
         tap_service_method = self.service.tap_service
         assert tap_service_method is not None
         assert callable(tap_service_method)
@@ -87,7 +78,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_target_service_class_access(self) -> None:
         """Test target service creation through service factory methods."""
-
         # Test creating target service through proper factory method
         result = self.service.create_target_service("target-jsonl")
         assert isinstance(result, FlextResult)
@@ -102,7 +92,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_dbt_service_unified_access(self) -> None:
         """Test unified service access for DBT operations."""
-
         # Test that the service can be configured for DBT operations
         assert self.service is not None
 
@@ -120,7 +109,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_multiple_service_creation(self) -> None:
         """Test creating multiple services of different types."""
-
         service_configs = [
             ("tap-csv", "create_tap_service"),
             ("target-jsonl", "create_target_service"),
@@ -139,7 +127,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_with_different_names(self) -> None:
         """Test service creation with various plugin names."""
-
         tap_names = ["tap-csv", "tap-postgres", "tap-github"]
 
         for tap_name in tap_names:
@@ -149,7 +136,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_concurrent_service_instances(self) -> None:
         """Test multiple service instances work independently."""
-
         service1 = FlextMeltanoService()
         service2 = FlextMeltanoService()
 
@@ -165,7 +151,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_error_handling_empty_names(self) -> None:
         """Test error handling with empty or invalid names."""
-
         invalid_names = ["", None]
 
         for invalid_name in invalid_names:
@@ -178,7 +163,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_consistency(self) -> None:
         """Test that all service creation methods have consistent interface."""
-
         methods = [
             self.service.create_tap_service,
             self.service.create_target_service,
@@ -197,7 +181,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_nested_class_hierarchy(self) -> None:
         """Test nested class structure and hierarchy."""
-
         nested_methods = ["tap_service", "target_service", "dbt_service"]
 
         for method_name in nested_methods:
@@ -207,7 +190,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_type_validation(self) -> None:
         """Test service creation with type validation."""
-
         # Test with various service types
         service_types = [
             ("tap-csv", "extractor"),
@@ -228,7 +210,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_lifecycle(self) -> None:
         """Test service lifecycle operations."""
-
         # Create service
         tap_result = self.service.create_tap_service("tap-csv")
         assert isinstance(tap_result, FlextResult)
@@ -242,7 +223,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_error_recovery_and_logging(self) -> None:
         """Test error recovery and logging behavior."""
-
         # Test with potentially problematic names
         problematic_names = [
             "tap-nonexistent-plugin",
@@ -261,7 +241,6 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_configuration_handling(self) -> None:
         """Test service configuration and setup."""
-
         # Test services with common configuration scenarios
         configurations = [
             ("tap-csv", {"files": [{"path": "test.csv"}]}),

@@ -1,14 +1,12 @@
+"""Test module for flext-meltano."""
 
 import asyncio
 from pathlib import Path
 from unittest import mock
+
 from flext_core import FlextResult
+
 from flext_meltano.executors_bridge import FlextMeltanoBridge
-
-"""
-
-
-
 
 
 class TestFlextMeltanoBridgeErrorCoverage:
@@ -16,12 +14,10 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-
         self.bridge = FlextMeltanoBridge()
 
     def test_get_version_adapter_failure(self) -> None:
         """Test get_version with adapter failure."""
-
         # Mock adapter.get_version to return failure
         with mock.patch.object(self.bridge.adapter, "get_version") as mock_get_version:
             mock_get_version.return_value = FlextResult.fail("Version check failed")
@@ -32,7 +28,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_get_version_adapter_exception(self) -> None:
         """Test get_version with adapter exception."""
-
         # Mock adapter.get_version to raise exception
         with mock.patch.object(
             self.bridge.adapter, "get_version", side_effect=Exception("Test exception")
@@ -43,7 +38,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_get_version_json_failure(self) -> None:
         """Test get_version_json with failure."""
-
         # Mock get_version to return failure
         with mock.patch.object(self.bridge, "get_version") as mock_get_version:
             mock_get_version.return_value = FlextResult.fail("Version check failed")
@@ -54,7 +48,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_pipeline_adapter_failure(self) -> None:
         """Test run_pipeline with adapter failure."""
-
         # Mock adapter._create_temporary_meltano_project to return failure
         with mock.patch.object(
             self.bridge.adapter, "_create_temporary_meltano_project"
@@ -69,7 +62,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_pipeline_adapter_exception(self) -> None:
         """Test run_pipeline with adapter exception."""
-
         # Mock adapter._create_temporary_meltano_project to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -82,7 +74,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_execute_meltano_command_adapter_failure(self) -> None:
         """Test execute_meltano_command with adapter failure."""
-
         # Mock adapter.execute_bridge_service to return failure
         with mock.patch.object(
             self.bridge.adapter, "execute_bridge_service"
@@ -95,7 +86,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_execute_meltano_command_adapter_exception(self) -> None:
         """Test execute_meltano_command with adapter exception."""
-
         # Mock adapter.execute_bridge_service to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -108,7 +98,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_execute_dbt_command_adapter_failure(self) -> None:
         """Test execute_dbt_command with adapter failure."""
-
         # Mock adapter.execute_dbt_operation to return failure
         with mock.patch.object(
             self.bridge.adapter, "execute_dbt_operation"
@@ -121,7 +110,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_execute_dbt_command_adapter_exception(self) -> None:
         """Test execute_dbt_command with adapter exception."""
-
         # Mock adapter.execute_dbt_operation to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -134,7 +122,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_install_plugin_project_not_found(self) -> None:
         """Test install_plugin with project not found."""
-
         # Mock Path.exists to return False
         with mock.patch.object(Path, "exists", return_value=False):
             result = self.bridge.install_plugin("tap-csv", "csv", ".")
@@ -143,7 +130,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_install_plugin_adapter_failure(self) -> None:
         """Test install_plugin with adapter failure."""
-
         # Mock Path.exists to return True and adapter.add_plugin to return failure
         with (
             mock.patch.object(Path, "exists", return_value=True),
@@ -159,7 +145,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_install_plugin_exception(self) -> None:
         """Test install_plugin with exception."""
-
         # Mock Path.exists to raise exception
         with mock.patch.object(Path, "exists", side_effect=Exception("Test exception")):
             result = self.bridge.install_plugin("tap-csv", "csv", ".")
@@ -168,7 +153,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_get_project_info_adapter_failure(self) -> None:
         """Test get_project_info with adapter failure."""
-
         # Mock adapter.create_project to return failure
         with mock.patch.object(
             self.bridge.adapter, "create_project"
@@ -183,7 +167,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_get_project_info_exception(self) -> None:
         """Test get_project_info with exception."""
-
         # Mock adapter.create_project to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -196,7 +179,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_discover_plugins_adapter_failure(self) -> None:
         """Test discover_plugins with adapter failure."""
-
         # Mock adapter.discover_plugins to return failure
         with mock.patch.object(
             self.bridge.adapter, "discover_plugins"
@@ -209,7 +191,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_discover_plugins_exception(self) -> None:
         """Test discover_plugins with exception."""
-
         # Mock adapter.discover_plugins to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -222,7 +203,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_plugin_async_exception(self) -> None:
         """Test run_plugin_async with exception."""
-
         # Mock _run_plugin_sync to raise exception
         with mock.patch.object(
             self.bridge, "_run_plugin_sync", side_effect=Exception("Test exception")
@@ -239,7 +219,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_plugin_sync_adapter_failure(self) -> None:
         """Test _run_plugin_sync with adapter failure."""
-
         # Mock adapter.execute_bridge_service to return failure
         with mock.patch.object(
             self.bridge.adapter, "execute_bridge_service"
@@ -252,7 +231,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_plugin_sync_exception(self) -> None:
         """Test _run_plugin_sync with exception."""
-
         # Mock adapter.execute_bridge_service to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -265,7 +243,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_list_plugins_adapter_failure(self) -> None:
         """Test list_plugins with adapter failure."""
-
         # Mock adapter.discover_plugins to return failure
         with mock.patch.object(
             self.bridge.adapter, "discover_plugins"
@@ -278,7 +255,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_list_plugins_exception(self) -> None:
         """Test list_plugins with exception."""
-
         # Mock adapter.discover_plugins to raise exception
         with mock.patch.object(
             self.bridge.adapter,
@@ -291,7 +267,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_initialize_project_adapter_failure(self) -> None:
         """Test initialize_project with adapter failure."""
-
         # Mock adapter.initialize_project to return failure
         with mock.patch.object(self.bridge.adapter, "initialize_project") as mock_init:
             mock_init.return_value = FlextResult.fail("Project initialization failed")
@@ -302,7 +277,6 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_initialize_project_exception(self) -> None:
         """Test initialize_project with exception."""
-
         # Mock adapter.initialize_project to raise exception
         with mock.patch.object(
             self.bridge.adapter,

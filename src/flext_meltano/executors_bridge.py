@@ -60,7 +60,7 @@ class FlextMeltanoBridge:
 
         """
         try:
-            result = operation()
+            result: object = operation()
 
             # Handle FlextResult returns with proper type checking
             if (
@@ -76,8 +76,16 @@ class FlextMeltanoBridge:
                     "error": getattr(result, "error", None),
                 }
 
-            # Handle dict returns - this covers all remaining cases
-            return result  # type: ignore[return-value]
+            # Handle dict returns
+            if isinstance(result, dict):
+                return result
+
+            # Convert non-dict results to dict format
+            return {
+                "success": True,
+                "data": result,
+                "error": None,
+            }
 
         except Exception as e:
             self.logger.exception("Bridge operation failed")
@@ -326,7 +334,10 @@ class FlextMeltanoBridge:
         return self.execute_dbt_command([command], project_root)
 
     def run_elt_pipeline(
-        self, tap_name: str, target_name: str, project_root: str = "."
+        self,
+        tap_name: str,
+        target_name: str,
+        _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
         """Run complete ELT pipeline."""
         return self.run_pipeline(tap_name, target_name)

@@ -36,16 +36,18 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     model_config = FlextDomainService.model_config.copy()
     model_config["frozen"] = False  # Allow attribute modification
 
-    # Define fields as Pydantic model fields
+    # Define fields as Pydantic model fields with proper initialization
     project_root: Path
     _bridge: MeltanoBridge | None = None
     meltano_adapter: FlextMeltanoAdapter
     logger: FlextLogger
 
-    def __init__(self, project_root: Path | None = None) -> None:
+    def __init__(self, project_root: Path | None = None, **_data: object) -> None:
         """Initialize executor with project root and dependencies."""
+        # Initialize base class first
         super().__init__()
-        # Set fields after initialization
+
+        # Set instance attributes using object.__setattr__ for frozen fields
         object.__setattr__(self, "project_root", project_root or Path.cwd())
         object.__setattr__(self, "meltano_adapter", FlextMeltanoAdapter())
         object.__setattr__(self, "logger", FlextLogger("FlextMeltanoExecutor"))
@@ -462,7 +464,6 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 return FlextResult[int].ok(1)
 
             tap_name, target_name = args[1], args[2]
-            project_root = args[3] if len(args) > min_run_args else "."
 
             result = self.bridge.run_pipeline(tap_name, target_name)
             exit_code = 0 if result["success"] else 1
@@ -611,9 +612,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             # Execute ELT pipeline using Meltano integration
             try:
                 # Use bridge for executing pipeline through Meltano
-                run_result = self.bridge.run_pipeline(
-                    tap_name, target_name
-                )
+                run_result = self.bridge.run_pipeline(tap_name, target_name)
                 if run_result["success"]:
                     pipeline_result = FlextResult.ok(
                         {

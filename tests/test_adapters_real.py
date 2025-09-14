@@ -1,3 +1,5 @@
+"""FLEXT Meltano Adapter Real Tests - Real API integration testing."""
+
 import tempfile
 from pathlib import Path
 
@@ -5,15 +7,6 @@ from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsMatchers
 
 from flext_meltano.adapters import FlextMeltanoAdapter
-
-"""FLEXT Meltano Adapter Real Tests - Real API integration testing.
-
-This module provides tests for FlextMeltanoAdapter using real Meltano APIs
-and actual ELT operations following FLEXT patterns.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
 
 
 class TestFlextMeltanoAdapterReal:

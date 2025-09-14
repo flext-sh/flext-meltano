@@ -1,12 +1,3 @@
-
-from __future__ import annotations
-
-import os
-import tempfile
-from pathlib import Path
-
-from flext_meltano.config import FlextMeltanoConfig
-
 """FLEXT Meltano Config Complete Coverage Tests - Comprehensive testing patterns.
 
 This module provides complete coverage tests for FlextMeltanoConfig using
@@ -16,7 +7,13 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from __future__ import annotations
 
+import os
+import tempfile
+from pathlib import Path
+
+from flext_meltano.config import FlextMeltanoConfig
 
 
 class TestFlextMeltanoConfig:

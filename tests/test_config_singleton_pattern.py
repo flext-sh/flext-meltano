@@ -1,9 +1,7 @@
+"""FLEXT Meltano Config Singleton Pattern Tests - Singleton testing patterns.
 
-from __future__ import annotations
-
-from pathlib import Path
-from flext_meltano.config import FlextMeltanoConfig
-
+This module provides tests for FlextMeltanoConfig singleton pattern using
+comprehensive testing patterns and singleton validation.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -11,7 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
 
+from flext_meltano.config import FlextMeltanoConfig
 
 
 class TestFlextMeltanoConfigSingletonPattern:
@@ -19,7 +19,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_get_global_instance_with_overrides(self) -> None:
         """Test get_global_instance with parameter overrides."""
-
         # Get instance with overrides
         config = FlextMeltanoConfig.get_global_instance(
             project_root="/custom/project", environment="production", log_level="ERROR"
@@ -32,7 +31,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_create_with_overrides(self) -> None:
         """Test create_with_overrides method."""
-
         result = FlextMeltanoConfig.create_with_overrides(
             project_root="/test/project",
             environment="staging",
@@ -48,7 +46,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_create_for_environment_with_overrides(self) -> None:
         """Test create_for_environment_with_overrides method."""
-
         result = FlextMeltanoConfig.create_for_environment_with_overrides(
             environment="production",
             project_root="/prod/project",
@@ -66,7 +63,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_apply_overrides_to_instance(self) -> None:
         """Test apply_overrides method on existing instance."""
-
         config = FlextMeltanoConfig()
         config.project_root = Path("/initial/project")
 
@@ -82,7 +78,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_apply_overrides_sealed_config(self) -> None:
         """Test apply_overrides fails on sealed configuration."""
-
         config = FlextMeltanoConfig()
         config.project_root = Path("/test")
         config.seal()
@@ -94,7 +89,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_get_meltano_environment_variables(self) -> None:
         """Test get_meltano_environment_variables includes both base and Meltano vars."""
-
         config = FlextMeltanoConfig()
         config.project_root = Path("/test/project")
         config.environment = "development"
@@ -112,7 +106,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_singleton_consistency_with_overrides(self) -> None:
         """Test that singleton pattern maintains consistency with overrides."""
-
         # Get first instance
         config1 = FlextMeltanoConfig.get_global_instance(environment="development")
 
@@ -129,7 +122,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_error_handling_invalid_environment(self) -> None:
         """Test error handling for invalid environment."""
-
         result = FlextMeltanoConfig.create_for_environment_with_overrides(
             environment="invalid_env", project_root="/test"
         )
@@ -139,7 +131,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_error_handling_invalid_overrides(self) -> None:
         """Test error handling for invalid override values."""
-
         result = FlextMeltanoConfig.create_with_overrides(
             project_root="/test", invalid_field="invalid_value"
         )
@@ -151,7 +142,6 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_metadata_tracking_overrides(self) -> None:
         """Test that metadata tracks applied overrides."""
-
         config = FlextMeltanoConfig(project_root="/test")
 
         # Apply overrides

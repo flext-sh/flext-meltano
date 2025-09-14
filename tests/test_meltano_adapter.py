@@ -1,22 +1,14 @@
+"""Test module for flext-meltano."""
 
 from __future__ import annotations
 
 import importlib.util
+
 import dbt.version
 from flext_core import FlextResult
+
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.executors_bridge import FlextMeltanoBridge as MeltanoBridge
-
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-from __future__ import annotations
-
-
-
 
 
 class TestMeltanoBridgeReal:
@@ -24,14 +16,12 @@ class TestMeltanoBridgeReal:
 
     def test_bridge_creation(self) -> None:
         """Testa criação do bridge com configuração padrão."""
-
         bridge = MeltanoBridge()
         assert bridge is not None
         assert hasattr(bridge, "get_version")
 
     def test_get_version_real(self) -> None:
         """Testa obtenção da versão do Meltano usando API real."""
-
         bridge = MeltanoBridge()
         result = bridge.get_version()
 
@@ -51,7 +41,6 @@ class TestMeltanoBridgeReal:
 
     def test_get_version_unwrap_or_pattern(self) -> None:
         """Testa padrão unwrap_or para simplificação de código."""
-
         bridge = MeltanoBridge()
         result = bridge.get_version()
 
@@ -66,7 +55,6 @@ class TestMeltanoBridgeReal:
 
     def test_meltano_imports_available(self) -> None:
         """Verifica disponibilidade das APIs reais do Meltano."""
-
         # APIs do Meltano Core devem estar disponíveis
         try:
             importlib.util.find_spec("meltano")
@@ -83,7 +71,6 @@ class TestMeltanoBridgeReal:
 
     def test_dbt_imports_available(self) -> None:
         """Verifica disponibilidade das APIs reais do DBT."""
-
         try:
             # Check if DBT specs exist
             dbt_cli_spec = importlib.util.find_spec("dbt.cli.main")
@@ -108,7 +95,6 @@ class TestMeltanoBridgeReal:
 
     def test_singer_sdk_imports_available(self) -> None:
         """Verifica disponibilidade do Singer SDK."""
-
         try:
             importlib.util.find_spec("singer_sdk.Stream")
             importlib.util.find_spec("singer_sdk.Tap")
@@ -125,17 +111,15 @@ class TestMeltanoBridgeReal:
 
 
 class TestFlextMeltanoAdapterReal:
-    """Testes REAIS do adapter - sem mocks."""
+    """Real adapter tests - no mocks."""
 
     def test_adapter_creation(self) -> None:
-        """Testa criação do adapter."""
-
+        """Test adapter creation."""
         adapter = FlextMeltanoAdapter()
         assert adapter is not None
 
     def test_adapter_with_config(self) -> None:
-        """Testa adapter com configuração."""
-
+        """Test adapter with configuration."""
         adapter = FlextMeltanoAdapter()
         assert adapter is not None
-        # Adapter não recebe config no constructor, mas pode processar configs
+        # Adapter doesn't receive config in constructor, but can process configs

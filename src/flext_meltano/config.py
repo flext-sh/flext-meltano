@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar
 
 from flext_core import (
     FlextConfig,
@@ -20,9 +20,9 @@ from flext_core import (
     FlextResult,
     FlextTypes,
 )
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+from pydantic_settings import SettingsConfigDict
 
-# Avoid circular import by importing constants after core
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -444,74 +444,74 @@ class FlextMeltanoConfig(FlextConfig):
         if hasattr(cls, "_global_instance"):
             cls._global_instance = None
 
-    @classmethod
-    def create_with_overrides(
-        cls, **overrides: object
-    ) -> FlextResult[FlextMeltanoConfig]:
-        """Create Meltano configuration with specific overrides.
+    # @classmethod
+    # def create_with_overrides(
+    #     cls, **overrides: object
+    # ) -> FlextResult[FlextMeltanoConfig]:
+    #     """Create Meltano configuration with specific overrides.
+    #
+    #     This method creates a new configuration instance using FlextConfig as the base
+    #     and applying the specified overrides. It follows the same pattern as FlextConfig.create().
+    #
+    #     Args:
+    #         **overrides: Configuration overrides to apply
+    #
+    #     Returns:
+    #         FlextResult containing configured FlextMeltanoConfig instance or error details
+    #
+    #     """
+    #     try:
+    #         # Create Meltano config directly with overrides
+    #         # Filter overrides to only include valid fields
+    #         valid_fields = cls.model_fields.keys()
+    #         filtered_overrides = {
+    #             k: v for k, v in overrides.items() if k in valid_fields
+    #         }
+    #         config = cls(**filtered_overrides)
+    #         return FlextResult[FlextMeltanoConfig].ok(config)
+    #
+    #     except Exception as error:
+    #         return FlextResult[FlextMeltanoConfig].fail(
+    #             f"Failed to create Meltano configuration: {error}",
+    #             error_code="CONFIG_CREATION_ERROR",
+    #         )
 
-        This method creates a new configuration instance using FlextConfig as the base
-        and applying the specified overrides. It follows the same pattern as FlextConfig.create().
-
-        Args:
-            **overrides: Configuration overrides to apply
-
-        Returns:
-            FlextResult containing configured FlextMeltanoConfig instance or error details
-
-        """
-        try:
-            # Create Meltano config directly with overrides
-            # Filter overrides to only include valid fields
-            valid_fields = cls.model_fields.keys()
-            filtered_overrides = {
-                k: v for k, v in overrides.items() if k in valid_fields
-            }
-            config = cls(**filtered_overrides)  # type: ignore[arg-type]
-            return FlextResult[FlextMeltanoConfig].ok(config)
-
-        except Exception as error:
-            return FlextResult[FlextMeltanoConfig].fail(
-                f"Failed to create Meltano configuration: {error}",
-                error_code="CONFIG_CREATION_ERROR",
-            )
-
-    @classmethod
-    def create_for_environment_with_overrides(
-        cls, environment: str, **overrides: object
-    ) -> FlextResult[FlextMeltanoConfig]:
-        """Create Meltano configuration for specific environment with overrides.
-
-        Args:
-            environment: Target environment (development, staging, production, test, local)
-            **overrides: Additional configuration overrides
-
-        Returns:
-            FlextResult containing configured FlextMeltanoConfig instance or error details
-
-        """
-        try:
-            # Validate environment
-            try:
-                env_type = cls.EnvironmentType(environment)
-            except ValueError:
-                return FlextResult[FlextMeltanoConfig].fail(
-                    f"Invalid environment: {environment}"
-                )
-
-            # Prepare configuration data
-            config_data = {
-                "environment": str(env_type),
-                **overrides,
-            }
-
-            return cls.create_with_overrides(**config_data)
-
-        except Exception as error:
-            return FlextResult[FlextMeltanoConfig].fail(
-                f"Failed to create environment configuration: {error}",
-                error_code="ENVIRONMENT_CONFIG_ERROR",
-            )
+    # @classmethod
+    # def create_for_environment_with_overrides(
+    #     cls, environment: str, **overrides: object
+    # ) -> FlextResult[FlextMeltanoConfig]:
+    #     """Create Meltano configuration for specific environment with overrides.
+    #
+    #     Args:
+    #         environment: Target environment (development, staging, production, test, local)
+    #         **overrides: Additional configuration overrides
+    #
+    #     Returns:
+    #         FlextResult containing configured FlextMeltanoConfig instance or error details
+    #
+    #     """
+    #     try:
+    #         # Validate environment
+    #         try:
+    #             env_type = cls.EnvironmentType(environment)
+    #         except ValueError:
+    #             return FlextResult[FlextMeltanoConfig].fail(
+    #                 f"Invalid environment: {environment}"
+    #             )
+    #
+    #         # Prepare configuration data
+    #         config_data = {
+    #             "environment": str(env_type),
+    #             **overrides,
+    #         }
+    #
+    #         return cls.create_with_overrides(**config_data)
+    #
+    #     except Exception as error:
+    #         return FlextResult[FlextMeltanoConfig].fail(
+    #             f"Failed to create environment configuration: {error}",
+    #             error_code="ENVIRONMENT_CONFIG_ERROR",
+    #         )
 
     def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.
@@ -596,12 +596,14 @@ class FlextMeltanoConfig(FlextConfig):
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    model_config = {
-        "extra": "ignore",  # Allow extra fields from environment variables
-        "validate_assignment": True,
-        "use_enum_values": True,
-        "arbitrary_types_allowed": True,
-    }
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        {
+            "extra": "ignore",  # Allow extra fields from environment variables
+            "validate_assignment": True,
+            "use_enum_values": True,
+            "arbitrary_types_allowed": True,
+        }
+    )
 
 
 __all__ = [

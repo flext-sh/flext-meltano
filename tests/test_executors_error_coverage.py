@@ -1,15 +1,12 @@
+"""Test module for flext-meltano."""
 
 from pathlib import Path
 from unittest import mock
+
+# SPDX-License-Identifier: MIT
 from flext_core import FlextResult
+
 from flext_meltano.executors import FlextMeltanoExecutor
-
-SPDX-License-Identifier: MIT
-"""
-
-
-
-from flext_core import FlextLogger
 
 
 class TestFlextMeltanoExecutorErrorCoverage:
@@ -17,12 +14,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-
         self.executor = FlextMeltanoExecutor()
 
     def test_execute_health_failure(self) -> None:
         """Test execute method with health command failure."""
-
         # Mock meltano_adapter.get_version to return failure
         with mock.patch.object(
             self.executor.meltano_adapter, "get_version"
@@ -36,7 +31,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_execute_version_failure(self) -> None:
         """Test execute method with version command failure."""
-
         # Mock meltano_adapter.get_version to return failure
         with mock.patch.object(
             self.executor.meltano_adapter, "get_version"
@@ -50,7 +44,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_execute_unknown_command(self) -> None:
         """Test execute method with unknown command."""
-
         result = self.executor.execute("unknown_command")
         assert result.is_failure
         assert result.error is not None
@@ -58,7 +51,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_execute_meltano_command_project_not_found(self) -> None:
         """Test execute_meltano_command with project not found."""
-
         # Use a non-existent path
         non_existent_path = Path("/non/existent/path")
 
@@ -71,7 +63,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_get_project_info_project_not_found(self) -> None:
         """Test get_project_info with project not found."""
-
         # Use a non-existent path
         non_existent_path = Path("/non/existent/path")
 
@@ -82,7 +73,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_execute_meltano_command_exception(self) -> None:
         """Test execute_meltano_command with exception."""
-
         # Mock Path.exists to raise exception
         with mock.patch.object(Path, "exists", side_effect=Exception("Test exception")):
             result = self.executor.execute_meltano_command(
@@ -94,7 +84,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_get_project_info_exception(self) -> None:
         """Test get_project_info with exception."""
-
         # Mock Path.exists to raise exception
         with mock.patch.object(Path, "exists", side_effect=Exception("Test exception")):
             result = self.executor.get_project_info(Path("/test"))
@@ -104,7 +93,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_run_command_exception(self) -> None:
         """Test run_command with exception."""
-
         # Test with invalid command that will cause internal errors
         result = self.executor.run_command(["invalid_command"])
         assert isinstance(result, FlextResult)
@@ -112,7 +100,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_run_method_exception(self) -> None:
         """Test run method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -124,7 +111,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_execute_and_format_result_exception(self) -> None:
         """Test _execute_and_format_result with exception."""
-
         # Test with invalid arguments that will cause internal errors
         result = self.executor._execute_and_format_result(["invalid_command"])
         assert result.is_success  # Should handle exception gracefully
@@ -132,7 +118,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_health_exception(self) -> None:
         """Test health method with exception."""
-
         # Mock meltano_adapter.get_version to raise exception
         with mock.patch.object(
             self.executor.meltano_adapter,
@@ -146,7 +131,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_version_exception(self) -> None:
         """Test version method with exception."""
-
         # Mock meltano_adapter.get_version to raise exception
         with mock.patch.object(
             self.executor.meltano_adapter,
@@ -160,7 +144,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_help_exception(self) -> None:
         """Test help method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -172,7 +155,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_list_commands_exception(self) -> None:
         """Test list_commands method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -184,7 +166,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_list_plugins_exception(self) -> None:
         """Test list_plugins method with exception."""
-
         # Mock meltano_adapter.discover_plugins to raise exception
         with mock.patch.object(
             self.executor.meltano_adapter,
@@ -198,7 +179,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_run_pipeline_exception(self) -> None:
         """Test run_pipeline method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -210,7 +190,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_flext_meltano_version_exception(self) -> None:
         """Test flext_meltano_version method with exception."""
-
         # Mock MeltanoBridge to raise exception
         with mock.patch(
             "flext_meltano.executors.MeltanoBridge",
@@ -223,7 +202,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_flext_meltano_install_exception(self) -> None:
         """Test flext_meltano_install method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -235,7 +213,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_flext_meltano_invoke_exception(self) -> None:
         """Test flext_meltano_invoke method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -247,7 +224,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_run_cli_exception(self) -> None:
         """Test run_cli method with exception."""
-
         # Mock logger.info to raise exception
         with mock.patch.object(
             self.executor.logger, "info", side_effect=Exception("Test exception")
@@ -259,7 +235,6 @@ class TestFlextMeltanoExecutorErrorCoverage:
 
     def test_create_flext_cli_exception(self) -> None:
         """Test create_flext_cli method with exception."""
-
         # Mock FlextLogger to raise exception
         with mock.patch(
             "flext_meltano.executors.FlextLogger",

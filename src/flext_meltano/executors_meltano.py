@@ -12,6 +12,7 @@ from typing import cast
 from flext_core import FlextTypes
 
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.typings import FlextMeltanoTypes
 
 # =================================================================
@@ -20,27 +21,18 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 # Simple aliases for backward compatibility - no duplication
-# Use lazy imports to avoid circular dependencies
-def _get_executor_class() -> type:
-    """Lazy import to avoid circular dependency."""
-    from flext_meltano.executors import FlextMeltanoExecutor  # noqa: PLC0415
-
-    return FlextMeltanoExecutor
-
-
-# Create aliases using lazy loading
-MeltanoExecutor = _get_executor_class()
-SimpleMeltanoExecutor = _get_executor_class()
-SimpleDbtExecutor = _get_executor_class()
+MeltanoExecutor = FlextMeltanoExecutor
+SimpleMeltanoExecutor = FlextMeltanoExecutor
+SimpleDbtExecutor = FlextMeltanoExecutor
 
 
 class FlextMeltanoExecutors:
     """Backward compatibility wrapper with simple aliases."""
 
-    # Aliases for nested classes using lazy loading
-    MeltanoExecutor = _get_executor_class()
-    SimpleMeltanoExecutor = _get_executor_class()
-    SimpleDbtExecutor = _get_executor_class()
+    # Aliases for nested classes
+    MeltanoExecutor = FlextMeltanoExecutor
+    SimpleMeltanoExecutor = FlextMeltanoExecutor
+    SimpleDbtExecutor = FlextMeltanoExecutor
 
     class ExecutionResult:
         """Execution result with structured data for Go integration."""

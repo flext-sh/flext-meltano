@@ -8,15 +8,10 @@ from __future__ import annotations
 
 from typing import (
     Protocol,
-    TypeVar,
     runtime_checkable,
 )
 
-from flext_core import FlextTypes  # Use flext-core type variables
-
-# Use flext-core type variables - eliminate duplication
-T_co = TypeVar("T_co", covariant=True)  # Keep this one as it needs covariance
-# U and V now come from flext-core
+from flext_core import FlextTypes, T_co
 
 # Python 3.13+ Type aliases - USE FlextTypes directly (eliminate duplication)
 type ConfigValue = FlextTypes.Core.ConfigValue  # ✅ ALIAS to eliminate duplication

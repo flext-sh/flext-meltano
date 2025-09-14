@@ -1,3 +1,5 @@
+"""Test configuration builders for flext-meltano."""
+
 from __future__ import annotations
 
 import unittest

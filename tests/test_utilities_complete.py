@@ -9,16 +9,12 @@ SPDX-License-Identifier: MIT
 
 import tempfile
 from pathlib import Path
+
 from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.utilities import FlextMeltanoUtilities
-
-"""
-
-
-
-from typing import Type
 
 
 class TestFlextMeltanoUtilitiesComplete:
@@ -26,7 +22,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
@@ -39,7 +34,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_temp_directory_success(self) -> None:
         """Test create_temp_directory success using flext_tests."""
-
         result = FlextMeltanoFileManagers.create_temp_directory(
             prefix="flext_test_", meltano_structure=True
         )
@@ -68,7 +62,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_temp_directory_default_prefix(self) -> None:
         """Test create_temp_directory with default prefix using flext_tests."""
-
         result = FlextMeltanoFileManagers.create_temp_directory()
 
         self.test_assertions.assert_true(
@@ -90,7 +83,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test create_meltano_config_dict success using flext_tests."""
-
         result = FlextMeltanoUtilities.create_meltano_config_dict(
             project_id="test_project", project_name="Test Meltano Project"
         )
@@ -145,7 +137,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_meltano_config_dict_with_defaults(self) -> None:
         """Test create_meltano_config_dict with defaults using flext_tests."""
-
         result = FlextMeltanoUtilities.create_meltano_config_dict(
             project_id="minimal_project"
         )
@@ -167,7 +158,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_meltano_config_dict_empty_inputs(self) -> None:
         """Test create_meltano_config_dict with empty inputs using flext_tests."""
-
         result = FlextMeltanoUtilities.create_meltano_config_dict(project_id="")
 
         self.test_assertions.assert_true(
@@ -190,7 +180,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_write_meltano_yml_success(self) -> None:
         """Test write_meltano_yml success using flext_tests."""
-
         # Create test config using flext_tests utilities
         test_config = {
             "version": 1,
@@ -238,7 +227,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_write_meltano_yml_invalid_path(self) -> None:
         """Test write_meltano_yml with invalid path using flext_tests."""
-
         test_config = {"version": 1, "project_id": "test"}
         invalid_path = Path("/nonexistent/invalid/path/meltano.yml")
 
@@ -259,7 +247,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_plugin_config_dict_success(self) -> None:
         """Test create_plugin_config_dict success using flext_tests."""
-
         result = FlextMeltanoUtilities.create_plugin_config_dict(
             name="tap-csv",
             plugin_type="extractor",
@@ -312,7 +299,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_plugin_config_dict_with_defaults(self) -> None:
         """Test create_plugin_config_dict with defaults using flext_tests."""
-
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="test-plugin")
 
         self.test_assertions.assert_true(
@@ -336,7 +322,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_plugin_config_dict_empty_name(self) -> None:
         """Test create_plugin_config_dict with empty name using flext_tests."""
-
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="")
 
         self.test_assertions.assert_true(
@@ -358,7 +343,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_utilities_error_handling(self) -> None:
         """Test utilities error handling using flext_tests error simulation."""
-
         # Test error handling with FlextResult patterns
         failure_result = FlextTestsFixtures.create_failure_result("Test error")
 
@@ -377,7 +361,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_complete_meltano_setup_workflow(self) -> None:
         """Test complete Meltano setup workflow using flext_tests."""
-
         # Step 1: Create temp directory
 
         temp_result = FlextMeltanoFileManagers.create_temp_directory("workflow_test_")
@@ -423,7 +406,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_utilities_edge_cases(self) -> None:
         """Test utilities edge cases using flext_tests."""
-
         # Test with various edge case inputs
         edge_cases = [
             ("", ""),  # Empty strings
@@ -443,7 +425,6 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_utilities_type_safety(self) -> None:
         """Test utilities type safety using flext_tests."""
-
         # All methods should return proper FlextResult types
 
         temp_result = FlextMeltanoFileManagers.create_temp_directory()
