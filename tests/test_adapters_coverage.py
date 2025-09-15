@@ -195,17 +195,22 @@ class TestFlextMeltanoAdapterCoverage:
             pass
 
     def test_initialize_attributes(self) -> None:
-        """Test _initialize_attributes method."""
+        """Test that attributes are properly initialized during construction."""
         # Create a new adapter instance to test initialization
         adapter = FlextMeltanoAdapter()
 
-        # Call the private method
-        adapter._initialize_attributes()
-
-        # Verify attributes are initialized
+        # Verify attributes are initialized during construction
         self.test_assertions.assert_true(
             condition=adapter._utilities is not None,
             message="Should initialize utilities",
+        )
+        self.test_assertions.assert_true(
+            condition=adapter._config is not None,
+            message="Should initialize config",
+        )
+        self.test_assertions.assert_true(
+            condition=adapter._logger is not None,
+            message="Should initialize logger",
         )
         self.test_assertions.assert_true(
             condition=adapter._current_project is None,

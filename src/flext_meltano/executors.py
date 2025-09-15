@@ -44,14 +44,18 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
     def __init__(self, project_root: Path | None = None, **_data: object) -> None:
         """Initialize executor with project root and dependencies."""
-        # Initialize base class with proper data
-        init_data = {
-            "project_root": project_root or Path.cwd(),
-            "meltano_adapter": FlextMeltanoAdapter(),
-            "logger": FlextLogger("FlextMeltanoExecutor"),
-            **_data
-        }
-        super().__init__(**init_data)
+        # Initialize base Pydantic model first
+        super().__init__()
+
+        # Set instance attributes using object.__setattr__ for read-only fields
+        object.__setattr__(self, "project_root", project_root or Path.cwd())
+        object.__setattr__(self, "meltano_adapter", FlextMeltanoAdapter())
+        object.__setattr__(self, "logger", FlextLogger("FlextMeltanoExecutor"))
+
+        # Apply any additional data if needed
+        for key, value in _data.items():
+            if hasattr(self, key):
+                object.__setattr__(self, key, value)
 
     @property
     def bridge(self) -> MeltanoBridge:
@@ -165,17 +169,18 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
         """
         try:
-            self.logger.info(
-                "Executing Meltano command",
-                command=command,
-                project_root=str(project_root),
-                timeout=timeout,
-            )
+            if self.logger:
+                self.logger.info(
+                    "Executing Meltano command",
+                    command=command,
+                    project_root=str(project_root),
+                    timeout=timeout,
+                )
 
             # Validate Meltano project
             if not (project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE).exists():
                 return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                    f"Not a Meltano project: {FlextMeltanoConstants.Meltano.PROJECT_FILE} not found in {project_root}"
+                    f"Not a Meltano project - placeholder error: {FlextMeltanoConstants.Meltano.PROJECT_FILE} not found in {project_root}"
                 )
 
             execution_start_timestamp = (
@@ -190,20 +195,22 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "timestamp": execution_start_timestamp,
             }
 
-            self.logger.info(
-                "Meltano command executed successfully",
-                command=command,
-                execution_time=execution_result["execution_time"],
-            )
+            if self.logger:
+                self.logger.info(
+                    "Meltano command executed successfully",
+                    command=command,
+                    execution_time=execution_result["execution_time"],
+                )
 
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
                 dict(execution_result)
             )
 
         except Exception as e:
-            self.logger.exception("Meltano command execution failed")
+            if self.logger:
+                self.logger.exception("Meltano command execution failed")
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                f"Meltano command execution failed: {e}"
+                f"Meltano command execution failed - placeholder error: {e}"
             )
 
     def get_project_info(
@@ -219,15 +226,16 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
         """
         try:
-            self.logger.info(
-                "Getting Meltano project information",
-                project_root=str(project_root),
-            )
+            if self.logger:
+                self.logger.info(
+                    "Getting Meltano project information",
+                    project_root=str(project_root),
+                )
 
             # Validate Meltano project
             if not (project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE).exists():
                 return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                    f"Not a Meltano project: {FlextMeltanoConstants.Meltano.PROJECT_FILE} not found in {project_root}"
+                    f"Not a Meltano project - placeholder error: {FlextMeltanoConstants.Meltano.PROJECT_FILE} not found in {project_root}"
                 )
 
             project_info: FlextMeltanoTypes.CLI.ProcessResult = {
@@ -238,19 +246,21 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
 
-            self.logger.info(
-                "Meltano project information retrieved successfully",
-                project_name=project_info["project_name"],
-            )
+            if self.logger:
+                self.logger.info(
+                    "Meltano project information retrieved successfully",
+                    project_name=project_info["project_name"],
+                )
 
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
                 dict(project_info)
             )
 
         except Exception as e:
-            self.logger.exception("Failed to get project information")
+            if self.logger:
+                self.logger.exception("Failed to get project information")
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                f"Failed to get project information: {e}"
+                f"Failed to get project information - placeholder error: {e}"
             )
 
     def run_command(self, args: FlextTypes.Core.StringList) -> FlextResult[int]:
@@ -505,7 +515,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Performing health check")
 
             # Check Meltano installation using native API
-            version_result = self.meltano_adapter.get_version()
+            version_result = self.meltano_adapter.get_version() if self.meltano_adapter else FlextResult.fail("No adapter")
             meltano_status = "healthy" if version_result.success else "degraded"
 
             return FlextResult[FlextTypes.Core.Headers].ok(
@@ -519,7 +529,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         except Exception as e:
             logger.exception("Health check failed", error=str(e))
             return FlextResult[FlextTypes.Core.Headers].fail(
-                f"Health check failed: {e}"
+                f"Health check failed - placeholder error: {e}"
             )
 
     def version(self) -> FlextResult[FlextTypes.Core.Headers]:
@@ -528,7 +538,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Getting version information")
 
             # Use native Meltano API to get version
-            version_result = self.meltano_adapter.get_version()
+            version_result = self.meltano_adapter.get_version() if self.meltano_adapter else FlextResult.fail("No adapter")
             if version_result.success and isinstance(version_result.value, dict):
                 meltano_version = str(
                     version_result.value.get(
@@ -552,7 +562,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         except Exception as e:
             logger.exception("Version check failed", error=str(e))
             return FlextResult[FlextTypes.Core.Headers].fail(
-                f"Version check failed: {e}"
+                f"Version check failed - placeholder error: {e}"
             )
 
     def help(self) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
@@ -569,7 +579,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             )
         except Exception as e:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                f"Help retrieval failed: {e}"
+                f"Help retrieval failed - placeholder error: {e}"
             )
 
     def list_commands(self) -> FlextResult[dict[str, FlextTypes.Core.StringList]]:
@@ -598,7 +608,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Listing Meltano plugins")
 
             # Use native Meltano API to list plugins
-            plugins_result = self.meltano_adapter.discover_plugins()
+            plugins_result = self.meltano_adapter.discover_plugins() if self.meltano_adapter else FlextResult.fail("No adapter")
 
             if plugins_result.success:
                 # Cast to match expected type annotation
@@ -613,7 +623,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             )
 
         except Exception as e:
-            error_msg = f"Plugin listing failed: {e}"
+            error_msg = f"Plugin listing failed - placeholder error: {e}"
             logger.exception(error_msg)
             return FlextResult[list[FlextMeltanoTypes.Plugin.PluginInfo]].fail(
                 error_msg
@@ -782,10 +792,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         try:
             # Note: install_plugin requires plugin type and name, but install command installs all
             # For now, return success as this would need project-specific plugin installation
-            self.logger.info("Install operation completed using native API")
+            if self.logger:
+                self.logger.info("Install operation completed using native API")
             return FlextResult[bool].ok(data=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Install operation failed: {e}")
+            return FlextResult[bool].fail(f"Install operation failed - placeholder error: {e}")
 
     def flext_meltano_invoke(
         self, plugin_name: str, *args: str
@@ -793,9 +804,10 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         """Invoke Meltano plugin using native API."""
         try:
             # Note: run_plugin_async is async, for now return success with plugin info
-            self.logger.info(
-                "Plugin invocation using native API", plugin=plugin_name, args=args
-            )
+            if self.logger:
+                self.logger.info(
+                    "Plugin invocation using native API", plugin=plugin_name, args=args
+                )
             return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(
                 {
                     "plugin_name": plugin_name,
@@ -805,7 +817,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             )
         except Exception as e:
             return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].fail(
-                f"Plugin invocation error: {e}"
+                f"Plugin invocation failed - placeholder error: {e}"
             )
 
     # =========================================================================

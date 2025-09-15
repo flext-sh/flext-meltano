@@ -1,5 +1,6 @@
 """Test module for flext-meltano."""
 
+
 from flext_core import FlextResult
 
 from flext_meltano.services import FlextMeltanoService
@@ -109,7 +110,7 @@ class TestFlextMeltanoServiceComplete:
 
     def test_multiple_service_creation(self) -> None:
         """Test creating multiple services of different types."""
-        service_configs: list[dict[str, object]] = [
+        service_configs: list[tuple[str, str]] = [
             ("tap-csv", "create_tap_service"),
             ("target-jsonl", "create_target_service"),
             ("dbt-test", "create_dbt_service"),
@@ -163,21 +164,26 @@ class TestFlextMeltanoServiceComplete:
 
     def test_service_consistency(self) -> None:
         """Test that all service creation methods have consistent interface."""
-        methods = [
-            self.service.create_tap_service,
-            self.service.create_target_service,
-            self.service.create_dbt_service,
-        ]
+        # Test create_tap_service
+        result1 = self.service.create_tap_service("test-service")
+        assert isinstance(result1, FlextResult)
+        if not result1.success:
+            assert result1.error_message
+            assert isinstance(result1.error_message, str)
 
-        for method in methods:
-            # All methods should accept a string parameter and return FlextResult
-            result = method("test-service")
-            assert isinstance(result, FlextResult)
+        # Test create_target_service
+        result2 = self.service.create_target_service("test-service")
+        assert isinstance(result2, FlextResult)
+        if not result2.success:
+            assert result2.error_message
+            assert isinstance(result2.error_message, str)
 
-            # All should have proper error handling
-            if not result.success:
-                assert result.error_message
-                assert isinstance(result.error_message, str)
+        # Test create_dbt_service
+        result3 = self.service.create_dbt_service("test-service")
+        assert isinstance(result3, FlextResult)
+        if not result3.success:
+            assert result3.error_message
+            assert isinstance(result3.error_message, str)
 
     def test_nested_class_hierarchy(self) -> None:
         """Test nested class structure and hierarchy."""

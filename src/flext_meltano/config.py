@@ -361,25 +361,38 @@ class FlextMeltanoConfig(FlextConfig):
                 k: v for k, v in kwargs.items() if k in valid_fields
             }
 
-            # Create config with proper type conversions
-            project_root_value = filtered_kwargs.get("project_root", ".")
-            if isinstance(project_root_value, str):
-                project_root = Path(project_root_value)
-            elif isinstance(project_root_value, Path):
-                project_root = project_root_value
-            else:
-                project_root = Path()
+            # Create config data with environment
+            config_data: dict[str, object] = {"environment": env_type.value}
 
-            config = cls(
-                environment=env_type.value,
-                project_root=project_root,
-                log_level=cls.LogLevel(
-                    str(filtered_kwargs.get("log_level", cls.LogLevel.INFO))
-                ),
-                run_mode=cls.RunMode(
-                    str(filtered_kwargs.get("run_mode", cls.RunMode.FULL))
-                ),
+            # Handle specific type conversions
+            if "project_root" in filtered_kwargs:
+                project_root_value = filtered_kwargs["project_root"]
+                if isinstance(project_root_value, str):
+                    config_data["project_root"] = Path(project_root_value)
+                elif isinstance(project_root_value, Path):
+                    config_data["project_root"] = project_root_value
+                else:
+                    config_data["project_root"] = Path()
+
+            if "log_level" in filtered_kwargs:
+                config_data["log_level"] = cls.LogLevel(
+                    str(filtered_kwargs["log_level"])
+                )
+
+            if "run_mode" in filtered_kwargs:
+                config_data["run_mode"] = cls.RunMode(str(filtered_kwargs["run_mode"]))
+
+            # Apply all other valid kwargs directly
+            excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
+            config_data.update(
+                {
+                    key: value
+                    for key, value in filtered_kwargs.items()
+                    if key not in excluded_keys
+                }
             )
+
+            config = cls(**config_data)
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
         except Exception as e:

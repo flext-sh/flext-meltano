@@ -499,14 +499,15 @@ class TestFlextSingerTypesComplete:
         # Test the exception handling branch (lines 187-188)
         # This should be covered by the try/except structure
 
-        # Test with None type_def to potentially trigger exception
+        # Test with empty type_def to potentially trigger exception
         try:
-            result = self.singer_types.validate_value("test", None)
+            empty_type_def: dict[str, object] = {}
+            result = self.singer_types.validate_value("test", empty_type_def)
             # If we get here, result should be a failure
             if isinstance(result, FlextResult):
                 self.test_assertions.assert_true(
                     condition=result.is_failure,
-                    message="Should handle None type_def gracefully",
+                    message="Should handle empty type_def gracefully",
                 )
         except Exception:
             # Exception is expected and acceptable for this edge case
@@ -538,7 +539,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Create object type with properties using created types
-        properties = {
+        properties: dict[str, object] = {
             "name": string_result.unwrap(),
             "age": integer_result.unwrap(),
             "active": boolean_result.unwrap(),
@@ -588,11 +589,13 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test nested object types
+        inner_object_props: dict[str, object] = {"id": {"type": "integer"}}
         inner_object = self.singer_types.create_object_type(
-            properties={"id": {"type": "integer"}}
+            properties=inner_object_props
         ).unwrap()
+        outer_object_props: dict[str, object] = {"nested": inner_object}
         outer_object = self.singer_types.create_object_type(
-            properties={"nested": inner_object}
+            properties=outer_object_props
         )
 
         self.test_assertions.assert_true(
@@ -601,7 +604,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test validation with edge values
-        edge_cases = [
+        edge_cases: list[tuple[object, dict[str, object]]] = [
             (0, {"type": "integer"}),
             (-1, {"type": "integer"}),
             (0.0, {"type": "number"}),

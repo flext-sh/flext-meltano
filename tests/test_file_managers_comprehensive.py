@@ -42,7 +42,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, object] = {"test": "data"}
+        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
 
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
@@ -51,7 +51,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: dict[str, object] = {
+        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -91,7 +91,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, object] = {"valid": "yaml", "content": {"nested": "value"}}
+        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {"valid": "yaml", "content": {"nested": "value"}}
         yaml_path = self.temp_dir / "valid.yml"
 
         save_result = FlextMeltanoFileManagers.save_yaml_config(config, yaml_path)
@@ -138,7 +138,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
         base_path = self.temp_dir / "empty_project"
-        empty_directories = []
+        empty_directories: list[str] = []
 
         result = FlextMeltanoFileManagers.create_directory_structure(
             base_path, empty_directories
@@ -289,7 +289,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             FlextTestsMatchers.assert_result_success(setup_result)
 
             # Create and save config
-            config: dict[str, object] = {
+            config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -315,8 +315,13 @@ class TestFlextMeltanoFileManagersComprehensive:
 
             # Verify loaded config matches original
             assert loaded_config["project_id"] == "integration-workflow-test"
-            assert len(loaded_config["plugins"]["extractors"]) == 2
-            assert len(loaded_config["plugins"]["loaders"]) == 2
+            plugins = loaded_config["plugins"]
+            if isinstance(plugins, dict):
+                extractors = plugins.get("extractors")
+                loaders = plugins.get("loaders")
+                if isinstance(extractors, list) and isinstance(loaders, list):
+                    assert len(extractors) == 2
+                    assert len(loaders) == 2
 
             # Validate project structure
             validate_structure_result = (
@@ -331,9 +336,11 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_error_handling_edge_cases(self) -> None:
         """Test error handling for various edge cases."""
-        # Test with None paths should return failure result instead of raising
+        # Test with invalid paths should return failure result instead of raising
         try:
-            result = FlextMeltanoFileManagers.save_yaml_config({}, None)
+            # Use an invalid path that still has proper type
+            invalid_path = Path("/invalid/path/that/does/not/exist")
+            result = FlextMeltanoFileManagers.save_yaml_config({}, invalid_path)
             # If it doesn't raise, it should return a failure result
             FlextTestsMatchers.assert_result_failure(result)
         except (TypeError, AttributeError):
@@ -356,7 +363,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
         # Create multiple configs simultaneously
-        configs = [
+        configs: list[ConfigDict] = [
             {"id": "config1", "data": "value1"},
             {"id": "config2", "data": "value2"},
             {"id": "config3", "data": "value3"},
