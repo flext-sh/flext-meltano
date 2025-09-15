@@ -265,19 +265,19 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             return FlextResult[FlextTypes.Core.Dict].fail(
                 "run_models is only available for DBT services"
             )
-        
+
         self._logger.info(
-            "Running DBT models", 
+            "Running DBT models",
             extra={"models": model_names or "all"}
         )
-        
+
         # Placeholder implementation - would integrate with actual DBT
         result_data: FlextTypes.Core.Dict = {
             "status": "completed",
             "models_run": model_names or [],
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
         }
-        
+
         return FlextResult[FlextTypes.Core.Dict].ok(result_data)
 
     # DBT-specific method for compatibility
