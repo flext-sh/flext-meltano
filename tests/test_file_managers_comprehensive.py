@@ -383,10 +383,10 @@ class TestFlextMeltanoFileManagersComprehensive:
         # Load all configs back and verify
         for i, expected_config in enumerate(configs):
             file_path = self.temp_dir / f"concurrent_{i}.yml"
-            result = FlextMeltanoFileManagers.load_yaml_config(file_path)
-            FlextTestsMatchers.assert_result_success(result)
+            load_result = FlextMeltanoFileManagers.load_yaml_config(file_path)
+            FlextTestsMatchers.assert_result_success(load_result)
 
-            loaded_config = result.value
+            loaded_config = load_result.value
             assert loaded_config["id"] == expected_config["id"]
             assert loaded_config["data"] == expected_config["data"]
 

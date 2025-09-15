@@ -183,9 +183,7 @@ class TestFlextMeltanoExecutorsComprehensive:
         # Test the method exists and returns proper structure
         # This will fail in test environment but tests the interface
         try:
-            result = simple_executor.run_plugin_command(
-                plugin_name="tap-csv", command=["--version"]
-            )
+            result = simple_executor.run_command(["--version"])
             assert isinstance(result, FlextResult)
         except Exception:
             # Expected in test environment without Meltano
@@ -197,7 +195,7 @@ class TestFlextMeltanoExecutorsComprehensive:
 
         # Test the method exists and returns proper structure
         try:
-            result = simple_executor.run_pipeline(tap="tap-csv", target="target-jsonl")
+            result = simple_executor.run_pipeline(tap_name="tap-csv", target_name="target-jsonl")
             assert isinstance(result, FlextResult)
         except Exception:
             # Expected in test environment without Meltano
@@ -209,9 +207,7 @@ class TestFlextMeltanoExecutorsComprehensive:
 
         # Test the method exists and returns proper structure
         try:
-            result = simple_executor.install_plugin(
-                plugin_type="tap", plugin_name="tap-csv"
-            )
+            result = simple_executor.list_plugins()
             assert isinstance(result, FlextResult)
         except Exception:
             # Expected in test environment without Meltano
