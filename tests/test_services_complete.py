@@ -1,6 +1,5 @@
 """Test module for flext-meltano."""
 
-
 from flext_core import FlextResult
 
 from flext_meltano.services import FlextMeltanoService

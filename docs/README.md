@@ -9,16 +9,19 @@
 ## 📋 Documentation Index
 
 ### **Getting Started**
+
 - **[Getting Started](getting-started.md)** - Installation and first steps
 - **[Architecture](architecture.md)** - Design patterns and structure
 - **[API Reference](api-reference.md)** - Complete API documentation
 
 ### **Development**
+
 - **[Development Guide](development.md)** - Contributing and workflows
 - **[Integration Patterns](integration.md)** - Ecosystem integration
 - **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
 
 ### **Examples**
+
 - **[Examples](examples/)** - Working code examples and patterns
 
 ---
@@ -29,12 +32,12 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 
 ### **Current Status**
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| **Architecture** | 🟢 Compliant | Single class per module pattern |
-| **FLEXT Integration** | 🟢 Strong | Extensive flext-core usage |
-| **Library Imports** | ⚠️ Issue | Direct meltano imports require abstraction |
-| **Type Safety** | 🟢 Good | MyPy compliance in src/ |
+| Component             | Status       | Details                                    |
+| --------------------- | ------------ | ------------------------------------------ |
+| **Architecture**      | 🟢 Compliant | Single class per module pattern            |
+| **FLEXT Integration** | 🟢 Strong    | Extensive flext-core usage                 |
+| **Library Imports**   | ⚠️ Issue     | Direct meltano imports require abstraction |
+| **Type Safety**       | 🟢 Good      | MyPy compliance in src/                    |
 
 ## 🏗️ Implementation Details
 
