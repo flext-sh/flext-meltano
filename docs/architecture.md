@@ -157,6 +157,7 @@ graph TD
 ### **FLEXT Ecosystem Integration**
 
 **flext-core Foundation**:
+
 ```python
 from flext_core import (
     FlextResult,           # Railway-oriented programming
@@ -168,6 +169,7 @@ from flext_core import (
 ```
 
 **Type System Integration**:
+
 ```python
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -180,6 +182,7 @@ result: FlextResult[FlextMeltanoTypes.ELT.PipelineResult]
 ### **External Library Integration**
 
 **Current Status (Direct Imports)**:
+
 ```python
 # ⚠️ ARCHITECTURE DEBT - Requires abstraction
 import meltano                                    # Line 14 in adapters.py
@@ -188,6 +191,7 @@ from meltano.core.plugin_invoker import PluginInvoker # Line 21 in adapters.py
 ```
 
 **Target Architecture (Abstracted)**:
+
 ```python
 # ✅ FUTURE STATE - Library wrapper pattern
 class _MeltanoLibraryWrapper:
@@ -295,24 +299,27 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 
 ### **Architecture Compliance Status**
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| **Type Safety** | 🟢 90% | Comprehensive Pydantic models and type annotations |
-| **FLEXT Integration** | 🟢 85% | Strong flext-core usage with FlextResult patterns |
-| **Single Class Pattern** | 🟢 100% | All modules follow single class architecture |
-| **External Abstractions** | 🟡 60% | Direct imports in adapters.py need wrapping |
+| Component                 | Status  | Details                                            |
+| ------------------------- | ------- | -------------------------------------------------- |
+| **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations |
+| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with FlextResult patterns  |
+| **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture       |
+| **External Abstractions** | 🟡 60%  | Direct imports in adapters.py need wrapping        |
 
 ### **Technical Debt**
 
 **Priority 1 - Critical**:
+
 - **Direct Imports**: Lines 14-25 in `adapters.py` need abstraction layer
 - **Library Wrapper**: Implement `_MeltanoLibraryWrapper` pattern
 
 **Priority 2 - Important**:
+
 - **Integration Testing**: Expand real API integration tests
 - **Bridge Communication**: Complete Go ↔ Python bridge patterns
 
 **Priority 3 - Enhancement**:
+
 - **Plugin Architecture**: Ecosystem-wide plugin foundation
 - **Performance**: Optimize for large data volume processing
 

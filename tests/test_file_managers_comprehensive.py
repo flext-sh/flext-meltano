@@ -42,7 +42,9 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {"test": "data"}
+        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+            "test": "data"
+        }
         invalid_path = Path("/nonexistent/directory/config.yml")
 
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
@@ -91,7 +93,10 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {"valid": "yaml", "content": {"nested": "value"}}
+        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+            "valid": "yaml",
+            "content": {"nested": "value"},
+        }
         yaml_path = self.temp_dir / "valid.yml"
 
         save_result = FlextMeltanoFileManagers.save_yaml_config(config, yaml_path)

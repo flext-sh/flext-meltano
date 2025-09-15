@@ -134,7 +134,7 @@ class TestFlextMeltanoConfigSingletonPattern:
         result = FlextMeltanoConfig.create_for_environment(
             environment="development",
             project_root="/test",
-            invalid_field="invalid_value"
+            invalid_field="invalid_value",
         )
 
         # Should succeed but ignore invalid fields

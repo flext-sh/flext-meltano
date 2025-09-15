@@ -259,17 +259,16 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 f"{self._service_type.title()} service validation failed: {e}"
             )
 
-    def run_models(self, model_names: list[str] | None = None) -> FlextResult[FlextTypes.Core.Dict]:
+    def run_models(
+        self, model_names: list[str] | None = None
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Run DBT models - placeholder implementation."""
         if self._service_type != "dbt":
             return FlextResult[FlextTypes.Core.Dict].fail(
                 "run_models is only available for DBT services"
             )
 
-        self._logger.info(
-            "Running DBT models",
-            extra={"models": model_names or "all"}
-        )
+        self._logger.info("Running DBT models", extra={"models": model_names or "all"})
 
         # Placeholder implementation - would integrate with actual DBT
         result_data: FlextTypes.Core.Dict = {

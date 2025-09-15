@@ -23,6 +23,7 @@ result: FlextResult[dict] = service.execute()
 ```
 
 **Methods**:
+
 - `execute() -> FlextResult[dict]` - Execute configured ELT operation
 - `validate_configuration() -> FlextResult[bool]` - Validate service configuration
 
@@ -38,6 +39,7 @@ result: FlextResult[dict] = adapter.run_pipeline("tap-csv", "target-jsonl")
 ```
 
 **Methods**:
+
 - `run_pipeline(tap: str, target: str) -> FlextResult[dict]` - Execute ELT pipeline
 - `validate_project() -> FlextResult[bool]` - Validate Meltano project configuration
 - `list_plugins() -> FlextResult[list]` - List available Meltano plugins
@@ -58,6 +60,7 @@ catalog_result: FlextResult[dict] = await tap_abstractions.discover_catalog("tap
 ```
 
 **Methods**:
+
 - `discover_catalog(tap_name: str) -> FlextResult[dict]` - Discover Singer catalog
 - `extract_data(tap_name: str, config: dict) -> FlextResult[list]` - Extract data records
 - `validate_tap_config(config: dict) -> FlextResult[bool]` - Validate tap configuration
@@ -74,6 +77,7 @@ result: FlextResult[dict] = await target_abstractions.load_data("target-jsonl", 
 ```
 
 **Methods**:
+
 - `load_data(target_name: str, records: list) -> FlextResult[dict]` - Load data records
 - `validate_target_config(config: dict) -> FlextResult[bool]` - Validate target configuration
 
@@ -95,6 +99,7 @@ result: FlextResult[dict] = dbt_service.execute_dbt_operation()
 **Current Status**: Placeholder implementation returning static data
 
 **Methods**:
+
 - `execute_dbt_operation() -> FlextResult[dict]` - Execute dbt transformations (placeholder)
 - `validate_dbt_project() -> FlextResult[bool]` - Validate dbt project structure
 
@@ -114,6 +119,7 @@ result: FlextResult[dict] = config.load_configuration("production")
 ```
 
 **Methods**:
+
 - `load_configuration(environment: str) -> FlextResult[dict]` - Load environment configuration
 - `validate_config() -> FlextResult[bool]` - Validate configuration structure
 
@@ -129,6 +135,7 @@ pipeline_config: FlextResult[dict] = builder.build_pipeline_config(tap_config, t
 ```
 
 **Methods**:
+
 - `build_pipeline_config(tap: dict, target: dict) -> FlextResult[dict]` - Build ELT pipeline configuration
 - `build_tap_config(settings: dict) -> FlextResult[dict]` - Build tap-specific configuration
 - `build_target_config(settings: dict) -> FlextResult[dict]` - Build target-specific configuration
@@ -149,6 +156,7 @@ result: FlextResult[dict] = await executor.run_meltano_command(["install"])
 ```
 
 **Methods**:
+
 - `run_meltano_command(args: list) -> FlextResult[dict]` - Execute Meltano command
 - `run_singer_command(tap: str, target: str) -> FlextResult[dict]` - Execute Singer pipeline
 - `validate_execution_environment() -> FlextResult[bool]` - Validate execution environment
@@ -165,6 +173,7 @@ response: FlextResult[dict] = bridge.handle_bridge_request(request_data)
 ```
 
 **Bridge Operations**:
+
 - `version` - Get bridge version information
 - `list_plugins` - List available ELT plugins
 - `run_pipeline` - Execute ELT pipeline
@@ -232,6 +241,7 @@ validation: FlextResult[bool] = utils.validate_singer_catalog(catalog)
 ```
 
 **Methods**:
+
 - `validate_singer_catalog(catalog: dict) -> FlextResult[bool]` - Validate Singer catalog structure
 - `parse_singer_messages(stream: Iterator) -> FlextResult[list]` - Parse Singer message stream
 - `format_pipeline_output(result: dict) -> FlextResult[str]` - Format pipeline execution output
@@ -248,6 +258,7 @@ result: FlextResult[bool] = validators.validate_pipeline_config(config)
 ```
 
 **Methods**:
+
 - `validate_pipeline_config(config: dict) -> FlextResult[bool]` - Validate complete pipeline configuration
 - `validate_singer_schema(schema: dict) -> FlextResult[bool]` - Validate Singer schema structure
 - `validate_dbt_models(models: list) -> FlextResult[bool]` - Validate dbt model definitions
@@ -268,6 +279,7 @@ result: FlextResult[str] = file_manager.read_meltano_config()
 ```
 
 **Methods**:
+
 - `read_meltano_config() -> FlextResult[str]` - Read meltano.yml configuration
 - `write_singer_catalog(catalog: dict, path: str) -> FlextResult[bool]` - Write Singer catalog to file
 - `backup_project_files() -> FlextResult[list]` - Backup critical project files
@@ -334,12 +346,12 @@ def create_elt_command():
 
 ### Current Compliance Status
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **FlextResult Usage** | 🟢 Complete | 600+ usages, 174 methods |
-| **Service Patterns** | 🟢 Implemented | Proper flext-core inheritance |
-| **Architecture Compliance** | 🔴 Blocked | Direct meltano.core imports |
-| **dbt Integration** | 🔴 Placeholder | Requires dbt programmatic API |
+| Component                   | Status         | Notes                         |
+| --------------------------- | -------------- | ----------------------------- |
+| **FlextResult Usage**       | 🟢 Complete    | 600+ usages, 174 methods      |
+| **Service Patterns**        | 🟢 Implemented | Proper flext-core inheritance |
+| **Architecture Compliance** | 🔴 Blocked     | Direct meltano.core imports   |
+| **dbt Integration**         | 🔴 Placeholder | Requires dbt programmatic API |
 
 ### Known Limitations
 

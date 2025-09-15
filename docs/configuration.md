@@ -199,10 +199,10 @@ transform/
 ### dbt Project Configuration (dbt_project.yml)
 
 ```yaml
-name: 'flext_transform'
-version: '1.0.0'
+name: "flext_transform"
+version: "1.0.0"
 
-profile: 'flext_profile'
+profile: "flext_profile"
 
 model-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -447,6 +447,7 @@ if env_validation.is_failure:
 ### Configuration Restrictions
 
 Due to compliance issues:
+
 - **Production Use**: Not recommended until abstraction layer implemented
 - **Full Configuration**: Limited by direct library import violations
 - **Modern Patterns**: Missing 2025 ELT configuration best practices

@@ -515,7 +515,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Performing health check")
 
             # Check Meltano installation using native API
-            version_result = self.meltano_adapter.get_version() if self.meltano_adapter else FlextResult.fail("No adapter")
+            version_result = (
+                self.meltano_adapter.get_version()
+                if self.meltano_adapter
+                else FlextResult.fail("No adapter")
+            )
             meltano_status = "healthy" if version_result.success else "degraded"
 
             return FlextResult[FlextTypes.Core.Headers].ok(
@@ -538,7 +542,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Getting version information")
 
             # Use native Meltano API to get version
-            version_result = self.meltano_adapter.get_version() if self.meltano_adapter else FlextResult.fail("No adapter")
+            version_result = (
+                self.meltano_adapter.get_version()
+                if self.meltano_adapter
+                else FlextResult.fail("No adapter")
+            )
             if version_result.success and isinstance(version_result.value, dict):
                 meltano_version = str(
                     version_result.value.get(
@@ -608,7 +616,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             logger.info("Listing Meltano plugins")
 
             # Use native Meltano API to list plugins
-            plugins_result = self.meltano_adapter.discover_plugins() if self.meltano_adapter else FlextResult.fail("No adapter")
+            plugins_result = (
+                self.meltano_adapter.discover_plugins()
+                if self.meltano_adapter
+                else FlextResult.fail("No adapter")
+            )
 
             if plugins_result.success:
                 # Cast to match expected type annotation
@@ -796,7 +808,9 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 self.logger.info("Install operation completed using native API")
             return FlextResult[bool].ok(data=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Install operation failed - placeholder error: {e}")
+            return FlextResult[bool].fail(
+                f"Install operation failed - placeholder error: {e}"
+            )
 
     def flext_meltano_invoke(
         self, plugin_name: str, *args: str

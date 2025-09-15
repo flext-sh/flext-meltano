@@ -213,7 +213,8 @@ class TestFlextTapAbstractionsComplete:
             message="Correlation ID should match",
         )
         self.test_assertions.assert_true(
-            condition=bool(result["discovered"]), message="Should reflect discovered status"
+            condition=bool(result["discovered"]),
+            message="Should reflect discovered status",
         )
 
     def test_get_stream_config(self) -> None:
@@ -238,7 +239,8 @@ class TestFlextTapAbstractionsComplete:
             condition=bool(users_config["selected"]), message="Users should be selected"
         )
         self.test_assertions.assert_false(
-            condition=bool(orders_config["selected"]), message="Orders should not be selected"
+            condition=bool(orders_config["selected"]),
+            message="Orders should not be selected",
         )
         self.test_assertions.assert_equals(
             actual=missing_config,
@@ -258,7 +260,10 @@ class TestFlextTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: dict[str, object] = {"users": {"selected": True}, "orders": {"selected": False}}
+        stream_config: dict[str, object] = {
+            "users": {"selected": True},
+            "orders": {"selected": False},
+        }
 
         result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
@@ -890,7 +895,10 @@ class TestFlextTapAbstractionsComplete:
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
         # Step 1: Create tap from config
-        connection_config: dict[str, object] = {"host": "localhost", "database": "test_db"}
+        connection_config: dict[str, object] = {
+            "host": "localhost",
+            "database": "test_db",
+        }
         stream_config: dict[str, object] = {"users": {"selected": True}}
 
         create_result = self.tap_abstractions.create_tap_from_config(
