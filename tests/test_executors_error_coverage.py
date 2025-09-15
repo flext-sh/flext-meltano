@@ -59,7 +59,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         )
         assert result.is_failure
         assert result.error is not None
-        assert "placeholder" in result.error
+        assert "placeholder error" in result.error
 
     def test_get_project_info_project_not_found(self) -> None:
         """Test get_project_info with project not found."""
@@ -69,7 +69,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         result = self.executor.get_project_info(non_existent_path)
         assert result.is_failure
         assert result.error is not None
-        assert "placeholder" in result.error
+        assert "placeholder error" in result.error
 
     def test_execute_meltano_command_exception(self) -> None:
         """Test execute_meltano_command with exception."""
@@ -80,7 +80,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             )
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_get_project_info_exception(self) -> None:
         """Test get_project_info with exception."""
@@ -89,7 +89,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.get_project_info(Path("/test"))
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_run_command_exception(self) -> None:
         """Test run_command with exception."""
@@ -127,7 +127,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.health()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_version_exception(self) -> None:
         """Test version method with exception."""
@@ -140,7 +140,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.version()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_help_exception(self) -> None:
         """Test help method with exception."""
@@ -175,7 +175,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.list_plugins()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_run_pipeline_exception(self) -> None:
         """Test run_pipeline method with exception."""
@@ -186,7 +186,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.run_pipeline("tap-csv", "target-csv")
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "Pipeline execution failed" in result.error
 
     def test_flext_meltano_version_exception(self) -> None:
         """Test flext_meltano_version method with exception."""
@@ -198,7 +198,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.flext_meltano_version()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "Version check failed" in result.error
 
     def test_flext_meltano_install_exception(self) -> None:
         """Test flext_meltano_install method with exception."""
@@ -209,7 +209,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.flext_meltano_install()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "placeholder error" in result.error
 
     def test_flext_meltano_invoke_exception(self) -> None:
         """Test flext_meltano_invoke method with exception."""
@@ -220,7 +220,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.flext_meltano_invoke("test-plugin", "arg1", "arg2")
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "Plugin invocation failed" in result.error
 
     def test_run_cli_exception(self) -> None:
         """Test run_cli method with exception."""
@@ -243,4 +243,4 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.create_flext_cli()
             assert result.is_failure
             assert result.error is not None
-            assert "placeholder" in result.error
+            assert "CLI creation failed" in result.error

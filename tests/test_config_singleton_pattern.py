@@ -30,10 +30,10 @@ class TestFlextMeltanoConfigSingletonPattern:
         assert config.log_level == "ERROR"
 
     def test_create_with_overrides(self) -> None:
-        """Test create_with_overrides method."""
-        result = FlextMeltanoConfig.create_with_overrides(
-            project_root="/test/project",
+        """Test create_for_environment method with overrides."""
+        result = FlextMeltanoConfig.create_for_environment(
             environment="staging",
+            project_root="/test/project",
             meltano_version="3.10.0",
         )
 
@@ -45,8 +45,8 @@ class TestFlextMeltanoConfigSingletonPattern:
         assert config.meltano_version == "3.10.0"
 
     def test_create_for_environment_with_overrides(self) -> None:
-        """Test create_for_environment_with_overrides method."""
-        result = FlextMeltanoConfig.create_for_environment_with_overrides(
+        """Test create_for_environment method with overrides."""
+        result = FlextMeltanoConfig.create_for_environment(
             environment="production",
             project_root="/prod/project",
             log_level="WARNING",
@@ -122,7 +122,7 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_error_handling_invalid_environment(self) -> None:
         """Test error handling for invalid environment."""
-        result = FlextMeltanoConfig.create_for_environment_with_overrides(
+        result = FlextMeltanoConfig.create_for_environment(
             environment="invalid_env", project_root="/test"
         )
 
@@ -131,8 +131,10 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_error_handling_invalid_overrides(self) -> None:
         """Test error handling for invalid override values."""
-        result = FlextMeltanoConfig.create_with_overrides(
-            project_root="/test", invalid_field="invalid_value"
+        result = FlextMeltanoConfig.create_for_environment(
+            environment="development",
+            project_root="/test",
+            invalid_field="invalid_value"
         )
 
         # Should succeed but ignore invalid fields
