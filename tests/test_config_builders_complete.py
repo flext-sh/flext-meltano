@@ -1,5 +1,7 @@
 """FLEXT Meltano Config Builders Complete Tests - Comprehensive testing patterns."""
 
+from collections.abc import Callable
+
 from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 
@@ -151,6 +153,7 @@ class TestFlextMeltanoConfigBuildersComplete:
 
         # Test metadata structure
         metadata = config["metadata"]
+        assert isinstance(metadata, dict), "Metadata should be a dict"
         self.test_assertions.assert_equals(
             actual=metadata["created_by"],
             expected="flext-meltano",
@@ -264,6 +267,7 @@ class TestFlextMeltanoConfigBuildersComplete:
 
         # Test metadata structure
         metadata = config["metadata"]
+        assert isinstance(metadata, dict), "Metadata should be a dict"
         self.test_assertions.assert_equals(
             actual=metadata["created_by"],
             expected="flext-meltano",
@@ -449,6 +453,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         # Check metadata consistency
         for config in [dbt_config, tap_config, target_config]:
             metadata = config["metadata"]
+            assert isinstance(metadata, dict), "Metadata should be a dict"
             self.test_assertions.assert_equals(
                 actual=metadata["created_by"],
                 expected="flext-meltano",
@@ -508,7 +513,7 @@ class TestFlextMeltanoConfigBuildersComplete:
     def test_type_safety_and_constraints(self) -> None:
         """Test type safety and constraints using flext_tests."""
         # Test that all methods return proper FlextResult types
-        methods_to_test = [
+        methods_to_test: list[Callable[[], object]] = [
             lambda: FlextMeltanoConfigBuilders().create_dbt_config("test_project"),
             lambda: FlextMeltanoConfigBuilders().create_singer_tap_config("test_tap"),
             lambda: FlextMeltanoConfigBuilders().create_singer_target_config(

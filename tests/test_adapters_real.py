@@ -112,8 +112,10 @@ class TestFlextMeltanoAdapterReal:
                 project = init_result.value
 
                 # Try to add a common plugin
+                project_root = project["root"]
+                assert isinstance(project_root, str), "Project root should be a string"
                 plugin_result = self.adapter.add_plugin(
-                    project_dir=Path(project["root"]),
+                    project_dir=Path(project_root),
                     plugin_type="extractors",
                     plugin_name="tap-csv",
                 )

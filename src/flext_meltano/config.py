@@ -382,17 +382,15 @@ class FlextMeltanoConfig(FlextConfig):
             if "run_mode" in filtered_kwargs:
                 config_data["run_mode"] = cls.RunMode(str(filtered_kwargs["run_mode"]))
 
-            # Apply all other valid kwargs directly
+            # Apply all other valid kwargs with proper type handling
             excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
-            config_data.update(
-                {
-                    key: value
-                    for key, value in filtered_kwargs.items()
-                    if key not in excluded_keys
-                }
-            )
+            config_data.update({
+                key: value
+                for key, value in filtered_kwargs.items()
+                if key not in excluded_keys
+            })
 
-            config = cls(**config_data)
+            config = cls.model_validate(config_data)
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
         except Exception as e:

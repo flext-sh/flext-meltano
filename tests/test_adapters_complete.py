@@ -216,8 +216,10 @@ class TestFlextMeltanoAdapterComplete:
 
             if init_result.success:
                 project = init_result.value
+                project_root = project["root"]
+                assert isinstance(project_root, str), "Project root should be a string"
                 plugin_result = self.adapter.add_plugin(
-                    project_dir=Path(project["root"]),
+                    project_dir=Path(project_root),
                     plugin_type="extractors",
                     plugin_name="tap-csv",
                 )
@@ -410,6 +412,7 @@ class TestFlextMeltanoAdapterComplete:
     def test_plugin_discovery_get_plugin_info(self) -> None:
         """Test PluginDiscovery get_plugin_info using flext_tests."""
         plugin_discovery = self.adapter.plugin_discovery()
+        assert hasattr(plugin_discovery, 'get_plugin_info'), "Plugin discovery should have get_plugin_info method"
 
         # Test with invalid plugin (should handle error gracefully)
         result = plugin_discovery.get_plugin_info(

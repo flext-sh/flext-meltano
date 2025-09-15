@@ -13,6 +13,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from flext_core import FlextResult
 from flext_tests import FlextTestsMatchers
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
@@ -355,11 +356,14 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
+        assert isinstance(config, dict)
 
         assert config["project_id"] == "analytics_project"
         assert config["project_name"] == "Analytics Project"
-        assert "extractors" in config["plugins"]
-        assert "loaders" in config["plugins"]
+        plugins = config["plugins"]
+        assert isinstance(plugins, dict)
+        assert "extractors" in plugins
+        assert "loaders" in plugins
 
     def test_create_meltano_config_environments_structure(self) -> None:
         """Test meltano configuration has proper environments structure."""
@@ -397,8 +401,10 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
 
         # Essential plugin types
         plugin_types = ["extractors", "loaders", "transformers", "orchestrators"]
+        plugins = config["plugins"]
+        assert isinstance(plugins, dict)
         for plugin_type in plugin_types:
-            assert plugin_type in config["plugins"]
+            assert plugin_type in plugins
 
     def test_meltano_config_metadata(self) -> None:
         """Test meltano configuration has proper metadata."""
@@ -408,9 +414,11 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
+        assert isinstance(config, dict)
 
         assert "metadata" in config
         metadata = config["metadata"]
+        assert isinstance(metadata, dict)
         assert metadata["created_by"] == "flext-meltano"
         assert "created_at" in metadata
         assert "flext_version" in metadata
@@ -479,8 +487,10 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         # Plugin configurations should be valid
         assert tap_config["name"] == "tap-postgres"
         assert target_config["name"] == "target-postgres"
-        assert "extractors" in meltano_config["plugins"]
-        assert "loaders" in meltano_config["plugins"]
+        meltano_plugins = meltano_config.get("plugins", {})
+        assert isinstance(meltano_plugins, dict)
+        assert "extractors" in meltano_plugins
+        assert "loaders" in meltano_plugins
 
     def test_configuration_builders_performance(self, benchmark: object) -> None:
         """Test configuration builders performance."""
@@ -493,12 +503,13 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
             FlextMeltanoConfigBuilders().create_meltano_config("perf_project")
 
         # All configurations should complete quickly
-        benchmark(create_all_configs)
+        if callable(benchmark):
+            benchmark(create_all_configs)
 
     def test_concurrent_configuration_building(self) -> None:
         """Test concurrent configuration building doesn't interfere."""
 
-        def create_config(config_num: int) -> object:
+        def create_config(config_num: int) -> FlextResult[dict[str, object]]:
             return FlextMeltanoConfigBuilders().create_dbt_config(
                 f"project_{config_num}"
             )
@@ -512,6 +523,8 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
 
         # All should succeed
         for result in results:
+            assert hasattr(result, "is_success"), "Result must have is_success attribute"
+            assert hasattr(result, "value"), "Result must have value attribute"
             FlextTestsMatchers.assert_result_success(result)
             assert isinstance(result.value, dict)
             assert "name" in result.value
@@ -565,7 +578,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
             ("create_meltano_config", ("test_meltano",)),
         ],
     )
-    def test_builder_methods_parametrized(self, method_name: str, args: tuple) -> None:
+    def test_builder_methods_parametrized(self, method_name: str, args: tuple[str, ...]) -> None:
         """Test builder methods with parametrized inputs."""
         builder = FlextMeltanoConfigBuilders()
         method = getattr(builder, method_name)

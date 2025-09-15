@@ -85,6 +85,7 @@ class TestFlextMeltanoConfigSingletonPattern:
         result = config.apply_overrides(environment="production")
 
         assert result.is_failure
+        assert result.error is not None
         assert "sealed" in result.error.lower()
 
     def test_get_meltano_environment_variables(self) -> None:
@@ -127,6 +128,7 @@ class TestFlextMeltanoConfigSingletonPattern:
         )
 
         assert result.is_failure
+        assert result.error is not None
         assert "Invalid environment" in result.error
 
     def test_error_handling_invalid_overrides(self) -> None:
@@ -144,7 +146,7 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_metadata_tracking_overrides(self) -> None:
         """Test that metadata tracks applied overrides."""
-        config = FlextMeltanoConfig(project_root="/test")
+        config = FlextMeltanoConfig(project_root=Path("/test"))
 
         # Apply overrides
         config.apply_overrides(environment="production", log_level="ERROR")
