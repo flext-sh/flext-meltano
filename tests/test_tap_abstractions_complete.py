@@ -39,7 +39,7 @@ class TestFlextTapAbstractionsComplete:
             "database": "test_db",
         }
         stream_config: dict[str, object] = {"users": {"selected": True}}
-        
+
         config = TapConfig(
             tap_type="tap-postgres",
             connection_config=connection_config,
@@ -68,7 +68,7 @@ class TestFlextTapAbstractionsComplete:
             "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
-        
+
         stream_def = StreamDefinition(
             stream_name="users",
             stream_schema=stream_schema,

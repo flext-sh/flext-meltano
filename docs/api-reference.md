@@ -1,8 +1,10 @@
 # flext-meltano API Reference
 
-**Complete API documentation for FLEXT ecosystem ELT foundation library**
+**Complete API documentation for flext-meltano v0.9.0**
 
-> **⚠️ COMPLIANCE STATUS**: Direct meltano.core imports in adapters.py require abstraction layer for full FLEXT compliance.
+**Last Updated**: 2025-09-17
+
+> **⚠️ STATUS**: Development phase - Foundation patterns implemented, direct imports require abstraction
 
 ---
 

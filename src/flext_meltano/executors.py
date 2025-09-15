@@ -37,20 +37,21 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     model_config["frozen"] = False  # Allow attribute modification
 
     # Define fields as Pydantic model fields with proper initialization
-    project_root: Path
+    project_root: Path | None = None
     _bridge: MeltanoBridge | None = None
-    meltano_adapter: FlextMeltanoAdapter
-    logger: FlextLogger
+    meltano_adapter: FlextMeltanoAdapter | None = None
+    logger: FlextLogger | None = None
 
     def __init__(self, project_root: Path | None = None, **_data: object) -> None:
         """Initialize executor with project root and dependencies."""
-        # Initialize base class first
-        super().__init__()
-
-        # Set instance attributes using object.__setattr__ for frozen fields
-        object.__setattr__(self, "project_root", project_root or Path.cwd())
-        object.__setattr__(self, "meltano_adapter", FlextMeltanoAdapter())
-        object.__setattr__(self, "logger", FlextLogger("FlextMeltanoExecutor"))
+        # Initialize base class with proper data
+        init_data = {
+            "project_root": project_root or Path.cwd(),
+            "meltano_adapter": FlextMeltanoAdapter(),
+            "logger": FlextLogger("FlextMeltanoExecutor"),
+            **_data
+        }
+        super().__init__(**init_data)
 
     @property
     def bridge(self) -> MeltanoBridge:
@@ -59,6 +60,25 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             self._bridge = MeltanoBridge()
         # At this point, self._bridge is guaranteed to be MeltanoBridge
         return self._bridge
+
+    @property
+    def project_root_safe(self) -> Path:
+        """Get project root, ensuring it's never None."""
+        return self.project_root if self.project_root is not None else Path.cwd()
+
+    @property
+    def meltano_adapter_safe(self) -> FlextMeltanoAdapter:
+        """Get meltano adapter, ensuring it's never None."""
+        if self.meltano_adapter is None:
+            object.__setattr__(self, "meltano_adapter", FlextMeltanoAdapter())
+        return cast("FlextMeltanoAdapter", self.meltano_adapter)
+
+    @property
+    def logger_safe(self) -> FlextLogger:
+        """Get logger, ensuring it's never None."""
+        if self.logger is None:
+            object.__setattr__(self, "logger", FlextLogger("FlextMeltanoExecutor"))
+        return cast("FlextLogger", self.logger)
 
     def execute(
         self, command: str | None = None
