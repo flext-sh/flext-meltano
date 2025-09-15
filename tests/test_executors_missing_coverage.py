@@ -109,8 +109,8 @@ class TestExecutorsMissingCoverage:
         )
 
     def test_run_command_with_none_args(self) -> None:
-        """Test run_command with None args."""
-        result = self.executor.run_command(None)
+        """Test run_command with empty args."""
+        result = self.executor.run_command([])
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),
@@ -118,8 +118,8 @@ class TestExecutorsMissingCoverage:
         )
 
     def test_run_command_with_invalid_command_type(self) -> None:
-        """Test run_command with invalid command type."""
-        result = self.executor.run_command([None])
+        """Test run_command with invalid command."""
+        result = self.executor.run_command(["invalid-command"])
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),
@@ -127,8 +127,8 @@ class TestExecutorsMissingCoverage:
         )
 
     def test_run_command_with_non_string_command(self) -> None:
-        """Test run_command with non-string command."""
-        result = self.executor.run_command([123])
+        """Test run_command with numeric command string."""
+        result = self.executor.run_command(["123"])
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),

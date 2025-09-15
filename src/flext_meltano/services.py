@@ -53,10 +53,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         "dbt": "transformer",
     }
 
-    # Class variable annotations for cached service classes
-    _tap_service_class: ClassVar[type[FlextMeltanoService] | None] = None
-    _target_service_class: ClassVar[type[FlextMeltanoService] | None] = None
-    _dbt_service_class: ClassVar[type[FlextMeltanoService] | None] = None
 
     def __init__(self, *, service_type: str = "tap", **data: object) -> None:
         """Initialize unified Meltano service using FlextConfig."""
@@ -79,45 +75,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             if value is not None:
                 setattr(self, field, value)
 
-    # Ultra-simple aliases for test compatibility - create classes once
-    @property
-    def tap_service(self) -> type[FlextMeltanoService]:
-        """Ultra-simple alias for test compatibility - TapService class."""
-        # Use cached class or create it
-        if FlextMeltanoService._tap_service_class is None:
-
-            class TapService(FlextMeltanoService):
-                pass
-
-            TapService.__name__ = "TapService"
-            FlextMeltanoService._tap_service_class = TapService
-        return FlextMeltanoService._tap_service_class
-
-    @property
-    def target_service(self) -> type[FlextMeltanoService]:
-        """Ultra-simple alias for test compatibility - TargetService class."""
-        # Use cached class or create it
-        if FlextMeltanoService._target_service_class is None:
-
-            class TargetService(FlextMeltanoService):
-                pass
-
-            TargetService.__name__ = "TargetService"
-            FlextMeltanoService._target_service_class = TargetService
-        return FlextMeltanoService._target_service_class
-
-    @property
-    def dbt_service(self) -> type[FlextMeltanoService]:
-        """Ultra-simple alias for test compatibility - DbtService class."""
-        # Use cached class or create it
-        if FlextMeltanoService._dbt_service_class is None:
-
-            class DbtService(FlextMeltanoService):
-                pass
-
-            DbtService.__name__ = "DbtService"
-            FlextMeltanoService._dbt_service_class = DbtService
-        return FlextMeltanoService._dbt_service_class
 
     def execute(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute service operation based on type - UNIFIED IMPLEMENTATION."""
@@ -289,11 +246,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         return self.get_default_config()
 
-    # Compatibility alias for test compatibility
-    @property
-    def adapter(self) -> FlextDomainService[FlextTypes.Core.Dict] | None:
-        """Adapter property alias for test compatibility."""
-        return self
 
     # Consolidated Service Factory - ZERO DUPLICATION using flext-core patterns
     @staticmethod

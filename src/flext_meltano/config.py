@@ -384,11 +384,13 @@ class FlextMeltanoConfig(FlextConfig):
 
             # Apply all other valid kwargs with proper type handling
             excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
-            config_data.update({
-                key: value
-                for key, value in filtered_kwargs.items()
-                if key not in excluded_keys
-            })
+            config_data.update(
+                {
+                    key: value
+                    for key, value in filtered_kwargs.items()
+                    if key not in excluded_keys
+                }
+            )
 
             config = cls.model_validate(config_data)
             return FlextResult["FlextMeltanoConfig"].ok(config)

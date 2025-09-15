@@ -17,7 +17,9 @@ class TestExamples:
 
     def _import_example_module(self) -> types.ModuleType:
         """Import the example module dynamically."""
-        example_path = Path(__file__).parent.parent / "examples" / "01_simple_working.py"
+        example_path = (
+            Path(__file__).parent.parent / "examples" / "01_simple_working.py"
+        )
         spec = importlib.util.spec_from_file_location("example_module", example_path)
         if spec is None or spec.loader is None:
             pytest.skip("Could not load example module")
@@ -72,10 +74,11 @@ class TestExamples:
         """Test main execution path with mocked functions."""
         example_module = self._import_example_module()
 
-        with patch.object(example_module, "simple_bridge_example") as mock_bridge, \
-             patch.object(example_module, "simple_executor_example") as mock_executor, \
-             patch.object(example_module, "simple_config_example") as mock_config:
-
+        with (
+            patch.object(example_module, "simple_bridge_example") as mock_bridge,
+            patch.object(example_module, "simple_executor_example") as mock_executor,
+            patch.object(example_module, "simple_config_example") as mock_config,
+        ):
             # Manually call main logic with mocks
             try:
                 mock_bridge()

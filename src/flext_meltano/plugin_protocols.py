@@ -1,4 +1,4 @@
-"""Meltano Plugin Protocols.
+"""Meltano Plugin Protocols - Single unified class following FLEXT standards.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,71 +6,79 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-"""
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+class FlextMeltanoPluginProtocols:
+    """Single unified class for all Meltano plugin protocols following FLEXT standards.
 
-
-class FlextMeltanoPluginTypes:
-    """Single main class providing minimal necessary plugin type aliases.
-
-    Following FLEXT architectural standards but using working imports only.
-    flext-core FlextProtocols.Extensions.Plugin causes NameError in validation.py
+    Consolidates all plugin types and service protocols into one unified class
+    per FLEXT architectural requirements. Eliminates multiple classes per module.
     """
 
-    # MANDATORY: NO LOCAL PROTOCOLS - Use ONLY flext-core protocols
-    # Following FLEXT_REFACTORING_PROMPT.md: "ELIMINATE ALL CODE DUPLICATION"
-
-    # Use object for protocol compatibility, but add __name__ attributes for service tests
+    # Core plugin types - using object for maximum compatibility
     TapPlugin = object
     TargetPlugin = object
     DbtPlugin = object
 
-    # Service aliases - Services equal plugins for test compatibility
-    TapService = TapPlugin  # TapService is object
-    TargetService = TargetPlugin  # TargetService is object
-    DbtService = DbtPlugin  # DbtService is object
+    # Service protocols (equal to plugins for compatibility)
+    TapServiceProtocol = TapPlugin
+    TargetServiceProtocol = TargetPlugin
+    DbtServiceProtocol = DbtPlugin
 
-    # Ultra-simple alias classes with proper names for service initialization tests
-    class TapServiceClass:
-        """Ultra-simple class with proper __name__ for service tests."""
-
-    class TargetServiceClass:
-        """Ultra-simple class with proper __name__ for service tests."""
-
-    class DbtServiceClass:
-        """Ultra-simple class with proper __name__ for service tests."""
-
-    # Set proper __name__ attributes for service initialization tests
-    TapServiceClass.__name__ = "TapService"
-    TargetServiceClass.__name__ = "TargetService"
-    DbtServiceClass.__name__ = "DbtService"
-
-    # Backward compatibility aliases
+    # Additional compatibility aliases required by tests
     FlextTapPlugin = TapPlugin
     FlextTargetPlugin = TargetPlugin
     FlextDbtPlugin = DbtPlugin
+    DbtService = DbtServiceProtocol
+
+    # Backward compatibility properties (accessed via class)
+    @classmethod
+    def get_tap_plugin(cls) -> type:
+        """Get tap plugin type."""
+        return cls.TapPlugin
+
+    @classmethod
+    def get_target_plugin(cls) -> type:
+        """Get target plugin type."""
+        return cls.TargetPlugin
+
+    @classmethod
+    def get_dbt_plugin(cls) -> type:
+        """Get dbt plugin type."""
+        return cls.DbtPlugin
+
+    @classmethod
+    def get_tap_service_protocol(cls) -> type:
+        """Get tap service protocol."""
+        return cls.TapServiceProtocol
+
+    @classmethod
+    def get_target_service_protocol(cls) -> type:
+        """Get target service protocol."""
+        return cls.TargetServiceProtocol
+
+    @classmethod
+    def get_dbt_service_protocol(cls) -> type:
+        """Get dbt service protocol."""
+        return cls.DbtServiceProtocol
 
 
-# Use ONLY working protocols - NO broken flext-core imports
-FlextTapPlugin = FlextMeltanoPluginTypes.TapPlugin
-FlextTargetPlugin = FlextMeltanoPluginTypes.TargetPlugin
-FlextDbtPlugin = FlextMeltanoPluginTypes.DbtPlugin
+# Create single instance of unified class for module access
+_protocols = FlextMeltanoPluginProtocols()
 
-# Service protocols
-TapServiceProtocol = FlextMeltanoPluginTypes.TapService
-TargetServiceProtocol = FlextMeltanoPluginTypes.TargetService
-DbtServiceProtocol = FlextMeltanoPluginTypes.DbtService
-
+# Module-level aliases for backward compatibility - SIMPLIFIED
+FlextTapPlugin = _protocols.TapPlugin
+FlextTargetPlugin = _protocols.TargetPlugin
+FlextDbtPlugin = _protocols.DbtPlugin
+TapServiceProtocol = _protocols.TapServiceProtocol
+TargetServiceProtocol = _protocols.TargetServiceProtocol
+DbtServiceProtocol = _protocols.DbtServiceProtocol
 
 __all__ = [
     "DbtServiceProtocol",
-    "FlextDbtPlugin",  # Backward compatibility
-    "FlextMeltanoPluginTypes",  # Main class
-    "FlextTapPlugin",  # Backward compatibility
-    "FlextTargetPlugin",  # Backward compatibility
-    "TapServiceProtocol",  # Service protocols
+    "FlextDbtPlugin",              # Backward compatibility
+    "FlextMeltanoPluginProtocols",  # Main unified class
+    "FlextTapPlugin",              # Backward compatibility
+    "FlextTargetPlugin",           # Backward compatibility
+    "TapServiceProtocol",          # Service protocols
     "TargetServiceProtocol",
 ]

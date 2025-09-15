@@ -528,6 +528,8 @@ class TestFlextMeltanoConfigBuildersComplete:
                 message=f"Method {method} should return FlextResult",
             )
 
+            # Type assertion for FlextResult
+            assert isinstance(result, FlextResult), "Result should be FlextResult"
             if result.is_success:
                 config = result.unwrap()
                 self.test_assertions.assert_true(

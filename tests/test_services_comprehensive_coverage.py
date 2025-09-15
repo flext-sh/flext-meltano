@@ -402,6 +402,7 @@ class TestServiceIntegration:
 
         if tap_result.is_success:
             tap_service = tap_result.data
+            assert tap_service is not None
 
             # Test service validation
             validate_result = tap_service.validate_service()
@@ -423,6 +424,7 @@ class TestServiceIntegration:
 
         if target_result.is_success:
             target_service = target_result.data
+            assert target_service is not None
 
             # Test service validation
             validate_result = target_service.validate_service()
@@ -440,6 +442,7 @@ class TestServiceIntegration:
 
         if dbt_result.is_success:
             dbt_service = dbt_result.data
+            assert dbt_service is not None
 
             # Test getting profiles config
             profiles_result = dbt_service.get_profiles_config()
@@ -545,6 +548,7 @@ class TestServiceErrorHandling:
 
         if tap_result.is_success:
             tap_service = tap_result.data
+            assert tap_service is not None
 
             # Test methods that might fail gracefully
             methods_to_test = [
