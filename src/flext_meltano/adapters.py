@@ -662,79 +662,7 @@ class FlextMeltanoAdapter:
             {"dbt_status": "ready", "models": []}
         )
 
-    # =================================================================
-    # COMPATIBILITY ALIASES - Simple aliases for test compatibility
-    # =================================================================
-
-    @classmethod
-    def adapt_plugin(
-        cls, plugin_config: FlextTypes.Core.Dict
-    ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Simple alias for plugin adaptation - returns adapted config directly."""
-        # Use SOURCE OF TRUTH - return adapted plugin config with required fields
-        adapted_config = dict(plugin_config)
-        adapted_config.update(
-            {
-                "type": plugin_config.get("type", "extractors"),
-                "name": plugin_config.get("name", "unknown"),
-                "namespace": plugin_config.get(
-                    "namespace",
-                    str(plugin_config.get("name", "unknown")).replace("-", "_"),
-                ),
-                "pip_url": plugin_config.get(
-                    "pip_url", plugin_config.get("name", "unknown")
-                ),
-            }
-        )
-        return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
-
-    @classmethod
-    def adapt_project_config(
-        cls, project_config: FlextTypes.Core.Dict
-    ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Simple alias for project config adaptation."""
-        # Use SOURCE OF TRUTH - return enhanced config with required fields
-        enhanced_config = dict(project_config)
-        enhanced_config.update(
-            {
-                "project_id": project_config.get("name", "default_project"),
-                "version": 1,
-                "environments": enhanced_config.get("environments", [{"name": "dev"}]),
-            }
-        )
-        return FlextResult[FlextTypes.Core.Dict].ok(enhanced_config)
-
-    # =========================================================================
-    # ULTRA-SIMPLE ALIASES FOR TEST COMPATIBILITY
-    # =========================================================================
-
-    def bridge(self) -> object:
-        """Ultra-simple alias for test compatibility - Bridge functionality."""
-        # Return a simple object that can be used in independence tests
-        return object()
-
-    def project_manager(self) -> object:
-        """Ultra-simple alias for test compatibility - ProjectManager functionality."""
-        # Return a simple object that can be used in independence tests
-        return object()
-
-    def plugin_discovery(self) -> object:
-        """Ultra-simple alias for test compatibility - PluginDiscovery functionality."""
-
-        # Return a simple class with get_plugin_info method for test compatibility
-        class MockPluginDiscovery:
-            def get_plugin_info(
-                self, plugin_name: str, plugin_type: str = "extractor"
-            ) -> FlextResult[dict[str, object]]:
-                if "nonexistent" in plugin_name:
-                    return FlextResult[dict[str, object]].fail(
-                        "Failed to get plugin info: Plugin not found"
-                    )
-                return FlextResult[dict[str, object]].ok(
-                    {"name": plugin_name, "type": plugin_type, "status": "available"}
-                )
-
-        return MockPluginDiscovery()
+    # Legitimate methods continue below
 
     def _create_project_structure(self, project_path: Path, project_name: str) -> None:
         """Create basic Meltano project structure manually.
@@ -852,6 +780,67 @@ Thumbs.db
 
         gitignore_path = project_path / ".gitignore"
         gitignore_path.write_text(gitignore_content)
+
+    # =========================================================================
+    # STATIC ADAPTER METHODS - Required by test API compatibility (FLEXT standards)
+    # =========================================================================
+
+    @staticmethod
+    def adapt_project_config(config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+        """Adapt project configuration with required fields."""
+        try:
+            adapted_config = dict(config)
+
+            # Add required fields if missing
+            if "project_id" not in adapted_config:
+                adapted_config["project_id"] = f"flext-project-{FlextUtilities.Generators.generate_uuid()[:8]}"
+
+            if "version" not in adapted_config:
+                adapted_config["version"] = 1
+
+            if "default_environment" not in adapted_config:
+                adapted_config["default_environment"] = "dev"
+
+            # Ensure plugins structure exists
+            if "plugins" not in adapted_config:
+                adapted_config["plugins"] = {"extractors": [], "loaders": [], "transformers": []}
+
+            return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
+
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to adapt project config: {e}")
+
+    @staticmethod
+    def adapt_plugin(plugin_data: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+        """Adapt plugin data with required fields."""
+        try:
+            adapted_plugin = dict(plugin_data)
+
+            # Add name if missing
+            if "name" not in adapted_plugin:
+                plugin_type = str(adapted_plugin.get("type", "plugin"))
+                pip_url = str(adapted_plugin.get("pip_url", "unknown"))
+                adapted_plugin["name"] = f"{plugin_type}-{pip_url.split('-')[-1] if '-' in pip_url else pip_url}"
+
+            # Add namespace if missing
+            if "namespace" not in adapted_plugin:
+                name = str(adapted_plugin.get("name", "plugin"))
+                adapted_plugin["namespace"] = name.replace("-", "_")
+
+            # Add executable if missing
+            if "executable" not in adapted_plugin:
+                name = str(adapted_plugin.get("name", "plugin"))
+                adapted_plugin["executable"] = name
+
+            return FlextResult[FlextTypes.Core.Dict].ok(adapted_plugin)
+
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to adapt plugin: {e}")
+
+    def plugin_discovery(self) -> object:
+        """Get plugin discovery interface for compatibility."""
+        # Return self to provide plugin discovery functionality
+        return self
 
 
 __all__ = [

@@ -9,7 +9,7 @@ import flext_meltano.plugin_protocols as protocols_module
 from flext_meltano.plugin_protocols import (
     DbtServiceProtocol,
     FlextDbtPlugin,
-    FlextMeltanoPluginTypes,
+    FlextMeltanoPluginProtocols,  # Updated unified class name
     FlextTapPlugin,
     FlextTargetPlugin,
     TapServiceProtocol,
@@ -17,16 +17,16 @@ from flext_meltano.plugin_protocols import (
 )
 
 
-class TestFlextMeltanoPluginTypesBasic(TestCase):
-    """Basic functionality tests for FlextMeltanoPluginTypes."""
+class TestFlextMeltanoPluginProtocolsBasic(TestCase):
+    """Basic functionality tests for FlextMeltanoPluginProtocols."""
 
     def test_class_exists(self) -> None:
-        """Test FlextMeltanoPluginTypes class exists."""
-        assert hasattr(FlextMeltanoPluginTypes, "__name__")
-        assert FlextMeltanoPluginTypes.__name__ == "FlextMeltanoPluginTypes"
+        """Test FlextMeltanoPluginProtocols class exists."""
+        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
+        assert FlextMeltanoPluginProtocols.__name__ == "FlextMeltanoPluginProtocols"
 
     def test_has_plugin_type_definitions(self) -> None:
-        """Test FlextMeltanoPluginTypes has plugin type definitions."""
+        """Test FlextMeltanoPluginProtocols has plugin type definitions."""
         expected_plugin_types = [
             "TapPlugin",
             "TargetPlugin",
@@ -37,13 +37,13 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
         ]
 
         for plugin_type in expected_plugin_types:
-            assert hasattr(FlextMeltanoPluginTypes, plugin_type), (
-                f"FlextMeltanoPluginTypes missing plugin type: {plugin_type}"
+            assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
+                f"FlextMeltanoPluginProtocols missing plugin type: {plugin_type}"
             )
 
     def test_tap_plugin_protocol(self) -> None:
         """Test TapPlugin protocol definition."""
-        protocol = FlextMeltanoPluginTypes.TapPlugin
+        protocol = FlextMeltanoPluginProtocols.TapPlugin
 
         # Should be a class or type
         assert protocol is not None
@@ -52,7 +52,7 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
 
     def test_target_plugin_protocol(self) -> None:
         """Test TargetPlugin protocol definition."""
-        protocol = FlextMeltanoPluginTypes.TargetPlugin
+        protocol = FlextMeltanoPluginProtocols.TargetPlugin
 
         # Should be a class or type
         assert protocol is not None
@@ -61,7 +61,7 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
 
     def test_dbt_plugin_protocol(self) -> None:
         """Test DbtPlugin protocol definition."""
-        protocol = FlextMeltanoPluginTypes.DbtPlugin
+        protocol = FlextMeltanoPluginProtocols.DbtPlugin
 
         # Should be a class or type
         assert protocol is not None
@@ -71,40 +71,40 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
     def test_service_protocol_aliases(self) -> None:
         """Test service protocol aliases exist."""
         # TapService should alias TapPlugin
-        assert FlextMeltanoPluginTypes.TapService is FlextMeltanoPluginTypes.TapPlugin
+        assert FlextMeltanoPluginProtocols.TapService is FlextMeltanoPluginProtocols.TapPlugin
 
         # TargetService should alias TargetPlugin
         assert (
-            FlextMeltanoPluginTypes.TargetService
-            is FlextMeltanoPluginTypes.TargetPlugin
+            FlextMeltanoPluginProtocols.TargetService
+            is FlextMeltanoPluginProtocols.TargetPlugin
         )
 
         # DbtService should alias DbtPlugin
-        assert FlextMeltanoPluginTypes.DbtService is FlextMeltanoPluginTypes.DbtPlugin
+        assert FlextMeltanoPluginProtocols.DbtService is FlextMeltanoPluginProtocols.DbtPlugin
 
     def test_backward_compatibility_aliases(self) -> None:
         """Test backward compatibility aliases exist."""
         # FlextTapPlugin should alias TapPlugin
         assert (
-            FlextMeltanoPluginTypes.FlextTapPlugin is FlextMeltanoPluginTypes.TapPlugin
+            FlextMeltanoPluginProtocols.FlextTapPlugin is FlextMeltanoPluginProtocols.TapPlugin
         )
 
         # FlextTargetPlugin should alias TargetPlugin
         assert (
-            FlextMeltanoPluginTypes.FlextTargetPlugin
-            is FlextMeltanoPluginTypes.TargetPlugin
+            FlextMeltanoPluginProtocols.FlextTargetPlugin
+            is FlextMeltanoPluginProtocols.TargetPlugin
         )
 
         # FlextDbtPlugin should alias DbtPlugin
         assert (
-            FlextMeltanoPluginTypes.FlextDbtPlugin is FlextMeltanoPluginTypes.DbtPlugin
+            FlextMeltanoPluginProtocols.FlextDbtPlugin is FlextMeltanoPluginProtocols.DbtPlugin
         )
 
     def test_nested_types_structure(self) -> None:
         """Test nested types structure exists."""
         # Should have proper class structure
-        assert hasattr(FlextMeltanoPluginTypes, "__module__")
-        assert FlextMeltanoPluginTypes.__module__ == "flext_meltano.plugin_protocols"
+        assert hasattr(FlextMeltanoPluginProtocols, "__module__")
+        assert FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
 
     def test_module_level_aliases(self) -> None:
         """Test module-level backward compatibility aliases."""
@@ -119,15 +119,15 @@ class TestFlextMeltanoPluginTypesBasic(TestCase):
     def test_import_works(self) -> None:
         """Test importing from module works."""
         # Should be importable without errors
-        assert FlextMeltanoPluginTypes is not None
+        assert FlextMeltanoPluginProtocols is not None
 
         # Should have expected structure
-        assert hasattr(FlextMeltanoPluginTypes, "__name__")
+        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
 
     def test_class_documentation(self) -> None:
         """Test class has proper documentation."""
         # Should have class docstring
-        assert FlextMeltanoPluginTypes.__doc__ is not None
+        assert FlextMeltanoPluginProtocols.__doc__ is not None
 
         # Should have module docstring
         assert protocols_module.__doc__ is not None

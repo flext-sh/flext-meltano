@@ -15,7 +15,6 @@ from flext_core import FlextResult, FlextUtilities
 
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -239,8 +238,8 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
     def test_save_yaml_config(self) -> None:
         """Test save_yaml_config method."""
-        # Create proper Meltano config for testing
-        config: FlextMeltanoTypes.DBT.ProjectConfig = {
+        # Create proper Meltano config for testing - cast to object dict
+        config_dict: dict[str, object] = {
             "version": 1,
             "project_id": "test",
             "plugins": {"extractors": [], "loaders": [], "transformers": []},
@@ -249,7 +248,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         with tempfile.TemporaryDirectory() as temp_dir:
             target_path = Path(temp_dir) / "test_config.yml"
 
-            result = FlextMeltanoUtilities.write_meltano_yml(config, target_path)
+            result = FlextMeltanoUtilities.write_meltano_yml(config_dict, target_path)
 
             assert isinstance(result, FlextResult)
             if result.success:
@@ -261,7 +260,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_write_meltano_yml(self) -> None:
         """Test write_meltano_yml method."""
         # Create proper Meltano config for testing
-        config: FlextMeltanoTypes.DBT.ProjectConfig = {
+        config_dict: dict[str, object] = {
             "version": 1,
             "project_id": "test-project",
             "plugins": {"extractors": [], "loaders": [], "transformers": []},
@@ -270,7 +269,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         with tempfile.TemporaryDirectory() as temp_dir:
             target_path = Path(temp_dir) / "meltano.yml"
 
-            result = FlextMeltanoUtilities.write_meltano_yml(config, target_path)
+            result = FlextMeltanoUtilities.write_meltano_yml(config_dict, target_path)
 
             assert isinstance(result, FlextResult)
             if result.success:

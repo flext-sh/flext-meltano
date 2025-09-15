@@ -7,6 +7,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+
 from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 
@@ -121,7 +122,7 @@ class TestConfigBuildersComprehensiveCoverage:
         base_config = base_result.unwrap()
 
         # Create plugin config
-        plugin_config = {
+        plugin_config: dict[str, object] = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -134,6 +135,9 @@ class TestConfigBuildersComprehensiveCoverage:
         assert result.success
         updated_config = result.unwrap()
 
+        assert isinstance(updated_config, dict)
+        assert isinstance(updated_config["plugins"], dict)
+        assert isinstance(updated_config["plugins"]["extractors"], list)
         assert len(updated_config["plugins"]["extractors"]) == 1
         assert updated_config["plugins"]["extractors"][0]["name"] == "tap-csv"
 
@@ -147,7 +151,7 @@ class TestConfigBuildersComprehensiveCoverage:
         base_config = base_result.unwrap()
 
         # Create plugin config
-        plugin_config = {
+        plugin_config: dict[str, object] = {
             "name": "target-jsonl",
             "namespace": "target_jsonl",
             "pip_url": "pipelinewise-target-jsonl",
@@ -160,6 +164,9 @@ class TestConfigBuildersComprehensiveCoverage:
         assert result.success
         updated_config = result.unwrap()
 
+        assert isinstance(updated_config, dict)
+        assert isinstance(updated_config["plugins"], dict)
+        assert isinstance(updated_config["plugins"]["loaders"], list)
         assert len(updated_config["plugins"]["loaders"]) == 1
         assert updated_config["plugins"]["loaders"][0]["name"] == "target-jsonl"
 
@@ -171,7 +178,7 @@ class TestConfigBuildersComprehensiveCoverage:
         assert base_result.success
         base_config = base_result.unwrap()
 
-        plugin_config = {"name": "test-plugin"}
+        plugin_config: dict[str, object] = {"name": "test-plugin"}
 
         # Try to add plugin with invalid type
         result = builder.add_plugin_to_config(
@@ -296,9 +303,11 @@ class TestConfigBuildersComprehensiveCoverage:
         assert result.success
         config = result.unwrap()
 
+        assert isinstance(config, dict)
         # Test that plugin types come from constants
         assert config["type"] == PluginTypes.EXTRACTORS.value  # Default
         assert "metadata" in config
+        assert isinstance(config["metadata"], dict)
         assert (
             config["metadata"]["created_by"]
             == FlextMeltanoConstants.Metadata.CREATED_BY

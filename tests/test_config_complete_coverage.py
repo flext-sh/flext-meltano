@@ -55,7 +55,7 @@ class TestFlextMeltanoConfig:
     def test_path_validation_success(self) -> None:
         """Test successful path validation."""
         config = FlextMeltanoConfig(
-            project_root="/valid/path", config_dir="config", logs_dir="logs"
+            project_root=Path("/valid/path"), config_dir=Path("config"), logs_dir=Path("logs")
         )
 
         # Should convert string paths to Path objects
@@ -64,7 +64,7 @@ class TestFlextMeltanoConfig:
 
     def test_path_validation_conversion(self) -> None:
         """Test path validation converts string to Path."""
-        config = FlextMeltanoConfig(project_root="string/path")
+        config = FlextMeltanoConfig(project_root=Path("string/path"))
         assert isinstance(config.project_root, Path)
         # Path gets resolved to absolute path, check the name
         assert config.project_root.name == "path"
@@ -72,7 +72,7 @@ class TestFlextMeltanoConfig:
     def test_version_validation_success(self) -> None:
         """Test successful version validation."""
         config = FlextMeltanoConfig(
-            project_root="/test",
+            project_root=Path("/test"),
             meltano_version="3.9.1",
             singer_sdk_version="0.48.0",
             dbt_version="1.10.5",
@@ -85,14 +85,14 @@ class TestFlextMeltanoConfig:
     def test_version_validation_failure(self) -> None:
         """Test version validation - all fields have defaults so validation passes."""
         # All version fields have defaults, so validation always passes
-        config = FlextMeltanoConfig(project_root="/test")
+        config = FlextMeltanoConfig(project_root=Path("/test"))
         assert config.meltano_version == "3.9.1"
         assert config.singer_sdk_version == "0.48.0"
         assert config.dbt_version == "1.10.5"
 
     def test_get_project_file(self) -> None:
         """Test get_project_file method."""
-        config = FlextMeltanoConfig(project_root="/test/project")
+        config = FlextMeltanoConfig(project_root=Path("/test/project"))
         project_file = config.get_project_file()
 
         assert isinstance(project_file, Path)
@@ -100,7 +100,7 @@ class TestFlextMeltanoConfig:
 
     def test_get_absolute_config_dir(self) -> None:
         """Test get_absolute_config_dir method."""
-        config = FlextMeltanoConfig(project_root="/test/project", config_dir=".meltano")
+        config = FlextMeltanoConfig(project_root=Path("/test/project"), config_dir=Path(".meltano"))
         config_dir = config.get_absolute_config_dir()
 
         assert isinstance(config_dir, Path)
@@ -110,7 +110,7 @@ class TestFlextMeltanoConfig:
 
     def test_get_absolute_logs_dir(self) -> None:
         """Test get_absolute_logs_dir method."""
-        config = FlextMeltanoConfig(project_root="/test/project", logs_dir="logs")
+        config = FlextMeltanoConfig(project_root=Path("/test/project"), logs_dir=Path("logs"))
         logs_dir = config.get_absolute_logs_dir()
 
         assert isinstance(logs_dir, Path)
@@ -120,7 +120,7 @@ class TestFlextMeltanoConfig:
 
     def test_get_absolute_venv_dir(self) -> None:
         """Test get_absolute_venv_dir method."""
-        config = FlextMeltanoConfig(project_root="/test/project")
+        config = FlextMeltanoConfig(project_root=Path("/test/project"))
         venv_dir = config.get_absolute_venv_dir()
 
         assert isinstance(venv_dir, Path)
@@ -131,11 +131,11 @@ class TestFlextMeltanoConfig:
     def test_validate_project_structure_missing_project_file(self) -> None:
         """Test project structure validation with missing meltano.yml."""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            config = FlextMeltanoConfig(project_root=tmp_dir)
+            config = FlextMeltanoConfig(project_root=Path(tmp_dir))
             result = config.validate_project_structure()
 
             assert result.is_failure
-            assert "meltano.yml not found" in result.error
+            assert "meltano.yml not found" in (result.error or "")
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
@@ -144,7 +144,7 @@ class TestFlextMeltanoConfig:
             project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
 
-            config = FlextMeltanoConfig(project_root=tmp_dir)
+            config = FlextMeltanoConfig(project_root=Path(tmp_dir))
             result = config.validate_project_structure()
 
             assert result.is_success
@@ -153,7 +153,7 @@ class TestFlextMeltanoConfig:
     def test_get_environment_variables(self) -> None:
         """Test environment variables extraction."""
         config = FlextMeltanoConfig(
-            project_root="/test/project", environment="development", log_level="debug"
+            project_root=Path("/test/project"), environment="development", log_level="debug"
         )
         env_vars = config.get_environment_variables()
 
@@ -195,7 +195,7 @@ class TestFlextMeltanoConfig:
             project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
 
-            result = FlextMeltanoConfig.create_from_project_root(project_root=tmp_dir)
+            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
 
             assert result.is_success
             config = result.unwrap()
@@ -209,7 +209,7 @@ class TestFlextMeltanoConfig:
             project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
 
-            result = FlextMeltanoConfig.create_from_project_root(project_root=tmp_dir)
+            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
 
             assert result.is_success
             config = result.unwrap()
@@ -220,7 +220,7 @@ class TestFlextMeltanoConfig:
         """Test create_for_environment factory method."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             result = FlextMeltanoConfig.create_for_environment(
-                environment="staging", project_root=tmp_dir, log_level="WARNING"
+                environment="staging", project_root=Path(tmp_dir), log_level="WARNING"
             )
 
             assert result.is_success
@@ -232,12 +232,12 @@ class TestFlextMeltanoConfig:
     def test_create_for_environment_with_validation_error(self) -> None:
         """Test create_for_environment with invalid parameters."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_env", project_root="/nonexistent"
+            environment="invalid_env", project_root=Path("/nonexistent")
         )
 
         # Should fail validation
         assert result.is_failure
-        assert "environment" in result.error.lower()
+        assert "environment" in (result.error or "").lower()
 
 
 class TestFlextMeltanoConfigEnums:
@@ -313,20 +313,20 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_invalid_environment_validation(self) -> None:
         """Test validation fails with invalid environment using create_for_environment."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_environment_name", project_root="/test"
+            environment="invalid_environment_name", project_root=Path("/test")
         )
         assert result.is_failure
-        assert "Invalid environment" in result.error
+        assert "Invalid environment" in (result.error or "")
 
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
         # Log level has default, so invalid values fall back to default
-        config = FlextMeltanoConfig(project_root="/test", log_level="INFO")
+        config = FlextMeltanoConfig(project_root=Path("/test"), log_level="INFO")
         assert config.log_level == "INFO"  # Valid log level
 
     def test_empty_project_root_validation(self) -> None:
         """Test empty project root gets resolved to current directory."""
-        config = FlextMeltanoConfig(project_root="")
+        config = FlextMeltanoConfig(project_root=Path())
         # Empty path gets resolved to current directory
         assert config.project_root.is_absolute()
         assert config.project_root.exists()
@@ -334,7 +334,7 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_factory_methods_with_invalid_data(self) -> None:
         """Test factory methods handle invalid data gracefully."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid", project_root=""
+            environment="invalid", project_root=Path()
         )
 
         assert result.is_failure
@@ -387,7 +387,7 @@ class TestFlextMeltanoConfigIntegration:
             logs_dir.mkdir()
 
             # Create config using factory
-            result = FlextMeltanoConfig.create_from_project_root(project_root=tmp_dir)
+            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
 
             assert result.is_success
             config = result.unwrap()
@@ -415,7 +415,7 @@ class TestFlextMeltanoConfigIntegration:
                 continue
 
             config = FlextMeltanoConfig(
-                project_root="/test",
+                project_root=Path("/test"),
                 environment=env_type.value,
                 log_level="INFO",
             )
@@ -429,7 +429,7 @@ class TestFlextMeltanoConfigIntegration:
 
     def test_config_constants_integration(self) -> None:
         """Test that config constants integrate properly with functionality."""
-        config = FlextMeltanoConfig(project_root="/test")
+        config = FlextMeltanoConfig(project_root=Path("/test"))
 
         # Test that constants are used properly
         project_file = config.get_project_file()

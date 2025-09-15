@@ -66,7 +66,7 @@ class TestFlextMeltanoAdapterCoverage:
         if result.is_failure:
             self.test_assertions.assert_in(
                 item="not found",
-                container=result.error.lower(),
+                container=(result.error or "").lower(),
                 message="Should indicate plugin not found",
             )
 
@@ -131,7 +131,7 @@ class TestFlextMeltanoAdapterCoverage:
                 if result.is_failure:
                     self.test_assertions.assert_in(
                         item="not found",
-                        container=result.error.lower(),
+                        container=(result.error or "").lower(),
                         message="Should indicate plugins not found",
                     )
 
@@ -179,20 +179,24 @@ class TestFlextMeltanoAdapterCoverage:
 
     def test_create_temporary_meltano_project_failure(self) -> None:
         """Test _create_temporary_meltano_project failure scenario."""
-        # This should fail due to invalid path
-        try:
+        # Mock tempfile.mkdtemp to raise an exception
+        with mock.patch("tempfile.mkdtemp") as mock_mkdtemp:
+            mock_mkdtemp.side_effect = OSError("Permission denied")
+
             result = self.adapter._create_temporary_meltano_project(
                 project_id="test-invalid-project", prefix="flext_test_"
             )
 
-            # If it doesn't fail immediately, it should still return a FlextResult
+            # Should return a failed FlextResult, not raise exception
             self.test_assertions.assert_true(
-                condition=isinstance(result, FlextResult),
-                message="Should return FlextResult even on failure",
+                condition=result.is_failure,
+                message="Should return failed result for permission error"
             )
-        except Exception:
-            # Expected to fail with invalid path
-            pass
+            self.test_assertions.assert_in(
+                item="Permission denied",
+                container=result.error or "",
+                message="Should include permission error in message"
+            )
 
     def test_initialize_attributes(self) -> None:
         """Test that attributes are properly initialized during construction."""
@@ -224,4 +228,4 @@ class TestFlextMeltanoAdapterCoverage:
 
             result = self.adapter._create_temporary_meltano_project()
             assert result.is_failure
-            assert "Failed to create temporary project" in result.error
+            assert "Failed to create temporary project" in (result.error or "")

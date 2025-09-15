@@ -13,27 +13,23 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.exceptions import FlextMeltanoConfigurationError, FlextMeltanoError
 from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.executors_bridge import FlextMeltanoBridge
-from flext_meltano.executors_cli import FlextMeltanoCli, flext_meltano_run_cli
-from flext_meltano.executors_meltano import (
-    FlextMeltanoExecutors,
-    SimpleDbtExecutor,
-    SimpleMeltanoExecutor,
-)
+
+# FlextMeltanoCli functionality available through FlextMeltanoExecutor.create_cli_runner
+# Executor functionality available through FlextMeltanoExecutor directly
+# No compatibility wrappers - use FlextMeltanoExecutor unified class
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.plugin_protocols import (
     DbtServiceProtocol,
     FlextDbtPlugin,
-    FlextMeltanoPluginTypes,
+    FlextMeltanoPluginProtocols,  # Updated unified class name
     FlextTapPlugin,
     FlextTargetPlugin,
     TapServiceProtocol,
     TargetServiceProtocol,
 )
-from flext_meltano.service_implementations import (
-    FlextMeltanoDbtService,
-    FlextMeltanoTapService,
-    FlextMeltanoTargetService,
-)
+
+# Service implementations available through FlextMeltanoService methods:
+# FlextMeltanoService.create_tap_service, create_target_service, create_dbt_service
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.singer_types import FlextSingerTypes
 from flext_meltano.tap_abstractions import (
@@ -43,9 +39,7 @@ from flext_meltano.tap_abstractions import (
     TapInstance,
 )
 from flext_meltano.target_abstractions import (
-    FlextStreamInfo,
     FlextTargetAbstractions,
-    FlextTargetConfig,
 )
 
 # Exception handling - DIRECT flext-core generated exceptions only
@@ -67,36 +61,34 @@ __all__ = [
     "FlextDbtPlugin",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
-    "FlextMeltanoCli",
+    # "FlextMeltanoCli",  # Use FlextMeltanoExecutor.create_cli_runner
     "FlextMeltanoConfig",
     "FlextMeltanoConfigBuilders",
     "FlextMeltanoConfigurationError",
     "FlextMeltanoConstants",
-    "FlextMeltanoDbtService",
+    # "FlextMeltanoDbtService",  # Use FlextMeltanoService.create_dbt_service
     "FlextMeltanoError",
     "FlextMeltanoExecutor",
-    "FlextMeltanoExecutors",
+    # "FlextMeltanoExecutors",  # Use FlextMeltanoExecutor directly
     "FlextMeltanoFileManagers",
-    "FlextMeltanoPluginTypes",
+    "FlextMeltanoPluginProtocols",  # Updated unified class name
     "FlextMeltanoService",
-    "FlextMeltanoTapService",
-    "FlextMeltanoTargetService",
+    # "FlextMeltanoTapService",  # Use FlextMeltanoService.create_tap_service
+    # "FlextMeltanoTargetService",  # Use FlextMeltanoService.create_target_service
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
     "FlextSingerTypes",
-    "FlextStreamInfo",
     "FlextTapAbstractions",
     "FlextTapPlugin",
     "FlextTargetAbstractions",
-    "FlextTargetConfig",
     "FlextTargetPlugin",
-    "SimpleDbtExecutor",
-    "SimpleMeltanoExecutor",
+    # "SimpleDbtExecutor",     # Use FlextMeltanoExecutor directly
+    # "SimpleMeltanoExecutor", # Use FlextMeltanoExecutor directly
     "StreamDefinition",
     "TapConfig",
     "TapInstance",
     "TapServiceProtocol",
     "TargetServiceProtocol",
-    "flext_meltano_run_cli",
+    # "flext_meltano_run_cli",  # Use FlextMeltanoExecutor.create_cli_runner
 ]

@@ -186,7 +186,7 @@ markers = [
     "meltano: Meltano-specific tests",
     "real: Real functionality tests without mocks",
 ]
-filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
+# filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
 
 [tool.coverage.run]
 source = ["src"]

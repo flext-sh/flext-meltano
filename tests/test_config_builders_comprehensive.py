@@ -523,7 +523,9 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
 
         # All should succeed
         for result in results:
-            assert hasattr(result, "is_success"), "Result must have is_success attribute"
+            assert hasattr(result, "is_success"), (
+                "Result must have is_success attribute"
+            )
             assert hasattr(result, "value"), "Result must have value attribute"
             FlextTestsMatchers.assert_result_success(result)
             assert isinstance(result.value, dict)
@@ -578,7 +580,9 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
             ("create_meltano_config", ("test_meltano",)),
         ],
     )
-    def test_builder_methods_parametrized(self, method_name: str, args: tuple[str, ...]) -> None:
+    def test_builder_methods_parametrized(
+        self, method_name: str, args: tuple[str, ...]
+    ) -> None:
         """Test builder methods with parametrized inputs."""
         builder = FlextMeltanoConfigBuilders()
         method = getattr(builder, method_name)

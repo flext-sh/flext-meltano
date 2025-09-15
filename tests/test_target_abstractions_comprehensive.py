@@ -302,7 +302,7 @@ class TestFlextTargetAbstractionsComprehensive:
         )
 
         FlextTestsMatchers.assert_result_success(result)
-        target_instance = cast("dict[str, object]", result.value)
+        target_instance = result.value
         assert isinstance(target_instance, dict)
         assert target_instance["target_type"] == "postgres"
         assert "target_id" in target_instance
@@ -326,10 +326,18 @@ class TestFlextTargetAbstractionsComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
-        assert target_instance["target_type"] == "csv"
-        assert str(csv_file) in str(
-            target_instance["config"]["connection_config"]["file_path"]
-        )
+        assert isinstance(target_instance, dict), "Target instance should be a dict"
+        # Cast to proper type - target_instance is validated as dict above
+        target_dict: dict[str, object] = target_instance
+        assert target_dict["target_type"] == "csv"
+        # Fix: Cast to proper type after validation
+        target_config = target_dict["config"]
+        assert isinstance(target_config, dict), "Config should be a dict"
+        target_config_typed: dict[str, object] = target_config
+        assert isinstance(target_config, dict), "Config should be a dict"
+        connection_config = target_config_typed["connection_config"]
+        assert isinstance(connection_config, dict), "Connection config should be a dict"
+        assert str(csv_file) in str(connection_config["file_path"])
 
     def test_create_flext_target_with_streams(self) -> None:
         """Test creating target with stream information."""
@@ -340,7 +348,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
         created_at = datetime.now(UTC).isoformat()
 
-        [
+        stream_infos = [
             FlextTargetAbstractions.FlextStreamInfo(
                 stream_name="users",
                 schema={
@@ -365,6 +373,9 @@ class TestFlextTargetAbstractionsComprehensive:
             ),
         ]
 
+        # Verify stream_infos were created properly
+        assert len(stream_infos) == 2
+
         result = self.target_abstractions.create_flext_target(
             config=config, adapter=None
         )
@@ -388,7 +399,11 @@ class TestFlextTargetAbstractionsComprehensive:
                 config=config, adapter=None
             )
 
+        # Add type assertion for benchmark callable
+        assert callable(benchmark), "Benchmark should be callable"
         result = benchmark(create_target)
+        # Type assertion for PyRight
+        assert isinstance(result, FlextResult)
         FlextTestsMatchers.assert_result_success(result)
 
     def test_complex_target_workflow_integration(self) -> None:
@@ -500,13 +515,14 @@ class TestFlextTargetAbstractionsComprehensive:
         ]
 
         for scenario in invalid_scenarios:
+            assert isinstance(scenario, dict), "Scenario should be a dict"
             result = self.target_abstractions.create_flext_target_config(**scenario)
             FlextTestsMatchers.assert_result_failure(result)
 
     def test_target_abstractions_edge_cases(self) -> None:
         """Test edge cases and boundary conditions."""
         # Test with minimal valid configuration
-        minimal_config = {
+        minimal_config: dict[str, object] = {
             "target_type": "csv",
             "connection_config": {"file_path": str(self.temp_dir / "minimal.csv")},
         }
@@ -523,7 +539,7 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_target_abstractions_concurrent_operations(self) -> None:
         """Test concurrent target operations don't interfere."""
 
-        def create_target_config(target_num: int) -> object:
+        def create_target_config(target_num: int) -> FlextResult[dict[str, object]]:
             return self.target_abstractions.create_flext_target_config(
                 target_type="csv",
                 connection_config={
@@ -540,6 +556,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
         # All should succeed
         for result in results:
+            assert hasattr(result, "is_success"), "Result should be FlextResult"
             FlextTestsMatchers.assert_result_success(result)
             assert isinstance(result.value, dict)
 
@@ -560,7 +577,10 @@ class TestFlextTargetAbstractionsComprehensive:
 
         # Verify large configuration was created
         config = result.value
-        assert len(config.get("config_extras", {})) == 100
+        assert isinstance(config, dict), "Config should be a dict"
+        config_extras = config.get("config_extras", {})
+        assert isinstance(config_extras, dict), "Config extras should be a dict"
+        assert len(config_extras) == 100
         assert config["target_type"] == "postgres"
 
     def test_target_abstractions_inheritance_validation(self) -> None:
@@ -585,7 +605,7 @@ class TestFlextTargetAbstractionsComprehensive:
         ],
     )
     def test_target_config_parametrized_creation(
-        self, target_type: str, connection_config: dict
+        self, target_type: str, connection_config: dict[str, object]
     ) -> None:
         """Test target configuration creation with various target types."""
         result = self.target_abstractions.create_flext_target_config(
@@ -615,7 +635,7 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         """Test basic functionality methods for coverage."""
         # Test basic property access methods that are likely to work
         # Create a simple target config first
-        target_config = {
+        target_config: dict[str, object] = {
             "target_type": "target-csv",
             "connection_config": {"file_path": str(self.temp_dir / "test.csv")},
         }
@@ -628,7 +648,10 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert isinstance(self.target_abstractions.is_production(), bool)
 
         # Test basic list operations
-        target_data = {"target_type": "test", "connection": {"host": "localhost"}}
+        target_data: dict[str, object] = {
+            "target_type": "test",
+            "connection": {"host": "localhost"},
+        }
         result = self.target_abstractions.list_streams(target_data)
         assert isinstance(result, list)
 
@@ -680,8 +703,13 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert result == "test"
 
         # Test non-existent path using flext-core SOURCE OF TRUTH
-        result = data.get("nonexistent", {}).get("path")
-        assert result is None
+        nonexistent_result = data.get("nonexistent", {})
+        path_result = (
+            nonexistent_result.get("path")
+            if isinstance(nonexistent_result, dict)
+            else None
+        )
+        assert path_result is None
 
     def test_domain_events_and_lifecycle(self) -> None:
         """Test lifecycle and utility methods for coverage."""
@@ -691,11 +719,14 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert result.is_success
 
         # Test target type identification
-        dummy_target = {"type": "test-target", "config": {}}
+        dummy_target: dict[str, object] = {"type": "test-target", "config": {}}
         target_type = self.target_abstractions.get_target_type(dummy_target)
         assert isinstance(target_type, str)
 
         # Test finalize
-        target_data = {"target_type": "test", "connection": {"host": "localhost"}}
-        result = self.target_abstractions.finalize(target_data)
-        assert isinstance(result, FlextResult)
+        target_data: dict[str, object] = {
+            "target_type": "test",
+            "connection": {"host": "localhost"},
+        }
+        finalize_result = self.target_abstractions.finalize(target_data)
+        assert isinstance(finalize_result, FlextResult)

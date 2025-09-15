@@ -2,6 +2,7 @@
 
 import asyncio
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 from flext_core import FlextResult
@@ -214,7 +215,7 @@ class TestFlextMeltanoBridgeComplete:
     def test_run_plugin_async(self) -> None:
         """Test run_plugin_async method."""
 
-        async def run_async_test() -> None:
+        async def run_async_test() -> object:
             with tempfile.TemporaryDirectory() as temp_dir:
                 project_path = Path(temp_dir)
                 # Create a mock project object
@@ -245,26 +246,18 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_multiple_bridge_operations(self) -> None:
         """Test multiple bridge operations in sequence."""
-        # Test FlextResult operations
-        flext_result_operations = [
-            self.bridge.get_version,
-            self.bridge.discover_plugins,
-        ]
+        # Test get_version operation
+        version_result = self.bridge.get_version()
+        assert isinstance(version_result, FlextResult)
 
-        for operation in flext_result_operations:
-            result = operation()
-            assert isinstance(result, FlextResult)
-            # Each operation should return FlextResult
+        # Test discover_plugins operation
+        discover_result = self.bridge.discover_plugins(None)
+        assert isinstance(discover_result, FlextResult)
 
-        # Test FlextResult operations
-        flext_result_operations_2 = [
-            self.bridge.list_plugins,
-        ]
-
-        for operation in flext_result_operations_2:
-            result = operation()
-            assert isinstance(result, FlextResult)
-            # Each operation should return FlextResult
+        # Test list_plugins operation
+        list_result = self.bridge.list_plugins()
+        assert isinstance(list_result, FlextResult)
+        # Each operation should return FlextResult
 
     def test_error_handling_invalid_commands(self) -> None:
         """Test error handling with invalid commands."""
@@ -294,7 +287,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_bridge_with_different_plugins(self) -> None:
         """Test bridge operations with different plugin types."""
-        plugin_configs: list[dict[str, object]] = [
+        plugin_configs: list[tuple[str, str]] = [
             ("extractors", "tap-csv"),
             ("loaders", "target-jsonl"),
             ("transformers", "dbt"),
@@ -307,7 +300,7 @@ class TestFlextMeltanoBridgeComplete:
 
     def test_pipeline_execution_patterns(self) -> None:
         """Test different pipeline execution patterns."""
-        pipeline_configs: list[dict[str, object]] = [
+        pipeline_configs: list[tuple[str, str]] = [
             ("tap-csv", "target-jsonl"),
             ("tap-postgres", "target-postgres"),
             ("tap-github", "target-bigquery"),
@@ -479,7 +472,7 @@ class TestFlextMeltanoBridgeComplete:
     def test_error_recovery_patterns(self) -> None:
         """Test error recovery and resilience patterns."""
         # Test FlextResult operations
-        flext_result_operations = [
+        flext_result_operations: list[Callable[[], object]] = [
             lambda: self.bridge.install_plugin("extractors", "invalid@plugin#name"),
         ]
 

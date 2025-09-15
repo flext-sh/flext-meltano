@@ -42,6 +42,7 @@ class TestFlextSingerTypesCoverage:
         assert isinstance(result, FlextResult)
         assert result.is_success
 
+        assert result.data is not None
         instance = result.data
         assert isinstance(instance, FlextSingerTypes)
         assert hasattr(instance, "_type_registry")
@@ -51,12 +52,16 @@ class TestFlextSingerTypesCoverage:
         # String type
         result = self.singer_types.create_string_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         string_type = result.data
         assert string_type["type"] == "string"
 
         # String type with constraints
         result = self.singer_types.create_string_type(maxLength=255, minLength=1)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         string_constrained = result.data
         assert string_constrained["type"] == "string"
         assert string_constrained["maxLength"] == 255
@@ -65,12 +70,16 @@ class TestFlextSingerTypesCoverage:
         # Integer type
         result = self.singer_types.create_integer_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         integer_type = result.data
         assert integer_type["type"] == "integer"
 
         # Integer with constraints
         result = self.singer_types.create_integer_type(minimum=0, maximum=100)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         integer_constrained = result.data
         assert integer_constrained["minimum"] == 0
         assert integer_constrained["maximum"] == 100
@@ -78,18 +87,24 @@ class TestFlextSingerTypesCoverage:
         # Number type
         result = self.singer_types.create_number_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         number_type = result.data
         assert number_type["type"] == "number"
 
         # Boolean type
         result = self.singer_types.create_boolean_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         boolean_type = result.data
         assert boolean_type["type"] == "boolean"
 
         # DateTime type
         result = self.singer_types.create_datetime_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         datetime_type = result.data
         assert datetime_type["type"] == "string"
         assert datetime_type["format"] == "date-time"
@@ -99,33 +114,45 @@ class TestFlextSingerTypesCoverage:
         # Array type with item type
         result = self.singer_types.create_array_type(items={"type": "string"})
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         array_type = result.data
         assert array_type["type"] == "array"
+        assert isinstance(array_type["items"], dict)
         assert array_type["items"]["type"] == "string"
 
         # Array type without items (default)
         result = self.singer_types.create_array_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         array_default = result.data
         assert array_default["type"] == "array"
         # When no items specified, no items key is added
         assert "items" not in array_default
 
         # Object type with properties
-        properties = {
+        properties_dict: dict[str, object] = {
             "name": {"type": "string"},
             "age": {"type": "integer", "minimum": 0},
         }
-        result = self.singer_types.create_object_type(properties=properties)
+        result = self.singer_types.create_object_type(properties=properties_dict)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         object_type = result.data
         assert object_type["type"] == "object"
+        assert isinstance(object_type["properties"], dict)
+        assert isinstance(object_type["properties"]["name"], dict)
+        assert isinstance(object_type["properties"]["age"], dict)
         assert object_type["properties"]["name"]["type"] == "string"
         assert object_type["properties"]["age"]["minimum"] == 0
 
         # Object type without properties (default)
         result = self.singer_types.create_object_type()
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         object_default = result.data
         assert object_default["type"] == "object"
         # When no properties specified, no properties key is added
@@ -134,17 +161,18 @@ class TestFlextSingerTypesCoverage:
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
         # Valid string validation
-        string_type = {"type": "string"}
+        string_type: dict[str, object] = {"type": "string"}
         result = self.singer_types.validate_value("hello world", string_type)
         assert result.is_success
 
         # Invalid string validation (number against string type)
         result = self.singer_types.validate_value(123, string_type)
         assert not result.is_success
-        assert "expected string" in result.error_message.lower()
+        assert result.error is not None
+        assert "expected string" in result.error.lower()
 
         # Valid integer validation
-        integer_type = {"type": "integer"}
+        integer_type: dict[str, object] = {"type": "integer"}
         result = self.singer_types.validate_value(42, integer_type)
         assert result.is_success
 
@@ -153,12 +181,12 @@ class TestFlextSingerTypesCoverage:
         assert not result.is_success
 
         # Valid number validation
-        number_type = {"type": "number"}
+        number_type: dict[str, object] = {"type": "number"}
         result = self.singer_types.validate_value(math.pi, number_type)
         assert result.is_success
 
         # Valid boolean validation
-        boolean_type = {"type": "boolean"}
+        boolean_type: dict[str, object] = {"type": "boolean"}
         result = self.singer_types.validate_value(True, boolean_type)
         assert result.is_success
         result = self.singer_types.validate_value(False, boolean_type)
@@ -182,13 +210,19 @@ class TestFlextSingerTypesCoverage:
         )
 
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         schema = result.data
         assert schema["type"] == "SCHEMA"
         assert schema["stream"] == "users"
         assert schema["key_properties"] == ["id"]
         assert "schema" in schema
+        assert isinstance(schema["schema"], dict)
         assert schema["schema"]["type"] == "object"
         assert "properties" in schema["schema"]
+        assert isinstance(schema["schema"]["properties"], dict)
+        assert isinstance(schema["schema"]["properties"]["id"], dict)
+        assert isinstance(schema["schema"]["properties"]["name"], dict)
         assert schema["schema"]["properties"]["id"]["type"] == "integer"
         assert schema["schema"]["properties"]["name"]["maxLength"] == 100
 
@@ -198,9 +232,12 @@ class TestFlextSingerTypesCoverage:
         record_data = {"id": 1, "name": "John Doe", "email": "john@example.com"}
         result = self.singer_types.create_record_message("users", record_data)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         record_message = result.data
         assert record_message["type"] == "RECORD"
         assert record_message["stream"] == "users"
+        assert isinstance(record_message["record"], dict)
         assert record_message["record"]["id"] == 1
         assert record_message["record"]["name"] == "John Doe"
         # time_extracted is only added if provided as kwargs
@@ -211,6 +248,8 @@ class TestFlextSingerTypesCoverage:
             "users", record_data, time_extracted="2025-01-15T10:30:00Z"
         )
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         record_with_time = result.data
         assert record_with_time["time_extracted"] == "2025-01-15T10:30:00Z"
 
@@ -222,22 +261,31 @@ class TestFlextSingerTypesCoverage:
             key_properties=["id"],
         )
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         schema_message = result.data
         assert schema_message["type"] == "SCHEMA"
         assert schema_message["stream"] == "users"
+        assert isinstance(schema_message["key_properties"], list)
         assert schema_message["key_properties"] == ["id"]
 
         # State message
-        state_data = {"bookmarks": {"users": {"id": 100}}}
+        state_data: dict[str, object] = {"bookmarks": {"users": {"id": 100}}}
         result = self.singer_types.create_state_message(state_data)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         state_message = result.data
+        assert isinstance(state_message, dict)  # Type assertion for subscript access
         assert state_message["type"] == "STATE"
+        assert isinstance(state_message["value"], dict)  # Type assertion for nested access
+        assert isinstance(state_message["value"]["bookmarks"], dict)
+        assert isinstance(state_message["value"]["bookmarks"]["users"], dict)
         assert state_message["value"]["bookmarks"]["users"]["id"] == 100
 
     def test_properties_management(self) -> None:
         """Test properties list creation and manipulation."""
-        properties = {
+        properties: dict[str, dict[str, object]] = {
             "user_id": {"type": "integer"},
             "username": {"type": "string"},
             "created_at": {"type": "string", "format": "date-time"},
@@ -245,6 +293,8 @@ class TestFlextSingerTypesCoverage:
 
         result = self.singer_types.create_properties_list(properties)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         props_dict = result.data
         assert isinstance(props_dict, dict)
         assert len(props_dict) == 3
@@ -253,15 +303,19 @@ class TestFlextSingerTypesCoverage:
         assert "user_id" in props_dict
         assert "username" in props_dict
         assert "created_at" in props_dict
+        assert isinstance(props_dict["user_id"], dict)  # Type assertion for subscript access
+        assert isinstance(props_dict["username"], dict)  # Type assertion for subscript access
         assert props_dict["user_id"]["type"] == "integer"
         assert props_dict["username"]["type"] == "string"
 
     def test_add_property_functionality(self) -> None:
         """Test adding properties to existing property lists."""
         # Start with basic properties
-        initial_props = {"id": {"type": "integer"}, "name": {"type": "string"}}
+        initial_props: dict[str, dict[str, object]] = {"id": {"type": "integer"}, "name": {"type": "string"}}
         result = self.singer_types.create_properties_list(initial_props)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         props_dict = result.data
 
         # Add new property
@@ -269,11 +323,14 @@ class TestFlextSingerTypesCoverage:
             props_dict, "email", {"type": "string", "format": "email"}
         )
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         updated_props = result.data
         assert len(updated_props) == 3
 
         # Verify new property is properly added
         assert "email" in updated_props
+        assert isinstance(updated_props["email"], dict)
         assert updated_props["email"]["type"] == "string"
         assert updated_props["email"]["format"] == "email"
 
@@ -287,16 +344,22 @@ class TestFlextSingerTypesCoverage:
         # Get specific type definitions
         result = self.singer_types.get_type_definition("string")
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         string_def = result.data
         assert string_def["type"] == "string"
 
         result = self.singer_types.get_type_definition("integer")
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         integer_def = result.data
         assert integer_def["type"] == "integer"
 
         result = self.singer_types.get_type_definition("date-time")
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         datetime_def = result.data
         assert datetime_def["type"] == "string"
         assert datetime_def["format"] == "date-time"
@@ -304,7 +367,8 @@ class TestFlextSingerTypesCoverage:
         # Test non-existent type
         result = self.singer_types.get_type_definition("nonexistent")
         assert not result.is_success
-        assert "not found" in result.error_message.lower()
+        assert result.error is not None
+        assert "not found" in result.error.lower()
 
     def test_data_conversion_functionality(self) -> None:
         """Test data conversion to dictionary format."""
@@ -312,9 +376,12 @@ class TestFlextSingerTypesCoverage:
         data = {"key": "value", "number": 42, "nested": {"inner": "data"}}
         result = self.singer_types.convert_to_dict(data)
         assert result.is_success
+        assert result.data is not None
+        assert isinstance(result.data, dict)
         converted = result.data
         assert converted["key"] == "value"
         assert converted["number"] == 42
+        assert isinstance(converted["nested"], dict)
         assert converted["nested"]["inner"] == "data"
 
         # Test non-dict data that can be converted
@@ -327,7 +394,7 @@ class TestFlextSingerTypesCoverage:
     def test_error_handling_and_edge_cases(self) -> None:
         """Test error handling and edge cases."""
         # Test validation with malformed type definition
-        malformed_type = {"invalid": "definition"}  # Missing "type" key
+        malformed_type: dict[str, object] = {"invalid": "definition"}  # Missing "type" key
         result = self.singer_types.validate_value("test", malformed_type)
         assert not result.is_success
 
@@ -342,7 +409,7 @@ class TestFlextSingerTypesCoverage:
         assert result.is_success  # Should handle empty records
 
         # Test state message with None data
-        result = self.singer_types.create_state_message(None)
+        result = self.singer_types.create_state_message({})
         # Implementation should handle None gracefully
         assert isinstance(result, FlextResult)
 
@@ -406,10 +473,12 @@ class TestFlextSingerTypesIntegration:
     def test_properties_list_complete_workflow(self) -> None:
         """Test complete properties list creation and manipulation."""
         # Start with base properties
-        base_properties = {"id": {"type": "integer"}, "name": {"type": "string"}}
+        base_properties: dict[str, dict[str, object]] = {"id": {"type": "integer"}, "name": {"type": "string"}}
 
         props_result = self.singer_types.create_properties_list(base_properties)
         assert props_result.is_success
+        assert props_result.data is not None
+        assert isinstance(props_result.data, dict)
         props_dict = props_result.data
 
         # Add multiple properties
@@ -425,9 +494,13 @@ class TestFlextSingerTypesIntegration:
                 current_props, field_name, field_def
             )
             assert add_result.is_success
+            assert add_result.data is not None
+            assert isinstance(add_result.data, dict)
             current_props = add_result.data
 
         # Verify final properties list
+        assert current_props is not None
+        assert isinstance(current_props, dict)
         assert len(current_props) == 5  # 2 base + 3 additional
         field_names = set(current_props.keys())
         assert field_names == {"id", "name", "email", "age", "is_verified"}
@@ -459,6 +532,10 @@ class TestFlextSingerTypesIntegration:
         assert state_result.is_success
 
         # Verify all messages have consistent stream naming
+        assert schema_result.data is not None
+        assert isinstance(schema_result.data, dict)
+        assert record_result.data is not None
+        assert isinstance(record_result.data, dict)
         schema_msg = schema_result.data
         record_msg = record_result.data
 
@@ -477,6 +554,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_string_type()
             assert result.is_failure
+            assert result.error is not None
             assert "String type creation failed" in result.error
 
         # Test create_integer_type exception path
@@ -485,6 +563,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_integer_type()
             assert result.is_failure
+            assert result.error is not None
             assert "Integer type creation failed" in result.error
 
         # Test create_number_type exception path
@@ -493,6 +572,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_number_type()
             assert result.is_failure
+            assert result.error is not None
             assert "Number type creation failed" in result.error
 
         # Test create_boolean_type exception path
@@ -501,6 +581,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_boolean_type()
             assert result.is_failure
+            assert result.error is not None
             assert "Boolean type creation failed" in result.error
 
         # Test create_array_type exception path
@@ -509,6 +590,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_array_type()
             assert result.is_failure
+            assert result.error is not None
             assert "Array type creation failed" in result.error
 
         # Test create_object_type exception path
@@ -517,6 +599,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_object_type()
             assert result.is_failure
+            assert result.error is not None
             assert "Object type creation failed" in result.error
 
         # Test create_datetime_type exception path
@@ -525,6 +608,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_datetime_type()
             assert result.is_failure
+            assert result.error is not None
             assert "DateTime type creation failed" in result.error
 
     def test_create_schema_message_exception_path(self) -> None:
@@ -534,6 +618,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_schema_message("test_stream", {})
             assert result.is_failure
+            assert result.error is not None
             assert "Schema message creation failed" in result.error
 
     def test_create_record_message_exception_path(self) -> None:
@@ -543,6 +628,7 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_record_message("test_stream", {})
             assert result.is_failure
+            assert result.error is not None
             assert "Record message creation failed" in result.error
 
     def test_create_state_message_exception_path(self) -> None:
@@ -552,4 +638,5 @@ class TestFlextSingerTypesIntegration:
 
             result = self.singer_types.create_state_message({})
             assert result.is_failure
+            assert result.error is not None
             assert "State message creation failed" in result.error

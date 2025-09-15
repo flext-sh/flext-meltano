@@ -24,7 +24,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.get_version()
             assert result.is_failure
-            assert "Version check failed" in result.error
+            assert "Version check failed" in (result.error or "")
 
     def test_get_version_adapter_exception(self) -> None:
         """Test get_version with adapter exception."""
@@ -34,7 +34,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.get_version()
             assert result.is_failure
-            assert "Test exception" in result.error
+            assert "Test exception" in (result.error or "")
 
     def test_get_version_json_failure(self) -> None:
         """Test get_version_json with failure."""
@@ -58,7 +58,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.run_pipeline("tap-csv", "target-csv")
             assert result["success"] is False
-            assert "Attempted to access value on failed result" in result["error"]
+            assert "Attempted to access value on failed result" in str(result["error"])
 
     def test_run_pipeline_adapter_exception(self) -> None:
         """Test run_pipeline with adapter exception."""
@@ -70,7 +70,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.run_pipeline("tap-csv", "target-csv")
             assert result["success"] is False
-            assert "Test exception" in result["error"]
+            assert "Test exception" in str(result["error"])
 
     def test_execute_meltano_command_adapter_failure(self) -> None:
         """Test execute_meltano_command with adapter failure."""
@@ -82,7 +82,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.execute_meltano_command(["test"])
             assert result["success"] is False
-            assert "Attempted to access value on failed result" in result["error"]
+            assert "Attempted to access value on failed result" in str(result["error"])
 
     def test_execute_meltano_command_adapter_exception(self) -> None:
         """Test execute_meltano_command with adapter exception."""
@@ -94,7 +94,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.execute_meltano_command(["test"])
             assert result["success"] is False
-            assert "Test exception" in result["error"]
+            assert "Test exception" in str(result["error"])
 
     def test_execute_dbt_command_adapter_failure(self) -> None:
         """Test execute_dbt_command with adapter failure."""
@@ -106,7 +106,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.execute_dbt_command(["test"])
             assert result["success"] is False
-            assert "Attempted to access value on failed result" in result["error"]
+            assert "Attempted to access value on failed result" in str(result["error"])
 
     def test_execute_dbt_command_adapter_exception(self) -> None:
         """Test execute_dbt_command with adapter exception."""
@@ -118,15 +118,16 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.execute_dbt_command(["test"])
             assert result["success"] is False
-            assert "Test exception" in result["error"]
+            assert "Test exception" in str(result["error"])
 
     def test_install_plugin_project_not_found(self) -> None:
         """Test install_plugin with project not found."""
         # Mock Path.exists to return False
         with mock.patch.object(Path, "exists", return_value=False):
             result = self.bridge.install_plugin("tap-csv", "csv", ".")
+            assert isinstance(result, FlextResult)
             assert result.is_failure
-            assert "meltano.yml not found" in result.error
+            assert "meltano.yml not found" in (result.error or "")
 
     def test_install_plugin_adapter_failure(self) -> None:
         """Test install_plugin with adapter failure."""
@@ -140,16 +141,18 @@ class TestFlextMeltanoBridgeErrorCoverage:
             )
 
             result = self.bridge.install_plugin("tap-csv", "csv", ".")
+            assert isinstance(result, FlextResult)
             assert result.is_failure
-            assert "Plugin installation failed" in result.error
+            assert "Plugin installation failed" in (result.error or "")
 
     def test_install_plugin_exception(self) -> None:
         """Test install_plugin with exception."""
         # Mock Path.exists to raise exception
         with mock.patch.object(Path, "exists", side_effect=Exception("Test exception")):
             result = self.bridge.install_plugin("tap-csv", "csv", ".")
+            assert isinstance(result, FlextResult)
             assert result.is_failure
-            assert "Test exception" in result.error
+            assert "Test exception" in (result.error or "")
 
     def test_get_project_info_adapter_failure(self) -> None:
         """Test get_project_info with adapter failure."""
@@ -163,7 +166,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.get_project_info(".")
             assert result["success"] is False
-            assert "Project creation failed" in result["error"]
+            assert "Project creation failed" in str(result["error"])
 
     def test_get_project_info_exception(self) -> None:
         """Test get_project_info with exception."""
@@ -175,7 +178,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.get_project_info(".")
             assert result["success"] is False
-            assert "Test exception" in result["error"]
+            assert "Test exception" in str(result["error"])
 
     def test_discover_plugins_adapter_failure(self) -> None:
         """Test discover_plugins with adapter failure."""
@@ -187,7 +190,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.discover_plugins()
             assert result.is_failure
-            assert "Discovery failed" in result.error
+            assert "Discovery failed" in (result.error or "")
 
     def test_discover_plugins_exception(self) -> None:
         """Test discover_plugins with exception."""
@@ -199,7 +202,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.discover_plugins()
             assert result.is_failure
-            assert "Test exception" in result.error
+            assert "Test exception" in (result.error or "")
 
     def test_run_plugin_async_exception(self) -> None:
         """Test run_plugin_async with exception."""
@@ -212,8 +215,9 @@ class TestFlextMeltanoBridgeErrorCoverage:
                 result = await self.bridge.run_plugin_async(
                     None, "test-plugin", "test", []
                 )
+                assert isinstance(result, dict)
                 assert result["success"] is False
-                assert "Test exception" in result["error"]
+                assert "Test exception" in str(result["error"])
 
             asyncio.run(test_async())
 
@@ -226,8 +230,9 @@ class TestFlextMeltanoBridgeErrorCoverage:
             mock_execute.return_value = FlextResult.fail("Plugin execution failed")
 
             result = self.bridge._run_plugin_sync(None, "test-plugin", "test", [])
+            assert isinstance(result, dict)
             assert result["success"] is False
-            assert "Plugin execution failed" in result["error"]
+            assert "Plugin execution failed" in str(result["error"])
 
     def test_run_plugin_sync_exception(self) -> None:
         """Test _run_plugin_sync with exception."""
@@ -238,8 +243,9 @@ class TestFlextMeltanoBridgeErrorCoverage:
             side_effect=Exception("Test exception"),
         ):
             result = self.bridge._run_plugin_sync(None, "test-plugin", "test", [])
+            assert isinstance(result, dict)
             assert result["success"] is False
-            assert "Test exception" in result["error"]
+            assert "Test exception" in str(result["error"])
 
     def test_list_plugins_adapter_failure(self) -> None:
         """Test list_plugins with adapter failure."""
@@ -251,7 +257,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.list_plugins()
             assert result.is_failure
-            assert "Plugin listing failed" in result.error
+            assert "Plugin listing failed" in (result.error or "")
 
     def test_list_plugins_exception(self) -> None:
         """Test list_plugins with exception."""
@@ -263,7 +269,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.list_plugins()
             assert result.is_failure
-            assert "Test exception" in result.error
+            assert "Test exception" in (result.error or "")
 
     def test_initialize_project_adapter_failure(self) -> None:
         """Test initialize_project with adapter failure."""
@@ -273,7 +279,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
             result = self.bridge.initialize_project(".")
             assert result.is_failure
-            assert "Project initialization failed" in result.error
+            assert "Project initialization failed" in (result.error or "")
 
     def test_initialize_project_exception(self) -> None:
         """Test initialize_project with exception."""
@@ -285,4 +291,4 @@ class TestFlextMeltanoBridgeErrorCoverage:
         ):
             result = self.bridge.initialize_project(".")
             assert result.is_failure
-            assert "Test exception" in result.error
+            assert "Test exception" in (result.error or "")

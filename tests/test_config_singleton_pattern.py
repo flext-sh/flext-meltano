@@ -17,6 +17,14 @@ from flext_meltano.config import FlextMeltanoConfig
 class TestFlextMeltanoConfigSingletonPattern:
     """Test singleton pattern with parameter overrides."""
 
+    def setup_method(self) -> None:
+        """Clear global instance before each test."""
+        FlextMeltanoConfig.clear_global_instance()
+
+    def teardown_method(self) -> None:
+        """Clear global instance after each test."""
+        FlextMeltanoConfig.clear_global_instance()
+
     def test_get_global_instance_with_overrides(self) -> None:
         """Test get_global_instance with parameter overrides."""
         # Get instance with overrides

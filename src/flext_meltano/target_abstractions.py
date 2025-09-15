@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from flext_core import (
@@ -156,39 +155,6 @@ class FlextTargetAbstractions:
         self._target_configs: dict[str, FlextTargetAbstractions.FlextTargetConfig] = {}
         self._stream_registry: dict[str, FlextTargetAbstractions.FlextStreamInfo] = {}
 
-        # Compatibility attributes for test methods
-        self.validation_count: int = 0
-        self.cache_hits: int = 0
-
-    @property
-    def id(self) -> str:
-        """Compatibility property for tests - returns target_id."""
-        return self.target_id
-
-    # Compatibility methods for test compatibility (previously inherited from Entity)
-    def is_development(self) -> bool:
-        """Check if development environment - compatibility method."""
-        env = os.getenv("FLEXT_ENVIRONMENT", "development")
-        return env in {"development", "local"}
-
-    def is_test(self) -> bool:
-        """Check if test environment - compatibility method."""
-        env = os.getenv("FLEXT_ENVIRONMENT", "development")
-        return env == "test"
-
-    def is_production(self) -> bool:
-        """Check if production environment - compatibility method."""
-        env = os.getenv("FLEXT_ENVIRONMENT", "development")
-        return env == "production"
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate target abstractions business rules (required by FlextModels.Entity)."""
-        try:
-            # Business rules are enforced through Pydantic models
-            # All configurations are validated at creation time
-            return FlextResult[None].ok(None)
-        except Exception as e:
-            return FlextResult[None].fail(f"Business rule validation failed: {e}")
 
     # ============================================================================
     # TARGET CONFIGURATION METHODS
@@ -656,27 +622,10 @@ class FlextTargetAbstractions:
 
     # =============================================================================
 
-    def increment_validation_count(self) -> None:
-        """Increment validation count for compatibility."""
-        self.validation_count += 1
-
-    def increment_cache_hits(self) -> None:
-        """Alias for increment_validation_count for test compatibility."""
-        self.increment_validation_count()
-
-    @property
-    def validation_cache_hits(self) -> int:
-        """Alias for validation_count for test compatibility."""
-        return self.validation_count
 
 
-# Module-level aliases for nested classes to support imports
-FlextTargetConfig = FlextTargetAbstractions.FlextTargetConfig
-FlextStreamInfo = FlextTargetAbstractions.FlextStreamInfo
 
 
 __all__ = [
-    "FlextStreamInfo",
     "FlextTargetAbstractions",
-    "FlextTargetConfig",
 ]
