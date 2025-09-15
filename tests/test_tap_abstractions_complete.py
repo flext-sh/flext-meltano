@@ -32,19 +32,20 @@ class TestFlextTapAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test TapConfig Pydantic validation using flext_tests."""
-        # Create test config using flext_tests utilities
-        test_config_data = {
-            "tap_type": "tap-postgres",
-            "connection_config": {
-                "host": "localhost",
-                "port": 5432,
-                "database": "test_db",
-            },
-            "stream_config": {"users": {"selected": True}},
-            "version": "v1.2.0",
+        # Create test config with explicit typing
+        connection_config: dict[str, object] = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "test_db",
         }
-
-        config = TapConfig(**test_config_data)
+        stream_config: dict[str, object] = {"users": {"selected": True}}
+        
+        config = TapConfig(
+            tap_type="tap-postgres",
+            connection_config=connection_config,
+            stream_config=stream_config,
+            version="v1.2.0",
+        )
 
         # Use flext_tests assertions
         self.test_assertions.assert_equals(
@@ -62,19 +63,19 @@ class TestFlextTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test StreamDefinition Pydantic validation using flext_tests."""
-        # Create test stream definition
-        test_stream_data = {
-            "stream_name": "users",
-            "stream_schema": {
-                "type": "object",
-                "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
-            },
-            "tap_type": "tap-postgres",
-            "status": "discovered",
-            "records_extracted": 42,
+        # Create test stream definition with explicit typing
+        stream_schema: dict[str, object] = {
+            "type": "object",
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
-
-        stream_def = StreamDefinition(**test_stream_data)
+        
+        stream_def = StreamDefinition(
+            stream_name="users",
+            stream_schema=stream_schema,
+            tap_type="tap-postgres",
+            status="discovered",
+            records_extracted=42,
+        )
 
         # Use flext_tests assertions
         self.test_assertions.assert_equals(
