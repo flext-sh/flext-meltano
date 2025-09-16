@@ -518,7 +518,9 @@ class TestFlextMeltanoExecutorComplete:
                 # Some edge cases may raise exceptions
                 # This is expected behavior for invalid commands
                 # Log the exception for debugging purposes
-                logger.debug(f"Expected exception during edge case command execution: {e}")
+                logger.debug(
+                    f"Expected exception during edge case command execution: {e}"
+                )
                 assert True  # Explicit assertion instead of pass
 
     def test_pipeline_execution_error_scenarios(self) -> None:

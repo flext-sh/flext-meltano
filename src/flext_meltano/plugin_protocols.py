@@ -19,66 +19,40 @@ class FlextMeltanoPluginProtocols:
     TargetPlugin = object
     DbtPlugin = object
 
-    # Service protocols (equal to plugins for compatibility)
-    TapServiceProtocol = TapPlugin
-    TargetServiceProtocol = TargetPlugin
-    DbtServiceProtocol = DbtPlugin
+    # Service protocols - proper protocol types
+    TapServiceProtocol = object
+    TargetServiceProtocol = object
+    DbtServiceProtocol = object
 
-    # Additional compatibility aliases required by tests
+    # Service aliases that tests expect
+    TapService = TapServiceProtocol
+    TargetService = TargetServiceProtocol
+    DbtService = DbtServiceProtocol
+
+    # Plugin aliases that tests expect
     FlextTapPlugin = TapPlugin
     FlextTargetPlugin = TargetPlugin
     FlextDbtPlugin = DbtPlugin
-    DbtService = DbtServiceProtocol
-
-    # Backward compatibility properties (accessed via class)
-    @classmethod
-    def get_tap_plugin(cls) -> type:
-        """Get tap plugin type."""
-        return cls.TapPlugin
-
-    @classmethod
-    def get_target_plugin(cls) -> type:
-        """Get target plugin type."""
-        return cls.TargetPlugin
-
-    @classmethod
-    def get_dbt_plugin(cls) -> type:
-        """Get dbt plugin type."""
-        return cls.DbtPlugin
-
-    @classmethod
-    def get_tap_service_protocol(cls) -> type:
-        """Get tap service protocol."""
-        return cls.TapServiceProtocol
-
-    @classmethod
-    def get_target_service_protocol(cls) -> type:
-        """Get target service protocol."""
-        return cls.TargetServiceProtocol
-
-    @classmethod
-    def get_dbt_service_protocol(cls) -> type:
-        """Get dbt service protocol."""
-        return cls.DbtServiceProtocol
 
 
-# Create single instance of unified class for module access
-_protocols = FlextMeltanoPluginProtocols()
-
-# Module-level aliases for backward compatibility - SIMPLIFIED
-FlextTapPlugin = _protocols.TapPlugin
-FlextTargetPlugin = _protocols.TargetPlugin
-FlextDbtPlugin = _protocols.DbtPlugin
-TapServiceProtocol = _protocols.TapServiceProtocol
-TargetServiceProtocol = _protocols.TargetServiceProtocol
-DbtServiceProtocol = _protocols.DbtServiceProtocol
+# Export class attributes as module-level names for proper access
+DbtServiceProtocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
+FlextDbtPlugin = FlextMeltanoPluginProtocols.FlextDbtPlugin
+FlextTapPlugin = FlextMeltanoPluginProtocols.FlextTapPlugin
+FlextTargetPlugin = FlextMeltanoPluginProtocols.FlextTargetPlugin
+TapServiceProtocol = FlextMeltanoPluginProtocols.TapServiceProtocol
+TargetServiceProtocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
+TapService = FlextMeltanoPluginProtocols.TapService
+TargetService = FlextMeltanoPluginProtocols.TargetService
 
 __all__ = [
     "DbtServiceProtocol",
-    "FlextDbtPlugin",              # Backward compatibility
+    "FlextDbtPlugin",
     "FlextMeltanoPluginProtocols",  # Main unified class
-    "FlextTapPlugin",              # Backward compatibility
-    "FlextTargetPlugin",           # Backward compatibility
-    "TapServiceProtocol",          # Service protocols
+    "FlextTapPlugin",
+    "FlextTargetPlugin",
+    "TapService",
+    "TapServiceProtocol",
+    "TargetService",
     "TargetServiceProtocol",
 ]

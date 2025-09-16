@@ -14,7 +14,7 @@ from pathlib import Path
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.constants import FlextMeltanoConstants
 
 # Type aliases for complex types to satisfy MyPy strict mode
 ResultType = (
@@ -99,7 +99,7 @@ class FlextMeltanoBridge:
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(
                     {
-                        "meltano": FlextMeltanoConstants.Meltano.VERSION_REQUIRED,
+                        "meltano": FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED,
                         "flext_meltano": "2.0.0",
                         "status": "ready",
                     }
@@ -209,11 +209,13 @@ class FlextMeltanoBridge:
                 project_root = plugin_name_or_root
 
             project_path = Path(project_root)
-            meltano_yml = project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
+            meltano_yml = (
+                project_path / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
+            )
 
             if not meltano_yml.exists():
                 return FlextResult.fail(
-                    f"{FlextMeltanoConstants.Meltano.PROJECT_FILE} not found"
+                    f"{FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE} not found"
                 )
 
             # Use adapter directly to avoid missing method
@@ -298,7 +300,7 @@ class FlextMeltanoBridge:
                 "success": True,
                 "data": data,
                 "execution_time": 0.0,
-                "timestamp": FlextMeltanoConstants.Meltano.VERSION_REQUIRED,
+                "timestamp": FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED,
             }
         except Exception as e:
             return {"success": False, "error": str(e)}

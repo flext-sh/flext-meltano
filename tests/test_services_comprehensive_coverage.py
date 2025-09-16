@@ -29,11 +29,9 @@ class TestFlextMeltanoServiceInitialization:
         assert hasattr(self.service, "create_target_service")
         assert hasattr(self.service, "create_dbt_service")
 
-        # Test nested classes are properly defined
-        # Service properties return types, not instances - check they're callable
-        assert callable(self.service.tap_service)
-        assert callable(self.service.target_service)
-        assert callable(self.service.dbt_service)
+        # Test unified service class is callable (eliminated service property wrappers)
+        # Tests now use FlextMeltanoService directly with service_type parameter
+        assert callable(FlextMeltanoService)
 
     def test_container_registration(self) -> None:
         """Test that services are registered in the container."""
@@ -346,14 +344,14 @@ class TestServiceGenericMethods:
     def test_create_service_generic_tap(self) -> None:
         """Test generic service creation for tap services."""
         result = self.service._create_service_generic(
-            self.service.tap_service, "tap-csv", "tap_name", "tap", tap_name="tap-csv"
+            FlextMeltanoService, "tap-csv", "tap_name", "tap", tap_name="tap-csv"
         )
         assert isinstance(result, FlextResult)
 
     def test_create_service_generic_target(self) -> None:
         """Test generic service creation for target services."""
         result = self.service._create_service_generic(
-            self.service.target_service,
+            FlextMeltanoService,
             "target-csv",
             "target_name",
             "target",
@@ -364,7 +362,7 @@ class TestServiceGenericMethods:
     def test_create_service_generic_dbt(self) -> None:
         """Test generic service creation for dbt services."""
         result = self.service._create_service_generic(
-            self.service.dbt_service,
+            FlextMeltanoService,
             "my_project",
             "project_name",
             "dbt",
@@ -375,7 +373,7 @@ class TestServiceGenericMethods:
     def test_create_service_generic_with_additional_config(self) -> None:
         """Test generic service creation with additional configuration."""
         result = self.service._create_service_generic(
-            self.service.tap_service,
+            FlextMeltanoService,
             "tap-postgres",
             "tap_name",
             "tap",

@@ -26,6 +26,27 @@ class FlextMeltanoConstants:
     - ALL timeout, batch size, port values MUST come from FlextConstants
     """
 
+    # Delegate to FlextConstants for general constants
+    Core = FlextConstants.Core
+    Config = FlextConstants.Config
+    Defaults = FlextConstants.Defaults
+    Entities = FlextConstants.Entities
+    Enums = FlextConstants.Enums
+    Environment = FlextConstants.Environment
+    Errors = FlextConstants.Errors
+    Limits = FlextConstants.Limits
+    Messages = FlextConstants.Messages
+    Network = FlextConstants.Network
+    Observability = FlextConstants.Observability
+    Patterns = FlextConstants.Patterns
+    Performance = FlextConstants.Performance
+    Platform = FlextConstants.Platform
+    Reliability = FlextConstants.Reliability
+    Taps = FlextConstants.Taps
+    Utilities = FlextConstants.Utilities
+    Validation = FlextConstants.Validation
+    Web = FlextConstants.Web
+
     # =========================================================================
     # FLEXT-CORE AS SOURCE OF TRUTH - Direct delegation to avoid duplication
     # =========================================================================
@@ -57,8 +78,8 @@ class FlextMeltanoConstants:
         CREATED_BY: Final[str] = "flext-meltano"
         DEFAULT_ENVIRONMENTS: Final[list[str]] = ["dev", "staging", "prod"]
 
-    class Meltano:
-        """Meltano constants using FlextConstants as SOURCE OF TRUTH."""
+    class MeltanoSpecific:
+        """Meltano-specific constants using FlextConstants as SOURCE OF TRUTH."""
 
         # DOMAIN-SPECIFIC: File and directory names
         PROJECT_FILE: Final[str] = "meltano.yml"

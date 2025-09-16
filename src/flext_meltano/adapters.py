@@ -24,7 +24,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
-from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -120,7 +120,9 @@ class FlextMeltanoAdapter:
             }
 
             # Write configuration and create project
-            meltano_file = temp_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
+            meltano_file = (
+                temp_path / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
+            )
             with meltano_file.open("w") as f:
                 yaml.dump(meltano_config, f)
 
@@ -205,7 +207,9 @@ class FlextMeltanoAdapter:
                 )
 
             # Verify it's a valid Meltano project
-            meltano_yml = project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
+            meltano_yml = (
+                project_root / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
+            )
             if not meltano_yml.exists():
                 return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
                     f"Not a Meltano project: meltano.yml not found in {project_root}"
@@ -349,7 +353,8 @@ class FlextMeltanoAdapter:
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
                     (
-                        full_project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
+                        full_project_path
+                        / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
                     ).exists()
                 ),
             }
@@ -786,14 +791,18 @@ Thumbs.db
     # =========================================================================
 
     @staticmethod
-    def adapt_project_config(config: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+    def adapt_project_config(
+        config: FlextTypes.Core.Dict,
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Adapt project configuration with required fields."""
         try:
             adapted_config = dict(config)
 
             # Add required fields if missing
             if "project_id" not in adapted_config:
-                adapted_config["project_id"] = f"flext-project-{FlextUtilities.Generators.generate_uuid()[:8]}"
+                adapted_config["project_id"] = (
+                    f"flext-project-{FlextUtilities.Generators.generate_uuid()[:8]}"
+                )
 
             if "version" not in adapted_config:
                 adapted_config["version"] = 1
@@ -803,15 +812,23 @@ Thumbs.db
 
             # Ensure plugins structure exists
             if "plugins" not in adapted_config:
-                adapted_config["plugins"] = {"extractors": [], "loaders": [], "transformers": []}
+                adapted_config["plugins"] = {
+                    "extractors": [],
+                    "loaders": [],
+                    "transformers": [],
+                }
 
             return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to adapt project config: {e}")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                f"Failed to adapt project config: {e}"
+            )
 
     @staticmethod
-    def adapt_plugin(plugin_data: FlextTypes.Core.Dict) -> FlextResult[FlextTypes.Core.Dict]:
+    def adapt_plugin(
+        plugin_data: FlextTypes.Core.Dict,
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Adapt plugin data with required fields."""
         try:
             adapted_plugin = dict(plugin_data)
@@ -820,7 +837,9 @@ Thumbs.db
             if "name" not in adapted_plugin:
                 plugin_type = str(adapted_plugin.get("type", "plugin"))
                 pip_url = str(adapted_plugin.get("pip_url", "unknown"))
-                adapted_plugin["name"] = f"{plugin_type}-{pip_url.split('-')[-1] if '-' in pip_url else pip_url}"
+                adapted_plugin["name"] = (
+                    f"{plugin_type}-{pip_url.rsplit('-', maxsplit=1)[-1] if '-' in pip_url else pip_url}"
+                )
 
             # Add namespace if missing
             if "namespace" not in adapted_plugin:
@@ -835,9 +854,11 @@ Thumbs.db
             return FlextResult[FlextTypes.Core.Dict].ok(adapted_plugin)
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to adapt plugin: {e}")
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                f"Failed to adapt plugin: {e}"
+            )
 
-    def plugin_discovery(self) -> object:
+    def plugin_discovery(self) -> FlextMeltanoAdapter:
         """Get plugin discovery interface for compatibility."""
         # Return self to provide plugin discovery functionality
         return self

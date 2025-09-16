@@ -190,7 +190,7 @@ class FlextMeltanoFileManagers:
 
             # Create essential config files
             configs: dict[str, ConfigDict] = {
-                FlextMeltanoConstants.Meltano.PROJECT_FILE: {
+                FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE: {
                     "version": 1,
                     "project_id": project_name,
                     "project_name": project_name,

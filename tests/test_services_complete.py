@@ -62,18 +62,18 @@ class TestFlextMeltanoServiceComplete:
             assert result.error_message
 
     def test_tap_service_class_access(self) -> None:
-        """Test access to tap service property (snake_case after ruff fixes)."""
-        tap_service_method = self.service.tap_service
-        assert tap_service_method is not None
-        assert callable(tap_service_method)
+        """Test access to unified service class (eliminated service property wrappers)."""
+        # Use FlextMeltanoService directly instead of eliminated property
+        assert callable(FlextMeltanoService)
+        assert FlextMeltanoService is not None
 
-        # Test that the property method returns a type
+        # Test that the unified service can be instantiated
         try:
-            service_type = tap_service_method()
-            assert service_type is not None
+            service_instance = FlextMeltanoService(service_type="tap")
+            assert service_instance is not None
         except (ValueError, TypeError, RuntimeError, AttributeError):
             # Service instantiation failed - this is expected without proper setup
-            # Test passes - we validated the method exists and is callable
+            # Test passes - we validated the class exists and is callable
             pass
 
     def test_target_service_class_access(self) -> None:
