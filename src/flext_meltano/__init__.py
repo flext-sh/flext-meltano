@@ -18,18 +18,7 @@ from flext_meltano.executors_bridge import FlextMeltanoBridge
 # Executor functionality available through FlextMeltanoExecutor directly
 # No compatibility wrappers - use FlextMeltanoExecutor unified class
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.plugin_protocols import (
-    DbtServiceProtocol,
-    FlextDbtPlugin,
-    FlextMeltanoPluginProtocols,  # Updated unified class name
-    FlextTapPlugin,
-    FlextTargetPlugin,
-    TapServiceProtocol,
-    TargetServiceProtocol,
-)
-
-# Service implementations available through FlextMeltanoService methods:
-# FlextMeltanoService.create_tap_service, create_target_service, create_dbt_service
+from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.singer_types import FlextSingerTypes
 from flext_meltano.tap_abstractions import (
@@ -41,20 +30,17 @@ from flext_meltano.tap_abstractions import (
 from flext_meltano.target_abstractions import (
     FlextTargetAbstractions,
 )
-
-# Exception handling - DIRECT flext-core generated exceptions only
-# Core executors
-# CLI executors
-# Meltano executors
-# Plugin protocols
-# Service implementations
-# Singer types and abstractions
-# Utilities and validation
-# Import test compatibility classes and functions from dedicated module
-# NOTE: Test compatibility classes available through existing abstraction modules
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Direct access to plugin protocols through unified class
+DbtServiceProtocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
+FlextDbtPlugin = FlextMeltanoPluginProtocols.FlextDbtPlugin
+FlextTapPlugin = FlextMeltanoPluginProtocols.FlextTapPlugin
+FlextTargetPlugin = FlextMeltanoPluginProtocols.FlextTargetPlugin
+TapServiceProtocol = FlextMeltanoPluginProtocols.TapServiceProtocol
+TargetServiceProtocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
 
 __all__ = [
     "DbtServiceProtocol",

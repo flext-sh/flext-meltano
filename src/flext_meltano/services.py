@@ -53,7 +53,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         "dbt": "transformer",
     }
 
-
     def __init__(self, *, service_type: str = "tap", **data: object) -> None:
         """Initialize unified Meltano service using FlextConfig."""
         # Convert data to mutable dict and extract service-specific fields
@@ -74,7 +73,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         for field, value in service_specific_fields.items():
             if value is not None:
                 setattr(self, field, value)
-
 
     def execute(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute service operation based on type - UNIFIED IMPLEMENTATION."""
@@ -131,45 +129,40 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 "Empty configuration provided"
             )
 
-        try:
-            service_name = getattr(
-                self, f"{self._service_type}_name", f"default-{self._service_type}"
-            )
+        service_name = getattr(
+            self, f"{self._service_type}_name", f"default-{self._service_type}"
+        )
 
-            instance: FlextTypes.Core.Dict
-            if self._service_type == "tap":
-                instance = {
-                    "name": service_name,
-                    "namespace": f"tap_{service_name.replace('-', '_')}",
-                    "config": config,
-                    "executable": f"tap-{service_name.split('-')[-1]}",
-                    "capabilities": ["discover", "catalog", "state"],
-                }
-            elif self._service_type == "target":
-                instance = {
-                    "name": service_name,
-                    "namespace": f"target_{service_name.replace('-', '_')}",
-                    "config": config,
-                    "executable": f"target-{service_name.split('-')[-1]}",
-                    "capabilities": ["about", "stream-maps"],
-                }
-            elif self._service_type == "dbt":
-                instance = {
-                    "name": service_name,
-                    "type": "dbt",
-                    "config": config,
-                    "executable": "dbt",
-                }
-            else:
-                return FlextResult[FlextTypes.Core.Dict].fail(
-                    f"Unknown service type: {self._service_type}"
-                )
-
-            return FlextResult[FlextTypes.Core.Dict].ok(instance)
-        except Exception as e:
+        instance: FlextTypes.Core.Dict
+        if self._service_type == "tap":
+            instance = {
+                "name": service_name,
+                "namespace": f"tap_{service_name.replace('-', '_')}",
+                "config": config,
+                "executable": f"tap-{service_name.split('-')[-1]}",
+                "capabilities": ["discover", "catalog", "state"],
+            }
+        elif self._service_type == "target":
+            instance = {
+                "name": service_name,
+                "namespace": f"target_{service_name.replace('-', '_')}",
+                "config": config,
+                "executable": f"target-{service_name.split('-')[-1]}",
+                "capabilities": ["about", "stream-maps"],
+            }
+        elif self._service_type == "dbt":
+            instance = {
+                "name": service_name,
+                "type": "dbt",
+                "config": config,
+                "executable": "dbt",
+            }
+        else:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Failed to create {self._service_type} instance: {e}"
+                f"Unknown service type: {self._service_type}"
             )
+
+        return FlextResult[FlextTypes.Core.Dict].ok(instance)
 
     def validate_service_config(
         self, config: FlextTypes.Core.Dict
@@ -204,17 +197,12 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
     def validate_service(self) -> FlextResult[bool]:
         """Validate service configuration and setup."""
-        try:
-            config_result = self.get_default_config()
-            if config_result.is_failure:
-                return FlextResult[bool].fail(
-                    f"Default config failed: {config_result.error}"
-                )
-            return self.validate_service_config(config_result.unwrap())
-        except Exception as e:
+        config_result = self.get_default_config()
+        if config_result.is_failure:
             return FlextResult[bool].fail(
-                f"{self._service_type.title()} service validation failed: {e}"
+                f"Default config failed: {config_result.error}"
             )
+        return self.validate_service_config(config_result.unwrap())
 
     def run_models(
         self, model_names: list[str] | None = None
@@ -246,33 +234,26 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         return self.get_default_config()
 
-
     # Consolidated Service Factory - ZERO DUPLICATION using flext-core patterns
     @staticmethod
     def _create_service_with_type(
         name: str, service_type: str, field_name: str, **config: object
     ) -> FlextResult[FlextMeltanoService]:
         """Consolidated factory using flext-core extensively - ELIMINATES 150+ lines duplication."""
-        try:
-            # Use flext-core validation and text processing extensively
-            safe_name = FlextUtilities.TextProcessor.safe_string(name)
+        # Use flext-core validation and text processing extensively
+        safe_name = FlextUtilities.TextProcessor.safe_string(name)
 
-            # Create unified configuration using flext-core patterns
-            service_kwargs: FlextTypes.Core.Dict = {
-                "service_type": service_type,
-                field_name: safe_name,
-                "entity_id": FlextUtilities.Generators.generate_id(),
-                **{k: v for k, v in config.items() if k != "service_type"},
-            }
+        # Create unified configuration using flext-core patterns
+        service_kwargs: FlextTypes.Core.Dict = {
+            "service_type": service_type,
+            field_name: safe_name,
+            "entity_id": FlextUtilities.Generators.generate_id(),
+            **{k: v for k, v in config.items() if k != "service_type"},
+        }
 
-            # Use model_validate for proper Pydantic instantiation
-            service_instance = FlextMeltanoService.model_validate(service_kwargs)
-            return FlextResult[FlextMeltanoService].ok(service_instance)
-
-        except Exception as e:
-            return FlextResult[FlextMeltanoService].fail(
-                f"Failed to create {service_type} service: {e}"
-            )
+        # Use model_validate for proper Pydantic instantiation
+        service_instance = FlextMeltanoService.model_validate(service_kwargs)
+        return FlextResult[FlextMeltanoService].ok(service_instance)
 
     # Generic Service Factory using advanced Python 3.13+ patterns
     @staticmethod
@@ -299,51 +280,43 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             FlextResult containing the created service instance or error
 
         """
-        try:
-            # Use FlextUtilities for name validation - consolidated pattern
-            default_name = f"{service_prefix}-default"
-            safe_name = FlextUtilities.TextProcessor.safe_string(name)
+        # Use FlextUtilities for name validation - consolidated pattern
+        default_name = f"{service_prefix}-default"
+        safe_name = FlextUtilities.TextProcessor.safe_string(name)
 
-            # Consolidated validation logic
-            if not safe_name or safe_name == default_name:
-                return FlextResult[T_Service].fail(
-                    f"Invalid {service_prefix} name: {name}"
-                )
+        # Consolidated validation logic
+        if not safe_name or safe_name == default_name:
+            return FlextResult[T_Service].fail(f"Invalid {service_prefix} name: {name}")
 
-            # Dynamic service instance creation using **kwargs pattern
-            service_kwargs: FlextTypes.Core.Dict = {field_name: safe_name}
-            service_kwargs.update(config)  # Add additional configuration
+        # Dynamic service instance creation using **kwargs pattern
+        service_kwargs: FlextTypes.Core.Dict = {field_name: safe_name}
+        service_kwargs.update(config)  # Add additional configuration
 
-            # Convert service_kwargs to proper types using FlextUtilities - NO DUPLICATION
-            typed_kwargs = {
-                "service_type": str(service_kwargs.get("service_type", service_prefix)),
-                "app_name": str(
-                    service_kwargs.get("app_name", f"{service_prefix}-{safe_name}")
-                ),
-                "environment": str(service_kwargs.get("environment", "development")),
-                "debug": bool(service_kwargs.get("debug", False)),
-                "log_level": str(service_kwargs.get("log_level", "INFO")),
-                "max_workers": FlextUtilities.Conversions.safe_int(
-                    str(service_kwargs.get("max_workers", 4))
-                ),
-                "timeout_seconds": FlextUtilities.Conversions.safe_int(
-                    str(service_kwargs.get("timeout_seconds", 30))
-                ),
-            }
+        # Convert service_kwargs to proper types using FlextUtilities - NO DUPLICATION
+        typed_kwargs = {
+            "service_type": str(service_kwargs.get("service_type", service_prefix)),
+            "app_name": str(
+                service_kwargs.get("app_name", f"{service_prefix}-{safe_name}")
+            ),
+            "environment": str(service_kwargs.get("environment", "development")),
+            "debug": bool(service_kwargs.get("debug", False)),
+            "log_level": str(service_kwargs.get("log_level", "INFO")),
+            "max_workers": FlextUtilities.Conversions.safe_int(
+                str(service_kwargs.get("max_workers", 4))
+            ),
+            "timeout_seconds": FlextUtilities.Conversions.safe_int(
+                str(service_kwargs.get("timeout_seconds", 30))
+            ),
+        }
 
-            # Add service-specific field
-            typed_kwargs[field_name] = safe_name
+        # Add service-specific field
+        typed_kwargs[field_name] = safe_name
 
-            # Service instantiation - Pydantic services accept kwargs
-            # Use model_validate for proper Pydantic instantiation
-            service_instance = service_class.model_validate(typed_kwargs)
+        # Service instantiation - Pydantic services accept kwargs
+        # Use model_validate for proper Pydantic instantiation
+        service_instance = service_class.model_validate(typed_kwargs)
 
-            return FlextResult[T_Service].ok(service_instance)
-
-        except Exception as e:
-            return FlextResult[T_Service].fail(
-                f"Failed to create {service_prefix} service: {e}"
-            )
+        return FlextResult[T_Service].ok(service_instance)
 
     @staticmethod
     def create_tap_service(
@@ -371,6 +344,32 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         return FlextMeltanoService._create_service_with_type(
             project_name, "dbt", "project_name", **config
         )
+
+    # COMPATIBILITY PROPERTIES - for backward compatibility with tests and external usage
+    @property
+    def tap_service(self) -> object:
+        """Backward compatibility property for tap service access."""
+        return self.create_tap_service
+
+    @property
+    def target_service(self) -> object:
+        """Backward compatibility property for target service access."""
+        return self.create_target_service
+
+    @property
+    def dbt_service(self) -> object:
+        """Backward compatibility property for dbt service access."""
+        return self.create_dbt_service
+
+    @property
+    def adapter(self) -> object:
+        """Adapter property for backward compatibility with tests."""
+        try:
+            from flext_meltano.adapters import FlextMeltanoAdapter  # noqa: PLC0415
+
+            return FlextMeltanoAdapter()
+        except Exception:
+            return None
 
 
 __all__ = [

@@ -71,7 +71,10 @@ class TestFlextMeltanoPluginProtocolsBasic(TestCase):
     def test_service_protocol_aliases(self) -> None:
         """Test service protocol aliases exist."""
         # TapService should alias TapPlugin
-        assert FlextMeltanoPluginProtocols.TapService is FlextMeltanoPluginProtocols.TapPlugin
+        assert (
+            FlextMeltanoPluginProtocols.TapService
+            is FlextMeltanoPluginProtocols.TapPlugin
+        )
 
         # TargetService should alias TargetPlugin
         assert (
@@ -80,13 +83,17 @@ class TestFlextMeltanoPluginProtocolsBasic(TestCase):
         )
 
         # DbtService should alias DbtPlugin
-        assert FlextMeltanoPluginProtocols.DbtService is FlextMeltanoPluginProtocols.DbtPlugin
+        assert (
+            FlextMeltanoPluginProtocols.DbtService
+            is FlextMeltanoPluginProtocols.DbtPlugin
+        )
 
     def test_backward_compatibility_aliases(self) -> None:
         """Test backward compatibility aliases exist."""
         # FlextTapPlugin should alias TapPlugin
         assert (
-            FlextMeltanoPluginProtocols.FlextTapPlugin is FlextMeltanoPluginProtocols.TapPlugin
+            FlextMeltanoPluginProtocols.FlextTapPlugin
+            is FlextMeltanoPluginProtocols.TapPlugin
         )
 
         # FlextTargetPlugin should alias TargetPlugin
@@ -97,14 +104,17 @@ class TestFlextMeltanoPluginProtocolsBasic(TestCase):
 
         # FlextDbtPlugin should alias DbtPlugin
         assert (
-            FlextMeltanoPluginProtocols.FlextDbtPlugin is FlextMeltanoPluginProtocols.DbtPlugin
+            FlextMeltanoPluginProtocols.FlextDbtPlugin
+            is FlextMeltanoPluginProtocols.DbtPlugin
         )
 
     def test_nested_types_structure(self) -> None:
         """Test nested types structure exists."""
         # Should have proper class structure
         assert hasattr(FlextMeltanoPluginProtocols, "__module__")
-        assert FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
+        assert (
+            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
+        )
 
     def test_module_level_aliases(self) -> None:
         """Test module-level backward compatibility aliases."""

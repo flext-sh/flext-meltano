@@ -42,15 +42,17 @@ class FlextMeltanoConfig(FlextConfig):
     # ============================================================================
 
     # Use FlextMeltanoConstants for all version constants (SOURCE OF TRUTH)
-    MELTANO_VERSION: ClassVar[str] = FlextMeltanoConstants.Meltano.VERSION_REQUIRED
+    MELTANO_VERSION: ClassVar[str] = (
+        FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED
+    )
     SINGER_SDK_VERSION: ClassVar[str] = (
         FlextMeltanoConstants.Singer.SDK_VERSION_REQUIRED
     )
     DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.DBT.VERSION_REQUIRED
 
     # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
-    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.PROJECT_FILE
-    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Meltano.STATE_DIR
+    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
+    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.MeltanoSpecific.STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
 
     # Meltano environment variables (Meltano-specific)

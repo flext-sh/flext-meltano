@@ -339,7 +339,9 @@ class TestFlextTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Test successful schema message processing (lines 249-289)
-        schema: dict[str, object] = {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}
+        schema: dict[str, object] = {
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}}
+        }
         schema_result = self.target_abstractions.process_schema_message(
             target, "users", schema
         )
@@ -421,7 +423,9 @@ class TestFlextTargetAbstractionsComplete:
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: dict[str, object] = {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}
+        schema: dict[str, object] = {
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}}
+        }
         schema_result = self.target_abstractions.process_schema_message(
             target, "users", schema
         )
@@ -487,7 +491,9 @@ class TestFlextTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Add schema and data
-        schema: dict[str, object] = {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}
+        schema: dict[str, object] = {
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}}
+        }
         schema_result = self.target_abstractions.process_schema_message(
             target, "users", schema
         )
@@ -521,7 +527,9 @@ class TestFlextTargetAbstractionsComplete:
             message="Should mark as completed",
         )
         total_records = finalization_info.get("total_records", 0)
-        assert isinstance(total_records, (int, str)), f"Expected int or str, got {type(total_records)}"
+        assert isinstance(total_records, (int, str)), (
+            f"Expected int or str, got {type(total_records)}"
+        )
         self.test_assertions.assert_true(
             condition=int(total_records) >= 2,
             message="Should count total records",
@@ -537,7 +545,9 @@ class TestFlextTargetAbstractionsComplete:
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: dict[str, object] = {"properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}
+        schema: dict[str, object] = {
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}}
+        }
         schema_result = self.target_abstractions.process_schema_message(
             target, "users", schema
         )

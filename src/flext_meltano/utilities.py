@@ -67,9 +67,7 @@ class FlextMeltanoUtilities:
                 yaml.dump(config, f, default_flow_style=False, indent=2)
             return FlextResult[bool].ok(data=True)
         except Exception as e:
-            error_msg = (
-                f"Failed to write {FlextMeltanoConstants.Meltano.PROJECT_FILE}: {e}"
-            )
+            error_msg = f"Failed to write {FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE}: {e}"
             FlextLogger(__name__).exception(error_msg)
             return FlextResult[bool].fail(error_msg)
 

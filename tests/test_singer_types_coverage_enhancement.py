@@ -278,7 +278,9 @@ class TestFlextSingerTypesCoverage:
         state_message = result.data
         assert isinstance(state_message, dict)  # Type assertion for subscript access
         assert state_message["type"] == "STATE"
-        assert isinstance(state_message["value"], dict)  # Type assertion for nested access
+        assert isinstance(
+            state_message["value"], dict
+        )  # Type assertion for nested access
         assert isinstance(state_message["value"]["bookmarks"], dict)
         assert isinstance(state_message["value"]["bookmarks"]["users"], dict)
         assert state_message["value"]["bookmarks"]["users"]["id"] == 100
@@ -303,15 +305,22 @@ class TestFlextSingerTypesCoverage:
         assert "user_id" in props_dict
         assert "username" in props_dict
         assert "created_at" in props_dict
-        assert isinstance(props_dict["user_id"], dict)  # Type assertion for subscript access
-        assert isinstance(props_dict["username"], dict)  # Type assertion for subscript access
+        assert isinstance(
+            props_dict["user_id"], dict
+        )  # Type assertion for subscript access
+        assert isinstance(
+            props_dict["username"], dict
+        )  # Type assertion for subscript access
         assert props_dict["user_id"]["type"] == "integer"
         assert props_dict["username"]["type"] == "string"
 
     def test_add_property_functionality(self) -> None:
         """Test adding properties to existing property lists."""
         # Start with basic properties
-        initial_props: dict[str, dict[str, object]] = {"id": {"type": "integer"}, "name": {"type": "string"}}
+        initial_props: dict[str, dict[str, object]] = {
+            "id": {"type": "integer"},
+            "name": {"type": "string"},
+        }
         result = self.singer_types.create_properties_list(initial_props)
         assert result.is_success
         assert result.data is not None
@@ -394,7 +403,9 @@ class TestFlextSingerTypesCoverage:
     def test_error_handling_and_edge_cases(self) -> None:
         """Test error handling and edge cases."""
         # Test validation with malformed type definition
-        malformed_type: dict[str, object] = {"invalid": "definition"}  # Missing "type" key
+        malformed_type: dict[str, object] = {
+            "invalid": "definition"
+        }  # Missing "type" key
         result = self.singer_types.validate_value("test", malformed_type)
         assert not result.is_success
 
@@ -473,7 +484,10 @@ class TestFlextSingerTypesIntegration:
     def test_properties_list_complete_workflow(self) -> None:
         """Test complete properties list creation and manipulation."""
         # Start with base properties
-        base_properties: dict[str, dict[str, object]] = {"id": {"type": "integer"}, "name": {"type": "string"}}
+        base_properties: dict[str, dict[str, object]] = {
+            "id": {"type": "integer"},
+            "name": {"type": "string"},
+        }
 
         props_result = self.singer_types.create_properties_list(base_properties)
         assert props_result.is_success

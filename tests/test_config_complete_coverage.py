@@ -55,7 +55,9 @@ class TestFlextMeltanoConfig:
     def test_path_validation_success(self) -> None:
         """Test successful path validation."""
         config = FlextMeltanoConfig(
-            project_root=Path("/valid/path"), config_dir=Path("config"), logs_dir=Path("logs")
+            project_root=Path("/valid/path"),
+            config_dir=Path("config"),
+            logs_dir=Path("logs"),
         )
 
         # Should convert string paths to Path objects
@@ -100,7 +102,9 @@ class TestFlextMeltanoConfig:
 
     def test_get_absolute_config_dir(self) -> None:
         """Test get_absolute_config_dir method."""
-        config = FlextMeltanoConfig(project_root=Path("/test/project"), config_dir=Path(".meltano"))
+        config = FlextMeltanoConfig(
+            project_root=Path("/test/project"), config_dir=Path(".meltano")
+        )
         config_dir = config.get_absolute_config_dir()
 
         assert isinstance(config_dir, Path)
@@ -110,7 +114,9 @@ class TestFlextMeltanoConfig:
 
     def test_get_absolute_logs_dir(self) -> None:
         """Test get_absolute_logs_dir method."""
-        config = FlextMeltanoConfig(project_root=Path("/test/project"), logs_dir=Path("logs"))
+        config = FlextMeltanoConfig(
+            project_root=Path("/test/project"), logs_dir=Path("logs")
+        )
         logs_dir = config.get_absolute_logs_dir()
 
         assert isinstance(logs_dir, Path)
@@ -153,7 +159,9 @@ class TestFlextMeltanoConfig:
     def test_get_environment_variables(self) -> None:
         """Test environment variables extraction."""
         config = FlextMeltanoConfig(
-            project_root=Path("/test/project"), environment="development", log_level="debug"
+            project_root=Path("/test/project"),
+            environment="development",
+            log_level="debug",
         )
         env_vars = config.get_environment_variables()
 
@@ -195,7 +203,9 @@ class TestFlextMeltanoConfig:
             project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
 
-            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
+            result = FlextMeltanoConfig.create_from_project_root(
+                project_root=Path(tmp_dir)
+            )
 
             assert result.is_success
             config = result.unwrap()
@@ -209,7 +219,9 @@ class TestFlextMeltanoConfig:
             project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
 
-            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
+            result = FlextMeltanoConfig.create_from_project_root(
+                project_root=Path(tmp_dir)
+            )
 
             assert result.is_success
             config = result.unwrap()
@@ -387,7 +399,9 @@ class TestFlextMeltanoConfigIntegration:
             logs_dir.mkdir()
 
             # Create config using factory
-            result = FlextMeltanoConfig.create_from_project_root(project_root=Path(tmp_dir))
+            result = FlextMeltanoConfig.create_from_project_root(
+                project_root=Path(tmp_dir)
+            )
 
             assert result.is_success
             config = result.unwrap()

@@ -190,12 +190,12 @@ class TestFlextMeltanoAdapterCoverage:
             # Should return a failed FlextResult, not raise exception
             self.test_assertions.assert_true(
                 condition=result.is_failure,
-                message="Should return failed result for permission error"
+                message="Should return failed result for permission error",
             )
             self.test_assertions.assert_in(
                 item="Permission denied",
                 container=result.error or "",
-                message="Should include permission error in message"
+                message="Should include permission error in message",
             )
 
     def test_initialize_attributes(self) -> None:
