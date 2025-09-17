@@ -1,7 +1,6 @@
 """Test module for flext-meltano."""
 
 from flext_core import FlextTypes
-
 from flext_meltano.singer_types import FlextSingerTypes
 
 
@@ -75,7 +74,7 @@ class TestFlextSingerTypesUnified:
 
         # Invalid type
         result = singer_types.validate_value(123, string_type)
-        assert result.failure
+        assert result.is_failure
         error_msg = result.error
         assert error_msg is not None
         assert "Expected string" in error_msg

@@ -12,7 +12,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar, TypeVar
+from typing import ClassVar
+
+from pydantic import ConfigDict
 
 from flext_core import (
     FlextContainer,
@@ -21,14 +23,10 @@ from flext_core import (
     FlextResult,
     FlextTypes,
     FlextUtilities,
+    T,
 )
-from pydantic import ConfigDict
-
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
-
-# Type variable for generic service factory
-T_Service = TypeVar("T_Service", bound="FlextMeltanoService")
 
 
 class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
@@ -258,12 +256,12 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
     # Generic Service Factory using advanced Python 3.13+ patterns
     @staticmethod
     def _create_service_generic(
-        service_class: type[T_Service],
+        service_class: type[T],
         name: str,
         field_name: str,
         service_prefix: str,
         **config: object,
-    ) -> FlextResult[T_Service]:
+    ) -> FlextResult[T]:
         """Generic factory method for all Meltano service types.
 
         Uses advanced Python 3.13+ generics with FlextUtilities validation
@@ -286,13 +284,13 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         # Consolidated validation logic
         if not safe_name or safe_name == default_name:
-            return FlextResult[T_Service].fail(f"Invalid {service_prefix} name: {name}")
+            return FlextResult[T].fail(f"Invalid {service_prefix} name: {name}")
 
         # Dynamic service instance creation using **kwargs pattern
         service_kwargs: FlextTypes.Core.Dict = {field_name: safe_name}
         service_kwargs.update(config)  # Add additional configuration
 
-        # Convert service_kwargs to proper types using FlextUtilities - NO DUPLICATION
+        # Convert service_kwargs to proper types using FlextUtilities
         typed_kwargs = {
             "service_type": str(service_kwargs.get("service_type", service_prefix)),
             "app_name": str(
@@ -312,11 +310,22 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         # Add service-specific field
         typed_kwargs[field_name] = safe_name
 
-        # Service instantiation - Pydantic services accept kwargs
-        # Use model_validate for proper Pydantic instantiation
-        service_instance = service_class.model_validate(typed_kwargs)
+        # Service instantiation - Handle both Pydantic and regular classes
+        try:
+            # Try Pydantic model_validate first, fallback to regular instantiation
+            if hasattr(service_class, "model_validate"):
+                # Pydantic model - use getattr for type safety
+                model_validate = getattr(service_class, "model_validate")
+                service_instance = model_validate(typed_kwargs)
+            else:
+                # Regular class instantiation
+                service_instance = service_class(**typed_kwargs)
+        except Exception as e:
+            return FlextResult[T].fail(
+                f"Failed to create {service_prefix} service: {e}"
+            )
 
-        return FlextResult[T_Service].ok(service_instance)
+        return FlextResult[T].ok(service_instance)
 
     @staticmethod
     def create_tap_service(
@@ -345,31 +354,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             project_name, "dbt", "project_name", **config
         )
 
-    # COMPATIBILITY PROPERTIES - for backward compatibility with tests and external usage
-    @property
-    def tap_service(self) -> object:
-        """Backward compatibility property for tap service access."""
-        return self.create_tap_service
-
-    @property
-    def target_service(self) -> object:
-        """Backward compatibility property for target service access."""
-        return self.create_target_service
-
-    @property
-    def dbt_service(self) -> object:
-        """Backward compatibility property for dbt service access."""
-        return self.create_dbt_service
-
-    @property
-    def adapter(self) -> object:
-        """Adapter property for backward compatibility with tests."""
-        try:
-            from flext_meltano.adapters import FlextMeltanoAdapter  # noqa: PLC0415
-
-            return FlextMeltanoAdapter()
-        except Exception:
-            return None
 
 
 __all__ = [

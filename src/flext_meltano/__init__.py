@@ -34,17 +34,9 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
-# Direct access to plugin protocols through unified class
-DbtServiceProtocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
-FlextDbtPlugin = FlextMeltanoPluginProtocols.FlextDbtPlugin
-FlextTapPlugin = FlextMeltanoPluginProtocols.FlextTapPlugin
-FlextTargetPlugin = FlextMeltanoPluginProtocols.FlextTargetPlugin
-TapServiceProtocol = FlextMeltanoPluginProtocols.TapServiceProtocol
-TargetServiceProtocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
+# NO ALIASES - Use FlextMeltanoPluginProtocols directly for all protocol access
 
 __all__ = [
-    "DbtServiceProtocol",
-    "FlextDbtPlugin",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     # "FlextMeltanoCli",  # Use FlextMeltanoExecutor.create_cli_runner
@@ -57,7 +49,7 @@ __all__ = [
     "FlextMeltanoExecutor",
     # "FlextMeltanoExecutors",  # Use FlextMeltanoExecutor directly
     "FlextMeltanoFileManagers",
-    "FlextMeltanoPluginProtocols",  # Updated unified class name
+    "FlextMeltanoPluginProtocols",  # Main unified class - NO ALIASES
     "FlextMeltanoService",
     # "FlextMeltanoTapService",  # Use FlextMeltanoService.create_tap_service
     # "FlextMeltanoTargetService",  # Use FlextMeltanoService.create_target_service
@@ -66,15 +58,11 @@ __all__ = [
     "FlextMeltanoValidators",
     "FlextSingerTypes",
     "FlextTapAbstractions",
-    "FlextTapPlugin",
     "FlextTargetAbstractions",
-    "FlextTargetPlugin",
-    # "SimpleDbtExecutor",     # Use FlextMeltanoExecutor directly
-    # "SimpleMeltanoExecutor", # Use FlextMeltanoExecutor directly
+    # "FlextMeltanoSimpleDbtExecutor",     # Use FlextMeltanoExecutor directly
+    # "FlextMeltanoSimpleExecutor", # Use FlextMeltanoExecutor directly
     "StreamDefinition",
     "TapConfig",
     "TapInstance",
-    "TapServiceProtocol",
-    "TargetServiceProtocol",
     # "flext_meltano_run_cli",  # Use FlextMeltanoExecutor.create_cli_runner
 ]

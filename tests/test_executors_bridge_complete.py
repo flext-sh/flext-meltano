@@ -6,7 +6,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 from flext_core import FlextResult
-
 from flext_meltano.executors_bridge import FlextMeltanoBridge
 
 
@@ -38,7 +37,7 @@ class TestFlextMeltanoBridgeComplete:
             )
         else:
             # May fail if Meltano is not available
-            assert result.error_message
+            assert result.error
 
     def test_get_version_json(self) -> None:
         """Test get_version_json method."""
@@ -65,7 +64,7 @@ class TestFlextMeltanoBridgeComplete:
                 assert isinstance(plugin, dict)
         else:
             # Network/API failures are acceptable
-            assert result.error_message
+            assert result.error
 
     def test_list_plugins(self) -> None:
         """Test list_plugins method."""
@@ -98,7 +97,7 @@ class TestFlextMeltanoBridgeComplete:
                 assert isinstance(project_info, dict)
             else:
                 # May fail without proper Meltano setup
-                assert result.error_message
+                assert result.error
 
     def test_get_project_info(self) -> None:
         """Test get_project_info method."""
@@ -124,7 +123,7 @@ class TestFlextMeltanoBridgeComplete:
             assert isinstance(install_info, dict)
         else:
             # May fail without proper setup or network issues
-            assert result.error_message
+            assert result.error
 
     def test_execute_meltano_command(self) -> None:
         """Test execute_meltano_command method."""
@@ -354,7 +353,7 @@ class TestFlextMeltanoBridgeComplete:
         init_result = self.bridge.initialize_project(str(invalid_path))
         assert isinstance(init_result, FlextResult)
         if not init_result.success:
-            assert init_result.error_message
+            assert init_result.error
 
         # Test get_project_info with invalid path
         project_result = self.bridge.get_project_info(str(invalid_path))
@@ -482,8 +481,8 @@ class TestFlextMeltanoBridgeComplete:
 
             # Should fail gracefully with informative errors
             if not result.success:
-                assert result.error_message
-                assert len(result.error_message) > 0
+                assert result.error
+                assert len(result.error) > 0
 
         # Test dict operations
         dict_operations = [

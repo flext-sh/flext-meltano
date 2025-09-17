@@ -12,7 +12,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
-
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 

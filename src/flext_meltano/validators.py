@@ -9,9 +9,9 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextValidations
 from pydantic import BaseModel, Field, field_validator
 
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
 
 logger = FlextLogger(__name__)
@@ -31,14 +31,13 @@ class FlextMeltanoValidators:
         cls, config: object
     ) -> FlextResult[bool]:
         """Validate MELTANO-SPECIFIC plugin business rules."""
-        # Delegate generic dict validation to flext-core
-        dict_result = FlextValidations.TypeValidators.validate_dict(config)
-        if dict_result.is_failure:
+        # Validate config is dict using direct validation
+        if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                f"Plugin config validation failed: {dict_result.error}"
+                "Plugin config validation failed: config must be a dictionary"
             )
 
-        config_dict = dict_result.unwrap()
+        config_dict = config
 
         # DOMAIN-SPECIFIC: Meltano plugin business rules
         class MeltanoPluginBusinessRules(BaseModel):
@@ -70,24 +69,25 @@ class FlextMeltanoValidators:
                     raise ValueError(msg)
                 return v
 
-        # Delegate Pydantic validation to flext-core
-        return FlextValidations.SchemaValidators.validate_with_pydantic_schema(
-            config_dict, MeltanoPluginBusinessRules
-        ).map(lambda _: True)
+        # Use Pydantic model validation directly
+        try:
+            MeltanoPluginBusinessRules.model_validate(config_dict)
+            return FlextResult[bool].ok(data=True)
+        except Exception as e:
+            return FlextResult[bool].fail(f"Plugin validation failed: {e}")
 
     @classmethod
     def validate_meltano_project_business_rules(
         cls, config: object
     ) -> FlextResult[bool]:
         """Validate MELTANO-SPECIFIC project business rules."""
-        # Delegate generic dict validation to flext-core
-        dict_result = FlextValidations.TypeValidators.validate_dict(config)
-        if dict_result.is_failure:
+        # Validate config is dict using direct validation
+        if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                f"Project config validation failed: {dict_result.error}"
+                "Project config validation failed: config must be a dictionary"
             )
 
-        config_dict = dict_result.unwrap()
+        config_dict = config
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(BaseModel):
@@ -112,22 +112,23 @@ class FlextMeltanoValidators:
                     raise ValueError(msg)
                 return v
 
-        # Delegate Pydantic validation to flext-core
-        return FlextValidations.SchemaValidators.validate_with_pydantic_schema(
-            config_dict, MeltanoProjectBusinessRules
-        ).map(lambda _: True)
+        # Use Pydantic model validation directly
+        try:
+            MeltanoProjectBusinessRules.model_validate(config_dict)
+            return FlextResult[bool].ok(data=True)
+        except Exception as e:
+            return FlextResult[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
     def validate_dbt_business_rules(cls, config: object) -> FlextResult[bool]:
         """Validate DBT-SPECIFIC business rules."""
-        # Delegate generic dict validation to flext-core
-        dict_result = FlextValidations.TypeValidators.validate_dict(config)
-        if dict_result.is_failure:
+        # Validate config is dict using direct validation
+        if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                f"DBT config validation failed: {dict_result.error}"
+                "DBT config validation failed: config must be a dictionary"
             )
 
-        config_dict = dict_result.unwrap()
+        config_dict = config
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(BaseModel):
@@ -149,10 +150,12 @@ class FlextMeltanoValidators:
                     raise ValueError(msg)
                 return v
 
-        # Delegate Pydantic validation to flext-core
-        return FlextValidations.SchemaValidators.validate_with_pydantic_schema(
-            config_dict, DbtBusinessRules
-        ).map(lambda _: True)
+        # Use Pydantic model validation directly
+        try:
+            DbtBusinessRules.model_validate(config_dict)
+            return FlextResult[bool].ok(data=True)
+        except Exception as e:
+            return FlextResult[bool].fail(f"DBT validation failed: {e}")
 
     # =================================================================
     # COMPATIBILITY ALIASES - For existing tests ONLY
@@ -218,22 +221,13 @@ class FlextMeltanoValidators:
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Validate connection configuration - DOMAIN-SPECIFIC business rules."""
         try:
-            # Delegate generic dict validation to flext-core
-            dict_result = FlextValidations.TypeValidators.validate_dict(config)
-            if dict_result.is_failure:
-                return FlextResult[FlextTypes.Core.Dict].fail(
-                    f"Connection config validation failed: {dict_result.error}"
-                )
-
-            config_dict = dict_result.unwrap()
-
             # DOMAIN-SPECIFIC: Connection config business rules
-            if not config_dict:
+            if not config:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     "Connection configuration cannot be empty"
                 )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
+            return FlextResult[FlextTypes.Core.Dict].ok(config)
         except Exception as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)

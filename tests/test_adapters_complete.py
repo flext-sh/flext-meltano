@@ -10,11 +10,11 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from meltano.core.plugin.base import PluginType
 
+from flext_core import FlextResult
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.constants import FlextMeltanoConstants
 
 
 class TestFlextMeltanoAdapterComplete:
@@ -420,15 +420,15 @@ class TestFlextMeltanoAdapterComplete:
 
         # Test with invalid plugin (should handle error gracefully)
         result = plugin_discovery.get_plugin_info(
-            "nonexistent_plugin_flext_test", FlextMeltanoConstants.Plugin.TYPE_TAP
+            "nonexistent_plugin_flext_test", PluginType.EXTRACTORS
         )
 
         # Should handle error gracefully using FlextResult pattern
         if result.is_failure:
             self.test_assertions.assert_in(
-                item="Failed to get plugin info",
+                item="not found",
                 container=result.error,
-                message="Should have error message",
+                message="Should have error message about plugin not found",
             )
 
     def test_elt_coordinator_execute_pipeline(self) -> None:
@@ -588,7 +588,7 @@ class TestFlextMeltanoAdapterComplete:
                     assert len(plugin["type"]) > 0
         else:
             # Network/API failures are acceptable
-            assert result.error_message
+            assert result.error
 
     def test_project_initialization_with_custom_config(self) -> None:
         """Test project initialization with custom configuration."""
@@ -603,4 +603,4 @@ class TestFlextMeltanoAdapterComplete:
                 assert project is not None
             else:
                 # Meltano may be unavailable
-                assert result.error_message
+                assert result.error

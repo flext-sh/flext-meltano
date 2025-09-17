@@ -3,9 +3,9 @@
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsMatchers
 
+from flext_core import FlextResult, FlextTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
 
 
@@ -36,8 +36,8 @@ class TestFlextMeltanoAdapterReal:
             assert "version" in version_info or "meltano_version" in version_info
         else:
             # If Meltano is not installed, should fail gracefully
-            assert result.error_message
-            assert isinstance(result.error_message, str)
+            assert result.error
+            assert isinstance(result.error, str)
 
     def test_discover_plugins(self) -> None:
         """Test plugin discovery - real Meltano Hub API."""
@@ -56,7 +56,7 @@ class TestFlextMeltanoAdapterReal:
                 assert any(key in plugin for key in expected_keys)
         else:
             # Network/API issues are acceptable
-            assert result.error_message
+            assert result.error
 
     def test_initialize_project(self) -> None:
         """Test project initialization."""
@@ -72,7 +72,7 @@ class TestFlextMeltanoAdapterReal:
                 assert project is not None
             else:
                 # May fail if Meltano is not available
-                assert result.error_message
+                assert result.error
 
     def test_create_project(self) -> None:
         """Test project creation."""
@@ -98,7 +98,7 @@ class TestFlextMeltanoAdapterReal:
                         assert meltano_yml.is_file()
             else:
                 # Acceptable if Meltano is not available
-                assert result.error_message
+                assert result.error
 
     def test_add_plugin(self) -> None:
         """Test adding plugin to project."""
@@ -128,7 +128,7 @@ class TestFlextMeltanoAdapterReal:
                     assert "name" in plugin_info or "plugin_name" in plugin_info
                 else:
                     # May fail due to network or Meltano setup
-                    assert plugin_result.error_message
+                    assert plugin_result.error
 
     def test_adapt_project_config(self) -> None:
         """Test project configuration adaptation."""
@@ -230,8 +230,8 @@ class TestFlextMeltanoAdapterReal:
         assert isinstance(result, FlextResult)
         # Should fail gracefully
         assert not result.success
-        assert result.error_message
-        assert isinstance(result.error_message, str)
+        assert result.error
+        assert isinstance(result.error, str)
 
     def test_error_handling_invalid_plugin_data(self) -> None:
         """Test error handling with invalid plugin data."""
@@ -257,7 +257,7 @@ class TestFlextMeltanoAdapterReal:
         assert isinstance(result, FlextResult)
         # Should handle None gracefully
         if not result.success:
-            assert result.error_message
+            assert result.error
         else:
             # If it succeeds, should return valid config
             config = result.value
@@ -281,7 +281,7 @@ class TestFlextMeltanoAdapterReal:
                 project_info = result.value
                 assert isinstance(project_info, dict)
             else:
-                assert result.error_message
+                assert result.error
 
     def test_multiple_plugin_operations(self) -> None:
         """Test multiple plugin operations in sequence."""

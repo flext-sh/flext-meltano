@@ -20,18 +20,10 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
-
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.executors_bridge import FlextMeltanoBridge as MeltanoBridge
-from flext_meltano.simple_executors import (
-    FlextMeltanoSimpleDbtExecutor,
-    FlextMeltanoSimpleExecutor,
-    MeltanoExecutor,
-    SimpleDbtExecutor,
-    SimpleMeltanoExecutor,
-)
 from flext_meltano.typings import FlextMeltanoTypes
 
 logger = FlextLogger(__name__)
@@ -998,37 +990,9 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         )
         return FlextResult[object].ok(dual_interface)
 
-    # =========================================================================
-    # BACKWARD COMPATIBILITY PROPERTIES - For existing tests and API usage
-    # =========================================================================
-
-    @property
-    def execution_result(self) -> type[FlextMeltanoExecutionResult]:  # noqa: N802
-        """Backward compatibility property for ExecutionResult access."""
-        return FlextMeltanoExecutionResult
-
-    @property
-    def simple_meltano_executor(self) -> type[FlextMeltanoSimpleExecutor]:  # noqa: N802
-        """Backward compatibility property for SimpleMeltanoExecutor access."""
-        return FlextMeltanoSimpleExecutor
-
-    @property
-    def simple_dbt_executor(self) -> type[FlextMeltanoSimpleDbtExecutor]:  # noqa: N802
-        """Backward compatibility property for SimpleDbtExecutor access."""
-        return FlextMeltanoSimpleDbtExecutor
-
-    @property
-    def meltano_executor(self) -> type[FlextMeltanoSimpleExecutor]:  # noqa: N802
-        """Backward compatibility property for MeltanoExecutor access."""
-        return FlextMeltanoSimpleExecutor
 
 
 __all__ = [
     "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
-    "FlextMeltanoSimpleDbtExecutor",
-    "FlextMeltanoSimpleExecutor",
-    "MeltanoExecutor",
-    "SimpleDbtExecutor",
-    "SimpleMeltanoExecutor",
 ]

@@ -12,7 +12,6 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult, FlextUtilities
-
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.utilities import FlextMeltanoUtilities
@@ -222,7 +221,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
                 config = result.value
                 assert isinstance(config, dict)
             else:
-                assert result.error_message
+                assert result.error
         finally:
             config_path.unlink(missing_ok=True)
 
@@ -234,7 +233,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
         assert isinstance(result, FlextResult)
         assert not result.success
-        assert result.error_message
+        assert result.error
 
     def test_save_yaml_config(self) -> None:
         """Test save_yaml_config method."""
@@ -255,7 +254,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
                 assert result.value
                 assert target_path.exists()
             else:
-                assert result.error_message
+                assert result.error
 
     def test_write_meltano_yml(self) -> None:
         """Test write_meltano_yml method."""
@@ -276,7 +275,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
                 assert result.value
                 assert target_path.exists()
             else:
-                assert result.error_message
+                assert result.error
 
     # NOTE: setup_project_structure method was removed to eliminate duplication.
     # Project structure operations should use FlextUtilities from flext-core directly.
@@ -297,4 +296,4 @@ class TestFlextMeltanoUtilitiesRealMethods:
         if result.success:
             assert result.value
         else:
-            assert result.error_message
+            assert result.error

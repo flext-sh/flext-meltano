@@ -12,47 +12,20 @@ class FlextMeltanoPluginProtocols:
 
     Consolidates all plugin types and service protocols into one unified class
     per FLEXT architectural requirements. Eliminates multiple classes per module.
+
+    All protocol types are accessed through this single class - NO ALIASES.
     """
 
-    # Core plugin types - using object for maximum compatibility
+    # Core plugin types
     TapPlugin = object
     TargetPlugin = object
     DbtPlugin = object
 
-    # Service protocols - proper protocol types
+    # Service protocols
     TapServiceProtocol = object
     TargetServiceProtocol = object
     DbtServiceProtocol = object
 
-    # Service aliases that tests expect
-    TapService = TapServiceProtocol
-    TargetService = TargetServiceProtocol
-    DbtService = DbtServiceProtocol
-
-    # Plugin aliases that tests expect
-    FlextTapPlugin = TapPlugin
-    FlextTargetPlugin = TargetPlugin
-    FlextDbtPlugin = DbtPlugin
-
-
-# Export class attributes as module-level names for proper access
-DbtServiceProtocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
-FlextDbtPlugin = FlextMeltanoPluginProtocols.FlextDbtPlugin
-FlextTapPlugin = FlextMeltanoPluginProtocols.FlextTapPlugin
-FlextTargetPlugin = FlextMeltanoPluginProtocols.FlextTargetPlugin
-TapServiceProtocol = FlextMeltanoPluginProtocols.TapServiceProtocol
-TargetServiceProtocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
-TapService = FlextMeltanoPluginProtocols.TapService
-TargetService = FlextMeltanoPluginProtocols.TargetService
-
 __all__ = [
-    "DbtServiceProtocol",
-    "FlextDbtPlugin",
-    "FlextMeltanoPluginProtocols",  # Main unified class
-    "FlextTapPlugin",
-    "FlextTargetPlugin",
-    "TapService",
-    "TapServiceProtocol",
-    "TargetService",
-    "TargetServiceProtocol",
+    "FlextMeltanoPluginProtocols",  # Main unified class - NO ALIASES
 ]

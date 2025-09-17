@@ -1,4 +1,11 @@
-"""Test module for flext-meltano."""
+"""Test module for flext-meltano plugin protocols - UNIFIED patterns only.
+
+Tests the FlextMeltanoPluginProtocols unified class following FLEXT standards.
+NO ALIASES, NO BACKWARD COMPATIBILITY - Direct API testing only.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -6,141 +13,141 @@ import unittest
 from unittest import TestCase
 
 import flext_meltano.plugin_protocols as protocols_module
-from flext_meltano.plugin_protocols import (
-    DbtServiceProtocol,
-    FlextDbtPlugin,
-    FlextMeltanoPluginProtocols,  # Updated unified class name
-    FlextTapPlugin,
-    FlextTargetPlugin,
-    TapServiceProtocol,
-    TargetServiceProtocol,
-)
+from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 
 
-class TestFlextMeltanoPluginProtocolsBasic(TestCase):
-    """Basic functionality tests for FlextMeltanoPluginProtocols."""
+class TestFlextMeltanoPluginProtocolsUnified(TestCase):
+    """Test FlextMeltanoPluginProtocols unified class - NO ALIASES."""
 
-    def test_class_exists(self) -> None:
-        """Test FlextMeltanoPluginProtocols class exists."""
+    def test_unified_class_exists(self) -> None:
+        """Test FlextMeltanoPluginProtocols unified class exists."""
         assert hasattr(FlextMeltanoPluginProtocols, "__name__")
         assert FlextMeltanoPluginProtocols.__name__ == "FlextMeltanoPluginProtocols"
 
-    def test_has_plugin_type_definitions(self) -> None:
-        """Test FlextMeltanoPluginProtocols has plugin type definitions."""
-        expected_plugin_types = [
+    def test_unified_class_has_core_plugin_types(self) -> None:
+        """Test FlextMeltanoPluginProtocols has core plugin type definitions."""
+        expected_core_types = [
             "TapPlugin",
             "TargetPlugin",
             "DbtPlugin",
+        ]
+
+        for plugin_type in expected_core_types:
+            assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
+                f"FlextMeltanoPluginProtocols missing core type: {plugin_type}"
+            )
+
+    def test_unified_class_has_service_protocols(self) -> None:
+        """Test FlextMeltanoPluginProtocols has service protocol definitions."""
+        expected_service_protocols = [
+            "TapServiceProtocol",
+            "TargetServiceProtocol",
+            "DbtServiceProtocol",
+        ]
+
+        for service_protocol in expected_service_protocols:
+            assert hasattr(FlextMeltanoPluginProtocols, service_protocol), (
+                f"FlextMeltanoPluginProtocols missing service protocol: {service_protocol}"
+            )
+
+    def test_tap_plugin_protocol_definition(self) -> None:
+        """Test TapPlugin protocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TapPlugin
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_target_plugin_protocol_definition(self) -> None:
+        """Test TargetPlugin protocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TargetPlugin
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_dbt_plugin_protocol_definition(self) -> None:
+        """Test DbtPlugin protocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.DbtPlugin
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_tap_service_protocol_definition(self) -> None:
+        """Test TapServiceProtocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TapServiceProtocol
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_target_service_protocol_definition(self) -> None:
+        """Test TargetServiceProtocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_dbt_service_protocol_definition(self) -> None:
+        """Test DbtServiceProtocol definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
+        assert protocol is not None
+        assert protocol is object  # Placeholder implementation
+
+    def test_no_aliases_exist(self) -> None:
+        """Test that NO aliases exist - direct API access only."""
+        # Verify the class does NOT have backward compatibility aliases
+        no_alias_attributes = [
+            "FlextTapPlugin",
+            "FlextTargetPlugin",
+            "FlextDbtPlugin",
             "TapService",
             "TargetService",
             "DbtService",
         ]
 
-        for plugin_type in expected_plugin_types:
-            assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
-                f"FlextMeltanoPluginProtocols missing plugin type: {plugin_type}"
+        for alias in no_alias_attributes:
+            assert not hasattr(FlextMeltanoPluginProtocols, alias), (
+                f"VIOLATION: Found eliminated alias {alias} - should not exist"
             )
 
-    def test_tap_plugin_protocol(self) -> None:
-        """Test TapPlugin protocol definition."""
-        protocol = FlextMeltanoPluginProtocols.TapPlugin
-
-        # Should be a class or type
-        assert protocol is not None
-        # Minimal plugin type - should exist
-        assert protocol is object
-
-    def test_target_plugin_protocol(self) -> None:
-        """Test TargetPlugin protocol definition."""
-        protocol = FlextMeltanoPluginProtocols.TargetPlugin
-
-        # Should be a class or type
-        assert protocol is not None
-        # Minimal plugin type - should exist
-        assert protocol is object
-
-    def test_dbt_plugin_protocol(self) -> None:
-        """Test DbtPlugin protocol definition."""
-        protocol = FlextMeltanoPluginProtocols.DbtPlugin
-
-        # Should be a class or type
-        assert protocol is not None
-        # Minimal plugin type - should exist
-        assert protocol is object
-
-    def test_service_protocol_aliases(self) -> None:
-        """Test service protocol aliases exist."""
-        # TapService should alias TapPlugin
-        assert (
-            FlextMeltanoPluginProtocols.TapService
-            is FlextMeltanoPluginProtocols.TapPlugin
-        )
-
-        # TargetService should alias TargetPlugin
-        assert (
-            FlextMeltanoPluginProtocols.TargetService
-            is FlextMeltanoPluginProtocols.TargetPlugin
-        )
-
-        # DbtService should alias DbtPlugin
-        assert (
-            FlextMeltanoPluginProtocols.DbtService
-            is FlextMeltanoPluginProtocols.DbtPlugin
-        )
-
-    def test_backward_compatibility_aliases(self) -> None:
-        """Test backward compatibility aliases exist."""
-        # FlextTapPlugin should alias TapPlugin
-        assert (
-            FlextMeltanoPluginProtocols.FlextTapPlugin
-            is FlextMeltanoPluginProtocols.TapPlugin
-        )
-
-        # FlextTargetPlugin should alias TargetPlugin
-        assert (
-            FlextMeltanoPluginProtocols.FlextTargetPlugin
-            is FlextMeltanoPluginProtocols.TargetPlugin
-        )
-
-        # FlextDbtPlugin should alias DbtPlugin
-        assert (
-            FlextMeltanoPluginProtocols.FlextDbtPlugin
-            is FlextMeltanoPluginProtocols.DbtPlugin
-        )
-
-    def test_nested_types_structure(self) -> None:
-        """Test nested types structure exists."""
-        # Should have proper class structure
+    def test_unified_class_structure(self) -> None:
+        """Test unified class has proper structure."""
         assert hasattr(FlextMeltanoPluginProtocols, "__module__")
         assert (
             FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
         )
 
-    def test_module_level_aliases(self) -> None:
-        """Test module-level backward compatibility aliases."""
-        # All should be importable
-        assert FlextTapPlugin is not None
-        assert FlextTargetPlugin is not None
-        assert FlextDbtPlugin is not None
-        assert TapServiceProtocol is not None
-        assert TargetServiceProtocol is not None
-        assert DbtServiceProtocol is not None
-
-    def test_import_works(self) -> None:
-        """Test importing from module works."""
-        # Should be importable without errors
+    def test_direct_api_access_only(self) -> None:
+        """Test that only direct API access works - NO module-level aliases."""
+        # Should be importable directly
         assert FlextMeltanoPluginProtocols is not None
 
-        # Should have expected structure
+        # Should have expected unified structure
         assert hasattr(FlextMeltanoPluginProtocols, "__name__")
 
-    def test_class_documentation(self) -> None:
-        """Test class has proper documentation."""
+    def test_class_documentation_exists(self) -> None:
+        """Test unified class has proper documentation."""
         # Should have class docstring
         assert FlextMeltanoPluginProtocols.__doc__ is not None
 
         # Should have module docstring
         assert protocols_module.__doc__ is not None
+
+    def test_module_exports_only_unified_class(self) -> None:
+        """Test module exports only the unified class - NO ALIASES."""
+        # Check __all__ exports only the unified class
+        all_exports = getattr(protocols_module, "__all__", [])
+        assert "FlextMeltanoPluginProtocols" in all_exports
+
+        # Should NOT export any aliases
+        forbidden_exports = [
+            "FlextTapPlugin",
+            "FlextTargetPlugin",
+            "FlextDbtPlugin",
+            "TapService",
+            "TargetService",
+            "TapServiceProtocol",
+            "TargetServiceProtocol",
+            "DbtServiceProtocol",
+        ]
+
+        for forbidden in forbidden_exports:
+            assert forbidden not in all_exports, (
+                f"VIOLATION: Found forbidden alias export: {forbidden}"
+            )
 
 
 if __name__ == "__main__":

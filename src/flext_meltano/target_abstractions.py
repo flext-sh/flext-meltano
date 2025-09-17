@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -15,8 +17,6 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
 from flext_meltano.validators import FlextMeltanoValidators
 
 if TYPE_CHECKING:

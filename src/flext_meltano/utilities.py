@@ -9,8 +9,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 
@@ -25,7 +25,7 @@ class FlextMeltanoUtilities:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         logger = FlextLogger(__name__)
         try:
-            # Delegate to FlextUtilities for text processing - NO DUPLICATION
+            # Delegate to FlextUtilities for text processing
             safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
             safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
 
@@ -84,7 +84,7 @@ class FlextMeltanoUtilities:
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
-            # Delegate to FlextUtilities for ALL text processing - NO DUPLICATION
+            # Delegate to FlextUtilities for ALL text processing
             safe_name = FlextUtilities.TextProcessor.safe_string(name)
             safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace)
 
@@ -117,7 +117,7 @@ class FlextMeltanoUtilities:
 
         ZERO DUPLICATION: Uses FlextMeltanoFileManagers.load_yaml_config.
         """
-        # Delegate to FlextMeltanoFileManagers - NO DUPLICATION
+        # Delegate to FlextMeltanoFileManagers
         result = FlextMeltanoFileManagers.load_yaml_config(path)
         if result.is_failure:
             return FlextResult[FlextTypes.Core.Dict].fail(

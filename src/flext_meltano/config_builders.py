@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
-
 from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
 
 # Type alias for configuration dictionaries
@@ -353,7 +352,7 @@ class FlextMeltanoConfigBuilders:
 
         """
         try:
-            # Use flext-core utilities directly - NO DUPLICATION
+            # Use flext-core utilities directly
             safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
             safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
 

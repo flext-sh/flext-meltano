@@ -14,7 +14,6 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
-
 from flext_meltano.config import FlextMeltanoConfig
 
 
