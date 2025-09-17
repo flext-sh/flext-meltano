@@ -4,9 +4,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
 from flext_tests import FlextTestsBuilders, FlextTestsMatchers, FlextTestsUtilities
 
+from flext_core import FlextResult
 from flext_meltano.executors import FlextMeltanoExecutor
 
 
@@ -32,14 +32,15 @@ class TestFlextMeltanoExecutorComprehensive:
         assert hasattr(executor, "logger")
 
     def test_meltano_executor_creation(self) -> None:
-        """Test MeltanoExecutor nested class creation."""
-        executor = self.executor.MeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor nested class creation."""
+        executor = self.executor.meltano_executor
         assert executor is not None
 
     def test_meltano_executor_logger_property(self) -> None:
-        """Test MeltanoExecutor logger property."""
-        executor = self.executor.MeltanoExecutor()
-        logger = executor.logger
+        """Test FlextMeltanoSimpleExecutor logger property."""
+        executor_class = self.executor.meltano_executor
+        executor_instance = executor_class()
+        logger = executor_instance.logger
         assert logger is not None
         assert hasattr(logger, "info")
         assert hasattr(logger, "error")
@@ -47,7 +48,7 @@ class TestFlextMeltanoExecutorComprehensive:
 
     def test_execution_result_creation(self) -> None:
         """Test ExecutionResult nested class creation."""
-        result = self.executor.ExecutionResult(
+        result = self.executor.execution_result(
             command=["meltano", "--version"],
             success=True,
             exit_code=0,
@@ -64,7 +65,7 @@ class TestFlextMeltanoExecutorComprehensive:
 
     def test_execution_result_to_dict(self) -> None:
         """Test ExecutionResult to_dict conversion."""
-        result = self.executor.ExecutionResult(
+        result = self.executor.execution_result(
             command=["meltano", "--version"],
             success=True,
             exit_code=0,
@@ -84,7 +85,7 @@ class TestFlextMeltanoExecutorComprehensive:
 
     def test_execution_result_to_json(self) -> None:
         """Test ExecutionResult to_json conversion."""
-        result = self.executor.ExecutionResult(
+        result = self.executor.execution_result(
             command=["test", "command"],
             success=True,
             exit_code=0,
@@ -101,7 +102,7 @@ class TestFlextMeltanoExecutorComprehensive:
 
     def test_execution_result_with_failure(self) -> None:
         """Test ExecutionResult with failure scenario."""
-        result = self.executor.ExecutionResult(
+        result = self.executor.execution_result(
             command=["invalid", "command"],
             success=False,
             exit_code=1,
@@ -114,18 +115,19 @@ class TestFlextMeltanoExecutorComprehensive:
         assert result.error == "Command not found"
 
     def test_simple_meltano_executor_creation(self) -> None:
-        """Test SimpleMeltanoExecutor creation."""
-        simple_executor = self.executor.SimpleMeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor creation."""
+        simple_executor = self.executor.simple_meltano_executor
         assert simple_executor is not None
 
     def test_simple_dbt_executor_creation(self) -> None:
-        """Test SimpleDbtExecutor creation."""
-        simple_dbt = self.executor.SimpleDbtExecutor()
+        """Test FlextMeltanoSimpleDbtExecutor creation."""
+        simple_dbt = self.executor.simple_dbt_executor
         assert simple_dbt is not None
 
     def test_simple_dbt_executor_temp_project(self) -> None:
-        """Test SimpleDbtExecutor temporary project creation."""
-        simple_dbt = self.executor.SimpleDbtExecutor()
+        """Test FlextMeltanoSimpleDbtExecutor temporary project creation."""
+        simple_dbt_class = self.executor.simple_dbt_executor
+        simple_dbt = simple_dbt_class()
 
         # Test executor initialization
         assert simple_dbt is not None
@@ -134,8 +136,9 @@ class TestFlextMeltanoExecutorComprehensive:
         assert hasattr(simple_dbt, "logger")
 
     def test_meltano_executor_execute_with_mock_command(self) -> None:
-        """Test MeltanoExecutor execute method with mock environment."""
-        executor = self.executor.MeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor execute method with mock environment."""
+        executor_class = self.executor.meltano_executor
+        executor = executor_class()
 
         # Test execute method (will return service info)
         result = executor.execute()
@@ -144,16 +147,17 @@ class TestFlextMeltanoExecutorComprehensive:
         FlextTestsMatchers.assert_result_success(result)
 
     def test_meltano_executor_project_info_mock(self) -> None:
-        """Test MeltanoExecutor get_project_info method."""
-        executor = self.executor.MeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor get_project_info method."""
+        executor_class = self.executor.meltano_executor
+        executor_instance = executor_class()
 
         # Test get_project_info with project_root parameter
-        result = executor.get_project_info(self.temp_dir)
+        result = executor_instance.get_project_info(self.temp_dir)
         assert isinstance(result, FlextResult)
 
     def test_execution_result_timestamp_presence(self) -> None:
         """Test ExecutionResult includes timestamp in dict representation."""
-        result = self.executor.ExecutionResult(
+        result = self.executor.execution_result(
             command=["test"],
             success=True,
             exit_code=0,
@@ -166,18 +170,16 @@ class TestFlextMeltanoExecutorComprehensive:
         assert isinstance(result_dict["timestamp"], str)
 
     def test_meltano_executor_command_execution_structure(self) -> None:
-        """Test MeltanoExecutor command execution structure."""
-        executor = self.executor.MeltanoExecutor()
-
+        """Test FlextMeltanoSimpleExecutor command execution structure."""
         # Test execute_meltano_command structure with project_root parameter
-        result = executor.execute_meltano_command(
+        result = self.executor.execute_meltano_command(
             project_root=self.temp_dir, command=["version"]
         )
         assert isinstance(result, FlextResult)
 
     def test_simple_meltano_executor_run_plugin_command_structure(self) -> None:
-        """Test SimpleMeltanoExecutor run_plugin_command structure."""
-        simple_executor = self.executor.SimpleMeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor run_plugin_command structure."""
+        simple_executor = self.executor.simple_meltano_executor
 
         # Test the method exists and returns proper structure
         # This will fail in test environment but tests the interface
@@ -190,8 +192,8 @@ class TestFlextMeltanoExecutorComprehensive:
             assert True  # Explicit assertion instead of pass
 
     def test_simple_meltano_executor_run_pipeline_structure(self) -> None:
-        """Test SimpleMeltanoExecutor run_pipeline structure."""
-        simple_executor = self.executor.SimpleMeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor run_pipeline structure."""
+        simple_executor = self.executor.simple_meltano_executor
 
         # Test the method exists and returns proper structure
         try:
@@ -205,8 +207,8 @@ class TestFlextMeltanoExecutorComprehensive:
             assert True  # Explicit assertion instead of pass
 
     def test_simple_meltano_executor_install_plugin_structure(self) -> None:
-        """Test SimpleMeltanoExecutor install_plugin structure."""
-        simple_executor = self.executor.SimpleMeltanoExecutor()
+        """Test FlextMeltanoSimpleExecutor install_plugin structure."""
+        simple_executor = self.executor.simple_meltano_executor
 
         # Test the method exists and returns proper structure
         try:
@@ -219,22 +221,22 @@ class TestFlextMeltanoExecutorComprehensive:
 
     def test_all_executor_classes_are_nested(self) -> None:
         """Test that all executor classes are properly nested within main class."""
-        # Verify nested class structure
-        assert hasattr(self.executor, "MeltanoExecutor")
-        assert hasattr(self.executor, "ExecutionResult")
-        assert hasattr(self.executor, "SimpleMeltanoExecutor")
-        assert hasattr(self.executor, "SimpleDbtExecutor")
+        # Verify nested class structure exists at class level
+        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleExecutor")
+        assert hasattr(FlextMeltanoExecutor, "ExecutionResult")
+        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleExecutor")
+        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleDbtExecutor")
 
         # Verify they are actual classes
-        assert isinstance(self.executor.MeltanoExecutor, type)
-        assert isinstance(self.executor.ExecutionResult, type)
-        assert isinstance(self.executor.SimpleMeltanoExecutor, type)
-        assert isinstance(self.executor.SimpleDbtExecutor, type)
+        assert isinstance(self.executor.meltano_executor, type)
+        assert isinstance(self.executor.execution_result, type)
+        assert isinstance(self.executor.simple_meltano_executor, type)
+        assert isinstance(self.executor.simple_dbt_executor, type)
 
     def test_execution_result_comprehensive_fields(self) -> None:
         """Test ExecutionResult with all possible field combinations."""
         # Test with minimal fields
-        minimal_result = self.executor.ExecutionResult(
+        minimal_result = self.executor.execution_result(
             command=["test"],
             success=True,
             exit_code=0,
@@ -245,7 +247,7 @@ class TestFlextMeltanoExecutorComprehensive:
         assert minimal_result is not None
 
         # Test with comprehensive fields
-        full_result = self.executor.ExecutionResult(
+        full_result = self.executor.execution_result(
             command=["meltano", "run", "tap-postgres", "target-snowflake"],
             success=False,
             exit_code=1,
@@ -259,31 +261,27 @@ class TestFlextMeltanoExecutorComprehensive:
         assert full_result.execution_time > 40.0
 
     def test_meltano_executor_with_different_configs(self) -> None:
-        """Test MeltanoExecutor works with different configurations."""
+        """Test FlextMeltanoSimpleExecutor works with different configurations."""
         # Test with no config
-        executor1 = self.executor.MeltanoExecutor()
+        executor1 = self.executor.meltano_executor
         assert executor1 is not None
 
         # Test with project_root parameter
-        executor2 = self.executor.MeltanoExecutor(project_root=Path.cwd())
+        executor_class = self.executor.meltano_executor
+        executor2 = executor_class(project_root=Path.cwd())
         assert executor2 is not None
 
     def test_flext_tests_integration_with_builders(self) -> None:
         """Test integration with flext_tests TestBuilders."""
         # Use FlextTestsBuilders for result creation
-        success_result = (
-            FlextTestsBuilders.ResultBuilder().with_success_data("test data").build()
-        )
+        builders = FlextTestsBuilders()
+        success_result = builders.result().with_success_data("test data").build()
         FlextTestsMatchers.assert_result_success(success_result, "test data")
 
         failure_result = (
-            FlextTestsBuilders.ResultBuilder()
-            .with_failure("test error", "TEST_001")
-            .build()
+            builders.result().with_failure("test error", "TEST_001").build()
         )
-        FlextTestsMatchers.assert_result_failure(
-            failure_result, "test error", "TEST_001"
-        )
+        FlextTestsMatchers.assert_result_failure(failure_result, "test error")
 
     def test_flext_tests_integration_with_utilities(self) -> None:
         """Test integration with flext_tests utilities."""

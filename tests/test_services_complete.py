@@ -1,7 +1,6 @@
 """Test module for flext-meltano."""
 
 from flext_core import FlextResult
-
 from flext_meltano.services import FlextMeltanoService
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -35,7 +34,7 @@ class TestFlextMeltanoServiceComplete:
             assert tap_service is not None
         else:
             # May fail without proper Meltano setup
-            assert result.error_message
+            assert result.error
 
     def test_create_target_service(self) -> None:
         """Test create_target_service method."""
@@ -47,7 +46,7 @@ class TestFlextMeltanoServiceComplete:
             assert target_service is not None
         else:
             # May fail without proper Meltano setup
-            assert result.error_message
+            assert result.error
 
     def test_create_dbt_service(self) -> None:
         """Test create_dbt_service method."""
@@ -59,7 +58,7 @@ class TestFlextMeltanoServiceComplete:
             assert dbt_service is not None
         else:
             # May fail without proper DBT setup
-            assert result.error_message
+            assert result.error
 
     def test_tap_service_class_access(self) -> None:
         """Test access to unified service class (eliminated service property wrappers)."""
@@ -122,8 +121,8 @@ class TestFlextMeltanoServiceComplete:
             assert isinstance(result, FlextResult)
             # Services may fail without proper setup, but should return FlextResult
             if not result.success:
-                assert result.error_message
-                assert isinstance(result.error_message, str)
+                assert result.error
+                assert isinstance(result.error, str)
 
     def test_service_with_different_names(self) -> None:
         """Test service creation with various plugin names."""
@@ -167,22 +166,22 @@ class TestFlextMeltanoServiceComplete:
         result1 = self.service.create_tap_service("test-service")
         assert isinstance(result1, FlextResult)
         if not result1.success:
-            assert result1.error_message
-            assert isinstance(result1.error_message, str)
+            assert result1.error
+            assert isinstance(result1.error, str)
 
         # Test create_target_service
         result2 = self.service.create_target_service("test-service")
         assert isinstance(result2, FlextResult)
         if not result2.success:
-            assert result2.error_message
-            assert isinstance(result2.error_message, str)
+            assert result2.error
+            assert isinstance(result2.error, str)
 
         # Test create_dbt_service
         result3 = self.service.create_dbt_service("test-service")
         assert isinstance(result3, FlextResult)
         if not result3.success:
-            assert result3.error_message
-            assert isinstance(result3.error_message, str)
+            assert result3.error
+            assert isinstance(result3.error, str)
 
     def test_nested_class_hierarchy(self) -> None:
         """Test nested class structure and hierarchy."""
@@ -241,8 +240,8 @@ class TestFlextMeltanoServiceComplete:
 
             # Should either succeed or fail gracefully with informative error
             if not result.success:
-                assert result.error_message
-                assert len(result.error_message) > 0
+                assert result.error
+                assert len(result.error) > 0
 
     def test_service_configuration_handling(self) -> None:
         """Test service configuration and setup."""

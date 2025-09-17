@@ -10,10 +10,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 from pydantic import ValidationError
 
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.tap_abstractions import FlextTapAbstractions
 
 

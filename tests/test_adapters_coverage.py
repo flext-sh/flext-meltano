@@ -8,11 +8,11 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 from meltano.core.project import Project
 
+from flext_core import FlextResult
 from flext_meltano import FlextMeltanoAdapter
 
 

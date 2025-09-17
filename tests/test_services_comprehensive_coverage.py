@@ -7,8 +7,8 @@ from __future__ import annotations
 import tempfile
 
 import pytest
-from flext_core import FlextDomainService, FlextResult
 
+from flext_core import FlextDomainService, FlextResult
 from flext_meltano.services import FlextMeltanoService
 
 

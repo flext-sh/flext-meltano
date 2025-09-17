@@ -1,9 +1,9 @@
 """Test module for flext-meltano."""
 
-from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 from pydantic import ValidationError
 
+from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano.target_abstractions import FlextTargetAbstractions
 
 logger = FlextLogger(__name__)
@@ -619,7 +619,7 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core SOURCE OF TRUTH."""
-        # Test timestamp generation using flext-core directly - NO DUPLICATION
+        # Test timestamp generation using flext-core directly
 
         timestamp = FlextUtilities.Generators.generate_iso_timestamp()
 
@@ -631,7 +631,7 @@ class TestFlextTargetAbstractionsComplete:
             item="T", container=timestamp, message="Should be ISO format timestamp"
         )
 
-        # Test nested value retrieval using flext-core SOURCE OF TRUTH - NO DUPLICATION
+        # Test nested value retrieval using flext-core SOURCE OF TRUTH
         test_data = {"level1": {"level2": {"level3": "found_value"}}}
 
         # Test successful nested retrieval using flext-core directly

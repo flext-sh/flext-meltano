@@ -5,8 +5,8 @@ from __future__ import annotations
 import importlib.util
 
 import dbt.version
-from flext_core import FlextResult
 
+from flext_core import FlextResult
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.executors_bridge import FlextMeltanoBridge as MeltanoBridge
 

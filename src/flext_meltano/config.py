@@ -13,6 +13,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
+from pydantic import Field, field_validator
+from pydantic_settings import SettingsConfigDict
+
 from flext_core import (
     FlextConfig,
     FlextConstants,
@@ -20,9 +23,6 @@ from flext_core import (
     FlextResult,
     FlextTypes,
 )
-from pydantic import Field, field_validator
-from pydantic_settings import SettingsConfigDict
-
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -331,7 +331,7 @@ class FlextMeltanoConfig(FlextConfig):
             config = cls(project_root=Path(project_root))
             validation_result = config.validate_project_structure()
 
-            if validation_result.failure:
+            if validation_result.is_failure:
                 return FlextResult["FlextMeltanoConfig"].fail(
                     validation_result.error or "Project validation failed"
                 )

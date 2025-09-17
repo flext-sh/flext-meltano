@@ -13,7 +13,6 @@ from uuid import UUID
 
 import meltano
 import yaml
-from flext_core import FlextConfig, FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from meltano.core.elt_context import ELTContext
 from meltano.core.hub import MeltanoHubService
 from meltano.core.job.job import Job
@@ -24,6 +23,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
+from flext_core import FlextConfig, FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
@@ -479,7 +479,7 @@ class FlextMeltanoAdapter:
             FlextResult containing validation result
 
         """
-        # Delegate to FlextMeltanoValidators - NO DUPLICATION
+        # Delegate to FlextMeltanoValidators
         return FlextMeltanoValidators.validate_meltano_project_structure(project_path)
 
     def get_plugin_info(

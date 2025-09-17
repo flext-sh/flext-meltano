@@ -14,9 +14,9 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import cast
 
-from flext_core import FlextResult, FlextTypes, FlextUtilities
 from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field, field_validator
 
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
@@ -432,7 +432,7 @@ class FlextTapAbstractions:
         """Ensure streams are discovered before access."""
         if not tap_instance.discovered:
             discovery_result = self.discover_streams(tap_instance)
-            if discovery_result.failure:
+            if discovery_result.is_failure:
                 return FlextResult[FlextTapAbstractions.TapInstance].fail(
                     f"Stream discovery failed: {discovery_result.error}"
                 )
@@ -631,7 +631,7 @@ class FlextTapAbstractions:
                 strategy,
             )
             records_result = typed_strategy(stream)
-            if records_result.failure:
+            if records_result.is_failure:
                 return FlextResult[
                     tuple[
                         list[FlextTypes.Core.Dict],
@@ -839,7 +839,7 @@ class FlextTapAbstractions:
         """Get stream for sync operation."""
         tap_instance, stream_name, target = params
         stream_result = self.get_stream_by_name(tap_instance, stream_name)
-        if stream_result.failure:
+        if stream_result.is_failure:
             return FlextResult[
                 tuple[
                     FlextTapAbstractions.StreamDefinition, FlextTypes.Core.Dict | None
@@ -869,7 +869,7 @@ class FlextTapAbstractions:
         """Extract records from stream."""
         stream, target = params
         records_result = self.extract_records(stream)
-        if records_result.failure:
+        if records_result.is_failure:
             return FlextResult[
                 tuple[
                     list[FlextTypes.Core.Dict],

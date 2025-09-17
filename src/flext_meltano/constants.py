@@ -18,41 +18,7 @@ type SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
 
 class FlextMeltanoConstants:
-    """DOMAIN-SPECIFIC Meltano constants using FlextConstants as SOURCE OF TRUTH.
-
-    ZERO DUPLICATION PRINCIPLE:
-    - FlextConstants is the SINGLE SOURCE OF TRUTH for ALL general constants
-    - Contains ONLY Meltano-specific constants that cannot be found in FlextConstants
-    - ALL timeout, batch size, port values MUST come from FlextConstants
-    """
-
-    # Delegate to FlextConstants for general constants
-    Core = FlextConstants.Core
-    Config = FlextConstants.Config
-    Defaults = FlextConstants.Defaults
-    Entities = FlextConstants.Entities
-    Enums = FlextConstants.Enums
-    Environment = FlextConstants.Environment
-    Errors = FlextConstants.Errors
-    Limits = FlextConstants.Limits
-    Messages = FlextConstants.Messages
-    Network = FlextConstants.Network
-    Observability = FlextConstants.Observability
-    Patterns = FlextConstants.Patterns
-    Performance = FlextConstants.Performance
-    Platform = FlextConstants.Platform
-    Reliability = FlextConstants.Reliability
-    Taps = FlextConstants.Taps
-    Utilities = FlextConstants.Utilities
-    Validation = FlextConstants.Validation
-    Web = FlextConstants.Web
-
-    # =========================================================================
-    # FLEXT-CORE AS SOURCE OF TRUTH - Direct delegation to avoid duplication
-    # =========================================================================
-
-    # ALL FlextConstants available as single source of truth
-    # Note: Access specific namespaces like FlextConstants.Defaults, FlextConstants.Performance, etc.
+    """DOMAIN-SPECIFIC Meltano constants."""
 
     # =========================================================================
     # VERSION METADATA (DOMAIN-SPECIFIC ONLY)
@@ -61,7 +27,7 @@ class FlextMeltanoConstants:
     FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"  # Domain-specific version
 
     # =========================================================================
-    # DOMAIN-SPECIFIC CONSTANTS - Use FlextConstants for performance values
+    # DOMAIN-SPECIFIC CONSTANTS
     # =========================================================================
 
     class Application:
@@ -79,7 +45,7 @@ class FlextMeltanoConstants:
         DEFAULT_ENVIRONMENTS: Final[list[str]] = ["dev", "staging", "prod"]
 
     class MeltanoSpecific:
-        """Meltano-specific constants using FlextConstants as SOURCE OF TRUTH."""
+        """Meltano-specific constants moved from FlextConstants.Meltano."""
 
         # DOMAIN-SPECIFIC: File and directory names
         PROJECT_FILE: Final[str] = "meltano.yml"
@@ -93,17 +59,17 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         VERSION_REQUIRED: Final[str] = "3.9.1"
 
-        # SOURCE OF TRUTH: ALL performance values from FlextConstants.Meltano
-        DEFAULT_TIMEOUT: Final[int] = FlextConstants.Meltano.DEFAULT_TIMEOUT
-        DISCOVERY_TIMEOUT: Final[int] = FlextConstants.Meltano.DISCOVERY_TIMEOUT
-        EXTRACT_TIMEOUT: Final[int] = FlextConstants.Meltano.EXTRACT_TIMEOUT
-        LOAD_TIMEOUT: Final[int] = FlextConstants.Meltano.LOAD_TIMEOUT
-        DEFAULT_POSTGRES_PORT: Final[int] = FlextConstants.Meltano.DEFAULT_POSTGRES_PORT
-        DEFAULT_MYSQL_PORT: Final[int] = FlextConstants.Meltano.DEFAULT_MYSQL_PORT
-        DEFAULT_ORACLE_PORT: Final[int] = FlextConstants.Meltano.DEFAULT_ORACLE_PORT
+        # MOVED FROM FlextConstants.Meltano - Now the source of truth
+        DEFAULT_TIMEOUT: Final[int] = 300  # Usage count: 2
+        DISCOVERY_TIMEOUT: Final[int] = 60  # Usage count: 0
+        EXTRACT_TIMEOUT: Final[int] = 1800  # Usage count: 0
+        LOAD_TIMEOUT: Final[int] = 1800  # Usage count: 0
+        DEFAULT_POSTGRES_PORT: Final[int] = 5432  # Usage count: 0
+        DEFAULT_MYSQL_PORT: Final[int] = 3306  # Usage count: 0
+        DEFAULT_ORACLE_PORT: Final[int] = 1521  # Usage count: 2
 
     class Singer:
-        """Singer constants using FlextConstants as SOURCE OF TRUTH."""
+        """Singer constants moved from FlextConstants.Singer."""
 
         # DOMAIN-SPECIFIC: Message types
         MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
@@ -114,22 +80,16 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
 
-        # SOURCE OF TRUTH: ALL performance values from FlextConstants.Singer
-        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Singer.DEFAULT_BATCH_SIZE
-        DEFAULT_BUFFER_SIZE: Final[int] = FlextConstants.Singer.DEFAULT_BUFFER_SIZE
-        MAX_BATCH_SIZE: Final[int] = FlextConstants.Singer.MAX_BATCH_SIZE
-        DEFAULT_CONNECTION_TIMEOUT: Final[int] = (
-            FlextConstants.Singer.DEFAULT_CONNECTION_TIMEOUT
-        )
-        DEFAULT_REQUEST_TIMEOUT: Final[int] = (
-            FlextConstants.Singer.DEFAULT_REQUEST_TIMEOUT
-        )
-        DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = (
-            FlextConstants.Singer.DEFAULT_MAX_PARALLEL_STREAMS
-        )
+        # MOVED FROM FlextConstants.Singer - Now the source of truth
+        DEFAULT_BATCH_SIZE: Final[int] = 1000  # Usage count: 4
+        DEFAULT_BUFFER_SIZE: Final[int] = 8192  # Usage count: 0
+        MAX_BATCH_SIZE: Final[int] = 10000  # Usage count: 4
+        DEFAULT_CONNECTION_TIMEOUT: Final[int] = 30  # Usage count: 0
+        DEFAULT_REQUEST_TIMEOUT: Final[int] = 60  # Usage count: 0
+        DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4  # Usage count: 4
 
     class DBT:
-        """DBT constants using FlextConstants as SOURCE OF TRUTH."""
+        """DBT constants moved from FlextConstants.DBT."""
 
         # DOMAIN-SPECIFIC: File names and commands
         PROJECT_FILE: Final[str] = "dbt_project.yml"
@@ -143,17 +103,15 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         VERSION_REQUIRED: Final[str] = "1.10.5"
 
-        # SOURCE OF TRUTH: ALL performance values from FlextConstants.DBT
-        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.DBT.DEFAULT_BATCH_SIZE
-        LARGE_BATCH_SIZE: Final[int] = FlextConstants.DBT.LARGE_BATCH_SIZE
-        MAX_BATCH_SIZE: Final[int] = FlextConstants.DBT.MAX_BATCH_SIZE
-        FRESHNESS_ERROR_AFTER: Final[int] = FlextConstants.DBT.FRESHNESS_ERROR_AFTER
-        FRESHNESS_WARN_AFTER: Final[int] = FlextConstants.DBT.FRESHNESS_WARN_AFTER
-        MATERIALIZATION_TABLE: Final[str] = FlextConstants.DBT.MATERIALIZATION_TABLE
-        MATERIALIZATION_VIEW: Final[str] = FlextConstants.DBT.MATERIALIZATION_VIEW
-        MATERIALIZATION_INCREMENTAL: Final[str] = (
-            FlextConstants.DBT.MATERIALIZATION_INCREMENTAL
-        )
+        # MOVED FROM FlextConstants.DBT - Now the source of truth
+        DEFAULT_BATCH_SIZE: Final[int] = 1000  # Usage count: 1
+        LARGE_BATCH_SIZE: Final[int] = 5000  # Usage count: 0
+        MAX_BATCH_SIZE: Final[int] = 10000  # Usage count: 0
+        FRESHNESS_ERROR_AFTER: Final[int] = 24  # Usage count: 1
+        FRESHNESS_WARN_AFTER: Final[int] = 12  # Usage count: 0
+        MATERIALIZATION_TABLE: Final[str] = "table"  # Usage count: 0
+        MATERIALIZATION_VIEW: Final[str] = "view"  # Usage count: 0
+        MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"  # Usage count: 0
 
     class Plugin:
         """Plugin constants using FlextConstants as SOURCE OF TRUTH."""
@@ -196,12 +154,12 @@ class FlextMeltanoConstants:
         ORCHESTRATORS = auto()
 
     class ReplicationMethods(StrEnum):
-        """Singer replication methods using FlextConstants.Taps as SOURCE OF TRUTH."""
+        """Singer replication methods moved from FlextConstants.Taps."""
 
-        # Use FlextConstants.Taps values to avoid duplication
-        FULL_TABLE = FlextConstants.Taps.FULL_REPLICATION
-        INCREMENTAL = FlextConstants.Taps.INCREMENTAL_REPLICATION
-        LOG_BASED = FlextConstants.Taps.LOG_BASED_REPLICATION
+        # MOVED FROM FlextConstants.Taps - Now the source of truth
+        FULL_TABLE = "FULL_TABLE"  # Usage count: 2
+        INCREMENTAL = "INCREMENTAL"  # Usage count: 0
+        LOG_BASED = "LOG_BASED"  # Usage count: 0  # Usage count: 0
 
 
 # Module-level aliases for nested enums to support imports
