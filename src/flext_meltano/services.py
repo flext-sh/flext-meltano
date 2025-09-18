@@ -355,7 +355,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         )
 
 
-
 __all__ = [
     "FlextMeltanoService",
 ]

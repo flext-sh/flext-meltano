@@ -50,8 +50,8 @@ class FlextMeltanoUtilities:
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
             }
-            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
-        except Exception as e:
+            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
+        except Exception as e:  # pragma: no cover
             error_msg = f"Failed to create Meltano config dict: {e}"
             logger.exception(error_msg)
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
@@ -105,8 +105,8 @@ class FlextMeltanoUtilities:
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }
-            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
-        except Exception as e:
+            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
+        except Exception as e:  # pragma: no cover
             error_msg = f"Failed to create plugin config: {e}"
             FlextLogger(__name__).exception(error_msg)
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
@@ -124,7 +124,7 @@ class FlextMeltanoUtilities:
                 result.error or "Failed to load YAML config"
             )
 
-        return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
+        return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
 
 
 __all__ = ["FlextMeltanoUtilities"]

@@ -39,7 +39,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     project_root: Path | None = None
     _bridge: MeltanoBridge | None = None
     meltano_adapter: FlextMeltanoAdapter | None = None
-    logger: FlextLogger | None = None
+    _logger: FlextLogger | None = None  # Private field to avoid property conflict
 
     def __init__(self, project_root: Path | None = None, **_data: object) -> None:
         """Initialize executor with project root and dependencies."""
@@ -49,12 +49,19 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         # Set instance attributes using object.__setattr__ for read-only fields
         object.__setattr__(self, "project_root", project_root or Path.cwd())
         object.__setattr__(self, "meltano_adapter", FlextMeltanoAdapter())
-        object.__setattr__(self, "logger", FlextLogger("FlextMeltanoExecutor"))
+        object.__setattr__(self, "_logger", FlextLogger("FlextMeltanoExecutor"))
 
         # Apply any additional data if needed
         for key, value in _data.items():  # pragma: no cover
             if hasattr(self, key):  # pragma: no cover
                 object.__setattr__(self, key, value)  # pragma: no cover
+
+    @property
+    def logger(self) -> FlextLogger:
+        """Get logger, ensuring it's never None."""
+        if self._logger is None:
+            object.__setattr__(self, "_logger", FlextLogger("FlextMeltanoExecutor"))
+        return cast("FlextLogger", self._logger)
 
     @property
     def bridge(self) -> MeltanoBridge:
@@ -83,11 +90,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     @property
     def logger_safe(self) -> FlextLogger:
         """Get logger, ensuring it's never None."""
-        if self.logger is None:  # pragma: no cover
-            object.__setattr__(
-                self, "logger", FlextLogger("FlextMeltanoExecutor")
-            )  # pragma: no cover
-        return cast("FlextLogger", self.logger)
+        return self.logger
 
     def execute(
         self, command: str | None = None
@@ -989,7 +992,6 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             FlextMeltanoConstants.Application.NAME, cli_interface
         )
         return FlextResult[object].ok(dual_interface)
-
 
 
 __all__ = [

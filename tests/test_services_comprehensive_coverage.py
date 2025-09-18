@@ -67,13 +67,13 @@ class TestTapService:
         assert isinstance(tap_service, FlextMeltanoService)
 
     def test_tap_service_adapter_property(self) -> None:
-        """Test TapService adapter property."""
+        """Test TapService has container for dependency injection."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
         tap_service = service_result.unwrap()
-        adapter = tap_service.adapter
-        # The adapter property should return an object (likely FlextMeltanoAdapter)
-        assert adapter is not None
+        # Test that service has internal container (unified architecture)
+        assert hasattr(tap_service, "_container")
+        assert tap_service._container is not None
 
     def test_tap_service_execute_method(self) -> None:
         """Test TapService execute method."""
@@ -163,13 +163,14 @@ class TestTargetService:
         target_service = service_result.unwrap()
         assert isinstance(target_service, FlextMeltanoService)
 
-    def test_target_service_adapter_property(self) -> None:
-        """Test TargetService adapter property."""
+    def test_target_service_has_container(self) -> None:
+        """Test TargetService has container for dependency injection."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
         target_service = service_result.unwrap()
-        adapter = target_service.adapter
-        assert adapter is not None
+        # Test that service has internal container (unified architecture)
+        assert hasattr(target_service, "_container")
+        assert target_service._container is not None
 
     def test_target_service_execute_method(self) -> None:
         """Test TargetService execute method."""
@@ -250,13 +251,14 @@ class TestDbtService:
         dbt_service = service_result.unwrap()
         assert isinstance(dbt_service, FlextMeltanoService)
 
-    def test_dbt_service_adapter_property(self) -> None:
-        """Test DbtService adapter property."""
+    def test_dbt_service_has_container(self) -> None:
+        """Test DbtService has container for dependency injection."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
         dbt_service = service_result.unwrap()
-        adapter = dbt_service.adapter
-        assert adapter is not None
+        # Test that service has internal container (unified architecture)
+        assert hasattr(dbt_service, "_container")
+        assert dbt_service._container is not None
 
     def test_dbt_service_execute_method(self) -> None:
         """Test DbtService execute method."""
@@ -615,8 +617,8 @@ class TestServiceArchitecture:
         # Container should have service classes registered
         # This tests the registration that happens in __init__
 
-    def test_service_adapter_pattern(self) -> None:
-        """Test that unified services implement the adapter pattern."""
+    def test_unified_service_container_pattern(self) -> None:
+        """Test that unified services implement the container pattern."""
         services = [
             FlextMeltanoService(service_type="tap", tap_name="test"),
             FlextMeltanoService(service_type="target", target_name="test"),
@@ -624,9 +626,9 @@ class TestServiceArchitecture:
         ]
 
         for service in services:
-            # All services should have adapter property (for test compatibility)
-            assert hasattr(service, "adapter")
-            adapter = service.adapter
-            assert adapter is not None
-            # In unified architecture, adapter property returns self
-            assert adapter is service
+            # All unified services should have container for dependency injection
+            assert hasattr(service, "_container")
+            container = service._container
+            assert container is not None
+            # Container should be a FlextContainer instance
+            assert hasattr(container, "register")

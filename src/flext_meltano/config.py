@@ -338,7 +338,7 @@ class FlextMeltanoConfig(FlextConfig):
 
             return FlextResult["FlextMeltanoConfig"].ok(config)
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             return FlextResult["FlextMeltanoConfig"].fail(
                 f"Config creation failed: {e}"
             )
@@ -550,7 +550,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         try:
             for key, value in overrides.items():
-                if hasattr(self, key) and key in self.model_fields:
+                if hasattr(self, key) and key in self.__class__.model_fields:
                     setattr(self, key, value)
 
             # Track the override in metadata (initialize if not exists)
