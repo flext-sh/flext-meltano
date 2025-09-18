@@ -191,7 +191,7 @@ class FlextTargetAbstractions:
                 target_type=target_type,
                 config_id=config_id,
             )
-            return FlextResult[FlextTypes.Core.Dict].ok(config_dict)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
 
         except Exception as e:
             error_msg = f"Failed to create FlextTarget config: {e}"
@@ -447,7 +447,7 @@ class FlextTargetAbstractions:
                 failed_count=failed_count,
             )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(batch_result)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=batch_result)
 
         except Exception as e:
             error_msg = f"Failed to load batch to stream {stream_name}: {e}"
@@ -488,7 +488,7 @@ class FlextTargetAbstractions:
                 self._logger.info(
                     "Stream finalized successfully", stream_name=stream_name
                 )
-                return FlextResult[FlextTypes.Core.Dict].ok(finalization_result)
+                return FlextResult[FlextTypes.Core.Dict].ok(data=finalization_result)
 
             return FlextResult[FlextTypes.Core.Dict].fail("Invalid stream info")
 
@@ -558,7 +558,7 @@ class FlextTargetAbstractions:
                 total_records=total_records,
             )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(finalization_result)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=finalization_result)
 
         except Exception as e:
             error_msg = f"Failed to finalize target operations: {e}"
@@ -583,7 +583,9 @@ class FlextTargetAbstractions:
                     f"Stream {stream_name} not found"
                 )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(target_streams[stream_name])
+            return FlextResult[FlextTypes.Core.Dict].ok(
+                data=target_streams[stream_name]
+            )
 
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
@@ -610,7 +612,7 @@ class FlextTargetAbstractions:
     @classmethod
     def create_instance(cls) -> FlextResult[FlextTargetAbstractions]:
         """Factory method to create FlextTargetAbstractions instance."""
-        return FlextResult["FlextTargetAbstractions"].ok(cls())
+        return FlextResult["FlextTargetAbstractions"].ok(data=cls())
 
     # Test compatibility methods and properties
     @property

@@ -43,36 +43,14 @@ class FlextMeltanoFileManagers:
     """
 
     @classmethod
-    def create_temp_directory(
-        cls, prefix: str = "flext_meltano_", *, meltano_structure: bool = False
-    ) -> FlextResult[Path]:
-        """Create temporary directory with optional Meltano structure.
-
-        CONSOLIDATED: Single method for temp directory creation with optional Meltano-specific structure.
-        ZERO DUPLICATION: Uses tempfile standard library + FlextUtilities validation.
-        """
+    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+        """Create temporary directory using direct tempfile implementation."""
+        logger = FlextLogger(__name__)
         try:
-            # Use Python tempfile standard library for temp directory creation
-            temp_dir_str = tempfile.mkdtemp(prefix=prefix)
-            temp_dir = Path(temp_dir_str)
-
-            # Basic path validation using flext-core utilities
-            if not FlextUtilities.TypeGuards.is_string_non_empty(str(temp_dir)):
-                return FlextResult[Path].fail(
-                    f"Invalid temp directory path: {temp_dir}"
-                )
-
-            # Add MELTANO-SPECIFIC directory structure if requested (DOMAIN-SPECIFIC)
-            if meltano_structure:
-                meltano_dirs = [".meltano", "extract", "load", "transform"]
-                for dir_name in meltano_dirs:
-                    (temp_dir / dir_name).mkdir(exist_ok=True)
-
-            logger.info(
-                "Created temp directory",
-                extra={"path": str(temp_dir), "meltano_structure": meltano_structure},
-            )
-            return FlextResult[Path].ok(temp_dir)
+            # Use direct tempfile.mkdtemp for temporary directory creation
+            temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
+            logger.info(f"Created temporary directory: {temp_dir}")
+            return FlextResult[Path].ok(data=temp_dir)
         except Exception as e:
             error_msg = f"Failed to create temp directory: {e}"
             logger.exception(error_msg)
@@ -113,12 +91,12 @@ class FlextMeltanoFileManagers:
                 config_data = yaml.safe_load(f)
 
             if config_data is None:
-                return FlextResult[ConfigDict].ok({})
+                return FlextResult[ConfigDict].ok(data={})
 
             if not isinstance(config_data, dict):
                 return FlextResult[ConfigDict].fail("YAML content is not a dictionary")
 
-            return FlextResult[ConfigDict].ok(config_data)
+            return FlextResult[ConfigDict].ok(data=config_data)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to load YAML config: {e}")
 
@@ -158,7 +136,7 @@ class FlextMeltanoFileManagers:
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return FlextResult[FlextTypes.Core.Headers].ok(created_paths)
+            return FlextResult[FlextTypes.Core.Headers].ok(data=created_paths)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Headers].fail(
                 f"Failed to create directories: {e}"
@@ -217,7 +195,7 @@ class FlextMeltanoFileManagers:
 
             # Add project root
             created_paths["project_root"] = project_root
-            return FlextResult[PathDict].ok(created_paths)
+            return FlextResult[PathDict].ok(data=created_paths)
         except Exception as e:
             return FlextResult[PathDict].fail(f"Failed to setup project structure: {e}")
 

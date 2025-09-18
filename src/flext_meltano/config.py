@@ -28,13 +28,37 @@ from flext_meltano.validators import FlextMeltanoValidators
 
 
 class FlextMeltanoConfig(FlextConfig):
-    """Meltano ELT configuration using FlextConfig as SOURCE OF TRUTH.
+    """Meltano ELT configuration management with enterprise-grade validation.
 
-    Extends FlextConfig to provide Meltano-specific configuration with validation
-    using flext-core patterns. Uses FlextConstants for all common values.
+    Extends FlextConfig to provide comprehensive Meltano-specific configuration
+    with validation using flext-core patterns. This class serves as the single
+    source of truth for all Meltano configuration across the application.
 
-    This class uses FlextConfig as singleton and adds only Meltano-specific fields.
-    Implements singleton pattern through FlextConfig's global instance.
+    The configuration includes support for:
+    - Multiple service types (extractors, loaders, transformers)
+    - Environment-specific settings (development, staging, production)
+    - Plugin management and validation
+    - Directory structure management
+    - Execution parameters and timeouts
+
+    Attributes:
+        MELTANO_VERSION: Required Meltano version for compatibility.
+        SINGER_SDK_VERSION: Required Singer SDK version.
+        DBT_VERSION: Required DBT version.
+        PROJECT_FILE: Default Meltano project file name.
+        STATE_DIR: Directory for Meltano state files.
+        VENV_DIR: Directory for Python virtual environments.
+
+    Example:
+        >>> config = FlextMeltanoConfig(
+        ...     project_root="/path/to/project",
+        ...     environment="development",
+        ...     log_level="INFO",
+        ... )
+        >>> validation_result = config.validate_project_structure()
+        >>> if validation_result.is_success:
+        ...     print("Configuration is valid")
+
     """
 
     # ============================================================================
@@ -65,7 +89,7 @@ class FlextMeltanoConfig(FlextConfig):
     # ============================================================================
 
     class PluginType(StrEnum):
-        """Plugin type enumeration."""
+        """Plugin type enumeration for Meltano services."""
 
         EXTRACTORS = "extractors"
         LOADERS = "loaders"
@@ -75,7 +99,7 @@ class FlextMeltanoConfig(FlextConfig):
         UTILITIES = "utilities"
 
     class EnvironmentType(StrEnum):
-        """Environment type enumeration."""
+        """Environment type enumeration for deployment contexts."""
 
         DEV = "development"
         STAGING = "staging"
@@ -84,7 +108,7 @@ class FlextMeltanoConfig(FlextConfig):
         LOCAL = "local"
 
     class LogLevel(StrEnum):
-        """Log level enumeration."""
+        """Log level enumeration for application logging."""
 
         DEBUG = "DEBUG"
         INFO = "INFO"
@@ -93,7 +117,7 @@ class FlextMeltanoConfig(FlextConfig):
         CRITICAL = "CRITICAL"
 
     class OperationStatus(StrEnum):
-        """Operation status enumeration."""
+        """Operation status enumeration for tracking execution states."""
 
         PENDING = "pending"
         RUNNING = "running"
@@ -103,7 +127,7 @@ class FlextMeltanoConfig(FlextConfig):
         CANCELLED = "cancelled"
 
     class RunMode(StrEnum):
-        """Run mode enumeration."""
+        """Run mode enumeration for execution strategies."""
 
         FULL = "full"
         INCREMENTAL = "incremental"
@@ -187,7 +211,18 @@ class FlextMeltanoConfig(FlextConfig):
     @field_validator("project_root", "venv_dir")
     @classmethod
     def validate_absolute_paths(cls, v: Path | str) -> Path:
-        """Validate and convert absolute path fields."""
+        """Validate and convert absolute path fields.
+
+        Args:
+            v: Path or string to validate and convert.
+
+        Returns:
+            Path: Resolved absolute path.
+
+        Raises:
+            FlextValidationError: If path validation fails.
+
+        """
         if isinstance(v, str):
             v = Path(v)
         return v.expanduser().resolve()
@@ -195,7 +230,15 @@ class FlextMeltanoConfig(FlextConfig):
     @field_validator("config_dir", "logs_dir")
     @classmethod
     def validate_relative_paths(cls, v: Path | str) -> Path:
-        """Validate relative path fields (should not be resolved to absolute)."""
+        """Validate relative path fields (should not be resolved to absolute).
+
+        Args:
+            v: Path or string to validate and convert.
+
+        Returns:
+            Path: Expanded but not resolved path to allow relative paths.
+
+        """
         if isinstance(v, str):
             v = Path(v)
         return v.expanduser()  # Don't resolve to allow relative paths
@@ -205,8 +248,14 @@ class FlextMeltanoConfig(FlextConfig):
     def validate_versions(cls, v: str) -> str:
         """Validate version strings.
 
+        Args:
+            v: Version string to validate.
+
         Returns:
-            Path: Validated version string.
+            str: Validated and stripped version string.
+
+        Raises:
+            FlextValidationError: If version string is invalid.
 
         """
         if not v or not isinstance(v, str):
@@ -219,7 +268,12 @@ class FlextMeltanoConfig(FlextConfig):
     # ============================================================================
 
     def get_project_file(self) -> Path:
-        """Get full path to meltano project file."""
+        """Get full path to meltano project file.
+
+        Returns:
+            Path: Full path to the Meltano project file.
+
+        """
         return self.project_root / self.PROJECT_FILE
 
     def get_absolute_config_dir(self) -> Path:
@@ -234,7 +288,12 @@ class FlextMeltanoConfig(FlextConfig):
         return self.project_root / self.config_dir
 
     def get_absolute_logs_dir(self) -> Path:
-        """Get absolute path to logs directory."""
+        """Get absolute path to logs directory.
+
+        Returns:
+            Path: Absolute logs directory path.
+
+        """
         if self.logs_dir.is_absolute():
             return self.logs_dir
         return self.project_root / self.logs_dir
@@ -251,9 +310,22 @@ class FlextMeltanoConfig(FlextConfig):
         return self.project_root / self.venv_dir
 
     def validate_project_structure(self) -> FlextResult[bool]:
-        """Validate Meltano project directory structure."""
-        # Use centralized validator to eliminate duplication
+        """Validate Meltano project directory structure.
 
+        Performs comprehensive validation of the Meltano project structure,
+        checking for required directories, files, and configuration.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        Example:
+            >>> config = FlextMeltanoConfig(project_root="/path/to/project")
+            >>> result = config.validate_project_structure()
+            >>> if result.is_success and result.unwrap():
+            ...     print("Project structure is valid")
+
+        """
+        # Use centralized validator to eliminate duplication
         return FlextMeltanoValidators.validate_meltano_project_structure(
             self.project_root
         )
@@ -266,6 +338,11 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
             FlextTypes.Core.Headers: Environment variables dictionary.
 
+        Example:
+            >>> config = FlextMeltanoConfig()
+            >>> env_vars = config.get_environment_variables()
+            >>> print(f"Meltano project root: {env_vars['MELTANO_PROJECT_ROOT']}")
+
         """
         return self.get_meltano_environment_variables()
 
@@ -275,27 +352,52 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def get_version(cls) -> str:
-        """Get FlextMeltano version from constants (SOURCE OF TRUTH)."""
+        """Get FlextMeltano version from constants.
+
+        Returns:
+            str: Current FlextMeltano version.
+
+        """
         return FlextMeltanoConstants.FLEXT_MELTANO_VERSION  # SOURCE OF TRUTH
 
     @classmethod
     def get_name(cls) -> str:
-        """Get FlextMeltano name."""
+        """Get FlextMeltano name.
+
+        Returns:
+            str: FlextMeltano application name.
+
+        """
         return FlextMeltanoConstants.Application.NAME  # SOURCE OF TRUTH
 
     @classmethod
     def get_default_timeout(cls) -> int:
-        """Get default timeout in seconds from FlextConstants (SOURCE OF TRUTH)."""
+        """Get default timeout in seconds from FlextConstants.
+
+        Returns:
+            int: Default timeout value in seconds.
+
+        """
         return FlextConstants.Network.DEFAULT_TIMEOUT  # SOURCE OF TRUTH
 
     @classmethod
     def get_default_batch_size(cls) -> int:
-        """Get default batch size from FlextConstants (SOURCE OF TRUTH)."""
+        """Get default batch size from FlextConstants.
+
+        Returns:
+            int: Default batch size for data processing.
+
+        """
         return FlextConstants.Performance.DEFAULT_BATCH_SIZE  # SOURCE OF TRUTH
 
     @classmethod
     def get_supported_plugin_types(cls) -> FlextTypes.Core.StringList:
-        """Get list of supported plugin types."""
+        """Get list of supported plugin types.
+
+        Returns:
+            FlextTypes.Core.StringList: List of supported plugin type names.
+
+        """
         return [plugin_type.value for plugin_type in cls.PluginType]
 
     @classmethod
@@ -303,14 +405,19 @@ class FlextMeltanoConfig(FlextConfig):
         """Get list of supported environments.
 
         Returns:
-            FlextTypes.Core.StringList:: Description of return value.
+            FlextTypes.Core.StringList: List of supported environment names.
 
         """
         return [env.value for env in cls.EnvironmentType]
 
     @classmethod
     def get_supported_log_levels(cls) -> FlextTypes.Core.StringList:
-        """Get list of supported log levels."""
+        """Get list of supported log levels.
+
+        Returns:
+            FlextTypes.Core.StringList: List of supported log level names.
+
+        """
         return [level.value for level in cls.LogLevel]
 
     # ============================================================================
@@ -323,8 +430,20 @@ class FlextMeltanoConfig(FlextConfig):
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration from project root directory.
 
+        Creates a new configuration instance from the specified project root
+        directory and validates the project structure.
+
+        Args:
+            project_root: Path to the Meltano project root directory.
+
         Returns:
-            FlextTypes.Core.StringList:: Description of return value.
+            FlextResult containing the created configuration or error details.
+
+        Example:
+            >>> result = FlextMeltanoConfig.create_from_project_root("/path/to/project")
+            >>> if result.is_success:
+            ...     config = result.unwrap()
+            ...     print(f"Created config for project: {config.project_root}")
 
         """
         try:
@@ -336,7 +455,7 @@ class FlextMeltanoConfig(FlextConfig):
                     validation_result.error or "Project validation failed"
                 )
 
-            return FlextResult["FlextMeltanoConfig"].ok(config)
+            return FlextResult["FlextMeltanoConfig"].ok(data=config)
 
         except Exception as e:  # pragma: no cover
             return FlextResult["FlextMeltanoConfig"].fail(
@@ -347,7 +466,27 @@ class FlextMeltanoConfig(FlextConfig):
     def create_for_environment(
         cls, environment: str, **kwargs: object
     ) -> FlextResult[FlextMeltanoConfig]:
-        """Create configuration for specific environment."""
+        """Create configuration for specific environment.
+
+        Creates a new configuration instance optimized for the specified
+        environment with appropriate defaults and validation.
+
+        Args:
+            environment: Target environment (development, staging, production, test, local).
+            **kwargs: Additional configuration parameters.
+
+        Returns:
+            FlextResult containing the created configuration or error details.
+
+        Example:
+            >>> result = FlextMeltanoConfig.create_for_environment(
+            ...     "production", project_root="/prod/project", log_level="WARNING"
+            ... )
+            >>> if result.is_success:
+            ...     config = result.unwrap()
+            ...     print(f"Created {config.environment} config")
+
+        """
         try:
             # Validate environment
             try:
@@ -395,7 +534,7 @@ class FlextMeltanoConfig(FlextConfig):
             )
 
             config = cls.model_validate(config_data)
-            return FlextResult["FlextMeltanoConfig"].ok(config)
+            return FlextResult["FlextMeltanoConfig"].ok(data=config)
 
         except Exception as e:
             return FlextResult["FlextMeltanoConfig"].fail(
@@ -415,10 +554,16 @@ class FlextMeltanoConfig(FlextConfig):
         and adds Meltano-specific fields. Parameters passed will override existing values.
 
         Args:
-            **overrides: Configuration overrides that will be applied with highest priority
+            **overrides: Configuration overrides that will be applied with highest priority.
 
         Returns:
-            FlextMeltanoConfig: The global configuration instance (created if needed)
+            FlextMeltanoConfig: The global configuration instance (created if needed).
+
+        Example:
+            >>> config = FlextMeltanoConfig.get_global_instance(
+            ...     project_root="/current/project", log_level="DEBUG"
+            ... )
+            >>> print(f"Global config: {config.project_root}")
 
         """
         # Always get fresh base configuration from FlextConfig singleton
@@ -441,7 +586,14 @@ class FlextMeltanoConfig(FlextConfig):
         is the source of truth for all configuration.
 
         Args:
-            config: The configuration to set as global
+            config: The configuration to set as global.
+
+        Raises:
+            TypeError: If config is not a FlextMeltanoConfig instance.
+
+        Example:
+            >>> config = FlextMeltanoConfig(project_root="/new/project")
+            >>> FlextMeltanoConfig.set_global_instance(config)
 
         """
         if not isinstance(config, FlextMeltanoConfig):
@@ -453,80 +605,20 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def clear_global_instance(cls) -> None:
-        """Clear the global instance (useful for testing)."""
+        """Clear the global instance (useful for testing).
+
+        Removes the current global configuration instance, allowing for
+        fresh configuration in test scenarios.
+
+        Example:
+            >>> FlextMeltanoConfig.clear_global_instance()
+            >>> # Now get_global_instance() will create a new instance
+
+        """
         # Delegate to FlextConfig since it's the source of truth
         FlextConfig.clear_global_instance()
         if hasattr(cls, "_global_instance"):
             cls._global_instance = None
-
-    # @classmethod
-    # def create_with_overrides(
-    #     cls, **overrides: object
-    # ) -> FlextResult[FlextMeltanoConfig]:
-    #     """Create Meltano configuration with specific overrides.
-    #
-    #     This method creates a new configuration instance using FlextConfig as the base
-    #     and applying the specified overrides. It follows the same pattern as FlextConfig.create().
-    #
-    #     Args:
-    #         **overrides: Configuration overrides to apply
-    #
-    #     Returns:
-    #         FlextResult containing configured FlextMeltanoConfig instance or error details
-    #
-    #     """
-    #     try:
-    #         # Create Meltano config directly with overrides
-    #         # Filter overrides to only include valid fields
-    #         valid_fields = cls.model_fields.keys()
-    #         filtered_overrides = {
-    #             k: v for k, v in overrides.items() if k in valid_fields
-    #         }
-    #         config = cls(**filtered_overrides)
-    #         return FlextResult[FlextMeltanoConfig].ok(config)
-    #
-    #     except Exception as error:
-    #         return FlextResult[FlextMeltanoConfig].fail(
-    #             f"Failed to create Meltano configuration: {error}",
-    #             error_code="CONFIG_CREATION_ERROR",
-    #         )
-
-    # @classmethod
-    # def create_for_environment_with_overrides(
-    #     cls, environment: str, **overrides: object
-    # ) -> FlextResult[FlextMeltanoConfig]:
-    #     """Create Meltano configuration for specific environment with overrides.
-    #
-    #     Args:
-    #         environment: Target environment (development, staging, production, test, local)
-    #         **overrides: Additional configuration overrides
-    #
-    #     Returns:
-    #         FlextResult containing configured FlextMeltanoConfig instance or error details
-    #
-    #     """
-    #     try:
-    #         # Validate environment
-    #         try:
-    #             env_type = cls.EnvironmentType(environment)
-    #         except ValueError:
-    #             return FlextResult[FlextMeltanoConfig].fail(
-    #                 f"Invalid environment: {environment}"
-    #             )
-    #
-    #         # Prepare configuration data
-    #         config_data = {
-    #             "environment": str(env_type),
-    #             **overrides,
-    #         }
-    #
-    #         return cls.create_with_overrides(**config_data)
-    #
-    #     except Exception as error:
-    #         return FlextResult[FlextMeltanoConfig].fail(
-    #             f"Failed to create environment configuration: {error}",
-    #             error_code="ENVIRONMENT_CONFIG_ERROR",
-    #         )
 
     def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.
@@ -535,10 +627,16 @@ class FlextMeltanoConfig(FlextConfig):
         following the same pattern as FlextConfig.apply_environment_overrides().
 
         Args:
-            **overrides: Configuration overrides to apply
+            **overrides: Configuration overrides to apply.
 
         Returns:
-            FlextResult indicating success or failure
+            FlextResult indicating success or failure.
+
+        Example:
+            >>> config = FlextMeltanoConfig()
+            >>> result = config.apply_overrides(log_level="DEBUG", timeout_seconds=60)
+            >>> if result.is_success:
+            ...     print("Overrides applied successfully")
 
         """
         # Check if configuration is sealed
@@ -559,7 +657,7 @@ class FlextMeltanoConfig(FlextConfig):
             self._metadata["overrides_applied"] = "true"
             self._metadata["override_count"] = str(len(overrides))
 
-            return FlextResult[None].ok(None)
+            return FlextResult[None].ok(data=None)
 
         except Exception as error:
             return FlextResult[None].fail(
@@ -568,12 +666,31 @@ class FlextMeltanoConfig(FlextConfig):
             )
 
     def seal(self) -> FlextResult[None]:
-        """Seal the configuration to prevent further modifications."""
+        """Seal the configuration to prevent further modifications.
+
+        Once sealed, the configuration cannot be modified, ensuring
+        immutability for production use.
+
+        Returns:
+            FlextResult indicating success or failure.
+
+        Example:
+            >>> config = FlextMeltanoConfig()
+            >>> result = config.seal()
+            >>> if result.is_success:
+            ...     print("Configuration is now sealed")
+
+        """
         self._sealed = True
-        return FlextResult[None].ok(None)
+        return FlextResult[None].ok(data=None)
 
     def is_sealed(self) -> bool:
-        """Check if the configuration is sealed."""
+        """Check if the configuration is sealed.
+
+        Returns:
+            bool: True if configuration is sealed, False otherwise.
+
+        """
         return getattr(self, "_sealed", False)
 
     def get_meltano_environment_variables(self) -> FlextTypes.Core.Headers:
@@ -583,7 +700,12 @@ class FlextMeltanoConfig(FlextConfig):
         as the source of truth for base configuration.
 
         Returns:
-            FlextTypes.Core.Headers: Environment variables dictionary
+            FlextTypes.Core.Headers: Environment variables dictionary.
+
+        Example:
+            >>> config = FlextMeltanoConfig(project_root="/my/project")
+            >>> env_vars = config.get_meltano_environment_variables()
+            >>> print(f"Project root: {env_vars['MELTANO_PROJECT_ROOT']}")
 
         """
         # Get base configuration from FlextConfig singleton

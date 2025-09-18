@@ -34,9 +34,7 @@ class TestFlextMeltanoUtilitiesComplete:
 
     def test_create_temp_directory_success(self) -> None:
         """Test create_temp_directory success using flext_tests."""
-        result = FlextMeltanoFileManagers.create_temp_directory(
-            prefix="flext_test_", meltano_structure=True
-        )
+        result = FlextMeltanoFileManagers.create_temp_directory(prefix="flext_test_")
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),
@@ -52,13 +50,11 @@ class TestFlextMeltanoUtilitiesComplete:
                 condition=temp_path.exists(), message="Temp directory should exist"
             )
 
-            # Check Meltano-specific directories were created
-            meltano_dirs = [".meltano", "extract", "load", "transform"]
-            for dir_name in meltano_dirs:
-                meltano_dir = temp_path / dir_name
-                self.test_assertions.assert_true(
-                    condition=meltano_dir.exists(), message=f"{dir_name} should exist"
-                )
+            # Check that basic temp directory was created
+            self.test_assertions.assert_true(
+                condition=temp_path.is_dir(),
+                message="Temp directory should be a directory",
+            )
 
     def test_create_temp_directory_default_prefix(self) -> None:
         """Test create_temp_directory with default prefix using flext_tests."""

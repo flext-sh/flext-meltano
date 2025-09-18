@@ -135,7 +135,7 @@ class FlextMeltanoBridge:
             )
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Pipeline failed"
             )
@@ -152,7 +152,7 @@ class FlextMeltanoBridge:
             result = self.adapter.execute_bridge_service()
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Command failed"
             )
@@ -169,7 +169,7 @@ class FlextMeltanoBridge:
             result = self.adapter.execute_dbt_operation()
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "DBT command failed"
             )
@@ -226,7 +226,7 @@ class FlextMeltanoBridge:
 
             if hasattr(result, "success"):
                 return result
-            return FlextResult.ok(result)
+            return FlextResult.ok(data=result)
         except Exception as e:
             return FlextResult.fail(str(e))
 
@@ -257,7 +257,7 @@ class FlextMeltanoBridge:
 
             # Result is always a FlextResult[list[FlextTypes.Core.Headers]] from adapter
             if result.is_success:
-                return FlextResult.ok({"plugins": result.value or []})
+                return FlextResult.ok(data={"plugins": result.value or []})
             return FlextResult.fail(result.error or "Discovery failed")
         except Exception as e:
             return FlextResult.fail(str(e))
@@ -309,7 +309,7 @@ class FlextMeltanoBridge:
         try:
             result = self.adapter.discover_plugins()
             if result.is_success:
-                return FlextResult.ok(result.value or [])
+                return FlextResult.ok(data=result.value or [])
             return FlextResult.fail(result.error or "Plugin listing failed")
         except Exception as e:
             return FlextResult.fail(str(e))
@@ -323,7 +323,7 @@ class FlextMeltanoBridge:
             result = self.adapter.initialize_project(project_path)
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Project initialization failed"
             )

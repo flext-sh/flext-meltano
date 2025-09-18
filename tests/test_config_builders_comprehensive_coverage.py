@@ -32,7 +32,7 @@ class TestConfigBuildersComprehensiveCoverage:
 
         assert config["name"] == "test_project"
         assert config["version"] == "1.0.0"
-        assert config["profile"] == ""  # profile_name="" is preserved by safe_string
+        assert not config["profile"]  # profile_name="" is preserved by safe_string
         assert config["model-paths"] == ["models"]
         assert config["analysis-paths"] == ["analysis"]
         assert config["test-paths"] == ["tests"]
@@ -59,8 +59,8 @@ class TestConfigBuildersComprehensiveCoverage:
         config = result.unwrap()
 
         # FlextUtilities.TextProcessor.safe_string preserves empty strings
-        assert config["name"] == ""
-        assert config["profile"] == ""
+        assert not config["name"]
+        assert not config["profile"]
 
     def test_dbt_config_builder_create_dbt_config_empty_profile_name(self) -> None:
         """Test DBT config creation with empty profile name - defaults to project."""
@@ -71,7 +71,7 @@ class TestConfigBuildersComprehensiveCoverage:
         config = result.unwrap()
 
         assert config["name"] == "test_project"
-        assert config["profile"] == ""  # Empty profile preserved by safe_string
+        assert not config["profile"]  # Empty profile preserved by safe_string
 
     def test_meltano_config_builder_create_meltano_config_basic(self) -> None:
         """Test basic Meltano configuration creation."""
@@ -82,7 +82,7 @@ class TestConfigBuildersComprehensiveCoverage:
         config = result.unwrap()
 
         assert config["project_id"] == "test_project"
-        assert config["project_name"] == ""  # Empty project_name defaults to empty
+        assert not config["project_name"]  # Empty project_name defaults to empty
         assert config["version"] == 1
         assert "plugins" in config
 
@@ -108,8 +108,8 @@ class TestConfigBuildersComprehensiveCoverage:
         config = result.unwrap()
 
         # FlextUtilities.TextProcessor.safe_string preserves empty strings
-        assert config["project_id"] == ""
-        assert config["project_name"] == ""
+        assert not config["project_id"]
+        assert not config["project_name"]
 
     def test_meltano_config_builder_add_plugin_to_config_extractor(self) -> None:
         """Test adding extractor plugin to existing config."""
@@ -268,7 +268,7 @@ class TestConfigBuildersComprehensiveCoverage:
         assert config["name"] == "test-plugin"
         assert config["type"] == PluginTypes.EXTRACTORS.value  # Default type
         assert config["namespace"] == "tap_test_plugin"  # Generated namespace
-        assert config["executable"] == ""  # Empty executable when not provided
+        assert not config["executable"]  # Empty executable when not provided
         assert "pip_url" in config  # Should have pip_url
 
     def test_singer_plugin_config_model_all_fields(self) -> None:
@@ -320,10 +320,10 @@ class TestConfigBuildersComprehensiveCoverage:
         result = builder.create_dbt_config("")
         assert result.success
         config = result.unwrap()
-        assert config["name"] == ""  # safe_string preserves empty string
+        assert not config["name"]  # safe_string preserves empty string
 
         # Test Meltano config with empty project name
         result = builder.create_meltano_config("project", "")
         assert result.success
         config = result.unwrap()
-        assert config["project_name"] == ""  # safe_string preserves empty
+        assert not config["project_name"]  # safe_string preserves empty

@@ -36,7 +36,7 @@ class TestFlextMeltanoExecutionResultComprehensive:
         assert result.success is True
         assert result.exit_code == 0
         assert result.output == "Pipeline completed successfully"
-        assert result.error == ""
+        assert not result.error
         assert result.execution_time == 45.2
 
     def test_initialization_failure_case(self) -> None:
@@ -54,7 +54,7 @@ class TestFlextMeltanoExecutionResultComprehensive:
         assert result.command == command
         assert result.success is False
         assert result.exit_code == 1
-        assert result.output == ""
+        assert not result.output
         assert result.error == "Plugin not found: tap-invalid"
         assert result.execution_time == 2.1
 
@@ -222,8 +222,8 @@ class TestFlextMeltanoExecutionResultComprehensive:
         result_json = result.to_json()
         parsed_json = json.loads(result_json)
 
-        assert parsed_json["output"] == ""
-        assert parsed_json["error"] == ""
+        assert not parsed_json["output"]
+        assert not parsed_json["error"]
         assert parsed_json["success"] is True
 
     def test_all_edge_cases(self) -> None:

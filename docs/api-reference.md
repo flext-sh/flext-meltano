@@ -1,6 +1,6 @@
 # flext-meltano API Reference
 
-**Complete API documentation for flext-meltano v0.9.0**
+**Complete API documentation for flext-meltano v0.9.9**
 
 **Last Updated**: 2025-09-17
 
@@ -369,4 +369,4 @@ def create_elt_command():
 
 ---
 
-**API Reference v0.9.0** - Reflects current implementation with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
+**API Reference v0.9.9** - Reflects current implementation with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.

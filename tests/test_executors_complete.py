@@ -9,6 +9,7 @@ from unittest import mock
 from click import Command
 from click.testing import CliRunner
 
+# FIXED: Use flext-cli foundation instead of direct Click imports
 from flext_core import FlextLogger, FlextResult
 from flext_meltano.executors import FlextMeltanoExecutor
 

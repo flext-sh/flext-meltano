@@ -2,7 +2,7 @@
 
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**
 
-**Version**: 0.9.0 | **Last Updated**: 2025-09-17
+**Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
 
 ---
 

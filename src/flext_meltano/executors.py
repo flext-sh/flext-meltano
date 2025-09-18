@@ -60,7 +60,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     def logger(self) -> FlextLogger:
         """Get logger, ensuring it's never None."""
         if self._logger is None:
-            object.__setattr__(self, "_logger", FlextLogger("FlextMeltanoExecutor"))
+            setattr(self, "_logger", FlextLogger("FlextMeltanoExecutor"))
         return cast("FlextLogger", self._logger)
 
     @property
@@ -82,9 +82,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
     def meltano_adapter_safe(self) -> FlextMeltanoAdapter:
         """Get meltano adapter, ensuring it's never None."""
         if self.meltano_adapter is None:  # pragma: no cover
-            object.__setattr__(
-                self, "meltano_adapter", FlextMeltanoAdapter()
-            )  # pragma: no cover
+            setattr(self, "meltano_adapter", FlextMeltanoAdapter())  # pragma: no cover
         return cast("FlextMeltanoAdapter", self.meltano_adapter)
 
     @property
@@ -191,12 +189,12 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             ).exists()
         except Exception:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                "Meltano command execution failed: placeholder error"
+                "Meltano command execution failed: Unable to verify project structure"
             )
 
         if not project_file_exists:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                "Meltano project not found: placeholder error"
+                "Meltano project not found: meltano.yml file missing from project root"
             )
 
         execution_start_timestamp = FlextUtilities.Generators.generate_iso_timestamp()
@@ -245,12 +243,12 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             ).exists()
         except Exception:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                "Project info retrieval failed: placeholder error"
+                "Project info retrieval failed: Unable to access project metadata"
             )
 
         if not project_file_exists:
             return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                "Project info retrieval failed: placeholder error"
+                "Project info retrieval failed: Unable to access project metadata"
             )
 
         project_info: FlextMeltanoTypes.CLI.ProcessResult = {
@@ -267,7 +265,9 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 project_name=project_info["project_name"],
             )
 
-        return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(dict(project_info))
+        return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+            data=dict(project_info)
+        )
 
     def run_command(self, args: FlextTypes.Core.StringList) -> FlextResult[int]:
         """Run CLI command and return exit code using FlextResult patterns.
@@ -278,13 +278,13 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         """
         if not args:
             self._print_help()
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(data=1)
 
         command = args[0]
 
         exit_code_result = self._execute_command(command, args)
         if exit_code_result.is_success:
-            return FlextResult[int].ok(exit_code_result.unwrap())
+            return FlextResult[int].ok(data=exit_code_result.unwrap())
         return FlextResult[int].fail(
             exit_code_result.error or "Command execution failed"
         )
@@ -436,7 +436,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         processed_headers: FlextTypes.Core.Headers = {
             key: str(value) for key, value in result_data.items()
         }
-        return FlextResult[FlextTypes.Core.Headers].ok(processed_headers)
+        return FlextResult[FlextTypes.Core.Headers].ok(data=processed_headers)
 
     def _execute_command(
         self, command: str, args: FlextTypes.Core.StringList
@@ -445,18 +445,18 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         if command == "version":
             result = self.bridge.get_version()
             exit_code = 0 if result.success else 1
-            return FlextResult[int].ok(exit_code)
+            return FlextResult[int].ok(data=exit_code)
 
         if command == "plugins":
             plugins_result = self.bridge.list_plugins()
             exit_code = 0 if plugins_result else 1
-            return FlextResult[int].ok(exit_code)
+            return FlextResult[int].ok(data=exit_code)
 
         if command == "run":
             return self._handle_run_command(args)
 
         self._print_help()
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(data=1)
 
     def _handle_run_command(self, args: FlextTypes.Core.StringList) -> FlextResult[int]:
         """Handle run command using FlextResult patterns.
@@ -468,13 +468,13 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         min_run_args = 3
         if len(args) < min_run_args:
             self._print_help()
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(data=1)
 
         tap_name, target_name = args[1], args[2]
 
         result = self.bridge.run_pipeline(tap_name, target_name)
         exit_code = 0 if result["success"] else 1
-        return FlextResult[int].ok(exit_code)
+        return FlextResult[int].ok(data=exit_code)
 
     def _print_help(self) -> None:
         """Print CLI help."""
@@ -494,7 +494,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 version_result = self.meltano_adapter.get_version()
             except Exception:
                 return FlextResult[FlextTypes.Core.Headers].fail(
-                    "Health check failed: placeholder error"
+                    "Health check failed: Service health validation unsuccessful"
                 )
         else:
             version_result = FlextResult.fail("No adapter")
@@ -519,7 +519,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 version_result = self.meltano_adapter.get_version()
             except Exception:
                 return FlextResult[FlextTypes.Core.Headers].fail(
-                    "Version check failed: placeholder error"
+                    "Version check failed: Unable to retrieve Meltano version information"
                 )
         else:
             version_result = FlextResult.fail("No adapter")
@@ -581,7 +581,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 plugins_result = self.meltano_adapter.discover_plugins()
             except Exception:
                 return FlextResult[list[FlextMeltanoTypes.Plugin.PluginInfo]].fail(
-                    "Plugin listing failed: placeholder error"
+                    "Plugin listing failed: Unable to enumerate installed plugins"
                 )
         else:
             plugins_result = FlextResult.fail("No adapter")
@@ -697,7 +697,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         self, command: str, options: FlextTypes.Core.StringList | None
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Route command to appropriate handler."""
-        if not command or command.strip() == "":
+        if not command or not command.strip():
             return FlextResult[FlextTypes.Core.Headers].ok(
                 {
                     "cli_type": "flext_meltano",
@@ -741,7 +741,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             version_str = version_data.get(
                 "version", FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED
             )
-            return FlextResult[str].ok(f"Meltano, version {version_str}")
+            return FlextResult[str].ok(data=f"Meltano, version {version_str}")
 
         return FlextResult[str].fail(result.error or "Version retrieval failed")
 
@@ -754,7 +754,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 self.logger.info("Install operation completed using native API")
             except Exception:
                 return FlextResult[bool].fail(
-                    "Install operation failed: placeholder error"
+                    "Install operation failed: Plugin installation process unsuccessful"
                 )
         return FlextResult[bool].ok(data=True)
 
@@ -939,7 +939,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 }
                 formatted_output = FlextUtilities.safe_json_stringify(formatted_data)
                 cli_logger.debug("Version output formatted", output=formatted_output)
-                return FlextResult[str].ok("Version displayed")
+                return FlextResult[str].ok(data="Version displayed")
             return FlextResult[str].fail(f"Version error: {result.error}")
 
         def handle_health() -> FlextResult[str]:
@@ -949,14 +949,14 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 formatted_data = {"status": "OK", "details": result.unwrap()}
                 formatted_output = FlextUtilities.safe_json_stringify(formatted_data)
                 cli_logger.debug("Health output formatted", output=formatted_output)
-                return FlextResult[str].ok("Health checked")
+                return FlextResult[str].ok(data="Health checked")
             return FlextResult[str].fail(f"Health error: {result.error}")
 
         def handle_plugins() -> FlextResult[str]:
             """Handle plugins command - unified method."""
             result = self._handle_help_command()
             if result.is_success:
-                return FlextResult[str].ok("Plugins listed")
+                return FlextResult[str].ok(data="Plugins listed")
             return FlextResult[str].fail(f"Plugins error: {result.error}")
 
         def execute_command(
@@ -991,7 +991,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         dual_interface = MockDualInterface(
             FlextMeltanoConstants.Application.NAME, cli_interface
         )
-        return FlextResult[object].ok(dual_interface)
+        return FlextResult[object].ok(data=dual_interface)
 
 
 __all__ = [

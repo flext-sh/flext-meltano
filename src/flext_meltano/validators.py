@@ -18,19 +18,57 @@ logger = FlextLogger(__name__)
 
 
 class FlextMeltanoValidators:
-    """DOMAIN-SPECIFIC Meltano business rule validators using FlextValidations foundation.
+    """Domain-specific Meltano business rule validators using FlextValidations foundation.
 
-    ZERO DUPLICATION PRINCIPLE:
-    - Uses FlextValidations.Core for ALL generic validation operations
-    - Contains ONLY Meltano/Singer/DBT business rule validations
-    - NO generic validation logic - delegate to flext-core
+    This class provides comprehensive validation for Meltano-specific business rules
+    while delegating generic validation operations to flext-core. It follows the
+    zero duplication principle by containing only Meltano/Singer/DBT specific
+    validation logic.
+
+    The validator supports validation for:
+    - Meltano plugin configurations
+    - Meltano project structures
+    - DBT project configurations
+    - Connection configurations
+
+    Example:
+        >>> validator = FlextMeltanoValidators()
+        >>> config = {"name": "tap-csv", "namespace": "tap_csv"}
+        >>> result = validator.validate_meltano_plugin_business_rules(config)
+        >>> if result.is_success:
+        ...     print("Plugin configuration is valid")
+
     """
 
     @classmethod
     def validate_meltano_plugin_business_rules(
         cls, config: object
     ) -> FlextResult[bool]:
-        """Validate MELTANO-SPECIFIC plugin business rules."""
+        """Validate Meltano-specific plugin business rules.
+
+        Performs comprehensive validation of Meltano plugin configurations,
+        including name format requirements, namespace validation, and
+        executable path validation.
+
+        Args:
+            config: Plugin configuration object to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        Example:
+            >>> config = {
+            ...     "name": "tap-csv",
+            ...     "namespace": "tap_csv",
+            ...     "executable": "tap-csv",
+            ... }
+            >>> result = FlextMeltanoValidators.validate_meltano_plugin_business_rules(
+            ...     config
+            ... )
+            >>> if result.is_success and result.unwrap():
+            ...     print("Plugin configuration is valid")
+
+        """
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
@@ -49,7 +87,18 @@ class FlextMeltanoValidators:
             @field_validator("name")
             @classmethod
             def validate_plugin_name_business_rules(cls, v: str) -> str:
-                """MELTANO-SPECIFIC: Plugin name business rules."""
+                """Validate Meltano-specific plugin name business rules.
+
+                Args:
+                    v: Plugin name to validate.
+
+                Returns:
+                    str: Validated plugin name.
+
+                Raises:
+                    ValueError: If plugin name violates business rules.
+
+                """
                 if not v or not v.strip():
                     msg = "Plugin name cannot be empty"
                     raise ValueError(msg)
@@ -80,7 +129,26 @@ class FlextMeltanoValidators:
     def validate_meltano_project_business_rules(
         cls, config: object
     ) -> FlextResult[bool]:
-        """Validate MELTANO-SPECIFIC project business rules."""
+        """Validate Meltano-specific project business rules.
+
+        Validates Meltano project configuration including version requirements
+        and project ID format restrictions.
+
+        Args:
+            config: Project configuration object to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        Example:
+            >>> config = {"version": 1, "project_id": "my-meltano-project"}
+            >>> result = FlextMeltanoValidators.validate_meltano_project_business_rules(
+            ...     config
+            ... )
+            >>> if result.is_success and result.unwrap():
+            ...     print("Project configuration is valid")
+
+        """
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
@@ -99,7 +167,18 @@ class FlextMeltanoValidators:
             @field_validator("project_id")
             @classmethod
             def validate_project_id_business_rules(cls, v: str) -> str:
-                """MELTANO-SPECIFIC: Project ID business rules."""
+                """Validate Meltano-specific project ID business rules.
+
+                Args:
+                    v: Project ID to validate.
+
+                Returns:
+                    str: Validated project ID.
+
+                Raises:
+                    ValueError: If project ID violates business rules.
+
+                """
                 if not v.strip():
                     msg = "Project ID cannot be empty or whitespace"
                     raise ValueError(msg)
@@ -121,7 +200,24 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_dbt_business_rules(cls, config: object) -> FlextResult[bool]:
-        """Validate DBT-SPECIFIC business rules."""
+        """Validate DBT-specific business rules.
+
+        Validates DBT project configuration including project name format
+        requirements and version specifications.
+
+        Args:
+            config: DBT configuration object to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        Example:
+            >>> config = {"name": "my_dbt_project", "version": "1.0.0"}
+            >>> result = FlextMeltanoValidators.validate_dbt_business_rules(config)
+            >>> if result.is_success and result.unwrap():
+            ...     print("DBT configuration is valid")
+
+        """
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
@@ -140,7 +236,18 @@ class FlextMeltanoValidators:
             @field_validator("name")
             @classmethod
             def validate_dbt_name_business_rules(cls, v: str) -> str:
-                """DBT-SPECIFIC: DBT project name business rules."""
+                """Validate DBT-specific project name business rules.
+
+                Args:
+                    v: DBT project name to validate.
+
+                Returns:
+                    str: Validated DBT project name.
+
+                Raises:
+                    ValueError: If project name violates business rules.
+
+                """
                 if not v or not v.strip():
                     msg = "DBT project name cannot be empty"
                     raise ValueError(msg)
@@ -163,24 +270,77 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_plugin_config(cls, config: object) -> FlextResult[bool]:
-        """DEPRECATED: Use validate_meltano_plugin_business_rules instead."""
+        """Validate plugin configuration (compatibility alias).
+
+        This method is deprecated and maintained for backward compatibility.
+        Use validate_meltano_plugin_business_rules instead.
+
+        Args:
+            config: Plugin configuration to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        """
         return cls.validate_meltano_plugin_business_rules(config)
 
     @classmethod
     def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
-        """DEPRECATED: Use validate_meltano_project_business_rules instead."""
+        """Validate Meltano configuration (compatibility alias).
+
+        This method is deprecated and maintained for backward compatibility.
+        Use validate_meltano_project_business_rules instead.
+
+        Args:
+            config: Meltano configuration to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        """
         return cls.validate_meltano_project_business_rules(config)
 
     @classmethod
     def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
-        """DEPRECATED: Use validate_dbt_business_rules instead."""
+        """Validate DBT configuration (compatibility alias).
+
+        This method is deprecated and maintained for backward compatibility.
+        Use validate_dbt_business_rules instead.
+
+        Args:
+            config: DBT configuration to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        """
         return cls.validate_dbt_business_rules(config)
 
     @classmethod
     def validate_meltano_project_structure(
         cls, project_path: Path
     ) -> FlextResult[bool]:
-        """Validate Meltano project structure - DOMAIN-SPECIFIC business rules."""
+        """Validate Meltano project structure with domain-specific business rules.
+
+        Performs comprehensive validation of the Meltano project directory
+        structure, checking for required files and directories.
+
+        Args:
+            project_path: Path to the Meltano project directory.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        Example:
+            >>> from pathlib import Path
+            >>> project_path = Path("/path/to/meltano/project")
+            >>> result = FlextMeltanoValidators.validate_meltano_project_structure(
+            ...     project_path
+            ... )
+            >>> if result.is_success and result.unwrap():
+            ...     print("Project structure is valid")
+
+        """
         try:
             # Check if path exists and is directory
             if not project_path.exists():
@@ -219,7 +379,25 @@ class FlextMeltanoValidators:
     def validate_connection_config(
         cls, config: FlextTypes.Core.Dict
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Validate connection configuration - DOMAIN-SPECIFIC business rules."""
+        """Validate connection configuration with domain-specific business rules.
+
+        Validates connection configuration data for Meltano services,
+        ensuring proper format and required fields.
+
+        Args:
+            config: Connection configuration dictionary to validate.
+
+        Returns:
+            FlextResult containing validated configuration or error details.
+
+        Example:
+            >>> config = {"host": "localhost", "port": 5432, "database": "mydb"}
+            >>> result = FlextMeltanoValidators.validate_connection_config(config)
+            >>> if result.is_success:
+            ...     validated_config = result.unwrap()
+            ...     print(f"Validated config: {validated_config}")
+
+        """
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
@@ -227,7 +405,7 @@ class FlextMeltanoValidators:
                     "Connection configuration cannot be empty"
                 )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(config)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=config)
         except Exception as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
