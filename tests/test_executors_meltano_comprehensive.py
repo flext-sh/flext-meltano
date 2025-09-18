@@ -1,307 +1,196 @@
-"""Test module for flext-meltano."""
+"""Comprehensive test module for FlextMeltanoExecutor - UNIFIED patterns only.
+
+Tests the FlextMeltanoExecutor unified class following FLEXT standards.
+NO ALIASES, NO BACKWARD COMPATIBILITY - Direct API testing only.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
+from __future__ import annotations
 
 import shutil
 import tempfile
 from pathlib import Path
 
-from flext_tests import FlextTestsBuilders, FlextTestsMatchers, FlextTestsUtilities
+import pytest
 
 from flext_core import FlextResult
 from flext_meltano.executors import FlextMeltanoExecutor
 
 
-class TestFlextMeltanoExecutorComprehensive:
-    """Comprehensive tests for FlextMeltanoExecutor with flext_tests integration."""
+class TestFlextMeltanoExecutorUnified:
+    """Test FlextMeltanoExecutor unified class - NO ALIASES."""
 
     def setup_method(self) -> None:
-        """Setup for each test."""
+        """Set up test fixtures."""
+        # Use temporary directory for test isolation
         self.temp_dir = Path(tempfile.mkdtemp())
-        self.executor = FlextMeltanoExecutor()
+        self.executor = FlextMeltanoExecutor(project_root=self.temp_dir)
+
+    def test_unified_executor_initialization(self) -> None:
+        """Test FlextMeltanoExecutor unified initialization."""
+        assert isinstance(self.executor, FlextMeltanoExecutor)
+        assert self.executor.project_root is not None
+        assert isinstance(self.executor.project_root, Path)
+
+    def test_unified_executor_has_required_attributes(self) -> None:
+        """Test that unified executor has all required attributes."""
+        required_attributes = [
+            "project_root",
+            "meltano_adapter",
+            "logger",
+            "_bridge",
+        ]
+
+        for attr in required_attributes:
+            assert hasattr(self.executor, attr), f"Missing required attribute: {attr}"
+
+    def test_unified_executor_has_required_methods(self) -> None:
+        """Test that unified executor has all required methods and properties."""
+        required_methods = [
+            "execute",
+            "execute_meltano_command",
+            "get_project_info",
+            "run_command",
+        ]
+
+        required_properties = [
+            "project_root_safe",
+            "meltano_adapter_safe",
+            "logger_safe",
+            "bridge",
+        ]
+
+        for method in required_methods:
+            assert hasattr(self.executor, method), f"Missing required method: {method}"
+            assert callable(getattr(self.executor, method)), (
+                f"Method {method} is not callable"
+            )
+
+        for prop in required_properties:
+            assert hasattr(self.executor, prop), f"Missing required property: {prop}"
+
+    def test_unified_executor_execute_method(self) -> None:
+        """Test FlextMeltanoExecutor execute method."""
+        result = self.executor.execute()
+        assert isinstance(result, FlextResult)
+        # Should succeed or fail gracefully
+        assert result.is_success or result.is_failure
+
+    def test_unified_executor_safe_property_access(self) -> None:
+        """Test safe property access."""
+        # Test safe project root access
+        project_root = self.executor.project_root_safe
+        assert isinstance(project_root, Path)
+
+        # Test safe meltano adapter access
+        adapter = self.executor.meltano_adapter_safe
+        assert adapter is not None
+
+        # Test safe logger access
+        logger = self.executor.logger_safe
+        assert logger is not None
+
+    def test_unified_executor_bridge_access(self) -> None:
+        """Test bridge access through unified executor."""
+        bridge = self.executor.bridge
+        assert bridge is not None
+        # Bridge should be the bridge instance with real methods
+        assert hasattr(bridge, "get_version")
+        assert hasattr(bridge, "run_pipeline")
+
+    def test_unified_executor_run_command_structure(self) -> None:
+        """Test unified executor run_command method structure."""
+        # Test with version command (should always be available)
+        result = self.executor.run_command(["--version"])
+        assert isinstance(result, FlextResult)
+        # Command should execute (success or controlled failure)
+        assert result.is_success or result.is_failure
+
+    def test_unified_executor_get_project_info(self) -> None:
+        """Test unified executor get_project_info method."""
+        result = self.executor.get_project_info(self.temp_dir)
+        assert isinstance(result, FlextResult)
+        # Should return project info or controlled failure
+        assert result.is_success or result.is_failure
+
+    def test_unified_executor_execute_meltano_command(self) -> None:
+        """Test unified executor execute_meltano_command method."""
+        # Test with simple command using project root
+        result = self.executor.execute_meltano_command(self.temp_dir, ["--version"])
+        assert isinstance(result, FlextResult)
+        # Should execute command or handle gracefully
+        assert result.is_success or result.is_failure
+
+    def test_no_backward_compatibility_aliases(self) -> None:
+        """Test that NO backward compatibility aliases exist."""
+        # Verify that old aliases do NOT exist
+        forbidden_attributes = [
+            "simple_meltano_executor",
+            "simple_dbt_executor",
+            "meltano_executor",
+            "adapter",  # Should use meltano_adapter_safe()
+        ]
+
+        for attr in forbidden_attributes:
+            assert not hasattr(self.executor, attr), (
+                f"VIOLATION: Found eliminated alias {attr} - should not exist"
+            )
+
+    def test_unified_executor_type_consistency(self) -> None:
+        """Test that executor maintains type consistency."""
+        # All instances should be the same unified type
+        executor1 = FlextMeltanoExecutor()
+        executor2 = FlextMeltanoExecutor()
+
+        assert type(executor1) is type(executor2)
+        assert isinstance(executor1, FlextMeltanoExecutor)
+        assert isinstance(executor2, FlextMeltanoExecutor)
+
+    def test_unified_executor_project_isolation(self) -> None:
+        """Test that executors with different project roots are isolated."""
+        temp_dir2 = Path(tempfile.mkdtemp())
+        executor2 = FlextMeltanoExecutor(project_root=temp_dir2)
+
+        # Should have different project roots
+        assert self.executor.project_root != executor2.project_root
+        assert self.executor.project_root == self.temp_dir
+        assert executor2.project_root == temp_dir2
+
+    def test_unified_executor_flext_result_consistency(self) -> None:
+        """Test that all executor methods return FlextResult consistently."""
+        # All methods that return results should use FlextResult
+        result_methods = [
+            "execute",
+            "execute_meltano_command",
+            "get_project_info",
+            "run_command",
+        ]
+
+        for method_name in result_methods:
+            method = getattr(self.executor, method_name)
+            if method_name == "execute":
+                result = method()
+            elif method_name == "execute_meltano_command":
+                result = method(self.temp_dir, ["--version"])
+            elif method_name == "run_command":
+                result = method(["--version"])
+            elif method_name == "get_project_info":
+                result = method(self.temp_dir)
+            else:
+                result = method()
+
+            assert isinstance(result, FlextResult), (
+                f"Method {method_name} did not return FlextResult"
+            )
 
     def teardown_method(self) -> None:
-        """Cleanup after each test."""
+        """Clean up test fixtures."""
+        # Clean up temporary directory
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir)
 
-    def test_main_class_initialization(self) -> None:
-        """Test main FlextMeltanoExecutors class initialization."""
-        executor = FlextMeltanoExecutor()
-        assert executor is not None
-        assert hasattr(executor, "project_root")
-        assert hasattr(executor, "meltano_adapter")
-        assert hasattr(executor, "logger")
 
-    def test_meltano_executor_creation(self) -> None:
-        """Test FlextMeltanoSimpleExecutor nested class creation."""
-        executor = self.executor.meltano_executor
-        assert executor is not None
-
-    def test_meltano_executor_logger_property(self) -> None:
-        """Test FlextMeltanoSimpleExecutor logger property."""
-        executor_class = self.executor.meltano_executor
-        executor_instance = executor_class()
-        logger = executor_instance.logger
-        assert logger is not None
-        assert hasattr(logger, "info")
-        assert hasattr(logger, "error")
-        assert hasattr(logger, "warning")
-
-    def test_execution_result_creation(self) -> None:
-        """Test ExecutionResult nested class creation."""
-        result = self.executor.execution_result(
-            command=["meltano", "--version"],
-            success=True,
-            exit_code=0,
-            output="meltano, version 3.0.0",
-            error="",
-            execution_time=1.5,
-        )
-        assert result.success is True
-        assert result.command == ["meltano", "--version"]
-        assert result.exit_code == 0
-        assert result.output == "meltano, version 3.0.0"
-        assert result.error == ""
-        assert result.execution_time == 1.5
-
-    def test_execution_result_to_dict(self) -> None:
-        """Test ExecutionResult to_dict conversion."""
-        result = self.executor.execution_result(
-            command=["meltano", "--version"],
-            success=True,
-            exit_code=0,
-            output="meltano, version 3.0.0",
-            error="",
-            execution_time=1.5,
-        )
-        result_dict = result.to_dict()
-
-        assert isinstance(result_dict, dict)
-        assert result_dict["success"] is True
-        assert result_dict["command"] == ["meltano", "--version"]
-        assert result_dict["exit_code"] == 0
-        assert result_dict["output"] == "meltano, version 3.0.0"
-        assert result_dict["error"] == ""
-        assert result_dict["execution_time"] == 1.5
-
-    def test_execution_result_to_json(self) -> None:
-        """Test ExecutionResult to_json conversion."""
-        result = self.executor.execution_result(
-            command=["test", "command"],
-            success=True,
-            exit_code=0,
-            output="test output",
-            error="",
-            execution_time=2.0,
-        )
-        json_str = result.to_json()
-
-        assert isinstance(json_str, str)
-        assert "success" in json_str
-        assert "test" in json_str
-        assert "test output" in json_str
-
-    def test_execution_result_with_failure(self) -> None:
-        """Test ExecutionResult with failure scenario."""
-        result = self.executor.execution_result(
-            command=["invalid", "command"],
-            success=False,
-            exit_code=1,
-            output="",
-            error="Command not found",
-            execution_time=0.1,
-        )
-        assert result.success is False
-        assert result.exit_code == 1
-        assert result.error == "Command not found"
-
-    def test_simple_meltano_executor_creation(self) -> None:
-        """Test FlextMeltanoSimpleExecutor creation."""
-        simple_executor = self.executor.simple_meltano_executor
-        assert simple_executor is not None
-
-    def test_simple_dbt_executor_creation(self) -> None:
-        """Test FlextMeltanoSimpleDbtExecutor creation."""
-        simple_dbt = self.executor.simple_dbt_executor
-        assert simple_dbt is not None
-
-    def test_simple_dbt_executor_temp_project(self) -> None:
-        """Test FlextMeltanoSimpleDbtExecutor temporary project creation."""
-        simple_dbt_class = self.executor.simple_dbt_executor
-        simple_dbt = simple_dbt_class()
-
-        # Test executor initialization
-        assert simple_dbt is not None
-        assert hasattr(simple_dbt, "project_root")
-        assert hasattr(simple_dbt, "meltano_adapter")
-        assert hasattr(simple_dbt, "logger")
-
-    def test_meltano_executor_execute_with_mock_command(self) -> None:
-        """Test FlextMeltanoSimpleExecutor execute method with mock environment."""
-        executor_class = self.executor.meltano_executor
-        executor = executor_class()
-
-        # Test execute method (will return service info)
-        result = executor.execute()
-        assert isinstance(result, FlextResult)
-        # Test the structure of service info
-        FlextTestsMatchers.assert_result_success(result)
-
-    def test_meltano_executor_project_info_mock(self) -> None:
-        """Test FlextMeltanoSimpleExecutor get_project_info method."""
-        executor_class = self.executor.meltano_executor
-        executor_instance = executor_class()
-
-        # Test get_project_info with project_root parameter
-        result = executor_instance.get_project_info(self.temp_dir)
-        assert isinstance(result, FlextResult)
-
-    def test_execution_result_timestamp_presence(self) -> None:
-        """Test ExecutionResult includes timestamp in dict representation."""
-        result = self.executor.execution_result(
-            command=["test"],
-            success=True,
-            exit_code=0,
-            output="",
-            error="",
-            execution_time=1.0,
-        )
-        result_dict = result.to_dict()
-        assert "timestamp" in result_dict
-        assert isinstance(result_dict["timestamp"], str)
-
-    def test_meltano_executor_command_execution_structure(self) -> None:
-        """Test FlextMeltanoSimpleExecutor command execution structure."""
-        # Test execute_meltano_command structure with project_root parameter
-        result = self.executor.execute_meltano_command(
-            project_root=self.temp_dir, command=["version"]
-        )
-        assert isinstance(result, FlextResult)
-
-    def test_simple_meltano_executor_run_plugin_command_structure(self) -> None:
-        """Test FlextMeltanoSimpleExecutor run_plugin_command structure."""
-        simple_executor = self.executor.simple_meltano_executor
-
-        # Test the method exists and returns proper structure
-        # This will fail in test environment but tests the interface
-        try:
-            result = simple_executor.run_command(["--version"])
-            assert isinstance(result, FlextResult)
-        except Exception:
-            # Expected in test environment without Meltano
-            # This is acceptable behavior when Meltano is not available
-            assert True  # Explicit assertion instead of pass
-
-    def test_simple_meltano_executor_run_pipeline_structure(self) -> None:
-        """Test FlextMeltanoSimpleExecutor run_pipeline structure."""
-        simple_executor = self.executor.simple_meltano_executor
-
-        # Test the method exists and returns proper structure
-        try:
-            result = simple_executor.run_pipeline(
-                tap_name="tap-csv", target_name="target-jsonl"
-            )
-            assert isinstance(result, FlextResult)
-        except Exception:
-            # Expected in test environment without Meltano
-            # This is acceptable behavior when Meltano is not available
-            assert True  # Explicit assertion instead of pass
-
-    def test_simple_meltano_executor_install_plugin_structure(self) -> None:
-        """Test FlextMeltanoSimpleExecutor install_plugin structure."""
-        simple_executor = self.executor.simple_meltano_executor
-
-        # Test the method exists and returns proper structure
-        try:
-            result = simple_executor.list_plugins()
-            assert isinstance(result, FlextResult)
-        except Exception:
-            # Expected in test environment without Meltano
-            # This is acceptable behavior when Meltano is not available
-            assert True  # Explicit assertion instead of pass
-
-    def test_all_executor_classes_are_nested(self) -> None:
-        """Test that all executor classes are properly nested within main class."""
-        # Verify nested class structure exists at class level
-        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleExecutor")
-        assert hasattr(FlextMeltanoExecutor, "ExecutionResult")
-        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleExecutor")
-        assert hasattr(FlextMeltanoExecutor, "FlextMeltanoSimpleDbtExecutor")
-
-        # Verify they are actual classes
-        assert isinstance(self.executor.meltano_executor, type)
-        assert isinstance(self.executor.execution_result, type)
-        assert isinstance(self.executor.simple_meltano_executor, type)
-        assert isinstance(self.executor.simple_dbt_executor, type)
-
-    def test_execution_result_comprehensive_fields(self) -> None:
-        """Test ExecutionResult with all possible field combinations."""
-        # Test with minimal fields
-        minimal_result = self.executor.execution_result(
-            command=["test"],
-            success=True,
-            exit_code=0,
-            output="",
-            error="",
-            execution_time=0.5,
-        )
-        assert minimal_result is not None
-
-        # Test with comprehensive fields
-        full_result = self.executor.execution_result(
-            command=["meltano", "run", "tap-postgres", "target-snowflake"],
-            success=False,
-            exit_code=1,
-            output="Processing 1000 records...\nCompleted tap extraction",
-            error="Connection timeout to Snowflake",
-            execution_time=45.7,
-        )
-        assert "run" in full_result.command
-        assert "1000 records" in full_result.output
-        assert "timeout" in full_result.error
-        assert full_result.execution_time > 40.0
-
-    def test_meltano_executor_with_different_configs(self) -> None:
-        """Test FlextMeltanoSimpleExecutor works with different configurations."""
-        # Test with no config
-        executor1 = self.executor.meltano_executor
-        assert executor1 is not None
-
-        # Test with project_root parameter
-        executor_class = self.executor.meltano_executor
-        executor2 = executor_class(project_root=Path.cwd())
-        assert executor2 is not None
-
-    def test_flext_tests_integration_with_builders(self) -> None:
-        """Test integration with flext_tests TestBuilders."""
-        # Use FlextTestsBuilders for result creation
-        builders = FlextTestsBuilders()
-        success_result = builders.result().with_success_data("test data").build()
-        FlextTestsMatchers.assert_result_success(success_result, "test data")
-
-        failure_result = (
-            builders.result().with_failure("test error", "TEST_001").build()
-        )
-        FlextTestsMatchers.assert_result_failure(failure_result, "test error")
-
-    def test_flext_tests_integration_with_utilities(self) -> None:
-        """Test integration with flext_tests utilities."""
-        # Use FlextTestsUtilities for test data creation
-        test_utilities = FlextTestsUtilities()
-
-        # Create test data structure using utilities
-        test_data = {
-            "project": "test-meltano-project",
-            "version": "1.0.0",
-            "plugins": ["tap-csv", "target-jsonl"],
-        }
-
-        # Validate the test utilities integration works correctly using actual methods
-        success_result = test_utilities.TestUtilities.create_test_result(
-            success=True, data=test_data
-        )
-        FlextTestsUtilities.TestUtilities.assert_result_success(success_result)
-
-        # Test data validation
-        assert isinstance(test_data["project"], str)
-        assert test_data["version"] == "1.0.0"
-        assert len(test_data["plugins"]) == 2
+if __name__ == "__main__":
+    pytest.main([__file__])

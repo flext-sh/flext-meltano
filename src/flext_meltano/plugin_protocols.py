@@ -26,6 +26,7 @@ class FlextMeltanoPluginProtocols:
     TargetServiceProtocol = object
     DbtServiceProtocol = object
 
+
 __all__ = [
     "FlextMeltanoPluginProtocols",  # Main unified class - NO ALIASES
 ]

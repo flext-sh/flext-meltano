@@ -32,7 +32,7 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, str | int | float | bool | list[str]]:
         """Convert to dictionary representation."""
         return {
             "command": self.command,

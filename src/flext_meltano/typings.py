@@ -71,15 +71,15 @@ class FlextMeltanoTypes:
 
         def get_config(self) -> ConfigDict:
             """Get plugin configuration."""
-            ...
+            ...  # pragma: no cover
 
         def validate_config(self, config: ConfigDict) -> bool:
             """Validate plugin configuration."""
-            ...
+            ...  # pragma: no cover
 
         def execute(self, *args: object) -> T_co:
             """Execute plugin with given arguments."""
-            ...
+            ...  # pragma: no cover
 
     @runtime_checkable
     class SingerStreamProtocol(Protocol):

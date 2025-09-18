@@ -19,10 +19,10 @@ class TestFlextMeltanoServiceComplete:
         service = FlextMeltanoService()
         assert service is not None
 
-        # Check service methods are available (snake_case after ruff fixes)
-        assert hasattr(service, "tap_service")
-        assert hasattr(service, "target_service")
-        assert hasattr(service, "dbt_service")
+        # Check unified service factory methods are available
+        assert hasattr(service, "create_tap_service")
+        assert hasattr(service, "create_target_service")
+        assert hasattr(service, "create_dbt_service")
 
     def test_create_tap_service(self) -> None:
         """Test create_tap_service method."""
@@ -183,14 +183,18 @@ class TestFlextMeltanoServiceComplete:
             assert result3.error
             assert isinstance(result3.error, str)
 
-    def test_nested_class_hierarchy(self) -> None:
-        """Test nested class structure and hierarchy."""
-        nested_methods = ["tap_service", "target_service", "dbt_service"]
+    def test_unified_service_factory_methods(self) -> None:
+        """Test unified service factory method structure."""
+        factory_methods = [
+            "create_tap_service",
+            "create_target_service",
+            "create_dbt_service",
+        ]
 
-        for method_name in nested_methods:
-            nested_method = getattr(self.service, method_name)
-            assert nested_method is not None
-            assert callable(nested_method)
+        for method_name in factory_methods:
+            factory_method = getattr(self.service, method_name)
+            assert factory_method is not None
+            assert callable(factory_method)
 
     def test_service_type_validation(self) -> None:
         """Test service creation with type validation."""

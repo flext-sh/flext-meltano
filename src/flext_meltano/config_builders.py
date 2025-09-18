@@ -42,14 +42,14 @@ class FlextMeltanoConfigBuilders:
     def create_dbt_config(
         self, project_name: str, profile_name: str = ""
     ) -> FlextResult[ConfigDict]:
-        """Cria configuração básica do DBT usando FlextResult patterns.
+        """Create basic DBT configuration using FlextResult patterns.
 
         Args:
-            project_name: Nome do projeto DBT
-            profile_name: Nome do profile (opcional)
+            project_name: DBT project name
+            profile_name: Profile name (optional)
 
         Returns:
-            FlextResult contendo Dict com configuração do DBT ou erro
+            FlextResult containing Dict with DBT configuration or error
 
         """
         try:
@@ -77,7 +77,7 @@ class FlextMeltanoConfigBuilders:
                 },
             }
 
-            return FlextResult[ConfigDict].ok(config)
+            return FlextResult[ConfigDict].ok(data=config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to create DBT config: {e}")
 
@@ -148,7 +148,7 @@ class FlextMeltanoConfigBuilders:
                 )
                 result_config["pip_url"] = f"{prefix}-{safe_name}"
 
-            return FlextResult[ConfigDict].ok(result_config)
+            return FlextResult[ConfigDict].ok(data=result_config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(
                 f"Failed to create Singer {plugin_type} config: {e}"
@@ -207,7 +207,7 @@ class FlextMeltanoConfigBuilders:
         variant: str = FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
         config_defaults: ConfigDict | None = None,
     ) -> FlextResult[ConfigDict]:
-        """Cria configuração completa para plugin Meltano usando FlextResult patterns.
+        """Create complete plugin configuration for Meltano using FlextResult patterns.
 
         Args:
             plugin_name: Name of the plugin
@@ -215,10 +215,10 @@ class FlextMeltanoConfigBuilders:
             pip_url: Pip URL for installation
             executable: Executable name
             variant: Plugin variant
-            config_defaults: Configurações padrão (opcional)
+            config_defaults: Default configuration (optional)
 
         Returns:
-            FlextResult contendo Dict com configuração completa do plugin ou erro
+            FlextResult containing Dict with complete plugin configuration or error
 
         """
         try:
@@ -251,7 +251,7 @@ class FlextMeltanoConfigBuilders:
             if config_defaults:
                 plugin_config["config"] = config_defaults
 
-            return FlextResult[ConfigDict].ok(plugin_config)
+            return FlextResult[ConfigDict].ok(data=plugin_config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to create plugin config: {e}")
 
@@ -261,15 +261,15 @@ class FlextMeltanoConfigBuilders:
         pip_url: str,
         config_defaults: ConfigDict | None = None,
     ) -> FlextResult[ConfigDict]:
-        """Cria configuração específica para extractors (taps) usando FlextResult patterns.
+        """Create specific configuration for extractors (taps) using FlextResult patterns.
 
         Args:
-            tap_name: Nome do tap
-            pip_url: URL do pip para instalação
-            config_defaults: Configurações padrão do tap
+            tap_name: Tap name
+            pip_url: Pip URL for installation
+            config_defaults: Default tap configuration
 
         Returns:
-            FlextResult contendo Dict com configuração do extractor ou erro
+            FlextResult containing Dict with extractor configuration or error
 
         """
         try:
@@ -291,7 +291,7 @@ class FlextMeltanoConfigBuilders:
                 },
             }
 
-            return FlextResult[ConfigDict].ok(config)
+            return FlextResult[ConfigDict].ok(data=config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(
                 f"Failed to create extractor config: {e}"
@@ -303,15 +303,15 @@ class FlextMeltanoConfigBuilders:
         pip_url: str,
         config_defaults: ConfigDict | None = None,
     ) -> FlextResult[ConfigDict]:
-        """Cria configuração específica para loaders (targets) usando FlextResult patterns.
+        """Create specific configuration for loaders (targets) using FlextResult patterns.
 
         Args:
-            target_name: Nome do target
-            pip_url: URL do pip para instalação
-            config_defaults: Configurações padrão do target
+            target_name: Target name
+            pip_url: Pip URL for installation
+            config_defaults: Default target configuration
 
         Returns:
-            FlextResult contendo Dict com configuração do loader ou erro
+            FlextResult containing Dict with loader configuration or error
 
         """
         try:
@@ -332,7 +332,7 @@ class FlextMeltanoConfigBuilders:
                 },
             }
 
-            return FlextResult[ConfigDict].ok(config)
+            return FlextResult[ConfigDict].ok(data=config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to create loader config: {e}")
 
@@ -377,7 +377,7 @@ class FlextMeltanoConfigBuilders:
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
             }
-            return FlextResult[ConfigDict].ok(config_dict)
+            return FlextResult[ConfigDict].ok(data=config_dict)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to create Meltano config: {e}")
 
@@ -387,15 +387,15 @@ class FlextMeltanoConfigBuilders:
         plugin_type: str,
         plugin_config: ConfigDict,
     ) -> FlextResult[ConfigDict]:
-        """Adiciona plugin à configuração Meltano usando FlextResult patterns.
+        """Add plugin to Meltano configuration using FlextResult patterns.
 
         Args:
-            meltano_config: Configuração Meltano existente
-            plugin_type: Tipo do plugin (extractors, loaders, etc.)
-            plugin_config: Configuração do plugin
+            meltano_config: Existing Meltano configuration
+            plugin_type: Plugin type (extractors, loaders, etc.)
+            plugin_config: Plugin configuration
 
         Returns:
-            FlextResult contendo Configuração Meltano atualizada ou erro
+            FlextResult containing updated Meltano configuration or error
 
         """
         try:
@@ -435,7 +435,7 @@ class FlextMeltanoConfigBuilders:
                 }
                 updated_config["metadata"] = metadata
 
-            return FlextResult[ConfigDict].ok(updated_config)
+            return FlextResult[ConfigDict].ok(data=updated_config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to add plugin to config: {e}")
 
