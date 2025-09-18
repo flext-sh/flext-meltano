@@ -2,7 +2,7 @@
 
 **Enterprise Meltano Data Integration Foundation for FLEXT Ecosystem**  
 **Version**: 2.0.0 | **Authority**: MELTANO ELT PIPELINE FOUNDATION | **Updated**: 2025-01-08  
-**Status**: Production-ready Meltano/Singer/DBT integration with zero errors across all quality gates
+**Status**: Production-ready Meltano/Singer/DBT integration with zero errors across all quality gates · 1.0.0 Release Preparation
 
 **References**: See [../CLAUDE.md](../CLAUDE.md) for FLEXT ecosystem standards and [README.md](README.md) for project overview.
 
@@ -10,11 +10,11 @@
 
 ## 🔗 MCP SERVER INTEGRATION
 
-| MCP Server | Purpose | Status |
-|------------|---------|--------|
-| **serena** | Meltano codebase analysis and ELT pipeline navigation | **ACTIVE** |
+| MCP Server              | Purpose                                                         | Status     |
+| ----------------------- | --------------------------------------------------------------- | ---------- |
+| **serena**              | Meltano codebase analysis and ELT pipeline navigation           | **ACTIVE** |
 | **sequential-thinking** | Meltano architecture and Singer/DBT integration problem solving | **ACTIVE** |
-| **github** | Meltano ecosystem integration and pipeline PRs | **ACTIVE** |
+| **github**              | Meltano ecosystem integration and pipeline PRs                  | **ACTIVE** |
 
 **Usage**: `claude mcp list` for available servers, leverage for Meltano-specific development patterns and ELT pipeline analysis.
 
@@ -323,10 +323,10 @@ from flext_core.internal.services import Service         # WRONG: Internal modul
 
 **MANDATORY FLEXT Ecosystem Dependencies:**
 
-- `flext-core>=0.9.0` - Foundation patterns, FlextResult, service base classes, logging
-- `flext-cli>=0.9.0` - CLI patterns, command processing, and user interface
-- `flext-observability>=0.9.0` - Monitoring, metrics, and distributed tracing
-- `flext-api>=0.9.0` - API client patterns and HTTP/REST abstractions
+- `flext-core>=0.9.9` - Foundation patterns, FlextResult, service base classes, logging
+- `flext-cli>=0.9.9` - CLI patterns, command processing, and user interface
+- `flext-observability>=0.9.9` - Monitoring, metrics, and distributed tracing
+- `flext-api>=0.9.9` - API client patterns and HTTP/REST abstractions
 
 **EXTERNAL ELT Dependencies (Abstracted Through FLEXT):**
 

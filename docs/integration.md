@@ -242,11 +242,11 @@ export MELTANO_ENVIRONMENT=dev
 # pyproject.toml for flext-tap-*/flext-target-*/flext-dbt-* projects
 [tool.poetry.dependencies]
 python = "^3.13"
-flext-core = "^0.9.0"
-flext-meltano = "^0.9.0"  # Mandatory ELT foundation
+flext-core = "^0.9.9"
+flext-meltano = "^0.9.9"  # Mandatory ELT foundation
 
 [tool.poetry.group.dev.dependencies]
-flext-cli = "^0.9.0"      # CLI development tools
+flext-cli = "^0.9.9"      # CLI development tools
 ```
 
 ---
@@ -334,4 +334,4 @@ if result.is_failure:
 
 ---
 
-**Integration Guide v0.9.0** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.
+**Integration Guide v0.9.9** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.

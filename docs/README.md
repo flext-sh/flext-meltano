@@ -2,7 +2,7 @@
 
 **Documentation for the FLEXT ecosystem ELT foundation library** providing Meltano, dbt, and Singer integration.
 
-**Version**: 0.9.0 | **Last Updated**: 2025-09-17
+**Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
 
 ---
 
@@ -117,6 +117,6 @@ make test               # Test suite execution
 
 ---
 
-**flext-meltano Documentation v0.9.0** - Last updated 2025-09-17
+**flext-meltano Documentation v0.9.9** - Last updated 2025-09-17
 
 **Purpose**: Comprehensive documentation for the FLEXT ecosystem ELT foundation library supporting Meltano, dbt, and Singer integration patterns.

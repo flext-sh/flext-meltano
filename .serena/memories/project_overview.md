@@ -1,22 +1,26 @@
 # flext-db-oracle Project Overview
 
 ## Purpose
-Oracle Database Integration for the FLEXT Ecosystem providing Oracle connectivity using SQLAlchemy 2.0 and python-oracledb with FLEXT patterns.
+
+Oracle Database Integration for the FLEXT Ecosystem providing Oracle connectivity using SQLAlchemy 2.0 and Python-oracledb with FLEXT patterns.
 
 ## Key Responsibilities
+
 1. Oracle Connectivity - Database connections and resource management
 2. Schema Operations - Metadata extraction and schema introspection
 3. Query Execution - SQL operations with FlextResult error handling
 4. Foundation Library - Base for Oracle-related FLEXT projects
 
 ## Architecture
+
 - 12 Python modules, 4,517 lines of code
 - 511 functions defined across modules
-- SQLAlchemy 2.0 with python-oracledb driver
+- SQLAlchemy 2.0 with Python-oracledb driver
 - 28 test files with 8,633 lines of test code
 - Real Oracle XE 21c container testing environment
 
 ## Source Structure
+
 ```
 src/flext_db_oracle/
 ├── __init__.py          # Public API exports
@@ -34,6 +38,7 @@ src/flext_db_oracle/
 ```
 
 ## Status
+
 - Functional foundation with critical gaps
 - CLI formatters incomplete (SimpleNamespace placeholders)
 - No async support

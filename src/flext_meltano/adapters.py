@@ -127,7 +127,7 @@ class FlextMeltanoAdapter:
                 yaml.dump(meltano_config, f)
 
             project = Project(root=temp_path)
-            return FlextResult[Project].ok(project)
+            return FlextResult[Project].ok(data=project)
 
         except Exception as e:
             return FlextResult[Project].fail(f"Failed to create temporary project: {e}")
@@ -154,27 +154,18 @@ class FlextMeltanoAdapter:
             ...     print(f"Version: {version_result.unwrap()['version']}")
 
         """
-        try:
-            # Get Meltano version using native API
-            meltano_version = getattr(meltano, "__version__", "3.9.1")
+        # FIXED: Removed ImportError fallback - meltano must be available (ZERO TOLERANCE)
+        # Get Meltano version using native API
+        meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-            version_info: FlextMeltanoTypes.Bridge.VersionInfo = {
-                "version": meltano_version,
-                "meltano": meltano_version,
-                "cli_type": "native_meltano_api",
-                "integration": "flext-core",
-            }
+        version_info: FlextMeltanoTypes.Bridge.VersionInfo = {
+            "version": meltano_version,
+            "meltano": meltano_version,
+            "cli_type": "native_meltano_api",
+            "integration": "flext-core",
+        }
 
-            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].ok(version_info)
-
-        except ImportError as import_error:
-            error_msg = f"Meltano not available: {import_error}"
-            self._logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].fail(error_msg)
-        except Exception as e:
-            error_msg = f"Failed to get Meltano version: {e}"
-            self._logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].fail(error_msg)
+        return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].ok(data=version_info)
 
     def initialize_project(
         self, project_root: Path
@@ -238,7 +229,7 @@ class FlextMeltanoAdapter:
                 "settings": str(getattr(project, "settings", "")),
                 "meltano_version": str(getattr(project, "meltano_version", "")),
             }
-            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(project_dict)
+            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(data=project_dict)
 
         except Exception as e:
             error_msg = f"Failed to initialize Meltano project: {e}"
@@ -312,7 +303,7 @@ class FlextMeltanoAdapter:
                 plugins.append(plugin_info)
 
             self._logger.info(f"Discovered {len(plugins)} plugins")
-            return FlextResult[list[FlextTypes.Core.Headers]].ok(plugins)
+            return FlextResult[list[FlextTypes.Core.Headers]].ok(data=plugins)
 
         except Exception as e:
             error_msg = f"Failed to discover plugins: {e}"
@@ -365,7 +356,7 @@ class FlextMeltanoAdapter:
                 project_path=str(full_project_path),
             )
 
-            return FlextResult[FlextTypes.Core.Headers].ok(project_result)
+            return FlextResult[FlextTypes.Core.Headers].ok(data=project_result)
 
         except Exception as e:
             error_msg = f"Failed to create Meltano project: {e}"
@@ -431,7 +422,7 @@ class FlextMeltanoAdapter:
                 plugin_type=plugin_type,
             )
 
-            return FlextResult[FlextTypes.Core.Headers].ok(plugin_result)
+            return FlextResult[FlextTypes.Core.Headers].ok(data=plugin_result)
 
         except Exception as e:
             error_msg = f"Failed to add plugin: {e}"
@@ -531,7 +522,7 @@ class FlextMeltanoAdapter:
                 "logo_url": getattr(indexed_plugin, "logo_url", ""),
             }
 
-            return FlextResult[FlextTypes.Core.Headers].ok(plugin_info)
+            return FlextResult[FlextTypes.Core.Headers].ok(data=plugin_info)
 
         except Exception as e:
             error_msg = f"Failed to get plugin info: {e}"
@@ -615,7 +606,7 @@ class FlextMeltanoAdapter:
                 loader=loader_name,
             )
 
-            return FlextResult[FlextTypes.Core.Headers].ok(pipeline_result)
+            return FlextResult[FlextTypes.Core.Headers].ok(data=pipeline_result)
 
         except RunnerError as runner_error:
             error_msg = f"ELT pipeline execution failed: {runner_error}"
@@ -818,7 +809,7 @@ Thumbs.db
                     "transformers": [],
                 }
 
-            return FlextResult[FlextTypes.Core.Dict].ok(adapted_config)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=adapted_config)
 
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
@@ -851,7 +842,7 @@ Thumbs.db
                 name = str(adapted_plugin.get("name", "plugin"))
                 adapted_plugin["executable"] = name
 
-            return FlextResult[FlextTypes.Core.Dict].ok(adapted_plugin)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=adapted_plugin)
 
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(

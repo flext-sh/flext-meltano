@@ -252,7 +252,7 @@ class TestExecutorsMissingCoverage:
         """Test execute method with health command success path."""
         # Mock the health method using object.__setattr__ to bypass Pydantic
         original_health = self.executor.health
-        object.__setattr__(
+        setattr(
             self.executor,
             "health",
             mock.Mock(return_value=FlextResult.ok({"status": "healthy"})),
@@ -266,13 +266,13 @@ class TestExecutorsMissingCoverage:
                 message="Should succeed with health command",
             )
         finally:
-            object.__setattr__(self.executor, "health", original_health)
+            setattr(self.executor, "health", original_health)
 
     def test_execute_method_version_command_success(self) -> None:
         """Test execute method with version command success path."""
         # Mock the version method using object.__setattr__ to bypass Pydantic
         original_version = self.executor.version
-        object.__setattr__(
+        setattr(
             self.executor,
             "version",
             mock.Mock(return_value=FlextResult.ok({"version": "1.0.0"})),
@@ -286,13 +286,13 @@ class TestExecutorsMissingCoverage:
                 message="Should succeed with version command",
             )
         finally:
-            object.__setattr__(self.executor, "version", original_version)
+            setattr(self.executor, "version", original_version)
 
     def test_execute_method_health_command_failure(self) -> None:
         """Test execute method with health command failure path."""
         # Mock the health method using object.__setattr__ to bypass Pydantic
         original_health = self.executor.health
-        object.__setattr__(
+        setattr(
             self.executor,
             "health",
             mock.Mock(return_value=FlextResult.fail("Health check failed")),
@@ -306,13 +306,13 @@ class TestExecutorsMissingCoverage:
                 message="Should fail with health command failure",
             )
         finally:
-            object.__setattr__(self.executor, "health", original_health)
+            setattr(self.executor, "health", original_health)
 
     def test_execute_method_version_command_failure(self) -> None:
         """Test execute method with version command failure path."""
         # Mock the version method using object.__setattr__ to bypass Pydantic
         original_version = self.executor.version
-        object.__setattr__(
+        setattr(
             self.executor,
             "version",
             mock.Mock(return_value=FlextResult.fail("Version check failed")),
@@ -326,4 +326,4 @@ class TestExecutorsMissingCoverage:
                 message="Should fail with version command failure",
             )
         finally:
-            object.__setattr__(self.executor, "version", original_version)
+            setattr(self.executor, "version", original_version)

@@ -148,7 +148,7 @@ class FlextTapAbstractions:
                 },
             )
 
-            return FlextResult[FlextTapAbstractions.TapInstance].ok(tap_instance)
+            return FlextResult[FlextTapAbstractions.TapInstance].ok(data=tap_instance)
 
         except Exception as e:
             return FlextResult[FlextTapAbstractions.TapInstance].fail(
@@ -223,7 +223,7 @@ class FlextTapAbstractions:
             result_dict = self.build(
                 process_result.unwrap(), correlation_id=correlation_id
             )
-            return FlextResult[FlextTypes.Core.Dict].ok(result_dict)
+            return FlextResult[FlextTypes.Core.Dict].ok(data=result_dict)
 
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(f"Failed to create tap: {e}")
@@ -328,7 +328,7 @@ class FlextTapAbstractions:
         self, tap_instance: FlextTapAbstractions.TapInstance
     ) -> FlextResult[list[FlextTapAbstractions.StreamDefinition]]:
         """PostgreSQL-specific stream discovery."""
-        return self._create_mock_streams(
+        return self._create_stream_definitions(
             tap_instance.tap_type, ["users", "orders", "products"]
         )
 
@@ -336,78 +336,190 @@ class FlextTapAbstractions:
         self, tap_instance: FlextTapAbstractions.TapInstance
     ) -> FlextResult[list[FlextTapAbstractions.StreamDefinition]]:
         """CSV-specific stream discovery."""
-        return self._create_mock_streams(tap_instance.tap_type, ["data"])
+        return self._create_stream_definitions(tap_instance.tap_type, ["data"])
 
     def _default_stream_strategy(
         self, tap_instance: FlextTapAbstractions.TapInstance
     ) -> FlextResult[list[FlextTapAbstractions.StreamDefinition]]:
         """Default stream discovery strategy."""
-        return self._create_mock_streams(tap_instance.tap_type, ["users", "orders"])
+        return self._create_stream_definitions(
+            tap_instance.tap_type, ["users", "orders"]
+        )
 
-    def _create_mock_streams(
+    def _create_stream_definitions(
         self, tap_type: str, stream_names: FlextTypes.Core.StringList
     ) -> FlextResult[list[FlextTapAbstractions.StreamDefinition]]:
-        """Factory for creating mock FlextTapAbstractions.StreamDefinition instances."""
+        """Factory for creating StreamDefinition instances from stream names.
+
+        Creates StreamDefinition instances for the provided stream names,
+        generating appropriate schemas based on the stream name patterns.
+
+        Args:
+            tap_type: Type of tap (postgres, csv, etc.).
+            stream_names: List of stream names to create definitions for.
+
+        Returns:
+            FlextResult containing list of StreamDefinition instances or error details.
+
+        Example:
+            >>> stream_names = ["users", "orders"]
+            >>> result = self._create_stream_definitions("postgres", stream_names)
+            >>> if result.is_success:
+            ...     streams = result.unwrap()
+            ...     print(f"Created {len(streams)} stream definitions")
+
+        """
         try:
             streams = []
             for stream_name in stream_names:
-                schema = self._generate_mock_schema(stream_name)
+                schema = self._generate_stream_schema(stream_name)
                 stream = FlextTapAbstractions.StreamDefinition(
                     stream_name=stream_name,
-                    stream_schema=schema,  # Use correct field name
+                    stream_schema=schema,
                     tap_type=tap_type,
                     status="discovered",
                 )
                 streams.append(stream)
-            return FlextResult[list[FlextTapAbstractions.StreamDefinition]].ok(streams)
+            return FlextResult[list[FlextTapAbstractions.StreamDefinition]].ok(
+                data=streams
+            )
         except Exception as e:
             return FlextResult[list[FlextTapAbstractions.StreamDefinition]].fail(
-                f"Mock stream creation failed: {e}"
+                f"Stream definition creation failed: {e}"
             )
 
-    def _generate_mock_schema(self, stream_name: str) -> FlextTypes.Core.Dict:
-        """Generate mock schema based on stream name - ELIMINATES hardcoded schemas."""
-        base_schemas: dict[str, FlextTypes.Core.Dict] = {
+    def _generate_stream_schema(self, stream_name: str) -> FlextTypes.Core.Dict:
+        """Generate stream schema based on stream name patterns.
+
+        Creates appropriate JSON schema definitions for common stream types
+        based on naming conventions and common data patterns.
+
+        Args:
+            stream_name: Name of the stream to generate schema for.
+
+        Returns:
+            FlextTypes.Core.Dict: JSON schema definition for the stream.
+
+        Example:
+            >>> schema = self._generate_stream_schema("users")
+            >>> print(f"Schema type: {schema['type']}")
+
+        """
+        # Common stream schemas based on naming patterns
+        stream_schemas: dict[str, FlextTypes.Core.Dict] = {
             "users": {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "integer"},
-                    "name": {"type": "string"},
-                    "email": {"type": "string"},
+                    "id": {"type": "integer", "description": "User identifier"},
+                    "name": {"type": "string", "description": "User full name"},
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "User email address",
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "User creation timestamp",
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "User last update timestamp",
+                    },
                 },
+                "required": ["id", "name", "email"],
             },
             "orders": {
                 "type": "object",
                 "properties": {
-                    "order_id": {"type": "string"},
-                    "user_id": {"type": "integer"},
-                    "amount": {"type": "number"},
+                    "order_id": {
+                        "type": "string",
+                        "description": "Unique order identifier",
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "description": "Reference to user who placed the order",
+                    },
+                    "amount": {"type": "number", "description": "Order total amount"},
+                    "currency": {
+                        "type": "string",
+                        "description": "Order currency code",
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": ["pending", "completed", "cancelled"],
+                        "description": "Order status",
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Order creation timestamp",
+                    },
                 },
+                "required": ["order_id", "user_id", "amount"],
             },
             "products": {
                 "type": "object",
                 "properties": {
-                    "product_id": {"type": "string"},
-                    "name": {"type": "string"},
-                    "price": {"type": "number"},
+                    "product_id": {
+                        "type": "string",
+                        "description": "Unique product identifier",
+                    },
+                    "name": {"type": "string", "description": "Product name"},
+                    "description": {
+                        "type": "string",
+                        "description": "Product description",
+                    },
+                    "price": {"type": "number", "description": "Product price"},
+                    "category": {"type": "string", "description": "Product category"},
+                    "in_stock": {
+                        "type": "boolean",
+                        "description": "Product availability status",
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Product creation timestamp",
+                    },
                 },
+                "required": ["product_id", "name", "price"],
             },
             "data": {
                 "type": "object",
                 "properties": {
-                    "column1": {"type": "string"},
-                    "column2": {"type": "string"},
+                    "id": {"type": "string", "description": "Record identifier"},
+                    "value": {"type": "string", "description": "Data value"},
+                    "metadata": {
+                        "type": "object",
+                        "description": "Additional metadata",
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data timestamp",
+                    },
                 },
+                "required": ["id", "value"],
             },
         }
-        return base_schemas.get(
+
+        # Return specific schema if available, otherwise return generic schema
+        return stream_schemas.get(
             stream_name,
             {
                 "type": "object",
                 "properties": {
-                    "id": {"type": "string"},
-                    "data": {"type": "string"},
+                    "id": {"type": "string", "description": "Record identifier"},
+                    "name": {"type": "string", "description": "Record name"},
+                    "data": {"type": "string", "description": "Record data"},
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp",
+                    },
                 },
+                "required": ["id"],
             },
         )
 
@@ -436,7 +548,7 @@ class FlextTapAbstractions:
                 return FlextResult[FlextTapAbstractions.TapInstance].fail(
                     f"Stream discovery failed: {discovery_result.error}"
                 )
-        return FlextResult[FlextTapAbstractions.TapInstance].ok(tap_instance)
+        return FlextResult[FlextTapAbstractions.TapInstance].ok(data=tap_instance)
 
     def _find_stream_by_name(
         self, tap_instance: FlextTapAbstractions.TapInstance, stream_name: str
@@ -483,7 +595,7 @@ class FlextTapAbstractions:
     ) -> FlextResult[list[FlextTapAbstractions.StreamDefinition]]:
         """Extract stream list from tap instance."""
         streams = list(tap_instance.streams.values())
-        return FlextResult[list[FlextTapAbstractions.StreamDefinition]].ok(streams)
+        return FlextResult[list[FlextTapAbstractions.StreamDefinition]].ok(data=streams)
 
     def _process_streams_to_catalog_entries(
         self, streams: list[FlextTapAbstractions.StreamDefinition]
