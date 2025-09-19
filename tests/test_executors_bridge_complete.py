@@ -144,7 +144,8 @@ class TestFlextMeltanoBridgeComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
             result = self.bridge.execute_meltano_command(
-                ["--version"], str(project_path),
+                ["--version"],
+                str(project_path),
             )
 
             assert isinstance(result, dict)
@@ -205,7 +206,9 @@ class TestFlextMeltanoBridgeComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
             result = self.bridge.run_elt_pipeline(
-                "tap-csv", "target-jsonl", str(project_path),
+                "tap-csv",
+                "target-jsonl",
+                str(project_path),
             )
 
             assert isinstance(result, dict)
@@ -220,7 +223,10 @@ class TestFlextMeltanoBridgeComplete:
                 # Create a mock project object
                 project = {"path": project_path}
                 return await self.bridge.run_plugin_async(
-                    project, "tap-csv", "describe", [],
+                    project,
+                    "tap-csv",
+                    "describe",
+                    [],
                 )
 
         # Run the async test
@@ -387,7 +393,8 @@ class TestFlextMeltanoBridgeComplete:
 
             # Test with different project roots
             real_result = self.bridge.execute_meltano_command(
-                ["version"], str(project_path),
+                ["version"],
+                str(project_path),
             )
             assert isinstance(real_result, dict)
             assert "success" in real_result
@@ -436,7 +443,10 @@ class TestFlextMeltanoBridgeComplete:
             project = {"path": project_path}
 
             sync_result = self.bridge._run_plugin_sync(
-                project, "tap-csv", "describe", [],
+                project,
+                "tap-csv",
+                "describe",
+                [],
             )
             # Method returns object, check it exists
             assert sync_result is not None

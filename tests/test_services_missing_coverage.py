@@ -131,7 +131,8 @@ class TestFlextMeltanoServiceMissingCoverage:
 
         # Test target service with edge case
         target_service = FlextMeltanoService(
-            service_type="target", target_name="edge-test",
+            service_type="target",
+            target_name="edge-test",
         )
         config: dict[str, object] = {"destination": "test"}
         result = target_service.create_instance(config)

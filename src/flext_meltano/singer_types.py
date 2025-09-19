@@ -63,7 +63,8 @@ class FlextSingerTypes:
             )
 
     def create_integer_type(
-        self, **kwargs: object,
+        self,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create integer type with optional constraints."""
         try:
@@ -87,7 +88,8 @@ class FlextSingerTypes:
             )
 
     def create_boolean_type(
-        self, **kwargs: object,
+        self,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create boolean type."""
         try:
@@ -100,7 +102,8 @@ class FlextSingerTypes:
             )
 
     def create_datetime_type(
-        self, **kwargs: object,
+        self,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create date-time type."""
         try:
@@ -113,7 +116,9 @@ class FlextSingerTypes:
             )
 
     def create_array_type(
-        self, items: FlextTypes.Core.Dict | None = None, **kwargs: object,
+        self,
+        items: FlextTypes.Core.Dict | None = None,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create array type with optional item type."""
         try:
@@ -128,7 +133,9 @@ class FlextSingerTypes:
             )
 
     def create_object_type(
-        self, properties: FlextTypes.Core.Dict | None = None, **kwargs: object,
+        self,
+        properties: FlextTypes.Core.Dict | None = None,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create object type with optional properties."""
         try:
@@ -143,7 +150,9 @@ class FlextSingerTypes:
             )
 
     def validate_value(
-        self, value: object, type_def: FlextTypes.Core.Dict,
+        self,
+        value: object,
+        type_def: FlextTypes.Core.Dict,
     ) -> FlextResult[object]:
         """Validate value against type definition using lookup table pattern.
 
@@ -239,7 +248,10 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_record_message(
-        self, stream: str, record: FlextTypes.Core.Dict, **kwargs: object,
+        self,
+        stream: str,
+        record: FlextTypes.Core.Dict,
+        **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer RECORD message."""
         try:
@@ -288,7 +300,8 @@ class FlextSingerTypes:
             )
 
     def create_state_message(
-        self, value: FlextTypes.Core.Dict,
+        self,
+        value: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer STATE message."""
         try:
@@ -304,7 +317,8 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_properties_list(
-        self, properties: dict[str, FlextTypes.Core.Dict],
+        self,
+        properties: dict[str, FlextTypes.Core.Dict],
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create and validate properties list."""
         try:

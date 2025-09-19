@@ -54,7 +54,9 @@ class TestFlextTapAbstractionsComplete:
             message="Tap type should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.version, expected="v1.2.0", message="Version should match",
+            actual=config.version,
+            expected="v1.2.0",
+            message="Version should match",
         )
         self.test_assertions.assert_true(
             condition="users" in config.stream_config,
@@ -196,11 +198,13 @@ class TestFlextTapAbstractionsComplete:
         )
 
         result = self.tap_abstractions.build(
-            tap_instance, correlation_id="test_corr_123",
+            tap_instance,
+            correlation_id="test_corr_123",
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, dict), message="Should return dict",
+            condition=isinstance(result, dict),
+            message="Should return dict",
         )
         self.test_assertions.assert_equals(
             actual=result["tap_id"],
@@ -233,10 +237,12 @@ class TestFlextTapAbstractionsComplete:
         missing_config = self.tap_abstractions.get_stream_config(config, "missing")
 
         self.test_assertions.assert_true(
-            condition=isinstance(users_config, dict), message="Should return dict",
+            condition=isinstance(users_config, dict),
+            message="Should return dict",
         )
         self.test_assertions.assert_true(
-            condition=bool(users_config["selected"]), message="Users should be selected",
+            condition=bool(users_config["selected"]),
+            message="Users should be selected",
         )
         self.test_assertions.assert_false(
             condition=bool(orders_config["selected"]),
@@ -279,7 +285,8 @@ class TestFlextTapAbstractionsComplete:
         if result.success:
             tap_dict = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(tap_dict, dict), message="Should return dict",
+                condition=isinstance(tap_dict, dict),
+                message="Should return dict",
             )
 
     def test_validate_tap_instance(self) -> None:
@@ -287,16 +294,21 @@ class TestFlextTapAbstractionsComplete:
         # Create valid tap instance
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         valid_instance = TapInstance(
-            tap_type="tap-csv", config=config, tap_id="valid_tap_123",
+            tap_type="tap-csv",
+            config=config,
+            tap_id="valid_tap_123",
         )
 
         # Try to create invalid tap instance but handle validation error
         try:
             invalid_config = TapConfig(
-                tap_type="", connection_config={},
+                tap_type="",
+                connection_config={},
             )  # Will fail validation
             invalid_instance = TapInstance(
-                tap_type="", config=invalid_config, tap_id="",
+                tap_type="",
+                config=invalid_config,
+                tap_id="",
             )
             # Use the process method instead of validate_tap_instance
             invalid_result = self.tap_abstractions.process(invalid_instance.config)
@@ -330,10 +342,13 @@ class TestFlextTapAbstractionsComplete:
     def test_discover_streams_postgres(self) -> None:
         """Test discover_streams with PostgreSQL strategy using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         result = self.tap_abstractions.discover_streams(tap_instance)
@@ -349,7 +364,8 @@ class TestFlextTapAbstractionsComplete:
                 message="Should return list of streams",
             )
             self.test_assertions.assert_true(
-                condition=len(streams) > 0, message="Should discover streams",
+                condition=len(streams) > 0,
+                message="Should discover streams",
             )
 
             # Check PostgreSQL-specific streams
@@ -369,7 +385,9 @@ class TestFlextTapAbstractionsComplete:
         """Test discover_streams with CSV strategy using flext_tests."""
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
-            tap_type="tap-csv", config=config, tap_id="csv_tap_123",
+            tap_type="tap-csv",
+            config=config,
+            tap_id="csv_tap_123",
         )
 
         result = self.tap_abstractions.discover_streams(tap_instance)
@@ -381,7 +399,8 @@ class TestFlextTapAbstractionsComplete:
         if result.success:
             streams = result.value
             self.test_assertions.assert_true(
-                condition=len(streams) > 0, message="Should discover CSV streams",
+                condition=len(streams) > 0,
+                message="Should discover CSV streams",
             )
 
             # Check CSV-specific streams
@@ -399,7 +418,9 @@ class TestFlextTapAbstractionsComplete:
             connection_config={"endpoint": "http://api.example.com"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-unknown", config=config, tap_id="unknown_tap_123",
+            tap_type="tap-unknown",
+            config=config,
+            tap_id="unknown_tap_123",
         )
 
         result = self.tap_abstractions.discover_streams(tap_instance)
@@ -411,7 +432,8 @@ class TestFlextTapAbstractionsComplete:
         if result.success:
             streams = result.value
             self.test_assertions.assert_true(
-                condition=len(streams) > 0, message="Should discover default streams",
+                condition=len(streams) > 0,
+                message="Should discover default streams",
             )
 
             # Check default streams
@@ -430,10 +452,13 @@ class TestFlextTapAbstractionsComplete:
     def test_get_stream_by_name(self) -> None:
         """Test get_stream_by_name method using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         # First discover streams
@@ -464,7 +489,8 @@ class TestFlextTapAbstractionsComplete:
 
         # Test missing stream
         missing_result = self.tap_abstractions.get_stream_by_name(
-            tap_instance, "missing_stream",
+            tap_instance,
+            "missing_stream",
         )
         if missing_result.is_failure:
             self.test_assertions.assert_true(
@@ -479,10 +505,13 @@ class TestFlextTapAbstractionsComplete:
     def test_generate_catalog_success(self) -> None:
         """Test generate_catalog success using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         result = self.tap_abstractions.generate_catalog(tap_instance)
@@ -498,20 +527,26 @@ class TestFlextTapAbstractionsComplete:
                 message="Should return catalog dict",
             )
             self.test_assertions.assert_equals(
-                actual=catalog["version"], expected=1, message="Should have version 1",
+                actual=catalog["version"],
+                expected=1,
+                message="Should have version 1",
             )
             self.test_assertions.assert_in(
-                item="streams", container=catalog, message="Should contain streams",
+                item="streams",
+                container=catalog,
+                message="Should contain streams",
             )
 
             # Validate streams structure
             streams = catalog["streams"]
             self.test_assertions.assert_true(
-                condition=isinstance(streams, list), message="Streams should be a list",
+                condition=isinstance(streams, list),
+                message="Streams should be a list",
             )
             if isinstance(streams, list):
                 self.test_assertions.assert_true(
-                    condition=len(streams) > 0, message="Should have discovered streams",
+                    condition=len(streams) > 0,
+                    message="Should have discovered streams",
                 )
 
     def test_catalog_entry_structure(self) -> None:
@@ -545,10 +580,14 @@ class TestFlextTapAbstractionsComplete:
                 message="Stream name should match",
             )
             self.test_assertions.assert_in(
-                item="schema", container=entry, message="Should contain schema",
+                item="schema",
+                container=entry,
+                message="Should contain schema",
             )
             self.test_assertions.assert_in(
-                item="metadata", container=entry, message="Should contain metadata",
+                item="metadata",
+                container=entry,
+                message="Should contain metadata",
             )
 
     # =========================================================================
@@ -583,14 +622,17 @@ class TestFlextTapAbstractionsComplete:
                 message="Should return list of records",
             )
             self.test_assertions.assert_true(
-                condition=len(records) > 0, message="Should extract records",
+                condition=len(records) > 0,
+                message="Should extract records",
             )
 
             # Check first record structure
             if records:
                 first_record = records[0]
                 self.test_assertions.assert_in(
-                    item="id", container=first_record, message="Should contain id field",
+                    item="id",
+                    container=first_record,
+                    message="Should contain id field",
                 )
                 self.test_assertions.assert_in(
                     item="name",
@@ -626,7 +668,9 @@ class TestFlextTapAbstractionsComplete:
         if result.success:
             records = result.value
             self.test_assertions.assert_equals(
-                actual=len(records), expected=1, message="Should respect limit",
+                actual=len(records),
+                expected=1,
+                message="Should respect limit",
             )
 
     def test_extract_records_products(self) -> None:
@@ -653,7 +697,8 @@ class TestFlextTapAbstractionsComplete:
         if result.success:
             records = result.value
             self.test_assertions.assert_true(
-                condition=len(records) > 0, message="Should extract product records",
+                condition=len(records) > 0,
+                message="Should extract product records",
             )
 
             # Check product record structure
@@ -665,7 +710,9 @@ class TestFlextTapAbstractionsComplete:
                     message="Should contain product_id",
                 )
                 self.test_assertions.assert_in(
-                    item="name", container=product_record, message="Should contain name",
+                    item="name",
+                    container=product_record,
+                    message="Should contain name",
                 )
                 self.test_assertions.assert_in(
                     item="price",
@@ -680,10 +727,13 @@ class TestFlextTapAbstractionsComplete:
     def test_sync_stream_success(self) -> None:
         """Test sync_stream success using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         # Mock target
@@ -722,7 +772,9 @@ class TestFlextTapAbstractionsComplete:
         """Test sync_stream without target using flext_tests."""
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
-            tap_type="tap-csv", config=config, tap_id="csv_tap_123",
+            tap_type="tap-csv",
+            config=config,
+            tap_id="csv_tap_123",
         )
 
         result = self.tap_abstractions.sync_stream(tap_instance, "data")
@@ -750,37 +802,47 @@ class TestFlextTapAbstractionsComplete:
     def test_list_streams(self) -> None:
         """Test list_streams method using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         # First discover streams
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         self.test_assertions.assert_true(
-            condition=discovery_result.success, message="Discovery should succeed",
+            condition=discovery_result.success,
+            message="Discovery should succeed",
         )
 
         # List streams
         stream_names = self.tap_abstractions.list_streams(tap_instance)
         self.test_assertions.assert_true(
-            condition=isinstance(stream_names, list), message="Should return list",
+            condition=isinstance(stream_names, list),
+            message="Should return list",
         )
         self.test_assertions.assert_true(
-            condition=len(stream_names) > 0, message="Should have stream names",
+            condition=len(stream_names) > 0,
+            message="Should have stream names",
         )
 
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
         config = TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = TapInstance(
-            tap_type="tap-csv", config=config, tap_id="csv_tap_123",
+            tap_type="tap-csv",
+            config=config,
+            tap_id="csv_tap_123",
         )
 
         tap_type = self.tap_abstractions.get_tap_type(tap_instance)
         self.test_assertions.assert_equals(
-            actual=tap_type, expected="tap-csv", message="Tap type should match",
+            actual=tap_type,
+            expected="tap-csv",
+            message="Tap type should match",
         )
 
     def test_get_registered_streams(self) -> None:
@@ -788,15 +850,19 @@ class TestFlextTapAbstractionsComplete:
         # Initially should be empty
         initial_streams = self.tap_abstractions.get_registered_streams()
         self.test_assertions.assert_true(
-            condition=isinstance(initial_streams, list), message="Should return list",
+            condition=isinstance(initial_streams, list),
+            message="Should return list",
         )
 
         # After discovery, should have streams
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
@@ -871,15 +937,19 @@ class TestFlextTapAbstractionsComplete:
     def test_missing_stream_handling(self) -> None:
         """Test missing stream handling using flext_tests."""
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="postgres_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="postgres_tap_123",
         )
 
         # Try to get non-existent stream without discovery
         result = self.tap_abstractions.get_stream_by_name(
-            tap_instance, "non_existent_stream",
+            tap_instance,
+            "non_existent_stream",
         )
 
         # Should handle gracefully
@@ -908,7 +978,8 @@ class TestFlextTapAbstractionsComplete:
             stream_config=stream_config,
         )
         self.test_assertions.assert_true(
-            condition=create_result.success, message="Tap creation should succeed",
+            condition=create_result.success,
+            message="Tap creation should succeed",
         )
 
         # Step 2: Create tap instance for further operations
@@ -918,7 +989,9 @@ class TestFlextTapAbstractionsComplete:
             stream_config=stream_config,
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="workflow_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="workflow_tap_123",
         )
 
         # Step 3: Discover streams
@@ -938,17 +1011,21 @@ class TestFlextTapAbstractionsComplete:
         # Step 5: Sync a stream
         sync_result = self.tap_abstractions.sync_stream(tap_instance, "users")
         self.test_assertions.assert_true(
-            condition=sync_result.success, message="Stream sync should succeed",
+            condition=sync_result.success,
+            message="Stream sync should succeed",
         )
 
     def test_tap_abstractions_performance(self) -> None:
         """Test tap abstractions performance using flext_tests."""
         # Test with multiple streams and operations
         config = TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tap_instance = TapInstance(
-            tap_type="tap-postgres", config=config, tap_id="performance_tap_123",
+            tap_type="tap-postgres",
+            config=config,
+            tap_id="performance_tap_123",
         )
 
         # Discover streams
@@ -960,7 +1037,8 @@ class TestFlextTapAbstractionsComplete:
             for stream_def in streams:
                 # Extract records from each stream
                 extract_result = self.tap_abstractions.extract_records(
-                    stream_def, limit=5,
+                    stream_def,
+                    limit=5,
                 )
                 self.test_assertions.assert_true(
                     condition=extract_result.success,
@@ -969,7 +1047,8 @@ class TestFlextTapAbstractionsComplete:
 
                 # Test sync operation
                 sync_result = self.tap_abstractions.sync_stream(
-                    tap_instance, stream_def.stream_name,
+                    tap_instance,
+                    stream_def.stream_name,
                 )
                 self.test_assertions.assert_true(
                     condition=sync_result.success,

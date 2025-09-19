@@ -181,7 +181,9 @@ class TestConfigBuildersComprehensiveCoverage:
 
         # Try to add plugin with invalid type
         result = builder.add_plugin_to_config(
-            base_config, "invalid_type", plugin_config,
+            base_config,
+            "invalid_type",
+            plugin_config,
         )
 
         # Should handle gracefully (either succeed by creating new section or fail safely)
@@ -233,7 +235,8 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
 
         result = builder._create_singer_config_generic(
-            plugin_name="tap-github", plugin_type=PluginTypes.EXTRACTORS.value,
+            plugin_name="tap-github",
+            plugin_type=PluginTypes.EXTRACTORS.value,
         )
 
         assert result.success
@@ -247,7 +250,8 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
 
         result = builder._create_singer_config_generic(
-            plugin_name="target-postgres", plugin_type=PluginTypes.LOADERS.value,
+            plugin_name="target-postgres",
+            plugin_type=PluginTypes.LOADERS.value,
         )
 
         assert result.success

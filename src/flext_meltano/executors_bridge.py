@@ -41,7 +41,8 @@ class FlextMeltanoBridge:
         self.logger = FlextLogger("MeltanoBridge")
 
     def _execute_with_json_response(
-        self, operation: OperationType,
+        self,
+        operation: OperationType,
     ) -> FlextTypes.Core.Dict:
         """Generic execution wrapper for all bridge operations.
 
@@ -143,7 +144,9 @@ class FlextMeltanoBridge:
         return self._execute_with_json_response(_run_pipeline)
 
     def execute_meltano_command(
-        self, _command: FlextTypes.Core.StringList, _project_root: str = ".",
+        self,
+        _command: FlextTypes.Core.StringList,
+        _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
         """Execute Meltano command using adapter."""
 
@@ -160,7 +163,9 @@ class FlextMeltanoBridge:
         return self._execute_with_json_response(_execute_command)
 
     def execute_dbt_command(
-        self, _command: FlextTypes.Core.StringList, _project_root: str = ".",
+        self,
+        _command: FlextTypes.Core.StringList,
+        _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
         """Execute DBT command using adapter."""
 
@@ -249,7 +254,8 @@ class FlextMeltanoBridge:
             return {"success": False, "error": str(e)}
 
     def discover_plugins(
-        self, _project: object = None,
+        self,
+        _project: object = None,
     ) -> FlextResult[dict[str, list[FlextTypes.Core.Headers]]]:
         """Discover available plugins."""
         try:
@@ -274,7 +280,12 @@ class FlextMeltanoBridge:
             # Run synchronous version in thread pool
             loop = asyncio.get_event_loop()
             return await loop.run_in_executor(
-                None, self._run_plugin_sync, project, plugin_name, command, args,
+                None,
+                self._run_plugin_sync,
+                project,
+                plugin_name,
+                command,
+                args,
             )
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -315,7 +326,8 @@ class FlextMeltanoBridge:
             return FlextResult.fail(str(e))
 
     def initialize_project(
-        self, project_root: str = ".",
+        self,
+        project_root: str = ".",
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Initialize Meltano project."""
         try:

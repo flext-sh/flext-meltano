@@ -20,7 +20,9 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def create_meltano_config_dict(
-        cls, project_id: str, project_name: str = "",
+        cls,
+        project_id: str,
+        project_name: str = "",
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         logger = FlextLogger(__name__)
@@ -58,7 +60,9 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def write_meltano_yml(
-        cls, config: FlextTypes.Core.Dict, target_path: Path,
+        cls,
+        config: FlextTypes.Core.Dict,
+        target_path: Path,
     ) -> FlextResult[bool]:
         """Write MELTANO-SPECIFIC YAML configuration - DOMAIN-SPECIFIC ONLY."""
         try:

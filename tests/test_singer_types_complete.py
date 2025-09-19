@@ -34,7 +34,8 @@ class TestFlextSingerTypesComplete:
             message="Singer types should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(singer_types, "_logger"), message="Should have logger",
+            condition=hasattr(singer_types, "_logger"),
+            message="Should have logger",
         )
         self.test_assertions.assert_true(
             condition=hasattr(singer_types, "_type_registry"),
@@ -55,7 +56,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="String type creation should succeed",
+            condition=result.is_success,
+            message="String type creation should succeed",
         )
 
         string_type = result.unwrap()
@@ -67,7 +69,8 @@ class TestFlextSingerTypesComplete:
 
         # Test string type with additional constraints
         result_with_constraints = self.singer_types.create_string_type(
-            minLength=1, maxLength=100,
+            minLength=1,
+            maxLength=100,
         )
 
         self.test_assertions.assert_true(
@@ -96,7 +99,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Integer type creation should succeed",
+            condition=result.is_success,
+            message="Integer type creation should succeed",
         )
 
         integer_type = result.unwrap()
@@ -108,7 +112,8 @@ class TestFlextSingerTypesComplete:
 
         # Test integer type with constraints
         result_with_constraints = self.singer_types.create_integer_type(
-            minimum=0, maximum=1000,
+            minimum=0,
+            maximum=1000,
         )
 
         constrained_type = result_with_constraints.unwrap()
@@ -133,7 +138,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Number type creation should succeed",
+            condition=result.is_success,
+            message="Number type creation should succeed",
         )
 
         number_type = result.unwrap()
@@ -153,7 +159,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Boolean type creation should succeed",
+            condition=result.is_success,
+            message="Boolean type creation should succeed",
         )
 
         boolean_type = result.unwrap()
@@ -173,7 +180,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="DateTime type creation should succeed",
+            condition=result.is_success,
+            message="DateTime type creation should succeed",
         )
 
         datetime_type = result.unwrap()
@@ -198,7 +206,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Array type creation should succeed",
+            condition=result.is_success,
+            message="Array type creation should succeed",
         )
 
         array_type = result.unwrap()
@@ -229,7 +238,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Object type creation should succeed",
+            condition=result.is_success,
+            message="Object type creation should succeed",
         )
 
         object_type = result.unwrap()
@@ -316,7 +326,8 @@ class TestFlextSingerTypesComplete:
 
         # Test invalid integer value
         invalid_result = self.singer_types.validate_value(
-            "not_an_integer", integer_type_def,
+            "not_an_integer",
+            integer_type_def,
         )
 
         self.test_assertions.assert_true(
@@ -348,7 +359,8 @@ class TestFlextSingerTypesComplete:
 
         # Test invalid number value
         invalid_result = self.singer_types.validate_value(
-            "not_a_number", number_type_def,
+            "not_a_number",
+            number_type_def,
         )
 
         self.test_assertions.assert_true(
@@ -400,7 +412,8 @@ class TestFlextSingerTypesComplete:
 
         # Test invalid array value
         invalid_result = self.singer_types.validate_value(
-            "not_an_array", array_type_def,
+            "not_an_array",
+            array_type_def,
         )
 
         self.test_assertions.assert_true(
@@ -414,7 +427,8 @@ class TestFlextSingerTypesComplete:
 
         # Test valid object value
         valid_result = self.singer_types.validate_value(
-            {"key": "value"}, object_type_def,
+            {"key": "value"},
+            object_type_def,
         )
 
         self.test_assertions.assert_true(
@@ -424,7 +438,8 @@ class TestFlextSingerTypesComplete:
 
         # Test invalid object value
         invalid_result = self.singer_types.validate_value(
-            "not_an_object", object_type_def,
+            "not_an_object",
+            object_type_def,
         )
 
         self.test_assertions.assert_true(
@@ -444,7 +459,8 @@ class TestFlextSingerTypesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_failure, message="Missing type should fail validation",
+            condition=result.is_failure,
+            message="Missing type should fail validation",
         )
         self.test_assertions.assert_in(
             item="Type definition missing 'type' field",
@@ -491,7 +507,8 @@ class TestFlextSingerTypesComplete:
                 message=f"{method.__name__} should return FlextResult",
             )
             self.test_assertions.assert_true(
-                condition=result.is_success, message=f"{method.__name__} should succeed",
+                condition=result.is_success,
+                message=f"{method.__name__} should succeed",
             )
 
     def test_validate_value_exception_handling(self) -> None:
@@ -557,13 +574,16 @@ class TestFlextSingerTypesComplete:
 
         # Validate individual fields
         name_validation = self.singer_types.validate_value(
-            valid_object["name"], string_result.unwrap(),
+            valid_object["name"],
+            string_result.unwrap(),
         )
         age_validation = self.singer_types.validate_value(
-            valid_object["age"], integer_result.unwrap(),
+            valid_object["age"],
+            integer_result.unwrap(),
         )
         active_validation = self.singer_types.validate_value(
-            valid_object["active"], boolean_result.unwrap(),
+            valid_object["active"],
+            boolean_result.unwrap(),
         )
 
         self.test_assertions.assert_true(
@@ -571,7 +591,8 @@ class TestFlextSingerTypesComplete:
             message="Name validation should succeed",
         )
         self.test_assertions.assert_true(
-            condition=age_validation.is_success, message="Age validation should succeed",
+            condition=age_validation.is_success,
+            message="Age validation should succeed",
         )
         self.test_assertions.assert_true(
             condition=active_validation.is_success,

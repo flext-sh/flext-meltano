@@ -29,7 +29,9 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test get_version with adapter exception."""
         # Mock adapter.get_version to raise exception
         with mock.patch.object(
-            self.bridge.adapter, "get_version", side_effect=Exception("Test exception"),
+            self.bridge.adapter,
+            "get_version",
+            side_effect=Exception("Test exception"),
         ):
             result = self.bridge.get_version()
             assert result.is_failure
@@ -49,7 +51,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test run_pipeline with adapter failure."""
         # Mock adapter._create_temporary_meltano_project to return failure
         with mock.patch.object(
-            self.bridge.adapter, "_create_temporary_meltano_project",
+            self.bridge.adapter,
+            "_create_temporary_meltano_project",
         ) as mock_create_project:
             mock_create_project.return_value = FlextResult.fail(
                 "Project creation failed",
@@ -75,7 +78,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test execute_meltano_command with adapter failure."""
         # Mock adapter.execute_bridge_service to return failure
         with mock.patch.object(
-            self.bridge.adapter, "execute_bridge_service",
+            self.bridge.adapter,
+            "execute_bridge_service",
         ) as mock_execute:
             mock_execute.return_value = FlextResult.fail("Command failed")
 
@@ -99,7 +103,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test execute_dbt_command with adapter failure."""
         # Mock adapter.execute_dbt_operation to return failure
         with mock.patch.object(
-            self.bridge.adapter, "execute_dbt_operation",
+            self.bridge.adapter,
+            "execute_dbt_operation",
         ) as mock_execute:
             mock_execute.return_value = FlextResult.fail("DBT command failed")
 
@@ -157,7 +162,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test get_project_info with adapter failure."""
         # Mock adapter.create_project to return failure
         with mock.patch.object(
-            self.bridge.adapter, "create_project",
+            self.bridge.adapter,
+            "create_project",
         ) as mock_create_project:
             mock_create_project.return_value = FlextResult.fail(
                 "Project creation failed",
@@ -183,7 +189,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test discover_plugins with adapter failure."""
         # Mock adapter.discover_plugins to return failure
         with mock.patch.object(
-            self.bridge.adapter, "discover_plugins",
+            self.bridge.adapter,
+            "discover_plugins",
         ) as mock_discover:
             mock_discover.return_value = FlextResult.fail("Discovery failed")
 
@@ -207,12 +214,17 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test run_plugin_async with exception."""
         # Mock _run_plugin_sync to raise exception
         with mock.patch.object(
-            self.bridge, "_run_plugin_sync", side_effect=Exception("Test exception"),
+            self.bridge,
+            "_run_plugin_sync",
+            side_effect=Exception("Test exception"),
         ):
 
             async def test_async() -> None:
                 result = await self.bridge.run_plugin_async(
-                    None, "test-plugin", "test", [],
+                    None,
+                    "test-plugin",
+                    "test",
+                    [],
                 )
                 assert isinstance(result, dict)
                 assert result["success"] is False
@@ -224,7 +236,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test _run_plugin_sync with adapter failure."""
         # Mock adapter.execute_bridge_service to return failure
         with mock.patch.object(
-            self.bridge.adapter, "execute_bridge_service",
+            self.bridge.adapter,
+            "execute_bridge_service",
         ) as mock_execute:
             mock_execute.return_value = FlextResult.fail("Plugin execution failed")
 
@@ -250,7 +263,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
         """Test list_plugins with adapter failure."""
         # Mock adapter.discover_plugins to return failure
         with mock.patch.object(
-            self.bridge.adapter, "discover_plugins",
+            self.bridge.adapter,
+            "discover_plugins",
         ) as mock_discover:
             mock_discover.return_value = FlextResult.fail("Plugin listing failed")
 

@@ -53,7 +53,8 @@ class TestFlextTargetConfigComprehensive:
         valid_types = ["postgres", "csv", "json", "sqlite", "mysql", "oracle"]
         for target_type in valid_types:
             config = FlextTargetAbstractions.FlextTargetConfig(
-                target_type=target_type, connection_config={"host": "localhost"},
+                target_type=target_type,
+                connection_config={"host": "localhost"},
             )
             assert config.target_type == target_type
 
@@ -61,7 +62,8 @@ class TestFlextTargetConfigComprehensive:
         """Test validation fails with empty target type."""
         with pytest.raises(ValueError, match="Target type must be non-empty string"):
             FlextTargetAbstractions.FlextTargetConfig(
-                target_type="", connection_config={"host": "localhost"},
+                target_type="",
+                connection_config={"host": "localhost"},
             )
 
     def test_target_config_validation_batch_size(self) -> None:
@@ -113,7 +115,8 @@ class TestFlextTargetConfigComprehensive:
 
         for conn_config in valid_configs:
             config = FlextTargetAbstractions.FlextTargetConfig(
-                target_type="postgres", connection_config=conn_config,
+                target_type="postgres",
+                connection_config=conn_config,
             )
             assert isinstance(config.connection_config, dict)
             assert len(config.connection_config) > 0
@@ -124,7 +127,8 @@ class TestFlextTargetConfigComprehensive:
             match="Connection configuration cannot be empty",
         ):
             FlextTargetAbstractions.FlextTargetConfig(
-                target_type="postgres", connection_config={},
+                target_type="postgres",
+                connection_config={},
             )
 
 
@@ -181,7 +185,9 @@ class TestFlextStreamInfoComprehensive:
 
         for schema in valid_schemas:
             stream_info = FlextTargetAbstractions.FlextStreamInfo(
-                stream_name="test_stream", schema=schema, created_at=created_at,
+                stream_name="test_stream",
+                schema=schema,
+                created_at=created_at,
             )
             assert stream_info.stream_schema == schema
 
@@ -239,7 +245,8 @@ class TestFlextTargetAbstractionsComprehensive:
         }
 
         result = self.target_abstractions.create_flext_target_config(
-            target_type=target_type, connection_config=connection_config,
+            target_type=target_type,
+            connection_config=connection_config,
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -321,7 +328,8 @@ class TestFlextTargetAbstractionsComprehensive:
         }
 
         result = self.target_abstractions.create_flext_target(
-            config=config, adapter=None,
+            config=config,
+            adapter=None,
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -377,14 +385,16 @@ class TestFlextTargetAbstractionsComprehensive:
         assert len(stream_infos) == 2
 
         result = self.target_abstractions.create_flext_target(
-            config=config, adapter=None,
+            config=config,
+            adapter=None,
         )
 
         FlextTestsMatchers.assert_result_success(result)
         target_instance = result.value
         assert target_instance["target_type"] == "json"
         assert isinstance(
-            target_instance["streams"], dict,
+            target_instance["streams"],
+            dict,
         )  # streams initialized as empty dict
 
     def test_create_flext_target_performance(self, benchmark: object) -> None:
@@ -396,7 +406,8 @@ class TestFlextTargetAbstractionsComprehensive:
 
         def create_target() -> object:
             return self.target_abstractions.create_flext_target(
-                config=config, adapter=None,
+                config=config,
+                adapter=None,
             )
 
         # Add type assertion for benchmark callable
@@ -483,7 +494,8 @@ class TestFlextTargetAbstractionsComprehensive:
 
         # Create target instance
         target_result = self.target_abstractions.create_flext_target(
-            config=postgres_config, adapter=None,
+            config=postgres_config,
+            adapter=None,
         )
 
         FlextTestsMatchers.assert_result_success(target_result)
@@ -528,7 +540,8 @@ class TestFlextTargetAbstractionsComprehensive:
         }
 
         result = self.target_abstractions.create_flext_target(
-            config=minimal_config, adapter=None,
+            config=minimal_config,
+            adapter=None,
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -605,11 +618,14 @@ class TestFlextTargetAbstractionsComprehensive:
         ],
     )
     def test_target_config_parametrized_creation(
-        self, target_type: str, connection_config: dict[str, object],
+        self,
+        target_type: str,
+        connection_config: dict[str, object],
     ) -> None:
         """Test target configuration creation with various target types."""
         result = self.target_abstractions.create_flext_target_config(
-            target_type=target_type, connection_config=connection_config,
+            target_type=target_type,
+            connection_config=connection_config,
         )
 
         FlextTestsMatchers.assert_result_success(result)
