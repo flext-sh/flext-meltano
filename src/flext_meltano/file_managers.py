@@ -65,7 +65,7 @@ class FlextMeltanoFileManagers:
             # Write YAML with proper encoding
             with file_path.open("w", encoding="utf-8") as f:
                 yaml.dump(
-                    config, f, indent=2, default_flow_style=False, sort_keys=False
+                    config, f, indent=2, default_flow_style=False, sort_keys=False,
                 )
             return FlextResult[bool].ok(data=True)
         except Exception as e:
@@ -81,7 +81,7 @@ class FlextMeltanoFileManagers:
             # Basic path validation using flext-core utilities
             if not FlextUtilities.TypeGuards.is_string_non_empty(str(file_path)):
                 return FlextResult[ConfigDict].fail(
-                    f"Invalid YAML file path: {file_path}"
+                    f"Invalid YAML file path: {file_path}",
                 )
 
             if not file_path.exists():
@@ -125,7 +125,7 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def create_directory_structure(
-        cls, base_path: Path, directories: FlextTypes.Core.StringList
+        cls, base_path: Path, directories: FlextTypes.Core.StringList,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Create directory structure using direct pathlib implementation."""
         try:
@@ -139,12 +139,12 @@ class FlextMeltanoFileManagers:
             return FlextResult[FlextTypes.Core.Headers].ok(data=created_paths)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Headers].fail(
-                f"Failed to create directories: {e}"
+                f"Failed to create directories: {e}",
             )
 
     @classmethod
     def setup_project_structure(
-        cls, project_root: Path, project_name: str
+        cls, project_root: Path, project_name: str,
     ) -> FlextResult[PathDict]:
         """Setup Meltano project structure using direct implementation."""
         try:

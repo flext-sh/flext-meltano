@@ -41,7 +41,7 @@ class FlextMeltanoBridge:
         self.logger = FlextLogger("MeltanoBridge")
 
     def _execute_with_json_response(
-        self, operation: OperationType
+        self, operation: OperationType,
     ) -> FlextTypes.Core.Dict:
         """Generic execution wrapper for all bridge operations.
 
@@ -101,10 +101,10 @@ class FlextMeltanoBridge:
                         "meltano": FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED,
                         "flext_meltano": "2.0.0",
                         "status": "ready",
-                    }
+                    },
                 )
             return FlextResult[FlextTypes.Core.Dict].fail(
-                result.error or "Version check failed"
+                result.error or "Version check failed",
             )
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(str(e))
@@ -124,7 +124,7 @@ class FlextMeltanoBridge:
             project_result = self.adapter._create_temporary_meltano_project()
             if project_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
-                    f"Failed to create project: {project_result.error}"
+                    f"Failed to create project: {project_result.error}",
                 )
 
             # Use adapter directly to eliminate duplication
@@ -137,13 +137,13 @@ class FlextMeltanoBridge:
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
-                result.error or "Pipeline failed"
+                result.error or "Pipeline failed",
             )
 
         return self._execute_with_json_response(_run_pipeline)
 
     def execute_meltano_command(
-        self, _command: FlextTypes.Core.StringList, _project_root: str = "."
+        self, _command: FlextTypes.Core.StringList, _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
         """Execute Meltano command using adapter."""
 
@@ -154,13 +154,13 @@ class FlextMeltanoBridge:
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
-                result.error or "Command failed"
+                result.error or "Command failed",
             )
 
         return self._execute_with_json_response(_execute_command)
 
     def execute_dbt_command(
-        self, _command: FlextTypes.Core.StringList, _project_root: str = "."
+        self, _command: FlextTypes.Core.StringList, _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
         """Execute DBT command using adapter."""
 
@@ -171,7 +171,7 @@ class FlextMeltanoBridge:
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
-                result.error or "DBT command failed"
+                result.error or "DBT command failed",
             )
 
         return self._execute_with_json_response(_execute_dbt)
@@ -195,7 +195,7 @@ class FlextMeltanoBridge:
         try:
             # Determine parameter order based on types
             if isinstance(project_root_or_type, Path) or project_root_or_type.endswith(
-                "/"
+                "/",
             ):
                 # Format: (project_root, plugin_type, plugin_name)
                 project_root = str(project_root_or_type)
@@ -214,7 +214,7 @@ class FlextMeltanoBridge:
 
             if not meltano_yml.exists():
                 return FlextResult.fail(
-                    f"{FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE} not found"
+                    f"{FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE} not found",
                 )
 
             # Use adapter directly to avoid missing method
@@ -249,7 +249,7 @@ class FlextMeltanoBridge:
             return {"success": False, "error": str(e)}
 
     def discover_plugins(
-        self, _project: object = None
+        self, _project: object = None,
     ) -> FlextResult[dict[str, list[FlextTypes.Core.Headers]]]:
         """Discover available plugins."""
         try:
@@ -274,7 +274,7 @@ class FlextMeltanoBridge:
             # Run synchronous version in thread pool
             loop = asyncio.get_event_loop()
             return await loop.run_in_executor(
-                None, self._run_plugin_sync, project, plugin_name, command, args
+                None, self._run_plugin_sync, project, plugin_name, command, args,
             )
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -315,7 +315,7 @@ class FlextMeltanoBridge:
             return FlextResult.fail(str(e))
 
     def initialize_project(
-        self, project_root: str = "."
+        self, project_root: str = ".",
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Initialize Meltano project."""
         try:
@@ -325,7 +325,7 @@ class FlextMeltanoBridge:
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
             return FlextResult[FlextTypes.Core.Dict].fail(
-                result.error or "Project initialization failed"
+                result.error or "Project initialization failed",
             )
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(str(e))

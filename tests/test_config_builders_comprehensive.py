@@ -104,7 +104,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
     def test_create_dbt_config_with_profile(self) -> None:
         """Test creating DBT configuration with custom profile."""
         result = FlextMeltanoConfigBuilders().create_dbt_config(
-            project_name="analytics_project", profile_name="prod_analytics"
+            project_name="analytics_project", profile_name="prod_analytics",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -128,7 +128,7 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
     def test_create_dbt_config_special_characters(self) -> None:
         """Test DBT configuration with special characters."""
         result = FlextMeltanoConfigBuilders().create_dbt_config(
-            project_name="project@#$%^&*()", profile_name="profile!@#$%^&*()"
+            project_name="project@#$%^&*()", profile_name="profile!@#$%^&*()",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -176,11 +176,11 @@ class TestFlextMeltanoConfigBuildersDbtComprehensive:
         ],
     )
     def test_dbt_config_parametrized_names(
-        self, project_name: str, profile_name: str
+        self, project_name: str, profile_name: str,
     ) -> None:
         """Test DBT configuration with various naming patterns."""
         result = FlextMeltanoConfigBuilders().create_dbt_config(
-            project_name=project_name, profile_name=profile_name
+            project_name=project_name, profile_name=profile_name,
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -207,7 +207,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
     def test_create_tap_config_basic(self) -> None:
         """Test creating basic tap configuration."""
         result = FlextMeltanoConfigBuilders().create_singer_tap_config(
-            tap_name="tap-csv"
+            tap_name="tap-csv",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -251,7 +251,7 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
     def test_create_target_config_basic(self) -> None:
         """Test creating basic target configuration."""
         result = FlextMeltanoConfigBuilders().create_singer_target_config(
-            target_name="target-postgres"
+            target_name="target-postgres",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -301,11 +301,11 @@ class TestFlextMeltanoConfigBuildersSingerComprehensive:
         ],
     )
     def test_tap_config_name_handling(
-        self, tap_name: str, expected_normalized: str
+        self, tap_name: str, expected_normalized: str,
     ) -> None:
         """Test tap configuration name handling."""
         result = FlextMeltanoConfigBuilders().create_singer_tap_config(
-            tap_name=tap_name
+            tap_name=tap_name,
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -335,7 +335,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
     def test_create_meltano_config_basic(self) -> None:
         """Test creating basic meltano configuration."""
         result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_id="test_project"
+            project_id="test_project",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -351,7 +351,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
         """Test creating meltano configuration with custom project name."""
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_meltano_config(
-            project_id="analytics_project", project_name="Analytics Project"
+            project_id="analytics_project", project_name="Analytics Project",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -368,7 +368,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
     def test_create_meltano_config_environments_structure(self) -> None:
         """Test meltano configuration has proper environments structure."""
         result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_id="env_project"
+            project_id="env_project",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -388,7 +388,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
     def test_meltano_config_structure_completeness(self) -> None:
         """Test that meltano config has complete structure."""
         result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_id="complete_project"
+            project_id="complete_project",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -409,7 +409,7 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
     def test_meltano_config_metadata(self) -> None:
         """Test meltano configuration has proper metadata."""
         result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_id="metadata_test"
+            project_id="metadata_test",
         )
 
         FlextTestsMatchers.assert_result_success(result)
@@ -453,25 +453,25 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         """Test complete project configuration workflow."""
         # Create DBT configuration
         dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(
-            project_name="analytics_project", profile_name="prod_analytics"
+            project_name="analytics_project", profile_name="prod_analytics",
         )
         FlextTestsMatchers.assert_result_success(dbt_result)
 
         # Create tap configuration
         tap_result = FlextMeltanoConfigBuilders().create_singer_tap_config(
-            tap_name="tap-postgres", pip_url="pipelinewise-tap-postgres"
+            tap_name="tap-postgres", pip_url="pipelinewise-tap-postgres",
         )
         FlextTestsMatchers.assert_result_success(tap_result)
 
         # Create target configuration
         target_result = FlextMeltanoConfigBuilders().create_singer_target_config(
-            target_name="target-postgres", pip_url="pipelinewise-target-postgres"
+            target_name="target-postgres", pip_url="pipelinewise-target-postgres",
         )
         FlextTestsMatchers.assert_result_success(target_result)
 
         # Create Meltano project configuration
         meltano_result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_id="analytics_project", project_name="Analytics Project"
+            project_id="analytics_project", project_name="Analytics Project",
         )
         FlextTestsMatchers.assert_result_success(meltano_result)
 
@@ -511,7 +511,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
 
         def create_config(config_num: int) -> FlextResult[dict[str, object]]:
             return FlextMeltanoConfigBuilders().create_dbt_config(
-                f"project_{config_num}"
+                f"project_{config_num}",
             )
 
         # Create multiple configurations concurrently
@@ -538,7 +538,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         # Create configurations with same project name
         dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(project_name)
         meltano_result = FlextMeltanoConfigBuilders().create_meltano_config(
-            project_name
+            project_name,
         )
 
         FlextTestsMatchers.assert_result_success(dbt_result)
@@ -581,7 +581,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         ],
     )
     def test_builder_methods_parametrized(
-        self, method_name: str, args: tuple[str, ...]
+        self, method_name: str, args: tuple[str, ...],
     ) -> None:
         """Test builder methods with parametrized inputs."""
         builder = FlextMeltanoConfigBuilders()

@@ -32,21 +32,21 @@ class TestFlextMeltanoConfigBuildersBasic(unittest.TestCase):
         """Test unified builder has DBT functionality (SOLID refactored)."""
         builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_dbt_config")
-        assert callable(getattr(builder, "create_dbt_config"))
+        assert callable(builder.create_dbt_config)
 
     def test_unified_builder_has_singer_functionality(self) -> None:
         """Test unified builder has Singer functionality (SOLID refactored)."""
         builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_singer_tap_config")
         assert hasattr(builder, "create_singer_target_config")
-        assert callable(getattr(builder, "create_singer_tap_config"))
+        assert callable(builder.create_singer_tap_config)
 
     def test_unified_builder_has_meltano_functionality(self) -> None:
         """Test unified builder has Meltano functionality (SOLID refactored)."""
         builder = FlextMeltanoConfigBuilders()
         assert hasattr(builder, "create_meltano_config")
         assert hasattr(builder, "add_plugin_to_config")
-        assert callable(getattr(builder, "create_meltano_config"))
+        assert callable(builder.create_meltano_config)
 
     def test_dbt_config_builder_has_build_method(self) -> None:
         """Test unified builder has DBT functionality."""

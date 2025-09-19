@@ -517,7 +517,7 @@ class TestFlextMeltanoExecutorComplete:
                 # This is expected behavior for invalid commands
                 # Log the exception for debugging purposes
                 logger.debug(
-                    f"Expected exception during edge case command execution: {e}"
+                    f"Expected exception during edge case command execution: {e}",
                 )
                 assert True  # Explicit assertion instead of pass
 
@@ -584,7 +584,7 @@ class TestFlextMeltanoExecutorComplete:
         try:
             # Mock sys.exit to force exceptions during CLI execution
             with mock.patch.object(
-                sys, "exit", side_effect=RuntimeError("CLI execution failed")
+                sys, "exit", side_effect=RuntimeError("CLI execution failed"),
             ):
                 result = self.executor.run_cli(["force_exception"])
                 # Should handle exception gracefully
@@ -754,7 +754,7 @@ class TestFlextMeltanoExecutorComplete:
                 return_value=FlextResult.fail("Pipeline failed"),
             ):
                 result = runner.invoke(
-                    cli_app, ["run", "tap-csv", "target-jsonl"], catch_exceptions=True
+                    cli_app, ["run", "tap-csv", "target-jsonl"], catch_exceptions=True,
                 )
                 # Should hit error path lines 834-835 (exit code may vary)
                 assert isinstance(result.exit_code, int)
@@ -772,11 +772,11 @@ class TestFlextMeltanoExecutorComplete:
 
             # Test plugins listing directly to hit the formatting paths
             mock_plugins_result = FlextResult.ok(
-                [{"name": "tap-csv", "type": "extractors"}]
+                [{"name": "tap-csv", "type": "extractors"}],
             )
 
             with mock.patch.object(
-                FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
+                FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result,
             ):
                 # Test successful execution path
                 plugins_result = executor.list_plugins()

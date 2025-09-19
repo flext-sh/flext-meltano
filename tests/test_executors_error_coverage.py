@@ -19,7 +19,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test execute method with health command failure."""
         # Mock meltano_adapter.get_version to return failure
         with mock.patch.object(
-            self.executor.meltano_adapter, "get_version"
+            self.executor.meltano_adapter, "get_version",
         ) as mock_get_version:
             mock_get_version.return_value = FlextResult.fail("Health check failed")
 
@@ -32,7 +32,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test execute method with version command failure."""
         # Mock meltano_adapter.get_version to return failure
         with mock.patch.object(
-            self.executor.meltano_adapter, "get_version"
+            self.executor.meltano_adapter, "get_version",
         ) as mock_get_version:
             mock_get_version.return_value = FlextResult.fail("Version check failed")
 
@@ -54,7 +54,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         non_existent_path = Path("/non/existent/path")
 
         result = self.executor.execute_meltano_command(
-            project_root=non_existent_path, command=["run", "tap-csv", "target-csv"]
+            project_root=non_existent_path, command=["run", "tap-csv", "target-csv"],
         )
         assert result.is_failure
         assert result.error is not None
@@ -75,7 +75,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         # Mock Path.exists to raise exception
         with mock.patch.object(Path, "exists", side_effect=Exception("Test exception")):
             result = self.executor.execute_meltano_command(
-                project_root=Path("/test"), command=["run", "tap-csv", "target-csv"]
+                project_root=Path("/test"), command=["run", "tap-csv", "target-csv"],
             )
             assert result.is_failure
             assert result.error is not None
@@ -101,7 +101,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test run method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.run(["test"])
             # The method handles exceptions gracefully and returns success
@@ -145,7 +145,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test help method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.help()
             # The method handles exceptions gracefully and returns success
@@ -156,7 +156,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test list_commands method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.list_commands()
             # The method handles exceptions gracefully and returns success
@@ -180,7 +180,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test run_pipeline method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.run_pipeline("tap-csv", "target-csv")
             assert result.is_failure
@@ -203,7 +203,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test flext_meltano_install method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.flext_meltano_install()
             assert result.is_failure
@@ -214,7 +214,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test flext_meltano_invoke method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.flext_meltano_invoke("test-plugin", "arg1", "arg2")
             assert result.is_failure
@@ -225,7 +225,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         """Test run_cli method with exception."""
         # Mock logger.info to raise exception
         with mock.patch.object(
-            self.executor.logger, "info", side_effect=Exception("Test exception")
+            self.executor.logger, "info", side_effect=Exception("Test exception"),
         ):
             result = self.executor.run_cli(["test"])
             # The method handles exceptions gracefully and returns success with error info

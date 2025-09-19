@@ -117,7 +117,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         self._logger.info(
-            "Executing Meltano service", extra={"service_type": self._service_type}
+            "Executing Meltano service", extra={"service_type": self._service_type},
         )
 
         # Convert to proper type for FlextResult
@@ -152,7 +152,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         service_name = getattr(
-            self, f"{self._service_type}_name", f"default-{self._service_type}"
+            self, f"{self._service_type}_name", f"default-{self._service_type}",
         )
         info: FlextMeltanoTypes.Plugin.PluginInfo = {
             "service_type": self._service_type,
@@ -193,7 +193,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         return FlextResult.ok(data=None)
 
     def create_instance(
-        self, config: FlextTypes.Core.Dict
+        self, config: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create service instance with configuration based on type.
 
@@ -228,11 +228,11 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         """
         if not config:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                "Empty configuration provided"
+                "Empty configuration provided",
             )
 
         service_name = getattr(
-            self, f"{self._service_type}_name", f"default-{self._service_type}"
+            self, f"{self._service_type}_name", f"default-{self._service_type}",
         )
 
         instance: FlextTypes.Core.Dict
@@ -261,13 +261,13 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             }
         else:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Unknown service type: {self._service_type}"
+                f"Unknown service type: {self._service_type}",
             )
 
         return FlextResult[FlextTypes.Core.Dict].ok(data=instance)
 
     def validate_service_config(
-        self, config: FlextTypes.Core.Dict
+        self, config: FlextTypes.Core.Dict,
     ) -> FlextResult[bool]:
         """Validate service configuration based on type.
 
@@ -324,7 +324,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 project_name: {
                     "outputs": {"dev": {"type": "duckdb", "path": "test.duckdb"}},
                     "target": "dev",
-                }
+                },
             }
             return FlextResult[FlextTypes.Core.Dict].ok(data=dbt_config)
         empty_config: FlextTypes.Core.Dict = {}
@@ -349,12 +349,12 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         config_result = self.get_default_config()
         if config_result.is_failure:
             return FlextResult[bool].fail(
-                f"Default config failed: {config_result.error}"
+                f"Default config failed: {config_result.error}",
             )
         return self.validate_service_config(config_result.unwrap())
 
     def run_models(
-        self, model_names: list[str] | None = None
+        self, model_names: list[str] | None = None,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Run DBT models with specified model names.
 
@@ -387,7 +387,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         """
         if self._service_type != "dbt":
             return FlextResult[FlextTypes.Core.Dict].fail(
-                "run_models is only available for DBT services"
+                "run_models is only available for DBT services",
             )
 
         self._logger.info("Running DBT models", extra={"models": model_names or "all"})
@@ -427,7 +427,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         """
         if self._service_type != "dbt":
             return FlextResult[FlextTypes.Core.Dict].fail(
-                "Profiles config only available for DBT service type"
+                "Profiles config only available for DBT service type",
             )
 
         return self.get_default_config()
@@ -435,7 +435,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
     # Consolidated Service Factory - ZERO DUPLICATION using flext-core patterns
     @staticmethod
     def _create_service_with_type(
-        name: str, service_type: str, field_name: str, **config: object
+        name: str, service_type: str, field_name: str, **config: object,
     ) -> FlextResult[FlextMeltanoService]:
         """Consolidated factory using flext-core extensively.
 
@@ -516,16 +516,16 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         typed_kwargs = {
             "service_type": str(service_kwargs.get("service_type", service_prefix)),
             "app_name": str(
-                service_kwargs.get("app_name", f"{service_prefix}-{safe_name}")
+                service_kwargs.get("app_name", f"{service_prefix}-{safe_name}"),
             ),
             "environment": str(service_kwargs.get("environment", "development")),
             "debug": bool(service_kwargs.get("debug", False)),
             "log_level": str(service_kwargs.get("log_level", "INFO")),
             "max_workers": FlextUtilities.Conversions.safe_int(
-                str(service_kwargs.get("max_workers", 4))
+                str(service_kwargs.get("max_workers", 4)),
             ),
             "timeout_seconds": FlextUtilities.Conversions.safe_int(
-                str(service_kwargs.get("timeout_seconds", 30))
+                str(service_kwargs.get("timeout_seconds", 30)),
             ),
         }
 
@@ -537,21 +537,21 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             # Try Pydantic model_validate first, fallback to regular instantiation
             if hasattr(service_class, "model_validate"):
                 # Pydantic model - use getattr for type safety
-                model_validate = getattr(service_class, "model_validate")
+                model_validate = service_class.model_validate
                 service_instance = model_validate(typed_kwargs)
             else:
                 # Regular class instantiation
                 service_instance = service_class(**typed_kwargs)
         except Exception as e:
             return FlextResult[T].fail(
-                f"Failed to create {service_prefix} service: {e}"
+                f"Failed to create {service_prefix} service: {e}",
             )
 
         return FlextResult[T].ok(data=service_instance)
 
     @staticmethod
     def create_tap_service(
-        tap_name: str, **config: object
+        tap_name: str, **config: object,
     ) -> FlextResult[FlextMeltanoService]:
         """Create tap service using flext-core factory patterns.
 
@@ -573,12 +573,12 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         return FlextMeltanoService._create_service_with_type(
-            tap_name, "tap", "tap_name", **config
+            tap_name, "tap", "tap_name", **config,
         )
 
     @staticmethod
     def create_target_service(
-        target_name: str, **config: object
+        target_name: str, **config: object,
     ) -> FlextResult[FlextMeltanoService]:
         """Create target service using flext-core factory patterns.
 
@@ -600,12 +600,12 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         return FlextMeltanoService._create_service_with_type(
-            target_name, "target", "target_name", **config
+            target_name, "target", "target_name", **config,
         )
 
     @staticmethod
     def create_dbt_service(
-        project_name: str, **config: object
+        project_name: str, **config: object,
     ) -> FlextResult[FlextMeltanoService]:
         """Create DBT service using flext-core factory patterns.
 
@@ -627,7 +627,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         return FlextMeltanoService._create_service_with_type(
-            project_name, "dbt", "project_name", **config
+            project_name, "dbt", "project_name", **config,
         )
 
 

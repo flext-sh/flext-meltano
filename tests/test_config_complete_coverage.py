@@ -103,7 +103,7 @@ class TestFlextMeltanoConfig:
     def test_get_absolute_config_dir(self) -> None:
         """Test get_absolute_config_dir method."""
         config = FlextMeltanoConfig(
-            project_root=Path("/test/project"), config_dir=Path(".meltano")
+            project_root=Path("/test/project"), config_dir=Path(".meltano"),
         )
         config_dir = config.get_absolute_config_dir()
 
@@ -115,7 +115,7 @@ class TestFlextMeltanoConfig:
     def test_get_absolute_logs_dir(self) -> None:
         """Test get_absolute_logs_dir method."""
         config = FlextMeltanoConfig(
-            project_root=Path("/test/project"), logs_dir=Path("logs")
+            project_root=Path("/test/project"), logs_dir=Path("logs"),
         )
         logs_dir = config.get_absolute_logs_dir()
 
@@ -204,7 +204,7 @@ class TestFlextMeltanoConfig:
             project_file.write_text("version: 1\n")
 
             result = FlextMeltanoConfig.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
 
             assert result.is_success
@@ -220,7 +220,7 @@ class TestFlextMeltanoConfig:
             project_file.write_text("version: 1\n")
 
             result = FlextMeltanoConfig.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
 
             assert result.is_success
@@ -232,7 +232,7 @@ class TestFlextMeltanoConfig:
         """Test create_for_environment factory method."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             result = FlextMeltanoConfig.create_for_environment(
-                environment="staging", project_root=Path(tmp_dir), log_level="WARNING"
+                environment="staging", project_root=Path(tmp_dir), log_level="WARNING",
             )
 
             assert result.is_success
@@ -244,7 +244,7 @@ class TestFlextMeltanoConfig:
     def test_create_for_environment_with_validation_error(self) -> None:
         """Test create_for_environment with invalid parameters."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_env", project_root=Path("/nonexistent")
+            environment="invalid_env", project_root=Path("/nonexistent"),
         )
 
         # Should fail validation
@@ -325,7 +325,7 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_invalid_environment_validation(self) -> None:
         """Test validation fails with invalid environment using create_for_environment."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_environment_name", project_root=Path("/test")
+            environment="invalid_environment_name", project_root=Path("/test"),
         )
         assert result.is_failure
         assert "Invalid environment" in (result.error or "")
@@ -346,7 +346,7 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_factory_methods_with_invalid_data(self) -> None:
         """Test factory methods handle invalid data gracefully."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid", project_root=Path()
+            environment="invalid", project_root=Path(),
         )
 
         assert result.is_failure
@@ -400,7 +400,7 @@ class TestFlextMeltanoConfigIntegration:
 
             # Create config using factory
             result = FlextMeltanoConfig.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
 
             assert result.is_success

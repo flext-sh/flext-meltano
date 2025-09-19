@@ -17,7 +17,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
-            "config_builders"
+            "config_builders",
         )
 
     # =========================================================================
@@ -120,7 +120,7 @@ class TestFlextMeltanoConfigBuildersComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="DBT config creation should succeed"
+            condition=result.is_success, message="DBT config creation should succeed",
         )
 
         config = result.unwrap()
@@ -142,13 +142,13 @@ class TestFlextMeltanoConfigBuildersComplete:
 
         # Test structure elements
         self.test_assertions.assert_in(
-            item="model-paths", container=config, message="Should include model-paths"
+            item="model-paths", container=config, message="Should include model-paths",
         )
         self.test_assertions.assert_in(
-            item="test-paths", container=config, message="Should include test-paths"
+            item="test-paths", container=config, message="Should include test-paths",
         )
         self.test_assertions.assert_in(
-            item="metadata", container=config, message="Should include metadata"
+            item="metadata", container=config, message="Should include metadata",
         )
 
         # Test metadata structure
@@ -160,14 +160,14 @@ class TestFlextMeltanoConfigBuildersComplete:
             message="Should include created_by",
         )
         self.test_assertions.assert_in(
-            item="created_at", container=metadata, message="Should include timestamp"
+            item="created_at", container=metadata, message="Should include timestamp",
         )
 
     def test_dbt_config_builder_with_profile(self) -> None:
         """Test DBT config creation with custom profile using flext_tests."""
         # Test with custom profile name (lines 84-86)
         result = FlextMeltanoConfigBuilders().create_dbt_config(
-            "analytics_project", "custom_profile"
+            "analytics_project", "custom_profile",
         )
 
         self.test_assertions.assert_true(
@@ -235,12 +235,12 @@ class TestFlextMeltanoConfigBuildersComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Generic Singer config should succeed"
+            condition=result.is_success, message="Generic Singer config should succeed",
         )
 
         config = result.unwrap()
         self.test_assertions.assert_equals(
-            actual=config["name"], expected="tap-postgres", message="Name should match"
+            actual=config["name"], expected="tap-postgres", message="Name should match",
         )
         self.test_assertions.assert_equals(
             actual=config["namespace"],
@@ -285,7 +285,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Generic loader config should succeed"
+            condition=result.is_success, message="Generic loader config should succeed",
         )
 
         config = result.unwrap()
@@ -307,12 +307,12 @@ class TestFlextMeltanoConfigBuildersComplete:
         # Test pip_url default generation for extractor using unified class pattern
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_singer_tap_config(
-            tap_name="tap-csv"
+            tap_name="tap-csv",
             # No pip_url provided - should generate default
         )
 
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Should succeed without pip_url"
+            condition=result.is_success, message="Should succeed without pip_url",
         )
 
         config = result.unwrap()
@@ -338,7 +338,7 @@ class TestFlextMeltanoConfigBuildersComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Tap config creation should succeed"
+            condition=result.is_success, message="Tap config creation should succeed",
         )
 
         config = result.unwrap()
@@ -373,7 +373,7 @@ class TestFlextMeltanoConfigBuildersComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Target config creation should succeed"
+            condition=result.is_success, message="Target config creation should succeed",
         )
 
         config = result.unwrap()
@@ -398,16 +398,16 @@ class TestFlextMeltanoConfigBuildersComplete:
         # Test error handling with edge cases using unified class pattern
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_singer_tap_config(
-            tap_name=""  # Empty name to test error handling
+            tap_name="",  # Empty name to test error handling
         )
 
         # Should still succeed due to safe_string preserving empty values
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Should handle empty name gracefully"
+            condition=result.is_success, message="Should handle empty name gracefully",
         )
         config = result.unwrap()
         self.test_assertions.assert_equals(
-            actual=config["name"], expected="", message="Should preserve empty name"
+            actual=config["name"], expected="", message="Should preserve empty name",
         )
 
     # =========================================================================
@@ -418,10 +418,10 @@ class TestFlextMeltanoConfigBuildersComplete:
         """Test complete Meltano project configuration workflow using flext_tests."""
         # Create DBT configuration
         dbt_result = FlextMeltanoConfigBuilders().create_dbt_config(
-            "analytics_project", "analytics_profile"
+            "analytics_project", "analytics_profile",
         )
         self.test_assertions.assert_true(
-            condition=dbt_result.is_success, message="DBT config should be created"
+            condition=dbt_result.is_success, message="DBT config should be created",
         )
 
         # Create tap configuration
@@ -431,7 +431,7 @@ class TestFlextMeltanoConfigBuildersComplete:
             pip_url="pipelinewise-tap-postgres",
         )
         self.test_assertions.assert_true(
-            condition=tap_result.is_success, message="Tap config should be created"
+            condition=tap_result.is_success, message="Tap config should be created",
         )
 
         # Create target configuration
@@ -503,7 +503,7 @@ class TestFlextMeltanoConfigBuildersComplete:
 
             # Test Singer config with edge case
             tap_result = FlextMeltanoConfigBuilders().create_singer_tap_config(
-                edge_case
+                edge_case,
             )
             self.test_assertions.assert_true(
                 condition=tap_result.is_success,
@@ -517,7 +517,7 @@ class TestFlextMeltanoConfigBuildersComplete:
             lambda: FlextMeltanoConfigBuilders().create_dbt_config("test_project"),
             lambda: FlextMeltanoConfigBuilders().create_singer_tap_config("test_tap"),
             lambda: FlextMeltanoConfigBuilders().create_singer_target_config(
-                "test_target"
+                "test_target",
             ),
         ]
 
@@ -554,7 +554,7 @@ class TestFlextMeltanoConfigBuildersComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=result.is_success, message="Complex loader config should succeed"
+            condition=result.is_success, message="Complex loader config should succeed",
         )
         config = result.unwrap()
 

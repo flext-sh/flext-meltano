@@ -88,7 +88,7 @@ class TestConfigBuildersMissingCoverage:
     def test_create_extractor_config_with_pip_url(self) -> None:
         """Test create_extractor_config with pip_url."""
         result = self.builder.create_extractor_config(
-            tap_name="test-tap", pip_url="test-pip-url"
+            tap_name="test-tap", pip_url="test-pip-url",
         )
 
         self.test_assertions.assert_true(
@@ -138,7 +138,7 @@ class TestConfigBuildersMissingCoverage:
     def test_create_loader_config_with_pip_url(self) -> None:
         """Test create_loader_config with pip_url."""
         result = self.builder.create_loader_config(
-            target_name="test-target", pip_url="test-pip-url"
+            target_name="test-target", pip_url="test-pip-url",
         )
 
         self.test_assertions.assert_true(
@@ -226,7 +226,7 @@ class TestConfigBuildersMissingCoverage:
     def test_create_singer_config_generic_with_minimal_parameters(self) -> None:
         """Test _create_singer_config_generic with minimal parameters."""
         result = self.builder._create_singer_config_generic(
-            plugin_name="minimal-singer-plugin"
+            plugin_name="minimal-singer-plugin",
         )
 
         self.test_assertions.assert_true(
@@ -245,7 +245,7 @@ class TestConfigBuildersMissingCoverage:
     def test_create_singer_config_generic_with_loaders_type(self) -> None:
         """Test _create_singer_config_generic with loaders type."""
         result = self.builder._create_singer_config_generic(
-            plugin_name="test-loader", plugin_type=PluginTypes.LOADERS.value
+            plugin_name="test-loader", plugin_type=PluginTypes.LOADERS.value,
         )
 
         self.test_assertions.assert_true(
@@ -264,7 +264,7 @@ class TestConfigBuildersMissingCoverage:
     def test_create_singer_config_generic_with_transforms_type(self) -> None:
         """Test _create_singer_config_generic with transforms type."""
         result = self.builder._create_singer_config_generic(
-            plugin_name="test-transformer", plugin_type=PluginTypes.TRANSFORMS.value
+            plugin_name="test-transformer", plugin_type=PluginTypes.TRANSFORMS.value,
         )
 
         self.test_assertions.assert_true(

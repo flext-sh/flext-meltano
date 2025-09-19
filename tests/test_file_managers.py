@@ -72,7 +72,7 @@ class TestFlextMeltanoFileManagersBasic(TestCase):
             "FlextMeltanoFileManagers missing create_directory_structure method"
         )
 
-        method = getattr(FlextMeltanoFileManagers, "create_directory_structure")
+        method = FlextMeltanoFileManagers.create_directory_structure
         assert callable(method), "create_directory_structure is not callable"
 
     def test_temp_directory_manager(self) -> None:

@@ -25,7 +25,7 @@ class TestFlextMeltanoUtilitiesComplete:
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
-            "meltano_utilities"
+            "meltano_utilities",
         )
 
     # =========================================================================
@@ -44,10 +44,10 @@ class TestFlextMeltanoUtilitiesComplete:
         if result.success:
             temp_path = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(temp_path, Path), message="Should return Path"
+                condition=isinstance(temp_path, Path), message="Should return Path",
             )
             self.test_assertions.assert_true(
-                condition=temp_path.exists(), message="Temp directory should exist"
+                condition=temp_path.exists(), message="Temp directory should exist",
             )
 
             # Check that basic temp directory was created
@@ -80,7 +80,7 @@ class TestFlextMeltanoUtilitiesComplete:
     def test_create_meltano_config_dict_success(self) -> None:
         """Test create_meltano_config_dict success using flext_tests."""
         result = FlextMeltanoUtilities.create_meltano_config_dict(
-            project_id="test_project", project_name="Test Meltano Project"
+            project_id="test_project", project_name="Test Meltano Project",
         )
 
         self.test_assertions.assert_true(
@@ -88,21 +88,21 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.success, message="Config creation should succeed"
+            condition=result.success, message="Config creation should succeed",
         )
 
         if result.success:
             config = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(config, dict), message="Should return dict"
+                condition=isinstance(config, dict), message="Should return dict",
             )
 
             # Validate config structure using flext_tests assertions
             self.test_assertions.assert_in(
-                item="version", container=config, message="Should contain version"
+                item="version", container=config, message="Should contain version",
             )
             self.test_assertions.assert_in(
-                item="project_id", container=config, message="Should contain project_id"
+                item="project_id", container=config, message="Should contain project_id",
             )
             self.test_assertions.assert_in(
                 item="project_name",
@@ -115,15 +115,15 @@ class TestFlextMeltanoUtilitiesComplete:
                 message="Should contain environments",
             )
             self.test_assertions.assert_in(
-                item="plugins", container=config, message="Should contain plugins"
+                item="plugins", container=config, message="Should contain plugins",
             )
             self.test_assertions.assert_in(
-                item="metadata", container=config, message="Should contain metadata"
+                item="metadata", container=config, message="Should contain metadata",
             )
 
             # Validate specific values
             self.test_assertions.assert_equals(
-                actual=config["version"], expected=1, message="Version should be 1"
+                actual=config["version"], expected=1, message="Version should be 1",
             )
             self.test_assertions.assert_equals(
                 actual=config["project_id"],
@@ -134,7 +134,7 @@ class TestFlextMeltanoUtilitiesComplete:
     def test_create_meltano_config_dict_with_defaults(self) -> None:
         """Test create_meltano_config_dict with defaults using flext_tests."""
         result = FlextMeltanoUtilities.create_meltano_config_dict(
-            project_id="minimal_project"
+            project_id="minimal_project",
         )
 
         self.test_assertions.assert_true(
@@ -199,13 +199,13 @@ class TestFlextMeltanoUtilitiesComplete:
                 message="Should return FlextResult",
             )
             self.test_assertions.assert_true(
-                condition=result.success, message="YAML writing should succeed"
+                condition=result.success, message="YAML writing should succeed",
             )
 
             if result.success:
                 # Verify file was created and has content
                 self.test_assertions.assert_true(
-                    condition=yaml_file.exists(), message="YAML file should be created"
+                    condition=yaml_file.exists(), message="YAML file should be created",
                 )
 
                 # Read and verify content
@@ -234,7 +234,7 @@ class TestFlextMeltanoUtilitiesComplete:
         )
         if result.is_failure:
             self.test_assertions.assert_true(
-                condition=result.error is not None, message="Should have error message"
+                condition=result.error is not None, message="Should have error message",
             )
 
     # =========================================================================
@@ -256,13 +256,13 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.success, message="Plugin config creation should succeed"
+            condition=result.success, message="Plugin config creation should succeed",
         )
 
         if result.success:
             config = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(config, dict), message="Should return dict"
+                condition=isinstance(config, dict), message="Should return dict",
             )
 
             # Validate plugin config structure
@@ -277,12 +277,12 @@ class TestFlextMeltanoUtilitiesComplete:
             ]
             for field in expected_fields:
                 self.test_assertions.assert_in(
-                    item=field, container=config, message=f"Should contain {field}"
+                    item=field, container=config, message=f"Should contain {field}",
                 )
 
             # Validate specific values
             self.test_assertions.assert_equals(
-                actual=config["name"], expected="tap-csv", message="Name should match"
+                actual=config["name"], expected="tap-csv", message="Name should match",
             )
             self.test_assertions.assert_equals(
                 actual=config["namespace"],
@@ -290,7 +290,7 @@ class TestFlextMeltanoUtilitiesComplete:
                 message="Namespace should match",
             )
             self.test_assertions.assert_equals(
-                actual=config["type"], expected="extractor", message="Type should match"
+                actual=config["type"], expected="extractor", message="Type should match",
             )
 
     def test_create_plugin_config_dict_with_defaults(self) -> None:
@@ -298,7 +298,7 @@ class TestFlextMeltanoUtilitiesComplete:
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="test-plugin")
 
         self.test_assertions.assert_true(
-            condition=result.success, message="Should succeed with defaults"
+            condition=result.success, message="Should succeed with defaults",
         )
 
         if result.success:
@@ -321,7 +321,7 @@ class TestFlextMeltanoUtilitiesComplete:
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="")
 
         self.test_assertions.assert_true(
-            condition=result.success, message="Should handle empty name gracefully"
+            condition=result.success, message="Should handle empty name gracefully",
         )
 
         if result.success:
@@ -370,7 +370,7 @@ class TestFlextMeltanoUtilitiesComplete:
 
             # Step 2: Create Meltano config
             config_result = FlextMeltanoUtilities.create_meltano_config_dict(
-                project_id="workflow_test", project_name="Workflow Test Project"
+                project_id="workflow_test", project_name="Workflow Test Project",
             )
             self.test_assertions.assert_true(
                 condition=config_result.success,
@@ -383,7 +383,7 @@ class TestFlextMeltanoUtilitiesComplete:
                 # Step 3: Write meltano.yml
                 meltano_yml_path = temp_path / "meltano.yml"
                 write_result = FlextMeltanoUtilities.write_meltano_yml(
-                    config, meltano_yml_path
+                    config, meltano_yml_path,
                 )
                 self.test_assertions.assert_true(
                     condition=write_result.success,
@@ -393,7 +393,7 @@ class TestFlextMeltanoUtilitiesComplete:
                 if write_result.success:
                     # Step 4: Create plugin config
                     plugin_result = FlextMeltanoUtilities.create_plugin_config_dict(
-                        name="tap-csv", plugin_type="extractor"
+                        name="tap-csv", plugin_type="extractor",
                     )
                     self.test_assertions.assert_true(
                         condition=plugin_result.success,
@@ -412,7 +412,7 @@ class TestFlextMeltanoUtilitiesComplete:
 
         for project_id, project_name in edge_cases:
             result = FlextMeltanoUtilities.create_meltano_config_dict(
-                project_id, project_name
+                project_id, project_name,
             )
             self.test_assertions.assert_true(
                 condition=result.success,

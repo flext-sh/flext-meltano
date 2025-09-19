@@ -205,7 +205,7 @@ class TestFlextSingerTypesCoverage:
         }
 
         result = self.singer_types.create_schema_definition(
-            stream_name="users", properties=properties, key_properties=["id"]
+            stream_name="users", properties=properties, key_properties=["id"],
         )
 
         assert result.is_success
@@ -244,7 +244,7 @@ class TestFlextSingerTypesCoverage:
 
         # Test record message with time_extracted
         result = self.singer_types.create_record_message(
-            "users", record_data, time_extracted="2025-01-15T10:30:00Z"
+            "users", record_data, time_extracted="2025-01-15T10:30:00Z",
         )
         assert result.is_success
         assert result.data is not None
@@ -278,7 +278,7 @@ class TestFlextSingerTypesCoverage:
         assert isinstance(state_message, dict)  # Type assertion for subscript access
         assert state_message["type"] == "STATE"
         assert isinstance(
-            state_message["value"], dict
+            state_message["value"], dict,
         )  # Type assertion for nested access
         assert isinstance(state_message["value"]["bookmarks"], dict)
         assert isinstance(state_message["value"]["bookmarks"]["users"], dict)
@@ -305,10 +305,10 @@ class TestFlextSingerTypesCoverage:
         assert "username" in props_dict
         assert "created_at" in props_dict
         assert isinstance(
-            props_dict["user_id"], dict
+            props_dict["user_id"], dict,
         )  # Type assertion for subscript access
         assert isinstance(
-            props_dict["username"], dict
+            props_dict["username"], dict,
         )  # Type assertion for subscript access
         assert props_dict["user_id"]["type"] == "integer"
         assert props_dict["username"]["type"] == "string"
@@ -328,7 +328,7 @@ class TestFlextSingerTypesCoverage:
 
         # Add new property
         result = self.singer_types.add_property(
-            props_dict, "email", {"type": "string", "format": "email"}
+            props_dict, "email", {"type": "string", "format": "email"},
         )
         assert result.is_success
         assert result.data is not None
@@ -403,14 +403,14 @@ class TestFlextSingerTypesCoverage:
         """Test error handling and edge cases."""
         # Test validation with malformed type definition
         malformed_type: dict[str, object] = {
-            "invalid": "definition"
+            "invalid": "definition",
         }  # Missing "type" key
         result = self.singer_types.validate_value("test", malformed_type)
         assert not result.is_success
 
         # Test schema creation with empty properties
         result = self.singer_types.create_schema_definition(
-            stream_name="empty_stream", properties={}, key_properties=[]
+            stream_name="empty_stream", properties={}, key_properties=[],
         )
         assert result.is_success  # Should handle empty properties gracefully
 
@@ -452,7 +452,7 @@ class TestFlextSingerTypesIntegration:
 
         # Create schema definition
         schema_result = self.singer_types.create_schema_definition(
-            stream_name="users", properties=properties, key_properties=["user_id"]
+            stream_name="users", properties=properties, key_properties=["user_id"],
         )
         assert schema_result.is_success
 
@@ -504,7 +504,7 @@ class TestFlextSingerTypesIntegration:
         current_props = props_dict
         for field_name, field_def in additional_fields:
             add_result = self.singer_types.add_property(
-                current_props, field_name, field_def
+                current_props, field_name, field_def,
             )
             assert add_result.is_success
             assert add_result.data is not None
@@ -534,13 +534,13 @@ class TestFlextSingerTypesIntegration:
 
         # Create record message
         record_result = self.singer_types.create_record_message(
-            stream_name, {"id": 1, "data": "test data"}
+            stream_name, {"id": 1, "data": "test data"},
         )
         assert record_result.is_success
 
         # Create state message
         state_result = self.singer_types.create_state_message(
-            {"bookmarks": {stream_name: {"last_id": 1}}}
+            {"bookmarks": {stream_name: {"last_id": 1}}},
         )
         assert state_result.is_success
 

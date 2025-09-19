@@ -55,7 +55,7 @@ class TestFlextMeltanoAdapterCoverage:
         """Test get_plugin_info with plugin not found scenario."""
         # Test with a plugin that definitely doesn't exist
         result = self.adapter.get_plugin_info(
-            "nonexistent-plugin-12345", PluginType.EXTRACTORS
+            "nonexistent-plugin-12345", PluginType.EXTRACTORS,
         )
 
         self.test_assertions.assert_true(
@@ -75,7 +75,7 @@ class TestFlextMeltanoAdapterCoverage:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a project with plugins
             project_result = self.adapter.create_project(
-                project_name="test_pipeline_coverage", project_dir=Path(temp_dir)
+                project_name="test_pipeline_coverage", project_dir=Path(temp_dir),
             )
 
             if project_result.is_success:
@@ -111,7 +111,7 @@ class TestFlextMeltanoAdapterCoverage:
         """Test execute_pipeline with plugins not found scenario."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_result = self.adapter.create_project(
-                project_name="test_pipeline_no_plugins", project_dir=Path(temp_dir)
+                project_name="test_pipeline_no_plugins", project_dir=Path(temp_dir),
             )
 
             if project_result.is_success:
@@ -162,7 +162,7 @@ class TestFlextMeltanoAdapterCoverage:
     def test_create_temporary_meltano_project_success(self) -> None:
         """Test _create_temporary_meltano_project success scenario."""
         result = self.adapter._create_temporary_meltano_project(
-            project_id="test-temp-project", prefix="flext_test_"
+            project_id="test-temp-project", prefix="flext_test_",
         )
 
         self.test_assertions.assert_true(
@@ -184,7 +184,7 @@ class TestFlextMeltanoAdapterCoverage:
             mock_mkdtemp.side_effect = OSError("Permission denied")
 
             result = self.adapter._create_temporary_meltano_project(
-                project_id="test-invalid-project", prefix="flext_test_"
+                project_id="test-invalid-project", prefix="flext_test_",
             )
 
             # Should return a failed FlextResult, not raise exception
