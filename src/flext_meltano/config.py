@@ -140,15 +140,15 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Core project configuration
     project_root: Path = Field(
-        default=Path(), description="Root directory of the Meltano project"
+        default=Path(), description="Root directory of the Meltano project",
     )
 
     meltano_version: str = Field(
-        default=MELTANO_VERSION, description="Meltano version to use"
+        default=MELTANO_VERSION, description="Meltano version to use",
     )
 
     singer_sdk_version: str = Field(
-        default=SINGER_SDK_VERSION, description="Singer SDK version to use"
+        default=SINGER_SDK_VERSION, description="Singer SDK version to use",
     )
 
     dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
@@ -187,16 +187,16 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     run_mode: RunMode = Field(
-        default=RunMode.FULL, description="Execution mode for operations"
+        default=RunMode.FULL, description="Execution mode for operations",
     )
 
     # Directory configuration
     config_dir: Path = Field(
-        default_factory=lambda: Path(".meltano"), description="Configuration directory"
+        default_factory=lambda: Path(".meltano"), description="Configuration directory",
     )
 
     logs_dir: Path = Field(
-        default_factory=lambda: Path("logs"), description="Logs directory"
+        default_factory=lambda: Path("logs"), description="Logs directory",
     )
 
     venv_dir: Path = Field(
@@ -327,7 +327,7 @@ class FlextMeltanoConfig(FlextConfig):
         """
         # Use centralized validator to eliminate duplication
         return FlextMeltanoValidators.validate_meltano_project_structure(
-            self.project_root
+            self.project_root,
         )
 
     def get_environment_variables(self) -> FlextTypes.Core.Headers:
@@ -426,7 +426,7 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def create_from_project_root(
-        cls, project_root: str | Path
+        cls, project_root: str | Path,
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration from project root directory.
 
@@ -452,19 +452,19 @@ class FlextMeltanoConfig(FlextConfig):
 
             if validation_result.is_failure:
                 return FlextResult["FlextMeltanoConfig"].fail(
-                    validation_result.error or "Project validation failed"
+                    validation_result.error or "Project validation failed",
                 )
 
             return FlextResult["FlextMeltanoConfig"].ok(data=config)
 
         except Exception as e:  # pragma: no cover
             return FlextResult["FlextMeltanoConfig"].fail(
-                f"Config creation failed: {e}"
+                f"Config creation failed: {e}",
             )
 
     @classmethod
     def create_for_environment(
-        cls, environment: str, **kwargs: object
+        cls, environment: str, **kwargs: object,
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration for specific environment.
 
@@ -493,7 +493,7 @@ class FlextMeltanoConfig(FlextConfig):
                 env_type = cls.EnvironmentType(environment)
             except ValueError:
                 return FlextResult["FlextMeltanoConfig"].fail(
-                    f"Invalid environment: {environment}"
+                    f"Invalid environment: {environment}",
                 )
 
             # Filter and type-cast kwargs to valid fields only
@@ -517,7 +517,7 @@ class FlextMeltanoConfig(FlextConfig):
 
             if "log_level" in filtered_kwargs:
                 config_data["log_level"] = cls.LogLevel(
-                    str(filtered_kwargs["log_level"])
+                    str(filtered_kwargs["log_level"]),
                 )
 
             if "run_mode" in filtered_kwargs:
@@ -530,7 +530,7 @@ class FlextMeltanoConfig(FlextConfig):
                     key: value
                     for key, value in filtered_kwargs.items()
                     if key not in excluded_keys
-                }
+                },
             )
 
             config = cls.model_validate(config_data)
@@ -538,7 +538,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         except Exception as e:
             return FlextResult["FlextMeltanoConfig"].fail(
-                f"Environment config creation failed: {e}"
+                f"Environment config creation failed: {e}",
             )
 
     # ============================================================================
@@ -739,7 +739,7 @@ class FlextMeltanoConfig(FlextConfig):
             "validate_assignment": True,
             "use_enum_values": True,
             "arbitrary_types_allowed": True,
-        }
+        },
     )
 
 

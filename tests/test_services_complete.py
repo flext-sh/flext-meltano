@@ -97,7 +97,7 @@ class TestFlextMeltanoServiceComplete:
         # Test that service_type can be set to dbt
         try:
             dbt_service = FlextMeltanoService(
-                service_type="dbt", project_name="dbt-project"
+                service_type="dbt", project_name="dbt-project",
             )
             assert dbt_service is not None
             assert dbt_service._service_type == "dbt"

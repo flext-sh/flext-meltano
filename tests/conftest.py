@@ -382,7 +382,7 @@ def mock_singer_target() -> object:
             self.config = config
 
         async def load(
-            self, records: list[FlextTypes.Core.Dict]
+            self, records: list[FlextTypes.Core.Dict],
         ) -> FlextTypes.Core.Dict:
             return {"records_loaded": len(records), "status": "success"}
 

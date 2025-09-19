@@ -25,7 +25,7 @@ class TestUnifiedServiceImplementations:
 
         # Test target service creation using unified service
         target_service = FlextMeltanoService(
-            service_type="target", target_name="test-target"
+            service_type="target", target_name="test-target",
         )
         assert isinstance(target_service, FlextMeltanoService)
         assert target_service._service_type == "target"

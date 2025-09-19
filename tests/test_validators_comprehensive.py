@@ -122,10 +122,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     @pytest.mark.parametrize(
-        "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
+        "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}],
     )
     def test_validate_plugin_config_parametrized_invalid(
-        self, invalid_config: object
+        self, invalid_config: object,
     ) -> None:
         """Test plugin config validation with various invalid inputs."""
         result = FlextMeltanoValidators.validate_plugin_config(invalid_config)

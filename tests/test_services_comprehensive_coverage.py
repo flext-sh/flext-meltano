@@ -60,7 +60,7 @@ class TestTapService:
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
         service_result = self.create_tap_service(
-            "tap-postgres", database="testdb", host="localhost"
+            "tap-postgres", database="testdb", host="localhost",
         )
         assert service_result.is_success
         tap_service = service_result.unwrap()
@@ -157,7 +157,7 @@ class TestTargetService:
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
         service_result = self.create_target_service(
-            "target-postgres", database="outputdb", host="localhost"
+            "target-postgres", database="outputdb", host="localhost",
         )
         assert service_result.is_success
         target_service = service_result.unwrap()
@@ -245,7 +245,7 @@ class TestDbtService:
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""
         service_result = self.create_dbt_service(
-            "analytics_project", profile_name="dev", target="dev"
+            "analytics_project", profile_name="dev", target="dev",
         )
         assert service_result.is_success
         dbt_service = service_result.unwrap()
@@ -303,7 +303,7 @@ class TestServiceFactoryMethods:
     def test_create_tap_service_with_config(self) -> None:
         """Test create_tap_service with additional configuration."""
         result = self.service.create_tap_service(
-            "tap-postgres", database="testdb", host="localhost"
+            "tap-postgres", database="testdb", host="localhost",
         )
         assert isinstance(result, FlextResult)
 
@@ -318,7 +318,7 @@ class TestServiceFactoryMethods:
     def test_create_target_service_with_config(self) -> None:
         """Test create_target_service with additional configuration."""
         result = self.service.create_target_service(
-            "target-postgres", database="outputdb", host="localhost"
+            "target-postgres", database="outputdb", host="localhost",
         )
         assert isinstance(result, FlextResult)
 
@@ -346,7 +346,7 @@ class TestServiceGenericMethods:
     def test_create_service_generic_tap(self) -> None:
         """Test generic service creation for tap services."""
         result = self.service._create_service_generic(
-            FlextMeltanoService, "tap-csv", "tap_name", "tap", tap_name="tap-csv"
+            FlextMeltanoService, "tap-csv", "tap_name", "tap", tap_name="tap-csv",
         )
         assert isinstance(result, FlextResult)
 
@@ -537,7 +537,7 @@ class TestServiceErrorHandling:
 
         # Test with empty configurations
         target_result = self.service.create_target_service(
-            "target-test", empty_config={}
+            "target-test", empty_config={},
         )
         assert isinstance(target_result, FlextResult)
 
@@ -566,7 +566,7 @@ class TestServiceErrorHandling:
                 except Exception:
                     # Methods should not raise exceptions, they should return FlextResult
                     pytest.fail(
-                        f"Method {method.__name__} raised exception instead of returning FlextResult"
+                        f"Method {method.__name__} raised exception instead of returning FlextResult",
                     )
 
 

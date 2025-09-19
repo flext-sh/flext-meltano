@@ -26,7 +26,7 @@ class TestFlextMeltanoAdapterComplete:
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
-            "meltano_adapter"
+            "meltano_adapter",
         )
 
     def test_adapter_initialization(self) -> None:
@@ -35,10 +35,10 @@ class TestFlextMeltanoAdapterComplete:
 
         # Use flext_tests assertion patterns
         self.test_assertions.assert_true(
-            condition=adapter is not None, message="Adapter should be initialized"
+            condition=adapter is not None, message="Adapter should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(adapter, "_logger"), message="Adapter should have logger"
+            condition=hasattr(adapter, "_logger"), message="Adapter should have logger",
         )
         self.test_assertions.assert_true(
             condition=hasattr(adapter, "_utilities"),
@@ -70,14 +70,14 @@ class TestFlextMeltanoAdapterComplete:
             # Should contain version information
             has_version = "version" in version_info or "meltano_version" in version_info
             self.test_assertions.assert_true(
-                condition=has_version, message="Should contain version info"
+                condition=has_version, message="Should contain version info",
             )
 
     def test_get_version_failure(self) -> None:
         """Test version call failure handling using functional service."""
         # Configure functional service to simulate failure
         self.functional_service.configure_method(
-            "get_version", should_fail=True, failure_message="Meltano not available"
+            "get_version", should_fail=True, failure_message="Meltano not available",
         )
 
         result = self.adapter.get_version()
@@ -85,7 +85,7 @@ class TestFlextMeltanoAdapterComplete:
         # Test graceful failure handling
         if result.is_failure:
             self.test_assertions.assert_true(
-                condition=result.error is not None, message="Should have error message"
+                condition=result.error is not None, message="Should have error message",
             )
             self.test_assertions.assert_true(
                 condition=isinstance(result.error, str),
@@ -99,7 +99,7 @@ class TestFlextMeltanoAdapterComplete:
 
         # Configure functional service
         self.functional_service.configure_method(
-            "discover_plugins", return_value=test_plugins
+            "discover_plugins", return_value=test_plugins,
         )
 
         result = self.adapter.discover_plugins()
@@ -113,12 +113,12 @@ class TestFlextMeltanoAdapterComplete:
         if result.success:
             plugins = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(plugins, list), message="Plugins should be list"
+                condition=isinstance(plugins, list), message="Plugins should be list",
             )
             if plugins:
                 plugin = plugins[0]
                 self.test_assertions.assert_true(
-                    condition=isinstance(plugin, dict), message="Plugin should be dict"
+                    condition=isinstance(plugin, dict), message="Plugin should be dict",
                 )
                 expected_keys = ["name", "type", "namespace", "pip_url"]
                 has_expected_key = any(key in plugin for key in expected_keys)
@@ -140,7 +140,7 @@ class TestFlextMeltanoAdapterComplete:
                 "version": 1,
             }
             self.functional_service.configure_method(
-                "initialize_project", return_value=project_data
+                "initialize_project", return_value=project_data,
             )
 
             # Create test path using flext_tests utilities
@@ -154,7 +154,7 @@ class TestFlextMeltanoAdapterComplete:
             if result.success:
                 project = result.value
                 self.test_assertions.assert_true(
-                    condition=project is not None, message="Project should not be None"
+                    condition=project is not None, message="Project should not be None",
                 )
 
     def test_create_project_functional(self) -> None:
@@ -163,12 +163,12 @@ class TestFlextMeltanoAdapterComplete:
             # Use flext_tests test data creation
             project_info = self.test_utils.create_test_data(size=1, prefix="project")[0]
             project_info.update(
-                {"project_path": temp_dir, "name": "test-flext-project"}
+                {"project_path": temp_dir, "name": "test-flext-project"},
             )
 
             # Configure functional service
             self.functional_service.configure_method(
-                "create_project", return_value=project_info
+                "create_project", return_value=project_info,
             )
 
             project_name = "test-flext-project"
@@ -205,10 +205,10 @@ class TestFlextMeltanoAdapterComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Configure functional service for both initialization and plugin addition
             self.functional_service.configure_method(
-                "initialize_project", return_value={"root": temp_dir}
+                "initialize_project", return_value={"root": temp_dir},
             )
             self.functional_service.configure_method(
-                "add_plugin", return_value=plugin_info
+                "add_plugin", return_value=plugin_info,
             )
 
             # Test the plugin addition workflow
@@ -236,7 +236,7 @@ class TestFlextMeltanoAdapterComplete:
                     )
                     has_name = "name" in result_info or "plugin_name" in result_info
                     self.test_assertions.assert_true(
-                        condition=has_name, message="Should contain plugin name"
+                        condition=has_name, message="Should contain plugin name",
                     )
 
     def test_get_version_functional(self) -> None:
@@ -288,7 +288,7 @@ class TestFlextMeltanoAdapterComplete:
         result = self.adapter.create_tap_stream_catalog()
 
         self.test_assertions.assert_true(
-            condition=result.success, message="create_tap_stream_catalog should succeed"
+            condition=result.success, message="create_tap_stream_catalog should succeed",
         )
         self.test_assertions.assert_equals(
             actual=result.value["catalog_type"],
@@ -301,7 +301,7 @@ class TestFlextMeltanoAdapterComplete:
         result = self.adapter.create_target_config()
 
         self.test_assertions.assert_true(
-            condition=result.success, message="create_target_config should succeed"
+            condition=result.success, message="create_target_config should succeed",
         )
         self.test_assertions.assert_true(
             condition=isinstance(result.value, dict),
@@ -324,7 +324,7 @@ class TestFlextMeltanoAdapterComplete:
         result = self.adapter.convert_singer_schema()
 
         self.test_assertions.assert_true(
-            condition=result.success, message="convert_singer_schema should succeed"
+            condition=result.success, message="convert_singer_schema should succeed",
         )
         self.test_assertions.assert_true(
             condition=isinstance(result.value, dict),
@@ -346,7 +346,7 @@ class TestFlextMeltanoAdapterComplete:
             result = self.adapter.validate_project(Path(temp_dir))
 
             self.test_assertions.assert_true(
-                condition=result.is_success, message="validate_project should succeed"
+                condition=result.is_success, message="validate_project should succeed",
             )
             self.test_assertions.assert_true(
                 condition=isinstance(result.unwrap(), bool),
@@ -358,7 +358,7 @@ class TestFlextMeltanoAdapterComplete:
         result = self.adapter.execute_dbt_operation()
 
         self.test_assertions.assert_true(
-            condition=result.success, message="execute_dbt_operation should succeed"
+            condition=result.success, message="execute_dbt_operation should succeed",
         )
         self.test_assertions.assert_equals(
             actual=result.value["dbt_status"],
@@ -402,7 +402,7 @@ class TestFlextMeltanoAdapterComplete:
             # Test should either fail (if validation occurs) or succeed (if it creates the path)
             # Either way, the method should return a valid FlextResult
             self.test_assertions.assert_true(
-                condition=result is not None, message="Should return FlextResult"
+                condition=result is not None, message="Should return FlextResult",
             )
             self.test_assertions.assert_true(
                 condition=hasattr(result, "is_failure"),
@@ -420,7 +420,7 @@ class TestFlextMeltanoAdapterComplete:
 
         # Test with invalid plugin (should handle error gracefully)
         result = plugin_discovery.get_plugin_info(
-            "nonexistent_plugin_flext_test", PluginType.EXTRACTORS
+            "nonexistent_plugin_flext_test", PluginType.EXTRACTORS,
         )
 
         # Should handle error gracefully using FlextResult pattern
@@ -436,7 +436,7 @@ class TestFlextMeltanoAdapterComplete:
         # Create a temporary project for testing pipeline execution
         with tempfile.TemporaryDirectory() as temp_dir:
             project_result = self.adapter.create_project(
-                project_name="test_pipeline_project", project_dir=Path(temp_dir)
+                project_name="test_pipeline_project", project_dir=Path(temp_dir),
             )
 
             if project_result.is_success:
@@ -457,7 +457,7 @@ class TestFlextMeltanoAdapterComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_dir = Path(temp_dir)
             result = self.adapter.create_project(
-                project_name="test_project", project_dir=project_dir
+                project_name="test_project", project_dir=project_dir,
             )
 
             self.test_assertions.assert_true(

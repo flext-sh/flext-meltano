@@ -40,7 +40,7 @@ class FlextMeltanoConfigBuilders:
     # DBT Configuration Methods
 
     def create_dbt_config(
-        self, project_name: str, profile_name: str = ""
+        self, project_name: str, profile_name: str = "",
     ) -> FlextResult[ConfigDict]:
         """Create basic DBT configuration using FlextResult patterns.
 
@@ -118,7 +118,7 @@ class FlextMeltanoConfigBuilders:
             # Use flext-core text processing - EXTENSIVE REUSE
             safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
             safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                namespace or f"{type_prefix}_{safe_name.replace('-', '_')}"
+                namespace or f"{type_prefix}_{safe_name.replace('-', '_')}",
             )
             safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
 
@@ -138,7 +138,7 @@ class FlextMeltanoConfigBuilders:
             # Smart pip_url using flext-core defaults factory
             if pip_url:
                 result_config["pip_url"] = FlextUtilities.TextProcessor.safe_string(
-                    pip_url
+                    pip_url,
                 )
             else:
                 prefix = (
@@ -151,7 +151,7 @@ class FlextMeltanoConfigBuilders:
             return FlextResult[ConfigDict].ok(data=result_config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(
-                f"Failed to create Singer {plugin_type} config: {e}"
+                f"Failed to create Singer {plugin_type} config: {e}",
             )
 
     def create_singer_tap_config(
@@ -225,7 +225,7 @@ class FlextMeltanoConfigBuilders:
             # Use flext-core text processing extensively - NO CUSTOM LOGIC
             safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
             safe_namespace = FlextUtilities.TextProcessor.safe_string(
-                namespace or safe_name
+                namespace or safe_name,
             )
             safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
 
@@ -240,12 +240,12 @@ class FlextMeltanoConfigBuilders:
 
             if executable:
                 plugin_config["executable"] = FlextUtilities.TextProcessor.safe_string(
-                    executable
+                    executable,
                 )
 
             if variant:
                 plugin_config["variant"] = FlextUtilities.TextProcessor.safe_string(
-                    variant
+                    variant,
                 )
 
             if config_defaults:
@@ -294,7 +294,7 @@ class FlextMeltanoConfigBuilders:
             return FlextResult[ConfigDict].ok(data=config)
         except Exception as e:
             return FlextResult[ConfigDict].fail(
-                f"Failed to create extractor config: {e}"
+                f"Failed to create extractor config: {e}",
             )
 
     def create_loader_config(
@@ -339,7 +339,7 @@ class FlextMeltanoConfigBuilders:
     # Meltano Configuration Methods
 
     def create_meltano_config(
-        self, project_id: str, project_name: str = ""
+        self, project_id: str, project_name: str = "",
     ) -> FlextResult[ConfigDict]:
         """Create complete Meltano configuration - ZERO DUPLICATION using flext-core.
 
@@ -407,7 +407,7 @@ class FlextMeltanoConfigBuilders:
             if safe_plugin_type not in valid_types:
                 return FlextResult[ConfigDict].fail(
                     f"Invalid plugin type: {safe_plugin_type}. "
-                    f"Valid types: {valid_types}"
+                    f"Valid types: {valid_types}",
                 )
 
             # Create copy to avoid mutation

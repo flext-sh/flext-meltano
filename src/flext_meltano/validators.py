@@ -42,7 +42,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_plugin_business_rules(
-        cls, config: object
+        cls, config: object,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific plugin business rules.
 
@@ -72,7 +72,7 @@ class FlextMeltanoValidators:
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                "Plugin config validation failed: config must be a dictionary"
+                "Plugin config validation failed: config must be a dictionary",
             )
 
         config_dict = config
@@ -127,7 +127,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_project_business_rules(
-        cls, config: object
+        cls, config: object,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific project business rules.
 
@@ -152,7 +152,7 @@ class FlextMeltanoValidators:
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                "Project config validation failed: config must be a dictionary"
+                "Project config validation failed: config must be a dictionary",
             )
 
         config_dict = config
@@ -160,7 +160,7 @@ class FlextMeltanoValidators:
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(BaseModel):
             version: int = Field(
-                ge=1, le=1, description="Meltano supports only version 1"
+                ge=1, le=1, description="Meltano supports only version 1",
             )
             project_id: str = Field(min_length=1, description="Project ID required")
 
@@ -221,7 +221,7 @@ class FlextMeltanoValidators:
         # Validate config is dict using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                "DBT config validation failed: config must be a dictionary"
+                "DBT config validation failed: config must be a dictionary",
             )
 
         config_dict = config
@@ -230,7 +230,7 @@ class FlextMeltanoValidators:
         class DbtBusinessRules(BaseModel):
             name: str = Field(min_length=1, description="DBT project name required")
             version: str = Field(
-                min_length=1, description="DBT project version required"
+                min_length=1, description="DBT project version required",
             )
 
             @field_validator("name")
@@ -318,7 +318,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_project_structure(
-        cls, project_path: Path
+        cls, project_path: Path,
     ) -> FlextResult[bool]:
         """Validate Meltano project structure with domain-specific business rules.
 
@@ -345,12 +345,12 @@ class FlextMeltanoValidators:
             # Check if path exists and is directory
             if not project_path.exists():
                 return FlextResult[bool].fail(
-                    f"Project path does not exist: {project_path}"
+                    f"Project path does not exist: {project_path}",
                 )
 
             if not project_path.is_dir():
                 return FlextResult[bool].fail(
-                    f"Project path is not a directory: {project_path}"
+                    f"Project path is not a directory: {project_path}",
                 )
 
             # Check for required Meltano files
@@ -359,7 +359,7 @@ class FlextMeltanoValidators:
                 return FlextResult[
                     bool
                 ].fail(
-                    f"meltano.yml not found in {project_path}"  # Test expectation compliance
+                    f"meltano.yml not found in {project_path}",  # Test expectation compliance
                 )
 
             # Check for transform directory (DBT) - optional for basic projects
@@ -377,7 +377,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_connection_config(
-        cls, config: FlextTypes.Core.Dict
+        cls, config: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Validate connection configuration with domain-specific business rules.
 
@@ -402,7 +402,7 @@ class FlextMeltanoValidators:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
                 return FlextResult[FlextTypes.Core.Dict].fail(
-                    "Connection configuration cannot be empty"
+                    "Connection configuration cannot be empty",
                 )
 
             return FlextResult[FlextTypes.Core.Dict].ok(data=config)

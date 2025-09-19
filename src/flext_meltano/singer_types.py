@@ -59,11 +59,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"String type creation failed: {e}"
+                f"String type creation failed: {e}",
             )
 
     def create_integer_type(
-        self, **kwargs: object
+        self, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create integer type with optional constraints."""
         try:
@@ -72,7 +72,7 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Integer type creation failed: {e}"
+                f"Integer type creation failed: {e}",
             )
 
     def create_number_type(self, **kwargs: object) -> FlextResult[FlextTypes.Core.Dict]:
@@ -83,11 +83,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Number type creation failed: {e}"
+                f"Number type creation failed: {e}",
             )
 
     def create_boolean_type(
-        self, **kwargs: object
+        self, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create boolean type."""
         try:
@@ -96,11 +96,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Boolean type creation failed: {e}"
+                f"Boolean type creation failed: {e}",
             )
 
     def create_datetime_type(
-        self, **kwargs: object
+        self, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create date-time type."""
         try:
@@ -109,11 +109,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"DateTime type creation failed: {e}"
+                f"DateTime type creation failed: {e}",
             )
 
     def create_array_type(
-        self, items: FlextTypes.Core.Dict | None = None, **kwargs: object
+        self, items: FlextTypes.Core.Dict | None = None, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create array type with optional item type."""
         try:
@@ -124,11 +124,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Array type creation failed: {e}"
+                f"Array type creation failed: {e}",
             )
 
     def create_object_type(
-        self, properties: FlextTypes.Core.Dict | None = None, **kwargs: object
+        self, properties: FlextTypes.Core.Dict | None = None, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create object type with optional properties."""
         try:
@@ -139,11 +139,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Object type creation failed: {e}"
+                f"Object type creation failed: {e}",
             )
 
     def validate_value(
-        self, value: object, type_def: FlextTypes.Core.Dict
+        self, value: object, type_def: FlextTypes.Core.Dict,
     ) -> FlextResult[object]:
         """Validate value against type definition using lookup table pattern.
 
@@ -175,12 +175,12 @@ class FlextSingerTypes:
                     # Handle tuple case like (int, float) for "number"
                     if not isinstance(value, expected_type_info):
                         return FlextResult[object].fail(
-                            f"Expected {type_display}, got {type(value).__name__}"
+                            f"Expected {type_display}, got {type(value).__name__}",
                         )
                 # Handle single type case
                 elif not isinstance(value, expected_type_info):
                     return FlextResult[object].fail(
-                        f"Expected {type_display}, got {type(value).__name__}"
+                        f"Expected {type_display}, got {type(value).__name__}",
                     )
 
             return FlextResult[object].ok(data=value)
@@ -227,11 +227,11 @@ class FlextSingerTypes:
                 return FlextResult[FlextTypes.Core.Dict].ok(data=message)
 
             return FlextResult[FlextTypes.Core.Dict].fail(
-                "Either properties (for schema) or stream_name (for SCHEMA message) must be provided"
+                "Either properties (for schema) or stream_name (for SCHEMA message) must be provided",
             )
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Schema definition creation failed: {e}"
+                f"Schema definition creation failed: {e}",
             )
 
     # ============================================================================
@@ -239,7 +239,7 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_record_message(
-        self, stream: str, record: FlextTypes.Core.Dict, **kwargs: object
+        self, stream: str, record: FlextTypes.Core.Dict, **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer RECORD message."""
         try:
@@ -257,7 +257,7 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=message)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Record message creation failed: {e}"
+                f"Record message creation failed: {e}",
             )
 
     def create_schema_message(
@@ -284,11 +284,11 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=message)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Schema message creation failed: {e}"
+                f"Schema message creation failed: {e}",
             )
 
     def create_state_message(
-        self, value: FlextTypes.Core.Dict
+        self, value: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer STATE message."""
         try:
@@ -296,7 +296,7 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=message)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"State message creation failed: {e}"
+                f"State message creation failed: {e}",
             )
 
     # ============================================================================
@@ -304,7 +304,7 @@ class FlextSingerTypes:
     # ============================================================================
 
     def create_properties_list(
-        self, properties: dict[str, FlextTypes.Core.Dict]
+        self, properties: dict[str, FlextTypes.Core.Dict],
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create and validate properties list."""
         try:
@@ -312,7 +312,7 @@ class FlextSingerTypes:
             for prop_name, prop_def in properties.items():
                 if not isinstance(prop_def, dict) or "type" not in prop_def:
                     return FlextResult[FlextTypes.Core.Dict].fail(
-                        f"Invalid property definition for {prop_name}"
+                        f"Invalid property definition for {prop_name}",
                     )
 
             # Convert nested dict to match return type using dict()
@@ -320,7 +320,7 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=properties_flat)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Properties list creation failed: {e}"
+                f"Properties list creation failed: {e}",
             )
 
     def add_property(
@@ -336,7 +336,7 @@ class FlextSingerTypes:
             return FlextResult[FlextTypes.Core.Dict].ok(data=updated_properties)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Property addition failed: {e}"
+                f"Property addition failed: {e}",
             )
 
     def convert_to_dict(self, data: object) -> FlextResult[FlextTypes.Core.Dict]:
@@ -344,19 +344,19 @@ class FlextSingerTypes:
         try:
             if isinstance(data, dict):
                 return FlextResult[FlextTypes.Core.Dict].ok(data=data)
-            if hasattr(data, "to_dict") and callable(getattr(data, "to_dict")):
-                result = getattr(data, "to_dict")()
+            if hasattr(data, "to_dict") and callable(data.to_dict):
+                result = data.to_dict()
                 if isinstance(result, dict):
                     return FlextResult[FlextTypes.Core.Dict].ok(data=result)
             elif hasattr(data, "__dict__"):
                 return FlextResult[FlextTypes.Core.Dict].ok(data=data.__dict__)
 
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Cannot convert {type(data)} to dict"
+                f"Cannot convert {type(data)} to dict",
             )
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Dictionary conversion failed: {e}"
+                f"Dictionary conversion failed: {e}",
             )
 
     # ============================================================================
@@ -371,7 +371,7 @@ class FlextSingerTypes:
         """Get type definition by name."""
         if type_name in self._type_registry:
             return FlextResult[FlextTypes.Core.Dict].ok(
-                self._type_registry[type_name].copy()
+                self._type_registry[type_name].copy(),
             )
         return FlextResult[FlextTypes.Core.Dict].fail(f"Type {type_name} not found")
 
@@ -382,7 +382,7 @@ class FlextSingerTypes:
             return FlextResult["FlextSingerTypes"].ok(data=cls())
         except Exception as e:
             return FlextResult["FlextSingerTypes"].fail(
-                f"Instance creation failed: {e}"
+                f"Instance creation failed: {e}",
             )
 
 
