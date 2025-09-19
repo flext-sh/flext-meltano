@@ -53,14 +53,16 @@ class FlextTargetAbstractions:
 
         target_type: str = Field(..., description="Target type identifier")
         connection_config: FlextTypes.Core.Dict = Field(
-            ..., description="Connection configuration dictionary",
+            ...,
+            description="Connection configuration dictionary",
         )
         batch_size: int = Field(
             default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
             description="Batch size for record processing",
         )
         max_batches: int = Field(
-            default=100, description="Maximum number of batches to process",
+            default=100,
+            description="Maximum number of batches to process",
         )
 
         @field_validator("target_type")
@@ -75,7 +77,8 @@ class FlextTargetAbstractions:
         @field_validator("connection_config")
         @classmethod
         def validate_connection_config(
-            cls, v: FlextTypes.Core.Dict,
+            cls,
+            v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             """Validate connection config using centralized validator."""
             # Use centralized validator to eliminate duplication
@@ -109,14 +112,18 @@ class FlextTargetAbstractions:
 
         stream_name: str = Field(..., description="Stream name identifier")
         stream_schema: FlextTypes.Core.Dict = Field(
-            ..., description="Stream schema definition", alias="schema",
+            ...,
+            description="Stream schema definition",
+            alias="schema",
         )
         status: str = Field(
-            default="initialized", description="Stream processing status",
+            default="initialized",
+            description="Stream processing status",
         )
         records_loaded: int = Field(default=0, description="Number of records loaded")
         batches_processed: int = Field(
-            default=0, description="Number of batches processed",
+            default=0,
+            description="Number of batches processed",
         )
         created_at: str = Field(..., description="Creation timestamp")
 
@@ -132,7 +139,8 @@ class FlextTargetAbstractions:
         @field_validator("stream_schema")
         @classmethod
         def validate_stream_schema(
-            cls, v: FlextTypes.Core.Dict,
+            cls,
+            v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             """Validate stream schema contains properties."""
             if "properties" not in v:
@@ -205,7 +213,9 @@ class FlextTargetAbstractions:
     # ============================================================================
 
     def create_flext_target(
-        self, config: FlextTypes.Core.Dict, adapter: FlextMeltanoAdapter | None = None,
+        self,
+        config: FlextTypes.Core.Dict,
+        adapter: FlextMeltanoAdapter | None = None,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create FlextTarget instance from configuration."""
         try:
@@ -257,7 +267,10 @@ class FlextTargetAbstractions:
     # ============================================================================
 
     def process_schema_message(
-        self, target: FlextTypes.Core.Dict, stream_name: str, schema: SchemaDict,
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
+        schema: SchemaDict,
     ) -> FlextResult[bool]:
         """Process Singer SCHEMA message with error handling."""
         try:
@@ -291,7 +304,8 @@ class FlextTargetAbstractions:
             self._stream_registry[stream_key] = stream_info_model
 
             self._logger.info(
-                "SCHEMA message processed successfully", stream_name=stream_name,
+                "SCHEMA message processed successfully",
+                stream_name=stream_name,
             )
             return FlextResult[bool].ok(data=True)
 
@@ -303,7 +317,10 @@ class FlextTargetAbstractions:
             return FlextResult[bool].fail(error_msg)
 
     def process_record_message(
-        self, target: FlextTypes.Core.Dict, stream_name: str, record: RecordDict,
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
+        record: RecordDict,
     ) -> FlextResult[bool]:
         """Process Singer RECORD message with error handling."""
         try:
@@ -343,7 +360,8 @@ class FlextTargetAbstractions:
             )
 
             self._logger.debug(
-                "RECORD message processed successfully", stream_name=stream_name,
+                "RECORD message processed successfully",
+                stream_name=stream_name,
             )
             return FlextResult[bool].ok(data=True)
 
@@ -355,7 +373,9 @@ class FlextTargetAbstractions:
             return FlextResult[bool].fail(error_msg)
 
     def process_state_message(
-        self, target: FlextTypes.Core.Dict, state: StateDict,
+        self,
+        target: FlextTypes.Core.Dict,
+        state: StateDict,
     ) -> FlextResult[bool]:
         """Process Singer STATE message with error handling."""
         try:
@@ -384,7 +404,10 @@ class FlextTargetAbstractions:
     # ============================================================================
 
     def load_record(
-        self, target: FlextTypes.Core.Dict, stream_name: str, record: RecordDict,
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
+        record: RecordDict,
     ) -> FlextResult[bool]:
         """Load single record to target system."""
         try:
@@ -397,12 +420,17 @@ class FlextTargetAbstractions:
             return FlextResult[bool].fail(error_msg)
 
     def load_batch(
-        self, target: FlextTypes.Core.Dict, stream_name: str, records: list[RecordDict],
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
+        records: list[RecordDict],
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Load batch of records to target system."""
         try:
             self._logger.info(
-                "Loading batch", stream_name=stream_name, record_count=len(records),
+                "Loading batch",
+                stream_name=stream_name,
+                record_count=len(records),
             )
 
             # Records validation is handled by business logic
@@ -455,7 +483,9 @@ class FlextTargetAbstractions:
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
     def finalize_stream(
-        self, target: FlextTypes.Core.Dict, stream_name: str,
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize stream loading (commit, cleanup, etc.)."""
         try:
@@ -486,7 +516,8 @@ class FlextTargetAbstractions:
                 }
 
                 self._logger.info(
-                    "Stream finalized successfully", stream_name=stream_name,
+                    "Stream finalized successfully",
+                    stream_name=stream_name,
                 )
                 return FlextResult[FlextTypes.Core.Dict].ok(data=finalization_result)
 
@@ -502,7 +533,8 @@ class FlextTargetAbstractions:
     # ============================================================================
 
     def finalize(
-        self, target: FlextTypes.Core.Dict,
+        self,
+        target: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize target operations with comprehensive reporting."""
         try:
@@ -522,7 +554,8 @@ class FlextTargetAbstractions:
                         stream_stats[stream_name] = {
                             "records_loaded": records_loaded,
                             "batches_processed": stream_info.get(
-                                "batches_processed", 0,
+                                "batches_processed",
+                                0,
                             ),
                             "status": stream_info.get("status", "unknown"),
                         }
@@ -570,7 +603,9 @@ class FlextTargetAbstractions:
     # ============================================================================
 
     def get_stream_by_name(
-        self, target: FlextTypes.Core.Dict, stream_name: str,
+        self,
+        target: FlextTypes.Core.Dict,
+        stream_name: str,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Get stream by name with error handling."""
         try:

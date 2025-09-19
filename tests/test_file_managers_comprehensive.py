@@ -127,7 +127,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         directories = ["config", "data", "logs", "extract", "load"]
 
         result = FlextMeltanoFileManagers.create_directory_structure(
-            base_path, directories,
+            base_path,
+            directories,
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -146,7 +147,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         empty_directories: list[str] = []
 
         result = FlextMeltanoFileManagers.create_directory_structure(
-            base_path, empty_directories,
+            base_path,
+            empty_directories,
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -160,7 +162,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         project_root = self.temp_dir / "complete_project"
 
         result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, project_name="test-complete-project",
+            project_root=project_root,
+            project_name="test-complete-project",
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -178,7 +181,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         project_root = self.temp_dir / "minimal_project"
 
         result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, project_name="test-minimal-project",
+            project_root=project_root,
+            project_name="test-minimal-project",
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -250,7 +254,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         project_root = self.temp_dir / "validation_project"
 
         setup_result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, project_name="validation-test",
+            project_root=project_root,
+            project_name="validation-test",
         )
         FlextTestsMatchers.assert_result_success(setup_result)
 
@@ -289,7 +294,8 @@ class TestFlextMeltanoFileManagersComprehensive:
             # Setup project structure
             project_root = temp_path / "integration_project"
             setup_result = FlextMeltanoFileManagers.setup_project_structure(
-                project_root=project_root, project_name="integration-workflow-test",
+                project_root=project_root,
+                project_name="integration-workflow-test",
             )
             FlextTestsMatchers.assert_result_success(setup_result)
 
@@ -354,7 +360,8 @@ class TestFlextMeltanoFileManagersComprehensive:
 
         # Test with empty config
         empty_config_result = FlextMeltanoFileManagers.save_yaml_config(
-            {}, self.temp_dir / "empty.yml",
+            {},
+            self.temp_dir / "empty.yml",
         )
         FlextTestsMatchers.assert_result_success(empty_config_result, True)
 

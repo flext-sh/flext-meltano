@@ -140,15 +140,18 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Core project configuration
     project_root: Path = Field(
-        default=Path(), description="Root directory of the Meltano project",
+        default=Path(),
+        description="Root directory of the Meltano project",
     )
 
     meltano_version: str = Field(
-        default=MELTANO_VERSION, description="Meltano version to use",
+        default=MELTANO_VERSION,
+        description="Meltano version to use",
     )
 
     singer_sdk_version: str = Field(
-        default=SINGER_SDK_VERSION, description="Singer SDK version to use",
+        default=SINGER_SDK_VERSION,
+        description="Singer SDK version to use",
     )
 
     dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
@@ -187,16 +190,19 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     run_mode: RunMode = Field(
-        default=RunMode.FULL, description="Execution mode for operations",
+        default=RunMode.FULL,
+        description="Execution mode for operations",
     )
 
     # Directory configuration
     config_dir: Path = Field(
-        default_factory=lambda: Path(".meltano"), description="Configuration directory",
+        default_factory=lambda: Path(".meltano"),
+        description="Configuration directory",
     )
 
     logs_dir: Path = Field(
-        default_factory=lambda: Path("logs"), description="Logs directory",
+        default_factory=lambda: Path("logs"),
+        description="Logs directory",
     )
 
     venv_dir: Path = Field(
@@ -220,7 +226,7 @@ class FlextMeltanoConfig(FlextConfig):
             Path: Resolved absolute path.
 
         Raises:
-            FlextValidationError: If path validation fails.
+            ValidationError: If path validation fails.
 
         """
         if isinstance(v, str):
@@ -255,12 +261,12 @@ class FlextMeltanoConfig(FlextConfig):
             str: Validated and stripped version string.
 
         Raises:
-            FlextValidationError: If version string is invalid.
+            ValidationError: If version string is invalid.
 
         """
         if not v or not isinstance(v, str):
             error_msg = "Version must be non-empty string"
-            raise FlextExceptions.FlextValidationError(error_msg)
+            raise FlextExceptions.ValidationError(error_msg)
         return v.strip()
 
     # ============================================================================
@@ -426,7 +432,8 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def create_from_project_root(
-        cls, project_root: str | Path,
+        cls,
+        project_root: str | Path,
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration from project root directory.
 
@@ -464,7 +471,9 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def create_for_environment(
-        cls, environment: str, **kwargs: object,
+        cls,
+        environment: str,
+        **kwargs: object,
     ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration for specific environment.
 
@@ -651,11 +660,9 @@ class FlextMeltanoConfig(FlextConfig):
                 if hasattr(self, key) and key in self.__class__.model_fields:
                     setattr(self, key, value)
 
-            # Track the override in metadata (initialize if not exists)
-            if not hasattr(self, "_metadata"):
-                self._metadata = {}
-            self._metadata["overrides_applied"] = "true"
-            self._metadata["override_count"] = str(len(overrides))
+            # Track the override in metadata
+            self.set_metadata("overrides_applied", "true")
+            self.set_metadata("override_count", str(len(overrides)))
 
             return FlextResult[None].ok(data=None)
 

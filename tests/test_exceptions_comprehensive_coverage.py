@@ -143,13 +143,15 @@ class TestExceptionUsagePatterns:
 
         # Test validation error
         with pytest.raises(
-            FlextMeltanoValidationError, match="Project path cannot be empty",
+            FlextMeltanoValidationError,
+            match="Project path cannot be empty",
         ):
             validate_meltano_project("")
 
         # Test configuration error
         with pytest.raises(
-            FlextMeltanoConfigurationError, match="Invalid project configuration",
+            FlextMeltanoConfigurationError,
+            match="Invalid project configuration",
         ):
             validate_meltano_project("/invalid")
 
@@ -170,7 +172,8 @@ class TestExceptionUsagePatterns:
 
         # Test connection error
         with pytest.raises(
-            FlextMeltanoConnectionError, match="Cannot connect to tap service",
+            FlextMeltanoConnectionError,
+            match="Cannot connect to tap service",
         ):
             connect_to_tap("unreachable-tap", {"api_key": "valid"})
 
@@ -187,7 +190,8 @@ class TestExceptionUsagePatterns:
 
         # Test timeout error
         with pytest.raises(
-            FlextMeltanoTimeoutError, match="Processing timeout must be positive",
+            FlextMeltanoTimeoutError,
+            match="Processing timeout must be positive",
         ):
             process_large_dataset(0)
 

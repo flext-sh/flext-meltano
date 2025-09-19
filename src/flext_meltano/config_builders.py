@@ -40,7 +40,9 @@ class FlextMeltanoConfigBuilders:
     # DBT Configuration Methods
 
     def create_dbt_config(
-        self, project_name: str, profile_name: str = "",
+        self,
+        project_name: str,
+        profile_name: str = "",
     ) -> FlextResult[ConfigDict]:
         """Create basic DBT configuration using FlextResult patterns.
 
@@ -339,7 +341,9 @@ class FlextMeltanoConfigBuilders:
     # Meltano Configuration Methods
 
     def create_meltano_config(
-        self, project_id: str, project_name: str = "",
+        self,
+        project_id: str,
+        project_name: str = "",
     ) -> FlextResult[ConfigDict]:
         """Create complete Meltano configuration - ZERO DUPLICATION using flext-core.
 

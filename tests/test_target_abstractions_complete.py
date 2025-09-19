@@ -49,10 +49,14 @@ class TestFlextTargetAbstractionsComplete:
             message="Target type should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.batch_size, expected=1000, message="Batch size should match",
+            actual=config.batch_size,
+            expected=1000,
+            message="Batch size should match",
         )
         self.test_assertions.assert_equals(
-            actual=config.max_batches, expected=50, message="Max batches should match",
+            actual=config.max_batches,
+            expected=50,
+            message="Max batches should match",
         )
 
     def test_flext_target_config_validation_errors(self) -> None:
@@ -60,10 +64,13 @@ class TestFlextTargetAbstractionsComplete:
         # Test invalid target_type using flext_tests error patterns
         try:
             FlextTargetAbstractions.FlextTargetConfig(
-                target_type="", connection_config={"test": "config"}, batch_size=100,
+                target_type="",
+                connection_config={"test": "config"},
+                batch_size=100,
             )
             self.test_assertions.assert_true(
-                condition=False, message="Should have raised ValidationError",
+                condition=False,
+                message="Should have raised ValidationError",
             )
         except ValidationError as e:
             self.test_assertions.assert_in(
@@ -122,7 +129,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Target abstractions should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(target_abs, "_logger"), message="Should have logger",
+            condition=hasattr(target_abs, "_logger"),
+            message="Should have logger",
         )
 
     def test_create_flext_target_config(self) -> None:
@@ -178,7 +186,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.success, message="Business rules validation should succeed",
+            condition=result.success,
+            message="Business rules validation should succeed",
         )
 
     # =========================================================================
@@ -227,7 +236,8 @@ class TestFlextTargetAbstractionsComplete:
         # Should handle gracefully
         if result.is_failure:
             self.test_assertions.assert_true(
-                condition=result.error is not None, message="Should have error message",
+                condition=result.error is not None,
+                message="Should have error message",
             )
 
     # =========================================================================
@@ -267,7 +277,9 @@ class TestFlextTargetAbstractionsComplete:
 
         # Test workflow: create config then create target
         config_result = self.target_abstractions.create_flext_target_config(
-            target_type="jsonl", connection_config=connection_config, batch_size=10,
+            target_type="jsonl",
+            connection_config=connection_config,
+            batch_size=10,
         )
 
         self.test_assertions.assert_true(
@@ -334,7 +346,8 @@ class TestFlextTargetAbstractionsComplete:
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         self.test_assertions.assert_true(
-            condition=target_result.is_success, message="Target creation should succeed",
+            condition=target_result.is_success,
+            message="Target creation should succeed",
         )
         target = target_result.unwrap()
 
@@ -343,7 +356,9 @@ class TestFlextTargetAbstractionsComplete:
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
-            target, "users", schema,
+            target,
+            "users",
+            schema,
         )
 
         self.test_assertions.assert_true(
@@ -358,7 +373,9 @@ class TestFlextTargetAbstractionsComplete:
         # Test successful record message processing (lines 295-341)
         record = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
-            target, "users", record,
+            target,
+            "users",
+            record,
         )
 
         self.test_assertions.assert_true(
@@ -382,7 +399,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=state_result.is_success, message="State processing should succeed",
+            condition=state_result.is_success,
+            message="State processing should succeed",
         )
 
     def test_message_processing_errors(self) -> None:
@@ -397,7 +415,9 @@ class TestFlextTargetAbstractionsComplete:
         # Test record processing without schema (lines 315-317)
         record = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
-            target, "unknown_stream", record,
+            target,
+            "unknown_stream",
+            record,
         )
 
         self.test_assertions.assert_true(
@@ -405,7 +425,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=record_result.is_failure, message="Should fail without schema",
+            condition=record_result.is_failure,
+            message="Should fail without schema",
         )
         self.test_assertions.assert_in(
             item="SCHEMA message required first",
@@ -427,10 +448,13 @@ class TestFlextTargetAbstractionsComplete:
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
-            target, "users", schema,
+            target,
+            "users",
+            schema,
         )
         self.test_assertions.assert_true(
-            condition=schema_result.is_success, message="Schema setup should succeed",
+            condition=schema_result.is_success,
+            message="Schema setup should succeed",
         )
 
         # Test load_record method (lines 376-383)
@@ -442,7 +466,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=load_result.is_success, message="Record loading should succeed",
+            condition=load_result.is_success,
+            message="Record loading should succeed",
         )
 
         # Test load_batch method (lines 389-441)
@@ -458,7 +483,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=batch_result.is_success, message="Batch loading should succeed",
+            condition=batch_result.is_success,
+            message="Batch loading should succeed",
         )
 
         batch_info = batch_result.unwrap()
@@ -495,17 +521,21 @@ class TestFlextTargetAbstractionsComplete:
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
-            target, "users", schema,
+            target,
+            "users",
+            schema,
         )
         self.test_assertions.assert_true(
-            condition=schema_result.is_success, message="Schema setup should succeed",
+            condition=schema_result.is_success,
+            message="Schema setup should succeed",
         )
 
         # Load some data
         records = [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
         batch_result = self.target_abstractions.load_batch(target, "users", records)
         self.test_assertions.assert_true(
-            condition=batch_result.is_success, message="Batch loading should succeed",
+            condition=batch_result.is_success,
+            message="Batch loading should succeed",
         )
 
         # Test target finalization (lines 492-554)
@@ -549,10 +579,13 @@ class TestFlextTargetAbstractionsComplete:
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
-            target, "users", schema,
+            target,
+            "users",
+            schema,
         )
         self.test_assertions.assert_true(
-            condition=schema_result.is_success, message="Schema setup should succeed",
+            condition=schema_result.is_success,
+            message="Schema setup should succeed",
         )
 
         # Test get_stream_by_name method (lines 564-577)
@@ -563,12 +596,14 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=stream_result.is_success, message="Should find existing stream",
+            condition=stream_result.is_success,
+            message="Should find existing stream",
         )
 
         # Test get_stream_by_name for non-existent stream (lines 570-572)
         missing_stream_result = self.target_abstractions.get_stream_by_name(
-            target, "non_existent",
+            target,
+            "non_existent",
         )
 
         self.test_assertions.assert_true(
@@ -584,10 +619,13 @@ class TestFlextTargetAbstractionsComplete:
         stream_names = self.target_abstractions.list_streams(target)
 
         self.test_assertions.assert_true(
-            condition=isinstance(stream_names, list), message="Should return list",
+            condition=isinstance(stream_names, list),
+            message="Should return list",
         )
         self.test_assertions.assert_in(
-            item="users", container=stream_names, message="Should contain users stream",
+            item="users",
+            container=stream_names,
+            message="Should contain users stream",
         )
 
         # Test get_target_type method (line 588)
@@ -603,7 +641,8 @@ class TestFlextTargetAbstractionsComplete:
         active_targets = self.target_abstractions.get_active_targets()
 
         self.test_assertions.assert_true(
-            condition=isinstance(active_targets, list), message="Should return list",
+            condition=isinstance(active_targets, list),
+            message="Should return list",
         )
         self.test_assertions.assert_true(
             condition=len(active_targets) >= 1,
@@ -614,7 +653,8 @@ class TestFlextTargetAbstractionsComplete:
         registered_streams = self.target_abstractions.get_registered_streams()
 
         self.test_assertions.assert_true(
-            condition=isinstance(registered_streams, list), message="Should return list",
+            condition=isinstance(registered_streams, list),
+            message="Should return list",
         )
 
     def test_utility_helper_methods(self) -> None:
@@ -628,7 +668,9 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return string timestamp",
         )
         self.test_assertions.assert_in(
-            item="T", container=timestamp, message="Should be ISO format timestamp",
+            item="T",
+            container=timestamp,
+            message="Should be ISO format timestamp",
         )
 
         # Test nested value retrieval using flext-core SOURCE OF TRUTH
@@ -688,7 +730,8 @@ class TestFlextTargetAbstractionsComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.is_failure, message="Should fail for non-existent stream",
+            condition=result.is_failure,
+            message="Should fail for non-existent stream",
         )
         self.test_assertions.assert_in(
             item="Stream non_existent_stream not found",

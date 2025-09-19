@@ -42,7 +42,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_plugin_business_rules(
-        cls, config: object,
+        cls,
+        config: object,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific plugin business rules.
 
@@ -127,7 +128,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_project_business_rules(
-        cls, config: object,
+        cls,
+        config: object,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific project business rules.
 
@@ -160,7 +162,9 @@ class FlextMeltanoValidators:
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(BaseModel):
             version: int = Field(
-                ge=1, le=1, description="Meltano supports only version 1",
+                ge=1,
+                le=1,
+                description="Meltano supports only version 1",
             )
             project_id: str = Field(min_length=1, description="Project ID required")
 
@@ -230,7 +234,8 @@ class FlextMeltanoValidators:
         class DbtBusinessRules(BaseModel):
             name: str = Field(min_length=1, description="DBT project name required")
             version: str = Field(
-                min_length=1, description="DBT project version required",
+                min_length=1,
+                description="DBT project version required",
             )
 
             @field_validator("name")
@@ -318,7 +323,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_meltano_project_structure(
-        cls, project_path: Path,
+        cls,
+        project_path: Path,
     ) -> FlextResult[bool]:
         """Validate Meltano project structure with domain-specific business rules.
 
@@ -377,7 +383,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_connection_config(
-        cls, config: FlextTypes.Core.Dict,
+        cls,
+        config: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Validate connection configuration with domain-specific business rules.
 

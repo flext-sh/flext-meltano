@@ -29,7 +29,9 @@ class TestFlextMeltanoConfigSingletonPattern:
         """Test get_global_instance with parameter overrides."""
         # Get instance with overrides
         config = FlextMeltanoConfig.get_global_instance(
-            project_root="/custom/project", environment="production", log_level="ERROR",
+            project_root="/custom/project",
+            environment="production",
+            log_level="ERROR",
         )
 
         # project_root gets resolved by validator
@@ -76,7 +78,9 @@ class TestFlextMeltanoConfigSingletonPattern:
 
         # Apply overrides
         result = config.apply_overrides(
-            environment="test", log_level="DEBUG", meltano_version="3.11.0",
+            environment="test",
+            log_level="DEBUG",
+            meltano_version="3.11.0",
         )
 
         assert result.is_success
@@ -132,7 +136,8 @@ class TestFlextMeltanoConfigSingletonPattern:
     def test_error_handling_invalid_environment(self) -> None:
         """Test error handling for invalid environment."""
         result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_env", project_root="/test",
+            environment="invalid_env",
+            project_root="/test",
         )
 
         assert result.is_failure

@@ -204,11 +204,13 @@ class TestExecutorsMissingCoverage:
 
         with mock.patch.object(Path, "exists", return_value=True):
             result = self.executor.execute_meltano_command(
-                project_root=temp_dir, command=["run", "tap-csv", "target-csv"],
+                project_root=temp_dir,
+                command=["run", "tap-csv", "target-csv"],
             )
 
             self.test_assertions.assert_true(
-                condition=result.is_success, message="Should succeed with valid project",
+                condition=result.is_success,
+                message="Should succeed with valid project",
             )
 
             if result.is_success:
@@ -232,7 +234,8 @@ class TestExecutorsMissingCoverage:
             result = self.executor.get_project_info(temp_dir)
 
             self.test_assertions.assert_true(
-                condition=result.is_success, message="Should succeed with valid project",
+                condition=result.is_success,
+                message="Should succeed with valid project",
             )
 
             if result.is_success:

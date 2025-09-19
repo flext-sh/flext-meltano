@@ -61,7 +61,8 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_create_meltano_config_dict_with_name(self) -> None:
         """Test create_meltano_config_dict with project name."""
         result = FlextMeltanoUtilities.create_meltano_config_dict(
-            "test-project", "Test Project",
+            "test-project",
+            "Test Project",
         )
 
         assert isinstance(result, FlextResult)
@@ -124,7 +125,10 @@ class TestFlextMeltanoUtilitiesRealMethods:
         """Test create_singer_tap_config method using ConfigBuilders (real implementation)."""
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_singer_tap_config(
-            "tap-csv", "tap_csv", "pipelinewise-tap-csv", "tap-csv",
+            "tap-csv",
+            "tap_csv",
+            "pipelinewise-tap-csv",
+            "tap-csv",
         )
 
         assert isinstance(result, FlextResult)
@@ -152,7 +156,8 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_create_dbt_config(self) -> None:
         """Test create_dbt_config method."""
         result = FlextMeltanoConfigBuilders().create_dbt_config(
-            "dbt-project", "analytics",
+            "dbt-project",
+            "analytics",
         )
 
         assert isinstance(result, FlextResult)
@@ -208,7 +213,10 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_load_yaml_config(self) -> None:
         """Test load_yaml_config method."""
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".yml", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".yml",
+            delete=False,
         ) as f:
             f.write("version: 1\nproject_id: test")
             config_path = Path(f.name)

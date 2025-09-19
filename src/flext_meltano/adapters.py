@@ -87,7 +87,9 @@ class FlextMeltanoAdapter:
     # =========================================================================
 
     def _create_temporary_meltano_project(
-        self, project_id: str | None = None, prefix: str = "flext_meltano_",
+        self,
+        project_id: str | None = None,
+        prefix: str = "flext_meltano_",
     ) -> FlextResult[Project]:
         """Create temporary Meltano project with standardized configuration.
 
@@ -168,7 +170,8 @@ class FlextMeltanoAdapter:
         return FlextResult[FlextMeltanoTypes.Bridge.VersionInfo].ok(data=version_info)
 
     def initialize_project(
-        self, project_root: Path,
+        self,
+        project_root: Path,
     ) -> FlextResult[FlextMeltanoTypes.DBT.Project]:
         """Initialize Meltano project using native API.
 
@@ -188,7 +191,8 @@ class FlextMeltanoAdapter:
         """
         try:
             self._logger.info(
-                "Initializing Meltano project", project_root=str(project_root),
+                "Initializing Meltano project",
+                project_root=str(project_root),
             )
 
             # Verify directory exists
@@ -237,7 +241,8 @@ class FlextMeltanoAdapter:
             return FlextResult[FlextMeltanoTypes.DBT.Project].fail(error_msg)
 
     def discover_plugins(
-        self, project: Project | None = None,
+        self,
+        project: Project | None = None,
     ) -> FlextResult[list[FlextTypes.Core.Headers]]:
         """Discover plugins from Meltano Hub using native API.
 
@@ -311,7 +316,9 @@ class FlextMeltanoAdapter:
             return FlextResult[list[FlextTypes.Core.Headers]].fail(error_msg)
 
     def create_project(
-        self, project_name: str, project_dir: Path,
+        self,
+        project_name: str,
+        project_dir: Path,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Create new Meltano project using manual file creation approach.
 
@@ -364,7 +371,10 @@ class FlextMeltanoAdapter:
             return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     def add_plugin(
-        self, project_dir: Path, plugin_type: str, plugin_name: str,
+        self,
+        project_dir: Path,
+        plugin_type: str,
+        plugin_name: str,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Add plugin to Meltano project using ProjectAddService native API.
 
@@ -474,7 +484,9 @@ class FlextMeltanoAdapter:
         return FlextMeltanoValidators.validate_meltano_project_structure(project_path)
 
     def get_plugin_info(
-        self, plugin_name: str, plugin_type: PluginType,
+        self,
+        plugin_name: str,
+        plugin_type: PluginType,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Get detailed information about specific plugin - UNIFIED METHOD.
 
@@ -492,7 +504,8 @@ class FlextMeltanoAdapter:
         try:
             # Use consolidated temporary project creation method
             project_result = self._create_temporary_meltano_project(
-                project_id="temp-info-project", prefix="flext_plugin_info_",
+                project_id="temp-info-project",
+                prefix="flext_plugin_info_",
             )
             if project_result.is_failure:
                 return FlextResult[FlextTypes.Core.Headers].fail(
@@ -530,7 +543,10 @@ class FlextMeltanoAdapter:
             return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     def execute_pipeline(
-        self, project: Project, extractor_name: str, loader_name: str,
+        self,
+        project: Project,
+        extractor_name: str,
+        loader_name: str,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Execute ELT pipeline using native Meltano APIs - UNIFIED METHOD.
 
