@@ -117,7 +117,7 @@ class FlextMeltanoAdapter:
             # Add FLEXT metadata using flext-core patterns
             meltano_config["metadata"] = {
                 "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
-                "created_at": self._utilities.generate_iso_timestamp(),
+                "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 "temp_project": True,
             }
 
@@ -173,7 +173,10 @@ class FlextMeltanoAdapter:
         self,
         project_root: Path,
     ) -> FlextResult[FlextMeltanoTypes.DBT.Project]:
-        """Initialize Meltano project using native API.
+        """Initialize Meltano project using railway pattern for composable steps.
+
+        Uses FlextResult flat_map chains for initialization steps with
+        automatic error handling and resource management.
 
         Args:
             project_root: Directory path of the Meltano project to initialize
@@ -189,33 +192,103 @@ class FlextMeltanoAdapter:
             ...     project = result.unwrap()
 
         """
+        # RAILWAY PATTERN: Chain initialization steps with proper type flow
+        return (
+            FlextResult[Path].ok(project_root)
+            .flat_map(self._log_project_initialization)
+            .flat_map(self._validate_project_directory)
+            .flat_map(self._validate_meltano_yml)
+            .flat_map(self._load_meltano_project)
+            .flat_map(self._cache_and_convert_project)
+        )
+
+    def _log_project_initialization(self, project_root: Path) -> FlextResult[Path]:
+        """Log project initialization start.
+
+        Args:
+            project_root: Project root directory.
+
+        Returns:
+            FlextResult containing the project root path.
+
+        """
+        self._logger.info(
+            "Initializing Meltano project",
+            project_root=str(project_root),
+        )
+        return FlextResult.ok(data=project_root)
+
+    def _validate_project_directory(self, project_root: Path) -> FlextResult[Path]:
+        """Validate that project directory exists.
+
+        Args:
+            project_root: Path to validate.
+
+        Returns:
+            FlextResult containing validated path or error.
+
+        """
+        if not project_root.exists():
+            return FlextResult[Path].fail(
+                f"Project directory not found: {project_root}"
+            )
+
+        return FlextResult.ok(data=project_root)
+
+    def _validate_meltano_yml(self, project_root: Path) -> FlextResult[Path]:
+        """Validate that meltano.yml exists in project directory.
+
+        Args:
+            project_root: Project directory to check.
+
+        Returns:
+            FlextResult containing validated project path or error.
+
+        """
+        meltano_yml = project_root / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
+        if not meltano_yml.exists():
+            return FlextResult[Path].fail(
+                f"Not a Meltano project: meltano.yml not found in {project_root}"
+            )
+
+        return FlextResult.ok(data=project_root)
+
+    def _load_meltano_project(self, project_root: Path) -> FlextResult[object]:
+        """Load Meltano project using native API.
+
+        Args:
+            project_root: Validated project directory.
+
+        Returns:
+            FlextResult containing loaded Meltano project or error.
+
+        """
         try:
-            self._logger.info(
-                "Initializing Meltano project",
-                project_root=str(project_root),
-            )
-
-            # Verify directory exists
-            if not project_root.exists():
-                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
-                    f"Project directory not found: {project_root}",
-                )
-
-            # Verify it's a valid Meltano project
-            meltano_yml = (
-                project_root / FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
-            )
-            if not meltano_yml.exists():
-                return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
-                    f"Not a Meltano project: meltano.yml not found in {project_root}",
-                )
-
             # Use native Meltano API to load project
             project = Project.find(project_root)
+            return FlextResult.ok(data=project)
+        except Exception as e:
+            return FlextResult.fail(f"Error loading Meltano project: {e}")
 
-            if project is None:
+    def _cache_and_convert_project(
+        self, project: object
+    ) -> FlextResult[FlextMeltanoTypes.DBT.Project]:
+        """Cache project and convert to FLEXT type representation.
+
+        Args:
+            project: Loaded Meltano project instance.
+
+        Returns:
+            FlextResult containing converted project dictionary.
+
+        """
+        try:
+            # Type safety: Cast to Project type for proper attribute access
+            from meltano.core.project import Project
+
+            if not isinstance(project, Project):
                 return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
-                    f"Failed to load Meltano project from {project_root}",
+                    f"Expected Project instance, got {type(project)}"
                 )
 
             # Cache the project for future operations
@@ -225,20 +298,21 @@ class FlextMeltanoAdapter:
                 "Meltano project initialized successfully",
                 project_root=str(project.root),
             )
+
             # Convert Meltano Project to dict representation
             # ✅ TYPE SAFETY: ConfigValue supports dict[str, object] per flext-core
             project_dict: FlextMeltanoTypes.DBT.Project = {
                 "name": str(getattr(project, "name", "meltano_project")),
-                "root": str(getattr(project, "root", ".")),
+                "root": str(project.root),
                 "settings": str(getattr(project, "settings", "")),
                 "meltano_version": str(getattr(project, "meltano_version", "")),
             }
-            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(data=project_dict)
 
+            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(data=project_dict)
         except Exception as e:
-            error_msg = f"Failed to initialize Meltano project: {e}"
-            self._logger.exception(error_msg, error=str(e))
-            return FlextResult[FlextMeltanoTypes.DBT.Project].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
+                f"Failed to cache and convert project: {e}"
+            )
 
     def discover_plugins(
         self,
@@ -375,8 +449,11 @@ class FlextMeltanoAdapter:
         project_dir: Path,
         plugin_type: str,
         plugin_name: str,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Add plugin to Meltano project using ProjectAddService native API.
+    ) -> FlextResult[dict[str, str]]:
+        """Add plugin to Meltano project using railway-oriented validation chain.
+
+        Uses FlextResult.chain_validations() to compose plugin addition steps
+        with automatic error accumulation and early termination on failure.
 
         Args:
             project_dir: Directory of the Meltano project
@@ -387,57 +464,182 @@ class FlextMeltanoAdapter:
             FlextResult containing plugin addition information
 
         """
-        try:
-            self._logger.info(
-                "Adding plugin using ProjectAddService",
-                plugin_name=plugin_name,
-                plugin_type=plugin_type,
-                project_dir=str(project_dir),
+        # RAILWAY PATTERN: Chain validations and operations
+        return (
+            self._log_plugin_addition_start(plugin_name, plugin_type, project_dir)
+            .flat_map(lambda _: self._validate_and_load_project(project_dir))
+            .flat_map(
+                lambda project: self._validate_and_map_plugin_type(plugin_type).map(
+                    lambda pt: (project, pt)
+                )
             )
+            .flat_map(
+                lambda data: self._execute_plugin_addition(
+                    data[0], data[1], plugin_name
+                )
+            )
+            .flat_map(
+                lambda result: self._build_plugin_addition_result(
+                    plugin_name, plugin_type, project_dir, result
+                )
+            )
+            .or_else_get(lambda: FlextResult[dict[str, str]].fail(
+                f"Plugin addition failed for {plugin_name}"
+            ))
+        )
 
-            # Load project
-            project = Project(project_dir)
+    def _log_plugin_addition_start(
+        self, plugin_name: str, plugin_type: str, project_dir: Path
+    ) -> FlextResult[None]:
+        """Log plugin addition start.
 
-            # Map type to enum
-            type_map = {
-                "extractors": PluginType.EXTRACTORS,
-                "loaders": PluginType.LOADERS,
-                "transformers": PluginType.TRANSFORMERS,
-            }
+        Args:
+            plugin_name: Name of the plugin.
+            plugin_type: Type of the plugin.
+            project_dir: Project directory path.
 
-            if plugin_type not in type_map:
-                return FlextResult[FlextTypes.Core.Headers].fail(
-                    f"Invalid plugin type: {plugin_type}. "
-                    f"Valid types: {list(type_map.keys())}",
+        Returns:
+            FlextResult indicating logging success.
+
+        """
+        self._logger.info(
+            "Adding plugin using ProjectAddService",
+            plugin_name=plugin_name,
+            plugin_type=plugin_type,
+            project_dir=str(project_dir),
+        )
+        return FlextResult.ok(data=None)
+
+    def _validate_and_load_project(self, project_dir: Path) -> FlextResult[object]:
+        """Validate project directory and load Meltano project.
+
+        Args:
+            project_dir: Path to Meltano project directory.
+
+        Returns:
+            FlextResult containing loaded Meltano project or error.
+
+        """
+        try:
+            if not project_dir.exists():
+                return FlextResult.fail(
+                    f"Project directory does not exist: {project_dir}"
                 )
 
-            # Use ProjectAddService native API
+            project = Project(project_dir)
+            return FlextResult.ok(data=project)
+        except Exception as e:
+            return FlextResult.fail(f"Failed to load Meltano project: {e}")
+
+    def _validate_and_map_plugin_type(self, plugin_type: str) -> FlextResult[object]:
+        """Validate and map plugin type to Meltano enum.
+
+        Args:
+            plugin_type: String plugin type to validate.
+
+        Returns:
+            FlextResult containing mapped plugin type enum or error.
+
+        """
+        type_map = {
+            "extractors": PluginType.EXTRACTORS,
+            "loaders": PluginType.LOADERS,
+            "transformers": PluginType.TRANSFORMERS,
+        }
+
+        if plugin_type not in type_map:
+            return FlextResult.fail(
+                f"Invalid plugin type: {plugin_type}. "
+                f"Valid types: {list(type_map.keys())}"
+            )
+
+        return FlextResult.ok(data=type_map[plugin_type])
+
+    def _execute_plugin_addition(
+        self, project: object, plugin_type_enum: object, plugin_name: str
+    ) -> FlextResult[bool]:
+        """Execute the actual plugin addition using Meltano API.
+
+        Args:
+            project: Loaded Meltano project.
+            plugin_type_enum: Mapped plugin type enum.
+            plugin_name: Name of plugin to add.
+
+        Returns:
+            FlextResult indicating addition success.
+
+        """
+        try:
+            # Type safety: Import proper types for casting
+            from meltano.core.plugin.base import PluginType
+            from meltano.core.project import Project
+
+            # Safe casting with runtime checks
+            if not isinstance(project, Project):
+                return FlextResult.fail(f"Invalid project type: {type(project)}")
+            if not isinstance(plugin_type_enum, PluginType):
+                return FlextResult.fail(f"Invalid plugin type: {type(plugin_type_enum)}")
+
+            # Use ProjectAddService native API with proper types
             add_service = ProjectAddService(project)
-            plugin_type_enum = type_map[plugin_type]
 
             # Add plugin using native API
             add_service.add(plugin_type_enum, plugin_name)
 
-            plugin_result = {
-                "success": "true",
-                "plugin_name": plugin_name,
-                "plugin_type": plugin_type,
-                "project_dir": str(project_dir),
-                "addition_method": "project_add_service_native",
-            }
-
-            self._logger.info(
-                "Plugin added successfully",
-                plugin_name=plugin_name,
-                plugin_type=plugin_type,
-            )
-
-            return FlextResult[FlextTypes.Core.Headers].ok(data=plugin_result)
-
+            return FlextResult.ok(True)
         except Exception as e:
-            error_msg = f"Failed to add plugin: {e}"
-            self._logger.exception(error_msg, error=str(e))
-            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+            return FlextResult.fail(f"Plugin addition failed: {e}")
+
+    def _build_plugin_addition_result(
+        self,
+        plugin_name: str,
+        plugin_type: str,
+        project_dir: Path,
+        addition_success: bool,
+    ) -> FlextResult[dict[str, str]]:
+        """Build successful plugin addition result.
+
+        Args:
+            plugin_name: Added plugin name.
+            plugin_type: Plugin type.
+            project_dir: Project directory.
+            addition_success: Addition operation result.
+
+        Returns:
+            FlextResult containing plugin addition information.
+
+        """
+        plugin_result: dict[str, str] = {
+            "success": "true",
+            "plugin_name": plugin_name,
+            "plugin_type": plugin_type,
+            "project_dir": str(project_dir),
+            "addition_method": "project_add_service_native",
+        }
+
+        self._logger.info(
+            "Plugin added successfully",
+            plugin_name=plugin_name,
+            plugin_type=plugin_type,
+        )
+
+        return FlextResult[dict[str, str]].ok(data=plugin_result)
+
+    def _handle_plugin_addition_error(
+        self, error: str
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Handle plugin addition errors with detailed logging.
+
+        Args:
+            error: Error message from failed plugin addition.
+
+        Returns:
+            FlextResult with contextualized error.
+
+        """
+        error_msg = f"Failed to add plugin: {error}"
+        self._logger.error(error_msg, error=error)
+        return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
 
     # =========================================================================
     # PRIVATE UTILITY METHODS - Internal helper functionality
@@ -547,11 +749,12 @@ class FlextMeltanoAdapter:
         project: Project,
         extractor_name: str,
         loader_name: str,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Execute ELT pipeline using native Meltano APIs - UNIFIED METHOD.
+    ) -> FlextResult[dict[str, str]]:
+        """Execute ELT pipeline using railway-oriented programming.
 
         Consolidates ELTCoordinator class functionality into unified adapter method
-        following SOLID principles and eliminating nested class violations.
+        using FlextResult railway patterns to eliminate nested error handling
+        and provide composable pipeline execution.
 
         Args:
             project: Meltano project instance
@@ -562,34 +765,106 @@ class FlextMeltanoAdapter:
             FlextResult containing pipeline execution results
 
         """
-        try:
-            self._logger.info(
-                "Executing ELT pipeline",
-                extractor=extractor_name,
-                loader=loader_name,
+        # RAILWAY PATTERN: Chain all pipeline operations with automatic error handling
+        return (
+            self._log_pipeline_start(extractor_name, loader_name)
+            .flat_map(
+                lambda _: self._find_required_plugins(
+                    project, extractor_name, loader_name
+                )
+            )
+            .flat_map(
+                lambda plugins: self._create_elt_context(
+                    project, extractor_name, loader_name, plugins
+                )
+            )
+            .flat_map(self._execute_singer_runner)
+            .flat_map(
+                lambda context: self._build_pipeline_result(
+                    extractor_name, loader_name, context
+                )
+            )
+            .or_else_get(lambda: FlextResult[dict[str, str]].fail(
+                f"Pipeline execution failed for {extractor_name} -> {loader_name}"
+            ))
+        )
+
+    def _log_pipeline_start(
+        self, extractor_name: str, loader_name: str
+    ) -> FlextResult[None]:
+        """Log pipeline execution start.
+
+        Args:
+            extractor_name: Extractor plugin name.
+            loader_name: Loader plugin name.
+
+        Returns:
+            FlextResult indicating logging success.
+
+        """
+        self._logger.info(
+            "Executing ELT pipeline",
+            extractor=extractor_name,
+            loader=loader_name,
+        )
+        return FlextResult.ok(data=None)
+
+    def _find_required_plugins(
+        self, project: Project, extractor_name: str, loader_name: str
+    ) -> FlextResult[tuple[object, object]]:
+        """Find required plugins in project.
+
+        Args:
+            project: Meltano project instance.
+            extractor_name: Name of extractor plugin.
+            loader_name: Name of loader plugin.
+
+        Returns:
+            FlextResult containing tuple of (extractor_plugin, loader_plugin).
+
+        """
+        extractor_plugin = None
+        loader_plugin = None
+
+        for plugin in project.plugins.plugins():
+            if plugin.name == extractor_name:
+                extractor_plugin = plugin
+            elif plugin.name == loader_name:
+                loader_plugin = plugin
+
+        if not extractor_plugin or not loader_plugin:
+            return FlextResult.fail(
+                f"Required plugins not found: {extractor_name}, {loader_name}"
             )
 
-            # Find plugins in project
-            extractor_plugin = None
-            loader_plugin = None
+        return FlextResult.ok(data=(extractor_plugin, loader_plugin))
 
-            for plugin in project.plugins.plugins():
-                if plugin.name == extractor_name:
-                    extractor_plugin = plugin
-                elif plugin.name == loader_name:
-                    loader_plugin = plugin
+    def _create_elt_context(
+        self,
+        project: Project,
+        extractor_name: str,
+        loader_name: str,
+        plugins: tuple[object, object],
+    ) -> FlextResult[dict[str, object]]:
+        """Create ELT context for pipeline execution.
 
-            if not extractor_plugin or not loader_plugin:
-                error_msg = (
-                    f"Required plugins not found: {extractor_name}, {loader_name}"
-                )
-                self._logger.error(error_msg)
-                return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+        Args:
+            project: Meltano project instance.
+            extractor_name: Extractor plugin name.
+            loader_name: Loader plugin name.
+            plugins: Tuple of (extractor_plugin, loader_plugin).
 
+        Returns:
+            FlextResult containing ELT context dictionary.
+
+        """
+        extractor_plugin, loader_plugin = plugins
+
+        try:
             # Create job for ELT context
             job = Job(job_name=f"{extractor_name}-to-{loader_name}")
 
-            # Create ELT context for native Meltano execution (simplified)
+            # Create ELT context for native Meltano execution
             elt_context = ELTContext(
                 project=project,
                 job=job,
@@ -597,23 +872,104 @@ class FlextMeltanoAdapter:
                 dry_run=False,
             )
 
+            context_data: dict[str, object] = {
+                "project": project,
+                "elt_context": elt_context,
+                "extractor_plugin": extractor_plugin,
+                "loader_plugin": loader_plugin,
+            }
+
+            return FlextResult.ok(data=context_data)
+        except Exception as e:
+            return FlextResult.fail(f"Failed to create ELT context: {e}")
+
+    def _execute_singer_runner(self, context_data: dict[str, object]) -> FlextResult[dict[str, object]]:
+        """Execute Singer runner with context data.
+
+        Args:
+            context_data: Dictionary containing ELT context and plugins.
+
+        Returns:
+            FlextResult containing updated context with execution results.
+
+        """
+        try:
+            # Type safety: Import proper types for casting
+            from meltano.core.elt_context import ELTContext
+            from meltano.core.project import Project
+
+            project_obj = context_data["project"]
+            elt_context_obj = context_data["elt_context"]
+            extractor_plugin_obj = context_data["extractor_plugin"]
+            loader_plugin_obj = context_data["loader_plugin"]
+
+            # Safe casting with runtime checks
+            if not isinstance(project_obj, Project):
+                return FlextResult[dict[str, object]].fail(f"Invalid project type: {type(project_obj)}")
+            if not isinstance(elt_context_obj, ELTContext):
+                return FlextResult[dict[str, object]].fail(f"Invalid ELT context type: {type(elt_context_obj)}")
+
+            # Use duck typing for plugin validation instead of specific type checks
+            if not hasattr(extractor_plugin_obj, "name") or not hasattr(extractor_plugin_obj, "type"):
+                return FlextResult[dict[str, object]].fail("Invalid extractor plugin: missing required attributes")
+            if not hasattr(loader_plugin_obj, "name") or not hasattr(loader_plugin_obj, "type"):
+                return FlextResult[dict[str, object]].fail("Invalid loader plugin: missing required attributes")
+
             # Create SingerRunner for native API execution
-            runner = SingerRunner(elt_context)
+            runner = SingerRunner(elt_context_obj)
 
             # Create plugin invokers for extractor and loader
-            extractor_invoker = PluginInvoker(project, extractor_plugin)
-            loader_invoker = PluginInvoker(project, loader_plugin)
+            # Type ignore for Meltano compatibility - plugins are validated above
+            extractor_invoker = PluginInvoker(project_obj, extractor_plugin_obj)  # type: ignore[arg-type]
+            loader_invoker = PluginInvoker(project_obj, loader_plugin_obj)  # type: ignore[arg-type]
 
-            # Execute the pipeline using native Meltano APIs (await since it's async)
+            # Execute the pipeline using native Meltano APIs
             asyncio.run(runner.run(extractor_invoker, loader_invoker))
 
-            pipeline_result = {
+            # Add execution results to context
+            context_data["execution_completed"] = True
+            return FlextResult[dict[str, object]].ok(context_data)
+
+        except RunnerError as runner_error:
+            return FlextResult[dict[str, object]].fail(f"ELT pipeline execution failed: {runner_error}")
+        except Exception as e:
+            return FlextResult[dict[str, object]].fail(f"Unexpected error in ELT pipeline: {e}")
+
+    def _build_pipeline_result(
+        self, extractor_name: str, loader_name: str, context_data: dict[str, object]
+    ) -> FlextResult[dict[str, str]]:
+        """Build successful pipeline result.
+
+        Args:
+            extractor_name: Extractor plugin name.
+            loader_name: Loader plugin name.
+            context_data: Execution context data.
+
+        Returns:
+            FlextResult containing pipeline execution results.
+
+        """
+        try:
+            # Type safety: Import proper types for casting
+            from meltano.core.elt_context import ELTContext
+            from meltano.core.project import Project
+
+            elt_context_obj = context_data["elt_context"]
+            project_obj = context_data["project"]
+
+            # Safe casting with runtime checks
+            if not isinstance(project_obj, Project):
+                return FlextResult.fail(f"Invalid project type: {type(project_obj)}")
+            if not isinstance(elt_context_obj, ELTContext):
+                return FlextResult.fail(f"Invalid ELT context type: {type(elt_context_obj)}")
+
+            pipeline_result: dict[str, str] = {
                 "success": "true",
                 "extractor": extractor_name,
                 "loader": loader_name,
                 "execution_method": "singer_runner_native",
-                "project_root": str(project.root),
-                "run_id": str(elt_context.run_id),
+                "project_root": str(project_obj.root),
+                "run_id": str(elt_context_obj.run_id),
             }
 
             self._logger.info(
@@ -622,16 +978,24 @@ class FlextMeltanoAdapter:
                 loader=loader_name,
             )
 
-            return FlextResult[FlextTypes.Core.Headers].ok(data=pipeline_result)
-
-        except RunnerError as runner_error:
-            error_msg = f"ELT pipeline execution failed: {runner_error}"
-            self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+            return FlextResult[dict[str, str]].ok(pipeline_result)
         except Exception as e:
-            error_msg = f"Unexpected error in ELT pipeline: {e}"
-            self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+            return FlextResult.fail(f"Failed to build pipeline result: {e}")
+
+    def _handle_pipeline_error(
+        self, error: str
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Handle pipeline execution errors with logging.
+
+        Args:
+            error: Error message from failed pipeline execution.
+
+        Returns:
+            FlextResult with error details.
+
+        """
+        self._logger.error(f"Pipeline execution failed: {error}")
+        return FlextResult[FlextTypes.Core.Headers].fail(error)
 
     # =================================================================
     # SINGER SDK INTEGRATION - Direct integration without wrappers

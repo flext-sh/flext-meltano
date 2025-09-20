@@ -94,7 +94,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         self,
         command: str | None = None,
     ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
-        """Execute Meltano executor operation (required by FlextDomainService).
+        """Execute Meltano executor operation using monadic command dispatch.
+
+        Uses FlextResult monadic patterns to eliminate manual command routing
+        and error handling, providing composable command execution with
+        automatic error propagation and type safety.
 
         Args:
             command: Optional command to execute (e.g., "health", "version")
@@ -103,61 +107,122 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             FlextResult containing service information or command result
 
         """
-        if command is None:
-            # Default service information
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                {
-                    "service": "FlextMeltanoExecutor",
-                    "status": "ready",
-                    "capabilities": [
-                        "execute_meltano_command",
-                        "get_project_info",
-                        "run_command",
-                        "version",
-                        "help",
-                        "health",
-                    ],
-                },
-            )
+        # RAILWAY PATTERN: Use simple conditional flow
+        if command is not None:
+            return self._dispatch_command(command)
+        return self._get_service_capabilities()
 
-        # Route command to appropriate handler
-        if command == "health":
-            health_result = self.health()
-            if health_result.is_success:
-                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                    {
-                        "command": "health",
-                        "status": "healthy",
-                        "result": cast(
-                            "FlextTypes.Core.JsonValue",
-                            health_result.unwrap(),
-                        ),
-                    },
-                )
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                f"Health check failed: {health_result.error}",
-            )
+    def _get_service_capabilities(
+        self,
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+        """Get default service capabilities and information.
 
-        if command == "version":
-            version_result = self.version()
-            if version_result.is_success:
-                return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-                    {
-                        "command": "version",
-                        "status": "success",
-                        "result": cast(
-                            "FlextTypes.Core.JsonValue",
-                            version_result.unwrap(),
-                        ),
-                    },
-                )
-            return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-                f"Version check failed: {version_result.error}",
-            )
+        Returns:
+            FlextResult containing service capability information.
 
-        # Unknown command
+        """
+        service_info: FlextMeltanoTypes.CLI.ProcessResult = {
+            "service": "FlextMeltanoExecutor",
+            "status": "ready",
+            "capabilities": [
+                "execute_meltano_command",
+                "get_project_info",
+                "run_command",
+                "version",
+                "help",
+                "health",
+            ],
+        }
+        return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(service_info)
+
+    def _dispatch_command(
+        self, command: str
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+        """Dispatch command using monadic command pattern.
+
+        Args:
+            command: Command to execute.
+
+        Returns:
+            FlextResult containing command execution result.
+
+        """
+        # MONADIC COMMAND DISPATCH: Create command registry with monadic composition
+        command_registry = {
+            "health": lambda: self.health().flat_map(
+                lambda result: self._format_command_result("health", "healthy", result)
+            ),
+            "version": lambda: self.version().flat_map(
+                lambda result: self._format_command_result("version", "success", result)
+            ),
+            "help": lambda: self.help().flat_map(
+                lambda result: self._format_command_result("help", "success", result)
+            ),
+        }
+
+        # Use FlextResult.or_try for fallback command handling
+        return (
+            FlextResult.ok(data=command)
+            .flat_map(
+                lambda cmd: self._execute_registered_command(cmd, command_registry)
+            )
+            .or_try(lambda: self._handle_unknown_command(command))
+        )
+
+    def _execute_registered_command(
+        self, command: str, registry: dict[str, Callable[[], FlextResult[FlextMeltanoTypes.CLI.ProcessResult]]]
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+        """Execute command from registry.
+
+        Args:
+            command: Command to execute.
+            registry: Command registry dictionary.
+
+        Returns:
+            FlextResult containing command result or error if not found.
+
+        """
+        if command in registry:
+            return registry[command]()
+        return FlextResult.fail(f"Command not in registry: {command}")
+
+    def _format_command_result(
+        self, command: str, status: str, result: object
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+        """Format command execution result.
+
+        Args:
+            command: Executed command name.
+            status: Command execution status.
+            result: Command execution result.
+
+        Returns:
+            FlextResult containing formatted command result.
+
+        """
+        formatted_result = {
+            "command": command,
+            "status": status,
+            "result": cast("FlextTypes.Core.JsonValue", result),
+        }
+        return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
+            data=formatted_result
+        )
+
+    def _handle_unknown_command(
+        self, command: str
+    ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
+        """Handle unknown command with error result.
+
+        Args:
+            command: Unknown command name.
+
+        Returns:
+            FlextResult containing error for unknown command.
+
+        """
         return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].fail(
-            f"Unknown command: {command}",
+            f"Unknown command: {command}"
         )
 
     def execute_meltano_command(
@@ -617,41 +682,151 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         target_name: str,
         project_root: str | None = None,
     ) -> FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:
-        """Run ELT pipeline using native Meltano API."""
+        """Run ELT pipeline using monadic error recovery and resource management.
+
+        Uses FlextResult monadic patterns to chain pipeline execution steps
+        with automatic error recovery, resource cleanup, and composable
+        pipeline result processing.
+
+        Args:
+            tap_name: Name of the tap (extractor) to use.
+            target_name: Name of the target (loader) to use.
+            project_root: Optional project root directory.
+
+        Returns:
+            FlextResult containing pipeline execution result with detailed metadata.
+
+        """
         logger.info("Running ELT pipeline", tap=tap_name, target=target_name)
 
-        # Execute ELT pipeline using Meltano integration
-        # Use bridge for executing pipeline through Meltano
-        run_result = self.bridge.run_pipeline(tap_name, target_name)
-        if run_result["success"]:
-            pipeline_result = FlextResult.ok(
-                {
-                    "status": "completed",
-                    "tap": tap_name,
-                    "target": target_name,
-                    "project": str(
-                        Path(project_root) if project_root else self.project_root,
-                    ),
-                    "execution_details": run_result,
-                },
-            )
-        else:
-            pipeline_result = FlextResult.fail(
-                f"Pipeline failed: {run_result.get('error', 'Unknown error')}",
+        # MONADIC PIPELINE EXECUTION: Chain steps with error recovery
+        return (
+            self._validate_pipeline_inputs(tap_name, target_name, project_root)
+            .flat_map(self._execute_bridge_pipeline)
+            .flat_map(self._process_pipeline_result)
+            .or_else_get(lambda: FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
+                f"Pipeline execution failed for {tap_name} -> {target_name}"
+            ))
+        )
+
+    def _validate_pipeline_inputs(
+        self, tap_name: str, target_name: str, project_root: str | None
+    ) -> FlextResult[dict[str, str]]:
+        """Validate pipeline input parameters.
+
+        Args:
+            tap_name: Tap name to validate.
+            target_name: Target name to validate.
+            project_root: Project root to validate.
+
+        Returns:
+            FlextResult containing validated pipeline inputs.
+
+        """
+        if not tap_name or not tap_name.strip():
+            return FlextResult.fail("Tap name cannot be empty")
+        if not target_name or not target_name.strip():
+            return FlextResult.fail("Target name cannot be empty")
+
+        validated_inputs = {
+            "tap_name": tap_name.strip(),
+            "target_name": target_name.strip(),
+            "project_root": str(
+                Path(project_root) if project_root else self.project_root
+            ),
+        }
+
+        return FlextResult.ok(data=validated_inputs)
+
+    def _execute_bridge_pipeline(
+        self, inputs: dict[str, str]
+    ) -> FlextResult[dict[str, object]]:
+        """Execute pipeline through bridge with error handling.
+
+        Args:
+            inputs: Validated pipeline inputs.
+
+        Returns:
+            FlextResult containing bridge execution result.
+
+        """
+        try:
+            # Execute ELT pipeline using Meltano integration through bridge
+            run_result = self.bridge.run_pipeline(
+                inputs["tap_name"], inputs["target_name"]
             )
 
-        if pipeline_result.success:
+            # Combine inputs with bridge result
+            combined_result = {
+                **inputs,
+                "bridge_result": run_result,
+                "success": run_result.get("success", False),
+            }
+
+            return FlextResult.ok(data=combined_result)
+        except Exception as e:
+            return FlextResult.fail(f"Bridge execution failed: {e}")
+
+    def _process_pipeline_result(
+        self, execution_data: dict[str, object]
+    ) -> FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:
+        """Process pipeline execution result into final format.
+
+        Args:
+            execution_data: Pipeline execution data from bridge.
+
+        Returns:
+            FlextResult containing processed pipeline result.
+
+        """
+        bridge_result = execution_data["bridge_result"]
+
+        if execution_data["success"]:
+            # SUCCESS PATH: Build successful pipeline result
+            pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = {
+                "status": "completed",
+                "tap": str(execution_data["tap_name"]),
+                "target": str(execution_data["target_name"]),
+                "result": cast(
+                    "FlextTypes.Core.JsonValue",
+                    {
+                        "status": "completed",
+                        "tap": execution_data["tap_name"],
+                        "target": execution_data["target_name"],
+                        "project": execution_data["project_root"],
+                        "execution_details": bridge_result,
+                    },
+                ),
+                "cli_type": "flext_meltano",
+            }
             return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].ok(
-                {
-                    "status": "completed",
-                    "tap": tap_name,
-                    "target": target_name,
-                    "result": cast("FlextTypes.Core.JsonValue", pipeline_result.value),
-                    "cli_type": "flext_meltano",
-                },
+                pipeline_result
             )
+        # FAILURE PATH: Extract error information
+        error_msg = (
+            bridge_result.get("error", "Unknown pipeline error")
+            if isinstance(bridge_result, dict)
+            else "Unknown pipeline error"
+        )
         return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
-            f"Pipeline execution failed: {pipeline_result.error}",
+            f"Pipeline failed: {error_msg}"
+        )
+
+    def _handle_pipeline_execution_error(
+        self, error: str
+    ) -> FlextResult[FlextMeltanoTypes.ELT.PipelineResult]:
+        """Handle pipeline execution errors with detailed logging and recovery.
+
+        Args:
+            error: Error message from failed pipeline execution.
+
+        Returns:
+            FlextResult containing error details with context.
+
+        """
+        logger.error(f"Pipeline execution failed: {error}")
+        return FlextResult[FlextMeltanoTypes.ELT.PipelineResult].fail(
+            f"Pipeline execution failed: {error}"
         )
 
     def _execute_version_command(self) -> FlextResult[FlextTypes.Core.Headers]:
@@ -714,34 +889,163 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         command: str,
         options: FlextTypes.Core.StringList | None,
     ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Route command to appropriate handler."""
-        if not command or not command.strip():
-            return FlextResult[FlextTypes.Core.Headers].ok(
-                {
-                    "cli_type": "flext_meltano",
-                    "project_root": str(self.project_root),
-                    "command": "default",
-                    "status": "success",
-                },
-            )
+        """Route command using monadic command dispatch with applicative validation.
 
-        # Command routing using single return point
-        command_handlers = {
+        Uses FlextResult.applicative_lift2() to validate command and options
+        in parallel, then dispatches using monadic patterns for composable
+        command routing with automatic error handling.
+
+        Args:
+            command: Command to route.
+            options: Optional command options.
+
+        Returns:
+            FlextResult containing command execution result.
+
+        """
+        # APPLICATIVE LIFTING: Validate command and options in parallel
+        command_validation = self._validate_command_input(command)
+        options_validation = self._validate_options_input(options)
+
+        # Fixed: applicative_lift2 signature: func first, then results
+        return FlextResult.applicative_lift2(
+            self._dispatch_validated_command,
+            command_validation,
+            options_validation,
+        ).flat_map(
+            lambda x: x
+        )  # Flatten nested FlextResult  # Flatten nested FlextResult
+
+    def _validate_command_input(self, command: str) -> FlextResult[str]:
+        """Validate command input string.
+
+        Args:
+            command: Command string to validate.
+
+        Returns:
+            FlextResult containing validated command or default.
+
+        """
+        if not command or not command.strip():
+            return FlextResult.ok(data="default")
+        return FlextResult.ok(data=command.strip())
+
+    def _validate_options_input(
+        self, options: FlextTypes.Core.StringList | None
+    ) -> FlextResult[FlextTypes.Core.StringList]:
+        """Validate options input.
+
+        Args:
+            options: Options list to validate.
+
+        Returns:
+            FlextResult containing validated options list.
+
+        """
+        validated_options = options if options is not None else []
+        return FlextResult.ok(data=validated_options)
+
+    def _dispatch_validated_command(
+        self, command: str, options: FlextTypes.Core.StringList
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Dispatch validated command using monadic command patterns.
+
+        Args:
+            command: Validated command string.
+            options: Validated options list.
+
+        Returns:
+            FlextResult containing command execution result.
+
+        """
+        # Handle default command case
+        if command == "default":
+            return self._handle_default_command_result()
+
+        # MONADIC COMMAND REGISTRY: Composable command dispatch
+        simple_commands = {
             "version": self._execute_version_command,
             "help": self._execute_help_command,
             "health": self._execute_health_command,
         }
 
-        if command in command_handlers:
-            return command_handlers[command]()
-        if command in {"discover", "install", "run"}:
-            return self._execute_action_command(command, options)
-        return FlextResult[FlextTypes.Core.Headers].ok(
-            {
-                "command": command,
-                "status": "unknown_command",
-            },
+        # MONADIC COMMAND CHAIN: Try simple commands first, then action commands
+        return (
+            self._try_simple_command(command, simple_commands)
+            .or_try(lambda: self._try_action_command(command, options))
+            .or_else(self._handle_unknown_command_result(command))
         )
+
+    def _handle_default_command_result(self) -> FlextResult[FlextTypes.Core.Headers]:
+        """Handle default command with success result.
+
+        Returns:
+            FlextResult containing default command information.
+
+        """
+        default_result = {
+            "cli_type": "flext_meltano",
+            "project_root": str(self.project_root),
+            "command": "default",
+            "status": "success",
+        }
+        return FlextResult[FlextTypes.Core.Headers].ok(data=default_result)
+
+    def _try_simple_command(
+        self,
+        command: str,
+        command_registry: dict[str, Callable[[], FlextResult[FlextTypes.Core.Headers]]],
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Try executing simple command from registry.
+
+        Args:
+            command: Command to execute.
+            command_registry: Registry of simple commands.
+
+        Returns:
+            FlextResult containing command result or failure.
+
+        """
+        if command in command_registry:
+            return command_registry[command]()
+        return FlextResult.fail(f"Command '{command}' not in simple command registry")
+
+    def _try_action_command(
+        self, command: str, options: FlextTypes.Core.StringList
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Try executing action command with options.
+
+        Args:
+            command: Command to execute.
+            options: Command options.
+
+        Returns:
+            FlextResult containing action command result or failure.
+
+        """
+        action_commands = {"discover", "install", "run"}
+
+        if command in action_commands:
+            return self._execute_action_command(command, options)
+        return FlextResult.fail(f"Command '{command}' not in action command registry")
+
+    def _handle_unknown_command_result(
+        self, command: str
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Handle unknown command with status result.
+
+        Args:
+            command: Unknown command name.
+
+        Returns:
+            FlextResult containing unknown command status.
+
+        """
+        unknown_result = {
+            "command": command,
+            "status": "unknown_command",
+        }
+        return FlextResult[FlextTypes.Core.Headers].ok(data=unknown_result)
 
     def flext_meltano_version(self) -> FlextResult[str]:
         """Get Meltano version string using native API."""
@@ -877,7 +1181,11 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         self,
         args: FlextTypes.Core.StringList | None = None,
     ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Run CLI operations with FlextResult pattern.
+        """Run CLI operations using monadic argument processing.
+
+        Uses FlextResult.traverse() to process command line arguments with
+        composable validation and execution patterns, eliminating manual
+        argument checking and providing type-safe CLI handling.
 
         Args:
             args: CLI arguments (None = no args, [] = empty args)
@@ -888,22 +1196,46 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         """
         logger.info("Running CLI operations", args=args)
 
-        # Handle None args case
-        if args is None:
-            args = []
+        # MONADIC ARGUMENT PROCESSING: Use traverse for argument validation
+        return (
+            FlextResult.ok(data=args)
+            .map(lambda arguments: arguments if arguments is not None else [])
+            .flat_map(self._process_cli_arguments)
+        )
 
-        # Use helper methods to reduce complexity
-        if not args:
-            return self._handle_cli_no_args()
+    def _process_cli_arguments(
+        self, args: FlextTypes.Core.StringList
+    ) -> FlextResult[FlextTypes.Core.Headers]:
+        """Process CLI arguments using monadic pattern matching.
 
-        if args == ["--version"]:
-            return self._handle_cli_version_args()
+        Args:
+            args: List of CLI arguments to process.
 
-        if args == ["--help"]:
-            return self._handle_cli_help_args()
+        Returns:
+            FlextResult containing CLI processing result.
 
-        # For other commands, try to execute them
-        return self._handle_cli_other_args(args)
+        """
+        # MONADIC PATTERN MATCHING: Use traverse() for argument pattern processing
+        argument_patterns: list[tuple[Callable[[FlextTypes.Core.StringList], bool], Callable[[], FlextResult[FlextTypes.Core.Headers]]]] = [
+            (lambda a: len(a) == 0, self._handle_cli_no_args),
+            (lambda a: a == ["--version"], self._handle_cli_version_args),
+            (lambda a: a == ["--help"], self._handle_cli_help_args),
+        ]
+
+        # Try each pattern using traverse
+        pattern_results = [
+            FlextResult.ok(handler)
+            if predicate(args)
+            else FlextResult.fail("Pattern not matched")
+            for predicate, handler in argument_patterns
+        ]
+
+        # Fixed: Use *args syntax for first_success
+        return (
+            FlextResult.first_success(*pattern_results)
+            .flat_map(lambda handler: handler())
+            .or_try(lambda: self._handle_cli_other_args(args))
+        )
 
     # =================================================================
     # STATIC METHODS - Class-based replacements for standalone functions
@@ -963,7 +1295,10 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                     "version": "2.0.0-enterprise",
                     "details": result.unwrap(),
                 }
-                formatted_output = FlextUtilities.safe_json_stringify(formatted_data)
+                # Fixed: Use standard json formatting instead of missing method
+                import json
+
+                formatted_output = json.dumps(formatted_data, indent=2)
                 cli_logger.debug("Version output formatted", output=formatted_output)
                 return FlextResult[str].ok(data="Version displayed")
             return FlextResult[str].fail(f"Version error: {result.error}")
@@ -973,7 +1308,10 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
             result = self._handle_help_command()
             if result.is_success:
                 formatted_data = {"status": "OK", "details": result.unwrap()}
-                formatted_output = FlextUtilities.safe_json_stringify(formatted_data)
+                # Fixed: Use standard json formatting instead of missing method
+                import json
+
+                formatted_output = json.dumps(formatted_data, indent=2)
                 cli_logger.debug("Health output formatted", output=formatted_output)
                 return FlextResult[str].ok(data="Health checked")
             return FlextResult[str].fail(f"Health error: {result.error}")

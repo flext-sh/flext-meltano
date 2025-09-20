@@ -23,8 +23,19 @@ type JsonObject = FlextTypes.Core.JsonObject  # ✅ ALIAS to eliminate duplicati
 type MessageType = str
 type MessageData = FlextTypes.Core.Dict
 type CommandName = str
-type CommandResult = object
+type CommandResult = JsonObject
 type HandlerContext = FlextTypes.Core.Dict
+
+# Singer SDK external types (JSON-based for type safety)
+type SingerTapProtocol = JsonObject
+type SingerTargetProtocol = JsonObject
+type SingerStreamProtocol = JsonObject
+
+# DBT Core external types (JSON-based for type safety)
+type DbtRunnerProtocol = JsonObject
+
+# Service call types (JSON-based for type safety)
+type ServiceCallProtocol = JsonValue
 
 
 class FlextMeltanoTypes:
@@ -77,7 +88,7 @@ class FlextMeltanoTypes:
             """Validate plugin configuration."""
             ...  # pragma: no cover
 
-        def execute(self, *args: object) -> T_co:
+        def execute(self, *args: JsonValue) -> T_co:
             """Execute plugin with given arguments."""
             ...  # pragma: no cover
 
@@ -141,10 +152,10 @@ class FlextMeltanoTypes:
         leveraging FlextTypes.Core and FlextTypes.Payload for message processing.
         """
 
-        # Core Singer components (use object for external types)
-        type Tap = object
-        type Target = object
-        type Stream = object
+        # Core Singer components (use proper protocol types)
+        type Tap = SingerTapProtocol
+        type Target = SingerTargetProtocol
+        type Stream = SingerStreamProtocol
 
         # Singer message system (using flext-core message types)
         type MessageType = MessageType  # Use Payload.MessageType
@@ -174,8 +185,8 @@ class FlextMeltanoTypes:
         leveraging FlextTypes.Core and FlextTypes.Config for configuration management.
         """
 
-        # DBT Core components (use object for external types)
-        type Runner = object
+        # DBT Core components (use proper protocol types)
+        type Runner = DbtRunnerProtocol
         type Project = ConfigDict  # Project as ConfigDict
         type Profile = ConfigDict  # Profile as ConfigDict
 
@@ -289,7 +300,7 @@ class FlextMeltanoTypes:
         # Adapter operation types (using basic FlextTypes.Core types)
         type OperationResult = JsonObject  # Operation result
         type AdapterResponse = JsonObject  # Response as JsonObject
-        type ServiceCall = object  # Service call as callable type
+        type ServiceCall = ServiceCallProtocol  # Service call as callable type
 
         # Integration patterns (using basic FlextTypes.Core types)
         type WrapperResult = JsonObject  # Wrapper result as JsonObject
