@@ -45,17 +45,17 @@ class FlextMeltanoValidators:
         cls,
         config: object,
     ) -> FlextResult[bool]:
-        """Validate Meltano-specific plugin business rules.
+        """Validate Meltano-specific plugin business rules using monadic error accumulation.
 
-        Performs comprehensive validation of Meltano plugin configurations,
-        including name format requirements, namespace validation, and
-        executable path validation.
+        Uses FlextResult.accumulate_errors() to collect all validation errors
+        instead of stopping at the first failure, providing comprehensive
+        validation feedback with composable validation rules.
 
         Args:
             config: Plugin configuration object to validate.
 
         Returns:
-            FlextResult containing boolean validation result or error details.
+            FlextResult containing boolean validation result or accumulated error details.
 
         Example:
             >>> config = {
@@ -70,61 +70,154 @@ class FlextMeltanoValidators:
             ...     print("Plugin configuration is valid")
 
         """
-        # Validate config is dict using direct validation
+        # MONADIC ERROR ACCUMULATION: Collect all validation errors
+        # Fixed: Use *args syntax for accumulate_errors
+        return FlextResult.accumulate_errors(
+            cls._validate_config_is_dict(config),
+            cls._validate_plugin_name(config),
+            cls._validate_plugin_namespace(config),
+            cls._validate_plugin_executable(config),
+            cls._validate_meltano_specific_rules(config),
+        ).map(
+            lambda _: True
+        )  # Convert successful validations to boolean result  # Convert successful validations to boolean result
+
+    @classmethod
+    def _validate_config_is_dict(cls, config: object) -> FlextResult[None]:
+        """Validate that config is a dictionary.
+
+        Args:
+            config: Configuration object to validate.
+
+        Returns:
+            FlextResult indicating if config is a valid dictionary.
+
+        """
         if not isinstance(config, dict):
-            return FlextResult[bool].fail(
-                "Plugin config validation failed: config must be a dictionary",
+            return FlextResult.fail(
+                "Plugin config validation failed: config must be a dictionary"
+            )
+        return FlextResult.ok(data=None)
+
+    @classmethod
+    def _validate_plugin_name(cls, config: object) -> FlextResult[None]:
+        """Validate plugin name field.
+
+        Args:
+            config: Configuration dictionary.
+
+        Returns:
+            FlextResult indicating name validation result.
+
+        """
+        if not isinstance(config, dict):
+            return FlextResult.fail("Config must be dictionary for name validation")
+
+        name = config.get("name", "")
+        if not name or not str(name).strip():
+            return FlextResult.fail("Plugin name cannot be empty")
+
+        return cls._validate_meltano_name_business_rules(str(name).strip())
+
+    @classmethod
+    def _validate_meltano_name_business_rules(cls, name: str) -> FlextResult[None]:
+        """Validate Meltano-specific name business rules.
+
+        Args:
+            name: Plugin name to validate.
+
+        Returns:
+            FlextResult indicating business rule validation.
+
+        """
+        validation_errors = []
+
+        # Meltano business rule: target plugin names
+        if (
+            name.startswith("target-")
+            and len(name) < FlextMeltanoConstants.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+        ):
+            validation_errors.append(
+                "Target plugin names must be at least 8 characters"
             )
 
-        config_dict = config
+        # Meltano business rule: tap plugin names
+        if (
+            name.startswith("tap-")
+            and len(name) < FlextMeltanoConstants.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+        ):
+            validation_errors.append("Tap plugin names must be at least 5 characters")
 
-        # DOMAIN-SPECIFIC: Meltano plugin business rules
-        class MeltanoPluginBusinessRules(BaseModel):
-            name: str = Field(min_length=1, description="Plugin name required")
-            namespace: str = Field(description="Plugin namespace (optional)")
-            pip_url: str = Field(description="Plugin pip URL (optional)")
-            executable: str = Field(description="Plugin executable (optional)")
+        if validation_errors:
+            return FlextResult.fail("; ".join(validation_errors))
 
-            @field_validator("name")
-            @classmethod
-            def validate_plugin_name_business_rules(cls, v: str) -> str:
-                """Validate Meltano-specific plugin name business rules.
+        return FlextResult.ok(data=None)
 
-                Args:
-                    v: Plugin name to validate.
+    @classmethod
+    def _validate_plugin_namespace(cls, config: object) -> FlextResult[None]:
+        """Validate plugin namespace field.
 
-                Returns:
-                    str: Validated plugin name.
+        Args:
+            config: Configuration dictionary.
 
-                Raises:
-                    ValueError: If plugin name violates business rules.
+        Returns:
+            FlextResult indicating namespace validation result.
 
-                """
-                if not v or not v.strip():
-                    msg = "Plugin name cannot be empty"
-                    raise ValueError(msg)
-                # Meltano business rule: names with special prefixes
-                if (
-                    v.startswith("target-")
-                    and len(v)
-                    < FlextMeltanoConstants.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
-                ):
-                    msg = "Target plugin names must be at least 8 characters"
-                    raise ValueError(msg)
-                if (
-                    v.startswith("tap-")
-                    and len(v) < FlextMeltanoConstants.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
-                ):
-                    msg = "Tap plugin names must be at least 5 characters"
-                    raise ValueError(msg)
-                return v
+        """
+        if not isinstance(config, dict):
+            return FlextResult.fail(
+                "Config must be dictionary for namespace validation"
+            )
 
-        # Use Pydantic model validation directly
-        try:
-            MeltanoPluginBusinessRules.model_validate(config_dict)
-            return FlextResult[bool].ok(data=True)
-        except Exception as e:
-            return FlextResult[bool].fail(f"Plugin validation failed: {e}")
+        # Namespace is optional, but if present should be valid
+        namespace = config.get("namespace")
+        if namespace is not None and not str(namespace).strip():
+            return FlextResult.fail("Plugin namespace cannot be empty if provided")
+
+        return FlextResult.ok(data=None)
+
+    @classmethod
+    def _validate_plugin_executable(cls, config: object) -> FlextResult[None]:
+        """Validate plugin executable field.
+
+        Args:
+            config: Configuration dictionary.
+
+        Returns:
+            FlextResult indicating executable validation result.
+
+        """
+        if not isinstance(config, dict):
+            return FlextResult.fail(
+                "Config must be dictionary for executable validation"
+            )
+
+        # Executable is optional, but if present should be valid
+        executable = config.get("executable")
+        if executable is not None and not str(executable).strip():
+            return FlextResult.fail("Plugin executable cannot be empty if provided")
+
+        return FlextResult.ok(data=None)
+
+    @classmethod
+    def _validate_meltano_specific_rules(cls, config: object) -> FlextResult[None]:
+        """Validate additional Meltano-specific business rules.
+
+        Args:
+            config: Configuration dictionary.
+
+        Returns:
+            FlextResult indicating Meltano-specific validation result.
+
+        """
+        if not isinstance(config, dict):
+            return FlextResult.fail(
+                "Config must be dictionary for Meltano rules validation"
+            )
+
+        # Additional Meltano-specific validations can be added here
+        # For now, return success as placeholder
+        return FlextResult.ok(data=None)
 
     @classmethod
     def validate_meltano_project_business_rules(
