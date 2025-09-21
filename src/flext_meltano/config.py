@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar
 
@@ -27,37 +26,212 @@ from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
 
+class FlextMeltanoLoggingConstants:
+    """Meltano-specific logging constants for FLEXT Meltano module.
+
+    Provides domain-specific logging defaults, levels, and configuration
+    options tailored for Meltano operations, data pipeline execution,
+    and ETL process monitoring.
+    """
+
+    # Meltano-specific log levels
+    DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
+    PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
+    EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
+    LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
+    TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
+    ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
+    PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
+
+    # Pipeline execution logging
+    LOG_PIPELINE_START = True
+    LOG_PIPELINE_END = True
+    LOG_PIPELINE_PROGRESS = True
+    LOG_PIPELINE_ERRORS = True
+    LOG_PIPELINE_STATS = True
+    LOG_PIPELINE_DURATION = True
+
+    # Extract operations logging
+    LOG_EXTRACT_START = True
+    LOG_EXTRACT_END = True
+    LOG_EXTRACT_RECORDS = True
+    LOG_EXTRACT_ERRORS = True
+    LOG_EXTRACT_DURATION = True
+    LOG_EXTRACT_SOURCE_INFO = True
+
+    # Load operations logging
+    LOG_LOAD_START = True
+    LOG_LOAD_END = True
+    LOG_LOAD_RECORDS = True
+    LOG_LOAD_ERRORS = True
+    LOG_LOAD_DURATION = True
+    LOG_LOAD_TARGET_INFO = True
+
+    # Transform operations logging
+    LOG_TRANSFORM_START = True
+    LOG_TRANSFORM_END = True
+    LOG_TRANSFORM_RECORDS = True
+    LOG_TRANSFORM_ERRORS = True
+    LOG_TRANSFORM_DURATION = True
+    LOG_TRANSFORM_SQL = False  # Don't log SQL by default (privacy/security)
+
+    # Performance tracking
+    TRACK_MELTANO_PERFORMANCE = True
+    MELTANO_PERFORMANCE_THRESHOLD_WARNING = 5000  # 5 seconds default
+    MELTANO_PERFORMANCE_THRESHOLD_CRITICAL = 10000  # 10 seconds default
+    TRACK_RECORD_COUNTS = True
+    TRACK_MEMORY_USAGE = True
+    HIGH_MEMORY_THRESHOLD = FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
+
+    # Data quality logging
+    LOG_DATA_QUALITY_ISSUES = True
+    LOG_VALIDATION_ERRORS = True
+    LOG_SCHEMA_CHANGES = True
+    LOG_DATA_TYPE_CONVERSIONS = True
+    LOG_NULL_VALUE_HANDLING = True
+
+    # Error handling and recovery
+    LOG_ERROR_RECOVERY = True
+    LOG_RETRY_ATTEMPTS = True
+    LOG_FALLBACK_OPERATIONS = True
+    LOG_PARTIAL_FAILURES = True
+    LOG_CRITICAL_FAILURES = True
+
+    # Context information to include
+    INCLUDE_PIPELINE_ID = True
+    INCLUDE_JOB_ID = True
+    INCLUDE_RUN_ID = True
+    INCLUDE_SOURCE_NAME = True
+    INCLUDE_TARGET_NAME = True
+    INCLUDE_TRANSFORM_NAME = True
+    INCLUDE_RECORD_COUNT = True
+    INCLUDE_DURATION = True
+
+    # Message templates for Meltano operations
+    class Messages:
+        """Meltano-specific log message templates."""
+
+        # Pipeline messages
+        PIPELINE_STARTED = "Meltano pipeline started: {pipeline_name} run_id: {run_id}"
+        PIPELINE_COMPLETED = "Meltano pipeline completed: {pipeline_name} run_id: {run_id} duration: {duration}ms"
+        PIPELINE_FAILED = (
+            "Meltano pipeline failed: {pipeline_name} run_id: {run_id} error: {error}"
+        )
+        PIPELINE_CANCELLED = (
+            "Meltano pipeline cancelled: {pipeline_name} run_id: {run_id}"
+        )
+
+        # Extract messages
+        EXTRACT_STARTED = "Meltano extract started: {source_name} run_id: {run_id}"
+        EXTRACT_COMPLETED = "Meltano extract completed: {source_name} {record_count} records in {duration}ms"
+        EXTRACT_FAILED = "Meltano extract failed: {source_name} error: {error}"
+        EXTRACT_PROGRESS = (
+            "Meltano extract progress: {source_name} {current}/{total} records"
+        )
+
+        # Load messages
+        LOAD_STARTED = "Meltano load started: {target_name} run_id: {run_id}"
+        LOAD_COMPLETED = "Meltano load completed: {target_name} {record_count} records in {duration}ms"
+        LOAD_FAILED = "Meltano load failed: {target_name} error: {error}"
+        LOAD_PROGRESS = "Meltano load progress: {target_name} {current}/{total} records"
+
+        # Transform messages
+        TRANSFORM_STARTED = (
+            "Meltano transform started: {transform_name} run_id: {run_id}"
+        )
+        TRANSFORM_COMPLETED = "Meltano transform completed: {transform_name} {record_count} records in {duration}ms"
+        TRANSFORM_FAILED = "Meltano transform failed: {transform_name} error: {error}"
+        TRANSFORM_PROGRESS = (
+            "Meltano transform progress: {transform_name} {current}/{total} records"
+        )
+
+        # Performance messages
+        SLOW_PIPELINE = "Slow Meltano pipeline: {pipeline_name} took {duration}ms"
+        SLOW_EXTRACT = "Slow Meltano extract: {source_name} took {duration}ms"
+        SLOW_LOAD = "Slow Meltano load: {target_name} took {duration}ms"
+        SLOW_TRANSFORM = "Slow Meltano transform: {transform_name} took {duration}ms"
+        HIGH_MEMORY_USAGE = (
+            "High memory usage in Meltano pipeline: {pipeline_name} {memory}MB"
+        )
+
+        # Data quality messages
+        DATA_QUALITY_ISSUE = (
+            "Data quality issue: {issue_type} in {source_name}: {details}"
+        )
+        VALIDATION_ERROR = "Meltano validation error: {field} {error} in {source_name}"
+        SCHEMA_CHANGE = "Schema change detected: {source_name} {change_type}: {details}"
+        DATA_TYPE_CONVERSION = (
+            "Data type conversion: {field} {from_type} -> {to_type} in {source_name}"
+        )
+        NULL_VALUE_HANDLED = "Null value handled: {field} {strategy} in {source_name}"
+
+        # Error messages
+        PIPELINE_ERROR = "Meltano pipeline error: {pipeline_name} {error}"
+        EXTRACT_ERROR = "Meltano extract error: {source_name} {error}"
+        LOAD_ERROR = "Meltano load error: {target_name} {error}"
+        TRANSFORM_ERROR = "Meltano transform error: {transform_name} {error}"
+        CONFIGURATION_ERROR = "Meltano configuration error: {error}"
+
+        # Recovery messages
+        ERROR_RECOVERY = (
+            "Meltano error recovery: {operation} retry {attempt}/{max_attempts}"
+        )
+        RETRY_ATTEMPT = (
+            "Meltano retry attempt: {operation} attempt {attempt}/{max_attempts}"
+        )
+        FALLBACK_OPERATION = (
+            "Meltano fallback operation: {operation} using {fallback_strategy}"
+        )
+        PARTIAL_FAILURE = (
+            "Meltano partial failure: {operation} {failed_count}/{total_count} failed"
+        )
+        CRITICAL_FAILURE = "Meltano critical failure: {operation} {error}"
+
+        # Statistics messages
+        PIPELINE_STATS = "Meltano pipeline statistics: {pipeline_name} records: {total_records} duration: {duration}ms"
+        EXTRACT_STATS = "Meltano extract statistics: {source_name} records: {record_count} duration: {duration}ms"
+        LOAD_STATS = "Meltano load statistics: {target_name} records: {record_count} duration: {duration}ms"
+        TRANSFORM_STATS = "Meltano transform statistics: {transform_name} records: {record_count} duration: {duration}ms"
+
+    # Environment-specific overrides for Meltano logging
+    class Environment:
+        """Environment-specific Meltano logging configuration."""
+
+        DEVELOPMENT: ClassVar[dict[str, object]] = {
+            "log_transform_sql": True,  # Log SQL in dev
+            "log_source_info": True,  # Log source info in dev
+            "log_target_info": True,  # Log target info in dev
+            "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
+        }
+
+        STAGING: ClassVar[dict[str, object]] = {
+            "log_transform_sql": False,
+            "log_source_info": True,
+            "log_target_info": True,
+            "audit_log_level": FlextConstants.Config.LogLevel.INFO,
+        }
+
+        PRODUCTION: ClassVar[dict[str, object]] = {
+            "log_transform_sql": False,
+            "log_source_info": False,
+            "log_target_info": False,
+            "audit_log_level": FlextConstants.Config.LogLevel.WARNING,
+        }
+
+        TESTING: ClassVar[dict[str, object]] = {
+            "log_transform_sql": True,
+            "log_source_info": True,
+            "log_target_info": True,
+            "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
+        }
+
+
 class FlextMeltanoConfig(FlextConfig):
     """Meltano ELT configuration management with enterprise-grade validation.
 
     Extends FlextConfig to provide comprehensive Meltano-specific configuration
     with validation using flext-core patterns. This class serves as the single
     source of truth for all Meltano configuration across the application.
-
-    The configuration includes support for:
-    - Multiple service types (extractors, loaders, transformers)
-    - Environment-specific settings (development, staging, production)
-    - Plugin management and validation
-    - Directory structure management
-    - Execution parameters and timeouts
-
-    Attributes:
-        MELTANO_VERSION: Required Meltano version for compatibility.
-        SINGER_SDK_VERSION: Required Singer SDK version.
-        DBT_VERSION: Required DBT version.
-        PROJECT_FILE: Default Meltano project file name.
-        STATE_DIR: Directory for Meltano state files.
-        VENV_DIR: Directory for Python virtual environments.
-
-    Example:
-        >>> config = FlextMeltanoConfig(
-        ...     project_root="/path/to/project",
-        ...     environment="development",
-        ...     log_level="INFO",
-        ... )
-        >>> validation_result = config.validate_project_structure()
-        >>> if validation_result.is_success:
-        ...     print("Configuration is valid")
 
     """
 
@@ -88,51 +262,16 @@ class FlextMeltanoConfig(FlextConfig):
     # ENUMS - All enumerated types as class enums
     # ============================================================================
 
-    class PluginType(StrEnum):
-        """Plugin type enumeration for Meltano services."""
-
-        EXTRACTORS = "extractors"
-        LOADERS = "loaders"
-        TRANSFORMERS = "transformers"
-        ORCHESTRATORS = "orchestrators"
-        FILES = "files"
-        UTILITIES = "utilities"
-
-    class EnvironmentType(StrEnum):
-        """Environment type enumeration for deployment contexts."""
-
-        DEV = "development"
-        STAGING = "staging"
-        PROD = "production"
-        TEST = "test"
-        LOCAL = "local"
-
-    class LogLevel(StrEnum):
-        """Log level enumeration for application logging."""
-
-        DEBUG = "DEBUG"
-        INFO = "INFO"
-        WARNING = "WARNING"
-        ERROR = "ERROR"
-        CRITICAL = "CRITICAL"
-
-    class OperationStatus(StrEnum):
-        """Operation status enumeration for tracking execution states."""
-
-        PENDING = "pending"
-        RUNNING = "running"
-        SUCCESS = "success"
-        ERROR = "error"
-        TIMEOUT = "timeout"
-        CANCELLED = "cancelled"
-
-    class RunMode(StrEnum):
-        """Run mode enumeration for execution strategies."""
-
-        FULL = "full"
-        INCREMENTAL = "incremental"
-        DRY_RUN = "dry_run"
-        TEST = "test"
+    # ALL ENUMS MUST COME FROM FlextConstants or FlextMeltanoConstants - NO ALIASES
+    PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
+    EnvironmentType: type = (
+        FlextConstants.Environment.ConfigEnvironment
+    )  # Core constants
+    LogLevel: type = FlextConstants.Config.LogLevel  # Core constants
+    OperationStatus: type = (
+        FlextMeltanoConstants.OperationStatus
+    )  # Domain-specific constants
+    RunMode: type = FlextMeltanoConstants.RunMode  # Domain-specific constants
 
     # ============================================================================
     # MELTANO-SPECIFIC CONFIGURATION FIELDS - Additional to FlextConfig
@@ -158,9 +297,438 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Environment and execution configuration - environment field inherited from FlextConfig
 
-    log_level: str = Field(default="INFO", description="Logging level for operations")
+    log_level: str = Field(
+        default=FlextConstants.Config.LogLevel.INFO,  # SOURCE OF TRUTH
+        description="Logging level for operations",
+    )
 
     timeout_seconds: int = Field(
+        default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
+        ge=1,
+        le=3600,
+        description="Timeout for operations in seconds",
+    )
+
+    # Meltano-specific logging configuration using FlextMeltanoLoggingConstants
+    log_pipeline_execution: bool = Field(
+        default=True,
+        description="Log pipeline execution details",
+    )
+
+    log_pipeline_stages: bool = Field(
+        default=True,
+        description="Log pipeline stage execution",
+    )
+
+    log_pipeline_progress: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_PIPELINE_PROGRESS,
+        description="Log pipeline progress updates",
+    )
+
+    log_pipeline_errors: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_PIPELINE_ERRORS,
+        description="Log pipeline errors",
+    )
+
+    log_pipeline_warnings: bool = Field(
+        default=True,
+        description="Log pipeline warnings",
+    )
+
+    log_pipeline_performance: bool = Field(
+        default=True,
+        description="Log pipeline performance metrics",
+    )
+
+    log_pipeline_timing: bool = Field(
+        default=True,
+        description="Log pipeline timing information",
+    )
+
+    log_pipeline_memory: bool = Field(
+        default=True,
+        description="Log pipeline memory usage",
+    )
+
+    log_pipeline_throughput: bool = Field(
+        default=True,
+        description="Log pipeline throughput metrics",
+    )
+
+    # Extract operations logging
+    log_extract_operations: bool = Field(
+        default=True,
+        description="Log extract operations",
+    )
+
+    log_extract_queries: bool = Field(
+        default=True,
+        description="Log extract queries",
+    )
+
+    log_extract_results: bool = Field(
+        default=True,
+        description="Log extract results",
+    )
+
+    log_extract_errors: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_EXTRACT_ERRORS,
+        description="Log extract errors",
+    )
+
+    log_extract_performance: bool = Field(
+        default=True,
+        description="Log extract performance metrics",
+    )
+
+    log_extract_timing: bool = Field(
+        default=True,
+        description="Log extract timing information",
+    )
+
+    log_extract_memory: bool = Field(
+        default=True,
+        description="Log extract memory usage",
+    )
+
+    log_extract_throughput: bool = Field(
+        default=True,
+        description="Log extract throughput metrics",
+    )
+
+    # Load operations logging
+    log_load_operations: bool = Field(
+        default=True,
+        description="Log load operations",
+    )
+
+    log_load_batches: bool = Field(
+        default=True,
+        description="Log load batches",
+    )
+
+    log_load_results: bool = Field(
+        default=True,
+        description="Log load results",
+    )
+
+    log_load_errors: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_LOAD_ERRORS,
+        description="Log load errors",
+    )
+
+    log_load_performance: bool = Field(
+        default=True,
+        description="Log load performance metrics",
+    )
+
+    log_load_timing: bool = Field(
+        default=True,
+        description="Log load timing information",
+    )
+
+    log_load_memory: bool = Field(
+        default=True,
+        description="Log load memory usage",
+    )
+
+    log_load_throughput: bool = Field(
+        default=True,
+        description="Log load throughput metrics",
+    )
+
+    # Transform operations logging
+    log_transform_operations: bool = Field(
+        default=True,
+        description="Log transform operations",
+    )
+
+    log_transform_sql: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_TRANSFORM_SQL,
+        description="Log transform SQL queries",
+    )
+
+    log_transform_results: bool = Field(
+        default=True,
+        description="Log transform results",
+    )
+
+    log_transform_errors: bool = Field(
+        default=FlextMeltanoLoggingConstants.LOG_TRANSFORM_ERRORS,
+        description="Log transform errors",
+    )
+
+    log_transform_performance: bool = Field(
+        default=True,
+        description="Log transform performance metrics",
+    )
+
+    log_transform_timing: bool = Field(
+        default=True,
+        description="Log transform timing information",
+    )
+
+    log_transform_memory: bool = Field(
+        default=True,
+        description="Log transform memory usage",
+    )
+
+    log_transform_throughput: bool = Field(
+        default=True,
+        description="Log transform throughput metrics",
+    )
+
+    # Data quality logging
+    log_data_quality: bool = Field(
+        default=True,
+        description="Log data quality checks",
+    )
+
+    log_data_quality_checks: bool = Field(
+        default=True,
+        description="Log data quality check results",
+    )
+
+    log_data_quality_errors: bool = Field(
+        default=True,
+        description="Log data quality errors",
+    )
+
+    log_data_quality_warnings: bool = Field(
+        default=True,
+        description="Log data quality warnings",
+    )
+
+    log_data_quality_metrics: bool = Field(
+        default=True,
+        description="Log data quality metrics",
+    )
+
+    log_data_quality_timing: bool = Field(
+        default=True,
+        description="Log data quality timing information",
+    )
+
+    log_data_quality_memory: bool = Field(
+        default=True,
+        description="Log data quality memory usage",
+    )
+
+    log_data_quality_throughput: bool = Field(
+        default=True,
+        description="Log data quality throughput metrics",
+    )
+
+    # Plugin logging
+    log_plugin_operations: bool = Field(
+        default=True,
+        description="Log plugin operations",
+    )
+
+    log_plugin_errors: bool = Field(
+        default=True,
+        description="Log plugin errors",
+    )
+
+    log_plugin_performance: bool = Field(
+        default=True,
+        description="Log plugin performance metrics",
+    )
+
+    log_plugin_timing: bool = Field(
+        default=True,
+        description="Log plugin timing information",
+    )
+
+    log_plugin_memory: bool = Field(
+        default=True,
+        description="Log plugin memory usage",
+    )
+
+    log_plugin_throughput: bool = Field(
+        default=True,
+        description="Log plugin throughput metrics",
+    )
+
+    # Source and target logging
+    log_source_info: bool = Field(
+        default=True,
+        description="Log source information",
+    )
+
+    log_target_info: bool = Field(
+        default=True,
+        description="Log target information",
+    )
+
+    log_source_errors: bool = Field(
+        default=True,
+        description="Log source errors",
+    )
+
+    log_target_errors: bool = Field(
+        default=True,
+        description="Log target errors",
+    )
+
+    log_source_performance: bool = Field(
+        default=True,
+        description="Log source performance metrics",
+    )
+
+    log_target_performance: bool = Field(
+        default=True,
+        description="Log target performance metrics",
+    )
+
+    log_source_timing: bool = Field(
+        default=True,
+        description="Log source timing information",
+    )
+
+    log_target_timing: bool = Field(
+        default=True,
+        description="Log target timing information",
+    )
+
+    log_source_memory: bool = Field(
+        default=True,
+        description="Log source memory usage",
+    )
+
+    log_target_memory: bool = Field(
+        default=True,
+        description="Log target memory usage",
+    )
+
+    log_source_throughput: bool = Field(
+        default=True,
+        description="Log source throughput metrics",
+    )
+
+    log_target_throughput: bool = Field(
+        default=True,
+        description="Log target throughput metrics",
+    )
+
+    # Performance tracking for Meltano operations
+    track_meltano_performance: bool = Field(
+        default=FlextMeltanoLoggingConstants.TRACK_MELTANO_PERFORMANCE,
+        description="Track Meltano performance metrics",
+    )
+
+    meltano_performance_threshold_warning: float = Field(
+        default=True,
+        description="Meltano performance warning threshold in milliseconds",
+    )
+
+    meltano_performance_threshold_critical: float = Field(
+        default=True,
+        description="Meltano performance critical threshold in milliseconds",
+    )
+
+    # Context information to include in logs
+    include_pipeline_info_in_logs: bool = Field(
+        default=True,
+        description="Include pipeline information in log messages",
+    )
+
+    include_plugin_info_in_logs: bool = Field(
+        default=True,
+        description="Include plugin information in log messages",
+    )
+
+    include_source_info_in_logs: bool = Field(
+        default=True,
+        description="Include source information in log messages",
+    )
+
+    include_target_info_in_logs: bool = Field(
+        default=True,
+        description="Include target information in log messages",
+    )
+
+    include_transform_info_in_logs: bool = Field(
+        default=True,
+        description="Include transform information in log messages",
+    )
+
+    include_data_quality_info_in_logs: bool = Field(
+        default=True,
+        description="Include data quality information in log messages",
+    )
+
+    include_timing_in_logs: bool = Field(
+        default=True,
+        description="Include timing information in log messages",
+    )
+
+    include_memory_in_logs: bool = Field(
+        default=True,
+        description="Include memory information in log messages",
+    )
+
+    include_throughput_in_logs: bool = Field(
+        default=True,
+        description="Include throughput information in log messages",
+    )
+
+    # Security and privacy settings
+    mask_sensitive_data: bool = Field(
+        default=True,
+        description="Mask sensitive data in logs",
+    )
+
+    mask_credentials: bool = Field(
+        default=True,
+        description="Mask credentials in logs",
+    )
+
+    mask_connection_strings: bool = Field(
+        default=True,
+        description="Mask connection strings in logs",
+    )
+
+    mask_api_keys: bool = Field(
+        default=True,
+        description="Mask API keys in logs",
+    )
+
+    # Log message templates
+    use_standard_templates: bool = Field(
+        default=True,
+        description="Use standard log message templates",
+    )
+
+    custom_log_format: str | None = Field(
+        default=None,
+        description="Custom log message format",
+    )
+
+    # Audit logging
+    enable_audit_logging: bool = Field(
+        default=True,
+        description="Enable audit logging",
+    )
+
+    audit_log_level: str = Field(
+        default="INFO",
+        description="Audit log level",
+    )
+
+    audit_log_file: str = Field(
+        default="audit.log",
+        description="Audit log file path",
+    )
+
+    # Environment-specific logging
+    environment_specific_logging: bool = Field(
+        default=True,
+        description="Enable environment-specific logging",
+    )
+
+    # Network timeout configuration
+    network_timeout: int = Field(
         default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
         ge=1,
         le=3600,
@@ -183,14 +751,14 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Plugin and execution configuration
     max_concurrent_jobs: int = Field(
-        default=4,  # Meltano-specific default (no FlextConstants equivalent)
+        default=FlextConstants.Container.MAX_WORKERS,  # SOURCE OF TRUTH
         ge=1,
         le=16,
         description="Maximum number of concurrent jobs",
     )
 
-    run_mode: RunMode = Field(
-        default=RunMode.FULL,
+    run_mode: str = Field(
+        default="FULL",
         description="Execution mode for operations",
     )
 
@@ -201,7 +769,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     logs_dir: Path = Field(
-        default_factory=lambda: Path("logs"),
+        default_factory=lambda: Path(FlextConstants.Platform.DIR_LOGS),
         description="Logs directory",
     )
 
@@ -261,7 +829,7 @@ class FlextMeltanoConfig(FlextConfig):
             ValidationError: If version string is invalid.
 
         """
-        if not v or not isinstance(v, str):
+        if not v:
             error_msg = "Version must be non-empty string"
             raise FlextExceptions.ValidationError(error_msg)
         return v.strip()
@@ -321,12 +889,6 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
             FlextResult containing boolean validation result or error details.
 
-        Example:
-            >>> config = FlextMeltanoConfig(project_root="/path/to/project")
-            >>> result = config.validate_project_structure()
-            >>> if result.is_success and result.unwrap():
-            ...     print("Project structure is valid")
-
         """
         # Use centralized validator to eliminate duplication
         return FlextMeltanoValidators.validate_meltano_project_structure(
@@ -340,11 +902,6 @@ class FlextMeltanoConfig(FlextConfig):
 
         Returns:
             FlextTypes.Core.Headers: Environment variables dictionary.
-
-        Example:
-            >>> config = FlextMeltanoConfig()
-            >>> env_vars = config.get_environment_variables()
-            >>> print(f"Meltano project root: {env_vars['MELTANO_PROJECT_ROOT']}")
 
         """
         return self.get_meltano_environment_variables()
@@ -373,12 +930,6 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
             FlextResult containing the created configuration or error details.
 
-        Example:
-            >>> result = FlextMeltanoConfig.create_from_project_root("/path/to/project")
-            >>> if result.is_success:
-            ...     config = result.unwrap()
-            ...     print(f"Created config for project: {config.project_root}")
-
         """
         try:
             config = cls(project_root=Path(project_root))
@@ -401,7 +952,7 @@ class FlextMeltanoConfig(FlextConfig):
         cls,
         environment: str,
         **kwargs: object,
-    ) -> FlextResult[FlextMeltanoConfig]:
+    ) -> FlextMeltanoConfig:
         """Create configuration for specific environment.
 
         Creates a new configuration instance optimized for the specified
@@ -411,71 +962,58 @@ class FlextMeltanoConfig(FlextConfig):
             environment: Target environment (development, staging, production, test, local).
             **kwargs: Additional configuration parameters.
 
-        Returns:
-            FlextResult containing the created configuration or error details.
+        Raises:
+            ValueError: If environment is invalid.
 
-        Example:
-            >>> result = FlextMeltanoConfig.create_for_environment(
-            ...     "production", project_root="/prod/project", log_level="WARNING"
-            ... )
-            >>> if result.is_success:
-            ...     config = result.unwrap()
-            ...     print(f"Created {config.environment} config")
+        Returns:
+            FlextMeltanoConfig: The created configuration instance.
 
         """
+        # Validate environment using FlextConstants
         try:
-            # Validate environment
-            try:
-                env_type = cls.EnvironmentType(environment)
-            except ValueError:
-                return FlextResult["FlextMeltanoConfig"].fail(
-                    f"Invalid environment: {environment}",
-                )
+            env_type = cls.EnvironmentType(environment)
+        except ValueError as e:
+            msg = f"Invalid environment: {environment}"
+            raise ValueError(msg) from e
 
-            # Filter and type-cast kwargs to valid fields only
-            valid_fields = cls.model_fields.keys()
-            filtered_kwargs: FlextTypes.Core.Dict = {
-                k: v for k, v in kwargs.items() if k in valid_fields
-            }
+        # Filter and type-cast kwargs to valid fields only
+        valid_fields = cls.model_fields.keys()
+        filtered_kwargs: FlextTypes.Core.Dict = {
+            k: v for k, v in kwargs.items() if k in valid_fields
+        }
 
-            # Create config data with environment
-            config_data: dict[str, object] = {"environment": env_type.value}
+        # Create config data with environment
+        config_data: dict[str, object] = {"environment": env_type.value}
 
-            # Handle specific type conversions
-            if "project_root" in filtered_kwargs:
-                project_root_value = filtered_kwargs["project_root"]
-                if isinstance(project_root_value, str):
-                    config_data["project_root"] = Path(project_root_value)
-                elif isinstance(project_root_value, Path):
-                    config_data["project_root"] = project_root_value
-                else:
-                    config_data["project_root"] = Path()
+        # Handle specific type conversions
+        if "project_root" in filtered_kwargs:
+            project_root_value = filtered_kwargs["project_root"]
+            if isinstance(project_root_value, str):
+                config_data["project_root"] = Path(project_root_value)
+            elif isinstance(project_root_value, Path):
+                config_data["project_root"] = project_root_value
+            else:
+                config_data["project_root"] = Path()
 
-            if "log_level" in filtered_kwargs:
-                config_data["log_level"] = cls.LogLevel(
-                    str(filtered_kwargs["log_level"]),
-                )
-
-            if "run_mode" in filtered_kwargs:
-                config_data["run_mode"] = cls.RunMode(str(filtered_kwargs["run_mode"]))
-
-            # Apply all other valid kwargs with proper type handling
-            excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
-            config_data.update(
-                {
-                    key: value
-                    for key, value in filtered_kwargs.items()
-                    if key not in excluded_keys
-                },
+        if "log_level" in filtered_kwargs:
+            config_data["log_level"] = cls.LogLevel(
+                str(filtered_kwargs["log_level"]),
             )
 
-            config = cls.model_validate(config_data)
-            return FlextResult["FlextMeltanoConfig"].ok(data=config)
+        if "run_mode" in filtered_kwargs:
+            config_data["run_mode"] = cls.RunMode(str(filtered_kwargs["run_mode"]))
 
-        except Exception as e:
-            return FlextResult["FlextMeltanoConfig"].fail(
-                f"Environment config creation failed: {e}",
-            )
+        # Apply all other valid kwargs with proper type handling
+        excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
+        config_data.update(
+            {
+                key: value
+                for key, value in filtered_kwargs.items()
+                if key not in excluded_keys
+            },
+        )
+
+        return cls.model_validate(config_data)
 
     # ============================================================================
     # SINGLETON METHODS - Global instance management using FlextConfig as SOURCE OF TRUTH
@@ -495,12 +1033,6 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
             FlextMeltanoConfig: The global configuration instance (created if needed).
 
-        Example:
-            >>> config = FlextMeltanoConfig.get_global_instance(
-            ...     project_root="/current/project", log_level="DEBUG"
-            ... )
-            >>> print(f"Global config: {config.project_root}")
-
         """
         # Always get fresh base configuration from FlextConfig singleton
         base_config = FlextConfig.get_global_instance()
@@ -515,29 +1047,25 @@ class FlextMeltanoConfig(FlextConfig):
         return cls(**base_data)
 
     @classmethod
-    def set_global_instance(cls, config: FlextConfig) -> None:
+    def set_global_instance(cls, instance: FlextConfig) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
         This method delegates to FlextConfig.set_global_instance() since FlextConfig
         is the source of truth for all configuration.
 
         Args:
-            config: The configuration to set as global.
+            instance: The configuration to set as global.
 
         Raises:
-            TypeError: If config is not a FlextMeltanoConfig instance.
-
-        Example:
-            >>> config = FlextMeltanoConfig(project_root="/new/project")
-            >>> FlextMeltanoConfig.set_global_instance(config)
+            TypeError: If instance is not a FlextMeltanoConfig instance.
 
         """
-        if not isinstance(config, FlextMeltanoConfig):
-            error_msg = "config must be a FlextMeltanoConfig instance"
+        if not isinstance(instance, FlextMeltanoConfig):
+            error_msg = "instance must be a FlextMeltanoConfig instance"
             raise TypeError(error_msg)
 
         # Delegate to FlextConfig since it's the source of truth
-        FlextConfig.set_global_instance(config)
+        FlextConfig.set_global_instance(instance)
 
     @classmethod
     def clear_global_instance(cls) -> None:
@@ -546,13 +1074,8 @@ class FlextMeltanoConfig(FlextConfig):
         Removes the current global configuration instance, allowing for
         fresh configuration in test scenarios.
 
-        Example:
-            >>> FlextMeltanoConfig.clear_global_instance()
-            >>> # Now get_global_instance() will create a new instance
-
         """
-        # Delegate to FlextConfig since it's the source of truth
-        FlextConfig.clear_global_instance()
+        # Clear the instance if it exists
         if hasattr(cls, "_global_instance"):
             cls._global_instance = None
 
@@ -560,19 +1083,13 @@ class FlextMeltanoConfig(FlextConfig):
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
-        following the same pattern as FlextConfig.apply_environment_overrides().
+        following the same pattern as FlextConfig validation.
 
         Args:
             **overrides: Configuration overrides to apply.
 
         Returns:
             FlextResult indicating success or failure.
-
-        Example:
-            >>> config = FlextMeltanoConfig()
-            >>> result = config.apply_overrides(log_level="DEBUG", timeout_seconds=60)
-            >>> if result.is_success:
-            ...     print("Overrides applied successfully")
 
         """
         # Check if configuration is sealed
@@ -586,10 +1103,6 @@ class FlextMeltanoConfig(FlextConfig):
             for key, value in overrides.items():
                 if hasattr(self, key) and key in self.__class__.model_fields:
                     setattr(self, key, value)
-
-            # Track the override in metadata
-            self.set_metadata("overrides_applied", "true")
-            self.set_metadata("override_count", str(len(overrides)))
 
             return FlextResult[None].ok(data=None)
 
@@ -607,12 +1120,6 @@ class FlextMeltanoConfig(FlextConfig):
 
         Returns:
             FlextResult indicating success or failure.
-
-        Example:
-            >>> config = FlextMeltanoConfig()
-            >>> result = config.seal()
-            >>> if result.is_success:
-            ...     print("Configuration is now sealed")
 
         """
         self._sealed = True
@@ -635,11 +1142,6 @@ class FlextMeltanoConfig(FlextConfig):
 
         Returns:
             FlextTypes.Core.Headers: Environment variables dictionary.
-
-        Example:
-            >>> config = FlextMeltanoConfig(project_root="/my/project")
-            >>> env_vars = config.get_meltano_environment_variables()
-            >>> print(f"Project root: {env_vars['MELTANO_PROJECT_ROOT']}")
 
         """
         # Get base configuration from FlextConfig singleton
@@ -666,6 +1168,97 @@ class FlextMeltanoConfig(FlextConfig):
     # ============================================================================
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
+
+    def get_meltano_logging_config(self) -> dict[str, object]:
+        """Get Meltano-specific logging configuration dictionary.
+
+        Returns:
+            dict[str, object]: Dictionary containing Meltano logging configuration.
+
+        """
+        return {
+            "log_pipeline_execution": self.log_pipeline_execution,
+            "log_pipeline_stages": self.log_pipeline_stages,
+            "log_pipeline_progress": self.log_pipeline_progress,
+            "log_pipeline_errors": self.log_pipeline_errors,
+            "log_pipeline_warnings": self.log_pipeline_warnings,
+            "log_pipeline_performance": self.log_pipeline_performance,
+            "log_pipeline_timing": self.log_pipeline_timing,
+            "log_pipeline_memory": self.log_pipeline_memory,
+            "log_pipeline_throughput": self.log_pipeline_throughput,
+            "log_extract_operations": self.log_extract_operations,
+            "log_extract_queries": self.log_extract_queries,
+            "log_extract_results": self.log_extract_results,
+            "log_extract_errors": self.log_extract_errors,
+            "log_extract_performance": self.log_extract_performance,
+            "log_extract_timing": self.log_extract_timing,
+            "log_extract_memory": self.log_extract_memory,
+            "log_extract_throughput": self.log_extract_throughput,
+            "log_load_operations": self.log_load_operations,
+            "log_load_batches": self.log_load_batches,
+            "log_load_results": self.log_load_results,
+            "log_load_errors": self.log_load_errors,
+            "log_load_performance": self.log_load_performance,
+            "log_load_timing": self.log_load_timing,
+            "log_load_memory": self.log_load_memory,
+            "log_load_throughput": self.log_load_throughput,
+            "log_transform_operations": self.log_transform_operations,
+            "log_transform_sql": self.log_transform_sql,
+            "log_transform_results": self.log_transform_results,
+            "log_transform_errors": self.log_transform_errors,
+            "log_transform_performance": self.log_transform_performance,
+            "log_transform_timing": self.log_transform_timing,
+            "log_transform_memory": self.log_transform_memory,
+            "log_transform_throughput": self.log_transform_throughput,
+            "log_data_quality": self.log_data_quality,
+            "log_data_quality_checks": self.log_data_quality_checks,
+            "log_data_quality_errors": self.log_data_quality_errors,
+            "log_data_quality_warnings": self.log_data_quality_warnings,
+            "log_data_quality_metrics": self.log_data_quality_metrics,
+            "log_data_quality_timing": self.log_data_quality_timing,
+            "log_data_quality_memory": self.log_data_quality_memory,
+            "log_data_quality_throughput": self.log_data_quality_throughput,
+            "log_plugin_operations": self.log_plugin_operations,
+            "log_plugin_errors": self.log_plugin_errors,
+            "log_plugin_performance": self.log_plugin_performance,
+            "log_plugin_timing": self.log_plugin_timing,
+            "log_plugin_memory": self.log_plugin_memory,
+            "log_plugin_throughput": self.log_plugin_throughput,
+            "log_source_info": self.log_source_info,
+            "log_target_info": self.log_target_info,
+            "log_source_errors": self.log_source_errors,
+            "log_target_errors": self.log_target_errors,
+            "log_source_performance": self.log_source_performance,
+            "log_target_performance": self.log_target_performance,
+            "log_source_timing": self.log_source_timing,
+            "log_target_timing": self.log_target_timing,
+            "log_source_memory": self.log_source_memory,
+            "log_target_memory": self.log_target_memory,
+            "log_source_throughput": self.log_source_throughput,
+            "log_target_throughput": self.log_target_throughput,
+            "track_meltano_performance": self.track_meltano_performance,
+            "meltano_performance_threshold_warning": self.meltano_performance_threshold_warning,
+            "meltano_performance_threshold_critical": self.meltano_performance_threshold_critical,
+            "include_pipeline_info_in_logs": self.include_pipeline_info_in_logs,
+            "include_plugin_info_in_logs": self.include_plugin_info_in_logs,
+            "include_source_info_in_logs": self.include_source_info_in_logs,
+            "include_target_info_in_logs": self.include_target_info_in_logs,
+            "include_transform_info_in_logs": self.include_transform_info_in_logs,
+            "include_data_quality_info_in_logs": self.include_data_quality_info_in_logs,
+            "include_timing_in_logs": self.include_timing_in_logs,
+            "include_memory_in_logs": self.include_memory_in_logs,
+            "include_throughput_in_logs": self.include_throughput_in_logs,
+            "mask_sensitive_data": self.mask_sensitive_data,
+            "mask_credentials": self.mask_credentials,
+            "mask_connection_strings": self.mask_connection_strings,
+            "mask_api_keys": self.mask_api_keys,
+            "use_standard_templates": self.use_standard_templates,
+            "custom_log_format": self.custom_log_format,
+            "enable_audit_logging": self.enable_audit_logging,
+            "audit_log_level": self.audit_log_level,
+            "audit_log_file": self.audit_log_file,
+            "environment_specific_logging": self.environment_specific_logging,
+        }
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         {

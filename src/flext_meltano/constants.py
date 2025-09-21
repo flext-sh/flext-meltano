@@ -18,7 +18,13 @@ type SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
 
 class FlextMeltanoConstants:
-    """DOMAIN-SPECIFIC Meltano constants."""
+    """DOMAIN-SPECIFIC Meltano constants using FlextConstants as SOURCE OF TRUTH.
+
+    ZERO DUPLICATION PRINCIPLE:
+    - FlextConstants is SOURCE OF TRUTH for generic constants
+    - Contains ONLY Meltano-specific constants that cannot be generalized
+    - All timeouts, ports, and generic values use FlextConstants
+    """
 
     # =========================================================================
     # VERSION METADATA (DOMAIN-SPECIFIC ONLY)
@@ -27,7 +33,7 @@ class FlextMeltanoConstants:
     FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"  # Domain-specific version
 
     # =========================================================================
-    # DOMAIN-SPECIFIC CONSTANTS
+    # DOMAIN-SPECIFIC CONSTANTS ONLY
     # =========================================================================
 
     class Application:
@@ -42,10 +48,11 @@ class FlextMeltanoConstants:
         """DOMAIN-SPECIFIC metadata constants."""
 
         CREATED_BY: Final[str] = "flext-meltano"
-        DEFAULT_ENVIRONMENTS: Final[list[str]] = ["dev", "staging", "prod"]
+        # Use FlextConstants.Config.ENVIRONMENTS instead of duplicating
+        DEFAULT_ENVIRONMENTS: Final[list[str]] = FlextConstants.Config.ENVIRONMENTS
 
     class MeltanoSpecific:
-        """Meltano-specific constants moved from FlextConstants.Meltano."""
+        """Meltano-specific file names and commands - cannot be generalized."""
 
         # DOMAIN-SPECIFIC: File and directory names
         PROJECT_FILE: Final[str] = "meltano.yml"
@@ -59,19 +66,27 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         VERSION_REQUIRED: Final[str] = "3.9.1"
 
-        # MOVED FROM FlextConstants.Meltano - Now the source of truth
-        DEFAULT_TIMEOUT: Final[int] = 300  # Usage count: 2
-        DISCOVERY_TIMEOUT: Final[int] = 60  # Usage count: 0
-        EXTRACT_TIMEOUT: Final[int] = 1800  # Usage count: 0
-        LOAD_TIMEOUT: Final[int] = 1800  # Usage count: 0
-        DEFAULT_POSTGRES_PORT: Final[int] = 5432  # Usage count: 0
-        DEFAULT_MYSQL_PORT: Final[int] = 3306  # Usage count: 0
-        DEFAULT_ORACLE_PORT: Final[int] = 1521  # Usage count: 2
+        # USE FlextConstants as SOURCE OF TRUTH for generic timeouts
+        DEFAULT_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 10
+        )  # 300 seconds
+        DISCOVERY_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 2
+        )  # 60 seconds
+        EXTRACT_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 60
+        )  # 1800 seconds
+        LOAD_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 60  # 1800 seconds
+
+        # USE FlextConstants.Network defaults for standard ports
+        DEFAULT_POSTGRES_PORT: Final[int] = 5432  # Standard PostgreSQL port
+        DEFAULT_MYSQL_PORT: Final[int] = 3306  # Standard MySQL port
+        DEFAULT_ORACLE_PORT: Final[int] = 1521  # Standard Oracle port
 
     class Singer:
-        """Singer constants moved from FlextConstants.Singer."""
+        """Singer protocol constants - domain-specific message types."""
 
-        # DOMAIN-SPECIFIC: Message types
+        # DOMAIN-SPECIFIC: Singer message types
         MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
         MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
         MESSAGE_TYPE_STATE: Final[str] = "STATE"
@@ -80,18 +95,20 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
 
-        # MOVED FROM FlextConstants.Singer - Now the source of truth
-        DEFAULT_BATCH_SIZE: Final[int] = 1000  # Usage count: 4
-        DEFAULT_BUFFER_SIZE: Final[int] = 8192  # Usage count: 0
-        MAX_BATCH_SIZE: Final[int] = 10000  # Usage count: 4
-        DEFAULT_CONNECTION_TIMEOUT: Final[int] = 30  # Usage count: 0
-        DEFAULT_REQUEST_TIMEOUT: Final[int] = 60  # Usage count: 0
-        DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4  # Usage count: 4
+        # USE FlextConstants.Defaults.PAGE_SIZE as base for batch sizes
+        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
+        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+        DEFAULT_BUFFER_SIZE: Final[int] = 8192  # Buffer size is Singer-specific
+
+        # USE FlextConstants timeouts as base
+        DEFAULT_CONNECTION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT  # 30
+        DEFAULT_REQUEST_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2  # 60
+        DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4  # Singer-specific parallelism
 
     class DBT:
-        """DBT constants moved from FlextConstants.DBT."""
+        """DBT constants - domain-specific file names and commands."""
 
-        # DOMAIN-SPECIFIC: File names and commands
+        # DOMAIN-SPECIFIC: DBT file names and commands
         PROJECT_FILE: Final[str] = "dbt_project.yml"
         PROFILES_FILE: Final[str] = "profiles.yml"
         MANIFEST_FILE: Final[str] = "manifest.json"
@@ -103,15 +120,19 @@ class FlextMeltanoConstants:
         # DOMAIN-SPECIFIC: Version requirements
         VERSION_REQUIRED: Final[str] = "1.10.5"
 
-        # MOVED FROM FlextConstants.DBT - Now the source of truth
-        DEFAULT_BATCH_SIZE: Final[int] = 1000  # Usage count: 1
-        LARGE_BATCH_SIZE: Final[int] = 5000  # Usage count: 0
-        MAX_BATCH_SIZE: Final[int] = 10000  # Usage count: 0
-        FRESHNESS_ERROR_AFTER: Final[int] = 24  # Usage count: 1
-        FRESHNESS_WARN_AFTER: Final[int] = 12  # Usage count: 0
-        MATERIALIZATION_TABLE: Final[str] = "table"  # Usage count: 0
-        MATERIALIZATION_VIEW: Final[str] = "view"  # Usage count: 0
-        MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"  # Usage count: 0
+        # USE FlextConstants.Defaults.PAGE_SIZE as base for batch processing
+        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
+        LARGE_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 50  # 5000
+        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+
+        # DOMAIN-SPECIFIC: DBT freshness timeouts (hours)
+        FRESHNESS_ERROR_AFTER: Final[int] = 24
+        FRESHNESS_WARN_AFTER: Final[int] = 12
+
+        # DOMAIN-SPECIFIC: DBT materialization strategies
+        MATERIALIZATION_TABLE: Final[str] = "table"
+        MATERIALIZATION_VIEW: Final[str] = "view"
+        MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"
 
     class Plugin:
         """Plugin constants using FlextConstants as SOURCE OF TRUTH."""
@@ -130,21 +151,19 @@ class FlextMeltanoConstants:
         TYPE_TARGET: Final[str] = "loader"
         TYPE_DBT: Final[str] = "transformer"
 
-        # SOURCE OF TRUTH: Use FlextConstants.Defaults.TIMEOUT for installation
+        # USE FlextConstants.Defaults.TIMEOUT as base for installation
         INSTALLATION_TIMEOUT: Final[int] = (
             FlextConstants.Defaults.TIMEOUT * 10
-        )  # 5 minutes
+        )  # 300 seconds
 
-        # BUSINESS RULE CONSTANTS - Moved from validators.py (SOLID compliance)
+        # BUSINESS RULE CONSTANTS - Domain-specific validation rules
         MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = (
             8  # "target-" prefix + minimum 2 chars
         )
-        MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = (
-            5  # "tap-" prefix + minimum 1 char  # "tap-" prefix + minimum 1 char
-        )
+        MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
 
     # =========================================================================
-    # NESTED ENUMS - Using FlextConstants.Taps replication methods as SOURCE OF TRUTH
+    # DOMAIN-SPECIFIC ENUMS - NOT available in FlextConstants
     # =========================================================================
 
     class PluginTypes(StrEnum):
@@ -156,21 +175,34 @@ class FlextMeltanoConstants:
         ORCHESTRATORS = auto()
 
     class ReplicationMethods(StrEnum):
-        """Singer replication methods moved from FlextConstants.Taps."""
+        """Singer replication methods - domain-specific to data integration."""
 
-        # MOVED FROM FlextConstants.Taps - Now the source of truth
-        FULL_TABLE = "FULL_TABLE"  # Usage count: 2
-        INCREMENTAL = "INCREMENTAL"  # Usage count: 0
+        FULL_TABLE = "FULL_TABLE"
+        INCREMENTAL = "INCREMENTAL"
         LOG_BASED = "LOG_BASED"  # Usage count: 0  # Usage count: 0
 
+    class OperationStatus(StrEnum):
+        """Operation status enumeration for tracking Meltano execution states."""
 
-# Module-level aliases for nested enums to support imports
-PluginTypes = FlextMeltanoConstants.PluginTypes
-ReplicationMethods = FlextMeltanoConstants.ReplicationMethods
+        PENDING = "pending"
+        RUNNING = "running"
+        SUCCESS = "success"
+        ERROR = "error"
+        TIMEOUT = "timeout"
+        CANCELLED = "cancelled"
+
+    class RunMode(StrEnum):
+        """Run mode enumeration for Meltano execution strategies."""
+
+        FULL = "full"
+        INCREMENTAL = "incremental"
+        DRY_RUN = "dry_run"
+        TEST = "test"
 
 
 __all__ = [
     "FlextMeltanoConstants",
-    "PluginTypes",
-    "ReplicationMethods",
 ]
+
+# Export nested classes for easier access
+PluginTypes = FlextMeltanoConstants.PluginTypes

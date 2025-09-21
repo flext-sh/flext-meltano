@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
-from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
+from flext_meltano.constants import FlextMeltanoConstants
 
 # Type alias for configuration dictionaries
 ConfigDict = dict[str, object]
@@ -88,7 +88,7 @@ class FlextMeltanoConfigBuilders:
     def _create_singer_config_generic(
         self,
         plugin_name: str,
-        plugin_type: str = PluginTypes.EXTRACTORS.value,
+        plugin_type: str = FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
@@ -113,7 +113,7 @@ class FlextMeltanoConfigBuilders:
             # Create type-specific configuration using flext-core patterns
             type_prefix = (
                 FlextMeltanoConstants.Plugin.PREFIX_TAP
-                if plugin_type == PluginTypes.EXTRACTORS.value
+                if plugin_type == FlextMeltanoConstants.PluginTypes.EXTRACTORS.value
                 else FlextMeltanoConstants.Plugin.PREFIX_TARGET
             )
 
@@ -145,7 +145,7 @@ class FlextMeltanoConfigBuilders:
             else:
                 prefix = (
                     "pipelinewise"
-                    if plugin_type == PluginTypes.EXTRACTORS.value
+                    if plugin_type == FlextMeltanoConstants.PluginTypes.EXTRACTORS.value
                     else type_prefix
                 )
                 result_config["pip_url"] = f"{prefix}-{safe_name}"
@@ -171,7 +171,7 @@ class FlextMeltanoConfigBuilders:
         """
         return self._create_singer_config_generic(
             plugin_name=tap_name,
-            plugin_type=PluginTypes.EXTRACTORS.value,
+            plugin_type=FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
             namespace=namespace,
             pip_url=pip_url,
             executable=executable,
@@ -192,7 +192,7 @@ class FlextMeltanoConfigBuilders:
         """
         return self._create_singer_config_generic(
             plugin_name=target_name,
-            plugin_type=PluginTypes.LOADERS.value,
+            plugin_type=FlextMeltanoConstants.PluginTypes.LOADERS.value,
             namespace=namespace,
             pip_url=pip_url,
             executable=executable,
@@ -290,7 +290,7 @@ class FlextMeltanoConfigBuilders:
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "type": PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
+                    "type": FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
                 },
             }
 
@@ -331,7 +331,7 @@ class FlextMeltanoConfigBuilders:
                 "metadata": {
                     "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "type": PluginTypes.LOADERS.value,  # SOURCE OF TRUTH
+                    "type": FlextMeltanoConstants.PluginTypes.LOADERS.value,  # SOURCE OF TRUTH
                 },
             }
 
