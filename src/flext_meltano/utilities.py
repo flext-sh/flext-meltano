@@ -83,7 +83,7 @@ class FlextMeltanoUtilities:
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
         # with_resource expects operation(value, resource) -> FlextResult[U]
         def write_operation(
-            _value: bool,  # noqa: FBT001
+            _value: bool,
             file_handle: TextIO,
         ) -> FlextResult[bool]:
             return cls._write_yaml_content(file_handle, config)
