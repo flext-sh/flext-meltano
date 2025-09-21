@@ -272,19 +272,18 @@ class TestFlextMeltanoExecutorComplete:
         assert isinstance(version_data, dict)
 
     def test_flext_meltano_version(self) -> None:
-        """Test flext_meltano_version method."""
-        result = self.executor.flext_meltano_version()
+        """Test version method."""
+        result = self.executor.version()
 
         assert isinstance(result, FlextResult)
         assert result.success
 
-        version = result.value
-        assert isinstance(version, str)
-        assert len(version) > 0
+        version_data = result.value
+        assert isinstance(version_data, dict)
 
     def test_flext_meltano_install(self) -> None:
-        """Test flext_meltano_install method."""
-        result = self.executor.flext_meltano_install()
+        """Test install functionality through run_command method."""
+        result = self.executor.run_command(["install"])
 
         assert isinstance(result, FlextResult)
         # Installation may succeed or fail depending on environment
@@ -295,8 +294,8 @@ class TestFlextMeltanoExecutorComplete:
             assert result.error
 
     def test_flext_meltano_invoke(self) -> None:
-        """Test flext_meltano_invoke method."""
-        result = self.executor.flext_meltano_invoke("version")
+        """Test invoke functionality through run_command method."""
+        result = self.executor.run_command(["version"])
 
         assert isinstance(result, FlextResult)
         # Invocation should work for basic commands
