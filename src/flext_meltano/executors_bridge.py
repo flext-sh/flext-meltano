@@ -398,7 +398,12 @@ class FlextMeltanoBridge:
             return FlextResult[FlextTypes.Core.Dict].fail(str(e))
 
     def invoke_dbt(self, command: str, project_root: str = ".") -> FlextTypes.Core.Dict:
-        """Invoke DBT command."""
+        """Invoke DBT command.
+
+        Returns:
+            Dictionary containing DBT command execution result.
+
+        """
         return self.execute_dbt_command([command], project_root)
 
     def run_elt_pipeline(
@@ -407,5 +412,10 @@ class FlextMeltanoBridge:
         target_name: str,
         _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
-        """Run complete ELT pipeline."""
+        """Run complete ELT pipeline.
+
+        Returns:
+            Dictionary containing ELT pipeline execution result.
+
+        """
         return self.run_pipeline(tap_name, target_name)

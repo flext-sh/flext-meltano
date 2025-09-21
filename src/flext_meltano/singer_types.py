@@ -333,7 +333,12 @@ class FlextSingerTypes:
         self,
         value: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create Singer STATE message."""
+        """Create Singer STATE message.
+
+        Returns:
+            FlextResult containing the state message.
+
+        """
         try:
             message: FlextTypes.Core.Dict = {"type": "STATE", "value": value}
             return FlextResult[FlextTypes.Core.Dict].ok(data=message)
@@ -350,7 +355,12 @@ class FlextSingerTypes:
         self,
         properties: dict[str, FlextTypes.Core.Dict],
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create and validate properties list."""
+        """Create and validate properties list.
+
+        Returns:
+            FlextResult containing the validated properties.
+
+        """
         try:
             # Validate each property
             for prop_name, prop_def in properties.items():
@@ -373,7 +383,12 @@ class FlextSingerTypes:
         name: str,
         type_def: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Add property to properties collection."""
+        """Add property to properties collection.
+
+        Returns:
+            FlextResult containing the updated properties.
+
+        """
         try:
             updated_properties = properties.copy()
             updated_properties[name] = type_def
@@ -384,7 +399,12 @@ class FlextSingerTypes:
             )
 
     def convert_to_dict(self, data: object) -> FlextResult[FlextTypes.Core.Dict]:
-        """Convert data to dictionary format."""
+        """Convert data to dictionary format.
+
+        Returns:
+            FlextResult containing the converted dictionary.
+
+        """
         try:
             if isinstance(data, dict):
                 return FlextResult[FlextTypes.Core.Dict].ok(data=data)
@@ -408,11 +428,21 @@ class FlextSingerTypes:
     # ============================================================================
 
     def get_registered_types(self) -> FlextTypes.Core.StringList:
-        """Get list of registered type names."""
+        """Get list of registered type names.
+
+        Returns:
+            List of registered type names.
+
+        """
         return list(self._type_registry.keys())
 
     def get_type_definition(self, type_name: str) -> FlextResult[FlextTypes.Core.Dict]:
-        """Get type definition by name."""
+        """Get type definition by name.
+
+        Returns:
+            FlextResult containing the type definition.
+
+        """
         if type_name in self._type_registry:
             return FlextResult[FlextTypes.Core.Dict].ok(
                 self._type_registry[type_name].copy(),
@@ -421,7 +451,12 @@ class FlextSingerTypes:
 
     @classmethod
     def create_instance(cls) -> FlextResult[FlextSingerTypes]:
-        """Factory method to create FlextSingerTypes instance."""
+        """Factory method to create FlextSingerTypes instance.
+
+        Returns:
+            FlextResult containing the created instance.
+
+        """
         try:
             return FlextResult["FlextSingerTypes"].ok(data=cls())
         except Exception as e:

@@ -58,6 +58,9 @@ class FlextTapAbstractions:
         def validate_tap_type(cls, v: str) -> str:
             """Validate tap_type is not empty.
 
+            Returns:
+                Validated tap_type string.
+
             Raises:
                 ValueError: If tap_type is empty or whitespace only.
 
@@ -74,6 +77,9 @@ class FlextTapAbstractions:
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             """Validate connection_config using centralized validator.
+
+            Returns:
+                Validated connection configuration dictionary.
 
             Raises:
                 ValueError: If connection config validation fails.
@@ -150,6 +156,10 @@ class FlextTapAbstractions:
 
         ELIMINATES: ServiceProcessor inheritance complexity.
         USES: Direct FlextResult patterns with nested classes.
+
+        Returns:
+            FlextResult containing the processed TapInstance.
+
         """
         try:
             # Pydantic validation is automatic - no manual validation needed
@@ -203,7 +213,12 @@ class FlextTapAbstractions:
         tap_config: FlextTapAbstractions.TapConfig,
         stream_name: str,
     ) -> FlextTypes.Core.Dict:
-        """Get stream configuration using Pydantic model - ELIMINATES type checking."""
+        """Get stream configuration using Pydantic model - ELIMINATES type checking.
+
+        Returns:
+            Dictionary containing stream configuration.
+
+        """
         # Cast to satisfy MyPy type checking
         result = tap_config.stream_config.get(stream_name, {})
         return dict(result) if isinstance(result, dict) else {}

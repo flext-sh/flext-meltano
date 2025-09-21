@@ -252,7 +252,12 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def validate_project_structure(cls, project_root: Path) -> FlextResult[bool]:
-        """Validate Meltano project structure using centralized validator."""
+        """Validate Meltano project structure using centralized validator.
+
+        Returns:
+            FlextResult indicating whether the project structure is valid.
+
+        """
         # Use centralized validator to eliminate duplication
 
         return FlextMeltanoValidators.validate_meltano_project_structure(project_root)

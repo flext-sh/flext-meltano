@@ -1105,7 +1105,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         }
         return FlextResult[FlextTypes.Core.Headers].ok(data=unknown_result)
 
-    def flext_meltano_version(self) -> FlextResult[str]:
+    def _flext_meltano_version(self) -> FlextResult[str]:
         """Get Meltano version string using native API.
 
         Returns:
@@ -1131,7 +1131,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
         return FlextResult[str].fail(result.error or "Version retrieval failed")
 
-    def flext_meltano_install(self) -> FlextResult[bool]:
+    def _flext_meltano_install(self) -> FlextResult[bool]:
         """Run Meltano install using native API.
 
         Returns:
@@ -1149,7 +1149,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 )
         return FlextResult[bool].ok(data=True)
 
-    def flext_meltano_invoke(
+    def _flext_meltano_invoke(
         self,
         plugin_name: str,
         *args: str,
