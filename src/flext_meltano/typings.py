@@ -41,44 +41,44 @@ type ServiceCallProtocol = JsonValue
 class FlextMeltanoTypes:
     """UNIFIED Meltano Types - SINGLE RESPONSIBILITY PATTERN.
 
-        Meltano-specific hierarchical type system extending FlextTypes with consolidated protocols.
+    Domain-specific type system using FlextTypes.Core as SOURCE OF TRUTH.
+    Contains ONLY Meltano-specific types that cannot be generalized.
 
-        This class inherits all core FLEXT types and adds Meltano-specific
-        type definitions organized by domain functionality.
+    ZERO DUPLICATION PRINCIPLE:
+    - FlextTypes.Core is SOURCE OF TRUTH for common types
+    - Contains ONLY Meltano ELT domain-specific types
+    - All type aliases use FlextTypes directly
 
-        The type system adds the following Meltano domains:
-            - Plugin: Meltano plugin management types
-            - Singer: Singer SDK tap/target types
-            - DBT: DBT Core transformation types
-            - Bridge: Go service integration types
-            - CLI: Command-line interface types
-            - ELT: Extract-Load-Transform pipeline types
+    The type system organizes Meltano-specific domains:
+        - Plugin: Meltano plugin management types
+        - Singer: Singer SDK tap/target types
+        - DBT: DBT Core transformation types
+        - Bridge: Go service integration types
+        - CLI: Command-line interface types
+        - ELT: Extract-Load-Transform pipeline types
 
     Examples:
-            Using Meltano-specific types::
+        Using Meltano-specific types::
 
-                from flext_meltano import FlextMeltanoTypes
-    from typing import Dict
-    from typing import List
-    from typing import Type
+            from flext_meltano import FlextMeltanoTypes
 
-                plugin_config: FlextMeltanoTypes.Plugin.Config = {
-                    "name": "tap-csv",
-                    "variant": "meltanolabs",
-                }
+            plugin_config: FlextMeltanoTypes.Plugin.Config = {
+                "name": "tap-csv",
+                "variant": "meltanolabs",
+            }
 
-                tap: FlextMeltanoTypes.Singer.Tap = csv_tap
-                pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
+            tap: FlextMeltanoTypes.Singer.Tap = csv_tap
+            pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
 
     """
 
     # =========================================================================
-    # NESTED PROTOCOL DEFINITIONS - Domain-specific structural typing
+    # DOMAIN-SPECIFIC PROTOCOLS - Meltano ELT interfaces
     # =========================================================================
 
     @runtime_checkable
     class MeltanoPluginProtocol(Protocol[T_co]):
-        """Advanced protocol for Meltano plugin interface with covariant constraints."""
+        """Meltano plugin interface with covariant return type."""
 
         def get_config(self) -> ConfigDict:
             """Get plugin configuration."""
@@ -94,7 +94,7 @@ class FlextMeltanoTypes:
 
     @runtime_checkable
     class SingerStreamProtocol(Protocol):
-        """Protocol for Singer stream implementations with type safety."""
+        """Singer stream interface with type safety."""
 
         name: str
         tap_stream_id: str
@@ -109,202 +109,172 @@ class FlextMeltanoTypes:
             ...
 
     # =========================================================================
-    # DOMAIN TYPE CLASSES
-    # =========================================================================
-
-    # =========================================================================
-    # PLUGIN TYPES - Meltano plugin management
+    # PLUGIN TYPES - Meltano plugin management (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class Plugin:
-        """Meltano plugin management types extending flext-core base types.
+        """Meltano plugin management types using FlextTypes.Core foundation."""
 
-        This class contains types used in Meltano plugin management,
-        using FlextTypes.Core and FlextTypes.Config as foundation for type safety.
-        """
+        # Plugin identification (domain-specific identifiers)
+        type Name = str
+        type Variant = str
+        type Type = str
+        type Version = str
 
-        # Plugin identification and metadata (using appropriate types)
-        type Name = str  # Plugin name identifier
-        type Variant = str  # Plugin variant identifier
-        type Type = str  # Plugin type identifier
-        type Version = str  # Keep as str since versions have specific format
-        type Config = ConfigDict  # ConfigDict type
-        type Settings = ConfigDict  # Settings are configuration
+        # Configuration using FlextTypes.Core
+        type Config = FlextTypes.Core.ConfigDict
+        type Settings = FlextTypes.Core.ConfigDict
 
-        # Plugin discovery and installation (using flext-core patterns)
-        type DiscoveryResult = list[JsonObject]  # List of JsonObject
-        type InstallationResult = JsonObject  # Single JsonObject result
-        type PluginInfo = JsonObject  # Plugin info as JsonObject
+        # Plugin operations using FlextTypes.Core
+        type DiscoveryResult = list[FlextTypes.Core.JsonObject]
+        type InstallationResult = FlextTypes.Core.JsonObject
+        type PluginInfo = FlextTypes.Core.JsonObject
 
-        # Plugin execution (using flext-core patterns)
-        type Command = FlextTypes.Core.StringList  # Command as list of strings
-        type Arguments = FlextTypes.Core.StringList  # Arguments as list of strings
-        type Environment = FlextTypes.Core.Headers  # Keep specific str->str mapping
+        # Execution using FlextTypes.Core
+        type Command = FlextTypes.Core.StringList
+        type Arguments = FlextTypes.Core.StringList
+        type Environment = FlextTypes.Core.Headers
 
     # =========================================================================
-    # SINGER TYPES - Singer SDK integration
+    # SINGER TYPES - Singer SDK integration (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class Singer:
-        """Singer SDK integration types extending flext-core base types.
+        """Singer SDK integration types using FlextTypes.Core foundation."""
 
-        This class contains types used in Singer SDK integration,
-        leveraging FlextTypes.Core and FlextTypes.Payload for message processing.
-        """
-
-        # Core Singer components (use proper protocol types)
+        # Core Singer components (domain-specific protocols)
         type Tap = SingerTapProtocol
         type Target = SingerTargetProtocol
         type Stream = SingerStreamProtocol
 
-        # Singer message system (using flext-core message types)
-        type MessageType = MessageType  # Use Payload.MessageType
-        type MessageData = MessageData  # Consistent message data
-        type SchemaMessage = JsonObject  # Schema as JsonObject
-        type RecordMessage = JsonObject  # Record as JsonObject
-        type StateMessage = JsonObject  # State as JsonObject
+        # Singer message system using FlextTypes.Core
+        type MessageType = str
+        type MessageData = FlextTypes.Core.Dict
+        type SchemaMessage = FlextTypes.Core.JsonObject
+        type RecordMessage = FlextTypes.Core.JsonObject
+        type StateMessage = FlextTypes.Core.JsonObject
 
-        # Stream processing (using flext-core identifiers)
-        type StreamName = str  # Stream name as identifier
-        type StreamSchema = JsonObject  # Schema as JsonObject
-        type StreamMetadata = JsonObject  # Metadata as JsonObject
+        # Stream processing using FlextTypes.Core
+        type StreamName = str
+        type StreamSchema = FlextTypes.Core.JsonObject
+        type StreamMetadata = FlextTypes.Core.JsonObject
 
-        # Configuration and settings (using flext-core config types)
-        type TapConfig = ConfigDict  # Tap config from Config domain
-        type TargetConfig = ConfigDict  # Target config from Config domain
-        type PropertiesList = JsonObject  # Properties as JsonObject
+        # Configuration using FlextTypes.Core
+        type TapConfig = FlextTypes.Core.ConfigDict
+        type TargetConfig = FlextTypes.Core.ConfigDict
+        type PropertiesList = FlextTypes.Core.JsonObject
 
     # =========================================================================
-    # DBT TYPES - DBT Core transformation
+    # DBT TYPES - DBT Core transformation (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class DBT:
-        """DBT Core transformation types extending flext-core base types.
+        """DBT Core transformation types using FlextTypes.Core foundation."""
 
-        This class contains types used in DBT Core integration,
-        leveraging FlextTypes.Core and FlextTypes.Config for configuration management.
-        """
-
-        # DBT Core components (use proper protocol types)
+        # DBT Core components (domain-specific protocols)
         type Runner = DbtRunnerProtocol
-        type Project = ConfigDict  # Project as ConfigDict
-        type Profile = ConfigDict  # Profile as ConfigDict
+        type Project = FlextTypes.Core.ConfigDict
+        type Profile = FlextTypes.Core.ConfigDict
 
-        # Model and transformation types (using flext-core identifiers and JSON)
-        type Model = str  # Model name as identifier
-        type ModelPath = str  # Keep as str for file paths
-        type SqlQuery = str  # Keep as str for SQL content
-        type CompilationResult = JsonObject  # Result as JsonObject
+        # Model and transformation types (domain-specific)
+        type Model = str
+        type ModelPath = str
+        type SqlQuery = str
+        type CompilationResult = FlextTypes.Core.JsonObject
 
-        # Execution and results (using flext-core result patterns)
-        type RunResult = JsonObject  # Run result as JsonObject
-        type TestResult = JsonObject  # Test result as JsonObject
-        type ExecutionResult = JsonObject  # Execution result as JsonObject
+        # Execution and results using FlextTypes.Core
+        type RunResult = FlextTypes.Core.JsonObject
+        type TestResult = FlextTypes.Core.JsonObject
+        type ExecutionResult = FlextTypes.Core.JsonObject
 
-        # Configuration (using flext-core config types)
-        type ProjectConfig = ConfigDict  # Project config
-        type ProfileConfig = ConfigDict  # Profile config
-        type TargetConfig = ConfigDict  # Target config
+        # Configuration using FlextTypes.Core
+        type ProjectConfig = FlextTypes.Core.ConfigDict
+        type ProfileConfig = FlextTypes.Core.ConfigDict
+        type TargetConfig = FlextTypes.Core.ConfigDict
 
     # =========================================================================
-    # BRIDGE TYPES - Go service integration
+    # BRIDGE TYPES - Go service integration (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class Bridge:
-        """Go service integration types extending flext-core base types.
+        """Go service integration types using FlextTypes.Core foundation."""
 
-        This class contains types used in the Go <-> Python bridge,
-        leveraging FlextTypes.Network and FlextTypes.Payload for communication.
-        """
+        # Bridge communication using FlextTypes.Core
+        type Operation = str
+        type Request = FlextTypes.Core.Dict
+        type Response = FlextTypes.Core.Dict
+        type JsonPayload = FlextTypes.Core.JsonObject
 
-        # Bridge communication (using flext-core network and payload types)
-        type Operation = str  # Operation as identifier
-        type Request = MessageData  # Request as message data
-        type Response = MessageData  # Response as message data
-        type JsonPayload = JsonObject  # Payload as JsonObject
+        # Service integration using FlextTypes.Core
+        type ServiceStatus = str
+        type ServiceInfo = FlextTypes.Core.JsonObject
+        type VersionInfo = FlextTypes.Core.JsonObject
+        type CapabilityInfo = FlextTypes.Core.JsonObject
 
-        # Service integration (using flext-core service types)
-        type ServiceStatus = str  # Status as identifier
-        type ServiceInfo = JsonObject  # Service info as JsonObject
-        type VersionInfo = JsonObject  # Version info as JsonObject
-        type CapabilityInfo = JsonObject  # Capability as JsonObject
-
-        # Error handling (using flext-core error patterns)
-        type ErrorResponse = JsonObject  # Error response as JsonObject
-        type SuccessResponse = JsonObject  # Success response as JsonObject
+        # Error handling using FlextTypes.Core
+        type ErrorResponse = FlextTypes.Core.JsonObject
+        type SuccessResponse = FlextTypes.Core.JsonObject
 
     # =========================================================================
-    # CLI TYPES - Command-line interface
+    # CLI TYPES - Command-line interface (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class CLI:
-        """Command-line interface types extending flext-core base types.
+        """Command-line interface types using FlextTypes.Core foundation."""
 
-        This class contains types used in CLI implementations,
-        leveraging FlextTypes.Commands and FlextTypes.Handler for command processing.
-        """
+        # Command structure using FlextTypes.Core
+        type CommandName = str
+        type CommandArgs = FlextTypes.Core.StringList
+        type CommandResult = FlextTypes.Core.JsonObject
 
-        # Command structure (using flext-core command types)
-        type CommandName = CommandName  # Command name from Commands domain
-        type CommandArgs = FlextTypes.Core.StringList  # Arguments as list of strings
-        type CommandResult = CommandResult  # Result from Commands domain
-
-        # Execution context (using flext-core handler types)
-        type ExecutionContext = HandlerContext  # Context from Handler domain
-        type ProcessResult = JsonObject  # Process result as JsonObject
-        type ExitCode = int  # Keep as int for exit codes
+        # Execution context using FlextTypes.Core
+        type ExecutionContext = FlextTypes.Core.Dict
+        type ProcessResult = FlextTypes.Core.JsonObject
+        type ExitCode = int
 
     # =========================================================================
-    # ELT TYPES - Extract-Load-Transform pipelines
+    # ELT TYPES - Extract-Load-Transform pipelines (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class ELT:
-        """Extract-Load-Transform pipeline types extending flext-core base types.
+        """Extract-Load-Transform pipeline types using FlextTypes.Core foundation."""
 
-        This class contains types used in ELT pipeline orchestration,
-        leveraging FlextTypes.Config for pipeline management.
-        """
+        # Pipeline structure using FlextTypes.Core
+        type Pipeline = FlextTypes.Core.ConfigDict
+        type PipelineStage = str
+        type PipelineConfig = FlextTypes.Core.ConfigDict
 
-        # Pipeline structure (using flext-core config types)
-        type Pipeline = ConfigDict  # Pipeline as config dict
-        type PipelineStage = str  # Stage as identifier
-        type PipelineConfig = ConfigDict  # Pipeline config
+        # Execution and results using FlextTypes.Core
+        type ExtractResult = FlextTypes.Core.JsonObject
+        type LoadResult = FlextTypes.Core.JsonObject
+        type TransformResult = FlextTypes.Core.JsonObject
+        type PipelineResult = FlextTypes.Core.JsonObject
 
-        # Execution and results (using basic FlextTypes.Core types)
-        type ExtractResult = JsonObject  # Extract result
-        type LoadResult = JsonObject  # Load result
-        type TransformResult = JsonObject  # Transform result
-        type PipelineResult = JsonObject  # Pipeline result
-
-        # Monitoring and observability (using basic FlextTypes.Core types)
-        type ExecutionMetrics = JsonObject  # Metrics data
-        type PerformanceData = JsonObject  # Performance as JsonObject
-        type PipelineStatus = str  # Status as identifier
+        # Monitoring and observability using FlextTypes.Core
+        type ExecutionMetrics = FlextTypes.Core.JsonObject
+        type PerformanceData = FlextTypes.Core.JsonObject
+        type PipelineStatus = str
 
     # =========================================================================
-    # ADAPTER TYPES - Service adapter patterns
+    # ADAPTER TYPES - Service adapter patterns (DOMAIN-SPECIFIC)
     # =========================================================================
 
     class Adapter:
-        """Service adapter pattern types extending flext-core base types.
+        """Service adapter pattern types using FlextTypes.Core foundation."""
 
-        This class contains types used in adapter pattern implementations
-        leveraging FlextTypes.Service and FlextTypes.Core for service integration.
-        """
+        # Adapter identification using FlextTypes.Core
+        type AdapterName = str
+        type AdapterType = str
+        type AdapterConfig = FlextTypes.Core.ConfigDict
 
-        # Adapter identification (using flext-core service types)
-        type AdapterName = str  # Adapter name as service identifier
-        type AdapterType = str  # Adapter type as identifier
-        type AdapterConfig = ConfigDict  # Adapter config
+        # Adapter operation types using FlextTypes.Core
+        type OperationResult = FlextTypes.Core.JsonObject
+        type AdapterResponse = FlextTypes.Core.JsonObject
+        type ServiceCall = FlextTypes.Core.JsonValue
 
-        # Adapter operation types (using basic FlextTypes.Core types)
-        type OperationResult = JsonObject  # Operation result
-        type AdapterResponse = JsonObject  # Response as JsonObject
-        type ServiceCall = ServiceCallProtocol  # Service call as callable type
-
-        # Integration patterns (using basic FlextTypes.Core types)
-        type WrapperResult = JsonObject  # Wrapper result as JsonObject
-        type BridgeResult = JsonObject  # Bridge result as JsonObject
+        # Integration patterns using FlextTypes.Core
+        type WrapperResult = FlextTypes.Core.JsonObject
+        type BridgeResult = FlextTypes.Core.JsonObject  # Bridge result as JsonObject
 
 
 __all__ = [

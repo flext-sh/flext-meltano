@@ -408,8 +408,8 @@ class FlextSingerTypes:
         try:
             if isinstance(data, dict):
                 return FlextResult[FlextTypes.Core.Dict].ok(data=data)
-            if hasattr(data, "to_dict") and callable(data.to_dict):
-                result = data.to_dict()
+            if hasattr(data, "to_dict") and callable(getattr(data, "to_dict")):
+                result = getattr(data, "to_dict")()
                 if isinstance(result, dict):
                     return FlextResult[FlextTypes.Core.Dict].ok(data=result)
             elif hasattr(data, "__dict__"):

@@ -8,12 +8,12 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from flext_tests import FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 from meltano.core.project import Project
 
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoAdapter
+from flext_tests import FlextTestsUtilities
 
 
 class TestFlextMeltanoAdapterCoverage:
@@ -164,7 +164,7 @@ class TestFlextMeltanoAdapterCoverage:
 
     def test_create_temporary_meltano_project_success(self) -> None:
         """Test _create_temporary_meltano_project success scenario."""
-        result = self.adapter._create_temporary_meltano_project(
+        result = self.adapter.create_temporary_meltano_project(
             project_id="test-temp-project",
             prefix="flext_test_",
         )
@@ -187,7 +187,7 @@ class TestFlextMeltanoAdapterCoverage:
         with mock.patch("tempfile.mkdtemp") as mock_mkdtemp:
             mock_mkdtemp.side_effect = OSError("Permission denied")
 
-            result = self.adapter._create_temporary_meltano_project(
+            result = self.adapter.create_temporary_meltano_project(
                 project_id="test-invalid-project",
                 prefix="flext_test_",
             )
@@ -231,6 +231,6 @@ class TestFlextMeltanoAdapterCoverage:
         with mock.patch("flext_meltano.adapters.Project") as mock_project:
             mock_project.side_effect = Exception("Test exception")
 
-            result = self.adapter._create_temporary_meltano_project()
+            result = self.adapter.create_temporary_meltano_project()
             assert result.is_failure
             assert "Failed to create temporary project" in (result.error or "")

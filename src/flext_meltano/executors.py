@@ -195,7 +195,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         return FlextResult.fail(f"Command not in registry: {command}")
 
     def _format_command_result(
-        self, command: str, status: str, result: FlextTypes.Core.JsonValue
+        self, command: str, status: str, result: object
     ) -> FlextResult[FlextMeltanoTypes.CLI.ProcessResult]:
         """Format command execution result.
 
@@ -211,10 +211,10 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         formatted_result = {
             "command": command,
             "status": status,
-            "result": cast("FlextTypes.Core.JsonValue", result),
+            "result": result,
         }
         return FlextResult[FlextMeltanoTypes.CLI.ProcessResult].ok(
-            data=formatted_result
+            data=cast("FlextMeltanoTypes.CLI.ProcessResult", formatted_result)
         )
 
     def _handle_unknown_command(
@@ -433,8 +433,8 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "command": "default",
                 "status": "success",
                 "args": str(args),
-                "success": str(result.success),
-                "data": str(result.value if result.success else {}),
+                "success": str(not result.is_failure),
+                "data": str(result.value if not result.is_failure else {}),
             },
         )
 
@@ -543,7 +543,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         """
         if command == "version":
             result = self.bridge.get_version()
-            exit_code = 0 if result.success else 1
+            exit_code = 0 if not result.is_failure else 1
             return FlextResult[int].ok(data=exit_code)
 
         if command == "plugins":
@@ -597,7 +597,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 )
         else:
             version_result = FlextResult.fail("No adapter")
-        meltano_status = "healthy" if version_result.success else "degraded"
+        meltano_status = "healthy" if not version_result.is_failure else "degraded"
 
         return FlextResult[FlextTypes.Core.Headers].ok(
             {
@@ -627,7 +627,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 )
         else:
             version_result = FlextResult.fail("No adapter")
-        if version_result.success and isinstance(version_result.value, dict):
+        if not version_result.is_failure and isinstance(version_result.value, dict):
             meltano_version = str(
                 version_result.value.get(
                     "version",
@@ -701,7 +701,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         else:
             plugins_result = FlextResult.fail("No adapter")
 
-        if plugins_result.success:
+        if not plugins_result.is_failure:
             # Cast to match expected type annotation
             plugins_data = cast(
                 "list[FlextMeltanoTypes.Plugin.PluginInfo]",
@@ -803,7 +803,9 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "success": run_result.get("success", False),
             }
 
-            return FlextResult.ok(data=combined_result)
+            return FlextResult[dict[str, FlextTypes.Core.JsonValue]].ok(
+                data=cast("dict[str, FlextTypes.Core.JsonValue]", combined_result)
+            )
         except Exception as e:
             return FlextResult.fail(f"Bridge execution failed: {e}")
 
@@ -875,7 +877,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
         """
         result = self.bridge.get_version()
-        if result.success:
+        if not result.is_failure:
             result_data = result.value or {}
             meltano_version = result_data.get(
                 "meltano",
@@ -1121,7 +1123,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "Version check failed: Bridge initialization error",
             )
 
-        if result.success:
+        if not result.is_failure:
             version_data = result.value
             version_str = version_data.get(
                 "version",
@@ -1197,8 +1199,8 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
                 "command": "default",
                 "status": "success",
                 "args": "[]",
-                "success": str(result.success),
-                "data": str(result.value if result.success else {}),
+                "success": str(not result.is_failure),
+                "data": str(result.value if not result.is_failure else {}),
             },
         )
 
@@ -1210,7 +1212,7 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
 
         """
         result = self.bridge.get_version()
-        if result.success:
+        if not result.is_failure:
             result_data = result.value or {}
             meltano_version = result_data.get(
                 "meltano",
@@ -1452,7 +1454,9 @@ class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResul
         )
 
         # Return clean CLI interface dictionary (no compatibility layers)
-        return FlextResult[FlextTypes.Core.JsonValue].ok(data=cli_interface)
+        return FlextResult[FlextTypes.Core.JsonValue].ok(
+            data=cast("FlextTypes.Core.JsonValue", cli_interface)
+        )
 
 
 __all__ = [

@@ -83,7 +83,8 @@ class FlextMeltanoUtilities:
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
         # with_resource expects operation(value, resource) -> FlextResult[U]
         def write_operation(
-            file_handle: TextIO, *, _initial_value: bool = True
+            _value: bool,  # noqa: FBT001
+            file_handle: TextIO,
         ) -> FlextResult[bool]:
             return cls._write_yaml_content(file_handle, config)
 
@@ -95,11 +96,18 @@ class FlextMeltanoUtilities:
             except Exception as e:
                 FlextLogger(__name__).warning(f"Error closing file handle: {e}")
 
+        def resource_factory() -> TextIO:
+            result = cls._open_yaml_file_for_writing(target_path)
+            if result.is_failure:
+                error_msg = f"Failed to open file: {result.error}"
+                raise RuntimeError(error_msg)
+            return result.value
+
         return (
             FlextResult[bool]
             .ok(data=True)
             .with_resource(
-                lambda: cls._open_yaml_file_for_writing(target_path),
+                resource_factory,
                 write_operation,
                 cleanup_file_handle,
             )
@@ -236,7 +244,7 @@ class FlextMeltanoUtilities:
 
         # MONADIC COMPOSITION: Chain file operations with automatic error handling
         def convert_to_dict(
-            config_dict: FlextTypes.Core.JsonValue,
+            config_dict: object,
         ) -> FlextTypes.Core.Dict:
             """Type-safe conversion from ConfigDict to FlextTypes.Core.Dict."""
             # ConfigDict is compatible with dict[str, JsonValue] but MyPy needs explicit conversion

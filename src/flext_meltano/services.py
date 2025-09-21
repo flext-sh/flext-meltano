@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import ClassVar, cast
 
+from flext_core.constants import FlextConstants
 from pydantic import ConfigDict
 
 from flext_core import (
@@ -188,7 +189,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         # Fixed: Convert bool result to None result for chain_validations compatibility
         def validate_plugin_config_none() -> FlextResult[None]:
-            result = FlextMeltanoValidators.validate_plugin_config(config)
+            result = FlextMeltanoValidators.validate_meltano_plugin_business_rules(
+                config
+            )
             if result.is_success:
                 return FlextResult[None].ok(None)
             return FlextResult[None].fail(result.error or "Plugin validation failed")
@@ -350,7 +353,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         """
         # Use centralized validator to eliminate duplication
         json_config = cast("FlextTypes.Core.JsonValue", config)
-        return FlextMeltanoValidators.validate_plugin_config(json_config)
+        return FlextMeltanoValidators.validate_meltano_plugin_business_rules(
+            json_config
+        )
 
     def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type.
@@ -630,7 +635,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         # Fixed: Function returns T directly, then flat_map the FlextResult-returning method
         def create_service_from_validation(
-            validated_name: str,  # noqa: ARG001
+            validated_name: str,
             typed_kwargs: FlextTypes.Core.Dict,
             validated_class: type[T],
         ) -> T:
@@ -648,7 +653,10 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             )
             if result.is_failure:
                 # For applicative lifting, we can't return FlextResult, so raise exception
-                raise ValueError(result.error or "Failed to create service instance")
+                raise ValueError(
+                    result.error
+                    or f"Failed to create service instance for '{validated_name}'"
+                )
             return result.unwrap()
 
         return FlextResult.applicative_lift3(
@@ -698,7 +706,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         safe_name = FlextUtilities.TextProcessor.safe_string(name)
 
         # Convert max_workers safely with proper type validation
-        max_workers_raw = config.get("max_workers", 4)
+        max_workers_raw = config.get(
+            "max_workers", FlextConstants.Container.DEFAULT_WORKERS
+        )
         if isinstance(max_workers_raw, (str, int, float)) or max_workers_raw is None:
             max_workers_result = FlextUtilities.Conversions.to_int(max_workers_raw)
         else:
@@ -712,7 +722,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
             )
 
         # Convert timeout_seconds safely with proper type validation
-        timeout_raw = config.get("timeout_seconds", 30)
+        timeout_raw = config.get("timeout_seconds", FlextConstants.Defaults.TIMEOUT)
         if isinstance(timeout_raw, (str, int, float)) or timeout_raw is None:
             timeout_result = FlextUtilities.Conversions.to_int(timeout_raw)
         else:

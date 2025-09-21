@@ -226,7 +226,7 @@ class FlextMeltanoFileManagers:
             for filename, config_data in configs.items():
                 config_path = project_root / filename
                 save_result = cls.save_yaml_config(config_data, config_path)
-                if save_result.success:
+                if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
 
             # Add project root

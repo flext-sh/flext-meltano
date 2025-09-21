@@ -471,7 +471,7 @@ class FlextTargetAbstractions:
 
             for record in records:
                 load_result = self.load_record(target, stream_name, record)
-                if load_result.success:
+                if not load_result.is_failure:
                     loaded_count += 1
                 else:
                     failed_count += 1
