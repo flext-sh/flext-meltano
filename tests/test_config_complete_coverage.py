@@ -13,6 +13,8 @@ import os
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from flext_meltano.config import FlextMeltanoConfig
 
 
@@ -239,22 +241,19 @@ class TestFlextMeltanoConfig:
                 log_level="WARNING",
             )
 
-            assert result.is_success
-            config = result.unwrap()
+            config = result
             assert config.environment == "staging"
             assert config.log_level == "WARNING"  # FlextConfig converts to uppercase
             assert config.project_root == Path(tmp_dir)
 
     def test_create_for_environment_with_validation_error(self) -> None:
         """Test create_for_environment with invalid parameters."""
-        result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_env",
-            project_root=Path("/nonexistent"),
-        )
-
-        # Should fail validation
-        assert result.is_failure
-        assert "environment" in (result.error or "").lower()
+        # Should raise ValueError for invalid environment
+        with pytest.raises(ValueError, match="environment"):
+            FlextMeltanoConfig.create_for_environment(
+                environment="invalid_env",
+                project_root=Path("/nonexistent"),
+            )
 
 
 class TestFlextMeltanoConfigEnums:
@@ -329,12 +328,12 @@ class TestFlextMeltanoConfigEdgeCases:
 
     def test_invalid_environment_validation(self) -> None:
         """Test validation fails with invalid environment using create_for_environment."""
-        result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_environment_name",
-            project_root=Path("/test"),
-        )
-        assert result.is_failure
-        assert "Invalid environment" in (result.error or "")
+        # Should raise ValueError for invalid environment
+        with pytest.raises(ValueError, match="Invalid environment"):
+            FlextMeltanoConfig.create_for_environment(
+                environment="invalid_environment_name",
+                project_root=Path("/test"),
+            )
 
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
@@ -351,14 +350,12 @@ class TestFlextMeltanoConfigEdgeCases:
 
     def test_factory_methods_with_invalid_data(self) -> None:
         """Test factory methods handle invalid data gracefully."""
-        result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid",
-            project_root=Path(),
-        )
-
-        assert result.is_failure
-        assert isinstance(result.error, str)
-        assert len(result.error) > 0
+        # Should raise ValueError for invalid environment
+        with pytest.raises(ValueError, match="environment"):
+            FlextMeltanoConfig.create_for_environment(
+                environment="invalid",
+                project_root=Path(),
+            )
 
     def test_environment_variables_with_special_paths(self) -> None:
         """Test environment variables with special characters in paths."""

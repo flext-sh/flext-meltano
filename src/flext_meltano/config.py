@@ -1068,6 +1068,51 @@ class FlextMeltanoConfig(FlextConfig):
         FlextConfig.set_global_instance(instance)
 
     @classmethod
+    def get_version(cls) -> str:
+        """Get the version of flext-meltano."""
+        return "0.9.0"
+
+    @classmethod
+    def get_name(cls) -> str:
+        """Get the name of flext-meltano."""
+        return "flext-meltano"
+
+    @classmethod
+    def get_default_timeout(cls) -> int:
+        """Get the default timeout value."""
+        return FlextConstants.Network.DEFAULT_TIMEOUT
+
+    @classmethod
+    def get_default_batch_size(cls) -> int:
+        """Get the default batch size value."""
+        return FlextConstants.Performance.DEFAULT_BATCH_SIZE
+
+    @classmethod
+    def get_supported_plugin_types(cls) -> list[str]:
+        """Get list of supported plugin types."""
+        return [
+            FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
+            FlextMeltanoConstants.PluginTypes.LOADERS.value,
+            FlextMeltanoConstants.PluginTypes.TRANSFORMS.value,
+            FlextMeltanoConstants.PluginTypes.ORCHESTRATORS.value,
+        ]
+
+    @classmethod
+    def get_supported_environments(cls) -> list[str]:
+        """Get list of supported environments."""
+        return ["development", "staging", "production"]
+
+    @classmethod
+    def get_supported_log_levels(cls) -> list[str]:
+        """Get list of supported log levels."""
+        return [
+            FlextConstants.Config.LogLevel.DEBUG.value,
+            FlextConstants.Config.LogLevel.INFO.value,
+            FlextConstants.Config.LogLevel.WARNING.value,
+            FlextConstants.Config.LogLevel.ERROR.value,
+        ]
+
+    @classmethod
     def clear_global_instance(cls) -> None:
         """Clear the global instance (useful for testing).
 

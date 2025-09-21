@@ -1,0 +1,1598 @@
+{
+    "version": "1.1.405",
+    "time": "1758491753386",
+    "generalDiagnostics": [
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_complete_coverage.py",
+            "severity": "error",
+            "message": "\"pytest\" is not defined",
+            "range": {
+                "start": {
+                    "line": 249,
+                    "character": 13
+                },
+                "end": {
+                    "line": 249,
+                    "character": 19
+                }
+            },
+            "rule": "reportUndefinedVariable"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_complete_coverage.py",
+            "severity": "error",
+            "message": "\"pytest\" is not defined",
+            "range": {
+                "start": {
+                    "line": 329,
+                    "character": 13
+                },
+                "end": {
+                    "line": 329,
+                    "character": 19
+                }
+            },
+            "rule": "reportUndefinedVariable"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_complete_coverage.py",
+            "severity": "error",
+            "message": "\"pytest\" is not defined",
+            "range": {
+                "start": {
+                    "line": 351,
+                    "character": 13
+                },
+                "end": {
+                    "line": 351,
+                    "character": 19
+                }
+            },
+            "rule": "reportUndefinedVariable"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_complete_coverage.py",
+            "severity": "error",
+            "message": "\"type\" is not iterable\n  \"__iter__\" method not defined",
+            "range": {
+                "start": {
+                    "line": 427,
+                    "character": 24
+                },
+                "end": {
+                    "line": 427,
+                    "character": 58
+                }
+            },
+            "rule": "reportGeneralTypeIssues"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_success\" for class \"FlextMeltanoConfig\"\n  Attribute \"is_success\" is unknown",
+            "range": {
+                "start": {
+                    "line": 49,
+                    "character": 22
+                },
+                "end": {
+                    "line": 49,
+                    "character": 32
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"unwrap\" for class \"FlextMeltanoConfig\"\n  Attribute \"unwrap\" is unknown",
+            "range": {
+                "start": {
+                    "line": 50,
+                    "character": 24
+                },
+                "end": {
+                    "line": 50,
+                    "character": 30
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_success\" for class \"FlextMeltanoConfig\"\n  Attribute \"is_success\" is unknown",
+            "range": {
+                "start": {
+                    "line": 65,
+                    "character": 22
+                },
+                "end": {
+                    "line": 65,
+                    "character": 32
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"unwrap\" for class \"FlextMeltanoConfig\"\n  Attribute \"unwrap\" is unknown",
+            "range": {
+                "start": {
+                    "line": 66,
+                    "character": 24
+                },
+                "end": {
+                    "line": 66,
+                    "character": 30
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_failure\" for class \"FlextMeltanoConfig\"\n  Attribute \"is_failure\" is unknown",
+            "range": {
+                "start": {
+                    "line": 142,
+                    "character": 22
+                },
+                "end": {
+                    "line": 142,
+                    "character": 32
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"error\" for class \"FlextMeltanoConfig\"\n  Attribute \"error\" is unknown",
+            "range": {
+                "start": {
+                    "line": 143,
+                    "character": 22
+                },
+                "end": {
+                    "line": 143,
+                    "character": 27
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"error\" for class \"FlextMeltanoConfig\"\n  Attribute \"error\" is unknown",
+            "range": {
+                "start": {
+                    "line": 144,
+                    "character": 47
+                },
+                "end": {
+                    "line": 144,
+                    "character": 52
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_success\" for class \"FlextMeltanoConfig\"\n  Attribute \"is_success\" is unknown",
+            "range": {
+                "start": {
+                    "line": 155,
+                    "character": 22
+                },
+                "end": {
+                    "line": 155,
+                    "character": 32
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_config_singleton_pattern.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"unwrap\" for class \"FlextMeltanoConfig\"\n  Attribute \"unwrap\" is unknown",
+            "range": {
+                "start": {
+                    "line": 156,
+                    "character": 24
+                },
+                "end": {
+                    "line": 156,
+                    "character": 30
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"str\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"int\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"float\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"bool\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"list[object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"dict[str, object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 675,
+                    "character": 37
+                },
+                "end": {
+                    "line": 675,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"str\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"int\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"float\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"bool\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"list[object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"dict[str, object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "\"execute\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 702,
+                    "character": 34
+                },
+                "end": {
+                    "line": 702,
+                    "character": 41
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"str\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"int\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"float\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"bool\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"list[object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"dict[str, object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "\"execute\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 706,
+                    "character": 38
+                },
+                "end": {
+                    "line": 706,
+                    "character": 45
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"str\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"int\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"float\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"bool\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"list[object]\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"dict[str, object]\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "\"list_plugins\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 710,
+                    "character": 38
+                },
+                "end": {
+                    "line": 710,
+                    "character": 50
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 736,
+                    "character": 32
+                },
+                "end": {
+                    "line": 736,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 746,
+                    "character": 32
+                },
+                "end": {
+                    "line": 746,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 756,
+                    "character": 32
+                },
+                "end": {
+                    "line": 756,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"str\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"int\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"float\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"bool\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"list[object]\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"list_plugins\" for class \"dict[str, object]\"\n  Attribute \"list_plugins\" is unknown",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "\"list_plugins\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 786,
+                    "character": 42
+                },
+                "end": {
+                    "line": 786,
+                    "character": 54
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"str\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"int\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"float\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"bool\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"list[object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"execute\" for class \"dict[str, object]\"\n  Attribute \"execute\" is unknown",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "\"execute\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 791,
+                    "character": 42
+                },
+                "end": {
+                    "line": 791,
+                    "character": 49
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_error_coverage.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"flext_meltano_version\" for class \"FlextMeltanoExecutor\"\n  Attribute \"flext_meltano_version\" is unknown",
+            "range": {
+                "start": {
+                    "line": 208,
+                    "character": 35
+                },
+                "end": {
+                    "line": 208,
+                    "character": 56
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_error_coverage.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"flext_meltano_install\" for class \"FlextMeltanoExecutor\"\n  Attribute \"flext_meltano_install\" is unknown",
+            "range": {
+                "start": {
+                    "line": 221,
+                    "character": 35
+                },
+                "end": {
+                    "line": 221,
+                    "character": 56
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_error_coverage.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"flext_meltano_invoke\" for class \"FlextMeltanoExecutor\"\n  Attribute \"flext_meltano_invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 234,
+                    "character": 35
+                },
+                "end": {
+                    "line": 234,
+                    "character": 55
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_meltano_adapter.py",
+            "severity": "error",
+            "message": "Import \"dbt.version\" could not be resolved",
+            "range": {
+                "start": {
+                    "line": 6,
+                    "character": 7
+                },
+                "end": {
+                    "line": 6,
+                    "character": 18
+                }
+            },
+            "rule": "reportMissingImports"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_business_rules\" for class \"FlextTargetAbstractions\"\n  Attribute \"validate_business_rules\" is unknown",
+            "range": {
+                "start": {
+                    "line": 181,
+                    "character": 42
+                },
+                "end": {
+                    "line": 181,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_business_rules\" for class \"FlextTargetAbstractions\"\n  Attribute \"validate_business_rules\" is unknown",
+            "range": {
+                "start": {
+                    "line": 744,
+                    "character": 42
+                },
+                "end": {
+                    "line": 744,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"id\" for class \"FlextTargetAbstractions\"\n  Attribute \"id\" is unknown",
+            "range": {
+                "start": {
+                    "line": 221,
+                    "character": 26
+                },
+                "end": {
+                    "line": 221,
+                    "character": 28
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"id\" for class \"FlextTargetAbstractions\"\n  Attribute \"id\" is unknown",
+            "range": {
+                "start": {
+                    "line": 228,
+                    "character": 26
+                },
+                "end": {
+                    "line": 228,
+                    "character": 28
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_business_rules\" for class \"FlextTargetAbstractions\"\n  Attribute \"validate_business_rules\" is unknown",
+            "range": {
+                "start": {
+                    "line": 232,
+                    "character": 42
+                },
+                "end": {
+                    "line": 232,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"id\" for class \"FlextTargetAbstractions\"\n  Attribute \"id\" is unknown",
+            "range": {
+                "start": {
+                    "line": 607,
+                    "character": 52
+                },
+                "end": {
+                    "line": 607,
+                    "character": 54
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_development\" for class \"FlextTargetAbstractions\"\n  Attribute \"is_development\" is unknown",
+            "range": {
+                "start": {
+                    "line": 661,
+                    "character": 51
+                },
+                "end": {
+                    "line": 661,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_test\" for class \"FlextTargetAbstractions\"\n  Attribute \"is_test\" is unknown",
+            "range": {
+                "start": {
+                    "line": 662,
+                    "character": 51
+                },
+                "end": {
+                    "line": 662,
+                    "character": 58
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"id\" for class \"FlextTargetAbstractions\"\n  Attribute \"id\" is unknown",
+            "range": {
+                "start": {
+                    "line": 676,
+                    "character": 51
+                },
+                "end": {
+                    "line": 676,
+                    "character": 53
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_business_rules\" for class \"FlextTargetAbstractions\"\n  Attribute \"validate_business_rules\" is unknown",
+            "range": {
+                "start": {
+                    "line": 683,
+                    "character": 42
+                },
+                "end": {
+                    "line": 683,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_development\" for class \"FlextTargetAbstractions\"\n  Attribute \"is_development\" is unknown",
+            "range": {
+                "start": {
+                    "line": 691,
+                    "character": 51
+                },
+                "end": {
+                    "line": 691,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"is_test\" for class \"FlextTargetAbstractions\"\n  Attribute \"is_test\" is unknown",
+            "range": {
+                "start": {
+                    "line": 692,
+                    "character": 51
+                },
+                "end": {
+                    "line": 692,
+                    "character": 58
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_target_abstractions_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_business_rules\" for class \"FlextTargetAbstractions\"\n  Attribute \"validate_business_rules\" is unknown",
+            "range": {
+                "start": {
+                    "line": 698,
+                    "character": 42
+                },
+                "end": {
+                    "line": 698,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_utilities_real_fixed.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 300,
+                    "character": 40
+                },
+                "end": {
+                    "line": 300,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 31,
+                    "character": 40
+                },
+                "end": {
+                    "line": 31,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 38,
+                    "character": 40
+                },
+                "end": {
+                    "line": 38,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 50,
+                    "character": 40
+                },
+                "end": {
+                    "line": 50,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 62,
+                    "character": 40
+                },
+                "end": {
+                    "line": 62,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 67,
+                    "character": 40
+                },
+                "end": {
+                    "line": 67,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 72,
+                    "character": 40
+                },
+                "end": {
+                    "line": 72,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_meltano_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_meltano_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 79,
+                    "character": 40
+                },
+                "end": {
+                    "line": 79,
+                    "character": 63
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_meltano_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_meltano_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 86,
+                    "character": 40
+                },
+                "end": {
+                    "line": 86,
+                    "character": 63
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_meltano_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_meltano_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 96,
+                    "character": 40
+                },
+                "end": {
+                    "line": 96,
+                    "character": 63
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_meltano_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_meltano_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 106,
+                    "character": 40
+                },
+                "end": {
+                    "line": 106,
+                    "character": 63
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_dbt_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_dbt_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 113,
+                    "character": 40
+                },
+                "end": {
+                    "line": 113,
+                    "character": 59
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_dbt_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_dbt_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 120,
+                    "character": 40
+                },
+                "end": {
+                    "line": 120,
+                    "character": 59
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 132,
+                    "character": 40
+                },
+                "end": {
+                    "line": 132,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_meltano_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_meltano_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 157,
+                    "character": 48
+                },
+                "end": {
+                    "line": 157,
+                    "character": 71
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_dbt_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_dbt_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 158,
+                    "character": 44
+                },
+                "end": {
+                    "line": 158,
+                    "character": 63
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 159,
+                    "character": 44
+                },
+                "end": {
+                    "line": 159,
+                    "character": 66
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 160,
+                    "character": 47
+                },
+                "end": {
+                    "line": 160,
+                    "character": 69
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 189,
+                    "character": 40
+                },
+                "end": {
+                    "line": 189,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 200,
+                    "character": 40
+                },
+                "end": {
+                    "line": 200,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 213,
+                    "character": 40
+                },
+                "end": {
+                    "line": 213,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 226,
+                    "character": 40
+                },
+                "end": {
+                    "line": 226,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 239,
+                    "character": 40
+                },
+                "end": {
+                    "line": 239,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 252,
+                    "character": 40
+                },
+                "end": {
+                    "line": 252,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_validators_comprehensive.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"validate_plugin_config\" for class \"type[FlextMeltanoValidators]\"\n  Attribute \"validate_plugin_config\" is unknown",
+            "range": {
+                "start": {
+                    "line": 263,
+                    "character": 40
+                },
+                "end": {
+                    "line": 263,
+                    "character": 62
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        }
+    ],
+    "summary": {
+        "filesAnalyzed": 46,
+        "errorCount": 99,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 5.009
+    }
+}
+
