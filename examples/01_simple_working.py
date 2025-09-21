@@ -2,6 +2,9 @@
 
 This example demonstrates the actual working functionality that exists,
 using only classes and functions that are actually exported from flext_meltano.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from pathlib import Path

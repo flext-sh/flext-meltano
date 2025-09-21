@@ -125,7 +125,7 @@ class FlextMeltanoConstants:
         PREFIX_TAP: Final[str] = "tap"
         PREFIX_TARGET: Final[str] = "target"
 
-        # Ultra-simple aliases for test compatibility
+        # DOMAIN-SPECIFIC: Plugin types (no legacy aliases)
         TYPE_TAP: Final[str] = "extractor"
         TYPE_TARGET: Final[str] = "loader"
         TYPE_DBT: Final[str] = "transformer"
@@ -139,7 +139,9 @@ class FlextMeltanoConstants:
         MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = (
             8  # "target-" prefix + minimum 2 chars
         )
-        MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
+        MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = (
+            5  # "tap-" prefix + minimum 1 char  # "tap-" prefix + minimum 1 char
+        )
 
     # =========================================================================
     # NESTED ENUMS - Using FlextConstants.Taps replication methods as SOURCE OF TRUTH

@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from pydantic import ConfigDict
 
@@ -70,9 +70,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         Args:
             service_type: Type of service to create (tap, target, or dbt).
             **data: Additional configuration data for the service.
-
-        Raises:
-            FlextMeltanoConfigurationError: If service configuration is invalid.
 
         """
         # Convert data to mutable dict and extract service-specific fields
@@ -257,9 +254,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 - executable: Executable command for the service
                 - capabilities: List of service capabilities
 
-        Raises:
-            FlextMeltanoConfigurationError: If configuration is empty or invalid.
-
         Example:
             >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
             >>> config = {"connection_string": "postgresql://..."}
@@ -275,7 +269,7 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         return (
             FlextResult[FlextTypes.Core.Dict]
             .ok(config)
-            .when(bool)  # Fixed: when() only takes condition function
+            .filter(bool)  # Use filter() instead of removed when()
             .flat_map(self._create_service_instance_by_type)
         )
 
@@ -355,7 +349,8 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         """
         # Use centralized validator to eliminate duplication
-        return FlextMeltanoValidators.validate_plugin_config(config)
+        json_config = cast("FlextTypes.Core.JsonValue", config)
+        return FlextMeltanoValidators.validate_plugin_config(json_config)
 
     def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type.
@@ -437,9 +432,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
                 - models_run: List of models that were executed
                 - timestamp: ISO timestamp of execution
 
-        Raises:
-            FlextMeltanoConfigurationError: If service type is not DBT.
-
         Example:
             >>> service = FlextMeltanoService(
             ...     service_type="dbt", project_name="my_project"
@@ -476,9 +468,6 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         Returns:
             FlextResult containing DBT profiles configuration or error details.
-
-        Raises:
-            FlextMeltanoConfigurationError: If service type is not DBT.
 
         Example:
             >>> service = FlextMeltanoService(
@@ -641,11 +630,16 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
 
         # Fixed: Function returns T directly, then flat_map the FlextResult-returning method
         def create_service_from_validation(
-            validated_name: str,
+            validated_name: str,  # noqa: ARG001
             typed_kwargs: FlextTypes.Core.Dict,
             validated_class: type[T],
         ) -> T:
-            """Create service instance from validated inputs - returns T directly."""
+            """Create service instance from validated inputs - returns T directly.
+
+            Raises:
+                ValueError: If service instance creation fails.
+
+            """
             result = FlextMeltanoService._create_instance_from_validated_inputs(
                 validated_class, typed_kwargs
             )

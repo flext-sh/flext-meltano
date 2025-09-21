@@ -203,6 +203,7 @@ class FlextMeltanoConfigBuilders:
     def create_plugin_config(
         self,
         plugin_name: str,
+        *,
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",

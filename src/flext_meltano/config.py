@@ -225,9 +225,6 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
             Path: Resolved absolute path.
 
-        Raises:
-            ValidationError: If path validation fails.
-
         """
         if isinstance(v, str):
             v = Path(v)

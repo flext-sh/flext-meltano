@@ -44,7 +44,12 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
-        """Create temporary directory using direct tempfile implementation."""
+        """Create temporary directory using direct tempfile implementation.
+
+        Returns:
+            FlextResult containing the created temporary directory path.
+
+        """
         logger = FlextLogger(__name__)
         try:
             # Use direct tempfile.mkdtemp for temporary directory creation
@@ -58,7 +63,12 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def save_yaml_config(cls, config: ConfigDict, file_path: Path) -> FlextResult[bool]:
-        """Save YAML config using direct implementation."""
+        """Save YAML config using direct implementation.
+
+        Returns:
+            FlextResult indicating success or failure of the save operation.
+
+        """
         try:
             # Ensure parent directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -80,6 +90,10 @@ class FlextMeltanoFileManagers:
         """Load YAML config using FlextUtilities.Files validation + direct YAML.
 
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
+
+        Returns:
+            FlextResult containing the loaded YAML configuration.
+
         """
         try:
             # Basic path validation using flext-core utilities
@@ -109,6 +123,10 @@ class FlextMeltanoFileManagers:
         """Validate YAML using FlextUtilities.Files + direct YAML parsing.
 
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
+
+        Returns:
+            FlextResult indicating whether the YAML file is valid.
+
         """
         try:
             # Basic path validation using flext-core utilities
@@ -133,7 +151,12 @@ class FlextMeltanoFileManagers:
         base_path: Path,
         directories: FlextTypes.Core.StringList,
     ) -> FlextResult[FlextTypes.Core.Headers]:
-        """Create directory structure using direct pathlib implementation."""
+        """Create directory structure using direct pathlib implementation.
+
+        Returns:
+            FlextResult containing the created directory structure information.
+
+        """
         try:
             created_paths: FlextTypes.Core.Headers = {}
 
@@ -154,7 +177,12 @@ class FlextMeltanoFileManagers:
         project_root: Path,
         project_name: str,
     ) -> FlextResult[PathDict]:
-        """Setup Meltano project structure using direct implementation."""
+        """Setup Meltano project structure using direct implementation.
+
+        Returns:
+            FlextResult containing the project structure information.
+
+        """
         try:
             # Define Meltano directory structure
             directories = [
@@ -209,7 +237,12 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> FlextResult[bool]:
-        """Cleanup temporary directory using direct implementation."""
+        """Cleanup temporary directory using direct implementation.
+
+        Returns:
+            FlextResult indicating success or failure of the cleanup operation.
+
+        """
         try:
             if temp_path.exists() and temp_path.is_dir():
                 shutil.rmtree(temp_path)

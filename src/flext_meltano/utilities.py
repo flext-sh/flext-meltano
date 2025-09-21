@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TextIO
 
 import yaml
 
@@ -78,27 +79,37 @@ class FlextMeltanoUtilities:
             FlextResult indicating write operation success.
 
         """
+
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
         # with_resource expects operation(value, resource) -> FlextResult[U]
-        def write_operation(initial_value: bool, file_handle: object) -> FlextResult[bool]:
+        def write_operation(
+            file_handle: TextIO, *, _initial_value: bool = True
+        ) -> FlextResult[bool]:
             return cls._write_yaml_content(file_handle, config)
 
         # Cleanup function should be Callable[[TResource], None] | None
-        def cleanup_file_handle(file_handle: object) -> None:
+        def cleanup_file_handle(file_handle: TextIO) -> None:
             try:
                 if hasattr(file_handle, "close"):
                     file_handle.close()
             except Exception as e:
                 FlextLogger(__name__).warning(f"Error closing file handle: {e}")
 
-        return FlextResult[bool].ok(True).with_resource(
-            lambda: cls._open_yaml_file_for_writing(target_path),
-            write_operation,
-            cleanup_file_handle,
-        ).with_context(lambda error: f"Writing {FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE}: {error}")
+        return (
+            FlextResult[bool]
+            .ok(data=True)
+            .with_resource(
+                lambda: cls._open_yaml_file_for_writing(target_path),
+                write_operation,
+                cleanup_file_handle,
+            )
+            .with_context(
+                lambda error: f"Writing {FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE}: {error}"
+            )
+        )
 
     @classmethod
-    def _open_yaml_file_for_writing(cls, target_path: Path) -> FlextResult[object]:
+    def _open_yaml_file_for_writing(cls, target_path: Path) -> FlextResult[TextIO]:
         """Open YAML file for writing with validation.
 
         Args:
@@ -119,7 +130,7 @@ class FlextMeltanoUtilities:
 
     @classmethod
     def _write_yaml_content(
-        cls, file_handle: object, config: FlextTypes.Core.Dict
+        cls, file_handle: TextIO, config: FlextTypes.Core.Dict
     ) -> FlextResult[bool]:
         """Write YAML content to file handle.
 
@@ -134,19 +145,21 @@ class FlextMeltanoUtilities:
         try:
             # TYPE SAFETY: Ensure file_handle is writable and config is properly typed
             if not hasattr(file_handle, "write"):
-                return FlextResult[bool].fail("Invalid file handle: missing write method")
+                return FlextResult[bool].fail(
+                    "Invalid file handle: missing write method"
+                )
 
             # MONADIC PATTERN: Safe YAML conversion with proper type casting
-            yaml_data: dict[str, object] = dict(config)  # Type-safe conversion
+            yaml_data = dict(config)  # Type-safe conversion
 
             # DOMAIN-SPECIFIC: YAML writing with Meltano formatting preferences
             yaml.dump(yaml_data, file_handle, default_flow_style=False, indent=2)
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult[bool].fail(f"Failed to write YAML content: {e}")
 
     @classmethod
-    def _close_file_handle(cls, file_handle: object) -> FlextResult[None]:
+    def _close_file_handle(cls, file_handle: TextIO) -> FlextResult[None]:
         """Close file handle safely.
 
         Args:
@@ -220,18 +233,24 @@ class FlextMeltanoUtilities:
             FlextResult containing loaded configuration dictionary.
 
         """
+
         # MONADIC COMPOSITION: Chain file operations with automatic error handling
-        def convert_to_dict(config_dict: object) -> FlextTypes.Core.Dict:
+        def convert_to_dict(
+            config_dict: FlextTypes.Core.JsonValue,
+        ) -> FlextTypes.Core.Dict:
             """Type-safe conversion from ConfigDict to FlextTypes.Core.Dict."""
-            # ConfigDict is compatible with dict[str, object] but MyPy needs explicit conversion
+            # ConfigDict is compatible with dict[str, JsonValue] but MyPy needs explicit conversion
             return dict(config_dict) if isinstance(config_dict, dict) else {}
 
         return (
-            FlextResult[Path].ok(path)
+            FlextResult[Path]
+            .ok(path)
             .flat_map(cls._validate_yaml_path)
             .flat_map(FlextMeltanoFileManagers.load_yaml_config)
             .map(convert_to_dict)  # Type-safe conversion to FlextTypes.Core.Dict
-            .with_context(lambda error: f"Loading YAML config from {path}: {error}")  # Add error context
+            .with_context(
+                lambda error: f"Loading YAML config from {path}: {error}"
+            )  # Add error context
         )
 
     @classmethod

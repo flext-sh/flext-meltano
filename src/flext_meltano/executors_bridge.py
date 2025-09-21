@@ -92,7 +92,12 @@ class FlextMeltanoBridge:
             return {"success": False, "data": None, "error": str(e)}
 
     def get_version(self) -> FlextResult[FlextTypes.Core.Dict]:
-        """Get Meltano version information."""
+        """Get Meltano version information.
+
+        Returns:
+            FlextResult containing version information.
+
+        """
         try:
             # Use adapter to get version
             result = self.adapter.get_version()
@@ -111,18 +116,28 @@ class FlextMeltanoBridge:
             return FlextResult[FlextTypes.Core.Dict].fail(str(e))
 
     def get_version_json(self) -> str:
-        """Get version as JSON string."""
+        """Get version as JSON string.
+
+        Returns:
+            JSON string containing version information.
+
+        """
         result = self.get_version()
         if result.is_success:
             return json.dumps(result.unwrap())
         return json.dumps({"error": result.error})
 
     def run_pipeline(self, tap_name: str, target_name: str) -> FlextTypes.Core.Dict:
-        """Run ELT pipeline using adapter."""
+        """Run ELT pipeline using adapter.
+
+        Returns:
+            Dictionary containing pipeline execution result.
+
+        """
 
         def _run_pipeline() -> FlextResult[FlextTypes.Core.Dict]:
             # Create a temporary project for pipeline execution
-            project_result = self.adapter._create_temporary_meltano_project()
+            project_result = self.adapter.create_temporary_meltano_project()
             if project_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Failed to create project: {project_result.error}",
@@ -148,7 +163,12 @@ class FlextMeltanoBridge:
         _command: FlextTypes.Core.StringList,
         _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
-        """Execute Meltano command using adapter."""
+        """Execute Meltano command using adapter.
+
+        Returns:
+            Dictionary containing command execution result.
+
+        """
 
         def _execute_command() -> FlextResult[FlextTypes.Core.Dict]:
             # Use adapter directly to eliminate duplication
@@ -167,7 +187,12 @@ class FlextMeltanoBridge:
         _command: FlextTypes.Core.StringList,
         _project_root: str = ".",
     ) -> FlextTypes.Core.Dict:
-        """Execute DBT command using adapter."""
+        """Execute DBT command using adapter.
+
+        Returns:
+            Dictionary containing DBT command execution result.
+
+        """
 
         def _execute_dbt() -> FlextResult[FlextTypes.Core.Dict]:
             # Use adapter directly to eliminate duplication
@@ -194,7 +219,7 @@ class FlextMeltanoBridge:
         - install_plugin(project_root, plugin_type, plugin_name)
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Plugin installation result.
+            Plugin installation result object.
 
         """
         try:
@@ -236,7 +261,12 @@ class FlextMeltanoBridge:
             return FlextResult.fail(str(e))
 
     def get_project_info(self, project_root: str = ".") -> FlextTypes.Core.Dict:
-        """Get project information."""
+        """Get project information.
+
+        Returns:
+            Dictionary containing project information.
+
+        """
         try:
             project_path = Path(project_root)
             # Use available methods - get project info via create_project
@@ -257,7 +287,12 @@ class FlextMeltanoBridge:
         self,
         _project: object = None,
     ) -> FlextResult[dict[str, list[FlextTypes.Core.Headers]]]:
-        """Discover available plugins."""
+        """Discover available plugins.
+
+        Returns:
+            FlextResult containing discovered plugins information.
+
+        """
         try:
             result = self.adapter.discover_plugins()
 
@@ -275,7 +310,12 @@ class FlextMeltanoBridge:
         command: str,
         args: FlextTypes.Core.StringList,
     ) -> object:
-        """Asynchronous plugin execution."""
+        """Asynchronous plugin execution.
+
+        Returns:
+            Plugin execution result object.
+
+        """
         try:
             # Run synchronous version in thread pool
             loop = asyncio.get_event_loop()
@@ -297,7 +337,12 @@ class FlextMeltanoBridge:
         _command: str,
         _args: FlextTypes.Core.StringList,
     ) -> object:
-        """Synchronous plugin execution."""
+        """Synchronous plugin execution.
+
+        Returns:
+            Plugin execution result object.
+
+        """
         try:
             # Execute plugin command using adapter
             result = self.adapter.execute_bridge_service()
@@ -316,7 +361,12 @@ class FlextMeltanoBridge:
             return {"success": False, "error": str(e)}
 
     def list_plugins(self) -> FlextResult[list[FlextTypes.Core.Headers]]:
-        """List available plugins."""
+        """List available plugins.
+
+        Returns:
+            FlextResult containing list of available plugins.
+
+        """
         try:
             result = self.adapter.discover_plugins()
             if result.is_success:
@@ -329,7 +379,12 @@ class FlextMeltanoBridge:
         self,
         project_root: str = ".",
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Initialize Meltano project."""
+        """Initialize Meltano project.
+
+        Returns:
+            FlextResult containing project initialization result.
+
+        """
         try:
             project_path = Path(project_root)
             result = self.adapter.initialize_project(project_path)

@@ -66,7 +66,12 @@ class FlextSingerTypes:
         self,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create integer type with optional constraints."""
+        """Create integer type with optional constraints.
+
+        Returns:
+            FlextResult containing the integer type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "integer"}
             type_def.update(kwargs)
@@ -77,7 +82,12 @@ class FlextSingerTypes:
             )
 
     def create_number_type(self, **kwargs: object) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create number type with optional constraints."""
+        """Create number type with optional constraints.
+
+        Returns:
+            FlextResult containing the number type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "number"}
             type_def.update(kwargs)
@@ -91,7 +101,12 @@ class FlextSingerTypes:
         self,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create boolean type."""
+        """Create boolean type.
+
+        Returns:
+            FlextResult containing the boolean type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "boolean"}
             type_def.update(kwargs)
@@ -105,7 +120,12 @@ class FlextSingerTypes:
         self,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create date-time type."""
+        """Create date-time type.
+
+        Returns:
+            FlextResult containing the date-time type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "string", "format": "date-time"}
             type_def.update(kwargs)
@@ -120,7 +140,12 @@ class FlextSingerTypes:
         items: FlextTypes.Core.Dict | None = None,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create array type with optional item type."""
+        """Create array type with optional item type.
+
+        Returns:
+            FlextResult containing the array type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "array"}
             if items:
@@ -137,7 +162,12 @@ class FlextSingerTypes:
         properties: FlextTypes.Core.Dict | None = None,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create object type with optional properties."""
+        """Create object type with optional properties.
+
+        Returns:
+            FlextResult containing the object type definition.
+
+        """
         try:
             type_def: FlextTypes.Core.Dict = {"type": "object"}
             if properties:
@@ -158,6 +188,10 @@ class FlextSingerTypes:
 
         Eliminates multiple return statements using validation dispatch table
         following advanced Python 3.13+ patterns and clean architecture.
+
+        Returns:
+            FlextResult containing the validated value or error information.
+
         """
         try:
             type_name = type_def.get("type")
@@ -202,42 +236,28 @@ class FlextSingerTypes:
 
     def create_schema_definition(
         self,
-        stream_name: str | None = None,
-        properties: dict[str, FlextTypes.Core.Dict] | None = None,
-        key_properties: FlextTypes.Core.StringList | None = None,
+        properties: dict[str, FlextTypes.Core.Dict],
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create Singer schema definition or SCHEMA message."""
+        """Create Singer schema definition (JSON Schema format).
+
+        This method creates a pure JSON Schema object for stream validation.
+        For Singer SCHEMA messages, use create_schema_message() instead.
+
+        Returns:
+            FlextResult containing the schema definition.
+
+        """
         try:
-            # Handle legacy call with just properties
-            if stream_name is None and properties is not None:
-                schema: FlextTypes.Core.Dict = {
-                    "type": "object",
-                    "properties": properties,
-                }
-                # Add optional metadata
-                for key in ["required", "additionalProperties", "description"]:
-                    if key in kwargs:
-                        schema[key] = kwargs[key]
-                return FlextResult[FlextTypes.Core.Dict].ok(data=schema)
-
-            # Handle Singer SCHEMA message creation
-            if stream_name is not None:
-                schema_obj: FlextTypes.Core.Dict = {
-                    "type": "object",
-                    "properties": properties or {},
-                }
-                message: FlextTypes.Core.Dict = {
-                    "type": "SCHEMA",
-                    "stream": stream_name,
-                    "schema": schema_obj,
-                    "key_properties": key_properties or [],
-                }
-                return FlextResult[FlextTypes.Core.Dict].ok(data=message)
-
-            return FlextResult[FlextTypes.Core.Dict].fail(
-                "Either properties (for schema) or stream_name (for SCHEMA message) must be provided",
-            )
+            schema: FlextTypes.Core.Dict = {
+                "type": "object",
+                "properties": properties,
+            }
+            # Add optional metadata
+            for key in ["required", "additionalProperties", "description"]:
+                if key in kwargs:
+                    schema[key] = kwargs[key]
+            return FlextResult[FlextTypes.Core.Dict].ok(data=schema)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(
                 f"Schema definition creation failed: {e}",
@@ -253,7 +273,12 @@ class FlextSingerTypes:
         record: FlextTypes.Core.Dict,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create Singer RECORD message."""
+        """Create Singer RECORD message.
+
+        Returns:
+            FlextResult containing the record message.
+
+        """
         try:
             message: FlextTypes.Core.Dict = {
                 "type": "RECORD",
@@ -279,7 +304,12 @@ class FlextSingerTypes:
         key_properties: FlextTypes.Core.StringList | None = None,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Create Singer SCHEMA message."""
+        """Create Singer SCHEMA message.
+
+        Returns:
+            FlextResult containing the schema message.
+
+        """
         try:
             message: FlextTypes.Core.Dict = {
                 "type": "SCHEMA",
