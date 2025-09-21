@@ -7,11 +7,10 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_tests import FlextTestsUtilities
-
 from flext_core import FlextResult
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
+from flext_tests import FlextTestsUtilities
 
 
 class TestConfigBuildersComprehensiveCoverage:

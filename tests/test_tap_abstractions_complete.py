@@ -2,7 +2,6 @@
 
 import tempfile
 
-from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 from pydantic_core import ValidationError
 
 from flext_core import FlextResult
@@ -12,6 +11,7 @@ from flext_meltano.tap_abstractions import (
     TapConfig,
     TapInstance,
 )
+from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 
 
 class TestFlextTapAbstractionsComplete:

@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from flext_tests import FlextTestsMatchers
 
 from flext_core import FlextResult, FlextUtilities
 from flext_meltano.target_abstractions import FlextTargetAbstractions
+from flext_tests import FlextTestsMatchers
 
 
 class TestFlextTargetConfigComprehensive:

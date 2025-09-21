@@ -13,11 +13,11 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_tests import FlextTestsMatchers
 
 from flext_core import FlextResult
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.constants import PluginTypes
+from flext_tests import FlextTestsMatchers
 
 
 class TestSingerConfigComprehensive:

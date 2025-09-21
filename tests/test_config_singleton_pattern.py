@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from flext_meltano.config import FlextMeltanoConfig
 
 
@@ -47,8 +49,7 @@ class TestFlextMeltanoConfigSingletonPattern:
             meltano_version="3.10.0",
         )
 
-        assert result.is_success
-        config = result.unwrap()
+        config = result
         # project_root gets resolved by validator, check if it contains expected path
         assert config.project_root.is_absolute()
         assert config.environment == "staging"
@@ -63,8 +64,7 @@ class TestFlextMeltanoConfigSingletonPattern:
             max_concurrent_jobs=8,
         )
 
-        assert result.is_success
-        config = result.unwrap()
+        config = result
         assert config.environment == "production"
         # project_root gets resolved by validator
         assert config.project_root.is_absolute()
@@ -135,14 +135,12 @@ class TestFlextMeltanoConfigSingletonPattern:
 
     def test_error_handling_invalid_environment(self) -> None:
         """Test error handling for invalid environment."""
-        result = FlextMeltanoConfig.create_for_environment(
-            environment="invalid_env",
-            project_root="/test",
-        )
-
-        assert result.is_failure
-        assert result.error is not None
-        assert "Invalid environment" in result.error
+        # Should raise ValueError for invalid environment
+        with pytest.raises(ValueError, match="Invalid environment"):
+            FlextMeltanoConfig.create_for_environment(
+                environment="invalid_env",
+                project_root="/test",
+            )
 
     def test_error_handling_invalid_overrides(self) -> None:
         """Test error handling for invalid override values."""
@@ -153,8 +151,7 @@ class TestFlextMeltanoConfigSingletonPattern:
         )
 
         # Should succeed but ignore invalid fields
-        assert result.is_success
-        config = result.unwrap()
+        config = result
         assert not hasattr(config, "invalid_field")
 
     def test_metadata_tracking_overrides(self) -> None:

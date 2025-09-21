@@ -4,9 +4,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_tests import FlextTestsMatchers
-
 from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
+from flext_tests import FlextTestsMatchers
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT

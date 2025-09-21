@@ -471,6 +471,25 @@ class FlextMeltanoValidators:
             logger.exception(error_msg)
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
+    @classmethod
+    def validate_plugin_config(
+        cls,
+        config: FlextTypes.Core.JsonValue,
+    ) -> FlextResult[bool]:
+        """Validate plugin configuration with comprehensive business rules.
+
+        Validates plugin configuration data for Meltano plugins,
+        ensuring proper format, required fields, and business rules.
+
+        Args:
+            config: Plugin configuration to validate.
+
+        Returns:
+            FlextResult containing boolean validation result or error details.
+
+        """
+        return cls.validate_meltano_plugin_business_rules(config)
+
 
 __all__ = [
     "FlextMeltanoValidators",
