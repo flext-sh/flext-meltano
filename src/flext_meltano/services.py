@@ -636,6 +636,9 @@ class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
         ) -> T:
             """Create service instance from validated inputs - returns T directly.
 
+            Returns:
+                Service instance of type T.
+
             Raises:
                 ValueError: If service instance creation fails.
 
