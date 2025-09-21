@@ -11,10 +11,10 @@ SPDX-License-Identifier: MIT
 from typing import cast
 
 import pytest
-from flext_tests import FlextTestsMatchers
 
 from flext_core import FlextResult
 from flext_meltano.validators import FlextMeltanoValidators
+from flext_tests import FlextTestsMatchers
 
 
 class TestFlextMeltanoValidatorsComprehensive:

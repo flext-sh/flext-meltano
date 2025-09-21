@@ -3,10 +3,9 @@
 import tempfile
 from pathlib import Path
 
-from flext_tests import FlextTestsMatchers
-
 from flext_core import FlextResult, FlextTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_tests import FlextTestsMatchers
 
 
 class TestFlextMeltanoAdapterReal:

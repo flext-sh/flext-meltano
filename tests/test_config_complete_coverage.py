@@ -427,18 +427,18 @@ class TestFlextMeltanoConfigIntegration:
 
     def test_config_with_all_supported_values(self) -> None:
         """Test config creation with all supported enum values."""
-        for env_type in FlextMeltanoConfig.EnvironmentType:
+        for env_type in FlextMeltanoConfig.get_supported_environments():
             # Skip invalid environment types
-            if env_type.value == "local":
+            if env_type == "local":
                 continue
 
             config = FlextMeltanoConfig(
                 project_root=Path("/test"),
-                environment=env_type.value,
+                environment=env_type,
                 log_level="INFO",
             )
 
-            assert config.environment == env_type.value
+            assert config.environment == env_type
             # In test environment, log_level is overridden by FLEXT_LOG_LEVEL=debug
             # So we check that it's either the expected value or the test environment value
             expected_log_level = "INFO"
