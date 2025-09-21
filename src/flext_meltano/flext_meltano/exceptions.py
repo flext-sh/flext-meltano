@@ -30,35 +30,27 @@ class FlextMeltanoExceptions:
 
     class BaseError(FlextExceptions.BaseError):
         """Base exception for Meltano operations."""
-        pass
 
     class Error(FlextExceptions.Error):
         """Generic Meltano errors."""
-        pass
 
     class ConfigurationError(FlextExceptions.ConfigurationError):
         """Meltano configuration errors."""
-        pass
 
     class ConnectionError(FlextExceptions.ConnectionError):
         """Meltano connection errors."""
-        pass
 
     class ValidationError(FlextExceptions.ValidationError):
         """Meltano validation errors."""
-        pass
 
     class AuthenticationError(FlextExceptions.AuthenticationError):
         """Meltano authentication errors."""
-        pass
 
     class ProcessingError(FlextExceptions.ProcessingError):
         """Meltano processing errors."""
-        pass
 
     class TimeoutError(FlextExceptions.TimeoutError):
         """Meltano timeout errors."""
-        pass
 
 
 __all__ = [

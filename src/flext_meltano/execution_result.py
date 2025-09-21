@@ -33,7 +33,12 @@ class FlextMeltanoExecutionResult:
         self.execution_time = execution_time
 
     def to_dict(self) -> dict[str, str | int | float | bool | list[str]]:
-        """Convert to dictionary representation."""
+        """Convert to dictionary representation.
+
+        Returns:
+            dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
+
+        """
         return {
             "command": self.command,
             "success": self.success,
@@ -45,7 +50,12 @@ class FlextMeltanoExecutionResult:
         }
 
     def to_json(self) -> str:
-        """Convert to JSON representation."""
+        """Convert to JSON representation.
+
+        Returns:
+            str: JSON string representation of execution result.
+
+        """
         return json.dumps(self.to_dict())
 
 

@@ -10,7 +10,7 @@ from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.exceptions import FlextMeltanoConfigurationError, FlextMeltanoError
+from flext_meltano.exceptions import FlextMeltanoExceptions
 from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.executors_bridge import FlextMeltanoBridge
 from flext_meltano.file_managers import FlextMeltanoFileManagers
@@ -35,9 +35,8 @@ __all__ = [
     "FlextMeltanoBridge",
     "FlextMeltanoConfig",
     "FlextMeltanoConfigBuilders",
-    "FlextMeltanoConfigurationError",
     "FlextMeltanoConstants",
-    "FlextMeltanoError",
+    "FlextMeltanoExceptions",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",
     "FlextMeltanoPluginProtocols",

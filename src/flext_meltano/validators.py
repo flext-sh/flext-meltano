@@ -43,7 +43,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_meltano_plugin_business_rules(
         cls,
-        config: object,
+        config: FlextTypes.Core.JsonValue,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific plugin business rules using monadic error accumulation.
 
@@ -52,7 +52,7 @@ class FlextMeltanoValidators:
         validation feedback with composable validation rules.
 
         Args:
-            config: Plugin configuration object to validate.
+            config: Plugin configuration dictionary to validate.
 
         Returns:
             FlextResult containing boolean validation result or accumulated error details.
@@ -83,11 +83,13 @@ class FlextMeltanoValidators:
         )  # Convert successful validations to boolean result  # Convert successful validations to boolean result
 
     @classmethod
-    def _validate_config_is_dict(cls, config: object) -> FlextResult[None]:
+    def _validate_config_is_dict(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[None]:
         """Validate that config is a dictionary.
 
         Args:
-            config: Configuration object to validate.
+            config: Configuration dictionary to validate.
 
         Returns:
             FlextResult indicating if config is a valid dictionary.
@@ -100,7 +102,9 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=None)
 
     @classmethod
-    def _validate_plugin_name(cls, config: object) -> FlextResult[None]:
+    def _validate_plugin_name(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[None]:
         """Validate plugin name field.
 
         Args:
@@ -154,7 +158,9 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=None)
 
     @classmethod
-    def _validate_plugin_namespace(cls, config: object) -> FlextResult[None]:
+    def _validate_plugin_namespace(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[None]:
         """Validate plugin namespace field.
 
         Args:
@@ -177,7 +183,9 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=None)
 
     @classmethod
-    def _validate_plugin_executable(cls, config: object) -> FlextResult[None]:
+    def _validate_plugin_executable(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[None]:
         """Validate plugin executable field.
 
         Args:
@@ -200,7 +208,9 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=None)
 
     @classmethod
-    def _validate_meltano_specific_rules(cls, config: object) -> FlextResult[None]:
+    def _validate_meltano_specific_rules(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[None]:
         """Validate additional Meltano-specific business rules.
 
         Args:
@@ -222,7 +232,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_meltano_project_business_rules(
         cls,
-        config: object,
+        config: FlextTypes.Core.JsonValue,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific project business rules.
 
@@ -230,7 +240,7 @@ class FlextMeltanoValidators:
         and project ID format restrictions.
 
         Args:
-            config: Project configuration object to validate.
+            config: Project configuration dictionary to validate.
 
         Returns:
             FlextResult containing boolean validation result or error details.
@@ -296,14 +306,16 @@ class FlextMeltanoValidators:
             return FlextResult[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
-    def validate_dbt_business_rules(cls, config: object) -> FlextResult[bool]:
+    def validate_dbt_business_rules(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[bool]:
         """Validate DBT-specific business rules.
 
         Validates DBT project configuration including project name format
         requirements and version specifications.
 
         Args:
-            config: DBT configuration object to validate.
+            config: DBT configuration dictionary to validate.
 
         Returns:
             FlextResult containing boolean validation result or error details.
@@ -361,58 +373,6 @@ class FlextMeltanoValidators:
             return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult[bool].fail(f"DBT validation failed: {e}")
-
-    # =================================================================
-    # COMPATIBILITY ALIASES - For existing tests ONLY
-    # =================================================================
-
-    @classmethod
-    def validate_plugin_config(cls, config: object) -> FlextResult[bool]:
-        """Validate plugin configuration (compatibility alias).
-
-        This method is deprecated and maintained for backward compatibility.
-        Use validate_meltano_plugin_business_rules instead.
-
-        Args:
-            config: Plugin configuration to validate.
-
-        Returns:
-            FlextResult containing boolean validation result or error details.
-
-        """
-        return cls.validate_meltano_plugin_business_rules(config)
-
-    @classmethod
-    def validate_meltano_config(cls, config: object) -> FlextResult[bool]:
-        """Validate Meltano configuration (compatibility alias).
-
-        This method is deprecated and maintained for backward compatibility.
-        Use validate_meltano_project_business_rules instead.
-
-        Args:
-            config: Meltano configuration to validate.
-
-        Returns:
-            FlextResult containing boolean validation result or error details.
-
-        """
-        return cls.validate_meltano_project_business_rules(config)
-
-    @classmethod
-    def validate_dbt_config(cls, config: object) -> FlextResult[bool]:
-        """Validate DBT configuration (compatibility alias).
-
-        This method is deprecated and maintained for backward compatibility.
-        Use validate_dbt_business_rules instead.
-
-        Args:
-            config: DBT configuration to validate.
-
-        Returns:
-            FlextResult containing boolean validation result or error details.
-
-        """
-        return cls.validate_dbt_business_rules(config)
 
     @classmethod
     def validate_meltano_project_structure(

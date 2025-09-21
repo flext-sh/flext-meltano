@@ -68,7 +68,12 @@ class FlextTargetAbstractions:
         @field_validator("target_type")
         @classmethod
         def validate_target_type(cls, v: str) -> str:
-            """Validate target type is non-empty string."""
+            """Validate target type is non-empty string.
+
+            Raises:
+                ValueError: If target type is empty or not a string.
+
+            """
             if not v or not isinstance(v, str):
                 msg = "Target type must be non-empty string"
                 raise ValueError(msg)
@@ -80,7 +85,12 @@ class FlextTargetAbstractions:
             cls,
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
-            """Validate connection config using centralized validator."""
+            """Validate connection config using centralized validator.
+
+            Raises:
+                ValueError: If connection config validation fails.
+
+            """
             # Use centralized validator to eliminate duplication
             result = FlextMeltanoValidators.validate_connection_config(v)
             if result.is_failure:
@@ -90,7 +100,12 @@ class FlextTargetAbstractions:
         @field_validator("batch_size")
         @classmethod
         def validate_batch_size(cls, v: int) -> int:
-            """Validate batch size is positive integer."""
+            """Validate batch size is positive integer.
+
+            Raises:
+                ValueError: If batch size is not a positive integer.
+
+            """
             if not isinstance(v, int) or v <= 0:
                 msg = "Batch size must be positive integer"
                 raise ValueError(msg)
@@ -99,7 +114,12 @@ class FlextTargetAbstractions:
         @field_validator("max_batches")
         @classmethod
         def validate_max_batches(cls, v: int) -> int:
-            """Validate max batches is positive integer."""
+            """Validate max batches is positive integer.
+
+            Raises:
+                ValueError: If max batches is not a positive integer.
+
+            """
             if not isinstance(v, int) or v <= 0:
                 msg = "Max batches must be positive integer"
                 raise ValueError(msg)
@@ -130,7 +150,12 @@ class FlextTargetAbstractions:
         @field_validator("stream_name")
         @classmethod
         def validate_stream_name(cls, v: str) -> str:
-            """Validate stream name is non-empty string."""
+            """Validate stream name is non-empty string.
+
+            Raises:
+                ValueError: If stream name is empty or not a string.
+
+            """
             if not v or not isinstance(v, str):
                 msg = "Stream name must be non-empty string"
                 raise ValueError(msg)
@@ -142,7 +167,12 @@ class FlextTargetAbstractions:
             cls,
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
-            """Validate stream schema contains properties."""
+            """Validate stream schema contains properties.
+
+            Raises:
+                ValueError: If schema does not contain properties.
+
+            """
             if "properties" not in v:
                 msg = "Schema must contain properties"
                 raise ValueError(msg)
@@ -648,25 +678,6 @@ class FlextTargetAbstractions:
     def create_instance(cls) -> FlextResult[FlextTargetAbstractions]:
         """Factory method to create FlextTargetAbstractions instance."""
         return FlextResult["FlextTargetAbstractions"].ok(data=cls())
-
-    # Test compatibility methods and properties
-    @property
-    def id(self) -> str:
-        """Get target ID for test compatibility."""
-        return self.target_id
-
-    def validate_business_rules(self) -> FlextResult[bool]:
-        """Validate business rules for test compatibility."""
-        validation_result = True
-        return FlextResult[bool].ok(data=validation_result)
-
-    def is_development(self) -> bool:
-        """Check if running in development mode."""
-        return True
-
-    def is_test(self) -> bool:
-        """Check if running in test mode."""
-        return True
 
     def is_production(self) -> bool:
         """Check if running in production mode."""

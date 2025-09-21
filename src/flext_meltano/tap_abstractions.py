@@ -56,7 +56,12 @@ class FlextTapAbstractions:
         @field_validator("tap_type")
         @classmethod
         def validate_tap_type(cls, v: str) -> str:
-            """Validate tap_type is not empty."""
+            """Validate tap_type is not empty.
+
+            Raises:
+                ValueError: If tap_type is empty or whitespace only.
+
+            """
             if not v or not v.strip():
                 msg = "tap_type cannot be empty"
                 raise ValueError(msg)
@@ -68,7 +73,12 @@ class FlextTapAbstractions:
             cls,
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
-            """Validate connection_config using centralized validator."""
+            """Validate connection_config using centralized validator.
+
+            Raises:
+                ValueError: If connection config validation fails.
+
+            """
             # Use centralized validator to eliminate duplication
             result = FlextMeltanoValidators.validate_connection_config(v)
             if result.is_failure:
