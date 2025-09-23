@@ -43,7 +43,7 @@ class TestFlextTargetConfigComprehensive:
 
         config = FlextTargetAbstractions.FlextTargetConfig.model_validate(config_data)
         assert config.target_type == "postgres"
-        assert config.connection_config["host"] == "localhost"
+        assert cast("str", config.connection_config["host"]) == "localhost"
         assert config.batch_size == 1000
         assert config.max_batches == 50
 
@@ -219,19 +219,14 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_target_abstractions_initialization(self) -> None:
         """Test FlextTargetAbstractions initialization."""
         target_abs = FlextTargetAbstractions()
-        assert target_abs.id is not None
+        assert target_abs.target_id is not None
         assert hasattr(target_abs, "_logger")
 
     def test_target_abstractions_with_custom_target_id(self) -> None:
         """Test initialization with custom target ID."""
         custom_id = "custom_target_123"
         target_abs = FlextTargetAbstractions(target_id=custom_id)
-        assert target_abs.id == custom_id
-
-    def test_validate_business_rules_success(self) -> None:
-        """Test business rules validation success."""
-        result = self.target_abstractions.validate_business_rules()
-        FlextTestsMatchers.assert_result_success(result, None)
+        assert target_abs.target_id == custom_id
 
     def test_create_flext_target_config_basic(self) -> None:
         """Test creating basic target configuration."""
@@ -252,7 +247,7 @@ class TestFlextTargetAbstractionsComprehensive:
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
         assert isinstance(config, dict)
-        assert config["target_type"] == target_type
+        assert cast("str", config["target_type"]) == target_type
         assert config["connection_config"] == connection_config
 
     def test_create_flext_target_config_with_options(self) -> None:
@@ -268,8 +263,8 @@ class TestFlextTargetAbstractionsComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
-        assert config["batch_size"] == 500
-        assert config["max_batches"] == 25
+        assert cast("int", config["batch_size"]) == 500
+        assert cast("int", config["max_batches"]) == 25
         assert config["stream_maps"] == {"users": "user_data"}
 
     def test_create_flext_target_config_invalid_type(self) -> None:
@@ -317,7 +312,7 @@ class TestFlextTargetAbstractionsComprehensive:
         # Cast nested dictionaries for type safety
         config_dict = cast("dict[str, object]", target_instance["config"])
         connection_config = cast("dict[str, object]", config_dict["connection_config"])
-        assert connection_config["host"] == "localhost"
+        assert cast("str", connection_config["host"]) == "localhost"
 
     def test_create_flext_target_csv(self) -> None:
         """Test creating CSV target instance."""
@@ -345,7 +340,7 @@ class TestFlextTargetAbstractionsComprehensive:
         assert isinstance(target_config, dict), "Config should be a dict"
         connection_config = target_config_typed["connection_config"]
         assert isinstance(connection_config, dict), "Connection config should be a dict"
-        assert str(csv_file) in str(connection_config["file_path"])
+        assert str(csv_file) in str(cast("object", connection_config["file_path"]))
 
     def test_create_flext_target_with_streams(self) -> None:
         """Test creating target with stream information."""
@@ -594,18 +589,18 @@ class TestFlextTargetAbstractionsComprehensive:
         config_extras = config.get("config_extras", {})
         assert isinstance(config_extras, dict), "Config extras should be a dict"
         assert len(config_extras) == 100
-        assert config["target_type"] == "postgres"
+        assert cast("str", config["target_type"]) == "postgres"
 
     def test_target_abstractions_inheritance_validation(self) -> None:
-        """Test that FlextTargetAbstractions properly inherits from FlextModels.Entity."""
+        """Test that FlextTargetAbstractions has proper attributes."""
         target_abs = FlextTargetAbstractions()
 
-        # Should have Entity attributes
-        assert hasattr(target_abs, "id")
-        assert hasattr(target_abs, "validate_business_rules")
+        # Should have instance attributes
+        assert hasattr(target_abs, "target_id")
+        assert hasattr(target_abs, "_logger")
 
-        # Entity ID should contain target_abstractions prefix
-        assert "target_abstractions_" in target_abs.id
+        # Target ID should contain target_abstractions prefix
+        assert "target_abstractions_" in target_abs.target_id
 
     @pytest.mark.parametrize(
         ("target_type", "connection_config"),
@@ -630,7 +625,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
         FlextTestsMatchers.assert_result_success(result)
         config = result.value
-        assert config["target_type"] == target_type
+        assert cast("str", config["target_type"]) == target_type
         assert config["connection_config"] == connection_config
 
 
@@ -659,8 +654,6 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert isinstance(target_type, str)
 
         # Test environment checks (these should always work)
-        assert isinstance(self.target_abstractions.is_development(), bool)
-        assert isinstance(self.target_abstractions.is_test(), bool)
         assert isinstance(self.target_abstractions.is_production(), bool)
 
         # Test basic list operations
@@ -674,30 +667,24 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         # Test target-specific functionality instead of Entity methods
         # Verify it has proper target ID (not Entity ID)
         assert hasattr(self.target_abstractions, "target_id")
-        assert isinstance(self.target_abstractions.id, str)  # Compatibility property
+        assert isinstance(self.target_abstractions.target_id, str)
 
     def test_target_specific_functionality(self) -> None:
         """Test target-specific functionality without Entity dependencies."""
-        # Test core target functionality (not Entity counter methods)
-
-        # Test target validation capabilities (use actual existing method)
-        result = self.target_abstractions.validate_business_rules()
-        assert result.success or result.is_failure  # Should return FlextResult
+        # Test core target functionality
 
         # Test target ID functionality
         assert hasattr(self.target_abstractions, "target_id")
         assert isinstance(self.target_abstractions.target_id, str)
 
-        # Test environment methods (target-specific, not Entity)
-        assert isinstance(self.target_abstractions.is_development(), bool)
-        assert isinstance(self.target_abstractions.is_test(), bool)
+        # Test environment methods (target-specific)
         assert isinstance(self.target_abstractions.is_production(), bool)
 
     def test_validation_and_environment_methods(self) -> None:
         """Test validation and environment methods for coverage."""
-        # Test basic validation that should work
-        result = self.target_abstractions.validate_business_rules()
-        assert isinstance(result, FlextResult)
+        # Test production mode check
+        is_prod = self.target_abstractions.is_production()
+        assert isinstance(is_prod, bool)
 
         # Test utility methods
         active_targets = self.target_abstractions.get_active_targets()

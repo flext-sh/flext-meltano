@@ -15,6 +15,7 @@ from flext_meltano.adapters import FlextMeltanoAdapter
 
 # Main unified API - RECOMMENDED for external use
 from flext_meltano.api import FlextMeltanoAPI
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 
 # Centralized definitions
@@ -39,6 +40,7 @@ __all__ = [
     "FlextMeltanoAPI",  # Main API - RECOMMENDED
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
+    "FlextMeltanoConfig",
     "FlextMeltanoConfigBuilders",
     "FlextMeltanoConstants",
     "FlextMeltanoExceptions",

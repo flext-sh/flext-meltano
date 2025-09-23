@@ -385,13 +385,16 @@ class TestFlextMeltanoConfigBuildersMeltanoComprehensive:
         assert "environments" in config
         environments = config["environments"]
         assert isinstance(environments, list)
-        assert len(environments) == 3  # dev, staging, prod
+        # Default environments: development, staging, production, test, local
+        assert len(environments) == 5
 
         # Check environment structure
         env_names = [env["name"] for env in environments]
-        assert "dev" in env_names
+        assert "development" in env_names
         assert "staging" in env_names
-        assert "prod" in env_names
+        assert "production" in env_names
+        assert "test" in env_names
+        assert "local" in env_names
 
     def test_meltano_config_structure_completeness(self) -> None:
         """Test that meltano config has complete structure."""

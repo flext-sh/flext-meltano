@@ -4,6 +4,7 @@ import sys
 import tempfile
 from collections.abc import MutableMapping
 from pathlib import Path
+from typing import cast
 from unittest import mock
 
 # FIXED: Use flext-cli foundation instead of direct Click imports
@@ -289,7 +290,9 @@ class TestFlextMeltanoExecutorComplete:
         # Installation may succeed or fail depending on environment
         if result.success:
             install_result = result.value
-            assert isinstance(install_result, bool)
+            # run_command returns int exit code, not boolean
+            assert isinstance(install_result, int)
+            assert install_result >= 0  # Exit code should be non-negative
         else:
             assert result.error
 
@@ -669,7 +672,7 @@ class TestFlextMeltanoExecutorComplete:
             assert "executor" in cli_app, "CLI should have executor property"
 
             # Safe dictionary access after isinstance check
-            executor = cli_app["executor"]
+            executor = cast("FlextMeltanoExecutor", cli_app["executor"])
             assert executor is not None, "Executor should be available in CLI interface"
 
             # Test health command execution (lines 776-787)
@@ -696,7 +699,7 @@ class TestFlextMeltanoExecutorComplete:
         # Type guard: verify cli_app is a dict before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
-            executor = cli_app["executor"]
+            executor = cast("FlextMeltanoExecutor", cli_app["executor"])
 
             # Test run command through executor directly
             # This tests the infrastructure without requiring Click invocation
@@ -771,7 +774,7 @@ class TestFlextMeltanoExecutorComplete:
         # Type guard: verify cli_app is a dict before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
-            executor = cli_app["executor"]
+            executor = cast("FlextMeltanoExecutor", cli_app["executor"])
 
             # Test plugins listing directly to hit the formatting paths
             mock_plugins_result = FlextResult.ok(

@@ -971,7 +971,7 @@ class FlextMeltanoConfig(FlextConfig):
         """
         # Validate environment using FlextConstants
         try:
-            env_type = cls.EnvironmentType(environment)
+            env_type = FlextConstants.Environment.ConfigEnvironment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
@@ -985,6 +985,10 @@ class FlextMeltanoConfig(FlextConfig):
         # Create config data with environment
         config_data: dict[str, object] = {"environment": env_type.value}
 
+        # Handle debug/environment conflict: production cannot have debug=True
+        if env_type.value == "production":
+            config_data["debug"] = False
+
         # Handle specific type conversions
         if "project_root" in filtered_kwargs:
             project_root_value = filtered_kwargs["project_root"]
@@ -996,12 +1000,14 @@ class FlextMeltanoConfig(FlextConfig):
                 config_data["project_root"] = Path()
 
         if "log_level" in filtered_kwargs:
-            config_data["log_level"] = cls.LogLevel(
+            config_data["log_level"] = FlextConstants.Config.LogLevel(
                 str(filtered_kwargs["log_level"]),
             )
 
         if "run_mode" in filtered_kwargs:
-            config_data["run_mode"] = cls.RunMode(str(filtered_kwargs["run_mode"]))
+            config_data["run_mode"] = FlextMeltanoConstants.RunMode(
+                str(filtered_kwargs["run_mode"])
+            )
 
         # Apply all other valid kwargs with proper type handling
         excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
@@ -1042,6 +1048,13 @@ class FlextMeltanoConfig(FlextConfig):
 
         # Apply overrides with highest priority
         base_data.update(overrides)
+
+        # Handle debug/environment conflict: production cannot have debug=True
+        if (
+            base_data.get("environment") == "production"
+            and base_data.get("debug") is True
+        ):
+            base_data["debug"] = False
 
         # Create Meltano config instance with all data
         return cls(**base_data)
@@ -1145,9 +1158,29 @@ class FlextMeltanoConfig(FlextConfig):
             )
 
         try:
+            # Handle debug/environment conflict before applying
+            if (
+                "environment" in overrides
+                and overrides["environment"] == "production"
+                and hasattr(self, "debug")
+                and self.debug
+            ):
+                # Force debug=False when switching to production
+                setattr(self, "debug", False)
+
+            applied_count = 0
             for key, value in overrides.items():
                 if hasattr(self, key) and key in self.__class__.model_fields:
                     setattr(self, key, value)
+                    applied_count += 1
+
+            # Track metadata about overrides
+            if not hasattr(self, "_metadata_extra"):
+                self._metadata_extra = {}
+            self._metadata_extra["overrides_applied"] = (
+                "true" if applied_count > 0 else "false"
+            )
+            self._metadata_extra["override_count"] = str(applied_count)
 
             return FlextResult[None].ok(data=None)
 
@@ -1304,6 +1337,22 @@ class FlextMeltanoConfig(FlextConfig):
             "audit_log_file": self.audit_log_file,
             "environment_specific_logging": self.environment_specific_logging,
         }
+
+    def get_metadata(self) -> dict[str, object]:
+        """Get configuration metadata including override tracking.
+
+        Returns:
+            dict[str, object]: Configuration metadata dictionary.
+
+        """
+        # Get base metadata from FlextConfig
+        base_metadata = super().get_metadata()
+
+        # Add extra metadata if it exists
+        if hasattr(self, "_metadata_extra"):
+            base_metadata.update(self._metadata_extra)
+
+        return base_metadata
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         {

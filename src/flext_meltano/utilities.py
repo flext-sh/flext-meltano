@@ -85,12 +85,13 @@ class FlextMeltanoUtilities:
             FlextResult indicating write operation success.
 
         """
-
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
         # with_resource expects operation(value, resource) -> FlextResult[U]
+
         def write_operation(
-            _value: bool,
+            _unused_value: object,  # Required by with_resource signature
             file_handle: TextIO,
+            /,
         ) -> FlextResult[bool]:
             return cls._write_yaml_content(file_handle, config)
 
