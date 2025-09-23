@@ -1,0 +1,62 @@
+{
+    "version": "1.1.405",
+    "time": "1758619412551",
+    "generalDiagnostics": [
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 739,
+                    "character": 32
+                },
+                "end": {
+                    "line": 739,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 749,
+                    "character": 32
+                },
+                "end": {
+                    "line": 749,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "/home/marlonsc/flext/flext-meltano/tests/test_executors_complete.py",
+            "severity": "error",
+            "message": "Cannot access attribute \"invoke\" for class \"object\"\n  Attribute \"invoke\" is unknown",
+            "range": {
+                "start": {
+                    "line": 759,
+                    "character": 32
+                },
+                "end": {
+                    "line": 759,
+                    "character": 38
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        }
+    ],
+    "summary": {
+        "filesAnalyzed": 68,
+        "errorCount": 3,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 13.786
+    }
+}
+

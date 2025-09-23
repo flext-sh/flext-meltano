@@ -1199,8 +1199,9 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.CLI.ProcessResult]):
                 "command": "default",
                 "status": "success",
                 "args": "[]",
-                "success": str(not result.is_failure),
-                "data": str(result.value if not result.is_failure else {}),
+                "success": str(result.is_success),
+                # Use unwrap_or to safely get value with a default
+                "data": str(result.unwrap_or({})),
             },
         )
 
@@ -1291,11 +1292,12 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.CLI.ProcessResult]):
         """
         logger.info("Running CLI operations", args=args)
 
+        # Convert None to empty list first, then process
+        normalized_args = args if args is not None else []
+
         # MONADIC ARGUMENT PROCESSING: Use traverse for argument validation
-        return (
-            FlextResult.ok(data=args)
-            .map(lambda arguments: arguments if arguments is not None else [])
-            .flat_map(self._process_cli_arguments)
+        return FlextResult.ok(data=normalized_args).flat_map(
+            self._process_cli_arguments
         )
 
     def _process_cli_arguments(

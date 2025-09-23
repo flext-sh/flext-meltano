@@ -83,7 +83,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         self,
         project_name: str,
         project_root: Path | None = None,
-        **kwargs: object,
+        **_kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create a new Meltano project.
 
@@ -97,7 +97,6 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         """
         try:
-            # Validate project name
             validation_result = (
                 self._validators.validate_meltano_project_business_rules({
                     "version": 1,
@@ -109,29 +108,22 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                     f"Project validation failed: {validation_result.error}"
                 )
 
-            # Create project configuration
-            config_result = self._config_builders.build_project_config(
+            project_dir = project_root or Path.cwd()
+            creation_result = self._adapter.create_project(
                 project_name=project_name,
-                project_root=project_root or Path.cwd(),
-                **kwargs,
+                project_dir=project_dir,
             )
-            if config_result.is_failure:
-                return FlextResult[FlextTypes.Core.Dict].fail(
-                    f"Config creation failed: {config_result.error}"
-                )
-
-            # Execute project creation through adapter
-            creation_result = await self._adapter.create_project(config_result.unwrap())
             if creation_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Project creation failed: {creation_result.error}"
                 )
 
             self._logger.info(f"Successfully created Meltano project: {project_name}")
+            result_data = creation_result.unwrap()
             return FlextResult[FlextTypes.Core.Dict].ok({
                 "name": project_name,
-                "root": str(project_root or Path.cwd()),
-                "config": config_result.unwrap(),
+                "root": str(project_dir),
+                "details": result_data,
                 "status": "created",
             })
 
@@ -154,7 +146,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         """
         try:
-            validation_result = await self._adapter.validate_project(
+            validation_result = self._adapter.validate_project(
                 project_root or Path.cwd()
             )
             if validation_result.is_failure:
@@ -182,7 +174,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         plugin_type: str,
         plugin_name: str,
         variant: str | None = None,
-        **kwargs: object,
+        **_kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Install a Meltano plugin.
 
@@ -197,12 +189,10 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         """
         try:
-            # Validate plugin configuration
-            plugin_config = {
+            plugin_config: FlextTypes.Core.JsonValue = {
                 "name": plugin_name,
                 "type": plugin_type,
                 "variant": variant or FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
-                **kwargs,
             }
 
             validation_result = self._validators.validate_meltano_plugin_business_rules(
@@ -213,20 +203,24 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                     f"Plugin validation failed: {validation_result.error}"
                 )
 
-            # Install plugin through adapter
-            installation_result = await self._adapter.install_plugin(plugin_config)
+            installation_result = self._adapter.add_plugin(
+                project_dir=Path.cwd(),
+                plugin_type=plugin_type,
+                plugin_name=plugin_name,
+            )
             if installation_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Plugin installation failed: {installation_result.error}"
                 )
 
             self._logger.info(f"Successfully installed plugin: {plugin_name}")
+            result_data = installation_result.unwrap()
             return FlextResult[FlextTypes.Core.Dict].ok({
                 "plugin_name": plugin_name,
                 "plugin_type": plugin_type,
                 "variant": variant or FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
                 "status": "installed",
-                "details": installation_result.unwrap(),
+                "details": result_data,
             })
 
         except Exception as e:
@@ -236,25 +230,28 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
     async def list_plugins(
         self,
-        plugin_type: str | None = None,
+        _plugin_type: str | None = None,
     ) -> FlextResult[list[FlextTypes.Core.Dict]]:
         """List installed Meltano plugins.
 
         Args:
-            plugin_type: Filter by plugin type (optional)
+            _plugin_type: Filter by plugin type (optional, not yet implemented)
 
         Returns:
             FlextResult containing list of plugins or error details
 
         """
         try:
-            plugins_result = await self._adapter.discover_plugins()
+            plugins_result = self._adapter.discover_plugins()
             if plugins_result.is_failure:
                 return FlextResult[list[FlextTypes.Core.Dict]].fail(
                     f"Failed to list plugins: {plugins_result.error}"
                 )
 
-            return FlextResult[list[FlextTypes.Core.Dict]].ok(plugins_result.unwrap())
+            plugins_data: list[FlextTypes.Core.Dict] = [
+                dict(plugin) for plugin in plugins_result.unwrap()
+            ]
+            return FlextResult[list[FlextTypes.Core.Dict]].ok(plugins_data)
 
         except Exception as e:
             error_msg = f"Failed to list plugins: {e}"
@@ -281,31 +278,18 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         """
         try:
-            # Create tap configuration
-            if config:
-                tap_config = FlextMeltanoModels.TapConfig(
-                    tap_type=tap_name,
-                    connection_config=config,
-                )
-            else:
-                # Use existing tap configuration
-                tap_config_result = await self._adapter.get_plugin_info(tap_name)
-                if tap_config_result.is_failure:
-                    return FlextResult[FlextTypes.Core.Dict].fail(
-                        f"Failed to get tap config: {tap_config_result.error}"
-                    )
-
-                config_data = tap_config_result.unwrap()
-                tap_config = FlextMeltanoModels.TapConfig(
-                    tap_type=tap_name,
-                    connection_config=config_data.get("config", {}),
-                    stream_config=config_data.get("stream_config", {}),
-                )
-
-            # Generate catalog through tap abstractions
-            discovery_result = await self._tap_abstractions.generate_catalog(
-                tap_config.tap_type
+            tap_config = FlextTapAbstractions.TapConfig(
+                tap_type=tap_name,
+                connection_config=config or {},
             )
+
+            tap_instance = FlextTapAbstractions.TapInstance(
+                config=tap_config,
+                tap_type=tap_name,
+                tap_id=f"tap_{tap_name}",
+            )
+
+            discovery_result = self._tap_abstractions.generate_catalog(tap_instance)
             if discovery_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Catalog discovery failed: {discovery_result.error}"
@@ -325,34 +309,48 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
     async def extract_data(
         self,
         tap_name: str,
-        catalog: FlextTypes.Core.Dict | None = None,
-        state: FlextTypes.Core.Dict | None = None,
+        stream_name: str,
+        limit: int | None = None,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Extract data using a Singer tap.
 
         Args:
             tap_name: Name of the tap to use
-            catalog: Optional catalog to use (defaults to discovery)
-            state: Optional state for incremental extraction
+            stream_name: Name of the stream to extract
+            limit: Optional limit on number of records
 
         Returns:
             FlextResult containing extraction results or error details
 
         """
         try:
-            # Get or discover catalog
-            if not catalog:
-                catalog_result = await self.discover_catalog(tap_name)
-                if catalog_result.is_failure:
-                    return FlextResult[FlextTypes.Core.Dict].fail(
-                        f"Failed to discover catalog: {catalog_result.error}"
-                    )
-                catalog = catalog_result.unwrap()["catalog"]
-
-            # Execute extraction through tap abstractions
-            extraction_result = await self._tap_abstractions.extract_records(
-                tap_name, catalog, state
+            tap_config = FlextTapAbstractions.TapConfig(
+                tap_type=tap_name,
+                connection_config={},
             )
+
+            tap_instance = FlextTapAbstractions.TapInstance(
+                config=tap_config,
+                tap_type=tap_name,
+                tap_id=f"tap_{tap_name}",
+            )
+
+            discover_result = self._tap_abstractions.discover_streams(tap_instance)
+            if discover_result.is_failure:
+                return FlextResult[FlextTypes.Core.Dict].fail(
+                    f"Failed to discover streams: {discover_result.error}"
+                )
+
+            stream_result = self._tap_abstractions.get_stream_by_name(
+                tap_instance, stream_name
+            )
+            if stream_result.is_failure:
+                return FlextResult[FlextTypes.Core.Dict].fail(
+                    f"Stream not found: {stream_result.error}"
+                )
+
+            stream = stream_result.unwrap()
+            extraction_result = self._tap_abstractions.extract_records(stream, limit)
             if extraction_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Data extraction failed: {extraction_result.error}"
@@ -360,7 +358,8 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
             return FlextResult[FlextTypes.Core.Dict].ok({
                 "tap_name": tap_name,
-                "extraction_details": extraction_result.unwrap(),
+                "stream_name": stream_name,
+                "records": extraction_result.unwrap(),
                 "status": "extracted",
             })
 
@@ -376,14 +375,16 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
     async def load_data(
         self,
         target_name: str,
-        data_source: str | FlextTypes.Core.Dict,
+        stream_name: str,
+        records: list[FlextTypes.Core.Dict],
         config: FlextTypes.Core.Dict | None = None,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Load data using a Singer target.
 
         Args:
             target_name: Name of the target to use
-            data_source: Source of data (file path or data dict)
+            stream_name: Name of the stream to load
+            records: List of records to load
             config: Optional target configuration
 
         Returns:
@@ -391,29 +392,16 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         """
         try:
-            # Create target configuration if needed
-            if config:
-                FlextMeltanoModels.TargetConfig(
-                    target_type=target_name,
-                    connection_config=config,
-                )
-            else:
-                # Use existing target configuration
-                target_config_result = await self._adapter.get_plugin_info(target_name)
-                if target_config_result.is_failure:
-                    return FlextResult[FlextTypes.Core.Dict].fail(
-                        f"Failed to get target config: {target_config_result.error}"
-                    )
+            target_dict = {
+                "target_type": target_name,
+                "config": config or {},
+                "batches_processed": 0,
+            }
 
-                config_data = target_config_result.unwrap()
-                FlextMeltanoModels.TargetConfig(
-                    target_type=target_name,
-                    connection_config=config_data.get("config", {}),
-                )
-
-            # Execute loading through target abstractions
-            loading_result = await self._target_abstractions.load_batch(
-                target_name, data_source
+            loading_result = self._target_abstractions.load_batch(
+                target=target_dict,
+                stream_name=stream_name,
+                records=records,
             )
             if loading_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
@@ -422,6 +410,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
             return FlextResult[FlextTypes.Core.Dict].ok({
                 "target_name": target_name,
+                "stream_name": stream_name,
                 "loading_details": loading_result.unwrap(),
                 "status": "loaded",
             })
@@ -439,30 +428,25 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         self,
         models: list[str] | None = None,
         project_dir: Path | None = None,
-        **kwargs: object,
+        **_kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Run DBT models.
 
         Args:
             models: List of models to run (defaults to all)
-            project_dir: DBT project directory
+            project_dir: DBT project directory (reserved for future use)
             **kwargs: Additional DBT configuration
 
         Returns:
             FlextResult containing execution results or error details
 
         """
-        try:
-            # Create DBT execution configuration
-            dbt_execution = FlextMeltanoModels.DbtExecutionModel(
-                command="run",
-                models=models or [],
-            )
+        # project_dir is reserved for future multi-project support
+        _ = project_dir  # Explicitly mark as intentionally unused for now
 
+        try:
             # Execute DBT through service
-            execution_result = await self._service.run_models(
-                dbt_execution, project_dir
-            )
+            execution_result = self._service.run_models(model_names=models)
             if execution_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"DBT execution failed: {execution_result.error}"
@@ -484,28 +468,25 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         self,
         models: list[str] | None = None,
         project_dir: Path | None = None,
-        **kwargs: object,
+        **_kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Test DBT models.
 
         Args:
             models: List of models to test (defaults to all)
-            project_dir: DBT project directory
+            project_dir: DBT project directory (reserved for future use)
             **kwargs: Additional DBT configuration
 
         Returns:
             FlextResult containing test results or error details
 
         """
-        try:
-            # Create DBT execution configuration
-            dbt_execution = FlextMeltanoModels.DbtExecutionModel(
-                command="test",
-                models=models or [],
-            )
+        # project_dir is reserved for future multi-project support
+        _ = project_dir  # Explicitly mark as intentionally unused for now
 
+        try:
             # Execute DBT tests through service
-            test_result = await self._service.run_models(dbt_execution, project_dir)
+            test_result = self._service.run_models(model_names=models)
             if test_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"DBT testing failed: {test_result.error}"
@@ -531,6 +512,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         self,
         tap_name: str,
         target_name: str,
+        stream_name: str,
         dbt_models: list[str] | None = None,
         **_kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
@@ -539,90 +521,45 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         Args:
             tap_name: Source tap to extract from
             target_name: Target to load to
+            stream_name: Stream to process
             dbt_models: DBT models to run (optional)
-            **kwargs: Additional pipeline configuration
+            **_kwargs: Additional pipeline configuration
 
         Returns:
             FlextResult containing pipeline results or error details
 
         """
         try:
-            # Create pipeline execution model
-            pipeline_result = FlextMeltanoModels.PipelineResult(
-                pipeline_id=f"{tap_name}-{target_name}-pipeline",
-            )
+            self._logger.info(f"Starting ELT pipeline: {tap_name} -> {target_name}")
 
-            # Extract phase
-            self._logger.info(f"Starting extraction from {tap_name}")
-            extract_result = await self.extract_data(tap_name)
+            extract_result = await self.extract_data(tap_name, stream_name, limit=1000)
             if extract_result.is_failure:
-                pipeline_result.overall_status = "error"
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Extraction failed: {extract_result.error}"
                 )
 
-            pipeline_result.tap_result = FlextMeltanoModels.ExecutionResult(
-                operation="extract",
-                status="success",
-                records_processed=int(extract_result.unwrap().get("record_count", 0)),
+            records_data = extract_result.unwrap().get("records", [])
+            records: list[FlextTypes.Core.Dict] = (
+                records_data if isinstance(records_data, list) else []
             )
-
-            # Load phase
-            self._logger.info(f"Starting load to {target_name}")
-            load_result = await self.load_data(target_name, extract_result.unwrap())
+            load_result = await self.load_data(target_name, stream_name, records)
             if load_result.is_failure:
-                pipeline_result.overall_status = "error"
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     f"Loading failed: {load_result.error}"
                 )
 
-            pipeline_result.target_result = FlextMeltanoModels.ExecutionResult(
-                operation="load",
-                status="success",
-                records_processed=int(load_result.unwrap().get("record_count", 0)),
-            )
-
-            # Transform phase (optional)
+            dbt_result = None
             if dbt_models:
-                self._logger.info("Starting DBT transformations")
-                dbt_result = await self.run_dbt_models(dbt_models)
-                if dbt_result.is_failure:
-                    pipeline_result.overall_status = "partial"
-                    pipeline_result.dbt_result = FlextMeltanoModels.ExecutionResult(
-                        operation="transform",
-                        status="error",
-                        error_message=dbt_result.error,
-                    )
-                else:
-                    pipeline_result.dbt_result = FlextMeltanoModels.ExecutionResult(
-                        operation="transform",
-                        status="success",
-                    )
+                dbt_exec = await self.run_dbt_models(dbt_models)
+                if dbt_exec.is_success:
+                    dbt_result = dbt_exec.unwrap()
 
-            # Calculate totals
-            pipeline_result.overall_status = "success"
-            pipeline_result.total_records = (
-                pipeline_result.tap_result.records_processed
-                if pipeline_result.tap_result
-                else 0
-            ) + (
-                pipeline_result.target_result.records_processed
-                if pipeline_result.target_result
-                else 0
-            )
-
-            self._logger.info(
-                f"Pipeline {pipeline_result.pipeline_id} completed successfully"
-            )
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "pipeline_id": pipeline_result.pipeline_id,
-                "status": pipeline_result.overall_status,
-                "total_records": pipeline_result.total_records,
+                "pipeline_id": f"{tap_name}-{target_name}-pipeline",
+                "status": "success",
                 "extract_result": extract_result.unwrap(),
                 "load_result": load_result.unwrap(),
-                "dbt_result": dbt_result.unwrap()
-                if dbt_models and dbt_result.is_success
-                else None,
+                "dbt_result": dbt_result,
             })
 
         except Exception as e:

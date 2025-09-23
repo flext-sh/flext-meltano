@@ -10,8 +10,9 @@ SPDX-License-Identifier: MIT
 import shutil
 import tempfile
 from pathlib import Path
+from typing import cast
 
-from flext_core import FlextResult, FlextUtilities
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.utilities import FlextMeltanoUtilities
@@ -200,10 +201,13 @@ class TestFlextMeltanoUtilitiesRealMethods:
         # Use FlextUtilities.TextProcessor.clean_text instead of duplicated method
 
         result = FlextUtilities.TextProcessor.clean_text("tap-csv@!#$")
-        assert isinstance(result, str)
+        assert isinstance(result, FlextResult)
+        assert result.is_success
 
         # FlextUtilities.clean_text provides proper text sanitization
-        assert len(result) > 0
+        cleaned = result.unwrap()
+        assert isinstance(cleaned, str)
+        assert len(cleaned) > 0
         # This test validates we use flext-core instead of duplicating functionality
 
     # NOTE: format_command_result, create_bridge_response, and parse_meltano_output_safe
@@ -298,7 +302,9 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
         config = config_result.value
 
-        result = FlextMeltanoValidators.validate_plugin_config(config)
+        result = FlextMeltanoValidators.validate_plugin_config(
+            cast("FlextTypes.Core.JsonValue", config)
+        )
 
         assert isinstance(result, FlextResult)
         if result.success:

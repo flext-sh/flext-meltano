@@ -49,10 +49,10 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_pipeline_adapter_failure(self) -> None:
         """Test run_pipeline with adapter failure."""
-        # Mock adapter._create_temporary_meltano_project to return failure
+        # Mock adapter.create_temporary_meltano_project to return failure
         with mock.patch.object(
             self.bridge.adapter,
-            "_create_temporary_meltano_project",
+            "create_temporary_meltano_project",
         ) as mock_create_project:
             mock_create_project.return_value = FlextResult.fail(
                 "Project creation failed",
@@ -64,10 +64,10 @@ class TestFlextMeltanoBridgeErrorCoverage:
 
     def test_run_pipeline_adapter_exception(self) -> None:
         """Test run_pipeline with adapter exception."""
-        # Mock adapter._create_temporary_meltano_project to raise exception
+        # Mock adapter.create_temporary_meltano_project to raise exception
         with mock.patch.object(
             self.bridge.adapter,
-            "_create_temporary_meltano_project",
+            "create_temporary_meltano_project",
             side_effect=Exception("Test exception"),
         ):
             result = self.bridge.run_pipeline("tap-csv", "target-csv")

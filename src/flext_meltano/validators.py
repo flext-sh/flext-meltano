@@ -57,25 +57,12 @@ class FlextMeltanoValidators:
         Returns:
             FlextResult containing boolean validation result or accumulated error details.
 
-        Example:
-            >>> config = {
-            ...     "name": "tap-csv",
-            ...     "namespace": "tap_csv",
-            ...     "executable": "tap-csv",
-            ... }
-            >>> result = FlextMeltanoValidators.validate_meltano_plugin_business_rules(
-            ...     config
-            ... )
-            >>> if result.is_success and result.unwrap():
-            ...     print("Plugin configuration is valid")
-
         """
-        # MONADIC ERROR ACCUMULATION: Collect all validation errors
-        # Fixed: Use *args syntax for accumulate_errors
         return FlextResult.accumulate_errors(
             cls._validate_config_is_dict(config),
             cls._validate_plugin_name(config),
             cls._validate_plugin_namespace(config),
+            cls._validate_plugin_pip_url(config),
             cls._validate_plugin_executable(config),
             cls._validate_meltano_specific_rules(config),
         ).map(
@@ -85,7 +72,7 @@ class FlextMeltanoValidators:
     @classmethod
     def _validate_config_is_dict(
         cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[None]:
+    ) -> FlextResult[bool]:
         """Validate that config is a dictionary.
 
         Args:
@@ -99,32 +86,26 @@ class FlextMeltanoValidators:
             return FlextResult.fail(
                 "Plugin config validation failed: config must be a dictionary"
             )
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_name(
         cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[None]:
-        """Validate plugin name field.
-
-        Args:
-            config: Configuration dictionary.
-
-        Returns:
-            FlextResult indicating name validation result.
-
-        """
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail("Config must be dictionary for name validation")
 
         name = config.get("name", "")
-        if not name or not str(name).strip():
+        if not isinstance(name, str):
+            return FlextResult.fail("Plugin name must be a string")
+
+        if not name or not name.strip():
             return FlextResult.fail("Plugin name cannot be empty")
 
-        return cls._validate_meltano_name_business_rules(str(name).strip())
+        return cls._validate_meltano_name_business_rules(name.strip())
 
     @classmethod
-    def _validate_meltano_name_business_rules(cls, name: str) -> FlextResult[None]:
+    def _validate_meltano_name_business_rules(cls, name: str) -> FlextResult[bool]:
         """Validate Meltano-specific name business rules.
 
         Args:
@@ -155,62 +136,73 @@ class FlextMeltanoValidators:
         if validation_errors:
             return FlextResult.fail("; ".join(validation_errors))
 
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_namespace(
         cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[None]:
-        """Validate plugin namespace field.
-
-        Args:
-            config: Configuration dictionary.
-
-        Returns:
-            FlextResult indicating namespace validation result.
-
-        """
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
                 "Config must be dictionary for namespace validation"
             )
 
-        # Namespace is optional, but if present should be valid
         namespace = config.get("namespace")
-        if namespace is not None and not str(namespace).strip():
-            return FlextResult.fail("Plugin namespace cannot be empty if provided")
+        if namespace is None:
+            return FlextResult.fail("Plugin namespace is required")
 
-        return FlextResult.ok(data=None)
+        if not isinstance(namespace, str):
+            return FlextResult.fail("Plugin namespace must be a string")
+
+        if not namespace.strip():
+            return FlextResult.fail("Plugin namespace cannot be empty")
+
+        return FlextResult.ok(data=True)
+
+    @classmethod
+    def _validate_plugin_pip_url(
+        cls, config: FlextTypes.Core.JsonValue
+    ) -> FlextResult[bool]:
+        if not isinstance(config, dict):
+            return FlextResult.fail("Config must be dictionary for pip_url validation")
+
+        pip_url = config.get("pip_url")
+        if pip_url is None:
+            return FlextResult.fail("Plugin pip_url is required")
+
+        if not isinstance(pip_url, str):
+            return FlextResult.fail("Plugin pip_url must be a string")
+
+        if not pip_url.strip():
+            return FlextResult.fail("Plugin pip_url cannot be empty")
+
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_executable(
         cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[None]:
-        """Validate plugin executable field.
-
-        Args:
-            config: Configuration dictionary.
-
-        Returns:
-            FlextResult indicating executable validation result.
-
-        """
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
                 "Config must be dictionary for executable validation"
             )
 
-        # Executable is optional, but if present should be valid
         executable = config.get("executable")
-        if executable is not None and not str(executable).strip():
-            return FlextResult.fail("Plugin executable cannot be empty if provided")
+        if executable is None:
+            return FlextResult.fail("Plugin executable is required")
 
-        return FlextResult.ok(data=None)
+        if not isinstance(executable, str):
+            return FlextResult.fail("Plugin executable must be a string")
+
+        if not executable.strip():
+            return FlextResult.fail("Plugin executable cannot be empty")
+
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_meltano_specific_rules(
         cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[None]:
+    ) -> FlextResult[bool]:
         """Validate additional Meltano-specific business rules.
 
         Args:
@@ -227,7 +219,7 @@ class FlextMeltanoValidators:
 
         # Additional Meltano-specific validations can be added here
         # For now, return success as placeholder
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def validate_meltano_project_business_rules(

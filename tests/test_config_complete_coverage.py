@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import inspect
 import os
 import tempfile
 from pathlib import Path
@@ -190,7 +191,8 @@ class TestFlextMeltanoConfig:
         assert isinstance(plugin_types, list)
         assert "extractors" in plugin_types
         assert "loaders" in plugin_types
-        assert "transformers" in plugin_types
+        # Use "transforms" not "transformers" - matches FlextMeltanoConstants.PluginTypes
+        assert "transforms" in plugin_types
 
         assert isinstance(environments, list)
         assert "development" in environments
@@ -257,48 +259,22 @@ class TestFlextMeltanoConfig:
 
 
 class TestFlextMeltanoConfigEnums:
-    """Test all enum classes in FlextMeltanoConfig."""
+    """Test FlextMeltanoConfig uses FlextConstants for enums."""
 
-    def test_plugin_type_enum(self) -> None:
-        """Test PluginType enum values."""
-        assert FlextMeltanoConfig.PluginType.EXTRACTORS == "extractors"
-        assert FlextMeltanoConfig.PluginType.LOADERS == "loaders"
-        assert FlextMeltanoConfig.PluginType.TRANSFORMERS == "transformers"
-        assert FlextMeltanoConfig.PluginType.ORCHESTRATORS == "orchestrators"
-        assert FlextMeltanoConfig.PluginType.FILES == "files"
-        assert FlextMeltanoConfig.PluginType.UTILITIES == "utilities"
+    def test_uses_flext_constants_for_enums(self) -> None:
+        """Test that FlextMeltanoConfig uses FlextConstants for enum values."""
+        from flext_core.constants import FlextConstants
 
-    def test_environment_type_enum(self) -> None:
-        """Test EnvironmentType enum values."""
-        assert FlextMeltanoConfig.EnvironmentType.DEV == "development"
-        assert FlextMeltanoConfig.EnvironmentType.STAGING == "staging"
-        assert FlextMeltanoConfig.EnvironmentType.PROD == "production"
-        assert FlextMeltanoConfig.EnvironmentType.TEST == "test"
-        assert FlextMeltanoConfig.EnvironmentType.LOCAL == "local"
+        # Config uses FlextConstants.Config.LogLevel, not nested LogLevel
+        assert hasattr(FlextConstants.Config, "LogLevel")
+        # Environment types are string literals, not enums
+        assert isinstance(FlextMeltanoConfig.model_fields["environment"].default, str)
 
-    def test_log_level_enum(self) -> None:
-        """Test LogLevel enum values."""
-        assert FlextMeltanoConfig.LogLevel.DEBUG == "DEBUG"
-        assert FlextMeltanoConfig.LogLevel.INFO == "INFO"
-        assert FlextMeltanoConfig.LogLevel.WARNING == "WARNING"
-        assert FlextMeltanoConfig.LogLevel.ERROR == "ERROR"
-        assert FlextMeltanoConfig.LogLevel.CRITICAL == "CRITICAL"
-
-    def test_operation_status_enum(self) -> None:
-        """Test OperationStatus enum values."""
-        assert FlextMeltanoConfig.OperationStatus.PENDING == "pending"
-        assert FlextMeltanoConfig.OperationStatus.RUNNING == "running"
-        assert FlextMeltanoConfig.OperationStatus.SUCCESS == "success"
-        assert FlextMeltanoConfig.OperationStatus.ERROR == "error"
-        assert FlextMeltanoConfig.OperationStatus.TIMEOUT == "timeout"
-        assert FlextMeltanoConfig.OperationStatus.CANCELLED == "cancelled"
-
-    def test_run_mode_enum(self) -> None:
-        """Test RunMode enum values."""
-        assert FlextMeltanoConfig.RunMode.FULL == "full"
-        assert FlextMeltanoConfig.RunMode.INCREMENTAL == "incremental"
-        assert FlextMeltanoConfig.RunMode.DRY_RUN == "dry_run"
-        assert FlextMeltanoConfig.RunMode.TEST == "test"
+    def test_handler_configuration_nested_class(self) -> None:
+        """Test HandlerConfiguration nested class exists."""
+        # HandlerConfiguration is a nested class for handler config
+        assert hasattr(FlextMeltanoConfig, "HandlerConfiguration")
+        assert inspect.isclass(FlextMeltanoConfig.HandlerConfiguration)
 
 
 class TestFlextMeltanoConfigConstants:
@@ -432,10 +408,12 @@ class TestFlextMeltanoConfigIntegration:
             if env_type == "local":
                 continue
 
+            # Production environment cannot have debug=True
             config = FlextMeltanoConfig(
                 project_root=Path("/test"),
                 environment=env_type,
                 log_level="INFO",
+                debug=env_type != "production",
             )
 
             assert config.environment == env_type

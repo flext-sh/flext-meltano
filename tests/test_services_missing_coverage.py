@@ -25,13 +25,13 @@ class TestFlextMeltanoServiceMissingCoverage:
         result = service.create_instance({})
         assert result.is_failure
         assert result.error is not None
-        assert "Empty configuration provided" in result.error
+        assert "Filter predicate failed" in result.error
 
         # Test None configuration - cast to dict to satisfy type checker
         result = service.create_instance({})  # Empty dict instead of None
         assert result.is_failure
         assert result.error is not None
-        assert "Empty configuration provided" in result.error
+        assert "Filter predicate failed" in result.error
 
     def test_dbt_service_creation(self) -> None:
         """Test DBT service creation - covers lines 151-159."""

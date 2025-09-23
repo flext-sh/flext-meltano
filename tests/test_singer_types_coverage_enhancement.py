@@ -204,28 +204,39 @@ class TestFlextSingerTypesCoverage:
             "active": {"type": "boolean"},
         }
 
-        result = self.singer_types.create_schema_definition(
-            stream_name="users",
+        # First create the JSON Schema
+        schema_result = self.singer_types.create_schema_definition(
             properties=properties,
+        )
+
+        assert schema_result.is_success
+        assert schema_result.data is not None
+        assert isinstance(schema_result.data, dict)
+        schema = schema_result.data
+        assert schema["type"] == "object"
+        assert "properties" in schema
+        assert isinstance(schema["properties"], dict)
+        assert isinstance(schema["properties"]["id"], dict)
+        assert isinstance(schema["properties"]["name"], dict)
+        assert schema["properties"]["id"]["type"] == "integer"
+        assert schema["properties"]["name"]["maxLength"] == 100
+
+        # Now create the SCHEMA message using the schema
+        message_result = self.singer_types.create_schema_message(
+            stream="users",
+            schema=schema,
             key_properties=["id"],
         )
 
-        assert result.is_success
-        assert result.data is not None
-        assert isinstance(result.data, dict)
-        schema = result.data
-        assert schema["type"] == "SCHEMA"
-        assert schema["stream"] == "users"
-        assert schema["key_properties"] == ["id"]
-        assert "schema" in schema
-        assert isinstance(schema["schema"], dict)
-        assert schema["schema"]["type"] == "object"
-        assert "properties" in schema["schema"]
-        assert isinstance(schema["schema"]["properties"], dict)
-        assert isinstance(schema["schema"]["properties"]["id"], dict)
-        assert isinstance(schema["schema"]["properties"]["name"], dict)
-        assert schema["schema"]["properties"]["id"]["type"] == "integer"
-        assert schema["schema"]["properties"]["name"]["maxLength"] == 100
+        assert message_result.is_success
+        assert message_result.data is not None
+        assert isinstance(message_result.data, dict)
+        message = message_result.data
+        assert message["type"] == "SCHEMA"
+        assert message["stream"] == "users"
+        assert message["key_properties"] == ["id"]
+        assert "schema" in message
+        assert message["schema"] == schema
 
     def test_message_creation(self) -> None:
         """Test creation of all Singer message types."""
