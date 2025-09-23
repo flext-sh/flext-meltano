@@ -596,6 +596,44 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         """Access to Meltano models."""
         return FlextMeltanoModels
 
+    async def execute(
+        self, command: str, **options: object
+    ) -> FlextResult[FlextTypes.Core.Dict]:
+        """Execute a Meltano command through the unified API.
+
+        Args:
+            command: The command to execute
+            **options: Additional command options
+
+        Returns:
+            FlextResult containing execution results
+
+        Example:
+            >>> api = FlextMeltanoAPI()
+            >>> result = await api.execute("version")
+            >>> if result.is_success:
+            ...     print(result.unwrap())
+        """
+        try:
+            if command == "version":
+                version_info: FlextTypes.Core.Dict = {
+                    "version": self.version,
+                    "success": True
+                }
+                return FlextResult[FlextTypes.Core.Dict].ok(data=version_info)
+
+            result = await self._executor.execute(command, **options)
+            if result.is_success:
+                return FlextResult[FlextTypes.Core.Dict].ok(data=result.unwrap())
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                result.error or "Execution failed"
+            )
+
+        except Exception as e:
+            error_msg = f"API execution failed: {e}"
+            self._logger.error(error_msg, command=command, error=str(e))
+            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+
 
 __all__ = [
     "FlextMeltanoAPI",

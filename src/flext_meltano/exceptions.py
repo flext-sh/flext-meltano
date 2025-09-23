@@ -11,10 +11,6 @@ from __future__ import annotations
 
 from flext_core import FlextExceptions
 
-# ============================================================================
-# SINGLE UNIFIED EXCEPTION CLASS - FLEXT Architecture Compliance
-# ============================================================================
-
 
 class FlextMeltanoExceptions:
     """Unified exception management for Meltano operations - Single Responsibility Pattern.
@@ -26,6 +22,7 @@ class FlextMeltanoExceptions:
     Usage:
         >>> raise FlextMeltanoExceptions.ConfigurationError("Invalid Meltano config")
         >>> raise FlextMeltanoExceptions.ValidationError("Plugin validation failed")
+        >>> raise FlextMeltanoExceptions.MeltanoProjectError("Project init failed")
     """
 
     BaseError = FlextExceptions.BaseError
@@ -37,59 +34,30 @@ class FlextMeltanoExceptions:
     ProcessingError = FlextExceptions.ProcessingError
     TimeoutError = FlextExceptions.TimeoutError
 
-    # Forward declarations for Meltano-specific exceptions (defined below)
-    MeltanoProjectError: type[Exception]
-    PluginError: type[Exception]
-    SingerProtocolError: type[Exception]
-    DbtExecutionError: type[Exception]
-    PipelineError: type[Exception]
-    CatalogDiscoveryError: type[Exception]
-    StreamValidationError: type[Exception]
-    ConfigBuilderError: type[Exception]
+    class MeltanoProjectError(FlextExceptions.BaseError):
+        """Meltano project configuration or initialization error."""
 
+    class PluginError(FlextExceptions.BaseError):
+        """Meltano plugin installation or execution error."""
 
-# Meltano-specific exceptions (defined outside class to avoid MyPy inheritance issues)
-class MeltanoProjectError(FlextExceptions.BaseError):
-    """Meltano project configuration or initialization error."""
+    class SingerProtocolError(FlextExceptions.BaseError):
+        """Singer tap/target protocol compliance error."""
 
+    class DbtExecutionError(FlextExceptions.BaseError):
+        """DBT model execution or compilation error."""
 
-class PluginError(FlextExceptions.BaseError):
-    """Meltano plugin installation or execution error."""
+    class PipelineError(FlextExceptions.BaseError):
+        """ELT pipeline execution error."""
 
+    class CatalogDiscoveryError(FlextExceptions.BaseError):
+        """Singer catalog discovery error."""
 
-class SingerProtocolError(FlextExceptions.BaseError):
-    """Singer tap/target protocol compliance error."""
+    class StreamValidationError(FlextExceptions.BaseError):
+        """Singer stream validation error."""
 
+    class ConfigBuilderError(FlextExceptions.BaseError):
+        """Meltano configuration builder error."""
 
-class DbtExecutionError(FlextExceptions.BaseError):
-    """DBT model execution or compilation error."""
-
-
-class PipelineError(FlextExceptions.BaseError):
-    """ELT pipeline execution error."""
-
-
-class CatalogDiscoveryError(FlextExceptions.BaseError):
-    """Singer catalog discovery error."""
-
-
-class StreamValidationError(FlextExceptions.BaseError):
-    """Singer stream validation error."""
-
-
-class ConfigBuilderError(FlextExceptions.BaseError):
-    """Meltano configuration builder error."""
-
-
-# Assign Meltano-specific exceptions to FlextMeltanoExceptions after definition
-FlextMeltanoExceptions.MeltanoProjectError = MeltanoProjectError
-FlextMeltanoExceptions.PluginError = PluginError
-FlextMeltanoExceptions.SingerProtocolError = SingerProtocolError
-FlextMeltanoExceptions.DbtExecutionError = DbtExecutionError
-FlextMeltanoExceptions.PipelineError = PipelineError
-FlextMeltanoExceptions.CatalogDiscoveryError = CatalogDiscoveryError
-FlextMeltanoExceptions.StreamValidationError = StreamValidationError
-FlextMeltanoExceptions.ConfigBuilderError = ConfigBuilderError
 
 __all__ = [
     "FlextMeltanoExceptions",

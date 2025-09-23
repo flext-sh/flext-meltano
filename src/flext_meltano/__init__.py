@@ -10,20 +10,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# Internal services - for advanced use cases
 from flext_meltano.adapters import FlextMeltanoAdapter
-
-# Main unified API - RECOMMENDED for external use
 from flext_meltano.api import FlextMeltanoAPI
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-
-# Centralized definitions
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.exceptions import FlextMeltanoExceptions
 from flext_meltano.executors import FlextMeltanoExecutor
-
-# Legacy support - to be removed in 2.0.0
 from flext_meltano.executors_bridge import FlextMeltanoBridge
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.models import FlextMeltanoModels
@@ -37,7 +30,7 @@ from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 __all__ = [
-    "FlextMeltanoAPI",  # Main API - RECOMMENDED
+    "FlextMeltanoAPI",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoConfig",
