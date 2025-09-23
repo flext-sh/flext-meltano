@@ -230,9 +230,9 @@ class UtilityClass:
         pass
 
 # ✅ Correct
-from flext_core import FlextDomainService
+from flext_core import FlextService
 
-class FlextMeltanoUtilityService(FlextDomainService):
+class FlextMeltanoUtilityService(FlextService):
     def do_something(self) -> FlextResult[dict]:
         # Implementation with proper error handling
         pass

@@ -11,7 +11,13 @@ from typing import TextIO
 
 import yaml
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import (
+    FlextConstants,
+    FlextLogger,
+    FlextResult,
+    FlextTypes,
+    FlextUtilities,
+)
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 
@@ -131,7 +137,9 @@ class FlextMeltanoUtilities:
             # Validate parent directory exists
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
-            file_handle = target_path.open("w", encoding="utf-8")
+            file_handle = target_path.open(
+                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+            )
             return FlextResult.ok(data=file_handle)
         except Exception as e:
             return FlextResult.fail(f"Failed to open file for writing: {e}")
@@ -276,7 +284,10 @@ class FlextMeltanoUtilities:
             return FlextResult.fail(f"YAML config file not found: {path}")
         if not path.is_file():
             return FlextResult.fail(f"Path is not a file: {path}")
-        if path.suffix.lower() not in {".yml", ".yaml"}:
+        if path.suffix.lower() not in {
+            FlextConstants.Platform.EXT_YML,
+            FlextConstants.Platform.EXT_YAML,
+        }:
             return FlextResult.fail(f"File is not a YAML file: {path}")
 
         return FlextResult.ok(data=path)

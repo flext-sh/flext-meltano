@@ -14,9 +14,9 @@ from typing import cast
 
 from flext_core import (
     FlextConstants,
-    FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextService,
     FlextTypes,
     FlextUtilities,
 )
@@ -29,10 +29,10 @@ from flext_meltano.typings import FlextMeltanoTypes
 logger = FlextLogger(__name__)
 
 
-class FlextMeltanoExecutor(FlextDomainService[FlextMeltanoTypes.CLI.ProcessResult]):
+class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.CLI.ProcessResult]):
     """Single executor class for all Meltano command execution following flext-core patterns."""
 
-    model_config = FlextDomainService.model_config.copy()
+    model_config = FlextService.model_config.copy()
     model_config["frozen"] = False  # Allow attribute modification
 
     # Define fields as Pydantic model fields with proper initialization

@@ -199,6 +199,87 @@ class FlextMeltanoConstants:
         DRY_RUN = "dry_run"
         TEST = "test"
 
+    class Logging:
+        """Meltano-specific logging constants for FLEXT Meltano module.
+
+        Provides domain-specific logging defaults, levels, and configuration
+        options tailored for Meltano operations, data pipeline execution,
+        and ETL process monitoring.
+        """
+
+        # Meltano-specific log levels
+        DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
+        PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
+        EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
+        LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
+        TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
+        ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
+        PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
+
+        # Pipeline execution logging
+        LOG_PIPELINE_START = True
+        LOG_PIPELINE_END = True
+        LOG_PIPELINE_PROGRESS = True
+        LOG_PIPELINE_ERRORS = True
+        LOG_PIPELINE_STATS = True
+        LOG_PIPELINE_DURATION = True
+
+        # Extract operations logging
+        LOG_EXTRACT_START = True
+        LOG_EXTRACT_END = True
+        LOG_EXTRACT_RECORDS = True
+        LOG_EXTRACT_ERRORS = True
+        LOG_EXTRACT_DURATION = True
+        LOG_EXTRACT_SOURCE_INFO = True
+
+        # Load operations logging
+        LOG_LOAD_START = True
+        LOG_LOAD_END = True
+        LOG_LOAD_RECORDS = True
+        LOG_LOAD_ERRORS = True
+        LOG_LOAD_DURATION = True
+        LOG_LOAD_TARGET_INFO = True
+
+        # Transform operations logging
+        LOG_TRANSFORM_START = True
+        LOG_TRANSFORM_END = True
+        LOG_TRANSFORM_RECORDS = True
+        LOG_TRANSFORM_ERRORS = True
+        LOG_TRANSFORM_DURATION = True
+        LOG_TRANSFORM_SQL = False  # Don't log SQL by default (privacy/security)
+
+        # Performance tracking
+        TRACK_MELTANO_PERFORMANCE = True
+        MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000  # 5 seconds default
+        MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000  # 10 seconds default
+        TRACK_RECORD_COUNTS = True
+        TRACK_MEMORY_USAGE = True
+        HIGH_MEMORY_THRESHOLD = FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
+
+        # Data quality logging
+        LOG_DATA_QUALITY_ISSUES = True
+        LOG_VALIDATION_ERRORS = True
+        LOG_SCHEMA_CHANGES = True
+        LOG_DATA_TYPE_CONVERSIONS = True
+        LOG_NULL_VALUE_HANDLING = True
+
+        # Error handling and recovery
+        LOG_ERROR_RECOVERY = True
+        LOG_RETRY_ATTEMPTS = True
+        LOG_FALLBACK_OPERATIONS = True
+        LOG_PARTIAL_FAILURES = True
+        LOG_CRITICAL_FAILURES = True
+
+        # Context information to include
+        INCLUDE_PIPELINE_ID = True
+        INCLUDE_JOB_ID = True
+        INCLUDE_RUN_ID = True
+        INCLUDE_SOURCE_NAME = True
+        INCLUDE_TARGET_NAME = True
+        INCLUDE_TRANSFORM_NAME = True
+        INCLUDE_RECORD_COUNT = True
+        INCLUDE_DURATION = True
+
 
 __all__ = [
     "FlextMeltanoConstants",

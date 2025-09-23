@@ -8,7 +8,7 @@ import tempfile
 
 import pytest
 
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextResult, FlextService
 from flext_meltano.services import FlextMeltanoService
 
 
@@ -593,18 +593,18 @@ class TestServiceArchitecture:
         self.service = FlextMeltanoService()
 
     def test_service_inheritance_hierarchy(self) -> None:
-        """Test that unified service properly inherits from FlextDomainService."""
+        """Test that unified service properly inherits from FlextService."""
         # Test unified service inheritance in SOLID architecture
-        assert issubclass(FlextMeltanoService, FlextDomainService)
+        assert issubclass(FlextMeltanoService, FlextService)
 
         # Test that different service types use the same unified class
         tap_service = FlextMeltanoService(service_type="tap", tap_name="test")
         target_service = FlextMeltanoService(service_type="target", target_name="test")
         dbt_service = FlextMeltanoService(service_type="dbt", project_name="test")
 
-        assert isinstance(tap_service, FlextDomainService)
-        assert isinstance(target_service, FlextDomainService)
-        assert isinstance(dbt_service, FlextDomainService)
+        assert isinstance(tap_service, FlextService)
+        assert isinstance(target_service, FlextService)
+        assert isinstance(dbt_service, FlextService)
 
     def test_service_type_annotations(self) -> None:
         """Test service type annotations and generics."""

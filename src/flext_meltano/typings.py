@@ -6,18 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import (
-    Protocol,
-    runtime_checkable,
-)
-
-from flext_core import FlextTypes, T_co
+from flext_core import FlextTypes
 
 # Python 3.13+ Type aliases - USE FlextTypes directly (eliminate duplication)
-type ConfigValue = FlextTypes.Core.ConfigValue  # ✅ ALIAS to eliminate duplication
-type ConfigDict = FlextTypes.Core.ConfigDict  # ✅ ALIAS to eliminate duplication
-type JsonValue = FlextTypes.Core.JsonValue  # ✅ ALIAS to eliminate duplication
-type JsonObject = FlextTypes.Core.JsonObject  # ✅ ALIAS to eliminate duplication
+type ConfigValue = FlextTypes.Core.ConfigValue
+type ConfigDict = FlextTypes.Core.ConfigDict
+type JsonValue = FlextTypes.Core.JsonValue
+type JsonObject = FlextTypes.Core.JsonObject
 
 # Advanced Python 3.13+ Union and Intersection Types
 type MessageType = str
@@ -71,42 +66,6 @@ class FlextMeltanoTypes:
             pipeline_result: FlextMeltanoTypes.ELT.PipelineResult = success_result
 
     """
-
-    # =========================================================================
-    # DOMAIN-SPECIFIC PROTOCOLS - Meltano ELT interfaces
-    # =========================================================================
-
-    @runtime_checkable
-    class MeltanoPluginProtocol(Protocol[T_co]):
-        """Meltano plugin interface with covariant return type."""
-
-        def get_config(self) -> ConfigDict:
-            """Get plugin configuration."""
-            ...  # pragma: no cover
-
-        def validate_config(self, config: ConfigDict) -> bool:
-            """Validate plugin configuration."""
-            ...  # pragma: no cover
-
-        def execute(self, *args: JsonValue) -> T_co:
-            """Execute plugin with given arguments."""
-            ...  # pragma: no cover
-
-    @runtime_checkable
-    class SingerStreamProtocol(Protocol):
-        """Singer stream interface with type safety."""
-
-        name: str
-        tap_stream_id: str
-        schema: JsonObject
-
-        def sync_records(self) -> JsonValue:
-            """Sync records from the stream."""
-            ...
-
-        def get_records(self) -> JsonValue:
-            """Get records from the stream."""
-            ...
 
     # =========================================================================
     # PLUGIN TYPES - Meltano plugin management (DOMAIN-SPECIFIC)

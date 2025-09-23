@@ -314,10 +314,10 @@ else:
 ### With flext-core
 
 ```python
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextService, FlextResult
 from flext_meltano import FlextMeltanoService
 
-class CustomELTService(FlextDomainService):
+class CustomELTService(FlextService):
     def __init__(self):
         super().__init__()
         self._meltano_service = FlextMeltanoService()
