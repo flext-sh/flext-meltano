@@ -48,7 +48,7 @@ src/flext_meltano/
 
 **Key Components**:
 
-- **FlextMeltanoService**: Unified service following FlextDomainService pattern
+- **FlextMeltanoService**: Unified service following FlextService pattern
 - **Service Implementations**: FlextTapService, FlextTargetService, FlextDbtService
 - **Plugin Protocols**: TapServiceProtocol, TargetServiceProtocol, DbtServiceProtocol
 
@@ -161,7 +161,7 @@ graph TD
 ```python
 from flext_core import (
     FlextResult,           # Railway-oriented programming
-    FlextDomainService,    # Service base class
+    FlextService,    # Service base class
     FlextLogger,           # Logging infrastructure
     FlextContainer,        # Dependency injection
     FlextUtilities         # Common utilities

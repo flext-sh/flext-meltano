@@ -19,9 +19,9 @@ from pydantic import ConfigDict
 
 from flext_core import (
     FlextContainer,
-    FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextService,
     FlextTypes,
     FlextUtilities,
     T,
@@ -30,7 +30,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoService(FlextDomainService[FlextTypes.Core.Dict]):
+class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
     """Unified Meltano service implementation with single responsibility.
 
     This service handles all Meltano operations (tap, target, dbt) in one cohesive

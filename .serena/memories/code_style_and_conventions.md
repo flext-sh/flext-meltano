@@ -16,7 +16,7 @@
 from flext_core import (
     FlextResult, FlextLogger, FlextContainer,
     FlextModels, FlextConfig, FlextConstants,
-    FlextUtilities, FlextDomainService
+    FlextUtilities, FlextService
 )
 from flext_cli import FlextCliApi, FlextCliMain  # CLI projects only
 
@@ -29,7 +29,7 @@ import rich  # Direct Rich imports prohibited - use flext-cli
 ## Class Structure Pattern
 
 ```python
-class UnifiedProjectService(FlextDomainService):
+class UnifiedProjectService(FlextService):
     """Single responsibility class with nested helpers."""
 
     def __init__(self, **data) -> None:

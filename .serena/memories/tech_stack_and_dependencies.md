@@ -10,7 +10,7 @@
 
 ## FLEXT Ecosystem Dependencies (MANDATORY)
 
-- **flext-core**: Foundation library (FlextResult, FlextContainer, FlextDomainService, get_logger)
+- **flext-core**: Foundation library (FlextResult, FlextContainer, FlextService, get_logger)
 - **flext-cli**: CLI patterns and utilities (integrated with Click)
 - **flext-observability**: Oracle monitoring, metrics, and database performance tracking
 

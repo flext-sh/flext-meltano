@@ -25,7 +25,13 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
-from flext_core import FlextConfig, FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import (
+    FlextConfig,
+    FlextLogger,
+    FlextResult,
+    FlextTypes,
+    FlextUtilities,
+)
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators

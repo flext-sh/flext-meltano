@@ -21,7 +21,7 @@ src/project_namespace/
 │
 ├── Domain Layer (DDD Patterns)
 │   ├── models.py              # Pydantic models
-│   ├── domain_services.py     # Domain services
+│   ├── service.py     # Domain services
 │   └── root_models.py         # RootModel patterns
 │
 ├── Application Layer (CQRS/Handlers)

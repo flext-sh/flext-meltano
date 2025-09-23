@@ -13,7 +13,13 @@ from pathlib import Path
 
 import yaml
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import (
+    FlextConstants,
+    FlextLogger,
+    FlextResult,
+    FlextTypes,
+    FlextUtilities,
+)
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -73,7 +79,9 @@ class FlextMeltanoFileManagers:
             # Ensure parent directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
-            with file_path.open("w", encoding="utf-8") as f:
+            with file_path.open(
+                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+            ) as f:
                 yaml.dump(
                     config,
                     f,
@@ -105,7 +113,9 @@ class FlextMeltanoFileManagers:
             if not file_path.exists():
                 return FlextResult[ConfigDict].fail(f"YAML file not found: {file_path}")
 
-            with file_path.open("r", encoding="utf-8") as f:
+            with file_path.open(
+                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+            ) as f:
                 config_data = yaml.safe_load(f)
 
             if config_data is None:
@@ -136,7 +146,9 @@ class FlextMeltanoFileManagers:
             if not file_path.exists():
                 return FlextResult[bool].fail(f"YAML file not found: {file_path}")
 
-            with file_path.open("r", encoding="utf-8") as f:
+            with file_path.open(
+                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+            ) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
             return FlextResult[bool].ok(data=True)

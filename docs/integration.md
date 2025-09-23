@@ -27,10 +27,10 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 
 ```python
 # Example: flext-tap-oracle integration
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextService, FlextResult
 from flext_meltano import FlextTapAbstractions, StreamDefinition
 
-class FlextOracleTapService(FlextDomainService):
+class FlextOracleTapService(FlextService):
     """Oracle tap using flext-meltano Singer abstractions."""
 
     def __init__(self):
@@ -52,10 +52,10 @@ class FlextOracleTapService(FlextDomainService):
 
 ```python
 # Example: flext-target-oracle integration
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextService, FlextResult
 from flext_meltano import FlextTargetAbstractions
 
-class FlextOracleTargetService(FlextDomainService):
+class FlextOracleTargetService(FlextService):
     """Oracle target using flext-meltano Singer abstractions."""
 
     def __init__(self):
@@ -77,10 +77,10 @@ class FlextOracleTargetService(FlextDomainService):
 
 ```python
 # Example: flext-dbt-oracle integration
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextService, FlextResult
 from flext_meltano import FlextMeltanoDbtService
 
-class FlextOracleDbtService(FlextDomainService):
+class FlextOracleDbtService(FlextService):
     """Oracle dbt transformations using flext-meltano."""
 
     def __init__(self):
@@ -104,10 +104,10 @@ class FlextOracleDbtService(FlextDomainService):
 **Full ELT workflow using flext-meltano foundation**:
 
 ```python
-from flext_core import FlextDomainService, FlextResult
+from flext_core import FlextService, FlextResult
 from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
 
-class EnterpriseELTService(FlextDomainService):
+class EnterpriseELTService(FlextService):
     """Complete ELT pipeline for enterprise applications."""
 
     def __init__(self):
