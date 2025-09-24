@@ -613,12 +613,13 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
             >>> result = await api.execute("version")
             >>> if result.is_success:
             ...     print(result.unwrap())
+
         """
         try:
             if command == "version":
                 version_info: FlextTypes.Core.Dict = {
                     "version": self.version,
-                    "success": True
+                    "success": True,
                 }
                 return FlextResult[FlextTypes.Core.Dict].ok(data=version_info)
 
@@ -631,7 +632,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
         except Exception as e:
             error_msg = f"API execution failed: {e}"
-            self._logger.error(error_msg, command=command, error=str(e))
+            self._logger.exception(error_msg, command=command, error=str(e))
             return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
 
 

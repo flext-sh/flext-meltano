@@ -22,8 +22,11 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 
-class FlextMeltanoUtilities:
-    """DOMAIN-SPECIFIC Meltano utilities - ONLY what cannot be generalized to flext-core."""
+class FlextMeltanoUtilities(FlextUtilities):
+    """DOMAIN-SPECIFIC Meltano utilities - ONLY what cannot be generalized to flext-core.
+
+    Inherits from FlextUtilities to avoid duplication and ensure consistency.
+    """
 
     @classmethod
     def create_meltano_config_dict(
