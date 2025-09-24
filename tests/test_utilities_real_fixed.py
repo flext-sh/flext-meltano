@@ -13,10 +13,12 @@ from pathlib import Path
 from typing import cast
 
 from flext_core import FlextResult, FlextTypes, FlextUtilities
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.utilities import FlextMeltanoUtilities
-from flext_meltano.validators import FlextMeltanoValidators
+from flext_meltano import (
+    FlextMeltanoConfigBuilders,
+    FlextMeltanoFileManagers,
+    FlextMeltanoUtilities,
+    FlextMeltanoValidators,
+)
 
 
 class TestFlextMeltanoUtilitiesRealMethods:

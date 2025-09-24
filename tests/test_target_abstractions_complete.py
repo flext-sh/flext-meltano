@@ -5,7 +5,7 @@ from typing import cast
 from pydantic import ValidationError
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
-from flext_meltano.target_abstractions import FlextTargetAbstractions
+from flext_meltano import FlextTargetAbstractions
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 
 logger = FlextLogger(__name__)

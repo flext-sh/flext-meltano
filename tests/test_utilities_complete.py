@@ -11,8 +11,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
-from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.utilities import FlextMeltanoUtilities
+from flext_meltano import FlextMeltanoFileManagers, FlextMeltanoUtilities
 from flext_tests import FlextTestsFixtures, FlextTestsUtilities
 
 

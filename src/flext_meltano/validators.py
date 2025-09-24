@@ -33,8 +33,10 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config = {"name": "tap-csv", "namespace": "tap_csv"}
-        >>> result = validator.validate_meltano_plugin_business_rules(config)
+        >>> config: FlextTypes.Core.Dict = {"name": "tap-csv", "namespace": "tap_csv"}
+        >>> result: FlextResult[object] = (
+        ...     validator.validate_meltano_plugin_business_rules(config)
+        ... )
         >>> if result.is_success:
         ...     print("Plugin configuration is valid")
 
@@ -115,12 +117,12 @@ class FlextMeltanoValidators:
             FlextResult indicating business rule validation.
 
         """
-        validation_errors = []
+        validation_errors: list[str] = []
 
         # Meltano business rule: target plugin names
         if (
             name.startswith("target-")
-            and len(name) < FlextMeltanoConstants.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
                 "Target plugin names must be at least 8 characters"
@@ -129,7 +131,7 @@ class FlextMeltanoValidators:
         # Meltano business rule: tap plugin names
         if (
             name.startswith("tap-")
-            and len(name) < FlextMeltanoConstants.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append("Tap plugin names must be at least 5 characters")
 
@@ -238,7 +240,10 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config = {"version": 1, "project_id": "my-meltano-project"}
+            >>> config: FlextTypes.Core.Dict = {
+            ...     "version": 1,
+            ...     "project_id": "my-meltano-project",
+            ... }
             >>> result = FlextMeltanoValidators.validate_meltano_project_business_rules(
             ...     config
             ... )
@@ -252,7 +257,7 @@ class FlextMeltanoValidators:
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict = config
+        config_dict: FlextTypes.Core.Dict = config
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(BaseModel):
@@ -313,8 +318,13 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config = {"name": "my_dbt_project", "version": "1.0.0"}
-            >>> result = FlextMeltanoValidators.validate_dbt_business_rules(config)
+            >>> config: FlextTypes.Core.Dict = {
+            ...     "name": "my_dbt_project",
+            ...     "version": "1.0.0",
+            ... }
+            >>> result: FlextResult[object] = (
+            ...     FlextMeltanoValidators.validate_dbt_business_rules(config)
+            ... )
             >>> if result.is_success and result.unwrap():
             ...     print("DBT configuration is valid")
 
@@ -325,7 +335,7 @@ class FlextMeltanoValidators:
                 "DBT config validation failed: config must be a dictionary",
             )
 
-        config_dict = config
+        config_dict: FlextTypes.Core.Dict = config
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(BaseModel):
@@ -443,10 +453,16 @@ class FlextMeltanoValidators:
             FlextResult containing validated configuration or error details.
 
         Example:
-            >>> config = {"host": "localhost", "port": 5432, "database": "mydb"}
-            >>> result = FlextMeltanoValidators.validate_connection_config(config)
+            >>> config: FlextTypes.Core.Dict = {
+            ...     "host": "localhost",
+            ...     "port": 5432,
+            ...     "database": "mydb",
+            ... }
+            >>> result: FlextResult[object] = (
+            ...     FlextMeltanoValidators.validate_connection_config(config)
+            ... )
             >>> if result.is_success:
-            ...     validated_config = result.unwrap()
+            ...     validated_config: FlextTypes.Core.Dict = result.unwrap()
             ...     print(f"Validated config: {validated_config}")
 
         """

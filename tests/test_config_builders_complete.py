@@ -3,8 +3,7 @@
 from collections.abc import Callable
 
 from flext_core import FlextResult
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-from flext_meltano.constants import PluginTypes
+from flext_meltano import FlextMeltanoConfigBuilders, PluginTypes
 from flext_tests import FlextTestsUtilities
 
 

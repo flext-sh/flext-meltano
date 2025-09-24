@@ -12,17 +12,11 @@ from __future__ import annotations
 from flext_core import FlextExceptions
 
 
-class FlextMeltanoExceptions:
-    """Unified exception management for Meltano operations - Single Responsibility Pattern.
+class FlextMeltanoExceptions(FlextExceptions):
+    """Single unified meltano exceptions class following FLEXT standards.
 
-    Provides domain-specific exception types for FLEXT Meltano operations while
-    maintaining single class per module principle. All exceptions inherit from
-    flext-core foundation following FLEXT domain separation standards.
-
-    Usage:
-        >>> raise FlextMeltanoExceptions.ConfigurationError("Invalid Meltano config")
-        >>> raise FlextMeltanoExceptions.ValidationError("Plugin validation failed")
-        >>> raise FlextMeltanoExceptions.MeltanoProjectError("Project init failed")
+    Contains all exception definitions for meltano domain operations.
+    Follows FLEXT pattern: one class per module with nested subclasses.
     """
 
     BaseError = FlextExceptions.BaseError

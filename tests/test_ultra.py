@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoConfig
 
 
 # Test just the core functionality without complex imports

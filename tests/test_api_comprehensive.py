@@ -168,10 +168,13 @@ class TestFlextMeltanoAPIPluginOperations:
         """Test plugin installation with configuration."""
         api = FlextMeltanoAPI()
 
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
+            tmp_path = tmp_file.name
+
         result = await api.install_plugin(
             plugin_type="extractors",
             plugin_name="tap-csv",
-            plugin_config={"path": "/tmp/data.csv"},  # noqa: S108
+            plugin_config={"path": tmp_path},
         )
 
         assert result.is_failure or result.is_success
@@ -217,8 +220,12 @@ class TestFlextMeltanoAPICatalogOperations:
         """Test catalog discovery with configuration."""
         api = FlextMeltanoAPI()
 
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
+            tmp_path = tmp_file.name
+
         result = await api.discover_catalog(
-            tap_name="tap-csv", config={"path": "/tmp/test.csv"}  # noqa: S108
+            tap_name="tap-csv",
+            config={"path": tmp_path},
         )
 
         assert result.is_failure or result.is_success

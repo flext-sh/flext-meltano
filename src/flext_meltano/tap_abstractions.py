@@ -41,7 +41,7 @@ class FlextTapAbstractions:
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config = PydanticConfigDict(extra="allow")
+        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -86,7 +86,9 @@ class FlextTapAbstractions:
 
             """
             # Use centralized validator to eliminate duplication
-            result = FlextMeltanoValidators.validate_connection_config(v)
+            result: FlextResult[object] = (
+                FlextMeltanoValidators.validate_connection_config(v)
+            )
             if result.is_failure:
                 raise ValueError(result.error or "Connection config validation failed")
             return v
@@ -94,7 +96,7 @@ class FlextTapAbstractions:
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config = PydanticConfigDict(extra="allow")
+        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -113,7 +115,7 @@ class FlextTapAbstractions:
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config = PydanticConfigDict(extra="allow")
+        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextTapAbstractions.TapConfig = Field(description="Tap configuration")
@@ -136,7 +138,7 @@ class FlextTapAbstractions:
         )
         tap_id: str = Field(description="Unique tap identifier")
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize unified tap abstractions."""
         self._stream_registry: dict[str, FlextTapAbstractions.StreamDefinition] = {}
         self.service_name = "FlextTapAbstractions"
@@ -220,7 +222,7 @@ class FlextTapAbstractions:
 
         """
         # Cast to satisfy MyPy type checking
-        result = tap_config.stream_config.get(stream_name, {})
+        result: FlextResult[object] = tap_config.stream_config.get(stream_name, {})
         return dict(result) if isinstance(result, dict) else {}
 
     # ============================================================================
@@ -248,10 +250,12 @@ class FlextTapAbstractions:
 
             config_data.update(dict(kwargs.items()))
             # Pydantic BaseModel validation - use model_validate for proper typing
-            config = FlextTapAbstractions.TapConfig.model_validate(config_data)
+            config: dict[str, object] = FlextTapAbstractions.TapConfig.model_validate(
+                config_data
+            )
 
             # Process the config directly - simplified approach
-            process_result = self.process(config)
+            process_result: FlextResult[object] = self.process(config)
             if process_result.is_failure:
                 return FlextResult[FlextTypes.Core.Dict].fail(
                     process_result.error or "Processing failed",
@@ -415,7 +419,9 @@ class FlextTapAbstractions:
 
         Example:
             >>> stream_names = ["users", "orders"]
-            >>> result = self._create_stream_definitions("postgres", stream_names)
+            >>> result: FlextResult[object] = self._create_stream_definitions(
+            ...     "postgres", stream_names
+            ... )
             >>> if result.is_success:
             ...     streams = result.unwrap()
             ...     print(f"Created {len(streams)} stream definitions")
@@ -598,7 +604,7 @@ class FlextTapAbstractions:
     ) -> FlextResult[FlextTapAbstractions.TapInstance]:
         """Ensure streams are discovered before access."""
         if not tap_instance.discovered:
-            discovery_result = self.discover_streams(tap_instance)
+            discovery_result: FlextResult[object] = self.discover_streams(tap_instance)
             if discovery_result.is_failure:
                 return FlextResult[FlextTapAbstractions.TapInstance].fail(
                     f"Stream discovery failed: {discovery_result.error}",
@@ -666,7 +672,9 @@ class FlextTapAbstractions:
         errors = []
 
         for stream in streams:
-            entry_result = self._create_catalog_entry_from_stream(stream)
+            entry_result: FlextResult[object] = self._create_catalog_entry_from_stream(
+                stream
+            )
             if entry_result.is_success:
                 successes.append(entry_result.unwrap())
             else:
@@ -810,7 +818,7 @@ class FlextTapAbstractions:
                 "Callable[[FlextTapAbstractions.StreamDefinition], FlextResult[list[FlextTypes.Core.Dict]]]",
                 strategy,
             )
-            records_result = typed_strategy(stream)
+            records_result: FlextResult[object] = typed_strategy(stream)
             if records_result.is_failure:
                 return FlextResult[
                     tuple[
@@ -1028,7 +1036,9 @@ class FlextTapAbstractions:
     ]:
         """Get stream for sync operation."""
         tap_instance, stream_name, target = params
-        stream_result = self.get_stream_by_name(tap_instance, stream_name)
+        stream_result: FlextResult[object] = self.get_stream_by_name(
+            tap_instance, stream_name
+        )
         if stream_result.is_failure:
             return FlextResult[
                 tuple[
@@ -1060,7 +1070,7 @@ class FlextTapAbstractions:
     ]:
         """Extract records from stream."""
         stream, target = params
-        records_result = self.extract_records(stream)
+        records_result: FlextResult[object] = self.extract_records(stream)
         if records_result.is_failure:
             return FlextResult[
                 tuple[
@@ -1145,12 +1155,12 @@ class FlextTapAbstractions:
         """Get tap type using Pydantic model - ELIMINATES type conversion."""
         return tap_instance.tap_type
 
-    def get_registered_streams(self) -> FlextTypes.Core.StringList:
+    def get_registered_streams(self: object) -> FlextTypes.Core.StringList:
         """Get registered stream keys."""
         return list(self._stream_registry.keys())
 
     @classmethod
-    def create_instance(cls) -> FlextResult[FlextTapAbstractions]:
+    def create_instance(cls: object) -> FlextResult[FlextTapAbstractions]:
         """Factory method using FlextResult - ELIMINATES try/catch."""
         try:
             instance = cls()

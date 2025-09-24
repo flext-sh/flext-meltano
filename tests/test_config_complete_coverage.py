@@ -15,8 +15,9 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from flext_core.constants import FlextConstants
 
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoConfig
 
 
 class TestFlextMeltanoConfig:
@@ -263,8 +264,6 @@ class TestFlextMeltanoConfigEnums:
 
     def test_uses_flext_constants_for_enums(self) -> None:
         """Test that FlextMeltanoConfig uses FlextConstants for enum values."""
-        from flext_core.constants import FlextConstants
-
         # Config uses FlextConstants.Config.LogLevel, not nested LogLevel
         assert hasattr(FlextConstants.Config, "LogLevel")
         # Environment types are string literals, not enums

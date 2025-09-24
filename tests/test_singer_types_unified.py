@@ -1,7 +1,7 @@
 """Test module for flext-meltano."""
 
 from flext_core import FlextTypes
-from flext_meltano.singer_types import FlextSingerTypes
+from flext_meltano import FlextSingerTypes
 
 
 class TestFlextSingerTypesUnified:

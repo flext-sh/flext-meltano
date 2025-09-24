@@ -14,22 +14,30 @@ from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltanoAPI
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
 from flext_meltano.exceptions import FlextMeltanoExceptions
+from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.executors_bridge import FlextMeltanoBridge
-from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.singer_types import FlextSingerTypes
-from flext_meltano.tap_abstractions import FlextTapAbstractions
+from flext_meltano.tap_abstractions import (
+    FlextTapAbstractions,
+    StreamDefinition,
+    TapConfig,
+    TapInstance,
+)
 from flext_meltano.target_abstractions import FlextTargetAbstractions
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 __all__ = [
+    "ConfigDict",
     "FlextMeltanoAPI",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
@@ -37,9 +45,11 @@ __all__ = [
     "FlextMeltanoConfigBuilders",
     "FlextMeltanoConstants",
     "FlextMeltanoExceptions",
+    "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",
     "FlextMeltanoModels",
+    "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
     "FlextMeltanoTypes",
@@ -48,4 +58,8 @@ __all__ = [
     "FlextSingerTypes",
     "FlextTapAbstractions",
     "FlextTargetAbstractions",
+    "PluginTypes",
+    "StreamDefinition",
+    "TapConfig",
+    "TapInstance",
 ]

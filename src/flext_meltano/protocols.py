@@ -27,7 +27,7 @@ class FlextMeltanoProtocols:
     class MeltanoPluginProtocol(Protocol[T_co]):
         """Meltano plugin interface with covariant return type."""
 
-        def get_config(self) -> ConfigDict:
+        def get_config(self: object) -> ConfigDict:
             """Get plugin configuration."""
             ...  # pragma: no cover
 
@@ -47,11 +47,11 @@ class FlextMeltanoProtocols:
         tap_stream_id: str
         schema: JsonObject
 
-        def sync_records(self) -> JsonValue:
+        def sync_records(self: object) -> JsonValue:
             """Sync records from the stream."""
             ...
 
-        def get_records(self) -> JsonValue:
+        def get_records(self: object) -> JsonValue:
             """Get records from the stream."""
             ...
 
@@ -59,7 +59,7 @@ class FlextMeltanoProtocols:
     class SingerTapProtocol(Protocol):
         """Singer Tap protocol for type safety."""
 
-        def discover(self) -> JsonObject:
+        def discover(self: object) -> JsonObject:
             """Discover catalog."""
             ...
 

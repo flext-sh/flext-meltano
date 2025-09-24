@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
+from flext_meltano import FlextMeltanoConfigBuilders
 
 """FLEXT Meltano Config Builders Tests - Enterprise ELT configuration testing.
 
