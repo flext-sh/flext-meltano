@@ -12,12 +12,12 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from flext_core import FlextConstants, FlextTypes
+from flext_core import FlextConstants, FlextModels, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoModels:
+class FlextMeltanoModels(FlextModels):
     """UNIFIED Meltano Models - SINGLE RESPONSIBILITY PATTERN.
 
     Contains ALL Pydantic models and settings for the Meltano domain.
