@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoConfig
 
 
 class TestFlextMeltanoConfigSingletonPattern:

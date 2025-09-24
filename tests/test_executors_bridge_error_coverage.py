@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 from flext_core import FlextResult
-from flext_meltano.executors_bridge import FlextMeltanoBridge
+from flext_meltano import FlextMeltanoBridge
 
 
 class TestFlextMeltanoBridgeErrorCoverage:

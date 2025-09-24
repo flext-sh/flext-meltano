@@ -32,7 +32,7 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(self) -> dict[str, str | int | float | bool | list[str]]:
+    def to_dict(self: object) -> dict[str, str | int | float | bool | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
@@ -49,7 +49,7 @@ class FlextMeltanoExecutionResult:
             "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
         }
 
-    def to_json(self) -> str:
+    def to_json(self: object) -> str:
         """Convert to JSON representation.
 
         Returns:

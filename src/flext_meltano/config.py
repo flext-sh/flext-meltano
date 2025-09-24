@@ -26,7 +26,7 @@ from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoLoggingConstants:
+class FlextMeltanoLoggingConstants(FlextConstants):
     """Meltano-specific logging constants for FLEXT Meltano module.
 
     Provides domain-specific logging defaults, levels, and configuration
@@ -197,28 +197,28 @@ class FlextMeltanoLoggingConstants:
     class Environment:
         """Environment-specific Meltano logging configuration."""
 
-        DEVELOPMENT: ClassVar[dict[str, object]] = {
+        DEVELOPMENT: ClassVar[FlextTypes.Core.Dict] = {
             "log_transform_sql": True,  # Log SQL in dev
             "log_source_info": True,  # Log source info in dev
             "log_target_info": True,  # Log target info in dev
             "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
         }
 
-        STAGING: ClassVar[dict[str, object]] = {
+        STAGING: ClassVar[FlextTypes.Core.Dict] = {
             "log_transform_sql": False,
             "log_source_info": True,
             "log_target_info": True,
             "audit_log_level": FlextConstants.Config.LogLevel.INFO,
         }
 
-        PRODUCTION: ClassVar[dict[str, object]] = {
+        PRODUCTION: ClassVar[FlextTypes.Core.Dict] = {
             "log_transform_sql": False,
             "log_source_info": False,
             "log_target_info": False,
             "audit_log_level": FlextConstants.Config.LogLevel.WARNING,
         }
 
-        TESTING: ClassVar[dict[str, object]] = {
+        TESTING: ClassVar[FlextTypes.Core.Dict] = {
             "log_transform_sql": True,
             "log_source_info": True,
             "log_target_info": True,
@@ -240,17 +240,15 @@ class FlextMeltanoConfig(FlextConfig):
     # ============================================================================
 
     # Use FlextMeltanoConstants for all version constants (SOURCE OF TRUTH)
-    MELTANO_VERSION: ClassVar[str] = (
-        FlextMeltanoConstants.MeltanoSpecific.VERSION_REQUIRED
-    )
+    MELTANO_VERSION: ClassVar[str] = FlextMeltanoConstants.MELTANO_VERSION_REQUIRED
     SINGER_SDK_VERSION: ClassVar[str] = (
-        FlextMeltanoConstants.Singer.SDK_VERSION_REQUIRED
+        FlextMeltanoConstants.SINGER_SDK_VERSION_REQUIRED
     )
-    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.DBT.VERSION_REQUIRED
+    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.DBT_VERSION_REQUIRED
 
     # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
-    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE
-    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.MeltanoSpecific.STATE_DIR
+    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.MELTANO_PROJECT_FILE
+    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.MELTANO_STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
 
     # Meltano environment variables (Meltano-specific)
@@ -932,8 +930,8 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         try:
-            config = cls(project_root=Path(project_root))
-            validation_result = config.validate_project_structure()
+            config: FlextTypes.Core.Dict = cls(project_root=Path(project_root))
+            validation_result: FlextResult[object] = config.validate_project_structure()
 
             if validation_result.is_failure:
                 return FlextResult["FlextMeltanoConfig"].fail(
@@ -983,7 +981,7 @@ class FlextMeltanoConfig(FlextConfig):
         }
 
         # Create config data with environment
-        config_data: dict[str, object] = {"environment": env_type.value}
+        config_data: FlextTypes.Core.Dict = {"environment": env_type.value}
 
         # Handle debug/environment conflict: production cannot have debug=True
         if env_type.value == "production":
@@ -1041,10 +1039,10 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         # Always get fresh base configuration from FlextConfig singleton
-        base_config = FlextConfig.get_global_instance()
+        base_config: FlextTypes.Core.Dict = FlextConfig.get_global_instance()
 
         # Convert base config to dict for processing
-        base_data = base_config.model_dump()
+        base_data: FlextTypes.Core.Dict = base_config.model_dump()
 
         # Apply overrides with highest priority
         base_data.update(overrides)
@@ -1081,27 +1079,27 @@ class FlextMeltanoConfig(FlextConfig):
         FlextConfig.set_global_instance(instance)
 
     @classmethod
-    def get_version(cls) -> str:
+    def get_version(cls: object) -> str:
         """Get the version of flext-meltano."""
         return "0.9.0"
 
     @classmethod
-    def get_name(cls) -> str:
+    def get_name(cls: object) -> str:
         """Get the name of flext-meltano."""
         return "flext-meltano"
 
     @classmethod
-    def get_default_timeout(cls) -> int:
+    def get_default_timeout(cls: object) -> int:
         """Get the default timeout value."""
         return FlextConstants.Network.DEFAULT_TIMEOUT
 
     @classmethod
-    def get_default_batch_size(cls) -> int:
+    def get_default_batch_size(cls: object) -> int:
         """Get the default batch size value."""
         return FlextConstants.Performance.DEFAULT_BATCH_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls) -> list[str]:
+    def get_supported_plugin_types(cls: object) -> list[str]:
         """Get list of supported plugin types."""
         return [
             FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
@@ -1111,12 +1109,12 @@ class FlextMeltanoConfig(FlextConfig):
         ]
 
     @classmethod
-    def get_supported_environments(cls) -> list[str]:
+    def get_supported_environments(cls: object) -> list[str]:
         """Get list of supported environments."""
         return ["development", "staging", "production"]
 
     @classmethod
-    def get_supported_log_levels(cls) -> list[str]:
+    def get_supported_log_levels(cls: object) -> list[str]:
         """Get list of supported log levels."""
         return [
             FlextConstants.Config.LogLevel.DEBUG.value,
@@ -1126,7 +1124,7 @@ class FlextMeltanoConfig(FlextConfig):
         ]
 
     @classmethod
-    def clear_global_instance(cls) -> None:
+    def clear_global_instance(cls: object) -> None:
         """Clear the global instance (useful for testing).
 
         Removes the current global configuration instance, allowing for
@@ -1223,7 +1221,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         # Get base configuration from FlextConfig singleton
-        base_config = FlextConfig.get_global_instance()
+        base_config: FlextTypes.Core.Dict = FlextConfig.get_global_instance()
 
         # Create base environment variables from FlextConfig fields
         base_env_vars = {
@@ -1247,11 +1245,11 @@ class FlextMeltanoConfig(FlextConfig):
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    def get_meltano_logging_config(self) -> dict[str, object]:
+    def get_meltano_logging_config(self) -> FlextTypes.Core.Dict:
         """Get Meltano-specific logging configuration dictionary.
 
         Returns:
-            dict[str, object]: Dictionary containing Meltano logging configuration.
+            FlextTypes.Core.Dict: Dictionary containing Meltano logging configuration.
 
         """
         return {
@@ -1338,15 +1336,15 @@ class FlextMeltanoConfig(FlextConfig):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> dict[str, object]:
+    def get_metadata(self) -> FlextTypes.Core.Dict:
         """Get configuration metadata including override tracking.
 
         Returns:
-            dict[str, object]: Configuration metadata dictionary.
+            FlextTypes.Core.Dict: Configuration metadata dictionary.
 
         """
         # Get base metadata from FlextConfig
-        base_metadata = super().get_metadata()
+        base_metadata: FlextTypes.Core.Dict = super().get_metadata()
 
         # Add extra metadata if it exists
         if hasattr(self, "_metadata_extra"):

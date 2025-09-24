@@ -33,7 +33,7 @@ class FlextMeltanoConfigBuilders:
     # UNIFIED CONFIGURATION BUILDING METHODS - NO NESTED CLASSES
     # =================================================================
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize unified configuration builders."""
         self._logger = FlextLogger(__name__)
 
@@ -73,7 +73,7 @@ class FlextMeltanoConfigBuilders:
                 "clean-targets": ["target", "dbt_packages"],
                 "models": {safe_project_name: {"+materialized": "view"}},
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "entity_id": FlextUtilities.Generators.generate_id(),
                 },
@@ -112,9 +112,9 @@ class FlextMeltanoConfigBuilders:
         try:
             # Create type-specific configuration using flext-core patterns
             type_prefix = (
-                FlextMeltanoConstants.Plugin.PREFIX_TAP
+                FlextMeltanoConstants.PLUGIN_PREFIX_TAP
                 if plugin_type == FlextMeltanoConstants.PluginTypes.EXTRACTORS.value
-                else FlextMeltanoConstants.Plugin.PREFIX_TARGET
+                else FlextMeltanoConstants.PLUGIN_PREFIX_TARGET
             )
 
             # Use flext-core text processing - EXTENSIVE REUSE
@@ -131,7 +131,7 @@ class FlextMeltanoConfigBuilders:
                 "executable": safe_executable,
                 "type": plugin_type,
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "entity_id": FlextUtilities.Generators.generate_id(),
                 },
@@ -207,7 +207,7 @@ class FlextMeltanoConfigBuilders:
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-        variant: str = FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
+        variant: str = FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
         config_defaults: ConfigDict | None = None,
     ) -> FlextResult[ConfigDict]:
         """Create complete plugin configuration for Meltano using FlextResult patterns.
@@ -288,7 +288,7 @@ class FlextMeltanoConfigBuilders:
                 "config": config_defaults or {},
                 "select": ["*.*"],  # Selecionar todas as tabelas por padrão
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "type": FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,  # SOURCE OF TRUTH
                 },
@@ -329,7 +329,7 @@ class FlextMeltanoConfigBuilders:
                 "executable": safe_target_name,
                 "config": config_defaults or {},
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,  # SOURCE OF TRUTH
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "type": FlextMeltanoConstants.PluginTypes.LOADERS.value,  # SOURCE OF TRUTH
                 },
@@ -368,7 +368,7 @@ class FlextMeltanoConfigBuilders:
                 "project_name": safe_project_name,
                 "environments": [
                     {"name": env}
-                    for env in FlextMeltanoConstants.Metadata.DEFAULT_ENVIRONMENTS
+                    for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
                     "extractors": [],
@@ -377,7 +377,7 @@ class FlextMeltanoConfigBuilders:
                     "orchestrators": [],
                 },
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
@@ -416,8 +416,8 @@ class FlextMeltanoConfigBuilders:
                 )
 
             # Create copy to avoid mutation
-            updated_config = dict(meltano_config)
-            plugins = updated_config.setdefault("plugins", {})
+            updated_config: dict[str, object] = dict(meltano_config)
+            plugins: dict[str, object] = updated_config.setdefault("plugins", {})
 
             if isinstance(plugins, dict):
                 typed_plugins = plugins
@@ -425,14 +425,16 @@ class FlextMeltanoConfigBuilders:
                     typed_plugins[safe_plugin_type] = []
                 plugin_list = typed_plugins[safe_plugin_type]
                 if isinstance(plugin_list, list):
-                    plugin_list_copy = list(plugin_list)  # Create mutable copy
+                    plugin_list_copy: list[object] = list(
+                        plugin_list
+                    )  # Create mutable copy
                     plugin_list_copy.append(plugin_config)
                     typed_plugins[safe_plugin_type] = plugin_list_copy
 
             # Add metadata about the operation
-            metadata = updated_config.get("metadata", {})
+            metadata: dict[str, object] = updated_config.get("metadata", {})
             if isinstance(metadata, dict):
-                metadata = dict(metadata)
+                metadata: dict[str, object] = dict(metadata)
                 metadata["last_plugin_added"] = {
                     "type": safe_plugin_type,
                     "name": plugin_config.get("name", "unknown"),

@@ -9,7 +9,7 @@ import tempfile
 import pytest
 
 from flext_core import FlextResult, FlextService
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano import FlextMeltanoService
 
 
 class TestFlextMeltanoServiceInitialization:

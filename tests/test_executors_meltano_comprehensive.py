@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 from flext_core import FlextResult
-from flext_meltano.executors import FlextMeltanoExecutor
+from flext_meltano import FlextMeltanoExecutor
 
 
 class TestFlextMeltanoExecutorUnified:

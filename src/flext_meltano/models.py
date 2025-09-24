@@ -10,9 +10,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from flext_core import FlextConstants, FlextModels, FlextTypes
+from flext_core import FlextConstants, FlextModels, FlextResult, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -31,7 +30,9 @@ class FlextMeltanoModels(FlextModels):
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            extra="allow", validate_assignment=True
+        )
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -59,7 +60,9 @@ class FlextMeltanoModels(FlextModels):
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             """Validate connection_config using centralized validator."""
-            result = FlextMeltanoValidators.validate_connection_config(v)
+            result: FlextResult[object] = (
+                FlextMeltanoValidators.validate_connection_config(v)
+            )
             if result.is_failure:
                 raise ValueError(result.error or "Connection config validation failed")
             return v
@@ -67,7 +70,9 @@ class FlextMeltanoModels(FlextModels):
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            extra="allow", validate_assignment=True
+        )
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -86,7 +91,9 @@ class FlextMeltanoModels(FlextModels):
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            extra="allow", validate_assignment=True
+        )
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextMeltanoModels.TapConfig = Field(description="Tap configuration")
@@ -116,7 +123,7 @@ class FlextMeltanoModels(FlextModels):
     class TargetConfig(BaseModel):
         """Pydantic model for target configuration with field validation."""
 
-        model_config = ConfigDict(frozen=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(frozen=True, extra="allow")
 
         target_type: str = Field(description="Target type identifier")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -147,7 +154,9 @@ class FlextMeltanoModels(FlextModels):
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             """Validate connection config using centralized validator."""
-            result = FlextMeltanoValidators.validate_connection_config(v)
+            result: FlextResult[object] = (
+                FlextMeltanoValidators.validate_connection_config(v)
+            )
             if result.is_failure:
                 raise ValueError(result.error or "Connection config validation failed")
             return v
@@ -173,7 +182,7 @@ class FlextMeltanoModels(FlextModels):
     class StreamInfo(BaseModel):
         """Pydantic model for stream information with validation."""
 
-        model_config = ConfigDict(frozen=False, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(description="Stream name identifier")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -219,7 +228,9 @@ class FlextMeltanoModels(FlextModels):
     class MeltanoProjectModel(BaseModel):
         """Pydantic model for Meltano project configuration."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         version: int = Field(
             ge=1,
@@ -258,14 +269,16 @@ class FlextMeltanoModels(FlextModels):
     class PluginModel(BaseModel):
         """Pydantic model for Meltano plugin configuration."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         name: str = Field(min_length=1, description="Plugin name")
         namespace: str = Field(description="Plugin namespace")
         pip_url: str | None = Field(default=None, description="Plugin pip URL")
         executable: str | None = Field(default=None, description="Plugin executable")
         variant: str = Field(
-            default=FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
+            default=FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
             description="Plugin variant",
         )
         settings: FlextTypes.Core.Dict = Field(
@@ -291,7 +304,9 @@ class FlextMeltanoModels(FlextModels):
     class DbtProjectModel(BaseModel):
         """Pydantic model for DBT project configuration."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         name: str = Field(min_length=1, description="DBT project name")
         version: str = Field(description="DBT project version")
@@ -332,7 +347,9 @@ class FlextMeltanoModels(FlextModels):
     class DbtExecutionModel(BaseModel):
         """Pydantic model for DBT execution configuration."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         command: str = Field(description="DBT command to execute")
         models: list[str] = Field(
@@ -367,122 +384,15 @@ class FlextMeltanoModels(FlextModels):
             return v
 
     # ========================================================================
-    # CONFIGURATION SETTINGS - Pydantic Settings for environment configuration
-    # ========================================================================
-
-    class FlextMeltanoConfig(BaseSettings):
-        """FLEXT Meltano configuration using Pydantic Settings."""
-
-        model_config = SettingsConfigDict(
-            env_prefix="FLEXT_MELTANO_",
-            env_file=".env",
-            env_file_encoding="utf-8",
-            case_sensitive=False,
-            extra="allow",
-        )
-
-        # Environment configuration
-        environment: str = Field(
-            default="development",
-            description="Current environment",
-        )
-        project_root: Path = Field(
-            default_factory=Path.cwd,
-            description="Project root directory",
-        )
-        log_level: str = Field(
-            default=FlextMeltanoConstants.Logging.DEFAULT_LEVEL,
-            description="Logging level",
-        )
-
-        # Meltano-specific configuration
-        meltano_project_root: Path = Field(
-            default_factory=Path.cwd,
-            description="Meltano project root",
-        )
-        meltano_environment: str = Field(
-            default="dev",
-            description="Meltano environment",
-        )
-        meltano_database_uri: str = Field(
-            default="sqlite:///meltano.db",
-            description="Meltano database URI",
-        )
-
-        # Singer configuration
-        singer_catalog_format: str = Field(
-            default="json",
-            description="Singer catalog format",
-        )
-        singer_buffer_size: int = Field(
-            default=FlextMeltanoConstants.Singer.DEFAULT_BUFFER_SIZE,
-            description="Singer stream buffer size",
-        )
-        singer_batch_size: int = Field(
-            default=FlextMeltanoConstants.Singer.DEFAULT_BATCH_SIZE,
-            description="Singer batch size",
-        )
-
-        # DBT configuration
-        dbt_profiles_dir: Path = Field(
-            default=Path.cwd() / "profiles",
-            description="DBT profiles directory",
-        )
-        dbt_project_dir: Path = Field(
-            default=Path.cwd() / "transform",
-            description="DBT project directory",
-        )
-        dbt_threads: int = Field(
-            default=1,
-            description="DBT execution threads",
-        )
-
-        # Performance configuration
-        default_timeout: int = Field(
-            default=FlextMeltanoConstants.MeltanoSpecific.DEFAULT_TIMEOUT,
-            description="Default operation timeout",
-        )
-        discovery_timeout: int = Field(
-            default=FlextMeltanoConstants.MeltanoSpecific.DISCOVERY_TIMEOUT,
-            description="Catalog discovery timeout",
-        )
-        extract_timeout: int = Field(
-            default=FlextMeltanoConstants.MeltanoSpecific.EXTRACT_TIMEOUT,
-            description="Data extraction timeout",
-        )
-        load_timeout: int = Field(
-            default=FlextMeltanoConstants.MeltanoSpecific.LOAD_TIMEOUT,
-            description="Data loading timeout",
-        )
-
-        @field_validator("environment")
-        @classmethod
-        def validate_environment(cls, v: str) -> str:
-            """Validate environment is valid."""
-            valid_envs = ["development", "staging", "production", "testing"]
-            if v not in valid_envs:
-                msg = f"Environment must be one of: {', '.join(valid_envs)}"
-                raise ValueError(msg)
-            return v
-
-        @field_validator("log_level")
-        @classmethod
-        def validate_log_level(cls, v: str) -> str:
-            """Validate log level is valid."""
-            valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-            if v.upper() not in valid_levels:
-                msg = f"Log level must be one of: {', '.join(valid_levels)}"
-                raise ValueError(msg)
-            return v.upper()
-
-    # ========================================================================
     # EXECUTION RESULT MODELS - Pipeline execution and monitoring
     # ========================================================================
 
     class ExecutionResult(BaseModel):
         """Pydantic model for execution result tracking."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         operation: str = Field(description="Operation performed")
         status: str = Field(description="Execution status")
@@ -524,7 +434,9 @@ class FlextMeltanoModels(FlextModels):
     class PipelineResult(BaseModel):
         """Pydantic model for pipeline execution result."""
 
-        model_config = ConfigDict(validate_assignment=True, extra="allow")
+        model_config: FlextTypes.Core.Dict = ConfigDict(
+            validate_assignment=True, extra="allow"
+        )
 
         pipeline_id: str = Field(description="Pipeline identifier")
         tap_result: FlextMeltanoModels.ExecutionResult | None = Field(

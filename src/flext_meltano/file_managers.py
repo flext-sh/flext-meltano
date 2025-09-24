@@ -116,7 +116,7 @@ class FlextMeltanoFileManagers:
             with file_path.open(
                 "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
-                config_data = yaml.safe_load(f)
+                config_data: dict[str, object] = yaml.safe_load(f)
 
             if config_data is None:
                 return FlextResult[ConfigDict].ok(data={})
@@ -216,7 +216,7 @@ class FlextMeltanoFileManagers:
 
             # Create essential config files
             configs: dict[str, ConfigDict] = {
-                FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE: {
+                FlextMeltanoConstants.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": project_name,
                     "project_name": project_name,
@@ -237,7 +237,9 @@ class FlextMeltanoFileManagers:
 
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                save_result = cls.save_yaml_config(config_data, config_path)
+                save_result: FlextResult[object] = cls.save_yaml_config(
+                    config_data, config_path
+                )
                 if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
 

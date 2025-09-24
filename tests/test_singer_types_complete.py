@@ -5,7 +5,7 @@ import math
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT
 from flext_core import FlextResult
-from flext_meltano.singer_types import FlextSingerTypes
+from flext_meltano import FlextSingerTypes
 from flext_tests import FlextTestsUtilities
 
 

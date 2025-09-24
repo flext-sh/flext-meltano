@@ -9,7 +9,7 @@ from unittest import mock
 
 # FIXED: Use flext-cli foundation instead of direct Click imports
 from flext_core import FlextLogger, FlextResult
-from flext_meltano.executors import FlextMeltanoExecutor
+from flext_meltano import FlextMeltanoExecutor
 
 logger = FlextLogger(__name__)
 
@@ -637,7 +637,7 @@ class TestFlextMeltanoExecutorComplete:
 
         # Test that the interface contains expected values
         assert cli_app["name"] == "flext-meltano", (
-            "CLI name should match FlextMeltanoConstants.Application.NAME"
+            "CLI name should match FlextMeltanoConstants.APPLICATION_NAME"
         )
         assert cli_app["output"] == "table", "Default output format should be table"
         assert cli_app["debug"] is False, "Default debug should be False"

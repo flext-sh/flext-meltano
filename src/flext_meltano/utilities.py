@@ -48,7 +48,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "project_name": safe_project_name,
                 "environments": [
                     {"name": env}
-                    for env in FlextMeltanoConstants.Metadata.DEFAULT_ENVIRONMENTS
+                    for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
                     "extractors": [],
@@ -57,7 +57,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                     "orchestrators": [],
                 },
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
@@ -107,7 +107,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 FlextLogger(__name__).warning(f"Error closing file handle: {e}")
 
         def resource_factory() -> TextIO:
-            result = cls._open_yaml_file_for_writing(target_path)
+            result: FlextResult[object] = cls._open_yaml_file_for_writing(target_path)
             if result.is_failure:
                 error_msg = f"Failed to open file: {result.error}"
                 raise RuntimeError(error_msg)
@@ -122,7 +122,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 cleanup_file_handle,
             )
             .with_context(
-                lambda error: f"Writing {FlextMeltanoConstants.MeltanoSpecific.PROJECT_FILE}: {error}"
+                lambda error: f"Writing {FlextMeltanoConstants.MELTANO_PROJECT_FILE}: {error}"
             )
         )
 
@@ -170,7 +170,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 )
 
             # MONADIC PATTERN: Safe YAML conversion with proper type casting
-            yaml_data = dict(config)  # Type-safe conversion
+            yaml_data: FlextTypes.Core.Dict = dict(config)  # Type-safe conversion
 
             # DOMAIN-SPECIFIC: YAML writing with Meltano formatting preferences
             yaml.dump(yaml_data, file_handle, default_flow_style=False, indent=2)
@@ -228,7 +228,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "settings": {},
                 "config": {},
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
+                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }

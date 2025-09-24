@@ -1,7 +1,7 @@
 """Test module for flext-meltano."""
 
 from flext_core import FlextResult
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano import FlextMeltanoService
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT

@@ -6,8 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from flext_core import (
@@ -17,10 +15,8 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.validators import FlextMeltanoValidators
-
-if TYPE_CHECKING:
-    from flext_meltano.adapters import FlextMeltanoAdapter
 
 # Constants
 
@@ -49,7 +45,7 @@ class FlextTargetAbstractions:
     class FlextTargetConfig(BaseModel):
         """Pydantic model for target configuration with field validation."""
 
-        model_config = ConfigDict(frozen=True, extra="allow")
+        model_config: dict[str, object] = ConfigDict(frozen=True, extra="allow")
 
         target_type: str = Field(..., description="Target type identifier")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -92,7 +88,9 @@ class FlextTargetAbstractions:
 
             """
             # Use centralized validator to eliminate duplication
-            result = FlextMeltanoValidators.validate_connection_config(v)
+            result: FlextResult[object] = (
+                FlextMeltanoValidators.validate_connection_config(v)
+            )
             if result.is_failure:
                 raise ValueError(result.error or "Connection config validation failed")
             return v
@@ -128,7 +126,7 @@ class FlextTargetAbstractions:
     class FlextStreamInfo(BaseModel):
         """Pydantic model for stream information with validation."""
 
-        model_config = ConfigDict(frozen=False, extra="allow")
+        model_config: dict[str, object] = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(..., description="Stream name identifier")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -217,11 +215,11 @@ class FlextTargetAbstractions:
             )
 
             # Store validated configuration
-            config_id = f"{target_type}_{id(config_model)}"
+            config_id: dict[str, object] = f"{target_type}_{id(config_model)}"
             self._target_configs[config_id] = config_model
 
             # Convert to dict for compatibility
-            config_dict = config_model.model_dump()
+            config_dict: dict[str, object] = config_model.model_dump()
             config_dict["config_id"] = config_id
 
             self._logger.info(
@@ -320,13 +318,13 @@ class FlextTargetAbstractions:
             # Target validation is handled by business logic, not field validation
 
             # Create or update stream
-            target_streams = target.get("streams", {})
+            target_streams: dict[str, object] = target.get("streams", {})
             if not isinstance(target_streams, dict):
                 target_streams = {}
                 target["streams"] = target_streams
 
             # Use validated stream info from Pydantic model
-            stream_info_dict = stream_info_model.model_dump()
+            stream_info_dict: dict[str, object] = stream_info_model.model_dump()
             target_streams[stream_name] = stream_info_dict
 
             # Register stream with Pydantic model
@@ -368,7 +366,7 @@ class FlextTargetAbstractions:
             # Parameter validation is handled by business logic, not field validation
 
             # Check if stream exists
-            target_streams = target.get("streams", {})
+            target_streams: dict[str, object] = target.get("streams", {})
             if (
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
@@ -414,7 +412,7 @@ class FlextTargetAbstractions:
             # Parameter validation is handled by business logic
 
             # Update internal state
-            target_state = target.get("state", {})
+            target_state: dict[str, object] = target.get("state", {})
             if not isinstance(target_state, dict):
                 target_state = {}
                 target["state"] = target_state
@@ -470,7 +468,9 @@ class FlextTargetAbstractions:
             failed_count = 0
 
             for record in records:
-                load_result = self.load_record(target, stream_name, record)
+                load_result: FlextResult[object] = self.load_record(
+                    target, stream_name, record
+                )
                 if not load_result.is_failure:
                     loaded_count += 1
                 else:
@@ -522,7 +522,7 @@ class FlextTargetAbstractions:
             self._logger.info("Finalizing stream", stream_name=stream_name)
 
             # Get stream info
-            target_streams = target.get("streams", {})
+            target_streams: dict[str, object] = target.get("streams", {})
             if (
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
@@ -575,7 +575,7 @@ class FlextTargetAbstractions:
             # Collect statistics from all streams
             stream_stats = {}
             total_records = 0
-            target_streams = target.get("streams", {})
+            target_streams: dict[str, object] = target.get("streams", {})
 
             if isinstance(target_streams, dict):
                 for stream_name, stream_info in target_streams.items():
@@ -639,7 +639,7 @@ class FlextTargetAbstractions:
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Get stream by name with error handling."""
         try:
-            target_streams = target.get("streams", {})
+            target_streams: dict[str, object] = target.get("streams", {})
             if (
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
@@ -659,27 +659,27 @@ class FlextTargetAbstractions:
 
     def list_streams(self, target: FlextTypes.Core.Dict) -> FlextTypes.Core.StringList:
         """List all active stream names."""
-        target_streams = target.get("streams", {})
+        target_streams: dict[str, object] = target.get("streams", {})
         return list(target_streams.keys()) if isinstance(target_streams, dict) else []
 
     def get_target_type(self, target: FlextTypes.Core.Dict) -> str:
         """Get target type."""
         return str(target.get("target_type", "unknown"))
 
-    def get_active_targets(self) -> FlextTypes.Core.StringList:
+    def get_active_targets(self: object) -> FlextTypes.Core.StringList:
         """Get list of active target IDs."""
         return list(self._active_targets.keys())
 
-    def get_registered_streams(self) -> FlextTypes.Core.StringList:
+    def get_registered_streams(self: object) -> FlextTypes.Core.StringList:
         """Get list of registered stream keys."""
         return list(self._stream_registry.keys())
 
     @classmethod
-    def create_instance(cls) -> FlextResult[FlextTargetAbstractions]:
+    def create_instance(cls: object) -> FlextResult[FlextTargetAbstractions]:
         """Factory method to create FlextTargetAbstractions instance."""
         return FlextResult["FlextTargetAbstractions"].ok(data=cls())
 
-    def is_production(self) -> bool:
+    def is_production(self: object) -> bool:
         """Check if running in production mode."""
         return False
 

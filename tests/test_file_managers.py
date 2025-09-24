@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest import TestCase
 
-from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano import FlextMeltanoFileManagers
 
 
 class TestFlextMeltanoFileManagersBasic(TestCase):

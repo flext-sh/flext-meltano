@@ -13,7 +13,7 @@ import pytest
 from pydantic import ValidationError
 
 from flext_core import FlextResult, FlextTypes, FlextUtilities
-from flext_meltano.tap_abstractions import FlextTapAbstractions
+from flext_meltano import FlextTapAbstractions
 from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 
 

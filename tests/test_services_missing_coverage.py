@@ -11,7 +11,7 @@ from __future__ import annotations
 import pytest
 
 from flext_core import FlextResult
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano import FlextMeltanoService
 
 
 class TestFlextMeltanoServiceMissingCoverage:

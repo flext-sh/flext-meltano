@@ -44,7 +44,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
     Example:
         >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
-        >>> result = service.execute()
+        >>> result: FlextResult[object] = service.execute()
         >>> if result.is_success:
         ...     print("Service executed successfully")
 
@@ -74,7 +74,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         """
         # Convert data to mutable dict and extract service-specific fields
-        mutable_data = dict(data)
+        mutable_data: FlextTypes.Core.Dict = dict(data)
         service_specific_fields = {
             "tap_name": mutable_data.pop("tap_name", None),
             "target_name": mutable_data.pop("target_name", None),
@@ -92,7 +92,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             if value is not None:
                 setattr(self, field, value)
 
-    def execute(self) -> FlextResult[FlextTypes.Core.Dict]:
+    def execute(self: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute service operation based on type.
 
         Performs the main operation for the configured service type, returning
@@ -108,9 +108,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap")
-            >>> result = service.execute()
+            >>> result: FlextResult[object] = service.execute()
             >>> if result.is_success:
-            ...     data = result.unwrap()
+            ...     data: dict[str, object] = result.unwrap()
             ...     print(f"Service {data['name']} executed successfully")
 
         """
@@ -130,7 +130,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         return FlextResult[FlextTypes.Core.Dict].ok(data=config_data)
 
-    def get_info(self) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
+    def get_info(self: object) -> FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]:
         """Get service information for any service type.
 
         Retrieves comprehensive information about the current service instance,
@@ -144,7 +144,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
-            >>> info_result = service.get_info()
+            >>> info_result: FlextResult[object] = service.get_info()
             >>> if info_result.is_success:
             ...     info = info_result.unwrap()
             ...     print(f"Service: {info['name']}, Type: {info['service_type']}")
@@ -162,7 +162,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         }
         return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(data=info)
 
-    def validate_config(self) -> FlextResult[None]:
+    def validate_config(self: object) -> FlextResult[None]:
         """Validate service configuration using monadic validation chain.
 
         Performs comprehensive validation of the service configuration using
@@ -174,13 +174,13 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
-            >>> validation_result = service.validate_config()
+            >>> validation_result: FlextResult[object] = service.validate_config()
             >>> if validation_result.is_failure:
             ...     print(f"Validation failed: {validation_result.error}")
 
         """
         # MONADIC VALIDATION CHAIN: Replace manual validation with chain_validations
-        config = {
+        config: FlextTypes.Core.Dict = {
             "service_type": self._service_type,
             "tap_name": getattr(self, "tap_name", None),
             "target_name": getattr(self, "target_name", None),
@@ -203,7 +203,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             validate_plugin_config_none,
         )
 
-    def _validate_service_type(self) -> FlextResult[None]:
+    def _validate_service_type(self: object) -> FlextResult[None]:
         """Validate service type is supported.
 
         Returns:
@@ -259,8 +259,8 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
-            >>> config = {"connection_string": "postgresql://..."}
-            >>> instance_result = service.create_instance(config)
+            >>> config: dict[str, object] = {"connection_string": "postgresql://..."}
+            >>> instance_result: FlextResult[object] = service.create_instance(config)
             >>> if instance_result.is_success:
             ...     instance = instance_result.unwrap()
             ...     print(
@@ -345,19 +345,21 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap")
-            >>> config = {"connection_string": "postgresql://..."}
-            >>> validation_result = service.validate_service_config(config)
+            >>> config: dict[str, object] = {"connection_string": "postgresql://..."}
+            >>> validation_result: FlextResult[object] = (
+            ...     service.validate_service_config(config)
+            ... )
             >>> if validation_result.is_success and validation_result.unwrap():
             ...     print("Configuration is valid")
 
         """
         # Use centralized validator to eliminate duplication
-        json_config = cast("FlextTypes.Core.JsonValue", config)
+        json_config: FlextTypes.Core.Dict = cast("FlextTypes.Core.JsonValue", config)
         return FlextMeltanoValidators.validate_meltano_plugin_business_rules(
             json_config
         )
 
-    def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
+    def get_default_config(self: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type.
 
         Generates appropriate default configuration for the current service type,
@@ -369,9 +371,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap")
-            >>> config_result = service.get_default_config()
+            >>> config_result: FlextResult[object] = service.get_default_config()
             >>> if config_result.is_success:
-            ...     config = config_result.unwrap()
+            ...     config: dict[str, object] = config_result.unwrap()
             ...     print(f"Default config: {config}")
 
         """
@@ -396,7 +398,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         empty_config: FlextTypes.Core.Dict = {}
         return FlextResult[FlextTypes.Core.Dict].ok(data=empty_config)
 
-    def validate_service(self) -> FlextResult[bool]:
+    def validate_service(self: object) -> FlextResult[bool]:
         """Validate service configuration and setup using monadic railway pattern.
 
         Uses FlextResult railway-oriented programming to chain validation operations
@@ -407,7 +409,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
 
         Example:
             >>> service = FlextMeltanoService(service_type="tap", tap_name="tap-csv")
-            >>> validation_result = service.validate_service()
+            >>> validation_result: FlextResult[object] = service.validate_service()
             >>> if validation_result.is_success and validation_result.unwrap():
             ...     print("Service is properly configured")
 
@@ -441,9 +443,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             >>> service = FlextMeltanoService(
             ...     service_type="dbt", project_name="my_project"
             ... )
-            >>> result = service.run_models(["model1", "model2"])
+            >>> result: FlextResult[object] = service.run_models(["model1", "model2"])
             >>> if result.is_success:
-            ...     data = result.unwrap()
+            ...     data: dict[str, object] = result.unwrap()
             ...     print(f"Ran {len(data['models_run'])} models")
 
         """
@@ -464,7 +466,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         return FlextResult[FlextTypes.Core.Dict].ok(data=result_data)
 
     # DBT-specific method for compatibility
-    def get_profiles_config(self) -> FlextResult[FlextTypes.Core.Dict]:
+    def get_profiles_config(self: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Get DBT profiles configuration for DBT service type.
 
         Retrieves the DBT profiles configuration, which contains database
@@ -478,7 +480,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             >>> service = FlextMeltanoService(
             ...     service_type="dbt", project_name="my_project"
             ... )
-            >>> profiles_result = service.get_profiles_config()
+            >>> profiles_result: FlextResult[object] = service.get_profiles_config()
             >>> if profiles_result.is_success:
             ...     profiles = profiles_result.unwrap()
             ...     print(f"Profiles config: {profiles}")
@@ -710,7 +712,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             "max_workers", FlextConstants.Container.DEFAULT_WORKERS
         )
         if isinstance(max_workers_raw, (str, int, float)) or max_workers_raw is None:
-            max_workers_result = FlextUtilities.Conversions.to_int(max_workers_raw)
+            max_workers_result: FlextResult[object] = FlextUtilities.Conversions.to_int(
+                max_workers_raw
+            )
         else:
             max_workers_result = FlextResult[int].fail(
                 f"Invalid max_workers type: {type(max_workers_raw)}"
@@ -724,7 +728,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         # Convert timeout_seconds safely with proper type validation
         timeout_raw = config.get("timeout_seconds", FlextConstants.Defaults.TIMEOUT)
         if isinstance(timeout_raw, (str, int, float)) or timeout_raw is None:
-            timeout_result = FlextUtilities.Conversions.to_int(timeout_raw)
+            timeout_result: FlextResult[object] = FlextUtilities.Conversions.to_int(
+                timeout_raw
+            )
         else:
             timeout_result = FlextResult[int].fail(
                 f"Invalid timeout_seconds type: {type(timeout_raw)}"
@@ -818,7 +824,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             FlextResult containing the created tap service instance or error details.
 
         Example:
-            >>> result = FlextMeltanoService.create_tap_service("tap-csv")
+            >>> result: FlextResult[object] = FlextMeltanoService.create_tap_service(
+            ...     "tap-csv"
+            ... )
             >>> if result.is_success:
             ...     tap_service = result.unwrap()
             ...     print(f"Created tap service: {tap_service}")
@@ -849,7 +857,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             FlextResult containing the created target service instance or error details.
 
         Example:
-            >>> result = FlextMeltanoService.create_target_service("target-jsonl")
+            >>> result: FlextResult[object] = FlextMeltanoService.create_target_service(
+            ...     "target-jsonl"
+            ... )
             >>> if result.is_success:
             ...     target_service = result.unwrap()
             ...     print(f"Created target service: {target_service}")
@@ -880,7 +890,9 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             FlextResult containing the created DBT service instance or error details.
 
         Example:
-            >>> result = FlextMeltanoService.create_dbt_service("my_dbt_project")
+            >>> result: FlextResult[object] = FlextMeltanoService.create_dbt_service(
+            ...     "my_dbt_project"
+            ... )
             >>> if result.is_success:
             ...     dbt_service = result.unwrap()
             ...     print(f"Created DBT service: {dbt_service}")

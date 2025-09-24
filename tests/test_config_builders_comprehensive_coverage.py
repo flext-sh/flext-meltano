@@ -8,8 +8,7 @@ SPDX-License-Identifier: MIT
 """
 
 from flext_core import FlextResult
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
-from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
+from flext_meltano import FlextMeltanoConfigBuilders, FlextMeltanoConstants, PluginTypes
 from flext_tests import FlextTestsUtilities
 
 
@@ -312,7 +311,7 @@ class TestConfigBuildersComprehensiveCoverage:
         assert isinstance(config["metadata"], dict)
         assert (
             config["metadata"]["created_by"]
-            == FlextMeltanoConstants.Metadata.CREATED_BY
+            == FlextMeltanoConstants.METADATA_CREATED_BY
         )
 
     def test_edge_case_none_values_handling(self) -> None:

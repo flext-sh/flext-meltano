@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 import pytest
 
-from flext_meltano.execution_result import FlextMeltanoExecutionResult
+from flext_meltano import FlextMeltanoExecutionResult
 
 
 class TestFlextMeltanoExecutionResultComprehensive:

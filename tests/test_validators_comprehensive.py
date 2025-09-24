@@ -13,7 +13,7 @@ from typing import cast
 import pytest
 
 from flext_core import FlextResult, FlextTypes
-from flext_meltano.validators import FlextMeltanoValidators
+from flext_meltano import FlextMeltanoValidators
 from flext_tests import FlextTestsMatchers
 
 

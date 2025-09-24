@@ -5,7 +5,7 @@ import tempfile
 from pydantic_core import ValidationError
 
 from flext_core import FlextResult
-from flext_meltano.tap_abstractions import (
+from flext_meltano import (
     FlextTapAbstractions,
     StreamDefinition,
     TapConfig,

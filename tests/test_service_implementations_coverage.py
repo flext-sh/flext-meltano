@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano import FlextMeltanoService
 
 
 class TestUnifiedServiceImplementations:
