@@ -108,7 +108,7 @@ class FlextMeltanoLoggingConstants(FlextConstants):
     INCLUDE_DURATION = True
 
     # Message templates for Meltano operations
-    class Messages:
+    class MeltanoMessages:
         """Meltano-specific log message templates."""
 
         # Pipeline messages
@@ -194,7 +194,7 @@ class FlextMeltanoLoggingConstants(FlextConstants):
         TRANSFORM_STATS = "Meltano transform statistics: {transform_name} records: {record_count} duration: {duration}ms"
 
     # Environment-specific overrides for Meltano logging
-    class Environment:
+    class MeltanoEnvironment:
         """Environment-specific Meltano logging configuration."""
 
         DEVELOPMENT: ClassVar[FlextTypes.Core.Dict] = {
@@ -930,18 +930,18 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         try:
-            config: FlextTypes.Core.Dict = cls(project_root=Path(project_root))
-            validation_result: FlextResult[object] = config.validate_project_structure()
+            config = cls(project_root=Path(project_root))
+            validation_result = config.validate_project_structure()
 
             if validation_result.is_failure:
-                return FlextResult["FlextMeltanoConfig"].fail(
+                return FlextResult[FlextMeltanoConfig].fail(
                     validation_result.error or "Project validation failed",
                 )
 
-            return FlextResult["FlextMeltanoConfig"].ok(data=config)
+            return FlextResult[FlextMeltanoConfig].ok(config)
 
         except Exception as e:  # pragma: no cover
-            return FlextResult["FlextMeltanoConfig"].fail(
+            return FlextResult[FlextMeltanoConfig].fail(
                 f"Config creation failed: {e}",
             )
 
@@ -1039,7 +1039,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         # Always get fresh base configuration from FlextConfig singleton
-        base_config: FlextTypes.Core.Dict = FlextConfig.get_global_instance()
+        base_config = FlextConfig.get_global_instance()
 
         # Convert base config to dict for processing
         base_data: FlextTypes.Core.Dict = base_config.model_dump()
@@ -1099,7 +1099,7 @@ class FlextMeltanoConfig(FlextConfig):
         return FlextConstants.Performance.DEFAULT_BATCH_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls: object) -> list[str]:
+    def get_supported_plugin_types(cls) -> list[str]:
         """Get list of supported plugin types."""
         return [
             FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
@@ -1109,12 +1109,12 @@ class FlextMeltanoConfig(FlextConfig):
         ]
 
     @classmethod
-    def get_supported_environments(cls: object) -> list[str]:
+    def get_supported_environments(cls) -> list[str]:
         """Get list of supported environments."""
         return ["development", "staging", "production"]
 
     @classmethod
-    def get_supported_log_levels(cls: object) -> list[str]:
+    def get_supported_log_levels(cls) -> list[str]:
         """Get list of supported log levels."""
         return [
             FlextConstants.Config.LogLevel.DEBUG.value,
@@ -1124,7 +1124,7 @@ class FlextMeltanoConfig(FlextConfig):
         ]
 
     @classmethod
-    def clear_global_instance(cls: object) -> None:
+    def clear_global_instance(cls) -> None:
         """Clear the global instance (useful for testing).
 
         Removes the current global configuration instance, allowing for
@@ -1221,7 +1221,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         # Get base configuration from FlextConfig singleton
-        base_config: FlextTypes.Core.Dict = FlextConfig.get_global_instance()
+        base_config = FlextConfig.get_global_instance()
 
         # Create base environment variables from FlextConfig fields
         base_env_vars = {
@@ -1336,7 +1336,7 @@ class FlextMeltanoConfig(FlextConfig):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> FlextTypes.Core.Dict:
+    def get_metadata(self) -> dict[str, object]:
         """Get configuration metadata including override tracking.
 
         Returns:
@@ -1344,7 +1344,7 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         # Get base metadata from FlextConfig
-        base_metadata: FlextTypes.Core.Dict = super().get_metadata()
+        base_metadata = super().get_metadata()
 
         # Add extra metadata if it exists
         if hasattr(self, "_metadata_extra"):

@@ -92,7 +92,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             if value is not None:
                 setattr(self, field, value)
 
-    def execute(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def execute(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Execute service operation based on type.
 
         Performs the main operation for the configured service type, returning
@@ -162,7 +162,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         }
         return FlextResult[FlextMeltanoTypes.Plugin.PluginInfo].ok(data=info)
 
-    def validate_config(self: object) -> FlextResult[None]:
+    def validate_config(self) -> FlextResult[None]:
         """Validate service configuration using monadic validation chain.
 
         Performs comprehensive validation of the service configuration using
@@ -203,7 +203,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             validate_plugin_config_none,
         )
 
-    def _validate_service_type(self: object) -> FlextResult[None]:
+    def _validate_service_type(self) -> FlextResult[None]:
         """Validate service type is supported.
 
         Returns:
@@ -359,7 +359,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
             json_config
         )
 
-    def get_default_config(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def get_default_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get default configuration based on service type.
 
         Generates appropriate default configuration for the current service type,
@@ -398,7 +398,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         empty_config: FlextTypes.Core.Dict = {}
         return FlextResult[FlextTypes.Core.Dict].ok(data=empty_config)
 
-    def validate_service(self: object) -> FlextResult[bool]:
+    def validate_service(self) -> FlextResult[bool]:
         """Validate service configuration and setup using monadic railway pattern.
 
         Uses FlextResult railway-oriented programming to chain validation operations
@@ -466,7 +466,7 @@ class FlextMeltanoService(FlextService[FlextTypes.Core.Dict]):
         return FlextResult[FlextTypes.Core.Dict].ok(data=result_data)
 
     # DBT-specific method for compatibility
-    def get_profiles_config(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def get_profiles_config(self) -> FlextResult[FlextTypes.Core.Dict]:
         """Get DBT profiles configuration for DBT service type.
 
         Retrieves the DBT profiles configuration, which contains database

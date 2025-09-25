@@ -29,7 +29,7 @@ class TestFlextMeltanoServiceComplete:
         result = self.service.create_tap_service("tap-csv")
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             tap_service = result.value
             assert tap_service is not None
         else:
@@ -41,7 +41,7 @@ class TestFlextMeltanoServiceComplete:
         result = self.service.create_target_service("target-jsonl")
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             target_service = result.value
             assert target_service is not None
         else:
@@ -53,7 +53,7 @@ class TestFlextMeltanoServiceComplete:
         result = self.service.create_dbt_service("dbt-project")
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             dbt_service = result.value
             assert dbt_service is not None
         else:
@@ -121,7 +121,7 @@ class TestFlextMeltanoServiceComplete:
 
             assert isinstance(result, FlextResult)
             # Services may fail without proper setup, but should return FlextResult
-            if not result.success:
+            if not result.is_success:
                 assert result.error
                 assert isinstance(result.error, str)
 
@@ -147,7 +147,7 @@ class TestFlextMeltanoServiceComplete:
         assert isinstance(result2, FlextResult)
 
         # Both should have consistent behavior
-        assert result1.success == result2.success
+        assert result1.is_success == result2.is_success
 
     def test_error_handling_empty_names(self) -> None:
         """Test error handling with empty or invalid names."""
@@ -166,21 +166,21 @@ class TestFlextMeltanoServiceComplete:
         # Test create_tap_service
         result1 = self.service.create_tap_service("test-service")
         assert isinstance(result1, FlextResult)
-        if not result1.success:
+        if not result1.is_success:
             assert result1.error
             assert isinstance(result1.error, str)
 
         # Test create_target_service
         result2 = self.service.create_target_service("test-service")
         assert isinstance(result2, FlextResult)
-        if not result2.success:
+        if not result2.is_success:
             assert result2.error
             assert isinstance(result2.error, str)
 
         # Test create_dbt_service
         result3 = self.service.create_dbt_service("test-service")
         assert isinstance(result3, FlextResult)
-        if not result3.success:
+        if not result3.is_success:
             assert result3.error
             assert isinstance(result3.error, str)
 
@@ -223,7 +223,7 @@ class TestFlextMeltanoServiceComplete:
         tap_result = self.service.create_tap_service("tap-csv")
         assert isinstance(tap_result, FlextResult)
 
-        if tap_result.success:
+        if tap_result.is_success:
             tap_service = tap_result.value
             assert tap_service is not None
 
@@ -244,7 +244,7 @@ class TestFlextMeltanoServiceComplete:
             assert isinstance(result, FlextResult)
 
             # Should either succeed or fail gracefully with informative error
-            if not result.success:
+            if not result.is_success:
                 assert result.error
                 assert len(result.error) > 0
 

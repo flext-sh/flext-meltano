@@ -37,13 +37,13 @@ def test_flext_core_import() -> None:
     """Test that flext-core imports work."""
     # Test FlextResult creation
     success_result = FlextResult.ok("success")
-    assert success_result.success is True
+    assert success_result.is_success is True
     assert success_result.value == "success"
     assert success_result.error is None
 
     # Test FlextResult failure
     failure_result: FlextResult[str] = FlextResult.fail("error message")
-    assert failure_result.success is False
+    assert failure_result.is_success is False
     # Don't access .value on failed result - it raises TypeError
     assert failure_result.error == "error message"
 

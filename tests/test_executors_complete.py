@@ -53,7 +53,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.run_command([])
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
         assert result.value == 1  # Should return exit code 1 for help
 
     def test_run_command_invalid(self) -> None:
@@ -62,7 +62,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # May succeed or fail depending on command handling
-        if not result.success:
+        if not result.is_success:
             assert result.error
             assert isinstance(result.error, str)
 
@@ -71,7 +71,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_version_command()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -87,7 +87,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_help_command()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         help_data = result.value
         assert isinstance(help_data, dict)
@@ -99,7 +99,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_default_command(["test", "args"])
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         default_data = result.value
         assert isinstance(default_data, dict)
@@ -111,24 +111,24 @@ class TestFlextMeltanoExecutorComplete:
         # Test with version
         result = self.executor.run(["version"])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with help
         result = self.executor.run(["help"])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with empty args
         result = self.executor.run([])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
     def test_health_method(self) -> None:
         """Test health check method."""
         result = self.executor.health()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         health_data = result.value
         assert isinstance(health_data, dict)
@@ -139,7 +139,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.version()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -153,7 +153,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.help()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         help_result = result.value
         # ProcessResult type from FlextMeltanoTypes
@@ -164,7 +164,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.list_commands()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         commands_data = result.value
         assert isinstance(commands_data, dict)
@@ -177,7 +177,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # May succeed with plugins list or fail if Meltano hub is unavailable
-        if result.success:
+        if result.is_success:
             plugins_list = result.value
             assert isinstance(plugins_list, list)
             # If any plugins, check structure
@@ -197,7 +197,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # Pipeline execution may fail without proper setup, but method should work
-        if not result.success:
+        if not result.is_success:
             assert result.error
             assert isinstance(result.error, str)
 
@@ -206,7 +206,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._execute_version_command()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -216,7 +216,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._execute_help_command()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         help_data = result.value
         assert isinstance(help_data, dict)
@@ -226,7 +226,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._execute_health_command()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         health_data = result.value
         assert isinstance(health_data, dict)
@@ -237,7 +237,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # Action execution may fail, but method should handle gracefully
-        if not result.success:
+        if not result.is_success:
             assert result.error
 
     def test_route_command_method(self) -> None:
@@ -245,17 +245,17 @@ class TestFlextMeltanoExecutorComplete:
         # Test version routing
         result = self.executor._route_command("version", [])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test help routing
         result = self.executor._route_command("help", [])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test health routing
         result = self.executor._route_command("health", [])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test unknown command routing
         result = self.executor._route_command("unknown", ["args"])
@@ -267,7 +267,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.execute()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -277,7 +277,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.version()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -288,7 +288,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # Installation may succeed or fail depending on environment
-        if result.success:
+        if result.is_success:
             install_result = result.value
             # run_command returns int exit code, not boolean
             assert isinstance(install_result, int)
@@ -302,7 +302,7 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result, FlextResult)
         # Invocation should work for basic commands
-        if result.success:
+        if result.is_success:
             invoke_result = result.value
             assert invoke_result is not None
         else:
@@ -313,7 +313,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_cli_no_args()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         cli_data = result.value
         assert isinstance(cli_data, dict)
@@ -323,7 +323,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_cli_version_args()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         version_data = result.value
         assert isinstance(version_data, dict)
@@ -333,7 +333,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_cli_help_args()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         help_data = result.value
         assert isinstance(help_data, dict)
@@ -343,7 +343,7 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._handle_cli_other_args(["test", "command"])
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         cli_data = result.value
         assert isinstance(cli_data, dict)
@@ -353,27 +353,27 @@ class TestFlextMeltanoExecutorComplete:
         # Test with None args
         result = self.executor.run_cli(None)
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with empty args
         result = self.executor.run_cli([])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with version args
         result = self.executor.run_cli(["version"])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with help args
         result = self.executor.run_cli(["help"])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         # Test with other args
         result = self.executor.run_cli(["test", "command"])
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
     def test_error_handling_with_invalid_project_root(self) -> None:
         """Test error handling with invalid project root."""
@@ -384,7 +384,7 @@ class TestFlextMeltanoExecutorComplete:
         result = executor.version()
         assert isinstance(result, FlextResult)
         # Should handle gracefully - either succeed or fail with proper error
-        if not result.success:
+        if not result.is_success:
             assert result.error
 
     def test_multiple_command_execution(self) -> None:
@@ -394,7 +394,7 @@ class TestFlextMeltanoExecutorComplete:
         for command in commands:
             result = self.executor.run([command])
             assert isinstance(result, FlextResult)
-            assert result.success
+            assert result.is_success
 
             data = result.value
             assert isinstance(data, dict)
@@ -411,8 +411,8 @@ class TestFlextMeltanoExecutorComplete:
 
         assert isinstance(result1, FlextResult)
         assert isinstance(result2, FlextResult)
-        assert result1.success
-        assert result2.success
+        assert result1.is_success
+        assert result2.is_success
 
         # Should produce similar results
         assert isinstance(result1.value, dict)
@@ -450,7 +450,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor.run(args)
                 assert isinstance(result, FlextResult)
                 # Should handle errors gracefully
-                if not result.success:
+                if not result.is_success:
                     assert result.error
                     assert len(result.error) > 0
             except Exception as e:
@@ -464,14 +464,14 @@ class TestFlextMeltanoExecutorComplete:
         """Test Click CLI infrastructure to hit uncovered lines 689-837."""
         # Test the create_click_cli() static method
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
         assert cli_app is not None
 
         # Test create_cli_runner for CLI infrastructure coverage
         runner_result = FlextMeltanoExecutor.create_cli_runner([])
         assert isinstance(runner_result, FlextResult)
-        assert runner_result.success
+        assert runner_result.is_success
 
         runner_data = runner_result.value
         assert isinstance(runner_data, dict)
@@ -490,7 +490,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = FlextMeltanoExecutor.create_cli_runner(args)
                 assert isinstance(result, FlextResult)
                 # CLI execution may succeed or fail, both acceptable
-                if not result.success:
+                if not result.is_success:
                     assert result.error
             except SystemExit:
                 # Click CLI may call sys.exit, which is normal behavior
@@ -537,7 +537,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor.run_pipeline(tap, target)
                 assert isinstance(result, FlextResult)
                 # Pipeline may fail, but should handle gracefully
-                if not result.success:
+                if not result.is_success:
                     assert result.error
                     assert isinstance(result.error, str)
             except Exception as e:
@@ -593,7 +593,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor.run_cli(["force_exception"])
                 # Should handle exception gracefully
                 assert isinstance(result, FlextResult)
-                if not result.success:
+                if not result.is_success:
                     # Exception should be caught and converted to error result
                     assert result.error
                     assert "CLI run failed" in result.error
@@ -608,7 +608,7 @@ class TestFlextMeltanoExecutorComplete:
             result = self.executor.run_cli(problematic_args)
             assert isinstance(result, FlextResult)
             # Should either succeed or fail with proper error message
-            if not result.success and result.error:
+            if not result.is_success and result.error:
                 assert len(result.error) > 0
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
             # CLI exceptions are acceptable for invalid commands
@@ -618,7 +618,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test CLI main command infrastructure to hit lines 738-760 (updated for unified CLI)."""
         # Create CLI app to test main infrastructure
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
         assert cli_app is not None
 
@@ -650,20 +650,20 @@ class TestFlextMeltanoExecutorComplete:
     def test_flext_cli_version_command_infrastructure(self) -> None:
         """Test flext-cli version command infrastructure using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
 
         # Test version command using flext-cli patterns (no direct Click usage)
         # Mock the CLI execution to test the infrastructure
         version_result = FlextMeltanoExecutor().version()
         assert isinstance(version_result, FlextResult)
         assert (
-            version_result.success or version_result.is_failure
+            version_result.is_success or version_result.is_failure
         )  # Either outcome is valid for testing
 
     def test_click_health_command_infrastructure(self) -> None:
         """Test health command infrastructure to hit lines 776-787 (updated for unified CLI)."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
         # Type guard: verify cli_app is a dict before dictionary operations
@@ -684,7 +684,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test flext-cli plugins command infrastructure (no direct Click usage)."""
         # Test CLI creation - should work with flext-cli patterns
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
         assert cli_app is not None
         # CLI should have plugins functionality accessible
@@ -693,7 +693,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_click_run_command_infrastructure(self) -> None:
         """Test run command infrastructure through executor methods."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
         # Type guard: verify cli_app is a dict before dictionary operations
@@ -714,10 +714,10 @@ class TestFlextMeltanoExecutorComplete:
             plugins_result = executor.list_plugins()
             assert isinstance(plugins_result, FlextResult)
 
-    def test_flext_cli_command_error_paths(self, meltano_cli_runner: object) -> None:
+    def test_self(self, meltano_cli_runner: object) -> None:
         """Test flext-cli command error paths using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
         runner = meltano_cli_runner
 
@@ -768,7 +768,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_cli_format_result_paths(self) -> None:
         """Test CLI format result paths to hit lines 802-806."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        assert cli_result.success, f"CLI creation failed: {cli_result.error}"
+        assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
         # Type guard: verify cli_app is a dict before dictionary operations
@@ -788,7 +788,7 @@ class TestFlextMeltanoExecutorComplete:
             ):
                 # Test successful execution path
                 plugins_result = executor.list_plugins()
-                assert plugins_result.success
+                assert plugins_result.is_success
                 assert len(plugins_result.value) > 0
 
                 # Test the actual CLI interface functionality
@@ -808,7 +808,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor.run_cli(cmd)
                 assert isinstance(result, FlextResult)
                 # Should handle all scenarios gracefully
-                if result.success:
+                if result.is_success:
                     assert isinstance(result.value, dict)
                 else:
                     assert result.error

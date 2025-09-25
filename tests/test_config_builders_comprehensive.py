@@ -506,7 +506,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
         assert "extractors" in meltano_plugins
         assert "loaders" in meltano_plugins
 
-    def test_configuration_builders_performance(self, benchmark: object) -> None:
+    def test_self(self, benchmark: object) -> None:
         """Test configuration builders performance."""
 
         def create_all_configs() -> None:

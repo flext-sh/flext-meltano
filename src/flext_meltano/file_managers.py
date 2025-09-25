@@ -24,13 +24,10 @@ from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
 from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
-ConfigDict = dict[
-    str,
-    str
-    | int
-    | FlextTypes.Core.StringList
-    | dict[str, str | FlextTypes.Core.StringList],
-]
+ConfigDict = (
+    dict[str, str | int | FlextTypes.Core.StringList]
+    | dict[str, str | FlextTypes.Core.StringList]
+)
 PathDict = dict[str, Path | str]
 
 logger = FlextLogger(__name__)

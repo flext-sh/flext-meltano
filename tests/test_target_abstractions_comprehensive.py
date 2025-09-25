@@ -392,7 +392,7 @@ class TestFlextTargetAbstractionsComprehensive:
             dict,
         )  # streams initialized as empty dict
 
-    def test_create_flext_target_performance(self, benchmark: object) -> None:
+    def test_self(self, benchmark: object) -> None:
         """Test target creation performance using pytest-benchmark."""
         config: dict[str, object] = {
             "target_type": "sqlite",

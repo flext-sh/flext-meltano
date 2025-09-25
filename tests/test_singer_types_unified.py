@@ -11,7 +11,7 @@ class TestFlextSingerTypesUnified:
         """Test FlextSingerTypes instance creation."""
         result = FlextSingerTypes.create_instance()
 
-        assert result.success
+        assert result.is_success
         assert isinstance(result.value, FlextSingerTypes)
 
     def test_string_type_creation(self) -> None:
@@ -19,7 +19,7 @@ class TestFlextSingerTypesUnified:
         singer_types = FlextSingerTypes()
         result = singer_types.create_string_type(maxLength=255)
 
-        assert result.success
+        assert result.is_success
         type_def = result.value
         assert type_def["type"] == "string"
         assert type_def["maxLength"] == 255
@@ -29,7 +29,7 @@ class TestFlextSingerTypesUnified:
         singer_types = FlextSingerTypes()
         result = singer_types.create_integer_type(minimum=0)
 
-        assert result.success
+        assert result.is_success
         type_def = result.value
         assert type_def["type"] == "integer"
         assert type_def["minimum"] == 0
@@ -39,7 +39,7 @@ class TestFlextSingerTypesUnified:
         singer_types = FlextSingerTypes()
         result = singer_types.create_record_message("users", {"id": 1, "name": "John"})
 
-        assert result.success
+        assert result.is_success
         message = result.value
         assert isinstance(message, dict)
         assert message["type"] == "RECORD"
@@ -57,7 +57,7 @@ class TestFlextSingerTypesUnified:
         }
         result = singer_types.create_schema_message("users", schema, ["id"])
 
-        assert result.success
+        assert result.is_success
         message = result.value
         assert message["type"] == "SCHEMA"
         assert message["stream"] == "users"
@@ -70,7 +70,7 @@ class TestFlextSingerTypesUnified:
 
         # Valid string
         result = singer_types.validate_value("test", string_type)
-        assert result.success
+        assert result.is_success
 
         # Invalid type
         result = singer_types.validate_value(123, string_type)

@@ -29,7 +29,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoFileManagers.create_temp_directory()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         temp_path = result.value
         assert isinstance(temp_path, Path)
@@ -43,7 +43,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoFileManagers.create_temp_directory("custom_")
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         temp_path = result.value
         assert "custom_" in temp_path.name
@@ -56,7 +56,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoUtilities.create_meltano_config_dict("test-project")
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -69,7 +69,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -79,7 +79,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoFileManagers.create_temp_directory()
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         temp_path = result.value
         assert isinstance(temp_path, Path)
@@ -93,7 +93,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -109,7 +109,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -119,7 +119,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoUtilities.create_plugin_config_dict("tap-postgres")
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -135,7 +135,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -151,7 +151,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -164,7 +164,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         config = result.value
         assert isinstance(config, dict)
@@ -231,7 +231,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
             result = FlextMeltanoUtilities.load_yaml_config(config_path)
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 config = result.value
                 assert isinstance(config, dict)
             else:
@@ -246,7 +246,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         result = FlextMeltanoUtilities.load_yaml_config(nonexistent_path)
 
         assert isinstance(result, FlextResult)
-        assert not result.success
+        assert not result.is_success
         assert result.error
 
     def test_save_yaml_config(self) -> None:
@@ -264,7 +264,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
             result = FlextMeltanoUtilities.write_meltano_yml(config_dict, target_path)
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 assert result.value
                 assert target_path.exists()
             else:
@@ -285,7 +285,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
             result = FlextMeltanoUtilities.write_meltano_yml(config_dict, target_path)
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 assert result.value
                 assert target_path.exists()
             else:
@@ -300,7 +300,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
 
         # Create a basic plugin config
         config_result = FlextMeltanoUtilities.create_plugin_config_dict("tap-csv")
-        assert config_result.success
+        assert config_result.is_success
 
         config = config_result.value
 
@@ -309,7 +309,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         )
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             assert result.value
         else:
             assert result.error

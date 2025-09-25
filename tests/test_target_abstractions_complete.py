@@ -150,7 +150,7 @@ class TestFlextTargetAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             config_data = result.value
             self.test_assertions.assert_equals(
                 actual=cast("str", config_data["target_type"]),
@@ -276,7 +276,7 @@ class TestFlextTargetAbstractionsComplete:
             message="Config creation should return FlextResult",
         )
 
-        if config_result.success:
+        if config_result.is_success:
             config_data = config_result.value
             target_result = self.target_abstractions.create_flext_target(config_data)
             self.test_assertions.assert_true(

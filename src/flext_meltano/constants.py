@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum, auto
+from enum import StrEnum
 from typing import Final, Literal
 
 from flext_core import FlextConstants
@@ -160,10 +160,10 @@ class FlextMeltanoConstants(FlextConstants):
     class PluginTypes(StrEnum):
         """DOMAIN-SPECIFIC plugin types - NOT available in FlextConstants."""
 
-        EXTRACTORS = auto()
-        LOADERS = auto()
-        TRANSFORMS = auto()
-        ORCHESTRATORS = auto()
+        EXTRACTORS = "extractors"
+        LOADERS = "loaders"
+        TRANSFORMS = "transforms"
+        ORCHESTRATORS = "orchestrators"
 
     class ReplicationMethods(StrEnum):
         """Singer replication methods - domain-specific to data integration."""

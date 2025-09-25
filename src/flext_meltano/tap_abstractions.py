@@ -41,7 +41,7 @@ class FlextTapAbstractions:
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
+        model_config = PydanticConfigDict(extra="allow")
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -96,7 +96,7 @@ class FlextTapAbstractions:
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
+        model_config = PydanticConfigDict(extra="allow")
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -115,7 +115,7 @@ class FlextTapAbstractions:
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config: dict[str, object] = PydanticConfigDict(extra="allow")
+        model_config = PydanticConfigDict(extra="allow")
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextTapAbstractions.TapConfig = Field(description="Tap configuration")
@@ -428,7 +428,7 @@ class FlextTapAbstractions:
 
         """
         try:
-            streams = []
+            streams: list[FlextTapAbstractions.StreamDefinition] = []
             for stream_name in stream_names:
                 schema = self._generate_stream_schema(stream_name)
                 stream = FlextTapAbstractions.StreamDefinition(
@@ -667,8 +667,8 @@ class FlextTapAbstractions:
         streams: list[FlextTapAbstractions.StreamDefinition],
     ) -> FlextResult[list[FlextTypes.Core.Dict]]:
         """Process streams to catalog entries using batch processing."""
-        # Process streams to catalog entries using batch processing pattern
-        successes = []
+        # Process streams to catalog entries usi: list[dict[str, object]]ng batch processing pattern
+        successes: list[dict[str, object]] = []
         errors = []
 
         for stream in streams:
@@ -1155,12 +1155,12 @@ class FlextTapAbstractions:
         """Get tap type using Pydantic model - ELIMINATES type conversion."""
         return tap_instance.tap_type
 
-    def get_registered_streams(self: object) -> FlextTypes.Core.StringList:
+    def get_registered_streams(self) -> FlextTypes.Core.StringList:
         """Get registered stream keys."""
         return list(self._stream_registry.keys())
 
     @classmethod
-    def create_instance(cls: object) -> FlextResult[FlextTapAbstractions]:
+    def create_instance(cls) -> FlextResult[FlextTapAbstractions]:
         """Factory method using FlextResult - ELIMINATES try/catch."""
         try:
             instance = cls()

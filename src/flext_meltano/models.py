@@ -30,9 +30,7 @@ class FlextMeltanoModels(FlextModels):
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            extra="allow", validate_assignment=True
-        )
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -70,9 +68,7 @@ class FlextMeltanoModels(FlextModels):
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            extra="allow", validate_assignment=True
-        )
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -91,9 +87,7 @@ class FlextMeltanoModels(FlextModels):
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            extra="allow", validate_assignment=True
-        )
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextMeltanoModels.TapConfig = Field(description="Tap configuration")
@@ -123,7 +117,7 @@ class FlextMeltanoModels(FlextModels):
     class TargetConfig(BaseModel):
         """Pydantic model for target configuration with field validation."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(frozen=True, extra="allow")
+        model_config = ConfigDict(frozen=True, extra="allow")
 
         target_type: str = Field(description="Target type identifier")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -182,7 +176,7 @@ class FlextMeltanoModels(FlextModels):
     class StreamInfo(BaseModel):
         """Pydantic model for stream information with validation."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(frozen=False, extra="allow")
+        model_config = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(description="Stream name identifier")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -228,9 +222,7 @@ class FlextMeltanoModels(FlextModels):
     class MeltanoProjectModel(BaseModel):
         """Pydantic model for Meltano project configuration."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         version: int = Field(
             ge=1,
@@ -269,9 +261,7 @@ class FlextMeltanoModels(FlextModels):
     class PluginModel(BaseModel):
         """Pydantic model for Meltano plugin configuration."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         name: str = Field(min_length=1, description="Plugin name")
         namespace: str = Field(description="Plugin namespace")
@@ -304,9 +294,7 @@ class FlextMeltanoModels(FlextModels):
     class DbtProjectModel(BaseModel):
         """Pydantic model for DBT project configuration."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         name: str = Field(min_length=1, description="DBT project name")
         version: str = Field(description="DBT project version")
@@ -347,9 +335,7 @@ class FlextMeltanoModels(FlextModels):
     class DbtExecutionModel(BaseModel):
         """Pydantic model for DBT execution configuration."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         command: str = Field(description="DBT command to execute")
         models: list[str] = Field(
@@ -390,9 +376,7 @@ class FlextMeltanoModels(FlextModels):
     class ExecutionResult(BaseModel):
         """Pydantic model for execution result tracking."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         operation: str = Field(description="Operation performed")
         status: str = Field(description="Execution status")
@@ -434,9 +418,7 @@ class FlextMeltanoModels(FlextModels):
     class PipelineResult(BaseModel):
         """Pydantic model for pipeline execution result."""
 
-        model_config: FlextTypes.Core.Dict = ConfigDict(
-            validate_assignment=True, extra="allow"
-        )
+        model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         pipeline_id: str = Field(description="Pipeline identifier")
         tap_result: FlextMeltanoModels.ExecutionResult | None = Field(

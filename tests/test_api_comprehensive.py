@@ -507,7 +507,7 @@ class TestFlextMeltanoAPISuccessPaths:
         )
 
         assert result.is_failure
-        assert "Failed to create project" in (result.error or "")
+        assert "Failed to create" in (result.error or "")
 
     async def test_validate_project_exception_path(self) -> None:
         """Test project validation exception handling."""

@@ -190,7 +190,7 @@ class TestStreamDefinitionComprehensive:
         "status",
         ["discovered", "extracting", "completed", "error", "paused"],
     )
-    def test_stream_definition_parametrized_statuses(self, status: str) -> None:
+    def test_self(self, status: str) -> None:
         """Test stream definition with various statuses."""
         stream = FlextTapAbstractions.StreamDefinition(
             stream_name="test_stream",

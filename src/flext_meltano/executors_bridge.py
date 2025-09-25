@@ -64,12 +64,12 @@ class FlextMeltanoBridge:
 
             # Handle FlextResult returns with proper type checking
             if (
-                hasattr(result, "success")
+                hasattr(result, "is_success")
                 and hasattr(result, "value")
                 and hasattr(result, "error")
             ):
                 # Use getattr with defaults to satisfy MyPy strict checking
-                success_val = bool(getattr(result, "success", False))
+                success_val = bool(getattr(result, "is_success", False))
                 return {
                     "success": success_val,
                     "data": getattr(result, "value", None),
@@ -254,7 +254,7 @@ class FlextMeltanoBridge:
                 plugin_name=plugin_name,
             )
 
-            if hasattr(result, "success"):
+            if hasattr(result, "is_success"):
                 return result
             return FlextResult.ok(data=result)
         except Exception as e:
