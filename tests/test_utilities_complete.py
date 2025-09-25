@@ -39,7 +39,7 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
 
-        if result.success:
+        if result.is_success:
             temp_path = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(temp_path, Path),
@@ -65,7 +65,7 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
 
-        if result.success:
+        if result.is_success:
             temp_path = result.value
             # Check that default prefix "flext_meltano_" is used in path name
             self.test_assertions.assert_true(
@@ -89,11 +89,11 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Config creation should succeed",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(config, dict),
@@ -151,11 +151,11 @@ class TestFlextMeltanoUtilitiesComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Config creation should succeed with defaults",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
             # REAL BEHAVIOR: FlextUtilities.TextProcessor.safe_string("", "minimal_project") returns empty string
             # NOT the fallback - correcting test to match actual behavior
@@ -170,11 +170,11 @@ class TestFlextMeltanoUtilitiesComplete:
         result = FlextMeltanoUtilities.create_meltano_config_dict(project_id="")
 
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Should handle empty project_id gracefully",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
             # REAL BEHAVIOR: FlextUtilities.TextProcessor.safe_string returns empty string when input is empty
             self.test_assertions.assert_equals(
@@ -212,11 +212,11 @@ class TestFlextMeltanoUtilitiesComplete:
                 message="Should return FlextResult",
             )
             self.test_assertions.assert_true(
-                condition=result.success,
+                condition=result.is_success,
                 message="YAML writing should succeed",
             )
 
-            if result.success:
+            if result.is_success:
                 # Verify file was created and has content
                 self.test_assertions.assert_true(
                     condition=yaml_file.exists(),
@@ -272,11 +272,11 @@ class TestFlextMeltanoUtilitiesComplete:
             message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Plugin config creation should succeed",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(config, dict),
@@ -322,11 +322,11 @@ class TestFlextMeltanoUtilitiesComplete:
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="test-plugin")
 
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Should succeed with defaults",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
 
             # REAL BEHAVIOR - SOURCE OF TRUTH from actual execution:
@@ -346,11 +346,11 @@ class TestFlextMeltanoUtilitiesComplete:
         result = FlextMeltanoUtilities.create_plugin_config_dict(name="")
 
         self.test_assertions.assert_true(
-            condition=result.success,
+            condition=result.is_success,
             message="Should handle empty name gracefully",
         )
 
-        if result.success:
+        if result.is_success:
             config = result.value
             # REAL BEHAVIOR: FlextUtilities.TextProcessor.safe_string returns empty string, not fallback
             self.test_assertions.assert_equals(
@@ -387,11 +387,11 @@ class TestFlextMeltanoUtilitiesComplete:
 
         temp_result = FlextMeltanoFileManagers.create_temp_directory("workflow_test_")
         self.test_assertions.assert_true(
-            condition=temp_result.success,
+            condition=temp_result.is_success,
             message="Temp directory creation should succeed",
         )
 
-        if temp_result.success:
+        if temp_result.is_success:
             temp_path = temp_result.value
 
             # Step 2: Create Meltano config
@@ -400,11 +400,11 @@ class TestFlextMeltanoUtilitiesComplete:
                 project_name="Workflow Test Project",
             )
             self.test_assertions.assert_true(
-                condition=config_result.success,
+                condition=config_result.is_success,
                 message="Config creation should succeed",
             )
 
-            if config_result.success:
+            if config_result.is_success:
                 config = config_result.value
 
                 # Step 3: Write meltano.yml
@@ -414,18 +414,18 @@ class TestFlextMeltanoUtilitiesComplete:
                     meltano_yml_path,
                 )
                 self.test_assertions.assert_true(
-                    condition=write_result.success,
+                    condition=write_result.is_success,
                     message="YAML writing should succeed",
                 )
 
-                if write_result.success:
+                if write_result.is_success:
                     # Step 4: Create plugin config
                     plugin_result = FlextMeltanoUtilities.create_plugin_config_dict(
                         name="tap-csv",
                         plugin_type="extractor",
                     )
                     self.test_assertions.assert_true(
-                        condition=plugin_result.success,
+                        condition=plugin_result.is_success,
                         message="Plugin config creation should succeed",
                     )
 
@@ -445,7 +445,7 @@ class TestFlextMeltanoUtilitiesComplete:
                 project_name,
             )
             self.test_assertions.assert_true(
-                condition=result.success,
+                condition=result.is_success,
                 message=f"Should handle edge case: {project_id}, {project_name}",
             )
 

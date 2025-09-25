@@ -203,7 +203,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert result.success
+        assert result.is_success
 
     def test_validate_plugin_name_empty(self) -> None:
         config: FlextTypes.Core.Dict = {
@@ -215,7 +215,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert not result.success
+        assert not result.is_success
         assert result.error is not None
         assert "Plugin name cannot be empty" in result.error
 
@@ -229,7 +229,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert not result.success
+        assert not result.is_success
         assert result.error is not None
         assert "Plugin name cannot be empty" in result.error
 
@@ -243,7 +243,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert not result.success
+        assert not result.is_success
         assert result.error is not None
         assert "Target plugin names must be at least 8 characters" in result.error
 
@@ -257,7 +257,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert not result.success
+        assert not result.is_success
         assert result.error is not None
         assert "Tap plugin names must be at least 5 characters" in result.error
 
@@ -271,7 +271,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert result.success
+        assert result.is_success
 
     def test_validate_tap_plugin_name_valid(self) -> None:
         config: FlextTypes.Core.Dict = {
@@ -283,4 +283,4 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("FlextTypes.Core.JsonValue", config)
         )
-        assert result.success
+        assert result.is_success

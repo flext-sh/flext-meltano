@@ -434,13 +434,13 @@ class FlextMeltanoConfigBuilders:
             # Add metadata about the operation
             metadata: dict[str, object] = updated_config.get("metadata", {})
             if isinstance(metadata, dict):
-                metadata: dict[str, object] = dict(metadata)
-                metadata["last_plugin_added"] = {
+                metadata_copy: dict[str, object] = dict(metadata)
+                metadata_copy["last_plugin_added"] = {
                     "type": safe_plugin_type,
                     "name": plugin_config.get("name", "unknown"),
                     "added_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 }
-                updated_config["metadata"] = metadata
+                updated_config["metadata"] = metadata_copy
 
             return FlextResult[ConfigDict].ok(data=updated_config)
         except Exception as e:

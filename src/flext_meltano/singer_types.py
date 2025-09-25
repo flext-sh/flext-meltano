@@ -29,7 +29,7 @@ class FlextSingerTypes:
     message handling, and properties management.
     """
 
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize unified Singer types manager."""
         self._logger = FlextLogger(f"{__name__}.FlextSingerTypes")
         self._type_registry: dict[str, FlextTypes.Core.Dict] = {
@@ -427,7 +427,7 @@ class FlextSingerTypes:
     # UTILITY METHODS
     # ============================================================================
 
-    def get_registered_types(self: object) -> FlextTypes.Core.StringList:
+    def get_registered_types(self) -> FlextTypes.Core.StringList:
         """Get list of registered type names.
 
         Returns:
@@ -450,7 +450,7 @@ class FlextSingerTypes:
         return FlextResult[FlextTypes.Core.Dict].fail(f"Type {type_name} not found")
 
     @classmethod
-    def create_instance(cls: object) -> FlextResult[FlextSingerTypes]:
+    def create_instance(cls) -> FlextResult[FlextSingerTypes]:
         """Factory method to create FlextSingerTypes instance.
 
         Returns:

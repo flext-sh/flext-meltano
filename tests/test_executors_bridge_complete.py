@@ -28,7 +28,7 @@ class TestFlextMeltanoBridgeComplete:
         result = self.bridge.get_version()
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             version_info = result.value
             assert isinstance(version_info, dict)
             # Should contain version information
@@ -53,7 +53,7 @@ class TestFlextMeltanoBridgeComplete:
         result = self.bridge.discover_plugins()
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             plugins_data = result.data
             assert isinstance(plugins_data, dict)
             plugins = plugins_data.get("plugins", [])
@@ -92,7 +92,7 @@ class TestFlextMeltanoBridgeComplete:
             result = self.bridge.initialize_project(str(project_path))
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 project_info = result.value
                 assert isinstance(project_info, dict)
             else:
@@ -118,7 +118,7 @@ class TestFlextMeltanoBridgeComplete:
         result = self.bridge.install_plugin("extractors", "tap-csv")
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             install_info = result.value
             assert isinstance(install_info, dict)
         else:
@@ -288,7 +288,7 @@ class TestFlextMeltanoBridgeComplete:
         assert isinstance(result2, FlextResult)
 
         # Both should have consistent behavior
-        assert result1.success == result2.success
+        assert result1.is_success == result2.is_success
 
     def test_bridge_with_different_plugins(self) -> None:
         """Test bridge operations with different plugin types."""
@@ -358,7 +358,7 @@ class TestFlextMeltanoBridgeComplete:
         # Test initialize_project with invalid path
         init_result = self.bridge.initialize_project(str(invalid_path))
         assert isinstance(init_result, FlextResult)
-        if not init_result.success:
+        if not init_result.is_success:
             assert init_result.error
 
         # Test get_project_info with invalid path
@@ -490,7 +490,7 @@ class TestFlextMeltanoBridgeComplete:
             assert isinstance(result, FlextResult)
 
             # Should fail gracefully with informative errors
-            if not result.success:
+            if not result.is_success:
                 assert result.error
                 assert len(result.error) > 0
 

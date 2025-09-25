@@ -25,7 +25,7 @@ class TestMeltanoBridgeReal:
         result = bridge.get_version()
 
         # Deve retornar sucesso
-        assert result.success is True
+        assert result.is_success is True
         assert isinstance(result, FlextResult)
 
         # Dados devem conter versão real
@@ -49,7 +49,7 @@ class TestMeltanoBridgeReal:
         assert "meltano" in version
 
         # Com sucesso, deve retornar o valor real
-        if result.success:
+        if result.is_success:
             assert version["meltano"] == "3.9.1"
 
     def test_meltano_imports_available(self) -> None:

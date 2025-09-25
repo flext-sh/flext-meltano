@@ -28,7 +28,7 @@ class TestFlextMeltanoAdapterReal:
 
         assert isinstance(result, FlextResult)
         # Version call should work if Meltano is available
-        if result.success:
+        if result.is_success:
             version_info = result.value
             assert isinstance(version_info, dict)
             # Should contain version information
@@ -43,7 +43,7 @@ class TestFlextMeltanoAdapterReal:
         result = self.adapter.discover_plugins()
 
         assert isinstance(result, FlextResult)
-        if result.success:
+        if result.is_success:
             plugins = result.value
             assert isinstance(plugins, list)
             # If any plugins found, check structure
@@ -65,7 +65,7 @@ class TestFlextMeltanoAdapterReal:
             result = self.adapter.initialize_project(project_path)
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 project = result.value
                 # Should return some project representation
                 assert project is not None
@@ -82,7 +82,7 @@ class TestFlextMeltanoAdapterReal:
             result = self.adapter.create_project(project_name, project_path)
 
             assert isinstance(result, FlextResult)
-            if result.success:
+            if result.is_success:
                 project_info = result.value
                 assert isinstance(project_info, dict)
                 assert "project_path" in project_info
@@ -107,7 +107,7 @@ class TestFlextMeltanoAdapterReal:
             # Try to initialize project first
             init_result = self.adapter.initialize_project(project_path)
 
-            if init_result.success:
+            if init_result.is_success:
                 project = init_result.value
 
                 # Try to add a common plugin
@@ -120,7 +120,7 @@ class TestFlextMeltanoAdapterReal:
                 )
 
                 assert isinstance(plugin_result, FlextResult)
-                if plugin_result.success:
+                if plugin_result.is_success:
                     plugin_info = plugin_result.value
                     assert isinstance(plugin_info, dict)
                     # Should contain plugin information
@@ -158,7 +158,7 @@ class TestFlextMeltanoAdapterReal:
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         adapted_config = result.value
         assert isinstance(adapted_config, dict)
@@ -175,7 +175,7 @@ class TestFlextMeltanoAdapterReal:
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         adapted_plugin = result.value
         assert isinstance(adapted_plugin, dict)
@@ -195,7 +195,7 @@ class TestFlextMeltanoAdapterReal:
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
         assert isinstance(result, FlextResult)
-        assert result.success
+        assert result.is_success
 
         adapted_plugin = result.value
         assert isinstance(adapted_plugin, dict)
@@ -228,7 +228,7 @@ class TestFlextMeltanoAdapterReal:
 
         assert isinstance(result, FlextResult)
         # Should fail gracefully
-        assert not result.success
+        assert not result.is_success
         assert result.error
         assert isinstance(result.error, str)
 
@@ -243,7 +243,7 @@ class TestFlextMeltanoAdapterReal:
 
         assert isinstance(result, FlextResult)
         # Should still succeed but adapt the data
-        if result.success:
+        if result.is_success:
             adapted = result.value
             assert isinstance(adapted, dict)
             assert "name" in adapted
@@ -255,7 +255,7 @@ class TestFlextMeltanoAdapterReal:
 
         assert isinstance(result, FlextResult)
         # Should handle None gracefully
-        if not result.success:
+        if not result.is_success:
             assert result.error
         else:
             # If it succeeds, should return valid config
@@ -276,7 +276,7 @@ class TestFlextMeltanoAdapterReal:
 
             assert isinstance(result, FlextResult)
             # May succeed or fail depending on Meltano behavior
-            if result.success:
+            if result.is_success:
                 project_info = result.value
                 assert isinstance(project_info, dict)
             else:
@@ -294,7 +294,7 @@ class TestFlextMeltanoAdapterReal:
         for plugin in plugins:
             result = FlextMeltanoAdapter.adapt_plugin(plugin)
             assert isinstance(result, FlextResult)
-            assert result.success
+            assert result.is_success
 
             adapted = result.value
             assert isinstance(adapted, dict)

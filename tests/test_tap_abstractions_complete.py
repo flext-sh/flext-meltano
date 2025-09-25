@@ -168,7 +168,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             tap_instance = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(tap_instance, TapInstance),
@@ -282,7 +282,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             tap_dict = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(tap_dict, dict),
@@ -323,13 +323,13 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(valid_result, FlextResult),
             message="Should return FlextResult",
         )
-        if valid_result.success:
+        if valid_result.is_success:
             self.test_assertions.assert_true(
                 condition=bool(valid_result.value),
                 message="Valid instance should pass validation",
             )
 
-        if invalid_result.success:
+        if invalid_result.is_success:
             self.test_assertions.assert_false(
                 condition=bool(invalid_result.value),
                 message="Invalid instance should fail validation",
@@ -357,7 +357,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             streams = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(streams, list),
@@ -396,7 +396,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             streams = result.value
             self.test_assertions.assert_true(
                 condition=len(streams) > 0,
@@ -429,7 +429,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             streams = result.value
             self.test_assertions.assert_true(
                 condition=len(streams) > 0,
@@ -464,7 +464,7 @@ class TestFlextTapAbstractionsComplete:
         # First discover streams
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         self.test_assertions.assert_true(
-            condition=discovery_result.success,
+            condition=discovery_result.is_success,
             message="Stream discovery should succeed",
         )
 
@@ -475,7 +475,7 @@ class TestFlextTapAbstractionsComplete:
             message="Should return FlextResult",
         )
 
-        if stream_result.success:
+        if stream_result.is_success:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, StreamDefinition),
@@ -520,7 +520,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             catalog = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(catalog, dict),
@@ -567,7 +567,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             entry = result.value
             self.test_assertions.assert_equals(
                 actual=entry["tap_stream_id"],
@@ -615,7 +615,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(records, list),
@@ -665,7 +665,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             records = result.value
             self.test_assertions.assert_equals(
                 actual=len(records),
@@ -694,7 +694,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
                 condition=len(records) > 0,
@@ -745,7 +745,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             sync_stats = result.value
             self.test_assertions.assert_equals(
                 actual=sync_stats["stream_name"],
@@ -783,7 +783,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             sync_stats = result.value
             self.test_assertions.assert_equals(
                 actual=sync_stats["stream_name"],
@@ -814,7 +814,7 @@ class TestFlextTapAbstractionsComplete:
         # First discover streams
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         self.test_assertions.assert_true(
-            condition=discovery_result.success,
+            condition=discovery_result.is_success,
             message="Discovery should succeed",
         )
 
@@ -866,7 +866,7 @@ class TestFlextTapAbstractionsComplete:
         )
 
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        if discovery_result.success:
+        if discovery_result.is_success:
             registered_streams = self.tap_abstractions.get_registered_streams()
             self.test_assertions.assert_true(
                 condition=len(registered_streams) > 0,
@@ -881,7 +881,7 @@ class TestFlextTapAbstractionsComplete:
             condition=isinstance(result, FlextResult),
             message="Should return FlextResult",
         )
-        if result.success:
+        if result.is_success:
             instance = result.value
             self.test_assertions.assert_true(
                 condition=isinstance(instance, FlextTapAbstractions),
@@ -978,7 +978,7 @@ class TestFlextTapAbstractionsComplete:
             stream_config=stream_config,
         )
         self.test_assertions.assert_true(
-            condition=create_result.success,
+            condition=create_result.is_success,
             message="Tap creation should succeed",
         )
 
@@ -997,21 +997,21 @@ class TestFlextTapAbstractionsComplete:
         # Step 3: Discover streams
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         self.test_assertions.assert_true(
-            condition=discovery_result.success,
+            condition=discovery_result.is_success,
             message="Stream discovery should succeed",
         )
 
         # Step 4: Generate catalog
         catalog_result = self.tap_abstractions.generate_catalog(tap_instance)
         self.test_assertions.assert_true(
-            condition=catalog_result.success,
+            condition=catalog_result.is_success,
             message="Catalog generation should succeed",
         )
 
         # Step 5: Sync a stream
         sync_result = self.tap_abstractions.sync_stream(tap_instance, "users")
         self.test_assertions.assert_true(
-            condition=sync_result.success,
+            condition=sync_result.is_success,
             message="Stream sync should succeed",
         )
 
@@ -1030,7 +1030,7 @@ class TestFlextTapAbstractionsComplete:
 
         # Discover streams
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        if discovery_result.success:
+        if discovery_result.is_success:
             streams = discovery_result.value
 
             # Test multiple stream operations
@@ -1041,7 +1041,7 @@ class TestFlextTapAbstractionsComplete:
                     limit=5,
                 )
                 self.test_assertions.assert_true(
-                    condition=extract_result.success,
+                    condition=extract_result.is_success,
                     message=f"Extraction should succeed for {stream_def.stream_name}",
                 )
 
@@ -1051,6 +1051,6 @@ class TestFlextTapAbstractionsComplete:
                     stream_def.stream_name,
                 )
                 self.test_assertions.assert_true(
-                    condition=sync_result.success,
+                    condition=sync_result.is_success,
                     message=f"Sync should succeed for {stream_def.stream_name}",
                 )

@@ -25,7 +25,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_dbt_config("test_project")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "test_project"
@@ -42,7 +42,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_dbt_config("my_project", "custom_profile")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "my_project"
@@ -53,7 +53,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_dbt_config("")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         # FlextUtilities.TextProcessor.safe_string preserves empty strings
@@ -65,7 +65,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_dbt_config("test_project", "")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "test_project"
@@ -76,7 +76,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_meltano_config("test_project")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["project_id"] == "test_project"
@@ -91,7 +91,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_meltano_config("my_project", "Custom Project Name")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["project_id"] == "my_project"
@@ -102,7 +102,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
         result = builder.create_meltano_config("")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         # FlextUtilities.TextProcessor.safe_string preserves empty strings
@@ -115,7 +115,7 @@ class TestConfigBuildersComprehensiveCoverage:
 
         # First create base config
         base_result = builder.create_meltano_config("test_project")
-        assert base_result.success
+        assert base_result.is_success
         base_config = base_result.unwrap()
 
         # Create plugin config
@@ -129,7 +129,7 @@ class TestConfigBuildersComprehensiveCoverage:
         # Add plugin to config
         result = builder.add_plugin_to_config(base_config, "extractors", plugin_config)
 
-        assert result.success
+        assert result.is_success
         updated_config = result.unwrap()
 
         assert isinstance(updated_config, dict)
@@ -144,7 +144,7 @@ class TestConfigBuildersComprehensiveCoverage:
 
         # First create base config
         base_result = builder.create_meltano_config("test_project")
-        assert base_result.success
+        assert base_result.is_success
         base_config = base_result.unwrap()
 
         # Create plugin config
@@ -158,7 +158,7 @@ class TestConfigBuildersComprehensiveCoverage:
         # Add plugin to config
         result = builder.add_plugin_to_config(base_config, "loaders", plugin_config)
 
-        assert result.success
+        assert result.is_success
         updated_config = result.unwrap()
 
         assert isinstance(updated_config, dict)
@@ -172,7 +172,7 @@ class TestConfigBuildersComprehensiveCoverage:
         builder = FlextMeltanoConfigBuilders()
 
         base_result = builder.create_meltano_config("test_project")
-        assert base_result.success
+        assert base_result.is_success
         base_config = base_result.unwrap()
 
         plugin_config: dict[str, object] = {"name": "test-plugin"}
@@ -199,7 +199,7 @@ class TestConfigBuildersComprehensiveCoverage:
             executable="tap-csv",
         )
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "tap-csv"
@@ -219,7 +219,7 @@ class TestConfigBuildersComprehensiveCoverage:
             executable="target-jsonl",
         )
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "target-jsonl"
@@ -237,7 +237,7 @@ class TestConfigBuildersComprehensiveCoverage:
             plugin_type=PluginTypes.EXTRACTORS.value,
         )
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "tap-github"
@@ -252,7 +252,7 @@ class TestConfigBuildersComprehensiveCoverage:
             plugin_type=PluginTypes.LOADERS.value,
         )
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "target-postgres"
@@ -264,7 +264,7 @@ class TestConfigBuildersComprehensiveCoverage:
 
         result = builder._create_singer_config_generic(plugin_name="test-plugin")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "test-plugin"
@@ -285,7 +285,7 @@ class TestConfigBuildersComprehensiveCoverage:
             executable="tap-postgres",
         )
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert config["name"] == "tap-postgres"
@@ -301,7 +301,7 @@ class TestConfigBuildersComprehensiveCoverage:
         # Test that default configurations come from constants
         result = builder._create_singer_config_generic(plugin_name="test-plugin")
 
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
 
         assert isinstance(config, dict)
@@ -320,12 +320,12 @@ class TestConfigBuildersComprehensiveCoverage:
 
         # Test DBT config with empty project name - safe_string preserves empty
         result = builder.create_dbt_config("")
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
         assert not config["name"]  # safe_string preserves empty string
 
         # Test Meltano config with empty project name
         result = builder.create_meltano_config("project", "")
-        assert result.success
+        assert result.is_success
         config = result.unwrap()
         assert not config["project_name"]  # safe_string preserves empty

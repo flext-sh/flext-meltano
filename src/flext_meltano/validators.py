@@ -257,7 +257,7 @@ class FlextMeltanoValidators:
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Core.Dict = config
+        config_dict: FlextTypes.Core.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(BaseModel):
@@ -335,7 +335,7 @@ class FlextMeltanoValidators:
                 "DBT config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Core.Dict = config
+        config_dict: FlextTypes.Core.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(BaseModel):

@@ -41,7 +41,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
             "test": "data",
         }
         invalid_path = Path("/nonexistent/directory/config.yml")
@@ -52,7 +52,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -92,7 +92,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -299,7 +299,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             FlextTestsMatchers.assert_result_success(setup_result)
 
             # Create and save config
-            config: dict[str, str | int | list[str] | dict[str, str | list[str]]] = {
+            config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
