@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 from flext_core import (
     FlextLogger,
@@ -20,9 +20,9 @@ from flext_core import (
 
 # Internal imports - these are hidden behind the abstraction layer
 try:
-    from dbt.cli.main import dbtRunner, dbtRunnerResult  # type: ignore[import-untyped]
-    from singer_sdk.helpers import get_selected_streams  # type: ignore[import-untyped]
-    from singer_sdk.singerlib import (  # type: ignore[import-untyped]
+    from dbt.cli.main import dbtRunner, dbtRunnerResult
+    from singer_sdk.helpers import get_selected_streams
+    from singer_sdk.singerlib import (
         SingerTap,
         SingerTarget,
     )
@@ -37,6 +37,9 @@ from flext_meltano.abstractions import FlextMeltanoAbstractions
 class FlextDbtProgrammaticRunner:
     """Advanced dbt runner using dbtRunner programmatic API."""
 
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize dbt runner with session management."""
         self._logger = FlextLogger(__name__)
@@ -102,7 +105,7 @@ class FlextDbtProgrammaticRunner:
                 ])
 
                 if manifest_result.exit_code != 0:
-                    return FlextResult[dict[str, Any]].fail(
+                    return FlextResult[dict["str", "Any"]].fail(
                         f"Failed to parse dbt project: {manifest_result.exception}"
                     )
 
@@ -113,11 +116,11 @@ class FlextDbtProgrammaticRunner:
                     "status": "cached",
                 }
 
-                return FlextResult[dict[str, Any]].ok(data=manifest_data)
+                return FlextResult[dict["str", "Any"]].ok(data=manifest_data)
 
             except Exception as e:
                 error_msg = f"Failed to cache dbt manifest: {e}"
-                return FlextResult[dict[str, Any]].fail(error_msg)
+                return FlextResult[dict["str", "Any"]].fail(error_msg)
 
     class _CommandExecutor:
         """dbt command execution with structured result handling."""
@@ -177,7 +180,7 @@ class FlextDbtProgrammaticRunner:
             # Create reusable session
             session_result = self._SessionManager.create_reusable_session(project_dir)
             if session_result.is_failure:
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict["str", "Any"]].fail(
                     f"Failed to create dbt session: {session_result.error}"
                 )
 
@@ -204,7 +207,7 @@ class FlextDbtProgrammaticRunner:
             )
 
             if execution_result.is_failure:
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict["str", "Any"]].fail(
                     f"dbt transformations failed: {execution_result.error}"
                 )
 
@@ -222,21 +225,24 @@ class FlextDbtProgrammaticRunner:
 
             self._logger.info(
                 "dbt transformations completed successfully",
-                models=models or "all",
+                models=models or all,
                 exit_code=result_data.exit_code,
             )
 
-            return FlextResult[dict[str, Any]].ok(data=transformation_result)
+            return FlextResult[dict["str", "Any"]].ok(data=transformation_result)
 
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict["str", "Any"]].fail(error_msg)
 
 
 class FlextSingerProtocolManager:
     """Singer protocol management following 2025 specifications."""
 
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize Singer protocol manager."""
         self._logger = FlextLogger(__name__)
@@ -283,11 +289,11 @@ class FlextSingerProtocolManager:
                         target_handler.write_state(state)
                         processing_results["state_updates"] += 1
 
-                return FlextResult[dict[str, Any]].ok(data=processing_results)
+                return FlextResult[dict["str", "Any"]].ok(data=processing_results)
 
             except Exception as e:
                 error_msg = f"Failed to process Singer messages: {e}"
-                return FlextResult[dict[str, Any]].fail(error_msg)
+                return FlextResult[dict["str", "Any"]].fail(error_msg)
 
     class _StateManager:
         """Incremental processing state management."""
@@ -309,21 +315,23 @@ class FlextSingerProtocolManager:
             try:
                 # Validate state data
                 if not isinstance(state_data, dict):
-                    return FlextResult[dict[str, Any]].fail("Invalid state data format")
+                    return FlextResult[dict["str", "Any"]].fail(
+                        "Invalid state data format"
+                    )
 
                 # Process state for incremental processing
                 processed_state = {
-                    "tap_name": tap_name,
+                    "tap_name": "tap_name",
                     "last_updated": FlextUtilities.Generators.generate_iso_timestamp(),
-                    "state_data": state_data,
-                    "incremental": True,
+                    "state_data": "state_data",
+                    "incremental": "True",
                 }
 
-                return FlextResult[dict[str, Any]].ok(data=processed_state)
+                return FlextResult[dict["str", "Any"]].ok(data=processed_state)
 
             except Exception as e:
                 error_msg = f"Failed to manage extraction state: {e}"
-                return FlextResult[dict[str, Any]].fail(error_msg)
+                return FlextResult[dict["str", "Any"]].fail(error_msg)
 
     async def execute_singer_pipeline(
         self, tap_instance: SingerTap, target_instance: SingerTarget
@@ -351,7 +359,7 @@ class FlextSingerProtocolManager:
             )
 
             if message_result.is_failure:
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict["str", "Any"]].fail(
                     f"Message processing failed: {message_result.error}"
                 )
 
@@ -371,7 +379,7 @@ class FlextSingerProtocolManager:
 
             # Build execution result
             execution_result = {
-                "success": True,
+                "success": "True",
                 "execution_method": "singer_protocol_compliant",
                 "tap_name": getattr(tap_instance, "name", "unknown"),
                 "target_name": getattr(target_instance, "name", "unknown"),
@@ -386,17 +394,20 @@ class FlextSingerProtocolManager:
                 messages_processed=execution_result["messages_processed"],
             )
 
-            return FlextResult[dict[str, Any]].ok(data=execution_result)
+            return FlextResult[dict["str", "Any"]].ok(data=execution_result)
 
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict["str", "Any"]].fail(error_msg)
 
 
 class FlextMeltanoLibraryRunner:
     """Main library runner providing unified access to advanced Meltano functionality."""
 
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize library runner with all components."""
         self._logger = FlextLogger(__name__)
@@ -460,7 +471,7 @@ class FlextMeltanoLibraryRunner:
                 "extraction": {},
                 "loading": {},
                 "transformation": {},
-                "overall_success": False,
+                "overall_success": "False",
             }
 
             # Extract phase using Singer protocol
@@ -468,11 +479,11 @@ class FlextMeltanoLibraryRunner:
                 # This would integrate with the Singer protocol manager
                 # For now, return a placeholder result
                 pipeline_results["extraction"] = {
-                    "success": True,
+                    "success": "True",
                     "method": "singer_protocol",
                 }
                 pipeline_results["loading"] = {
-                    "success": True,
+                    "success": "True",
                     "method": "singer_protocol",
                 }
 
@@ -486,7 +497,7 @@ class FlextMeltanoLibraryRunner:
                     pipeline_results["transformation"] = dbt_result.unwrap()
                 else:
                     pipeline_results["transformation"] = {
-                        "success": False,
+                        "success": "False",
                         "error": dbt_result.error,
                     }
 
@@ -502,12 +513,12 @@ class FlextMeltanoLibraryRunner:
                 overall_success=pipeline_results["overall_success"],
             )
 
-            return FlextResult[dict[str, Any]].ok(data=pipeline_results)
+            return FlextResult[dict["str", "Any"]].ok(data=pipeline_results)
 
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict["str", "Any"]].fail(error_msg)
 
 
 __all__ = [

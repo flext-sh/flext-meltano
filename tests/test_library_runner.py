@@ -4,11 +4,13 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.library_runner import (
     FlextDbtProgrammaticRunner,
     FlextMeltanoLibraryRunner,
@@ -29,7 +31,8 @@ class TestFlextDbtProgrammaticRunner:
     async def test_run_transformations_programmatic_mock(self) -> None:
         """Test dbt transformations with mocked dependencies."""
         runner = FlextDbtProgrammaticRunner()
-        project_dir = Path("/tmp/test_dbt_project")
+        with tempfile.TemporaryDirectory(prefix="test_dbt_project_") as temp_dir:
+            project_dir = Path(temp_dir)
 
         # Mock the dbtRunner and its methods
         with patch("flext_meltano.library_runner.dbtRunner") as mock_dbt_runner_class:
@@ -124,29 +127,33 @@ class TestFlextMeltanoLibraryRunner:
     async def test_execute_complete_elt_pipeline_mock(self) -> None:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
-        project_dir = Path("/tmp/test_project")
 
-        extractor_config = {"name": "test_extractor", "config": {}}
-        loader_config = {"name": "test_loader", "config": {}}
-        transformer_config = {"name": "test_transformer", "config": {}}
+        with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:
+            project_dir = Path(temp_dir)
 
-        # Mock the dbt runner
-        with patch.object(
-            runner._dbt_runner, "run_transformations_programmatic"
-        ) as mock_dbt:
-            mock_dbt.return_value = runner._dbt_runner._logger.info("Mocked dbt result")
+            extractor_config = {"name": "test_extractor", "config": {}}
+            loader_config = {"name": "test_loader", "config": {}}
+            transformer_config = {"name": "test_transformer", "config": {}}
 
-            # Test the complete pipeline
-            result = await runner.execute_complete_elt_pipeline(
-                project_dir, extractor_config, loader_config, transformer_config
-            )
+            # Mock the dbt runner
+            with patch.object(
+                runner._dbt_runner, "run_transformations_programmatic"
+            ) as mock_dbt:
+                mock_dbt.return_value = runner._dbt_runner._logger.info(
+                    "Mocked dbt result"
+                )
 
-            assert result.is_success
-            pipeline_data = result.unwrap()
-            assert "extraction" in pipeline_data
-            assert "loading" in pipeline_data
-            assert "transformation" in pipeline_data
-            assert "overall_success" in pipeline_data
+                # Test the complete pipeline
+                result = await runner.execute_complete_elt_pipeline(
+                    project_dir, extractor_config, loader_config, transformer_config
+                )
+
+                assert result.is_success
+                pipeline_data = result.unwrap()
+                assert "extraction" in pipeline_data
+                assert "loading" in pipeline_data
+                assert "transformation" in pipeline_data
+                assert "overall_success" in pipeline_data
 
 
 class TestFlextMeltanoAdapterIntegration:
@@ -154,8 +161,6 @@ class TestFlextMeltanoAdapterIntegration:
 
     def test_adapter_has_library_runner(self) -> None:
         """Test that adapter has library runner instance."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
         library_runner = adapter.get_library_runner()
         assert isinstance(library_runner, FlextMeltanoLibraryRunner)
@@ -163,22 +168,26 @@ class TestFlextMeltanoAdapterIntegration:
     @pytest.mark.asyncio
     async def test_adapter_dbt_integration(self) -> None:
         """Test adapter dbt integration."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
-        project_dir = Path("/tmp/test_project")
 
-        # Mock the library runner
-        with patch.object(adapter._library_runner, "get_dbt_runner") as mock_get_dbt:
-            mock_dbt_runner = Mock()
-            mock_result = Mock()
-            mock_result.is_success = True
-            mock_result.unwrap.return_value = {"success": True, "models_run": "all"}
-            mock_dbt_runner.run_transformations_programmatic.return_value = mock_result
-            mock_get_dbt.return_value = mock_dbt_runner
+        with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:
+            project_dir = Path(temp_dir)
 
-            # Test dbt transformations through adapter
-            result = await adapter.run_dbt_transformations(project_dir)
+            # Mock the library runner
+            with patch.object(
+                adapter._library_runner, "get_dbt_runner"
+            ) as mock_get_dbt:
+                mock_dbt_runner = Mock()
+                mock_result = Mock()
+                mock_result.is_success = True
+                mock_result.unwrap.return_value = {"success": True, "models_run": "all"}
+                mock_dbt_runner.run_transformations_programmatic.return_value = (
+                    mock_result
+                )
+                mock_get_dbt.return_value = mock_dbt_runner
 
-            assert result.is_success
-            assert result.unwrap()["success"] is True
+                # Test dbt transformations through adapter
+                result = await adapter.run_dbt_transformations(project_dir)
+
+                assert result.is_success
+                assert result.unwrap()["success"] is True

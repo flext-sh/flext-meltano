@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from typing import override
 
 from flext_core import (
     FlextConstants,
@@ -16,7 +16,6 @@ from flext_core import (
     FlextUtilities,
 )
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.validators import FlextMeltanoValidators
 
 # Constants
 
@@ -35,151 +34,32 @@ class FlextTargetAbstractions:
     - NO longer inherits from FlextModels.Entity (inappropriate for abstractions)
     - Simple class focused on target functionality abstraction
     - Follows single responsibility principle
-    - Consolidates all target functionality: FlextTargetConfig, FlextStreamInfo nested classes
+    - Consolidates all target functionality: "FlextTargetConfig", FlextStreamInfo nested classes
     """
 
     # =========================================================================
     # NESTED PYDANTIC MODELS - Domain-specific data validation
     # =========================================================================
 
-    class FlextTargetConfig(BaseModel):
-        """Pydantic model for target configuration with field validation."""
+    class FlextTargetConfig(FlextMeltanoModels.TargetConfig):
+        """Target configuration - uses unified FlextMeltanoModels.TargetConfig.
 
-        model_config: dict[str, object] = ConfigDict(frozen=True, extra="allow")
+        This class extends the unified model for any target-specific customizations
+        while maintaining the consolidated [Project]Models pattern.
+        """
 
-        target_type: str = Field(..., description="Target type identifier")
-        connection_config: FlextTypes.Core.Dict = Field(
-            ...,
-            description="Connection configuration dictionary",
-        )
-        batch_size: int = Field(
-            default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
-            description="Batch size for record processing",
-        )
-        max_batches: int = Field(
-            default=100,
-            description="Maximum number of batches to process",
-        )
+    class FlextStreamInfo(FlextMeltanoModels.StreamInfo):
+        """Stream information - uses unified FlextMeltanoModels.StreamInfo.
 
-        @field_validator("target_type")
-        @classmethod
-        def validate_target_type(cls, v: str) -> str:
-            """Validate target type is non-empty string.
-
-            Raises:
-                ValueError: If target type is empty or not a string.
-
-            """
-            if not v or not isinstance(v, str):
-                msg = "Target type must be non-empty string"
-                raise ValueError(msg)
-            return v
-
-        @field_validator("connection_config")
-        @classmethod
-        def validate_connection_config(
-            cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
-            """Validate connection config using centralized validator.
-
-            Raises:
-                ValueError: If connection config validation fails.
-
-            """
-            # Use centralized validator to eliminate duplication
-            result: FlextResult[object] = (
-                FlextMeltanoValidators.validate_connection_config(v)
-            )
-            if result.is_failure:
-                raise ValueError(result.error or "Connection config validation failed")
-            return v
-
-        @field_validator("batch_size")
-        @classmethod
-        def validate_batch_size(cls, v: int) -> int:
-            """Validate batch size is positive integer.
-
-            Raises:
-                ValueError: If batch size is not a positive integer.
-
-            """
-            if not isinstance(v, int) or v <= 0:
-                msg = "Batch size must be positive integer"
-                raise ValueError(msg)
-            return v
-
-        @field_validator("max_batches")
-        @classmethod
-        def validate_max_batches(cls, v: int) -> int:
-            """Validate max batches is positive integer.
-
-            Raises:
-                ValueError: If max batches is not a positive integer.
-
-            """
-            if not isinstance(v, int) or v <= 0:
-                msg = "Max batches must be positive integer"
-                raise ValueError(msg)
-            return v
-
-    class FlextStreamInfo(BaseModel):
-        """Pydantic model for stream information with validation."""
-
-        model_config: dict[str, object] = ConfigDict(frozen=False, extra="allow")
-
-        stream_name: str = Field(..., description="Stream name identifier")
-        stream_schema: FlextTypes.Core.Dict = Field(
-            ...,
-            description="Stream schema definition",
-            alias="schema",
-        )
-        status: str = Field(
-            default="initialized",
-            description="Stream processing status",
-        )
-        records_loaded: int = Field(default=0, description="Number of records loaded")
-        batches_processed: int = Field(
-            default=0,
-            description="Number of batches processed",
-        )
-        created_at: str = Field(..., description="Creation timestamp")
-
-        @field_validator("stream_name")
-        @classmethod
-        def validate_stream_name(cls, v: str) -> str:
-            """Validate stream name is non-empty string.
-
-            Raises:
-                ValueError: If stream name is empty or not a string.
-
-            """
-            if not v or not isinstance(v, str):
-                msg = "Stream name must be non-empty string"
-                raise ValueError(msg)
-            return v
-
-        @field_validator("stream_schema")
-        @classmethod
-        def validate_stream_schema(
-            cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
-            """Validate stream schema contains properties.
-
-            Raises:
-                ValueError: If schema does not contain properties.
-
-            """
-            if "properties" not in v:
-                msg = "Schema must contain properties"
-                raise ValueError(msg)
-            return v
+        This class extends the unified model for any target-specific customizations
+        while maintaining the consolidated [Project]Models pattern.
+        """
 
     # =========================================================================
     # UNIFIED CLASS INSTANCE METHODS
     # =========================================================================
 
+    @override
     def __init__(self, target_id: str | None = None) -> None:
         """Initialize unified target abstractions."""
         self.target_id = (
@@ -255,9 +135,9 @@ class FlextTargetAbstractions:
 
             # Create target instance
             target_instance: FlextTypes.Core.Dict = {
-                "target_type": target_type,
+                "target_type": "target_type",
                 "config": dict(config),
-                "adapter": adapter,
+                "adapter": "adapter",
                 "status": "initialized",
                 "streams": {},
                 "state": {},
@@ -281,7 +161,7 @@ class FlextTargetAbstractions:
             return FlextResult[FlextTypes.Core.Dict].ok(
                 {
                     **target_instance,
-                    "target_id": target_id,
+                    "target_id": "target_id",
                 },
             )
 
@@ -309,7 +189,7 @@ class FlextTargetAbstractions:
                 stream_info_model = self.FlextStreamInfo(
                     stream_name=stream_name,
                     schema=schema,  # Use alias parameter
-                    status="schema_processed",
+                    status=schema_processed,
                     created_at=FlextUtilities.Generators.generate_iso_timestamp(),
                 )
             except Exception as e:
@@ -490,12 +370,12 @@ class FlextTargetAbstractions:
             )
 
             batch_result = {
-                "stream_name": stream_name,
+                "stream_name": "stream_name",
                 "records_attempted": len(records),
-                "records_loaded": loaded_count,
-                "records_failed": failed_count,
+                "records_loaded": "loaded_count",
+                "records_failed": "failed_count",
                 "batch_number": target["batches_processed"],
-                "status": "completed" if failed_count == 0 else "partial_failure",
+                "status": completed if failed_count == 0 else "partial_failure",
             }
 
             self._logger.info(
@@ -539,7 +419,7 @@ class FlextTargetAbstractions:
                 )
 
                 finalization_result = {
-                    "stream_name": stream_name,
+                    "stream_name": "stream_name",
                     "records_loaded": stream_info.get("records_loaded", 0),
                     "batches_processed": stream_info.get("batches_processed", 0),
                     "status": "finalized",
@@ -582,7 +462,7 @@ class FlextTargetAbstractions:
                     if isinstance(stream_info, dict):
                         records_loaded = stream_info.get("records_loaded", 0)
                         stream_stats[stream_name] = {
-                            "records_loaded": records_loaded,
+                            "records_loaded": "records_loaded",
                             "batches_processed": stream_info.get(
                                 "batches_processed",
                                 0,
@@ -600,8 +480,8 @@ class FlextTargetAbstractions:
                 "total_streams": len(target_streams)
                 if isinstance(target_streams, dict)
                 else 0,
-                "total_records": total_records,
-                "stream_stats": stream_stats,
+                "total_records": "total_records",
+                "stream_stats": "stream_stats",
                 "final_state": target.get("state", {}),
                 "config_summary": {
                     "target_type": target.get("target_type", "unknown"),

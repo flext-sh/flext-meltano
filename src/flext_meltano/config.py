@@ -198,32 +198,52 @@ class FlextMeltanoLoggingConstants(FlextConstants):
         """Environment-specific Meltano logging configuration."""
 
         DEVELOPMENT: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": True,  # Log SQL in dev
-            "log_source_info": True,  # Log source info in dev
-            "log_target_info": True,  # Log target info in dev
+            "log_transform_sql": "True",  # Log SQL in dev
+            "log_source_info": "True",  # Log source info in dev
+            "log_target_info": "True",  # Log target info in dev
             "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
         }
 
         STAGING: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": False,
-            "log_source_info": True,
-            "log_target_info": True,
+            "log_transform_sql": "False",
+            "log_source_info": "True",
+            "log_target_info": "True",
             "audit_log_level": FlextConstants.Config.LogLevel.INFO,
         }
 
         PRODUCTION: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": False,
-            "log_source_info": False,
-            "log_target_info": False,
+            "log_transform_sql": "False",
+            "log_source_info": "False",
+            "log_target_info": "False",
             "audit_log_level": FlextConstants.Config.LogLevel.WARNING,
         }
 
         TESTING: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": True,
-            "log_source_info": True,
-            "log_target_info": True,
+            "log_transform_sql": "True",
+            "log_source_info": "True",
+            "log_target_info": "True",
             "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
         }
+
+    # Singleton pattern attributes
+    _global_instance: ClassVar[FlextMeltanoConfig | None] = None
+    _lock: ClassVar[threading.Lock] = threading.Lock()
+
+    model_config = SettingsConfigDict(
+        env_prefix=FLEXT_MELTANO_,
+        case_sensitive=False,
+        extra=ignore,
+        env_file=".env",
+        env_file_encoding="utf-8",
+        use_enum_values=True,
+        validate_assignment=True,
+        validate_default=True,
+        frozen=False,
+        str_strip_whitespace=True,
+    )
+
+
+import threading
 
 
 class FlextMeltanoConfig(FlextConfig):
@@ -710,7 +730,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     audit_log_level: str = Field(
-        default="INFO",
+        default=INFO,
         description="Audit log level",
     )
 
@@ -756,7 +776,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     run_mode: str = Field(
-        default="FULL",
+        default=FULL,
         description="Execution mode for operations",
     )
 
@@ -1355,9 +1375,9 @@ class FlextMeltanoConfig(FlextConfig):
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         {
             "extra": "ignore",  # Allow extra fields from environment variables
-            "validate_assignment": True,
-            "use_enum_values": True,
-            "arbitrary_types_allowed": True,
+            "validate_assignment": "True",
+            "use_enum_values": "True",
+            "arbitrary_types_allowed": "True",
         },
     )
 

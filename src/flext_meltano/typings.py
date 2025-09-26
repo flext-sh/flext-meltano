@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import Literal
 
 from flext_core import FlextTypes
 
@@ -21,18 +21,8 @@ from flext_core import FlextTypes
 # MELTANO-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for Meltano operations
 # =============================================================================
 
+
 # Meltano domain TypeVars
-TMeltanoProject = TypeVar("TMeltanoProject")
-TSingerTap = TypeVar("TSingerTap")
-TSingerTarget = TypeVar("TSingerTarget")
-TSingerStream = TypeVar("TSingerStream")
-TDbtModel = TypeVar("TDbtModel")
-TDbtRunner = TypeVar("TDbtRunner")
-TMeltanoPlugin = TypeVar("TMeltanoPlugin")
-TMeltanoEnvironment = TypeVar("TMeltanoEnvironment")
-TPipelineConfig = TypeVar("TPipelineConfig")
-
-
 class FlextMeltanoTypes(FlextTypes):
     """Meltano-specific type definitions extending FlextTypes.
 
@@ -93,17 +83,40 @@ class FlextMeltanoTypes(FlextTypes):
     # MELTANO PROJECT TYPES - Complex project management
     # =========================================================================
 
-    class Project:
-        """Meltano project complex types."""
+    class Project(FlextTypes.Project):
+        """Meltano-specific project types extending FlextTypes.Project.
 
-        type ProjectDefinition = dict[
-            str, FlextTypes.Core.ConfigValue | list[dict[str, object]]
+        Adds Meltano/ELT-specific project types while inheriting generic types
+        from FlextTypes. Follows domain separation principle: Meltano domain owns
+        Meltano-specific types.
+        """
+
+        # Meltano-specific project types extending the generic ones
+        type ProjectType = Literal[
+            # Generic types inherited from FlextTypes.Project
+            "library",
+            "application",
+            "service",
+            # Meltano-specific types
+            "meltano-project",
+            "elt-pipeline",
+            "data-pipeline",
+            "etl-service",
+            "singer-tap",
+            "singer-target",
+            "dbt-project",
+            "data-integration",
+            "pipeline-orchestrator",
+            "data-extractor",
+            "data-loader",
+            "transformation-service",
         ]
-        type EnvironmentConfig = dict[str, FlextTypes.Core.ConfigDict]
-        type ScheduleDefinition = dict[str, str | int | list[str]]
-        type JobDefinition = dict[str, str | list[str] | dict[str, object]]
-        type PipelineConfiguration = list[dict[str, str | dict[str, object]]]
-        type StateManagement = dict[str, FlextTypes.Core.JsonValue | dict[str, object]]
+
+        # Meltano-specific project configurations
+        type MeltanoProjectConfig = dict[str, FlextTypes.Core.ConfigValue | object]
+        type PipelineConfig = dict[str, str | int | bool | list[str]]
+        type SingerConfig = dict[str, bool | str | dict[str, object]]
+        type DbtConfig = dict[str, FlextTypes.Core.ConfigValue | object]
 
     # =========================================================================
     # ELT PIPELINE TYPES - Complex pipeline operations
@@ -126,22 +139,74 @@ class FlextMeltanoTypes(FlextTypes):
             str, FlextTypes.Processing.WorkflowStatus | list[str]
         ]
 
+    # =========================================================================
+    # CORE COMMONLY USED TYPES - Extending FlextTypes.Core for Meltano domain
+    # =========================================================================
+
+    class Core(FlextTypes.Core):
+        """Commonly used Meltano-specific type aliases extending FlextTypes.Core.
+
+        Provides standardized type aliases for frequent Meltano patterns while
+        inheriting all core types from FlextTypes.Core. Reduces generic dict/list
+        usage throughout the Meltano codebase.
+        """
+
+        # Meltano configuration and data types
+        type MeltanoConfigDict = dict[str, object]
+        type PluginConfigDict = dict[str, object]
+        type EnvironmentDict = dict[str, str]
+        type VariablesDict = dict[str, str]
+        type SettingsDict = dict[str, object]
+        type CommandDict = dict[str, object]
+        type ScheduleDict = dict[str, object]
+        type JobDict = dict[str, object]
+
+        # Plugin and execution types
+        type PluginList = list[str]
+        type PluginNameList = list[str]
+        type PluginTypeList = list[str]
+        type ExecutionResultDict = dict[str, object]
+        type ExecutionStatusDict = dict[str, str]
+        type RuntimeConfigDict = dict[str, object]
+
+        # Singer protocol types
+        type SingerRecordDict = dict[str, object]
+        type SingerStateDict = dict[str, object]
+        type SingerCatalogDict = dict[str, object]
+        type SingerConfigDict = dict[str, object]
+        type SingerSchemaDict = dict[str, object]
+        type SingerMessageList = list[dict[str, object]]
+        type StreamNameList = list[str]
+
+        # DBT transformation types
+        type DbtModelDict = dict[str, object]
+        type DbtProfileDict = dict[str, object]
+        type DbtProjectDict = dict[str, object]
+        type DbtManifestDict = dict[str, object]
+        type DbtResultDict = dict[str, object]
+        type DbtModelList = list[str]
+        type DbtTestList = list[str]
+
+        # Pipeline and workflow types
+        type PipelineConfigDict = dict[str, object]
+        type WorkflowDict = dict[str, object]
+        type RunContextDict = dict[str, object]
+        type ExecutionLogsDict = dict[str, object]
+        type MetricsDict = dict[str, float]
+        type ErrorsDict = dict[str, str]
+
+        # Library and runner types
+        type LibraryDict = dict[str, object]
+        type RunnerConfigDict = dict[str, object]
+        type ProcessResultDict = dict[str, object]
+        type OutputDict = dict[str, object]
+        type LogsDict = dict[str, object]
+
 
 # =============================================================================
 # PUBLIC API EXPORTS - Meltano TypeVars and types
 # =============================================================================
 
 __all__: list[str] = [
-    # Meltano Types class
     "FlextMeltanoTypes",
-    # Meltano-specific TypeVars
-    "TDbtModel",
-    "TDbtRunner",
-    "TMeltanoEnvironment",
-    "TMeltanoPlugin",
-    "TMeltanoProject",
-    "TPipelineConfig",
-    "TSingerStream",
-    "TSingerTap",
-    "TSingerTarget",
 ]

@@ -10,6 +10,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from flext_core import FlextResult
+from flext_meltano.abstractions import FlextMeltanoAbstractions
+from flext_meltano.adapters import FlextMeltanoAdapter
 
 
 class TestFlextMeltanoLibraryRunnerFoundation:
@@ -25,8 +27,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
         """Test that adapter can be imported even without library runner dependencies."""
         # Mock the library runner import to avoid the ImportError
         with patch.dict("sys.modules", {"flext_meltano.library_runner": Mock()}):
-            from flext_meltano.adapters import FlextMeltanoAdapter
-
             # Test that adapter can be instantiated
             adapter = FlextMeltanoAdapter()
             assert adapter is not None
@@ -34,8 +34,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_abstractions_functionality(self) -> None:
         """Test that abstractions work independently."""
-        from flext_meltano.abstractions import FlextMeltanoAbstractions
-
         abstractions = FlextMeltanoAbstractions()
         assert abstractions is not None
 
@@ -48,8 +46,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_adapter_basic_functionality(self) -> None:
         """Test basic adapter functionality without external dependencies."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test basic methods
@@ -65,8 +61,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_adapter_project_validation(self) -> None:
         """Test project validation functionality."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test with non-existent directory
@@ -77,8 +71,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_adapter_plugin_discovery(self) -> None:
         """Test plugin discovery functionality."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test plugin discovery
@@ -89,8 +81,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_adapter_static_methods(self) -> None:
         """Test static adapter methods."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         # Test adapt_project_config
         config = {"version": 1}
         adapted_config = FlextMeltanoAdapter.adapt_project_config(config)
@@ -115,8 +105,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_flext_result_patterns(self) -> None:
         """Test that FlextResult patterns are used throughout."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test that all methods return FlextResult
@@ -136,8 +124,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_logging_integration(self) -> None:
         """Test that logging is properly integrated."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test that logger is available
@@ -146,8 +132,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_utilities_integration(self) -> None:
         """Test that utilities are properly integrated."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test that utilities are available
@@ -156,8 +140,6 @@ class TestFlextMeltanoLibraryRunnerFoundation:
 
     def test_config_integration(self) -> None:
         """Test that configuration is properly integrated."""
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
         adapter = FlextMeltanoAdapter()
 
         # Test that config is available

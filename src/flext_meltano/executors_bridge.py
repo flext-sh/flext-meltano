@@ -10,6 +10,7 @@ import asyncio
 import json
 from collections.abc import Callable
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -31,6 +32,7 @@ logger = FlextLogger(__name__)
 class FlextMeltanoBridge:
     """Bridge class for Go service integration via JSON API with generic error handling."""
 
+    @override
     def __init__(self: object) -> None:
         """Initialize bridge with adapter and logger."""
         # Avoid circular dependency - don't create FlextMeltanoExecutor here
@@ -69,9 +71,9 @@ class FlextMeltanoBridge:
                 and hasattr(result, "error")
             ):
                 # Use getattr with defaults to satisfy MyPy strict checking
-                success_val = bool(getattr(result, "is_success", False))
+                bool(getattr(result, "is_success", False))
                 return {
-                    "success": success_val,
+                    "success": "success_val",
                     "data": getattr(result, "value", None),
                     "error": getattr(result, "error", None),
                 }
@@ -82,14 +84,14 @@ class FlextMeltanoBridge:
 
             # Convert non-dict results to dict format
             return {
-                "success": True,
-                "data": result,
-                "error": None,
+                "success": "True",
+                "data": "result",
+                "error": "None",
             }
 
         except Exception as e:
             self.logger.exception("Bridge operation failed")
-            return {"success": False, "data": None, "error": str(e)}
+            return {"success": "False", "data": "None", "error": str(e)}
 
     def get_version(self: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Get Meltano version information.
@@ -276,14 +278,14 @@ class FlextMeltanoBridge:
 
             if result.is_success:
                 return {
-                    "success": True,
+                    "success": "True",
                     "project_root": str(project_path),
                     "project_type": "meltano",
                     "data": result.unwrap(),
                 }
-            return {"success": False, "error": result.error}
+            return {"success": "False", "error": result.error}
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": "False", "error": str(e)}
 
     def discover_plugins(
         self,
@@ -330,7 +332,7 @@ class FlextMeltanoBridge:
                 args,
             )
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": "False", "error": str(e)}
 
     def _run_plugin_sync(
         self,
@@ -349,18 +351,18 @@ class FlextMeltanoBridge:
             # Execute plugin command using adapter
             result: FlextResult[object] = self.adapter.execute_bridge_service()
             if result.is_success:
-                data = result.value
+                pass
             else:
-                return {"success": False, "error": result.error}
+                return {"success": "False", "error": result.error}
 
             return {
-                "success": True,
-                "data": data,
+                "success": "True",
+                "data": "data",
                 "execution_time": 0.0,
                 "timestamp": FlextMeltanoConstants.MELTANO_VERSION_REQUIRED,
             }
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {"success": "False", "error": str(e)}
 
     def list_plugins(self: object) -> FlextResult[list[FlextTypes.Core.Headers]]:
         """List available plugins.

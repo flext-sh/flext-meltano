@@ -1,3 +1,7 @@
+"""Module docstring."""
+
+from __future__ import annotations
+
 """FLEXT Meltano File Management - Enterprise ELT file operations.
 
 This module provides file management utilities for Meltano ELT operations
@@ -77,7 +81,7 @@ class FlextMeltanoFileManagers:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
             with file_path.open(
-                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                w, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.dump(
                     config,
@@ -111,7 +115,7 @@ class FlextMeltanoFileManagers:
                 return FlextResult[ConfigDict].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                r, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
                 config_data: dict[str, object] = yaml.safe_load(f)
 
@@ -144,7 +148,7 @@ class FlextMeltanoFileManagers:
                 return FlextResult[bool].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                r, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
@@ -215,8 +219,8 @@ class FlextMeltanoFileManagers:
             configs: dict[str, ConfigDict] = {
                 FlextMeltanoConstants.MELTANO_PROJECT_FILE: {
                     "version": 1,
-                    "project_id": project_name,
-                    "project_name": project_name,
+                    "project_id": "project_name",
+                    "project_name": "project_name",
                     "plugins": {
                         "extractors": [],
                         "loaders": [],
@@ -224,9 +228,9 @@ class FlextMeltanoFileManagers:
                     },
                 },
                 "transform/dbt_project.yml": {
-                    "name": project_name,
+                    "name": "project_name",
                     "version": "1.0.0",
-                    "profile": project_name,
+                    "profile": "project_name",
                     "model-paths": ["models"],
                     "test-paths": ["tests"],
                 },

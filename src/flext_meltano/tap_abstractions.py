@@ -12,12 +12,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import cast
-
-from pydantic import BaseModel, ConfigDict as PydanticConfigDict, Field, field_validator
+from typing import cast, override
 
 from flext_core import FlextResult, FlextTypes, FlextUtilities
-from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
 RecordDict = FlextTypes.Core.Dict
@@ -38,106 +35,28 @@ class FlextTapAbstractions:
     # NESTED PYDANTIC MODELS - SINGLE RESPONSIBILITY ORGANIZATION
     # =============================================================================
 
-    class TapConfig(BaseModel):
-        """Pydantic model for tap configuration with validation."""
+    class TapConfig(FlextMeltanoModels.TapConfig):
+        """Tap configuration - uses unified FlextMeltanoModels.TapConfig.
 
-        model_config = PydanticConfigDict(extra="allow")
+        This class extends the unified model for any tap-specific customizations
+        while maintaining the consolidated [Project]Models pattern.
+        """
 
-        tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
-        connection_config: FlextTypes.Core.Dict = Field(
-            description="Connection configuration",
-        )
-        stream_config: FlextTypes.Core.Dict = Field(
-            default_factory=dict,
-            description="Stream-specific configuration",
-        )
-        version: str = Field(default="latest", description="Tap version")
+    class StreamDefinition(FlextMeltanoModels.StreamDefinition):
+        """Stream definition - uses unified FlextMeltanoModels.StreamDefinition.
 
-        @field_validator("tap_type")
-        @classmethod
-        def validate_tap_type(cls, v: str) -> str:
-            """Validate tap_type is not empty.
+        This class extends the unified model for any tap-specific customizations
+        while maintaining the consolidated [Project]Models pattern.
+        """
 
-            Returns:
-                Validated tap_type string.
+    class TapInstance(FlextMeltanoModels.TapInstance):
+        """Tap instance - uses unified FlextMeltanoModels.TapInstance.
 
-            Raises:
-                ValueError: If tap_type is empty or whitespace only.
+        This class extends the unified model for any tap-specific customizations
+        while maintaining the consolidated [Project]Models pattern.
+        """
 
-            """
-            if not v or not v.strip():
-                msg = "tap_type cannot be empty"
-                raise ValueError(msg)
-            return v
-
-        @field_validator("connection_config")
-        @classmethod
-        def validate_connection_config(
-            cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
-            """Validate connection_config using centralized validator.
-
-            Returns:
-                Validated connection configuration dictionary.
-
-            Raises:
-                ValueError: If connection config validation fails.
-
-            """
-            # Use centralized validator to eliminate duplication
-            result: FlextResult[object] = (
-                FlextMeltanoValidators.validate_connection_config(v)
-            )
-            if result.is_failure:
-                raise ValueError(result.error or "Connection config validation failed")
-            return v
-
-    class StreamDefinition(BaseModel):
-        """Pydantic model for stream definition."""
-
-        model_config = PydanticConfigDict(extra="allow")
-
-        stream_name: str = Field(description="Name of the stream")
-        stream_schema: FlextTypes.Core.Dict = Field(
-            description="JSON schema for the stream",
-        )
-        tap_type: str = Field(description="Type of tap this stream belongs to")
-        status: str = Field(
-            default="discovered",
-            description="Current status of the stream",
-        )
-        records_extracted: int = Field(
-            default=0,
-            description="Number of records extracted",
-        )
-
-    class TapInstance(BaseModel):
-        """Pydantic model for tap instance."""
-
-        model_config = PydanticConfigDict(extra="allow")
-
-        tap_type: str = Field(description="Type of the tap")
-        config: FlextTapAbstractions.TapConfig = Field(description="Tap configuration")
-        adapter: object | None = Field(
-            default=None,
-            description="FlextMeltanoAdapter instance",
-        )
-        status: str = Field(default="initialized", description="Current status")
-        streams: dict[str, FlextTapAbstractions.StreamDefinition] = Field(
-            default_factory=dict,
-            description="Discovered streams",
-        )
-        discovered: bool = Field(
-            default=False,
-            description="Whether streams have been discovered",
-        )
-        metadata: FlextTypes.Core.Dict = Field(
-            default_factory=dict,
-            description="Additional metadata",
-        )
-        tap_id: str = Field(description="Unique tap identifier")
-
+    @override
     def __init__(self: object) -> None:
         """Initialize unified tap abstractions."""
         self._stream_registry: dict[str, FlextTapAbstractions.StreamDefinition] = {}
@@ -150,6 +69,7 @@ class FlextTapAbstractions:
     # UNIFIED TAP PROCESSING - REPLACES COMPLEX INHERITANCE
     # ============================================================================
 
+    @override
     def process(
         self,
         request: FlextTapAbstractions.TapConfig,
@@ -171,7 +91,7 @@ class FlextTapAbstractions:
             tap_instance = FlextTapAbstractions.TapInstance(
                 tap_type=request.tap_type,
                 config=request,
-                status="initialized",
+                status=initialized,
                 tap_id=tap_id,
                 metadata={
                     "created_at": datetime.now(tz=UTC).isoformat(),
@@ -206,7 +126,7 @@ class FlextTapAbstractions:
             "status": domain.status,
             "discovered": domain.discovered,
             "streams_count": len(domain.streams),
-            "correlation_id": correlation_id,
+            "correlation_id": "correlation_id",
             "created_at": domain.metadata.get("created_at"),
         }
 
@@ -243,8 +163,8 @@ class FlextTapAbstractions:
         try:
             # Create FlextTapAbstractions.TapConfig with Pydantic validation - use type-safe dict merging
             config_data: FlextTypes.Core.Dict = {
-                "tap_type": tap_type,
-                "connection_config": connection_config,
+                "tap_type": "tap_type",
+                "connection_config": "connection_config",
                 "stream_config": stream_config or {},
             }
 
@@ -321,11 +241,11 @@ class FlextTapAbstractions:
             "tap-csv": self._csv_stream_strategy,
             "default": self._default_stream_strategy,
         }
-        strategy = strategies.get(tap_type, strategies["default"])
+        strategies.get(tap_type, strategies["default"])
         return FlextResult[FlextTypes.Core.Dict].ok(
             {
-                "strategy": strategy,
-                "tap_type": tap_type,
+                "strategy": "strategy",
+                "tap_type": "tap_type",
             },
         )
 
@@ -477,12 +397,12 @@ class FlextTapAbstractions:
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "User creation timestamp",
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "User last update timestamp",
                     },
                 },
@@ -511,7 +431,7 @@ class FlextTapAbstractions:
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "Order creation timestamp",
                     },
                 },
@@ -537,7 +457,7 @@ class FlextTapAbstractions:
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "Product creation timestamp",
                     },
                 },
@@ -554,7 +474,7 @@ class FlextTapAbstractions:
                     },
                     "timestamp": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "Data timestamp",
                     },
                 },
@@ -573,7 +493,7 @@ class FlextTapAbstractions:
                     "data": {"type": "string", "description": "Record data"},
                     "created_at": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": date - time,
                         "description": "Creation timestamp",
                     },
                 },
@@ -667,7 +587,7 @@ class FlextTapAbstractions:
         streams: list[FlextTapAbstractions.StreamDefinition],
     ) -> FlextResult[list[FlextTypes.Core.Dict]]:
         """Process streams to catalog entries using batch processing."""
-        # Process streams to catalog entries usi: list[dict[str, object]]ng batch processing pattern
+        # Process streams to catalog entries usi: list[dict["str", "object"]]ng batch processing pattern
         successes: list[dict[str, object]] = []
         errors = []
 
@@ -716,7 +636,7 @@ class FlextTapAbstractions:
                 "breadcrumb": [],
                 "metadata": {
                     "replication-method": "FULL_TABLE",
-                    "selected": True,
+                    "selected": "True",
                 },
             },
         ]
@@ -744,7 +664,7 @@ class FlextTapAbstractions:
         """Assemble final catalog structure."""
         catalog = {
             "version": 1,
-            "streams": catalog_entries,
+            "streams": "catalog_entries",
         }
         return FlextResult[FlextTypes.Core.Dict].ok(catalog)
 
@@ -784,13 +704,13 @@ class FlextTapAbstractions:
         params: tuple[FlextTapAbstractions.StreamDefinition, int | None],
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create extraction strategy based on stream type."""
-        stream, limit = params
-        strategy = self._get_extraction_strategy(stream.stream_name)
+        stream, _limit = params
+        self._get_extraction_strategy(stream.stream_name)
         return FlextResult[FlextTypes.Core.Dict].ok(
             {
-                "strategy": strategy,
-                "stream": stream,
-                "limit": limit,
+                "strategy": "strategy",
+                "stream": "stream",
+                "limit": "limit",
             },
         )
 
@@ -981,8 +901,8 @@ class FlextTapAbstractions:
         """Default record extraction strategy."""
         # Generate default records based on stream configuration
         records: list[FlextTypes.Core.Dict] = [
-            {"id": "1", "data": "sample data 1", "stream": stream.stream_name},
-            {"id": "2", "data": "sample data 2", "stream": stream.stream_name},
+            {"id": 1, "data": "sample data 1", "stream": stream.stream_name},
+            {"id": 2, "data": "sample data 2", "stream": stream.stream_name},
         ]
         return FlextResult[list[FlextTypes.Core.Dict]].ok(records)
 
@@ -1132,11 +1052,11 @@ class FlextTapAbstractions:
         ],
     ) -> FlextTypes.Core.Dict:
         """Create sync statistics result."""
-        records, stream, loaded_to_target = params
+        records, stream, _loaded_to_target = params
         return {
             "stream_name": stream.stream_name,
             "records_processed": len(records),
-            "target_loaded": loaded_to_target,
+            "target_loaded": "loaded_to_target",
             "status": "completed",
         }
 

@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
+from typing import cast, override
 
 from flext_core import (
     FlextContainer,
@@ -58,6 +58,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
 
     """
 
+    @override
     def __init__(self, **data: object) -> None:
         """Initialize the unified Meltano API."""
         super().__init__(**data)
@@ -102,7 +103,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
             validation_result = (
                 self._validators.validate_meltano_project_business_rules({
                     "version": 1,
-                    "project_id": project_name,
+                    "project_id": "project_name",
                 })
             )
             if validation_result.is_failure:
@@ -121,11 +122,11 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                 )
 
             self._logger.info(f"Successfully created Meltano project: {project_name}")
-            result_data = creation_result.unwrap()
+            creation_result.unwrap()
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "name": project_name,
+                "name": "project_name",
                 "root": str(project_dir),
-                "details": result_data,
+                "details": "result_data",
                 "status": "created",
             })
 
@@ -192,8 +193,8 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         """
         try:
             plugin_config: FlextTypes.Core.JsonValue = {
-                "name": plugin_name,
-                "type": plugin_type,
+                "name": "plugin_name",
+                "type": "plugin_type",
                 "variant": variant or FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
             }
 
@@ -216,13 +217,13 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                 )
 
             self._logger.info(f"Successfully installed plugin: {plugin_name}")
-            result_data = installation_result.unwrap()
+            installation_result.unwrap()
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "plugin_name": plugin_name,
-                "plugin_type": plugin_type,
+                "plugin_name": "plugin_name",
+                "plugin_type": "plugin_type",
                 "variant": variant or FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
                 "status": "installed",
-                "details": result_data,
+                "details": "result_data",
             })
 
         except Exception as e:
@@ -298,7 +299,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                 )
 
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "tap_name": tap_name,
+                "tap_name": "tap_name",
                 "catalog": discovery_result.unwrap(),
                 "status": "discovered",
             })
@@ -359,8 +360,8 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                 )
 
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "tap_name": tap_name,
-                "stream_name": stream_name,
+                "tap_name": "tap_name",
+                "stream_name": "stream_name",
                 "records": extraction_result.unwrap(),
                 "status": "extracted",
             })
@@ -395,7 +396,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         """
         try:
             target_dict = {
-                "target_type": target_name,
+                "target_type": "target_name",
                 "config": config or {},
                 "batches_processed": 0,
             }
@@ -411,8 +412,8 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                 )
 
             return FlextResult[FlextTypes.Core.Dict].ok({
-                "target_name": target_name,
-                "stream_name": stream_name,
+                "target_name": "target_name",
+                "stream_name": "stream_name",
                 "loading_details": loading_result.unwrap(),
                 "status": "loaded",
             })
@@ -550,18 +551,17 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
                     f"Loading failed: {load_result.error}"
                 )
 
-            dbt_result = None
             if dbt_models:
                 dbt_exec = await self.run_dbt_models(dbt_models)
                 if dbt_exec.is_success:
-                    dbt_result = dbt_exec.unwrap()
+                    dbt_exec.unwrap()
 
             return FlextResult[FlextTypes.Core.Dict].ok({
                 "pipeline_id": f"{tap_name}-{target_name}-pipeline",
                 "status": "success",
                 "extract_result": extract_result.unwrap(),
                 "load_result": load_result.unwrap(),
-                "dbt_result": dbt_result,
+                "dbt_result": "dbt_result",
             })
 
         except Exception as e:
@@ -598,6 +598,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
         """Access to Meltano models."""
         return FlextMeltanoModels
 
+    @override
     async def execute(
         self, command: str | None = None
     ) -> FlextResult[FlextTypes.Core.Dict]:
@@ -659,7 +660,7 @@ class FlextMeltanoAPI(FlextService[FlextResult[FlextTypes.Core.Dict]]):
             if command == "version":
                 version_info: FlextTypes.Core.Dict = {
                     "version": self.version,
-                    "success": True,
+                    "success": "True",
                 }
                 return FlextResult[FlextTypes.Core.Dict].ok(data=version_info)
 
