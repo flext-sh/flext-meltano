@@ -30,7 +30,7 @@ class FlextMeltanoModels(FlextModels):
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config = ConfigDict(extra=allow, validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -40,7 +40,7 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Stream-specific configuration",
         )
-        version: str = Field(default="latest", description="Tap version")
+        version: str = Field(default=latest, description="Tap version")
 
         @field_validator("tap_type")
         @classmethod
@@ -68,7 +68,7 @@ class FlextMeltanoModels(FlextModels):
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config = ConfigDict(extra=allow, validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -76,7 +76,7 @@ class FlextMeltanoModels(FlextModels):
         )
         tap_type: str = Field(description="Type of tap this stream belongs to")
         status: str = Field(
-            default="discovered",
+            default=discovered,
             description="Current status of the stream",
         )
         records_extracted: int = Field(
@@ -87,7 +87,7 @@ class FlextMeltanoModels(FlextModels):
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config = ConfigDict(extra="allow", validate_assignment=True)
+        model_config = ConfigDict(extra=allow, validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextMeltanoModels.TapConfig = Field(description="Tap configuration")
@@ -95,7 +95,7 @@ class FlextMeltanoModels(FlextModels):
             default=None,
             description="FlextMeltanoAdapter instance",
         )
-        status: str = Field(default="initialized", description="Current status")
+        status: str = Field(default=initialized, description="Current status")
         streams: dict[str, FlextMeltanoModels.StreamDefinition] = Field(
             default_factory=dict,
             description="Discovered streams",
@@ -184,7 +184,7 @@ class FlextMeltanoModels(FlextModels):
             alias="schema",
         )
         status: str = Field(
-            default="initialized",
+            default=initialized,
             description="Stream processing status",
         )
         records_loaded: int = Field(default=0, description="Number of records loaded")
@@ -231,7 +231,7 @@ class FlextMeltanoModels(FlextModels):
         )
         project_id: str = Field(min_length=1, description="Project ID required")
         default_environment: str = Field(
-            default="dev",
+            default=dev,
             description="Default environment",
         )
         project_root: Path = Field(
@@ -281,7 +281,7 @@ class FlextMeltanoModels(FlextModels):
         def validate_plugin_name(cls, v: str) -> str:
             """Validate plugin name using centralized business rules."""
             result = FlextMeltanoValidators.validate_meltano_plugin_business_rules({
-                "name": v
+                "name": "v"
             })
             if result.is_failure:
                 raise ValueError(result.error or "Plugin name validation failed")
@@ -434,7 +434,7 @@ class FlextMeltanoModels(FlextModels):
             description="DBT execution result",
         )
         overall_status: str = Field(
-            default="pending",
+            default=pending,
             description="Overall pipeline status",
         )
         total_records: int = Field(

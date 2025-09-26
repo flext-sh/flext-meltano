@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from uuid import UUID
 
 from meltano.core.elt_context import ELTContext
@@ -34,6 +34,11 @@ from flext_core import (
 class FlextMeltanoProjectWrapper:
     """FLEXT-compliant wrapper for Meltano Project operations."""
 
+    @override
+    @override
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize the wrapper with FLEXT patterns."""
         self._logger = FlextLogger(__name__)
@@ -85,6 +90,11 @@ class FlextMeltanoProjectWrapper:
 class FlextMeltanoHubWrapper:
     """FLEXT-compliant wrapper for Meltano Hub operations."""
 
+    @override
+    @override
+    @override
+    @override
+    @override
     def __init__(self, project: Project) -> None:
         """Initialize hub wrapper with project instance.
 
@@ -128,7 +138,7 @@ class FlextMeltanoHubWrapper:
             if not self._hub_service:
                 init_result = self.initialize_hub_service()
                 if init_result.is_failure:
-                    return FlextResult[dict[str, Any]].fail(
+                    return FlextResult[dict["str", "Any"]].fail(
                         init_result.error or "Failed to initialize hub service"
                     )
                 self._hub_service = init_result.unwrap()
@@ -141,7 +151,7 @@ class FlextMeltanoHubWrapper:
             }
 
             if plugin_type not in type_mapping:
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict["str", "Any"]].fail(
                     f"Invalid plugin type: {plugin_type}. Valid types: {list(type_mapping.keys())}"
                 )
 
@@ -153,17 +163,22 @@ class FlextMeltanoHubWrapper:
                 f"Retrieved {len(plugins_dict)} plugins of type {plugin_type}"
             )
 
-            return FlextResult[dict[str, Any]].ok(data=plugins_dict)
+            return FlextResult[dict["str", "Any"]].ok(data=plugins_dict)
 
         except Exception as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, Any]].fail(error_msg)
+            return FlextResult[dict["str", "Any"]].fail(error_msg)
 
 
 class FlextMeltanoPluginWrapper:
     """FLEXT-compliant wrapper for Meltano plugin operations."""
 
+    @override
+    @override
+    @override
+    @override
+    @override
     def __init__(self, project: Project) -> None:
         """Initialize plugin wrapper with project instance.
 
@@ -217,6 +232,11 @@ class FlextMeltanoPluginWrapper:
 class FlextMeltanoRunnerWrapper:
     """FLEXT-compliant wrapper for Meltano runner operations."""
 
+    @override
+    @override
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize runner wrapper."""
         self._logger = FlextLogger(__name__)
@@ -284,7 +304,7 @@ class FlextMeltanoRunnerWrapper:
             asyncio.run(runner.run(extractor_invoker, loader_invoker))
 
             result = {
-                "success": True,
+                "success": "True",
                 "extractor": extractor_plugin.name,
                 "loader": loader_plugin.name,
                 "execution_method": "singer_runner_native",
@@ -294,21 +314,26 @@ class FlextMeltanoRunnerWrapper:
                 f"Singer pipeline executed successfully: {extractor_plugin.name} -> {loader_plugin.name}"
             )
 
-            return FlextResult[dict[str, object]].ok(data=result)
+            return FlextResult[dict["str", "object"]].ok(data=result)
 
         except RunnerError as runner_error:
             error_msg = f"Singer pipeline execution failed: {runner_error}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[dict["str", "object"]].fail(error_msg)
         except Exception as e:
             error_msg = f"Unexpected error in Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[dict["str", "object"]].fail(error_msg)
 
 
 class FlextMeltanoAbstractions:
     """Main abstraction class providing unified access to Meltano functionality."""
 
+    @override
+    @override
+    @override
+    @override
+    @override
     def __init__(self) -> None:
         """Initialize abstractions with FLEXT patterns."""
         self._logger = FlextLogger(__name__)

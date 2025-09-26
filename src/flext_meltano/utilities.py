@@ -38,16 +38,16 @@ class FlextMeltanoUtilities(FlextUtilities):
         logger = FlextLogger(__name__)
         try:
             # Delegate to FlextUtilities for text processing
-            safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
-            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
+            FlextUtilities.TextProcessor.safe_string(project_id)
+            FlextUtilities.TextProcessor.safe_string(project_name)
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
             config_dict = {
                 "version": 1,
-                "project_id": safe_project_id,
-                "project_name": safe_project_name,
+                "project_id": "safe_project_id",
+                "project_name": "safe_project_name",
                 "environments": [
-                    {"name": env}
+                    {"name": "env"}
                     for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
@@ -142,7 +142,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             file_handle = target_path.open(
-                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                w, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             )
             return FlextResult.ok(data=file_handle)
         except Exception as e:
@@ -212,18 +212,18 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
             # Delegate to FlextUtilities for ALL text processing
-            safe_name = FlextUtilities.TextProcessor.safe_string(name)
-            safe_namespace = FlextUtilities.TextProcessor.safe_string(namespace)
+            FlextUtilities.TextProcessor.safe_string(name)
+            FlextUtilities.TextProcessor.safe_string(namespace)
 
             # DOMAIN-SPECIFIC: Meltano plugin-specific defaults
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
-            safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
+            FlextUtilities.TextProcessor.safe_string(pip_url)
+            FlextUtilities.TextProcessor.safe_string(executable)
 
             config_dict: FlextTypes.Core.Dict = {
-                "name": safe_name,
-                "namespace": safe_namespace,
-                "pip_url": safe_pip_url,
-                "executable": safe_executable,
+                "name": "safe_name",
+                "namespace": "safe_namespace",
+                "pip_url": "safe_pip_url",
+                "executable": "safe_executable",
                 "type": plugin_type or "extractor",
                 "settings": {},
                 "config": {},
@@ -259,7 +259,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             config_dict: object,
         ) -> FlextTypes.Core.Dict:
             """Type-safe conversion from ConfigDict to FlextTypes.Core.Dict."""
-            # ConfigDict is compatible with dict[str, JsonValue] but MyPy needs explicit conversion
+            # ConfigDict is compatible with dict["str", "JsonValue"] but MyPy needs explicit conversion
             return dict(config_dict) if isinstance(config_dict, dict) else {}
 
         return (

@@ -8,11 +8,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano.constants import FlextMeltanoConstants
 
 # Type alias for configuration dictionaries
-ConfigDict = dict[str, object]
+ConfigDict = dict["str", "object"]
 
 
 class FlextMeltanoConfigBuilders:
@@ -33,6 +35,7 @@ class FlextMeltanoConfigBuilders:
     # UNIFIED CONFIGURATION BUILDING METHODS - NO NESTED CLASSES
     # =================================================================
 
+    @override
     def __init__(self: object) -> None:
         """Initialize unified configuration builders."""
         self._logger = FlextLogger(__name__)
@@ -119,17 +122,17 @@ class FlextMeltanoConfigBuilders:
 
             # Use flext-core text processing - EXTENSIVE REUSE
             safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
-            safe_namespace = FlextUtilities.TextProcessor.safe_string(
+            FlextUtilities.TextProcessor.safe_string(
                 namespace or f"{type_prefix}_{safe_name.replace('-', '_')}",
             )
-            safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
+            FlextUtilities.TextProcessor.safe_string(executable)
 
             # Use flext-core configuration template - NO CUSTOM IMPLEMENTATION
             result_config: ConfigDict = {
-                "name": safe_name,
-                "namespace": safe_namespace,
-                "executable": safe_executable,
-                "type": plugin_type,
+                "name": "safe_name",
+                "namespace": "safe_namespace",
+                "executable": "safe_executable",
+                "type": "plugin_type",
                 "metadata": {
                     "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
@@ -227,15 +230,15 @@ class FlextMeltanoConfigBuilders:
         try:
             # Use flext-core text processing extensively - NO CUSTOM LOGIC
             safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
-            safe_namespace = FlextUtilities.TextProcessor.safe_string(
+            FlextUtilities.TextProcessor.safe_string(
                 namespace or safe_name,
             )
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
+            FlextUtilities.TextProcessor.safe_string(pip_url)
 
             plugin_config: ConfigDict = {
-                "name": safe_name,
-                "namespace": safe_namespace,
-                "pip_url": safe_pip_url,
+                "name": "safe_name",
+                "namespace": "safe_namespace",
+                "pip_url": "safe_pip_url",
                 # Use flext-core metadata template - ZERO DUPLICATION
                 "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 "entity_id": FlextUtilities.Generators.generate_entity_id(),
@@ -278,13 +281,13 @@ class FlextMeltanoConfigBuilders:
         try:
             # Validate inputs using FlextUtilities
             safe_tap_name = FlextUtilities.TextProcessor.safe_string(tap_name)
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
+            FlextUtilities.TextProcessor.safe_string(pip_url)
 
             config: ConfigDict = {
-                "name": safe_tap_name,
+                "name": "safe_tap_name",
                 "namespace": f"tap_{safe_tap_name.replace('-', '_')}",
-                "pip_url": safe_pip_url,
-                "executable": safe_tap_name,
+                "pip_url": "safe_pip_url",
+                "executable": "safe_tap_name",
                 "config": config_defaults or {},
                 "select": ["*.*"],  # Selecionar todas as tabelas por padrão
                 "metadata": {
@@ -320,13 +323,13 @@ class FlextMeltanoConfigBuilders:
         try:
             # Validate inputs using FlextUtilities
             safe_target_name = FlextUtilities.TextProcessor.safe_string(target_name)
-            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url)
+            FlextUtilities.TextProcessor.safe_string(pip_url)
 
             config: ConfigDict = {
-                "name": safe_target_name,
+                "name": "safe_target_name",
                 "namespace": f"target_{safe_target_name.replace('-', '_')}",
-                "pip_url": safe_pip_url,
-                "executable": safe_target_name,
+                "pip_url": "safe_pip_url",
+                "executable": "safe_target_name",
                 "config": config_defaults or {},
                 "metadata": {
                     "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
@@ -358,16 +361,16 @@ class FlextMeltanoConfigBuilders:
         """
         try:
             # Use flext-core utilities directly
-            safe_project_id = FlextUtilities.TextProcessor.safe_string(project_id)
-            safe_project_name = FlextUtilities.TextProcessor.safe_string(project_name)
+            FlextUtilities.TextProcessor.safe_string(project_id)
+            FlextUtilities.TextProcessor.safe_string(project_name)
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
             config_dict: ConfigDict = {
                 "version": 1,
-                "project_id": safe_project_id,
-                "project_name": safe_project_name,
+                "project_id": "safe_project_id",
+                "project_name": "safe_project_name",
                 "environments": [
-                    {"name": env}
+                    {"name": "env"}
                     for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
@@ -436,7 +439,7 @@ class FlextMeltanoConfigBuilders:
             if isinstance(metadata, dict):
                 metadata_copy: dict[str, object] = dict(metadata)
                 metadata_copy["last_plugin_added"] = {
-                    "type": safe_plugin_type,
+                    "type": "safe_plugin_type",
                     "name": plugin_config.get("name", "unknown"),
                     "added_at": FlextUtilities.Generators.generate_iso_timestamp(),
                 }

@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
 # Constants
@@ -29,6 +31,7 @@ class FlextSingerTypes:
     message handling, and properties management.
     """
 
+    @override
     def __init__(self) -> None:
         """Initialize unified Singer types manager."""
         self._logger = FlextLogger(f"{__name__}.FlextSingerTypes")
@@ -37,7 +40,7 @@ class FlextSingerTypes:
             "integer": {"type": "integer"},
             "number": {"type": "number"},
             "boolean": {"type": "boolean"},
-            "date-time": {"type": "string", "format": "date-time"},
+            "date-time": {"type": "string", "format": date - time},
             "array": {"type": "array"},
             "object": {"type": "object"},
         }
@@ -127,7 +130,7 @@ class FlextSingerTypes:
 
         """
         try:
-            type_def: FlextTypes.Core.Dict = {"type": "string", "format": "date-time"}
+            type_def: FlextTypes.Core.Dict = {"type": "string", "format": date - time}
             type_def.update(kwargs)
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
@@ -212,7 +215,7 @@ class FlextSingerTypes:
 
             # Single validation logic with dispatch table
             if isinstance(type_name, str) and type_name in validation_rules:
-                expected_type_info, type_display = validation_rules[type_name]
+                type_display, expected_type_info = validation_rules[type_name]
 
                 if isinstance(expected_type_info, tuple):
                     # Handle tuple case like (int, float) for "number"
@@ -251,7 +254,7 @@ class FlextSingerTypes:
         try:
             schema: FlextTypes.Core.Dict = {
                 "type": "object",
-                "properties": properties,
+                "properties": "properties",
             }
             # Add optional metadata
             for key in ["required", "additionalProperties", "description"]:
@@ -282,8 +285,8 @@ class FlextSingerTypes:
         try:
             message: FlextTypes.Core.Dict = {
                 "type": "RECORD",
-                "stream": stream,
-                "record": record,
+                "stream": "stream",
+                "record": "record",
             }
 
             # Add optional fields
@@ -313,8 +316,8 @@ class FlextSingerTypes:
         try:
             message: FlextTypes.Core.Dict = {
                 "type": "SCHEMA",
-                "stream": stream,
-                "schema": schema,
+                "stream": "stream",
+                "schema": "schema",
                 "key_properties": key_properties or [],
             }
 
@@ -340,7 +343,7 @@ class FlextSingerTypes:
 
         """
         try:
-            message: FlextTypes.Core.Dict = {"type": "STATE", "value": value}
+            message: FlextTypes.Core.Dict = {"type": "STATE", "value": "value"}
             return FlextResult[FlextTypes.Core.Dict].ok(data=message)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Dict].fail(

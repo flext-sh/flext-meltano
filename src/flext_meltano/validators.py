@@ -9,8 +9,6 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-from pydantic import BaseModel, Field, field_validator
-
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
 
@@ -33,7 +31,7 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: FlextTypes.Core.Dict = {"name": "tap-csv", "namespace": "tap_csv"}
+        >>> config: FlextTypes.Core.Dict = {"name": tap - csv, "namespace": "tap_csv"}
         >>> result: FlextResult[object] = (
         ...     validator.validate_meltano_plugin_business_rules(config)
         ... )
@@ -242,7 +240,7 @@ class FlextMeltanoValidators:
         Example:
             >>> config: FlextTypes.Core.Dict = {
             ...     "version": 1,
-            ...     "project_id": "my-meltano-project",
+            ...     "project_id": my - meltano - project,
             ... }
             >>> result = FlextMeltanoValidators.validate_meltano_project_business_rules(
             ...     config
@@ -260,40 +258,12 @@ class FlextMeltanoValidators:
         config_dict: FlextTypes.Core.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: Meltano project business rules
-        class MeltanoProjectBusinessRules(BaseModel):
-            version: int = Field(
-                ge=1,
-                le=1,
-                description="Meltano supports only version 1",
-            )
-            project_id: str = Field(min_length=1, description="Project ID required")
+        class MeltanoProjectBusinessRules(FlextMeltanoModels.MeltanoProjectModel):
+            """Meltano project business rules - uses unified FlextMeltanoModels.MeltanoProjectModel.
 
-            @field_validator("project_id")
-            @classmethod
-            def validate_project_id_business_rules(cls, v: str) -> str:
-                """Validate Meltano-specific project ID business rules.
-
-                Args:
-                    v: Project ID to validate.
-
-                Returns:
-                    str: Validated project ID.
-
-                Raises:
-                    ValueError: If project ID violates business rules.
-
-                """
-                if not v.strip():
-                    msg = "Project ID cannot be empty or whitespace"
-                    raise ValueError(msg)
-                # Meltano business rule: project ID format restrictions
-                if " " in v:
-                    msg = "Project ID cannot contain spaces"
-                    raise ValueError(msg)
-                if not v.replace("-", "").replace("_", "").isalnum():
-                    msg = "Project ID can only contain letters, numbers, hyphens, and underscores"
-                    raise ValueError(msg)
-                return v
+            This class extends the unified model for validation-specific functionality
+            while maintaining the consolidated [Project]Models pattern.
+            """
 
         # Use Pydantic model validation directly
         try:
@@ -320,7 +290,7 @@ class FlextMeltanoValidators:
         Example:
             >>> config: FlextTypes.Core.Dict = {
             ...     "name": "my_dbt_project",
-            ...     "version": "1.0.0",
+            ...     "version": 1.0.0,
             ... }
             >>> result: FlextResult[object] = (
             ...     FlextMeltanoValidators.validate_dbt_business_rules(config)
@@ -338,36 +308,12 @@ class FlextMeltanoValidators:
         config_dict: FlextTypes.Core.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: DBT business rules
-        class DbtBusinessRules(BaseModel):
-            name: str = Field(min_length=1, description="DBT project name required")
-            version: str = Field(
-                min_length=1,
-                description="DBT project version required",
-            )
+        class DbtBusinessRules(FlextMeltanoModels.DbtProjectModel):
+            """DBT project business rules - uses unified FlextMeltanoModels.DbtProjectModel.
 
-            @field_validator("name")
-            @classmethod
-            def validate_dbt_name_business_rules(cls, v: str) -> str:
-                """Validate DBT-specific project name business rules.
-
-                Args:
-                    v: DBT project name to validate.
-
-                Returns:
-                    str: Validated DBT project name.
-
-                Raises:
-                    ValueError: If project name violates business rules.
-
-                """
-                if not v or not v.strip():
-                    msg = "DBT project name cannot be empty"
-                    raise ValueError(msg)
-                # DBT business rule: no spaces in project names
-                if " " in v:
-                    msg = "DBT project names cannot contain spaces"
-                    raise ValueError(msg)
-                return v
+            This class extends the unified model for validation-specific functionality
+            while maintaining the consolidated [Project]Models pattern.
+            """
 
         # Use Pydantic model validation directly
         try:

@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
+from typing import override
 
 from flext_core import FlextUtilities
 
@@ -14,6 +15,7 @@ from flext_core import FlextUtilities
 class FlextMeltanoExecutionResult:
     """Execution result model for Meltano command operations following flext-core patterns."""
 
+    @override
     def __init__(
         self,
         command: list[str],

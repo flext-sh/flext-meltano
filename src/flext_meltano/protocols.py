@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import Protocol, override, runtime_checkable
 
 from flext_core import FlextTypes, T_co
 
@@ -35,6 +35,7 @@ class FlextMeltanoProtocols:
             """Validate plugin configuration."""
             ...  # pragma: no cover
 
+        @override
         def execute(self, *args: JsonValue) -> T_co:
             """Execute plugin with given arguments."""
             ...  # pragma: no cover
@@ -83,6 +84,7 @@ class FlextMeltanoProtocols:
     class DbtRunnerProtocol(Protocol):
         """DBT Runner protocol for type safety."""
 
+        @override
         def run(self, models: list[str]) -> JsonObject:
             """Run DBT models."""
             ...
