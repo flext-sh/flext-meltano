@@ -166,7 +166,7 @@ class TestFlextTargetAbstractionsComplete:
     def test_create_flext_target(self) -> None:
         """Test create_flext_target method using flext_tests."""
         # Create test config using flext_tests utilities
-        test_config = {
+        test_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
             "batch_size": 100,
@@ -338,7 +338,7 @@ class TestFlextTargetAbstractionsComplete:
             condition=target_result.is_success,
             message="Target creation should succeed",
         )
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         # Test successful schema message processing (lines 249-289)
         schema: dict[str, object] = {
@@ -360,7 +360,7 @@ class TestFlextTargetAbstractionsComplete:
         )
 
         # Test successful record message processing (lines 295-341)
-        record = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "users",
@@ -399,10 +399,10 @@ class TestFlextTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         # Test record processing without schema (lines 315-317)
-        record = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "unknown_stream",
@@ -431,7 +431,7 @@ class TestFlextTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
@@ -447,7 +447,7 @@ class TestFlextTargetAbstractionsComplete:
         )
 
         # Test load_record method (lines 376-383)
-        record = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         load_result = self.target_abstractions.load_record(target, "users", record)
 
         self.test_assertions.assert_true(
@@ -460,7 +460,7 @@ class TestFlextTargetAbstractionsComplete:
         )
 
         # Test load_batch method (lines 389-441)
-        records = [
+        records: list[dict[str, object]] = [
             {"id": 1, "name": "John"},
             {"id": 2, "name": "Jane"},
             {"id": 3, "name": "Bob"},
@@ -503,7 +503,7 @@ class TestFlextTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         # Add schema and data
         schema: dict[str, object] = {
@@ -520,7 +520,10 @@ class TestFlextTargetAbstractionsComplete:
         )
 
         # Load some data
-        records = [{"id": 1, "name": "John"}, {"id": 2, "name": "Jane"}]
+        records: list[dict[str, object]] = [
+            {"id": 1, "name": "John"},
+            {"id": 2, "name": "Jane"},
+        ]
         batch_result = self.target_abstractions.load_batch(target, "users", records)
         self.test_assertions.assert_true(
             condition=batch_result.is_success,
@@ -562,7 +565,7 @@ class TestFlextTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
@@ -695,7 +698,7 @@ class TestFlextTargetAbstractionsComplete:
             message="Instance creation should succeed",
         )
 
-        instance = cast("FlextTargetAbstractions", instance_result.unwrap())
+        instance = instance_result.unwrap()
         self.test_assertions.assert_true(
             condition=isinstance(instance, FlextTargetAbstractions),
             message="Should create FlextTargetAbstractions instance",
@@ -709,7 +712,7 @@ class TestFlextTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = cast("dict[str, object]", target_result.unwrap())
+        target = target_result.unwrap()
 
         # Test finalization of non-existent stream
         result = self.target_abstractions.finalize_stream(target, "non_existent_stream")

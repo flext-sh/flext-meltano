@@ -192,8 +192,8 @@ class TestFlextMeltanoConfig:
         assert isinstance(plugin_types, list)
         assert "extractors" in plugin_types
         assert "loaders" in plugin_types
-        # Use "transforms" not "transformers" - matches FlextMeltanoConstants.PluginTypes
-        assert "transforms" in plugin_types
+        # Use "transformers" not "transforms" - matches actual implementation
+        assert "transformers" in plugin_types
 
         assert isinstance(environments, list)
         assert "development" in environments

@@ -152,6 +152,8 @@ class FlextMeltanoConstants(FlextConstants):
         8  # "target-" prefix + minimum 2 chars
     )
     PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
+    # Service validation rules
+    SERVICE_MIN_NAME_LENGTH: Final[int] = 3  # Minimum service name length
 
     # =========================================================================
     # DOMAIN-SPECIFIC ENUMS - NOT available in FlextConstants

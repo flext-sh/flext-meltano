@@ -30,8 +30,13 @@ class TestFlextMeltanoAPIInitialization:
 
     async def test_api_initialization_default(self) -> None:
         """Test API initialization with default parameters."""
-        api = FlextMeltanoAPI()
 
+        # Create a concrete implementation for testing
+        class ConcreteAPI(FlextMeltanoAPI):
+            async def execute(self, command: str) -> FlextResult[str]:
+                return FlextResult[str].ok("test")
+
+        api = ConcreteAPI()
         assert api is not None
 
     async def test_api_initialization_with_project_root(self) -> None:

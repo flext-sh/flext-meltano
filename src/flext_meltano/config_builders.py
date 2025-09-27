@@ -8,13 +8,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.typings import FlextMeltanoTypes
 
 # Type alias for configuration dictionaries
-ConfigDict = dict["str", "object"]
+ConfigDict = dict[str, object]
 
 
 class FlextMeltanoConfigBuilders:
@@ -35,8 +36,7 @@ class FlextMeltanoConfigBuilders:
     # UNIFIED CONFIGURATION BUILDING METHODS - NO NESTED CLASSES
     # =================================================================
 
-    @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize unified configuration builders."""
         self._logger = FlextLogger(__name__)
 
@@ -370,7 +370,7 @@ class FlextMeltanoConfigBuilders:
                 "project_id": "safe_project_id",
                 "project_name": "safe_project_name",
                 "environments": [
-                    {"name": "env"}
+                    {"name": env}
                     for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
                 ],
                 "plugins": {
@@ -419,31 +419,36 @@ class FlextMeltanoConfigBuilders:
                 )
 
             # Create copy to avoid mutation
-            updated_config: dict[str, object] = dict(meltano_config)
-            plugins: dict[str, object] = updated_config.setdefault("plugins", {})
+            updated_config: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(
+                meltano_config
+            )
+            plugins: FlextMeltanoTypes.Core.PluginConfigDict = cast(
+                "FlextMeltanoTypes.Core.PluginConfigDict",
+                updated_config.setdefault("plugins", {}),
+            )
 
-            if isinstance(plugins, dict):
-                typed_plugins = plugins
-                if safe_plugin_type not in typed_plugins:
-                    typed_plugins[safe_plugin_type] = []
-                plugin_list = typed_plugins[safe_plugin_type]
-                if isinstance(plugin_list, list):
-                    plugin_list_copy: list[object] = list(
-                        plugin_list
-                    )  # Create mutable copy
-                    plugin_list_copy.append(plugin_config)
-                    typed_plugins[safe_plugin_type] = plugin_list_copy
+            typed_plugins = plugins
+            if safe_plugin_type not in typed_plugins:
+                typed_plugins[safe_plugin_type] = []
+            plugin_list = typed_plugins[safe_plugin_type]
+            if not isinstance(plugin_list, list):
+                plugin_list = []
+            plugin_list_copy: list[object] = list(plugin_list)  # Create mutable copy
+            plugin_list_copy.append(plugin_config)
+            typed_plugins[safe_plugin_type] = plugin_list_copy
 
             # Add metadata about the operation
-            metadata: dict[str, object] = updated_config.get("metadata", {})
-            if isinstance(metadata, dict):
-                metadata_copy: dict[str, object] = dict(metadata)
-                metadata_copy["last_plugin_added"] = {
-                    "type": "safe_plugin_type",
-                    "name": plugin_config.get("name", "unknown"),
-                    "added_at": FlextUtilities.Generators.generate_iso_timestamp(),
-                }
-                updated_config["metadata"] = metadata_copy
+            metadata: FlextMeltanoTypes.Core.SettingsDict = cast(
+                "FlextMeltanoTypes.Core.SettingsDict",
+                updated_config.get("metadata", {}),
+            )
+            metadata_copy: FlextMeltanoTypes.Core.SettingsDict = dict(metadata)
+            metadata_copy["last_plugin_added"] = {
+                "type": "safe_plugin_type",
+                "name": plugin_config.get("name", "unknown"),
+                "added_at": FlextUtilities.Generators.generate_iso_timestamp(),
+            }
+            updated_config["metadata"] = metadata_copy
 
             return FlextResult[ConfigDict].ok(data=updated_config)
         except Exception as e:

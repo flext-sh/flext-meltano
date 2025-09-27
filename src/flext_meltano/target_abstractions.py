@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import cast
 
 from flext_core import (
     FlextConstants,
@@ -16,6 +16,8 @@ from flext_core import (
     FlextUtilities,
 )
 from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes
 
 # Constants
 
@@ -59,7 +61,6 @@ class FlextTargetAbstractions:
     # UNIFIED CLASS INSTANCE METHODS
     # =========================================================================
 
-    @override
     def __init__(self, target_id: str | None = None) -> None:
         """Initialize unified target abstractions."""
         self.target_id = (
@@ -79,7 +80,7 @@ class FlextTargetAbstractions:
         self,
         target_type: str,
         connection_config: ConnectionConfig,
-        batch_size: int = FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
+        batch_size: int = FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         max_batches: int = 100,  # No specific constant for max_batches yet
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
@@ -95,11 +96,13 @@ class FlextTargetAbstractions:
             )
 
             # Store validated configuration
-            config_id: dict[str, object] = f"{target_type}_{id(config_model)}"
+            config_id: str = f"{target_type}_{id(config_model)}"
             self._target_configs[config_id] = config_model
 
             # Convert to dict for compatibility
-            config_dict: dict[str, object] = config_model.model_dump()
+            config_dict: FlextMeltanoTypes.Core.PluginConfigDict = (
+                config_model.model_dump()
+            )
             config_dict["config_id"] = config_id
 
             self._logger.info(
@@ -123,7 +126,7 @@ class FlextTargetAbstractions:
     def create_flext_target(
         self,
         config: FlextTypes.Core.Dict,
-        adapter: FlextMeltanoAdapter | None = None,
+        _adapter: FlextMeltanoAdapter | None = None,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create FlextTarget instance from configuration."""
         try:
@@ -176,7 +179,7 @@ class FlextTargetAbstractions:
 
     def process_schema_message(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
         schema: SchemaDict,
     ) -> FlextResult[bool]:
@@ -189,7 +192,7 @@ class FlextTargetAbstractions:
                 stream_info_model = self.FlextStreamInfo(
                     stream_name=stream_name,
                     schema=schema,  # Use alias parameter
-                    status=schema_processed,
+                    status="schema_processed",
                     created_at=FlextUtilities.Generators.generate_iso_timestamp(),
                 )
             except Exception as e:
@@ -198,13 +201,18 @@ class FlextTargetAbstractions:
             # Target validation is handled by business logic, not field validation
 
             # Create or update stream
-            target_streams: dict[str, object] = target.get("streams", {})
-            if not isinstance(target_streams, dict):
+            target_streams_raw = target.get("streams", {})
+            target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+            )
+            if not target_streams:
                 target_streams = {}
                 target["streams"] = target_streams
 
             # Use validated stream info from Pydantic model
-            stream_info_dict: dict[str, object] = stream_info_model.model_dump()
+            stream_info_dict: FlextMeltanoTypes.Core.SingerSchemaDict = (
+                stream_info_model.model_dump()
+            )
             target_streams[stream_name] = stream_info_dict
 
             # Register stream with Pydantic model
@@ -226,7 +234,7 @@ class FlextTargetAbstractions:
 
     def process_record_message(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
         record: RecordDict,
     ) -> FlextResult[bool]:
@@ -238,34 +246,35 @@ class FlextTargetAbstractions:
             # Use basic debug logging without level comparison
             self._logger.debug(
                 "Record data received",
-                record_keys=list(record.keys())
-                if isinstance(record, dict)
-                else "non-dict",
+                record_keys=list(record.keys()),
             )
 
             # Parameter validation is handled by business logic, not field validation
 
             # Check if stream exists
-            target_streams: dict[str, object] = target.get("streams", {})
-            if (
-                not isinstance(target_streams, dict)
-                or stream_name not in target_streams
-            ):
+            target_streams_raw = target.get("streams", {})
+            target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+            )
+            if stream_name not in target_streams:
                 return FlextResult[bool].fail(
                     f"Stream {stream_name} not found - SCHEMA message required first",
                 )
 
             # Process record
-            stream_info = target_streams[stream_name]
-            if isinstance(stream_info, dict):
-                stream_info["records_loaded"] = stream_info.get("records_loaded", 0) + 1
-                stream_info["status"] = "record_processed"
+            stream_info_raw = target_streams[stream_name]
+            stream_info: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", stream_info_raw
+            )
+            current_count = stream_info.get("records_loaded", 0)
+            # Cast to int for arithmetic operation
+            stream_info["records_loaded"] = cast("int", current_count) + 1
+            stream_info["status"] = "record_processed"
 
             # Update target statistics with proper type handling
             current_count = target.get("loaded_records", 0)
-            target["loaded_records"] = (
-                int(current_count) + 1 if isinstance(current_count, (int, str)) else 1
-            )
+            # Cast to int for arithmetic operation
+            target["loaded_records"] = cast("int", current_count) + 1
 
             self._logger.debug(
                 "RECORD message processed successfully",
@@ -282,7 +291,7 @@ class FlextTargetAbstractions:
 
     def process_state_message(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         state: StateDict,
     ) -> FlextResult[bool]:
         """Process Singer STATE message with error handling."""
@@ -292,8 +301,11 @@ class FlextTargetAbstractions:
             # Parameter validation is handled by business logic
 
             # Update internal state
-            target_state: dict[str, object] = target.get("state", {})
-            if not isinstance(target_state, dict):
+            target_state_raw = target.get("state", {})
+            target_state: FlextMeltanoTypes.Core.SingerStateDict = cast(
+                "FlextMeltanoTypes.Core.SingerStateDict", target_state_raw
+            )
+            if not target_state:
                 target_state = {}
                 target["state"] = target_state
 
@@ -313,7 +325,7 @@ class FlextTargetAbstractions:
 
     def load_record(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
         record: RecordDict,
     ) -> FlextResult[bool]:
@@ -329,7 +341,7 @@ class FlextTargetAbstractions:
 
     def load_batch(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
         records: list[RecordDict],
     ) -> FlextResult[FlextTypes.Core.Dict]:
@@ -348,7 +360,7 @@ class FlextTargetAbstractions:
             failed_count = 0
 
             for record in records:
-                load_result: FlextResult[object] = self.load_record(
+                load_result: FlextResult[bool] = self.load_record(
                     target, stream_name, record
                 )
                 if not load_result.is_failure:
@@ -369,13 +381,13 @@ class FlextTargetAbstractions:
                 else 1
             )
 
-            batch_result = {
-                "stream_name": "stream_name",
+            batch_result: dict[str, object] = {
+                "stream_name": stream_name,
                 "records_attempted": len(records),
-                "records_loaded": "loaded_count",
-                "records_failed": "failed_count",
+                "records_loaded": loaded_count,
+                "records_failed": failed_count,
                 "batch_number": target["batches_processed"],
-                "status": completed if failed_count == 0 else "partial_failure",
+                "status": "completed" if failed_count == 0 else "partial_failure",
             }
 
             self._logger.info(
@@ -394,7 +406,7 @@ class FlextTargetAbstractions:
 
     def finalize_stream(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize stream loading (commit, cleanup, etc.)."""
@@ -402,7 +414,10 @@ class FlextTargetAbstractions:
             self._logger.info("Finalizing stream", stream_name=stream_name)
 
             # Get stream info
-            target_streams: dict[str, object] = target.get("streams", {})
+            target_streams_raw = target.get("streams", {})
+            target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+            )
             if (
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
@@ -418,8 +433,8 @@ class FlextTargetAbstractions:
                     FlextUtilities.Generators.generate_iso_timestamp()
                 )
 
-                finalization_result = {
-                    "stream_name": "stream_name",
+                finalization_result: dict[str, object] = {
+                    "stream_name": stream_name,
                     "records_loaded": stream_info.get("records_loaded", 0),
                     "batches_processed": stream_info.get("batches_processed", 0),
                     "status": "finalized",
@@ -444,7 +459,7 @@ class FlextTargetAbstractions:
 
     def finalize(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Finalize target operations with comprehensive reporting."""
         try:
@@ -455,14 +470,17 @@ class FlextTargetAbstractions:
             # Collect statistics from all streams
             stream_stats = {}
             total_records = 0
-            target_streams: dict[str, object] = target.get("streams", {})
+            target_streams_raw = target.get("streams", {})
+            target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+            )
 
             if isinstance(target_streams, dict):
                 for stream_name, stream_info in target_streams.items():
                     if isinstance(stream_info, dict):
                         records_loaded = stream_info.get("records_loaded", 0)
                         stream_stats[stream_name] = {
-                            "records_loaded": "records_loaded",
+                            "records_loaded": records_loaded,
                             "batches_processed": stream_info.get(
                                 "batches_processed",
                                 0,
@@ -475,13 +493,13 @@ class FlextTargetAbstractions:
                             else 0
                         )
 
-            finalization_result: FlextTypes.Core.Dict = {
+            finalization_result: dict[str, object] = {
                 "status": "completed",
                 "total_streams": len(target_streams)
                 if isinstance(target_streams, dict)
                 else 0,
-                "total_records": "total_records",
-                "stream_stats": "stream_stats",
+                "total_records": total_records,
+                "stream_stats": stream_stats,
                 "final_state": target.get("state", {}),
                 "config_summary": {
                     "target_type": target.get("target_type", "unknown"),
@@ -514,50 +532,56 @@ class FlextTargetAbstractions:
 
     def get_stream_by_name(
         self,
-        target: FlextTypes.Core.Dict,
+        target: dict[str, object],
         stream_name: str,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Get stream by name with error handling."""
         try:
-            target_streams: dict[str, object] = target.get("streams", {})
+            target_streams_raw = target.get("streams", {})
+            target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+                "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+            )
             if (
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
             ):
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"Stream {stream_name} not found",
                 )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(
-                data=target_streams[stream_name],
+            return FlextResult[dict[str, object]].ok(
+                data=cast("dict[str, object]", target_streams[stream_name]),
             )
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Failed to get stream {stream_name}: {e}",
             )
 
-    def list_streams(self, target: FlextTypes.Core.Dict) -> FlextTypes.Core.StringList:
+    def list_streams(self, target: dict[str, object]) -> FlextTypes.Core.StringList:
         """List all active stream names."""
-        target_streams: dict[str, object] = target.get("streams", {})
+        target_streams_raw = target.get("streams", {})
+        target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
+            "FlextMeltanoTypes.Core.SingerSchemaDict", target_streams_raw
+        )
         return list(target_streams.keys()) if isinstance(target_streams, dict) else []
 
-    def get_target_type(self, target: FlextTypes.Core.Dict) -> str:
+    def get_target_type(self, target: dict[str, object]) -> str:
         """Get target type."""
         return str(target.get("target_type", "unknown"))
 
-    def get_active_targets(self: object) -> FlextTypes.Core.StringList:
+    def get_active_targets(self) -> FlextTypes.Core.StringList:
         """Get list of active target IDs."""
         return list(self._active_targets.keys())
 
-    def get_registered_streams(self: object) -> FlextTypes.Core.StringList:
+    def get_registered_streams(self) -> FlextTypes.Core.StringList:
         """Get list of registered stream keys."""
         return list(self._stream_registry.keys())
 
     @classmethod
-    def create_instance(cls: object) -> FlextResult[FlextTargetAbstractions]:
+    def create_instance(cls) -> FlextResult[FlextTargetAbstractions]:
         """Factory method to create FlextTargetAbstractions instance."""
-        return FlextResult["FlextTargetAbstractions"].ok(data=cls())
+        return FlextResult[FlextTargetAbstractions].ok(data=cls())
 
     def is_production(self: object) -> bool:
         """Check if running in production mode."""

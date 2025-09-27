@@ -116,7 +116,11 @@ class TestFlextMeltanoValidatorsComprehensive:
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_dbt_config_valid(self) -> None:
-        dbt_config: FlextTypes.Core.Dict = {"name": "analytics", "version": "1.0.0"}
+        dbt_config: FlextTypes.Core.Dict = {
+            "name": "analytics",
+            "version": "1.0.0",
+            "profile": "analytics_profile",
+        }
 
         result = FlextMeltanoValidators.validate_dbt_business_rules(
             cast("FlextTypes.Core.JsonValue", dbt_config)
@@ -150,7 +154,11 @@ class TestFlextMeltanoValidatorsComprehensive:
             "project_id": "integration-test",
         }
 
-        dbt_config: FlextTypes.Core.Dict = {"name": "analytics", "version": "1.0.0"}
+        dbt_config: FlextTypes.Core.Dict = {
+            "name": "analytics",
+            "version": "1.0.0",
+            "profile": "analytics_profile",
+        }
 
         tap_config: FlextTypes.Core.Dict = {
             "name": "tap-csv",

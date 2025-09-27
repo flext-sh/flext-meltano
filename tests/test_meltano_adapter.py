@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import importlib.util
 
-import dbt.version
+# Optional import for DBT
+try:
+    import dbt.version
+except ImportError:
+    dbt = None  # type: ignore[assignment]
 
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoBridge as MeltanoBridge

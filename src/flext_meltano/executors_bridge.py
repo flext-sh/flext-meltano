@@ -10,7 +10,7 @@ import asyncio
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import override
+from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -32,15 +32,19 @@ logger = FlextLogger(__name__)
 class FlextMeltanoBridge:
     """Bridge class for Go service integration via JSON API with generic error handling."""
 
-    @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize bridge with adapter and logger."""
         # Avoid circular dependency - don't create FlextMeltanoExecutor here
-        self.adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
+        self._adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         # Unified adapter - no need for separate wrapper
         self._current_project: object | None = None
         # Create logger with specific name expected by tests
         self.logger = FlextLogger("MeltanoBridge")
+
+    @property
+    def adapter(self) -> FlextMeltanoAdapter:
+        """Public access to the adapter for testing purposes."""
+        return self._adapter
 
     def _execute_with_json_response(
         self,
@@ -91,7 +95,7 @@ class FlextMeltanoBridge:
 
         except Exception as e:
             self.logger.exception("Bridge operation failed")
-            return {"success": "False", "data": "None", "error": str(e)}
+            return {"success": False, "data": "None", "error": str(e)}
 
     def get_version(self: object) -> FlextResult[FlextTypes.Core.Dict]:
         """Get Meltano version information.
@@ -102,14 +106,17 @@ class FlextMeltanoBridge:
         """
         try:
             # Use adapter to get version
-            result: FlextResult[object] = self.adapter.get_version()
+            result = self._adapter.get_version()
             if result.is_success:
                 return FlextResult[FlextTypes.Core.Dict].ok(
-                    {
-                        "meltano": FlextMeltanoConstants.MELTANO_VERSION_REQUIRED,
-                        "flext_meltano": "2.0.0",
-                        "status": "ready",
-                    },
+                    cast(
+                        "FlextTypes.Core.Dict",
+                        {
+                            "meltano": FlextMeltanoConstants.MELTANO_VERSION_REQUIRED,
+                            "flext_meltano": "2.0.0",
+                            "status": "ready",
+                        },
+                    )
                 )
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Version check failed",
@@ -124,7 +131,7 @@ class FlextMeltanoBridge:
             JSON string containing version information.
 
         """
-        result: FlextResult[object] = self.get_version()
+        result = self.get_version()
         if result.is_success:
             return json.dumps(result.unwrap())
         return json.dumps({"error": result.error})
@@ -148,14 +155,16 @@ class FlextMeltanoBridge:
                 )
 
             # Use adapter directly to eliminate duplication
-            result = self.adapter.execute_pipeline(
+            result = self._adapter.execute_pipeline(
                 project=project_result.unwrap(),
                 extractor_name=tap_name,
                 loader_name=target_name,
             )
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(
+                    data=cast("FlextTypes.Core.Dict", result.value)
+                )
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Pipeline failed",
             )
@@ -176,10 +185,10 @@ class FlextMeltanoBridge:
 
         def _execute_command() -> FlextResult[FlextTypes.Core.Dict]:
             # Use adapter directly to eliminate duplication
-            result: FlextResult[object] = self.adapter.execute_bridge_service()
+            result = self.adapter.execute_bridge_service()
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=result.value)
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Command failed",
             )
@@ -200,10 +209,10 @@ class FlextMeltanoBridge:
 
         def _execute_dbt() -> FlextResult[FlextTypes.Core.Dict]:
             # Use adapter directly to eliminate duplication
-            result: FlextResult[object] = self.adapter.execute_dbt_operation()
+            result = self.adapter.execute_dbt_operation()
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(data=result.value)
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "DBT command failed",
             )
@@ -272,20 +281,18 @@ class FlextMeltanoBridge:
         try:
             project_path = Path(project_root)
             # Use available methods - get project info via create_project
-            result: FlextResult[object] = self.adapter.create_project(
-                str(project_path), project_path
-            )
+            result = self.adapter.create_project(str(project_path), project_path)
 
             if result.is_success:
                 return {
-                    "success": "True",
+                    "success": True,
                     "project_root": str(project_path),
                     "project_type": "meltano",
                     "data": result.unwrap(),
                 }
-            return {"success": "False", "error": result.error}
+            return {"success": False, "error": result.error}
         except Exception as e:
-            return {"success": "False", "error": str(e)}
+            return {"success": False, "error": str(e)}
 
     def discover_plugins(
         self,
@@ -298,7 +305,7 @@ class FlextMeltanoBridge:
 
         """
         try:
-            result: FlextResult[object] = self.adapter.discover_plugins()
+            result = self.adapter.discover_plugins()
 
             # Result is always a FlextResult[list[FlextTypes.Core.Headers]] from adapter
             if result.is_success:
@@ -332,7 +339,7 @@ class FlextMeltanoBridge:
                 args,
             )
         except Exception as e:
-            return {"success": "False", "error": str(e)}
+            return {"success": False, "error": str(e)}
 
     def _run_plugin_sync(
         self,
@@ -349,11 +356,11 @@ class FlextMeltanoBridge:
         """
         try:
             # Execute plugin command using adapter
-            result: FlextResult[object] = self.adapter.execute_bridge_service()
+            result = self.adapter.execute_bridge_service()
             if result.is_success:
                 pass
             else:
-                return {"success": "False", "error": result.error}
+                return {"success": False, "error": result.error}
 
             return {
                 "success": "True",
@@ -362,7 +369,7 @@ class FlextMeltanoBridge:
                 "timestamp": FlextMeltanoConstants.MELTANO_VERSION_REQUIRED,
             }
         except Exception as e:
-            return {"success": "False", "error": str(e)}
+            return {"success": False, "error": str(e)}
 
     def list_plugins(self: object) -> FlextResult[list[FlextTypes.Core.Headers]]:
         """List available plugins.
@@ -372,9 +379,11 @@ class FlextMeltanoBridge:
 
         """
         try:
-            result: FlextResult[object] = self.adapter.discover_plugins()
+            result = self._adapter.discover_plugins()
             if result.is_success:
-                return FlextResult.ok(data=result.value or [])
+                return FlextResult.ok(
+                    data=cast("list[dict[str, str]]", result.value) or []
+                )
             return FlextResult.fail(result.error or "Plugin listing failed")
         except Exception as e:
             return FlextResult.fail(str(e))
@@ -391,10 +400,12 @@ class FlextMeltanoBridge:
         """
         try:
             project_path = Path(project_root)
-            result: FlextResult[object] = self.adapter.initialize_project(project_path)
+            result = self._adapter.initialize_project(project_path)
 
             if result.is_success:
-                return FlextResult[FlextTypes.Core.Dict].ok(data=dict(result.unwrap()))
+                return FlextResult[FlextTypes.Core.Dict].ok(
+                    data=cast("FlextTypes.Core.Dict", result.value)
+                )
             return FlextResult[FlextTypes.Core.Dict].fail(
                 result.error or "Project initialization failed",
             )
