@@ -18,6 +18,7 @@ from meltano.core.elt_context import ELTContext
 from meltano.core.hub import MeltanoHubService
 from meltano.core.job.job import Job
 from meltano.core.plugin.base import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -138,7 +139,7 @@ class FlextMeltanoHubWrapper:
             if not self._hub_service:
                 init_result = self.initialize_hub_service()
                 if init_result.is_failure:
-                    return FlextResult[dict["str", "Any"]].fail(
+                    return FlextResult[dict[str, Any]].fail(
                         init_result.error or "Failed to initialize hub service"
                     )
                 self._hub_service = init_result.unwrap()
@@ -151,7 +152,7 @@ class FlextMeltanoHubWrapper:
             }
 
             if plugin_type not in type_mapping:
-                return FlextResult[dict["str", "Any"]].fail(
+                return FlextResult[dict[str, Any]].fail(
                     f"Invalid plugin type: {plugin_type}. Valid types: {list(type_mapping.keys())}"
                 )
 
@@ -163,12 +164,12 @@ class FlextMeltanoHubWrapper:
                 f"Retrieved {len(plugins_dict)} plugins of type {plugin_type}"
             )
 
-            return FlextResult[dict["str", "Any"]].ok(data=plugins_dict)
+            return FlextResult[dict[str, Any]].ok(data=plugins_dict)
 
         except Exception as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "Any"]].fail(error_msg)
+            return FlextResult[dict[str, Any]].fail(error_msg)
 
 
 class FlextMeltanoPluginWrapper:
@@ -279,7 +280,10 @@ class FlextMeltanoRunnerWrapper:
             return FlextResult[ELTContext].fail(error_msg)
 
     def execute_singer_pipeline(
-        self, elt_context: ELTContext, extractor_plugin: object, loader_plugin: object
+        self,
+        elt_context: ELTContext,
+        extractor_plugin: ProjectPlugin,
+        loader_plugin: ProjectPlugin,
     ) -> FlextResult[dict[str, object]]:
         """Execute Singer pipeline using internal meltano.core API.
 
@@ -303,10 +307,10 @@ class FlextMeltanoRunnerWrapper:
             # Execute pipeline
             asyncio.run(runner.run(extractor_invoker, loader_invoker))
 
-            result = {
-                "success": "True",
-                "extractor": extractor_plugin.name,
-                "loader": loader_plugin.name,
+            result: dict[str, object] = {
+                "success": True,
+                "extractor": str(extractor_plugin.name),
+                "loader": str(loader_plugin.name),
                 "execution_method": "singer_runner_native",
             }
 
@@ -314,16 +318,16 @@ class FlextMeltanoRunnerWrapper:
                 f"Singer pipeline executed successfully: {extractor_plugin.name} -> {loader_plugin.name}"
             )
 
-            return FlextResult[dict["str", "object"]].ok(data=result)
+            return FlextResult[dict[str, object]].ok(data=result)
 
         except RunnerError as runner_error:
             error_msg = f"Singer pipeline execution failed: {runner_error}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "object"]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
         except Exception as e:
             error_msg = f"Unexpected error in Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "object"]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
 
 class FlextMeltanoAbstractions:

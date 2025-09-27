@@ -42,7 +42,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             FlextUtilities.TextProcessor.safe_string(project_name)
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
-            config_dict = {
+            config_dict: FlextTypes.Core.Dict = {
                 "version": 1,
                 "project_id": "safe_project_id",
                 "project_name": "safe_project_name",
@@ -107,7 +107,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 FlextLogger(__name__).warning(f"Error closing file handle: {e}")
 
         def resource_factory() -> TextIO:
-            result: FlextResult[object] = cls._open_yaml_file_for_writing(target_path)
+            result: FlextResult[TextIO] = cls._open_yaml_file_for_writing(target_path)
             if result.is_failure:
                 error_msg = f"Failed to open file: {result.error}"
                 raise RuntimeError(error_msg)
@@ -142,11 +142,11 @@ class FlextMeltanoUtilities(FlextUtilities):
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             file_handle = target_path.open(
-                w, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             )
-            return FlextResult.ok(data=file_handle)
+            return FlextResult[TextIO].ok(data=file_handle)
         except Exception as e:
-            return FlextResult.fail(f"Failed to open file for writing: {e}")
+            return FlextResult[TextIO].fail(f"Failed to open file for writing: {e}")
 
     @classmethod
     def _write_yaml_content(

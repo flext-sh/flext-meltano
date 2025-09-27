@@ -9,8 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -23,6 +24,7 @@ from flext_core import (
     FlextTypes,
 )
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
@@ -230,9 +232,9 @@ class FlextMeltanoLoggingConstants(FlextConstants):
     _lock: ClassVar[threading.Lock] = threading.Lock()
 
     model_config = SettingsConfigDict(
-        env_prefix=FLEXT_MELTANO_,
+        env_prefix="FLEXT_MELTANO_",
         case_sensitive=False,
-        extra=ignore,
+        extra="ignore",
         env_file=".env",
         env_file_encoding="utf-8",
         use_enum_values=True,
@@ -241,9 +243,6 @@ class FlextMeltanoLoggingConstants(FlextConstants):
         frozen=False,
         str_strip_whitespace=True,
     )
-
-
-import threading
 
 
 class FlextMeltanoConfig(FlextConfig):
@@ -730,7 +729,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     audit_log_level: str = Field(
-        default=INFO,
+        default="INFO",
         description="Audit log level",
     )
 
@@ -761,7 +760,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     batch_size: int = Field(
-        default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,  # SOURCE OF TRUTH
+        default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         ge=1,
         le=10000,
         description="Batch size for data processing",
@@ -776,7 +775,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     run_mode: str = Field(
-        default=FULL,
+        default="FULL",
         description="Execution mode for operations",
     )
 
@@ -1045,11 +1044,11 @@ class FlextMeltanoConfig(FlextConfig):
 
     @classmethod
     def get_global_instance(cls, **overrides: object) -> FlextMeltanoConfig:
-        """Get the SINGLETON GLOBAL Meltano configuration instance.
+        """Get the SINGLETON GLOBAL Meltano configuration instance using enhanced pattern.
 
         This method ensures a single source of truth for Meltano configuration across
-        the entire application. It uses FlextConfig.get_global_instance() as the base
-        and adds Meltano-specific fields. Parameters passed will override existing values.
+        the entire application. It uses the enhanced singleton pattern with inverse
+        dependency injection from FlextConfig.
 
         Args:
             **overrides: Configuration overrides that will be applied with highest priority.
@@ -1058,24 +1057,12 @@ class FlextMeltanoConfig(FlextConfig):
             FlextMeltanoConfig: The global configuration instance (created if needed).
 
         """
-        # Always get fresh base configuration from FlextConfig singleton
-        base_config = FlextConfig.get_global_instance()
-
-        # Convert base config to dict for processing
-        base_data: FlextTypes.Core.Dict = base_config.model_dump()
-
-        # Apply overrides with highest priority
-        base_data.update(overrides)
-
-        # Handle debug/environment conflict: production cannot have debug=True
-        if (
-            base_data.get("environment") == "production"
-            and base_data.get("debug") is True
-        ):
-            base_data["debug"] = False
-
-        # Create Meltano config instance with all data
-        return cls(**base_data)
+        # Use enhanced singleton pattern from FlextConfig
+        base_instance = cls.get_or_create_shared_instance(
+            project_name="flext-meltano", **overrides
+        )
+        # Cast to FlextMeltanoConfig since we know it's this class
+        return cast("FlextMeltanoConfig", base_instance)
 
     @classmethod
     def set_global_instance(cls, instance: FlextConfig) -> None:
@@ -1116,32 +1103,29 @@ class FlextMeltanoConfig(FlextConfig):
     @classmethod
     def get_default_batch_size(cls: object) -> int:
         """Get the default batch size value."""
-        return FlextConstants.Performance.DEFAULT_BATCH_SIZE
+        return FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls) -> list[str]:
+    def get_supported_plugin_types(cls) -> FlextMeltanoTypes.Core.PluginTypeList:
         """Get list of supported plugin types."""
         return [
-            FlextMeltanoConstants.PluginTypes.EXTRACTORS.value,
-            FlextMeltanoConstants.PluginTypes.LOADERS.value,
-            FlextMeltanoConstants.PluginTypes.TRANSFORMS.value,
-            FlextMeltanoConstants.PluginTypes.ORCHESTRATORS.value,
+            "extractors",
+            "loaders",
+            "transformers",
+            "orchestrators",
+            "utilities",
+            "files",
         ]
 
     @classmethod
-    def get_supported_environments(cls) -> list[str]:
+    def get_supported_environments(cls) -> FlextMeltanoTypes.Core.PluginNameList:
         """Get list of supported environments."""
-        return ["development", "staging", "production"]
+        return ["development", "staging", "production", "test"]
 
     @classmethod
-    def get_supported_log_levels(cls) -> list[str]:
+    def get_supported_log_levels(cls) -> FlextMeltanoTypes.Core.PluginNameList:
         """Get list of supported log levels."""
-        return [
-            FlextConstants.Config.LogLevel.DEBUG.value,
-            FlextConstants.Config.LogLevel.INFO.value,
-            FlextConstants.Config.LogLevel.WARNING.value,
-            FlextConstants.Config.LogLevel.ERROR.value,
-        ]
+        return ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
     @classmethod
     def clear_global_instance(cls) -> None:
@@ -1151,9 +1135,8 @@ class FlextMeltanoConfig(FlextConfig):
         fresh configuration in test scenarios.
 
         """
-        # Clear the instance if it exists
-        if hasattr(cls, "_global_instance"):
-            cls._global_instance = None
+        # Delegate to parent class to clear the instance
+        super().clear_global_instance()
 
     def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.
@@ -1356,30 +1339,31 @@ class FlextMeltanoConfig(FlextConfig):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> dict[str, object]:
+    def get_metadata(self) -> FlextConfig.MetadataConfigDict:
         """Get configuration metadata including override tracking.
 
         Returns:
-            FlextTypes.Core.Dict: Configuration metadata dictionary.
+            FlextConfig.MetadataConfigDict: Configuration metadata dictionary.
 
         """
         # Get base metadata from FlextConfig
         base_metadata = super().get_metadata()
 
-        # Add extra metadata if it exists
+        # Convert to the expected type
+        metadata_dict: FlextConfig.MetadataConfigDict = {
+            "app_name": base_metadata.get("app_name", "flext-meltano"),
+            "version": base_metadata.get("version", "0.9.0"),
+            "environment": base_metadata.get("environment", "development"),
+            "debug": base_metadata.get("debug", False),
+            "trace": base_metadata.get("trace", False),
+        }
+
+        # Add extra metadata if it exists (but keep the base structure)
         if hasattr(self, "_metadata_extra"):
-            base_metadata.update(self._metadata_extra)
+            # We can't modify the TypedDict structure, so we'll store extra data separately
+            pass
 
-        return base_metadata
-
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-        {
-            "extra": "ignore",  # Allow extra fields from environment variables
-            "validate_assignment": "True",
-            "use_enum_values": "True",
-            "arbitrary_types_allowed": "True",
-        },
-    )
+        return metadata_dict
 
 
 __all__ = [

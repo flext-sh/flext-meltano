@@ -48,6 +48,7 @@ class FlextMeltanoTypes(FlextTypes):
         type PluginRegistry = dict[str, PluginDefinition | PluginConfiguration]
         type PluginInstallation = dict[str, str | bool | list[str]]
         type PluginExecution = dict[str, FlextTypes.Core.JsonValue | bool]
+        type PluginInfo = dict[str, str | bool | int | dict[str, object]]
 
     # =========================================================================
     # SINGER PROTOCOL TYPES - Complex Singer operations
@@ -78,6 +79,7 @@ class FlextMeltanoTypes(FlextTypes):
         ]
         type RunResults = dict[str, list[dict[str, FlextTypes.Core.JsonValue]]]
         type ManifestData = dict[str, dict[str, FlextTypes.Core.JsonValue]]
+        type Project = dict[str, str | bool | dict[str, object] | list[str]]
 
     # =========================================================================
     # MELTANO PROJECT TYPES - Complex project management
@@ -92,7 +94,7 @@ class FlextMeltanoTypes(FlextTypes):
         """
 
         # Meltano-specific project types extending the generic ones
-        type ProjectType = Literal[
+        type MeltanoProjectType = Literal[
             # Generic types inherited from FlextTypes.Project
             "library",
             "application",
@@ -138,6 +140,44 @@ class FlextMeltanoTypes(FlextTypes):
         type WorkflowConfiguration = dict[
             str, FlextTypes.Processing.WorkflowStatus | list[str]
         ]
+
+    # =========================================================================
+    # BRIDGE TYPES - Complex bridge operations
+    # =========================================================================
+
+    class Bridge:
+        """Bridge operation complex types."""
+
+        type VersionInfo = dict[str, str | int]
+        type ConnectionInfo = dict[str, str | int | bool]
+        type BridgeConfig = dict[str, FlextTypes.Core.ConfigValue | object]
+        type BridgeStatus = dict[str, str | bool | dict[str, object]]
+
+    # =========================================================================
+    # CLI TYPES - Complex CLI operations
+    # =========================================================================
+
+    class CLI:
+        """CLI operation complex types."""
+
+        type ProcessResult = dict[str, str | int | float | bool | list[str]]
+        type CommandResult = dict[str, str | int | bool]
+        type ExecutionResult = dict[str, str | int | bool | dict[str, object]]
+        type CLIStatus = dict[str, str | bool]
+
+    # =========================================================================
+    # ELT PIPELINE TYPES - Complex ELT operations
+    # =========================================================================
+
+    class ELT:
+        """ELT pipeline complex types."""
+
+        type PipelineResult = dict[
+            str, str | int | float | bool | dict[str, object] | list[object]
+        ]
+        type ExtractionResult = dict[str, str | int | bool | dict[str, object]]
+        type LoadingResult = dict[str, str | int | bool | dict[str, object]]
+        type TransformationResult = dict[str, str | int | bool | dict[str, object]]
 
     # =========================================================================
     # CORE COMMONLY USED TYPES - Extending FlextTypes.Core for Meltano domain
@@ -201,6 +241,8 @@ class FlextMeltanoTypes(FlextTypes):
         type ProcessResultDict = dict[str, object]
         type OutputDict = dict[str, object]
         type LogsDict = dict[str, object]
+        type MetadataDict = dict[str, str | int | bool | dict[str, object]]
+        type ResponseDict = dict[str, str | int | bool | dict[str, object]]
 
 
 # =============================================================================

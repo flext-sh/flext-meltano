@@ -1,7 +1,3 @@
-"""Module docstring."""
-
-from __future__ import annotations
-
 """FLEXT Meltano File Management - Enterprise ELT file operations.
 
 This module provides file management utilities for Meltano ELT operations
@@ -11,9 +7,12 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from __future__ import annotations
+
 import shutil
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -25,6 +24,7 @@ from flext_core import (
     FlextUtilities,
 )
 from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
@@ -81,7 +81,7 @@ class FlextMeltanoFileManagers:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
             with file_path.open(
-                w, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.dump(
                     config,
@@ -115,9 +115,11 @@ class FlextMeltanoFileManagers:
                 return FlextResult[ConfigDict].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                r, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
-                config_data: dict[str, object] = yaml.safe_load(f)
+                config_data: FlextMeltanoTypes.Core.MeltanoConfigDict = yaml.safe_load(
+                    f
+                )
 
             if config_data is None:
                 return FlextResult[ConfigDict].ok(data={})
@@ -125,7 +127,7 @@ class FlextMeltanoFileManagers:
             if not isinstance(config_data, dict):
                 return FlextResult[ConfigDict].fail("YAML content is not a dictionary")
 
-            return FlextResult[ConfigDict].ok(data=config_data)
+            return FlextResult[ConfigDict].ok(data=cast("ConfigDict", config_data))
         except Exception as e:
             return FlextResult[ConfigDict].fail(f"Failed to load YAML config: {e}")
 
@@ -148,7 +150,7 @@ class FlextMeltanoFileManagers:
                 return FlextResult[bool].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                r, encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
@@ -188,7 +190,7 @@ class FlextMeltanoFileManagers:
     def setup_project_structure(
         cls,
         project_root: Path,
-        project_name: str,
+        _project_name: str,
     ) -> FlextResult[PathDict]:
         """Setup Meltano project structure using direct implementation.
 
@@ -216,7 +218,7 @@ class FlextMeltanoFileManagers:
                 created_paths[directory] = dir_path
 
             # Create essential config files
-            configs: dict[str, ConfigDict] = {
+            configs = {
                 FlextMeltanoConstants.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
@@ -238,9 +240,7 @@ class FlextMeltanoFileManagers:
 
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                save_result: FlextResult[object] = cls.save_yaml_config(
-                    config_data, config_path
-                )
+                save_result = cls.save_yaml_config(config_data, config_path)
                 if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
 

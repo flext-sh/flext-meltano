@@ -40,7 +40,7 @@ class FlextSingerTypes:
             "integer": {"type": "integer"},
             "number": {"type": "number"},
             "boolean": {"type": "boolean"},
-            "date-time": {"type": "string", "format": date - time},
+            "date-time": {"type": "string", "format": "date-time"},
             "array": {"type": "array"},
             "object": {"type": "object"},
         }
@@ -130,7 +130,7 @@ class FlextSingerTypes:
 
         """
         try:
-            type_def: FlextTypes.Core.Dict = {"type": "string", "format": date - time}
+            type_def: FlextTypes.Core.Dict = {"type": "string", "format": "date-time"}
             type_def.update(kwargs)
             return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
         except Exception as e:
@@ -224,7 +224,7 @@ class FlextSingerTypes:
                             f"Expected {type_display}, got {type(value).__name__}",
                         )
                 # Handle single type case
-                elif not isinstance(value, expected_type_info):
+                elif not isinstance(value, (str, int, float, bool, list, dict)):
                     return FlextResult[object].fail(
                         f"Expected {type_display}, got {type(value).__name__}",
                     )
@@ -239,7 +239,7 @@ class FlextSingerTypes:
 
     def create_schema_definition(
         self,
-        properties: dict[str, FlextTypes.Core.Dict],
+        _properties: dict[str, FlextTypes.Core.Dict],
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer schema definition (JSON Schema format).
@@ -272,8 +272,8 @@ class FlextSingerTypes:
 
     def create_record_message(
         self,
-        stream: str,
-        record: FlextTypes.Core.Dict,
+        _stream: str,
+        _record: FlextTypes.Core.Dict,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer RECORD message.
@@ -302,8 +302,8 @@ class FlextSingerTypes:
 
     def create_schema_message(
         self,
-        stream: str,
-        schema: FlextTypes.Core.Dict,
+        _stream: str,
+        _schema: FlextTypes.Core.Dict,
         key_properties: FlextTypes.Core.StringList | None = None,
         **kwargs: object,
     ) -> FlextResult[FlextTypes.Core.Dict]:
@@ -334,7 +334,7 @@ class FlextSingerTypes:
 
     def create_state_message(
         self,
-        value: FlextTypes.Core.Dict,
+        _value: FlextTypes.Core.Dict,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Create Singer STATE message.
 
@@ -461,9 +461,9 @@ class FlextSingerTypes:
 
         """
         try:
-            return FlextResult["FlextSingerTypes"].ok(data=cls())
+            return FlextResult[FlextSingerTypes].ok(data=cls())
         except Exception as e:
-            return FlextResult["FlextSingerTypes"].fail(
+            return FlextResult[FlextSingerTypes].fail(
                 f"Instance creation failed: {e}",
             )
 

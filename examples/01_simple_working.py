@@ -28,12 +28,12 @@ def simple_bridge_example() -> None:
 
     # Get version - this actually works
     version_result = bridge.get_version()
-    if version_result.success:
+    if version_result.is_success:
         logger.info(f"Meltano version: {version_result.value}")
 
     # Discover available plugins - this actually works
     discovery_result = bridge.discover_plugins()
-    if discovery_result.success:
+    if discovery_result.is_success:
         plugins = discovery_result.value
         logger.info(f"Found {len(plugins)} available plugins")
 
@@ -45,7 +45,7 @@ def simple_executor_example() -> None:
 
     # Execute with required command parameter (string, not list)
     result = executor.execute("version")
-    if result.success:
+    if result.is_success:
         logger.info(f"Executor result: {result.value}")
 
 

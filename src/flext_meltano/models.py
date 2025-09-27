@@ -11,9 +11,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from flext_core import FlextConstants, FlextModels, FlextResult, FlextTypes
+from flext_core import FlextConstants, FlextModels, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.validators import FlextMeltanoValidators
+from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoModels(FlextModels):
@@ -30,7 +30,7 @@ class FlextMeltanoModels(FlextModels):
     class TapConfig(BaseModel):
         """Pydantic model for tap configuration with validation."""
 
-        model_config = ConfigDict(extra=allow, validate_assignment=True)
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -40,7 +40,7 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Stream-specific configuration",
         )
-        version: str = Field(default=latest, description="Tap version")
+        version: str = Field(default="latest", description="Tap version")
 
         @field_validator("tap_type")
         @classmethod
@@ -57,18 +57,19 @@ class FlextMeltanoModels(FlextModels):
             cls,
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
-            """Validate connection_config using centralized validator."""
-            result: FlextResult[object] = (
-                FlextMeltanoValidators.validate_connection_config(v)
-            )
-            if result.is_failure:
-                raise ValueError(result.error or "Connection config validation failed")
+            """Validate connection_config with basic validation."""
+            if not v:
+                empty_config_msg = "Connection configuration cannot be empty"
+                raise ValueError(empty_config_msg)
+            if not isinstance(v, dict):
+                invalid_type_msg = "Connection configuration must be a dictionary"
+                raise TypeError(invalid_type_msg)
             return v
 
     class StreamDefinition(BaseModel):
         """Pydantic model for stream definition."""
 
-        model_config = ConfigDict(extra=allow, validate_assignment=True)
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
         stream_schema: FlextTypes.Core.Dict = Field(
@@ -76,7 +77,7 @@ class FlextMeltanoModels(FlextModels):
         )
         tap_type: str = Field(description="Type of tap this stream belongs to")
         status: str = Field(
-            default=discovered,
+            default="discovered",
             description="Current status of the stream",
         )
         records_extracted: int = Field(
@@ -87,7 +88,7 @@ class FlextMeltanoModels(FlextModels):
     class TapInstance(BaseModel):
         """Pydantic model for tap instance."""
 
-        model_config = ConfigDict(extra=allow, validate_assignment=True)
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         tap_type: str = Field(description="Type of the tap")
         config: FlextMeltanoModels.TapConfig = Field(description="Tap configuration")
@@ -95,7 +96,7 @@ class FlextMeltanoModels(FlextModels):
             default=None,
             description="FlextMeltanoAdapter instance",
         )
-        status: str = Field(default=initialized, description="Current status")
+        status: str = Field(default="initialized", description="Current status")
         streams: dict[str, FlextMeltanoModels.StreamDefinition] = Field(
             default_factory=dict,
             description="Discovered streams",
@@ -124,7 +125,7 @@ class FlextMeltanoModels(FlextModels):
             description="Connection configuration dictionary",
         )
         batch_size: int = Field(
-            default=FlextConstants.Performance.DEFAULT_BATCH_SIZE,
+            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Batch size for record processing",
         )
         max_batches: int = Field(
@@ -147,12 +148,13 @@ class FlextMeltanoModels(FlextModels):
             cls,
             v: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
-            """Validate connection config using centralized validator."""
-            result: FlextResult[object] = (
-                FlextMeltanoValidators.validate_connection_config(v)
-            )
-            if result.is_failure:
-                raise ValueError(result.error or "Connection config validation failed")
+            """Validate connection config with basic validation."""
+            if not v:
+                empty_config_msg = "Connection configuration cannot be empty"
+                raise ValueError(empty_config_msg)
+            if not isinstance(v, dict):
+                invalid_type_msg = "Connection configuration must be a dictionary"
+                raise TypeError(invalid_type_msg)
             return v
 
         @field_validator("batch_size")
@@ -184,7 +186,7 @@ class FlextMeltanoModels(FlextModels):
             alias="schema",
         )
         status: str = Field(
-            default=initialized,
+            default="initialized",
             description="Stream processing status",
         )
         records_loaded: int = Field(default=0, description="Number of records loaded")
@@ -231,14 +233,14 @@ class FlextMeltanoModels(FlextModels):
         )
         project_id: str = Field(min_length=1, description="Project ID required")
         default_environment: str = Field(
-            default=dev,
+            default="dev",
             description="Default environment",
         )
         project_root: Path = Field(
             default_factory=Path.cwd,
             description="Project root directory",
         )
-        environments: list[str] = Field(
+        environments: FlextMeltanoTypes.Core.PluginNameList = Field(
             default_factory=lambda: ["dev", "staging", "prod"],
             description="Available environments",
         )
@@ -279,13 +281,14 @@ class FlextMeltanoModels(FlextModels):
         @field_validator("name")
         @classmethod
         def validate_plugin_name(cls, v: str) -> str:
-            """Validate plugin name using centralized business rules."""
-            result = FlextMeltanoValidators.validate_meltano_plugin_business_rules({
-                "name": "v"
-            })
-            if result.is_failure:
-                raise ValueError(result.error or "Plugin name validation failed")
-            return v
+            """Validate plugin name with basic business rules."""
+            if not v or not v.strip():
+                empty_name_msg = "Plugin name cannot be empty"
+                raise ValueError(empty_name_msg)
+            if " " in v:
+                spaces_msg = "Plugin name cannot contain spaces"
+                raise ValueError(spaces_msg)
+            return v.strip()
 
     # ========================================================================
     # DBT MODELS - DBT project and execution models
@@ -299,23 +302,23 @@ class FlextMeltanoModels(FlextModels):
         name: str = Field(min_length=1, description="DBT project name")
         version: str = Field(description="DBT project version")
         profile: str = Field(description="DBT profile name")
-        model_paths: list[str] = Field(
+        model_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
             default=["models"],
             description="DBT model paths",
         )
-        analysis_paths: list[str] = Field(
+        analysis_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
             default=["analysis"],
             description="DBT analysis paths",
         )
-        test_paths: list[str] = Field(
+        test_paths: FlextMeltanoTypes.Core.DbtTestList = Field(
             default=["tests"],
             description="DBT test paths",
         )
-        seed_paths: list[str] = Field(
+        seed_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
             default=["seeds"],
             description="DBT seed paths",
         )
-        macro_paths: list[str] = Field(
+        macro_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
             default=["macros"],
             description="DBT macro paths",
         )
@@ -338,11 +341,11 @@ class FlextMeltanoModels(FlextModels):
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
         command: str = Field(description="DBT command to execute")
-        models: list[str] = Field(
+        models: FlextMeltanoTypes.Core.DbtModelList = Field(
             default_factory=list,
             description="Models to execute",
         )
-        exclude: list[str] = Field(
+        exclude: FlextMeltanoTypes.Core.DbtModelList = Field(
             default_factory=list,
             description="Models to exclude",
         )
@@ -434,7 +437,7 @@ class FlextMeltanoModels(FlextModels):
             description="DBT execution result",
         )
         overall_status: str = Field(
-            default=pending,
+            default="pending",
             description="Overall pipeline status",
         )
         total_records: int = Field(

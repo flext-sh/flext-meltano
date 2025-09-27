@@ -9,8 +9,10 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
+# Import for type hints only - avoid circular imports
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
 
 logger = FlextLogger(__name__)
 

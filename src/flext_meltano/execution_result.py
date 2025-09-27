@@ -34,11 +34,11 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(self: object) -> dict[str, str | int, float] | bool | list[str]:
+    def to_dict(self) -> dict[str, str | int | float | bool | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
-            dict[str, str | int | float] | bool | list[str]: Dictionary representation of execution result.
+            dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
 
         """
         return {

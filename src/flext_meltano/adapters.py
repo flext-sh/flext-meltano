@@ -163,6 +163,34 @@ class FlextMeltanoAdapter:
         """
         return self._current_project
 
+    def get_project_info(self) -> FlextResult[FlextTypes.Core.Dict]:
+        """Get current project information.
+
+        Returns:
+            FlextResult containing project information dictionary.
+
+        """
+        try:
+            if self._current_project is None:
+                return FlextResult[FlextTypes.Core.Dict].fail("No project loaded")
+
+            # Extract basic project information
+            project_info = {
+                "success": "true",
+                "project_root": str(getattr(self._current_project, "root", "unknown")),
+                "project_id": getattr(self._current_project, "id", "unknown"),
+                "meltano_version": getattr(
+                    self._current_project, "meltano_version", "unknown"
+                ),
+            }
+
+            return FlextResult[FlextTypes.Core.Dict].ok(data=project_info)
+
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.Dict].fail(
+                f"Failed to get project info: {e}"
+            )
+
     # =========================================================================
     # MELTANO DIRECT INTEGRATION - NO WRAPPERS, DIRECT MELTANO CORE USAGE
     # =========================================================================
@@ -197,7 +225,7 @@ class FlextMeltanoAdapter:
     def initialize_project(
         self,
         project_root: Path,
-    ) -> FlextResult[FlextMeltanoTypes.DBT.Project]:
+    ) -> FlextResult[FlextMeltanoTypes.Dbt.Project]:
         """Initialize Meltano project using railway pattern for composable steps.
 
         Uses FlextResult flat_map chains for initialization steps with
@@ -306,7 +334,7 @@ class FlextMeltanoAdapter:
 
     def _cache_and_convert_project(
         self, project: object
-    ) -> FlextResult[FlextMeltanoTypes.DBT.Project]:
+    ) -> FlextResult[FlextMeltanoTypes.Dbt.Project]:
         """Cache project and convert to FLEXT type representation.
 
         Args:
@@ -322,21 +350,21 @@ class FlextMeltanoAdapter:
 
             self._logger.info(
                 "Meltano project initialized successfully",
-                project_root=str(project.root),
+                project_root=str(getattr(project, "root", "unknown")),
             )
 
             # Convert Meltano Project to dict representation
             # ✅ TYPE SAFETY: ConfigValue supports dict[str, FlextTypes.Core.JsonValue] per flext-core
-            project_dict: FlextMeltanoTypes.DBT.Project = {
+            project_dict: FlextMeltanoTypes.Dbt.Project = {
                 "name": str(getattr(project, "name", "meltano_project")),
-                "root": str(project.root),
+                "root": str(getattr(project, "root", "unknown")),
                 "settings": str(getattr(project, "settings", "")),
                 "meltano_version": str(getattr(project, "meltano_version", "")),
             }
 
-            return FlextResult[FlextMeltanoTypes.DBT.Project].ok(data=project_dict)
+            return FlextResult[FlextMeltanoTypes.Dbt.Project].ok(data=project_dict)
         except Exception as e:
-            return FlextResult[FlextMeltanoTypes.DBT.Project].fail(
+            return FlextResult[FlextMeltanoTypes.Dbt.Project].fail(
                 f"Failed to cache and convert project: {e}"
             )
 
@@ -438,6 +466,12 @@ class FlextMeltanoAdapter:
 
         """
         try:
+            # Validate project name
+            if not project_name or not project_name.strip():
+                return FlextResult[FlextTypes.Core.Headers].fail(
+                    "Project name cannot be empty"
+                )
+
             self._logger.info(
                 "Creating Meltano project using manual file creation",
                 project_name=project_name,
@@ -820,7 +854,9 @@ class FlextMeltanoAdapter:
             .flat_map(self._execute_singer_runner)
             .flat_map(
                 lambda context: self._build_pipeline_result(
-                    extractor_name, loader_name, cast("dict[str, object]", context)
+                    extractor_name,
+                    loader_name,
+                    cast("FlextMeltanoTypes.Core.RunContextDict", context),
                 )
             )
             .or_else_get(
@@ -867,18 +903,21 @@ class FlextMeltanoAdapter:
         extractor_plugin = None
         loader_plugin = None
 
-        for plugin in project.plugins.plugins():
-            if plugin.name == extractor_name:
-                extractor_plugin = plugin
-            elif plugin.name == loader_name:
-                loader_plugin = plugin
+        # Use duck typing to access project.plugins
+        if hasattr(project, "plugins") and hasattr(project.plugins, "plugins"):
+            for plugin in project.plugins.plugins():
+                if hasattr(plugin, "name"):
+                    if plugin.name == extractor_name:
+                        extractor_plugin = plugin
+                    elif plugin.name == loader_name:
+                        loader_plugin = plugin
 
         if not extractor_plugin or not loader_plugin:
             return FlextResult.fail(
                 f"Required plugins not found: {extractor_name}, {loader_name}"
             )
 
-        return FlextResult[tuple["object", "object"]].ok(
+        return FlextResult[tuple[object, object]].ok(
             data=(extractor_plugin, loader_plugin)
         )
 
@@ -888,7 +927,7 @@ class FlextMeltanoAdapter:
         extractor_name: str,
         loader_name: str,
         plugins: tuple[object, object],
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict]:
         """Create ELT context for pipeline execution.
 
         Args:
@@ -911,27 +950,27 @@ class FlextMeltanoAdapter:
             )
 
             if elt_context_result.is_failure:
-                return FlextResult[dict["str", "object"]].fail(
+                return FlextResult[dict[str, object]].fail(
                     elt_context_result.error or "Failed to create ELT context"
                 )
 
             elt_context_result.unwrap()
 
-            context_data: dict[str, object] = {
+            context_data: FlextMeltanoTypes.Core.RunContextDict = {
                 "project": "project",
                 "elt_context": "elt_context",
                 "extractor_plugin": "extractor_plugin",
                 "loader_plugin": "loader_plugin",
             }
 
-            return FlextResult[dict["str", "object"]].ok(data=context_data)
+            return FlextResult[dict[str, object]].ok(data=context_data)
         except Exception as e:
-            return FlextResult[dict["str", "object"]].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Failed to create ELT context: {e}"
             )
 
     def _execute_singer_runner(
-        self, context_data: dict[str, object]
+        self, context_data: FlextMeltanoTypes.Core.RunContextDict
     ) -> FlextResult[dict[str, FlextTypes.Core.JsonValue]]:
         """Execute Singer runner with context data.
 
@@ -990,7 +1029,7 @@ class FlextMeltanoAdapter:
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: dict[str, object],
+        context_data: FlextMeltanoTypes.Core.RunContextDict,
     ) -> FlextResult[FlextTypes.Core.Headers]:
         """Build successful pipeline result.
 
@@ -1033,7 +1072,7 @@ class FlextMeltanoAdapter:
                 loader=loader_name,
             )
 
-            return FlextResult[dict["str", "str"]].ok(pipeline_result)
+            return FlextResult[dict[str, str]].ok(pipeline_result)
         except Exception as e:
             return FlextResult[FlextTypes.Core.Headers].fail(
                 f"Failed to build pipeline result: {e}"
@@ -1249,7 +1288,7 @@ Thumbs.db
 
         """
         try:
-            adapted_config: dict[str, object] = dict(config)
+            adapted_config: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(config)
 
             # Add required fields if missing
             if "project_id" not in adapted_config:
@@ -1341,7 +1380,7 @@ Thumbs.db
 
     async def run_dbt_transformations(
         self, project_dir: Path, models: list[str] | None = None, **options: object
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict]:
         """Run dbt transformations using programmatic API.
 
         Args:
@@ -1382,11 +1421,11 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "object"]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     async def execute_singer_pipeline_advanced(
         self, tap_instance: object, target_instance: object
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict]:
         """Execute Singer pipeline with advanced protocol management.
 
         Args:
@@ -1426,15 +1465,15 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "object"]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     async def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
-        extractor_config: dict[str, object],
-        loader_config: dict[str, object],
-        transformer_config: dict[str, object] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+        extractor_config: FlextMeltanoTypes.Core.PluginConfigDict,
+        loader_config: FlextMeltanoTypes.Core.PluginConfigDict,
+        transformer_config: FlextMeltanoTypes.Core.PluginConfigDict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict]:
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
@@ -1475,7 +1514,7 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict["str", "object"]].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
 
 __all__ = [
