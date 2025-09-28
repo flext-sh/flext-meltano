@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 import tempfile
 from pathlib import Path
-from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -14,7 +13,11 @@ import pytest
 from flext_core import FlextResult
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-from flext_meltano.types import DbtTransformationResult, SingerExecutionResult, EltPipelineResult
+from flext_meltano.types import (
+    DbtTransformationResult,
+    EltPipelineResult,
+    SingerExecutionResult,
+)
 
 
 class TestFlextDbtProgrammaticRunner:
@@ -169,7 +172,7 @@ class TestFlextMeltanoLibraryRunner:
 
             assert result.is_success
             # Get the pipeline data from the result
-            pipeline_data: dict[str, Any] = result.unwrap()
+            pipeline_data: EltPipelineResult = result.unwrap()
             # Check that the pipeline data has the expected structure
             assert isinstance(pipeline_data, dict)
             assert "extraction" in pipeline_data
