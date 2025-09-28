@@ -20,6 +20,7 @@ from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.executors_bridge import FlextMeltanoBridge
 from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 from flext_meltano.protocols import FlextMeltanoProtocols
@@ -32,12 +33,20 @@ from flext_meltano.tap_abstractions import (
     TapInstance,
 )
 from flext_meltano.target_abstractions import FlextTargetAbstractions
+from flext_meltano.types import (
+    DbtTransformationResult,
+    EltPipelineResult,
+    SingerExecutionResult,
+    SingerProcessingResult,
+)
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 __all__ = [
     "ConfigDict",
+    "DbtTransformationResult",
+    "EltPipelineResult",
     "FlextMeltanoAPI",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
@@ -48,6 +57,7 @@ __all__ = [
     "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",
+    "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
     "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
@@ -59,6 +69,8 @@ __all__ = [
     "FlextTapAbstractions",
     "FlextTargetAbstractions",
     "PluginTypes",
+    "SingerExecutionResult",
+    "SingerProcessingResult",
     "StreamDefinition",
     "TapConfig",
     "TapInstance",

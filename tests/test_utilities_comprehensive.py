@@ -10,6 +10,8 @@ import tempfile
 from pathlib import Path
 from unittest.mock import mock_open, patch
 
+import yaml
+
 from flext_core import (
     FlextResult,
     FlextUtilities,
@@ -83,7 +85,7 @@ class TestFlextMeltanoUtilitiesConfigCreation:
     def test_create_meltano_config_dict_invalid_project_id_type(self) -> None:
         """Test configuration creation with invalid project ID type."""
         result = FlextMeltanoUtilities.create_meltano_config_dict(
-            project_id=123,  # type: ignore
+            project_id=123,
             project_name="Test Project",
         )
 
@@ -156,7 +158,7 @@ class TestFlextMeltanoUtilitiesProjectValidation:
     def test_validate_meltano_project_structure_invalid_path_type(self) -> None:
         """Test project structure validation with invalid path type."""
         result = FlextMeltanoUtilities.validate_meltano_project_structure(
-            "/tmp/test"  # type: ignore
+            tempfile.mktemp()
         )
 
         assert result.is_failure
@@ -202,7 +204,7 @@ class TestFlextMeltanoUtilitiesFileCreation:
             project_path = Path(temp_dir)
 
             # Invalid config data (not a dict)
-            config_data = "invalid_config"  # type: ignore
+            config_data = "invalid_config"
 
             result = FlextMeltanoUtilities.create_meltano_project_file(
                 project_path=project_path, config_data=config_data
@@ -401,7 +403,7 @@ class TestFlextMeltanoUtilitiesErrorHandling:
             mock_file.side_effect = OSError("File operation failed")
 
             result = FlextMeltanoUtilities.save_yaml_file(
-                Path("/tmp/test.yml"), {"test": "data"}
+                Path(tempfile.mktemp(suffix=".yml")), {"test": "data"}
             )
 
             assert result.is_failure
@@ -413,7 +415,7 @@ class TestFlextMeltanoUtilitiesErrorHandling:
             mock_yaml_dump.side_effect = yaml.YAMLError("YAML error")
 
             result = FlextMeltanoUtilities.save_yaml_file(
-                Path("/tmp/test.yml"), {"test": "data"}
+                Path(tempfile.mktemp(suffix=".yml")), {"test": "data"}
             )
 
             assert result.is_failure

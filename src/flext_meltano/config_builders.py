@@ -122,17 +122,17 @@ class FlextMeltanoConfigBuilders:
 
             # Use flext-core text processing - EXTENSIVE REUSE
             safe_name = FlextUtilities.TextProcessor.safe_string(plugin_name)
-            FlextUtilities.TextProcessor.safe_string(
+            safe_namespace = FlextUtilities.TextProcessor.safe_string(
                 namespace or f"{type_prefix}_{safe_name.replace('-', '_')}",
             )
-            FlextUtilities.TextProcessor.safe_string(executable)
+            safe_executable = FlextUtilities.TextProcessor.safe_string(executable)
 
             # Use flext-core configuration template - NO CUSTOM IMPLEMENTATION
             result_config: ConfigDict = {
-                "name": "safe_name",
-                "namespace": "safe_namespace",
-                "executable": "safe_executable",
-                "type": "plugin_type",
+                "name": safe_name,
+                "namespace": safe_namespace,
+                "executable": safe_executable,
+                "type": plugin_type,
                 "metadata": {
                     "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
