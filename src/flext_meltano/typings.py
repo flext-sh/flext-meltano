@@ -191,6 +191,17 @@ class FlextMeltanoTypes(FlextTypes):
         usage throughout the Meltano codebase.
         """
 
+        # Core aliases for compatibility with FlextTypes.Core
+        type Dict = dict[str, object]
+        type List = list[object]
+        type StringList = list[str]
+        type ConfigValue = (
+            str | int | bool | float | list[object] | dict[str, object] | None
+        )
+        type JsonValue = (
+            str | int | bool | float | list[object] | dict[str, object] | None
+        )
+
         # Meltano configuration and data types
         type MeltanoConfigDict = dict[str, object]
         type PluginConfigDict = dict[str, object]

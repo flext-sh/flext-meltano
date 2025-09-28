@@ -15,13 +15,16 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
+    FlextTypes,
 )
 from flext_meltano.executors import FlextMeltanoExecutor
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoAPI(
-    FlextService[FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]]
+    FlextService[FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]],
+    FlextMeltanoProtocols.ServiceCallProtocol,
 ):
     """FLEXT Meltano API service for programmatic pipeline management.
 
@@ -37,6 +40,10 @@ class FlextMeltanoAPI(
 
     The API supports both synchronous and asynchronous operations for different
     use cases and performance requirements.
+
+    Implements FlextMeltanoProtocols.ServiceCallProtocol through structural subtyping:
+    - call: Execute service operations with operation name and payload
+    - execute: Execute the main API service operation (required by FlextService)
 
     Attributes:
         service_name: Name of the API service instance
@@ -76,6 +83,223 @@ class FlextMeltanoAPI(
         self.executor = FlextMeltanoExecutor()
 
         self.logger.info(f"FlextMeltanoAPI '{service_name}' v{version} initialized")
+
+    def call(
+        self, operation: str, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Execute service call with FlextResult - implements ServiceCallProtocol.
+
+        Args:
+            operation: Operation name to execute
+            payload: Operation payload data
+
+        Returns:
+            FlextResult containing operation result or error
+
+        """
+        operation_registry = {
+            "create_pipeline": self._handle_create_pipeline_call,
+            "execute_pipeline": self._handle_execute_pipeline_call,
+            "install_plugin": self._handle_install_plugin_call,
+            "list_plugins": self._handle_list_plugins_call,
+            "configure_environment": self._handle_configure_environment_call,
+            "run_dbt_models": self._handle_run_dbt_models_call,
+            "test_dbt_models": self._handle_test_dbt_models_call,
+            "run_elt_pipeline": self._handle_run_elt_pipeline_call,
+        }
+
+        if operation in operation_registry:
+            return operation_registry[operation](payload)
+
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            f"Unknown operation: {operation}"
+        )
+
+    def _handle_create_pipeline_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle create_pipeline operation call."""
+        if not isinstance(payload, dict):
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "Payload must be a dictionary"
+            )
+
+        tap_name = payload.get("tap_name", "")
+        target_name = payload.get("target_name", "")
+        config = payload.get("config")
+
+        if not tap_name or not target_name:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "tap_name and target_name are required"
+            )
+
+        result = self.create_pipeline(str(tap_name), str(target_name), config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "Pipeline creation failed"
+        )
+
+    def _handle_execute_pipeline_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle execute_pipeline operation call."""
+        if not isinstance(payload, dict):
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "Payload must be a dictionary"
+            )
+
+        pipeline_id = payload.get("pipeline_id", "")
+        config = payload.get("config")
+
+        if not pipeline_id:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "pipeline_id is required"
+            )
+
+        result = self.execute_pipeline(str(pipeline_id), config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "Pipeline execution failed"
+        )
+
+    def _handle_install_plugin_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle install_plugin operation call."""
+        if not isinstance(payload, dict):
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "Payload must be a dictionary"
+            )
+
+        plugin_type = payload.get("plugin_type", "")
+        plugin_name = payload.get("plugin_name", "")
+        config = payload.get("config")
+
+        if not plugin_type or not plugin_name:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "plugin_type and plugin_name are required"
+            )
+
+        result = self.install_plugin(str(plugin_type), str(plugin_name), config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "Plugin installation failed"
+        )
+
+    def _handle_list_plugins_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle list_plugins operation call."""
+        plugin_type = None
+        if isinstance(payload, dict):
+            plugin_type = payload.get("plugin_type")
+
+        result = self.list_plugins(str(plugin_type) if plugin_type else None)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "Plugin listing failed"
+        )
+
+    def _handle_configure_environment_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle configure_environment operation call."""
+        if not isinstance(payload, dict):
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "Payload must be a dictionary"
+            )
+
+        environment_name = payload.get("environment_name", "")
+        config = payload.get("config")
+
+        if not environment_name:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "environment_name is required"
+            )
+
+        result = self.configure_environment(str(environment_name), config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "Environment configuration failed"
+        )
+
+    def _handle_run_dbt_models_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle run_dbt_models operation call."""
+        models = None
+        config = None
+        if isinstance(payload, dict):
+            models = payload.get("models")
+            config = payload.get("config")
+
+        result = self.run_dbt_models(models, config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "DBT models execution failed"
+        )
+
+    def _handle_test_dbt_models_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle test_dbt_models operation call."""
+        models = None
+        config = None
+        if isinstance(payload, dict):
+            models = payload.get("models")
+            config = payload.get("config")
+
+        result = self.test_dbt_models(models, config)
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "DBT models testing failed"
+        )
+
+    def _handle_run_elt_pipeline_call(
+        self, payload: FlextTypes.Core.JsonValue
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle run_elt_pipeline operation call."""
+        if not isinstance(payload, dict):
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "Payload must be a dictionary"
+            )
+
+        tap_name = payload.get("tap_name", "")
+        target_name = payload.get("target_name", "")
+        dbt_models = payload.get("dbt_models")
+        config = payload.get("config")
+
+        if not tap_name or not target_name:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                "tap_name and target_name are required"
+            )
+
+        result = self.run_elt_pipeline(
+            str(tap_name), str(target_name), dbt_models, config
+        )
+        if result.is_success:
+            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+        return FlextResult[FlextTypes.Core.JsonValue].fail(
+            result.error or "ELT pipeline execution failed"
+        )
+
+    def execute(self) -> FlextResult[object]:
+        """Execute the main API service operation - implements ServiceCallProtocol.
+
+        Returns:
+            FlextResult containing service execution status
+
+        """
+        return self.get_service_status().map(
+            lambda result: result.unwrap() if result.is_success else {"status": "error"}
+        )
 
     def create_pipeline(
         self,

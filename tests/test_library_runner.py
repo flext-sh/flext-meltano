@@ -188,7 +188,7 @@ class TestFlextMeltanoAdapterIntegration:
         """Test that adapter has library runner instance."""
         adapter = FlextMeltanoAdapter()
         # Access private attribute for testing p
-        library_runner = adapter._library_runner  # type: ignore[attr-defined]
+        library_runner = adapter._library_runner
         assert isinstance(library_runner, FlextMeltanoLibraryRunner)
 
     @pytest.mark.asyncio

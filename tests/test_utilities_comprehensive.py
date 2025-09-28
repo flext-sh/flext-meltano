@@ -157,9 +157,8 @@ class TestFlextMeltanoUtilitiesProjectValidation:
 
     def test_validate_meltano_project_structure_invalid_path_type(self) -> None:
         """Test project structure validation with invalid path type."""
-        result = FlextMeltanoUtilities.validate_meltano_project_structure(
-            tempfile.mktemp()
-        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = FlextMeltanoUtilities.validate_meltano_project_structure(temp_dir)
 
         assert result.is_failure
         assert "Project path must be a Path object" in result.error
@@ -241,8 +240,6 @@ class TestFlextMeltanoUtilitiesYamlOperations:
             }
 
             with Path(yaml_file).open("w", encoding="utf-8") as f:
-                import yaml
-
                 yaml.dump(test_data, f)
 
             result = FlextMeltanoUtilities.load_yaml_file(yaml_file)
@@ -402,9 +399,10 @@ class TestFlextMeltanoUtilitiesErrorHandling:
         with patch("builtins.open", mock_open()) as mock_file:
             mock_file.side_effect = OSError("File operation failed")
 
-            result = FlextMeltanoUtilities.save_yaml_file(
-                Path(tempfile.mktemp(suffix=".yml")), {"test": "data"}
-            )
+            with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as temp_file:
+                result = FlextMeltanoUtilities.save_yaml_file(
+                    Path(temp_file.name), {"test": "data"}
+                )
 
             assert result.is_failure
             assert "File operation failed" in result.error
@@ -414,9 +412,10 @@ class TestFlextMeltanoUtilitiesErrorHandling:
         with patch("yaml.dump") as mock_yaml_dump:
             mock_yaml_dump.side_effect = yaml.YAMLError("YAML error")
 
-            result = FlextMeltanoUtilities.save_yaml_file(
-                Path(tempfile.mktemp(suffix=".yml")), {"test": "data"}
-            )
+            with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as temp_file:
+                result = FlextMeltanoUtilities.save_yaml_file(
+                    Path(temp_file.name), {"test": "data"}
+                )
 
             assert result.is_failure
             assert "YAML error" in result.error

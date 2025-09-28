@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from flext_core import FlextTypes, T_co
+from flext_core import FlextProtocols, FlextResult, FlextTypes, T_co
 
 # Type aliases for protocol type safety
 ConfigDict = FlextTypes.Core.ConfigDict
@@ -16,7 +16,7 @@ JsonValue = FlextTypes.Core.JsonValue
 JsonObject = FlextTypes.Core.JsonObject
 
 
-class FlextMeltanoProtocols:
+class FlextMeltanoProtocols(FlextProtocols):
     """UNIFIED Meltano Protocols - SINGLE RESPONSIBILITY PATTERN.
 
     Contains ALL protocol definitions for the Meltano domain.
@@ -56,47 +56,63 @@ class FlextMeltanoProtocols:
             ...
 
     @runtime_checkable
-    class SingerTapProtocol(Protocol):
-        """Singer Tap protocol for type safety."""
+    class SingerTapProtocol(FlextProtocols.Domain.Service, Protocol):
+        """Singer Tap protocol extending Domain.Service for ELT operations."""
 
-        def discover(self: object) -> JsonObject:
-            """Discover catalog."""
+        def discover(self: object) -> FlextResult[JsonObject]:
+            """Discover catalog with FlextResult."""
             ...
 
-        def sync(self, catalog: JsonObject) -> JsonValue:
-            """Sync data from source."""
+        def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
+            """Sync data from source with FlextResult."""
             ...
 
-    @runtime_checkable
-    class SingerTargetProtocol(Protocol):
-        """Singer Target protocol for type safety."""
-
-        def handle_record(self, record: JsonObject) -> JsonValue:
-            """Handle a single record."""
-            ...
-
-        def handle_batch(self, records: list[JsonObject]) -> JsonValue:
-            """Handle a batch of records."""
+        def execute(self: object) -> FlextResult[object]:
+            """Execute the tap extraction (implements Domain.Service)."""
             ...
 
     @runtime_checkable
-    class DbtRunnerProtocol(Protocol):
-        """DBT Runner protocol for type safety."""
+    class SingerTargetProtocol(FlextProtocols.Domain.Service, Protocol):
+        """Singer Target protocol extending Domain.Service for ELT operations."""
 
-        def run(self, models: list[str]) -> JsonObject:
-            """Run DBT models."""
+        def handle_record(self, record: JsonObject) -> FlextResult[JsonValue]:
+            """Handle a single record with FlextResult."""
             ...
 
-        def test(self, models: list[str]) -> JsonObject:
-            """Test DBT models."""
+        def handle_batch(self, records: list[JsonObject]) -> FlextResult[JsonValue]:
+            """Handle a batch of records with FlextResult."""
+            ...
+
+        def execute(self: object) -> FlextResult[object]:
+            """Execute the target loading (implements Domain.Service)."""
             ...
 
     @runtime_checkable
-    class ServiceCallProtocol(Protocol):
-        """Service call protocol for type safety."""
+    class DbtRunnerProtocol(FlextProtocols.Domain.Service, Protocol):
+        """DBT Runner protocol extending Domain.Service for ELT operations."""
 
-        def call(self, operation: str, payload: JsonValue) -> JsonValue:
-            """Execute service call."""
+        def run(self, models: list[str]) -> FlextResult[JsonObject]:
+            """Run DBT models with FlextResult."""
+            ...
+
+        def test(self, models: list[str]) -> FlextResult[JsonObject]:
+            """Test DBT models with FlextResult."""
+            ...
+
+        def execute(self: object) -> FlextResult[object]:
+            """Execute DBT transformations (implements Domain.Service)."""
+            ...
+
+    @runtime_checkable
+    class ServiceCallProtocol(FlextProtocols.Domain.Service, Protocol):
+        """Service call protocol extending Domain.Service."""
+
+        def call(self, operation: str, payload: JsonValue) -> FlextResult[JsonValue]:
+            """Execute service call with FlextResult."""
+            ...
+
+        def execute(self: object) -> FlextResult[object]:
+            """Execute service operation (implements Domain.Service)."""
             ...
 
 

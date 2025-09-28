@@ -37,10 +37,11 @@ class TestFlextMeltanoModelsTapConfig:
 
     def test_tap_config_default_values(self) -> None:
         """Test TapConfig with default values."""
-        config = FlextMeltanoModels.TapConfig(
-            tap_type="tap-csv",
-            connection_config={"file_path": tempfile.mktemp(suffix=".csv")},
-        )
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as temp_file:
+            config = FlextMeltanoModels.TapConfig(
+                tap_type="tap-csv",
+                connection_config={"file_path": temp_file.name},
+            )
 
         assert config.tap_type == "tap-csv"
         assert config.stream_config == {}
@@ -133,10 +134,11 @@ class TestFlextMeltanoModelsTapInstance:
 
     def test_tap_instance_default_values(self) -> None:
         """Test TapInstance with default values."""
-        tap_config = FlextMeltanoModels.TapConfig(
-            tap_type="tap-csv",
-            connection_config={"file_path": tempfile.mktemp(suffix=".csv")},
-        )
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as temp_file:
+            tap_config = FlextMeltanoModels.TapConfig(
+                tap_type="tap-csv",
+                connection_config={"file_path": temp_file.name},
+            )
 
         tap_instance = FlextMeltanoModels.TapInstance(
             tap_type="tap-csv", config=tap_config, tap_id="tap-002"
@@ -166,10 +168,11 @@ class TestFlextMeltanoModelsTargetConfig:
 
     def test_target_config_default_values(self) -> None:
         """Test TargetConfig with default values."""
-        config = FlextMeltanoModels.TargetConfig(
-            target_type="target-csv",
-            connection_config={"file_path": tempfile.mktemp(suffix=".csv")},
-        )
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as temp_file:
+            config = FlextMeltanoModels.TargetConfig(
+                target_type="target-csv",
+                connection_config={"file_path": temp_file.name},
+            )
 
         assert (
             config.batch_size == FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE
@@ -276,20 +279,21 @@ class TestFlextMeltanoModelsMeltanoProjectModel:
 
     def test_meltano_project_valid_creation(self) -> None:
         """Test creating a valid MeltanoProjectModel."""
-        temp_project_path = Path(tempfile.mktemp())
-        project = FlextMeltanoModels.MeltanoProjectModel(
-            version=1,
-            project_id="my-meltano-project",
-            default_environment="development",
-            project_root=temp_project_path,
-            environments=["development", "staging", "production"],
-        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_project_path = Path(temp_dir)
+            project = FlextMeltanoModels.MeltanoProjectModel(
+                version=1,
+                project_id="my-meltano-project",
+                default_environment="development",
+                project_root=temp_project_path,
+                environments=["development", "staging", "production"],
+            )
 
-        assert project.version == 1
-        assert project.project_id == "my-meltano-project"
-        assert project.default_environment == "development"
-        assert project.project_root == temp_project_path
-        assert project.environments == ["development", "staging", "production"]
+            assert project.version == 1
+            assert project.project_id == "my-meltano-project"
+            assert project.default_environment == "development"
+            assert project.project_root == temp_project_path
+            assert project.environments == ["development", "staging", "production"]
 
     def test_meltano_project_default_values(self) -> None:
         """Test MeltanoProjectModel with default values."""
@@ -619,7 +623,8 @@ class TestFlextMeltanoModelsIntegration:
 
     def test_model_serialization(self) -> None:
         """Test model serialization and deserialization."""
-        temp_file_path = tempfile.mktemp(suffix=".csv")
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as temp_file:
+            temp_file_path = temp_file.name
         tap_config = FlextMeltanoModels.TapConfig(
             tap_type="tap-csv", connection_config={"file_path": temp_file_path}
         )

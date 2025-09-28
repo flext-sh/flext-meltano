@@ -17,6 +17,7 @@ from flext_core import (
 )
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Constants
@@ -29,8 +30,8 @@ StateDict = FlextTypes.Core.Dict
 ResultDict = FlextTypes.Core.Dict
 
 
-class FlextTargetAbstractions:
-    """UNIFIED Target Abstractions - SINGLE RESPONSIBILITY PATTERN.
+class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
+    """UNIFIED Target Abstractions implementing SingerTargetProtocol.
 
     CORRECTED ARCHITECTURE:
     - NO longer inherits from FlextModels.Entity (inappropriate for abstractions)
@@ -586,6 +587,161 @@ class FlextTargetAbstractions:
     def is_production(self: object) -> bool:
         """Check if running in production mode."""
         return False
+
+    # =============================================================================
+    # PROTOCOL IMPLEMENTATION - SingerTargetProtocol
+    # =============================================================================
+
+    def handle_record(
+        self, record: FlextTypes.Core.JsonObject
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle a single record (implements SingerTargetProtocol)."""
+        try:
+            # Extract stream information from record
+            stream_name = record.get("stream", "unknown")
+            record_data = record.get("record", {})
+
+            # Create a dummy target config for processing
+            target_config = cast("dict[str, object]", {"stream": stream_name})
+
+            # Use existing load_record functionality
+            load_result = self.load_record(
+                target_config, str(stream_name), cast("RecordDict", record_data)
+            )
+
+            if load_result.is_failure:
+                return FlextResult[FlextTypes.Core.JsonValue].fail(load_result.error)
+
+            return FlextResult[FlextTypes.Core.JsonValue].ok({
+                "loaded": load_result.unwrap()
+            })
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                f"Record handling failed: {e}"
+            )
+
+    def handle_batch(
+        self, records: list[FlextTypes.Core.JsonObject]
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Handle a batch of records (implements SingerTargetProtocol)."""
+        try:
+            # Group records by stream
+            streams_data: dict[str, list[FlextTypes.Core.JsonObject]] = {}
+
+            for record in records:
+                stream_name = str(record.get("stream", "unknown"))
+                if stream_name not in streams_data:
+                    streams_data[stream_name] = []
+                streams_data[stream_name].append(record.get("record", {}))
+
+            # Process each stream's batch
+            results = {}
+            for stream_name, stream_records in streams_data.items():
+                target_config = cast("dict[str, object]", {"stream": stream_name})
+                batch_records = cast("list[RecordDict]", stream_records)
+
+                batch_result = self.load_batch(
+                    target_config, stream_name, batch_records
+                )
+                if batch_result.is_failure:
+                    return FlextResult[FlextTypes.Core.JsonValue].fail(
+                        f"Batch processing failed for stream {stream_name}: {batch_result.error}"
+                    )
+
+                results[stream_name] = batch_result.unwrap()
+
+            return FlextResult[FlextTypes.Core.JsonValue].ok(results)
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(
+                f"Batch handling failed: {e}"
+            )
+
+    def execute(self: object) -> FlextResult[object]:
+        """Execute the target loading (implements Domain.Service)."""
+        try:
+            # Finalize all streams and targets
+            finalize_result = self.finalize()
+            if finalize_result.is_failure:
+                return FlextResult[object].fail(
+                    f"Target finalization failed: {finalize_result.error}"
+                )
+
+            return FlextResult[object].ok({
+                "target_type": self.get_target_type(),
+                "streams": list(self.get_registered_streams()),
+                "finalized": finalize_result.unwrap(),
+            })
+        except Exception as e:
+            return FlextResult[object].fail(f"Target execution failed: {e}")
+
+    # Protocol compliance validation methods
+    def is_valid(self: object) -> bool:
+        """Check if the target service is in a valid state (implements Domain.Service)."""
+        return hasattr(self, "_stream_registry") and len(self._stream_registry) >= 0
+
+    def validate_business_rules(self: object) -> FlextResult[None]:
+        """Validate business rules for the target service (implements Domain.Service)."""
+        try:
+            # Basic validation - ensure target registry is initialized
+            if not hasattr(self, "_stream_registry"):
+                return FlextResult[None].fail("Stream registry not initialized")
+
+            if not hasattr(self, "_active_targets"):
+                return FlextResult[None].fail("Active targets registry not initialized")
+
+            return FlextResult[None].ok(None)
+        except Exception as e:
+            return FlextResult[None].fail(f"Business rules validation failed: {e}")
+
+    def validate_config(self: object) -> FlextResult[None]:
+        """Validate service configuration (implements Domain.Service)."""
+        try:
+            # Basic configuration validation
+            if not hasattr(self, "target_id"):
+                return FlextResult[None].fail("Target ID not configured")
+
+            return FlextResult[None].ok(None)
+        except Exception as e:
+            return FlextResult[None].fail(f"Config validation failed: {e}")
+
+    def execute_operation(self, operation: object) -> FlextResult[object]:
+        """Execute operation using OperationExecutionRequest model (implements Domain.Service)."""
+        try:
+            if isinstance(operation, dict):
+                op_type = operation.get("type", "unknown")
+
+                if op_type == "handle_record":
+                    record = operation.get("record", {})
+                    return self.handle_record(
+                        cast("FlextTypes.Core.JsonObject", record)
+                    )
+                if op_type == "handle_batch":
+                    records = operation.get("records", [])
+                    return self.handle_batch(
+                        cast("list[FlextTypes.Core.JsonObject]", records)
+                    )
+                if op_type == "finalize":
+                    return self.execute()
+                return FlextResult[object].fail(f"Unknown operation type: {op_type}")
+
+            return FlextResult[object].fail("Invalid operation format")
+        except Exception as e:
+            return FlextResult[object].fail(f"Operation execution failed: {e}")
+
+    def get_service_info(self: object) -> FlextTypes.Core.Dict:
+        """Get service information and metadata (implements Domain.Service)."""
+        return {
+            "service_name": "FlextTargetAbstractions",
+            "service_type": "singer_target",
+            "target_id": getattr(self, "target_id", "unknown"),
+            "streams_count": len(self._stream_registry)
+            if hasattr(self, "_stream_registry")
+            else 0,
+            "active_targets": len(self._active_targets)
+            if hasattr(self, "_active_targets")
+            else 0,
+            "protocol_version": "1.0.0",
+        }
 
     # =============================================================================
 

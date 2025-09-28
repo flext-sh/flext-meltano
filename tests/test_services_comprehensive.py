@@ -29,11 +29,12 @@ class TestFlextMeltanoServiceInitialization:
 
     def test_service_initialization_with_config(self) -> None:
         """Test service initializes correctly with configuration."""
-        config = {
-            "environment": "development",
-            "project_root": tempfile.mktemp(),
-            "plugins": ["tap-postgres", "target-postgres"],
-        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = {
+                "environment": "development",
+                "project_root": temp_dir,
+                "plugins": ["tap-postgres", "target-postgres"],
+            }
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=config
@@ -76,7 +77,8 @@ class TestFlextMeltanoServiceExecution:
 
     def test_execute_with_config(self) -> None:
         """Test service execution with configuration."""
-        config = {"environment": "development", "project_root": tempfile.mktemp()}
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = {"environment": "development", "project_root": temp_dir}
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=config
@@ -115,11 +117,12 @@ class TestFlextMeltanoServiceValidation:
 
     def test_validate_with_config(self) -> None:
         """Test service validation with configuration."""
-        config = {
-            "environment": "development",
-            "project_root": tempfile.mktemp(),
-            "plugins": ["tap-postgres"],
-        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = {
+                "environment": "development",
+                "project_root": temp_dir,
+                "plugins": ["tap-postgres"],
+            }
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=config
@@ -132,10 +135,11 @@ class TestFlextMeltanoServiceValidation:
 
     def test_validate_invalid_config(self) -> None:
         """Test service validation with invalid configuration."""
-        config = {
-            "environment": "",  # Invalid empty environment
-            "project_root": tempfile.mktemp(),
-        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = {
+                "environment": "",  # Invalid empty environment
+                "project_root": temp_dir,
+            }
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=config
@@ -185,7 +189,8 @@ class TestFlextMeltanoServiceConfiguration:
         """Test successful configuration update."""
         service = FlextMeltanoService(service_name="test_service", version="1.0.0")
 
-        new_config = {"environment": "production", "project_root": tempfile.mktemp()}
+        with tempfile.TemporaryDirectory() as temp_dir:
+            new_config = {"environment": "production", "project_root": temp_dir}
 
         result = service.update_config(new_config)
 
@@ -194,36 +199,39 @@ class TestFlextMeltanoServiceConfiguration:
 
     def test_update_config_partial(self) -> None:
         """Test partial configuration update."""
-        temp_project_root = tempfile.mktemp()
-        initial_config = {
-            "environment": "development",
-            "project_root": temp_project_root,
-            "plugins": ["tap-postgres"],
-        }
+        with tempfile.TemporaryDirectory() as temp_project_root:
+            initial_config = {
+                "environment": "development",
+                "project_root": temp_project_root,
+                "plugins": ["tap-postgres"],
+            }
 
-        service = FlextMeltanoService(
-            service_name="test_service", version="1.0.0", config=initial_config
-        )
+            service = FlextMeltanoService(
+                service_name="test_service", version="1.0.0", config=initial_config
+            )
 
-        update_config = {"environment": "staging"}
+            update_config = {"environment": "staging"}
 
-        result = service.update_config(update_config)
+            result = service.update_config(update_config)
 
-        assert result.is_success
-        assert service.config["environment"] == "staging"
-        assert (
-            service.config["project_root"] == temp_project_root
-        )  # Should remain unchanged
-        assert service.config["plugins"] == ["tap-postgres"]  # Should remain unchanged
+            assert result.is_success
+            assert service.config["environment"] == "staging"
+            assert (
+                service.config["project_root"] == temp_project_root
+            )  # Should remain unchanged
+            assert service.config["plugins"] == [
+                "tap-postgres"
+            ]  # Should remain unchanged  # Should remain unchanged
 
     def test_update_config_invalid(self) -> None:
         """Test configuration update with invalid values."""
         service = FlextMeltanoService(service_name="test_service", version="1.0.0")
 
-        invalid_config = {
-            "environment": "",  # Invalid empty environment
-            "project_root": tempfile.mktemp(),
-        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            invalid_config = {
+                "environment": "",  # Invalid empty environment
+                "project_root": temp_dir,
+            }
 
         result = service.update_config(invalid_config)
 
@@ -232,10 +240,11 @@ class TestFlextMeltanoServiceConfiguration:
 
     def test_reset_config(self) -> None:
         """Test configuration reset."""
-        initial_config = {
-            "environment": "development",
-            "project_root": tempfile.mktemp(),
-        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            initial_config = {
+                "environment": "development",
+                "project_root": temp_dir,
+            }
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=initial_config

@@ -9,7 +9,14 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    computed_field,
+    field_serializer,
+    field_validator,
+    model_validator,
+)
 
 from flext_core import FlextConstants, FlextModels, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
@@ -17,20 +24,36 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoModels(FlextModels):
-    """UNIFIED Meltano Models - SINGLE RESPONSIBILITY PATTERN.
+    """UNIFIED Meltano Models - Advanced Pydantic 2.11 Features with FLEXT Ecosystem Integration.
 
     Contains ALL Pydantic models and settings for the Meltano domain.
-    Follows flext-core standards with proper model organization.
+    Follows flext-core standards with proper model organization and composition patterns.
     """
+
+    model_config = ConfigDict(
+        validate_assignment=True,
+        use_enum_values=True,
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        frozen=False,
+        str_strip_whitespace=True,
+        validate_return=True,
+        ser_json_timedelta="iso8601",
+        ser_json_bytes="base64",
+    )
 
     # ========================================================================
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
-    class TapConfig(BaseModel):
-        """Pydantic model for tap configuration with validation."""
+    class TapConfig(FlextModels.Entity):
+        """Pydantic model for tap configuration with advanced validation and composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
+
+        # Configuration complexity thresholds
+        _SIMPLE_CONFIG_THRESHOLD = 3
+        _MODERATE_CONFIG_THRESHOLD = 8
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -41,6 +64,59 @@ class FlextMeltanoModels(FlextModels):
             description="Stream-specific configuration",
         )
         version: str = Field(default="latest", description="Tap version")
+
+        @computed_field
+        @property
+        def tap_identifier(self) -> str:
+            """Computed field for unique tap identifier."""
+            return f"{self.tap_type}:{self.version}"
+
+        @computed_field
+        @property
+        def has_stream_config(self) -> bool:
+            """Computed field indicating if stream configuration is present."""
+            return bool(self.stream_config)
+
+        @computed_field
+        @property
+        def config_complexity(self) -> str:
+            """Computed field for configuration complexity assessment."""
+            total_configs = len(self.connection_config) + len(self.stream_config)
+            if total_configs <= self._SIMPLE_CONFIG_THRESHOLD:
+                return "simple"
+            if total_configs <= self._MODERATE_CONFIG_THRESHOLD:
+                return "moderate"
+            return "complex"
+
+        @model_validator(mode="after")
+        def validate_tap_config_consistency(self) -> FlextMeltanoModels.TapConfig:
+            """Model validator for tap configuration consistency."""
+            # Validate tap_type format
+            if not self.tap_type.startswith("tap-"):
+                msg = "Tap type must start with 'tap-'"
+                raise ValueError(msg)
+
+            # Ensure connection config has minimum required fields
+            if not self.connection_config:
+                msg = "Connection configuration cannot be empty"
+                raise ValueError(msg)
+
+            return self
+
+        @field_serializer("connection_config")
+        def serialize_connection_config(
+            self, value: FlextTypes.Core.Dict
+        ) -> FlextTypes.Core.Dict:
+            """Field serializer for connection config with sensitive data protection."""
+            # Mask sensitive fields
+            sensitive_keys = {"password", "token", "api_key", "secret"}
+            serialized = {}
+            for key, val in value.items():
+                if any(sensitive in key.lower() for sensitive in sensitive_keys):
+                    serialized[key] = "[PROTECTED]"
+                else:
+                    serialized[key] = val
+            return serialized
 
         @field_validator("tap_type")
         @classmethod
@@ -66,8 +142,8 @@ class FlextMeltanoModels(FlextModels):
                 raise TypeError(invalid_type_msg)
             return v
 
-    class StreamDefinition(BaseModel):
-        """Pydantic model for stream definition."""
+    class StreamDefinition(FlextModels.Entity):
+        """Pydantic model for stream definition with advanced Pydantic 2.11 features."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
@@ -85,8 +161,62 @@ class FlextMeltanoModels(FlextModels):
             description="Number of records extracted",
         )
 
-    class TapInstance(BaseModel):
-        """Pydantic model for tap instance."""
+        @computed_field
+        @property
+        def is_active(self) -> bool:
+            """Computed field indicating if stream is active."""
+            return self.status in {"discovered", "selected", "extracting"}
+
+        @computed_field
+        @property
+        def has_data(self) -> bool:
+            """Computed field indicating if stream has extracted data."""
+            return self.records_extracted > 0
+
+        @computed_field
+        @property
+        def schema_properties_count(self) -> int:
+            """Computed field for number of schema properties."""
+            return len(self.stream_schema.get("properties", {}))
+
+        @model_validator(mode="after")
+        def validate_stream_definition_consistency(
+            self,
+        ) -> FlextMeltanoModels.StreamDefinition:
+            """Model validator for stream definition consistency."""
+            # Validate schema has required properties
+            if "properties" not in self.stream_schema:
+                msg = "Stream schema must contain properties"
+                raise ValueError(msg)
+
+            # Validate status values
+            valid_statuses = {
+                "discovered",
+                "selected",
+                "extracting",
+                "completed",
+                "error",
+            }
+            if self.status not in valid_statuses:
+                msg = f"Status must be one of: {', '.join(valid_statuses)}"
+                raise ValueError(msg)
+
+            return self
+
+        @field_serializer("stream_schema")
+        def serialize_stream_schema(
+            self, value: FlextTypes.Core.Dict
+        ) -> FlextTypes.Core.Dict:
+            """Field serializer for stream schema normalization."""
+            # Ensure consistent schema structure
+            if "properties" not in value:
+                value["properties"] = {}
+            if "type" not in value:
+                value["type"] = "object"
+            return value
+
+    class TapInstance(FlextModels.Entity):
+        """Pydantic model for tap instance with comprehensive composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
@@ -111,14 +241,61 @@ class FlextMeltanoModels(FlextModels):
         )
         tap_id: str = Field(description="Unique tap identifier")
 
+        @computed_field
+        @property
+        def stream_count(self) -> int:
+            """Computed field for number of discovered streams."""
+            return len(self.streams)
+
+        @computed_field
+        @property
+        def active_streams_count(self) -> int:
+            """Computed field for number of active streams."""
+            return sum(1 for stream in self.streams.values() if stream.is_active)
+
+        @computed_field
+        @property
+        def total_records_extracted(self) -> int:
+            """Computed field for total records extracted across all streams."""
+            return sum(stream.records_extracted for stream in self.streams.values())
+
+        @computed_field
+        @property
+        def is_ready_for_extraction(self) -> bool:
+            """Computed field indicating if tap is ready for data extraction."""
+            return (
+                self.discovered
+                and self.stream_count > 0
+                and self.status == "configured"
+            )
+
+        @model_validator(mode="after")
+        def validate_tap_instance_consistency(self) -> FlextMeltanoModels.TapInstance:
+            """Model validator for tap instance consistency."""
+            # Ensure tap types match
+            if self.config.tap_type != self.tap_type:
+                msg = "Tap type must match between instance and config"
+                raise ValueError(msg)
+
+            # Validate discovery state
+            if self.discovered and not self.streams:
+                msg = "Discovered tap must have at least one stream"
+                raise ValueError(msg)
+
+            return self
+
     # ========================================================================
     # TARGET MODELS - Singer target configurations and instances
     # ========================================================================
 
-    class TargetConfig(BaseModel):
-        """Pydantic model for target configuration with field validation."""
+    class TargetConfig(FlextModels.Entity):
+        """Pydantic model for target configuration with advanced field validation and composition."""
 
         model_config = ConfigDict(frozen=True, extra="allow")
+
+        # Processing efficiency thresholds
+        _HIGH_EFFICIENCY_THRESHOLD = 1000
+        _MEDIUM_EFFICIENCY_THRESHOLD = 100
 
         target_type: str = Field(description="Target type identifier")
         connection_config: FlextTypes.Core.Dict = Field(
@@ -132,6 +309,59 @@ class FlextMeltanoModels(FlextModels):
             default=100,
             description="Maximum number of batches to process",
         )
+
+        @computed_field
+        @property
+        def target_identifier(self) -> str:
+            """Computed field for unique target identifier."""
+            return f"{self.target_type}:batch_{self.batch_size}"
+
+        @computed_field
+        @property
+        def max_records_capacity(self) -> int:
+            """Computed field for maximum records capacity."""
+            return self.batch_size * self.max_batches
+
+        @computed_field
+        @property
+        def processing_efficiency(self) -> str:
+            """Computed field for processing efficiency assessment."""
+            if self.batch_size >= self._HIGH_EFFICIENCY_THRESHOLD:
+                return "high"
+            if self.batch_size >= self._MEDIUM_EFFICIENCY_THRESHOLD:
+                return "medium"
+            return "low"
+
+        @model_validator(mode="after")
+        def validate_target_config_consistency(self) -> FlextMeltanoModels.TargetConfig:
+            """Model validator for target configuration consistency."""
+            # Validate target_type format
+            if not self.target_type.startswith("target-"):
+                msg = "Target type must start with 'target-'"
+                raise ValueError(msg)
+
+            # Validate batch configuration
+            max_reasonable_batch_size = 10000
+            if self.batch_size > max_reasonable_batch_size:
+                msg = f"Batch size too large (max {max_reasonable_batch_size})"
+                raise ValueError(msg)
+
+            return self
+
+        @field_serializer("connection_config")
+        def serialize_connection_config(
+            self, value: FlextTypes.Core.Dict
+        ) -> FlextTypes.Core.Dict:
+            """Field serializer for connection config with sensitive data protection."""
+            # Mask sensitive fields
+            sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
+            serialized = {}
+            for key, val in value.items():
+                if any(sensitive in key.lower() for sensitive in sensitive_keys):
+                    serialized[key] = "[PROTECTED]"
+                else:
+                    serialized[key] = val
+            return serialized
 
         @field_validator("target_type")
         @classmethod
@@ -175,8 +405,8 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class StreamInfo(BaseModel):
-        """Pydantic model for stream information with validation."""
+    class StreamInfo(FlextModels.Entity):
+        """Pydantic model for stream information with advanced validation and computed fields."""
 
         model_config = ConfigDict(frozen=False, extra="allow")
 
@@ -195,6 +425,48 @@ class FlextMeltanoModels(FlextModels):
             description="Number of batches processed",
         )
         created_at: str = Field(description="Creation timestamp")
+
+        @computed_field
+        @property
+        def has_processed_data(self) -> bool:
+            """Computed field indicating if stream has processed data."""
+            return self.records_loaded > 0 or self.batches_processed > 0
+
+        @computed_field
+        @property
+        def average_records_per_batch(self) -> float:
+            """Computed field for average records per batch."""
+            if self.batches_processed == 0:
+                return 0.0
+            return self.records_loaded / self.batches_processed
+
+        @computed_field
+        @property
+        def processing_status(self) -> str:
+            """Computed field for processing status assessment."""
+            if self.status == "completed" and self.records_loaded > 0:
+                return "success"
+            if self.status == "error":
+                return "failed"
+            if self.records_loaded > 0:
+                return "in_progress"
+            return "pending"
+
+        @model_validator(mode="after")
+        def validate_stream_info_consistency(self) -> FlextMeltanoModels.StreamInfo:
+            """Model validator for stream information consistency."""
+            # Validate records and batches consistency
+            if self.records_loaded > 0 and self.batches_processed == 0:
+                msg = "Records loaded but no batches processed"
+                raise ValueError(msg)
+
+            # Validate status values
+            valid_statuses = {"initialized", "processing", "completed", "error"}
+            if self.status not in valid_statuses:
+                msg = f"Status must be one of: {', '.join(valid_statuses)}"
+                raise ValueError(msg)
+
+            return self
 
         @field_validator("stream_name")
         @classmethod
@@ -221,10 +493,14 @@ class FlextMeltanoModels(FlextModels):
     # MELTANO PROJECT MODELS - Project configuration and validation
     # ========================================================================
 
-    class MeltanoProjectModel(BaseModel):
-        """Pydantic model for Meltano project configuration."""
+    class MeltanoProjectModel(FlextModels.Entity):
+        """Pydantic model for Meltano project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
+
+        # Project maturity thresholds
+        _MATURE_PROJECT_ENVIRONMENTS = 3
+        _DEVELOPING_PROJECT_ENVIRONMENTS = 2
 
         version: int = Field(
             ge=1,
@@ -245,6 +521,53 @@ class FlextMeltanoModels(FlextModels):
             description="Available environments",
         )
 
+        @computed_field
+        @property
+        def environment_count(self) -> int:
+            """Computed field for number of environments."""
+            return len(self.environments)
+
+        @computed_field
+        @property
+        def has_production_environment(self) -> bool:
+            """Computed field indicating if production environment exists."""
+            prod_environments = {"prod", "production", "live"}
+            return any(env.lower() in prod_environments for env in self.environments)
+
+        @computed_field
+        @property
+        def project_maturity(self) -> str:
+            """Computed field for project maturity assessment."""
+            if (
+                self.has_production_environment
+                and self.environment_count
+                >= FlextMeltanoConstants.PROJECT_MATURITY_MATURE_ENV_COUNT
+            ):
+                return "mature"
+            if (
+                self.environment_count
+                >= FlextMeltanoConstants.PROJECT_MATURITY_DEVELOPING_ENV_COUNT
+            ):
+                return "developing"
+            return "basic"
+
+        @model_validator(mode="after")
+        def validate_meltano_project_consistency(
+            self,
+        ) -> FlextMeltanoModels.MeltanoProjectModel:
+            """Model validator for Meltano project consistency."""
+            # Ensure default environment exists
+            if self.default_environment not in self.environments:
+                msg = f"Default environment '{self.default_environment}' not in environments list"
+                raise ValueError(msg)
+
+            # Validate project root exists
+            if not self.project_root.exists():
+                msg = f"Project root directory does not exist: {self.project_root}"
+                raise ValueError(msg)
+
+            return self
+
         @field_validator("project_id")
         @classmethod
         def validate_project_id_business_rules(cls, v: str) -> str:
@@ -260,8 +583,8 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class PluginModel(BaseModel):
-        """Pydantic model for Meltano plugin configuration."""
+    class PluginModel(FlextModels.Entity):
+        """Pydantic model for Meltano plugin configuration with advanced composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
@@ -277,6 +600,60 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Plugin settings",
         )
+
+        @computed_field
+        @property
+        def full_plugin_name(self) -> str:
+            """Computed field for full plugin name with namespace."""
+            return f"{self.namespace}.{self.name}"
+
+        @computed_field
+        @property
+        def has_custom_executable(self) -> bool:
+            """Computed field indicating if plugin has custom executable."""
+            return self.executable is not None
+
+        @computed_field
+        @property
+        def settings_count(self) -> int:
+            """Computed field for number of plugin settings."""
+            return len(self.settings)
+
+        @computed_field
+        @property
+        def plugin_complexity(self) -> str:
+            """Computed field for plugin complexity assessment."""
+            if (
+                self.settings_count
+                == FlextMeltanoConstants.PLUGIN_COMPLEXITY_MINIMAL_SETTINGS
+            ):
+                return "minimal"
+            if (
+                self.settings_count
+                <= FlextMeltanoConstants.PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS
+            ):
+                return "simple"
+            if (
+                self.settings_count
+                <= FlextMeltanoConstants.PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS
+            ):
+                return "moderate"
+            return "complex"
+
+        @model_validator(mode="after")
+        def validate_plugin_consistency(self) -> FlextMeltanoModels.PluginModel:
+            """Model validator for plugin consistency."""
+            # Validate namespace format
+            if "." in self.namespace:
+                msg = "Plugin namespace cannot contain dots"
+                raise ValueError(msg)
+
+            # Ensure pip_url or executable is provided
+            if not self.pip_url and not self.executable:
+                msg = "Plugin must have either pip_url or executable"
+                raise ValueError(msg)
+
+            return self
 
         @field_validator("name")
         @classmethod
@@ -294,8 +671,8 @@ class FlextMeltanoModels(FlextModels):
     # DBT MODELS - DBT project and execution models
     # ========================================================================
 
-    class DbtProjectModel(BaseModel):
-        """Pydantic model for DBT project configuration."""
+    class DbtProjectModel(FlextModels.Entity):
+        """Pydantic model for DBT project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
@@ -323,6 +700,66 @@ class FlextMeltanoModels(FlextModels):
             description="DBT macro paths",
         )
 
+        @computed_field
+        @property
+        def total_path_count(self) -> int:
+            """Computed field for total number of configured paths."""
+            return (
+                len(self.model_paths)
+                + len(self.analysis_paths)
+                + len(self.test_paths)
+                + len(self.seed_paths)
+                + len(self.macro_paths)
+            )
+
+        @computed_field
+        @property
+        def has_custom_paths(self) -> bool:
+            """Computed field indicating if project has custom paths."""
+            default_paths = {"models", "analysis", "tests", "seeds", "macros"}
+            all_paths = set(
+                self.model_paths
+                + self.analysis_paths
+                + self.test_paths
+                + self.seed_paths
+                + self.macro_paths
+            )
+            return bool(all_paths - default_paths)
+
+        @computed_field
+        @property
+        def project_structure_complexity(self) -> str:
+            """Computed field for project structure complexity."""
+            if (
+                self.total_path_count
+                <= FlextMeltanoConstants.PROJECT_STRUCTURE_SIMPLE_MAX_PATHS
+            ):
+                return "simple"
+            if (
+                self.total_path_count
+                <= FlextMeltanoConstants.PROJECT_STRUCTURE_MODERATE_MAX_PATHS
+            ):
+                return "moderate"
+            return "complex"
+
+        @model_validator(mode="after")
+        def validate_dbt_project_consistency(
+            self,
+        ) -> FlextMeltanoModels.DbtProjectModel:
+            """Model validator for DBT project consistency."""
+            # Ensure model paths are not empty
+            if not self.model_paths:
+                msg = "DBT project must have at least one model path"
+                raise ValueError(msg)
+
+            # Validate version format
+            version_parts = self.version.split(".")
+            if len(version_parts) != FlextMeltanoConstants.DBT_VERSION_PARTS_COUNT:
+                msg = "DBT project version must be in format 'x.y.z'"
+                raise ValueError(msg)
+
+            return self
+
         @field_validator("name")
         @classmethod
         def validate_dbt_project_name(cls, v: str) -> str:
@@ -335,10 +772,14 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class DbtExecutionModel(BaseModel):
-        """Pydantic model for DBT execution configuration."""
+    class DbtExecutionModel(FlextModels.Entity):
+        """Pydantic model for DBT execution configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
+
+        # Execution complexity thresholds
+        _SIMPLE_EXECUTION_THRESHOLD = 5
+        _MODERATE_EXECUTION_THRESHOLD = 20
 
         command: str = Field(description="DBT command to execute")
         models: FlextMeltanoTypes.Core.DbtModelList = Field(
@@ -362,6 +803,58 @@ class FlextMeltanoModels(FlextModels):
             description="Number of threads to use",
         )
 
+        @computed_field
+        @property
+        def model_count(self) -> int:
+            """Computed field for number of models to execute."""
+            return len(self.models)
+
+        @computed_field
+        @property
+        def exclude_count(self) -> int:
+            """Computed field for number of models to exclude."""
+            return len(self.exclude)
+
+        @computed_field
+        @property
+        def execution_complexity(self) -> str:
+            """Computed field for execution complexity assessment."""
+            total_scope = self.model_count + self.exclude_count
+            if total_scope == 0:
+                return "full_project"
+            if total_scope <= self._SIMPLE_EXECUTION_THRESHOLD:
+                return "simple"
+            if total_scope <= self._MODERATE_EXECUTION_THRESHOLD:
+                return "moderate"
+            return "complex"
+
+        @computed_field
+        @property
+        def is_parallel_execution(self) -> bool:
+            """Computed field indicating if execution uses multiple threads."""
+            return self.threads > 1
+
+        @model_validator(mode="after")
+        def validate_dbt_execution_consistency(
+            self,
+        ) -> FlextMeltanoModels.DbtExecutionModel:
+            """Model validator for DBT execution consistency."""
+            # Validate thread count
+            max_threads = 32
+            if self.threads > max_threads:
+                msg = f"Thread count cannot exceed {max_threads}"
+                raise ValueError(msg)
+
+            # Ensure models and exclude don't overlap
+            model_set = set(self.models)
+            exclude_set = set(self.exclude)
+            overlap = model_set & exclude_set
+            if overlap:
+                msg = f"Models cannot be both included and excluded: {overlap}"
+                raise ValueError(msg)
+
+            return self
+
         @field_validator("command")
         @classmethod
         def validate_dbt_command(cls, v: str) -> str:
@@ -376,8 +869,13 @@ class FlextMeltanoModels(FlextModels):
     # EXECUTION RESULT MODELS - Pipeline execution and monitoring
     # ========================================================================
 
-    class ExecutionResult(BaseModel):
-        """Pydantic model for execution result tracking."""
+    class ExecutionResult(FlextModels.TimestampedModel):
+        """Pydantic model for execution result tracking with advanced composition."""
+
+        # Performance categorization thresholds
+        _HIGH_PERFORMANCE_THRESHOLD = 1000
+        _GOOD_PERFORMANCE_THRESHOLD = 100
+        _MODERATE_PERFORMANCE_THRESHOLD = 10
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
@@ -408,6 +906,70 @@ class FlextMeltanoModels(FlextModels):
             description="Additional execution metadata",
         )
 
+        @computed_field
+        @property
+        def is_completed(self) -> bool:
+            """Computed field indicating if execution is completed."""
+            return self.end_time is not None
+
+        @computed_field
+        @property
+        def is_successful(self) -> bool:
+            """Computed field indicating if execution was successful."""
+            return self.status == "success" and self.error_message is None
+
+        @computed_field
+        @property
+        def execution_rate_per_second(self) -> float:
+            """Computed field for execution rate (records/second)."""
+            if not self.duration_seconds or self.duration_seconds <= 0:
+                return 0.0
+            return self.records_processed / self.duration_seconds
+
+        @computed_field
+        @property
+        def performance_category(self) -> str:
+            """Computed field for performance categorization."""
+            rate = self.execution_rate_per_second
+            if rate >= self._HIGH_PERFORMANCE_THRESHOLD:
+                return "high_performance"
+            if rate >= self._GOOD_PERFORMANCE_THRESHOLD:
+                return "good_performance"
+            if rate >= self._MODERATE_PERFORMANCE_THRESHOLD:
+                return "moderate_performance"
+            return "low_performance"
+
+        @model_validator(mode="after")
+        def validate_execution_result_consistency(
+            self,
+        ) -> FlextMeltanoModels.ExecutionResult:
+            """Model validator for execution result consistency."""
+            # Calculate duration if both times are available
+            if self.start_time and self.end_time:
+                calculated_duration = (self.end_time - self.start_time).total_seconds()
+                if self.duration_seconds is None:
+                    self.duration_seconds = calculated_duration
+                elif abs(self.duration_seconds - calculated_duration) > 1.0:
+                    msg = "Duration inconsistent with start/end times"
+                    raise ValueError(msg)
+
+            # Validate error status consistency
+            if self.status == "error" and not self.error_message:
+                msg = "Error status requires error message"
+                raise ValueError(msg)
+
+            return self
+
+        @field_serializer("error_message")
+        def serialize_error_message(self, value: str | None) -> str | None:
+            """Field serializer for error message truncation."""
+            if value is None:
+                return None
+            max_length = 1000
+            if len(value) > max_length:
+                return f"{value[:max_length]}... (truncated)"
+            return value
+
         @field_validator("status")
         @classmethod
         def validate_status(cls, v: str) -> str:
@@ -418,8 +980,8 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class PipelineResult(BaseModel):
-        """Pydantic model for pipeline execution result."""
+    class PipelineResult(FlextModels.TimestampedModel):
+        """Pydantic model for pipeline execution result with comprehensive composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
@@ -448,6 +1010,78 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Pipeline execution metadata",
         )
+
+        @computed_field
+        @property
+        def completed_stages(self) -> list[str]:
+            """Computed field for completed pipeline stages."""
+            stages = []
+            if self.tap_result and self.tap_result.is_completed:
+                stages.append("extraction")
+            if self.target_result and self.target_result.is_completed:
+                stages.append("loading")
+            if self.dbt_result and self.dbt_result.is_completed:
+                stages.append("transformation")
+            return stages
+
+        @computed_field
+        @property
+        def completion_percentage(self) -> float:
+            """Computed field for pipeline completion percentage."""
+            total_stages = 3  # tap, target, dbt
+            completed = len(self.completed_stages)
+            return (completed / total_stages) * 100
+
+        @computed_field
+        @property
+        def is_fully_successful(self) -> bool:
+            """Computed field indicating if all stages completed successfully."""
+            return (
+                self.tap_result
+                and self.tap_result.is_successful
+                and self.target_result
+                and self.target_result.is_successful
+                and self.dbt_result
+                and self.dbt_result.is_successful
+            )
+
+        @computed_field
+        @property
+        def total_duration_seconds(self) -> float:
+            """Computed field for total pipeline duration."""
+            total = 0.0
+            if self.tap_result and self.tap_result.duration_seconds:
+                total += self.tap_result.duration_seconds
+            if self.target_result and self.target_result.duration_seconds:
+                total += self.target_result.duration_seconds
+            if self.dbt_result and self.dbt_result.duration_seconds:
+                total += self.dbt_result.duration_seconds
+            return total
+
+        @model_validator(mode="after")
+        def validate_pipeline_result_consistency(
+            self,
+        ) -> FlextMeltanoModels.PipelineResult:
+            """Model validator for pipeline result consistency."""
+            # Validate total records consistency
+            total_from_stages = 0
+            if self.tap_result:
+                total_from_stages += self.tap_result.records_processed
+
+            if (
+                self.total_records > 0
+                and total_from_stages > 0
+                and abs(self.total_records - total_from_stages)
+                > (total_from_stages * 0.1)
+            ):
+                msg = "Total records inconsistent with stage results"
+                raise ValueError(msg)
+
+            # Validate overall status
+            if self.is_fully_successful and self.overall_status != "success":
+                self.overall_status = "success"
+
+            return self
 
         @field_validator("overall_status")
         @classmethod
