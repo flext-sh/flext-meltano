@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import tempfile
 from unittest.mock import patch
 
 from flext_core import FlextLogger, FlextService
@@ -30,7 +31,7 @@ class TestFlextMeltanoServiceInitialization:
         """Test service initializes correctly with configuration."""
         config = {
             "environment": "development",
-            "project_root": "/tmp/test_project",
+            "project_root": tempfile.mktemp(),
             "plugins": ["tap-postgres", "target-postgres"],
         }
 
@@ -75,7 +76,7 @@ class TestFlextMeltanoServiceExecution:
 
     def test_execute_with_config(self) -> None:
         """Test service execution with configuration."""
-        config = {"environment": "development", "project_root": "/tmp/test_project"}
+        config = {"environment": "development", "project_root": tempfile.mktemp()}
 
         service = FlextMeltanoService(
             service_name="test_service", version="1.0.0", config=config
@@ -116,7 +117,7 @@ class TestFlextMeltanoServiceValidation:
         """Test service validation with configuration."""
         config = {
             "environment": "development",
-            "project_root": "/tmp/test_project",
+            "project_root": tempfile.mktemp(),
             "plugins": ["tap-postgres"],
         }
 
@@ -133,7 +134,7 @@ class TestFlextMeltanoServiceValidation:
         """Test service validation with invalid configuration."""
         config = {
             "environment": "",  # Invalid empty environment
-            "project_root": "/tmp/test_project",
+            "project_root": tempfile.mktemp(),
         }
 
         service = FlextMeltanoService(
@@ -184,7 +185,7 @@ class TestFlextMeltanoServiceConfiguration:
         """Test successful configuration update."""
         service = FlextMeltanoService(service_name="test_service", version="1.0.0")
 
-        new_config = {"environment": "production", "project_root": "/tmp/prod_project"}
+        new_config = {"environment": "production", "project_root": tempfile.mktemp()}
 
         result = service.update_config(new_config)
 
@@ -193,9 +194,10 @@ class TestFlextMeltanoServiceConfiguration:
 
     def test_update_config_partial(self) -> None:
         """Test partial configuration update."""
+        temp_project_root = tempfile.mktemp()
         initial_config = {
             "environment": "development",
-            "project_root": "/tmp/dev_project",
+            "project_root": temp_project_root,
             "plugins": ["tap-postgres"],
         }
 
@@ -210,7 +212,7 @@ class TestFlextMeltanoServiceConfiguration:
         assert result.is_success
         assert service.config["environment"] == "staging"
         assert (
-            service.config["project_root"] == "/tmp/dev_project"
+            service.config["project_root"] == temp_project_root
         )  # Should remain unchanged
         assert service.config["plugins"] == ["tap-postgres"]  # Should remain unchanged
 
@@ -220,7 +222,7 @@ class TestFlextMeltanoServiceConfiguration:
 
         invalid_config = {
             "environment": "",  # Invalid empty environment
-            "project_root": "/tmp/test_project",
+            "project_root": tempfile.mktemp(),
         }
 
         result = service.update_config(invalid_config)
@@ -232,7 +234,7 @@ class TestFlextMeltanoServiceConfiguration:
         """Test configuration reset."""
         initial_config = {
             "environment": "development",
-            "project_root": "/tmp/dev_project",
+            "project_root": tempfile.mktemp(),
         }
 
         service = FlextMeltanoService(

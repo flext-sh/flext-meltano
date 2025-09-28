@@ -8,7 +8,7 @@ import importlib.util
 try:
     import dbt.version
 except ImportError:
-    dbt = None  # type: ignore[assignment]
+    dbt = None
 
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoBridge as MeltanoBridge

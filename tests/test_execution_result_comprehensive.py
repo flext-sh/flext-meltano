@@ -84,11 +84,13 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.2,
         )
 
-        with patch("flext_core.FlextUtilities.Generators.generate_iso_timestamp") as mock_timestamp:
+        with patch(
+            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+        ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:00:00Z"
-            
+
             result_dict = result.to_dict()
-            
+
             assert result_dict["command"] == command
             assert result_dict["success"] is True
             assert result_dict["exit_code"] == 0
@@ -109,11 +111,13 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.1,
         )
 
-        with patch("flext_core.FlextUtilities.Generators.generate_iso_timestamp") as mock_timestamp:
+        with patch(
+            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+        ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:01:00Z"
-            
+
             result_dict = result.to_dict()
-            
+
             assert result_dict["command"] == command
             assert result_dict["success"] is False
             assert result_dict["exit_code"] == 1
@@ -134,12 +138,14 @@ class TestFlextMeltanoExecutionResult:
             execution_time=2.0,
         )
 
-        with patch("flext_core.FlextUtilities.Generators.generate_iso_timestamp") as mock_timestamp:
+        with patch(
+            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+        ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
-            
+
             json_str = result.to_json()
             parsed_json = json.loads(json_str)
-            
+
             assert parsed_json["command"] == command
             assert parsed_json["success"] is True
             assert parsed_json["exit_code"] == 0
@@ -160,12 +166,14 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.3,
         )
 
-        with patch("flext_core.FlextUtilities.Generators.generate_iso_timestamp") as mock_timestamp:
+        with patch(
+            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+        ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
-            
+
             json_str = result.to_json()
             parsed_json = json.loads(json_str)
-            
+
             assert parsed_json["command"] == command
             assert parsed_json["success"] is False
             assert parsed_json["exit_code"] == 2
@@ -186,12 +194,14 @@ class TestFlextMeltanoExecutionResult:
             execution_time=5.5,
         )
 
-        with patch("flext_core.FlextUtilities.Generators.generate_iso_timestamp") as mock_timestamp:
+        with patch(
+            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+        ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
-            
+
             json_str = result.to_json()
             parsed_json = json.loads(json_str)
-            
+
             assert parsed_json["command"] == command
             assert parsed_json["success"] is True
             assert parsed_json["exit_code"] == 0
@@ -213,8 +223,11 @@ class TestFlextMeltanoExecutionResult:
         )
 
         result_dict = result.to_dict()
-        
-        assert result_dict["error"] == "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
+
+        assert (
+            result_dict["error"]
+            == "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
+        )
         assert result_dict["command"] == command
         assert result_dict["success"] is False
 
@@ -231,7 +244,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         result_dict = result.to_dict()
-        
+
         assert result_dict["execution_time"] == 3600.5
         assert result_dict["success"] is True
         assert result_dict["command"] == command
