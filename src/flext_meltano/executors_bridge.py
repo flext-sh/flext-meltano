@@ -34,7 +34,6 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize bridge with adapter and logger."""
-        # Avoid circular dependency - don't create FlextMeltanoExecutor here
         self._adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         # Unified adapter - no need for separate wrapper
         self._current_project: object | None = None

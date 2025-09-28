@@ -36,7 +36,6 @@ class FlextMeltanoProjectWrapper:
     """FLEXT-compliant wrapper for Meltano Project operations."""
 
     @override
-    @override
     def __init__(self) -> None:
         """Initialize the wrapper with FLEXT patterns."""
         self._logger = FlextLogger(__name__)
@@ -88,7 +87,6 @@ class FlextMeltanoProjectWrapper:
 class FlextMeltanoHubWrapper:
     """FLEXT-compliant wrapper for Meltano Hub operations."""
 
-    @override
     @override
     def __init__(self, project: Project) -> None:
         """Initialize hub wrapper with project instance.
@@ -170,7 +168,6 @@ class FlextMeltanoPluginWrapper:
     """FLEXT-compliant wrapper for Meltano plugin operations."""
 
     @override
-    @override
     def __init__(self, project: Project) -> None:
         """Initialize plugin wrapper with project instance.
 
@@ -224,7 +221,6 @@ class FlextMeltanoPluginWrapper:
 class FlextMeltanoRunnerWrapper:
     """FLEXT-compliant wrapper for Meltano runner operations."""
 
-    @override
     @override
     def __init__(self) -> None:
         """Initialize runner wrapper."""
@@ -321,7 +317,6 @@ class FlextMeltanoRunnerWrapper:
 class FlextMeltanoAbstractions:
     """Main abstraction class providing unified access to Meltano functionality."""
 
-    @override
     @override
     def __init__(self) -> None:
         """Initialize abstractions with FLEXT patterns."""

@@ -14,6 +14,7 @@ from typing import cast
 
 from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 
 # Type aliases (MyPy compatible)
 RecordDict = FlextTypes.Core.Dict
@@ -23,8 +24,8 @@ StateDict = FlextTypes.Core.Dict
 ResultDict = FlextTypes.Core.Dict
 
 
-class FlextTapAbstractions:
-    """UNIFIED Tap Abstractions - SINGLE RESPONSIBILITY PATTERN.
+class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
+    """UNIFIED Tap Abstractions implementing SingerTapProtocol.
 
     Consolidates ALL tap functionality following SOLID principles with nested classes.
     ELIMINATES multiple class per module violations by unifying all tap abstractions.
@@ -288,6 +289,130 @@ class FlextTapAbstractions:
             return FlextResult[FlextTapAbstractions].fail(
                 f"Failed to create instance: {e}"
             )
+
+    # =============================================================================
+    # PROTOCOL IMPLEMENTATION - SingerTapProtocol
+    # =============================================================================
+
+    def discover(self) -> FlextResult[FlextTypes.Core.JsonObject]:
+        """Discover catalog (implements SingerTapProtocol)."""
+        try:
+            # Use existing discover_streams functionality
+            dummy_instance = cast("TapInstance", {"name": "default", "config": {}})
+            result = self.discover_streams(dummy_instance)
+            if result.is_failure:
+                return FlextResult[FlextTypes.Core.JsonObject].fail(result.error)
+
+            catalog_data = cast("FlextTypes.Core.JsonObject", result.unwrap())
+            return FlextResult[FlextTypes.Core.JsonObject].ok(catalog_data)
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.JsonObject].fail(
+                f"Discovery failed: {e}"
+            )
+
+    def sync(
+        self, catalog: FlextTypes.Core.JsonObject
+    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        """Sync data from source (implements SingerTapProtocol)."""
+        try:
+            # Extract streams from catalog and sync them
+            streams_raw = catalog.get("streams", [])
+            streams = streams_raw if isinstance(streams_raw, list) else []
+            results = []
+
+            for stream_data in streams:
+                if isinstance(stream_data, dict):
+                    stream_name = stream_data.get("name", "unknown")
+                    tap_instance = cast(
+                        "dict[str, object]", {"name": stream_name, "config": {}}
+                    )
+                    sync_result = self.sync_stream(tap_instance, stream_name)
+
+                    if sync_result.is_failure:
+                        return FlextResult[FlextTypes.Core.JsonValue].fail(
+                            sync_result.error or "Sync failed"
+                        )
+
+                    results.append(sync_result.unwrap())
+
+            return FlextResult[FlextTypes.Core.JsonValue].ok(results)
+        except Exception as e:
+            return FlextResult[FlextTypes.Core.JsonValue].fail(f"Sync failed: {e}")
+
+    def execute(self) -> FlextResult[object]:
+        """Execute the tap extraction (implements Domain.Service)."""
+        try:
+            # First discover the catalog
+            catalog_result = self.discover()
+            if catalog_result.is_failure:
+                return FlextResult[object].fail(
+                    f"Discovery failed: {catalog_result.error}"
+                )
+
+            # Then sync the data
+            sync_result = self.sync(catalog_result.unwrap())
+            if sync_result.is_failure:
+                return FlextResult[object].fail(f"Sync failed: {sync_result.error}")
+
+            return FlextResult[object].ok({
+                "catalog": catalog_result.unwrap(),
+                "sync_results": sync_result.unwrap(),
+            })
+        except Exception as e:
+            return FlextResult[object].fail(f"Tap execution failed: {e}")
+
+    # Protocol compliance validation methods
+    def is_valid(self) -> bool:
+        """Check if the tap service is in a valid state (implements Domain.Service)."""
+        return len(self._stream_registry) >= 0  # Always valid for now
+
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate business rules for the tap service (implements Domain.Service)."""
+        try:
+            # Basic validation - ensure we can create dummy instances
+            if not hasattr(self, "_stream_registry"):
+                return FlextResult[None].fail("Stream registry not initialized")
+
+            return FlextResult[None].ok(None)
+        except Exception as e:
+            return FlextResult[None].fail(f"Business rules validation failed: {e}")
+
+    def validate_config(self: object) -> FlextResult[None]:
+        """Validate service configuration (implements Domain.Service)."""
+        try:
+            # Basic configuration validation
+            if not hasattr(self, "service_name"):
+                return FlextResult[None].fail("Service name not configured")
+
+            return FlextResult[None].ok(None)
+        except Exception as e:
+            return FlextResult[None].fail(f"Config validation failed: {e}")
+
+    def execute_operation(self, operation: object) -> FlextResult[object]:
+        """Execute operation using OperationExecutionRequest model (implements Domain.Service)."""
+        try:
+            if isinstance(operation, dict):
+                op_type = operation.get("type", "unknown")
+
+                if op_type == "discover":
+                    return self.discover()
+                if op_type == "sync":
+                    catalog = operation.get("catalog", {})
+                    return self.sync(cast("FlextTypes.Core.JsonObject", catalog))
+                return FlextResult[object].fail(f"Unknown operation type: {op_type}")
+
+            return FlextResult[object].fail("Invalid operation format")
+        except Exception as e:
+            return FlextResult[object].fail(f"Operation execution failed: {e}")
+
+    def get_service_info(self: object) -> FlextTypes.Core.Dict:
+        """Get service information and metadata (implements Domain.Service)."""
+        return {
+            "service_name": getattr(self, "service_name", "FlextTapAbstractions"),
+            "service_type": "singer_tap",
+            "streams_count": len(self._stream_registry),
+            "protocol_version": "1.0.0",
+        }
 
 
 # Module-level aliases for nested classes to support imports

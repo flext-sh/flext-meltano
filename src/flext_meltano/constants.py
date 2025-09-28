@@ -46,6 +46,16 @@ class FlextMeltanoConstants(FlextConstants):
     # Use FlextConstants.Config.ENVIRONMENTS instead of duplicating
     METADATA_DEFAULT_ENVIRONMENTS: Final[list[str]] = FlextConstants.Config.ENVIRONMENTS
 
+    # Model validation constants - replace magic numbers in models.py
+    PROJECT_MATURITY_MATURE_ENV_COUNT: Final[int] = 3
+    PROJECT_MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
+    PLUGIN_COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 0
+    PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 5
+    PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS: Final[int] = 15
+    PROJECT_STRUCTURE_SIMPLE_MAX_PATHS: Final[int] = 5
+    PROJECT_STRUCTURE_MODERATE_MAX_PATHS: Final[int] = 10
+    DBT_VERSION_PARTS_COUNT: Final[int] = 3
+
     # Meltano-specific file names and commands - cannot be generalized
     MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
     MELTANO_STATE_DIR: Final[str] = ".meltano"

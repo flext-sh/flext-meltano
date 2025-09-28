@@ -35,6 +35,7 @@ class TestFlextMeltanoAPIInitialization:
         # Create a concrete implementation for testing
         class ConcreteAPI(FlextMeltanoAPI):
             async def execute(self, command: str) -> FlextResult[str]:
+                _ = command  # Intentionally unused in test implementation
                 return FlextResult[str].ok("test")
 
         api = ConcreteAPI()

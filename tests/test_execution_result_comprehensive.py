@@ -31,7 +31,7 @@ class TestFlextMeltanoExecutionResult:
         assert result.success is True
         assert result.exit_code == 0
         assert result.output == "Successfully executed"
-        assert result.error == ""
+        assert not result.error
         assert result.execution_time == 1.5
 
     def test_initialization_with_failure(self) -> None:
@@ -49,7 +49,7 @@ class TestFlextMeltanoExecutionResult:
         assert result.command == command
         assert result.success is False
         assert result.exit_code == 1
-        assert result.output == ""
+        assert not result.output
         assert result.error == "Plugin not found"
         assert result.execution_time == 0.5
 
@@ -68,7 +68,7 @@ class TestFlextMeltanoExecutionResult:
         assert result.command == []
         assert result.success is False
         assert result.exit_code == -1
-        assert result.output == ""
+        assert not result.output
         assert result.error == "No command provided"
         assert result.execution_time == 0.0
 
@@ -95,7 +95,7 @@ class TestFlextMeltanoExecutionResult:
             assert result_dict["success"] is True
             assert result_dict["exit_code"] == 0
             assert result_dict["output"] == "meltano, version 1.0.0"
-            assert result_dict["error"] == ""
+            assert not result_dict["error"]
             assert result_dict["execution_time"] == 0.2
             assert result_dict["timestamp"] == "2025-01-01T12:00:00Z"
 
@@ -121,7 +121,7 @@ class TestFlextMeltanoExecutionResult:
             assert result_dict["command"] == command
             assert result_dict["success"] is False
             assert result_dict["exit_code"] == 1
-            assert result_dict["output"] == ""
+            assert not result_dict["output"]
             assert result_dict["error"] == "Plugin 'invalid' not found"
             assert result_dict["execution_time"] == 0.1
             assert result_dict["timestamp"] == "2025-01-01T12:01:00Z"
@@ -150,7 +150,7 @@ class TestFlextMeltanoExecutionResult:
             assert parsed_json["success"] is True
             assert parsed_json["exit_code"] == 0
             assert parsed_json["output"] == '{"streams": []}'
-            assert parsed_json["error"] == ""
+            assert not parsed_json["error"]
             assert parsed_json["execution_time"] == 2.0
             assert parsed_json["timestamp"] == "2025-01-01T12:02:00Z"
 
@@ -177,7 +177,7 @@ class TestFlextMeltanoExecutionResult:
             assert parsed_json["command"] == command
             assert parsed_json["success"] is False
             assert parsed_json["exit_code"] == 2
-            assert parsed_json["output"] == ""
+            assert not parsed_json["output"]
             assert parsed_json["error"] == "Configuration error: invalid settings"
             assert parsed_json["execution_time"] == 0.3
             assert parsed_json["timestamp"] == "2025-01-01T12:03:00Z"
@@ -206,7 +206,7 @@ class TestFlextMeltanoExecutionResult:
             assert parsed_json["success"] is True
             assert parsed_json["exit_code"] == 0
             assert parsed_json["output"] == "Pipeline completed successfully"
-            assert parsed_json["error"] == ""
+            assert not parsed_json["error"]
             assert parsed_json["execution_time"] == 5.5
             assert parsed_json["timestamp"] == "2025-01-01T12:04:00Z"
 

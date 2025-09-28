@@ -14,54 +14,33 @@ ZERO TOLERANCE COMPLIANCE:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Protocol
 
-# Core FLEXT imports - use root-level only
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-
-# Local imports
+from flext_meltano.executors_bridge import FlextMeltanoBridge
 from flext_meltano.types import (
     DbtTransformationResult,
     EltPipelineResult,
     SingerExecutionResult,
 )
 
-# External integrations - properly abstracted
-try:
-    from dbt.cli.main import DbtRunner, DbtRunnerResult
-except ImportError:
-    # Graceful handling when dbt is not available
-    DbtRunner = None
-    DbtRunnerResult = None
 
-try:
-    from typing import Protocol
+class SingerTap(Protocol):
+    """Singer Tap protocol definition."""
 
-    class SingerTap(Protocol):
-        """Singer Tap protocol definition."""
+    streams: list[str]
+    name: str
+    state: dict[str, object]
 
-        streams: list[str]
-        name: str
-        state: dict[str, Any]
+    def get_records(self, stream_name: str) -> list[dict[str, object]]: ...
+    def get_state(self) -> dict[str, object]: ...
 
-        def get_records(self, stream_name: str) -> Any: ...
-        def get_state(self) -> dict[str, Any]: ...
 
-    class SingerTarget(Protocol):
-        """Singer Target protocol definition."""
+class SingerTarget(Protocol):
+    """Singer Target protocol definition."""
 
-        name: str
-
-        def write_record(self, record: Any) -> None: ...
-        def write_state(self, state: dict[str, Any]) -> None: ...
-
-except ImportError:
-    # Fallback for environments without Singer
-    SingerTap = None
-    SingerTarget = None
-
-__all__ = ["FlextMeltanoLibraryRunner"]
+    name: str
 
 
 class FlextMeltanoLibraryRunner:
@@ -85,9 +64,9 @@ class FlextMeltanoLibraryRunner:
         self._abstractions = FlextMeltanoAbstractions()
 
         # Component state management
-        self._dbt_session_cache: dict[str, Any] = {}
-        self._singer_state_cache: dict[str, dict[str, Any]] = {}
-        self._manifest_cache: dict[str, Any] = {}
+        self._dbt_session_cache: dict[str, object] = {}
+        self._singer_state_cache: dict[str, dict[str, object]] = {}
+        self._manifest_cache: dict[str, object] = {}
 
     # =========================================================================
     # DBT PROGRAMMATIC RUNNER COMPONENT
@@ -102,55 +81,58 @@ class FlextMeltanoLibraryRunner:
             self._logger = parent._logger
 
         class _SessionManager:
-            """dbt session and manifest management for performance."""
+            """dbt session and manifest management for performance using flext bridge."""
 
             @staticmethod
-            def create_reusable_session(project_dir: Path) -> FlextResult[Any]:
+            def create_reusable_session(
+                project_dir: Path,
+            ) -> FlextResult[dict[str, object]]:
                 """Create dbt session for reuse (performance optimization).
 
                 Args:
                     project_dir: Path to dbt project directory
 
                 Returns:
-                    FlextResult containing reusable DbtRunner instance
+                    FlextResult containing dbt session info for bridge usage
 
                 """
-                if DbtRunner is None:
-                    return FlextResult[Any].fail("DBT not available - install dbt-core")
-
                 try:
-                    # Create DbtRunner with pre-loaded manifest for performance
-                    runner = DbtRunner()
+                    # Use bridge to test dbt availability and compile project
+                    bridge = FlextMeltanoBridge()
 
-                    # Pre-compile project to cache manifest
-                    compile_result = runner.invoke([
-                        "compile",
-                        "--project-dir",
-                        str(project_dir),
-                    ])
-
-                    if (
-                        hasattr(compile_result, "exit_code")
-                        and getattr(compile_result, "exit_code", 1) != 0
-                    ):
-                        return FlextResult[Any].fail(
-                            f"Failed to compile dbt project: {getattr(compile_result, 'exception', 'Unknown error')}"
+                    # Test dbt availability by running version command
+                    test_result = bridge.invoke_dbt("--version", str(project_dir))
+                    if not test_result.get("success", False):
+                        return FlextResult[dict[str, object]].fail(
+                            "DBT not available - install dbt-core"
                         )
 
-                    return FlextResult[Any].ok(runner)
+                    # Pre-compile project using bridge
+                    compile_result = bridge.invoke_dbt("compile", str(project_dir))
+                    if not compile_result.get("success", False):
+                        return FlextResult[dict[str, object]].fail(
+                            f"Failed to compile dbt project: {compile_result.get('error', 'Unknown error')}"
+                        )
+
+                    # Return session info for bridge usage
+                    return FlextResult[dict[str, object]].ok({
+                        "project_dir": str(project_dir),
+                        "compiled": True,
+                        "bridge_available": True,
+                    })
 
                 except Exception as e:
                     error_msg = f"Failed to create dbt session: {e}"
-                    return FlextResult[Any].fail(error_msg)
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
             @staticmethod
             def cache_manifest(
-                runner: Any, project_dir: Path
-            ) -> FlextResult[dict[str, Any]]:
+                _session_info: dict[str, object], project_dir: Path
+            ) -> FlextResult[dict[str, object]]:
                 """Cache dbt manifest for reuse across operations.
 
                 Args:
-                    runner: DbtRunner instance
+                    _session_info: Session info from create_reusable_session (reserved for future use)
                     project_dir: Path to dbt project directory
 
                 Returns:
@@ -158,19 +140,14 @@ class FlextMeltanoLibraryRunner:
 
                 """
                 try:
-                    # Parse manifest for caching
-                    manifest_result = runner.invoke([
-                        "parse",
-                        "--project-dir",
-                        str(project_dir),
-                    ])
+                    # Use bridge to parse manifest for caching
+                    bridge = FlextMeltanoBridge()
 
-                    if (
-                        hasattr(manifest_result, "exit_code")
-                        and getattr(manifest_result, "exit_code", 1) != 0
-                    ):
-                        return FlextResult[dict[str, Any]].fail(
-                            f"Failed to parse dbt project: {getattr(manifest_result, 'exception', 'Unknown error')}"
+                    # Parse manifest using bridge
+                    manifest_result = bridge.invoke_dbt("parse", str(project_dir))
+                    if not manifest_result.get("success", False):
+                        return FlextResult[dict[str, object]].fail(
+                            f"Failed to parse dbt project: {manifest_result.get('error', 'Unknown error')}"
                         )
 
                     # Extract manifest data for caching
@@ -178,49 +155,56 @@ class FlextMeltanoLibraryRunner:
                         "project_dir": str(project_dir),
                         "parsed_at": FlextUtilities.Generators.generate_iso_timestamp(),
                         "status": "cached",
+                        "bridge_result": manifest_result,
                     }
 
-                    return FlextResult[dict[str, Any]].ok(manifest_data)
+                    return FlextResult[dict[str, object]].ok(manifest_data)
 
                 except Exception as e:
                     error_msg = f"Failed to cache dbt manifest: {e}"
-                    return FlextResult[dict[str, Any]].fail(error_msg)
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
         class _CommandExecutor:
             """dbt command execution with structured result handling."""
 
             @staticmethod
             def execute_dbt_command(
-                runner: Any, command_args: list[str], project_dir: Path
-            ) -> FlextResult[Any]:
+                project_dir: Path, command_args: list[str]
+            ) -> FlextResult[dict[str, object]]:
                 """Execute dbt command with proper error handling.
 
                 Args:
-                    runner: DbtRunner instance
-                    command_args: List of dbt command arguments
                     project_dir: Path to dbt project directory
+                    command_args: List of dbt command arguments
 
                 Returns:
-                    FlextResult containing DbtRunnerResult
+                    FlextResult containing command execution result
 
                 """
                 try:
+                    # Use bridge to execute dbt command
+                    bridge = FlextMeltanoBridge()
+
                     # Add project directory to command args
-                    full_args = ["--project-dir", str(project_dir), *command_args]
+                    full_command = (
+                        f"--project-dir {project_dir} {' '.join(command_args)}"
+                    )
 
-                    # Execute command using programmatic API
-                    result = runner.invoke(full_args)
+                    # Execute command using bridge
+                    result = bridge.invoke_dbt(full_command, str(project_dir))
 
-                    # Check exit code with proper type handling
-                    exit_code = getattr(result, "exit_code", 1)
-                    if isinstance(exit_code, int) and exit_code == 0:
-                        return FlextResult[Any].ok(result)
-                    error_msg = f"dbt command failed: {getattr(result, 'exception', 'Unknown error')}"
-                    return FlextResult[Any].fail(error_msg)
+                    # Check success with proper type handling
+                    if result.get("success", False):
+                        return FlextResult[dict[str, object]].ok(result)
+
+                    error_msg = (
+                        f"dbt command failed: {result.get('error', 'Unknown error')}"
+                    )
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
                 except Exception as e:
                     error_msg = f"Failed to execute dbt command: {e}"
-                    return FlextResult[Any].fail(error_msg)
+                    return FlextResult[object].fail(error_msg)
 
         async def run_transformations_programmatic(
             self, project_dir: Path, models: list[str] | None = None, **options: object
@@ -252,13 +236,15 @@ class FlextMeltanoLibraryRunner:
                         f"Failed to create dbt session: {session_result.error}"
                     )
 
-                runner = session_result.unwrap()
+                session_info = session_result.unwrap()
 
                 # Cache manifest for performance
-                cache_result = self._SessionManager.cache_manifest(runner, project_dir)
+                cache_result = self._SessionManager.cache_manifest(
+                    session_info, project_dir
+                )
                 if cache_result.is_success:
-                    self._parent._manifest_cache[str(project_dir)] = (
-                        cache_result.unwrap()
+                    self._parent.set_manifest_cache(
+                        str(project_dir), cache_result.unwrap()
                     )
 
                 # Build command arguments
@@ -273,7 +259,7 @@ class FlextMeltanoLibraryRunner:
 
                 # Execute transformations
                 execution_result = self._CommandExecutor.execute_dbt_command(
-                    runner, command_args, project_dir
+                    project_dir, command_args
                 )
 
                 if execution_result.is_failure:
@@ -324,8 +310,8 @@ class FlextMeltanoLibraryRunner:
 
             @staticmethod
             def process_singer_messages(
-                tap_stream: Any, target_handler: Any
-            ) -> FlextResult[dict[str, Any]]:
+                tap_stream: object, target_handler: object
+            ) -> FlextResult[dict[str, object]]:
                 """Process Singer messages with proper state management.
 
                 Args:
@@ -337,7 +323,7 @@ class FlextMeltanoLibraryRunner:
 
                 """
                 if SingerTap is None or SingerTarget is None:
-                    return FlextResult[dict[str, Any]].fail(
+                    return FlextResult[dict[str, object]].fail(
                         "Singer protocols not available"
                     )
 
@@ -377,19 +363,19 @@ class FlextMeltanoLibraryRunner:
                                 write_state_method(state)
                                 processing_results["state_updates"] += 1
 
-                    return FlextResult[dict[str, Any]].ok(processing_results)
+                    return FlextResult[dict[str, object]].ok(processing_results)
 
                 except Exception as e:
                     error_msg = f"Failed to process Singer messages: {e}"
-                    return FlextResult[dict[str, Any]].fail(error_msg)
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
         class _StateManager:
             """Incremental processing state management."""
 
             @staticmethod
             def manage_extraction_state(
-                tap_name: str, state_data: dict[str, Any]
-            ) -> FlextResult[dict[str, Any]]:
+                tap_name: str, state_data: dict[str, object]
+            ) -> FlextResult[dict[str, object]]:
                 """Manage Singer state for incremental extractions.
 
                 Args:
@@ -403,7 +389,7 @@ class FlextMeltanoLibraryRunner:
                 try:
                     # Validate state data
                     if not isinstance(state_data, dict):
-                        return FlextResult[dict[str, Any]].fail(
+                        return FlextResult[dict[str, object]].fail(
                             "Invalid state data format"
                         )
 
@@ -415,14 +401,14 @@ class FlextMeltanoLibraryRunner:
                         "incremental": True,
                     }
 
-                    return FlextResult[dict[str, Any]].ok(processed_state)
+                    return FlextResult[dict[str, object]].ok(processed_state)
 
                 except Exception as e:
                     error_msg = f"Failed to manage extraction state: {e}"
-                    return FlextResult[dict[str, Any]].fail(error_msg)
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
         async def execute_singer_pipeline(
-            self, tap_instance: Any, target_instance: Any
+            self, tap_instance: object, target_instance: object
         ) -> FlextResult[SingerExecutionResult]:
             """Execute Singer tap-target pipeline with protocol compliance.
 
@@ -461,9 +447,10 @@ class FlextMeltanoLibraryRunner:
                     )
 
                     if state_result.is_success:
-                        self._parent._singer_state_cache[
-                            getattr(tap_instance, "name", "unknown")
-                        ] = state_result.unwrap()
+                        self._parent.set_singer_state_cache(
+                            getattr(tap_instance, "name", "unknown"),
+                            state_result.unwrap(),
+                        )
 
                 # Build execution result with proper typing
                 execution_result: SingerExecutionResult = {
@@ -488,6 +475,34 @@ class FlextMeltanoLibraryRunner:
                 error_msg = f"Failed to execute Singer pipeline: {e}"
                 self._logger.exception(error_msg)
                 return FlextResult[SingerExecutionResult].fail(error_msg)
+
+    # =========================================================================
+    # CACHE MANAGEMENT API - Public methods for cache operations
+    # =========================================================================
+
+    def set_manifest_cache(
+        self, project_dir: str, manifest_data: dict[str, object]
+    ) -> None:
+        """Set manifest cache data for a project directory.
+
+        Args:
+            project_dir: Project directory path as string key
+            manifest_data: Manifest data to cache
+
+        """
+        self._manifest_cache[project_dir] = manifest_data
+
+    def set_singer_state_cache(
+        self, tap_name: str, state_data: dict[str, object]
+    ) -> None:
+        """Set Singer state cache data for a tap.
+
+        Args:
+            tap_name: Name of the tap
+            state_data: State data to cache
+
+        """
+        self._singer_state_cache[tap_name] = state_data
 
     # =========================================================================
     # PUBLIC API - Unified interface for all components
@@ -523,9 +538,9 @@ class FlextMeltanoLibraryRunner:
     async def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
-        extractor_config: dict[str, Any],
-        loader_config: dict[str, Any],
-        transformer_config: dict[str, Any] | None = None,
+        extractor_config: dict[str, object],
+        loader_config: dict[str, object],
+        transformer_config: dict[str, object] | None = None,
     ) -> FlextResult[EltPipelineResult]:
         """Execute complete E-L-T pipeline using unified library APIs.
 
@@ -599,3 +614,6 @@ class FlextMeltanoLibraryRunner:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
             return FlextResult[EltPipelineResult].fail(error_msg)
+
+
+__all__ = ["FlextMeltanoLibraryRunner"]

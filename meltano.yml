@@ -2,6 +2,6 @@ version: 1
 default_environment: dev
 project_id: .
 environments:
-- name: dev
-- name: staging
-- name: prod
+  - name: dev
+  - name: staging
+  - name: prod
