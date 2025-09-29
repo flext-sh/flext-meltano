@@ -610,7 +610,9 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             )
 
             if load_result.is_failure:
-                return FlextResult[FlextTypes.Core.JsonValue].fail(load_result.error)
+                return FlextResult[FlextTypes.Core.JsonValue].fail(
+                    load_result.error or "Unknown error"
+                )
 
             return FlextResult[FlextTypes.Core.JsonValue].ok({
                 "loaded": load_result.unwrap()
@@ -632,7 +634,9 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 stream_name = str(record.get("stream", "unknown"))
                 if stream_name not in streams_data:
                     streams_data[stream_name] = []
-                streams_data[stream_name].append(record.get("record", {}))
+                streams_data[stream_name].append(
+                    cast("dict[str, object]", record.get("record", {}))
+                )
 
             # Process each stream's batch
             results = {}
@@ -656,7 +660,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 f"Batch handling failed: {e}"
             )
 
-    def execute(self: object) -> FlextResult[object]:
+    def execute(self) -> FlextResult[object]:
         """Execute the target loading (implements Domain.Service)."""
         try:
             # Finalize all streams and targets
@@ -712,13 +716,27 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
                 if op_type == "handle_record":
                     record = operation.get("record", {})
-                    return self.handle_record(
+                    result = self.handle_record(
                         cast("FlextTypes.Core.JsonObject", record)
+                    )
+                    return (
+                        FlextResult[object].ok(result.unwrap())
+                        if result.is_success
+                        else FlextResult[object].fail(
+                            result.error or "Handle record failed"
+                        )
                     )
                 if op_type == "handle_batch":
                     records = operation.get("records", [])
-                    return self.handle_batch(
+                    result = self.handle_batch(
                         cast("list[FlextTypes.Core.JsonObject]", records)
+                    )
+                    return (
+                        FlextResult[object].ok(result.unwrap())
+                        if result.is_success
+                        else FlextResult[object].fail(
+                            result.error or "Handle batch failed"
+                        )
                     )
                 if op_type == "finalize":
                     return self.execute()

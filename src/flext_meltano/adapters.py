@@ -12,6 +12,7 @@ from typing import cast, override
 
 import meltano
 import yaml
+from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 
@@ -202,7 +203,7 @@ class FlextMeltanoAdapter:
     # MELTANO DIRECT INTEGRATION - NO WRAPPERS, DIRECT MELTANO CORE USAGE
     # =========================================================================
 
-    def get_version(self: object) -> FlextResult[FlextMeltanoTypes.Bridge.VersionInfo]:
+    def get_version(self) -> FlextResult[FlextMeltanoTypes.Bridge.VersionInfo]:
         """Get Meltano version information using native API.
 
         Returns:
@@ -413,7 +414,9 @@ class FlextMeltanoAdapter:
                 working_project = temp_project_result.unwrap()
 
             # Use abstraction layer for hub operations
-            hub_wrapper = self._abstractions.get_hub_wrapper(cast("Project", working_project))
+            hub_wrapper = self._abstractions.get_hub_wrapper(
+                cast("Project", working_project)
+            )
 
             plugins = []
 
@@ -846,16 +849,17 @@ class FlextMeltanoAdapter:
 
         """
         # RAILWAY PATTERN: Chain all pipeline operations with automatic error handling
+        project_obj = cast("Project", project)
         return (
             self._log_pipeline_start(extractor_name, loader_name)
             .flat_map(
                 lambda _: self._find_required_plugins(
-                    project, extractor_name, loader_name
+                    project_obj, extractor_name, loader_name
                 )
             )
             .flat_map(
                 lambda plugins: self._create_elt_context(
-                    project, extractor_name, loader_name, plugins
+                    project_obj, extractor_name, loader_name, plugins
                 )
             )
             .flat_map(self._execute_singer_runner)
@@ -1027,7 +1031,9 @@ class FlextMeltanoAdapter:
             # Use abstraction layer to execute Singer pipeline
             runner_wrapper = self._abstractions.get_runner_wrapper()
             execution_result = runner_wrapper.execute_singer_pipeline(
-                elt_context_obj, extractor_plugin_obj, loader_plugin_obj
+                cast("ELTContext", elt_context_obj),
+                cast("ProjectPlugin", extractor_plugin_obj),
+                cast("ProjectPlugin", loader_plugin_obj),
             )
 
             if execution_result.is_failure:
