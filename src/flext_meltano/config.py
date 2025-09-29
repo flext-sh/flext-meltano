@@ -9,11 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import threading
 from pathlib import Path
 from typing import ClassVar, cast
 
-from pydantic import Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_core import (
@@ -28,223 +27,6 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoLoggingConstants(FlextConstants):
-    """Meltano-specific logging constants for FLEXT Meltano module.
-
-    Provides domain-specific logging defaults, levels, and configuration
-    options tailored for Meltano operations, data pipeline execution,
-    and ETL process monitoring.
-    """
-
-    # Meltano-specific log levels
-    DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
-    PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
-    EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
-    TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
-    ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
-    PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
-
-    # Pipeline execution logging
-    LOG_PIPELINE_START = True
-    LOG_PIPELINE_END = True
-    LOG_PIPELINE_PROGRESS = True
-    LOG_PIPELINE_ERRORS = True
-    LOG_PIPELINE_STATS = True
-    LOG_PIPELINE_DURATION = True
-
-    # Extract operations logging
-    LOG_EXTRACT_START = True
-    LOG_EXTRACT_END = True
-    LOG_EXTRACT_RECORDS = True
-    LOG_EXTRACT_ERRORS = True
-    LOG_EXTRACT_DURATION = True
-    LOG_EXTRACT_SOURCE_INFO = True
-
-    # Load operations logging
-    LOG_LOAD_START = True
-    LOG_LOAD_END = True
-    LOG_LOAD_RECORDS = True
-    LOG_LOAD_ERRORS = True
-    LOG_LOAD_DURATION = True
-    LOG_LOAD_TARGET_INFO = True
-
-    # Transform operations logging
-    LOG_TRANSFORM_START = True
-    LOG_TRANSFORM_END = True
-    LOG_TRANSFORM_RECORDS = True
-    LOG_TRANSFORM_ERRORS = True
-    LOG_TRANSFORM_DURATION = True
-    LOG_TRANSFORM_SQL = False  # Don't log SQL by default (privacy/security)
-
-    # Performance tracking
-    TRACK_MELTANO_PERFORMANCE = True
-    MELTANO_PERFORMANCE_THRESHOLD_WARNING = 5000  # 5 seconds default
-    MELTANO_PERFORMANCE_THRESHOLD_CRITICAL = 10000  # 10 seconds default
-    TRACK_RECORD_COUNTS = True
-    TRACK_MEMORY_USAGE = True
-    HIGH_MEMORY_THRESHOLD = FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
-
-    # Data quality logging
-    LOG_DATA_QUALITY_ISSUES = True
-    LOG_VALIDATION_ERRORS = True
-    LOG_SCHEMA_CHANGES = True
-    LOG_DATA_TYPE_CONVERSIONS = True
-    LOG_NULL_VALUE_HANDLING = True
-
-    # Error handling and recovery
-    LOG_ERROR_RECOVERY = True
-    LOG_RETRY_ATTEMPTS = True
-    LOG_FALLBACK_OPERATIONS = True
-    LOG_PARTIAL_FAILURES = True
-    LOG_CRITICAL_FAILURES = True
-
-    # Context information to include
-    INCLUDE_PIPELINE_ID = True
-    INCLUDE_JOB_ID = True
-    INCLUDE_RUN_ID = True
-    INCLUDE_SOURCE_NAME = True
-    INCLUDE_TARGET_NAME = True
-    INCLUDE_TRANSFORM_NAME = True
-    INCLUDE_RECORD_COUNT = True
-    INCLUDE_DURATION = True
-
-    # Message templates for Meltano operations
-    class MeltanoMessages:
-        """Meltano-specific log message templates."""
-
-        # Pipeline messages
-        PIPELINE_STARTED = "Meltano pipeline started: {pipeline_name} run_id: {run_id}"
-        PIPELINE_COMPLETED = "Meltano pipeline completed: {pipeline_name} run_id: {run_id} duration: {duration}ms"
-        PIPELINE_FAILED = (
-            "Meltano pipeline failed: {pipeline_name} run_id: {run_id} error: {error}"
-        )
-        PIPELINE_CANCELLED = (
-            "Meltano pipeline cancelled: {pipeline_name} run_id: {run_id}"
-        )
-
-        # Extract messages
-        EXTRACT_STARTED = "Meltano extract started: {source_name} run_id: {run_id}"
-        EXTRACT_COMPLETED = "Meltano extract completed: {source_name} {record_count} records in {duration}ms"
-        EXTRACT_FAILED = "Meltano extract failed: {source_name} error: {error}"
-        EXTRACT_PROGRESS = (
-            "Meltano extract progress: {source_name} {current}/{total} records"
-        )
-
-        # Load messages
-        LOAD_STARTED = "Meltano load started: {target_name} run_id: {run_id}"
-        LOAD_COMPLETED = "Meltano load completed: {target_name} {record_count} records in {duration}ms"
-        LOAD_FAILED = "Meltano load failed: {target_name} error: {error}"
-        LOAD_PROGRESS = "Meltano load progress: {target_name} {current}/{total} records"
-
-        # Transform messages
-        TRANSFORM_STARTED = (
-            "Meltano transform started: {transform_name} run_id: {run_id}"
-        )
-        TRANSFORM_COMPLETED = "Meltano transform completed: {transform_name} {record_count} records in {duration}ms"
-        TRANSFORM_FAILED = "Meltano transform failed: {transform_name} error: {error}"
-        TRANSFORM_PROGRESS = (
-            "Meltano transform progress: {transform_name} {current}/{total} records"
-        )
-
-        # Performance messages
-        SLOW_PIPELINE = "Slow Meltano pipeline: {pipeline_name} took {duration}ms"
-        SLOW_EXTRACT = "Slow Meltano extract: {source_name} took {duration}ms"
-        SLOW_LOAD = "Slow Meltano load: {target_name} took {duration}ms"
-        SLOW_TRANSFORM = "Slow Meltano transform: {transform_name} took {duration}ms"
-        HIGH_MEMORY_USAGE = (
-            "High memory usage in Meltano pipeline: {pipeline_name} {memory}MB"
-        )
-
-        # Data quality messages
-        DATA_QUALITY_ISSUE = (
-            "Data quality issue: {issue_type} in {source_name}: {details}"
-        )
-        VALIDATION_ERROR = "Meltano validation error: {field} {error} in {source_name}"
-        SCHEMA_CHANGE = "Schema change detected: {source_name} {change_type}: {details}"
-        DATA_TYPE_CONVERSION = (
-            "Data type conversion: {field} {from_type} -> {to_type} in {source_name}"
-        )
-        NULL_VALUE_HANDLED = "Null value handled: {field} {strategy} in {source_name}"
-
-        # Error messages
-        PIPELINE_ERROR = "Meltano pipeline error: {pipeline_name} {error}"
-        EXTRACT_ERROR = "Meltano extract error: {source_name} {error}"
-        LOAD_ERROR = "Meltano load error: {target_name} {error}"
-        TRANSFORM_ERROR = "Meltano transform error: {transform_name} {error}"
-        CONFIGURATION_ERROR = "Meltano configuration error: {error}"
-
-        # Recovery messages
-        ERROR_RECOVERY = (
-            "Meltano error recovery: {operation} retry {attempt}/{max_attempts}"
-        )
-        RETRY_ATTEMPT = (
-            "Meltano retry attempt: {operation} attempt {attempt}/{max_attempts}"
-        )
-        FALLBACK_OPERATION = (
-            "Meltano fallback operation: {operation} using {fallback_strategy}"
-        )
-        PARTIAL_FAILURE = (
-            "Meltano partial failure: {operation} {failed_count}/{total_count} failed"
-        )
-        CRITICAL_FAILURE = "Meltano critical failure: {operation} {error}"
-
-        # Statistics messages
-        PIPELINE_STATS = "Meltano pipeline statistics: {pipeline_name} records: {total_records} duration: {duration}ms"
-        EXTRACT_STATS = "Meltano extract statistics: {source_name} records: {record_count} duration: {duration}ms"
-        LOAD_STATS = "Meltano load statistics: {target_name} records: {record_count} duration: {duration}ms"
-        TRANSFORM_STATS = "Meltano transform statistics: {transform_name} records: {record_count} duration: {duration}ms"
-
-    # Environment-specific overrides for Meltano logging
-    class MeltanoEnvironment:
-        """Environment-specific Meltano logging configuration."""
-
-        DEVELOPMENT: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": "True",  # Log SQL in dev
-            "log_source_info": "True",  # Log source info in dev
-            "log_target_info": "True",  # Log target info in dev
-            "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
-        }
-
-        STAGING: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": "False",
-            "log_source_info": "True",
-            "log_target_info": "True",
-            "audit_log_level": FlextConstants.Config.LogLevel.INFO,
-        }
-
-        PRODUCTION: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": "False",
-            "log_source_info": "False",
-            "log_target_info": "False",
-            "audit_log_level": FlextConstants.Config.LogLevel.WARNING,
-        }
-
-        TESTING: ClassVar[FlextTypes.Core.Dict] = {
-            "log_transform_sql": "True",
-            "log_source_info": "True",
-            "log_target_info": "True",
-            "audit_log_level": FlextConstants.Config.LogLevel.DEBUG,
-        }
-
-    # Singleton pattern attributes
-    _global_instance: ClassVar[FlextMeltanoConfig | None] = None
-    _lock: ClassVar[threading.Lock] = threading.Lock()
-
-    model_config = SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_",
-        case_sensitive=False,
-        extra="ignore",
-        env_file=".env",
-        env_file_encoding="utf-8",
-        use_enum_values=True,
-        validate_assignment=True,
-        validate_default=True,
-        frozen=False,
-        str_strip_whitespace=True,
-    )
-
-
 class FlextMeltanoConfig(FlextConfig):
     """Meltano ELT configuration management with enterprise-grade validation.
 
@@ -252,7 +34,25 @@ class FlextMeltanoConfig(FlextConfig):
     with validation using flext-core patterns. This class serves as the single
     source of truth for all Meltano configuration across the application.
 
+    Features:
+    - Uses Pydantic 2.11+ features (SettingsConfigDict, SecretStr for sensitive data)
+    - Enhanced singleton pattern with get_or_create_shared_instance()
+    - Complete type annotations with Python 3.13+ syntax
+    - Environment-specific factory methods for different deployment contexts
+
     """
+
+    # Model configuration using Pydantic 2.11+ SettingsConfigDict
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_",
+        case_sensitive=False,
+        extra="ignore",
+        str_strip_whitespace=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
+        use_enum_values=True,
+        frozen=False,
+    )
 
     # ============================================================================
     # MELTANO-SPECIFIC CONSTANTS - Using FlextMeltanoConstants as SOURCE OF TRUTH
@@ -326,7 +126,18 @@ class FlextMeltanoConfig(FlextConfig):
         description="Timeout for operations in seconds",
     )
 
-    # Meltano-specific logging configuration using FlextMeltanoLoggingConstants
+    # Sensitive data using SecretStr for enhanced security
+    meltano_database_uri: SecretStr | None = Field(
+        default_factory=lambda: SecretStr("sqlite:///meltano.db"),
+        description="Meltano system database URI (sensitive)",
+    )
+
+    meltano_api_key: SecretStr | None = Field(
+        default=None,
+        description="Meltano API key for cloud operations (sensitive)",
+    )
+
+    # Meltano-specific logging configuration using FlextMeltanoConstants
     log_pipeline_execution: bool = Field(
         default=True,
         description="Log pipeline execution details",
@@ -338,12 +149,12 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     log_pipeline_progress: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_PIPELINE_PROGRESS,
+        default=FlextMeltanoConstants.LOGGING_LOG_PIPELINE_PROGRESS,
         description="Log pipeline progress updates",
     )
 
     log_pipeline_errors: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_PIPELINE_ERRORS,
+        default=FlextMeltanoConstants.LOGGING_LOG_PIPELINE_ERRORS,
         description="Log pipeline errors",
     )
 
@@ -389,7 +200,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     log_extract_errors: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_EXTRACT_ERRORS,
+        default=FlextMeltanoConstants.LOGGING_LOG_EXTRACT_ERRORS,
         description="Log extract errors",
     )
 
@@ -430,7 +241,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     log_load_errors: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_LOAD_ERRORS,
+        default=FlextMeltanoConstants.LOGGING_LOG_LOAD_ERRORS,
         description="Log load errors",
     )
 
@@ -461,7 +272,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     log_transform_sql: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_TRANSFORM_SQL,
+        default=FlextMeltanoConstants.LOGGING_LOG_TRANSFORM_SQL,
         description="Log transform SQL queries",
     )
 
@@ -471,7 +282,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     log_transform_errors: bool = Field(
-        default=FlextMeltanoLoggingConstants.LOG_TRANSFORM_ERRORS,
+        default=FlextMeltanoConstants.LOGGING_LOG_TRANSFORM_ERRORS,
         description="Log transform errors",
     )
 
@@ -630,17 +441,17 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Performance tracking for Meltano operations
     track_meltano_performance: bool = Field(
-        default=FlextMeltanoLoggingConstants.TRACK_MELTANO_PERFORMANCE,
+        default=FlextMeltanoConstants.LOGGING_TRACK_MELTANO_PERFORMANCE,
         description="Track Meltano performance metrics",
     )
 
     meltano_performance_threshold_warning: float = Field(
-        default=True,
+        default=FlextMeltanoConstants.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_WARNING,
         description="Meltano performance warning threshold in milliseconds",
     )
 
     meltano_performance_threshold_critical: float = Field(
-        default=True,
+        default=FlextMeltanoConstants.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL,
         description="Meltano performance critical threshold in milliseconds",
     )
 
@@ -851,6 +662,24 @@ class FlextMeltanoConfig(FlextConfig):
             raise FlextExceptions.ValidationError(error_msg)
         return v.strip()
 
+    @field_validator("meltano_database_uri", "meltano_api_key")
+    @classmethod
+    def validate_secret_fields(cls, v: SecretStr | None) -> SecretStr | None:
+        """Validate SecretStr fields for sensitive data.
+
+        Args:
+            v: SecretStr value to validate.
+
+        Returns:
+            SecretStr | None: Validated SecretStr or None.
+
+        """
+        if v is None:
+            return None
+        if isinstance(v, str):
+            return SecretStr(v)
+        return v
+
     # ============================================================================
     # CONFIGURATION METHODS - Business logic methods
     # ============================================================================
@@ -922,6 +751,28 @@ class FlextMeltanoConfig(FlextConfig):
 
         """
         return self.get_meltano_environment_variables()
+
+    def get_meltano_database_uri_value(self) -> str:
+        """Get the actual Meltano database URI value (safely extract from SecretStr).
+
+        Returns:
+            str: The database URI value.
+
+        """
+        if self.meltano_database_uri is None:
+            return "sqlite:///meltano.db"
+        return self.meltano_database_uri.get_secret_value()
+
+    def get_meltano_api_key_value(self) -> str | None:
+        """Get the actual Meltano API key value (safely extract from SecretStr).
+
+        Returns:
+            str | None: The API key value or None if not set.
+
+        """
+        if self.meltano_api_key is None:
+            return None
+        return self.meltano_api_key.get_secret_value()
 
     # ============================================================================
     # CONSTANTS ACCESS METHODS - Utility methods for constants
@@ -1240,6 +1091,17 @@ class FlextMeltanoConfig(FlextConfig):
             self.MELTANO_ENVIRONMENT_ENV: str(self.environment),
             self.MELTANO_LOG_LEVEL_ENV: str(self.log_level).upper(),
         }
+
+        # Add sensitive environment variables safely
+        if self.meltano_database_uri:
+            meltano_env_vars["MELTANO_DATABASE_URI"] = (
+                self.get_meltano_database_uri_value()
+            )
+
+        if self.meltano_api_key:
+            api_key_value = self.get_meltano_api_key_value()
+            if api_key_value is not None:
+                meltano_env_vars["MELTANO_API_KEY"] = api_key_value
 
         # Merge base and Meltano environment variables
         return {**base_env_vars, **meltano_env_vars}

@@ -13,6 +13,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
+from typing import cast
 
 from flext_core import (
     FlextLogger,
@@ -200,7 +201,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             }
 
             self.logger.info(
-                f"Catalog discovered with {len(catalog['streams'])} streams"
+                f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
             )
             return FlextResult[FlextTypes.Core.JsonObject].ok(catalog)
 
@@ -241,9 +242,11 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         try:
             # Extract selected streams from catalog
-            streams = catalog.get("streams", [])
+            streams = cast("list", catalog.get("streams", []))
             selected_streams = [
-                s for s in streams if s.get("metadata", {}).get("selected", False)
+                s
+                for s in streams
+                if cast("dict", s).get("metadata", {}).get("selected", False)
             ]
 
             if not selected_streams:
@@ -256,7 +259,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             extracted_streams = []
 
             for stream in selected_streams:
-                stream_id = stream.get("tap_stream_id", "unknown")
+                stream_id = cast("dict", stream).get("tap_stream_id", "unknown")
                 # Simulate extraction (would be actual data source interaction)
                 records_count = 100  # Simulated record count
                 total_records += records_count
@@ -349,7 +352,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             processed_record: FlextTypes.Core.JsonValue = {
                 "status": "processed",
                 "stream": stream_name,
-                "record_id": record_data.get("id", "unknown"),
+                "record_id": cast("dict", record_data).get("id", "unknown"),
                 "processing_timestamp": str(time.time()),
                 "service_name": self.service_name,
                 "validation_status": "passed",

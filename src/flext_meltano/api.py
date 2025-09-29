@@ -133,7 +133,11 @@ class FlextMeltanoAPI(
                 "tap_name and target_name are required"
             )
 
-        result = self.create_pipeline(str(tap_name), str(target_name), config)
+        result = self.create_pipeline(
+            str(tap_name),
+            str(target_name),
+            config if isinstance(config, dict) else None,
+        )
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
         return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -157,7 +161,9 @@ class FlextMeltanoAPI(
                 "pipeline_id is required"
             )
 
-        result = self.execute_pipeline(str(pipeline_id), config)
+        result = self.execute_pipeline(
+            str(pipeline_id), config if isinstance(config, dict) else None
+        )
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
         return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -182,7 +188,11 @@ class FlextMeltanoAPI(
                 "plugin_type and plugin_name are required"
             )
 
-        result = self.install_plugin(str(plugin_type), str(plugin_name), config)
+        result = self.install_plugin(
+            str(plugin_type),
+            str(plugin_name),
+            config if isinstance(config, dict) else None,
+        )
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
         return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -199,7 +209,9 @@ class FlextMeltanoAPI(
 
         result = self.list_plugins(str(plugin_type) if plugin_type else None)
         if result.is_success:
-            return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.Core.JsonValue].ok(
+                cast(list[object], result.value)
+            )
         return FlextResult[FlextTypes.Core.JsonValue].fail(
             result.error or "Plugin listing failed"
         )
@@ -221,7 +233,9 @@ class FlextMeltanoAPI(
                 "environment_name is required"
             )
 
-        result = self.configure_environment(str(environment_name), config)
+        result = self.configure_environment(
+            str(environment_name), config if isinstance(config, dict) else None
+        )
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
         return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -238,7 +252,10 @@ class FlextMeltanoAPI(
             models = payload.get("models")
             config = payload.get("config")
 
-        result = self.run_dbt_models(models, config)
+        result = self.run_dbt_models(
+            models if isinstance(models, list) else None,
+            config if isinstance(config, dict) else None,
+        )
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(result.value)
         return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -249,11 +266,15 @@ class FlextMeltanoAPI(
         self, payload: FlextTypes.Core.JsonValue
     ) -> FlextResult[FlextTypes.Core.JsonValue]:
         """Handle test_dbt_models operation call."""
-        models = None
-        config = None
+        models: FlextMeltanoTypes.Core.DbtModelList | None = None
+        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None
         if isinstance(payload, dict):
-            models = payload.get("models")
-            config = payload.get("config")
+            models_raw = payload.get("models")
+            config_raw = payload.get("config")
+            if models_raw is not None and isinstance(models_raw, list):
+                models = models_raw
+            if config_raw is not None and isinstance(config_raw, dict):
+                config = config_raw
 
         result = self.test_dbt_models(models, config)
         if result.is_success:
@@ -273,8 +294,15 @@ class FlextMeltanoAPI(
 
         tap_name = payload.get("tap_name", "")
         target_name = payload.get("target_name", "")
-        dbt_models = payload.get("dbt_models")
-        config = payload.get("config")
+        dbt_models_raw = payload.get("dbt_models")
+        config_raw = payload.get("config")
+
+        dbt_models: FlextMeltanoTypes.Core.DbtModelList | None = None
+        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None
+        if dbt_models_raw is not None and isinstance(dbt_models_raw, list):
+            dbt_models = dbt_models_raw
+        if config_raw is not None and isinstance(config_raw, dict):
+            config = config_raw
 
         if not tap_name or not target_name:
             return FlextResult[FlextTypes.Core.JsonValue].fail(
@@ -290,16 +318,16 @@ class FlextMeltanoAPI(
             result.error or "ELT pipeline execution failed"
         )
 
-    def execute(self) -> FlextResult[object]:
+    def execute(
+        self,
+    ) -> FlextResult[FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]]:
         """Execute the main API service operation - implements ServiceCallProtocol.
 
         Returns:
             FlextResult containing service execution status
 
         """
-        return self.get_service_status().map(
-            lambda result: result.unwrap() if result.is_success else {"status": "error"}
-        )
+        return self.get_service_status()
 
     def create_pipeline(
         self,

@@ -14,7 +14,7 @@ ZERO TOLERANCE COMPLIANCE:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, cast
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -158,7 +158,9 @@ class FlextMeltanoLibraryRunner:
                         "bridge_result": manifest_result,
                     }
 
-                    return FlextResult[dict[str, object]].ok(manifest_data)
+                    return FlextResult[dict[str, object]].ok(
+                        cast("dict[str, object]", manifest_data)
+                    )
 
                 except Exception as e:
                     error_msg = f"Failed to cache dbt manifest: {e}"
@@ -204,7 +206,7 @@ class FlextMeltanoLibraryRunner:
 
                 except Exception as e:
                     error_msg = f"Failed to execute dbt command: {e}"
-                    return FlextResult[object].fail(error_msg)
+                    return FlextResult[dict[str, object]].fail(error_msg)
 
         async def run_transformations_programmatic(
             self, project_dir: Path, models: list[str] | None = None, **options: object
@@ -363,7 +365,9 @@ class FlextMeltanoLibraryRunner:
                                 write_state_method(state)
                                 processing_results["state_updates"] += 1
 
-                    return FlextResult[dict[str, object]].ok(processing_results)
+                    return FlextResult[dict[str, object]].ok(
+                        cast("dict[str, object]", processing_results)
+                    )
 
                 except Exception as e:
                     error_msg = f"Failed to process Singer messages: {e}"
@@ -401,7 +405,9 @@ class FlextMeltanoLibraryRunner:
                         "incremental": True,
                     }
 
-                    return FlextResult[dict[str, object]].ok(processed_state)
+                    return FlextResult[dict[str, object]].ok(
+                        cast("dict[str, object]", processed_state)
+                    )
 
                 except Exception as e:
                     error_msg = f"Failed to manage extraction state: {e}"
@@ -458,9 +464,13 @@ class FlextMeltanoLibraryRunner:
                     "execution_method": "singer_protocol_compliant",
                     "tap_name": getattr(tap_instance, "name", "unknown"),
                     "target_name": getattr(target_instance, "name", "unknown"),
-                    "streams_processed": message_data.get("streams_processed", 0),
-                    "messages_processed": message_data.get("messages_processed", 0),
-                    "state_updates": message_data.get("state_updates", 0),
+                    "streams_processed": cast(
+                        "int", message_data.get("streams_processed", 0)
+                    ),
+                    "messages_processed": cast(
+                        "int", message_data.get("messages_processed", 0)
+                    ),
+                    "state_updates": cast("int", message_data.get("state_updates", 0)),
                 }
 
                 self._logger.info(
@@ -588,7 +598,9 @@ class FlextMeltanoLibraryRunner:
                 )
 
                 if dbt_result.is_success:
-                    pipeline_results["transformation"] = dbt_result.unwrap()
+                    pipeline_results["transformation"] = cast(
+                        "dict[str, object]", dbt_result.unwrap()
+                    )
                 else:
                     pipeline_results["transformation"] = {
                         "success": "False",

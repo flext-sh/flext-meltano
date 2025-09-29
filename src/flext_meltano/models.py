@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 from pydantic import (
     ConfigDict,
@@ -177,7 +178,7 @@ class FlextMeltanoModels(FlextModels):
         @property
         def schema_properties_count(self) -> int:
             """Computed field for number of schema properties."""
-            return len(self.stream_schema.get("properties", {}))
+            return len(cast("dict", self.stream_schema.get("properties", {})))
 
         @model_validator(mode="after")
         def validate_stream_definition_consistency(
@@ -306,7 +307,7 @@ class FlextMeltanoModels(FlextModels):
             description="Batch size for record processing",
         )
         max_batches: int = Field(
-            default=100,
+            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Maximum number of batches to process",
         )
 
@@ -1036,7 +1037,7 @@ class FlextMeltanoModels(FlextModels):
         @property
         def is_fully_successful(self) -> bool:
             """Computed field indicating if all stages completed successfully."""
-            return (
+            return bool(
                 self.tap_result
                 and self.tap_result.is_successful
                 and self.target_result

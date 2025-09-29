@@ -301,7 +301,9 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
             dummy_instance = cast("TapInstance", {"name": "default", "config": {}})
             result = self.discover_streams(dummy_instance)
             if result.is_failure:
-                return FlextResult[FlextTypes.Core.JsonObject].fail(result.error)
+                return FlextResult[FlextTypes.Core.JsonObject].fail(
+                    result.error or "Unknown error"
+                )
 
             catalog_data = cast("FlextTypes.Core.JsonObject", result.unwrap())
             return FlextResult[FlextTypes.Core.JsonObject].ok(catalog_data)
@@ -395,17 +397,27 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                 op_type = operation.get("type", "unknown")
 
                 if op_type == "discover":
-                    return self.discover()
+                    result = self.discover()
+                    return (
+                        FlextResult[object].ok(result.unwrap())
+                        if result.is_success
+                        else FlextResult[object].fail(result.error or "Discover failed")
+                    )
                 if op_type == "sync":
                     catalog = operation.get("catalog", {})
-                    return self.sync(cast("FlextTypes.Core.JsonObject", catalog))
+                    result = self.sync(cast("FlextTypes.Core.JsonObject", catalog))
+                    return (
+                        FlextResult[object].ok(result.unwrap())
+                        if result.is_success
+                        else FlextResult[object].fail(result.error or "Sync failed")
+                    )
                 return FlextResult[object].fail(f"Unknown operation type: {op_type}")
 
             return FlextResult[object].fail("Invalid operation format")
         except Exception as e:
             return FlextResult[object].fail(f"Operation execution failed: {e}")
 
-    def get_service_info(self: object) -> FlextTypes.Core.Dict:
+    def get_service_info(self) -> FlextTypes.Core.Dict:
         """Get service information and metadata (implements Domain.Service)."""
         return {
             "service_name": getattr(self, "service_name", "FlextTapAbstractions"),
