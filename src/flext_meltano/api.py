@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
+from typing import cast
 
 from flext_core import (
     FlextLogger,
@@ -210,7 +211,7 @@ class FlextMeltanoAPI(
         result = self.list_plugins(str(plugin_type) if plugin_type else None)
         if result.is_success:
             return FlextResult[FlextTypes.Core.JsonValue].ok(
-                cast(list[object], result.value)
+                cast("list[object]", result.value)
             )
         return FlextResult[FlextTypes.Core.JsonValue].fail(
             result.error or "Plugin listing failed"
