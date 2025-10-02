@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from flext_meltano import FlextTargetAbstractions
-from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from flext_tests import FlextTestsFactories, FlextTestsUtilities
 
 logger = FlextLogger(__name__)
 
@@ -186,7 +186,7 @@ class TestFlextTargetAbstractionsComplete:
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
         # Test error handling with FlextResult patterns
-        failure_result = FlextTestsFixtures.create_failure_result("Target error")
+        failure_result = FlextTestsFactories.create_failure_result("Target error")
 
         self.test_assertions.assert_true(
             condition=isinstance(failure_result, FlextResult),

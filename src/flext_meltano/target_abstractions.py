@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from flext_cli import FlextCli
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -69,6 +70,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             or f"target_abstractions_{FlextUtilities.Generators.generate_uuid()[:8]}"
         )
         self._logger = FlextLogger(f"{__name__}.FlextTargetAbstractions")
+        self._cli = FlextCli()
         self._active_targets: dict[str, FlextTypes.Core.Dict] = {}
         self._target_configs: dict[str, FlextTargetAbstractions.FlextTargetConfig] = {}
         self._stream_registry: dict[str, FlextTargetAbstractions.FlextStreamInfo] = {}
@@ -186,6 +188,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
     ) -> FlextResult[bool]:
         """Process Singer SCHEMA message with error handling."""
         try:
+            self._cli.info(f"Processing SCHEMA message for stream: {stream_name}")
             self._logger.info("Processing SCHEMA message", stream_name=stream_name)
 
             # Create stream info with Pydantic validation
@@ -193,7 +196,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 stream_info_model = self.FlextStreamInfo(
                     stream_name=stream_name,
                     schema=schema,  # Use alias parameter
-                    status="schema_processed",
+                    status="processing",  # Valid status: initialized, processing, completed, error
                     created_at=FlextUtilities.Generators.generate_iso_timestamp(),
                 )
             except Exception as e:
@@ -220,6 +223,9 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             stream_key = f"{target.get('target_type', 'unknown')}_{stream_name}"
             self._stream_registry[stream_key] = stream_info_model
 
+            self._cli.success(
+                f"SCHEMA message processed successfully for stream: {stream_name}"
+            )
             self._logger.info(
                 "SCHEMA message processed successfully",
                 stream_name=stream_name,
@@ -231,6 +237,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 f"Failed to process SCHEMA message for stream {stream_name}: {e}"
             )
             self._logger.exception(error_msg)
+            self._cli.error(error_msg)
             return FlextResult[bool].fail(error_msg)
 
     def process_record_message(

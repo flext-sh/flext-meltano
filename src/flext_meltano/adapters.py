@@ -1407,7 +1407,7 @@ Thumbs.db
         """
         return self._library_runner
 
-    async def run_dbt_transformations(
+    def run_dbt_transformations(
         self, project_dir: Path, models: list[str] | None = None, **options: object
     ) -> FlextResult[DbtTransformationResult]:
         """Run dbt transformations using programmatic API.
@@ -1430,7 +1430,7 @@ Thumbs.db
 
             # Use library runner for dbt operations
             dbt_runner = self._library_runner.get_dbt_runner()
-            result = await dbt_runner.run_transformations_programmatic(
+            result = dbt_runner.run_transformations_programmatic(
                 project_dir, models, **options
             )
 
@@ -1452,7 +1452,7 @@ Thumbs.db
             self._logger.exception(error_msg)
             return FlextResult[DbtTransformationResult].fail(error_msg)
 
-    async def execute_singer_pipeline_advanced(
+    def execute_singer_pipeline_advanced(
         self, tap_instance: object, target_instance: object
     ) -> FlextResult[SingerExecutionResult]:
         """Execute Singer pipeline with advanced protocol management.
@@ -1474,7 +1474,7 @@ Thumbs.db
 
             # Use library runner for Singer operations
             singer_manager = self._library_runner.get_singer_manager()
-            result = await singer_manager.execute_singer_pipeline(
+            result = singer_manager.execute_singer_pipeline(
                 tap_instance, target_instance
             )
 
@@ -1496,7 +1496,7 @@ Thumbs.db
             self._logger.exception(error_msg)
             return FlextResult[SingerExecutionResult].fail(error_msg)
 
-    async def execute_complete_elt_pipeline(
+    def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
         extractor_config: FlextMeltanoTypes.Core.PluginConfigDict,
@@ -1522,7 +1522,7 @@ Thumbs.db
             )
 
             # Use library runner for complete pipeline
-            result = await self._library_runner.execute_complete_elt_pipeline(
+            result = self._library_runner.execute_complete_elt_pipeline(
                 project_dir, extractor_config, loader_config, transformer_config
             )
 

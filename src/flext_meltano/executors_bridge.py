@@ -6,15 +6,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import asyncio
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
-from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
+
+if TYPE_CHECKING:
+    from flext_meltano.adapters import FlextMeltanoAdapter
 
 # Import Meltano types for proper typing
 try:
@@ -40,6 +41,9 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize bridge with adapter and logger."""
+        # Lazy import to break circular dependency
+        from flext_meltano.adapters import FlextMeltanoAdapter
+
         self._adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         # Unified adapter - no need for separate wrapper
         self._current_project: object | None = None
@@ -319,14 +323,14 @@ class FlextMeltanoBridge:
         except Exception as e:
             return FlextResult.fail(str(e))
 
-    async def run_plugin_async(
+    def run_plugin(
         self,
         project: object,
         plugin_name: str,
         command: str,
         args: FlextTypes.Core.StringList,
     ) -> object:
-        """Asynchronous plugin execution.
+        """Hronous plugin execution.
 
         Returns:
             Plugin execution result object.
@@ -334,8 +338,8 @@ class FlextMeltanoBridge:
         """
         try:
             # Run synchronous version in thread pool
-            loop = asyncio.get_event_loop()
-            return await loop.run_in_executor(
+            loop = get_event_loop()
+            return loop.run_in_executor(
                 None,
                 self._run_plugin_sync,
                 project,

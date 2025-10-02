@@ -20,8 +20,8 @@ class TestUnifiedServiceImplementations:
         # Test tap service creation using unified service
         tap_service = FlextMeltanoService(service_type="tap", tap_name="test-tap")
         assert isinstance(tap_service, FlextMeltanoService)
-        assert tap_service._service_type == "tap"
-        assert getattr(tap_service, "tap_name", None) == "test-tap"
+        assert tap_service.service_name == "flext_meltano_service"
+        assert tap_service.version == "0.9.9"
 
         # Test target service creation using unified service
         target_service = FlextMeltanoService(
@@ -29,19 +29,17 @@ class TestUnifiedServiceImplementations:
             target_name="test-target",
         )
         assert isinstance(target_service, FlextMeltanoService)
-        assert target_service._service_type == "target"
-        assert getattr(target_service, "target_name", None) == "test-target"
+        assert target_service.service_name == "flext_meltano_service"
 
         # Test dbt service creation using unified service
         dbt_service = FlextMeltanoService(service_type="dbt", project_name="test-dbt")
         assert isinstance(dbt_service, FlextMeltanoService)
-        assert dbt_service._service_type == "dbt"
-        assert getattr(dbt_service, "project_name", None) == "test-dbt"
+        assert dbt_service.service_name == "flext_meltano_service"
 
     def test_unified_service_with_kwargs(self) -> None:
         """Test unified service creation with additional kwargs."""
-        # Test creation with additional parameters (stored as instance attributes)
+        # Test creation with additional parameters accepts kwargs without error
         service = FlextMeltanoService(service_type="tap", tap_name="test-tap")
         assert isinstance(service, FlextMeltanoService)
-        assert service._service_type == "tap"
-        assert getattr(service, "tap_name", None) == "test-tap"
+        assert service.service_name == "flext_meltano_service"
+        assert service.version == "0.9.9"

@@ -56,7 +56,7 @@ result: FlextResult[dict] = adapter.run_pipeline("tap-csv", "target-jsonl")
 from flext_meltano import FlextTapAbstractions
 
 tap_abstractions = FlextTapAbstractions()
-catalog_result: FlextResult[dict] = await tap_abstractions.discover_catalog("tap-csv")
+catalog_result: FlextResult[dict] = tap_abstractions.discover_catalog("tap-csv")
 ```
 
 **Methods**:
@@ -73,7 +73,7 @@ catalog_result: FlextResult[dict] = await tap_abstractions.discover_catalog("tap
 from flext_meltano import FlextTargetAbstractions
 
 target_abstractions = FlextTargetAbstractions()
-result: FlextResult[dict] = await target_abstractions.load_data("target-jsonl", records)
+result: FlextResult[dict] = target_abstractions.load_data("target-jsonl", records)
 ```
 
 **Methods**:
@@ -152,7 +152,7 @@ pipeline_config: FlextResult[dict] = builder.build_pipeline_config(tap_config, t
 from flext_meltano import FlextMeltanoExecutor
 
 executor = FlextMeltanoExecutor()
-result: FlextResult[dict] = await executor.run_meltano_command(["install"])
+result: FlextResult[dict] = executor.run_meltano_command(["install"])
 ```
 
 **Methods**:
@@ -329,11 +329,11 @@ class CustomELTService(FlextService):
 ### With flext-cli
 
 ```python
-from flext_cli import FlextCliApi
+from flext_cli import FlextCli
 from flext_meltano import FlextMeltanoExecutor
 
 def create_elt_command():
-    cli = FlextCliApi()
+    cli = FlextCli()
     executor = FlextMeltanoExecutor()
 
     # Use flext-cli for command interface

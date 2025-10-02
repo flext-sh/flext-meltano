@@ -38,14 +38,18 @@ class FlextMeltanoUtilities(FlextUtilities):
         logger = FlextLogger(__name__)
         try:
             # Delegate to FlextUtilities for text processing
-            FlextUtilities.TextProcessor.safe_string(project_id)
-            FlextUtilities.TextProcessor.safe_string(project_name)
+            safe_project_id = FlextUtilities.TextProcessor.safe_string(
+                project_id, project_id
+            )
+            safe_project_name = FlextUtilities.TextProcessor.safe_string(
+                project_name, project_name
+            )
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
             config_dict: FlextTypes.Core.Dict = {
                 "version": 1,
-                "project_id": "safe_project_id",
-                "project_name": "safe_project_name",
+                "project_id": safe_project_id,
+                "project_name": safe_project_name,
                 "environments": [
                     {"name": "env"}
                     for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
@@ -212,18 +216,22 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
             # Delegate to FlextUtilities for ALL text processing
-            FlextUtilities.TextProcessor.safe_string(name)
-            FlextUtilities.TextProcessor.safe_string(namespace)
+            safe_name = FlextUtilities.TextProcessor.safe_string(name, name)
+            safe_namespace = FlextUtilities.TextProcessor.safe_string(
+                namespace, namespace
+            )
 
             # DOMAIN-SPECIFIC: Meltano plugin-specific defaults
-            FlextUtilities.TextProcessor.safe_string(pip_url)
-            FlextUtilities.TextProcessor.safe_string(executable)
+            safe_pip_url = FlextUtilities.TextProcessor.safe_string(pip_url, pip_url)
+            safe_executable = FlextUtilities.TextProcessor.safe_string(
+                executable, executable
+            )
 
             config_dict: FlextTypes.Core.Dict = {
-                "name": "safe_name",
-                "namespace": "safe_namespace",
-                "pip_url": "safe_pip_url",
-                "executable": "safe_executable",
+                "name": safe_name,
+                "namespace": safe_namespace,
+                "pip_url": safe_pip_url,
+                "executable": safe_executable,
                 "type": plugin_type or "extractor",
                 "settings": {},
                 "config": {},

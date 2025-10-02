@@ -1,6 +1,5 @@
 """Test module for flext-meltano."""
 
-import asyncio
 from pathlib import Path
 from unittest import mock
 
@@ -210,8 +209,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
             assert result.is_failure
             assert "Test exception" in (result.error or "")
 
-    def test_run_plugin_async_exception(self) -> None:
-        """Test run_plugin_async with exception."""
+    def test_run_plugin_exception(self) -> None:
+        """Test run_plugin with exception."""
         # Mock _run_plugin_sync to raise exception
         with mock.patch.object(
             self.bridge,
@@ -219,8 +218,8 @@ class TestFlextMeltanoBridgeErrorCoverage:
             side_effect=Exception("Test exception"),
         ):
 
-            async def test_async() -> None:
-                result = await self.bridge.run_plugin_async(
+            def test() -> None:
+                result = self.bridge.run_plugin(
                     None,
                     "test-plugin",
                     "test",
@@ -230,7 +229,7 @@ class TestFlextMeltanoBridgeErrorCoverage:
                 assert result["success"] is False
                 assert "Test exception" in str(result["error"])
 
-            asyncio.run(test_async())
+            test()
 
     def test_run_plugin_sync_adapter_failure(self) -> None:
         """Test _run_plugin_sync with adapter failure."""

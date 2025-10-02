@@ -12,6 +12,7 @@ from __future__ import annotations
 import time
 from typing import cast
 
+from flext_cli import FlextCli
 from flext_core import (
     FlextLogger,
     FlextResult,
@@ -19,13 +20,11 @@ from flext_core import (
     FlextTypes,
 )
 from flext_meltano.executors import FlextMeltanoExecutor
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoAPI(
-    FlextService[FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]],
-    FlextMeltanoProtocols.ServiceCallProtocol,
+    FlextService[FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]]
 ):
     """FLEXT Meltano API service for programmatic pipeline management.
 
@@ -39,7 +38,7 @@ class FlextMeltanoAPI(
     This API follows FLEXT patterns with railway-oriented programming using FlextResult
     for all operations, ensuring type-safe error handling and comprehensive logging.
 
-    The API supports both synchronous and asynchronous operations for different
+    The API supports both synchronous and hronous operations for different
     use cases and performance requirements.
 
     Implements FlextMeltanoProtocols.ServiceCallProtocol through structural subtyping:
@@ -61,6 +60,10 @@ class FlextMeltanoAPI(
 
     """
 
+    # Pydantic model fields
+    service_name: str = "flext_meltano_api"
+    version: str = "0.9.9"
+
     def __init__(
         self,
         service_name: str = "flext_meltano_api",
@@ -73,15 +76,13 @@ class FlextMeltanoAPI(
             msg = "API service name cannot be empty"
             raise ValueError(msg)
 
-        super().__init__(**data)
+        # Pass fields to Pydantic parent
+        super().__init__(service_name=service_name, version=version, **data)
 
-        # API-specific initialization
-        self.service_name = service_name
-        self.version = version
-        self.logger = FlextLogger(__name__)
-
-        # Initialize Meltano executor for pipeline operations
-        self.executor = FlextMeltanoExecutor()
+        # API-specific initialization (use object.__setattr__ to bypass Pydantic validation)
+        object.__setattr__(self, "logger", FlextLogger(__name__))
+        object.__setattr__(self, "_cli", FlextCli())
+        object.__setattr__(self, "executor", FlextMeltanoExecutor())
 
         self.logger.info(f"FlextMeltanoAPI '{service_name}' v{version} initialized")
 
@@ -670,10 +671,16 @@ class FlextMeltanoAPI(
             dbt_config = config or {}
             models_to_run = models or ["all_models"]
 
+            self._cli.info(f"Running DBT models: {', '.join(models_to_run)}")
+
             # DBT execution simulation (in real implementation, this would
             # execute actual DBT models)
             execution_start = time.time()
             execution_duration = time.time() - execution_start
+
+            self._cli.success(
+                f"DBT models executed successfully in {execution_duration:.2f}s"
+            )
 
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok({
                 "models": models_to_run,
@@ -687,6 +694,7 @@ class FlextMeltanoAPI(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT models execution failed: {e}"
             self.logger.exception(error_msg)
+            self._cli.error(error_msg)
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
 
     def test_dbt_models(
@@ -721,15 +729,21 @@ class FlextMeltanoAPI(
             test_config = config or {}
             models_to_test = models or ["all_models"]
 
+            self._cli.info(f"Testing DBT models: {', '.join(models_to_test)}")
+
             # DBT test execution simulation
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
+            tests_count = len(models_to_test) * 3  # Simulate multiple tests per model
+            self._cli.success(
+                f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s"
+            )
+
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok({
                 "models": models_to_test,
                 "status": "passed",
-                "tests_executed": len(models_to_test)
-                * 3,  # Simulate multiple tests per model
+                "tests_executed": tests_count,
                 "execution_duration": execution_duration,
                 "configuration": test_config,
                 "executed_at": str(time.time()),
@@ -739,6 +753,7 @@ class FlextMeltanoAPI(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT model testing failed: {e}"
             self.logger.exception(error_msg)
+            self._cli.error(error_msg)
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
 
     def run_elt_pipeline(

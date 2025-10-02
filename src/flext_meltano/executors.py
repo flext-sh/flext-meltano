@@ -1342,7 +1342,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.CLI.ProcessResult]):
             FlextResult[FlextMeltanoTypes.Plugin.PluginInfo]: Result containing plugin information.
 
         """
-        # Note: run_plugin_async is async, for now return success with plugin info
+        # Note: run_plugin is , for now return success with plugin info
         if hasattr(self, "_logger") and self._logger:
             try:
                 self.logger_safe.info(
@@ -1563,7 +1563,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.CLI.ProcessResult]):
             "name": FlextMeltanoConstants.APPLICATION_NAME,
             "project_root": str(self.project_root_safe),
             "output": "table",
-            "debug": "False",
+            "debug": False,
             "executor": "self",
             "logger": "cli_logger",
         }

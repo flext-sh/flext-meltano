@@ -14,7 +14,7 @@ from meltano.core.plugin.base import PluginType
 
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoAdapter
-from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from flext_tests import FlextTestsFactories, FlextTestsUtilities
 
 
 class TestFlextMeltanoAdapterComplete:
@@ -139,7 +139,7 @@ class TestFlextMeltanoAdapterComplete:
     def test_initialize_project_functional(self) -> None:
         """Test project initialization using flext_tests temp directory."""
         # Use flext_tests fixture for temporary directory (avoiding duplication)
-        FlextTestsFixtures()
+        FlextTestsFactories()
 
         # Configure functional service for project initialization
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -510,18 +510,15 @@ class TestFlextMeltanoAdapterComplete:
     # =========================================================================
 
     def test_adapter_error_boundaries(self) -> None:
-        """Test adapter error boundaries using flext_tests error simulation."""
-        # Use flext_tests error simulation
-        error_factory = FlextTestsFixtures.ErrorSimulationFactory()
-
-        # Test various error scenarios without duplication
-        timeout_error = error_factory.create_timeout_error()
+        """Test adapter error boundaries using direct error instances."""
+        # Create error instances directly for testing
+        timeout_error = TimeoutError("Test timeout")
         self.test_assertions.assert_true(
             condition=isinstance(timeout_error, Exception),
             message="Should create timeout error",
         )
 
-        validation_error = error_factory.create_validation_error()
+        validation_error = ValueError("Test validation error")
         self.test_assertions.assert_true(
             condition=isinstance(validation_error, Exception),
             message="Should create validation error",

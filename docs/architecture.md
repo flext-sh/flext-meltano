@@ -256,7 +256,7 @@ class StreamDefinition(BaseModel):
 
 ```python
 # All operations return FlextResult[T] for railway-oriented programming
-async def process_elt_pipeline(
+def process_elt_pipeline(
     tap_config: TapConfig,
     target_config: dict[str, object]
 ) -> FlextResult[dict[str, object]]:
@@ -270,7 +270,7 @@ async def process_elt_pipeline(
         )
 
     # Execution phase
-    execution_result = await execute_pipeline(tap_config, target_config)
+    execution_result = execute_pipeline(tap_config, target_config)
     if execution_result.is_failure:
         return FlextResult[dict[str, object]].fail(
             f"Pipeline execution failed: {execution_result.error}"

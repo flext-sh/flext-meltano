@@ -208,7 +208,7 @@ class FlextMeltanoLibraryRunner:
                     error_msg = f"Failed to execute dbt command: {e}"
                     return FlextResult[dict[str, object]].fail(error_msg)
 
-        async def run_transformations_programmatic(
+        def run_transformations_programmatic(
             self, project_dir: Path, models: list[str] | None = None, **options: object
         ) -> FlextResult[DbtTransformationResult]:
             """Execute dbt transformations using programmatic API.
@@ -413,7 +413,7 @@ class FlextMeltanoLibraryRunner:
                     error_msg = f"Failed to manage extraction state: {e}"
                     return FlextResult[dict[str, object]].fail(error_msg)
 
-        async def execute_singer_pipeline(
+        def execute_singer_pipeline(
             self, tap_instance: object, target_instance: object
         ) -> FlextResult[SingerExecutionResult]:
             """Execute Singer tap-target pipeline with protocol compliance.
@@ -545,7 +545,7 @@ class FlextMeltanoLibraryRunner:
         """
         return self._abstractions
 
-    async def execute_complete_elt_pipeline(
+    def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
         extractor_config: dict[str, object],
@@ -593,7 +593,7 @@ class FlextMeltanoLibraryRunner:
             # Transform phase using dbt programmatic API
             if transformer_config:
                 dbt_runner = self.get_dbt_runner()
-                dbt_result = await dbt_runner.run_transformations_programmatic(
+                dbt_result = dbt_runner.run_transformations_programmatic(
                     project_dir / "transform"
                 )
 

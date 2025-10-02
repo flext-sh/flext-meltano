@@ -37,13 +37,13 @@ class FlextOracleTapService(FlextService):
         super().__init__()
         self._tap_abstractions = FlextTapAbstractions()
 
-    async def discover_oracle_streams(self, config: dict) -> FlextResult[list[StreamDefinition]]:
+    def discover_oracle_streams(self, config: dict) -> FlextResult[list[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
-        return await self._tap_abstractions.discover_catalog("tap-oracle")
+        return self._tap_abstractions.discover_catalog("tap-oracle")
 
-    async def extract_oracle_data(self, stream: str, config: dict) -> FlextResult[list]:
+    def extract_oracle_data(self, stream: str, config: dict) -> FlextResult[list]:
         """Extract data using flext-meltano abstractions."""
-        return await self._tap_abstractions.extract_data("tap-oracle", config)
+        return self._tap_abstractions.extract_data("tap-oracle", config)
 ```
 
 ### Target Implementation Pattern
@@ -62,9 +62,9 @@ class FlextOracleTargetService(FlextService):
         super().__init__()
         self._target_abstractions = FlextTargetAbstractions()
 
-    async def load_to_oracle(self, records: list, config: dict) -> FlextResult[dict]:
+    def load_to_oracle(self, records: list, config: dict) -> FlextResult[dict]:
         """Load records to Oracle using flext-meltano abstractions."""
-        return await self._target_abstractions.load_data("target-oracle", records)
+        return self._target_abstractions.load_data("target-oracle", records)
 ```
 
 ---
@@ -87,7 +87,7 @@ class FlextOracleDbtService(FlextService):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    async def run_oracle_models(self, models: list[str]) -> FlextResult[dict]:
+    def run_oracle_models(self, models: list[str]) -> FlextResult[dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -115,7 +115,7 @@ class EnterpriseELTService(FlextService):
         self._meltano_service = FlextMeltanoService()
         self._adapter = FlextMeltanoAdapter()
 
-    async def execute_elt_pipeline(
+    def execute_elt_pipeline(
         self,
         tap_name: str,
         target_name: str,
@@ -317,7 +317,7 @@ config = builder.build_pipeline_config(tap_settings, target_settings)
 
 ```python
 # Consistent FlextResult patterns across all integrations
-result = await tap_abstractions.discover_catalog("tap-name")
+result = tap_abstractions.discover_catalog("tap-name")
 if result.is_failure:
     return FlextResult[dict].fail(f"Integration failed: {result.error}")
 ```

@@ -69,7 +69,7 @@ from flext_meltano import FlextTapAbstractions
 tap_abstractions = FlextTapAbstractions()
 
 # Example catalog discovery (requires configured tap)
-# catalog_result = await tap_abstractions.discover_catalog("tap-csv")
+# catalog_result = tap_abstractions.discover_catalog("tap-csv")
 ```
 
 ### **FlextResult Pattern**

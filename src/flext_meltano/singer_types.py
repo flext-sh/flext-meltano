@@ -223,16 +223,10 @@ class FlextSingerTypes:
 
             # Single validation logic with dispatch table
             if isinstance(type_name, str) and type_name in validation_rules:
-                type_display, expected_type_info = validation_rules[type_name]
+                expected_types, type_display = validation_rules[type_name]
 
-                if isinstance(expected_type_info, tuple):
-                    # Handle tuple case like (int, float) for "number"
-                    if not isinstance(value, expected_type_info):
-                        return FlextResult[object].fail(
-                            f"Expected {type_display}, got {type(value).__name__}",
-                        )
-                # Handle single type case
-                elif not isinstance(value, (str, int, float, bool, list, dict)):
+                # Check if value matches expected type(s)
+                if not isinstance(value, expected_types):
                     return FlextResult[object].fail(
                         f"Expected {type_display}, got {type(value).__name__}",
                     )
