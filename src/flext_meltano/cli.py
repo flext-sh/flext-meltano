@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from typing import Any
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger, FlextResult
@@ -570,13 +569,13 @@ class FlextMeltanoCLI:
     # DISPLAY METHODS (using flext-cli exclusively)
     # =============================================================================
 
-    def _display_execution_metrics(self, data: dict[str, Any]) -> None:
+    def _display_execution_metrics(self, data: dict[str, object]) -> None:
         """Display pipeline execution metrics."""
         self._cli.header("Execution Metrics")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_pipelines_table(self, pipelines: list[dict[str, Any]]) -> None:
+    def _display_pipelines_table(self, pipelines: list[dict[str, object]]) -> None:
         """Display pipelines in table format."""
         self._cli.table(
             data=pipelines,
@@ -584,43 +583,45 @@ class FlextMeltanoCLI:
             title="Configured Pipelines",
         )
 
-    def _display_tap_metrics(self, data: dict[str, Any]) -> None:
+    def _display_tap_metrics(self, data: dict[str, object]) -> None:
         """Display tap execution metrics."""
         self._cli.header("Tap Metrics")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_target_metrics(self, data: dict[str, Any]) -> None:
+    def _display_target_metrics(self, data: dict[str, object]) -> None:
         """Display target execution metrics."""
         self._cli.header("Target Metrics")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_dbt_metrics(self, data: dict[str, Any]) -> None:
+    def _display_dbt_metrics(self, data: dict[str, object]) -> None:
         """Display DBT execution metrics."""
         self._cli.header("DBT Metrics")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_dbt_test_results(self, data: dict[str, Any]) -> None:
+    def _display_dbt_test_results(self, data: dict[str, object]) -> None:
         """Display DBT test results."""
         self._cli.header("DBT Test Results")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_plugins_table(self, plugins: list[dict[str, Any]], title: str) -> None:
+    def _display_plugins_table(
+        self, plugins: list[dict[str, object]], title: str
+    ) -> None:
         """Display plugins in table format."""
         self._cli.table(
             data=plugins, headers=["Name", "Type", "Version", "Status"], title=title
         )
 
-    def _display_status(self, status_data: dict[str, Any]) -> None:
+    def _display_status(self, status_data: dict[str, object]) -> None:
         """Display service status."""
         self._cli.header("Service Status")
         for key, value in status_data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_version(self, version_data: dict[str, Any]) -> None:
+    def _display_version(self, version_data: dict[str, object]) -> None:
         """Display version information."""
         self._cli.header("Version Information")
         for key, value in version_data.items():

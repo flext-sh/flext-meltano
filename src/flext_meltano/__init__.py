@@ -26,7 +26,6 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
-from flext_meltano.singer_types import FlextSingerTypes
 from flext_meltano.tap_abstractions import (
     FlextTapAbstractions,
     StreamDefinition,
@@ -34,15 +33,18 @@ from flext_meltano.tap_abstractions import (
     TapInstance,
 )
 from flext_meltano.target_abstractions import FlextTargetAbstractions
-from flext_meltano.types import (
-    DbtTransformationResult,
-    EltPipelineResult,
-    SingerExecutionResult,
-    SingerProcessingResult,
-)
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Type aliases for backward compatibility (deprecated - use FlextMeltanoTypes.Processing.*)
+DbtTransformationResult = FlextMeltanoTypes.Processing.DbtTransformationResult
+EltPipelineResult = FlextMeltanoTypes.Processing.EltPipelineResult
+SingerExecutionResult = FlextMeltanoTypes.Processing.SingerExecutionResult
+SingerProcessingResult = FlextMeltanoTypes.Processing.SingerProcessingResult
+
+# Service class aliases for backward compatibility
+FlextSingerTypes = FlextMeltanoService.FlextSingerTypes
 
 __all__ = [
     "ConfigDict",

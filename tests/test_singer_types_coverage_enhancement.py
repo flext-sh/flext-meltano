@@ -168,7 +168,7 @@ class TestFlextSingerTypesCoverage:
         result = self.singer_types.validate_value(123, string_type)
         assert not result.is_success
         assert result.error is not None
-        assert "expected string" in result.error.lower()
+        assert result.error is not None and "expected string" in result.error.lower()
 
         # Valid integer validation
         integer_type: dict[str, object] = {"type": "integer"}
@@ -396,7 +396,7 @@ class TestFlextSingerTypesCoverage:
         result = self.singer_types.get_type_definition("nonexistent")
         assert not result.is_success
         assert result.error is not None
-        assert "not found" in result.error.lower()
+        assert result.error is not None and "not found" in result.error.lower()
 
     def test_data_conversion_functionality(self) -> None:
         """Test data conversion to dictionary format."""
@@ -595,7 +595,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_string_type()
             assert result.is_failure
             assert result.error is not None
-            assert "String type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "String type creation failed" in result.error
+            )
 
         # Test create_integer_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -604,7 +607,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_integer_type()
             assert result.is_failure
             assert result.error is not None
-            assert "Integer type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Integer type creation failed" in result.error
+            )
 
         # Test create_number_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -613,7 +619,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_number_type()
             assert result.is_failure
             assert result.error is not None
-            assert "Number type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Number type creation failed" in result.error
+            )
 
         # Test create_boolean_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -622,7 +631,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_boolean_type()
             assert result.is_failure
             assert result.error is not None
-            assert "Boolean type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Boolean type creation failed" in result.error
+            )
 
         # Test create_array_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -631,7 +643,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_array_type()
             assert result.is_failure
             assert result.error is not None
-            assert "Array type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Array type creation failed" in result.error
+            )
 
         # Test create_object_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -640,7 +655,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_object_type()
             assert result.is_failure
             assert result.error is not None
-            assert "Object type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Object type creation failed" in result.error
+            )
 
         # Test create_datetime_type exception path
         with mock.patch("flext_meltano.singer_types.FlextResult.ok") as mock_ok:
@@ -649,7 +667,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_datetime_type()
             assert result.is_failure
             assert result.error is not None
-            assert "DateTime type creation failed" in result.error
+            assert (
+                result.error is not None
+                and "DateTime type creation failed" in result.error
+            )
 
     def test_create_schema_message_exception_path(self) -> None:
         """Test create_schema_message exception path."""
@@ -659,7 +680,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_schema_message("test_stream", {})
             assert result.is_failure
             assert result.error is not None
-            assert "Schema message creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Schema message creation failed" in result.error
+            )
 
     def test_create_record_message_exception_path(self) -> None:
         """Test create_record_message exception path."""
@@ -669,7 +693,10 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_record_message("test_stream", {})
             assert result.is_failure
             assert result.error is not None
-            assert "Record message creation failed" in result.error
+            assert (
+                result.error is not None
+                and "Record message creation failed" in result.error
+            )
 
     def test_create_state_message_exception_path(self) -> None:
         """Test create_state_message exception path."""
@@ -679,4 +706,7 @@ class TestFlextSingerTypesIntegration:
             result = self.singer_types.create_state_message({})
             assert result.is_failure
             assert result.error is not None
-            assert "State message creation failed" in result.error
+            assert (
+                result.error is not None
+                and "State message creation failed" in result.error
+            )

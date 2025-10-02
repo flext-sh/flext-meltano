@@ -26,7 +26,6 @@ class CliRunnerProtocol(Protocol):
 
     def invoke(self, *args: object, **kwargs: object) -> object:
         """Invoke CLI command."""
-        ...
 
 
 # Test environment setup

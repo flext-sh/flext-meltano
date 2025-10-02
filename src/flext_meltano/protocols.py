@@ -29,15 +29,15 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def get_config(self: object) -> ConfigDict:
             """Get plugin configuration."""
-            ...  # pragma: no cover
+            # pragma: no cover
 
         def validate_config(self, config: ConfigDict) -> bool:
             """Validate plugin configuration."""
-            ...  # pragma: no cover
+            # pragma: no cover
 
         def execute(self, *args: JsonValue) -> T_co:
             """Execute plugin with given arguments."""
-            ...  # pragma: no cover
+            # pragma: no cover
 
     @runtime_checkable
     class SingerStreamProtocol(Protocol):
@@ -49,11 +49,9 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def sync_records(self: object) -> JsonValue:
             """Sync records from the stream."""
-            ...
 
         def get_records(self: object) -> JsonValue:
             """Get records from the stream."""
-            ...
 
     @runtime_checkable
     class SingerTapProtocol(FlextProtocols.Domain.Service, Protocol):
@@ -61,15 +59,12 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def discover(self: object) -> FlextResult[JsonObject]:
             """Discover catalog with FlextResult."""
-            ...
 
         def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
             """Sync data from source with FlextResult."""
-            ...
 
         def execute(self: object) -> FlextResult[object]:
             """Execute the tap extraction (implements Domain.Service)."""
-            ...
 
     @runtime_checkable
     class SingerTargetProtocol(FlextProtocols.Domain.Service, Protocol):
@@ -77,15 +72,12 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def handle_record(self, record: JsonObject) -> FlextResult[JsonValue]:
             """Handle a single record with FlextResult."""
-            ...
 
         def handle_batch(self, records: list[JsonObject]) -> FlextResult[JsonValue]:
             """Handle a batch of records with FlextResult."""
-            ...
 
         def execute(self: object) -> FlextResult[object]:
             """Execute the target loading (implements Domain.Service)."""
-            ...
 
     @runtime_checkable
     class DbtRunnerProtocol(FlextProtocols.Domain.Service, Protocol):
@@ -93,15 +85,12 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def run(self, models: list[str]) -> FlextResult[JsonObject]:
             """Run DBT models with FlextResult."""
-            ...
 
         def test(self, models: list[str]) -> FlextResult[JsonObject]:
             """Test DBT models with FlextResult."""
-            ...
 
         def execute(self: object) -> FlextResult[object]:
             """Execute DBT transformations (implements Domain.Service)."""
-            ...
 
     @runtime_checkable
     class ServiceCallProtocol(FlextProtocols.Domain.Service, Protocol):
@@ -109,11 +98,9 @@ class FlextMeltanoProtocols(FlextProtocols):
 
         def call(self, operation: str, payload: JsonValue) -> FlextResult[JsonValue]:
             """Execute service call with FlextResult."""
-            ...
 
         def execute(self: object) -> FlextResult[object]:
             """Execute service operation (implements Domain.Service)."""
-            ...
 
 
 __all__ = [

@@ -9,13 +9,13 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from flext_core import FlextResult
-from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-from flext_meltano.types import (
+from flext_meltano import (
     DbtTransformationResult,
     EltPipelineResult,
     SingerExecutionResult,
 )
+from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
 
 class TestFlextDbtProgrammaticRunner:

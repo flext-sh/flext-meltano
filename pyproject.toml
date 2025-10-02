@@ -25,7 +25,6 @@
         "jinja2>=3.1.0",
         "meltano>=3.0.0",
         "pandas>=2.0.0",
-        "pool>=0.5.0",
         "prometheus-client>=0.21.0",
         "pydantic-settings>=2.10.1",
         "pydantic>=2.11.7",

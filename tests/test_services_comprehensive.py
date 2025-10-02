@@ -99,7 +99,7 @@ class TestFlextMeltanoServiceExecution:
             result = service.execute()
 
             assert result.is_failure
-            assert "Execution failed" in result.error
+            assert result.error is not None and "Execution failed" in result.error
 
 
 class TestFlextMeltanoServiceValidation:
@@ -148,7 +148,7 @@ class TestFlextMeltanoServiceValidation:
         result = service.validate()
 
         assert result.is_failure
-        assert "Invalid configuration" in result.error
+        assert result.error is not None and "Invalid configuration" in result.error
 
 
 class TestFlextMeltanoServiceStatus:
@@ -236,7 +236,7 @@ class TestFlextMeltanoServiceConfiguration:
         result = service.update_config(invalid_config)
 
         assert result.is_failure
-        assert "Invalid configuration" in result.error
+        assert result.error is not None and "Invalid configuration" in result.error
 
     def test_reset_config(self) -> None:
         """Test configuration reset."""
@@ -288,7 +288,9 @@ class TestFlextMeltanoServicePluginManagement:
         result = service.install_plugin(plugin_config)
 
         assert result.is_failure
-        assert "Plugin name cannot be empty" in result.error
+        assert (
+            result.error is not None and "Plugin name cannot be empty" in result.error
+        )
 
     def test_uninstall_plugin_success(self) -> None:
         """Test successful plugin uninstallation."""
@@ -307,7 +309,9 @@ class TestFlextMeltanoServicePluginManagement:
         result = service.uninstall_plugin("")
 
         assert result.is_failure
-        assert "Plugin name cannot be empty" in result.error
+        assert (
+            result.error is not None and "Plugin name cannot be empty" in result.error
+        )
 
     def test_list_plugins_success(self) -> None:
         """Test successful plugin listing."""
@@ -362,7 +366,10 @@ class TestFlextMeltanoServicePipelineManagement:
         result = service.create_pipeline(tap_config, target_config)
 
         assert result.is_failure
-        assert "Connection configuration cannot be empty" in result.error
+        assert (
+            result.error is not None
+            and "Connection configuration cannot be empty" in result.error
+        )
 
     def test_run_pipeline_success(self) -> None:
         """Test successful pipeline execution."""
@@ -402,7 +409,10 @@ class TestFlextMeltanoServicePipelineManagement:
         result = service.run_pipeline(tap_config, target_config)
 
         assert result.is_failure
-        assert "Connection configuration cannot be empty" in result.error
+        assert (
+            result.error is not None
+            and "Connection configuration cannot be empty" in result.error
+        )
 
     def test_get_pipeline_status_success(self) -> None:
         """Test successful pipeline status retrieval."""
@@ -422,7 +432,9 @@ class TestFlextMeltanoServicePipelineManagement:
         result = service.get_pipeline_status("")
 
         assert result.is_failure
-        assert "Pipeline ID cannot be empty" in result.error
+        assert (
+            result.error is not None and "Pipeline ID cannot be empty" in result.error
+        )
 
 
 class TestFlextMeltanoServiceErrorHandling:
@@ -438,7 +450,7 @@ class TestFlextMeltanoServiceErrorHandling:
             result = service.execute()
 
             assert result.is_failure
-            assert "Unexpected error" in result.error
+            assert result.error is not None and "Unexpected error" in result.error
 
     def test_service_timeout_handling(self) -> None:
         """Test service handles timeouts gracefully."""
@@ -450,7 +462,7 @@ class TestFlextMeltanoServiceErrorHandling:
             result = service.execute()
 
             assert result.is_failure
-            assert "Operation timed out" in result.error
+            assert result.error is not None and "Operation timed out" in result.error
 
     def test_service_validation_error_handling(self) -> None:
         """Test service handles validation errors gracefully."""
@@ -462,7 +474,7 @@ class TestFlextMeltanoServiceErrorHandling:
             result = service.validate()
 
             assert result.is_failure
-            assert "Validation failed" in result.error
+            assert result.error is not None and "Validation failed" in result.error
 
 
 class TestFlextMeltanoServiceIntegration:

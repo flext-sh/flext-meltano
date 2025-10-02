@@ -225,7 +225,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         assert not result.is_success
         assert result.error is not None
-        assert "Plugin name cannot be empty" in result.error
+        assert (
+            result.error is not None and "Plugin name cannot be empty" in result.error
+        )
 
     def test_validate_plugin_name_whitespace(self) -> None:
         config: FlextTypes.Core.Dict = {
@@ -239,7 +241,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         assert not result.is_success
         assert result.error is not None
-        assert "Plugin name cannot be empty" in result.error
+        assert (
+            result.error is not None and "Plugin name cannot be empty" in result.error
+        )
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         config: FlextTypes.Core.Dict = {
@@ -253,7 +257,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         assert not result.is_success
         assert result.error is not None
-        assert "Target plugin names must be at least 8 characters" in result.error
+        assert (
+            result.error is not None
+            and "Target plugin names must be at least 8 characters" in result.error
+        )
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
         config: FlextTypes.Core.Dict = {
@@ -267,7 +274,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         assert not result.is_success
         assert result.error is not None
-        assert "Tap plugin names must be at least 5 characters" in result.error
+        assert (
+            result.error is not None
+            and "Tap plugin names must be at least 5 characters" in result.error
+        )
 
     def test_validate_target_plugin_name_valid(self) -> None:
         config: FlextTypes.Core.Dict = {

@@ -180,6 +180,27 @@ class FlextMeltanoTypes(FlextTypes):
         type TransformationResult = dict[str, str | int | bool | dict[str, object]]
 
     # =========================================================================
+    # PROCESSING TYPES - Data processing results extending FlextTypes.Processing
+    # =========================================================================
+
+    class Processing(FlextTypes.Processing):
+        """Meltano-specific processing types extending FlextTypes.Processing.
+
+        Inherits all generic processing types and adds Meltano-specific result types.
+        Provides structured result types for DBT, Singer, and ELT operations.
+        """
+
+        # Direct access to inherited processing types
+        type ProcessingStatus = FlextTypes.Processing.ProcessingStatus
+        type ProcessingMode = FlextTypes.Processing.ProcessingMode
+
+        # Meltano-specific processing result types
+        type DbtTransformationResult = FlextTypes.Processing.DbtTransformationResult
+        type SingerProcessingResult = FlextTypes.Processing.SingerProcessingResult
+        type SingerExecutionResult = FlextTypes.Processing.SingerExecutionResult
+        type EltPipelineResult = FlextTypes.Processing.EltPipelineResult
+
+    # =========================================================================
     # CORE COMMONLY USED TYPES - Extending FlextTypes.Core for Meltano domain
     # =========================================================================
 

@@ -98,7 +98,7 @@ class TestFlextMeltanoConfigSingletonPattern:
 
         assert result.is_failure
         assert result.error is not None
-        assert "sealed" in result.error.lower()
+        assert result.error is not None and "sealed" in result.error.lower()
 
     def test_get_meltano_environment_variables(self) -> None:
         """Test get_meltano_environment_variables includes both base and Meltano vars."""
