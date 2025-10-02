@@ -11,7 +11,7 @@ from flext_meltano import (
     TapConfig,
     TapInstance,
 )
-from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from flext_tests import FlextTestsFactories, FlextTestsUtilities
 
 
 class TestFlextTapAbstractionsComplete:
@@ -112,6 +112,9 @@ class TestFlextTapAbstractionsComplete:
                 tap_id="tap_csv_123",
                 status="initialized",
                 discovered=True,
+                streams=[
+                    {"name": "test_stream", "schema": {}}
+                ],  # Discovered taps must have streams
                 metadata={"created_at": "2025-01-01T00:00:00Z"},
             )
 
@@ -478,11 +481,11 @@ class TestFlextTapAbstractionsComplete:
         if stream_result.is_success:
             stream = stream_result.value
             self.test_assertions.assert_true(
-                condition=isinstance(stream, StreamDefinition),
-                message="Should return StreamDefinition",
+                condition=isinstance(stream, dict),
+                message="Should return dict stream definition",
             )
             self.test_assertions.assert_equals(
-                actual=stream.stream_name,
+                actual=stream.get("name"),
                 expected="users",
                 message="Stream name should match",
             )
@@ -900,7 +903,7 @@ class TestFlextTapAbstractionsComplete:
     def test_tap_abstractions_error_handling(self) -> None:
         """Test tap abstractions error handling using flext_tests error simulation."""
         # Use flext_tests error simulation
-        error_factory = FlextTestsFixtures.ErrorSimulationFactory()
+        error_factory = FlextTestsFactories.ErrorSimulationFactory()
 
         # Test various error scenarios
         timeout_error = error_factory.create_timeout_error()

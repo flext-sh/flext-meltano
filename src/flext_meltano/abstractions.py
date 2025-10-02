@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import asyncio
 from pathlib import Path
 from typing import Any, override
 from uuid import UUID
@@ -289,7 +288,7 @@ class FlextMeltanoRunnerWrapper:
             runner = SingerRunner(elt_context)
 
             # Execute pipeline
-            asyncio.run(runner.run(extractor_invoker, loader_invoker))
+            run(runner.run(extractor_invoker, loader_invoker))
 
             result: dict[str, object] = {
                 "success": True,

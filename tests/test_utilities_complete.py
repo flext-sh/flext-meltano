@@ -12,7 +12,7 @@ from pathlib import Path
 
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoFileManagers, FlextMeltanoUtilities
-from flext_tests import FlextTestsFixtures, FlextTestsUtilities
+from flext_tests import FlextTestsUtilities
 
 
 class TestFlextMeltanoUtilitiesComplete:
@@ -364,9 +364,9 @@ class TestFlextMeltanoUtilitiesComplete:
     # =========================================================================
 
     def test_utilities_error_handling(self) -> None:
-        """Test utilities error handling using flext_tests error simulation."""
-        # Test error handling with FlextResult patterns
-        failure_result = FlextTestsFixtures.create_failure_result("Test error")
+        """Test utilities error handling using FlextResult patterns."""
+        # Test error handling with FlextResult patterns - create directly
+        failure_result = FlextResult[None].fail("Test error")
 
         self.test_assertions.assert_true(
             condition=isinstance(failure_result, FlextResult),

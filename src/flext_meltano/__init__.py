@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltanoAPI
+from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.config_builders import FlextMeltanoConfigBuilders
 from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
@@ -50,6 +51,7 @@ __all__ = [
     "FlextMeltanoAPI",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
+    "FlextMeltanoCLI",
     "FlextMeltanoConfig",
     "FlextMeltanoConfigBuilders",
     "FlextMeltanoConstants",

@@ -8,8 +8,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import pytest
-
 from flext_core import FlextResult
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
@@ -30,8 +28,7 @@ class TestFlextDbtProgrammaticRunner:
         assert dbt_runner is not None
         assert hasattr(dbt_runner, "_parent")
 
-    @pytest.mark.asyncio
-    async def test_run_transformations_programmatic_mock(self) -> None:
+    def test_run_transformations_programmatic_mock(self) -> None:
         """Test dbt transformations with mocked dependencies."""
         library_runner = FlextMeltanoLibraryRunner()
         dbt_runner = library_runner.get_dbt_runner()
@@ -51,10 +48,10 @@ class TestFlextDbtProgrammaticRunner:
                 mock_dbt_runner_class.return_value = mock_runner
 
                 # Test the transformation
-                result: FlextResult[
-                    DbtTransformationResult
-                ] = await dbt_runner.run_transformations_programmatic(
-                    project_dir, models=["model1", "model2"]
+                result: FlextResult[DbtTransformationResult] = (
+                    dbt_runner.run_transformations_programmatic(
+                        project_dir, models=["model1", "model2"]
+                    )
                 )
 
                 # Type annotation to help type checker
@@ -74,8 +71,7 @@ class TestFlextSingerProtocolManager:
         assert singer_manager is not None
         assert hasattr(singer_manager, "_parent")
 
-    @pytest.mark.asyncio
-    async def test_execute_singer_pipeline_mock(self) -> None:
+    def test_execute_singer_pipeline_mock(self) -> None:
         """Test Singer pipeline execution with mocked dependencies."""
         library_runner = FlextMeltanoLibraryRunner()
         singer_manager = library_runner.get_singer_manager()
@@ -94,9 +90,9 @@ class TestFlextSingerProtocolManager:
         mock_target.write_state.return_value = None
 
         # Test the pipeline execution
-        result: FlextResult[
-            SingerExecutionResult
-        ] = await singer_manager.execute_singer_pipeline(mock_tap, mock_target)
+        result: FlextResult[SingerExecutionResult] = (
+            singer_manager.execute_singer_pipeline(mock_tap, mock_target)
+        )
 
         # Type annotation to help type checker
         assert result.is_success
@@ -141,8 +137,7 @@ class TestFlextMeltanoLibraryRunner:
         abstractions = runner.get_abstractions()
         assert abstractions is not None
 
-    @pytest.mark.asyncio
-    async def test_execute_complete_elt_pipeline_mock(self) -> None:
+    def test_execute_complete_elt_pipeline_mock(self) -> None:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
 
@@ -164,10 +159,10 @@ class TestFlextMeltanoLibraryRunner:
             }
 
             # Test the complete pipeline
-            result: FlextResult[
-                EltPipelineResult
-            ] = await runner.execute_complete_elt_pipeline(
-                project_dir, extractor_config, loader_config, transformer_config
+            result: FlextResult[EltPipelineResult] = (
+                runner.execute_complete_elt_pipeline(
+                    project_dir, extractor_config, loader_config, transformer_config
+                )
             )
 
             assert result.is_success
@@ -191,8 +186,7 @@ class TestFlextMeltanoAdapterIntegration:
         library_runner = adapter._library_runner
         assert isinstance(library_runner, FlextMeltanoLibraryRunner)
 
-    @pytest.mark.asyncio
-    async def test_adapter_dbt_integration(self) -> None:
+    def test_adapter_dbt_integration(self) -> None:
         """Test adapter dbt integration."""
         adapter = FlextMeltanoAdapter()
 

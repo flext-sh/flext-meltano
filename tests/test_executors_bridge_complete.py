@@ -1,6 +1,5 @@
 """Test module for flext-meltano."""
 
-import asyncio
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
@@ -214,23 +213,23 @@ class TestFlextMeltanoBridgeComplete:
             assert isinstance(result, dict)
             assert "success" in result
 
-    def test_run_plugin_async(self) -> None:
-        """Test run_plugin_async method."""
+    def test_run_plugin(self) -> None:
+        """Test run_plugin method."""
 
-        async def run_async_test() -> object:
+        def run_test() -> object:
             with tempfile.TemporaryDirectory() as temp_dir:
                 project_path = Path(temp_dir)
                 # Create a mock project object
                 project = {"path": project_path}
-                return await self.bridge.run_plugin_async(
+                return self.bridge.run_plugin(
                     project,
                     "tap-csv",
                     "describe",
                     [],
                 )
 
-        # Run the async test
-        result = asyncio.run(run_async_test())
+        # Run the test
+        result = run_test()
 
         # The method returns object, so we check it exists
         assert result is not None

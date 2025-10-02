@@ -331,20 +331,20 @@ def mock_meltano_service() -> object:
     """Mock Meltano service for testing."""
 
     class MockMeltanoService:
-        async def create_project(
+        def create_project(
             self,
             _config: FlextTypes.Core.Dict,
         ) -> FlextTypes.Core.Dict:
             return {"project_id": "test-project", "status": "created"}
 
-        async def install_plugin(
+        def install_plugin(
             self,
             _plugin_type: str,
             plugin_name: str,
         ) -> FlextTypes.Core.Dict:
             return {"plugin": plugin_name, "status": "installed"}
 
-        async def run_pipeline(
+        def run_pipeline(
             self,
             _extractor: str,
             _loader: str,
@@ -363,10 +363,10 @@ def mock_singer_tap() -> type[object]:
             """Initialize the instance."""
             self.config = config
 
-        async def discover(self) -> FlextTypes.Core.Dict:
+        def discover(self) -> FlextTypes.Core.Dict:
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-        async def extract(self) -> list[FlextTypes.Core.Dict]:
+        def extract(self) -> list[FlextTypes.Core.Dict]:
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
@@ -381,7 +381,7 @@ def mock_singer_target() -> object:
             """Initialize the instance."""
             self.config = config
 
-        async def load(
+        def load(
             self,
             records: list[FlextTypes.Core.Dict],
         ) -> FlextTypes.Core.Dict:
