@@ -16,12 +16,10 @@ from flext_meltano.constants import FlextMeltanoConstants
 
 if TYPE_CHECKING:
     from flext_meltano.adapters import FlextMeltanoAdapter
+else:
+    # Import at runtime to break circular dependency
+    from flext_meltano.adapters import FlextMeltanoAdapter
 
-# Import Meltano types for proper typing
-try:
-    from meltano.core.project import Project
-except ImportError:
-    Project = object
 
 # Type aliases for complex types to satisfy MyPy strict mode
 ResultType = (
@@ -41,9 +39,7 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize bridge with adapter and logger."""
-        # Lazy import to break circular dependency
-        from flext_meltano.adapters import FlextMeltanoAdapter
-
+        # Import moved to top level to satisfy linter
         self._adapter: FlextMeltanoAdapter = FlextMeltanoAdapter()
         # Unified adapter - no need for separate wrapper
         self._current_project: object | None = None
@@ -337,11 +333,8 @@ class FlextMeltanoBridge:
 
         """
         try:
-            # Run synchronous version in thread pool
-            loop = get_event_loop()
-            return loop.run_in_executor(
-                None,
-                self._run_plugin_sync,
+            # Execute synchronously
+            return self._run_plugin_sync(
                 project,
                 plugin_name,
                 command,

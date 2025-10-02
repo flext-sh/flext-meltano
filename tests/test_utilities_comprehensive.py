@@ -71,7 +71,7 @@ class TestFlextMeltanoUtilitiesConfigCreation:
         )
 
         assert result.is_failure
-        assert "Project ID cannot be empty" in result.error
+        assert result.error is not None and "Project ID cannot be empty" in result.error
 
     def test_create_meltano_config_dict_whitespace_project_id(self) -> None:
         """Test configuration creation with whitespace-only project ID."""
@@ -80,7 +80,7 @@ class TestFlextMeltanoUtilitiesConfigCreation:
         )
 
         assert result.is_failure
-        assert "Project ID cannot be empty" in result.error
+        assert result.error is not None and "Project ID cannot be empty" in result.error
 
     def test_create_meltano_config_dict_invalid_project_id_type(self) -> None:
         """Test configuration creation with invalid project ID type."""
@@ -90,7 +90,10 @@ class TestFlextMeltanoUtilitiesConfigCreation:
         )
 
         assert result.is_failure
-        assert "'int' object has no attribute 'strip'" in result.error
+        assert (
+            result.error is not None
+            and "'int' object has no attribute 'strip'" in result.error
+        )
 
 
 class TestFlextMeltanoUtilitiesProjectValidation:
@@ -129,7 +132,7 @@ class TestFlextMeltanoUtilitiesProjectValidation:
             )
 
             assert result.is_failure
-            assert "Missing required files" in result.error
+            assert result.error is not None and "Missing required files" in result.error
 
     def test_validate_meltano_project_structure_missing_directories(self) -> None:
         """Test project structure validation with missing directories."""
@@ -144,7 +147,10 @@ class TestFlextMeltanoUtilitiesProjectValidation:
             )
 
             assert result.is_failure
-            assert "Missing required directories" in result.error
+            assert (
+                result.error is not None
+                and "Missing required directories" in result.error
+            )
 
     def test_validate_meltano_project_structure_nonexistent_path(self) -> None:
         """Test project structure validation with nonexistent path."""
@@ -153,7 +159,9 @@ class TestFlextMeltanoUtilitiesProjectValidation:
         )
 
         assert result.is_failure
-        assert "Project path does not exist" in result.error
+        assert (
+            result.error is not None and "Project path does not exist" in result.error
+        )
 
     def test_validate_meltano_project_structure_invalid_path_type(self) -> None:
         """Test project structure validation with invalid path type."""
@@ -161,7 +169,10 @@ class TestFlextMeltanoUtilitiesProjectValidation:
             result = FlextMeltanoUtilities.validate_meltano_project_structure(temp_dir)
 
         assert result.is_failure
-        assert "Project path must be a Path object" in result.error
+        assert (
+            result.error is not None
+            and "Project path must be a Path object" in result.error
+        )
 
 
 class TestFlextMeltanoUtilitiesFileCreation:
@@ -195,7 +206,7 @@ class TestFlextMeltanoUtilitiesFileCreation:
         )
 
         assert result.is_failure
-        assert "Cannot create file" in result.error
+        assert result.error is not None and "Cannot create file" in result.error
 
     def test_create_meltano_project_file_invalid_config(self) -> None:
         """Test project file creation with invalid config data."""
@@ -210,7 +221,10 @@ class TestFlextMeltanoUtilitiesFileCreation:
             )
 
             assert result.is_failure
-            assert "Config data must be a dictionary" in result.error
+            assert (
+                result.error is not None
+                and "Config data must be a dictionary" in result.error
+            )
 
     def test_create_meltano_project_file_empty_config(self) -> None:
         """Test project file creation with empty config data."""
@@ -222,7 +236,10 @@ class TestFlextMeltanoUtilitiesFileCreation:
             )
 
             assert result.is_failure
-            assert "Config data cannot be empty" in result.error
+            assert (
+                result.error is not None
+                and "Config data cannot be empty" in result.error
+            )
 
 
 class TestFlextMeltanoUtilitiesYamlOperations:
@@ -254,7 +271,7 @@ class TestFlextMeltanoUtilitiesYamlOperations:
         result = FlextMeltanoUtilities.load_yaml_file(Path("/nonexistent/file.yml"))
 
         assert result.is_failure
-        assert "File does not exist" in result.error
+        assert result.error is not None and "File does not exist" in result.error
 
     def test_load_yaml_file_invalid_yaml(self) -> None:
         """Test YAML file loading with invalid YAML content."""
@@ -268,7 +285,7 @@ class TestFlextMeltanoUtilitiesYamlOperations:
             result = FlextMeltanoUtilities.load_yaml_file(yaml_file)
 
             assert result.is_failure
-            assert "Invalid YAML format" in result.error
+            assert result.error is not None and "Invalid YAML format" in result.error
 
     def test_save_yaml_file_success(self) -> None:
         """Test successful YAML file saving."""
@@ -298,7 +315,7 @@ class TestFlextMeltanoUtilitiesYamlOperations:
             result = FlextMeltanoUtilities.save_yaml_file(yaml_file, invalid_data)
 
             assert result.is_failure
-            assert "Cannot serialize data" in result.error
+            assert result.error is not None and "Cannot serialize data" in result.error
 
     def test_save_yaml_file_invalid_path(self) -> None:
         """Test YAML file saving with invalid path."""
@@ -309,7 +326,7 @@ class TestFlextMeltanoUtilitiesYamlOperations:
         )
 
         assert result.is_failure
-        assert "Cannot create file" in result.error
+        assert result.error is not None and "Cannot create file" in result.error
 
 
 class TestFlextMeltanoUtilitiesPathOperations:
@@ -336,14 +353,16 @@ class TestFlextMeltanoUtilitiesPathOperations:
             result = FlextMeltanoUtilities.get_project_root(project_path)
 
             assert result.is_failure
-            assert "No meltano.yml file found" in result.error
+            assert (
+                result.error is not None and "No meltano.yml file found" in result.error
+            )
 
     def test_get_project_root_nonexistent_path(self) -> None:
         """Test project root detection with nonexistent path."""
         result = FlextMeltanoUtilities.get_project_root(Path("/nonexistent/path"))
 
         assert result.is_failure
-        assert "Path does not exist" in result.error
+        assert result.error is not None and "Path does not exist" in result.error
 
     def test_ensure_directory_exists_success(self) -> None:
         """Test successful directory creation."""
@@ -376,7 +395,7 @@ class TestFlextMeltanoUtilitiesPathOperations:
         )
 
         assert result.is_failure
-        assert "Permission denied" in result.error
+        assert result.error is not None and "Permission denied" in result.error
 
 
 class TestFlextMeltanoUtilitiesErrorHandling:
@@ -392,7 +411,7 @@ class TestFlextMeltanoUtilitiesErrorHandling:
             result = FlextMeltanoUtilities.create_meltano_config_dict("test_project")
 
             assert result.is_failure
-            assert "Unexpected error" in result.error
+            assert result.error is not None and "Unexpected error" in result.error
 
     def test_utilities_file_operation_error(self) -> None:
         """Test utilities handle file operation errors gracefully."""
@@ -405,7 +424,7 @@ class TestFlextMeltanoUtilitiesErrorHandling:
                 )
 
             assert result.is_failure
-            assert "File operation failed" in result.error
+            assert result.error is not None and "File operation failed" in result.error
 
     def test_utilities_yaml_error_handling(self) -> None:
         """Test utilities handle YAML errors gracefully."""
@@ -418,7 +437,7 @@ class TestFlextMeltanoUtilitiesErrorHandling:
                 )
 
             assert result.is_failure
-            assert "YAML error" in result.error
+            assert result.error is not None and "YAML error" in result.error
 
 
 class TestFlextMeltanoUtilitiesIntegration:

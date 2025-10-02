@@ -17,13 +17,13 @@ from pathlib import Path
 from typing import Protocol, cast
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.executors_bridge import FlextMeltanoBridge
-from flext_meltano.types import (
+from flext_meltano import (
     DbtTransformationResult,
     EltPipelineResult,
     SingerExecutionResult,
 )
+from flext_meltano.abstractions import FlextMeltanoAbstractions
+from flext_meltano.executors_bridge import FlextMeltanoBridge
 
 
 class SingerTap(Protocol):

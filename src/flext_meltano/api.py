@@ -19,6 +19,7 @@ from flext_core import (
     FlextService,
     FlextTypes,
 )
+
 from flext_meltano.executors import FlextMeltanoExecutor
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -63,6 +64,11 @@ class FlextMeltanoAPI(
     # Pydantic model fields
     service_name: str = "flext_meltano_api"
     version: str = "0.9.9"
+
+    # Instance attributes (declared for type checker)
+    logger: FlextLogger
+    _cli: FlextCli
+    executor: FlextMeltanoExecutor
 
     def __init__(
         self,

@@ -12,10 +12,6 @@ from typing import cast, override
 
 import meltano
 import yaml
-from meltano.core.elt_context import ELTContext
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
-
 from flext_core import (
     FlextConfig,
     FlextLogger,
@@ -23,18 +19,28 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
+from meltano.core.elt_context import ELTContext
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.project import Project
+
+from flext_meltano import (
+    DbtTransformationResult,
+    EltPipelineResult,
+    SingerExecutionResult,
+)
 from flext_meltano.abstractions import (
     FlextMeltanoAbstractions,
 )
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-from flext_meltano.types import (
-    DbtTransformationResult,
-    EltPipelineResult,
-    SingerExecutionResult,
-)
+
+# Type imports from FlextMeltanoTypes (moved from types.py)
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Import result types for method signatures
+SingerExecutionResult = FlextTypes.Processing.SingerExecutionResult
+EltPipelineResult = FlextTypes.Processing.EltPipelineResult
 
 
 class FlextMeltanoAdapter:

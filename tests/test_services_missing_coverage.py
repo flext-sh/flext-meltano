@@ -25,13 +25,13 @@ class TestFlextMeltanoServiceMissingCoverage:
         result = service.create_instance({})
         assert result.is_failure
         assert result.error is not None
-        assert "Filter predicate failed" in result.error
+        assert result.error is not None and "Filter predicate failed" in result.error
 
         # Test None configuration - cast to dict to satisfy type checker
         result = service.create_instance({})  # Empty dict instead of None
         assert result.is_failure
         assert result.error is not None
-        assert "Filter predicate failed" in result.error
+        assert result.error is not None and "Filter predicate failed" in result.error
 
     def test_dbt_service_creation(self) -> None:
         """Test DBT service creation - covers lines 151-159."""
@@ -65,7 +65,10 @@ class TestFlextMeltanoServiceMissingCoverage:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Unknown service type: invalid_type" in result.error
+        assert (
+            result.error is not None
+            and "Unknown service type: invalid_type" in result.error
+        )
 
     def test_create_dbt_service_factory_method(self) -> None:
         """Test create_dbt_service factory method - covers lines 209-223."""

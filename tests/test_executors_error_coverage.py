@@ -48,7 +48,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
         result = self.executor.execute("unknown_command")
         assert result.is_failure
         assert result.error is not None
-        assert "Command not in registry" in result.error
+        assert result.error is not None and "Command not in registry" in result.error
 
     def test_execute_meltano_command_project_not_found(self) -> None:
         """Test execute_meltano_command with project not found."""
@@ -61,7 +61,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
         )
         assert result.is_failure
         assert result.error is not None
-        assert "meltano.yml file missing from project root" in result.error
+        assert (
+            result.error is not None
+            and "meltano.yml file missing from project root" in result.error
+        )
 
     def test_get_project_info_project_not_found(self) -> None:
         """Test get_project_info with project not found."""
@@ -71,7 +74,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
         result = self.executor.get_project_info(non_existent_path)
         assert result.is_failure
         assert result.error is not None
-        assert "Unable to access project metadata" in result.error
+        assert (
+            result.error is not None
+            and "Unable to access project metadata" in result.error
+        )
 
     def test_execute_meltano_command_exception(self) -> None:
         """Test execute_meltano_command with exception."""
@@ -83,7 +89,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
             )
             assert result.is_failure
             assert result.error is not None
-            assert "Unable to verify project structure" in result.error
+            assert (
+                result.error is not None
+                and "Unable to verify project structure" in result.error
+            )
 
     def test_get_project_info_exception(self) -> None:
         """Test get_project_info with exception."""
@@ -92,7 +101,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.get_project_info(Path("/test"))
             assert result.is_failure
             assert result.error is not None
-            assert "Unable to access project metadata" in result.error
+            assert (
+                result.error is not None
+                and "Unable to access project metadata" in result.error
+            )
 
     def test_run_command_exception(self) -> None:
         """Test run_command with exception."""
@@ -132,7 +144,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.health()
             assert result.is_failure
             assert result.error is not None
-            assert "Service health validation unsuccessful" in result.error
+            assert (
+                result.error is not None
+                and "Service health validation unsuccessful" in result.error
+            )
 
     def test_version_exception(self) -> None:
         """Test version method with exception."""
@@ -145,7 +160,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.version()
             assert result.is_failure
             assert result.error is not None
-            assert "Unable to retrieve Meltano version information" in result.error
+            assert (
+                result.error is not None
+                and "Unable to retrieve Meltano version information" in result.error
+            )
 
     def test_help_exception(self) -> None:
         """Test help method with exception."""
@@ -184,7 +202,10 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.list_plugins()
             assert result.is_failure
             assert result.error is not None
-            assert "Unable to enumerate installed plugins" in result.error
+            assert (
+                result.error is not None
+                and "Unable to enumerate installed plugins" in result.error
+            )
 
     def test_run_pipeline_exception(self) -> None:
         """Test run_pipeline method with exception."""
@@ -197,7 +218,9 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.run_pipeline("tap-csv", "target-csv")
             assert result.is_failure
             assert result.error is not None
-            assert "Pipeline execution failed" in result.error
+            assert (
+                result.error is not None and "Pipeline execution failed" in result.error
+            )
 
     def test_flext_meltano_version_exception(self) -> None:
         """Test _flext_meltano_version method with exception."""
@@ -209,7 +232,7 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor._flext_meltano_version()
             assert result.is_failure
             assert result.error is not None
-            assert "Version check failed" in result.error
+            assert result.error is not None and "Version check failed" in result.error
 
     def test_flext_meltano_install_exception(self) -> None:
         """Test install command with exception."""
@@ -236,7 +259,9 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor._flext_meltano_invoke("test-plugin", "arg1", "arg2")
             assert result.is_failure
             assert result.error is not None
-            assert "Plugin invocation failed" in result.error
+            assert (
+                result.error is not None and "Plugin invocation failed" in result.error
+            )
 
     def test_run_cli_exception(self) -> None:
         """Test run_cli method with exception."""
@@ -261,4 +286,4 @@ class TestFlextMeltanoExecutorErrorCoverage:
             result = self.executor.create_flext_cli()
             assert result.is_failure
             assert result.error is not None
-            assert "CLI creation failed" in result.error
+            assert result.error is not None and "CLI creation failed" in result.error
