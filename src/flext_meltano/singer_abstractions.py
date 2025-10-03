@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from flext_cli import FlextCli
 
@@ -23,6 +23,10 @@ from flext_core import (
 )
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+if TYPE_CHECKING:
+    from flext_meltano.adapters import FlextMeltanoAdapter
 
 # Type aliases (MyPy compatible)
 RecordDict = FlextTypes.Dict
@@ -478,7 +482,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
     def create_flext_target_config(
         self,
         target_type: str,
-        connection_config: ConnectionConfig,
+        connection_config: FlextTypes.Dict,
         batch_size: int = FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         max_batches: int = 100,  # No specific constant for max_batches yet
         **kwargs: object,

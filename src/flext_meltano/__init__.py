@@ -12,14 +12,16 @@ from __future__ import annotations
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltanoAPI
+from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.config_builders import FlextMeltanoConfigBuilders
+from flext_meltano.configuration import (
+    FlextMeltanoConfig,
+    FlextMeltanoConfigBuilders,
+)
 from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
 from flext_meltano.exceptions import FlextMeltanoExceptions
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
-from flext_meltano.executors import FlextMeltanoExecutor
-from flext_meltano.executors_bridge import FlextMeltanoBridge
+from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels

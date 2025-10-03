@@ -11,10 +11,12 @@
 ## 📋 DOCUMENT STRUCTURE & REFERENCES
 
 **Quick Links**:
+
 - **[~/.claude/commands/flext.md](~/.claude/commands/flext.md)**: Optimization command for module refactoring (USE with `/flext` command)
 - **[../CLAUDE.md](../CLAUDE.md)**: FLEXT ecosystem standards and domain library rules
 
 **Document Purpose**:
+
 - **This file (CLAUDE.md)**: Project-specific flext-meltano standards, MELTANO ELT PIPELINE patterns, and Singer/DBT integration authority
 - **flext.md command**: Practical refactoring workflows and MCP tool usage patterns (HOW-TO)
 - **Workspace CLAUDE.md**: Domain library standards and ecosystem architectural principles (WHAT and WHY)

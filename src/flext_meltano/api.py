@@ -27,7 +27,7 @@ from flext_core import (
     FlextTypes,
 )
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.executors import FlextMeltanoExecutor
+from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.typings import FlextMeltanoTypes
 
 
