@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import override
 
-from flext_core import FlextUtilities
+from flext_core import FlextTypes, FlextUtilities
 
 
 class FlextMeltanoExecutionResult:
@@ -18,7 +18,7 @@ class FlextMeltanoExecutionResult:
     @override
     def __init__(
         self,
-        command: list[str],
+        command: FlextTypes.StringList,
         *,
         success: bool,
         exit_code: int,
@@ -34,11 +34,11 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(self) -> dict[str, str | int | float | bool | list[str]]:
+    def to_dict(self) -> dict[str, str | int | float | bool | FlextTypes.StringList]:
         """Convert to dictionary representation.
 
         Returns:
-            dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
+            dict[str, str | int | float | bool | FlextTypes.StringList]: Dictionary representation of execution result.
 
         """
         return {

@@ -87,7 +87,7 @@ class FlextOracleDbtService(FlextService):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    def run_oracle_models(self, models: list[str]) -> FlextResult[dict]:
+    def run_oracle_models(self, models: FlextTypes.StringList) -> FlextResult[dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -119,7 +119,7 @@ class EnterpriseELTService(FlextService):
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: list[str] = None
+        dbt_models: FlextTypes.StringList = None
     ) -> FlextResult[dict]:
         """Execute complete ELT pipeline."""
 

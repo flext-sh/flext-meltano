@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from unittest import mock
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextSingerTypes
 
 
@@ -131,7 +131,7 @@ class TestFlextSingerTypesCoverage:
         assert "items" not in array_default
 
         # Object type with properties
-        properties_dict: dict[str, object] = {
+        properties_dict: FlextTypes.Dict = {
             "name": {"type": "string"},
             "age": {"type": "integer", "minimum": 0},
         }
@@ -160,7 +160,7 @@ class TestFlextSingerTypesCoverage:
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
         # Valid string validation
-        string_type: dict[str, object] = {"type": "string"}
+        string_type: FlextTypes.Dict = {"type": "string"}
         result = self.singer_types.validate_value("hello world", string_type)
         assert result.is_success
 
@@ -171,7 +171,7 @@ class TestFlextSingerTypesCoverage:
         assert result.error is not None and "expected string" in result.error.lower()
 
         # Valid integer validation
-        integer_type: dict[str, object] = {"type": "integer"}
+        integer_type: FlextTypes.Dict = {"type": "integer"}
         result = self.singer_types.validate_value(42, integer_type)
         assert result.is_success
 
@@ -180,12 +180,12 @@ class TestFlextSingerTypesCoverage:
         assert not result.is_success
 
         # Valid number validation
-        number_type: dict[str, object] = {"type": "number"}
+        number_type: FlextTypes.Dict = {"type": "number"}
         result = self.singer_types.validate_value(math.pi, number_type)
         assert result.is_success
 
         # Valid boolean validation
-        boolean_type: dict[str, object] = {"type": "boolean"}
+        boolean_type: FlextTypes.Dict = {"type": "boolean"}
         result = self.singer_types.validate_value(True, boolean_type)
         assert result.is_success
         result = self.singer_types.validate_value(False, boolean_type)
@@ -284,7 +284,7 @@ class TestFlextSingerTypesCoverage:
         assert schema_message["key_properties"] == ["id"]
 
         # State message
-        state_data: dict[str, object] = {"bookmarks": {"users": {"id": 100}}}
+        state_data: FlextTypes.Dict = {"bookmarks": {"users": {"id": 100}}}
         result = self.singer_types.create_state_message(state_data)
         assert result.is_success
         assert result.data is not None
@@ -302,7 +302,7 @@ class TestFlextSingerTypesCoverage:
 
     def test_properties_management(self) -> None:
         """Test properties list creation and manipulation."""
-        properties: dict[str, dict[str, object]] = {
+        properties: FlextTypes.NestedDict = {
             "user_id": {"type": "integer"},
             "username": {"type": "string"},
             "created_at": {"type": "string", "format": "date-time"},
@@ -334,7 +334,7 @@ class TestFlextSingerTypesCoverage:
     def test_add_property_functionality(self) -> None:
         """Test adding properties to existing property lists."""
         # Start with basic properties
-        initial_props: dict[str, dict[str, object]] = {
+        initial_props: FlextTypes.NestedDict = {
             "id": {"type": "integer"},
             "name": {"type": "string"},
         }
@@ -422,7 +422,7 @@ class TestFlextSingerTypesCoverage:
     def test_error_handling_and_edge_cases(self) -> None:
         """Test error handling and edge cases."""
         # Test validation with malformed type definition
-        malformed_type: dict[str, object] = {
+        malformed_type: FlextTypes.Dict = {
             "invalid": "definition",
         }  # Missing "type" key
         result = self.singer_types.validate_value("test", malformed_type)
@@ -507,7 +507,7 @@ class TestFlextSingerTypesIntegration:
     def test_properties_list_complete_workflow(self) -> None:
         """Test complete properties list creation and manipulation."""
         # Start with base properties
-        base_properties: dict[str, dict[str, object]] = {
+        base_properties: FlextTypes.NestedDict = {
             "id": {"type": "integer"},
             "name": {"type": "string"},
         }

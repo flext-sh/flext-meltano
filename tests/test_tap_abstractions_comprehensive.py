@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 from pydantic import ValidationError
 
 from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano import FlextTapAbstractions
-from flext_tests import FlextTestsMatchers, FlextTestsPerformance
 
 
 class TestTapConfigComprehensive:
@@ -31,7 +31,7 @@ class TestTapConfigComprehensive:
 
     def test_tap_config_valid_creation(self) -> None:
         """Test creating valid tap configuration."""
-        config_data: FlextTypes.Core.Dict = {
+        config_data: FlextTypes.Dict = {
             "tap_type": "tap-postgres",
             "connection_config": {
                 "host": "localhost",
@@ -53,10 +53,10 @@ class TestTapConfigComprehensive:
         config = FlextTapAbstractions.TapConfig(
             tap_type=str(config_data["tap_type"]),
             connection_config=cast(
-                "FlextTypes.Core.Dict",
+                "FlextTypes.Dict",
                 config_data["connection_config"],
             ),
-            stream_config=cast("FlextTypes.Core.Dict", config_data["stream_config"]),
+            stream_config=cast("FlextTypes.Dict", config_data["stream_config"]),
             version=str(config_data["version"]),
         )
 
@@ -65,7 +65,7 @@ class TestTapConfigComprehensive:
 
         users_stream = config.stream_config.get("users")
         assert users_stream is not None
-        users_config = cast("FlextTypes.Core.Dict", users_stream)
+        users_config = cast("FlextTypes.Dict", users_stream)
         assert users_config["replication_method"] == "FULL_TABLE"
 
         assert config.version == "1.2.3"
@@ -491,7 +491,7 @@ class TestFlextTapAbstractionsComprehensive:
         assert stream.stream_name == "products"
         assert stream.tap_type == "tap-postgres"
         schema_properties = cast(
-            "FlextTypes.Core.Dict",
+            "FlextTypes.Dict",
             stream.stream_schema.get("properties", {}),
         )
         assert "product_id" in schema_properties
@@ -627,7 +627,7 @@ class TestFlextTapAbstractionsOracleIntegration:
         assert tap_instance.tap_type == "tap-oracle"
         assert "tables" in tap_instance.config.connection_config
         tables = cast(
-            "FlextTypes.Core.StringList",
+            "FlextTypes.StringList",
             tap_instance.config.connection_config["tables"],
         )
         assert len(tables) == 3
@@ -831,7 +831,7 @@ class TestFlextTapAbstractionsOracleIntegration:
     def test_tap_abstractions_parametrized_tap_types(
         self,
         tap_type: str,
-        connection_config: FlextTypes.Core.Dict,
+        connection_config: FlextTypes.Dict,
     ) -> None:
         """Test tap abstractions with various tap types."""
         config = FlextTapAbstractions.TapConfig(

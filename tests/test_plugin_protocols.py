@@ -54,36 +54,36 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
     def test_tap_plugin_protocol_definition(self) -> None:
         protocol = FlextMeltanoPluginProtocols.TapPlugin
         assert protocol is not None
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_target_plugin_protocol_definition(self) -> None:
         """Test TargetPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TargetPlugin
         assert protocol is not None
         # TargetPlugin is a type alias for JsonObject, not object itself
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_dbt_plugin_protocol_definition(self) -> None:
         protocol = FlextMeltanoPluginProtocols.DbtPlugin
         assert protocol is not None
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_tap_service_protocol_definition(self) -> None:
         protocol = FlextMeltanoPluginProtocols.TapServiceProtocol
         assert protocol is not None
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_target_service_protocol_definition(self) -> None:
         """Test TargetServiceProtocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
         assert protocol is not None
         # TargetServiceProtocol is a type alias for JsonObject, not object itself
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_dbt_service_protocol_definition(self) -> None:
         protocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
         assert protocol is not None
-        assert protocol == FlextTypes.Core.JsonObject  # Placeholder implementation
+        assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_no_aliases_exist(self) -> None:
         """Test that NO aliases exist - direct API access only."""

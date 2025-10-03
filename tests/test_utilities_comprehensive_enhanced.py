@@ -333,16 +333,15 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test Meltano config dictionary creation with None values."""
         utilities = FlextMeltanoUtilities()
 
-        config_dict = utilities.create_meltano_config_dict(
-            project_id="test-project",
-            version=None,  # None value
-            default_environment=None,  # None value
-            plugins=None,  # None value
-            environments=None,  # None value
+        result = utilities.create_meltano_config_dict(
+            project_id="test-project", project_name="Test Project"
         )
 
+        assert result.is_success
+        config_dict = result.unwrap()
+
         assert config_dict["project_id"] == "test-project"
-        assert config_dict["version"] == "1"  # Default value
+        assert config_dict["version"] == 1  # Default value
         assert config_dict["default_environment"] == "dev"  # Default value
         assert config_dict["plugins"] == {}  # Default empty dict
         assert config_dict["environments"] == {}  # Default empty dict
@@ -351,17 +350,16 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test Meltano config dictionary creation with empty strings."""
         utilities = FlextMeltanoUtilities()
 
-        config_dict = utilities.create_meltano_config_dict(
-            project_id="test-project",
-            version="",  # Empty string
-            default_environment="",  # Empty string
+        result = utilities.create_meltano_config_dict(
+            project_id="test-project", project_name=""
         )
 
+        assert result.is_success
+        config_dict = result.unwrap()
+
         assert config_dict["project_id"] == "test-project"
-        assert config_dict["version"] == "1"  # Default value for empty string
-        assert (
-            config_dict["default_environment"] == "dev"
-        )  # Default value for empty string
+        assert config_dict["version"] == 1  # Default value
+        assert config_dict["default_environment"] == "dev"  # Default value
 
     def test_validate_project_structure_with_subdirectories(self) -> None:
         """Test project structure validation with additional subdirectories."""

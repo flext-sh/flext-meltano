@@ -178,9 +178,9 @@ class TestFlextMeltanoAdapterPluginManagement:
 
         # Test plugin discovery with mocked failure
         with patch.object(adapter, "discover_plugins") as mock_discover:
-            mock_discover.return_value = FlextResult[
-                list[FlextTypes.Core.Headers]
-            ].fail("Discovery failed")
+            mock_discover.return_value = FlextResult[list[FlextTypes.StringDict]].fail(
+                "Discovery failed"
+            )
 
             result = adapter.discover_plugins()
 
@@ -228,7 +228,7 @@ class TestFlextMeltanoAdapterConfigurationManagement:
 
         # Test with mocked failure
         with patch.object(adapter, "convert_singer_schema") as mock_convert:
-            mock_convert.return_value = FlextResult[FlextTypes.Core.Dict].fail(
+            mock_convert.return_value = FlextResult[FlextTypes.Dict].fail(
                 "Invalid schema configuration"
             )
 
@@ -257,7 +257,7 @@ class TestFlextMeltanoAdapterExecution:
 
         # Test with mocked failure
         with patch.object(adapter, "execute_dbt_operation") as mock_execute:
-            mock_execute.return_value = FlextResult[FlextTypes.Core.Dict].fail(
+            mock_execute.return_value = FlextResult[FlextTypes.Dict].fail(
                 "DBT operation failed"
             )
 
@@ -327,9 +327,9 @@ class TestFlextMeltanoAdapterErrorHandling:
 
         # Test with mocked exception
         with patch.object(adapter, "discover_plugins") as mock_discover:
-            mock_discover.return_value = FlextResult[
-                list[FlextTypes.Core.Headers]
-            ].fail("Unexpected error")
+            mock_discover.return_value = FlextResult[list[FlextTypes.StringDict]].fail(
+                "Unexpected error"
+            )
 
             result = adapter.discover_plugins()
 
@@ -343,7 +343,7 @@ class TestFlextMeltanoAdapterErrorHandling:
 
         # Test with mocked timeout
         with patch.object(adapter, "execute_dbt_operation") as mock_execute:
-            mock_execute.return_value = FlextResult[FlextTypes.Core.Dict].fail(
+            mock_execute.return_value = FlextResult[FlextTypes.Dict].fail(
                 "Operation timed out"
             )
 
@@ -359,9 +359,9 @@ class TestFlextMeltanoAdapterErrorHandling:
 
         # Test with mocked network error
         with patch.object(adapter, "discover_plugins") as mock_discover:
-            mock_discover.return_value = FlextResult[
-                list[FlextTypes.Core.Headers]
-            ].fail("Network connection failed")
+            mock_discover.return_value = FlextResult[list[FlextTypes.StringDict]].fail(
+                "Network connection failed"
+            )
 
             result = adapter.discover_plugins()
 

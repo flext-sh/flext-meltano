@@ -22,7 +22,7 @@ from flext_core import (
     FlextTypes,
     T,
 )
-
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -63,9 +63,16 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
     service_name: str
     version: str
     logger: FlextLogger
+    _config: FlextMeltanoConfig
+
+    @property
+    def config(self) -> FlextMeltanoConfig:
+        """Get the FlextMeltanoConfig instance used by this service."""
+        return self._config
 
     def __init__(
         self,
+        config: FlextMeltanoConfig | None = None,
         service_name: str = "flext_meltano_service",
         version: str = "0.9.9",
         **data: object,
@@ -75,6 +82,9 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         if not service_name:
             msg = "Service name cannot be empty"
             raise ValueError(msg)
+
+        # Get or create configuration using FlextMeltanoConfig as source of truth
+        self._config = config or FlextMeltanoConfig.get_global_instance()
 
         # Type-safe data preparation for service initialization
         mutable_data: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(data)
@@ -92,7 +102,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         # Log successful service initialization
         self.logger.info(
-            f"FlextMeltanoService '{service_name}' initialized successfully"
+            f"FlextMeltanoService '{service_name}' initialized with FlextMeltanoConfig integration"
         )
 
     def execute(self) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
@@ -138,7 +148,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
     # SINGER TAP PROTOCOL IMPLEMENTATION - SingerTapProtocol compliance
     # =============================================================================
 
-    def discover(self) -> FlextResult[FlextTypes.Core.JsonObject]:
+    def discover(self) -> FlextResult[FlextTypes.JsonValue]:
         """Discover catalog with FlextResult - implements SingerTapProtocol.
 
         Discovers the available schemas, tables, and metadata from the data source
@@ -159,7 +169,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         try:
             # Singer catalog discovery with comprehensive metadata
-            catalog: FlextTypes.Core.JsonObject = {
+            catalog: FlextTypes.JsonValue = {
                 "streams": [
                     {
                         "tap_stream_id": "users",
@@ -201,19 +211,22 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 ]
             }
 
-            self.logger.info(
-                f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
-            )
-            return FlextResult[FlextTypes.Core.JsonObject].ok(catalog)
+            # Extract stream count safely
+            stream_count = 0
+            if isinstance(catalog, dict) and "streams" in catalog:
+                streams = catalog["streams"]
+                if isinstance(streams, list):
+                    stream_count = len(streams)
+
+            self.logger.info(f"Catalog discovered with {stream_count} streams")
+            return FlextResult[FlextTypes.JsonValue].ok(catalog)
 
         except Exception as e:
             error_msg = f"Catalog discovery failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.JsonObject].fail(error_msg)
+            return FlextResult[FlextTypes.JsonValue].fail(error_msg)
 
-    def sync(
-        self, catalog: FlextTypes.Core.JsonObject
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+    def sync(self, catalog: FlextTypes.JsonValue) -> FlextResult[FlextTypes.JsonValue]:
         """Sync data from source with FlextResult - implements SingerTapProtocol.
 
         Synchronizes data from the source system using the provided catalog
@@ -237,7 +250,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         """
         if not catalog or not isinstance(catalog, dict):
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Valid catalog is required for sync operation"
             )
 
@@ -251,7 +264,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             ]
 
             if not selected_streams:
-                return FlextResult[FlextTypes.Core.JsonValue].fail(
+                return FlextResult[FlextTypes.JsonValue].fail(
                     "No streams selected in catalog"
                 )
 
@@ -272,7 +285,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 })
 
             # Sync result with comprehensive metrics
-            sync_result: FlextTypes.Core.JsonValue = {
+            sync_result: FlextTypes.JsonValue = {
                 "status": "completed",
                 "total_records_extracted": total_records,
                 "streams_processed": len(selected_streams),
@@ -284,20 +297,20 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             self.logger.info(
                 f"Sync completed: {total_records} records from {len(selected_streams)} streams"
             )
-            return FlextResult[FlextTypes.Core.JsonValue].ok(sync_result)
+            return FlextResult[FlextTypes.JsonValue].ok(sync_result)
 
         except Exception as e:
             error_msg = f"Sync operation failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.JsonValue].fail(error_msg)
+            return FlextResult[FlextTypes.JsonValue].fail(error_msg)
 
     # =============================================================================
     # SINGER TARGET PROTOCOL IMPLEMENTATION - SingerTargetProtocol compliance
     # =============================================================================
 
     def handle_record(
-        self, record: FlextTypes.Core.JsonObject
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        self, record: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle a single record with FlextResult - implements SingerTargetProtocol.
 
         Processes and loads a single data record according to Singer target
@@ -325,7 +338,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         """
         if not record or not isinstance(record, dict):
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Valid record object is required"
             )
 
@@ -333,24 +346,22 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             # Validate Singer record format
             record_type = record.get("type")
             if record_type != "RECORD":
-                return FlextResult[FlextTypes.Core.JsonValue].fail(
+                return FlextResult[FlextTypes.JsonValue].fail(
                     f"Expected RECORD type, got: {record_type}"
                 )
 
             stream_name = record.get("stream")
             if not stream_name:
-                return FlextResult[FlextTypes.Core.JsonValue].fail(
+                return FlextResult[FlextTypes.JsonValue].fail(
                     "Stream name is required in record"
                 )
 
             record_data = record.get("record")
             if not record_data:
-                return FlextResult[FlextTypes.Core.JsonValue].fail(
-                    "Record data is required"
-                )
+                return FlextResult[FlextTypes.JsonValue].fail("Record data is required")
 
             # Process the record (simulate loading to target)
-            processed_record: FlextTypes.Core.JsonValue = {
+            processed_record: FlextTypes.JsonValue = {
                 "status": "processed",
                 "stream": stream_name,
                 "record_id": cast("dict", record_data).get("id", "unknown"),
@@ -360,16 +371,16 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             }
 
             self.logger.info(f"Record processed for stream '{stream_name}'")
-            return FlextResult[FlextTypes.Core.JsonValue].ok(processed_record)
+            return FlextResult[FlextTypes.JsonValue].ok(processed_record)
 
         except Exception as e:
             error_msg = f"Record handling failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.JsonValue].fail(error_msg)
+            return FlextResult[FlextTypes.JsonValue].fail(error_msg)
 
     def handle_batch(
-        self, records: list[FlextTypes.Core.JsonObject]
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        self, records: list[FlextTypes.JsonValue]
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle a batch of records with FlextResult - implements SingerTargetProtocol.
 
         Processes and loads a batch of data records for improved performance,
@@ -406,12 +417,12 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         """
         if not records or not isinstance(records, list):
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Valid records list is required"
             )
 
         if not records:
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Records list cannot be empty"
             )
 
@@ -442,7 +453,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                     continue
 
             # Batch processing result with comprehensive metrics
-            batch_result: FlextTypes.Core.JsonValue = {
+            batch_result: FlextTypes.JsonValue = {
                 "status": "completed" if failed_count == 0 else "partial",
                 "total_records": len(records),
                 "records_processed": processed_count,
@@ -458,12 +469,12 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 log_msg += f", {failed_count} failed"
             self.logger.info(log_msg)
 
-            return FlextResult[FlextTypes.Core.JsonValue].ok(batch_result)
+            return FlextResult[FlextTypes.JsonValue].ok(batch_result)
 
         except Exception as e:
             error_msg = f"Batch handling failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.JsonValue].fail(error_msg)
+            return FlextResult[FlextTypes.JsonValue].fail(error_msg)
 
     # =============================================================================
     # EXISTING SERVICE METHODS - Enhanced with protocol compliance
@@ -544,7 +555,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             # Default configuration with type safety
             pipeline_config = config or {}
 
-            # Build comprehensive pipeline configuration
+            # Build comprehensive pipeline configuration using config values
             pipeline_config_dict: FlextMeltanoTypes.Core.MeltanoConfigDict = {
                 "tap": tap_name,
                 "target": target_name,
@@ -552,6 +563,10 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 "configuration": pipeline_config,
                 "created_at": str(time.time()),
                 "service_name": self.service_name,
+                "timeout_seconds": self._config.timeout_seconds,
+                "log_level": self._config.log_level,
+                "environment": self._config.environment,
+                "project_root": str(self._config.project_root),
             }
 
             self.logger.info(f"Pipeline configured: {tap_name} -> {target_name}")
@@ -1074,7 +1089,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         def __init__(self) -> None:
             """Initialize integrated Singer types manager."""
             self._logger = FlextLogger(f"{__name__}.FlextSingerTypes")
-            self._type_registry: dict[str, FlextTypes.Core.Dict] = {
+            self._type_registry: FlextTypes.NestedDict = {
                 "string": {"type": "string"},
                 "integer": {"type": "integer"},
                 "number": {"type": "number"},
@@ -1088,28 +1103,26 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         # TYPE CREATION METHODS - Factory methods for Singer type definitions
         # ============================================================================
 
-        def create_string_type(
-            self, **kwargs: object
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        def create_string_type(self, **kwargs: object) -> FlextResult[FlextTypes.Dict]:
             """Create string type with optional constraints.
 
             Returns:
-                FlextResult[FlextTypes.Core.Dict]: String type creation result.
+                FlextResult[FlextTypes.Dict]: String type creation result.
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "string"}
+                type_def: FlextTypes.Dict = {"type": "string"}
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"String type creation failed: {e}",
                 )
 
         def create_integer_type(
             self,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create integer type with optional constraints.
 
             Returns:
@@ -1117,17 +1130,15 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "integer"}
+                type_def: FlextTypes.Dict = {"type": "integer"}
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Integer type creation failed: {e}",
                 )
 
-        def create_number_type(
-            self, **kwargs: object
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        def create_number_type(self, **kwargs: object) -> FlextResult[FlextTypes.Dict]:
             """Create number type with optional constraints.
 
             Returns:
@@ -1135,18 +1146,18 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "number"}
+                type_def: FlextTypes.Dict = {"type": "number"}
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Number type creation failed: {e}",
                 )
 
         def create_boolean_type(
             self,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create boolean type.
 
             Returns:
@@ -1154,18 +1165,18 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "boolean"}
+                type_def: FlextTypes.Dict = {"type": "boolean"}
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Boolean type creation failed: {e}",
                 )
 
         def create_datetime_type(
             self,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create date-time type.
 
             Returns:
@@ -1173,22 +1184,22 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {
+                type_def: FlextTypes.Dict = {
                     "type": "string",
                     "format": "date-time",
                 }
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"DateTime type creation failed: {e}",
                 )
 
         def create_array_type(
             self,
-            items: FlextTypes.Core.Dict | None = None,
+            items: FlextTypes.Dict | None = None,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create array type with optional item type.
 
             Returns:
@@ -1196,21 +1207,21 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "array"}
+                type_def: FlextTypes.Dict = {"type": "array"}
                 if items:
                     type_def["items"] = items
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Array type creation failed: {e}",
                 )
 
         def create_object_type(
             self,
-            properties: FlextTypes.Core.Dict | None = None,
+            properties: FlextTypes.Dict | None = None,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create object type with optional properties.
 
             Returns:
@@ -1218,20 +1229,20 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                type_def: FlextTypes.Core.Dict = {"type": "object"}
+                type_def: FlextTypes.Dict = {"type": "object"}
                 if properties:
                     type_def["properties"] = properties
                 type_def.update(kwargs)
-                return FlextResult[FlextTypes.Core.Dict].ok(data=type_def)
+                return FlextResult[FlextTypes.Dict].ok(data=type_def)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Object type creation failed: {e}",
                 )
 
         def validate_value(
             self,
             value: object,
-            type_def: FlextTypes.Core.Dict,
+            type_def: FlextTypes.Dict,
         ) -> FlextResult[object]:
             """Validate value against type definition using lookup table pattern.
 
@@ -1281,9 +1292,9 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         def create_schema_definition(
             self,
-            _properties: dict[str, FlextTypes.Core.Dict],
+            _properties: FlextTypes.NestedDict,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create Singer schema definition (JSON Schema format).
 
             This method creates a pure JSON Schema object for stream validation.
@@ -1294,7 +1305,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                schema: FlextTypes.Core.Dict = {
+                schema: FlextTypes.Dict = {
                     "type": "object",
                     "properties": "properties",
                 }
@@ -1302,9 +1313,9 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 for key in ["required", "additionalProperties", "description"]:
                     if key in kwargs:
                         schema[key] = kwargs[key]
-                return FlextResult[FlextTypes.Core.Dict].ok(data=schema)
+                return FlextResult[FlextTypes.Dict].ok(data=schema)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Schema definition creation failed: {e}",
                 )
 
@@ -1315,9 +1326,9 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         def create_record_message(
             self,
             _stream: str,
-            _record: FlextTypes.Core.Dict,
+            _record: FlextTypes.Dict,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create Singer RECORD message.
 
             Returns:
@@ -1325,7 +1336,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                message: FlextTypes.Core.Dict = {
+                message: FlextTypes.Dict = {
                     "type": "RECORD",
                     "stream": "stream",
                     "record": "record",
@@ -1336,19 +1347,19 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                     if key in kwargs:
                         message[key] = kwargs[key]
 
-                return FlextResult[FlextTypes.Core.Dict].ok(data=message)
+                return FlextResult[FlextTypes.Dict].ok(data=message)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Record message creation failed: {e}",
                 )
 
         def create_schema_message(
             self,
             _stream: str,
-            _schema: FlextTypes.Core.Dict,
-            key_properties: FlextTypes.Core.StringList | None = None,
+            _schema: FlextTypes.Dict,
+            key_properties: FlextTypes.StringList | None = None,
             **kwargs: object,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create Singer SCHEMA message.
 
             Returns:
@@ -1356,7 +1367,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                message: FlextTypes.Core.Dict = {
+                message: FlextTypes.Dict = {
                     "type": "SCHEMA",
                     "stream": "stream",
                     "schema": "schema",
@@ -1368,16 +1379,16 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                     if key in kwargs:
                         message[key] = kwargs[key]
 
-                return FlextResult[FlextTypes.Core.Dict].ok(data=message)
+                return FlextResult[FlextTypes.Dict].ok(data=message)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Schema message creation failed: {e}",
                 )
 
         def create_state_message(
             self,
-            _value: FlextTypes.Core.Dict,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+            _value: FlextTypes.Dict,
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create Singer STATE message.
 
             Returns:
@@ -1385,10 +1396,10 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                message: FlextTypes.Core.Dict = {"type": "STATE", "value": "value"}
-                return FlextResult[FlextTypes.Core.Dict].ok(data=message)
+                message: FlextTypes.Dict = {"type": "STATE", "value": "value"}
+                return FlextResult[FlextTypes.Dict].ok(data=message)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"State message creation failed: {e}",
                 )
 
@@ -1398,8 +1409,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         def create_properties_list(
             self,
-            properties: dict[str, FlextTypes.Core.Dict],
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+            properties: FlextTypes.NestedDict,
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create and validate properties list.
 
             Returns:
@@ -1410,24 +1421,24 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 # Validate each property
                 for prop_name, prop_def in properties.items():
                     if not isinstance(prop_def, dict) or "type" not in prop_def:
-                        return FlextResult[FlextTypes.Core.Dict].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             f"Invalid property definition for {prop_name}",
                         )
 
                 # Convert nested dict to match return type using dict()
-                properties_flat: FlextTypes.Core.Dict = dict(properties.items())
-                return FlextResult[FlextTypes.Core.Dict].ok(data=properties_flat)
+                properties_flat: FlextTypes.Dict = dict(properties.items())
+                return FlextResult[FlextTypes.Dict].ok(data=properties_flat)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Properties list creation failed: {e}",
                 )
 
         def add_property(
             self,
-            properties: FlextTypes.Core.Dict,
+            properties: FlextTypes.Dict,
             name: str,
-            type_def: FlextTypes.Core.Dict,
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+            type_def: FlextTypes.Dict,
+        ) -> FlextResult[FlextTypes.Dict]:
             """Add property to properties collection.
 
             Returns:
@@ -1437,13 +1448,13 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             try:
                 updated_properties = properties.copy()
                 updated_properties[name] = type_def
-                return FlextResult[FlextTypes.Core.Dict].ok(data=updated_properties)
+                return FlextResult[FlextTypes.Dict].ok(data=updated_properties)
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Property addition failed: {e}",
                 )
 
-        def convert_to_dict(self, data: object) -> FlextResult[FlextTypes.Core.Dict]:
+        def convert_to_dict(self, data: object) -> FlextResult[FlextTypes.Dict]:
             """Convert data to dictionary format.
 
             Returns:
@@ -1452,19 +1463,19 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             """
             try:
                 if isinstance(data, dict):
-                    return FlextResult[FlextTypes.Core.Dict].ok(data=data)
+                    return FlextResult[FlextTypes.Dict].ok(data=data)
                 if hasattr(data, "to_dict") and callable(getattr(data, "to_dict")):
                     result: FlextResult[object] = getattr(data, "to_dict")()
                     if isinstance(result, dict):
-                        return FlextResult[FlextTypes.Core.Dict].ok(data=result)
+                        return FlextResult[FlextTypes.Dict].ok(data=result)
                 elif hasattr(data, "__dict__"):
-                    return FlextResult[FlextTypes.Core.Dict].ok(data=data.__dict__)
+                    return FlextResult[FlextTypes.Dict].ok(data=data.__dict__)
 
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Cannot convert {type(data)} to dict",
                 )
             except Exception as e:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Dictionary conversion failed: {e}",
                 )
 
@@ -1472,7 +1483,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         # UTILITY METHODS
         # ============================================================================
 
-        def get_registered_types(self) -> FlextTypes.Core.StringList:
+        def get_registered_types(self) -> FlextTypes.StringList:
             """Get list of registered type names.
 
             Returns:
@@ -1481,9 +1492,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             """
             return list(self._type_registry.keys())
 
-        def get_type_definition(
-            self, type_name: str
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        def get_type_definition(self, type_name: str) -> FlextResult[FlextTypes.Dict]:
             """Get type definition by name.
 
             Returns:
@@ -1491,10 +1500,10 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             if type_name in self._type_registry:
-                return FlextResult[FlextTypes.Core.Dict].ok(
+                return FlextResult[FlextTypes.Dict].ok(
                     self._type_registry[type_name].copy(),
                 )
-            return FlextResult[FlextTypes.Core.Dict].fail(f"Type {type_name} not found")
+            return FlextResult[FlextTypes.Dict].fail(f"Type {type_name} not found")
 
         @classmethod
         def create_instance(cls) -> FlextResult[FlextMeltanoService.FlextSingerTypes]:
@@ -1505,11 +1514,9 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
             """
             try:
-                return FlextResult["FlextMeltanoService.FlextSingerTypes"].ok(
-                    data=cls()
-                )
+                return FlextResult[FlextMeltanoService.FlextSingerTypes].ok(data=cls())
             except Exception as e:
-                return FlextResult["FlextMeltanoService.FlextSingerTypes"].fail(
+                return FlextResult[FlextMeltanoService.FlextSingerTypes].fail(
                     f"Instance creation failed: {e}",
                 )
 

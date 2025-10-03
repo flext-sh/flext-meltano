@@ -16,25 +16,23 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol, cast
 
-from flext_core import FlextLogger, FlextResult, FlextUtilities
-from flext_meltano import (
-    DbtTransformationResult,
-    EltPipelineResult,
-    SingerExecutionResult,
-)
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.executors_bridge import FlextMeltanoBridge
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Types are accessed via FlextMeltanoTypes.Processing.*
 
 
 class SingerTap(Protocol):
     """Singer Tap protocol definition."""
 
-    streams: list[str]
+    streams: FlextTypes.StringList
     name: str
-    state: dict[str, object]
+    state: FlextTypes.Dict
 
-    def get_records(self, stream_name: str) -> list[dict[str, object]]: ...
-    def get_state(self) -> dict[str, object]: ...
+    def get_records(self, stream_name: str) -> list[FlextTypes.Dict]: ...
+    def get_state(self) -> FlextTypes.Dict: ...
 
 
 class SingerTarget(Protocol):
@@ -64,9 +62,9 @@ class FlextMeltanoLibraryRunner:
         self._abstractions = FlextMeltanoAbstractions()
 
         # Component state management
-        self._dbt_session_cache: dict[str, object] = {}
-        self._singer_state_cache: dict[str, dict[str, object]] = {}
-        self._manifest_cache: dict[str, object] = {}
+        self._dbt_session_cache: FlextTypes.Dict = {}
+        self._singer_state_cache: FlextTypes.NestedDict = {}
+        self._manifest_cache: FlextTypes.Dict = {}
 
     # =========================================================================
     # DBT PROGRAMMATIC RUNNER COMPONENT
@@ -86,7 +84,7 @@ class FlextMeltanoLibraryRunner:
             @staticmethod
             def create_reusable_session(
                 project_dir: Path,
-            ) -> FlextResult[dict[str, object]]:
+            ) -> FlextResult[FlextTypes.Dict]:
                 """Create dbt session for reuse (performance optimization).
 
                 Args:
@@ -103,19 +101,19 @@ class FlextMeltanoLibraryRunner:
                     # Test dbt availability by running version command
                     test_result = bridge.invoke_dbt("--version", str(project_dir))
                     if not test_result.get("success", False):
-                        return FlextResult[dict[str, object]].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             "DBT not available - install dbt-core"
                         )
 
                     # Pre-compile project using bridge
                     compile_result = bridge.invoke_dbt("compile", str(project_dir))
                     if not compile_result.get("success", False):
-                        return FlextResult[dict[str, object]].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             f"Failed to compile dbt project: {compile_result.get('error', 'Unknown error')}"
                         )
 
                     # Return session info for bridge usage
-                    return FlextResult[dict[str, object]].ok({
+                    return FlextResult[FlextTypes.Dict].ok({
                         "project_dir": str(project_dir),
                         "compiled": True,
                         "bridge_available": True,
@@ -123,12 +121,12 @@ class FlextMeltanoLibraryRunner:
 
                 except Exception as e:
                     error_msg = f"Failed to create dbt session: {e}"
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
             @staticmethod
             def cache_manifest(
-                _session_info: dict[str, object], project_dir: Path
-            ) -> FlextResult[dict[str, object]]:
+                _session_info: FlextTypes.Dict, project_dir: Path
+            ) -> FlextResult[FlextTypes.Dict]:
                 """Cache dbt manifest for reuse across operations.
 
                 Args:
@@ -146,7 +144,7 @@ class FlextMeltanoLibraryRunner:
                     # Parse manifest using bridge
                     manifest_result = bridge.invoke_dbt("parse", str(project_dir))
                     if not manifest_result.get("success", False):
-                        return FlextResult[dict[str, object]].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             f"Failed to parse dbt project: {manifest_result.get('error', 'Unknown error')}"
                         )
 
@@ -158,21 +156,21 @@ class FlextMeltanoLibraryRunner:
                         "bridge_result": manifest_result,
                     }
 
-                    return FlextResult[dict[str, object]].ok(
-                        cast("dict[str, object]", manifest_data)
+                    return FlextResult[FlextTypes.Dict].ok(
+                        cast("FlextTypes.Dict", manifest_data)
                     )
 
                 except Exception as e:
                     error_msg = f"Failed to cache dbt manifest: {e}"
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
         class _CommandExecutor:
             """dbt command execution with structured result handling."""
 
             @staticmethod
             def execute_dbt_command(
-                project_dir: Path, command_args: list[str]
-            ) -> FlextResult[dict[str, object]]:
+                project_dir: Path, command_args: FlextTypes.StringList
+            ) -> FlextResult[FlextTypes.Dict]:
                 """Execute dbt command with proper error handling.
 
                 Args:
@@ -197,20 +195,23 @@ class FlextMeltanoLibraryRunner:
 
                     # Check success with proper type handling
                     if result.get("success", False):
-                        return FlextResult[dict[str, object]].ok(result)
+                        return FlextResult[FlextTypes.Dict].ok(result)
 
                     error_msg = (
                         f"dbt command failed: {result.get('error', 'Unknown error')}"
                     )
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
                 except Exception as e:
                     error_msg = f"Failed to execute dbt command: {e}"
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
         def run_transformations_programmatic(
-            self, project_dir: Path, models: list[str] | None = None, **options: object
-        ) -> FlextResult[DbtTransformationResult]:
+            self,
+            project_dir: Path,
+            models: FlextTypes.StringList | None = None,
+            **options: object,
+        ) -> FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult]:
             """Execute dbt transformations using programmatic API.
 
             Args:
@@ -234,9 +235,9 @@ class FlextMeltanoLibraryRunner:
                     project_dir
                 )
                 if session_result.is_failure:
-                    return FlextResult[DbtTransformationResult].fail(
-                        f"Failed to create dbt session: {session_result.error}"
-                    )
+                    return FlextResult[
+                        FlextMeltanoTypes.Processing.DbtTransformationResult
+                    ].fail(f"Failed to create dbt session: {session_result.error}")
 
                 session_info = session_result.unwrap()
 
@@ -265,15 +266,15 @@ class FlextMeltanoLibraryRunner:
                 )
 
                 if execution_result.is_failure:
-                    return FlextResult[DbtTransformationResult].fail(
-                        f"dbt transformations failed: {execution_result.error}"
-                    )
+                    return FlextResult[
+                        FlextMeltanoTypes.Processing.DbtTransformationResult
+                    ].fail(f"dbt transformations failed: {execution_result.error}")
 
                 result_data = execution_result.unwrap()
 
                 # Build result summary with proper typing
                 exit_code = getattr(result_data, "exit_code", 1)
-                transformation_result: DbtTransformationResult = {
+                transformation_result: FlextMeltanoTypes.Processing.DbtTransformationResult = {
                     "success": isinstance(exit_code, int) and exit_code == 0,
                     "exit_code": exit_code if isinstance(exit_code, int) else 1,
                     "models_run": models or "all",
@@ -288,12 +289,16 @@ class FlextMeltanoLibraryRunner:
                     exit_code=getattr(result_data, "exit_code", 1),
                 )
 
-                return FlextResult[DbtTransformationResult].ok(transformation_result)
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.DbtTransformationResult
+                ].ok(transformation_result)
 
             except Exception as e:
                 error_msg = f"Failed to run dbt transformations: {e}"
                 self._logger.exception(error_msg)
-                return FlextResult[DbtTransformationResult].fail(error_msg)
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.DbtTransformationResult
+                ].fail(error_msg)
 
     # =========================================================================
     # SINGER PROTOCOL MANAGER COMPONENT
@@ -313,7 +318,7 @@ class FlextMeltanoLibraryRunner:
             @staticmethod
             def process_singer_messages(
                 tap_stream: object, target_handler: object
-            ) -> FlextResult[dict[str, object]]:
+            ) -> FlextResult[FlextTypes.Dict]:
                 """Process Singer messages with proper state management.
 
                 Args:
@@ -325,7 +330,7 @@ class FlextMeltanoLibraryRunner:
 
                 """
                 if SingerTap is None or SingerTarget is None:
-                    return FlextResult[dict[str, object]].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         "Singer protocols not available"
                     )
 
@@ -365,21 +370,21 @@ class FlextMeltanoLibraryRunner:
                                 write_state_method(state)
                                 processing_results["state_updates"] += 1
 
-                    return FlextResult[dict[str, object]].ok(
-                        cast("dict[str, object]", processing_results)
+                    return FlextResult[FlextTypes.Dict].ok(
+                        cast("FlextTypes.Dict", processing_results)
                     )
 
                 except Exception as e:
                     error_msg = f"Failed to process Singer messages: {e}"
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
         class _StateManager:
             """Incremental processing state management."""
 
             @staticmethod
             def manage_extraction_state(
-                tap_name: str, state_data: dict[str, object]
-            ) -> FlextResult[dict[str, object]]:
+                tap_name: str, state_data: FlextTypes.Dict
+            ) -> FlextResult[FlextTypes.Dict]:
                 """Manage Singer state for incremental extractions.
 
                 Args:
@@ -393,7 +398,7 @@ class FlextMeltanoLibraryRunner:
                 try:
                     # Validate state data
                     if not isinstance(state_data, dict):
-                        return FlextResult[dict[str, object]].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             "Invalid state data format"
                         )
 
@@ -405,17 +410,17 @@ class FlextMeltanoLibraryRunner:
                         "incremental": True,
                     }
 
-                    return FlextResult[dict[str, object]].ok(
-                        cast("dict[str, object]", processed_state)
+                    return FlextResult[FlextTypes.Dict].ok(
+                        cast("FlextTypes.Dict", processed_state)
                     )
 
                 except Exception as e:
                     error_msg = f"Failed to manage extraction state: {e}"
-                    return FlextResult[dict[str, object]].fail(error_msg)
+                    return FlextResult[FlextTypes.Dict].fail(error_msg)
 
         def execute_singer_pipeline(
             self, tap_instance: object, target_instance: object
-        ) -> FlextResult[SingerExecutionResult]:
+        ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
             """Execute Singer tap-target pipeline with protocol compliance.
 
             Args:
@@ -439,9 +444,9 @@ class FlextMeltanoLibraryRunner:
                 )
 
                 if message_result.is_failure:
-                    return FlextResult[SingerExecutionResult].fail(
-                        f"Message processing failed: {message_result.error}"
-                    )
+                    return FlextResult[
+                        FlextMeltanoTypes.Processing.SingerExecutionResult
+                    ].fail(f"Message processing failed: {message_result.error}")
 
                 message_data = message_result.unwrap()
 
@@ -459,7 +464,7 @@ class FlextMeltanoLibraryRunner:
                         )
 
                 # Build execution result with proper typing
-                execution_result: SingerExecutionResult = {
+                execution_result: FlextMeltanoTypes.Processing.SingerExecutionResult = {
                     "success": "True",
                     "execution_method": "singer_protocol_compliant",
                     "tap_name": getattr(tap_instance, "name", "unknown"),
@@ -479,19 +484,23 @@ class FlextMeltanoLibraryRunner:
                     messages_processed=execution_result["messages_processed"],
                 )
 
-                return FlextResult[SingerExecutionResult].ok(execution_result)
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.SingerExecutionResult
+                ].ok(execution_result)
 
             except Exception as e:
                 error_msg = f"Failed to execute Singer pipeline: {e}"
                 self._logger.exception(error_msg)
-                return FlextResult[SingerExecutionResult].fail(error_msg)
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.SingerExecutionResult
+                ].fail(error_msg)
 
     # =========================================================================
     # CACHE MANAGEMENT API - Public methods for cache operations
     # =========================================================================
 
     def set_manifest_cache(
-        self, project_dir: str, manifest_data: dict[str, object]
+        self, project_dir: str, manifest_data: FlextTypes.Dict
     ) -> None:
         """Set manifest cache data for a project directory.
 
@@ -503,7 +512,7 @@ class FlextMeltanoLibraryRunner:
         self._manifest_cache[project_dir] = manifest_data
 
     def set_singer_state_cache(
-        self, tap_name: str, state_data: dict[str, object]
+        self, tap_name: str, state_data: FlextTypes.Dict
     ) -> None:
         """Set Singer state cache data for a tap.
 
@@ -548,10 +557,10 @@ class FlextMeltanoLibraryRunner:
     def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
-        extractor_config: dict[str, object],
-        loader_config: dict[str, object],
-        transformer_config: dict[str, object] | None = None,
-    ) -> FlextResult[EltPipelineResult]:
+        extractor_config: FlextTypes.Dict,
+        loader_config: FlextTypes.Dict,
+        transformer_config: FlextTypes.Dict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
         """Execute complete E-L-T pipeline using unified library APIs.
 
         Args:
@@ -570,7 +579,7 @@ class FlextMeltanoLibraryRunner:
                 project_dir=str(project_dir),
             )
 
-            pipeline_results: EltPipelineResult = {
+            pipeline_results: FlextMeltanoTypes.Processing.EltPipelineResult = {
                 "extraction": {},
                 "loading": {},
                 "transformation": {},
@@ -599,7 +608,7 @@ class FlextMeltanoLibraryRunner:
 
                 if dbt_result.is_success:
                     pipeline_results["transformation"] = cast(
-                        "dict[str, object]", dbt_result.unwrap()
+                        "FlextTypes.Dict", dbt_result.unwrap()
                     )
                 else:
                     pipeline_results["transformation"] = {
@@ -608,7 +617,7 @@ class FlextMeltanoLibraryRunner:
                     }
 
             # Determine overall success with proper type handling
-            success_values: list[bool] = [
+            success_values: FlextTypes.BoolList = [
                 bool(phase.get("success", False))
                 for phase in pipeline_results.values()
                 if isinstance(phase, dict)
@@ -620,12 +629,16 @@ class FlextMeltanoLibraryRunner:
                 overall_success=pipeline_results["overall_success"],
             )
 
-            return FlextResult[EltPipelineResult].ok(pipeline_results)
+            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].ok(
+                pipeline_results
+            )
 
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[EltPipelineResult].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
+                error_msg
+            )
 
 
 __all__ = ["FlextMeltanoLibraryRunner"]

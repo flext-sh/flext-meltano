@@ -11,17 +11,17 @@ SPDX-License-Identifier: MIT
 from typing import cast
 
 import pytest
+from flext_tests import FlextTestsMatchers
 
 from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextMeltanoValidators
-from flext_tests import FlextTestsMatchers
 
 
 class TestFlextMeltanoValidatorsComprehensive:
     """Comprehensive tests for FlextMeltanoValidators with 100% coverage."""
 
     def test_validate_plugin_config_valid(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -29,20 +29,20 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_plugin_config_missing_fields(self) -> None:
-        config: FlextTypes.Core.Dict = {"name": "tap-csv"}
+        config: FlextTypes.Dict = {"name": "tap-csv"}
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_empty_fields(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -50,12 +50,12 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_plugin_config_invalid_types(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": 123,
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -63,7 +63,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
@@ -78,60 +78,60 @@ class TestFlextMeltanoValidatorsComprehensive:
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_valid(self) -> None:
-        config: FlextTypes.Core.Dict = {"version": 1, "project_id": "test-project"}
+        config: FlextTypes.Dict = {"version": 1, "project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_meltano_config_missing_version(self) -> None:
-        config: FlextTypes.Core.Dict = {"project_id": "test-project"}
+        config: FlextTypes.Dict = {"project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_invalid_version(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "version": 2,
             "project_id": "test-project",
         }
 
         result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "version": 1,
             "project_id": "",
         }
 
         result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_validate_dbt_config_valid(self) -> None:
-        dbt_config: FlextTypes.Core.Dict = {
+        dbt_config: FlextTypes.Dict = {
             "name": "analytics",
             "version": "1.0.0",
             "profile": "analytics_profile",
         }
 
         result = FlextMeltanoValidators.validate_dbt_business_rules(
-            cast("FlextTypes.Core.JsonValue", dbt_config)
+            cast("FlextTypes.JsonValue", dbt_config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
     def test_validate_dbt_config_missing_required(self) -> None:
-        dbt_config: FlextTypes.Core.Dict = {"name": "analytics"}
+        dbt_config: FlextTypes.Dict = {"name": "analytics"}
 
         result = FlextMeltanoValidators.validate_dbt_business_rules(
-            cast("FlextTypes.Core.JsonValue", dbt_config)
+            cast("FlextTypes.JsonValue", dbt_config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
@@ -144,30 +144,30 @@ class TestFlextMeltanoValidatorsComprehensive:
         invalid_config: object,
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", invalid_config)
+            cast("FlextTypes.JsonValue", invalid_config)
         )
         FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
 
     def test_complex_validation_scenario(self) -> None:
-        meltano_config: FlextTypes.Core.Dict = {
+        meltano_config: FlextTypes.Dict = {
             "version": 1,
             "project_id": "integration-test",
         }
 
-        dbt_config: FlextTypes.Core.Dict = {
+        dbt_config: FlextTypes.Dict = {
             "name": "analytics",
             "version": "1.0.0",
             "profile": "analytics_profile",
         }
 
-        tap_config: FlextTypes.Core.Dict = {
+        tap_config: FlextTypes.Dict = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
 
-        target_config: FlextTypes.Core.Dict = {
+        target_config: FlextTypes.Dict = {
             "name": "target-postgres",
             "namespace": "target_postgres",
             "pip_url": "pipelinewise-target-postgres",
@@ -175,16 +175,16 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         meltano_result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            cast("FlextTypes.Core.JsonValue", meltano_config)
+            cast("FlextTypes.JsonValue", meltano_config)
         )
         dbt_result = FlextMeltanoValidators.validate_dbt_business_rules(
-            cast("FlextTypes.Core.JsonValue", dbt_config)
+            cast("FlextTypes.JsonValue", dbt_config)
         )
         tap_result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", tap_config)
+            cast("FlextTypes.JsonValue", tap_config)
         )
         target_result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", target_config)
+            cast("FlextTypes.JsonValue", target_config)
         )
 
         FlextTestsMatchers.assert_result_success(meltano_result, True)
@@ -202,26 +202,26 @@ class TestFlextMeltanoValidatorsComprehensive:
         assert not hasattr(FlextMeltanoValidators, "safe_json_stringify")
         assert not hasattr(FlextMeltanoValidators, "TextProcessor")
 
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "test-plugin",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert result.is_success
 
     def test_validate_plugin_name_empty(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -230,14 +230,14 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
 
     def test_validate_plugin_name_whitespace(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "   ",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -246,14 +246,14 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
 
     def test_validate_target_plugin_name_too_short(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "target-",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -263,14 +263,14 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "tap-",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -280,25 +280,25 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
 
     def test_validate_target_plugin_name_valid(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "target-postgres",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert result.is_success
 
     def test_validate_tap_plugin_name_valid(self) -> None:
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "tap-csv",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
         assert result.is_success

@@ -12,7 +12,8 @@ from __future__ import annotations
 import sys
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger, FlextResult
+
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.api import FlextMeltanoAPI
 
 
@@ -39,7 +40,7 @@ class FlextMeltanoCLI:
     # MAIN CLI ENTRY POINT
     # =============================================================================
 
-    def main(self, args: list[str] | None = None) -> int:
+    def main(self, args: FlextTypes.StringList | None = None) -> int:
         """Main CLI entry point.
 
         Args:
@@ -90,7 +91,9 @@ class FlextMeltanoCLI:
     # PIPELINE COMMANDS
     # =============================================================================
 
-    def _handle_pipeline_command(self, args: list[str]) -> FlextResult[None]:
+    def _handle_pipeline_command(
+        self, args: FlextTypes.StringList
+    ) -> FlextResult[None]:
         """Handle pipeline subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_pipeline_help()
@@ -110,7 +113,7 @@ class FlextMeltanoCLI:
         self._show_pipeline_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _pipeline_create(self, args: list[str]) -> FlextResult[None]:
+    def _pipeline_create(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Create a new pipeline."""
         # Parse arguments
         parsed = self._parse_pipeline_create_args(args)
@@ -127,10 +130,11 @@ class FlextMeltanoCLI:
 
         # Create pipeline via API
         result = self._api.create_pipeline(
-            name=name,
             tap_name=tap,
             target_name=target,
-            transform_name=transform,
+            config={"pipeline_name": name, "transform_name": transform}
+            if transform
+            else {"pipeline_name": name},
         )
 
         if result.is_failure:
@@ -140,7 +144,7 @@ class FlextMeltanoCLI:
         self._cli.success(f"Pipeline '{name}' created successfully")
         return FlextResult[None].ok(None)
 
-    def _pipeline_execute(self, args: list[str]) -> FlextResult[None]:
+    def _pipeline_execute(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Execute a pipeline."""
         if not args:
             self._cli.error("Pipeline name required")
@@ -151,7 +155,7 @@ class FlextMeltanoCLI:
         self._cli.info(f"Executing pipeline: {pipeline_name}")
 
         # Execute pipeline via API
-        result = self._api.execute_pipeline(pipeline_name=pipeline_name)
+        result = self._api.execute_pipeline(pipeline_id=pipeline_name)
 
         if result.is_failure:
             self._cli.error(f"Pipeline execution failed: {result.error}")
@@ -165,7 +169,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _pipeline_list(self, _args: list[str]) -> FlextResult[None]:
+    def _pipeline_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available pipelines."""
         self._cli.info("Listing pipelines...")
 
@@ -191,7 +195,7 @@ class FlextMeltanoCLI:
     # TAP COMMANDS
     # =============================================================================
 
-    def _handle_tap_command(self, args: list[str]) -> FlextResult[None]:
+    def _handle_tap_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle tap subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_tap_help()
@@ -211,7 +215,7 @@ class FlextMeltanoCLI:
         self._show_tap_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _tap_run(self, args: list[str]) -> FlextResult[None]:
+    def _tap_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Run a Singer tap."""
         if not args:
             self._cli.error("Tap name required")
@@ -225,7 +229,7 @@ class FlextMeltanoCLI:
             self._cli.info(f"  Config: {config_file}")
 
         # Run tap via API
-        result = self._api.run_tap(tap_name=tap_name, config_path=config_file)
+        result = self._api.run_tap(tap_name=tap_name)
 
         if result.is_failure:
             self._cli.error(f"Tap execution failed: {result.error}")
@@ -239,7 +243,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _tap_list(self, _args: list[str]) -> FlextResult[None]:
+    def _tap_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available taps."""
         self._cli.info("Listing available taps...")
 
@@ -261,7 +265,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _tap_install(self, args: list[str]) -> FlextResult[None]:
+    def _tap_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Install a Singer tap."""
         if not args:
             self._cli.error("Tap name required")
@@ -285,7 +289,7 @@ class FlextMeltanoCLI:
     # TARGET COMMANDS
     # =============================================================================
 
-    def _handle_target_command(self, args: list[str]) -> FlextResult[None]:
+    def _handle_target_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle target subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_target_help()
@@ -305,7 +309,7 @@ class FlextMeltanoCLI:
         self._show_target_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _target_run(self, args: list[str]) -> FlextResult[None]:
+    def _target_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Run a Singer target."""
         if not args:
             self._cli.error("Target name required")
@@ -319,7 +323,7 @@ class FlextMeltanoCLI:
             self._cli.info(f"  Config: {config_file}")
 
         # Run target via API
-        result = self._api.run_target(target_name=target_name, config_path=config_file)
+        result = self._api.run_target(target_name=target_name)
 
         if result.is_failure:
             self._cli.error(f"Target execution failed: {result.error}")
@@ -333,7 +337,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _target_list(self, _args: list[str]) -> FlextResult[None]:
+    def _target_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available targets."""
         self._cli.info("Listing available targets...")
 
@@ -355,7 +359,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _target_install(self, args: list[str]) -> FlextResult[None]:
+    def _target_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Install a Singer target."""
         if not args:
             self._cli.error("Target name required")
@@ -379,7 +383,7 @@ class FlextMeltanoCLI:
     # DBT COMMANDS
     # =============================================================================
 
-    def _handle_dbt_command(self, args: list[str]) -> FlextResult[None]:
+    def _handle_dbt_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle DBT subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_dbt_help()
@@ -399,7 +403,7 @@ class FlextMeltanoCLI:
         self._show_dbt_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _dbt_run(self, args: list[str]) -> FlextResult[None]:
+    def _dbt_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Run DBT models."""
         models = self._parse_models_arg(args)
 
@@ -422,7 +426,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _dbt_test(self, args: list[str]) -> FlextResult[None]:
+    def _dbt_test(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Test DBT models."""
         models = self._parse_models_arg(args)
 
@@ -445,7 +449,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _dbt_docs(self, _args: list[str]) -> FlextResult[None]:
+    def _dbt_docs(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """Generate DBT documentation."""
         self._cli.info("Generating DBT documentation...")
 
@@ -463,7 +467,7 @@ class FlextMeltanoCLI:
     # PLUGIN COMMANDS
     # =============================================================================
 
-    def _handle_plugin_command(self, args: list[str]) -> FlextResult[None]:
+    def _handle_plugin_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle plugin subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_plugin_help()
@@ -481,7 +485,7 @@ class FlextMeltanoCLI:
         self._show_plugin_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _plugin_list(self, _args: list[str]) -> FlextResult[None]:
+    def _plugin_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List all installed plugins."""
         self._cli.info("Listing all plugins...")
 
@@ -503,7 +507,7 @@ class FlextMeltanoCLI:
 
         return FlextResult[None].ok(None)
 
-    def _plugin_install(self, args: list[str]) -> FlextResult[None]:
+    def _plugin_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Install a plugin."""
         min_args_required = 2
         if len(args) < min_args_required:
@@ -531,7 +535,7 @@ class FlextMeltanoCLI:
     # STATUS COMMANDS
     # =============================================================================
 
-    def _handle_status_command(self, _args: list[str]) -> FlextResult[None]:
+    def _handle_status_command(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle status command."""
         self._cli.info("Checking Meltano service status...")
 
@@ -542,14 +546,21 @@ class FlextMeltanoCLI:
             self._cli.error(f"Failed to get status: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        status_data = result.unwrap()
+        nested_result = result.unwrap()
+        if nested_result.is_failure:
+            self._cli.error(f"Status check failed: {nested_result.error}")
+            return FlextResult[None].fail(nested_result.error)
+
+        status_data = nested_result.unwrap()
 
         # Display status information
         self._display_status(status_data)
 
         return FlextResult[None].ok(None)
 
-    def _handle_version_command(self, _args: list[str]) -> FlextResult[None]:
+    def _handle_version_command(
+        self, _args: FlextTypes.StringList
+    ) -> FlextResult[None]:
         """Handle version command."""
         # Get version info via API
         result = self._api.get_version_info()
@@ -569,13 +580,13 @@ class FlextMeltanoCLI:
     # DISPLAY METHODS (using flext-cli exclusively)
     # =============================================================================
 
-    def _display_execution_metrics(self, data: dict[str, object]) -> None:
+    def _display_execution_metrics(self, data: FlextTypes.Dict) -> None:
         """Display pipeline execution metrics."""
-        self._cli.header("Execution Metrics")
+        self._cli.info("=== Execution Metrics ===")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_pipelines_table(self, pipelines: list[dict[str, object]]) -> None:
+    def _display_pipelines_table(self, pipelines: list[FlextTypes.Dict]) -> None:
         """Display pipelines in table format."""
         self._cli.table(
             data=pipelines,
@@ -583,47 +594,47 @@ class FlextMeltanoCLI:
             title="Configured Pipelines",
         )
 
-    def _display_tap_metrics(self, data: dict[str, object]) -> None:
+    def _display_tap_metrics(self, data: FlextTypes.Dict) -> None:
         """Display tap execution metrics."""
-        self._cli.header("Tap Metrics")
+        self._cli.info("\n--- Tap Metrics ---")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_target_metrics(self, data: dict[str, object]) -> None:
+    def _display_target_metrics(self, data: FlextTypes.Dict) -> None:
         """Display target execution metrics."""
-        self._cli.header("Target Metrics")
+        self._cli.info("\n--- Target Metrics ---")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_dbt_metrics(self, data: dict[str, object]) -> None:
+    def _display_dbt_metrics(self, data: FlextTypes.Dict) -> None:
         """Display DBT execution metrics."""
-        self._cli.header("DBT Metrics")
+        self._cli.info("\n--- DBT Metrics ---")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_dbt_test_results(self, data: dict[str, object]) -> None:
+    def _display_dbt_test_results(self, data: FlextTypes.Dict) -> None:
         """Display DBT test results."""
-        self._cli.header("DBT Test Results")
+        self._cli.info("\n--- DBT Test Results ---")
         for key, value in data.items():
             self._cli.info(f"  {key}: {value}")
 
     def _display_plugins_table(
-        self, plugins: list[dict[str, object]], title: str
+        self, plugins: list[FlextTypes.Dict], title: str
     ) -> None:
         """Display plugins in table format."""
         self._cli.table(
             data=plugins, headers=["Name", "Type", "Version", "Status"], title=title
         )
 
-    def _display_status(self, status_data: dict[str, object]) -> None:
+    def _display_status(self, status_data: FlextTypes.Dict) -> None:
         """Display service status."""
-        self._cli.header("Service Status")
+        self._cli.info("=== Service Status ===")
         for key, value in status_data.items():
             self._cli.info(f"  {key}: {value}")
 
-    def _display_version(self, version_data: dict[str, object]) -> None:
+    def _display_version(self, version_data: FlextTypes.Dict) -> None:
         """Display version information."""
-        self._cli.header("Version Information")
+        self._cli.info("=== Version Information ===")
         for key, value in version_data.items():
             self._cli.info(f"  {key}: {value}")
 
@@ -633,7 +644,7 @@ class FlextMeltanoCLI:
 
     def _show_banner(self) -> None:
         """Show CLI banner."""
-        self._cli.header("FLEXT Meltano - Data Integration Platform")
+        self._cli.info("FLEXT Meltano - Data Integration Platform")
         self._cli.info("Professional CLI for Meltano, Singer, and DBT operations")
         self._cli.info("")
 
@@ -701,7 +712,7 @@ class FlextMeltanoCLI:
     # =============================================================================
 
     def _parse_pipeline_create_args(
-        self, args: list[str]
+        self, args: FlextTypes.StringList
     ) -> tuple[str, str, str, str | None] | None:
         """Parse pipeline create arguments."""
         min_args_required = 3
@@ -719,14 +730,14 @@ class FlextMeltanoCLI:
 
         return name, tap, target, transform
 
-    def _parse_config_arg(self, args: list[str]) -> str | None:
+    def _parse_config_arg(self, args: FlextTypes.StringList) -> str | None:
         """Parse config file argument."""
         for i, arg in enumerate(args):
             if arg in {"--config", "-c"} and i + 1 < len(args):
                 return args[i + 1]
         return None
 
-    def _parse_models_arg(self, args: list[str]) -> list[str]:
+    def _parse_models_arg(self, args: FlextTypes.StringList) -> FlextTypes.StringList:
         """Parse models argument."""
         for i, arg in enumerate(args):
             if arg in {"--models", "-m"} and i + 1 < len(args):

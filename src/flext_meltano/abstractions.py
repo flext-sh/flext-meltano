@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import uuid
 from pathlib import Path
 from typing import override
 from uuid import UUID
@@ -27,7 +28,7 @@ from meltano.core.runner.singer import SingerRunner
 from flext_core import (
     FlextLogger,
     FlextResult,
-    FlextUtilities,
+    FlextTypes,
 )
 
 
@@ -116,7 +117,7 @@ class FlextMeltanoHubWrapper:
             self._logger.exception(error_msg)
             return FlextResult[MeltanoHubService].fail(error_msg)
 
-    def get_plugins_of_type(self, plugin_type: str) -> FlextResult[dict[str, object]]:
+    def get_plugins_of_type(self, plugin_type: str) -> FlextResult[FlextTypes.Dict]:
         """Get plugins of specified type using internal meltano.core API.
 
         Args:
@@ -130,7 +131,7 @@ class FlextMeltanoHubWrapper:
             if not self._hub_service:
                 init_result = self.initialize_hub_service()
                 if init_result.is_failure:
-                    return FlextResult[dict[str, object]].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         init_result.error or "Failed to initialize hub service"
                     )
                 self._hub_service = init_result.unwrap()
@@ -143,7 +144,7 @@ class FlextMeltanoHubWrapper:
             }
 
             if plugin_type not in type_mapping:
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Invalid plugin type: {plugin_type}. Valid types: {list(type_mapping.keys())}"
                 )
 
@@ -155,12 +156,12 @@ class FlextMeltanoHubWrapper:
                 f"Retrieved {len(plugins_dict)} plugins of type {plugin_type}"
             )
 
-            return FlextResult[dict[str, object]].ok(data=plugins_dict)
+            return FlextResult[FlextTypes.Dict].ok(data=plugins_dict)
 
         except Exception as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
 
 class FlextMeltanoPluginWrapper:
@@ -247,7 +248,7 @@ class FlextMeltanoRunnerWrapper:
             elt_context = ELTContext(
                 project=project,
                 job=job,
-                run_id=UUID(FlextUtilities.Generators.generate_uuid()),
+                run_id=UUID(str(uuid.uuid4())),
                 dry_run=False,
             )
 
@@ -267,7 +268,7 @@ class FlextMeltanoRunnerWrapper:
         elt_context: ELTContext,
         extractor_plugin: ProjectPlugin,
         loader_plugin: ProjectPlugin,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Execute Singer pipeline using internal meltano.core API.
 
         Args:
@@ -290,7 +291,7 @@ class FlextMeltanoRunnerWrapper:
             # Execute pipeline
             runner.run(extractor_invoker, loader_invoker)
 
-            result: dict[str, object] = {
+            result: FlextTypes.Dict = {
                 "success": True,
                 "extractor": str(extractor_plugin.name),
                 "loader": str(loader_plugin.name),
@@ -301,16 +302,16 @@ class FlextMeltanoRunnerWrapper:
                 f"Singer pipeline executed successfully: {extractor_plugin.name} -> {loader_plugin.name}"
             )
 
-            return FlextResult[dict[str, object]].ok(data=result)
+            return FlextResult[FlextTypes.Dict].ok(data=result)
 
         except RunnerError as runner_error:
             error_msg = f"Singer pipeline execution failed: {runner_error}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
         except Exception as e:
             error_msg = f"Unexpected error in Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
 
 class FlextMeltanoAbstractions:

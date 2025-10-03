@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import cast
 
 from flext_cli import FlextCli
+
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -24,11 +25,11 @@ from flext_meltano.typings import FlextMeltanoTypes
 # Constants
 
 # Type aliases to replace explicit object (avoid shadowing Pydantic ConfigDict)
-RecordDict = FlextTypes.Core.Dict
-ConnectionConfig = FlextTypes.Core.Dict
-SchemaDict = FlextTypes.Core.Dict
-StateDict = FlextTypes.Core.Dict
-ResultDict = FlextTypes.Core.Dict
+RecordDict = FlextTypes.Dict
+ConnectionConfig = FlextTypes.Dict
+SchemaDict = FlextTypes.Dict
+StateDict = FlextTypes.Dict
+ResultDict = FlextTypes.Dict
 
 
 class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
@@ -71,7 +72,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
         )
         self._logger = FlextLogger(f"{__name__}.FlextTargetAbstractions")
         self._cli = FlextCli()
-        self._active_targets: dict[str, FlextTypes.Core.Dict] = {}
+        self._active_targets: FlextTypes.NestedDict = {}
         self._target_configs: dict[str, FlextTargetAbstractions.FlextTargetConfig] = {}
         self._stream_registry: dict[str, FlextTargetAbstractions.FlextStreamInfo] = {}
 
@@ -86,7 +87,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
         batch_size: int = FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         max_batches: int = 100,  # No specific constant for max_batches yet
         **kwargs: object,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create FlextTarget configuration with Pydantic validation."""
         try:
             # Use Pydantic model for validation - all validation is automatic
@@ -113,12 +114,12 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 target_type=target_type,
                 config_id=config_id,
             )
-            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
+            return FlextResult[FlextTypes.Dict].ok(data=config_dict)
 
         except Exception as e:
             error_msg = f"Failed to create FlextTarget config: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # Removed _validate_target_config - validation now handled by Pydantic FlextTargetConfig model
 
@@ -128,9 +129,9 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def create_flext_target(
         self,
-        config: FlextTypes.Core.Dict,
+        config: FlextTypes.Dict,
         _adapter: FlextMeltanoAdapter | None = None,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create FlextTarget instance from configuration."""
         try:
             # Extract target_type for logging
@@ -140,7 +141,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             # Config validation is handled by Pydantic models during usage
 
             # Create target instance
-            target_instance: FlextTypes.Core.Dict = {
+            target_instance: FlextTypes.Dict = {
                 "target_type": "target_type",
                 "config": dict(config),
                 "adapter": "adapter",
@@ -164,7 +165,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 target_type=target_type,
                 target_id=target_id,
             )
-            return FlextResult[FlextTypes.Core.Dict].ok(
+            return FlextResult[FlextTypes.Dict].ok(
                 {
                     **target_instance,
                     "target_id": "target_id",
@@ -174,7 +175,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
         except Exception as e:
             error_msg = f"Failed to create FlextTarget: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # ============================================================================
     # MESSAGE PROCESSING METHODS
@@ -182,7 +183,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def process_schema_message(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
         schema: SchemaDict,
     ) -> FlextResult[bool]:
@@ -242,7 +243,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def process_record_message(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
         record: RecordDict,
     ) -> FlextResult[bool]:
@@ -299,7 +300,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def process_state_message(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         state: StateDict,
     ) -> FlextResult[bool]:
         """Process Singer STATE message with error handling."""
@@ -333,7 +334,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def load_record(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
         record: RecordDict,
     ) -> FlextResult[bool]:
@@ -349,10 +350,10 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def load_batch(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
         records: list[RecordDict],
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Load batch of records to target system."""
         try:
             self._logger.info(
@@ -389,7 +390,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 else 1
             )
 
-            batch_result: dict[str, object] = {
+            batch_result: FlextTypes.Dict = {
                 "stream_name": stream_name,
                 "records_attempted": len(records),
                 "records_loaded": loaded_count,
@@ -405,18 +406,18 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 failed_count=failed_count,
             )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=batch_result)
+            return FlextResult[FlextTypes.Dict].ok(data=batch_result)
 
         except Exception as e:
             error_msg = f"Failed to load batch to stream {stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     def finalize_stream(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Finalize stream loading (commit, cleanup, etc.)."""
         try:
             self._logger.info("Finalizing stream", stream_name=stream_name)
@@ -430,7 +431,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
             ):
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Stream {stream_name} not found",
                 )
 
@@ -441,7 +442,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                     FlextUtilities.Generators.generate_iso_timestamp()
                 )
 
-                finalization_result: dict[str, object] = {
+                finalization_result: FlextTypes.Dict = {
                     "stream_name": stream_name,
                     "records_loaded": stream_info.get("records_loaded", 0),
                     "batches_processed": stream_info.get("batches_processed", 0),
@@ -452,14 +453,14 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                     "Stream finalized successfully",
                     stream_name=stream_name,
                 )
-                return FlextResult[FlextTypes.Core.Dict].ok(data=finalization_result)
+                return FlextResult[FlextTypes.Dict].ok(data=finalization_result)
 
-            return FlextResult[FlextTypes.Core.Dict].fail("Invalid stream info")
+            return FlextResult[FlextTypes.Dict].fail("Invalid stream info")
 
         except Exception as e:
             error_msg = f"Failed to finalize stream {stream_name}: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # ============================================================================
     # TARGET FINALIZATION METHODS
@@ -467,8 +468,8 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def finalize(
         self,
-        target: dict[str, object],
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+        target: FlextTypes.Dict,
+    ) -> FlextResult[FlextTypes.Dict]:
         """Finalize target operations with comprehensive reporting."""
         try:
             self._logger.info("Finalizing target operations")
@@ -501,7 +502,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                             else 0
                         )
 
-            finalization_result: dict[str, object] = {
+            finalization_result: FlextTypes.Dict = {
                 "status": "completed",
                 "total_streams": len(target_streams)
                 if isinstance(target_streams, dict)
@@ -527,12 +528,12 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 total_records=total_records,
             )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=finalization_result)
+            return FlextResult[FlextTypes.Dict].ok(data=finalization_result)
 
         except Exception as e:
             error_msg = f"Failed to finalize target operations: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # ============================================================================
     # QUERY AND UTILITY METHODS
@@ -540,9 +541,9 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
     def get_stream_by_name(
         self,
-        target: dict[str, object],
+        target: FlextTypes.Dict,
         stream_name: str,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Get stream by name with error handling."""
         try:
             target_streams_raw = target.get("streams", {})
@@ -553,20 +554,20 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 not isinstance(target_streams, dict)
                 or stream_name not in target_streams
             ):
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Stream {stream_name} not found",
                 )
 
-            return FlextResult[dict[str, object]].ok(
-                data=cast("dict[str, object]", target_streams[stream_name]),
+            return FlextResult[FlextTypes.Dict].ok(
+                data=cast("FlextTypes.Dict", target_streams[stream_name]),
             )
 
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to get stream {stream_name}: {e}",
             )
 
-    def list_streams(self, target: dict[str, object]) -> FlextTypes.Core.StringList:
+    def list_streams(self, target: FlextTypes.Dict) -> FlextTypes.StringList:
         """List all active stream names."""
         target_streams_raw = target.get("streams", {})
         target_streams: FlextMeltanoTypes.Core.SingerSchemaDict = cast(
@@ -574,15 +575,15 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
         )
         return list(target_streams.keys()) if isinstance(target_streams, dict) else []
 
-    def get_target_type(self, target: dict[str, object]) -> str:
+    def get_target_type(self, target: FlextTypes.Dict) -> str:
         """Get target type."""
         return str(target.get("target_type", "unknown"))
 
-    def get_active_targets(self) -> FlextTypes.Core.StringList:
+    def get_active_targets(self) -> FlextTypes.StringList:
         """Get list of active target IDs."""
         return list(self._active_targets.keys())
 
-    def get_registered_streams(self) -> FlextTypes.Core.StringList:
+    def get_registered_streams(self) -> FlextTypes.StringList:
         """Get list of registered stream keys."""
         return list(self._stream_registry.keys())
 
@@ -600,8 +601,8 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
     # =============================================================================
 
     def handle_record(
-        self, record: FlextTypes.Core.JsonObject
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        self, record: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle a single record (implements SingerTargetProtocol)."""
         try:
             # Extract stream information from record
@@ -609,7 +610,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             record_data = record.get("record", {})
 
             # Create a dummy target config for processing
-            target_config = cast("dict[str, object]", {"stream": stream_name})
+            target_config = cast("FlextTypes.Dict", {"stream": stream_name})
 
             # Use existing load_record functionality
             load_result = self.load_record(
@@ -617,55 +618,53 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
             )
 
             if load_result.is_failure:
-                return FlextResult[FlextTypes.Core.JsonValue].fail(
+                return FlextResult[FlextTypes.JsonValue].fail(
                     load_result.error or "Unknown error"
                 )
 
-            return FlextResult[FlextTypes.Core.JsonValue].ok({
+            return FlextResult[FlextTypes.JsonValue].ok({
                 "loaded": load_result.unwrap()
             })
         except Exception as e:
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 f"Record handling failed: {e}"
             )
 
     def handle_batch(
-        self, records: list[FlextTypes.Core.JsonObject]
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+        self, records: list[FlextTypes.JsonValue]
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle a batch of records (implements SingerTargetProtocol)."""
         try:
             # Group records by stream
-            streams_data: dict[str, list[FlextTypes.Core.JsonObject]] = {}
+            streams_data: dict[str, list[FlextTypes.JsonValue]] = {}
 
             for record in records:
                 stream_name = str(record.get("stream", "unknown"))
                 if stream_name not in streams_data:
                     streams_data[stream_name] = []
                 streams_data[stream_name].append(
-                    cast("dict[str, object]", record.get("record", {}))
+                    cast("FlextTypes.Dict", record.get("record", {}))
                 )
 
             # Process each stream's batch
             results = {}
             for stream_name, stream_records in streams_data.items():
-                target_config = cast("dict[str, object]", {"stream": stream_name})
+                target_config = cast("FlextTypes.Dict", {"stream": stream_name})
                 batch_records = cast("list[RecordDict]", stream_records)
 
                 batch_result = self.load_batch(
                     target_config, stream_name, batch_records
                 )
                 if batch_result.is_failure:
-                    return FlextResult[FlextTypes.Core.JsonValue].fail(
+                    return FlextResult[FlextTypes.JsonValue].fail(
                         f"Batch processing failed for stream {stream_name}: {batch_result.error}"
                     )
 
                 results[stream_name] = batch_result.unwrap()
 
-            return FlextResult[FlextTypes.Core.JsonValue].ok(results)
+            return FlextResult[FlextTypes.JsonValue].ok(results)
         except Exception as e:
-            return FlextResult[FlextTypes.Core.JsonValue].fail(
-                f"Batch handling failed: {e}"
-            )
+            return FlextResult[FlextTypes.JsonValue].fail(f"Batch handling failed: {e}")
 
     def execute(self) -> FlextResult[object]:
         """Execute the target loading (implements Domain.Service)."""
@@ -723,9 +722,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
 
                 if op_type == "handle_record":
                     record = operation.get("record", {})
-                    result = self.handle_record(
-                        cast("FlextTypes.Core.JsonObject", record)
-                    )
+                    result = self.handle_record(cast("FlextTypes.JsonValue", record))
                     return (
                         FlextResult[object].ok(result.unwrap())
                         if result.is_success
@@ -736,7 +733,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
                 if op_type == "handle_batch":
                     records = operation.get("records", [])
                     result = self.handle_batch(
-                        cast("list[FlextTypes.Core.JsonObject]", records)
+                        cast("list[FlextTypes.JsonValue]", records)
                     )
                     return (
                         FlextResult[object].ok(result.unwrap())
@@ -753,7 +750,7 @@ class FlextTargetAbstractions(FlextMeltanoProtocols.SingerTargetProtocol):
         except Exception as e:
             return FlextResult[object].fail(f"Operation execution failed: {e}")
 
-    def get_service_info(self: object) -> FlextTypes.Core.Dict:
+    def get_service_info(self: object) -> FlextTypes.Dict:
         """Get service information and metadata (implements Domain.Service)."""
         return {
             "service_name": "FlextTargetAbstractions",

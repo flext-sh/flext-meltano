@@ -215,7 +215,7 @@ class FlextMeltanoTypes:
         """Meltano plugin management types."""
         type Name = str
         type Config = ConfigDict
-        type Command = list[str]
+        type Command = FlextTypes.StringList
 
     class Singer:
         """Singer protocol integration types."""
@@ -237,14 +237,14 @@ class FlextMeltanoTypes:
 class TapConfig(BaseModel):
     """Type-safe tap configuration model."""
     tap_type: str
-    connection_config: dict[str, object]
-    stream_config: dict[str, object] | None = None
+    connection_config: FlextTypes.Dict
+    stream_config: FlextTypes.Dict | None = None
     version: str | None = None
 
 class StreamDefinition(BaseModel):
     """Type-safe stream definition model."""
     stream_name: str
-    stream_schema: dict[str, object]
+    stream_schema: FlextTypes.Dict
     tap_type: str
     status: str = "discovered"
     records_extracted: int = 0
@@ -258,25 +258,25 @@ class StreamDefinition(BaseModel):
 # All operations return FlextResult[T] for railway-oriented programming
 def process_elt_pipeline(
     tap_config: TapConfig,
-    target_config: dict[str, object]
-) -> FlextResult[dict[str, object]]:
+    target_config: FlextTypes.Dict
+) -> FlextResult[FlextTypes.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase
     validation_result = validate_configuration(tap_config)
     if validation_result.is_failure:
-        return FlextResult[dict[str, object]].fail(
+        return FlextResult[FlextTypes.Dict].fail(
             f"Configuration validation failed: {validation_result.error}"
         )
 
     # Execution phase
     execution_result = execute_pipeline(tap_config, target_config)
     if execution_result.is_failure:
-        return FlextResult[dict[str, object]].fail(
+        return FlextResult[FlextTypes.Dict].fail(
             f"Pipeline execution failed: {execution_result.error}"
         )
 
-    return FlextResult[dict[str, object]].ok(execution_result.unwrap())
+    return FlextResult[FlextTypes.Dict].ok(execution_result.unwrap())
 ```
 
 ### **Exception Hierarchy**

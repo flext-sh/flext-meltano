@@ -3,9 +3,10 @@
 import tempfile
 from pathlib import Path
 
+from flext_tests import FlextTestsMatchers
+
 from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextMeltanoAdapter
-from flext_tests import FlextTestsMatchers
 
 
 class TestFlextMeltanoAdapterReal:
@@ -131,7 +132,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config(self) -> None:
         """Test project configuration adaptation."""
-        config: FlextTypes.Core.Dict = {
+        config: FlextTypes.Dict = {
             "name": "test-project",
             "plugins": {"extractors": [], "loaders": []},
         }
@@ -153,7 +154,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_project_config_minimal(self) -> None:
         """Test project config adaptation with minimal input."""
-        config: FlextTypes.Core.Dict = {}
+        config: FlextTypes.Dict = {}
 
         result = FlextMeltanoAdapter.adapt_project_config(config)
 
@@ -167,7 +168,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin(self) -> None:
         """Test plugin adaptation."""
-        plugin_data: FlextTypes.Core.Dict = {
+        plugin_data: FlextTypes.Dict = {
             "type": "extractors",
             "pip_url": "pipelinewise-tap-csv",
         }
@@ -190,7 +191,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_adapt_plugin_minimal(self) -> None:
         """Test plugin adaptation with minimal input."""
-        plugin_data: FlextTypes.Core.Dict = {}
+        plugin_data: FlextTypes.Dict = {}
 
         result = FlextMeltanoAdapter.adapt_plugin(plugin_data)
 
@@ -234,7 +235,7 @@ class TestFlextMeltanoAdapterReal:
 
     def test_error_handling_invalid_plugin_data(self) -> None:
         """Test error handling with invalid plugin data."""
-        invalid_plugin: FlextTypes.Core.Dict = {
+        invalid_plugin: FlextTypes.Dict = {
             "invalid": "data",
             "type": "nonexistent",
         }
@@ -285,7 +286,7 @@ class TestFlextMeltanoAdapterReal:
     def test_multiple_plugin_operations(self) -> None:
         """Test multiple plugin operations in sequence."""
         # Test plugin adaptation multiple times
-        plugins: list[FlextTypes.Core.Dict] = [
+        plugins: list[FlextTypes.Dict] = [
             {"type": "extractors", "name": "tap-csv"},
             {"type": "loaders", "name": "target-postgres"},
             {"type": "transformers", "name": "dbt"},

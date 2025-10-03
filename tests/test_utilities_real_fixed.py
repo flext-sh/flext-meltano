@@ -252,7 +252,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_save_yaml_config(self) -> None:
         """Test save_yaml_config method."""
         # Create proper Meltano config for testing - cast to object dict
-        config_dict: dict[str, object] = {
+        config_dict: FlextTypes.Dict = {
             "version": 1,
             "project_id": "test",
             "plugins": {"extractors": [], "loaders": [], "transformers": []},
@@ -273,7 +273,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_write_meltano_yml(self) -> None:
         """Test write_meltano_yml method."""
         # Create proper Meltano config for testing
-        config_dict: dict[str, object] = {
+        config_dict: FlextTypes.Dict = {
             "version": 1,
             "project_id": "test-project",
             "plugins": {"extractors": [], "loaders": [], "transformers": []},
@@ -305,7 +305,7 @@ class TestFlextMeltanoUtilitiesRealMethods:
         config = config_result.value
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.Core.JsonValue", config)
+            cast("FlextTypes.JsonValue", config)
         )
 
         assert isinstance(result, FlextResult)
