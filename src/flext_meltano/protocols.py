@@ -66,17 +66,22 @@ class FlextMeltanoProtocols:
         class PluginProtocol(Protocol[T_co]):
             """Meltano plugin interface with covariant return type."""
 
-            def get_config(self: object) -> ConfigDict:
+            # Plugin attributes (matching actual Meltano plugin objects)
+            name: str
+            default_variant: str | None
+            variants: dict[str, object] | None
+
+            def get_config(self) -> ConfigDict:
                 """Get plugin configuration."""
-                # pragma: no cover
+                ...
 
             def validate_config(self, config: ConfigDict) -> bool:
                 """Validate plugin configuration."""
-                # pragma: no cover
+                ...
 
             def execute(self, *args: JsonValue) -> T_co:
                 """Execute plugin with given arguments."""
-                # pragma: no cover
+                ...
 
         @runtime_checkable
         class StreamProtocol(Protocol):
@@ -86,24 +91,29 @@ class FlextMeltanoProtocols:
             tap_stream_id: str
             schema: JsonObject
 
-            def sync_records(self: object) -> JsonValue:
+            def sync_records(self) -> JsonValue:
                 """Sync records from the stream."""
+                ...
 
-            def get_records(self: object) -> JsonValue:
+            def get_records(self) -> JsonValue:
                 """Get records from the stream."""
+                ...
 
         @runtime_checkable
         class TapProtocol(FlextProtocols.Domain.Service, Protocol):
             """Singer Tap protocol extending Domain.Service for ELT operations."""
 
-            def discover(self: object) -> FlextResult[JsonObject]:
+            def discover(self) -> FlextResult[JsonObject]:
                 """Discover catalog with FlextResult."""
+                ...
 
             def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
                 """Sync data from source with FlextResult."""
+                ...
 
-            def execute(self: object) -> FlextResult[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute the tap extraction (implements Domain.Service)."""
+                ...
 
         @runtime_checkable
         class TargetProtocol(FlextProtocols.Domain.Service, Protocol):

@@ -35,6 +35,7 @@ from flext_meltano.singer_abstractions import (
     TapConfig,
     TapInstance,
 )
+from flext_meltano.singer_types import FlextMeltanoSingerTypes
 from flext_meltano.typings import (
     # Export specific types for backward compatibility
     FlextMeltanoTypes,
@@ -50,7 +51,7 @@ SingerExecutionResult = FlextMeltanoTypes.Processing.SingerExecutionResult
 # Type aliases imported from types.py for backward compatibility
 
 # Service class aliases for backward compatibility
-FlextSingerTypes = FlextMeltanoService.FlextSingerTypes
+FlextSingerTypes = FlextMeltanoSingerTypes
 
 __all__ = [
     "ConfigDict",
@@ -72,6 +73,7 @@ __all__ = [
     "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
+    "FlextMeltanoSingerTypes",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
