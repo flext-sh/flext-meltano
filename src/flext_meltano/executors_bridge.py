@@ -9,14 +9,14 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+
+# TYPE_CHECKING import to avoid circular import
+from typing import TYPE_CHECKING, cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
-# TYPE_CHECKING import to avoid circular import
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from flext_meltano.adapters import FlextMeltanoAdapter
 
@@ -39,18 +39,18 @@ class FlextMeltanoBridge:
     def __init__(self) -> None:
         """Initialize bridge with adapter and logger."""
         # Lazy import to break circular dependency
-        self._adapter: "FlextMeltanoAdapter" | None = None
+        self._adapter: FlextMeltanoAdapter | None = None
         # Unified adapter - no need for separate wrapper
         self._current_project: object | None = None
         # Create logger with specific name expected by tests
         self.logger = FlextLogger("MeltanoBridge")
 
     @property
-    def adapter(self) -> "FlextMeltanoAdapter":
+    def adapter(self) -> FlextMeltanoAdapter:
         """Public access to the adapter for testing purposes."""
         if self._adapter is None:
             # Lazy import and initialization to break circular dependency
-            from flext_meltano.adapters import FlextMeltanoAdapter
+            from flext_meltano.adapters import FlextMeltanoAdapter  # noqa: PLC0415
             self._adapter = FlextMeltanoAdapter()
         return self._adapter
 
