@@ -4,8 +4,10 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_meltano import ConfigDict, FlextMeltanoFileManagers
 from flext_tests import FlextTestsMatchers
+
+from flext_core import FlextTypes
+from flext_meltano import ConfigDict, FlextMeltanoFileManagers
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT
@@ -41,7 +43,10 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
+        config: (
+            dict[str, str | int, FlextTypes.StringList]
+            | dict[str, str | FlextTypes.StringList]
+        ) = {
             "test": "data",
         }
         invalid_path = Path("/nonexistent/directory/config.yml")
@@ -52,7 +57,10 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
+        config: (
+            dict[str, str | int, FlextTypes.StringList]
+            | dict[str, str | FlextTypes.StringList]
+        ) = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -92,7 +100,10 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
+        config: (
+            dict[str, str | int, FlextTypes.StringList]
+            | dict[str, str | FlextTypes.StringList]
+        ) = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -143,7 +154,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
         base_path = self.temp_dir / "empty_project"
-        empty_directories: list[str] = []
+        empty_directories: FlextTypes.StringList = []
 
         result = FlextMeltanoFileManagers.create_directory_structure(
             base_path,
@@ -299,7 +310,10 @@ class TestFlextMeltanoFileManagersComprehensive:
             FlextTestsMatchers.assert_result_success(setup_result)
 
             # Create and save config
-            config: dict[str, str | int, list[str]] | dict[str, str | list[str]] = {
+            config: (
+                dict[str, str | int, FlextTypes.StringList]
+                | dict[str, str | FlextTypes.StringList]
+            ) = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {

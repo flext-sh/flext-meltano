@@ -8,9 +8,10 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+from flext_tests import FlextTestsUtilities
+
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoExecutor
-from flext_tests import FlextTestsUtilities
 
 
 class TestExecutorsMissingCoverage:

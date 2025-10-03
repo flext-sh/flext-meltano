@@ -4,9 +4,10 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from flext_tests import FlextTestsUtilities
+
 from flext_core import FlextResult
 from flext_meltano import FlextMeltanoConfigBuilders, PluginTypes
-from flext_tests import FlextTestsUtilities
 
 
 class TestConfigBuildersMissingCoverage:

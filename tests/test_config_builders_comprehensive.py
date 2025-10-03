@@ -13,10 +13,10 @@ import tempfile
 from pathlib import Path
 
 import pytest
-
-from flext_core import FlextResult
-from flext_meltano import FlextMeltanoConfigBuilders, PluginTypes
 from flext_tests import FlextTestsMatchers
+
+from flext_core import FlextResult, FlextTypes
+from flext_meltano import FlextMeltanoConfigBuilders, PluginTypes
 
 
 class TestSingerConfigComprehensive:
@@ -523,7 +523,7 @@ class TestFlextMeltanoConfigBuildersIntegrationComprehensive:
     def test_concurrent_configuration_building(self) -> None:
         """Test concurrent configuration building doesn't interfere."""
 
-        def create_config(config_num: int) -> FlextResult[dict[str, object]]:
+        def create_config(config_num: int) -> FlextResult[FlextTypes.Dict]:
             return FlextMeltanoConfigBuilders().create_dbt_config(
                 f"project_{config_num}",
             )

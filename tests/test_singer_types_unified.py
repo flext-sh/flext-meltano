@@ -51,7 +51,7 @@ class TestFlextSingerTypesUnified:
     def test_schema_message_creation(self) -> None:
         """Test Singer SCHEMA message creation."""
         singer_types = FlextSingerTypes()
-        schema: FlextTypes.Core.Dict = {
+        schema: FlextTypes.Dict = {
             "type": "object",
             "properties": {"id": {"type": "integer"}},
         }
@@ -66,7 +66,7 @@ class TestFlextSingerTypesUnified:
     def test_value_validation(self) -> None:
         """Test value validation against type definitions."""
         singer_types = FlextSingerTypes()
-        string_type: FlextTypes.Core.Dict = {"type": "string"}
+        string_type: FlextTypes.Dict = {"type": "string"}
 
         # Valid string
         result = singer_types.validate_value("test", string_type)

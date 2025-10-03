@@ -1,0 +1,437 @@
+ERROR Could not import `DbtTransformationResult` from `flext_meltano.typings` [missing-module-attribute]
+  --> src/flext_meltano/__init__.py:38:5
+   |
+38 |     DbtTransformationResult,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Could not import `EltPipelineResult` from `flext_meltano.typings` [missing-module-attribute]
+  --> src/flext_meltano/__init__.py:39:5
+   |
+39 |     EltPipelineResult,
+   |     ^^^^^^^^^^^^^^^^^
+   |
+ERROR Could not import `SingerExecutionResult` from `flext_meltano.typings` [missing-module-attribute]
+  --> src/flext_meltano/__init__.py:41:5
+   |
+41 |     SingerExecutionResult,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Argument `dict[str, IndexedPlugin]` is not assignable to parameter `data` with type `dict[str, object]` in function `flext_core.result.FlextResult.ok` [bad-argument-type]
+   --> src/flext_meltano/abstractions.py:159:57
+    |
+159 |             return FlextResult[FlextTypes.Dict].ok(data=plugins_dict)
+    |                                                         ^^^^^^^^^^^^
+    |
+ERROR Result of async function call is unused. Did you forget to `await`? [unused-coroutine]
+   --> src/flext_meltano/abstractions.py:292:13
+    |
+292 |             runner.run(extractor_invoker, loader_invoker)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `name` [missing-attribute]
+   --> src/flext_meltano/adapters.py:428:33
+    |
+428 |                         "name": indexed_plugin.name,
+    |                                 ^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `default_variant` [missing-attribute]
+   --> src/flext_meltano/adapters.py:430:48
+    |
+430 |                         "default_variant": str(indexed_plugin.default_variant),
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `keys` [missing-attribute]
+   --> src/flext_meltano/adapters.py:431:51
+    |
+431 |                         "variants": ",".join(list(indexed_plugin.variants.keys()))
+    |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `variants` [missing-attribute]
+   --> src/flext_meltano/adapters.py:432:28
+    |
+432 |                         if indexed_plugin.variants
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `name` [missing-attribute]
+   --> src/flext_meltano/adapters.py:444:33
+    |
+444 |                         "name": indexed_plugin.name,
+    |                                 ^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `default_variant` [missing-attribute]
+   --> src/flext_meltano/adapters.py:446:48
+    |
+446 |                         "default_variant": str(indexed_plugin.default_variant),
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `keys` [missing-attribute]
+   --> src/flext_meltano/adapters.py:447:51
+    |
+447 |                         "variants": ",".join(list(indexed_plugin.variants.keys()))
+    |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `variants` [missing-attribute]
+   --> src/flext_meltano/adapters.py:448:28
+    |
+448 |                         if indexed_plugin.variants
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `name` [missing-attribute]
+   --> src/flext_meltano/adapters.py:812:25
+    |
+812 |                 "name": indexed_plugin.name,
+    |                         ^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `object` has no attribute `default_variant` [missing-attribute]
+   --> src/flext_meltano/adapters.py:814:40
+    |
+814 |                 "default_variant": str(indexed_plugin.default_variant),
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextCli` has no attribute `header` [missing-attribute]
+   --> src/flext_meltano/cli.py:599:9
+    |
+599 |         self._cli.header("Tap Metrics")
+    |         ^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextCli` has no attribute `header` [missing-attribute]
+   --> src/flext_meltano/cli.py:605:9
+    |
+605 |         self._cli.header("Target Metrics")
+    |         ^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextCli` has no attribute `header` [missing-attribute]
+   --> src/flext_meltano/cli.py:611:9
+    |
+611 |         self._cli.header("DBT Metrics")
+    |         ^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextCli` has no attribute `header` [missing-attribute]
+   --> src/flext_meltano/cli.py:617:9
+    |
+617 |         self._cli.header("DBT Test Results")
+    |         ^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextCli` has no attribute `header` [missing-attribute]
+   --> src/flext_meltano/cli.py:647:9
+    |
+647 |         self._cli.header("FLEXT Meltano - Data Integration Platform")
+    |         ^^^^^^^^^^^^^^^^
+    |
+ERROR Object of class `FlextConfig` has no attribute `clear_global_instance` [missing-attribute]
+   --> src/flext_meltano/config.py:990:9
+    |
+990 |         super().clear_global_instance()
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Class `FlextConfig` has no class attribute `MetadataConfigDict` [missing-attribute]
+    --> src/flext_meltano/config.py:1204:31
+     |
+1204 |     def get_metadata(self) -> FlextConfig.MetadataConfigDict:
+     |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+ERROR Class `FlextConfig` has no class attribute `MetadataConfigDict` [missing-attribute]
+    --> src/flext_meltano/config.py:1215:24
+     |
+1215 |         metadata_dict: FlextConfig.MetadataConfigDict = {
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+ERROR Class `FlextMeltanoTypes` has no class attribute `Headers` [missing-attribute]
+  --> src/flext_meltano/executors_bridge.py:26:24
+   |
+26 |     | FlextResult[list[FlextMeltanoTypes.Headers]]
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Class `FlextMeltanoTypes` has no class attribute `Headers` [missing-attribute]
+  --> src/flext_meltano/executors_bridge.py:27:19
+   |
+27 |     | FlextResult[FlextMeltanoTypes.Headers]
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Class `FlextMeltanoTypes` has no class attribute `Headers` [missing-attribute]
+   --> src/flext_meltano/executors_bridge.py:308:37
+    |
+308 |     ) -> FlextResult[dict[str, list[FlextMeltanoTypes.Headers]]]:
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Class `FlextMeltanoTypes` has no class attribute `Headers` [missing-attribute]
+   --> src/flext_meltano/executors_bridge.py:379:48
+    |
+379 |     def list_plugins(self) -> FlextResult[list[FlextMeltanoTypes.Headers]]:
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+ERROR `dict[str, bool | dict[str, object] | float | int | list[object] | list[str] | str | None]` is not assignable to `dict[str, bool | dict[str, object] | float | int | list[object] | str | None]` [bad-assignment]
+   --> src/flext_meltano/library_runner.py:277:95
+    |
+277 |                   transformation_result: FlextMeltanoTypes.Processing.DbtTransformationResult = {
+    |  _______________________________________________________________________________________________^
+278 | |                     "success": isinstance(exit_code, int) and exit_code == 0,
+279 | |                     "exit_code": exit_code if isinstance(exit_code, int) else 1,
+280 | |                     "models_run": models or "all",
+281 | |                     "execution_method": "dbt_runner_programmatic",
+282 | |                     "project_dir": str(project_dir),
+    | |_____________________________________________________^
+    |
+ERROR Could not find name `EltPipelineResult` [unknown-name]
+   --> src/flext_meltano/library_runner.py:633:32
+    |
+633 |             return FlextResult[EltPipelineResult].fail(error_msg)
+    |                                ^^^^^^^^^^^^^^^^^
+    |
+ERROR Class member `TapConfig.version` overrides parent class `Entity` in an inconsistent manner [bad-override]
+  --> src/flext_meltano/models.py:67:9
+   |
+67 |         version: str = Field(default="latest", description="Tap version")
+   |         ^^^^^^^
+   |
+  `TapConfig.version` has type `str`, which is not consistent with `int` in `Entity.version` (the type of read-write attributes cannot be changed)
+ERROR Class member `StreamInfo.created_at` overrides parent class `Entity` in an inconsistent manner [bad-override]
+   --> src/flext_meltano/models.py:426:9
+    |
+426 |         created_at: str = Field(description="Creation timestamp")
+    |         ^^^^^^^^^^
+    |
+  `StreamInfo.created_at` has type `str`, which is not consistent with `datetime` in `Entity.created_at` (the type of read-write attributes cannot be changed)
+ERROR Class member `DbtProjectModel.version` overrides parent class `Entity` in an inconsistent manner [bad-override]
+   --> src/flext_meltano/models.py:679:9
+    |
+679 |         version: str = Field(description="DBT project version")
+    |         ^^^^^^^
+    |
+  `DbtProjectModel.version` has type `str`, which is not consistent with `int` in `Entity.version` (the type of read-write attributes cannot be changed)
+ERROR Function declared to return `dict[str, bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:30:41
+   |
+30 |         def get_config(self: object) -> ConfigDict:
+   |                                         ^^^^^^^^^^
+   |
+ERROR Function declared to return `bool` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:34:58
+   |
+34 |         def validate_config(self, config: ConfigDict) -> bool:
+   |                                                          ^^^^
+   |
+ERROR Function declared to return `T_co` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:38:48
+   |
+38 |         def execute(self, *args: JsonValue) -> T_co:
+   |                                                ^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:60:39
+   |
+60 |         def discover(self: object) -> FlextResult[JsonObject]:
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:63:48
+   |
+63 |         def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[object]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:66:38
+   |
+66 |         def execute(self: object) -> FlextResult[object]:
+   |                                      ^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:73:56
+   |
+73 |         def handle_record(self, record: JsonObject) -> FlextResult[JsonValue]:
+   |                                                        ^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:76:62
+   |
+76 |         def handle_batch(self, records: list[JsonObject]) -> FlextResult[JsonValue]:
+   |                                                              ^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[object]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:79:38
+   |
+79 |         def execute(self: object) -> FlextResult[object]:
+   |                                      ^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:86:57
+   |
+86 |         def run(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
+   |                                                         ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:89:58
+   |
+89 |         def test(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
+   |                                                          ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[object]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:92:38
+   |
+92 |         def execute(self: object) -> FlextResult[object]:
+   |                                      ^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+  --> src/flext_meltano/protocols.py:99:63
+   |
+99 |         def call(self, operation: str, payload: JsonValue) -> FlextResult[JsonValue]:
+   |                                                               ^^^^^^^^^^^^^^^^^^^^^^
+   |
+ERROR Function declared to return `FlextResult[object]` but is missing an explicit `return` [bad-return]
+   --> src/flext_meltano/protocols.py:102:38
+    |
+102 |         def execute(self: object) -> FlextResult[object]:
+    |                                      ^^^^^^^^^^^^^^^^^^^
+    |
+ERROR Cannot index into `bool` [index-error]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+  Object of class `bool` has no attribute `__getitem__`
+ERROR Cannot index into `float` [index-error]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+  Object of class `float` has no attribute `__getitem__`
+ERROR Cannot index into `int` [index-error]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+  Object of class `int` has no attribute `__getitem__`
+ERROR Cannot index into `list[object]` [index-error]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+  No matching overload found for function `list.__getitem__`
+  Possible overloads:
+  (i: SupportsIndex, /) -> object [closest match]
+  (s: slice[Any, Any, Any], /) -> list[object]
+ERROR Cannot index into `str` [index-error]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+  No matching overload found for function `str.__getitem__`
+  Possible overloads:
+  (key: SupportsIndex | slice[Any, Any, Any], /) -> LiteralString
+  (key: SupportsIndex | slice[Any, Any, Any], /) -> str [closest match]
+ERROR `None` is not subscriptable [unsupported-operation]
+   --> src/flext_meltano/services.py:204:61
+    |
+204 |                 f"Catalog discovered with {len(cast('list', catalog['streams']))} streams"
+    |                                                             ^^^^^^^^^^^^^^^^^^
+    |
+ERROR Expected a type form, got instance of `Literal['FlextMeltanoService.FlextSingerTypes']` [not-a-type]
+    --> src/flext_meltano/services.py:1497:36
+     |
+1497 |                 return FlextResult["FlextMeltanoService.FlextSingerTypes"].ok(
+     |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+ERROR Expected a type form, got instance of `Literal['FlextMeltanoService.FlextSingerTypes']` [not-a-type]
+    --> src/flext_meltano/services.py:1501:36
+     |
+1501 |                 return FlextResult["FlextMeltanoService.FlextSingerTypes"].fail(
+     |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+ERROR Cannot set item in `dict[str, FlextTapAbstractions.StreamDefinition]` [unsupported-operation]
+   --> src/flext_meltano/tap_abstractions.py:128:43
+    |
+128 |                     self._stream_registry[stream_name] = stream
+    |                                           ^^^^^^^^^^^
+    |
+  Argument `dict[str, dict[str, dict[str, str]] | str] | str` is not assignable to parameter `key` with type `str` in function `dict.__setitem__`
+ERROR Cannot set item in `dict[str, FlextTapAbstractions.StreamDefinition]` [unsupported-operation]
+   --> src/flext_meltano/tap_abstractions.py:128:58
+    |
+128 |                     self._stream_registry[stream_name] = stream
+    |                                                          ^^^^^^
+    |
+  Argument `dict[str, dict[str, dict[str, dict[str, str]] | str] | str]` is not assignable to parameter `value` with type `FlextTapAbstractions.StreamDefinition` in function `dict.__setitem__`
+ERROR Object of class `NoneType` has no attribute `get`
+Object of class `bool` has no attribute `get`
+Object of class `float` has no attribute `get`
+Object of class `int` has no attribute `get`
+Object of class `list` has no attribute `get`
+Object of class `str` has no attribute `get` [missing-attribute]
+   --> src/flext_meltano/tap_abstractions.py:339:27
+    |
+339 |             streams_raw = catalog.get("streams", [])
+    |                           ^^^^^^^^^^^
+    |
+ERROR Object of class `NoneType` has no attribute `get`
+Object of class `bool` has no attribute `get`
+Object of class `float` has no attribute `get`
+Object of class `int` has no attribute `get`
+Object of class `list` has no attribute `get`
+Object of class `str` has no attribute `get` [missing-attribute]
+   --> src/flext_meltano/target_abstractions.py:609:27
+    |
+609 |             stream_name = record.get("stream", "unknown")
+    |                           ^^^^^^^^^^
+    |
+ERROR Object of class `NoneType` has no attribute `get`
+Object of class `bool` has no attribute `get`
+Object of class `float` has no attribute `get`
+Object of class `int` has no attribute `get`
+Object of class `list` has no attribute `get`
+Object of class `str` has no attribute `get` [missing-attribute]
+   --> src/flext_meltano/target_abstractions.py:610:27
+    |
+610 |             record_data = record.get("record", {})
+    |                           ^^^^^^^^^^
+    |
+ERROR Object of class `NoneType` has no attribute `get`
+Object of class `bool` has no attribute `get`
+Object of class `float` has no attribute `get`
+Object of class `int` has no attribute `get`
+Object of class `list` has no attribute `get`
+Object of class `str` has no attribute `get` [missing-attribute]
+   --> src/flext_meltano/target_abstractions.py:642:35
+    |
+642 |                 stream_name = str(record.get("stream", "unknown"))
+    |                                   ^^^^^^^^^^
+    |
+ERROR Object of class `NoneType` has no attribute `get`
+Object of class `bool` has no attribute `get`
+Object of class `float` has no attribute `get`
+Object of class `int` has no attribute `get`
+Object of class `list` has no attribute `get`
+Object of class `str` has no attribute `get` [missing-attribute]
+   --> src/flext_meltano/target_abstractions.py:646:45
+    |
+646 |                     cast("FlextTypes.Dict", record.get("record", {}))
+    |                                             ^^^^^^^^^^
+    |
+ERROR Missing argument `target` in function `FlextTargetAbstractions.finalize` [missing-argument]
+   --> src/flext_meltano/target_abstractions.py:673:44
+    |
+673 |             finalize_result = self.finalize()
+    |                                            ^^
+    |
+ERROR Missing argument `target` in function `FlextTargetAbstractions.get_target_type` [missing-argument]
+   --> src/flext_meltano/target_abstractions.py:680:52
+    |
+680 |                 "target_type": self.get_target_type(),
+    |                                                    ^^
+    |
+ERROR Argument `Path` is not assignable to parameter `config` with type `dict[str, object]` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
+   --> src/flext_meltano/utilities.py:346:36
+    |
+346 |             self.write_meltano_yml(file_path, content)
+    |                                    ^^^^^^^^^
+    |
+ERROR Argument `dict[str, object]` is not assignable to parameter `target_path` with type `Path` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
+   --> src/flext_meltano/utilities.py:346:47
+    |
+346 |             self.write_meltano_yml(file_path, content)
+    |                                               ^^^^^^^
+    |

@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -120,7 +120,7 @@ class FlextMeltanoConfig(FlextConfig):
     )
 
     timeout_seconds: int = Field(
-        default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
+        default=FlextConstants.Defaults.TIMEOUT,
         ge=1,
         le=3600,
         description="Timeout for operations in seconds",
@@ -557,7 +557,7 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Network timeout configuration
     network_timeout: int = Field(
-        default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
+        default=30,  # Default timeout in seconds
         ge=1,
         le=3600,
         description="Timeout for operations in seconds",
@@ -741,13 +741,13 @@ class FlextMeltanoConfig(FlextConfig):
             self.project_root,
         )
 
-    def get_environment_variables(self) -> FlextTypes.Core.Headers:
+    def get_environment_variables(self) -> FlextTypes.StringDict:
         """Get environment variables for Meltano operations.
 
         This method uses FlextConfig as the base and adds Meltano-specific variables.
 
         Returns:
-            FlextTypes.Core.Headers: Environment variables dictionary.
+            FlextTypes.StringDict: Environment variables dictionary.
 
         """
         return self.get_meltano_environment_variables()
@@ -846,12 +846,12 @@ class FlextMeltanoConfig(FlextConfig):
 
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
-        filtered_kwargs: FlextTypes.Core.Dict = {
+        filtered_kwargs: FlextTypes.Dict = {
             k: v for k, v in kwargs.items() if k in valid_fields
         }
 
         # Create config data with environment
-        config_data: FlextTypes.Core.Dict = {"environment": env_type.value}
+        config_data: FlextTypes.Dict = {"environment": env_type.value}
 
         # Handle debug/environment conflict: production cannot have debug=True
         if env_type.value == "production":
@@ -908,12 +908,15 @@ class FlextMeltanoConfig(FlextConfig):
             FlextMeltanoConfig: The global configuration instance (created if needed).
 
         """
-        # Use enhanced singleton pattern from FlextConfig
-        base_instance = cls.get_or_create_shared_instance(
-            project_name="flext-meltano", **overrides
-        )
-        # Cast to FlextMeltanoConfig since we know it's this class
-        return cast("FlextMeltanoConfig", base_instance)
+        # Use enhanced singleton pattern from FlextConfig - create directly and apply overrides
+        instance = cls()
+        if overrides:
+            # Apply overrides to the instance
+            for key, value in overrides.items():
+                if hasattr(instance, key):
+                    setattr(instance, key, value)
+
+        return instance
 
     @classmethod
     def set_global_instance(cls, instance: FlextConfig) -> None:
@@ -986,8 +989,8 @@ class FlextMeltanoConfig(FlextConfig):
         fresh configuration in test scenarios.
 
         """
-        # Delegate to parent class to clear the instance
-        super().clear_global_instance()
+        # Clear the global instance directly
+        cls._global_instance = None
 
     def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.
@@ -1064,14 +1067,14 @@ class FlextMeltanoConfig(FlextConfig):
         """
         return getattr(self, "_sealed", False)
 
-    def get_meltano_environment_variables(self) -> FlextTypes.Core.Headers:
+    def get_meltano_environment_variables(self) -> FlextTypes.StringDict:
         """Get Meltano-specific environment variables.
 
         This method provides Meltano-specific environment variables using FlextConfig
         as the source of truth for base configuration.
 
         Returns:
-            FlextTypes.Core.Headers: Environment variables dictionary.
+            FlextTypes.StringDict: Environment variables dictionary.
 
         """
         # Get base configuration from FlextConfig singleton
@@ -1110,11 +1113,11 @@ class FlextMeltanoConfig(FlextConfig):
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    def get_meltano_logging_config(self) -> FlextTypes.Core.Dict:
+    def get_meltano_logging_config(self) -> FlextTypes.Dict:
         """Get Meltano-specific logging configuration dictionary.
 
         Returns:
-            FlextTypes.Core.Dict: Dictionary containing Meltano logging configuration.
+            FlextTypes.Dict: Dictionary containing Meltano logging configuration.
 
         """
         return {
@@ -1201,7 +1204,7 @@ class FlextMeltanoConfig(FlextConfig):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> FlextConfig.MetadataConfigDict:
+    def get_metadata(self) -> dict[str, str | bool]:
         """Get configuration metadata including override tracking.
 
         Returns:
@@ -1212,7 +1215,7 @@ class FlextMeltanoConfig(FlextConfig):
         base_metadata = super().get_metadata()
 
         # Convert to the expected type
-        metadata_dict: FlextConfig.MetadataConfigDict = {
+        metadata_dict: dict[str, str | bool] = {
             "app_name": base_metadata.get("app_name", "flext-meltano"),
             "version": base_metadata.get("version", "0.9.0"),
             "environment": base_metadata.get("environment", "development"),

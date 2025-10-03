@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextMeltanoService
 
 
@@ -39,7 +39,7 @@ class TestFlextMeltanoServiceMissingCoverage:
         # Set the dbt_name attribute to override default
         setattr(service, "dbt_name", "test-dbt")
 
-        config: dict[str, object] = {
+        config: FlextTypes.Dict = {
             "project_dir": "/path/to/dbt",
             "profiles_dir": "/path/to/profiles",
             "target": "dev",
@@ -60,7 +60,7 @@ class TestFlextMeltanoServiceMissingCoverage:
         service = FlextMeltanoService()
         service._service_type = "invalid_type"
 
-        config: dict[str, object] = {"test": "config"}
+        config: FlextTypes.Dict = {"test": "config"}
         result = service.create_instance(config)
 
         assert result.is_failure
@@ -104,7 +104,7 @@ class TestFlextMeltanoServiceMissingCoverage:
         service = FlextMeltanoService(service_type="tap")
 
         # Test with invalid configuration that passes empty check but fails validation
-        invalid_config: dict[str, object] = {
+        invalid_config: FlextTypes.Dict = {
             "invalid": "configuration",
             "missing": "required_fields",
         }
@@ -128,7 +128,7 @@ class TestFlextMeltanoServiceMissingCoverage:
         """Test multiple service types to ensure all paths are covered."""
         # Test tap service with edge case
         tap_service = FlextMeltanoService(service_type="tap", tap_name="edge-test")
-        config: dict[str, object] = {"streams": []}
+        config: FlextTypes.Dict = {"streams": []}
         result = tap_service.create_instance(config)
         assert isinstance(result, FlextResult)
 
@@ -137,7 +137,7 @@ class TestFlextMeltanoServiceMissingCoverage:
             service_type="target",
             target_name="edge-test",
         )
-        config: dict[str, object] = {"destination": "test"}
+        config: FlextTypes.Dict = {"destination": "test"}
         result = target_service.create_instance(config)
         assert isinstance(result, FlextResult)
 
@@ -175,7 +175,7 @@ class TestFlextMeltanoServiceMissingCoverage:
 
         # Create configuration that will fail validation
         # This tests the validation failure path (line 117)
-        config: dict[str, object] = {"invalid_structure": True}
+        config: FlextTypes.Dict = {"invalid_structure": True}
 
         # The validation may pass or fail depending on validator implementation
         # Both outcomes are acceptable for coverage
@@ -188,7 +188,7 @@ class TestFlextMeltanoServiceMissingCoverage:
         service = FlextMeltanoService(service_type="tap")
         # Don't set tap_name to test default name generation
 
-        config: dict[str, object] = {"test": "config"}
+        config: FlextTypes.Dict = {"test": "config"}
         result = service.create_instance(config)
         assert isinstance(result, FlextResult)
 

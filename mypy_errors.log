@@ -38,13 +38,13 @@ tests/test_adapters_complete.py:415:18: error: "object" has no attribute
 tests/test_adapters_complete.py: note: In member "test_elt_coordinator_execute_pipeline" of class "TestFlextMeltanoAdapterComplete":
 tests/test_adapters_complete.py:440:29: error: Argument "project" to
 "execute_pipeline" of "FlextMeltanoAdapter" has incompatible type
-"dict[str, str]"; expected "Project"  [arg-type]
+"FlextTypes.StringDict"; expected "Project"  [arg-type]
                         project=project,
                                 ^~~~~~~
 tests/test_adapters_complete.py: note: In member "test_adapter_with_different_configurations" of class "TestFlextMeltanoAdapterComplete":
 tests/test_adapters_complete.py:530:55: error: Argument 1 to "adapt_plugin" of
-"FlextMeltanoAdapter" has incompatible type "dict[str, str]"; expected
-"dict[str, object]"  [arg-type]
+"FlextMeltanoAdapter" has incompatible type "FlextTypes.StringDict"; expected
+"FlextTypes.Dict"  [arg-type]
                 result = FlextMeltanoAdapter.adapt_plugin(config)
                                                           ^~~~~~
 tests/test_adapters_complete.py:530:55: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -52,7 +52,7 @@ tests/test_adapters_complete.py:530:55: note: Consider using "Mapping" instead, 
 tests/test_adapters_complete.py: note: In member "test_project_config_with_complex_structure" of class "TestFlextMeltanoAdapterComplete":
 tests/test_adapters_complete.py:557:59: error: Argument 1 to
 "adapt_project_config" of "FlextMeltanoAdapter" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...     result = FlextMeltanoAdapter.adapt_project_config(complex_config)
                                                               ^~~~~~~~~~~~~~
 tests/test_adapters_complete.py:557:59: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -65,7 +65,7 @@ type "str": "dict[str, list[Never]]"; expected "str": "str | int | float | None"
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~...
 tests/test_utilities_real_fixed.py:252:62: error: Argument 1 to
 "write_meltano_yml" of "FlextMeltanoUtilities" has incompatible type
-"dict[str, str | int | float | bool | None]"; expected "dict[str, object]" 
+"dict[str, str | int | float | bool | None]"; expected "FlextTypes.Dict" 
 [arg-type]
     ... result = FlextMeltanoUtilities.write_meltano_yml(config, target_path)
                                                          ^~~~~~
@@ -79,7 +79,7 @@ type "str": "dict[str, list[Never]]"; expected "str": "str | int | float | None"
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~...
 tests/test_utilities_real_fixed.py:273:62: error: Argument 1 to
 "write_meltano_yml" of "FlextMeltanoUtilities" has incompatible type
-"dict[str, str | int | float | bool | None]"; expected "dict[str, object]" 
+"dict[str, str | int | float | bool | None]"; expected "FlextTypes.Dict" 
 [arg-type]
     ... result = FlextMeltanoUtilities.write_meltano_yml(config, target_path)
                                                          ^~~~~~
@@ -87,8 +87,8 @@ tests/test_utilities_real_fixed.py:273:62: note: "dict" is invariant -- see http
 tests/test_utilities_real_fixed.py:273:62: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_comprehensive.py: note: In member "test_create_flext_target_postgres" of class "TestFlextTargetAbstractionsComprehensive":
 tests/test_target_abstractions_comprehensive.py:305:27: error: Redundant cast
-to "dict[str, object]"  [redundant-cast]
-            target_instance = cast("dict[str, object]", result.value)
+to "FlextTypes.Dict"  [redundant-cast]
+            target_instance = cast("FlextTypes.Dict", result.value)
                               ^
 tests/test_target_abstractions_comprehensive.py: note: In member "test_create_flext_target_csv" of class "TestFlextTargetAbstractionsComprehensive":
 tests/test_target_abstractions_comprehensive.py:331:13: error: Value of type
@@ -108,7 +108,7 @@ tests/test_target_abstractions_comprehensive.py:503:22: error: Argument after
 tests/test_target_abstractions_comprehensive.py: note: In member "test_target_abstractions_edge_cases" of class "TestFlextTargetAbstractionsComprehensive":
 tests/test_target_abstractions_comprehensive.py:515:20: error: Argument
 "config" to "create_flext_target" of "FlextTargetAbstractions" has incompatible
-type "dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+type "dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
                 config=minimal_config, adapter=None
                        ^~~~~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:515:20: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -136,40 +136,40 @@ parameters for generic type "dict"  [type-arg]
 tests/test_target_abstractions_comprehensive.py: note: In member "test_basic_functionality_coverage" of class "TestFlextTargetAbstractionsCoverageEnhancement":
 tests/test_target_abstractions_comprehensive.py:622:64: error: Argument 1 to
 "get_target_type" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ... target_type = self.target_abstractions.get_target_type(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:622:64: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_comprehensive.py:622:64: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_comprehensive.py:632:56: error: Argument 1 to
 "list_streams" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
             result = self.target_abstractions.list_streams(target_data)
                                                            ^~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:632:56: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_comprehensive.py:632:56: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_comprehensive.py: note: In member "test_utility_and_audit_methods" of class "TestFlextTargetAbstractionsCoverageEnhancement":
 tests/test_target_abstractions_comprehensive.py:683:18: error: Incompatible
-types in assignment (expression has type "dict[str, str] | None", variable has
+types in assignment (expression has type "FlextTypes.StringDict | None", variable has
 type "str | None")  [assignment]
             result = data.get("nonexistent", {}).get("path")
                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py: note: In member "test_domain_events_and_lifecycle" of class "TestFlextTargetAbstractionsCoverageEnhancement":
 tests/test_target_abstractions_comprehensive.py:695:64: error: Argument 1 to
 "get_target_type" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...  target_type = self.target_abstractions.get_target_type(dummy_target)
                                                                 ^~~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:695:64: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_comprehensive.py:695:64: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_comprehensive.py:700:18: error: Incompatible
-types in assignment (expression has type "FlextResult[dict[str, object]]",
+types in assignment (expression has type "FlextResult[FlextTypes.Dict]",
 variable has type "FlextResult[FlextTargetAbstractions]")  [assignment]
             result = self.target_abstractions.finalize(target_data)
                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:700:52: error: Argument 1 to
 "finalize" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
             result = self.target_abstractions.finalize(target_data)
                                                        ^~~~~~~~~~~
 tests/test_target_abstractions_comprehensive.py:700:52: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -177,7 +177,7 @@ tests/test_target_abstractions_comprehensive.py:700:52: note: Consider using "Ma
 tests/test_target_abstractions_complete.py: note: In member "test_create_flext_target_config" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:132:31: error: Argument
 "connection_config" to "create_flext_target_config" of "FlextTargetAbstractions"
-has incompatible type "dict[str, str]"; expected "dict[str, object]"  [arg-type]
+has incompatible type "FlextTypes.StringDict"; expected "FlextTypes.Dict"  [arg-type]
                 connection_config=connection_config,
                                   ^~~~~~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:132:31: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -185,7 +185,7 @@ tests/test_target_abstractions_complete.py:132:31: note: Consider using "Mapping
 tests/test_target_abstractions_complete.py: note: In member "test_target_workflow_integration" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:265:52: error: Argument
 "connection_config" to "create_flext_target_config" of "FlextTargetAbstractions"
-has incompatible type "dict[str, str]"; expected "dict[str, object]"  [arg-type]
+has incompatible type "FlextTypes.StringDict"; expected "FlextTypes.Dict"  [arg-type]
     ...          target_type="jsonl", connection_config=connection_config, ba...
                                                         ^~~~~~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:265:52: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -202,21 +202,21 @@ no attribute "assert_fail"; maybe "assert_false" or "assert_in"?  [attr-defined]
 tests/test_target_abstractions_complete.py: note: In member "test_message_processing_comprehensive" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:328:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:328:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_complete.py:328:70: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_complete.py:337:30: error: Argument 3 to
 "process_schema_message" of "FlextTargetAbstractions" has incompatible type
-"dict[str, dict[str, dict[str, str]]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, dict[str, FlextTypes.StringDict]]"; expected "FlextTypes.Dict"  [arg-type]
                 target, "users", schema
                                  ^~~~~~
 tests/test_target_abstractions_complete.py:337:30: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_complete.py:337:30: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_complete.py:369:79: error: Argument 2 to
 "process_state_message" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...result = self.target_abstractions.process_state_message(target, state)
                                                                        ^~~~~
 tests/test_target_abstractions_complete.py:369:79: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -224,7 +224,7 @@ tests/test_target_abstractions_complete.py:369:79: note: Consider using "Mapping
 tests/test_target_abstractions_complete.py: note: In member "test_message_processing_errors" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:385:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:385:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -232,14 +232,14 @@ tests/test_target_abstractions_complete.py:385:70: note: Consider using "Mapping
 tests/test_target_abstractions_complete.py: note: In member "test_data_loading_methods" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:414:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:414:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_complete.py:414:70: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_complete.py:419:30: error: Argument 3 to
 "process_schema_message" of "FlextTargetAbstractions" has incompatible type
-"dict[str, dict[str, dict[str, str]]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, dict[str, FlextTypes.StringDict]]"; expected "FlextTypes.Dict"  [arg-type]
                 target, "users", schema
                                  ^~~~~~
 tests/test_target_abstractions_complete.py:419:30: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -247,14 +247,14 @@ tests/test_target_abstractions_complete.py:419:30: note: Consider using "Mapping
 tests/test_target_abstractions_complete.py: note: In member "test_target_finalization" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:479:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:479:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_complete.py:479:70: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_complete.py:485:30: error: Argument 3 to
 "process_schema_message" of "FlextTargetAbstractions" has incompatible type
-"dict[str, dict[str, dict[str, str]]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, dict[str, FlextTypes.StringDict]]"; expected "FlextTypes.Dict"  [arg-type]
                 target, "users", schema
                                  ^~~~~~
 tests/test_target_abstractions_complete.py:485:30: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -266,14 +266,14 @@ types for <= ("int" and "object")  [operator]
 tests/test_target_abstractions_complete.py: note: In member "test_query_and_utility_methods" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:528:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:528:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
 tests/test_target_abstractions_complete.py:528:70: note: Consider using "Mapping" instead, which is covariant in the value type
 tests/test_target_abstractions_complete.py:533:30: error: Argument 3 to
 "process_schema_message" of "FlextTargetAbstractions" has incompatible type
-"dict[str, dict[str, dict[str, str]]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, dict[str, FlextTypes.StringDict]]"; expected "FlextTypes.Dict"  [arg-type]
                 target, "users", schema
                                  ^~~~~~
 tests/test_target_abstractions_complete.py:533:30: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -281,7 +281,7 @@ tests/test_target_abstractions_complete.py:533:30: note: Consider using "Mapping
 tests/test_target_abstractions_complete.py: note: In member "test_error_handling_edge_cases" of class "TestFlextTargetAbstractionsComplete":
 tests/test_target_abstractions_complete.py:661:70: error: Argument 1 to
 "create_flext_target" of "FlextTargetAbstractions" has incompatible type
-"dict[str, Collection[str]]"; expected "dict[str, object]"  [arg-type]
+"dict[str, Collection[str]]"; expected "FlextTypes.Dict"  [arg-type]
     ...t_result = self.target_abstractions.create_flext_target(target_config)
                                                                ^~~~~~~~~~~~~
 tests/test_target_abstractions_complete.py:661:70: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
@@ -298,28 +298,28 @@ unknown type  [operator]
                          ^~~~~~~~~~~
 tests/test_executors_bridge_complete.py: note: In member "test_bridge_with_different_plugins" of class "TestFlextMeltanoBridgeComplete":
 tests/test_executors_bridge_complete.py:298:13: error: List item 0 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("extractors", "tap-csv"),
                 ^~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py:299:13: error: List item 1 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("loaders", "target-jsonl"),
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py:300:13: error: List item 2 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("transformers", "dbt"),
                 ^~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py: note: In member "test_pipeline_execution_patterns" of class "TestFlextMeltanoBridgeComplete":
 tests/test_executors_bridge_complete.py:311:13: error: List item 0 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("tap-csv", "target-jsonl"),
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py:312:13: error: List item 1 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("tap-postgres", "target-postgres"),
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py:313:13: error: List item 2 has
-incompatible type "tuple[str, str]"; expected "dict[str, object]"  [list-item]
+incompatible type "tuple[str, str]"; expected "FlextTypes.Dict"  [list-item]
                 ("tap-github", "target-bigquery"),
                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 tests/test_executors_bridge_complete.py: note: In member "test_error_recovery_patterns" of class "TestFlextMeltanoBridgeComplete":

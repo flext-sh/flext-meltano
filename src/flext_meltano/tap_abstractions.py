@@ -13,16 +13,17 @@ from __future__ import annotations
 from typing import cast
 
 from flext_cli import FlextCli
+
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import FlextMeltanoProtocols
 
 # Type aliases (MyPy compatible)
-RecordDict = FlextTypes.Core.Dict
-ConfigDict = FlextTypes.Core.Dict
-SchemaDict = FlextTypes.Core.Dict
-StateDict = FlextTypes.Core.Dict
-ResultDict = FlextTypes.Core.Dict
+RecordDict = FlextTypes.Dict
+ConfigDict = FlextTypes.Dict
+SchemaDict = FlextTypes.Dict
+StateDict = FlextTypes.Dict
+ResultDict = FlextTypes.Dict
 
 
 class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
@@ -69,11 +70,11 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
 
     def generate_catalog(
         self, _tap_instance: TapInstance
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Generate catalog for the given tap instance."""
         try:
             # Simple implementation that returns a basic catalog structure
-            catalog: dict[str, object] = {
+            catalog: FlextTypes.Dict = {
                 "streams": [
                     {
                         "tap_stream_id": "example_stream",
@@ -97,15 +98,13 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                     }
                 ]
             }
-            return FlextResult[dict[str, object]].ok(catalog)
+            return FlextResult[FlextTypes.Dict].ok(catalog)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
-                f"Failed to generate catalog: {e}"
-            )
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to generate catalog: {e}")
 
     def discover_streams(
         self, _tap_instance: TapInstance
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Discover streams for the given tap instance."""
         try:
             self._cli.info("Discovering streams...")
@@ -129,17 +128,15 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                     self._stream_registry[stream_name] = stream
 
             self._cli.success(f"Discovered {len(streams)} stream(s)")
-            return FlextResult[dict[str, object]].ok({"streams": streams})
+            return FlextResult[FlextTypes.Dict].ok({"streams": streams})
         except Exception as e:
             self._logger.exception("Stream discovery failed")
             self._cli.error(f"Failed to discover streams: {e}")
-            return FlextResult[dict[str, object]].fail(
-                f"Failed to discover streams: {e}"
-            )
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to discover streams: {e}")
 
     def get_stream_by_name(
         self, _tap_instance: TapInstance, stream_name: str
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Get stream by name from the tap instance."""
         try:
             stream = {
@@ -152,13 +149,13 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                     },
                 },
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", stream))
+            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", stream))
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to get stream: {e}")
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to get stream: {e}")
 
     def extract_records(
-        self, _stream: dict[str, object], limit: int = 100
-    ) -> FlextResult[list[dict[str, object]]]:
+        self, _stream: FlextTypes.Dict, limit: int = 100
+    ) -> FlextResult[list[FlextTypes.Dict]]:
         """Extract records from the given stream."""
         try:
             stream_name = _stream.get("name", "unknown")
@@ -171,17 +168,17 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
             ]
 
             self._cli.success(f"Extracted {len(records)} record(s)")
-            return FlextResult[list[dict[str, object]]].ok(
-                cast("list[dict[str, object]]", records)
+            return FlextResult[list[FlextTypes.Dict]].ok(
+                cast("list[FlextTypes.Dict]", records)
             )
         except Exception as e:
             self._logger.exception("Record extraction failed")
             self._cli.error(f"Failed to extract records: {e}")
-            return FlextResult[list[dict[str, object]]].fail(
+            return FlextResult[list[FlextTypes.Dict]].fail(
                 f"Failed to extract records: {e}"
             )
 
-    def process(self, config: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def process(self, config: FlextTypes.Dict) -> FlextResult[FlextTypes.Dict]:
         """Process tap configuration and return results."""
         try:
             config_type = config.get("type", "unknown")
@@ -190,11 +187,11 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                 "config_type": config_type,
                 "processed_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(result)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to process config: {e}")
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to process config: {e}")
 
-    def build(self, config: dict[str, object]) -> FlextResult[dict[str, object]]:
+    def build(self, config: FlextTypes.Dict) -> FlextResult[FlextTypes.Dict]:
         """Build tap instance from configuration."""
         try:
             config_type = config.get("type", "unknown")
@@ -203,25 +200,25 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                 "config_type": config_type,
                 "built_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(result)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to build tap: {e}")
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to build tap: {e}")
 
     def get_stream_config(
-        self, config: dict[str, object], stream_name: str
-    ) -> dict[str, object] | None:
+        self, config: FlextTypes.Dict, stream_name: str
+    ) -> FlextTypes.Dict | None:
         """Get configuration for a specific stream."""
         try:
             streams = config.get("streams", {})
             if isinstance(streams, dict):
-                return cast("dict[str, object] | None", streams.get(stream_name))
+                return cast("FlextTypes.Dict | None", streams.get(stream_name))
             return None
         except Exception:
             return None
 
     def create_tap_from_config(
-        self, config: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        self, config: FlextTypes.Dict
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create tap instance from configuration."""
         try:
             config_type = config.get("type", "unknown")
@@ -230,13 +227,13 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                 "config_type": config_type,
                 "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(result)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(f"Failed to create tap: {e}")
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to create tap: {e}")
 
     def sync_stream(
-        self, tap_instance: dict[str, object], stream_name: str
-    ) -> FlextResult[dict[str, object]]:
+        self, tap_instance: FlextTypes.Dict, stream_name: str
+    ) -> FlextResult[FlextTypes.Dict]:
         """Sync a stream from tap to target."""
         try:
             self._cli.info(f"Syncing stream: {stream_name}")
@@ -248,13 +245,13 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                 "synced_at": FlextUtilities.Generators.generate_iso_timestamp(),
             }
             self._cli.success(f"Stream '{stream_name}' synced successfully")
-            return FlextResult[dict[str, object]].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(result)
         except Exception as e:
             self._logger.exception("Stream sync failed")
             self._cli.error(f"Failed to sync stream: {e}")
-            return FlextResult[dict[str, object]].fail(f"Failed to sync stream: {e}")
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to sync stream: {e}")
 
-    def list_streams(self, tap_instance: dict[str, object]) -> list[str]:
+    def list_streams(self, tap_instance: FlextTypes.Dict) -> FlextTypes.StringList:
         """List available streams from tap instance."""
         try:
             streams = tap_instance.get("streams", [])
@@ -264,14 +261,14 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
         except Exception:
             return []
 
-    def get_tap_type(self, tap_instance: dict[str, object]) -> str:
+    def get_tap_type(self, tap_instance: FlextTypes.Dict) -> str:
         """Get the type of the tap instance."""
         try:
             return str(tap_instance.get("type", "unknown"))
         except Exception:
             return "unknown"
 
-    def get_registered_streams(self) -> list[str]:
+    def get_registered_streams(self) -> FlextTypes.StringList:
         """Get list of registered streams."""
         try:
             return list(self._stream_registry.keys())
@@ -279,12 +276,12 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
             return []
 
     def _create_catalog_entry_from_stream(
-        self, stream: dict[str, object]
-    ) -> FlextResult[dict[str, object]]:
+        self, stream: FlextTypes.Dict
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create catalog entry from stream definition."""
         try:
             stream_name = stream.get("name", "unknown_stream")
-            catalog_entry: dict[str, object] = {
+            catalog_entry: FlextTypes.Dict = {
                 "tap_stream_id": stream_name,
                 "stream": stream_name,
                 "schema": stream.get("schema", {}),
@@ -298,9 +295,9 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                     }
                 ],
             }
-            return FlextResult[dict[str, object]].ok(catalog_entry)
+            return FlextResult[FlextTypes.Dict].ok(catalog_entry)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to create catalog entry: {e}"
             )
 
@@ -319,52 +316,50 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
     # PROTOCOL IMPLEMENTATION - SingerTapProtocol
     # =============================================================================
 
-    def discover(self) -> FlextResult[FlextTypes.Core.JsonObject]:
+    def discover(self) -> FlextResult[FlextTypes.JsonValue]:
         """Discover catalog (implements SingerTapProtocol)."""
         try:
             # Use existing discover_streams functionality
             dummy_instance = cast("TapInstance", {"name": "default", "config": {}})
             result = self.discover_streams(dummy_instance)
             if result.is_failure:
-                return FlextResult[FlextTypes.Core.JsonObject].fail(
+                return FlextResult[FlextTypes.JsonValue].fail(
                     result.error or "Unknown error"
                 )
 
-            catalog_data = cast("FlextTypes.Core.JsonObject", result.unwrap())
-            return FlextResult[FlextTypes.Core.JsonObject].ok(catalog_data)
+            catalog_data = cast("FlextTypes.JsonValue", result.unwrap())
+            return FlextResult[FlextTypes.JsonValue].ok(catalog_data)
         except Exception as e:
-            return FlextResult[FlextTypes.Core.JsonObject].fail(
-                f"Discovery failed: {e}"
-            )
+            return FlextResult[FlextTypes.JsonValue].fail(f"Discovery failed: {e}")
 
-    def sync(
-        self, catalog: FlextTypes.Core.JsonObject
-    ) -> FlextResult[FlextTypes.Core.JsonValue]:
+    def sync(self, catalog: FlextTypes.JsonValue) -> FlextResult[FlextTypes.JsonValue]:
         """Sync data from source (implements SingerTapProtocol)."""
         try:
             # Extract streams from catalog and sync them
-            streams_raw = catalog.get("streams", [])
-            streams = streams_raw if isinstance(streams_raw, list) else []
+            streams = []
+            if isinstance(catalog, dict):
+                streams_raw = catalog.get("streams", [])
+                streams = streams_raw if isinstance(streams_raw, list) else []
             results = []
 
             for stream_data in streams:
                 if isinstance(stream_data, dict):
                     stream_name = stream_data.get("name", "unknown")
                     tap_instance = cast(
-                        "dict[str, object]", {"name": stream_name, "config": {}}
+                        "FlextTypes.Dict", {"name": stream_name, "config": {}}
                     )
                     sync_result = self.sync_stream(tap_instance, stream_name)
 
                     if sync_result.is_failure:
-                        return FlextResult[FlextTypes.Core.JsonValue].fail(
+                        return FlextResult[FlextTypes.JsonValue].fail(
                             sync_result.error or "Sync failed"
                         )
 
                     results.append(sync_result.unwrap())
 
-            return FlextResult[FlextTypes.Core.JsonValue].ok(results)
+            return FlextResult[FlextTypes.JsonValue].ok(results)
         except Exception as e:
-            return FlextResult[FlextTypes.Core.JsonValue].fail(f"Sync failed: {e}")
+            return FlextResult[FlextTypes.JsonValue].fail(f"Sync failed: {e}")
 
     def execute(self) -> FlextResult[object]:
         """Execute the tap extraction (implements Domain.Service)."""
@@ -430,7 +425,7 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
                     )
                 if op_type == "sync":
                     catalog = operation.get("catalog", {})
-                    result = self.sync(cast("FlextTypes.Core.JsonObject", catalog))
+                    result = self.sync(cast("FlextTypes.JsonValue", catalog))
                     return (
                         FlextResult[object].ok(result.unwrap())
                         if result.is_success
@@ -442,7 +437,7 @@ class FlextTapAbstractions(FlextMeltanoProtocols.SingerTapProtocol):
         except Exception as e:
             return FlextResult[object].fail(f"Operation execution failed: {e}")
 
-    def get_service_info(self) -> FlextTypes.Core.Dict:
+    def get_service_info(self) -> FlextTypes.Dict:
         """Get service information and metadata (implements Domain.Service)."""
         return {
             "service_name": getattr(self, "service_name", "FlextTapAbstractions"),

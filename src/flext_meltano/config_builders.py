@@ -10,13 +10,13 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextUtilities
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 # Type alias for configuration dictionaries
-ConfigDict = dict[str, object]
+ConfigDict = FlextTypes.Dict
 
 
 class FlextMeltanoConfigBuilders:
@@ -289,7 +289,7 @@ class FlextMeltanoConfigBuilders:
             plugin_list = typed_plugins[safe_plugin_type]
             if not isinstance(plugin_list, list):
                 plugin_list = []
-            plugin_list_copy: list[object] = list(plugin_list)  # Create mutable copy
+            plugin_list_copy: FlextTypes.List = list(plugin_list)  # Create mutable copy
             plugin_list_copy.append(plugin_config)
             typed_plugins[safe_plugin_type] = plugin_list_copy
 

@@ -7,9 +7,10 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_core import FlextResult
-from flext_meltano import FlextMeltanoConfigBuilders, FlextMeltanoConstants, PluginTypes
 from flext_tests import FlextTestsUtilities
+
+from flext_core import FlextResult, FlextTypes
+from flext_meltano import FlextMeltanoConfigBuilders, FlextMeltanoConstants, PluginTypes
 
 
 class TestConfigBuildersComprehensiveCoverage:
@@ -119,7 +120,7 @@ class TestConfigBuildersComprehensiveCoverage:
         base_config = base_result.unwrap()
 
         # Create plugin config
-        plugin_config: dict[str, object] = {
+        plugin_config: FlextTypes.Dict = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -148,7 +149,7 @@ class TestConfigBuildersComprehensiveCoverage:
         base_config = base_result.unwrap()
 
         # Create plugin config
-        plugin_config: dict[str, object] = {
+        plugin_config: FlextTypes.Dict = {
             "name": "target-jsonl",
             "namespace": "target_jsonl",
             "pip_url": "pipelinewise-target-jsonl",
@@ -175,7 +176,7 @@ class TestConfigBuildersComprehensiveCoverage:
         assert base_result.is_success
         base_config = base_result.unwrap()
 
-        plugin_config: dict[str, object] = {"name": "test-plugin"}
+        plugin_config: FlextTypes.Dict = {"name": "test-plugin"}
 
         # Try to add plugin with invalid type
         result = builder.add_plugin_to_config(

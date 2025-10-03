@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final, Literal
 
-from flext_core import FlextConstants
+from flext_core import FlextConstants, FlextTypes
 
 # Python 3.13+ Type Aliases - ONLY Meltano-specific
 type PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
@@ -44,7 +44,9 @@ class FlextMeltanoConstants(FlextConstants):
     # Metadata constants
     METADATA_CREATED_BY: Final[str] = "flext-meltano"
     # Use FlextConstants.Config.ENVIRONMENTS instead of duplicating
-    METADATA_DEFAULT_ENVIRONMENTS: Final[list[str]] = FlextConstants.Config.ENVIRONMENTS
+    METADATA_DEFAULT_ENVIRONMENTS: Final[FlextTypes.StringList] = (
+        FlextConstants.Config.ENVIRONMENTS
+    )
 
     # Model validation constants - replace magic numbers in models.py
     PROJECT_MATURITY_MATURE_ENV_COUNT: Final[int] = 3

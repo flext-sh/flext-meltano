@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-
-from flext_core import FlextResult, FlextUtilities
-from flext_meltano import FlextTargetAbstractions
 from flext_tests import FlextTestsMatchers
+
+from flext_core import FlextResult, FlextTypes, FlextUtilities
+from flext_meltano import FlextTargetAbstractions
 
 
 class TestFlextTargetConfigComprehensive:
@@ -107,7 +107,7 @@ class TestFlextTargetConfigComprehensive:
     def test_target_config_connection_validation(self) -> None:
         """Test connection config validation."""
         # Valid connection configs
-        valid_configs: list[dict[str, object]] = [
+        valid_configs: list[FlextTypes.Dict] = [
             {"host": "localhost", "port": 5432},
             {"file_path": str(self.temp_dir / "test.csv")},
             {"url": "sqlite:///test.db"},
@@ -171,7 +171,7 @@ class TestFlextStreamInfoComprehensive:
         created_at = datetime.now(UTC).isoformat()
 
         # Valid schemas (must have 'properties' based on validation)
-        valid_schemas: list[dict[str, object]] = [
+        valid_schemas: list[FlextTypes.Dict] = [
             {"type": "object", "properties": {"id": {"type": "integer"}}},
             {
                 "type": "object",
@@ -287,7 +287,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_create_flext_target_postgres(self) -> None:
         """Test creating PostgreSQL target instance."""
-        config: dict[str, object] = {
+        config: FlextTypes.Dict = {
             "target_type": "postgres",
             "connection_config": {
                 "host": "localhost",
@@ -310,14 +310,14 @@ class TestFlextTargetAbstractionsComprehensive:
         assert "target_id" in target_instance
         assert "config" in target_instance
         # Cast nested dictionaries for type safety
-        config_dict = cast("dict[str, object]", target_instance["config"])
-        connection_config = cast("dict[str, object]", config_dict["connection_config"])
+        config_dict = cast("FlextTypes.Dict", target_instance["config"])
+        connection_config = cast("FlextTypes.Dict", config_dict["connection_config"])
         assert cast("str", connection_config["host"]) == "localhost"
 
     def test_create_flext_target_csv(self) -> None:
         """Test creating CSV target instance."""
         csv_file = self.temp_dir / "test_output.csv"
-        config: dict[str, object] = {
+        config: FlextTypes.Dict = {
             "target_type": "csv",
             "connection_config": {"file_path": str(csv_file)},
         }
@@ -331,12 +331,12 @@ class TestFlextTargetAbstractionsComprehensive:
         target_instance = result.value
         assert isinstance(target_instance, dict), "Target instance should be a dict"
         # Cast to proper type - target_instance is validated as dict above
-        target_dict: dict[str, object] = target_instance
+        target_dict: FlextTypes.Dict = target_instance
         assert target_dict["target_type"] == "csv"
         # Fix: Cast to proper type after validation
         target_config = target_dict["config"]
         assert isinstance(target_config, dict), "Config should be a dict"
-        target_config_typed: dict[str, object] = target_config
+        target_config_typed: FlextTypes.Dict = target_config
         assert isinstance(target_config, dict), "Config should be a dict"
         connection_config = target_config_typed["connection_config"]
         assert isinstance(connection_config, dict), "Connection config should be a dict"
@@ -344,7 +344,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_create_flext_target_with_streams(self) -> None:
         """Test creating target with stream information."""
-        config: dict[str, object] = {
+        config: FlextTypes.Dict = {
             "target_type": "json",
             "connection_config": {"file_path": str(self.temp_dir / "output.json")},
         }
@@ -394,7 +394,7 @@ class TestFlextTargetAbstractionsComprehensive:
 
     def test_self(self, benchmark: object) -> None:
         """Test target creation performance using pytest-benchmark."""
-        config: dict[str, object] = {
+        config: FlextTypes.Dict = {
             "target_type": "sqlite",
             "connection_config": {"database": str(self.temp_dir / "test.db")},
         }
@@ -529,7 +529,7 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_target_abstractions_edge_cases(self) -> None:
         """Test edge cases and boundary conditions."""
         # Test with minimal valid configuration
-        minimal_config: dict[str, object] = {
+        minimal_config: FlextTypes.Dict = {
             "target_type": "csv",
             "connection_config": {"file_path": str(self.temp_dir / "minimal.csv")},
         }
@@ -547,7 +547,7 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_target_abstractions_concurrent_operations(self) -> None:
         """Test concurrent target operations don't interfere."""
 
-        def create_target_config(target_num: int) -> FlextResult[dict[str, object]]:
+        def create_target_config(target_num: int) -> FlextResult[FlextTypes.Dict]:
             return self.target_abstractions.create_flext_target_config(
                 target_type="csv",
                 connection_config={
@@ -615,7 +615,7 @@ class TestFlextTargetAbstractionsComprehensive:
     def test_target_config_parametrized_creation(
         self,
         target_type: str,
-        connection_config: dict[str, object],
+        connection_config: FlextTypes.Dict,
     ) -> None:
         """Test target configuration creation with various target types."""
         result = self.target_abstractions.create_flext_target_config(
@@ -646,7 +646,7 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         """Test basic functionality methods for coverage."""
         # Test basic property access methods that are likely to work
         # Create a simple target config first
-        target_config: dict[str, object] = {
+        target_config: FlextTypes.Dict = {
             "target_type": "target-csv",
             "connection_config": {"file_path": str(self.temp_dir / "test.csv")},
         }
@@ -657,7 +657,7 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert isinstance(self.target_abstractions.is_production(), bool)
 
         # Test basic list operations
-        target_data: dict[str, object] = {
+        target_data: FlextTypes.Dict = {
             "target_type": "test",
             "connection": {"host": "localhost"},
         }
@@ -722,12 +722,12 @@ class TestFlextTargetAbstractionsCoverageEnhancement:
         assert result.is_success
 
         # Test target type identification
-        dummy_target: dict[str, object] = {"type": "test-target", "config": {}}
+        dummy_target: FlextTypes.Dict = {"type": "test-target", "config": {}}
         target_type = self.target_abstractions.get_target_type(dummy_target)
         assert isinstance(target_type, str)
 
         # Test finalize
-        target_data: dict[str, object] = {
+        target_data: FlextTypes.Dict = {
             "target_type": "test",
             "connection": {"host": "localhost"},
         }

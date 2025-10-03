@@ -33,7 +33,7 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: FlextTypes.Core.Dict = {"name": tap - csv, "namespace": "tap_csv"}
+        >>> config: FlextTypes.Dict = {"name": tap - csv, "namespace": "tap_csv"}
         >>> result: FlextResult[object] = (
         ...     validator.validate_meltano_plugin_business_rules(config)
         ... )
@@ -45,7 +45,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_meltano_plugin_business_rules(
         cls,
-        config: FlextTypes.Core.JsonValue,
+        config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific plugin business rules using monadic error accumulation.
 
@@ -73,7 +73,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_config_is_dict(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         """Validate that config is a dictionary.
 
@@ -91,9 +91,7 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=True)
 
     @classmethod
-    def _validate_plugin_name(
-        cls, config: FlextTypes.Core.JsonValue
-    ) -> FlextResult[bool]:
+    def _validate_plugin_name(cls, config: FlextTypes.JsonValue) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail("Config must be dictionary for name validation")
 
@@ -117,7 +115,7 @@ class FlextMeltanoValidators:
             FlextResult indicating business rule validation.
 
         """
-        validation_errors: list[str] = []
+        validation_errors: FlextTypes.StringList = []
 
         # Meltano business rule: target plugin names
         if (
@@ -142,7 +140,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_plugin_namespace(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
@@ -163,7 +161,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_plugin_pip_url(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail("Config must be dictionary for pip_url validation")
@@ -182,7 +180,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_plugin_executable(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
@@ -203,7 +201,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_meltano_specific_rules(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         """Validate additional Meltano-specific business rules.
 
@@ -226,7 +224,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_meltano_project_business_rules(
         cls,
-        config: FlextTypes.Core.JsonValue,
+        config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
         """Validate Meltano-specific project business rules.
 
@@ -240,7 +238,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextTypes.Core.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -257,7 +255,7 @@ class FlextMeltanoValidators:
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Core.Dict = dict(config)
+        config_dict: FlextTypes.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(FlextMeltanoModels.MeltanoProjectModel):
@@ -276,7 +274,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_dbt_business_rules(
-        cls, config: FlextTypes.Core.JsonValue
+        cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
         """Validate DBT-specific business rules.
 
@@ -290,7 +288,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextTypes.Core.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "name": "my_dbt_project",
             ...     "version": 1.0.0,
             ... }
@@ -307,7 +305,7 @@ class FlextMeltanoValidators:
                 "DBT config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Core.Dict = dict(config)
+        config_dict: FlextTypes.Dict = dict(config)
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(FlextMeltanoModels.DbtProjectModel):
@@ -387,8 +385,8 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_connection_config(
         cls,
-        config: FlextTypes.Core.Dict,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+        config: FlextTypes.Dict,
+    ) -> FlextResult[FlextTypes.Dict]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for Meltano services,
@@ -401,7 +399,7 @@ class FlextMeltanoValidators:
             FlextResult containing validated configuration or error details.
 
         Example:
-            >>> config: FlextTypes.Core.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "host": "localhost",
             ...     "port": 5432,
             ...     "database": "mydb",
@@ -410,27 +408,27 @@ class FlextMeltanoValidators:
             ...     FlextMeltanoValidators.validate_connection_config(config)
             ... )
             >>> if result.is_success:
-            ...     validated_config: FlextTypes.Core.Dict = result.unwrap()
+            ...     validated_config: FlextTypes.Dict = result.unwrap()
             ...     print(f"Validated config: {validated_config}")
 
         """
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     "Connection configuration cannot be empty",
                 )
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=config)
+            return FlextResult[FlextTypes.Dict].ok(data=config)
         except Exception as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(
         cls,
-        config: FlextTypes.Core.JsonValue,
+        config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
         """Validate plugin configuration with comprehensive business rules.
 

@@ -7,54 +7,55 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast, override
 
 import meltano
 import yaml
+from meltano.core.elt_context import ELTContext
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.project import Project
+
 from flext_core import (
-    FlextConfig,
     FlextLogger,
     FlextResult,
     FlextTypes,
     FlextUtilities,
 )
-from meltano.core.elt_context import ELTContext
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 
-from flext_meltano import (
-    DbtTransformationResult,
-    EltPipelineResult,
-    SingerExecutionResult,
-)
+# Import result types directly from typings to avoid circular import
 from flext_meltano.abstractions import (
     FlextMeltanoAbstractions,
 )
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+
+# Result types are imported from flext_meltano namespace above
+from flext_meltano.protocols import FlextMeltanoProtocols
 
 # Type imports from FlextMeltanoTypes (moved from types.py)
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
-# Import result types for method signatures
-SingerExecutionResult = FlextTypes.Processing.SingerExecutionResult
-EltPipelineResult = FlextTypes.Processing.EltPipelineResult
+# Use the protocol from protocols.py
+MeltanoPluginProtocol = FlextMeltanoProtocols.MeltanoPluginProtocol
 
 
 class FlextMeltanoAdapter:
     """Single adapter class for all Meltano Core integration following flext-core patterns."""
 
     @override
-    def __init__(self) -> None:
-        """Initialize FlextMeltanoAdapter with flext-core patterns using FlextConfig.
+    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        """Initialize FlextMeltanoAdapter with flext-core patterns using FlextMeltanoConfig.
 
         Sets up the adapter with proper flext-core integration including
-        logging, utilities, and error handling patterns using FlextConfig.
+        logging, utilities, and error handling patterns using FlextMeltanoConfig.
         """
-        # Get configuration using FlextConfig singleton - FLEXT-core pattern
-        self._config = FlextConfig.get_global_instance()
+        # Get configuration using FlextMeltanoConfig as source of truth
+        self._config = config or FlextMeltanoConfig.get_global_instance()
         self._logger = FlextLogger(__name__)
         self._utilities = FlextUtilities()
         self._abstractions = FlextMeltanoAbstractions()
@@ -71,11 +72,11 @@ class FlextMeltanoAdapter:
         @staticmethod
         def create_minimal_config(
             project_id: str | None = None,
-        ) -> FlextTypes.Core.Dict:
+        ) -> FlextTypes.Dict:
             """Create minimal meltano.yml configuration.
 
             Returns:
-                FlextTypes.Core.Dict: Minimal meltano.yml configuration dictionary.
+                FlextTypes.Dict: Minimal meltano.yml configuration dictionary.
 
             """
             return {
@@ -144,7 +145,7 @@ class FlextMeltanoAdapter:
             # Add FLEXT metadata using flext-core patterns
             meltano_config["metadata"] = {
                 "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
-                "created_at": FlextUtilities.Generators.generate_iso_timestamp(),
+                "created_at": datetime.now(UTC).isoformat(),
                 "temp_project": "True",
             }
 
@@ -177,7 +178,7 @@ class FlextMeltanoAdapter:
         """
         return self._current_project
 
-    def get_project_info(self) -> FlextResult[FlextTypes.Core.Dict]:
+    def get_project_info(self) -> FlextResult[FlextTypes.Dict]:
         """Get current project information.
 
         Returns:
@@ -186,7 +187,7 @@ class FlextMeltanoAdapter:
         """
         try:
             if self._current_project is None:
-                return FlextResult[FlextTypes.Core.Dict].fail("No project loaded")
+                return FlextResult[FlextTypes.Dict].fail("No project loaded")
 
             # Extract basic project information
             project_info = {
@@ -198,12 +199,10 @@ class FlextMeltanoAdapter:
                 ),
             }
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=project_info)
+            return FlextResult[FlextTypes.Dict].ok(data=project_info)
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
-                f"Failed to get project info: {e}"
-            )
+            return FlextResult[FlextTypes.Dict].fail(f"Failed to get project info: {e}")
 
     # =========================================================================
     # MELTANO DIRECT INTEGRATION - NO WRAPPERS, DIRECT MELTANO CORE USAGE
@@ -368,7 +367,7 @@ class FlextMeltanoAdapter:
             )
 
             # Convert Meltano Project to dict representation
-            # ✅ TYPE SAFETY: ConfigValue supports dict[str, FlextTypes.Core.JsonValue] per flext-core
+            # ✅ TYPE SAFETY: ConfigValue supports dict[str, FlextTypes.JsonValue] per flext-core
             project_dict: FlextMeltanoTypes.Dbt.Project = {
                 "name": str(getattr(project, "name", "meltano_project")),
                 "root": str(getattr(project, "root", "unknown")),
@@ -385,7 +384,7 @@ class FlextMeltanoAdapter:
     def discover_plugins(
         self,
         project: object | None = None,
-    ) -> FlextResult[list[FlextTypes.Core.Headers]]:
+    ) -> FlextResult[list[FlextTypes.StringDict]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -413,7 +412,7 @@ class FlextMeltanoAdapter:
                     self.create_temporary_meltano_project()
                 )
                 if temp_project_result.is_failure:
-                    return FlextResult[list[FlextTypes.Core.Headers]].fail(
+                    return FlextResult[list[FlextTypes.StringDict]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
@@ -429,7 +428,9 @@ class FlextMeltanoAdapter:
             # Discover extractors using abstraction layer
             extractors_result = hub_wrapper.get_plugins_of_type("extractors")
             if extractors_result.is_success:
-                extractors_dict = extractors_result.unwrap()
+                extractors_dict: dict[str, MeltanoPluginProtocol] = (
+                    extractors_result.unwrap()
+                )
                 for _plugin_name, indexed_plugin in list(extractors_dict.items())[:10]:
                     plugin_info = {
                         "name": indexed_plugin.name,
@@ -445,7 +446,7 @@ class FlextMeltanoAdapter:
             # Discover loaders using abstraction layer
             loaders_result = hub_wrapper.get_plugins_of_type("loaders")
             if loaders_result.is_success:
-                loaders_dict = loaders_result.unwrap()
+                loaders_dict: dict[str, MeltanoPluginProtocol] = loaders_result.unwrap()
                 for _plugin_name, indexed_plugin in list(loaders_dict.items())[:5]:
                     plugin_info = {
                         "name": indexed_plugin.name,
@@ -459,18 +460,18 @@ class FlextMeltanoAdapter:
                     plugins.append(plugin_info)
 
             self._logger.info(f"Discovered {len(plugins)} plugins")
-            return FlextResult[list[FlextTypes.Core.Headers]].ok(data=plugins)
+            return FlextResult[list[FlextTypes.StringDict]].ok(data=plugins)
 
         except Exception as e:
             error_msg = f"Failed to discover plugins: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult[list[FlextTypes.Core.Headers]].fail(error_msg)
+            return FlextResult[list[FlextTypes.StringDict]].fail(error_msg)
 
     def create_project(
         self,
         project_name: str,
         project_dir: Path,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Create new Meltano project using manual file creation approach.
 
         Args:
@@ -484,7 +485,7 @@ class FlextMeltanoAdapter:
         try:
             # Validate project name
             if not project_name or not project_name.strip():
-                return FlextResult[FlextTypes.Core.Headers].fail(
+                return FlextResult[FlextTypes.StringDict].fail(
                     "Project name cannot be empty"
                 )
 
@@ -519,19 +520,19 @@ class FlextMeltanoAdapter:
                 project_path=str(full_project_path),
             )
 
-            return FlextResult[FlextTypes.Core.Headers].ok(data=project_result)
+            return FlextResult[FlextTypes.StringDict].ok(data=project_result)
 
         except Exception as e:
             error_msg = f"Failed to create Meltano project: {e}"
             self._logger.exception(error_msg, error=str(e))
-            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+            return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     def add_plugin(
         self,
         project_dir: Path,
         plugin_type: str,
         plugin_name: str,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
         Uses FlextResult.chain_validations() to compose plugin addition steps
@@ -566,7 +567,7 @@ class FlextMeltanoAdapter:
                 )
             )
             .or_else_get(
-                lambda: FlextResult[FlextTypes.Core.Headers].fail(
+                lambda: FlextResult[FlextTypes.StringDict].fail(
                     f"Plugin addition failed for {plugin_name}"
                 )
             )
@@ -678,7 +679,7 @@ class FlextMeltanoAdapter:
         project_dir: Path,
         *,
         addition_success: bool,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Build successful plugin addition result.
 
         Args:
@@ -691,7 +692,7 @@ class FlextMeltanoAdapter:
             FlextResult containing plugin addition information.
 
         """
-        plugin_result: FlextTypes.Core.Headers = {
+        plugin_result: FlextTypes.StringDict = {
             "success": "true" if addition_success else "false",
             "plugin_name": "plugin_name",
             "plugin_type": "plugin_type",
@@ -705,11 +706,11 @@ class FlextMeltanoAdapter:
             plugin_type=plugin_type,
         )
 
-        return FlextResult[FlextTypes.Core.Headers].ok(data=plugin_result)
+        return FlextResult[FlextTypes.StringDict].ok(data=plugin_result)
 
     def _handle_plugin_addition_error(
         self, error: str
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Handle plugin addition errors with detailed logging.
 
         Args:
@@ -721,7 +722,7 @@ class FlextMeltanoAdapter:
         """
         error_msg = f"Failed to add plugin: {error}"
         self._logger.error(error_msg, error=error)
-        return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+        return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     # =========================================================================
     # PRIVATE UTILITY METHODS - Internal helper functionality
@@ -771,7 +772,7 @@ class FlextMeltanoAdapter:
         self,
         plugin_name: str,
         plugin_type: str,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Get detailed information about specific plugin - UNIFIED METHOD.
 
         Consolidates PluginDiscovery class functionality into unified adapter method
@@ -792,7 +793,7 @@ class FlextMeltanoAdapter:
                 prefix="flext_plugin_info_",
             )
             if project_result.is_failure:
-                return FlextResult[FlextTypes.Core.Headers].fail(
+                return FlextResult[FlextTypes.StringDict].fail(
                     f"Failed to create temp project: {project_result.error}",
                 )
 
@@ -803,14 +804,14 @@ class FlextMeltanoAdapter:
             plugins_result = hub_wrapper.get_plugins_of_type(plugin_type)
 
             if plugins_result.is_failure:
-                return FlextResult[FlextTypes.Core.Headers].fail(
+                return FlextResult[FlextTypes.StringDict].fail(
                     f"Failed to get plugins of type {plugin_type}: {plugins_result.error}"
                 )
 
-            plugins_dict = plugins_result.unwrap()
+            plugins_dict: dict[str, MeltanoPluginProtocol] = plugins_result.unwrap()
 
             if plugin_name not in plugins_dict:
-                return FlextResult[FlextTypes.Core.Headers].fail(
+                return FlextResult[FlextTypes.StringDict].fail(
                     f"Plugin '{plugin_name}' not found in {plugin_type}",
                 )
 
@@ -826,19 +827,19 @@ class FlextMeltanoAdapter:
                 "logo_url": getattr(indexed_plugin, "logo_url", ""),
             }
 
-            return FlextResult[FlextTypes.Core.Headers].ok(data=plugin_info)
+            return FlextResult[FlextTypes.StringDict].ok(data=plugin_info)
 
         except Exception as e:
             error_msg = f"Failed to get plugin info: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Headers].fail(error_msg)
+            return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     def execute_pipeline(
         self,
         project: object,
         extractor_name: str,
         loader_name: str,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Execute ELT pipeline using railway-oriented programming.
 
         Consolidates ELTCoordinator class functionality into unified adapter method
@@ -856,30 +857,45 @@ class FlextMeltanoAdapter:
         """
         # RAILWAY PATTERN: Chain all pipeline operations with automatic error handling
         project_obj = cast("Project", project)
-        return (
-            self._log_pipeline_start(extractor_name, loader_name)
-            .flat_map(
-                lambda _: self._find_required_plugins(
-                    project_obj, extractor_name, loader_name
-                )
+
+        # Execute synchronous steps first
+        start_result = self._log_pipeline_start(extractor_name, loader_name)
+        if start_result.is_failure:
+            return start_result
+
+        plugins_result = self._find_required_plugins(
+            project_obj, extractor_name, loader_name
+        )
+        if plugins_result.is_failure:
+            return FlextResult[FlextTypes.StringDict].fail(
+                plugins_result.error or "Failed to find plugins"
             )
-            .flat_map(
-                lambda plugins: self._create_elt_context(
-                    project_obj, extractor_name, loader_name, plugins
-                )
+
+        # Execute ELT context creation
+        elt_context_result = self._create_elt_context(
+            project_obj, extractor_name, loader_name, plugins_result.unwrap()
+        )
+        if elt_context_result.is_failure:
+            return FlextResult[FlextTypes.StringDict].fail(
+                elt_context_result.error or "Failed to create ELT context"
             )
-            .flat_map(self._execute_singer_runner)
-            .flat_map(
-                lambda context: self._build_pipeline_result(
-                    extractor_name,
-                    loader_name,
-                    cast("FlextMeltanoTypes.Core.RunContextDict", context),
-                )
+
+        # Execute singer runner
+        runner_result = self._execute_singer_runner(elt_context_result.unwrap())
+        if runner_result.is_failure:
+            return FlextResult[FlextTypes.StringDict].fail(
+                runner_result.error or "Failed to execute singer runner"
             )
-            .or_else_get(
-                lambda: FlextResult[FlextTypes.Core.Headers].fail(
-                    f"Pipeline execution failed for {extractor_name} -> {loader_name}"
-                )
+
+        # Execute final synchronous step
+        final_result = self._build_pipeline_result(
+            extractor_name,
+            loader_name,
+            cast("FlextMeltanoTypes.Core.RunContextDict", runner_result.unwrap()),
+        )
+        return final_result.or_else_get(
+            lambda: FlextResult[FlextTypes.StringDict].fail(
+                f"Pipeline execution failed for {extractor_name} -> {loader_name}"
             )
         )
 
@@ -983,7 +999,7 @@ class FlextMeltanoAdapter:
             )
 
             if elt_context_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     elt_context_result.error or "Failed to create ELT context"
                 )
 
@@ -996,15 +1012,15 @@ class FlextMeltanoAdapter:
                 "loader_plugin": "loader_plugin",
             }
 
-            return FlextResult[dict[str, object]].ok(data=context_data)
+            return FlextResult[FlextTypes.Dict].ok(data=context_data)
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to create ELT context: {e}"
             )
 
     def _execute_singer_runner(
         self, context_data: FlextMeltanoTypes.Core.RunContextDict
-    ) -> FlextResult[dict[str, FlextTypes.Core.JsonValue]]:
+    ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
         """Execute Singer runner with context data.
 
         Args:
@@ -1024,13 +1040,13 @@ class FlextMeltanoAdapter:
             if not hasattr(extractor_plugin_obj, "name") or not hasattr(
                 extractor_plugin_obj, "type"
             ):
-                return FlextResult[dict[str, FlextTypes.Core.JsonValue]].fail(
+                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                     "Invalid extractor plugin: missing required attributes"
                 )
             if not hasattr(loader_plugin_obj, "name") or not hasattr(
                 loader_plugin_obj, "type"
             ):
-                return FlextResult[dict[str, FlextTypes.Core.JsonValue]].fail(
+                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                     "Invalid loader plugin: missing required attributes"
                 )
 
@@ -1043,7 +1059,7 @@ class FlextMeltanoAdapter:
             )
 
             if execution_result.is_failure:
-                return FlextResult[dict[str, FlextTypes.Core.JsonValue]].fail(
+                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
 
@@ -1051,12 +1067,12 @@ class FlextMeltanoAdapter:
             context_data["execution_completed"] = True
             context_data["execution_result"] = execution_result.unwrap()
 
-            return FlextResult[dict[str, FlextTypes.Core.JsonValue]].ok(
-                cast("dict[str, FlextTypes.Core.JsonValue]", context_data)
+            return FlextResult[dict[str, FlextTypes.JsonValue]].ok(
+                cast("dict[str, FlextTypes.JsonValue]", context_data)
             )
 
         except Exception as e:
-            return FlextResult[dict[str, FlextTypes.Core.JsonValue]].fail(
+            return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                 f"Unexpected error in ELT pipeline: {e}"
             )
 
@@ -1065,7 +1081,7 @@ class FlextMeltanoAdapter:
         extractor_name: str,
         loader_name: str,
         context_data: FlextMeltanoTypes.Core.RunContextDict,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Build successful pipeline result.
 
         Args:
@@ -1084,7 +1100,7 @@ class FlextMeltanoAdapter:
             execution_result = context_data.get("execution_result", {})
 
             # Build pipeline result using available data
-            pipeline_result: dict[str, str] = {
+            pipeline_result: FlextTypes.StringDict = {
                 "success": "true",
                 "extractor": "extractor_name",
                 "loader": "loader_name",
@@ -1107,15 +1123,13 @@ class FlextMeltanoAdapter:
                 loader=loader_name,
             )
 
-            return FlextResult[dict[str, str]].ok(pipeline_result)
+            return FlextResult[FlextTypes.StringDict].ok(pipeline_result)
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Headers].fail(
+            return FlextResult[FlextTypes.StringDict].fail(
                 f"Failed to build pipeline result: {e}"
             )
 
-    def _handle_pipeline_error(
-        self, error: str
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+    def _handle_pipeline_error(self, error: str) -> FlextResult[FlextTypes.StringDict]:
         """Handle pipeline execution errors with logging.
 
         Args:
@@ -1126,48 +1140,48 @@ class FlextMeltanoAdapter:
 
         """
         self._logger.error(f"Pipeline execution failed: {error}")
-        return FlextResult[FlextTypes.Core.Headers].fail(error)
+        return FlextResult[FlextTypes.StringDict].fail(error)
 
     # =================================================================
     # SINGER SDK INTEGRATION - Direct integration without wrappers
     # =================================================================
 
-    def create_tap_stream_catalog(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def create_tap_stream_catalog(self: object) -> FlextResult[FlextTypes.Dict]:
         """Create tap stream catalog using native Singer SDK.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing tap stream catalog.
+            FlextResult[FlextTypes.Dict]: Result containing tap stream catalog.
 
         """
-        return FlextResult[FlextTypes.Core.Dict].ok(
+        return FlextResult[FlextTypes.Dict].ok(
             {
                 "streams": [],
                 "catalog_type": "singer_tap",
             },
         )
 
-    def create_target_config(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def create_target_config(self: object) -> FlextResult[FlextTypes.Dict]:
         """Create target configuration using native Singer SDK.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing target configuration.
+            FlextResult[FlextTypes.Dict]: Result containing target configuration.
 
         """
-        return FlextResult[FlextTypes.Core.Dict].ok(
+        return FlextResult[FlextTypes.Dict].ok(
             {
                 "target_schema": "default",
                 "batch_config": {},
             },
         )
 
-    def convert_singer_schema(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def convert_singer_schema(self: object) -> FlextResult[FlextTypes.Dict]:
         """Convert Singer schema types using native APIs.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing converted schema.
+            FlextResult[FlextTypes.Dict]: Result containing converted schema.
 
         """
-        return FlextResult[FlextTypes.Core.Dict].ok(
+        return FlextResult[FlextTypes.Dict].ok(
             {
                 "schema_version": 1.0,
                 "properties": {},
@@ -1178,14 +1192,14 @@ class FlextMeltanoAdapter:
     # DBT INTEGRATION - Direct integration without wrappers
     # =================================================================
 
-    def execute_dbt_operation(self: object) -> FlextResult[FlextTypes.Core.Dict]:
+    def execute_dbt_operation(self: object) -> FlextResult[FlextTypes.Dict]:
         """Execute DBT operation using native DBT Core API.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing DBT operation status.
+            FlextResult[FlextTypes.Dict]: Result containing DBT operation status.
 
         """
-        return FlextResult[FlextTypes.Core.Dict].ok(
+        return FlextResult[FlextTypes.Dict].ok(
             {"dbt_status": "ready", "models": []},
         )
 
@@ -1314,12 +1328,12 @@ Thumbs.db
 
     @staticmethod
     def adapt_project_config(
-        config: FlextTypes.Core.Dict,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+        config: FlextTypes.Dict,
+    ) -> FlextResult[FlextTypes.Dict]:
         """Adapt project configuration with required fields.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing adapted configuration.
+            FlextResult[FlextTypes.Dict]: Result containing adapted configuration.
 
         """
         try:
@@ -1327,9 +1341,7 @@ Thumbs.db
 
             # Add required fields if missing
             if "project_id" not in adapted_config:
-                adapted_config["project_id"] = (
-                    f"flext-project-{FlextUtilities.Generators.generate_uuid()[:8]}"
-                )
+                adapted_config["project_id"] = f"flext-project-{str(uuid.uuid4())[:8]}"
 
             if "version" not in adapted_config:
                 adapted_config["version"] = 1
@@ -1345,21 +1357,21 @@ Thumbs.db
                     "transformers": [],
                 }
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=adapted_config)
+            return FlextResult[FlextTypes.Dict].ok(data=adapted_config)
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to adapt project config: {e}",
             )
 
     @staticmethod
     def adapt_plugin(
-        plugin_data: FlextTypes.Core.Dict,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+        plugin_data: FlextTypes.Dict,
+    ) -> FlextResult[FlextTypes.Dict]:
         """Adapt plugin data with required fields.
 
         Returns:
-            FlextResult[FlextTypes.Core.Dict]: Result containing adapted plugin data.
+            FlextResult[FlextTypes.Dict]: Result containing adapted plugin data.
 
         """
         try:
@@ -1383,10 +1395,10 @@ Thumbs.db
                 name = str(adapted_plugin.get("name", "plugin"))
                 adapted_plugin["executable"] = name
 
-            return FlextResult[FlextTypes.Core.Dict].ok(data=adapted_plugin)
+            return FlextResult[FlextTypes.Dict].ok(data=adapted_plugin)
 
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Dict].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to adapt plugin: {e}",
             )
 
@@ -1414,8 +1426,11 @@ Thumbs.db
         return self._library_runner
 
     def run_dbt_transformations(
-        self, project_dir: Path, models: list[str] | None = None, **options: object
-    ) -> FlextResult[DbtTransformationResult]:
+        self,
+        project_dir: Path,
+        models: FlextTypes.StringList | None = None,
+        **options: object,
+    ) -> FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult]:
         """Run dbt transformations using programmatic API.
 
         Args:
@@ -1456,11 +1471,13 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[DbtTransformationResult].fail(error_msg)
+            return FlextResult[
+                FlextMeltanoTypes.Processing.DbtTransformationResult
+            ].fail(error_msg)
 
     def execute_singer_pipeline_advanced(
         self, tap_instance: object, target_instance: object
-    ) -> FlextResult[SingerExecutionResult]:
+    ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
         """Execute Singer pipeline with advanced protocol management.
 
         Args:
@@ -1500,7 +1517,9 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[SingerExecutionResult].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
+                error_msg
+            )
 
     def execute_complete_elt_pipeline(
         self,
@@ -1508,7 +1527,7 @@ Thumbs.db
         extractor_config: FlextMeltanoTypes.Core.PluginConfigDict,
         loader_config: FlextMeltanoTypes.Core.PluginConfigDict,
         transformer_config: FlextMeltanoTypes.Core.PluginConfigDict | None = None,
-    ) -> FlextResult[EltPipelineResult]:
+    ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
@@ -1549,7 +1568,9 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[EltPipelineResult].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
+                error_msg
+            )
 
 
 __all__ = [

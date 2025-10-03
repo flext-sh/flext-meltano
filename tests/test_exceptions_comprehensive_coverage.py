@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from flext_core import FlextTypes
 from flext_meltano import FlextMeltanoExceptions
 
 
@@ -165,7 +166,7 @@ class TestExceptionUsagePatterns:
     def test_singer_tap_connection_errors(self) -> None:
         """Test exception patterns for Singer tap connections."""
 
-        def connect_to_tap(tap_name: str, credentials: dict[str, str]) -> None:
+        def connect_to_tap(tap_name: str, credentials: FlextTypes.StringDict) -> None:
             if not credentials.get("api_key"):
                 msg = "API key required for tap connection"
                 raise FlextMeltanoExceptions.AuthenticationError(msg)

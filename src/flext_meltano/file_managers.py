@@ -29,8 +29,8 @@ from flext_meltano.validators import FlextMeltanoValidators
 
 # Type aliases (MyPy compatible)
 ConfigDict = (
-    dict[str, str | int | FlextTypes.Core.StringList]
-    | dict[str, str | FlextTypes.Core.StringList]
+    dict[str, str | int | FlextTypes.StringList]
+    | dict[str, str | FlextTypes.StringList]
 )
 PathDict = dict[str, Path | str]
 
@@ -164,8 +164,8 @@ class FlextMeltanoFileManagers:
     def create_directory_structure(
         cls,
         base_path: Path,
-        directories: FlextTypes.Core.StringList,
-    ) -> FlextResult[FlextTypes.Core.Headers]:
+        directories: FlextTypes.StringList,
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
@@ -173,16 +173,16 @@ class FlextMeltanoFileManagers:
 
         """
         try:
-            created_paths: FlextTypes.Core.Headers = {}
+            created_paths: FlextTypes.StringDict = {}
 
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return FlextResult[FlextTypes.Core.Headers].ok(data=created_paths)
+            return FlextResult[FlextTypes.StringDict].ok(data=created_paths)
         except Exception as e:
-            return FlextResult[FlextTypes.Core.Headers].fail(
+            return FlextResult[FlextTypes.StringDict].fail(
                 f"Failed to create directories: {e}",
             )
 

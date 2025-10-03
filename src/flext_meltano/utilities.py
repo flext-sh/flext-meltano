@@ -33,7 +33,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         cls,
         project_id: str,
         project_name: str = "",
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         logger = FlextLogger(__name__)
         try:
@@ -46,7 +46,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             )
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
-            config_dict: FlextTypes.Core.Dict = {
+            config_dict: FlextTypes.Dict = {
                 "version": 1,
                 "project_id": safe_project_id,
                 "project_name": safe_project_name,
@@ -66,16 +66,16 @@ class FlextMeltanoUtilities(FlextUtilities):
                     "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
                 },
             }
-            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
+            return FlextResult[FlextTypes.Dict].ok(data=config_dict)
         except Exception as e:  # pragma: no cover
             error_msg = f"Failed to create Meltano config dict: {e}"
             logger.exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     @classmethod
     def write_meltano_yml(
         cls,
-        config: FlextTypes.Core.Dict,
+        config: FlextTypes.Dict,
         target_path: Path,
     ) -> FlextResult[bool]:
         """Write MELTANO-SPECIFIC YAML configuration using monadic resource management.
@@ -154,7 +154,7 @@ class FlextMeltanoUtilities(FlextUtilities):
 
     @classmethod
     def _write_yaml_content(
-        cls, file_handle: TextIO, config: FlextTypes.Core.Dict
+        cls, file_handle: TextIO, config: FlextTypes.Dict
     ) -> FlextResult[bool]:
         """Write YAML content to file handle.
 
@@ -174,7 +174,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 )
 
             # MONADIC PATTERN: Safe YAML conversion with proper type casting
-            yaml_data: FlextTypes.Core.Dict = dict(config)  # Type-safe conversion
+            yaml_data: FlextTypes.Dict = dict(config)  # Type-safe conversion
 
             # DOMAIN-SPECIFIC: YAML writing with Meltano formatting preferences
             yaml.dump(yaml_data, file_handle, default_flow_style=False, indent=2)
@@ -212,7 +212,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Create MELTANO-SPECIFIC plugin config using FlextUtilities foundation."""
         try:
             # Delegate to FlextUtilities for ALL text processing
@@ -227,7 +227,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 executable, executable
             )
 
-            config_dict: FlextTypes.Core.Dict = {
+            config_dict: FlextTypes.Dict = {
                 "name": safe_name,
                 "namespace": safe_namespace,
                 "pip_url": safe_pip_url,
@@ -240,14 +240,14 @@ class FlextMeltanoUtilities(FlextUtilities):
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }
-            return FlextResult[FlextTypes.Core.Dict].ok(data=config_dict)
+            return FlextResult[FlextTypes.Dict].ok(data=config_dict)
         except Exception as e:  # pragma: no cover
             error_msg = f"Failed to create plugin config: {e}"
             FlextLogger(__name__).exception(error_msg)
-            return FlextResult[FlextTypes.Core.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     @classmethod
-    def load_yaml_config(cls, path: Path) -> FlextResult[FlextTypes.Core.Dict]:
+    def load_yaml_config(cls, path: Path) -> FlextResult[FlextTypes.Dict]:
         """Load YAML config using monadic composition with resource management.
 
         Uses FlextResult monadic patterns to chain file loading, validation,
@@ -265,8 +265,8 @@ class FlextMeltanoUtilities(FlextUtilities):
         # MONADIC COMPOSITION: Chain file operations with automatic error handling
         def convert_to_dict(
             config_dict: object,
-        ) -> FlextTypes.Core.Dict:
-            """Type-safe conversion from ConfigDict to FlextTypes.Core.Dict."""
+        ) -> FlextTypes.Dict:
+            """Type-safe conversion from ConfigDict to FlextTypes.Dict."""
             # ConfigDict is compatible with dict["str", "JsonValue"] but MyPy needs explicit conversion
             return dict(config_dict) if isinstance(config_dict, dict) else {}
 
@@ -275,7 +275,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             .ok(path)
             .flat_map(cls._validate_yaml_path)
             .flat_map(FlextMeltanoFileManagers.load_yaml_config)
-            .map(convert_to_dict)  # Type-safe conversion to FlextTypes.Core.Dict
+            .map(convert_to_dict)  # Type-safe conversion to FlextTypes.Dict
             .with_context(
                 lambda error: f"Loading YAML config from {path}: {error}"
             )  # Add error context
@@ -303,6 +303,50 @@ class FlextMeltanoUtilities(FlextUtilities):
             return FlextResult.fail(f"File is not a YAML file: {path}")
 
         return FlextResult.ok(data=path)
+
+    def directory_exists(self, path: Path) -> FlextResult[bool]:
+        """Check if directory exists."""
+        try:
+            return FlextResult.ok(path.exists() and path.is_dir())
+        except (OSError, ValueError) as e:
+            return FlextResult.fail(f"Failed to check directory existence: {e}")
+
+    def validate_project_structure(self, project_path: Path) -> FlextResult[bool]:
+        """Validate Meltano project structure."""
+        try:
+            if not project_path.exists():
+                return FlextResult.fail(f"Project path does not exist: {project_path}")
+
+            meltano_yml = project_path / "meltano.yml"
+            if not meltano_yml.exists():
+                return FlextResult.fail(f"Meltano config file not found: {meltano_yml}")
+
+            return FlextResult.ok(True)
+        except (OSError, ValueError) as e:
+            return FlextResult.fail(f"Failed to validate project structure: {e}")
+
+    def create_project_file(self, file_path: Path, content: str) -> FlextResult[Path]:
+        """Create a project file with content."""
+        try:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(content, encoding="utf-8")
+            return FlextResult.ok(file_path)
+        except (OSError, ValueError) as e:
+            return FlextResult.fail(f"Failed to create project file: {e}")
+
+    def load_yaml_file(self, file_path: Path) -> FlextResult[FlextTypes.Dict]:
+        """Load YAML file."""
+        return self.load_yaml_config(file_path)
+
+    def save_yaml_file(
+        self, file_path: Path, content: FlextTypes.Dict
+    ) -> FlextResult[Path]:
+        """Save content to YAML file."""
+        try:
+            self.write_meltano_yml(file_path, content)
+            return FlextResult.ok(file_path)
+        except (OSError, ValueError, yaml.YAMLError) as e:
+            return FlextResult.fail(f"Failed to save YAML file: {e}")
 
 
 __all__ = ["FlextMeltanoUtilities"]

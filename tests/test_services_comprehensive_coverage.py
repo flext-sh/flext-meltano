@@ -8,7 +8,7 @@ import tempfile
 
 import pytest
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, FlextTypes
 from flext_meltano import FlextMeltanoService
 
 
@@ -108,7 +108,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"file_path": tmp_file.name}
+            config: FlextTypes.Dict = {"file_path": tmp_file.name}
             result = tap_service.create_instance(config)
             assert isinstance(result, FlextResult)
 
@@ -118,7 +118,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"file_path": tmp_file.name}
+            config: FlextTypes.Dict = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
             assert isinstance(result, FlextResult)
 
@@ -198,7 +198,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"output_path": tmp_file.name}
+            config: FlextTypes.Dict = {"output_path": tmp_file.name}
             result = target_service.create_instance(config)
             assert isinstance(result, FlextResult)
 
@@ -208,7 +208,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"output_path": tmp_file.name}
+            config: FlextTypes.Dict = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
             assert isinstance(result, FlextResult)
 

@@ -10,11 +10,11 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
+from flext_tests import FlextTestsFactories, FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextMeltanoAdapter
-from flext_tests import FlextTestsFactories, FlextTestsUtilities
 
 
 class TestFlextMeltanoAdapterComplete:
@@ -549,8 +549,8 @@ class TestFlextMeltanoAdapterComplete:
         ]
 
         for config in configs:
-            # Cast config to expected type - dict[str, str] to dict[str, object]
-            config_dict: dict[str, object] = dict(config)
+            # Cast config to expected type - FlextTypes.StringDict to FlextTypes.Dict
+            config_dict: FlextTypes.Dict = dict(config)
             result = FlextMeltanoAdapter.adapt_plugin(config_dict)
             assert isinstance(result, FlextResult)
             assert result.is_success
@@ -578,8 +578,8 @@ class TestFlextMeltanoAdapterComplete:
             },
         }
 
-        # Cast complex_config to expected type - Collection[str] to dict[str, object]
-        complex_config_dict: dict[str, object] = dict(complex_config.items())
+        # Cast complex_config to expected type - Collection[str] to FlextTypes.Dict
+        complex_config_dict: FlextTypes.Dict = dict(complex_config.items())
         result = FlextMeltanoAdapter.adapt_project_config(complex_config_dict)
 
         assert isinstance(result, FlextResult)

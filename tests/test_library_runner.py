@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 from flext_meltano import (
     DbtTransformationResult,
     EltPipelineResult,
@@ -145,15 +145,15 @@ class TestFlextMeltanoLibraryRunner:
             project_dir = Path(temp_dir)
 
             # Type annotations to help type checker
-            extractor_config: dict[str, str | dict[str, str]] = {
+            extractor_config: dict[str, str | FlextTypes.StringDict] = {
                 "name": "test_extractor",
                 "config": {},
             }
-            loader_config: dict[str, str | dict[str, str]] = {
+            loader_config: dict[str, str | FlextTypes.StringDict] = {
                 "name": "test_loader",
                 "config": {},
             }
-            transformer_config: dict[str, str | dict[str, str]] = {
+            transformer_config: dict[str, str | FlextTypes.StringDict] = {
                 "name": "test_transformer",
                 "config": {},
             }

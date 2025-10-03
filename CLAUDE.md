@@ -527,26 +527,26 @@ async def extract_transform_load(
     tap_name: str,
     target_name: str,
     dbt_models: List[str]
-) -> FlextResult[Dict[str, object]]:
+) -> FlextResult[FlextTypes.Dict]:
     """Complete ELT pipeline with railway-oriented programming."""
     adapter = FlextMeltanoAdapter()
 
     # Extract phase with FlextResult chaining
     extract_result = await adapter.run_extraction(tap_name)
     if extract_result.is_failure:
-        return FlextResult[Dict[str, object]].fail(f"Extraction failed: {extract_result.error}")
+        return FlextResult[FlextTypes.Dict].fail(f"Extraction failed: {extract_result.error}")
 
     # Transform phase with FlextResult chaining
     transform_result = await adapter.run_transformations(dbt_models)
     if transform_result.is_failure:
-        return FlextResult[Dict[str, object]].fail(f"Transformation failed: {transform_result.error}")
+        return FlextResult[FlextTypes.Dict].fail(f"Transformation failed: {transform_result.error}")
 
     # Load phase with FlextResult chaining
     load_result = await adapter.run_loading(target_name)
     if load_result.is_failure:
-        return FlextResult[Dict[str, object]].fail(f"Loading failed: {load_result.error}")
+        return FlextResult[FlextTypes.Dict].fail(f"Loading failed: {load_result.error}")
 
-    return FlextResult[Dict[str, object]].ok({
+    return FlextResult[FlextTypes.Dict].ok({
         "extracted_records": extract_result.unwrap(),
         "transformed_models": transform_result.unwrap(),
         "loaded_records": load_result.unwrap()

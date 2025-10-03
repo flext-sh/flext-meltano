@@ -33,15 +33,19 @@ from flext_meltano.tap_abstractions import (
     TapInstance,
 )
 from flext_meltano.target_abstractions import FlextTargetAbstractions
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import (
+    # Export specific types for backward compatibility
+    FlextMeltanoTypes,
+)
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
-# Type aliases for backward compatibility (deprecated - use FlextMeltanoTypes.Processing.*)
+# Type aliases for backward compatibility
 DbtTransformationResult = FlextMeltanoTypes.Processing.DbtTransformationResult
 EltPipelineResult = FlextMeltanoTypes.Processing.EltPipelineResult
 SingerExecutionResult = FlextMeltanoTypes.Processing.SingerExecutionResult
-SingerProcessingResult = FlextMeltanoTypes.Processing.SingerProcessingResult
+
+# Type aliases imported from types.py for backward compatibility
 
 # Service class aliases for backward compatibility
 FlextSingerTypes = FlextMeltanoService.FlextSingerTypes
@@ -74,7 +78,6 @@ __all__ = [
     "FlextTargetAbstractions",
     "PluginTypes",
     "SingerExecutionResult",
-    "SingerProcessingResult",
     "StreamDefinition",
     "TapConfig",
     "TapInstance",

@@ -57,10 +57,10 @@ class FlextMeltanoModels(FlextModels):
         _MODERATE_CONFIG_THRESHOLD = 8
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
-        connection_config: FlextTypes.Core.Dict = Field(
+        connection_config: FlextTypes.Dict = Field(
             description="Connection configuration",
         )
-        stream_config: FlextTypes.Core.Dict = Field(
+        stream_config: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Stream-specific configuration",
         )
@@ -106,8 +106,8 @@ class FlextMeltanoModels(FlextModels):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextTypes.Core.Dict
-        ) -> FlextTypes.Core.Dict:
+            self, value: FlextTypes.Dict
+        ) -> FlextTypes.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret"}
@@ -132,8 +132,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate connection_config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -149,7 +149,7 @@ class FlextMeltanoModels(FlextModels):
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
-        stream_schema: FlextTypes.Core.Dict = Field(
+        stream_schema: FlextTypes.Dict = Field(
             description="JSON schema for the stream",
         )
         tap_type: str = Field(description="Type of tap this stream belongs to")
@@ -205,9 +205,7 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("stream_schema")
-        def serialize_stream_schema(
-            self, value: FlextTypes.Core.Dict
-        ) -> FlextTypes.Core.Dict:
+        def serialize_stream_schema(self, value: FlextTypes.Dict) -> FlextTypes.Dict:
             """Field serializer for stream schema normalization."""
             # Ensure consistent schema structure
             if "properties" not in value:
@@ -236,7 +234,7 @@ class FlextMeltanoModels(FlextModels):
             default=False,
             description="Whether streams have been discovered",
         )
-        metadata: FlextTypes.Core.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional metadata",
         )
@@ -299,7 +297,7 @@ class FlextMeltanoModels(FlextModels):
         _MEDIUM_EFFICIENCY_THRESHOLD = 100
 
         target_type: str = Field(description="Target type identifier")
-        connection_config: FlextTypes.Core.Dict = Field(
+        connection_config: FlextTypes.Dict = Field(
             description="Connection configuration dictionary",
         )
         batch_size: int = Field(
@@ -351,8 +349,8 @@ class FlextMeltanoModels(FlextModels):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextTypes.Core.Dict
-        ) -> FlextTypes.Core.Dict:
+            self, value: FlextTypes.Dict
+        ) -> FlextTypes.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
@@ -377,8 +375,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate connection config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -412,7 +410,7 @@ class FlextMeltanoModels(FlextModels):
         model_config = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(description="Stream name identifier")
-        stream_schema: FlextTypes.Core.Dict = Field(
+        stream_schema: FlextTypes.Dict = Field(
             description="Stream schema definition",
             alias="schema",
         )
@@ -482,8 +480,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_stream_schema(
             cls,
-            v: FlextTypes.Core.Dict,
-        ) -> FlextTypes.Core.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate stream schema contains properties."""
             if "properties" not in v:
                 msg = "Schema must contain properties"
@@ -597,7 +595,7 @@ class FlextMeltanoModels(FlextModels):
             default=FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
             description="Plugin variant",
         )
-        settings: FlextTypes.Core.Dict = Field(
+        settings: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Plugin settings",
         )
@@ -902,7 +900,7 @@ class FlextMeltanoModels(FlextModels):
             default=None,
             description="Error message if failed",
         )
-        metadata: FlextTypes.Core.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional execution metadata",
         )
@@ -1007,14 +1005,14 @@ class FlextMeltanoModels(FlextModels):
             default=0,
             description="Total records processed",
         )
-        pipeline_metadata: FlextTypes.Core.Dict = Field(
+        pipeline_metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Pipeline execution metadata",
         )
 
         @computed_field
         @property
-        def completed_stages(self) -> list[str]:
+        def completed_stages(self) -> FlextTypes.StringList:
             """Computed field for completed pipeline stages."""
             stages = []
             if self.tap_result and self.tap_result.is_completed:
