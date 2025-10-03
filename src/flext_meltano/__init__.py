@@ -26,13 +26,13 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
-from flext_meltano.tap_abstractions import (
+from flext_meltano.singer_abstractions import (
     FlextTapAbstractions,
+    FlextTargetAbstractions,
     StreamDefinition,
     TapConfig,
     TapInstance,
 )
-from flext_meltano.target_abstractions import FlextTargetAbstractions
 from flext_meltano.typings import (
     # Export specific types for backward compatibility
     FlextMeltanoTypes,
