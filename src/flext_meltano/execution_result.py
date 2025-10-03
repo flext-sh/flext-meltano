@@ -1,4 +1,7 @@
-"""FLEXT Meltano Execution Result - Command execution result model.
+"""FLEXT Meltano Execution Result - Model for command execution results.
+
+This module provides the FlextMeltanoExecutionResult class for representing
+Meltano command execution outcomes following flext-core patterns.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -7,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
-from typing import override
 
 from flext_core import FlextTypes, FlextUtilities
 
@@ -15,7 +17,6 @@ from flext_core import FlextTypes, FlextUtilities
 class FlextMeltanoExecutionResult:
     """Execution result model for Meltano command operations following flext-core patterns."""
 
-    @override
     def __init__(
         self,
         command: FlextTypes.StringList,
