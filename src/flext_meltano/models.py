@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
+from flext_core import FlextConstants, FlextModels, FlextTypes
 from pydantic import (
     ConfigDict,
     Field,
@@ -19,7 +20,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_core import FlextConstants, FlextModels, FlextTypes
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 

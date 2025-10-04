@@ -11,6 +11,8 @@ from __future__ import annotations
 from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities

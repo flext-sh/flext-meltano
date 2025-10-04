@@ -19,12 +19,12 @@ from flext_meltano import FlextMeltanoService
 from flext_core import FlextResult
 
 service = FlextMeltanoService(service_type="tap")
-result: FlextResult[dict] = service.execute()
+result: FlextResult[FlextTypes.Dict] = service.execute()
 ```
 
 **Methods**:
 
-- `execute() -> FlextResult[dict]` - Execute configured ELT operation
+- `execute() -> FlextResult[FlextTypes.Dict]` - Execute configured ELT operation
 - `validate_configuration() -> FlextResult[bool]` - Validate service configuration
 
 ### FlextMeltanoAdapter
@@ -35,12 +35,12 @@ result: FlextResult[dict] = service.execute()
 from flext_meltano import FlextMeltanoAdapter
 
 adapter = FlextMeltanoAdapter()
-result: FlextResult[dict] = adapter.run_pipeline("tap-csv", "target-jsonl")
+result: FlextResult[FlextTypes.Dict] = adapter.run_pipeline("tap-csv", "target-jsonl")
 ```
 
 **Methods**:
 
-- `run_pipeline(tap: str, target: str) -> FlextResult[dict]` - Execute ELT pipeline
+- `run_pipeline(tap: str, target: str) -> FlextResult[FlextTypes.Dict]` - Execute ELT pipeline
 - `validate_project() -> FlextResult[bool]` - Validate Meltano project configuration
 - `list_plugins() -> FlextResult[list]` - List available Meltano plugins
 
@@ -56,12 +56,12 @@ result: FlextResult[dict] = adapter.run_pipeline("tap-csv", "target-jsonl")
 from flext_meltano import FlextTapAbstractions
 
 tap_abstractions = FlextTapAbstractions()
-catalog_result: FlextResult[dict] = tap_abstractions.discover_catalog("tap-csv")
+catalog_result: FlextResult[FlextTypes.Dict] = tap_abstractions.discover_catalog("tap-csv")
 ```
 
 **Methods**:
 
-- `discover_catalog(tap_name: str) -> FlextResult[dict]` - Discover Singer catalog
+- `discover_catalog(tap_name: str) -> FlextResult[FlextTypes.Dict]` - Discover Singer catalog
 - `extract_data(tap_name: str, config: dict) -> FlextResult[list]` - Extract data records
 - `validate_tap_config(config: dict) -> FlextResult[bool]` - Validate tap configuration
 
@@ -73,12 +73,12 @@ catalog_result: FlextResult[dict] = tap_abstractions.discover_catalog("tap-csv")
 from flext_meltano import FlextTargetAbstractions
 
 target_abstractions = FlextTargetAbstractions()
-result: FlextResult[dict] = target_abstractions.load_data("target-jsonl", records)
+result: FlextResult[FlextTypes.Dict] = target_abstractions.load_data("target-jsonl", records)
 ```
 
 **Methods**:
 
-- `load_data(target_name: str, records: list) -> FlextResult[dict]` - Load data records
+- `load_data(target_name: str, records: list) -> FlextResult[FlextTypes.Dict]` - Load data records
 - `validate_target_config(config: dict) -> FlextResult[bool]` - Validate target configuration
 
 ---
@@ -93,14 +93,14 @@ result: FlextResult[dict] = target_abstractions.load_data("target-jsonl", record
 from flext_meltano import FlextMeltanoDbtService
 
 dbt_service = FlextMeltanoDbtService()
-result: FlextResult[dict] = dbt_service.execute_dbt_operation()
+result: FlextResult[FlextTypes.Dict] = dbt_service.execute_dbt_operation()
 ```
 
 **Current Status**: Placeholder implementation returning static data
 
 **Methods**:
 
-- `execute_dbt_operation() -> FlextResult[dict]` - Execute dbt transformations (placeholder)
+- `execute_dbt_operation() -> FlextResult[FlextTypes.Dict]` - Execute dbt transformations (placeholder)
 - `validate_dbt_project() -> FlextResult[bool]` - Validate dbt project structure
 
 ---
@@ -115,12 +115,12 @@ result: FlextResult[dict] = dbt_service.execute_dbt_operation()
 from flext_meltano import FlextMeltanoConfig
 
 config = FlextMeltanoConfig()
-result: FlextResult[dict] = config.load_configuration("production")
+result: FlextResult[FlextTypes.Dict] = config.load_configuration("production")
 ```
 
 **Methods**:
 
-- `load_configuration(environment: str) -> FlextResult[dict]` - Load environment configuration
+- `load_configuration(environment: str) -> FlextResult[FlextTypes.Dict]` - Load environment configuration
 - `validate_config() -> FlextResult[bool]` - Validate configuration structure
 
 ### FlextMeltanoConfigBuilders
@@ -131,14 +131,14 @@ result: FlextResult[dict] = config.load_configuration("production")
 from flext_meltano import FlextMeltanoConfigBuilders
 
 builder = FlextMeltanoConfigBuilders()
-pipeline_config: FlextResult[dict] = builder.build_pipeline_config(tap_config, target_config)
+pipeline_config: FlextResult[FlextTypes.Dict] = builder.build_pipeline_config(tap_config, target_config)
 ```
 
 **Methods**:
 
-- `build_pipeline_config(tap: dict, target: dict) -> FlextResult[dict]` - Build ELT pipeline configuration
-- `build_tap_config(settings: dict) -> FlextResult[dict]` - Build tap-specific configuration
-- `build_target_config(settings: dict) -> FlextResult[dict]` - Build target-specific configuration
+- `build_pipeline_config(tap: dict, target: dict) -> FlextResult[FlextTypes.Dict]` - Build ELT pipeline configuration
+- `build_tap_config(settings: dict) -> FlextResult[FlextTypes.Dict]` - Build tap-specific configuration
+- `build_target_config(settings: dict) -> FlextResult[FlextTypes.Dict]` - Build target-specific configuration
 
 ---
 
@@ -152,13 +152,13 @@ pipeline_config: FlextResult[dict] = builder.build_pipeline_config(tap_config, t
 from flext_meltano import FlextMeltanoExecutor
 
 executor = FlextMeltanoExecutor()
-result: FlextResult[dict] = executor.run_meltano_command(["install"])
+result: FlextResult[FlextTypes.Dict] = executor.run_meltano_command(["install"])
 ```
 
 **Methods**:
 
-- `run_meltano_command(args: list) -> FlextResult[dict]` - Execute Meltano command
-- `run_singer_command(tap: str, target: str) -> FlextResult[dict]` - Execute Singer pipeline
+- `run_meltano_command(args: list) -> FlextResult[FlextTypes.Dict]` - Execute Meltano command
+- `run_singer_command(tap: str, target: str) -> FlextResult[FlextTypes.Dict]` - Execute Singer pipeline
 - `validate_execution_environment() -> FlextResult[bool]` - Validate execution environment
 
 ### FlextMeltanoBridge
@@ -169,7 +169,7 @@ result: FlextResult[dict] = executor.run_meltano_command(["install"])
 from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
-response: FlextResult[dict] = bridge.handle_bridge_request(request_data)
+response: FlextResult[FlextTypes.Dict] = bridge.handle_bridge_request(request_data)
 ```
 
 **Bridge Operations**:
@@ -294,10 +294,10 @@ All flext-meltano operations use the FlextResult pattern for type-safe error han
 from flext_core import FlextResult
 
 # Success case
-result = FlextResult[dict].ok({"status": "success", "records": 100})
+result = FlextResult[FlextTypes.Dict].ok({"status": "success", "records": 100})
 
 # Error case
-result = FlextResult[dict].fail("Pipeline execution failed: Invalid configuration")
+result = FlextResult[FlextTypes.Dict].fail("Pipeline execution failed: Invalid configuration")
 
 # Handling results
 if result.is_success:
@@ -322,7 +322,7 @@ class CustomELTService(FlextService):
         super().__init__()
         self._meltano_service = FlextMeltanoService()
 
-    def process_data(self) -> FlextResult[dict]:
+    def process_data(self) -> FlextResult[FlextTypes.Dict]:
         return self._meltano_service.execute()
 ```
 

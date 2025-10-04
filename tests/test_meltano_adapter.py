@@ -11,6 +11,7 @@ except ImportError:
     dbt = None
 
 from flext_core import FlextResult
+
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoBridge as MeltanoBridge
 
 

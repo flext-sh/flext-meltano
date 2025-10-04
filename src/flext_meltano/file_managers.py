@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -23,7 +22,9 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
-from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+
+# Use specific module imports to avoid circular dependencies
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 

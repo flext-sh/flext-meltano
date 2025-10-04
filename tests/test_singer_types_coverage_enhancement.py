@@ -6,6 +6,7 @@ import math
 from unittest import mock
 
 from flext_core import FlextResult, FlextTypes
+
 from flext_meltano import FlextSingerTypes
 
 

@@ -11,6 +11,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from flext_core import FlextResult, FlextTypes
+
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.typings import FlextMeltanoTypes
 

@@ -1,6 +1,7 @@
 """Test module for flext-meltano."""
 
 from flext_core import FlextTypes
+
 from flext_meltano import FlextSingerTypes
 
 

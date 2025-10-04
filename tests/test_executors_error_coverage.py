@@ -5,6 +5,7 @@ from unittest import mock
 
 # SPDX-License-Identifier: MIT
 from flext_core import FlextResult
+
 from flext_meltano import FlextMeltanoExecutor
 
 

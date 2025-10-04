@@ -12,8 +12,7 @@ from __future__ import annotations
 import time
 from typing import cast
 
-from flext_cli import FlextCli
-
+# CLI functionality replaced with logger calls (use flext-cli when available)
 from flext_core import (
     FlextBus,
     FlextContainer,
@@ -26,7 +25,9 @@ from flext_core import (
     FlextService,
     FlextTypes,
 )
-from flext_meltano.config import FlextMeltanoConfig
+
+# Use specific module imports to avoid circular dependencies
+from flext_meltano.configuration import FlextMeltanoConfig
 from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -90,7 +91,6 @@ class FlextMeltanoAPI(
 
     # Instance attributes (declared for type checker)
     logger: FlextLogger
-    _cli: FlextCli
     _config: FlextMeltanoConfig
     executor: FlextMeltanoExecutor
     container: FlextContainer
@@ -119,14 +119,13 @@ class FlextMeltanoAPI(
             raise ValueError(msg)
 
         # Get or create configuration using FlextMeltanoConfig as source of truth
-        self._config = config or FlextMeltanoConfig.get_global_instance()
+        self._config = config or FlextMeltanoConfig()
 
         # Pass fields to Pydantic parent
         super().__init__(service_name=service_name, version=version, **data)
 
         # API-specific initialization (use object.__setattr__ to bypass Pydantic validation)
         object.__setattr__(self, "logger", FlextLogger(__name__))
-        object.__setattr__(self, "_cli", FlextCli())
         object.__setattr__(self, "executor", FlextMeltanoExecutor())
 
         # Complete FLEXT-core ecosystem integration
@@ -714,14 +713,14 @@ class FlextMeltanoAPI(
             dbt_config = config or {}
             models_to_run = models or ["all_models"]
 
-            self._cli.info(f"Running DBT models: {', '.join(models_to_run)}")
+            self.logger.info(f"Running DBT models: {', '.join(models_to_run)}")
 
             # DBT execution simulation (in real implementation, this would
             # execute actual DBT models)
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            self._cli.success(
+            self.logger.info(
                 f"DBT models executed successfully in {execution_duration:.2f}s"
             )
 
@@ -741,7 +740,6 @@ class FlextMeltanoAPI(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT models execution failed: {e}"
             self.logger.exception(error_msg)
-            self._cli.error(error_msg)
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
 
     def test_dbt_models(
@@ -776,14 +774,14 @@ class FlextMeltanoAPI(
             test_config = config or {}
             models_to_test = models or ["all_models"]
 
-            self._cli.info(f"Testing DBT models: {', '.join(models_to_test)}")
+            self.logger.info(f"Testing DBT models: {', '.join(models_to_test)}")
 
             # DBT test execution simulation
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
             tests_count = len(models_to_test) * 3  # Simulate multiple tests per model
-            self._cli.success(
+            self.logger.info(
                 f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s"
             )
 
@@ -800,7 +798,6 @@ class FlextMeltanoAPI(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT model testing failed: {e}"
             self.logger.exception(error_msg)
-            self._cli.error(error_msg)
             return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
 
     def run_elt_pipeline(
@@ -991,7 +988,7 @@ class FlextMeltanoAPI(
         """
         try:
             # Get version information from executor
-            version_result = self.executor.execute("version")
+            version_result = self.executor.get_version()
             if version_result.is_success:
                 version_info: FlextMeltanoTypes.Core.MeltanoConfigDict = {
                     "api_version": self.version,

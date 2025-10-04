@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import TextIO
 
 import yaml
-
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -18,6 +17,8 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 

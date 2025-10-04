@@ -10,6 +10,7 @@ import tempfile
 from unittest.mock import patch
 
 from flext_core import FlextLogger, FlextService
+
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService

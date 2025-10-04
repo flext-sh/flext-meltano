@@ -62,7 +62,7 @@ class FlextOracleTargetService(FlextService):
         super().__init__()
         self._target_abstractions = FlextTargetAbstractions()
 
-    def load_to_oracle(self, records: list, config: dict) -> FlextResult[dict]:
+    def load_to_oracle(self, records: list, config: dict) -> FlextResult[FlextTypes.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
         return self._target_abstractions.load_data("target-oracle", records)
 ```
@@ -87,7 +87,7 @@ class FlextOracleDbtService(FlextService):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    def run_oracle_models(self, models: FlextTypes.StringList) -> FlextResult[dict]:
+    def run_oracle_models(self, models: FlextTypes.StringList) -> FlextResult[FlextTypes.Dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -120,7 +120,7 @@ class EnterpriseELTService(FlextService):
         tap_name: str,
         target_name: str,
         dbt_models: FlextTypes.StringList = None
-    ) -> FlextResult[dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Execute complete ELT pipeline."""
 
         # 1. Extract and Load using Meltano
@@ -135,7 +135,7 @@ class EnterpriseELTService(FlextService):
             if transform_result.is_failure:
                 return transform_result
 
-        return FlextResult[dict].ok({
+        return FlextResult[FlextTypes.Dict].ok({
             "pipeline": pipeline_result.unwrap(),
             "models_executed": dbt_models or []
         })
@@ -319,7 +319,7 @@ config = builder.build_pipeline_config(tap_settings, target_settings)
 # Consistent FlextResult patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.is_failure:
-    return FlextResult[dict].fail(f"Integration failed: {result.error}")
+    return FlextResult[FlextTypes.Dict].fail(f"Integration failed: {result.error}")
 ```
 
 ### Quality Standards

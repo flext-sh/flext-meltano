@@ -2,9 +2,9 @@
 
 from collections.abc import Callable
 
+from flext_core import FlextResult
 from flext_tests import FlextTestsUtilities
 
-from flext_core import FlextResult
 from flext_meltano import FlextMeltanoConfigBuilders, PluginTypes
 
 

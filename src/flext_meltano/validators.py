@@ -11,6 +11,8 @@ from pathlib import Path
 
 # Import for type hints only - avoid circular imports
 from flext_core import FlextLogger, FlextResult, FlextTypes
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 

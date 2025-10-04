@@ -18,6 +18,8 @@ from flext_core import (
     FlextService,
     FlextTypes,
 )
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
@@ -43,7 +45,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict
         self,
         command: FlextTypes.StringList,
         timeout: int = FlextMeltanoConstants.MELTANO_DEFAULT_TIMEOUT,
-        cwd: Path | None = None,  # noqa: ARG002
+        cwd: Path | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
 
@@ -84,7 +86,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict
         self,
         tap_name: str,
         target_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,  # noqa: ARG002
+        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a complete ELT pipeline.
 
@@ -131,6 +133,14 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict
             return FlextResult[FlextMeltanoExecutionResult].fail(
                 f"DBT command failed: {e}"
             )
+
+    def get_version(self) -> FlextResult[str]:
+        """Get version information from Meltano/DBT."""
+        try:
+            # Placeholder - real implementation would get actual version
+            return FlextResult[str].ok("3.0.0")
+        except Exception as e:
+            return FlextResult[str].fail(f"Failed to get version: {e}")
 
 
 __all__ = ["FlextMeltanoExecutor"]

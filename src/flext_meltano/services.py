@@ -22,7 +22,9 @@ from flext_core import (
     FlextTypes,
     T,
 )
-from flext_meltano.config import FlextMeltanoConfig
+
+# Use specific module imports to avoid circular dependencies
+from flext_meltano.configuration import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -84,7 +86,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             raise ValueError(msg)
 
         # Get or create configuration using FlextMeltanoConfig as source of truth
-        self._config = config or FlextMeltanoConfig.get_global_instance()
+        self._config = config or FlextMeltanoConfig()
 
         # Type-safe data preparation for service initialization
         mutable_data: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(data)
