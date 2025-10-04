@@ -8,8 +8,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-
 from flext_core import FlextResult
+
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.adapters import FlextMeltanoAdapter
 

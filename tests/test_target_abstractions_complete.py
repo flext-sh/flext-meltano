@@ -2,10 +2,10 @@
 
 from typing import cast
 
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsFactories, FlextTestsUtilities
 from pydantic import ValidationError
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_meltano import FlextTargetAbstractions
 
 logger = FlextLogger(__name__)

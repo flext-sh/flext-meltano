@@ -335,6 +335,213 @@ from flext_meltano.services import FlextMeltanoService    # WRONG: Use root impo
 from flext_core.internal.services import Service         # WRONG: Internal modules
 ```
 
+### 🎵 SINGER SDK WRAPPER PATTERN (DOMAIN SEPARATION ENFORCEMENT)
+
+**CRITICAL PATTERN**: All flext-tap-*, flext-target-*, and flext-dbt-* projects MUST use flext-meltano Singer SDK wrappers instead of direct singer_sdk imports. This enforces domain separation and ensures consistent FLEXT ecosystem integration.
+
+#### ✅ MANDATORY SINGER SDK WRAPPER IMPORTS
+
+**For Singer Tap Projects (flext-tap-*):**
+
+```python
+# ✅ CORRECT - Use FLEXT Meltano wrappers (domain separation)
+from flext_meltano import FlextStream as Stream, FlextTap as Tap
+
+# Example tap implementation
+class MyCustomTap(Tap):
+    """Singer tap using FLEXT wrapper."""
+    name = "tap-custom"
+
+    def discover_streams(self) -> list[Stream]:
+        return [MyCustomStream(self)]
+
+class MyCustomStream(Stream):
+    """Singer stream using FLEXT wrapper."""
+    name = "my_stream"
+
+    def get_records(self, context: dict | None) -> Iterable[dict]:
+        # Stream implementation
+        yield {"id": 1, "name": "example"}
+```
+
+**For Singer Target Projects (flext-target-*):**
+
+```python
+# ✅ CORRECT - Use FLEXT Meltano wrappers (domain separation)
+from flext_meltano import FlextTarget as Target, FlextSink as Sink
+
+# Example target implementation
+class MyCustomTarget(Target):
+    """Singer target using FLEXT wrapper."""
+    name = "target-custom"
+    default_sink_class = MyCustomSink
+
+class MyCustomSink(Sink):
+    """Singer sink using FLEXT wrapper."""
+
+    def process_record(self, record: dict, context: dict) -> None:
+        # Sink implementation
+        self._write_record(record)
+```
+
+**For Projects Using Multiple Wrappers:**
+
+```python
+# ✅ CORRECT - Import multiple wrappers as needed
+from flext_meltano import (
+    FlextStream as Stream,
+    FlextTap as Tap,
+    FlextTarget as Target,
+    FlextSink as Sink,
+)
+
+# singer_sdk.typing is ALLOWED for schema definitions
+from singer_sdk.typing import (
+    PropertiesList,
+    Property,
+    StringType,
+    IntegerType,
+    ArrayType,
+    ObjectType,
+)
+```
+
+#### ❌ FORBIDDEN SINGER SDK DIRECT IMPORTS
+
+**ZERO TOLERANCE - These imports are ABSOLUTELY PROHIBITED:**
+
+```python
+# ❌ FORBIDDEN - Direct singer_sdk imports (violates domain separation)
+from singer_sdk import Stream    # VIOLATION: Use FlextStream as Stream
+from singer_sdk import Tap        # VIOLATION: Use FlextTap as Tap
+from singer_sdk import Target     # VIOLATION: Use FlextTarget as Target
+from singer_sdk import Sink       # VIOLATION: Use FlextSink as Sink
+
+# ❌ FORBIDDEN - Direct class imports
+from singer_sdk.streams import Stream  # VIOLATION: Use root FlextStream
+from singer_sdk.tap_base import Tap    # VIOLATION: Use root FlextTap
+```
+
+#### ✅ WHITELIST: Allowed singer_sdk Imports
+
+**ONLY singer_sdk.typing imports are allowed (for schema definitions):**
+
+```python
+# ✅ ALLOWED - singer_sdk.typing for schema definitions
+from singer_sdk.typing import PropertiesList, Property
+from singer_sdk import typing as th  # Also allowed as alias
+
+# These are schema utilities, not base classes
+schema = PropertiesList(
+    Property("id", IntegerType, required=True),
+    Property("name", StringType),
+).to_dict()
+```
+
+#### 🔄 Migration Pattern (Existing Projects)
+
+**Step 1: Replace Direct Imports**
+
+```python
+# BEFORE (direct import - FORBIDDEN):
+from singer_sdk import Stream, Tap
+
+# AFTER (FLEXT wrapper - CORRECT):
+# Use FLEXT Meltano wrappers instead of direct singer_sdk imports (domain separation)
+from flext_meltano import FlextStream as Stream, FlextTap as Tap
+```
+
+**Step 2: Verify No Direct Imports Remain**
+
+```bash
+# Run validation script to verify zero direct singer_sdk imports
+grep -r "from singer_sdk import.*\(Stream\|Tap\|Target\|Sink\)" src/ | \
+  grep -v "FlextStream\|FlextTap\|FlextTarget\|FlextSink" | \
+  grep -v "typing"
+
+# Expected output: (empty - no violations)
+```
+
+**Step 3: Add Domain Separation Comment**
+
+```python
+# Add this comment above wrapper imports to document intent:
+# Use FLEXT Meltano wrappers instead of direct singer_sdk imports (domain separation)
+from flext_meltano import FlextStream as Stream, FlextTap as Tap
+```
+
+#### 🎯 Validation Commands
+
+**Automated Singer SDK Import Validation:**
+
+```bash
+# Comprehensive validation (checks all tap/target/dbt projects)
+./scripts/validate_singer_imports.sh
+
+# Expected output for compliant projects:
+# ✅ PASSED: Zero direct singer_sdk imports (excluding typing)
+# ✅ All tap/target projects properly use flext-meltano wrappers
+
+# Manual grep check for violations:
+find flext-tap-* flext-target-* flext-dbt-* -name "*.py" -path "*/src/*" | \
+  xargs grep -E "from singer_sdk import.*(Stream|Tap|Target|Sink)" | \
+  grep -v "Flext" | \
+  grep -v "typing"
+```
+
+#### 📊 Wrapper Implementation Details
+
+**FlextStream Wrapper (src/flext_meltano/singer_stream_base.py):**
+
+- Inherits from singer_sdk.Stream
+- Adds FLEXT ecosystem integration (FlextLogger, FlextContainer)
+- Maintains full Singer protocol compatibility
+- Provides enhanced error handling via FlextResult patterns
+
+**FlextTap Wrapper (src/flext_meltano/singer_tap_base.py):**
+
+- Inherits from singer_sdk.Tap
+- Integrates with FLEXT configuration management
+- Adds FLEXT observability and monitoring
+- Maintains Singer catalog discovery compliance
+
+**FlextTarget Wrapper (src/flext_meltano/singer_target_base.py):**
+
+- Inherits from singer_sdk.Target
+- Provides FLEXT data loading patterns
+- Integrates with FLEXT error handling
+- Maintains Singer message processing compliance
+
+**FlextSink Wrapper (src/flext_meltano/singer_sink_base.py):**
+
+- Inherits from singer_sdk.Sink
+- Adds FLEXT batch processing capabilities
+- Provides enhanced state management
+- Maintains Singer sink protocol compliance
+
+#### 🏆 Benefits of Singer SDK Wrapper Pattern
+
+1. **Domain Separation**: Clear boundary between Singer SDK (external) and FLEXT ecosystem (internal)
+2. **Consistent Integration**: All tap/target projects use identical FLEXT patterns
+3. **Enhanced Observability**: Automatic integration with flext-observability
+4. **Error Handling**: FlextResult railway-oriented programming throughout
+5. **Dependency Management**: Single point of control for singer_sdk version
+6. **Testing**: Easier to mock/stub Singer interactions at wrapper boundary
+7. **Evolution**: Can enhance wrappers without changing all tap/target projects
+
+#### 🔍 Projects Using Singer SDK Wrappers
+
+**Successfully Migrated (Validated):**
+
+- ✅ flext-tap-ldif (2 files: streams.py, tap.py)
+- ✅ flext-tap-ldap (4 files: ldif_stream.py, streams.py, tap.py, tap_streams.py)
+- ✅ flext-tap-oracle (1 file: tap_streams.py)
+- ✅ flext-tap-oracle-wms (3 files: client.py, streams.py, tap_streams.py)
+- ✅ flext-tap-oracle-oic (validated - only uses singer_sdk.typing)
+- ✅ flext-target-oracle-oic (4 files: sinks.py, target.py, target_client.py, __init__.py)
+
+**Validation Status: PASSED** (Zero direct singer_sdk imports excluding typing)
+
 ### 🏢 ENTERPRISE DEPENDENCY ARCHITECTURE (LEVEL-BASED CONSTRAINTS)
 
 **ALLOWED Dependencies (Level 1-2 Foundation Only):**

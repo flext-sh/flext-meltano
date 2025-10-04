@@ -14,9 +14,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import Field, SecretStr, field_validator
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import (
     FlextConfig,
     FlextConstants,
@@ -25,6 +22,8 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
+from pydantic import Field, SecretStr, field_validator
+from pydantic_settings import SettingsConfigDict
 
 # Type alias for configuration dictionaries
 ConfigDict = FlextTypes.Dict
@@ -469,7 +468,7 @@ class FlextMeltanoConfig(FlextConfig):
     # METADATA AND SERIALIZATION METHODS
     # =========================================================================
 
-    def get_metadata(self) -> dict[str, str | bool]:
+    def get_metadata(self) -> FlextTypes.Dict:
         """Get configuration metadata for logging and debugging."""
         return {
             "app_name": self.project_name,

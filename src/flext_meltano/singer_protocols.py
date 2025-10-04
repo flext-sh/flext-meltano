@@ -21,8 +21,13 @@ class SingerTap(Protocol):
     name: str
     state: FlextTypes.Dict
 
-    def get_records(self, stream_name: str) -> list[FlextTypes.Dict]: ...  # noqa: D102
-    def get_state(self) -> FlextTypes.Dict: ...  # noqa: D102
+    def get_records(self, stream_name: str) -> list[FlextTypes.Dict]:
+        """Get records for a specific stream."""
+        ...
+
+    def get_state(self) -> FlextTypes.Dict:
+        """Get current state."""
+        ...
 
 
 class SingerTarget(Protocol):

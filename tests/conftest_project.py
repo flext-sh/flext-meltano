@@ -17,7 +17,6 @@ from typing import Protocol
 
 import pytest
 import yaml
-
 from flext_core import FlextTypes
 
 

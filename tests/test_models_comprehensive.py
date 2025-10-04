@@ -11,8 +11,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-
 from flext_core import FlextConstants
+
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 

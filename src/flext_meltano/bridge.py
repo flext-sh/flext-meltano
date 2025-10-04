@@ -67,5 +67,20 @@ class FlextMeltanoBridge:
         except Exception as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 
+    def discover_plugins(self) -> FlextResult[FlextTypes.Dict]:
+        """Discover available plugins through the Go bridge."""
+        try:
+            # Placeholder - real implementation would query Go bridge for plugins
+            result = {
+                "extractors": ["tap-csv", "tap-postgres", "tap-json"],
+                "loaders": ["target-csv", "target-postgres", "target-jsonl"],
+                "transformers": ["dbt-postgres", "dbt-snowflake"],
+                "status": "discovered",
+                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+            }
+            return FlextResult[FlextTypes.Dict].ok(result)
+        except Exception as e:
+            return FlextResult[FlextTypes.Dict].fail(f"Plugin discovery failed: {e}")
+
 
 __all__ = ["FlextMeltanoBridge"]

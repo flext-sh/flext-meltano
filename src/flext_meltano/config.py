@@ -12,9 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import Field, SecretStr, field_validator
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import (
     FlextConfig,
     FlextConstants,
@@ -22,7 +19,11 @@ from flext_core import (
     FlextResult,
     FlextTypes,
 )
-from flext_meltano.constants import FlextMeltanoConstants  # SOURCE OF TRUTH
+from pydantic import Field, SecretStr, field_validator
+from pydantic_settings import SettingsConfigDict
+
+# Use specific module imports to avoid circular dependencies
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -989,8 +990,8 @@ class FlextMeltanoConfig(FlextConfig):
         fresh configuration in test scenarios.
 
         """
-        # Clear the global instance directly
-        cls._global_instance = None
+        # Delegate to parent class for proper clearing
+        FlextConfig.clear_global_instance()
 
     def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.

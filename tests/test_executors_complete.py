@@ -8,6 +8,7 @@ from unittest import mock
 
 # FIXED: Use flext-cli foundation instead of direct Click imports
 from flext_core import FlextLogger, FlextResult
+
 from flext_meltano import FlextMeltanoExecutor
 
 logger = FlextLogger(__name__)

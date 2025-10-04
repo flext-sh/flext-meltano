@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from flext_core import FlextResult, FlextTypes
+
 from flext_meltano import (
     DbtTransformationResult,
     EltPipelineResult,

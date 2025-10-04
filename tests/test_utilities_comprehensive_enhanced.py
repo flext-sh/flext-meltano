@@ -11,8 +11,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from flext_core import FlextUtilities
+
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 

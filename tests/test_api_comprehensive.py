@@ -13,8 +13,8 @@ import tempfile
 from pathlib import Path
 
 import pytest
-
 from flext_core import FlextResult
+
 from flext_meltano import (
     FlextMeltanoAPI,
     FlextMeltanoConstants,

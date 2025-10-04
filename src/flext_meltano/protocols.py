@@ -69,7 +69,7 @@ class FlextMeltanoProtocols:
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: dict[str, object] | None
+            variants: FlextTypes.Dict | None
 
             def get_config(self) -> ConfigDict:
                 """Get plugin configuration."""
@@ -127,7 +127,7 @@ class FlextMeltanoProtocols:
                 """Handle a batch of records with FlextResult."""
                 ...
 
-            def execute(self: object) -> FlextResult[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute the target loading (implements Domain.Service)."""
                 ...
 
@@ -143,7 +143,7 @@ class FlextMeltanoProtocols:
                 """Test DBT models with FlextResult."""
                 ...
 
-            def execute(self: object) -> FlextResult[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute DBT transformations (implements Domain.Service)."""
                 ...
 
@@ -157,7 +157,7 @@ class FlextMeltanoProtocols:
                 """Execute service call with FlextResult."""
                 ...
 
-            def execute(self: object) -> FlextResult[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute service operation (implements Domain.Service)."""
                 ...
 

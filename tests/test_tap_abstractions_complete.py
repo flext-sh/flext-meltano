@@ -2,10 +2,10 @@
 
 import tempfile
 
+from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsFactories, FlextTestsUtilities
 from pydantic_core import ValidationError
 
-from flext_core import FlextResult, FlextTypes
 from flext_meltano import (
     FlextTapAbstractions,
     StreamDefinition,

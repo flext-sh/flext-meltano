@@ -11,11 +11,11 @@ from pathlib import Path
 from unittest.mock import mock_open, patch
 
 import yaml
-
 from flext_core import (
     FlextResult,
     FlextUtilities,
 )
+
 from flext_meltano.utilities import FlextMeltanoUtilities
 
 

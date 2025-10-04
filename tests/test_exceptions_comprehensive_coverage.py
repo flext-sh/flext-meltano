@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-
 from flext_core import FlextTypes
+
 from flext_meltano import FlextMeltanoExceptions
 
 

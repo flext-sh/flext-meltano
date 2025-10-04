@@ -12,8 +12,9 @@ from __future__ import annotations
 import sys
 
 from flext_cli import FlextCli
-
 from flext_core import FlextLogger, FlextResult, FlextTypes
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.api import FlextMeltanoAPI
 
 

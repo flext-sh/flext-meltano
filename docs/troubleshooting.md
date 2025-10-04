@@ -63,7 +63,7 @@ make type-check
 from typing import Optional
 from flext_core import FlextResult
 
-def process_data(data: dict) -> FlextResult[Optional[dict]]:
+def process_data(data: dict) -> FlextResult[Optional[FlextTypes.Dict]]:
     # Implementation
     pass
 ```
@@ -210,7 +210,7 @@ def risky_operation():
         return None  # Lost error information
 
 # ✅ Correct
-def safe_operation() -> FlextResult[dict]:
+def safe_operation() -> FlextResult[FlextTypes.Dict]:
     try:
         # operation
         return FlextResult.ok(data)
@@ -233,7 +233,7 @@ class UtilityClass:
 from flext_core import FlextService
 
 class FlextMeltanoUtilityService(FlextService):
-    def do_something(self) -> FlextResult[dict]:
+    def do_something(self) -> FlextResult[FlextTypes.Dict]:
         # Implementation with proper error handling
         pass
 ```

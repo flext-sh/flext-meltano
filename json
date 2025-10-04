@@ -16,7 +16,7 @@ ERROR Could not import `SingerExecutionResult` from `flext_meltano.typings` [mis
 41 |     SingerExecutionResult,
    |     ^^^^^^^^^^^^^^^^^^^^^
    |
-ERROR Argument `dict[str, IndexedPlugin]` is not assignable to parameter `data` with type `dict[str, object]` in function `flext_core.result.FlextResult.ok` [bad-argument-type]
+ERROR Argument `dict[str, IndexedPlugin]` is not assignable to parameter `data` with type `FlextTypes.Dict` in function `flext_core.result.FlextResult.ok` [bad-argument-type]
    --> src/flext_meltano/abstractions.py:159:57
     |
 159 |             return FlextResult[FlextTypes.Dict].ok(data=plugins_dict)
@@ -160,7 +160,7 @@ ERROR Class `FlextMeltanoTypes` has no class attribute `Headers` [missing-attrib
 379 |     def list_plugins(self) -> FlextResult[list[FlextMeltanoTypes.Headers]]:
     |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
     |
-ERROR `dict[str, bool | dict[str, object] | float | int | list[object] | list[str] | str | None]` is not assignable to `dict[str, bool | dict[str, object] | float | int | list[object] | str | None]` [bad-assignment]
+ERROR `dict[str, bool | FlextTypes.Dict | float | int | list[object] | list[str] | str | None]` is not assignable to `dict[str, bool | FlextTypes.Dict | float | int | list[object] | str | None]` [bad-assignment]
    --> src/flext_meltano/library_runner.py:277:95
     |
 277 |                   transformation_result: FlextMeltanoTypes.Processing.DbtTransformationResult = {
@@ -199,7 +199,7 @@ ERROR Class member `DbtProjectModel.version` overrides parent class `Entity` in 
     |         ^^^^^^^
     |
   `DbtProjectModel.version` has type `str`, which is not consistent with `int` in `Entity.version` (the type of read-write attributes cannot be changed)
-ERROR Function declared to return `dict[str, bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `dict[str, bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:30:41
    |
 30 |         def get_config(self: object) -> ConfigDict:
@@ -217,13 +217,13 @@ ERROR Function declared to return `T_co` but is missing an explicit `return` [ba
 38 |         def execute(self, *args: JsonValue) -> T_co:
    |                                                ^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:60:39
    |
 60 |         def discover(self: object) -> FlextResult[JsonObject]:
    |                                       ^^^^^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:63:48
    |
 63 |         def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
@@ -235,13 +235,13 @@ ERROR Function declared to return `FlextResult[object]` but is missing an explic
 66 |         def execute(self: object) -> FlextResult[object]:
    |                                      ^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:73:56
    |
 73 |         def handle_record(self, record: JsonObject) -> FlextResult[JsonValue]:
    |                                                        ^^^^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:76:62
    |
 76 |         def handle_batch(self, records: list[JsonObject]) -> FlextResult[JsonValue]:
@@ -253,13 +253,13 @@ ERROR Function declared to return `FlextResult[object]` but is missing an explic
 79 |         def execute(self: object) -> FlextResult[object]:
    |                                      ^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:86:57
    |
 86 |         def run(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
    |                                                         ^^^^^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:89:58
    |
 89 |         def test(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
@@ -271,7 +271,7 @@ ERROR Function declared to return `FlextResult[object]` but is missing an explic
 92 |         def execute(self: object) -> FlextResult[object]:
    |                                      ^^^^^^^^^^^^^^^^^^^
    |
-ERROR Function declared to return `FlextResult[bool | dict[str, object] | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
+ERROR Function declared to return `FlextResult[bool | FlextTypes.Dict | float | int | list[object] | str | None]` but is missing an explicit `return` [bad-return]
   --> src/flext_meltano/protocols.py:99:63
    |
 99 |         def call(self, operation: str, payload: JsonValue) -> FlextResult[JsonValue]:
@@ -423,13 +423,13 @@ ERROR Missing argument `target` in function `FlextTargetAbstractions.get_target_
 680 |                 "target_type": self.get_target_type(),
     |                                                    ^^
     |
-ERROR Argument `Path` is not assignable to parameter `config` with type `dict[str, object]` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
+ERROR Argument `Path` is not assignable to parameter `config` with type `FlextTypes.Dict` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
    --> src/flext_meltano/utilities.py:346:36
     |
 346 |             self.write_meltano_yml(file_path, content)
     |                                    ^^^^^^^^^
     |
-ERROR Argument `dict[str, object]` is not assignable to parameter `target_path` with type `Path` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
+ERROR Argument `FlextTypes.Dict` is not assignable to parameter `target_path` with type `Path` in function `FlextMeltanoUtilities.write_meltano_yml` [bad-argument-type]
    --> src/flext_meltano/utilities.py:346:47
     |
 346 |             self.write_meltano_yml(file_path, content)

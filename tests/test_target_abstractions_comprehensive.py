@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsMatchers
 
-from flext_core import FlextResult, FlextTypes, FlextUtilities
 from flext_meltano import FlextTargetAbstractions
 
 

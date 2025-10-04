@@ -10,10 +10,10 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
+from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsFactories, FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 
-from flext_core import FlextResult, FlextTypes
 from flext_meltano import FlextMeltanoAdapter
 
 

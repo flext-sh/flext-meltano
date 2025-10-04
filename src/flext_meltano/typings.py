@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import Literal
 
 from flext_core import FlextTypes
+from singer_sdk import typing as singer_sdk_typing
 
 # =============================================================================
 # MELTANO-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for Meltano operations
@@ -61,6 +62,38 @@ class FlextMeltanoTypes(FlextTypes):
         type TargetConfig = dict[str, FlextTypes.ConfigValue | FlextTypes.Dict]
         type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
+
+        # Singer SDK typing utilities (domain separation from singer_sdk.typing)
+        # ALL tap/target projects MUST use these instead of direct singer_sdk.typing imports
+        class Typing:
+            """Singer SDK typing utilities wrapper (ZERO TOLERANCE for direct imports).
+
+            This class provides access to all Singer SDK typing utilities through FLEXT
+            domain separation pattern. ALL tap/target projects MUST use this instead of
+            importing directly from singer_sdk.typing.
+
+            Usage:
+                from flext_meltano import FlextMeltanoTypes
+
+                schema = FlextMeltanoTypes.Singer.Typing.PropertiesList(
+                    FlextMeltanoTypes.Singer.Typing.Property("id", FlextMeltanoTypes.Singer.Typing.StringType),
+                    FlextMeltanoTypes.Singer.Typing.Property("count", FlextMeltanoTypes.Singer.Typing.IntegerType),
+                ).to_dict()
+            """
+
+            ArrayType = singer_sdk_typing.ArrayType
+            BooleanType = singer_sdk_typing.BooleanType
+            CustomType = singer_sdk_typing.CustomType
+            DateTimeType = singer_sdk_typing.DateTimeType
+            DateType = singer_sdk_typing.DateType
+            DurationType = singer_sdk_typing.DurationType
+            IntegerType = singer_sdk_typing.IntegerType
+            NumberType = singer_sdk_typing.NumberType
+            ObjectType = singer_sdk_typing.ObjectType
+            PropertiesList = singer_sdk_typing.PropertiesList
+            Property = singer_sdk_typing.Property
+            StringType = singer_sdk_typing.StringType
+            TimeType = singer_sdk_typing.TimeType
 
     # =========================================================================
     # DBT TRANSFORMATION TYPES - Complex DBT operations

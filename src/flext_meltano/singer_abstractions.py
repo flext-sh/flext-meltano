@@ -13,7 +13,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from flext_cli import FlextCli
-
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -21,6 +20,8 @@ from flext_core import (
     FlextTypes,
     FlextUtilities,
 )
+
+# Use specific module imports to avoid circular dependencies
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
