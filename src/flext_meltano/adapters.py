@@ -1454,9 +1454,15 @@ Thumbs.db
                 ].fail(dbt_runner_result.error or "Failed to get DBT runner")
             # For now, just return success since dbt_runner is just a dict
             from typing import cast
+
             result = FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
-            ].ok(cast(FlextMeltanoTypes.Processing.DbtTransformationResult, dbt_runner_result.unwrap()))
+            ].ok(
+                cast(
+                    "FlextMeltanoTypes.Processing.DbtTransformationResult",
+                    dbt_runner_result.unwrap(),
+                )
+            )
 
             if result.is_success:
                 self._logger.info(
@@ -1501,13 +1507,17 @@ Thumbs.db
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
-                    singer_manager_result.error or "Failed to get Singer manager"
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.SingerExecutionResult
+                ].fail(singer_manager_result.error or "Failed to get Singer manager")
             # For now, just return success since singer_manager is just a dict
             from typing import cast
+
             result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
-                cast(FlextMeltanoTypes.Processing.SingerExecutionResult, singer_manager_result.unwrap())
+                cast(
+                    "FlextMeltanoTypes.Processing.SingerExecutionResult",
+                    singer_manager_result.unwrap(),
+                )
             )
 
             if result.is_success:
@@ -1563,8 +1573,13 @@ Thumbs.db
             )
 
             # Use library runner for complete pipeline
+            from typing import cast
+
             result = self._library_runner.execute_complete_elt_pipeline(
-                tap_name, target_name, dbt_models, transformer_config
+                tap_name,
+                target_name,
+                cast("list[str] | None", dbt_models),
+                cast("dict[str, object] | None", transformer_config),
             )
 
             if result.is_success:
