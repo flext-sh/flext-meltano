@@ -1426,7 +1426,7 @@ Thumbs.db
         self,
         project_dir: Path,
         models: FlextTypes.StringList | None = None,
-        **options: object,
+        **_options: object,
     ) -> FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult]:
         """Run dbt transformations using programmatic API.
 
@@ -1449,11 +1449,14 @@ Thumbs.db
             # Use library runner for dbt operations
             dbt_runner_result = self._library_runner.get_dbt_runner()
             if dbt_runner_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
-                    dbt_runner_result.error or "Failed to get DBT runner"
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.DbtTransformationResult
+                ].fail(dbt_runner_result.error or "Failed to get DBT runner")
             # For now, just return success since dbt_runner is just a dict
-            result = FlextResult[FlextTypes.Dict].ok(dbt_runner_result.unwrap())
+            from typing import cast
+            result = FlextResult[
+                FlextMeltanoTypes.Processing.DbtTransformationResult
+            ].ok(cast(FlextMeltanoTypes.Processing.DbtTransformationResult, dbt_runner_result.unwrap()))
 
             if result.is_success:
                 self._logger.info(
@@ -1498,11 +1501,14 @@ Thumbs.db
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
                     singer_manager_result.error or "Failed to get Singer manager"
                 )
             # For now, just return success since singer_manager is just a dict
-            result = FlextResult[FlextTypes.Dict].ok(singer_manager_result.unwrap())
+            from typing import cast
+            result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
+                cast(FlextMeltanoTypes.Processing.SingerExecutionResult, singer_manager_result.unwrap())
+            )
 
             if result.is_success:
                 self._logger.info(
@@ -1515,7 +1521,7 @@ Thumbs.db
                     error=result.error,
                 )
 
-            return result
+            return result  # type: ignore[return-value] # Already properly typed above
 
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"

@@ -7,8 +7,6 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from pathlib import Path
-
 from flext_core import FlextLogger
 
 # Import ONLY what actually exists
@@ -40,11 +38,11 @@ def simple_bridge_example() -> None:
 
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
-    # Create executor with proper Path argument
-    executor = FlextMeltanoExecutor(Path.cwd())
+    # Create executor with proper config dict
+    executor = FlextMeltanoExecutor({})
 
-    # Execute with required command parameter (string, not list)
-    result = executor.execute("version")
+    # Execute with required command parameter (list of strings)
+    result = executor.execute_command(["meltano", "version"])
     if result.is_success:
         logger.info(f"Executor result: {result.value}")
 
