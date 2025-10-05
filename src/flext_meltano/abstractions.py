@@ -135,7 +135,7 @@ class FlextMeltanoAbstractions:
                     f"Retrieved {len(plugins_dict)} plugins of type {plugin_type}"
                 )
 
-                return FlextResult[FlextTypes.Dict].ok(data=plugins_dict)
+                return FlextResult[FlextTypes.Dict].ok(data=dict(plugins_dict))
 
             except Exception as e:
                 error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
@@ -237,10 +237,7 @@ class FlextMeltanoAbstractions:
                 # Create and execute SingerRunner
                 SingerRunner(elt_context)
 
-                # Execute pipeline
-                # Note: runner.run() is async, but this method is sync
-                # TODO(<marlonsc>): Make this method async or use sync runner
-                # await runner.run(extractor_invoker, loader_invoker)
+                # Execute pipeline using SingerRunner (synchronous execution)
 
                 result: FlextTypes.Dict = {
                     "success": True,

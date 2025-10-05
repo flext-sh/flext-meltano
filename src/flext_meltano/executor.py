@@ -45,7 +45,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict
         self,
         command: FlextTypes.StringList,
         timeout: int = FlextMeltanoConstants.MELTANO_DEFAULT_TIMEOUT,
-        cwd: Path | None = None,
+        _cwd: Path | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
 
@@ -86,7 +86,7 @@ class FlextMeltanoExecutor(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict
         self,
         tap_name: str,
         target_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
+        _config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a complete ELT pipeline.
 
