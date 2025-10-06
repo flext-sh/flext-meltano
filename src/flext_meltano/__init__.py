@@ -98,6 +98,5 @@ __all__ = [
     "FlextTap",
     "FlextTapAbstractions",
     "FlextTargetAbstractions",
-    "PluginTypes",
     "SingerCliTranslator",
 ]
