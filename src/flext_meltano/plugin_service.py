@@ -46,6 +46,10 @@ class FlextMeltanoPluginService(
         self._config = config or FlextMeltanoConfig()
         self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
+        # Type guard for pyrefly - logger is always initialized
+        if self._logger is None:
+            error_msg = "Logger initialization failed"
+            raise RuntimeError(error_msg)
 
     def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute the Meltano plugin service.
@@ -58,8 +62,8 @@ class FlextMeltanoPluginService(
             config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
-                "config": self._config.to_dict()
-                if hasattr(self._config, "to_dict")
+                "config": self._config.model_dump()
+                if hasattr(self._config, "model_dump")
                 else {},
             }
 

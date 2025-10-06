@@ -10,6 +10,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+# Singer SDK base classes (ZERO TOLERANCE - re-export for domain separation)
+# ALL tap/target projects MUST import these from flext_meltano, NOT directly from singer_sdk
+from singer_sdk import Stream as FlextStream, Tap as FlextTap
+
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltano
@@ -35,6 +39,11 @@ from flext_meltano.services import FlextMeltanoService
 
 # Singer SDK classes
 from flext_meltano.singer import FlextMeltanoSinger
+from flext_meltano.singer_cli_translator import SingerCliTranslator
+
+# Singer abstractions
+from flext_meltano.tap_abstractions import FlextTapAbstractions
+from flext_meltano.target_abstractions import FlextTargetAbstractions
 
 # Singer types and typing utilities are in FlextMeltanoTypes.Singer namespace
 # ALL tap/target projects MUST use FlextMeltanoTypes.Singer.Typing for schema definitions
@@ -85,5 +94,10 @@ __all__ = [
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
     "FlextSingerTypes",
+    "FlextStream",
+    "FlextTap",
+    "FlextTapAbstractions",
+    "FlextTargetAbstractions",
     "PluginTypes",
+    "SingerCliTranslator",
 ]

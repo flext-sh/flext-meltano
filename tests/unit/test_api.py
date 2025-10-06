@@ -1,4 +1,4 @@
-"""Comprehensive tests for FlextMeltanoAPI - Real API testing without mocks.
+"""Comprehensive tests for FlextMeltano - Real API testing without mocks.
 
 Tests the main unified API for FLEXT Meltano operations following enterprise
 testing standards with real Meltano integration.
@@ -16,7 +16,7 @@ import pytest
 from flext_core import FlextResult
 
 from flext_meltano import (
-    FlextMeltanoAPI,
+    FlextMeltano,
     FlextMeltanoConstants,
     FlextMeltanoExceptions,
     FlextMeltanoModels,
@@ -26,14 +26,14 @@ from flext_meltano import (
 pytestmark = pytest.mark.io
 
 
-class TestFlextMeltanoAPIInitialization:
-    """Test FlextMeltanoAPI initialization and basic properties."""
+class TestFlextMeltanoInitialization:
+    """Test FlextMeltano initialization and basic properties."""
 
     def test_api_initialization_default(self) -> None:
         """Test API initialization with default parameters."""
 
         # Create a concrete implementation for testing
-        class ConcreteAPI(FlextMeltanoAPI):
+        class ConcreteAPI(FlextMeltano):
             def execute(self, command: str) -> FlextResult[str]:
                 _ = command  # Intentionally unused in test implementation
                 return FlextResult[str].ok("test")
@@ -45,52 +45,52 @@ class TestFlextMeltanoAPIInitialization:
         """Test API initialization with specific project root."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            api = FlextMeltanoAPI(project_root=temp_path)
+            api = FlextMeltano(project_root=temp_path)
 
             assert api is not None
 
     def test_api_version_property(self) -> None:
         """Test API version property."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
         version = api.version
 
         assert version == FlextMeltanoConstants.FLEXT_MELTANO_VERSION
 
     def test_api_constants_property(self) -> None:
         """Test API constants property."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
         constants = api.constants
 
         assert constants == FlextMeltanoConstants
 
     def test_api_exceptions_property(self) -> None:
         """Test API exceptions property."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
         exceptions = api.exceptions
 
         assert exceptions == FlextMeltanoExceptions
 
     def test_api_types_property(self) -> None:
         """Test API types property."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
         types = api.types
 
         assert types == FlextMeltanoTypes
 
     def test_api_models_property(self) -> None:
         """Test API models property."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
         models = api.models
 
         assert models == FlextMeltanoModels
 
 
-class TestFlextMeltanoAPIProjectOperations:
-    """Test FlextMeltanoAPI project creation and validation operations."""
+class TestFlextMeltanoProjectOperations:
+    """Test FlextMeltano project creation and validation operations."""
 
     def test_create_project_success(self) -> None:
         """Test successful project creation."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir) / "test_project"
@@ -103,7 +103,7 @@ class TestFlextMeltanoAPIProjectOperations:
 
     def test_create_project_invalid_name(self) -> None:
         """Test project creation with invalid name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.create_project(project_name="", project_root=temp_dir)
@@ -113,7 +113,7 @@ class TestFlextMeltanoAPIProjectOperations:
 
     def test_create_project_with_config(self) -> None:
         """Test project creation with configuration."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.create_project(
@@ -126,7 +126,7 @@ class TestFlextMeltanoAPIProjectOperations:
 
     def test_validate_project_nonexistent(self) -> None:
         """Test validation of non-existent project."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             nonexistent = Path(temp_dir) / "nonexistent"
@@ -138,7 +138,7 @@ class TestFlextMeltanoAPIProjectOperations:
 
     def test_validate_project_with_path(self) -> None:
         """Test project validation with specific path."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.validate_project(Path(temp_dir))
@@ -146,12 +146,12 @@ class TestFlextMeltanoAPIProjectOperations:
             assert result.is_success or result.is_failure
 
 
-class TestFlextMeltanoAPIPluginOperations:
-    """Test FlextMeltanoAPI plugin installation and listing operations."""
+class TestFlextMeltanoPluginOperations:
+    """Test FlextMeltano plugin installation and listing operations."""
 
     def test_install_plugin_without_project(self) -> None:
         """Test plugin installation without valid project."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.install_plugin(plugin_type="extractors", plugin_name="tap-csv")
 
@@ -159,7 +159,7 @@ class TestFlextMeltanoAPIPluginOperations:
 
     def test_install_plugin_invalid_type(self) -> None:
         """Test plugin installation with invalid type."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.install_plugin(
@@ -171,7 +171,7 @@ class TestFlextMeltanoAPIPluginOperations:
 
     def test_install_plugin_with_config(self) -> None:
         """Test plugin installation with configuration."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             tmp_path = tmp_file.name
@@ -186,7 +186,7 @@ class TestFlextMeltanoAPIPluginOperations:
 
     def test_list_plugins_without_project(self) -> None:
         """Test listing plugins without valid project."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.list_plugins()
 
@@ -194,19 +194,19 @@ class TestFlextMeltanoAPIPluginOperations:
 
     def test_list_plugins_with_type_filter(self) -> None:
         """Test listing plugins with type filter."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.list_plugins(_plugin_type="extractors")
 
         assert result.is_failure or result.is_success
 
 
-class TestFlextMeltanoAPICatalogOperations:
-    """Test FlextMeltanoAPI catalog discovery operations."""
+class TestFlextMeltanoCatalogOperations:
+    """Test FlextMeltano catalog discovery operations."""
 
     def test_discover_catalog_without_tap(self) -> None:
         """Test catalog discovery without tap name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.discover_catalog(tap_name="")
 
@@ -215,7 +215,7 @@ class TestFlextMeltanoAPICatalogOperations:
 
     def test_discover_catalog_nonexistent_tap(self) -> None:
         """Test catalog discovery with non-existent tap."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.discover_catalog(tap_name="nonexistent-tap")
 
@@ -223,7 +223,7 @@ class TestFlextMeltanoAPICatalogOperations:
 
     def test_discover_catalog_with_config(self) -> None:
         """Test catalog discovery with configuration."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             tmp_path = tmp_file.name
@@ -236,12 +236,12 @@ class TestFlextMeltanoAPICatalogOperations:
         assert result.is_failure or result.is_success
 
 
-class TestFlextMeltanoAPIDataOperations:
-    """Test FlextMeltanoAPI data extraction and loading operations."""
+class TestFlextMeltanoDataOperations:
+    """Test FlextMeltano data extraction and loading operations."""
 
     def test_extract_data_without_tap(self) -> None:
         """Test data extraction without tap name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.extract_data(tap_name="", stream_name="test_stream")
 
@@ -250,7 +250,7 @@ class TestFlextMeltanoAPIDataOperations:
 
     def test_extract_data_without_stream(self) -> None:
         """Test data extraction without stream name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.extract_data(tap_name="tap-csv", stream_name="")
 
@@ -259,7 +259,7 @@ class TestFlextMeltanoAPIDataOperations:
 
     def test_load_data_without_target(self) -> None:
         """Test data loading without target name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.load_data(target_name="", stream_name="test_stream", records=[])
 
@@ -267,7 +267,7 @@ class TestFlextMeltanoAPIDataOperations:
 
     def test_load_data_with_empty_records(self) -> None:
         """Test data loading with empty records."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.load_data(
             target_name="target-jsonl", stream_name="test_stream", records=[]
@@ -277,7 +277,7 @@ class TestFlextMeltanoAPIDataOperations:
 
     def test_extract_data_with_limit(self) -> None:
         """Test data extraction with record limit."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.extract_data(
             tap_name="tap-csv", stream_name="test_stream", limit=100
@@ -287,7 +287,7 @@ class TestFlextMeltanoAPIDataOperations:
 
     def test_load_data_with_records(self) -> None:
         """Test data loading with actual records."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         records = [{"id": 1, "name": "test"}]
         result = api.load_data(
@@ -297,12 +297,12 @@ class TestFlextMeltanoAPIDataOperations:
         assert result.is_failure or result.is_success
 
 
-class TestFlextMeltanoAPIDbtOperations:
-    """Test FlextMeltanoAPI DBT operations."""
+class TestFlextMeltanoDbtOperations:
+    """Test FlextMeltano DBT operations."""
 
     def test_run_dbt_models_without_models(self) -> None:
         """Test DBT run without model list."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_dbt_models(models=[])
 
@@ -311,7 +311,7 @@ class TestFlextMeltanoAPIDbtOperations:
 
     def test_run_dbt_models_without_project(self) -> None:
         """Test DBT run without valid project."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_dbt_models(models=["model1"])
 
@@ -319,7 +319,7 @@ class TestFlextMeltanoAPIDbtOperations:
 
     def test_test_dbt_models_without_models(self) -> None:
         """Test DBT test without model list."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.test_dbt_models(models=[])
 
@@ -328,7 +328,7 @@ class TestFlextMeltanoAPIDbtOperations:
 
     def test_run_dbt_models_with_project(self) -> None:
         """Test DBT run with project root."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.run_dbt_models(models=["model1"], project_root=temp_dir)
@@ -337,7 +337,7 @@ class TestFlextMeltanoAPIDbtOperations:
 
     def test_test_dbt_models_with_project(self) -> None:
         """Test DBT test with project root."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.test_dbt_models(models=["model1"], project_root=temp_dir)
@@ -345,12 +345,12 @@ class TestFlextMeltanoAPIDbtOperations:
             assert result.is_failure or result.is_success
 
 
-class TestFlextMeltanoAPIELTPipeline:
-    """Test FlextMeltanoAPI complete ELT pipeline operations."""
+class TestFlextMeltanoELTPipeline:
+    """Test FlextMeltano complete ELT pipeline operations."""
 
     def test_run_elt_pipeline_without_tap(self) -> None:
         """Test ELT pipeline without tap name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_elt_pipeline(
             tap_name="", target_name="target-jsonl", stream_name="test_stream"
@@ -361,7 +361,7 @@ class TestFlextMeltanoAPIELTPipeline:
 
     def test_run_elt_pipeline_without_target(self) -> None:
         """Test ELT pipeline without target name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_elt_pipeline(
             tap_name="tap-csv", target_name="", stream_name="test_stream"
@@ -372,7 +372,7 @@ class TestFlextMeltanoAPIELTPipeline:
 
     def test_run_elt_pipeline_without_stream(self) -> None:
         """Test ELT pipeline without stream name."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_elt_pipeline(
             tap_name="tap-csv", target_name="target-jsonl", stream_name=""
@@ -383,7 +383,7 @@ class TestFlextMeltanoAPIELTPipeline:
 
     def test_run_elt_pipeline_with_dbt_models(self) -> None:
         """Test ELT pipeline with DBT models."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_elt_pipeline(
             tap_name="tap-csv",
@@ -395,22 +395,22 @@ class TestFlextMeltanoAPIELTPipeline:
         assert result.is_failure or result.is_success
 
 
-class TestFlextMeltanoAPIErrorHandling:
-    """Test FlextMeltanoAPI error handling and edge cases."""
+class TestFlextMeltanoErrorHandling:
+    """Test FlextMeltano error handling and edge cases."""
 
     def test_api_handles_none_project_root(self) -> None:
         """Test API handles None project root gracefully."""
-        api = FlextMeltanoAPI(project_root=None)
+        api = FlextMeltano(project_root=None)
         assert api is not None
 
     def test_api_handles_invalid_project_root(self) -> None:
         """Test API handles invalid project root type."""
-        api = FlextMeltanoAPI(project_root=123)
+        api = FlextMeltano(project_root=123)
         assert api is not None
 
     def test_create_project_exception_handling(self) -> None:
         """Test project creation handles exceptions gracefully."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.create_project(
             project_name="test", project_root="/invalid/path/that/does/not/exist"
@@ -420,7 +420,7 @@ class TestFlextMeltanoAPIErrorHandling:
 
     def test_validate_project_exception_handling(self) -> None:
         """Test project validation handles exceptions gracefully."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.validate_project("/invalid/path")
 
@@ -428,12 +428,12 @@ class TestFlextMeltanoAPIErrorHandling:
         assert result.error is not None
 
 
-class TestFlextMeltanoAPIIntegration:
-    """Integration tests for FlextMeltanoAPI operations."""
+class TestFlextMeltanoIntegration:
+    """Integration tests for FlextMeltano operations."""
 
     def test_api_full_workflow_simulation(self) -> None:
         """Test simulated full workflow without actual Meltano execution."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir) / "integration_test"
@@ -458,7 +458,7 @@ class TestFlextMeltanoAPIIntegration:
         """Test API respects project root context across operations."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            api = FlextMeltanoAPI(project_root=temp_path)
+            api = FlextMeltano(project_root=temp_path)
 
             assert api is not None
 
@@ -467,12 +467,12 @@ class TestFlextMeltanoAPIIntegration:
             assert result.is_success or result.is_failure
 
 
-class TestFlextMeltanoAPIExecuteMethod:
-    """Test FlextMeltanoAPI execute method."""
+class TestFlextMeltanoExecuteMethod:
+    """Test FlextMeltano execute method."""
 
     def test_execute_version_command(self) -> None:
         """Test execute method with version command."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.execute("version")
 
@@ -481,7 +481,7 @@ class TestFlextMeltanoAPIExecuteMethod:
 
     def test_execute_unknown_command(self) -> None:
         """Test execute method with unknown command."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.execute("unknown_command")
 
@@ -489,7 +489,7 @@ class TestFlextMeltanoAPIExecuteMethod:
 
     def test_execute_with_options(self) -> None:
         """Test execute method with options."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.execute("version", debug=True)
 
@@ -497,12 +497,12 @@ class TestFlextMeltanoAPIExecuteMethod:
 
 
 @pytest.mark.benchmark
-class TestFlextMeltanoAPISuccessPaths:
-    """Test FlextMeltanoAPI success scenarios for coverage."""
+class TestFlextMeltanoSuccessPaths:
+    """Test FlextMeltano success scenarios for coverage."""
 
     def test_create_project_exception_path(self) -> None:
         """Test project creation exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.create_project(
             project_name="test",
@@ -514,7 +514,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_validate_project_exception_path(self) -> None:
         """Test project validation exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.validate_project(Path("/nonexistent/path"))
 
@@ -523,7 +523,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_install_plugin_exception_path(self) -> None:
         """Test plugin installation exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.install_plugin(
             plugin_type="invalid", plugin_name="nonexistent-plugin"
@@ -533,7 +533,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_list_plugins_exception_path(self) -> None:
         """Test plugin listing exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.list_plugins()
 
@@ -541,7 +541,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_discover_catalog_exception_path(self) -> None:
         """Test catalog discovery exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.discover_catalog(tap_name="nonexistent-tap")
 
@@ -549,7 +549,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_extract_data_exception_path(self) -> None:
         """Test data extraction exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.extract_data(
             tap_name="nonexistent-tap", stream_name="nonexistent-stream"
@@ -559,7 +559,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_load_data_exception_path(self) -> None:
         """Test data loading exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.load_data(
             target_name="nonexistent-target", stream_name="test", records=[]
@@ -569,7 +569,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_run_dbt_models_exception_path(self) -> None:
         """Test DBT models execution exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_dbt_models(models=["model1"])
 
@@ -577,7 +577,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_test_dbt_models_exception_path(self) -> None:
         """Test DBT models testing exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.test_dbt_models(models=["model1"])
 
@@ -585,7 +585,7 @@ class TestFlextMeltanoAPISuccessPaths:
 
     def test_run_elt_pipeline_exception_path(self) -> None:
         """Test ELT pipeline exception handling."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         result = api.run_elt_pipeline(
             tap_name="tap", target_name="target", stream_name="stream"
@@ -595,21 +595,21 @@ class TestFlextMeltanoAPISuccessPaths:
 
 
 @pytest.mark.benchmark
-class TestFlextMeltanoAPIPerformance:
-    """Performance benchmarks for FlextMeltanoAPI operations."""
+class TestFlextMeltanoPerformance:
+    """Performance benchmarks for FlextMeltano operations."""
 
     def test_api_initialization_performance(self, benchmark: object) -> None:
         """Benchmark API initialization performance."""
 
-        def create_api() -> FlextMeltanoAPI:
-            return FlextMeltanoAPI()
+        def create_api() -> FlextMeltano:
+            return FlextMeltano()
 
         result = benchmark(create_api)
         assert result is not None
 
     def test_api_properties_access_performance(self, benchmark: object) -> None:
         """Benchmark API properties access performance."""
-        api = FlextMeltanoAPI()
+        api = FlextMeltano()
 
         def access_properties() -> tuple[str, type, type, type, type]:
             return (api.version, api.constants, api.exceptions, api.types, api.models)

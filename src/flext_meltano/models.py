@@ -45,6 +45,105 @@ class FlextMeltanoModels(FlextModels):
     )
 
     # ========================================================================
+    # CLI PARAMETER MODELS - For Singer SDK CLI Translation
+    # ========================================================================
+
+    class TapRunParams(FlextModels.BaseModel):
+        """CLI parameters for running Singer taps with automatic Singer SDK translation."""
+
+        model_config = ConfigDict(validate_assignment=True)
+
+        tap_name: str = Field(description="Name of the tap to run (e.g., tap-postgres)")
+        config_file: str | None = Field(
+            default=None, description="Path to tap configuration file"
+        )
+        catalog_file: str | None = Field(
+            default=None, description="Path to catalog file for stream selection"
+        )
+        state_file: str | None = Field(
+            default=None, description="Path to state file for incremental sync"
+        )
+        properties_file: str | None = Field(
+            default=None, description="Path to properties file (legacy format)"
+        )
+        discover: bool = Field(
+            default=False, description="Run in discovery mode to output catalog"
+        )
+
+    class TargetRunParams(FlextModels.BaseModel):
+        """CLI parameters for running Singer targets with automatic Singer SDK translation."""
+
+        model_config = ConfigDict(validate_assignment=True)
+
+        target_name: str = Field(
+            description="Name of the target to run (e.g., target-postgres)"
+        )
+        config_file: str | None = Field(
+            default=None, description="Path to target configuration file"
+        )
+        input_file: str | None = Field(
+            default=None,
+            description="Path to Singer messages input file (default: stdin)",
+        )
+
+    class PipelineRunParams(FlextModels.BaseModel):
+        """CLI parameters for running complete Singer pipelines (tap → target)."""
+
+        model_config = ConfigDict(validate_assignment=True)
+
+        tap_name: str = Field(description="Name of the tap")
+        target_name: str = Field(description="Name of the target")
+        tap_config: str | None = Field(
+            default=None, description="Path to tap configuration file"
+        )
+        target_config: str | None = Field(
+            default=None, description="Path to target configuration file"
+        )
+        catalog_file: str | None = Field(
+            default=None, description="Path to catalog file"
+        )
+        state_file: str | None = Field(default=None, description="Path to state file")
+        state_output_file: str | None = Field(
+            default=None, description="Path to write final state"
+        )
+
+    class DbtRunParams(FlextModels.BaseModel):
+        """CLI parameters for DBT operations."""
+
+        model_config = ConfigDict(validate_assignment=True)
+
+        project_dir: str = Field(description="DBT project directory")
+        models: str | None = Field(
+            default=None, description="Specific models to run (space-separated)"
+        )
+        select: str | None = Field(
+            default=None, description="DBT selection syntax for models"
+        )
+        exclude: str | None = Field(
+            default=None, description="DBT exclusion syntax for models"
+        )
+        full_refresh: bool = Field(
+            default=False, description="Run models with --full-refresh"
+        )
+        vars: str | None = Field(
+            default=None, description="DBT variables as JSON string"
+        )
+
+    class PluginInstallParams(FlextModels.BaseModel):
+        """CLI parameters for plugin installation."""
+
+        model_config = ConfigDict(validate_assignment=True)
+
+        plugin_type: str = Field(
+            description="Type of plugin (tap, target, transformer)"
+        )
+        plugin_name: str = Field(description="Name of the plugin to install")
+        variant: str | None = Field(default=None, description="Specific plugin variant")
+        pip_url: str | None = Field(
+            default=None, description="Custom pip URL for plugin"
+        )
+
+    # ========================================================================
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
@@ -53,9 +152,13 @@ class FlextMeltanoModels(FlextModels):
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
-        # Configuration complexity thresholds
-        _SIMPLE_CONFIG_THRESHOLD = 3
-        _MODERATE_CONFIG_THRESHOLD = 8
+        # Configuration complexity thresholds (from FlextMeltanoConstants)
+        _SIMPLE_CONFIG_THRESHOLD = (
+            FlextMeltanoConstants.Model.TAP_SIMPLE_CONFIG_THRESHOLD
+        )
+        _MODERATE_CONFIG_THRESHOLD = (
+            FlextMeltanoConstants.Model.TAP_MODERATE_CONFIG_THRESHOLD
+        )
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
         connection_config: FlextTypes.Dict = Field(
@@ -223,12 +326,10 @@ class FlextMeltanoModels(FlextModels):
         sink_name: str = Field(description="Name of the sink")
         target_name: str = Field(description="Name of the target")
         config: FlextTypes.Dict = Field(
-            default_factory=dict,
-            description="Sink configuration"
+            default_factory=dict, description="Sink configuration"
         )
-        schema: FlextTypes.Dict = Field(
-            default_factory=dict,
-            description="Sink schema"
+        sink_schema: FlextTypes.Dict = Field(
+            default_factory=dict, description="Sink schema"
         )
         status: str = Field(default="initialized", description="Current status")
 
@@ -326,6 +427,50 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
+    class TargetInstance(FlextModels.Entity):
+        """Pydantic model for target instance with comprehensive composition."""
+
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
+
+        target_type: str = Field(description="Type of the target")
+        config: FlextMeltanoModels.TargetConfig = Field(
+            description="Target configuration"
+        )
+        adapter: object | None = Field(
+            default=None,
+            description="FlextMeltanoAdapter instance",
+        )
+        status: str = Field(default="initialized", description="Current status")
+        batch_size: int = Field(default=1000, description="Batch processing size")
+        sink_count: int = Field(default=0, description="Number of configured sinks")
+
+        @computed_field
+        @property
+        def is_ready(self) -> bool:
+            """Computed field indicating if target is ready for processing."""
+            return (
+                self.status == "configured"
+                and self.config is not None
+                and self.batch_size > 0
+            )
+
+        @model_validator(mode="after")
+        def validate_target_instance_consistency(
+            self,
+        ) -> FlextMeltanoModels.TargetInstance:
+            """Model validator for target instance consistency."""
+            # Ensure target types match
+            if self.config.target_type != self.target_type:
+                msg = "Target type must match between instance and config"
+                raise ValueError(msg)
+
+            # Validate batch size
+            if self.batch_size <= 0:
+                msg = "Batch size must be positive"
+                raise ValueError(msg)
+
+            return self
+
     # ========================================================================
     # TARGET MODELS - Singer target configurations and instances
     # ========================================================================
@@ -335,9 +480,13 @@ class FlextMeltanoModels(FlextModels):
 
         model_config = ConfigDict(frozen=True, extra="allow")
 
-        # Processing efficiency thresholds
-        _HIGH_EFFICIENCY_THRESHOLD = 1000
-        _MEDIUM_EFFICIENCY_THRESHOLD = 100
+        # Processing efficiency thresholds (from FlextMeltanoConstants)
+        _HIGH_EFFICIENCY_THRESHOLD = (
+            FlextMeltanoConstants.Model.TARGET_HIGH_EFFICIENCY_THRESHOLD
+        )
+        _MEDIUM_EFFICIENCY_THRESHOLD = (
+            FlextMeltanoConstants.Model.TARGET_MEDIUM_EFFICIENCY_THRESHOLD
+        )
 
         target_type: str = Field(description="Target type identifier")
         connection_config: FlextTypes.Dict = Field(
@@ -824,9 +973,13 @@ class FlextMeltanoModels(FlextModels):
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
-        # Execution complexity thresholds
-        _SIMPLE_EXECUTION_THRESHOLD = 5
-        _MODERATE_EXECUTION_THRESHOLD = 20
+        # Execution complexity thresholds (from FlextMeltanoConstants)
+        _SIMPLE_EXECUTION_THRESHOLD = (
+            FlextMeltanoConstants.Model.DBT_SIMPLE_EXECUTION_THRESHOLD
+        )
+        _MODERATE_EXECUTION_THRESHOLD = (
+            FlextMeltanoConstants.Model.DBT_MODERATE_EXECUTION_THRESHOLD
+        )
 
         command: str = Field(description="DBT command to execute")
         models: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
@@ -919,10 +1072,16 @@ class FlextMeltanoModels(FlextModels):
     class ExecutionResult(FlextModels.TimestampedModel):
         """Pydantic model for execution result tracking with advanced composition."""
 
-        # Performance categorization thresholds
-        _HIGH_PERFORMANCE_THRESHOLD = 1000
-        _GOOD_PERFORMANCE_THRESHOLD = 100
-        _MODERATE_PERFORMANCE_THRESHOLD = 10
+        # Performance categorization thresholds (from FlextMeltanoConstants)
+        _HIGH_PERFORMANCE_THRESHOLD = (
+            FlextMeltanoConstants.Model.EXECUTION_HIGH_PERFORMANCE_THRESHOLD
+        )
+        _GOOD_PERFORMANCE_THRESHOLD = (
+            FlextMeltanoConstants.Model.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
+        )
+        _MODERATE_PERFORMANCE_THRESHOLD = (
+            FlextMeltanoConstants.Model.EXECUTION_MODERATE_PERFORMANCE_THRESHOLD
+        )
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 

@@ -36,7 +36,11 @@ class FlextMeltanoConstants(FlextConstants):
 
         # Metadata constants
         METADATA_CREATED_BY: Final[str] = "flext-meltano"
-        METADATA_DEFAULT_ENVIRONMENTS: Final[tuple[str, ...]] = ("dev", "staging", "prod")
+        METADATA_DEFAULT_ENVIRONMENTS: Final[tuple[str, ...]] = (
+            "dev",
+            "staging",
+            "prod",
+        )
 
         # File constants
         PROJECT_FILE: Final[str] = "meltano.yml"
@@ -185,6 +189,23 @@ class FlextMeltanoConstants(FlextConstants):
 
         # DBT version validation
         VERSION_PARTS_COUNT: Final[int] = 3
+
+        # Tap/Target configuration thresholds
+        TAP_SIMPLE_CONFIG_THRESHOLD: Final[int] = 3
+        TAP_MODERATE_CONFIG_THRESHOLD: Final[int] = 8
+
+        # Target processing efficiency thresholds
+        TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1000
+        TARGET_MEDIUM_EFFICIENCY_THRESHOLD: Final[int] = 100
+
+        # DBT execution complexity thresholds
+        DBT_SIMPLE_EXECUTION_THRESHOLD: Final[int] = 5
+        DBT_MODERATE_EXECUTION_THRESHOLD: Final[int] = 20
+
+        # Execution result performance thresholds
+        EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1000
+        EXECUTION_GOOD_PERFORMANCE_THRESHOLD: Final[int] = 100
+        EXECUTION_MODERATE_PERFORMANCE_THRESHOLD: Final[int] = 10
 
     # =========================================================================
     # ENUMS - Domain-specific enumerations

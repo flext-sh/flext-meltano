@@ -346,7 +346,9 @@ class FlextMeltanoUtilities(FlextUtilities):
         except (OSError, ValueError) as e:
             return FlextResult.fail(f"Failed to validate project structure: {e}")
 
-    def create_project_file(self, file_path: Path, content: str | FlextTypes.Dict) -> FlextResult[Path]:
+    def create_project_file(
+        self, file_path: Path, content: str | FlextTypes.Dict
+    ) -> FlextResult[Path]:
         """Create a project file with content."""
         if not isinstance(content, (str, dict)):
             return FlextResult.fail("Invalid content type: must be string or dict")

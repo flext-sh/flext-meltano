@@ -1356,9 +1356,7 @@ Thumbs.db
                     "transformers": [],
                 }
 
-            return FlextResult[FlextTypes.Dict].ok(
-                data=cast("FlextTypes.Dict", adapted_config)
-            )
+            return FlextResult[FlextTypes.Dict].ok(data=adapted_config)
 
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(

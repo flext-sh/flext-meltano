@@ -15,7 +15,6 @@ from typing import cast
 # CLI functionality replaced with logger calls (use flext-cli when available)
 from flext_core import (
     FlextBus,
-    FlextConfig,
     FlextContainer,
     FlextContext,
     FlextDispatcher,
@@ -91,7 +90,7 @@ class FlextMeltano(
     version: str = "0.9.9"
 
     # Instance attributes (declared for type checker)
-    _config: FlextConfig | None = None
+    _config: FlextMeltanoConfig
     executor: FlextMeltanoExecutor
     bus: FlextBus
     context: FlextContext
@@ -598,17 +597,14 @@ class FlextMeltano(
             )
 
         return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-            data=cast(
-                "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
-                {
-                    "plugin_name": plugin_name,
-                    "plugin_type": plugin_type,
-                    "status": "installed",
-                    "configuration": plugin_config,
-                    "installed_at": str(time.time()),
-                    "api_version": self.version,
-                },
-            )
+            data={
+                "plugin_name": plugin_name,
+                "plugin_type": plugin_type,
+                "status": "installed",
+                "configuration": plugin_config,
+                "installed_at": str(time.time()),
+                "api_version": self.version,
+            }
         )
 
     def list_plugins(
