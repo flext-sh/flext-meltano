@@ -40,16 +40,17 @@ class FlextMeltanoPluginService(
     FLEXT patterns with railway-oriented programming.
     """
 
+    # Instance attributes for type checker
+    _config: FlextMeltanoConfig
+    logger: FlextLogger
+    _abstractions: FlextMeltanoAbstractions
+
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize plugin service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
         self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
-        # Type guard for pyrefly - logger is always initialized
-        if self._logger is None:
-            error_msg = "Logger initialization failed"
-            raise RuntimeError(error_msg)
 
     def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute the Meltano plugin service.
@@ -67,14 +68,14 @@ class FlextMeltanoPluginService(
                 else {},
             }
 
-            self._logger.info("FlextMeltanoPluginService executed successfully")
+            self.logger.info("FlextMeltanoPluginService executed successfully")
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=config_data
             )
 
         except Exception as e:
             error_msg = f"Plugin service execution failed: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 error_msg
             )
@@ -93,7 +94,7 @@ class FlextMeltanoPluginService(
 
         """
         try:
-            self._logger.info("Discovering Meltano plugins")
+            self.logger.info("Discovering Meltano plugins")
 
             # Use provided project or create temporary one
             if project:
@@ -153,12 +154,12 @@ class FlextMeltanoPluginService(
                     }
                     plugins.append(plugin_info)
 
-            self._logger.info(f"Discovered {len(plugins)} plugins")
+            self.logger.info(f"Discovered {len(plugins)} plugins")
             return FlextResult[list[FlextTypes.StringDict]].ok(data=plugins)
 
         except Exception as e:
             error_msg = f"Failed to discover plugins: {e}"
-            self._logger.exception(error_msg, error=str(e))
+            self.logger.exception(error_msg, error=str(e))
             return FlextResult[list[FlextTypes.StringDict]].fail(error_msg)
 
     def add_plugin(
@@ -256,7 +257,7 @@ class FlextMeltanoPluginService(
 
         except Exception as e:
             error_msg = f"Failed to get plugin info: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     # Private helper methods
@@ -265,7 +266,7 @@ class FlextMeltanoPluginService(
         self, plugin_name: str, plugin_type: str
     ) -> FlextResult[None]:
         """Log plugin addition start."""
-        self._logger.info(
+        self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
@@ -315,7 +316,7 @@ class FlextMeltanoPluginService(
             "addition_method": "project_add_service_native",
         }
 
-        self._logger.info(
+        self.logger.info(
             "Plugin added successfully",
             plugin_name=plugin_name,
             plugin_type=plugin_type,

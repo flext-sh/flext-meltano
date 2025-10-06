@@ -46,7 +46,7 @@ class FlextMeltanoAbstractions:
 
         def __init__(self) -> None:
             """Initialize project helper with FLEXT patterns."""
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
             self._project: Project | None = None
 
         def find_project(self, project_root: Path) -> FlextResult[Project]:
@@ -55,7 +55,7 @@ class FlextMeltanoAbstractions:
                 project = Project.find(project_root)
                 self._project = project
 
-                self._logger.info(
+                self.logger.info(
                     "Meltano project loaded successfully",
                     project_root=str(project_root),
                 )
@@ -64,7 +64,7 @@ class FlextMeltanoAbstractions:
 
             except Exception as e:
                 error_msg = f"Failed to load Meltano project: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[Project].fail(error_msg)
 
         def get_project_root(self) -> FlextResult[Path]:
@@ -87,7 +87,7 @@ class FlextMeltanoAbstractions:
 
         def __init__(self, project: Project) -> None:
             """Initialize hub helper with project instance."""
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
             self._project = project
             self._hub_service: MeltanoHubService | None = None
 
@@ -96,12 +96,12 @@ class FlextMeltanoAbstractions:
             try:
                 self._hub_service = MeltanoHubService(self._project)
 
-                self._logger.info("MeltanoHubService initialized successfully")
+                self.logger.info("MeltanoHubService initialized successfully")
                 return FlextResult[MeltanoHubService].ok(data=self._hub_service)
 
             except Exception as e:
                 error_msg = f"Failed to initialize MeltanoHubService: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[MeltanoHubService].fail(error_msg)
 
         def get_plugins_of_type(self, plugin_type: str) -> FlextResult[FlextTypes.Dict]:
@@ -131,7 +131,7 @@ class FlextMeltanoAbstractions:
                     type_mapping[plugin_type]
                 )
 
-                self._logger.info(
+                self.logger.info(
                     f"Retrieved {len(plugins_dict)} plugins of type {plugin_type}"
                 )
 
@@ -139,7 +139,7 @@ class FlextMeltanoAbstractions:
 
             except Exception as e:
                 error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # ========================================================================
@@ -151,7 +151,7 @@ class FlextMeltanoAbstractions:
 
         def __init__(self, project: Project) -> None:
             """Initialize plugin helper with project instance."""
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
             self._project = project
 
         def add_plugin(self, plugin_type: str, plugin_name: str) -> FlextResult[bool]:
@@ -173,7 +173,7 @@ class FlextMeltanoAbstractions:
                 add_service = ProjectAddService(self._project)
                 add_service.add(type_mapping[plugin_type], plugin_name)
 
-                self._logger.info(
+                self.logger.info(
                     f"Plugin {plugin_name} of type {plugin_type} added successfully"
                 )
 
@@ -181,7 +181,7 @@ class FlextMeltanoAbstractions:
 
             except Exception as e:
                 error_msg = f"Failed to add plugin {plugin_name}: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[bool].fail(error_msg)
 
     # ========================================================================
@@ -193,7 +193,7 @@ class FlextMeltanoAbstractions:
 
         def __init__(self) -> None:
             """Initialize runner helper."""
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         def create_elt_context(
             self, project: Project, extractor_name: str, loader_name: str
@@ -211,7 +211,7 @@ class FlextMeltanoAbstractions:
                     dry_run=False,
                 )
 
-                self._logger.info(
+                self.logger.info(
                     f"ELT context created for {extractor_name} -> {loader_name}"
                 )
 
@@ -219,7 +219,7 @@ class FlextMeltanoAbstractions:
 
             except Exception as e:
                 error_msg = f"Failed to create ELT context: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[ELTContext].fail(error_msg)
 
         def execute_singer_pipeline(
@@ -246,7 +246,7 @@ class FlextMeltanoAbstractions:
                     "execution_method": "singer_runner_native",
                 }
 
-                self._logger.info(
+                self.logger.info(
                     f"Singer pipeline executed successfully: {extractor_plugin.name} -> {loader_plugin.name}"
                 )
 
@@ -254,11 +254,11 @@ class FlextMeltanoAbstractions:
 
             except RunnerError as runner_error:
                 error_msg = f"Singer pipeline execution failed: {runner_error}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[FlextTypes.Dict].fail(error_msg)
             except Exception as e:
                 error_msg = f"Unexpected error in Singer pipeline: {e}"
-                self._logger.exception(error_msg)
+                self.logger.exception(error_msg)
                 return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # ========================================================================
@@ -267,7 +267,7 @@ class FlextMeltanoAbstractions:
 
     def __init__(self) -> None:
         """Initialize unified abstractions with FLEXT patterns."""
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._project_helper = self._ProjectHelper()
         self._hub_helpers: dict[str, FlextMeltanoAbstractions._HubHelper] = {}
         self._plugin_helpers: dict[str, FlextMeltanoAbstractions._PluginHelper] = {}

@@ -41,7 +41,7 @@ class FlextTargetAbstractions(
         """Initialize unified target abstractions with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     def configure_sink(
         self, target_config: FlextMeltanoModels.TargetConfig
@@ -56,7 +56,7 @@ class FlextTargetAbstractions(
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Configuring sink for target",
                 target_name=target_config.target_type,
                 target_type=target_config.target_type,
@@ -70,7 +70,7 @@ class FlextTargetAbstractions(
                 status="configured",
             )
 
-            self._logger.info(
+            self.logger.info(
                 "Sink configured successfully",
                 sink_name=sink_def.sink_name,
             )
@@ -78,7 +78,7 @@ class FlextTargetAbstractions(
             return FlextResult[FlextMeltanoModels.SinkDefinition].ok(sink_def)
 
         except Exception as e:
-            self._logger.exception("Sink configuration failed", error=str(e))
+            self.logger.exception("Sink configuration failed", error=str(e))
             return FlextResult[FlextMeltanoModels.SinkDefinition].fail(
                 f"Sink configuration failed: {e}"
             )
@@ -96,7 +96,7 @@ class FlextTargetAbstractions(
 
         """
         try:
-            self._logger.debug(
+            self.logger.debug(
                 "Validating target configuration",
                 target_name=target_config.target_type,
             )
@@ -112,7 +112,7 @@ class FlextTargetAbstractions(
             return FlextResult[bool].ok(True)
 
         except Exception as e:
-            self._logger.exception(
+            self.logger.exception(
                 "Target configuration validation failed", error=str(e)
             )
             return FlextResult[bool].fail(
@@ -132,7 +132,7 @@ class FlextTargetAbstractions(
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Creating target instance",
                 target_name=target_config.target_type,
                 target_type=target_config.target_type,
@@ -145,7 +145,7 @@ class FlextTargetAbstractions(
                 status="configured",
             )
 
-            self._logger.info(
+            self.logger.info(
                 "Target instance created successfully",
                 target_name=target_instance.config.name,
             )
@@ -153,7 +153,7 @@ class FlextTargetAbstractions(
             return FlextResult[FlextMeltanoModels.TargetInstance].ok(target_instance)
 
         except Exception as e:
-            self._logger.exception("Target instance creation failed", error=str(e))
+            self.logger.exception("Target instance creation failed", error=str(e))
             return FlextResult[FlextMeltanoModels.TargetInstance].fail(
                 f"Target instance creation failed: {e}"
             )

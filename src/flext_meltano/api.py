@@ -93,7 +93,6 @@ class FlextMeltano(
     _config: FlextMeltanoConfig
     executor: FlextMeltanoExecutor
     bus: FlextBus
-    context: FlextContext
     dispatcher: FlextDispatcher
     processors: FlextProcessors
     registry: FlextRegistry

@@ -34,7 +34,7 @@ class TestFlextSingerTypesComplete:
             message="Singer types should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(singer_types, "_logger"),
+            condition=hasattr(singer_types, "logger"),
             message="Should have logger",
         )
         self.test_assertions.assert_true(

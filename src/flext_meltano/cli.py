@@ -38,7 +38,7 @@ class FlextMeltanoCLI:
     def __init__(self) -> None:
         """Initialize CLI with flext-cli API and Meltano API."""
         self._cli = FlextCli()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
         self._api = FlextMeltano()
         self._output = self._cli.output
 
@@ -89,7 +89,7 @@ class FlextMeltanoCLI:
             result = handler(command_args)
             return 0 if result.is_success else 1
         except Exception:
-            self._logger.exception("Command failed")
+            self.logger.exception("Command failed")
             self._output.print_error("Command failed")
             return 1
 
@@ -889,13 +889,15 @@ class FlextMeltanoCLI:
         )
 
         if params_result.is_failure:
-            self._logger.error(f"Parameter validation failed: {params_result.error}")
+            self.logger.error(f"Parameter validation failed: {params_result.error}")
             return FlextResult[None].fail(
                 f"Invalid tap parameters: {params_result.error}"
             )
 
-        params: FlextMeltanoModels.TapRunParams = params_result.unwrap()
-        self._logger.info(f"Running tap with params: {params.model_dump()}")
+        params: FlextMeltanoModels.TapRunParams = cast(
+            "FlextMeltanoModels.TapRunParams", params_result.unwrap()
+        )
+        self.logger.info(f"Running tap with params: {params.model_dump()}")
 
         # Translate Pydantic model to Singer CLI command
         command_result = SingerCliTranslator.translate_tap_run(params)
@@ -938,13 +940,15 @@ class FlextMeltanoCLI:
         )
 
         if params_result.is_failure:
-            self._logger.error(f"Parameter validation failed: {params_result.error}")
+            self.logger.error(f"Parameter validation failed: {params_result.error}")
             return FlextResult[None].fail(
                 f"Invalid target parameters: {params_result.error}"
             )
 
-        params: FlextMeltanoModels.TargetRunParams = params_result.unwrap()
-        self._logger.info(f"Running target with params: {params.model_dump()}")
+        params: FlextMeltanoModels.TargetRunParams = cast(
+            "FlextMeltanoModels.TargetRunParams", params_result.unwrap()
+        )
+        self.logger.info(f"Running target with params: {params.model_dump()}")
 
         # Translate Pydantic model to Singer CLI command
         command_result = SingerCliTranslator.translate_target_run(params)
@@ -989,13 +993,15 @@ class FlextMeltanoCLI:
         )
 
         if params_result.is_failure:
-            self._logger.error(f"Parameter validation failed: {params_result.error}")
+            self.logger.error(f"Parameter validation failed: {params_result.error}")
             return FlextResult[None].fail(
                 f"Invalid pipeline parameters: {params_result.error}"
             )
 
-        params: FlextMeltanoModels.PipelineRunParams = params_result.unwrap()
-        self._logger.info(f"Running pipeline with params: {params.model_dump()}")
+        params: FlextMeltanoModels.PipelineRunParams = cast(
+            "FlextMeltanoModels.PipelineRunParams", params_result.unwrap()
+        )
+        self.logger.info(f"Running pipeline with params: {params.model_dump()}")
 
         # Translate Pydantic model to tap and target commands
         commands_result = SingerCliTranslator.translate_pipeline_run(params)

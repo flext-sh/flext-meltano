@@ -76,7 +76,7 @@ All methods return `FlextResult[T]` for type-safe error handling:
 result = (
     SingerCliTranslator.translate_tap_run(tap_params)
     .flat_map(lambda cmd: SingerCliTranslator.execute_singer_command(cmd))
-    .map(lambda output: output['stdout'])
+    .map(lambda output: output["stdout"])
 )
 
 if result.is_failure:
@@ -89,7 +89,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
+import subprocess  # noqa: S404 - subprocess required for CLI command execution
 from pathlib import Path
 from typing import Any
 
@@ -249,7 +249,7 @@ class SingerCliTranslator:
         try:
             process_input = input_data.encode() if input_data else None
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603 - command generated internally, trusted input
                 command,
                 input=process_input,
                 capture_output=True,

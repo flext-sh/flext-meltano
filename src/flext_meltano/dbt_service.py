@@ -35,16 +35,16 @@ class FlextMeltanoDbtService(
     with railway-oriented programming.
     """
 
+    # Instance attributes for type checker
+    _config: FlextMeltanoConfig
+    _library_runner: FlextMeltanoLibraryRunner
+
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize DBT service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
-        # Type guard for pyrefly - logger is always initialized
-        if self._logger is None:
-            error_msg = "Logger initialization failed"
-            raise RuntimeError(error_msg)
 
     def run_transformations(
         self,
@@ -64,7 +64,7 @@ class FlextMeltanoDbtService(
 
         """
         try:
-            _ = self._logger.info(
+            _ = self.logger.info(
                 "Running dbt transformations using programmatic API",
                 project_dir=str(project_dir),
                 models=models or "all",
@@ -88,12 +88,12 @@ class FlextMeltanoDbtService(
             )
 
             if result.is_success:
-                _ = self._logger.info(
+                _ = self.logger.info(
                     "dbt transformations completed successfully",
                     models=models or "all",
                 )
             else:
-                _ = self._logger.error(
+                _ = self.logger.error(
                     "dbt transformations failed",
                     error=result.error,
                 )
@@ -102,7 +102,7 @@ class FlextMeltanoDbtService(
 
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
-            _ = self._logger.exception(error_msg)
+            _ = self.logger.exception(error_msg)
             return FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].fail(error_msg)

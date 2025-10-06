@@ -131,7 +131,7 @@ class TestFlextTargetAbstractionsComplete:
             message="Target abstractions should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(target_abs, "_logger"),
+            condition=hasattr(target_abs, "logger"),
             message="Should have logger",
         )
 
