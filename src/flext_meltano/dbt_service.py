@@ -41,6 +41,10 @@ class FlextMeltanoDbtService(
         self._config = config or FlextMeltanoConfig()
         self._logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
+        # Type guard for pyrefly - logger is always initialized
+        if self._logger is None:
+            error_msg = "Logger initialization failed"
+            raise RuntimeError(error_msg)
 
     def run_transformations(
         self,

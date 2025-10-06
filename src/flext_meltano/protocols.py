@@ -10,7 +10,7 @@ from typing import Protocol, TypeVar, runtime_checkable
 
 from flext_core import FlextProtocols, FlextResult, FlextTypes
 
-T_co = TypeVar('T_co', covariant=True)
+T_co = TypeVar("T_co", covariant=True)
 
 
 class FlextMeltanoProtocols:

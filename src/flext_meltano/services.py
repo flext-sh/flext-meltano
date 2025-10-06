@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from typing import cast, TypeVar
+from typing import TypeVar, cast
 
 from flext_core import (
     FlextLogger,
@@ -22,12 +22,12 @@ from flext_core import (
     FlextTypes,
 )
 
-T = TypeVar('T')
-
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
+
+T = TypeVar("T")
 
 
 class FlextMeltanoService(

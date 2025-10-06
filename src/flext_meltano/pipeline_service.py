@@ -44,6 +44,10 @@ class FlextMeltanoPipelineService(
         self._config = config or FlextMeltanoConfig()
         self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
+        # Type guard for pyrefly - logger is always initialized
+        if self._logger is None:
+            error_msg = "Logger initialization failed"
+            raise RuntimeError(error_msg)
 
     def execute_pipeline(
         self,
@@ -67,7 +71,7 @@ class FlextMeltanoPipelineService(
 
         """
         # RAILWAY PATTERN: Chain all pipeline operations with automatic error handling
-        project_obj = cast("object", project)
+        project_obj = project
 
         # Execute synchronous steps first
         start_result = self._log_pipeline_start(extractor_name, loader_name)

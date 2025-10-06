@@ -20,7 +20,7 @@ from flext_core import (
     FlextTypes,
 )
 from pydantic import Field, SecretStr, field_validator
-from pydantic_settings import SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
@@ -28,7 +28,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoConfig(FlextConfig):
+class FlextMeltanoConfig(FlextConfig, BaseSettings):
     """Meltano ELT configuration management with enterprise-grade validation.
 
     Extends FlextConfig to provide comprehensive Meltano-specific configuration

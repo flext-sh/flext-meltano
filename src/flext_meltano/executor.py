@@ -27,9 +27,7 @@ from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoExecutor(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+class FlextMeltanoExecutor(FlextService[FlextTypes.Dict]):
     """Unified executor architecture following flext-core patterns.
 
     Provides comprehensive Meltano command execution with proper error handling,
@@ -41,17 +39,15 @@ class FlextMeltanoExecutor(
     ) -> None:
         """Initialize executor with configuration."""
         super().__init__()
-        self._config: FlextMeltanoConfig | None = (
-            FlextMeltanoConfig(**config) if config else None
-        )
-        self._logger = FlextLogger(__name__)
+        self._config = FlextMeltanoConfig(**config) if config else FlextMeltanoConfig()
+        self._logger: FlextLogger = FlextLogger(__name__)
         self._bridge = FlextMeltanoBridge()
         # Type guard for mypy - logger is always initialized
         if self._logger is None:
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
-    def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    def execute(self) -> FlextResult[FlextTypes.JsonValue]:
         """Execute the Meltano executor service.
 
         Returns:
@@ -63,7 +59,9 @@ class FlextMeltanoExecutor(
                 "executor_type": "flext_meltano_executor",
                 "status": "ready",
                 "execution_timestamp": str(time.time()),
-                "config": self._config.model_dump() if self._config is not None else {},
+                "config": self._config.model_dump()
+                if self._config is not None and hasattr(self._config, "model_dump")
+                else {},
             }
 
             self._logger.info("FlextMeltanoExecutor executed successfully")

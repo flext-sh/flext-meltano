@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
@@ -115,16 +116,19 @@ class FlextMeltanoLibraryRunner:
                 ].fail(result.error or "DBT transformation failed")
 
             execution_result = result.unwrap()
-            dbt_result: FlextMeltanoTypes.Processing.DbtTransformationResult = {
-                "success": execution_result.success,
-                "exit_code": execution_result.exit_code,
-                "models_run": models or ["all"],
-                "execution_method": "library_runner",
-                "project_dir": str(project_dir) if project_dir else None,
-                "execution_time": execution_result.execution_time,
-                "output": execution_result.output,
-                "error": execution_result.error,
-            }
+            dbt_result = cast(
+                "FlextMeltanoTypes.Processing.DbtTransformationResult",
+                {
+                    "success": execution_result.success,
+                    "exit_code": execution_result.exit_code,
+                    "models_run": models or ["all"],
+                    "execution_method": "library_runner",
+                    "project_dir": str(project_dir) if project_dir else None,
+                    "execution_time": execution_result.execution_time,
+                    "output": execution_result.output,
+                    "error": execution_result.error,
+                },
+            )
 
             return FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult].ok(
                 dbt_result
@@ -146,7 +150,7 @@ class FlextMeltanoLibraryRunner:
                 "status": "available",
                 "capabilities": ["run", "test", "docs", "seed"],
             }
-            return FlextResult[FlextTypes.Dict].ok(dbt_runner)
+            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", dbt_runner))
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(f"Failed to get DBT runner: {e}")
 
@@ -159,7 +163,9 @@ class FlextMeltanoLibraryRunner:
                 "status": "available",
                 "capabilities": ["discover", "sync", "validate"],
             }
-            return FlextResult[FlextTypes.Dict].ok(singer_manager)
+            return FlextResult[FlextTypes.Dict].ok(
+                cast("FlextTypes.Dict", singer_manager)
+            )
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(
                 f"Failed to get Singer manager: {e}"

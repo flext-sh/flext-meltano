@@ -64,8 +64,8 @@ class FlextMeltanoProjectService(
             config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_project_service",
                 "status": "ready",
-                "config": self._config.to_dict()
-                if hasattr(self._config, "to_dict")
+                "config": self._config.model_dump()
+                if hasattr(self._config, "model_dump")
                 else {},
             }
 
