@@ -70,7 +70,9 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
             }
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
-            return FlextResult[FlextTypes.JsonValue].ok(data=config_data)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast(FlextTypes.JsonValue, config_data)
+            )
 
         except Exception as e:
             error_msg = f"Executor execution failed: {e}"

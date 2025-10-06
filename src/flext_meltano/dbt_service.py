@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import cast
 
 from flext_core import (
-    FlextLogger,
     FlextResult,
     FlextService,
 )
@@ -43,7 +42,6 @@ class FlextMeltanoDbtService(
         """Initialize DBT service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def run_transformations(
