@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextResult, FlextTypes
-from flext_tests import FlextTestsFactories, FlextTestsUtilities
+from flext_tests import FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 
 from flext_meltano import FlextMeltanoAdapter
@@ -138,9 +138,6 @@ class TestFlextMeltanoAdapterComplete:
 
     def test_initialize_project_functional(self) -> None:
         """Test project initialization using flext_tests temp directory."""
-        # Use flext_tests fixture for temporary directory (avoiding duplication)
-        FlextTestsFactories()
-
         # Configure functional service for project initialization
         with tempfile.TemporaryDirectory() as temp_dir:
             project_data = {

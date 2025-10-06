@@ -3,7 +3,7 @@
 from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
-from flext_tests import FlextTestsFactories, FlextTestsUtilities
+from flext_tests import FlextTestsUtilities
 from pydantic import ValidationError
 
 from flext_meltano import FlextTargetAbstractions
@@ -186,7 +186,7 @@ class TestFlextTargetAbstractionsComplete:
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
         # Test error handling with FlextResult patterns
-        failure_result = FlextTestsFactories.create_failure_result("Target error")
+        failure_result = FlextResult[str].fail("Target error")
 
         self.test_assertions.assert_true(
             condition=isinstance(failure_result, FlextResult),

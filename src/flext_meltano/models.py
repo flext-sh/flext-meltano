@@ -48,7 +48,7 @@ class FlextMeltanoModels(FlextModels):
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
-    class TapConfig(FlextModels.Entity):
+    class TapConfig(FlextModels.BaseModel):
         """Pydantic model for tap configuration with advanced validation and composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -405,7 +405,7 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class StreamInfo(FlextModels.Entity):
+    class StreamInfo(FlextModels.BaseModel):
         """Pydantic model for stream information with advanced validation and computed fields."""
 
         model_config = ConfigDict(frozen=False, extra="allow")
@@ -498,11 +498,16 @@ class FlextMeltanoModels(FlextModels):
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
 
-        # Project maturity thresholds
-        _MATURE_PROJECT_ENVIRONMENTS = 3
-        _DEVELOPING_PROJECT_ENVIRONMENTS = 2
+        # Project maturity thresholds (using FlextMeltanoConstants as source)
+        _MATURE_PROJECT_ENVIRONMENTS = (
+            FlextMeltanoConstants.Model.MATURITY_MATURE_ENV_COUNT
+        )
+        _DEVELOPING_PROJECT_ENVIRONMENTS = (
+            FlextMeltanoConstants.Model.MATURITY_DEVELOPING_ENV_COUNT
+        )
 
         version: int = Field(
+            default=1,
             ge=1,
             le=1,
             description="Meltano project version (only version 1 supported)",
@@ -516,7 +521,7 @@ class FlextMeltanoModels(FlextModels):
             default_factory=Path.cwd,
             description="Project root directory",
         )
-        environments: FlextMeltanoTypes.Core.PluginNameList = Field(
+        environments: FlextMeltanoTypes.MeltanoCore.PluginNameList = Field(
             default_factory=lambda: ["dev", "staging", "prod"],
             description="Available environments",
         )
@@ -541,12 +546,12 @@ class FlextMeltanoModels(FlextModels):
             if (
                 self.has_production_environment
                 and self.environment_count
-                >= FlextMeltanoConstants.PROJECT_MATURITY_MATURE_ENV_COUNT
+                >= FlextMeltanoConstants.Model.PROJECT_MATURITY_MATURE_ENV_COUNT
             ):
                 return "mature"
             if (
                 self.environment_count
-                >= FlextMeltanoConstants.PROJECT_MATURITY_DEVELOPING_ENV_COUNT
+                >= FlextMeltanoConstants.Model.PROJECT_MATURITY_DEVELOPING_ENV_COUNT
             ):
                 return "developing"
             return "basic"
@@ -593,7 +598,7 @@ class FlextMeltanoModels(FlextModels):
         pip_url: str | None = Field(default=None, description="Plugin pip URL")
         executable: str | None = Field(default=None, description="Plugin executable")
         variant: str = Field(
-            default=FlextMeltanoConstants.PLUGIN_DEFAULT_VARIANT,
+            default=FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
             description="Plugin variant",
         )
         settings: FlextTypes.Dict = Field(
@@ -625,17 +630,17 @@ class FlextMeltanoModels(FlextModels):
             """Computed field for plugin complexity assessment."""
             if (
                 self.settings_count
-                == FlextMeltanoConstants.PLUGIN_COMPLEXITY_MINIMAL_SETTINGS
+                == FlextMeltanoConstants.Model.COMPLEXITY_MINIMAL_SETTINGS
             ):
                 return "minimal"
             if (
                 self.settings_count
-                <= FlextMeltanoConstants.PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS
+                <= FlextMeltanoConstants.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS
             ):
                 return "simple"
             if (
                 self.settings_count
-                <= FlextMeltanoConstants.PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS
+                <= FlextMeltanoConstants.Model.COMPLEXITY_MODERATE_MAX_SETTINGS
             ):
                 return "moderate"
             return "complex"
@@ -671,7 +676,7 @@ class FlextMeltanoModels(FlextModels):
     # DBT MODELS - DBT project and execution models
     # ========================================================================
 
-    class DbtProjectModel(FlextModels.Entity):
+    class DbtProjectModel(FlextModels.BaseModel):
         """Pydantic model for DBT project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -679,23 +684,23 @@ class FlextMeltanoModels(FlextModels):
         name: str = Field(min_length=1, description="DBT project name")
         version: str = Field(description="DBT project version")
         profile: str = Field(description="DBT profile name")
-        model_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
+        model_paths: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default=["models"],
             description="DBT model paths",
         )
-        analysis_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
+        analysis_paths: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default=["analysis"],
             description="DBT analysis paths",
         )
-        test_paths: FlextMeltanoTypes.Core.DbtTestList = Field(
+        test_paths: FlextMeltanoTypes.MeltanoCore.DbtTestList = Field(
             default=["tests"],
             description="DBT test paths",
         )
-        seed_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
+        seed_paths: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default=["seeds"],
             description="DBT seed paths",
         )
-        macro_paths: FlextMeltanoTypes.Core.DbtModelList = Field(
+        macro_paths: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default=["macros"],
             description="DBT macro paths",
         )
@@ -732,12 +737,12 @@ class FlextMeltanoModels(FlextModels):
             """Computed field for project structure complexity."""
             if (
                 self.total_path_count
-                <= FlextMeltanoConstants.PROJECT_STRUCTURE_SIMPLE_MAX_PATHS
+                <= FlextMeltanoConstants.Model.STRUCTURE_SIMPLE_MAX_PATHS
             ):
                 return "simple"
             if (
                 self.total_path_count
-                <= FlextMeltanoConstants.PROJECT_STRUCTURE_MODERATE_MAX_PATHS
+                <= FlextMeltanoConstants.Model.STRUCTURE_MODERATE_MAX_PATHS
             ):
                 return "moderate"
             return "complex"
@@ -754,7 +759,7 @@ class FlextMeltanoModels(FlextModels):
 
             # Validate version format
             version_parts = self.version.split(".")
-            if len(version_parts) != FlextMeltanoConstants.DBT_VERSION_PARTS_COUNT:
+            if len(version_parts) != FlextMeltanoConstants.Model.VERSION_PARTS_COUNT:
                 msg = "DBT project version must be in format 'x.y.z'"
                 raise ValueError(msg)
 
@@ -782,11 +787,11 @@ class FlextMeltanoModels(FlextModels):
         _MODERATE_EXECUTION_THRESHOLD = 20
 
         command: str = Field(description="DBT command to execute")
-        models: FlextMeltanoTypes.Core.DbtModelList = Field(
+        models: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default_factory=list,
             description="Models to execute",
         )
-        exclude: FlextMeltanoTypes.Core.DbtModelList = Field(
+        exclude: FlextMeltanoTypes.MeltanoCore.DbtModelList = Field(
             default_factory=list,
             description="Models to exclude",
         )

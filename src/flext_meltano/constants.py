@@ -9,12 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final, Literal
 
-from flext_core import FlextConstants, FlextTypes
-
-# Python 3.13+ Type Aliases - ONLY Meltano-specific
-type PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
-type ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
-type SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
+from flext_core import FlextConstants
 
 
 class FlextMeltanoConstants(FlextConstants):
@@ -26,153 +21,173 @@ class FlextMeltanoConstants(FlextConstants):
     """
 
     # =========================================================================
-    # VERSION METADATA (DOMAIN-SPECIFIC ONLY)
+    # MELTANO DOMAIN NAMESPACES - Following FLEXT pattern
     # =========================================================================
 
-    FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"  # Domain-specific version
+    class Meltano:
+        """Meltano-specific constants namespace."""
+
+        # Version metadata
+        VERSION: Final[str] = "0.9.0"
+        APPLICATION_NAME: Final[str] = "flext-meltano"
+        APPLICATION_DESCRIPTION: Final[str] = "FLEXT Meltano ELT Pipeline Foundation"
+        APPLICATION_AUTHOR: Final[str] = "FLEXT Team"
+        APPLICATION_LICENSE: Final[str] = "MIT"
+
+        # Metadata constants
+        METADATA_CREATED_BY: Final[str] = "flext-meltano"
+
+        # File constants
+        PROJECT_FILE: Final[str] = "meltano.yml"
+        MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
+        STATE_DIR: Final[str] = ".meltano"
+        LOGS_DIR: Final[str] = "logs"
+        OUTPUT_DIR: Final[str] = "output"
+
+        # Command constants
+        COMMAND_INSTALL: Final[str] = "install"
+        COMMAND_RUN: Final[str] = "run"
+        COMMAND_ELT: Final[str] = "elt"
+
+        # Version requirements
+        VERSION_REQUIRED: Final[str] = "3.9.1"
+
+        # Default timeout constants
+        MELTANO_DEFAULT_TIMEOUT: Final[int] = 300  # 5 minutes
+
+        # Timeout constants (using FlextConstants as base)
+        DEFAULT_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 10
+        )  # 300 seconds
+        DISCOVERY_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 2
+        )  # 60 seconds
+        EXTRACT_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 60
+        )  # 1800 seconds
+        LOAD_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 60  # 1800 seconds
+
+        # Database ports
+        DEFAULT_POSTGRES_PORT: Final[int] = 5432
+        DEFAULT_MYSQL_PORT: Final[int] = 3306
+        DEFAULT_ORACLE_PORT: Final[int] = 1521
+
+    class Singer:
+        """Singer protocol constants namespace."""
+
+        # Message types
+        MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
+        MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
+        MESSAGE_TYPE_STATE: Final[str] = "STATE"
+        MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
+
+        # Version requirements
+        SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
+
+        # Batch sizes (using FlextConstants as base)
+        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
+        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+        DEFAULT_BUFFER_SIZE: Final[int] = 8192
+
+        # Timeouts (using FlextConstants as base)
+        DEFAULT_CONNECTION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT  # 30
+        DEFAULT_REQUEST_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2  # 60
+        DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4
+
+    class Dbt:
+        """DBT transformation constants namespace."""
+
+        # File constants
+        PROJECT_FILE: Final[str] = "dbt_project.yml"
+        PROFILES_FILE: Final[str] = "profiles.yml"
+        MANIFEST_FILE: Final[str] = "manifest.json"
+
+        # Command constants
+        COMMAND_RUN: Final[str] = "run"
+        COMMAND_TEST: Final[str] = "test"
+        COMMAND_BUILD: Final[str] = "build"
+        COMMAND_COMPILE: Final[str] = "compile"
+
+        # Version requirements
+        VERSION_REQUIRED: Final[str] = "1.10.5"
+
+        # Batch processing (using FlextConstants as base)
+        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
+        LARGE_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 50  # 5000
+        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+
+        # Freshness timeouts (hours)
+        FRESHNESS_ERROR_AFTER: Final[int] = 24
+        FRESHNESS_WARN_AFTER: Final[int] = 12
+
+        # Materialization strategies
+        MATERIALIZATION_TABLE: Final[str] = "table"
+        MATERIALIZATION_VIEW: Final[str] = "view"
+        MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"
+
+    class Plugin:
+        """Plugin management constants namespace."""
+
+        # Configuration constants
+        CONFIG_VERSION: Final[int] = 1
+        DISCOVERY_FILENAME: Final[str] = "catalog.json"
+        STATE_FILENAME: Final[str] = "state.json"
+        DEFAULT_VARIANT: Final[str] = "meltanolabs"
+        HUB_URL: Final[str] = "https://hub.meltano.com"
+
+        # Prefixes
+        PREFIX_TAP: Final[str] = "tap"
+        PREFIX_TARGET: Final[str] = "target"
+
+        # Types
+        TYPE_TAP: Final[str] = "extractor"
+        TYPE_TARGET: Final[str] = "loader"
+        TYPE_DBT: Final[str] = "transformer"
+
+        # Installation timeout (using FlextConstants as base)
+        INSTALLATION_TIMEOUT: Final[int] = (
+            FlextConstants.Defaults.TIMEOUT * 10
+        )  # 300 seconds
+
+        # Validation rules
+        MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = (
+            8  # "target-" prefix + minimum 2 chars
+        )
+        MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
+
+    class Service:
+        """Service management constants namespace."""
+
+        # Validation rules
+        MIN_NAME_LENGTH: Final[int] = 3  # Minimum service name length
+
+    class Model:
+        """Model validation constants namespace."""
+
+        # Project maturity thresholds
+        MATURITY_MATURE_ENV_COUNT: Final[int] = 3
+        MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
+        PROJECT_MATURITY_MATURE_ENV_COUNT: Final[int] = 3
+        PROJECT_MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
+
+        # Plugin complexity thresholds
+        COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 0
+        COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 5
+        COMPLEXITY_MODERATE_MAX_SETTINGS: Final[int] = 15
+
+        # Project structure thresholds
+        STRUCTURE_SIMPLE_MAX_PATHS: Final[int] = 5
+        STRUCTURE_MODERATE_MAX_PATHS: Final[int] = 10
+
+        # DBT version validation
+        VERSION_PARTS_COUNT: Final[int] = 3
 
     # =========================================================================
-    # DOMAIN-SPECIFIC CONSTANTS ONLY - FLAT CLASS STRUCTURE
-    # =========================================================================
-
-    # Application metadata constants
-    APPLICATION_NAME: Final[str] = "flext-meltano"
-    APPLICATION_DESCRIPTION: Final[str] = "FLEXT Meltano ELT Pipeline Foundation"
-    APPLICATION_AUTHOR: Final[str] = "FLEXT Team"
-    APPLICATION_LICENSE: Final[str] = "MIT"
-
-    # Metadata constants
-    METADATA_CREATED_BY: Final[str] = "flext-meltano"
-    # Use FlextConstants.Config.ENVIRONMENTS instead of duplicating
-    METADATA_DEFAULT_ENVIRONMENTS: Final[FlextTypes.StringList] = (
-        FlextConstants.Config.ENVIRONMENTS
-    )
-
-    # Model validation constants - replace magic numbers in models.py
-    PROJECT_MATURITY_MATURE_ENV_COUNT: Final[int] = 3
-    PROJECT_MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
-    PLUGIN_COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 0
-    PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 5
-    PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS: Final[int] = 15
-    PROJECT_STRUCTURE_SIMPLE_MAX_PATHS: Final[int] = 5
-    PROJECT_STRUCTURE_MODERATE_MAX_PATHS: Final[int] = 10
-    DBT_VERSION_PARTS_COUNT: Final[int] = 3
-
-    # Meltano-specific file names and commands - cannot be generalized
-    MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
-    MELTANO_STATE_DIR: Final[str] = ".meltano"
-    MELTANO_LOGS_DIR: Final[str] = "logs"
-    MELTANO_OUTPUT_DIR: Final[str] = "output"
-    MELTANO_COMMAND_INSTALL: Final[str] = "install"
-    MELTANO_COMMAND_RUN: Final[str] = "run"
-    MELTANO_COMMAND_ELT: Final[str] = "elt"
-
-    # Meltano version requirements
-    MELTANO_VERSION_REQUIRED: Final[str] = "3.9.1"
-
-    # Meltano timeouts - USE FlextConstants as SOURCE OF TRUTH for generic timeouts
-    MELTANO_DEFAULT_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 10
-    )  # 300 seconds
-    MELTANO_DISCOVERY_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 2
-    )  # 60 seconds
-    MELTANO_EXTRACT_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 60
-    )  # 1800 seconds
-    MELTANO_LOAD_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 60
-    )  # 1800 seconds
-
-    # Database ports - USE FlextConstants.Network defaults for standard ports
-    MELTANO_DEFAULT_POSTGRES_PORT: Final[int] = 5432  # Standard PostgreSQL port
-    MELTANO_DEFAULT_MYSQL_PORT: Final[int] = 3306  # Standard MySQL port
-    MELTANO_DEFAULT_ORACLE_PORT: Final[int] = 1521  # Standard Oracle port
-
-    # Singer protocol constants - domain-specific message types
-    SINGER_MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
-    SINGER_MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
-    SINGER_MESSAGE_TYPE_STATE: Final[str] = "STATE"
-    SINGER_MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
-
-    # Singer version requirements
-    SINGER_SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
-
-    # Singer batch sizes - USE FlextConstants.Defaults.PAGE_SIZE as base
-    SINGER_DEFAULT_BATCH_SIZE: Final[int] = (
-        FlextConstants.Defaults.PAGE_SIZE * 10
-    )  # 1000
-    SINGER_MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
-    SINGER_DEFAULT_BUFFER_SIZE: Final[int] = 8192  # Buffer size is Singer-specific
-
-    # Singer timeouts - USE FlextConstants timeouts as base
-    SINGER_DEFAULT_CONNECTION_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT
-    )  # 30
-    SINGER_DEFAULT_REQUEST_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 2
-    )  # 60
-    SINGER_DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4  # Singer-specific parallelism
-
-    # DBT file names and commands
-    DBT_PROJECT_FILE: Final[str] = "dbt_project.yml"
-    DBT_PROFILES_FILE: Final[str] = "profiles.yml"
-    DBT_MANIFEST_FILE: Final[str] = "manifest.json"
-    DBT_COMMAND_RUN: Final[str] = "run"
-    DBT_COMMAND_TEST: Final[str] = "test"
-    DBT_COMMAND_BUILD: Final[str] = "build"
-    DBT_COMMAND_COMPILE: Final[str] = "compile"
-
-    # DBT version requirements
-    DBT_VERSION_REQUIRED: Final[str] = "1.10.5"
-
-    # DBT batch processing - USE FlextConstants.Defaults.PAGE_SIZE as base
-    DBT_DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
-    DBT_LARGE_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 50  # 5000
-    DBT_MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
-
-    # DBT freshness timeouts (hours)
-    DBT_FRESHNESS_ERROR_AFTER: Final[int] = 24
-    DBT_FRESHNESS_WARN_AFTER: Final[int] = 12
-
-    # DBT materialization strategies
-    DBT_MATERIALIZATION_TABLE: Final[str] = "table"
-    DBT_MATERIALIZATION_VIEW: Final[str] = "view"
-    DBT_MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"
-
-    # Plugin configuration constants
-    PLUGIN_CONFIG_VERSION: Final[int] = 1
-    PLUGIN_DISCOVERY_FILENAME: Final[str] = "catalog.json"
-    PLUGIN_STATE_FILENAME: Final[str] = "state.json"
-    PLUGIN_DEFAULT_VARIANT: Final[str] = "meltanolabs"
-    PLUGIN_HUB_URL: Final[str] = "https://hub.meltano.com"
-    PLUGIN_PREFIX_TAP: Final[str] = "tap"
-    PLUGIN_PREFIX_TARGET: Final[str] = "target"
-
-    # Plugin types (no legacy aliases)
-    PLUGIN_TYPE_TAP: Final[str] = "extractor"
-    PLUGIN_TYPE_TARGET: Final[str] = "loader"
-    PLUGIN_TYPE_DBT: Final[str] = "transformer"
-
-    # Plugin installation timeout - USE FlextConstants.Defaults.TIMEOUT as base
-    PLUGIN_INSTALLATION_TIMEOUT: Final[int] = (
-        FlextConstants.Defaults.TIMEOUT * 10
-    )  # 300 seconds
-
-    # Plugin validation rules - Domain-specific validation rules
-    PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = (
-        8  # "target-" prefix + minimum 2 chars
-    )
-    PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
-    # Service validation rules
-    SERVICE_MIN_NAME_LENGTH: Final[int] = 3  # Minimum service name length
-
-    # =========================================================================
-    # DOMAIN-SPECIFIC ENUMS - NOT available in FlextConstants
+    # ENUMS - Domain-specific enumerations
     # =========================================================================
 
     class PluginTypes(StrEnum):
-        """DOMAIN-SPECIFIC plugin types - NOT available in FlextConstants."""
+        """Plugin types enumeration."""
 
         EXTRACTORS = "extractors"
         LOADERS = "loaders"
@@ -180,14 +195,14 @@ class FlextMeltanoConstants(FlextConstants):
         ORCHESTRATORS = "orchestrators"
 
     class ReplicationMethods(StrEnum):
-        """Singer replication methods - domain-specific to data integration."""
+        """Singer replication methods enumeration."""
 
         FULL_TABLE = "FULL_TABLE"
         INCREMENTAL = "INCREMENTAL"
         LOG_BASED = "LOG_BASED"
 
     class OperationStatus(StrEnum):
-        """Operation status enumeration for tracking Meltano execution states."""
+        """Operation status enumeration."""
 
         PENDING = "pending"
         RUNNING = "running"
@@ -197,7 +212,7 @@ class FlextMeltanoConstants(FlextConstants):
         CANCELLED = "cancelled"
 
     class RunMode(StrEnum):
-        """Run mode enumeration for Meltano execution strategies."""
+        """Run mode enumeration."""
 
         FULL = "full"
         INCREMENTAL = "incremental"
@@ -205,91 +220,94 @@ class FlextMeltanoConstants(FlextConstants):
         TEST = "test"
 
     # =========================================================================
-    # MELTANO-SPECIFIC LOGGING CONSTANTS
+    # LITERAL TYPES - Python 3.13+ type aliases
     # =========================================================================
 
-    # Meltano-specific log levels - USE FlextConstants.Config.LogLevel as source
-    LOGGING_DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOGGING_PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOGGING_EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOGGING_LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOGGING_TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
-    LOGGING_ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
-    LOGGING_PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
+    # Plugin type literals
+    PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
+    ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
+    SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
-    # Pipeline execution logging
-    LOGGING_LOG_PIPELINE_START = True
-    LOGGING_LOG_PIPELINE_END = True
-    LOGGING_LOG_PIPELINE_PROGRESS = True
-    LOGGING_LOG_PIPELINE_ERRORS = True
-    LOGGING_LOG_PIPELINE_STATS = True
-    LOGGING_LOG_PIPELINE_DURATION = True
+    class MeltanoLogging:
+        """Meltano-specific logging configuration constants namespace."""
 
-    # Extract operations logging
-    LOGGING_LOG_EXTRACT_START = True
-    LOGGING_LOG_EXTRACT_END = True
-    LOGGING_LOG_EXTRACT_RECORDS = True
-    LOGGING_LOG_EXTRACT_ERRORS = True
-    LOGGING_LOG_EXTRACT_DURATION = True
-    LOGGING_LOG_EXTRACT_SOURCE_INFO = True
+        # Log levels (using FlextConstants as source)
+        DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
+        PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
+        EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
+        LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
+        TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
+        ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
+        PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
 
-    # Load operations logging
-    LOGGING_LOG_LOAD_START = True
-    LOGGING_LOG_LOAD_END = True
-    LOGGING_LOG_LOAD_RECORDS = True
-    LOGGING_LOG_LOAD_ERRORS = True
-    LOGGING_LOG_LOAD_DURATION = True
-    LOGGING_LOG_LOAD_TARGET_INFO = True
+        # Pipeline execution logging
+        LOG_PIPELINE_START = True
+        LOG_PIPELINE_END = True
+        LOG_PIPELINE_PROGRESS = True
+        LOG_PIPELINE_ERRORS = True
+        LOG_PIPELINE_STATS = True
+        LOG_PIPELINE_DURATION = True
 
-    # Transform operations logging
-    LOGGING_LOG_TRANSFORM_START = True
-    LOGGING_LOG_TRANSFORM_END = True
-    LOGGING_LOG_TRANSFORM_RECORDS = True
-    LOGGING_LOG_TRANSFORM_ERRORS = True
-    LOGGING_LOG_TRANSFORM_DURATION = True
-    LOGGING_LOG_TRANSFORM_SQL = False  # Don't log SQL by default (privacy/security)
+        # Extract operations logging
+        LOG_EXTRACT_START = True
+        LOG_EXTRACT_END = True
+        LOG_EXTRACT_RECORDS = True
+        LOG_EXTRACT_ERRORS = True
+        LOG_EXTRACT_DURATION = True
+        LOG_EXTRACT_SOURCE_INFO = True
 
-    # Performance tracking
-    LOGGING_TRACK_MELTANO_PERFORMANCE = True
-    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = (
-        5000  # 5 seconds default
-    )
-    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = (
-        10000  # 10 seconds default
-    )
-    LOGGING_TRACK_RECORD_COUNTS = True
-    LOGGING_TRACK_MEMORY_USAGE = True
-    LOGGING_HIGH_MEMORY_THRESHOLD = (
-        FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
-    )
+        # Load operations logging
+        LOG_LOAD_START = True
+        LOG_LOAD_END = True
+        LOG_LOAD_RECORDS = True
+        LOG_LOAD_ERRORS = True
+        LOG_LOAD_DURATION = True
+        LOG_LOAD_TARGET_INFO = True
 
-    # Data quality logging
-    LOGGING_LOG_DATA_QUALITY_ISSUES = True
-    LOGGING_LOG_VALIDATION_ERRORS = True
-    LOGGING_LOG_SCHEMA_CHANGES = True
-    LOGGING_LOG_DATA_TYPE_CONVERSIONS = True
-    LOGGING_LOG_NULL_VALUE_HANDLING = True
+        # Transform operations logging
+        LOG_TRANSFORM_START = True
+        LOG_TRANSFORM_END = True
+        LOG_TRANSFORM_RECORDS = True
+        LOG_TRANSFORM_ERRORS = True
+        LOG_TRANSFORM_DURATION = True
+        LOG_TRANSFORM_SQL = False  # Don't log SQL by default (privacy/security)
 
-    # Error handling and recovery
-    LOGGING_LOG_ERROR_RECOVERY = True
-    LOGGING_LOG_RETRY_ATTEMPTS = True
-    LOGGING_LOG_FALLBACK_OPERATIONS = True
-    LOGGING_LOG_PARTIAL_FAILURES = True
-    LOGGING_LOG_CRITICAL_FAILURES = True
+        # Performance tracking
+        TRACK_MELTANO_PERFORMANCE = True
+        MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000  # 5 seconds
+        MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000  # 10 seconds
+        TRACK_RECORD_COUNTS = True
+        TRACK_MEMORY_USAGE = True
+        HIGH_MEMORY_THRESHOLD = FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
 
-    # Context information to include
-    LOGGING_INCLUDE_PIPELINE_ID = True
-    LOGGING_INCLUDE_JOB_ID = True
-    LOGGING_INCLUDE_RUN_ID = True
-    LOGGING_INCLUDE_SOURCE_NAME = True
-    LOGGING_INCLUDE_TARGET_NAME = True
-    LOGGING_INCLUDE_TRANSFORM_NAME = True
-    LOGGING_INCLUDE_RECORD_COUNT = True
-    LOGGING_INCLUDE_DURATION = True
+        # Data quality logging
+        LOG_DATA_QUALITY_ISSUES = True
+        LOG_VALIDATION_ERRORS = True
+        LOG_SCHEMA_CHANGES = True
+        LOG_DATA_TYPE_CONVERSIONS = True
+        LOG_NULL_VALUE_HANDLING = True
+
+        # Error handling and recovery
+        LOG_ERROR_RECOVERY = True
+        LOG_RETRY_ATTEMPTS = True
+        LOG_FALLBACK_OPERATIONS = True
+        LOG_PARTIAL_FAILURES = True
+        LOG_CRITICAL_FAILURES = True
+
+        # Context information to include
+        INCLUDE_PIPELINE_ID = True
+        INCLUDE_JOB_ID = True
+        INCLUDE_RUN_ID = True
+        INCLUDE_SOURCE_NAME = True
+        INCLUDE_TARGET_NAME = True
+        INCLUDE_TRANSFORM_NAME = True
+        INCLUDE_RECORD_COUNT = True
+        INCLUDE_DURATION = True
 
 
 __all__ = [
     "FlextMeltanoConstants",
+    "PluginTypes",
 ]
 
 # Export nested classes for easier access

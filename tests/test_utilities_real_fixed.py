@@ -15,7 +15,6 @@ from typing import cast
 from flext_core import FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano import (
-    FlextMeltanoConfigBuilders,
     FlextMeltanoFileManagers,
     FlextMeltanoUtilities,
     FlextMeltanoValidators,
@@ -118,51 +117,6 @@ class TestFlextMeltanoUtilitiesRealMethods:
     def test_create_plugin_config_dict(self) -> None:
         """Test create_plugin_config_dict method."""
         result = FlextMeltanoUtilities.create_plugin_config_dict("tap-postgres")
-
-        assert isinstance(result, FlextResult)
-        assert result.is_success
-
-        config = result.value
-        assert isinstance(config, dict)
-
-    def test_create_singer_tap_config(self) -> None:
-        """Test create_singer_tap_config method using ConfigBuilders (real implementation)."""
-        builder = FlextMeltanoConfigBuilders()
-        result = builder.create_singer_tap_config(
-            "tap-csv",
-            "tap_csv",
-            "pipelinewise-tap-csv",
-            "tap-csv",
-        )
-
-        assert isinstance(result, FlextResult)
-        assert result.is_success
-
-        config = result.value
-        assert isinstance(config, dict)
-
-    def test_create_singer_target_config(self) -> None:
-        """Test create_singer_target_config method using FlextMeltanoConfigBuilders."""
-        builder = FlextMeltanoConfigBuilders()
-        result = builder.create_singer_target_config(
-            target_name="target-postgres",
-            namespace="target_postgres",
-            pip_url="pipelinewise-target-postgres",
-            executable="target-postgres",
-        )
-
-        assert isinstance(result, FlextResult)
-        assert result.is_success
-
-        config = result.value
-        assert isinstance(config, dict)
-
-    def test_create_dbt_config(self) -> None:
-        """Test create_dbt_config method."""
-        result = FlextMeltanoConfigBuilders().create_dbt_config(
-            "dbt-project",
-            "analytics",
-        )
 
         assert isinstance(result, FlextResult)
         assert result.is_success

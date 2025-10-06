@@ -12,7 +12,7 @@ except ImportError:
 
 from flext_core import FlextResult
 
-from flext_meltano import FlextMeltanoAdapter, FlextMeltanoBridge as MeltanoBridge
+from flext_meltano import FlextMeltanoAdapter, FlextMeltanoBridge
 
 
 class TestMeltanoBridgeReal:
@@ -20,13 +20,13 @@ class TestMeltanoBridgeReal:
 
     def test_bridge_creation(self) -> None:
         """Testa criação do bridge com configuração padrão."""
-        bridge = MeltanoBridge()
+        bridge = FlextMeltanoBridge()
         assert bridge is not None
         assert hasattr(bridge, "get_version")
 
     def test_get_version_real(self) -> None:
         """Testa obtenção da versão do Meltano usando API real."""
-        bridge = MeltanoBridge()
+        bridge = FlextMeltanoBridge()
         result = bridge.get_version()
 
         # Deve retornar sucesso
@@ -45,7 +45,7 @@ class TestMeltanoBridgeReal:
 
     def test_get_version_unwrap_or_pattern(self) -> None:
         """Testa padrão unwrap_or para simplificação de código."""
-        bridge = MeltanoBridge()
+        bridge = FlextMeltanoBridge()
         result = bridge.get_version()
 
         # Padrão unwrap_or para valores padrão

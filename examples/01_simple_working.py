@@ -56,7 +56,10 @@ def simple_config_example() -> None:
     logger.info(f"Config created: {config}")
 
     # Show environment value
-    logger.info(f"Environment: {config.environment}")
+    if config is not None:
+        logger.info(f"Environment: {config.environment}")
+    else:
+        logger.info("Environment: config is None")
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ from flext_core import FlextLogger, FlextResult, FlextTypes
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.api import FlextMeltanoAPI
+from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoCLI:
@@ -34,8 +35,9 @@ class FlextMeltanoCLI:
     def __init__(self) -> None:
         """Initialize CLI with flext-cli API and Meltano API."""
         self._cli = FlextCli()
-        self._logger = FlextLogger(__name__)
+        self._logger: FlextLogger = FlextLogger(__name__)
         self._api = FlextMeltanoAPI()
+        self._output = self._cli.output
 
     # =============================================================================
     # MAIN CLI ENTRY POINT
@@ -76,7 +78,7 @@ class FlextMeltanoCLI:
 
         handler = command_map.get(command)
         if not handler:
-            self._cli.error(f"Unknown command: {command}")
+            self._output.print_error(f"Unknown command: {command}")
             self._show_main_help()
             return 1
 
@@ -85,7 +87,7 @@ class FlextMeltanoCLI:
             return 0 if result.is_success else 1
         except Exception:
             self._logger.exception("Command failed")
-            self._cli.error("Command failed")
+            self._output.print_error("Command failed")
             return 1
 
     # =============================================================================
@@ -110,7 +112,7 @@ class FlextMeltanoCLI:
         if subcommand == "list":
             return self._pipeline_list(subcommand_args)
 
-        self._cli.error(f"Unknown pipeline subcommand: {subcommand}")
+        self._output.print_error(f"Unknown pipeline subcommand: {subcommand}")
         self._show_pipeline_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
@@ -123,11 +125,11 @@ class FlextMeltanoCLI:
 
         name, tap, target, transform = parsed
 
-        self._cli.info(f"Creating pipeline: {name}")
-        self._cli.info(f"  Tap: {tap}")
-        self._cli.info(f"  Target: {target}")
+        self._output.print_message(f"Creating pipeline: {name}")
+        self._output.print_message(f"  Tap: {tap}")
+        self._output.print_message(f"  Target: {target}")
         if transform:
-            self._cli.info(f"  Transform: {transform}")
+            self._output.print_message(f"  Transform: {transform}")
 
         # Create pipeline via API
         result = self._api.create_pipeline(
@@ -139,31 +141,31 @@ class FlextMeltanoCLI:
         )
 
         if result.is_failure:
-            self._cli.error(f"Pipeline creation failed: {result.error}")
+            self._output.print_error(f"Pipeline creation failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        self._cli.success(f"Pipeline '{name}' created successfully")
+        self._output.print_success(f"Pipeline '{name}' created successfully")
         return FlextResult[None].ok(None)
 
     def _pipeline_execute(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Execute a pipeline."""
         if not args:
-            self._cli.error("Pipeline name required")
+            self._output.print_error("Pipeline name required")
             return FlextResult[None].fail("Missing pipeline name")
 
         pipeline_name = args[0]
 
-        self._cli.info(f"Executing pipeline: {pipeline_name}")
+        self._output.print_message(f"Executing pipeline: {pipeline_name}")
 
         # Execute pipeline via API
         result = self._api.execute_pipeline(pipeline_id=pipeline_name)
 
         if result.is_failure:
-            self._cli.error(f"Pipeline execution failed: {result.error}")
+            self._output.print_error(f"Pipeline execution failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
         execution_data = result.unwrap()
-        self._cli.success("Pipeline executed successfully")
+        self._output.print_success("Pipeline executed successfully")
 
         # Display execution metrics
         self._display_execution_metrics(execution_data)
@@ -172,19 +174,19 @@ class FlextMeltanoCLI:
 
     def _pipeline_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available pipelines."""
-        self._cli.info("Listing pipelines...")
+        self._output.print_message("Listing pipelines...")
 
         # Get pipelines via API
         result = self._api.list_pipelines()
 
         if result.is_failure:
-            self._cli.error(f"Failed to list pipelines: {result.error}")
+            self._output.print_error(f"Failed to list pipelines: {result.error}")
             return FlextResult[None].fail(result.error)
 
         pipelines = result.unwrap()
 
         if not pipelines:
-            self._cli.warning("No pipelines configured")
+            self._output.print_warning("No pipelines configured")
             return FlextResult[None].ok(None)
 
         # Display pipelines in table format
@@ -212,32 +214,32 @@ class FlextMeltanoCLI:
         if subcommand == "install":
             return self._tap_install(subcommand_args)
 
-        self._cli.error(f"Unknown tap subcommand: {subcommand}")
+        self._output.print_error(f"Unknown tap subcommand: {subcommand}")
         self._show_tap_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
     def _tap_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Run a Singer tap."""
         if not args:
-            self._cli.error("Tap name required")
+            self._output.print_error("Tap name required")
             return FlextResult[None].fail("Missing tap name")
 
         tap_name = args[0]
         config_file = self._parse_config_arg(args[1:])
 
-        self._cli.info(f"Running tap: {tap_name}")
+        self._output.print_message(f"Running tap: {tap_name}")
         if config_file:
-            self._cli.info(f"  Config: {config_file}")
+            self._output.print_message(f"  Config: {config_file}")
 
         # Run tap via API
         result = self._api.run_tap(tap_name=tap_name)
 
         if result.is_failure:
-            self._cli.error(f"Tap execution failed: {result.error}")
+            self._output.print_error(f"Tap execution failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
         tap_data = result.unwrap()
-        self._cli.success(f"Tap '{tap_name}' completed successfully")
+        self._output.print_success(f"Tap '{tap_name}' completed successfully")
 
         # Display tap metrics
         self._display_tap_metrics(tap_data)
@@ -246,19 +248,19 @@ class FlextMeltanoCLI:
 
     def _tap_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available taps."""
-        self._cli.info("Listing available taps...")
+        self._output.print_message("Listing available taps...")
 
         # Get taps via API
         result = self._api.list_plugins(plugin_type="extractors")
 
         if result.is_failure:
-            self._cli.error(f"Failed to list taps: {result.error}")
+            self._output.print_error(f"Failed to list taps: {result.error}")
             return FlextResult[None].fail(result.error)
 
         taps = result.unwrap()
 
         if not taps:
-            self._cli.warning("No taps installed")
+            self._output.print_warning("No taps installed")
             return FlextResult[None].ok(None)
 
         # Display taps in table format
@@ -269,21 +271,21 @@ class FlextMeltanoCLI:
     def _tap_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Install a Singer tap."""
         if not args:
-            self._cli.error("Tap name required")
+            self._output.print_error("Tap name required")
             return FlextResult[None].fail("Missing tap name")
 
         tap_name = args[0]
 
-        self._cli.info(f"Installing tap: {tap_name}")
+        self._output.print_message(f"Installing tap: {tap_name}")
 
         # Install tap via API
         result = self._api.install_plugin(plugin_type="extractor", plugin_name=tap_name)
 
         if result.is_failure:
-            self._cli.error(f"Tap installation failed: {result.error}")
+            self._output.print_error(f"Tap installation failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        self._cli.success(f"Tap '{tap_name}' installed successfully")
+        self._output.print_success(f"Tap '{tap_name}' installed successfully")
         return FlextResult[None].ok(None)
 
     # =============================================================================
@@ -306,32 +308,32 @@ class FlextMeltanoCLI:
         if subcommand == "install":
             return self._target_install(subcommand_args)
 
-        self._cli.error(f"Unknown target subcommand: {subcommand}")
+        self._output.print_error(f"Unknown target subcommand: {subcommand}")
         self._show_target_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
     def _target_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Run a Singer target."""
         if not args:
-            self._cli.error("Target name required")
+            self._output.print_error("Target name required")
             return FlextResult[None].fail("Missing target name")
 
         target_name = args[0]
         config_file = self._parse_config_arg(args[1:])
 
-        self._cli.info(f"Running target: {target_name}")
+        self._output.print_message(f"Running target: {target_name}")
         if config_file:
-            self._cli.info(f"  Config: {config_file}")
+            self._output.print_message(f"  Config: {config_file}")
 
         # Run target via API
         result = self._api.run_target(target_name=target_name)
 
         if result.is_failure:
-            self._cli.error(f"Target execution failed: {result.error}")
+            self._output.print_error(f"Target execution failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
         target_data = result.unwrap()
-        self._cli.success(f"Target '{target_name}' completed successfully")
+        self._output.print_success(f"Target '{target_name}' completed successfully")
 
         # Display target metrics
         self._display_target_metrics(target_data)
@@ -340,19 +342,19 @@ class FlextMeltanoCLI:
 
     def _target_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List available targets."""
-        self._cli.info("Listing available targets...")
+        self._output.print_message("Listing available targets...")
 
         # Get targets via API
         result = self._api.list_plugins(plugin_type="loaders")
 
         if result.is_failure:
-            self._cli.error(f"Failed to list targets: {result.error}")
+            self._output.print_error(f"Failed to list targets: {result.error}")
             return FlextResult[None].fail(result.error)
 
         targets = result.unwrap()
 
         if not targets:
-            self._cli.warning("No targets installed")
+            self._output.print_warning("No targets installed")
             return FlextResult[None].ok(None)
 
         # Display targets in table format
@@ -363,21 +365,21 @@ class FlextMeltanoCLI:
     def _target_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
         """Install a Singer target."""
         if not args:
-            self._cli.error("Target name required")
+            self._output.print_error("Target name required")
             return FlextResult[None].fail("Missing target name")
 
         target_name = args[0]
 
-        self._cli.info(f"Installing target: {target_name}")
+        self._output.print_message(f"Installing target: {target_name}")
 
         # Install target via API
         result = self._api.install_plugin(plugin_type="loader", plugin_name=target_name)
 
         if result.is_failure:
-            self._cli.error(f"Target installation failed: {result.error}")
+            self._output.print_error(f"Target installation failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        self._cli.success(f"Target '{target_name}' installed successfully")
+        self._output.print_success(f"Target '{target_name}' installed successfully")
         return FlextResult[None].ok(None)
 
     # =============================================================================
@@ -400,7 +402,7 @@ class FlextMeltanoCLI:
         if subcommand == "docs":
             return self._dbt_docs(subcommand_args)
 
-        self._cli.error(f"Unknown dbt subcommand: {subcommand}")
+        self._output.print_error(f"Unknown dbt subcommand: {subcommand}")
         self._show_dbt_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
@@ -408,19 +410,19 @@ class FlextMeltanoCLI:
         """Run DBT models."""
         models = self._parse_models_arg(args)
 
-        self._cli.info("Running DBT models...")
+        self._output.print_message("Running DBT models...")
         if models:
-            self._cli.info(f"  Models: {', '.join(models)}")
+            self._output.print_message(f"  Models: {', '.join(models)}")
 
         # Run DBT via API
         result = self._api.run_dbt_models(models=models or None)
 
         if result.is_failure:
-            self._cli.error(f"DBT run failed: {result.error}")
+            self._output.print_error(f"DBT run failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
         dbt_data = result.unwrap()
-        self._cli.success("DBT models executed successfully")
+        self._output.print_success("DBT models executed successfully")
 
         # Display DBT metrics
         self._display_dbt_metrics(dbt_data)
@@ -431,19 +433,19 @@ class FlextMeltanoCLI:
         """Test DBT models."""
         models = self._parse_models_arg(args)
 
-        self._cli.info("Testing DBT models...")
+        self._output.print_message("Testing DBT models...")
         if models:
-            self._cli.info(f"  Models: {', '.join(models)}")
+            self._output.print_message(f"  Models: {', '.join(models)}")
 
         # Test DBT via API
         result = self._api.test_dbt_models(models=models or None)
 
         if result.is_failure:
-            self._cli.error(f"DBT test failed: {result.error}")
+            self._output.print_error(f"DBT test failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
         test_data = result.unwrap()
-        self._cli.success("DBT tests completed successfully")
+        self._output.print_success("DBT tests completed successfully")
 
         # Display test results
         self._display_dbt_test_results(test_data)
@@ -452,16 +454,16 @@ class FlextMeltanoCLI:
 
     def _dbt_docs(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """Generate DBT documentation."""
-        self._cli.info("Generating DBT documentation...")
+        self._output.print_message("Generating DBT documentation...")
 
         # Generate docs via API
         result = self._api.generate_dbt_docs()
 
         if result.is_failure:
-            self._cli.error(f"DBT docs generation failed: {result.error}")
+            self._output.print_error(f"DBT docs generation failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        self._cli.success("DBT documentation generated successfully")
+        self._output.print_success("DBT documentation generated successfully")
         return FlextResult[None].ok(None)
 
     # =============================================================================
@@ -482,25 +484,25 @@ class FlextMeltanoCLI:
         if subcommand == "install":
             return self._plugin_install(subcommand_args)
 
-        self._cli.error(f"Unknown plugin subcommand: {subcommand}")
+        self._output.print_error(f"Unknown plugin subcommand: {subcommand}")
         self._show_plugin_help()
         return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
 
     def _plugin_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """List all installed plugins."""
-        self._cli.info("Listing all plugins...")
+        self._output.print_message("Listing all plugins...")
 
         # Get all plugins via API
         result = self._api.list_plugins()
 
         if result.is_failure:
-            self._cli.error(f"Failed to list plugins: {result.error}")
+            self._output.print_error(f"Failed to list plugins: {result.error}")
             return FlextResult[None].fail(result.error)
 
         plugins = result.unwrap()
 
         if not plugins:
-            self._cli.warning("No plugins installed")
+            self._output.print_warning("No plugins installed")
             return FlextResult[None].ok(None)
 
         # Display plugins in table format
@@ -512,13 +514,13 @@ class FlextMeltanoCLI:
         """Install a plugin."""
         min_args_required = 2
         if len(args) < min_args_required:
-            self._cli.error("Plugin type and name required")
+            self._output.print_error("Plugin type and name required")
             return FlextResult[None].fail("Missing arguments")
 
         plugin_type = args[0]
         plugin_name = args[1]
 
-        self._cli.info(f"Installing {plugin_type}: {plugin_name}")
+        self._output.print_message(f"Installing {plugin_type}: {plugin_name}")
 
         # Install plugin via API
         result = self._api.install_plugin(
@@ -526,10 +528,10 @@ class FlextMeltanoCLI:
         )
 
         if result.is_failure:
-            self._cli.error(f"Plugin installation failed: {result.error}")
+            self._output.print_error(f"Plugin installation failed: {result.error}")
             return FlextResult[None].fail(result.error)
 
-        self._cli.success(f"Plugin '{plugin_name}' installed successfully")
+        self._output.print_success(f"Plugin '{plugin_name}' installed successfully")
         return FlextResult[None].ok(None)
 
     # =============================================================================
@@ -538,18 +540,18 @@ class FlextMeltanoCLI:
 
     def _handle_status_command(self, _args: FlextTypes.StringList) -> FlextResult[None]:
         """Handle status command."""
-        self._cli.info("Checking Meltano service status...")
+        self._output.print_message("Checking Meltano service status...")
 
         # Get status via API
         result = self._api.get_service_status()
 
         if result.is_failure:
-            self._cli.error(f"Failed to get status: {result.error}")
+            self._output.print_error(f"Failed to get status: {result.error}")
             return FlextResult[None].fail(result.error)
 
         nested_result = result.unwrap()
         if nested_result.is_failure:
-            self._cli.error(f"Status check failed: {nested_result.error}")
+            self._output.print_error(f"Status check failed: {nested_result.error}")
             return FlextResult[None].fail(nested_result.error)
 
         status_data = nested_result.unwrap()
@@ -567,7 +569,7 @@ class FlextMeltanoCLI:
         result = self._api.get_version_info()
 
         if result.is_failure:
-            self._cli.error(f"Failed to get version: {result.error}")
+            self._output.print_error(f"Failed to get version: {result.error}")
             return FlextResult[None].fail(result.error)
 
         version_data = result.unwrap()
@@ -581,63 +583,81 @@ class FlextMeltanoCLI:
     # DISPLAY METHODS (using flext-cli exclusively)
     # =============================================================================
 
-    def _display_execution_metrics(self, data: FlextTypes.Dict) -> None:
+    def _display_execution_metrics(
+        self, data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display pipeline execution metrics."""
-        self._cli.info("=== Execution Metrics ===")
+        self._output.print_message("=== Execution Metrics ===")
         for key, value in data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
-    def _display_pipelines_table(self, pipelines: list[FlextTypes.Dict]) -> None:
+    def _display_pipelines_table(
+        self, pipelines: list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+    ) -> None:
         """Display pipelines in table format."""
-        self._cli.table(
-            data=pipelines,
+        self._output.format_table(
+            data=cast("list[dict[str, object]]", pipelines),
             headers=["Name", "Tap", "Target", "Transform", "Status"],
             title="Configured Pipelines",
         )
 
-    def _display_tap_metrics(self, data: FlextTypes.Dict) -> None:
+    def _display_tap_metrics(
+        self, data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display tap execution metrics."""
-        self._cli.info("\n--- Tap Metrics ---")
+        self._output.print_message("\n--- Tap Metrics ---")
         for key, value in data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
-    def _display_target_metrics(self, data: FlextTypes.Dict) -> None:
+    def _display_target_metrics(
+        self, data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display target execution metrics."""
-        self._cli.info("\n--- Target Metrics ---")
+        self._output.print_message("\n--- Target Metrics ---")
         for key, value in data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
-    def _display_dbt_metrics(self, data: FlextTypes.Dict) -> None:
+    def _display_dbt_metrics(
+        self, data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display DBT execution metrics."""
-        self._cli.info("\n--- DBT Metrics ---")
+        self._output.print_message("\n--- DBT Metrics ---")
         for key, value in data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
-    def _display_dbt_test_results(self, data: FlextTypes.Dict) -> None:
+    def _display_dbt_test_results(
+        self, data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display DBT test results."""
-        self._cli.info("\n--- DBT Test Results ---")
+        self._output.print_message("\n--- DBT Test Results ---")
         for key, value in data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
     def _display_plugins_table(
-        self, plugins: list[FlextTypes.Dict], title: str
+        self, plugins: list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict], title: str
     ) -> None:
         """Display plugins in table format."""
-        self._cli.table(
-            data=plugins, headers=["Name", "Type", "Version", "Status"], title=title
+        self._output.format_table(
+            data=cast("list[dict[str, object]]", plugins),
+            headers=["Name", "Type", "Version", "Status"],
+            title=title,
         )
 
-    def _display_status(self, status_data: FlextTypes.Dict) -> None:
+    def _display_status(
+        self, status_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display service status."""
-        self._cli.info("=== Service Status ===")
+        self._output.print_message("=== Service Status ===")
         for key, value in status_data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
-    def _display_version(self, version_data: FlextTypes.Dict) -> None:
+    def _display_version(
+        self, version_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> None:
         """Display version information."""
-        self._cli.info("=== Version Information ===")
+        self._output.print_message("=== Version Information ===")
         for key, value in version_data.items():
-            self._cli.info(f"  {key}: {value}")
+            self._output.print_message(f"  {key}: {value}")
 
     # =============================================================================
     # HELP METHODS
@@ -645,68 +665,80 @@ class FlextMeltanoCLI:
 
     def _show_banner(self) -> None:
         """Show CLI banner."""
-        self._cli.info("FLEXT Meltano - Data Integration Platform")
-        self._cli.info("Professional CLI for Meltano, Singer, and DBT operations")
-        self._cli.info("")
+        self._output.print_message("FLEXT Meltano - Data Integration Platform")
+        self._output.print_message(
+            "Professional CLI for Meltano, Singer, and DBT operations"
+        )
+        self._output.print_message("")
 
     def _show_main_help(self) -> None:
         """Show main help message."""
-        self._cli.info("Usage: flext-meltano <command> [options]")
-        self._cli.info("")
-        self._cli.info("Commands:")
-        self._cli.info("  pipeline    Pipeline management (create, execute, list)")
-        self._cli.info("  tap         Singer tap operations (run, list, install)")
-        self._cli.info("  target      Singer target operations (run, list, install)")
-        self._cli.info("  dbt         DBT operations (run, test, docs)")
-        self._cli.info("  plugin      Plugin management (list, install)")
-        self._cli.info("  status      Service status")
-        self._cli.info("  version     Version information")
-        self._cli.info("")
-        self._cli.info("Use 'flext-meltano <command> --help' for command-specific help")
+        self._output.print_message("Usage: flext-meltano <command> [options]")
+        self._output.print_message("")
+        self._output.print_message("Commands:")
+        self._output.print_message(
+            "  pipeline    Pipeline management (create, execute, list)"
+        )
+        self._output.print_message(
+            "  tap         Singer tap operations (run, list, install)"
+        )
+        self._output.print_message(
+            "  target      Singer target operations (run, list, install)"
+        )
+        self._output.print_message("  dbt         DBT operations (run, test, docs)")
+        self._output.print_message("  plugin      Plugin management (list, install)")
+        self._output.print_message("  status      Service status")
+        self._output.print_message("  version     Version information")
+        self._output.print_message("")
+        self._output.print_message(
+            "Use 'flext-meltano <command> --help' for command-specific help"
+        )
 
     def _show_pipeline_help(self) -> None:
         """Show pipeline help."""
-        self._cli.info("Usage: flext-meltano pipeline <subcommand> [options]")
-        self._cli.info("")
-        self._cli.info("Subcommands:")
-        self._cli.info("  create      Create a new pipeline")
-        self._cli.info("  execute     Execute a pipeline")
-        self._cli.info("  list        List available pipelines")
+        self._output.print_message(
+            "Usage: flext-meltano pipeline <subcommand> [options]"
+        )
+        self._output.print_message("")
+        self._output.print_message("Subcommands:")
+        self._output.print_message("  create      Create a new pipeline")
+        self._output.print_message("  execute     Execute a pipeline")
+        self._output.print_message("  list        List available pipelines")
 
     def _show_tap_help(self) -> None:
         """Show tap help."""
-        self._cli.info("Usage: flext-meltano tap <subcommand> [options]")
-        self._cli.info("")
-        self._cli.info("Subcommands:")
-        self._cli.info("  run         Run a Singer tap")
-        self._cli.info("  list        List available taps")
-        self._cli.info("  install     Install a Singer tap")
+        self._output.print_message("Usage: flext-meltano tap <subcommand> [options]")
+        self._output.print_message("")
+        self._output.print_message("Subcommands:")
+        self._output.print_message("  run         Run a Singer tap")
+        self._output.print_message("  list        List available taps")
+        self._output.print_message("  install     Install a Singer tap")
 
     def _show_target_help(self) -> None:
         """Show target help."""
-        self._cli.info("Usage: flext-meltano target <subcommand> [options]")
-        self._cli.info("")
-        self._cli.info("Subcommands:")
-        self._cli.info("  run         Run a Singer target")
-        self._cli.info("  list        List available targets")
-        self._cli.info("  install     Install a Singer target")
+        self._output.print_message("Usage: flext-meltano target <subcommand> [options]")
+        self._output.print_message("")
+        self._output.print_message("Subcommands:")
+        self._output.print_message("  run         Run a Singer target")
+        self._output.print_message("  list        List available targets")
+        self._output.print_message("  install     Install a Singer target")
 
     def _show_dbt_help(self) -> None:
         """Show DBT help."""
-        self._cli.info("Usage: flext-meltano dbt <subcommand> [options]")
-        self._cli.info("")
-        self._cli.info("Subcommands:")
-        self._cli.info("  run         Run DBT models")
-        self._cli.info("  test        Test DBT models")
-        self._cli.info("  docs        Generate DBT documentation")
+        self._output.print_message("Usage: flext-meltano dbt <subcommand> [options]")
+        self._output.print_message("")
+        self._output.print_message("Subcommands:")
+        self._output.print_message("  run         Run DBT models")
+        self._output.print_message("  test        Test DBT models")
+        self._output.print_message("  docs        Generate DBT documentation")
 
     def _show_plugin_help(self) -> None:
         """Show plugin help."""
-        self._cli.info("Usage: flext-meltano plugin <subcommand> [options]")
-        self._cli.info("")
-        self._cli.info("Subcommands:")
-        self._cli.info("  list        List installed plugins")
-        self._cli.info("  install     Install a plugin")
+        self._output.print_message("Usage: flext-meltano plugin <subcommand> [options]")
+        self._output.print_message("")
+        self._output.print_message("Subcommands:")
+        self._output.print_message("  list        List installed plugins")
+        self._output.print_message("  install     Install a plugin")
 
     # =============================================================================
     # ARGUMENT PARSING HELPERS
@@ -719,7 +751,9 @@ class FlextMeltanoCLI:
         min_args_required = 3
         transform_arg_index = 3
         if len(args) < min_args_required:
-            self._cli.error("Usage: pipeline create <name> <tap> <target> [transform]")
+            self._output.print_error(
+                "Usage: pipeline create <name> <tap> <target> [transform]"
+            )
             return None
 
         name = args[0]

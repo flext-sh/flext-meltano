@@ -64,9 +64,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
 
-        config_dict = utilities.create_meltano_config_dict(
+        config_result = utilities.create_meltano_config_dict(
             project_id="multi-env-project", environments=environments
         )
+
+        assert config_result.is_success
+        config_dict = config_result.unwrap()
 
         assert config_dict["project_id"] == "multi-env-project"
         assert "dev" in config_dict["environments"]

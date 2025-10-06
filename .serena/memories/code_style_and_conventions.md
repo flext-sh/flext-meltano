@@ -18,7 +18,7 @@ from flext_core import (
     FlextModels, FlextConfig, FlextConstants,
     FlextUtilities, FlextService
 )
-from flext_cli import FlextCliApi, FlextCliCommands  # CLI projects only
+from flext_cli import FlextCli, FlextCliCommands  # CLI projects only
 
 # ❌ FORBIDDEN
 from flext_core.result import FlextResult  # Internal imports prohibited

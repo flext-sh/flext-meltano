@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 
 
@@ -21,7 +23,7 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize the bridge."""
-        self._logger = FlextLogger(__name__)
+        self._logger: FlextLogger = FlextLogger(__name__)
 
     def execute_command(
         self,
@@ -47,7 +49,7 @@ class FlextMeltanoBridge:
                 "status": "executed",
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(f"Bridge command failed: {e}")
 
@@ -78,7 +80,7 @@ class FlextMeltanoBridge:
                 "status": "discovered",
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(result)
+            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(f"Plugin discovery failed: {e}")
 

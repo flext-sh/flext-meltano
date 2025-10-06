@@ -15,33 +15,37 @@ from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltanoAPI
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.configuration import (
+from flext_meltano.config import (
     FlextMeltanoConfig,
-    FlextMeltanoConfigBuilders,
 )
-from flext_meltano.constants import FlextMeltanoConstants, PluginTypes
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.dbt_service import FlextMeltanoDbtService
 from flext_meltano.exceptions import FlextMeltanoExceptions
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.executor import FlextMeltanoExecutor
-from flext_meltano.file_managers import ConfigDict, FlextMeltanoFileManagers
+from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.pipeline_service import FlextMeltanoPipelineService
 from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
+from flext_meltano.plugin_service import FlextMeltanoPluginService
+from flext_meltano.project_service import FlextMeltanoProjectService
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
-from flext_meltano.singer_abstractions import (
+
+# Singer SDK wrapper classes for domain separation
+from flext_meltano.singer import (
+    FlextMeltanoSinger,
+    FlextSink,
+    FlextStream,
+    FlextTap,
     FlextTapAbstractions,
+    FlextTarget,
     FlextTargetAbstractions,
     StreamDefinition,
     TapConfig,
     TapInstance,
 )
-
-# Singer SDK wrapper classes for domain separation
-from flext_meltano.singer_sink_base import FlextSink
-from flext_meltano.singer_stream_base import FlextStream
-from flext_meltano.singer_tap_base import FlextTap
-from flext_meltano.singer_target_base import FlextTarget
 
 # Singer types and typing utilities are in FlextMeltanoTypes.Singer namespace
 # ALL tap/target projects MUST use FlextMeltanoTypes.Singer.Typing for schema definitions
@@ -75,24 +79,26 @@ __all__ = [
     "FlextMeltanoBridge",
     "FlextMeltanoCLI",
     "FlextMeltanoConfig",
-    "FlextMeltanoConfigBuilders",
     "FlextMeltanoConstants",
+    "FlextMeltanoDbtService",
     "FlextMeltanoExceptions",
     "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
+    "FlextMeltanoPipelineService",
     "FlextMeltanoPluginProtocols",
+    "FlextMeltanoPluginService",
+    "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
-    "FlextMeltanoSingerTypes",
+    "FlextMeltanoSinger",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
     "FlextSingerStream",
     "FlextSingerTypes",
-    "FlextSingerTyping",  # Singer SDK typing utilities wrapper (ZERO TOLERANCE)
     "FlextSink",  # Singer SDK wrapper for domain separation
     "FlextStream",  # Singer SDK wrapper for domain separation
     "FlextTap",  # Singer SDK wrapper for domain separation

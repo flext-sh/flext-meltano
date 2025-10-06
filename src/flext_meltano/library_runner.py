@@ -30,7 +30,7 @@ class FlextMeltanoLibraryRunner:
 
     def __init__(self) -> None:
         """Initialize the library runner."""
-        self._logger = FlextLogger(__name__)
+        self._logger: FlextLogger = FlextLogger(__name__)
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
 
@@ -207,7 +207,9 @@ class FlextMeltanoLibraryRunner:
                     elt_result["dbt_error"] = dbt_result.error
                 else:
                     elt_result["dbt_success"] = True
-                    elt_result["dbt_models_run"] = dbt_models
+                    elt_result["dbt_models_run"] = list(
+                        dbt_models
+                    )  # Convert to list[object]
 
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].ok(
                 elt_result

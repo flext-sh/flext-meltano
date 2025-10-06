@@ -308,7 +308,7 @@ from flext_meltano import FlextMeltanoConfigBuilders, FlextMeltanoValidators
 # ✅ FLEXT Ecosystem Integration (REQUIRED)
 from flext_core import FlextResult, FlextServiceProcessor, get_logger
 from flext_core import FlextDomainService, FlextUtilities
-from flext_cli import CLICommand, FlextCliApi
+from flext_cli import CLICommand, FlextCli
 from flext_observability import FlextMonitor, FlextMetrics
 ```
 
@@ -337,11 +337,11 @@ from flext_core.internal.services import Service         # WRONG: Internal modul
 
 ### 🎵 SINGER SDK WRAPPER PATTERN (DOMAIN SEPARATION ENFORCEMENT)
 
-**CRITICAL PATTERN**: All flext-tap-*, flext-target-*, and flext-dbt-* projects MUST use flext-meltano Singer SDK wrappers instead of direct singer_sdk imports. This enforces domain separation and ensures consistent FLEXT ecosystem integration.
+**CRITICAL PATTERN**: All flext-tap-_, flext-target-_, and flext-dbt-\* projects MUST use flext-meltano Singer SDK wrappers instead of direct singer_sdk imports. This enforces domain separation and ensures consistent FLEXT ecosystem integration.
 
 #### ✅ MANDATORY SINGER SDK WRAPPER IMPORTS
 
-**For Singer Tap Projects (flext-tap-*):**
+**For Singer Tap Projects (flext-tap-\*):**
 
 ```python
 # ✅ CORRECT - Use FLEXT Meltano wrappers (domain separation)
@@ -364,7 +364,7 @@ class MyCustomStream(Stream):
         yield {"id": 1, "name": "example"}
 ```
 
-**For Singer Target Projects (flext-target-*):**
+**For Singer Target Projects (flext-target-\*):**
 
 ```python
 # ✅ CORRECT - Use FLEXT Meltano wrappers (domain separation)
@@ -538,7 +538,7 @@ find flext-tap-* flext-target-* flext-dbt-* -name "*.py" -path "*/src/*" | \
 - ✅ flext-tap-oracle (1 file: tap_streams.py)
 - ✅ flext-tap-oracle-wms (3 files: client.py, streams.py, tap_streams.py)
 - ✅ flext-tap-oracle-oic (validated - only uses singer_sdk.typing)
-- ✅ flext-target-oracle-oic (4 files: sinks.py, target.py, target_client.py, __init__.py)
+- ✅ flext-target-oracle-oic (4 files: sinks.py, target.py, target_client.py, **init**.py)
 
 **Validation Status: PASSED** (Zero direct singer_sdk imports excluding typing)
 

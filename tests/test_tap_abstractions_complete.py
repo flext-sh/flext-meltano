@@ -3,7 +3,7 @@
 import tempfile
 
 from flext_core import FlextResult, FlextTypes
-from flext_tests import FlextTestsFactories, FlextTestsUtilities
+from flext_tests import FlextTestsUtilities
 from pydantic_core import ValidationError
 
 from flext_meltano import (
@@ -901,18 +901,18 @@ class TestFlextTapAbstractionsComplete:
     # =========================================================================
 
     def test_tap_abstractions_error_handling(self) -> None:
-        """Test tap abstractions error handling using flext_tests error simulation."""
-        # Use flext_tests error simulation
-        error_factory = FlextTestsFactories.ErrorSimulationFactory()
-
+        """Test tap abstractions error handling."""
         # Test various error scenarios
-        timeout_error = error_factory.create_timeout_error()
+        timeout_error = TimeoutError("Connection timed out")
         self.test_assertions.assert_true(
             condition=isinstance(timeout_error, Exception),
             message="Should create timeout error",
         )
 
-        validation_error = error_factory.create_validation_error()
+        validation_error = ValidationError.from_exception_data(
+            title="Validation Error",
+            line_errors=[],
+        )
         self.test_assertions.assert_true(
             condition=isinstance(validation_error, Exception),
             message="Should create validation error",

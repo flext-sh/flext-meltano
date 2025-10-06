@@ -1,2 +1,0 @@
-# Meltano requirements
-meltano>=3.0.0
