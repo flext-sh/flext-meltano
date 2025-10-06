@@ -481,9 +481,11 @@ class TestSingerCliTranslatorExecuteCommand:
             stderr=b"",
         )
 
-        result = SingerCliTranslator.execute_singer_command(
-            ["tap-postgres", "--config", "config.json"]
-        )
+        result = SingerCliTranslator.execute_singer_command([
+            "tap-postgres",
+            "--config",
+            "config.json",
+        ])
 
         assert result.is_success
         output = result.unwrap()

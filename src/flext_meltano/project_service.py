@@ -48,7 +48,7 @@ class FlextMeltanoProjectService(
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
         self._utilities = FlextUtilities()
         self._abstractions = FlextMeltanoAbstractions()
@@ -69,14 +69,14 @@ class FlextMeltanoProjectService(
                 else {},
             }
 
-            self._logger.info("FlextMeltanoProjectService executed successfully")
+            self.logger.info("FlextMeltanoProjectService executed successfully")
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=config_data
             )
 
         except Exception as e:
             error_msg = f"Project service execution failed: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 error_msg
             )
@@ -391,7 +391,7 @@ environments:
                 ),
             }
 
-            self._logger.info(
+            self.logger.info(
                 "Meltano project created successfully",
                 project_name=project_name,
                 project_path=str(project_path),

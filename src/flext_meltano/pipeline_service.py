@@ -38,16 +38,17 @@ class FlextMeltanoPipelineService(
     following FLEXT patterns with railway-oriented programming.
     """
 
+    # Instance attributes for type checker
+    _config: FlextMeltanoConfig
+    logger: FlextLogger
+    _abstractions: FlextMeltanoAbstractions
+
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize pipeline service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
-        # Type guard for pyrefly - logger is always initialized
-        if self._logger is None:
-            error_msg = "Logger initialization failed"
-            raise RuntimeError(error_msg)
 
     def execute_pipeline(
         self,
@@ -122,7 +123,7 @@ class FlextMeltanoPipelineService(
         self, extractor_name: str, loader_name: str
     ) -> FlextResult[None]:
         """Log pipeline execution start."""
-        self._logger.info(
+        self.logger.info(
             "Executing ELT pipeline",
             extractor=extractor_name,
             loader=loader_name,
@@ -271,7 +272,7 @@ class FlextMeltanoPipelineService(
                     if isinstance(v, (str, int, bool))
                 })
 
-            self._logger.info(
+            self.logger.info(
                 "ELT pipeline executed successfully",
                 extractor=extractor_name,
                 loader=loader_name,

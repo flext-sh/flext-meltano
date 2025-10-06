@@ -43,7 +43,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         """Initialize unified Singer class with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def execute_pipeline(
@@ -60,7 +60,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Executing Singer pipeline with advanced protocol management",
                 tap_name=getattr(tap_instance, "name", "unknown"),
                 target_name=getattr(target_instance, "name", "unknown"),
@@ -77,12 +77,12 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             result = FlextResult[FlextTypes.Dict].ok(singer_manager_result.unwrap())
 
             if result.is_success:
-                self._logger.info(
+                self.logger.info(
                     "Singer pipeline executed successfully",
                     streams_processed=result.unwrap().get("streams_processed", 0),
                 )
             else:
-                self._logger.error(
+                self.logger.error(
                     "Singer pipeline failed",
                     error=result.error,
                 )
@@ -91,7 +91,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
                 error_msg
             )
@@ -117,7 +117,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Executing complete E-L-T pipeline using library APIs",
                 project_dir=str(project_dir),
             )
@@ -136,12 +136,12 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
             if result.is_success:
                 pipeline_data = result.unwrap()
-                self._logger.info(
+                self.logger.info(
                     "Complete E-L-T pipeline executed successfully",
                     overall_success=pipeline_data.get("overall_success", False),
                 )
             else:
-                self._logger.error(
+                self.logger.error(
                     "Complete E-L-T pipeline failed",
                     error=result.error,
                 )
@@ -150,7 +150,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
                 error_msg
             )

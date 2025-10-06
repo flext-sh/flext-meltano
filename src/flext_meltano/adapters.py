@@ -49,7 +49,7 @@ class FlextMeltanoAdapter:
         """
         # Get configuration using FlextMeltanoConfig as source of truth
         self._config = config or FlextMeltanoConfig()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
         self._utilities = FlextUtilities()
         self._abstractions = FlextMeltanoAbstractions()
         self._library_runner = FlextMeltanoLibraryRunner()
@@ -270,7 +270,7 @@ class FlextMeltanoAdapter:
             FlextResult containing the project root path.
 
         """
-        self._logger.info(
+        self.logger.info(
             "Initializing Meltano project",
             project_root=str(project_root),
         )
@@ -350,7 +350,7 @@ class FlextMeltanoAdapter:
             # Cache the project for future operations
             self._current_project = project
 
-            self._logger.info(
+            self.logger.info(
                 "Meltano project initialized successfully",
                 project_root=str(getattr(project, "root", "unknown")),
             )
@@ -391,7 +391,7 @@ class FlextMeltanoAdapter:
 
         """
         try:
-            self._logger.info("Discovering Meltano plugins")
+            self.logger.info("Discovering Meltano plugins")
 
             # Use provided project or create temporary one
             if project:
@@ -449,12 +449,12 @@ class FlextMeltanoAdapter:
                     }
                     plugins.append(plugin_info)
 
-            self._logger.info(f"Discovered {len(plugins)} plugins")
+            self.logger.info(f"Discovered {len(plugins)} plugins")
             return FlextResult[list[FlextTypes.StringDict]].ok(data=plugins)
 
         except Exception as e:
             error_msg = f"Failed to discover plugins: {e}"
-            self._logger.exception(error_msg, error=str(e))
+            self.logger.exception(error_msg, error=str(e))
             return FlextResult[list[FlextTypes.StringDict]].fail(error_msg)
 
     def create_project(
@@ -479,7 +479,7 @@ class FlextMeltanoAdapter:
                     "Project name cannot be empty"
                 )
 
-            self._logger.info(
+            self.logger.info(
                 "Creating Meltano project using manual file creation",
                 project_name=project_name,
                 project_dir=str(project_dir),
@@ -504,7 +504,7 @@ class FlextMeltanoAdapter:
                 ),
             }
 
-            self._logger.info(
+            self.logger.info(
                 "Meltano project created successfully",
                 project_name=project_name,
                 project_path=str(full_project_path),
@@ -514,7 +514,7 @@ class FlextMeltanoAdapter:
 
         except Exception as e:
             error_msg = f"Failed to create Meltano project: {e}"
-            self._logger.exception(error_msg, error=str(e))
+            self.logger.exception(error_msg, error=str(e))
             return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     def add_plugin(
@@ -577,7 +577,7 @@ class FlextMeltanoAdapter:
             FlextResult indicating logging success.
 
         """
-        self._logger.info(
+        self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
@@ -689,7 +689,7 @@ class FlextMeltanoAdapter:
             "addition_method": "project_add_service_native",
         }
 
-        self._logger.info(
+        self.logger.info(
             "Plugin added successfully",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
@@ -710,7 +710,7 @@ class FlextMeltanoAdapter:
 
         """
         error_msg = f"Failed to add plugin: {error}"
-        self._logger.error(error_msg, error=error)
+        self.logger.error(error_msg, error=error)
         return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     # =========================================================================
@@ -823,7 +823,7 @@ class FlextMeltanoAdapter:
 
         except Exception as e:
             error_msg = f"Failed to get plugin info: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextTypes.StringDict].fail(error_msg)
 
     def execute_pipeline(
@@ -908,7 +908,7 @@ class FlextMeltanoAdapter:
             FlextResult indicating logging success.
 
         """
-        self._logger.info(
+        self.logger.info(
             "Executing ELT pipeline",
             extractor=extractor_name,
             loader=loader_name,
@@ -1116,7 +1116,7 @@ class FlextMeltanoAdapter:
                     if isinstance(v, (str, int, bool))
                 })
 
-            self._logger.info(
+            self.logger.info(
                 "ELT pipeline executed successfully",
                 extractor=extractor_name,
                 loader=loader_name,
@@ -1138,7 +1138,7 @@ class FlextMeltanoAdapter:
             FlextResult with error details.
 
         """
-        self._logger.error(f"Pipeline execution failed: {error}")
+        self.logger.error(f"Pipeline execution failed: {error}")
         return FlextResult[FlextTypes.StringDict].fail(error)
 
     # =================================================================
@@ -1442,7 +1442,7 @@ Thumbs.db
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Running dbt transformations using programmatic API",
                 project_dir=str(project_dir),
                 models=models or "all",
@@ -1465,12 +1465,12 @@ Thumbs.db
             )
 
             if result.is_success:
-                self._logger.info(
+                self.logger.info(
                     "dbt transformations completed successfully",
                     models=models or "all",
                 )
             else:
-                self._logger.error(
+                self.logger.error(
                     "dbt transformations failed",
                     error=result.error,
                 )
@@ -1479,7 +1479,7 @@ Thumbs.db
 
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].fail(error_msg)
@@ -1498,7 +1498,7 @@ Thumbs.db
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Executing Singer pipeline with advanced protocol management",
                 tap_name=getattr(tap_instance, "name", "unknown"),
                 target_name=getattr(target_instance, "name", "unknown"),
@@ -1519,12 +1519,12 @@ Thumbs.db
             )
 
             if result.is_success:
-                self._logger.info(
+                self.logger.info(
                     "Singer pipeline executed successfully",
                     streams_processed=result.unwrap().get("streams_processed", 0),
                 )
             else:
-                self._logger.error(
+                self.logger.error(
                     "Singer pipeline failed",
                     error=result.error,
                 )
@@ -1533,7 +1533,7 @@ Thumbs.db
 
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
                 error_msg
             )
@@ -1559,7 +1559,7 @@ Thumbs.db
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Executing complete E-L-T pipeline using library APIs",
                 project_dir=str(project_dir),
             )
@@ -1581,12 +1581,12 @@ Thumbs.db
 
             if result.is_success:
                 pipeline_data = result.unwrap()
-                self._logger.info(
+                self.logger.info(
                     "Complete E-L-T pipeline executed successfully",
                     overall_success=pipeline_data.get("overall_success", False),
                 )
             else:
-                self._logger.error(
+                self.logger.error(
                     "Complete E-L-T pipeline failed",
                     error=result.error,
                 )
@@ -1595,7 +1595,7 @@ Thumbs.db
 
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
                 error_msg
             )

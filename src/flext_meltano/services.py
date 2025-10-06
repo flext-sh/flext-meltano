@@ -1103,7 +1103,7 @@ class FlextMeltanoService(
 
         def __init__(self) -> None:
             """Initialize integrated Singer types manager."""
-            self._logger = FlextLogger(f"{__name__}.FlextSingerTypes")
+            self.logger = FlextLogger(f"{__name__}.FlextSingerTypes")
             self._type_registry: FlextTypes.NestedDict = {
                 "string": {"type": "string"},
                 "integer": {"type": "integer"},

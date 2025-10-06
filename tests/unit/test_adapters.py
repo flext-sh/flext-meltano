@@ -39,7 +39,7 @@ class TestFlextMeltanoAdapterComplete:
             message="Adapter should be initialized",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(adapter, "_logger"),
+            condition=hasattr(adapter, "logger"),
             message="Adapter should have logger",
         )
         self.test_assertions.assert_true(

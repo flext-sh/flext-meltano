@@ -44,7 +44,7 @@ class FlextTapAbstractions(
         """Initialize unified tap abstractions with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     def discover_streams(
         self, tap_config: FlextMeltanoModels.TapConfig
@@ -59,7 +59,7 @@ class FlextTapAbstractions(
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Discovering streams for tap",
                 tap_type=tap_config.tap_type,
                 tap_name=tap_config.tap_type,
@@ -78,7 +78,7 @@ class FlextTapAbstractions(
                 "tap_type": tap_config.tap_type,
             }
 
-            self._logger.info(
+            self.logger.info(
                 "Stream discovery completed",
                 stream_count=len(catalog.get("streams", [])),
             )
@@ -86,7 +86,7 @@ class FlextTapAbstractions(
             return FlextResult[FlextTypes.Dict].ok(catalog)
 
         except Exception as e:
-            self._logger.exception("Stream discovery failed", error=str(e))
+            self.logger.exception("Stream discovery failed", error=str(e))
             return FlextResult[FlextTypes.Dict].fail(f"Stream discovery failed: {e}")
 
     def validate_stream_schema(
@@ -102,7 +102,7 @@ class FlextTapAbstractions(
 
         """
         try:
-            self._logger.debug(
+            self.logger.debug(
                 "Validating stream schema",
                 stream_name=stream_def.stream_name,
             )
@@ -120,7 +120,7 @@ class FlextTapAbstractions(
             return FlextResult[bool].ok(True)
 
         except Exception as e:
-            self._logger.exception("Schema validation failed", error=str(e))
+            self.logger.exception("Schema validation failed", error=str(e))
             return FlextResult[bool].fail(f"Schema validation failed: {e}")
 
     def create_tap_instance(
@@ -136,7 +136,7 @@ class FlextTapAbstractions(
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Creating tap instance",
                 tap_name=tap_config.tap_type,
                 tap_type=tap_config.tap_type,
@@ -149,7 +149,7 @@ class FlextTapAbstractions(
                 status="configured",
             )
 
-            self._logger.info(
+            self.logger.info(
                 "Tap instance created successfully",
                 tap_name=tap_instance.config.name,
             )
@@ -157,7 +157,7 @@ class FlextTapAbstractions(
             return FlextResult[FlextMeltanoModels.TapInstance].ok(tap_instance)
 
         except Exception as e:
-            self._logger.exception("Tap instance creation failed", error=str(e))
+            self.logger.exception("Tap instance creation failed", error=str(e))
             return FlextResult[FlextMeltanoModels.TapInstance].fail(
                 f"Tap instance creation failed: {e}"
             )

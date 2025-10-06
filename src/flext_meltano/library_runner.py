@@ -31,7 +31,7 @@ class FlextMeltanoLibraryRunner:
 
     def __init__(self) -> None:
         """Initialize the library runner."""
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
 
@@ -53,7 +53,7 @@ class FlextMeltanoLibraryRunner:
 
         """
         try:
-            self._logger.info(
+            self.logger.info(
                 "Starting ELT pipeline", tap_name=tap.name, target_name=target.name
             )
 
@@ -83,7 +83,7 @@ class FlextMeltanoLibraryRunner:
 
         except Exception as e:
             error_msg = f"ELT pipeline execution failed: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
                 error_msg
             )
@@ -136,7 +136,7 @@ class FlextMeltanoLibraryRunner:
 
         except Exception as e:
             error_msg = f"DBT transformation failed: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].fail(error_msg)
@@ -180,7 +180,7 @@ class FlextMeltanoLibraryRunner:
     ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
-            self._logger.info(
+            self.logger.info(
                 "Starting complete ELT pipeline",
                 tap_name=tap_name,
                 target_name=target_name,
@@ -223,7 +223,7 @@ class FlextMeltanoLibraryRunner:
 
         except Exception as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
-            self._logger.exception(error_msg)
+            self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
                 error_msg
             )

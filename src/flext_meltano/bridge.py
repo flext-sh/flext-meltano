@@ -23,7 +23,7 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize the bridge."""
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
 
     def execute_command(
         self,
