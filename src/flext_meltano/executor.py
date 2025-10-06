@@ -21,6 +21,7 @@ from flext_core import (
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.bridge import FlextMeltanoBridge
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.typings import FlextMeltanoTypes
@@ -40,8 +41,10 @@ class FlextMeltanoExecutor(
     ) -> None:
         """Initialize executor with configuration."""
         super().__init__()
-        self._config: FlextConfig | None = None
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self._config: FlextMeltanoConfig | None = (
+            FlextMeltanoConfig(**config) if config else None
+        )
+        self._logger = FlextLogger(__name__)
         self._bridge = FlextMeltanoBridge()
         # Type guard for mypy - logger is always initialized
         if self._logger is None:
@@ -60,7 +63,7 @@ class FlextMeltanoExecutor(
                 "executor_type": "flext_meltano_executor",
                 "status": "ready",
                 "execution_timestamp": str(time.time()),
-                "config": self._config.model_dump() if self._config else {},
+                "config": self._config.model_dump() if self._config is not None else {},
             }
 
             self._logger.info("FlextMeltanoExecutor executed successfully")

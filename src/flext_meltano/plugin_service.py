@@ -44,7 +44,7 @@ class FlextMeltanoPluginService(
         """Initialize plugin service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:

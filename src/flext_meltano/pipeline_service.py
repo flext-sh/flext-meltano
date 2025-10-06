@@ -42,7 +42,7 @@ class FlextMeltanoPipelineService(
         """Initialize pipeline service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute_pipeline(

@@ -6,10 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import Protocol, TypeVar, runtime_checkable
 
-from flext_core import FlextProtocols, FlextResult, FlextTypes, T_co
+from flext_core import FlextProtocols, FlextResult, FlextTypes
 
+T_co = TypeVar('T_co', covariant=True)
 
 
 class FlextMeltanoProtocols:
@@ -67,15 +68,15 @@ class FlextMeltanoProtocols:
             default_variant: str | None
             variants: FlextTypes.Dict | None
 
-            def get_config(self) -> ConfigDict:
+            def get_config(self) -> FlextTypes.Dict:
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: ConfigDict) -> bool:
+            def validate_config(self, config: FlextTypes.Dict) -> bool:
                 """Validate plugin configuration."""
                 ...
 
-            def execute(self, *args: JsonValue) -> T_co:
+            def execute(self, *args: FlextTypes.JsonValue) -> T_co:
                 """Execute plugin with given arguments."""
                 ...
 
@@ -85,13 +86,13 @@ class FlextMeltanoProtocols:
 
             name: str
             tap_stream_id: str
-            schema: JsonObject
+            schema: FlextTypes.JsonValue
 
-            def sync_records(self) -> JsonValue:
+            def sync_records(self) -> FlextTypes.JsonValue:
                 """Sync records from the stream."""
                 ...
 
-            def get_records(self) -> JsonValue:
+            def get_records(self) -> FlextTypes.JsonValue:
                 """Get records from the stream."""
                 ...
 
@@ -99,11 +100,13 @@ class FlextMeltanoProtocols:
         class TapProtocol(FlextProtocols.Domain.Service, Protocol):
             """Singer Tap protocol extending Domain.Service for ELT operations."""
 
-            def discover(self) -> FlextResult[JsonObject]:
+            def discover(self) -> FlextResult[FlextTypes.JsonValue]:
                 """Discover catalog with FlextResult."""
                 ...
 
-            def sync(self, catalog: JsonObject) -> FlextResult[JsonValue]:
+            def sync(
+                self, catalog: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Sync data from source with FlextResult."""
                 ...
 
@@ -115,11 +118,15 @@ class FlextMeltanoProtocols:
         class TargetProtocol(FlextProtocols.Domain.Service, Protocol):
             """Singer Target protocol extending Domain.Service for ELT operations."""
 
-            def handle_record(self, record: JsonObject) -> FlextResult[JsonValue]:
+            def handle_record(
+                self, record: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Handle a single record with FlextResult."""
                 ...
 
-            def handle_batch(self, records: list[JsonObject]) -> FlextResult[JsonValue]:
+            def handle_batch(
+                self, records: list[FlextTypes.JsonValue]
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Handle a batch of records with FlextResult."""
                 ...
 
@@ -131,11 +138,15 @@ class FlextMeltanoProtocols:
         class DbtRunnerProtocol(FlextProtocols.Domain.Service, Protocol):
             """DBT Runner protocol extending Domain.Service for ELT operations."""
 
-            def run(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
+            def run(
+                self, models: FlextTypes.StringList
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Run DBT models with FlextResult."""
                 ...
 
-            def test(self, models: FlextTypes.StringList) -> FlextResult[JsonObject]:
+            def test(
+                self, models: FlextTypes.StringList
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Test DBT models with FlextResult."""
                 ...
 
@@ -148,8 +159,8 @@ class FlextMeltanoProtocols:
             """Service call protocol extending Domain.Service."""
 
             def call(
-                self, operation: str, payload: JsonValue
-            ) -> FlextResult[JsonValue]:
+                self, operation: str, payload: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
                 """Execute service call with FlextResult."""
                 ...
 

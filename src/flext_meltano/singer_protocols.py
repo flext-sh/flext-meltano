@@ -14,26 +14,36 @@ from typing import Protocol
 from flext_core import FlextTypes
 
 
-class SingerTap(Protocol):
-    """Singer Tap protocol definition."""
+class FlextMeltanoSingerProtocols:
+    """Unified Singer protocols for Meltano ELT operations.
 
-    streams: FlextTypes.StringList
-    name: str
-    state: FlextTypes.Dict
+    This class consolidates all Singer protocol definitions into a single
+    namespace following FLEXT 'one class per module' pattern.
+    """
 
-    def get_records(self, stream_name: str) -> list[FlextTypes.Dict]:
-        """Get records for a specific stream."""
-        ...
+    class SingerTap(Protocol):
+        """Singer Tap protocol definition."""
 
-    def get_state(self) -> FlextTypes.Dict:
-        """Get current state."""
-        ...
+        streams: FlextTypes.StringList
+        name: str
+        state: FlextTypes.Dict
+
+        def get_records(self, stream_name: str) -> list[FlextTypes.Dict]:
+            """Get records for a specific stream."""
+            ...
+
+        def get_state(self) -> FlextTypes.Dict:
+            """Get current state."""
+            ...
+
+    class SingerTarget(Protocol):
+        """Singer Target protocol definition."""
+
+        name: str
 
 
-class SingerTarget(Protocol):
-    """Singer Target protocol definition."""
+# Backward compatibility aliases
+SingerTap = FlextMeltanoSingerProtocols.SingerTap
+SingerTarget = FlextMeltanoSingerProtocols.SingerTarget
 
-    name: str
-
-
-__all__ = ["SingerTap", "SingerTarget"]
+__all__ = ["FlextMeltanoSingerProtocols", "SingerTap", "SingerTarget"]

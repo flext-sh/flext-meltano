@@ -33,7 +33,7 @@ from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoAPI(
+class FlextMeltano(
     FlextService[FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]
 ):
     """FLEXT Meltano API service with complete flext-core ecosystem integration.
@@ -1302,5 +1302,5 @@ class FlextMeltanoAPI(
 
 
 __all__ = [
-    "FlextMeltanoAPI",
+    "FlextMeltano",
 ]

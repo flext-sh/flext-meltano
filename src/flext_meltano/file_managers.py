@@ -63,7 +63,9 @@ class FlextMeltanoFileManagers:
             return FlextResult[Path].fail(error_msg)
 
     @classmethod
-    def save_yaml_config(cls, config: FlextMeltanoTypes.MeltanoCore.FileConfigDict, file_path: Path) -> FlextResult[bool]:
+    def save_yaml_config(
+        cls, config: FlextMeltanoTypes.MeltanoCore.FileConfigDict, file_path: Path
+    ) -> FlextResult[bool]:
         """Save YAML config using direct implementation.
 
         Returns:
@@ -89,7 +91,9 @@ class FlextMeltanoFileManagers:
             return FlextResult[bool].fail(f"Failed to save YAML config: {e}")
 
     @classmethod
-    def load_yaml_config(cls, file_path: Path) -> FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict]:
+    def load_yaml_config(
+        cls, file_path: Path
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict]:
         """Load YAML config using FlextUtilities.Files validation + direct YAML.
 
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
@@ -106,7 +110,9 @@ class FlextMeltanoFileManagers:
                 )
 
             if not file_path.exists():
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(f"YAML file not found: {file_path}")
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
+                    f"YAML file not found: {file_path}"
+                )
 
             with file_path.open(
                 "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
@@ -116,14 +122,22 @@ class FlextMeltanoFileManagers:
                 )
 
             if config_data is None:
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(data={})
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
+                    data={}
+                )
 
             if not isinstance(config_data, dict):
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail("YAML content is not a dictionary")
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
+                    "YAML content is not a dictionary"
+                )
 
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(data=cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data))
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
+                data=cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data)
+            )
         except Exception as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(f"Failed to load YAML config: {e}")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
+                f"Failed to load YAML config: {e}"
+            )
 
     @classmethod
     def validate_yaml_file(cls, file_path: Path) -> FlextResult[bool]:
@@ -235,16 +249,21 @@ class FlextMeltanoFileManagers:
             for filename, config_data in configs.items():
                 config_path = project_root / filename
                 save_result = cls.save_yaml_config(
-                    cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data), config_path
+                    cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data),
+                    config_path,
                 )
                 if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
 
             # Add project root
             created_paths["project_root"] = project_root
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].ok(data=created_paths)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].ok(
+                data=created_paths
+            )
         except Exception as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].fail(f"Failed to setup project structure: {e}")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].fail(
+                f"Failed to setup project structure: {e}"
+            )
 
     @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> FlextResult[bool]:

@@ -67,8 +67,10 @@ class FlextMeltanoExceptions(FlextExceptions):
             for key in ["context", "correlation_id", "error_code"]:
                 kwargs.pop(key, None)
 
+            from typing import cast
+
             return (
-                base_context,
+                cast("dict[str, object]", base_context),
                 str(correlation_id) if correlation_id is not None else None,
                 str(error_code) if error_code is not None else None,
             )

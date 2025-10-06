@@ -13,9 +13,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Literal
 
 from flext_core import FlextTypes
+from pydantic import ConfigDict as PydanticConfigDict
 from singer_sdk import typing as singer_sdk_typing
 
 
@@ -199,7 +201,6 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Type aliases for singer.py
         RecordDict = FlextTypes.Dict
-        ConfigDict = FlextTypes.Dict
         SchemaDict = FlextTypes.Dict
         StateDict = FlextTypes.Dict
         ResultDict = FlextTypes.Dict
@@ -258,15 +259,10 @@ class FlextMeltanoTypes(FlextTypes):
         type ResponseDict = dict[str, str | int | bool | FlextTypes.Dict]
 
 
+# Export ConfigDict for backward compatibility
+ConfigDict = PydanticConfigDict
+
 __all__ = [
-    "FlextMeltanoTypes",
-    # Backward compatibility aliases
-    "RecordDict",
     "ConfigDict",
-    "SchemaDict",
-    "StateDict",
-    "ResultDict",
-    "JsonObject",
-    "FileConfigDict",
-    "PathDict",
+    "FlextMeltanoTypes",
 ]
