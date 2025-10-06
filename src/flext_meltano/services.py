@@ -24,12 +24,14 @@ from flext_core import (
 )
 
 # Use specific module imports to avoid circular dependencies
-from flext_meltano.configuration import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]):
+class FlextMeltanoService(
+    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+):
     """FLEXT Meltano service for ELT pipeline management and orchestration.
 
     This service provides comprehensive Meltano integration capabilities including:
@@ -89,7 +91,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         self._config = config or FlextMeltanoConfig()
 
         # Type-safe data preparation for service initialization
-        mutable_data: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(data)
+        mutable_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = dict(data)
 
         # Ensure required service configuration fields
         mutable_data.update({
@@ -107,7 +109,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             f"FlextMeltanoService '{service_name}' initialized with FlextMeltanoConfig integration"
         )
 
-    def execute(self) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+    def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute Meltano service operations with comprehensive error handling.
 
         Performs core service operations including configuration validation,
@@ -128,7 +130,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         try:
             # Prepare service configuration data with type safety
-            config_data: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_name": self.service_name,
                 "version": self.version,
                 "status": "active",
@@ -137,14 +139,16 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             }
 
             self.logger.info(f"Service '{self.service_name}' executed successfully")
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=config_data
             )
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Service execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     # =============================================================================
     # SINGER TAP PROTOCOL IMPLEMENTATION - SingerTapProtocol compliance
@@ -520,8 +524,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         self,
         tap_name: str,
         target_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Configure Meltano ELT pipeline with tap and target specifications.
 
         Sets up a complete ELT pipeline configuration including tap (extractor),
@@ -549,7 +553,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         # Input validation using FLEXT patterns
         if not tap_name or not target_name:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 "Tap name and target name are required for pipeline configuration"
             )
 
@@ -558,7 +562,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             pipeline_config = config or {}
 
             # Build comprehensive pipeline configuration using config values
-            pipeline_config_dict: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            pipeline_config_dict: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "tap": tap_name,
                 "target": target_name,
                 "pipeline_name": f"{tap_name}_to_{target_name}",
@@ -572,17 +576,19 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             }
 
             self.logger.info(f"Pipeline configured: {tap_name} -> {target_name}")
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=pipeline_config_dict or {}
             )
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Pipeline configuration failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def _validate_service_name(
-        self, config: FlextMeltanoTypes.Core.MeltanoConfigDict
+        self, config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
     ) -> FlextResult[None]:
         """Validate service name in configuration.
 
@@ -611,8 +617,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
     def _prepare_service_instance(
         self,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict,
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Prepare service instance configuration with validation.
 
         Internal method for preparing and validating service instance configuration
@@ -631,58 +637,58 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             # Validate configuration first
             validation_result = self._validate_service_name(config)
             if validation_result.is_failure:
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
-                    validation_result.error or "Configuration validation failed"
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+                ].fail(validation_result.error or "Configuration validation failed")
 
             # Service instance preparation with enhanced metadata
             instance_type = config.get("service_type", "unknown")
 
             if instance_type == "tap":
-                tap_instance: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                tap_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     **config,
                     "plugin_type": "extractors",
                     "singer_type": "tap",
                     "capabilities": ["discover", "properties", "catalog"],
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=tap_instance
                 )
 
             if instance_type == "target":
-                target_instance: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                target_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     **config,
                     "plugin_type": "loaders",
                     "singer_type": "target",
                     "capabilities": ["stream", "record", "state"],
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=target_instance
                 )
 
             if instance_type == "dbt":
-                dbt_instance: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                dbt_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     **config,
                     "plugin_type": "transformers",
                     "transformer_type": "dbt",
                     "capabilities": ["run", "test", "docs"],
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=dbt_instance
                 )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Service instance preparation failed: {e}"
             )
 
-        return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
             f"Unknown service type: {instance_type}"
         )
 
     def _create_service_instance(
-        self, _config: FlextMeltanoTypes.Core.MeltanoConfigDict
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        self, _config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Create service instance with configuration.
 
         Internal method for creating actual service instances based on prepared
@@ -700,7 +706,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         try:
             # Service instance creation logic would go here
             # For now, return a placeholder successful response
-            instance: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "instance_id": f"instance_{int(time.time())}",
                 "status": "created",
                 "service_name": self.service_name,
@@ -708,18 +714,18 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 "configuration": _config,
             }
 
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=instance
             )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Service instance creation failed: {e}"
             )
 
     def _finalize_service_setup(
         self,
-        _config: FlextMeltanoTypes.Core.MeltanoConfigDict,
+        _config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict,
         service_name: str,
     ) -> None:
         """Finalize service setup with logging and cleanup.
@@ -739,7 +745,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
     def get_default_config(
         self,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Get default service configuration for different plugin types.
 
         Provides default configuration templates for various Meltano plugin types
@@ -762,40 +768,40 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
 
         try:
             if service_type == "tap":
-                tap_config: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                tap_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     "connection_string": "test_connection"
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=tap_config
                 )
 
             if service_type == "target":
-                target_config: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                target_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     "host": "localhost",
                     "port": 5432,
                     "database": "target_db",
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=target_config
                 )
 
             if service_type == "dbt":
-                dbt_config: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+                dbt_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     "project_dir": "./dbt_project",
                     "profiles_dir": "./profiles",
                     "target": "dev",
                 }
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=dbt_config
                 )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Default config generation failed: {e}"
             )
 
-        empty_config: FlextMeltanoTypes.Core.MeltanoConfigDict = {}
-        return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+        empty_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {}
+        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
             data=empty_config
         )
 
@@ -803,8 +809,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         self,
         tap_name: str,
         target_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Validate and execute ELT pipeline with comprehensive error handling.
 
         Performs complete pipeline validation including plugin availability,
@@ -832,7 +838,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         # Input validation
         if not tap_name or not target_name:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 "Both tap_name and target_name are required"
             )
 
@@ -840,7 +846,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             # Pipeline execution simulation with comprehensive metadata
             execution_config = config or {}
 
-            result_data: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            result_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "tap": tap_name,
                 "target": target_name,
                 "status": "completed",
@@ -848,18 +854,20 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 "configuration": execution_config,
             }
 
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=result_data
             )
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Pipeline validation and execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def get_profiles_config(
         self,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Get DBT profiles configuration for data transformations.
 
         Generates and validates DBT profiles configuration including database
@@ -880,7 +888,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         try:
             # DBT profiles configuration with environment support
-            profiles_config: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            profiles_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "profile_name": "flext_dbt_profile",
                 "target": "dev",
                 "targets": {
@@ -899,12 +907,12 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 },
             }
 
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=profiles_config
             )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Profiles configuration failed: {e}"
             )
 
@@ -915,8 +923,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         self,
         service_type: str,
         service_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Create typed service kwargs with comprehensive validation.
 
         Internal method for creating type-safe service keyword arguments
@@ -934,25 +942,25 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         try:
             base_config = config or {}
 
-            service_kwargs: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            service_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": service_type,
                 "service_name": service_name,
                 "configuration": base_config,
                 "created_at": str(time.time()),
             }
 
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=service_kwargs
             )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Service kwargs creation failed: {e}"
             )
 
     def _validate_and_create_typed_service(
         self,
-        service_kwargs: FlextMeltanoTypes.Core.MeltanoConfigDict,
+        service_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict,
         service_class: type,
     ) -> FlextResult[object]:
         """Validate and create typed service instance.
@@ -980,8 +988,8 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         self,
         service_type: str,
         service_name: str,
-        config: FlextMeltanoTypes.Core.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict]:
+        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Get typed service kwargs with validation and type safety.
 
         Internal method for preparing type-safe service keyword arguments
@@ -998,7 +1006,7 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
         """
         # Input validation
         if not service_type or not service_name:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 "Service type and name are required"
             )
 
@@ -1006,20 +1014,24 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
             # Service type validation
             valid_types = ["tap", "target", "dbt", "utility"]
             if service_type not in valid_types:
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+                return FlextResult[
+                    FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+                ].fail(
                     f"Invalid service type: {service_type}. Valid types: {valid_types}"
                 )
 
             # Service name validation
             if len(service_name) < FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH:
-                return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+                return FlextResult[
+                    FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+                ].fail(
                     f"Service name must be at least {FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH} characters"
                 )
 
             # Build typed kwargs with service-specific defaults
             base_config = config or {}
 
-            typed_kwargs: FlextMeltanoTypes.Core.MeltanoConfigDict = {
+            typed_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": service_type,
                 "service_name": service_name,
                 "configuration": base_config,
@@ -1041,19 +1053,19 @@ class FlextMeltanoService(FlextService[FlextMeltanoTypes.Core.MeltanoConfigDict]
                 typed_kwargs["plugin_type"] = "transformers"
                 typed_kwargs["transformer_type"] = "dbt"
 
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=typed_kwargs
             )
 
         except (ValueError, TypeError, AttributeError) as e:
-            return FlextResult[FlextMeltanoTypes.Core.MeltanoConfigDict].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Typed service kwargs preparation failed: {e}"
             )
 
     def _handle_service_creation_with_types(
         self,
         service_class: type[T],
-        typed_kwargs: FlextMeltanoTypes.Core.MeltanoConfigDict,
+        typed_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict,
     ) -> FlextResult[T]:
         """Handle service creation with proper typing and error handling.
 

@@ -43,6 +43,53 @@ class FlextMeltanoExceptions(FlextExceptions):
     class MeltanoBaseError(FlextExceptions.BaseError):
         """Base exception for all Meltano domain errors."""
 
+        def _extract_common_kwargs(
+            self, kwargs: dict[str, object]
+        ) -> tuple[dict[str, object], str | None, str | None]:
+            """Extract common kwargs for error initialization.
+
+            Args:
+                kwargs: Keyword arguments
+
+            Returns:
+                Tuple of (base_context, correlation_id, error_code)
+
+            """
+            base_context = (
+                kwargs.get("context", {})
+                if isinstance(kwargs.get("context"), dict)
+                else {}
+            )
+            correlation_id = kwargs.get("correlation_id")
+            error_code = kwargs.get("error_code")
+
+            # Remove extracted keys from kwargs to avoid duplication
+            for key in ["context", "correlation_id", "error_code"]:
+                kwargs.pop(key, None)
+
+            return (
+                base_context,
+                str(correlation_id) if correlation_id is not None else None,
+                str(error_code) if error_code is not None else None,
+            )
+
+        def _build_context(
+            self, base_context: dict[str, object], **meltano_fields: object
+        ) -> dict[str, object]:
+            """Build context dictionary with Meltano-specific fields.
+
+            Args:
+                base_context: Base context dictionary
+                **meltano_fields: Meltano-specific fields to add
+
+            Returns:
+                Complete context dictionary
+
+            """
+            context = dict(base_context)
+            context.update(meltano_fields)
+            return context
+
         @override
         def __init__(
             self,
@@ -76,9 +123,9 @@ class FlextMeltanoExceptions(FlextExceptions):
             # Call parent with complete error information
             super().__init__(
                 message,
-                code=error_code or "MELTANO_ERROR",
-                context=context,
+                error_code=error_code or "MELTANO_ERROR",
                 correlation_id=correlation_id,
+                metadata={"context": context, **kwargs},
             )
 
     class MeltanoProjectError(MeltanoBaseError):

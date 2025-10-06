@@ -26,7 +26,7 @@ from meltano.core.project import Project
 
 # Import from specific modules to avoid circular import with __init__.py
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.configuration import FlextMeltanoConfig
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.protocols import FlextMeltanoProtocols
@@ -49,7 +49,7 @@ class FlextMeltanoAdapter:
         """
         # Get configuration using FlextMeltanoConfig as source of truth
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
+        self._logger: FlextLogger = FlextLogger(__name__)
         self._utilities = FlextUtilities()
         self._abstractions = FlextMeltanoAbstractions()
         self._library_runner = FlextMeltanoLibraryRunner()
@@ -137,13 +137,13 @@ class FlextMeltanoAdapter:
 
             # Add FLEXT metadata using flext-core patterns
             meltano_config["metadata"] = {
-                "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,  # SOURCE OF TRUTH
+                "created_by": FlextMeltanoConstants.Meltano.METADATA_CREATED_BY,  # SOURCE OF TRUTH
                 "created_at": datetime.now(UTC).isoformat(),
                 "temp_project": "True",
             }
 
             # Write configuration and create project
-            meltano_file = temp_path / FlextMeltanoConstants.MELTANO_PROJECT_FILE
+            meltano_file = temp_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
             with meltano_file.open("w") as f:
                 yaml.dump(meltano_config, f)
 
@@ -303,7 +303,7 @@ class FlextMeltanoAdapter:
             FlextResult containing validated project path or error.
 
         """
-        meltano_yml = project_root / FlextMeltanoConstants.MELTANO_PROJECT_FILE
+        meltano_yml = project_root / FlextMeltanoConstants.Meltano.PROJECT_FILE
         if not meltano_yml.exists():
             return FlextResult[Path].fail(
                 f"Not a Meltano project: meltano.yml not found in {project_root}"
@@ -499,7 +499,7 @@ class FlextMeltanoAdapter:
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
                     (
-                        full_project_path / FlextMeltanoConstants.MELTANO_PROJECT_FILE
+                        full_project_path / FlextMeltanoConstants.Meltano.PROJECT_FILE
                     ).exists(),
                 ),
             }
@@ -885,7 +885,9 @@ class FlextMeltanoAdapter:
         final_result = self._build_pipeline_result(
             extractor_name,
             loader_name,
-            cast("FlextMeltanoTypes.Core.RunContextDict", runner_result.unwrap()),
+            cast(
+                "FlextMeltanoTypes.MeltanoCore.RunContextDict", runner_result.unwrap()
+            ),
         )
         return final_result.or_else_get(
             lambda: FlextResult[FlextTypes.StringDict].fail(
@@ -954,7 +956,7 @@ class FlextMeltanoAdapter:
         extractor_name: str,
         loader_name: str,
         plugins: tuple[ProjectPlugin, ProjectPlugin],
-    ) -> FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.ExecutionResultDict]:
         """Create ELT context for pipeline execution.
 
         Args:
@@ -976,9 +978,9 @@ class FlextMeltanoAdapter:
             )
 
             if elt_context_result.is_failure:
-                return FlextResult[FlextMeltanoTypes.Core.ExecutionResultDict].fail(
-                    f"Failed to create ELT context: {elt_context_result.error}"
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.MeltanoCore.ExecutionResultDict
+                ].fail(f"Failed to create ELT context: {elt_context_result.error}")
 
             elt_context_obj = elt_context_result.unwrap()
 
@@ -1003,7 +1005,7 @@ class FlextMeltanoAdapter:
 
             elt_context_result.unwrap()
 
-            context_data: FlextMeltanoTypes.Core.RunContextDict = {
+            context_data: FlextMeltanoTypes.MeltanoCore.RunContextDict = {
                 "project": "project",
                 "elt_context": "elt_context",
                 "extractor_plugin": "extractor_plugin",
@@ -1017,7 +1019,7 @@ class FlextMeltanoAdapter:
             )
 
     def _execute_singer_runner(
-        self, context_data: FlextMeltanoTypes.Core.RunContextDict
+        self, context_data: FlextMeltanoTypes.MeltanoCore.RunContextDict
     ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
         """Execute Singer runner with context data.
 
@@ -1077,7 +1079,7 @@ class FlextMeltanoAdapter:
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: FlextMeltanoTypes.Core.RunContextDict,
+        context_data: FlextMeltanoTypes.MeltanoCore.RunContextDict,
     ) -> FlextResult[FlextTypes.StringDict]:
         """Build successful pipeline result.
 
@@ -1334,7 +1336,7 @@ Thumbs.db
 
         """
         try:
-            adapted_config: FlextMeltanoTypes.Core.MeltanoConfigDict = dict(config)
+            adapted_config = config.copy()
 
             # Add required fields if missing
             if "project_id" not in adapted_config:
@@ -1354,7 +1356,9 @@ Thumbs.db
                     "transformers": [],
                 }
 
-            return FlextResult[FlextTypes.Dict].ok(data=adapted_config)
+            return FlextResult[FlextTypes.Dict].ok(
+                data=cast("FlextTypes.Dict", adapted_config)
+            )
 
         except Exception as e:
             return FlextResult[FlextTypes.Dict].fail(
@@ -1453,8 +1457,6 @@ Thumbs.db
                     FlextMeltanoTypes.Processing.DbtTransformationResult
                 ].fail(dbt_runner_result.error or "Failed to get DBT runner")
             # For now, just return success since dbt_runner is just a dict
-            from typing import cast
-
             result = FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].ok(
@@ -1511,8 +1513,6 @@ Thumbs.db
                     FlextMeltanoTypes.Processing.SingerExecutionResult
                 ].fail(singer_manager_result.error or "Failed to get Singer manager")
             # For now, just return success since singer_manager is just a dict
-            from typing import cast
-
             result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
                 cast(
                     "FlextMeltanoTypes.Processing.SingerExecutionResult",
@@ -1531,7 +1531,7 @@ Thumbs.db
                     error=result.error,
                 )
 
-            return result  # type: ignore[return-value] # Already properly typed above
+            return result
 
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
@@ -1543,9 +1543,10 @@ Thumbs.db
     def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
-        extractor_config: FlextMeltanoTypes.Core.PluginConfigDict,
-        loader_config: FlextMeltanoTypes.Core.PluginConfigDict,
-        transformer_config: FlextMeltanoTypes.Core.PluginConfigDict | None = None,
+        extractor_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
+        loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
+        transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
+        | None = None,
     ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
         """Execute complete E-L-T pipeline using library APIs.
 
@@ -1566,20 +1567,18 @@ Thumbs.db
             )
 
             # Extract tap and target names from configs
-            tap_name = extractor_config.get("name", "")
-            target_name = loader_config.get("name", "")
+            tap_name = str(extractor_config.get("name", ""))
+            target_name = str(loader_config.get("name", ""))
             dbt_models = (
                 transformer_config.get("models") if transformer_config else None
             )
 
             # Use library runner for complete pipeline
-            from typing import cast
-
             result = self._library_runner.execute_complete_elt_pipeline(
                 tap_name,
                 target_name,
                 cast("list[str] | None", dbt_models),
-                cast("dict[str, object] | None", transformer_config),
+                cast("dict[str, FlextTypes.JsonValue] | None", transformer_config),
             )
 
             if result.is_success:

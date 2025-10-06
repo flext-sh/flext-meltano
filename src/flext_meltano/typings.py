@@ -18,12 +18,7 @@ from typing import Literal
 from flext_core import FlextTypes
 from singer_sdk import typing as singer_sdk_typing
 
-# =============================================================================
-# MELTANO-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for Meltano operations
-# =============================================================================
 
-
-# Meltano domain TypeVars
 class FlextMeltanoTypes(FlextTypes):
     """Meltano-specific type definitions extending FlextTypes.
 
@@ -33,11 +28,11 @@ class FlextMeltanoTypes(FlextTypes):
     """
 
     # =========================================================================
-    # MELTANO PLUGIN TYPES - Complex plugin management types
+    # MELTANO DOMAIN NAMESPACES - Following FLEXT pattern
     # =========================================================================
 
     class Plugin:
-        """Meltano plugin complex types."""
+        """Meltano plugin complex types namespace."""
 
         type PluginDefinition = dict[
             str, str | FlextTypes.StringList | dict[str, FlextTypes.ConfigValue]
@@ -49,12 +44,8 @@ class FlextMeltanoTypes(FlextTypes):
         type PluginExecution = dict[str, FlextTypes.JsonValue | bool]
         type PluginInfo = dict[str, str | bool | int | FlextTypes.Dict]
 
-    # =========================================================================
-    # SINGER PROTOCOL TYPES - Complex Singer operations
-    # =========================================================================
-
     class Singer:
-        """Singer protocol complex types."""
+        """Singer protocol complex types namespace."""
 
         type CatalogEntry = dict[str, str | dict[str, FlextTypes.JsonValue]]
         type StreamSchema = dict[str, dict[str, FlextTypes.JsonValue]]
@@ -64,7 +55,6 @@ class FlextMeltanoTypes(FlextTypes):
         type StreamCatalog = dict[str, list[CatalogEntry]]
 
         # Singer SDK typing utilities (domain separation from singer_sdk.typing)
-        # ALL tap/target projects MUST use these instead of direct singer_sdk.typing imports
         class Typing:
             """Singer SDK typing utilities wrapper (ZERO TOLERANCE for direct imports).
 
@@ -95,12 +85,8 @@ class FlextMeltanoTypes(FlextTypes):
             StringType = singer_sdk_typing.StringType
             TimeType = singer_sdk_typing.TimeType
 
-    # =========================================================================
-    # DBT TRANSFORMATION TYPES - Complex DBT operations
-    # =========================================================================
-
     class Dbt:
-        """DBT transformation complex types."""
+        """DBT transformation complex types namespace."""
 
         type ModelConfiguration = dict[
             str, FlextTypes.ConfigValue | FlextTypes.StringList
@@ -114,17 +100,8 @@ class FlextMeltanoTypes(FlextTypes):
         type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
         type Project = dict[str, str | bool | FlextTypes.Dict | FlextTypes.StringList]
 
-    # =========================================================================
-    # MELTANO PROJECT TYPES - Complex project management
-    # =========================================================================
-
     class Project(FlextTypes.Project):
-        """Meltano-specific project types extending FlextTypes.Project.
-
-        Adds Meltano/ELT-specific project types while inheriting generic types
-        from FlextTypes. Follows domain separation principle: Meltano domain owns
-        Meltano-specific types.
-        """
+        """Meltano-specific project types extending FlextTypes.Project."""
 
         # Meltano-specific project types extending the generic ones
         type MeltanoProjectType = Literal[
@@ -153,12 +130,8 @@ class FlextMeltanoTypes(FlextTypes):
         type SingerConfig = dict[str, bool | str | FlextTypes.Dict]
         type DbtConfig = dict[str, FlextTypes.ConfigValue | object]
 
-    # =========================================================================
-    # ELT PIPELINE TYPES - Complex pipeline operations
-    # =========================================================================
-
     class Pipeline:
-        """ELT pipeline complex types."""
+        """ELT pipeline complex types namespace."""
 
         type PipelineDefinition = list[dict[str, str | dict[str, FlextTypes.JsonValue]]]
         type ExecutionContext = dict[str, FlextTypes.JsonValue | FlextTypes.Dict]
@@ -170,36 +143,24 @@ class FlextMeltanoTypes(FlextTypes):
             str, FlextTypes.Processing.WorkflowStatus | FlextTypes.StringList
         ]
 
-    # =========================================================================
-    # BRIDGE TYPES - Complex bridge operations
-    # =========================================================================
-
     class Bridge:
-        """Bridge operation complex types."""
+        """Bridge operation complex types namespace."""
 
         type VersionInfo = dict[str, str | int]
         type ConnectionInfo = dict[str, str | int | bool]
         type BridgeConfig = dict[str, FlextTypes.ConfigValue | object]
         type BridgeStatus = dict[str, str | bool | FlextTypes.Dict]
 
-    # =========================================================================
-    # CLI TYPES - Complex CLI operations
-    # =========================================================================
-
     class CLI:
-        """CLI operation complex types."""
+        """CLI operation complex types namespace."""
 
         type ProcessResult = dict[str, str | int | float | bool | FlextTypes.StringList]
         type CommandResult = dict[str, str | int | bool]
         type ExecutionResult = dict[str, str | int | bool | FlextTypes.Dict]
         type CLIStatus = dict[str, str | bool]
 
-    # =========================================================================
-    # ELT PIPELINE TYPES - Complex ELT operations
-    # =========================================================================
-
     class ELT:
-        """ELT pipeline complex types."""
+        """ELT pipeline complex types namespace."""
 
         type PipelineResult = dict[
             str, str | int | float | bool | FlextTypes.Dict | FlextTypes.List
@@ -208,20 +169,8 @@ class FlextMeltanoTypes(FlextTypes):
         type LoadingResult = dict[str, str | int | bool | FlextTypes.Dict]
         type TransformationResult = dict[str, str | int | bool | FlextTypes.Dict]
 
-    # =========================================================================
-    # PROCESSING TYPES - Data processing results extending FlextTypes.Processing
-    # =========================================================================
-
     class Processing(FlextTypes.Processing):
-        """Meltano-specific processing types extending FlextTypes.Processing.
-
-        Inherits all generic processing types and adds Meltano-specific result types.
-        Provides structured result types for DBT, Singer, and ELT operations.
-        """
-
-        # Direct access to inherited processing types
-        type ProcessingStatus = FlextTypes.Processing.ProcessingStatus
-        type ProcessingMode = FlextTypes.Processing.ProcessingMode
+        """Meltano-specific processing types extending FlextTypes.Processing."""
 
         # Meltano-specific processing result types
         type DbtTransformationResult = dict[str, FlextTypes.JsonValue]
@@ -232,31 +181,11 @@ class FlextMeltanoTypes(FlextTypes):
         # HTTP and network types
         type Headers = dict[str, str]  # HTTP headers mapping
 
-    # =========================================================================
-    # CORE COMMONLY USED TYPES - Extending FlextTypes for Meltano domain
-    # =========================================================================
-
-    class Core(FlextTypes):
-        """Commonly used Meltano-specific type aliases extending FlextTypes.
-
-        Provides standardized type aliases for frequent Meltano patterns while
-        inheriting all core types from FlextTypes. Reduces generic dict/list
-        usage throughout the Meltano codebase.
-        """
-
-        # Core aliases for compatibility with FlextTypes
-        type Dict = FlextTypes.Dict
-        type List = FlextTypes.List
-        type StringList = FlextTypes.StringList
-        type ConfigValue = (
-            str | int | bool | float | FlextTypes.List | FlextTypes.Dict | None
-        )
-        type JsonValue = (
-            str | int | bool | float | FlextTypes.List | FlextTypes.Dict | None
-        )
+    class MeltanoCore:
+        """Commonly used Meltano-specific type aliases extending FlextTypes."""
 
         # Meltano configuration and data types
-        type MeltanoConfigDict = FlextTypes.Dict
+        type MeltanoConfigDict = dict[str, FlextTypes.JsonValue]
         type PluginConfigDict = FlextTypes.Dict
         type EnvironmentDict = FlextTypes.StringDict
         type VariablesDict = FlextTypes.StringDict
@@ -264,6 +193,26 @@ class FlextMeltanoTypes(FlextTypes):
         type CommandDict = FlextTypes.Dict
         type ScheduleDict = FlextTypes.Dict
         type JobDict = FlextTypes.Dict
+
+        # JsonValue type alias for compatibility
+        JsonValue = FlextTypes.JsonValue
+
+        # Type aliases for singer.py
+        RecordDict = FlextTypes.Dict
+        ConfigDict = FlextTypes.Dict
+        SchemaDict = FlextTypes.Dict
+        StateDict = FlextTypes.Dict
+        ResultDict = FlextTypes.Dict
+
+        # Type aliases for protocols.py
+        JsonObject = FlextTypes.JsonValue
+
+        # Type aliases for file_managers.py
+        FileConfigDict = (
+            dict[str, str | int | FlextTypes.StringList]
+            | dict[str, str | FlextTypes.StringList]
+        )
+        PathDict = dict[str, str | Path]
 
         # Plugin and execution types
         type PluginList = FlextTypes.StringList
@@ -309,10 +258,15 @@ class FlextMeltanoTypes(FlextTypes):
         type ResponseDict = dict[str, str | int | bool | FlextTypes.Dict]
 
 
-# =============================================================================
-# PUBLIC API EXPORTS - Meltano TypeVars and types
-# =============================================================================
-
-__all__: FlextTypes.StringList = [
+__all__ = [
     "FlextMeltanoTypes",
+    # Backward compatibility aliases
+    "RecordDict",
+    "ConfigDict",
+    "SchemaDict",
+    "StateDict",
+    "ResultDict",
+    "JsonObject",
+    "FileConfigDict",
+    "PathDict",
 ]

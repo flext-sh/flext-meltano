@@ -344,7 +344,7 @@ class FlextMeltanoUtilities(FlextUtilities):
     ) -> FlextResult[Path]:
         """Save content to YAML file."""
         try:
-            self.write_meltano_yml(file_path, content)
+            self.write_meltano_yml(content, file_path)
             return FlextResult.ok(file_path)
         except (OSError, ValueError, yaml.YAMLError) as e:
             return FlextResult.fail(f"Failed to save YAML file: {e}")

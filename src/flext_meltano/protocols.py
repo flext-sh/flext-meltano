@@ -10,10 +10,6 @@ from typing import Protocol, runtime_checkable
 
 from flext_core import FlextProtocols, FlextResult, FlextTypes, T_co
 
-# Type aliases for protocol type safety
-ConfigDict = FlextTypes.ConfigDict
-JsonValue = FlextTypes.JsonValue
-JsonObject = FlextTypes.JsonValue
 
 
 class FlextMeltanoProtocols:
