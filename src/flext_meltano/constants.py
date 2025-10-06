@@ -36,6 +36,7 @@ class FlextMeltanoConstants(FlextConstants):
 
         # Metadata constants
         METADATA_CREATED_BY: Final[str] = "flext-meltano"
+        METADATA_DEFAULT_ENVIRONMENTS: Final[tuple[str, ...]] = ("dev", "staging", "prod")
 
         # File constants
         PROJECT_FILE: Final[str] = "meltano.yml"
@@ -51,6 +52,9 @@ class FlextMeltanoConstants(FlextConstants):
 
         # Version requirements
         VERSION_REQUIRED: Final[str] = "3.9.1"
+
+        # FLEXT Meltano version
+        FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"
 
         # Default timeout constants
         MELTANO_DEFAULT_TIMEOUT: Final[int] = 300  # 5 minutes

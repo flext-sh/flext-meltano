@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.api import FlextMeltanoAPI
+from flext_meltano.api import FlextMeltano
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.config import (
@@ -33,24 +33,14 @@ from flext_meltano.project_service import FlextMeltanoProjectService
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
 
-# Singer SDK wrapper classes for domain separation
-from flext_meltano.singer import (
-    FlextMeltanoSinger,
-    FlextSink,
-    FlextStream,
-    FlextTap,
-    FlextTapAbstractions,
-    FlextTarget,
-    FlextTargetAbstractions,
-    StreamDefinition,
-    TapConfig,
-    TapInstance,
-)
+# Singer SDK classes
+from flext_meltano.singer import FlextMeltanoSinger
 
 # Singer types and typing utilities are in FlextMeltanoTypes.Singer namespace
 # ALL tap/target projects MUST use FlextMeltanoTypes.Singer.Typing for schema definitions
 from flext_meltano.typings import (
     # Export specific types for backward compatibility
+    ConfigDict,
     FlextMeltanoTypes,
 )
 from flext_meltano.utilities import FlextMeltanoUtilities
@@ -65,15 +55,12 @@ SingerExecutionResult = FlextMeltanoTypes.Processing.SingerExecutionResult
 
 # Service class aliases for backward compatibility
 FlextSingerTypes = FlextMeltanoTypes
-FlextSingerStream = (
-    StreamDefinition  # Alias for backward compatibility with tap/target projects
-)
 
 __all__ = [
     "ConfigDict",
     "DbtTransformationResult",
     "EltPipelineResult",
-    "FlextMeltanoAPI",
+    "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
@@ -97,17 +84,6 @@ __all__ = [
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
-    "FlextSingerStream",
     "FlextSingerTypes",
-    "FlextSink",  # Singer SDK wrapper for domain separation
-    "FlextStream",  # Singer SDK wrapper for domain separation
-    "FlextTap",  # Singer SDK wrapper for domain separation
-    "FlextTapAbstractions",
-    "FlextTarget",  # Singer SDK wrapper for domain separation
-    "FlextTargetAbstractions",
     "PluginTypes",
-    "SingerExecutionResult",
-    "StreamDefinition",
-    "TapConfig",
-    "TapInstance",
 ]

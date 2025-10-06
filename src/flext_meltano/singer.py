@@ -36,7 +36,6 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-
 class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]):
     """UNIFIED Singer namespace class consolidating ALL Singer functionality.
 
@@ -295,7 +294,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             tap: FlextMeltanoSinger.Tap,
             name: str | None = None,
             schema: dict | None = None,
-            path: str | None = None,  # noqa: ARG002
+            path: str | None = None,  # noqa: ARG002 - Reserved for future use
         ) -> None:
             """Initialize FlextStream with FLEXT ecosystem integration.
 
@@ -680,28 +679,9 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
                 )
 
 
-# Module-level aliases for backward compatibility and easier imports
-FlextTap = FlextMeltanoSinger.Tap
-FlextStream = FlextMeltanoSinger.Stream
-FlextTarget = FlextMeltanoSinger.Target
-FlextSink = FlextMeltanoSinger.Sink
-FlextTapAbstractions = FlextMeltanoSinger.TapAbstractions
-FlextTargetAbstractions = FlextMeltanoSinger.TargetAbstractions
-
-# Type aliases for backward compatibility
-StreamDefinition = FlextMeltanoModels.StreamDefinition
-TapConfig = FlextMeltanoModels.TapConfig
-TapInstance = FlextMeltanoModels.TapInstance
+# Use direct access to inner classes for cleaner API
+# No unnecessary aliases - use FlextMeltanoSinger.Tap, etc.
 
 __all__ = [
     "FlextMeltanoSinger",
-    "FlextSink",
-    "FlextStream",
-    "FlextTap",
-    "FlextTapAbstractions",
-    "FlextTarget",
-    "FlextTargetAbstractions",
-    "StreamDefinition",
-    "TapConfig",
-    "TapInstance",
 ]

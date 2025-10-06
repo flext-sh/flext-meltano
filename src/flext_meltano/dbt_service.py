@@ -39,7 +39,7 @@ class FlextMeltanoDbtService(
         """Initialize DBT service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger: FlextLogger = FlextLogger(__name__)
+        self._logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def run_transformations(

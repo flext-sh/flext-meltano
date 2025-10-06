@@ -97,6 +97,7 @@
     python-version = "3.13"
     search-path = [
         "../flext-core/src",
+        "/home/marlonsc/.local/lib/python3.13/site-packages",
         "examples",
         "src",
         "tests",

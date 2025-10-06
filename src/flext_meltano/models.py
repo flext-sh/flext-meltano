@@ -215,6 +215,48 @@ class FlextMeltanoModels(FlextModels):
                 value["type"] = "object"
             return value
 
+    class SinkDefinition(FlextModels.Entity):
+        """Pydantic model for sink definition with advanced Pydantic 2.11 features."""
+
+        model_config = ConfigDict(extra="allow", validate_assignment=True)
+
+        sink_name: str = Field(description="Name of the sink")
+        target_name: str = Field(description="Name of the target")
+        config: FlextTypes.Dict = Field(
+            default_factory=dict,
+            description="Sink configuration"
+        )
+        schema: FlextTypes.Dict = Field(
+            default_factory=dict,
+            description="Sink schema"
+        )
+        status: str = Field(default="initialized", description="Current status")
+
+        @computed_field
+        @property
+        def config_keys_count(self) -> int:
+            """Computed field for number of config keys."""
+            return len(self.config)
+
+        @model_validator(mode="after")
+        def validate_sink_definition_consistency(
+            self,
+        ) -> FlextMeltanoModels.SinkDefinition:
+            """Model validator for sink definition consistency."""
+            # Validate status values
+            valid_statuses = {
+                "initialized",
+                "configured",
+                "running",
+                "completed",
+                "error",
+            }
+            if self.status not in valid_statuses:
+                msg = f"Status must be one of: {', '.join(valid_statuses)}"
+                raise ValueError(msg)
+
+            return self
+
     class TapInstance(FlextModels.Entity):
         """Pydantic model for tap instance with comprehensive composition."""
 

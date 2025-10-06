@@ -22,13 +22,12 @@ from flext_core import (
     FlextUtilities,
 )
 
-from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoConfig,
-    FlextMeltanoConstants,
-    FlextMeltanoTypes,
-    FlextMeltanoValidators,
-)
+# Direct imports to avoid circular dependencies
+from flext_meltano.abstractions import FlextMeltanoAbstractions
+from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.validators import FlextMeltanoValidators
 
 
 class FlextMeltanoProjectService(

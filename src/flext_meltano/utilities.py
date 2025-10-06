@@ -34,6 +34,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         cls,
         project_id: str,
         project_name: str = "",
+        version: str | None = None,
+        default_environment: str | None = None,
+        plugins: FlextTypes.Dict | None = None,
+        environments: FlextTypes.Dict | None = None,
     ) -> FlextResult[FlextTypes.Dict]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         logger = FlextLogger(__name__)
@@ -48,24 +52,40 @@ class FlextMeltanoUtilities(FlextUtilities):
 
             # DOMAIN-SPECIFIC: Meltano configuration structure
             config_dict: FlextTypes.Dict = {
-                "version": 1,
+                "version": version or 1,
                 "project_id": safe_project_id,
-                "project_name": safe_project_name,
-                "environments": [
-                    {"name": "env"}
-                    for env in FlextMeltanoConstants.METADATA_DEFAULT_ENVIRONMENTS
-                ],
-                "plugins": {
+                "project_name": safe_project_name or safe_project_id,
+            }
+
+            # Add default_environment if provided
+            if default_environment:
+                config_dict["default_environment"] = default_environment
+
+            # Add environments if provided, otherwise use defaults
+            if environments:
+                config_dict["environments"] = environments
+            else:
+                config_dict["environments"] = [
+                    {"name": env}
+                    for env in FlextMeltanoConstants.Meltano.METADATA_DEFAULT_ENVIRONMENTS
+                ]
+
+            # Add plugins if provided, otherwise use defaults
+            if plugins:
+                config_dict["plugins"] = plugins
+            else:
+                config_dict["plugins"] = {
                     "extractors": [],
                     "loaders": [],
                     "transformers": [],
                     "orchestrators": [],
-                },
-                "metadata": {
-                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,
-                    "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
-                    "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
-                },
+                }
+
+            # Add metadata
+            config_dict["metadata"] = {
+                "created_by": FlextMeltanoConstants.Meltano.METADATA_CREATED_BY,
+                "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
+                "flext_version": FlextMeltanoConstants.Meltano.FLEXT_MELTANO_VERSION,
             }
             return FlextResult[FlextTypes.Dict].ok(data=config_dict)
         except Exception as e:  # pragma: no cover
@@ -127,7 +147,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 cleanup_file_handle,
             )
             .with_context(
-                lambda error: f"Writing {FlextMeltanoConstants.MELTANO_PROJECT_FILE}: {error}"
+                lambda error: f"Writing {FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE}: {error}"
             )
         )
 
@@ -237,7 +257,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "settings": {},
                 "config": {},
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.METADATA_CREATED_BY,
+                    "created_by": FlextMeltanoConstants.Meltano.METADATA_CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }
@@ -326,13 +346,20 @@ class FlextMeltanoUtilities(FlextUtilities):
         except (OSError, ValueError) as e:
             return FlextResult.fail(f"Failed to validate project structure: {e}")
 
-    def create_project_file(self, file_path: Path, content: str) -> FlextResult[Path]:
+    def create_project_file(self, file_path: Path, content: str | FlextTypes.Dict) -> FlextResult[Path]:
         """Create a project file with content."""
+        if not isinstance(content, (str, dict)):
+            return FlextResult.fail("Invalid content type: must be string or dict")
+
         try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(content, encoding="utf-8")
+            if isinstance(content, dict):
+                yaml_content = yaml.dump(content, default_flow_style=False, indent=2)
+                file_path.write_text(yaml_content, encoding="utf-8")
+            else:
+                file_path.write_text(content, encoding="utf-8")
             return FlextResult.ok(file_path)
-        except (OSError, ValueError) as e:
+        except (OSError, ValueError, yaml.YAMLError) as e:
             return FlextResult.fail(f"Failed to create project file: {e}")
 
     def load_yaml_file(self, file_path: Path) -> FlextResult[FlextTypes.Dict]:

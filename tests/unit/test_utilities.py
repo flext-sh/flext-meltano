@@ -10,7 +10,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 from flext_core import FlextUtilities
 
 from flext_meltano.utilities import FlextMeltanoUtilities
@@ -28,9 +27,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test successful Meltano config dictionary creation."""
         utilities = FlextMeltanoUtilities()
 
-        config_dict = utilities.create_meltano_config_dict(
+        result = utilities.create_meltano_config_dict(
             project_id="test-project", version="1.0.0", default_environment="dev"
         )
+
+        assert result.is_success
+        config_dict = result.unwrap()
 
         assert config_dict["project_id"] == "test-project"
         assert config_dict["version"] == "1.0.0"
@@ -47,9 +49,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
             "loaders": [{"name": "target-csv"}],
         }
 
-        config_dict = utilities.create_meltano_config_dict(
+        result = utilities.create_meltano_config_dict(
             project_id="etl-project", plugins=plugins
         )
+
+        assert result.is_success
+        config_dict = result.unwrap()
 
         assert config_dict["project_id"] == "etl-project"
         assert config_dict["plugins"]["extractors"][0]["name"] == "tap-postgres"
@@ -83,14 +88,14 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test Meltano config dictionary creation with invalid project_id type."""
         utilities = FlextMeltanoUtilities()
 
-        # This should raise an AttributeError when trying to call strip() on an int
-        with pytest.raises(
-            AttributeError, match="'int' object has no attribute 'strip'"
-        ):
-            utilities.create_meltano_config_dict(
-                project_id=123,  # Invalid type - should be string
-                version="1.0.0",
-            )
+        # This should return a failure result due to invalid project_id type
+        result = utilities.create_meltano_config_dict(
+            project_id=123,  # Invalid type - should be string
+            version="1.0.0",
+        )
+
+        assert result.is_failure
+        assert "Failed to create Meltano config dict" in result.error
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
