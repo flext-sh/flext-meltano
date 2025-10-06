@@ -21,6 +21,8 @@ from flext_core import (
 )
 
 # Import from specific modules to avoid circular dependencies
+from meltano.core.project import Project
+
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.project_service import FlextMeltanoProjectService
@@ -116,7 +118,7 @@ class FlextMeltanoPluginService(
 
             # Discover extractors using abstraction layer
             extractors_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project), "extractors"
+                cast("Project", working_project), "extractors"
             )
             if extractors_result.is_success:
                 extractors_dict = cast(
@@ -136,7 +138,7 @@ class FlextMeltanoPluginService(
 
             # Discover loaders using abstraction layer
             loaders_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project), "loaders"
+                cast("Project", working_project), "loaders"
             )
             if loaders_result.is_success:
                 loaders_dict = cast(
@@ -224,7 +226,7 @@ class FlextMeltanoPluginService(
 
             # Get plugins of type
             plugins_result = self._abstractions.get_plugins_of_type(
-                cast("object", project_result.unwrap()), plugin_type
+                cast("Project", project_result.unwrap()), plugin_type
             )
 
             if plugins_result.is_failure:
@@ -289,7 +291,7 @@ class FlextMeltanoPluginService(
         try:
             # Use abstraction layer for plugin addition
             add_result = self._abstractions.add_plugin(
-                cast("object", project), plugin_type_str, plugin_name
+                cast(Project, project), plugin_type_str, plugin_name
             )
 
             if add_result.is_failure:

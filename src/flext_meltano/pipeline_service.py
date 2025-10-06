@@ -164,7 +164,9 @@ class FlextMeltanoPipelineService(
 
             # Execute singer pipeline
             execution_result = self._abstractions.execute_singer_pipeline(
-                cast("object", elt_context_obj), extractor_plugin_obj, loader_plugin_obj
+                cast("FlextMeltanoTypes.MeltanoCore.ELTContext", elt_context_obj),
+                extractor_plugin_obj,
+                loader_plugin_obj,
             )
 
             if execution_result.is_failure:
@@ -218,9 +220,9 @@ class FlextMeltanoPipelineService(
 
             # Use abstraction layer to execute Singer pipeline
             execution_result = self._abstractions.execute_singer_pipeline(
-                cast("object", elt_context_obj),
-                cast("object", extractor_plugin_obj),
-                cast("object", loader_plugin_obj),
+                cast("FlextMeltanoTypes.MeltanoCore.ELTContext", elt_context_obj),
+                cast("FlextMeltanoTypes.Plugin.ProjectPlugin", extractor_plugin_obj),
+                cast("FlextMeltanoTypes.Plugin.ProjectPlugin", loader_plugin_obj),
             )
 
             if execution_result.is_failure:
