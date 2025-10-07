@@ -291,7 +291,7 @@ class FlextMeltanoPluginService(
         try:
             # Use abstraction layer for plugin addition
             add_result = self._abstractions.add_plugin(
-                cast(Project, project), plugin_type_str, plugin_name
+                cast("Project", project), plugin_type_str, plugin_name
             )
 
             if add_result.is_failure:

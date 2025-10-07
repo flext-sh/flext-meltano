@@ -89,11 +89,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess  # noqa: S404 - subprocess required for CLI command execution
 from pathlib import Path
 from typing import Any
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 
 from flext_meltano.models import FlextMeltanoModels
 
@@ -246,42 +245,42 @@ class SingerCliTranslator:
             FlextResult containing execution results with stdout/stderr
 
         """
-        try:
-            process_input = input_data.encode() if input_data else None
+        # Use FlextUtilities.run_external_command for standardized subprocess execution
+        process_input = input_data.encode() if input_data else None
 
-            result = subprocess.run(  # noqa: S603 - command generated internally, trusted input
-                command,
-                input=process_input,
-                capture_output=True,
-                timeout=timeout,
-                check=False,
-            )
+        # Execute command with FlextUtilities (includes comprehensive error handling)
+        result = FlextUtilities.run_external_command(
+            cmd=command,
+            capture_output=True,
+            check=False,  # Don't raise exception on non-zero exit
+            timeout=timeout,
+            command_input=process_input,
+            text=True,  # Get string output automatically
+        )
 
-            if result.returncode != 0:
-                error_msg = result.stderr.decode() if result.stderr else "Unknown error"
-                return FlextResult[dict[str, Any]].fail(
-                    f"Command failed with code {result.returncode}: {error_msg}"
-                )
+        # Handle execution failure
+        if result.is_failure:
+            return FlextResult[dict[str, Any]].fail(result.error)
 
-            output_data: dict[str, Any] = {
-                "stdout": result.stdout.decode() if result.stdout else "",
-                "stderr": result.stderr.decode() if result.stderr else "",
-                "returncode": result.returncode,
-                "command": " ".join(command),
-            }
+        # Extract completed process
+        completed_process = result.value
 
-            return FlextResult[dict[str, Any]].ok(output_data)
-
-        except subprocess.TimeoutExpired:
+        # Check for non-zero exit code
+        if completed_process.returncode != 0:
+            error_msg = completed_process.stderr or "Unknown error"
             return FlextResult[dict[str, Any]].fail(
-                f"Command timeout after {timeout} seconds"
+                f"Command failed with code {completed_process.returncode}: {error_msg}"
             )
-        except FileNotFoundError as e:
-            return FlextResult[dict[str, Any]].fail(
-                f"Command not found: {command[0]} - {e!s}"
-            )
-        except Exception as e:
-            return FlextResult[dict[str, Any]].fail(f"Command execution failed: {e!s}")
+
+        # Prepare output data with decoded strings
+        output_data: dict[str, Any] = {
+            "stdout": completed_process.stdout or "",
+            "stderr": completed_process.stderr or "",
+            "returncode": completed_process.returncode,
+            "command": " ".join(command),
+        }
+
+        return FlextResult[dict[str, Any]].ok(output_data)
 
     @staticmethod
     def validate_file_path(file_path: str | None) -> FlextResult[Path | None]:

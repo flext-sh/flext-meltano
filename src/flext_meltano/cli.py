@@ -10,12 +10,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable
 from typing import Any, cast
 
 from flext_cli import FlextCli, FlextCliModels
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.api import FlextMeltano
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer_cli_translator import SingerCliTranslator
@@ -37,6 +37,7 @@ class FlextMeltanoCLI:
 
     def __init__(self) -> None:
         """Initialize CLI with flext-cli API and Meltano API."""
+        super().__init__()
         self._cli = FlextCli()
         self.logger: FlextLogger = FlextLogger(__name__)
         self._api = FlextMeltano()
@@ -68,8 +69,8 @@ class FlextMeltanoCLI:
         # Route to command handlers
         command = args[0]
         command_args = args[1:]
-
-        command_map = {
+        # Map subcommands to handler functions
+        command_map: dict[str, Callable[[FlextTypes.StringList], FlextResult[None]]] = {
             "pipeline": self._handle_pipeline_command,
             "tap": self._handle_tap_command,
             "target": self._handle_target_command,
@@ -80,13 +81,14 @@ class FlextMeltanoCLI:
         }
 
         handler = command_map.get(command)
-        if not handler:
+        if handler is None:
             self._output.print_error(f"Unknown command: {command}")
             self._show_main_help()
             return 1
 
         try:
-            result = handler(command_args)
+            # Handler is assured non-None here
+            result: FlextResult[None] = handler(command_args)
             return 0 if result.is_success else 1
         except Exception:
             self.logger.exception("Command failed")

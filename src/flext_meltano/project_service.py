@@ -248,7 +248,9 @@ class FlextMeltanoProjectService(
     ) -> FlextResult[Path]:
         """Write meltano.yml configuration file."""
         try:
-            config_file = project_path / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+            config_file = (
+                project_path / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+            )
             with config_file.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False)
             return FlextResult[Path].ok(project_path)
