@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Callable
-from typing import Any, cast
+from typing import cast
 
 from flext_cli import FlextCli, FlextCliModels
 from flext_core import FlextLogger, FlextResult, FlextTypes
@@ -1064,7 +1064,7 @@ class FlextMeltanoCLI:
 
         return name, tap, target, transform
 
-    def _parse_tap_run_args(self, args: FlextTypes.StringList) -> dict[str, Any]:
+    def _parse_tap_run_args(self, args: FlextTypes.StringList) -> dict[str, object]:
         """Parse tap run CLI arguments into dictionary format for TapRunParams model.
 
         Args:
@@ -1074,7 +1074,7 @@ class FlextMeltanoCLI:
             Dictionary with keys matching TapRunParams fields (underscores)
 
         """
-        cli_args: dict[str, Any] = {
+        cli_args: dict[str, object] = {
             "tap_name": args[0],  # Required first positional arg
             "discover": False,
             "config_file": None,
@@ -1108,7 +1108,7 @@ class FlextMeltanoCLI:
 
         return cli_args
 
-    def _parse_target_run_args(self, args: FlextTypes.StringList) -> dict[str, Any]:
+    def _parse_target_run_args(self, args: FlextTypes.StringList) -> dict[str, object]:
         """Parse target run CLI arguments into dictionary format for TargetRunParams model.
 
         Args:
@@ -1118,7 +1118,7 @@ class FlextMeltanoCLI:
             Dictionary with keys matching TargetRunParams fields (underscores)
 
         """
-        cli_args: dict[str, Any] = {
+        cli_args: dict[str, object] = {
             "target_name": args[0],  # Required first positional arg
             "config_file": None,
             "input_file": None,
@@ -1140,7 +1140,9 @@ class FlextMeltanoCLI:
 
         return cli_args
 
-    def _parse_pipeline_run_args(self, args: FlextTypes.StringList) -> dict[str, Any]:
+    def _parse_pipeline_run_args(
+        self, args: FlextTypes.StringList
+    ) -> dict[str, object]:
         """Parse pipeline run CLI arguments into dictionary format for PipelineRunParams model.
 
         Args:
@@ -1155,7 +1157,7 @@ class FlextMeltanoCLI:
             # Return incomplete dict - will fail validation
             return {"tap_name": args[0] if args else None, "target_name": None}
 
-        cli_args: dict[str, Any] = {
+        cli_args: dict[str, object] = {
             "tap_name": args[0],  # Required first positional arg
             "target_name": args[1],  # Required second positional arg
             "tap_config": None,
