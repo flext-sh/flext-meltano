@@ -103,7 +103,7 @@ validate_configuration() -> FlextResult[bool]
 class FlextSingerTap(FlextService):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, config: dict[str, Any], state: dict[str, Any] | None = None)
+    def __init__(self, tap_name: str, config: dict[str, object], state: dict[str, object] | None = None)
     async def discover(self) -> FlextResult[Catalog]
     async def sync(self, streams: list[str] | None = None) -> FlextResult[SyncResult]
 ```
@@ -114,8 +114,8 @@ class FlextSingerTap(FlextService):
 class FlextSingerTarget(FlextService):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, config: dict[str, Any])
-    async def load_records(self, records: list[dict[str, Any]]) -> FlextResult[LoadResult]
+    def __init__(self, target_name: str, config: dict[str, object])
+    async def load_records(self, records: list[dict[str, object]]) -> FlextResult[LoadResult]
     async def flush(self) -> FlextResult[FlushResult]
 ```
 

@@ -90,7 +90,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextUtilities
 
@@ -233,7 +232,7 @@ class SingerCliTranslator:
         command: list[str],
         input_data: str | None = None,
         timeout: int = 300,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -260,7 +259,7 @@ class SingerCliTranslator:
 
         # Handle execution failure
         if result.is_failure:
-            return FlextResult[dict[str, Any]].fail(result.error)
+            return FlextResult[dict[str, object]].fail(result.error)
 
         # Extract completed process
         completed_process = result.value
@@ -268,19 +267,19 @@ class SingerCliTranslator:
         # Check for non-zero exit code
         if completed_process.returncode != 0:
             error_msg = completed_process.stderr or "Unknown error"
-            return FlextResult[dict[str, Any]].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Command failed with code {completed_process.returncode}: {error_msg}"
             )
 
         # Prepare output data with decoded strings
-        output_data: dict[str, Any] = {
+        output_data: dict[str, object] = {
             "stdout": completed_process.stdout or "",
             "stderr": completed_process.stderr or "",
             "returncode": completed_process.returncode,
             "command": " ".join(command),
         }
 
-        return FlextResult[dict[str, Any]].ok(output_data)
+        return FlextResult[dict[str, object]].ok(output_data)
 
     @staticmethod
     def validate_file_path(file_path: str | None) -> FlextResult[Path | None]:
