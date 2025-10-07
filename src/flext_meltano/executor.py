@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import cast
 
 from flext_core import (
     FlextLogger,
@@ -71,7 +72,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
             return FlextResult[FlextTypes.JsonValue].ok(
-                data=cast(FlextTypes.JsonValue, config_data)
+                data=cast("FlextTypes.JsonValue", config_data)
             )
 
         except Exception as e:
