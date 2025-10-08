@@ -7,15 +7,15 @@ import math
 from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsUtilities
 
-from flext_meltano import FlextSingerTypes
+from flext_meltano import FlextMeltanoTypes
 
 
 class TestFlextSingerTypesComplete:
-    """Complete test suite for FlextSingerTypes using flext_tests exclusively."""
+    """Complete test suite for FlextMeltanoTypes using flext_tests exclusively."""
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-        self.singer_types = FlextSingerTypes()
+        self.singer_types = FlextMeltanoTypes()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service("singer_types")
@@ -25,8 +25,8 @@ class TestFlextSingerTypesComplete:
     # =========================================================================
 
     def test_singer_types_initialization(self) -> None:
-        """Test FlextSingerTypes initialization using flext_tests."""
-        singer_types = FlextSingerTypes()
+        """Test FlextMeltanoTypes initialization using flext_tests."""
+        singer_types = FlextMeltanoTypes()
 
         # Use flext_tests assertions
         self.test_assertions.assert_true(

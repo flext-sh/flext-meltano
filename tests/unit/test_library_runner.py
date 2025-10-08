@@ -10,11 +10,7 @@ from unittest.mock import Mock, patch
 
 from flext_core import FlextResult, FlextTypes
 
-from flext_meltano import (
-    DbtTransformationResult,
-    EltPipelineResult,
-    SingerExecutionResult,
-)
+from flext_meltano import FlextMeltanoTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
@@ -49,10 +45,10 @@ class TestFlextDbtProgrammaticRunner:
                 mock_dbt_runner_class.return_value = mock_runner
 
                 # Test the transformation
-                result: FlextResult[DbtTransformationResult] = (
-                    dbt_runner.run_transformations_programmatic(
-                        project_dir, models=["model1", "model2"]
-                    )
+                result: FlextResult[
+                    FlextMeltanoTypes.Processing.DbtTransformationResult
+                ] = dbt_runner.run_transformations_programmatic(
+                    project_dir, models=["model1", "model2"]
                 )
 
                 # Type annotation to help type checker
@@ -91,7 +87,7 @@ class TestFlextSingerProtocolManager:
         mock_target.write_state.return_value = None
 
         # Test the pipeline execution
-        result: FlextResult[SingerExecutionResult] = (
+        result: FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult] = (
             singer_manager.execute_singer_pipeline(mock_tap, mock_target)
         )
 
@@ -160,7 +156,7 @@ class TestFlextMeltanoLibraryRunner:
             }
 
             # Test the complete pipeline
-            result: FlextResult[EltPipelineResult] = (
+            result: FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult] = (
                 runner.execute_complete_elt_pipeline(
                     project_dir, extractor_config, loader_config, transformer_config
                 )
@@ -168,7 +164,9 @@ class TestFlextMeltanoLibraryRunner:
 
             assert result.is_success
             # Get the pipeline data from the result
-            pipeline_data: EltPipelineResult = result.unwrap()
+            pipeline_data: FlextMeltanoTypes.Processing.EltPipelineResult = (
+                result.unwrap()
+            )
             # Check that the pipeline data has the expected structure
             assert isinstance(pipeline_data, dict)
             assert "extraction" in pipeline_data

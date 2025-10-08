@@ -19,8 +19,6 @@ from flext_core import (
     FlextService,
     FlextTypes,
 )
-
-# Import from specific modules to avoid circular dependencies
 from meltano.core.project import Project
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -28,9 +26,6 @@ from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.project_service import FlextMeltanoProjectService
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
-
-# Use the protocol from protocols.py
-MeltanoPluginProtocol = FlextMeltanoProtocols.MeltanoPluginProtocol
 
 
 class FlextMeltanoPluginService(
@@ -122,7 +117,8 @@ class FlextMeltanoPluginService(
             )
             if extractors_result.is_success:
                 extractors_dict = cast(
-                    "dict[str, MeltanoPluginProtocol]", extractors_result.unwrap()
+                    "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                    extractors_result.unwrap(),
                 )
                 for plugin_name, indexed_plugin in list(extractors_dict.items())[:10]:
                     plugin_info = {
@@ -142,7 +138,8 @@ class FlextMeltanoPluginService(
             )
             if loaders_result.is_success:
                 loaders_dict = cast(
-                    "dict[str, MeltanoPluginProtocol]", loaders_result.unwrap()
+                    "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                    loaders_result.unwrap(),
                 )
                 for plugin_name, indexed_plugin in list(loaders_dict.items())[:5]:
                     plugin_info = {
@@ -235,7 +232,8 @@ class FlextMeltanoPluginService(
                 )
 
             plugins_dict = cast(
-                "dict[str, MeltanoPluginProtocol]", plugins_result.unwrap()
+                "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                plugins_result.unwrap(),
             )
 
             if plugin_name not in plugins_dict:

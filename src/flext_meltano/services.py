@@ -1093,7 +1093,7 @@ class FlextMeltanoService(
     # SINGER TYPES SERVICE - Integrated type management for Singer operations
     # ============================================================================
 
-    class FlextSingerTypes:
+    class FlextMeltanoTypes:
         """Integrated Singer types and schema handling within Meltano service.
 
         Consolidated class providing all Singer type functionality following flext-core
@@ -1103,7 +1103,7 @@ class FlextMeltanoService(
 
         def __init__(self) -> None:
             """Initialize integrated Singer types manager."""
-            self.logger = FlextLogger(f"{__name__}.FlextSingerTypes")
+            self.logger = FlextLogger(f"{__name__}.FlextMeltanoTypes")
             self._type_registry: FlextTypes.NestedDict = {
                 "string": {"type": "string"},
                 "integer": {"type": "integer"},
@@ -1521,17 +1521,17 @@ class FlextMeltanoService(
             return FlextResult[FlextTypes.Dict].fail(f"Type {type_name} not found")
 
         @classmethod
-        def create_instance(cls) -> FlextResult[FlextMeltanoService.FlextSingerTypes]:
-            """Factory method to create FlextSingerTypes instance.
+        def create_instance(cls) -> FlextResult[FlextMeltanoService.FlextMeltanoTypes]:
+            """Factory method to create FlextMeltanoTypes instance.
 
             Returns:
                 FlextResult containing the created instance.
 
             """
             try:
-                return FlextResult[FlextMeltanoService.FlextSingerTypes].ok(data=cls())
+                return FlextResult[FlextMeltanoService.FlextMeltanoTypes].ok(data=cls())
             except Exception as e:
-                return FlextResult[FlextMeltanoService.FlextSingerTypes].fail(
+                return FlextResult[FlextMeltanoService.FlextMeltanoTypes].fail(
                     f"Instance creation failed: {e}",
                 )
 

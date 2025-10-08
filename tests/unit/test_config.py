@@ -13,6 +13,7 @@ import inspect
 import os
 import tempfile
 from pathlib import Path
+from typing import Literal
 
 import pytest
 from flext_core.constants import FlextConstants
@@ -29,7 +30,6 @@ class TestFlextMeltanoConfig:
         config.project_root = Path("/test/project")
         config.config_dir = Path(".meltano")
         config.logs_dir = Path("logs")
-        config.environment = "development"
         config.log_level = "info"
         config.meltano_version = "3.9.1"
         config.singer_sdk_version = "0.48.0"
@@ -38,7 +38,6 @@ class TestFlextMeltanoConfig:
         assert config.project_root == Path("/test/project").resolve()
         assert config.config_dir.name == ".meltano"  # Path is resolved, check name
         assert config.logs_dir.name == "logs"  # Path is resolved, check name
-        assert config.environment == "development"
         assert config.log_level == "INFO"  # FlextConfig converts to uppercase
         assert config.meltano_version == "3.9.1"
         assert config.singer_sdk_version == "0.48.0"
@@ -166,14 +165,12 @@ class TestFlextMeltanoConfig:
         """Test environment variables extraction."""
         config = FlextMeltanoConfig(
             project_root=Path("/test/project"),
-            environment="development",
             log_level="debug",
         )
         env_vars = config.get_environment_variables()
 
         assert isinstance(env_vars, dict)
         assert env_vars["MELTANO_PROJECT_ROOT"] == str(config.project_root)
-        assert env_vars["MELTANO_ENVIRONMENT"] == "development"
         assert env_vars["MELTANO_LOG_LEVEL"] == "DEBUG"
 
     def test_class_methods(self) -> None:
@@ -186,7 +183,6 @@ class TestFlextMeltanoConfig:
     def test_get_supported_lists(self) -> None:
         """Test methods that return lists of supported values."""
         plugin_types = FlextMeltanoConfig.get_supported_plugin_types()
-        environments = FlextMeltanoConfig.get_supported_environments()
         log_levels = FlextMeltanoConfig.get_supported_log_levels()
 
         assert isinstance(plugin_types, list)
@@ -194,10 +190,6 @@ class TestFlextMeltanoConfig:
         assert "loaders" in plugin_types
         # Use "transformers" not "transforms" - matches actual implementation
         assert "transformers" in plugin_types
-
-        assert isinstance(environments, list)
-        assert "development" in environments
-        assert "production" in environments
 
         assert isinstance(log_levels, list)
         assert "INFO" in log_levels
@@ -217,7 +209,6 @@ class TestFlextMeltanoConfig:
             assert result.is_success
             config = result.unwrap()
             assert config.project_root == Path(tmp_dir).resolve()
-            assert config.environment == "development"  # default value
 
     def test_create_from_project_root_with_defaults(self) -> None:
         """Test create_from_project_root with default values."""
@@ -233,28 +224,24 @@ class TestFlextMeltanoConfig:
             assert result.is_success
             config = result.unwrap()
             assert config.project_root == Path(tmp_dir).resolve()
-            assert config.environment == "development"  # default
 
     def test_create_for_environment_factory(self) -> None:
         """Test create_for_environment factory method."""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            result = FlextMeltanoConfig.create_for_environment(
-                environment="staging",
+            result = FlextMeltanoConfig(
                 project_root=Path(tmp_dir),
                 log_level="WARNING",
             )
 
             config = result
-            assert config.environment == "staging"
             assert config.log_level == "WARNING"  # FlextConfig converts to uppercase
             assert config.project_root == Path(tmp_dir)
 
     def test_create_for_environment_with_validation_error(self) -> None:
         """Test create_for_environment with invalid parameters."""
         # Should raise ValueError for invalid environment
-        with pytest.raises(ValueError, match="environment"):
-            FlextMeltanoConfig.create_for_environment(
-                environment="invalid_env",
+        with pytest.raises(ValueError):
+            FlextMeltanoConfig(
                 project_root=Path("/nonexistent"),
             )
 
@@ -301,15 +288,6 @@ class TestFlextMeltanoConfigConstants:
 class TestFlextMeltanoConfigEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_invalid_environment_validation(self) -> None:
-        """Test validation fails with invalid environment using create_for_environment."""
-        # Should raise ValueError for invalid environment
-        with pytest.raises(ValueError, match="Invalid environment"):
-            FlextMeltanoConfig.create_for_environment(
-                environment="invalid_environment_name",
-                project_root=Path("/test"),
-            )
-
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
         # Log level has default, so invalid values fall back to default
@@ -327,7 +305,7 @@ class TestFlextMeltanoConfigEdgeCases:
         """Test factory methods handle invalid data gracefully."""
         # Should raise ValueError for invalid environment
         with pytest.raises(ValueError, match="environment"):
-            FlextMeltanoConfig.create_for_environment(
+            FlextMeltanoConfig()
                 environment="invalid",
                 project_root=Path(),
             )

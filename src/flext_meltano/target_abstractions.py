@@ -1,6 +1,6 @@
 """FLEXT Meltano Target Abstractions - Single unified class for target operations.
 
-This module provides the FlextTargetAbstractions class following FLEXT patterns:
+This module provides the FlextMeltanoTargetAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -23,7 +23,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextTargetAbstractions(
+class FlextMeltanoTargetAbstractions(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """UNIFIED Target Abstractions class consolidating ALL target functionality.

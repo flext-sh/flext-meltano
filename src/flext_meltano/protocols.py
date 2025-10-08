@@ -13,7 +13,7 @@ from flext_core import FlextProtocols, FlextResult, FlextTypes
 T_co = TypeVar("T_co", covariant=True)
 
 
-class FlextMeltanoProtocols:
+class FlextMeltanoProtocols(FlextProtocols):
     """Unified Meltano protocols following FLEXT domain extension pattern.
 
     This class consolidates Meltano ELT pipeline protocols while explicitly
@@ -33,19 +33,6 @@ class FlextMeltanoProtocols:
         # Meltano ELT-specific access
         FlextMeltanoProtocols.Meltano.TapProtocol
     """
-
-    # =========================================================================
-    # FOUNDATION PROTOCOL RE-EXPORTS (from flext-core)
-    # =========================================================================
-    # Explicitly re-export foundation protocols for unified access.
-    # This maintains backward compatibility while providing clean namespace access.
-
-    Foundation = FlextProtocols.Foundation
-    Domain = FlextProtocols.Domain
-    Application = FlextProtocols.Application
-    Infrastructure = FlextProtocols.Infrastructure
-    Extensions = FlextProtocols.Extensions
-    Commands = FlextProtocols.Commands
 
     # =========================================================================
     # MELTANO ELT-SPECIFIC PROTOCOLS

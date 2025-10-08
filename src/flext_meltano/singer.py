@@ -48,7 +48,9 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
     def execute_pipeline(
         self, tap_instance: object, target_instance: object
-    ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
+    ) -> FlextResult[
+        FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
+    ]:
         """Execute Singer pipeline with advanced protocol management.
 
         Args:
@@ -92,9 +94,9 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
-                error_msg
-            )
+            return FlextResult[
+                FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
+            ].fail(error_msg)
 
     def execute_complete_elt_pipeline(
         self,
@@ -103,7 +105,9 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
         transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
         | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
+    ) -> FlextResult[
+        FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
+    ]:
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
@@ -151,6 +155,6 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
-                error_msg
-            )
+            return FlextResult[
+                FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
+            ].fail(error_msg)

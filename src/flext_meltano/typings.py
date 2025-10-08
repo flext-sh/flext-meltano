@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Literal
 
 from flext_core import FlextTypes
-from pydantic import ConfigDict as PydanticConfigDict
 from singer_sdk import typing as singer_sdk_typing
 
 
@@ -259,10 +258,6 @@ class FlextMeltanoTypes(FlextTypes):
         type ResponseDict = dict[str, str | int | bool | FlextTypes.Dict]
 
 
-# Export ConfigDict for backward compatibility
-ConfigDict = PydanticConfigDict
-
 __all__ = [
-    "ConfigDict",
     "FlextMeltanoTypes",
 ]

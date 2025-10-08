@@ -20,13 +20,9 @@ from flext_core import (
     FlextTypes,
 )
 
-# Import from specific modules to avoid circular dependencies
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.typings import FlextMeltanoTypes
-
-# Type aliases for cleaner code
-Project = FlextMeltanoTypes.Dbt.Project
 
 
 class FlextMeltanoPipelineService(
@@ -52,7 +48,7 @@ class FlextMeltanoPipelineService(
 
     def execute_pipeline(
         self,
-        project: object,
+        project: FlextMeltanoTypes.Dbt.Project,
         extractor_name: str,
         loader_name: str,
     ) -> FlextResult[FlextTypes.StringDict]:
@@ -63,7 +59,7 @@ class FlextMeltanoPipelineService(
         and provide composable pipeline execution.
 
         Args:
-            project: Meltano project instance
+            project: Meltano FlextMeltanoTypes.Dbt.Project instance
             extractor_name: Name of the extractor plugin
             loader_name: Name of the loader plugin
 
@@ -133,13 +129,13 @@ class FlextMeltanoPipelineService(
     def _find_required_plugins(
         self,
     ) -> FlextResult[tuple[object, object]]:
-        """Find required plugins in project."""
+        """Find required plugins in FlextMeltanoTypes.Dbt.Project."""
         # Simplified implementation - would need actual plugin discovery
         return FlextResult[tuple[object, object]].ok(data=(object(), object()))
 
     def _create_elt_context(
         self,
-        project: object,
+        project: FlextMeltanoTypes.Dbt.Project,
         extractor_name: str,
         loader_name: str,
         plugins: tuple[object, object],
@@ -148,7 +144,7 @@ class FlextMeltanoPipelineService(
         try:
             # Use abstraction layer to create ELT context
             elt_context_result = self._abstractions.create_elt_context(
-                cast("Project", project), extractor_name, loader_name
+                project, extractor_name, loader_name
             )
 
             if elt_context_result.is_failure:
@@ -164,7 +160,7 @@ class FlextMeltanoPipelineService(
 
             # Execute singer pipeline
             execution_result = self._abstractions.execute_singer_pipeline(
-                cast("FlextMeltanoTypes.MeltanoCore.ELTContext", elt_context_obj),
+                elt_context_obj,
                 extractor_plugin_obj,
                 loader_plugin_obj,
             )
@@ -182,7 +178,7 @@ class FlextMeltanoPipelineService(
             elt_context_result.unwrap()
 
             context_data: FlextMeltanoTypes.MeltanoCore.RunContextDict = {
-                "project": "project",
+                "FlextMeltanoTypes.Dbt.Project": "FlextMeltanoTypes.Dbt.Project",
                 "elt_context": "elt_context",
                 "extractor_plugin": "extractor_plugin",
                 "loader_plugin": "loader_plugin",
@@ -253,7 +249,7 @@ class FlextMeltanoPipelineService(
         try:
             # Extract context data
             elt_context_obj = context_data["elt_context"]
-            project_obj = context_data["project"]
+            project_obj = context_data["FlextMeltanoTypes.Dbt.Project"]
             execution_result = context_data.get("execution_result", {})
 
             # Build pipeline result using available data

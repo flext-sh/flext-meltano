@@ -49,7 +49,7 @@ src/flext_meltano/
 **Key Components**:
 
 - **FlextMeltanoService**: Unified service following FlextService pattern
-- **Service Implementations**: FlextTapService, FlextTargetService, FlextDbtService
+- **Service Implementations**: FlextMeltanoTapService, FlextTargetService, FlextDbtService
 - **Plugin Protocols**: TapServiceProtocol, TargetServiceProtocol, DbtServiceProtocol
 
 ### **Execution Layer**
@@ -70,9 +70,9 @@ src/flext_meltano/
 **Protocol and Data Integration**
 
 ```python
-├── singer_types.py           # FlextSingerTypes (Singer protocol abstractions)
-├── tap_abstractions.py       # FlextTapAbstractions with TapConfig, StreamDefinition
-├── target_abstractions.py   # FlextTargetAbstractions for target operations
+├── singer_types.py           # FlextMeltanoTypes (Singer protocol abstractions)
+├── tap_abstractions.py       # FlextMeltanoTapAbstractions with TapConfig, StreamDefinition
+├── target_abstractions.py   # FlextMeltanoTargetAbstractions for target operations
 └── file_managers.py         # FlextMeltanoFileManagers for file operations
 ```
 
@@ -97,10 +97,10 @@ src/flext_meltano/
 ```mermaid
 graph TD
     A[External Request] --> B[FlextMeltanoService]
-    B --> C[FlextTapAbstractions]
+    B --> C[FlextMeltanoTapAbstractions]
     C --> D[Singer Protocol]
     D --> E[Data Extraction]
-    E --> F[FlextTargetAbstractions]
+    E --> F[FlextMeltanoTargetAbstractions]
     F --> G[Data Loading]
     G --> H[FlextResult Response]
 

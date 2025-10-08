@@ -6,7 +6,7 @@ from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsUtilities
 from pydantic import ValidationError
 
-from flext_meltano import FlextTargetAbstractions
+from flext_meltano import FlextMeltanoTargetAbstractions
 
 logger = FlextLogger(__name__)
 
@@ -14,12 +14,12 @@ logger = FlextLogger(__name__)
 # SPDX-License-Identifier: MIT
 
 
-class TestFlextTargetAbstractionsComplete:
-    """Complete test suite for FlextTargetAbstractions using flext_tests exclusively."""
+class TestFlextMeltanoTargetAbstractionsComplete:
+    """Complete test suite for FlextMeltanoTargetAbstractions using flext_tests exclusively."""
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-        self.target_abstractions = FlextTargetAbstractions()
+        self.target_abstractions = FlextMeltanoTargetAbstractions()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
@@ -40,7 +40,7 @@ class TestFlextTargetAbstractionsComplete:
             "max_batches": 50,
         }
 
-        config = FlextTargetAbstractions.FlextTargetConfig.model_validate(
+        config = FlextMeltanoTargetAbstractions.FlextTargetConfig.model_validate(
             test_config_data,
         )
 
@@ -65,7 +65,7 @@ class TestFlextTargetAbstractionsComplete:
         """Test FlextTargetConfig validation errors using flext_tests."""
         # Test invalid target_type using flext_tests error patterns
         try:
-            FlextTargetAbstractions.FlextTargetConfig(
+            FlextMeltanoTargetAbstractions.FlextTargetConfig(
                 target_type="",
                 connection_config={"test": "config"},
                 batch_size=100,
@@ -86,7 +86,7 @@ class TestFlextTargetAbstractionsComplete:
     # =========================================================================
 
     def test_flext_stream_info_validation(self) -> None:
-        """Test FlextStreamInfo validation using flext_tests."""
+        """Test FlextMeltanoStreamInfo validation using flext_tests."""
         # Create test stream info using flext_tests data
         test_stream_data = {
             "stream_name": "test_stream",
@@ -97,8 +97,10 @@ class TestFlextTargetAbstractionsComplete:
             "created_at": "2025-01-01T00:00:00Z",
         }
 
-        stream_info = FlextTargetAbstractions.FlextStreamInfo.model_validate(
-            test_stream_data,
+        stream_info = (
+            FlextMeltanoTargetAbstractions.FlextMeltanoStreamInfo.model_validate(
+                test_stream_data,
+            )
         )
 
         # Use flext_tests assertions
@@ -123,8 +125,8 @@ class TestFlextTargetAbstractionsComplete:
     # =========================================================================
 
     def test_target_abstractions_initialization(self) -> None:
-        """Test FlextTargetAbstractions initialization using flext_tests."""
-        target_abs = FlextTargetAbstractions()
+        """Test FlextMeltanoTargetAbstractions initialization using flext_tests."""
+        target_abs = FlextMeltanoTargetAbstractions()
 
         self.test_assertions.assert_true(
             condition=target_abs is not None,
@@ -234,8 +236,8 @@ class TestFlextTargetAbstractionsComplete:
     # =========================================================================
 
     def test_nested_classes_if_exist(self) -> None:
-        """Test nested classes if they exist in FlextTargetAbstractions."""
-        target_abs = FlextTargetAbstractions()
+        """Test nested classes if they exist in FlextMeltanoTargetAbstractions."""
+        target_abs = FlextMeltanoTargetAbstractions()
 
         # Check if there are nested classes and test them
         class_attributes = [
@@ -290,9 +292,9 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_field_validators_error_coverage(self) -> None:
         """Test field validation errors to cover lines 105-106, 113-114."""
-        # Test FlextStreamInfo stream_name validation error (line 105-106)
+        # Test FlextMeltanoStreamInfo stream_name validation error (line 105-106)
         try:
-            FlextTargetAbstractions.FlextStreamInfo(
+            FlextMeltanoTargetAbstractions.FlextMeltanoStreamInfo(
                 stream_name="",  # Empty string should fail
                 schema={"properties": {"id": {"type": "integer"}}},
                 created_at="2025-01-01T10:00:00Z",
@@ -308,9 +310,9 @@ class TestFlextTargetAbstractionsComplete:
                 message="Should raise stream_name validation error",
             )
 
-        # Test FlextStreamInfo schema validation error (line 113-114)
+        # Test FlextMeltanoStreamInfo schema validation error (line 113-114)
         try:
-            FlextTargetAbstractions.FlextStreamInfo(
+            FlextMeltanoTargetAbstractions.FlextMeltanoStreamInfo(
                 stream_name="test_stream",
                 schema={"type": "object"},  # Missing properties should fail
                 created_at="2025-01-01T10:00:00Z",
@@ -687,7 +689,7 @@ class TestFlextTargetAbstractionsComplete:
         )
 
         # Test create_instance factory method (lines 620-625)
-        instance_result = FlextTargetAbstractions.create_instance()
+        instance_result = FlextMeltanoTargetAbstractions.create_instance()
 
         self.test_assertions.assert_true(
             condition=isinstance(instance_result, FlextResult),
@@ -700,8 +702,8 @@ class TestFlextTargetAbstractionsComplete:
 
         instance = instance_result.unwrap()
         self.test_assertions.assert_true(
-            condition=isinstance(instance, FlextTargetAbstractions),
-            message="Should create FlextTargetAbstractions instance",
+            condition=isinstance(instance, FlextMeltanoTargetAbstractions),
+            message="Should create FlextMeltanoTargetAbstractions instance",
         )
 
     def test_error_handling_edge_cases(self) -> None:
@@ -733,6 +735,6 @@ class TestFlextTargetAbstractionsComplete:
 
     def test_business_rules_validation_exception_case(self) -> None:
         """Test business rules validation exception case to cover line 141-142."""
-        # FlextTargetAbstractions doesn't have validate_business_rules method
+        # FlextMeltanoTargetAbstractions doesn't have validate_business_rules method
         # This test is no longer applicable
         assert self.target_abstractions is not None

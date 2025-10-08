@@ -22,7 +22,6 @@ from flext_core import (
     FlextUtilities,
 )
 
-# Direct imports to avoid circular dependencies
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants

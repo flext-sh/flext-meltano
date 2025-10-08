@@ -13,7 +13,7 @@ Layer 1: CLI Arguments (string list)
 Layer 2: Dictionary (key-value pairs)
     ↓ (converted by FlextCliModels.CliModelConverter)
 Layer 3: Pydantic Models (TapRunParams, TargetRunParams, etc.)
-    ↓ (translated by SingerCliTranslator) ← THIS MODULE
+    ↓ (translated by FlextMeltanoSingerCliTranslator) ← THIS MODULE
 Layer 4: Singer SDK Commands (list of strings)
     ↓ (executed by subprocess)
 Layer 5: Singer SDK Execution
@@ -25,7 +25,7 @@ Layer 5: Singer SDK Execution
 
 ```python
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_cli_translator import SingerCliTranslator
+from flext_meltano.singer_cli_translator import FlextMeltanoSingerCliTranslator
 
 # Create tap parameters
 tap_params = FlextMeltanoModels.TapRunParams(
@@ -36,13 +36,15 @@ tap_params = FlextMeltanoModels.TapRunParams(
 )
 
 # Translate to Singer SDK command
-command_result = SingerCliTranslator.translate_tap_run(tap_params)
+command_result = FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
 if command_result.is_success:
     singer_command = command_result.unwrap()
     # singer_command = ["tap-postgres", "--config", "config/tap-config.json", ...]
 
     # Execute Singer SDK command
-    execution_result = SingerCliTranslator.execute_singer_command(singer_command)
+    execution_result = FlextMeltanoSingerCliTranslator.execute_singer_command(
+        singer_command
+    )
     if execution_result.is_success:
         output = execution_result.unwrap()
         print(f"Tap executed: {output['stdout']}")
@@ -61,7 +63,9 @@ pipeline_params = FlextMeltanoModels.PipelineRunParams(
 )
 
 # Translate to tap and target commands
-commands_result = SingerCliTranslator.translate_pipeline_run(pipeline_params)
+commands_result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(
+    pipeline_params
+)
 if commands_result.is_success:
     tap_command, target_command = commands_result.unwrap()
     # Execute as pipeline: tap_command | target_command
@@ -74,8 +78,8 @@ All methods return `FlextResult[T]` for type-safe error handling:
 ```python
 # Example: Chain operations with FlextResult
 result = (
-    SingerCliTranslator.translate_tap_run(tap_params)
-    .flat_map(lambda cmd: SingerCliTranslator.execute_singer_command(cmd))
+    FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
+    .flat_map(lambda cmd: FlextMeltanoSingerCliTranslator.execute_singer_command(cmd))
     .map(lambda output: output["stdout"])
 )
 
@@ -96,7 +100,7 @@ from flext_core import FlextResult, FlextUtilities
 from flext_meltano.models import FlextMeltanoModels
 
 
-class SingerCliTranslator:
+class FlextMeltanoSingerCliTranslator:
     """Translates Pydantic models to Singer SDK CLI commands.
 
     Provides model-driven CLI command generation for Singer taps, targets,
@@ -305,4 +309,4 @@ class SingerCliTranslator:
         return FlextResult[Path | None].ok(path)
 
 
-__all__ = ["SingerCliTranslator"]
+__all__ = ["FlextMeltanoSingerCliTranslator"]

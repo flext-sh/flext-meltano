@@ -90,7 +90,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         """Test that NO aliases exist - direct API access only."""
         # Verify the class does NOT have backward compatibility aliases
         no_alias_attributes = [
-            "FlextTapPlugin",
+            "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
             "FlextDbtPlugin",
             "TapService",
@@ -134,7 +134,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
 
         # Should NOT export any aliases
         forbidden_exports = [
-            "FlextTapPlugin",
+            "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
             "FlextDbtPlugin",
             "TapService",

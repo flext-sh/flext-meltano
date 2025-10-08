@@ -57,7 +57,7 @@ def simple_config_example() -> None:
 
     # Show environment value
     if config is not None:
-        logger.info(f"Environment: {config.environment}")
+        logger.info(f"Environment: {getattr(config, 'environment', 'unknown')}")
     else:
         logger.info("Environment: config is None")
 

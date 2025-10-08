@@ -7,19 +7,19 @@ from flext_tests import FlextTestsUtilities
 from pydantic_core import ValidationError
 
 from flext_meltano import (
-    FlextTapAbstractions,
+    FlextMeltanoTapAbstractions,
     StreamDefinition,
     TapConfig,
     TapInstance,
 )
 
 
-class TestFlextTapAbstractionsComplete:
-    """Complete test suite for FlextTapAbstractions using flext_tests exclusively."""
+class TestFlextMeltanoTapAbstractionsComplete:
+    """Complete test suite for FlextMeltanoTapAbstractions using flext_tests exclusively."""
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-        self.tap_abstractions = FlextTapAbstractions()
+        self.tap_abstractions = FlextMeltanoTapAbstractions()
         self.test_utils = FlextTestsUtilities.utilities()
         self.test_assertions = FlextTestsUtilities.assertion()
         self.functional_service = FlextTestsUtilities.functional_service(
@@ -139,8 +139,8 @@ class TestFlextTapAbstractionsComplete:
     # =========================================================================
 
     def test_tap_abstractions_initialization(self) -> None:
-        """Test FlextTapAbstractions initialization using flext_tests."""
-        tap_abs = FlextTapAbstractions()
+        """Test FlextMeltanoTapAbstractions initialization using flext_tests."""
+        tap_abs = FlextMeltanoTapAbstractions()
 
         self.test_assertions.assert_true(
             condition=tap_abs is not None,
@@ -148,7 +148,7 @@ class TestFlextTapAbstractionsComplete:
         )
         self.test_assertions.assert_equals(
             actual=tap_abs.service_name,
-            expected="FlextTapAbstractions",
+            expected="FlextMeltanoTapAbstractions",
             message="Service name should match",
         )
         self.test_assertions.assert_true(
@@ -878,7 +878,7 @@ class TestFlextTapAbstractionsComplete:
 
     def test_create_instance_factory(self) -> None:
         """Test create_instance factory method using flext_tests."""
-        result = FlextTapAbstractions.create_instance()
+        result = FlextMeltanoTapAbstractions.create_instance()
 
         self.test_assertions.assert_true(
             condition=isinstance(result, FlextResult),
@@ -887,12 +887,12 @@ class TestFlextTapAbstractionsComplete:
         if result.is_success:
             instance = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(instance, FlextTapAbstractions),
-                message="Should return FlextTapAbstractions instance",
+                condition=isinstance(instance, FlextMeltanoTapAbstractions),
+                message="Should return FlextMeltanoTapAbstractions instance",
             )
             self.test_assertions.assert_equals(
                 actual=instance.service_name,
-                expected="FlextTapAbstractions",
+                expected="FlextMeltanoTapAbstractions",
                 message="Service name should match",
             )
 

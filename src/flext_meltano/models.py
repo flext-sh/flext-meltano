@@ -20,7 +20,6 @@ from pydantic import (
     model_validator,
 )
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 

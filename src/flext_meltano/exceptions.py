@@ -800,7 +800,7 @@ FlextDbtModelError = FlextMeltanoExceptions.DbtModelError
 FlextPipelineError = FlextMeltanoExceptions.PipelineError
 FlextPipelineExecutionError = FlextMeltanoExceptions.PipelineExecutionError
 FlextCatalogDiscoveryError = FlextMeltanoExceptions.CatalogDiscoveryError
-FlextStreamValidationError = FlextMeltanoExceptions.StreamValidationError
+FlextMeltanoStreamValidationError = FlextMeltanoExceptions.StreamValidationError
 FlextConfigBuilderError = FlextMeltanoExceptions.ConfigBuilderError
 
 __all__ = [
@@ -813,6 +813,7 @@ __all__ = [
     "FlextMeltanoErrorCodes",
     "FlextMeltanoExceptions",
     "FlextMeltanoProjectError",
+    "FlextMeltanoStreamValidationError",
     "FlextPipelineError",
     "FlextPipelineExecutionError",
     "FlextPluginError",
@@ -821,5 +822,4 @@ __all__ = [
     "FlextSingerCatalogError",
     "FlextSingerProtocolError",
     "FlextSingerStreamError",
-    "FlextStreamValidationError",
 ]
