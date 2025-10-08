@@ -18,7 +18,7 @@ from flext_core import FlextLogger, FlextResult, FlextTypes
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_cli_translator import SingerCliTranslator
+from flext_meltano.singer_cli_translator import FlextMeltanoSingerCliTranslator
 from flext_meltano.typings import FlextMeltanoTypes
 
 
@@ -156,7 +156,7 @@ class FlextMeltanoCLI:
         """Execute a complete Singer pipeline (tap → target) using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to PipelineRunParams model,
-        then SingerCliTranslator to generate both tap and target Singer SDK commands.
+        then FlextMeltanoSingerCliTranslator to generate both tap and target Singer SDK commands.
         """
         if not args:
             self._output.print_error("Tap and target names required")
@@ -196,7 +196,9 @@ class FlextMeltanoCLI:
             self._output.print_message(f"  State: {pipeline_params.state_file}")
 
         # Translate to Singer SDK commands (tap and target)
-        commands_result = SingerCliTranslator.translate_pipeline_run(pipeline_params)
+        commands_result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(
+            pipeline_params
+        )
 
         if commands_result.is_failure:
             self._output.print_error(
@@ -270,7 +272,7 @@ class FlextMeltanoCLI:
         """Run a Singer tap using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to TapRunParams model,
-        then SingerCliTranslator to generate Singer SDK command.
+        then FlextMeltanoSingerCliTranslator to generate Singer SDK command.
         """
         if not args:
             self._output.print_error("Tap name required")
@@ -302,7 +304,7 @@ class FlextMeltanoCLI:
             self._output.print_message("  Mode: Discovery")
 
         # Translate to Singer SDK command
-        command_result = SingerCliTranslator.translate_tap_run(tap_params)
+        command_result = FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
 
         if command_result.is_failure:
             self._output.print_error(
@@ -313,7 +315,7 @@ class FlextMeltanoCLI:
         singer_command = command_result.unwrap()
 
         # Execute Singer SDK command
-        execution_result = SingerCliTranslator.execute_singer_command(
+        execution_result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             singer_command, timeout=300
         )
 
@@ -402,7 +404,7 @@ class FlextMeltanoCLI:
         """Run a Singer target using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to TargetRunParams model,
-        then SingerCliTranslator to generate Singer SDK command.
+        then FlextMeltanoSingerCliTranslator to generate Singer SDK command.
         """
         if not args:
             self._output.print_error("Target name required")
@@ -432,7 +434,9 @@ class FlextMeltanoCLI:
             self._output.print_message(f"  Input: {target_params.input_file}")
 
         # Translate to Singer SDK command
-        command_result = SingerCliTranslator.translate_target_run(target_params)
+        command_result = FlextMeltanoSingerCliTranslator.translate_target_run(
+            target_params
+        )
 
         if command_result.is_failure:
             self._output.print_error(
@@ -443,7 +447,7 @@ class FlextMeltanoCLI:
         singer_command = command_result.unwrap()
 
         # Execute Singer SDK command
-        execution_result = SingerCliTranslator.execute_singer_command(
+        execution_result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             singer_command, timeout=300
         )
 
@@ -902,7 +906,7 @@ class FlextMeltanoCLI:
         self.logger.info(f"Running tap with params: {params.model_dump()}")
 
         # Translate Pydantic model to Singer CLI command
-        command_result = SingerCliTranslator.translate_tap_run(params)
+        command_result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
         if command_result.is_failure:
             return FlextResult[None].fail(
                 f"Command translation failed: {command_result.error}"
@@ -912,7 +916,7 @@ class FlextMeltanoCLI:
         self._output.print_message(f"Executing Singer tap: {' '.join(command)}")
 
         # Execute Singer command
-        exec_result = SingerCliTranslator.execute_singer_command(command)
+        exec_result = FlextMeltanoSingerCliTranslator.execute_singer_command(command)
         if exec_result.is_failure:
             self._output.print_error(f"Tap execution failed: {exec_result.error}")
             return FlextResult[None].fail(exec_result.error)
@@ -953,7 +957,7 @@ class FlextMeltanoCLI:
         self.logger.info(f"Running target with params: {params.model_dump()}")
 
         # Translate Pydantic model to Singer CLI command
-        command_result = SingerCliTranslator.translate_target_run(params)
+        command_result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
         if command_result.is_failure:
             return FlextResult[None].fail(
                 f"Command translation failed: {command_result.error}"
@@ -963,7 +967,7 @@ class FlextMeltanoCLI:
         self._output.print_message(f"Executing Singer target: {' '.join(command)}")
 
         # Execute Singer command
-        exec_result = SingerCliTranslator.execute_singer_command(command)
+        exec_result = FlextMeltanoSingerCliTranslator.execute_singer_command(command)
         if exec_result.is_failure:
             self._output.print_error(f"Target execution failed: {exec_result.error}")
             return FlextResult[None].fail(exec_result.error)
@@ -1006,7 +1010,7 @@ class FlextMeltanoCLI:
         self.logger.info(f"Running pipeline with params: {params.model_dump()}")
 
         # Translate Pydantic model to tap and target commands
-        commands_result = SingerCliTranslator.translate_pipeline_run(params)
+        commands_result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
         if commands_result.is_failure:
             return FlextResult[None].fail(
                 f"Command translation failed: {commands_result.error}"
@@ -1018,7 +1022,7 @@ class FlextMeltanoCLI:
         )
 
         # Execute tap
-        tap_result = SingerCliTranslator.execute_singer_command(tap_command)
+        tap_result = FlextMeltanoSingerCliTranslator.execute_singer_command(tap_command)
         if tap_result.is_failure:
             self._output.print_error(f"Tap execution failed: {tap_result.error}")
             return FlextResult[None].fail(tap_result.error)
@@ -1026,7 +1030,7 @@ class FlextMeltanoCLI:
         tap_output = tap_result.unwrap()
 
         # Execute target with tap output as input
-        target_result = SingerCliTranslator.execute_singer_command(
+        target_result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             target_command, input_data=tap_output.get("stdout")
         )
         if target_result.is_failure:

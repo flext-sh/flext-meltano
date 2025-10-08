@@ -28,14 +28,14 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 ```python
 # Example: flext-tap-oracle integration
 from flext_core import FlextService, FlextResult
-from flext_meltano import FlextTapAbstractions, StreamDefinition
+from flext_meltano import FlextMeltanoTapAbstractions, StreamDefinition
 
 class FlextOracleTapService(FlextService):
     """Oracle tap using flext-meltano Singer abstractions."""
 
     def __init__(self):
         super().__init__()
-        self._tap_abstractions = FlextTapAbstractions()
+        self._tap_abstractions = FlextMeltanoTapAbstractions()
 
     def discover_oracle_streams(self, config: dict) -> FlextResult[list[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
@@ -53,14 +53,14 @@ class FlextOracleTapService(FlextService):
 ```python
 # Example: flext-target-oracle integration
 from flext_core import FlextService, FlextResult
-from flext_meltano import FlextTargetAbstractions
+from flext_meltano import FlextMeltanoTargetAbstractions
 
 class FlextOracleTargetService(FlextService):
     """Oracle target using flext-meltano Singer abstractions."""
 
     def __init__(self):
         super().__init__()
-        self._target_abstractions = FlextTargetAbstractions()
+        self._target_abstractions = FlextMeltanoTargetAbstractions()
 
     def load_to_oracle(self, records: list, config: dict) -> FlextResult[FlextTypes.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
@@ -184,11 +184,11 @@ response = bridge.handle_bridge_request({
 
 | Project Category        | Integration Pattern     | Status     | Notes                        |
 | ----------------------- | ----------------------- | ---------- | ---------------------------- |
-| **flext-tap-csv**       | FlextTapAbstractions    | ✅ Active  | Working Singer abstractions  |
-| **flext-tap-oracle**    | FlextTapAbstractions    | ✅ Active  | Real Meltano integration     |
-| **flext-tap-ldap**      | FlextTapAbstractions    | ✅ Active  | Singer protocol compliance   |
-| **flext-target-oracle** | FlextTargetAbstractions | ✅ Active  | Target service wrappers      |
-| **flext-target-ldap**   | FlextTargetAbstractions | ✅ Active  | Load operation abstractions  |
+| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
+| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
+| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
+| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
+| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
 | **flext-dbt-oracle**    | FlextMeltanoDbtService  | 🔴 Limited | Placeholder implementation   |
 | **DataCosmos**          | Complete ELT Foundation | 🟡 Partial | Blocked by compliance issues |
 
@@ -196,14 +196,14 @@ response = bridge.handle_bridge_request({
 
 \__For flext-tap-_ projects\_\*:
 
-1. Use FlextTapAbstractions for all Singer operations
+1. Use FlextMeltanoTapAbstractions for all Singer operations
 2. Follow FlextResult patterns for error handling
 3. Implement stream discovery and data extraction
 4. Maintain Singer protocol compliance
 
 \__For flext-target-_ projects\_\*:
 
-1. Use FlextTargetAbstractions for all load operations
+1. Use FlextMeltanoTargetAbstractions for all load operations
 2. Implement record loading with validation
 3. Handle Singer message processing
 4. Follow FLEXT service patterns
@@ -272,7 +272,7 @@ flext-cli = "^0.9.9"      # CLI development tools
 
 **Current Development Approach**:
 
-1. **Use Working Abstractions**: FlextTapAbstractions and FlextTargetAbstractions are fully functional
+1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and FlextMeltanoTargetAbstractions are fully functional
 2. **Follow FlextResult Patterns**: Maintain consistency for future compatibility
 3. **Plan for Updates**: Design integration patterns to accommodate resolution
 4. **Document Limitations**: Clear communication about current constraints
@@ -296,12 +296,12 @@ flext-cli = "^0.9.9"      # CLI development tools
 
 ```python
 from flext_core import FlextContainer
-from flext_meltano import FlextTapAbstractions
+from flext_meltano import FlextMeltanoTapAbstractions
 
 # Register services for ecosystem consumption
 container = FlextContainer.get_global()
-container.register("tap_abstractions", FlextTapAbstractions)
-container.register("target_abstractions", FlextTargetAbstractions)
+container.register("tap_abstractions", FlextMeltanoTapAbstractions)
+container.register("target_abstractions", FlextMeltanoTargetAbstractions)
 ```
 
 **2. Configuration Management**:

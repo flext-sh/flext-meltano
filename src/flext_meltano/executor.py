@@ -20,7 +20,6 @@ from flext_core import (
     FlextTypes,
 )
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants

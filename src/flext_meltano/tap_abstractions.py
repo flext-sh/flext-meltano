@@ -1,6 +1,6 @@
 """FLEXT Meltano Tap Abstractions - Single unified class for tap operations.
 
-This module provides the FlextTapAbstractions class following FLEXT patterns:
+This module provides the FlextMeltanoTapAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -26,7 +26,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextTapAbstractions(
+class FlextMeltanoTapAbstractions(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """UNIFIED Tap Abstractions class consolidating ALL tap functionality.

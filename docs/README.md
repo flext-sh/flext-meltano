@@ -51,8 +51,8 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 ### **Key Components**
 
 - **FlextMeltanoService**: Core ELT orchestration
-- **FlextTapAbstractions**: Singer tap integration
-- **FlextTargetAbstractions**: Singer target integration
+- **FlextMeltanoTapAbstractions**: Singer tap integration
+- **FlextMeltanoTargetAbstractions**: Singer target integration
 - **FlextMeltanoAdapter**: Meltano project management (requires abstraction work)
 - **FlextMeltanoExecutor**: Command execution engine
 

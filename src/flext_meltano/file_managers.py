@@ -23,7 +23,6 @@ from flext_core import (
     FlextUtilities,
 )
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators

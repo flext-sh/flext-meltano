@@ -63,10 +63,10 @@ print("flext-meltano service initialized")
 ### **Singer Protocol Operations**
 
 ```python
-from flext_meltano import FlextTapAbstractions
+from flext_meltano import FlextMeltanoTapAbstractions
 
 # Initialize tap abstractions
-tap_abstractions = FlextTapAbstractions()
+tap_abstractions = FlextMeltanoTapAbstractions()
 
 # Example catalog discovery (requires configured tap)
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")

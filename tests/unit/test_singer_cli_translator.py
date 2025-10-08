@@ -1,4 +1,4 @@
-"""Comprehensive tests for SingerCliTranslator module.
+"""Comprehensive tests for FlextMeltanoSingerCliTranslator module.
 
 Tests the complete Singer SDK CLI command translation layer including:
 - Pydantic model to CLI command conversion
@@ -17,10 +17,10 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_cli_translator import SingerCliTranslator
+from flext_meltano.singer_cli_translator import FlextMeltanoSingerCliTranslator
 
 
-class TestSingerCliTranslatorTapRun:
+class TestFlextMeltanoSingerCliTranslatorTapRun:
     """Test translate_tap_run method."""
 
     def test_translate_tap_run_minimal(self) -> None:
@@ -30,7 +30,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -43,7 +43,7 @@ class TestSingerCliTranslatorTapRun:
             discover=True,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -57,7 +57,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -71,7 +71,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -85,7 +85,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -99,7 +99,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -116,7 +116,7 @@ class TestSingerCliTranslatorTapRun:
             discover=False,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -141,7 +141,7 @@ class TestSingerCliTranslatorTapRun:
             discover=True,
         )
 
-        result = SingerCliTranslator.translate_tap_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -149,7 +149,7 @@ class TestSingerCliTranslatorTapRun:
         assert command == ["tap-postgres", "--discover"]
 
 
-class TestSingerCliTranslatorTargetRun:
+class TestFlextMeltanoSingerCliTranslatorTargetRun:
     """Test translate_target_run method."""
 
     def test_translate_target_run_minimal(self) -> None:
@@ -158,7 +158,7 @@ class TestSingerCliTranslatorTargetRun:
             target_name="target-postgres",
         )
 
-        result = SingerCliTranslator.translate_target_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -171,7 +171,7 @@ class TestSingerCliTranslatorTargetRun:
             config_file="/path/to/config.json",
         )
 
-        result = SingerCliTranslator.translate_target_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -184,7 +184,7 @@ class TestSingerCliTranslatorTargetRun:
             input_file="/path/to/input.jsonl",
         )
 
-        result = SingerCliTranslator.translate_target_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -198,7 +198,7 @@ class TestSingerCliTranslatorTargetRun:
             input_file="/path/to/input.jsonl",
         )
 
-        result = SingerCliTranslator.translate_target_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -211,7 +211,7 @@ class TestSingerCliTranslatorTargetRun:
         ]
 
 
-class TestSingerCliTranslatorPipelineRun:
+class TestFlextMeltanoSingerCliTranslatorPipelineRun:
     """Test translate_pipeline_run method."""
 
     def test_translate_pipeline_run_minimal(self) -> None:
@@ -221,7 +221,7 @@ class TestSingerCliTranslatorPipelineRun:
             target_name="target-postgres",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -236,7 +236,7 @@ class TestSingerCliTranslatorPipelineRun:
             tap_config="/path/to/tap-config.json",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -251,7 +251,7 @@ class TestSingerCliTranslatorPipelineRun:
             target_config="/path/to/target-config.json",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -270,7 +270,7 @@ class TestSingerCliTranslatorPipelineRun:
             catalog_file="/path/to/catalog.json",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -285,7 +285,7 @@ class TestSingerCliTranslatorPipelineRun:
             state_file="/path/to/state.json",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -303,7 +303,7 @@ class TestSingerCliTranslatorPipelineRun:
             state_file="/path/to/state.json",
         )
 
-        result = SingerCliTranslator.translate_pipeline_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
         tap_command, target_command = result.unwrap()
@@ -323,7 +323,7 @@ class TestSingerCliTranslatorPipelineRun:
         ]
 
 
-class TestSingerCliTranslatorDbtRun:
+class TestFlextMeltanoSingerCliTranslatorDbtRun:
     """Test translate_dbt_run method."""
 
     def test_translate_dbt_run_minimal(self) -> None:
@@ -332,7 +332,7 @@ class TestSingerCliTranslatorDbtRun:
             project_dir="/path/to/dbt/project",
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -345,7 +345,7 @@ class TestSingerCliTranslatorDbtRun:
             models="users orders",
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -365,7 +365,7 @@ class TestSingerCliTranslatorDbtRun:
             select="tag:daily",
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -385,7 +385,7 @@ class TestSingerCliTranslatorDbtRun:
             exclude="tag:deprecated",
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -405,7 +405,7 @@ class TestSingerCliTranslatorDbtRun:
             full_refresh=True,
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -424,7 +424,7 @@ class TestSingerCliTranslatorDbtRun:
             vars='{"key": "value"}',
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -448,7 +448,7 @@ class TestSingerCliTranslatorDbtRun:
             vars='{"environment": "production"}',
         )
 
-        result = SingerCliTranslator.translate_dbt_run(params)
+        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
         command = result.unwrap()
@@ -469,7 +469,7 @@ class TestSingerCliTranslatorDbtRun:
         ]
 
 
-class TestSingerCliTranslatorExecuteCommand:
+class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     """Test execute_singer_command method."""
 
     @patch("flext_core.utilities.FlextUtilities.run_external_command")
@@ -481,7 +481,7 @@ class TestSingerCliTranslatorExecuteCommand:
             stderr="",
         )
 
-        result = SingerCliTranslator.execute_singer_command([
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-postgres",
             "--config",
             "config.json",
@@ -506,7 +506,7 @@ class TestSingerCliTranslatorExecuteCommand:
         )
 
         input_data = '{"type": "RECORD", "stream": "users"}'
-        result = SingerCliTranslator.execute_singer_command(
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             ["target-postgres"], input_data=input_data
         )
 
@@ -525,7 +525,9 @@ class TestSingerCliTranslatorExecuteCommand:
             stderr="Error: Connection failed",
         )
 
-        result = SingerCliTranslator.execute_singer_command(["tap-postgres"])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
+            "tap-postgres"
+        ])
 
         assert result.is_failure
         assert "Command failed with code 1" in result.error
@@ -536,7 +538,7 @@ class TestSingerCliTranslatorExecuteCommand:
         """Test command execution timeout."""
         mock_run.side_effect = subprocess.TimeoutExpired("tap-postgres", 10)
 
-        result = SingerCliTranslator.execute_singer_command(
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             ["tap-postgres"], timeout=10
         )
 
@@ -548,7 +550,9 @@ class TestSingerCliTranslatorExecuteCommand:
         """Test command not found error."""
         mock_run.side_effect = FileNotFoundError("tap-nonexistent not found")
 
-        result = SingerCliTranslator.execute_singer_command(["tap-nonexistent"])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
+            "tap-nonexistent"
+        ])
 
         assert result.is_failure
         assert "Command not found: tap-nonexistent" in result.error
@@ -560,25 +564,27 @@ class TestSingerCliTranslatorExecuteCommand:
         """Test generic exception handling."""
         mock_run.side_effect = RuntimeError("Unexpected error")
 
-        result = SingerCliTranslator.execute_singer_command(["tap-postgres"])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
+            "tap-postgres"
+        ])
 
         assert result.is_failure
         assert "Unexpected error running command" in result.error
 
 
-class TestSingerCliTranslatorFileValidation:
+class TestFlextMeltanoSingerCliTranslatorFileValidation:
     """Test validate_file_path method."""
 
     def test_validate_file_path_none(self) -> None:
         """Test file path validation with None input."""
-        result = SingerCliTranslator.validate_file_path(None)
+        result = FlextMeltanoSingerCliTranslator.validate_file_path(None)
 
         assert result.is_success
         assert result.unwrap() is None
 
     def test_validate_file_path_empty_string(self) -> None:
         """Test file path validation with empty string."""
-        result = SingerCliTranslator.validate_file_path("")
+        result = FlextMeltanoSingerCliTranslator.validate_file_path("")
 
         assert result.is_success
         assert result.unwrap() is None
@@ -588,7 +594,7 @@ class TestSingerCliTranslatorFileValidation:
         test_file = tmp_path / "config.json"
         test_file.write_text('{"key": "value"}')
 
-        result = SingerCliTranslator.validate_file_path(str(test_file))
+        result = FlextMeltanoSingerCliTranslator.validate_file_path(str(test_file))
 
         assert result.is_success
         validated_path = result.unwrap()
@@ -597,7 +603,9 @@ class TestSingerCliTranslatorFileValidation:
 
     def test_validate_file_path_not_found(self) -> None:
         """Test file path validation with non-existent file."""
-        result = SingerCliTranslator.validate_file_path("/path/to/nonexistent.json")
+        result = FlextMeltanoSingerCliTranslator.validate_file_path(
+            "/path/to/nonexistent.json"
+        )
 
         assert result.is_failure
         assert "File not found" in result.error
@@ -607,7 +615,7 @@ class TestSingerCliTranslatorFileValidation:
         test_dir = tmp_path / "test_dir"
         test_dir.mkdir()
 
-        result = SingerCliTranslator.validate_file_path(str(test_dir))
+        result = FlextMeltanoSingerCliTranslator.validate_file_path(str(test_dir))
 
         assert result.is_failure
         assert "Not a file" in result.error

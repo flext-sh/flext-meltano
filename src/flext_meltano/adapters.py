@@ -24,7 +24,6 @@ from meltano.core.elt_context import ELTContext
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 
-# Import from specific modules to avoid circular import with __init__.py
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
@@ -32,9 +31,6 @@ from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
-
-# Use the protocol from protocols.py
-MeltanoPluginProtocol = FlextMeltanoProtocols.MeltanoPluginProtocol
 
 
 class FlextMeltanoAdapter:
@@ -415,7 +411,8 @@ class FlextMeltanoAdapter:
             )
             if extractors_result.is_success:
                 extractors_dict = cast(
-                    "dict[str, MeltanoPluginProtocol]", extractors_result.unwrap()
+                    "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                    extractors_result.unwrap(),
                 )
                 for _plugin_name, indexed_plugin in list(extractors_dict.items())[:10]:
                     plugin_info = {
@@ -435,7 +432,8 @@ class FlextMeltanoAdapter:
             )
             if loaders_result.is_success:
                 loaders_dict = cast(
-                    "dict[str, MeltanoPluginProtocol]", loaders_result.unwrap()
+                    "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                    loaders_result.unwrap(),
                 )
                 for _plugin_name, indexed_plugin in list(loaders_dict.items())[:5]:
                     plugin_info = {
@@ -799,7 +797,8 @@ class FlextMeltanoAdapter:
                 )
 
             plugins_dict = cast(
-                "dict[str, MeltanoPluginProtocol]", plugins_result.unwrap()
+                "dict[str, FlextMeltanoProtocols.MeltanoPluginProtocol]",
+                plugins_result.unwrap(),
             )
 
             if plugin_name not in plugins_dict:
@@ -1486,7 +1485,9 @@ Thumbs.db
 
     def execute_singer_pipeline_advanced(
         self, tap_instance: object, target_instance: object
-    ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
+    ) -> FlextResult[
+        FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
+    ]:
         """Execute Singer pipeline with advanced protocol management.
 
         Args:
@@ -1508,12 +1509,14 @@ Thumbs.db
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
                 return FlextResult[
-                    FlextMeltanoTypes.Processing.SingerExecutionResult
+                    FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
                 ].fail(singer_manager_result.error or "Failed to get Singer manager")
             # For now, just return success since singer_manager is just a dict
-            result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
+            result = FlextResult[
+                FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
+            ].ok(
                 cast(
-                    "FlextMeltanoTypes.Processing.SingerExecutionResult",
+                    "FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult",
                     singer_manager_result.unwrap(),
                 )
             )
@@ -1534,9 +1537,9 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
-                error_msg
-            )
+            return FlextResult[
+                FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
+            ].fail(error_msg)
 
     def execute_complete_elt_pipeline(
         self,
@@ -1545,7 +1548,9 @@ Thumbs.db
         loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
         transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
         | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
+    ) -> FlextResult[
+        FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
+    ]:
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
@@ -1596,9 +1601,9 @@ Thumbs.db
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
-                error_msg
-            )
+            return FlextResult[
+                FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
+            ].fail(error_msg)
 
 
 __all__ = [
