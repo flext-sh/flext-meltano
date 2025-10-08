@@ -113,7 +113,7 @@ which python
 python -m pip list | grep flext
 
 # Use FLEXT workspace environment
-cd /home/marlonsc/flext
+cd ../..
 source .venv/bin/activate
 cd flext-meltano
 ```

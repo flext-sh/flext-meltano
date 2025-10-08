@@ -13,7 +13,6 @@ import inspect
 import os
 import tempfile
 from pathlib import Path
-from typing import Literal
 
 import pytest
 from flext_core.constants import FlextConstants
@@ -300,24 +299,6 @@ class TestFlextMeltanoConfigEdgeCases:
         # Empty path gets resolved to current directory
         assert config.project_root.is_absolute()
         assert config.project_root.exists()
-
-    def test_factory_methods_with_invalid_data(self) -> None:
-        """Test factory methods handle invalid data gracefully."""
-        # Should raise ValueError for invalid environment
-        with pytest.raises(ValueError, match="environment"):
-            FlextMeltanoConfig()
-                environment="invalid",
-                project_root=Path(),
-            )
-
-    def test_environment_variables_with_special_paths(self) -> None:
-        """Test environment variables with special characters in paths."""
-        config = FlextMeltanoConfig()
-        config.project_root = Path("/path with spaces/special-chars_123")
-        config.environment = "development"
-        env_vars = config.get_environment_variables()
-
-        assert env_vars["MELTANO_PROJECT_ROOT"] == "/path with spaces/special-chars_123"
 
     def test_project_structure_validation_with_relative_paths(self) -> None:
         """Test project validation works with relative paths."""

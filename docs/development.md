@@ -29,7 +29,7 @@ This is a dual-purpose project:
 
 ```bash
 # Navigate to project
-cd /home/marlonsc/flext/flext-meltano
+cd ..flext-meltano
 
 # Activate FLEXT workspace environment
 source ../.venv/bin/activate

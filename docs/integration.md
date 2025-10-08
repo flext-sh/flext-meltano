@@ -182,15 +182,15 @@ response = bridge.handle_bridge_request({
 
 ### FLEXT Project Integration Status
 
-| Project Category        | Integration Pattern     | Status     | Notes                        |
-| ----------------------- | ----------------------- | ---------- | ---------------------------- |
+| Project Category        | Integration Pattern            | Status     | Notes                        |
+| ----------------------- | ------------------------------ | ---------- | ---------------------------- |
 | **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
 | **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
 | **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
 | **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
 | **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
-| **flext-dbt-oracle**    | FlextMeltanoDbtService  | 🔴 Limited | Placeholder implementation   |
-| **DataCosmos**          | Complete ELT Foundation | 🟡 Partial | Blocked by compliance issues |
+| **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Placeholder implementation   |
+| **DataCosmos**          | Complete ELT Foundation        | 🟡 Partial | Blocked by compliance issues |
 
 ### Integration Requirements
 
@@ -225,12 +225,12 @@ response = bridge.handle_bridge_request({
 
 ```bash
 # FLEXT workspace virtual environment
-cd /home/marlonsc/flext
+cd ../..
 source .venv/bin/activate
 
 # flext-meltano specific variables
-export PYTHONPATH=/home/marlonsc/flext/flext-meltano/src:$PYTHONPATH
-export MELTANO_PROJECT_ROOT=/home/marlonsc/flext/flext-meltano
+export PYTHONPATH=..flext-meltano/src:$PYTHONPATH
+export MELTANO_PROJECT_ROOT=..flext-meltano
 export MELTANO_ENVIRONMENT=dev
 ```
 
