@@ -39,7 +39,6 @@
 
     description = "FLEXT Meltano - Enterprise Data Integration Platform"
     keywords = [
-        "",
         "data-integration",
         "enterprise",
         "etl",

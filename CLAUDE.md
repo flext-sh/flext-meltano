@@ -884,7 +884,7 @@ export DBT_PROJECT_DIR=$(PWD)/transform          # DBT project directory
 
 ```bash
 # MANDATORY - Use FLEXT workspace virtual environment
-cd /home/marlonsc/flext                          # Navigate to FLEXT workspace
+cd ..                          # Navigate to FLEXT workspace
 source .venv/bin/activate                        # Activate shared virtual environment
 cd flext-meltano                                 # Navigate to Meltano project
 

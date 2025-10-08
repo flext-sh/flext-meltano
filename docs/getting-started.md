@@ -22,7 +22,7 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 
 ```bash
 # Navigate to FLEXT workspace
-cd /home/marlonsc/flext
+cd ../..
 
 # Activate shared virtual environment
 source .venv/bin/activate

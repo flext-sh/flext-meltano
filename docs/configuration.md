@@ -46,7 +46,7 @@ export DBT_PROJECT_DIR=/path/to/transform
 
 ```bash
 # Use FLEXT workspace virtual environment
-cd /home/marlonsc/flext
+cd ../..
 source .venv/bin/activate
 cd flext-meltano
 
