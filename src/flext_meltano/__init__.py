@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_meltano.__version__ import __version__, __version_info__
+
 from singer_sdk import Stream as FlextMeltanoStream, Tap as FlextMeltanoTap
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
