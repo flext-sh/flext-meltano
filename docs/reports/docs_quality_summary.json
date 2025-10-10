@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-10-10T15:03:34.150386",
+  "quality_score": 97.3,
+  "metrics": {
+    "total_files": 37,
+    "total_words": 39468,
+    "total_links": 138,
+    "broken_links": 0,
+    "images": 0,
+    "missing_images": 0,
+    "code_blocks": 318
+  },
+  "issues": {
+    "total": 123,
+    "by_severity": {
+      "medium": 3,
+      "high": 88,
+      "low": 27,
+      "info": 5
+    },
+    "by_type": {
+      "missing_structure": 3,
+      "broken_internal_link": 88,
+      "long_lines": 26,
+      "todo_markers": 5,
+      "insufficient_content": 1
+    }
+  }
+}
