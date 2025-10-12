@@ -70,27 +70,27 @@ PYTHONPATH=src poetry run python -c "import sys; print('Basic import works')"
 **Risk Level**: Low (straightforward dependency addition)
 **Dependencies**: flext-tests project must exist and be accessible
 
-### **Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)**
+### **Blocker 2: FlextCore.Models.BaseModel Inheritance Issues (Priority: Critical)**
 
 **Impact Level**: 🚨 **HIGH** - Prevents model-related test execution
 **Current Status**: ❌ **VERIFIED BLOCKING** - Confirmed AttributeError during import
 
 **Root Cause Analysis:**
-- flext-meltano models inherit from `FlextModels.BaseModel`
-- Confirmed error: `AttributeError: type object 'FlextModels' has no attribute 'BaseModel'`
+- flext-meltano models inherit from `FlextCore.Models.BaseModel`
+- Confirmed error: `AttributeError: type object 'FlextCore.Models' has no attribute 'BaseModel'`
 - flext-core v1.0.0 changed BaseModel implementation or removed it
-- Import fails during test collection: `class TapRunParams(FlextModels.BaseModel)`
+- Import fails during test collection: `class TapRunParams(FlextCore.Models.BaseModel)`
 
 **Resolution Plan:**
 ```python
-# Step 1: Analyze current flext-core FlextModels implementation
+# Step 1: Analyze current flext-core FlextCore.Models implementation
 # Check ../flext-core/src/flext_core/models.py for available classes
 
 # Step 2: Identify correct base class in flext-core v1.0.0
 # Look for alternative BaseModel or correct inheritance pattern
 
 # Step 3: Update flext-meltano model inheritance
-# Change from FlextModels.BaseModel to correct base class
+# Change from FlextCore.Models.BaseModel to correct base class
 # Example: from flext_core import BaseModel (if available)
 
 # Step 4: Test model instantiation after fix
@@ -143,7 +143,7 @@ poetry run pytest --collect-only tests/unit/test_api.py
 
 **Deliverables:**
 - ✅ **COMPLETED**: flext-tests dependency confirmed missing
-- ✅ **COMPLETED**: FlextModels.BaseModel inheritance error confirmed
+- ✅ **COMPLETED**: FlextCore.Models.BaseModel inheritance error confirmed
 - ✅ **COMPLETED**: Test execution failure verified
 - 🔄 **IN PROGRESS**: Analyze flext-core v1.0.0 model structure
 - 🔄 **IN PROGRESS**: Determine best approach for flext-tests dependency
@@ -187,7 +187,7 @@ poetry run pytest --collect-only tests/unit/test_api.py
 - Poetry environment shows all dependencies resolved
 
 #### **Day 2: Model Inheritance Fix**
-**Objective**: Resolve FlextModels.BaseModel compatibility issues
+**Objective**: Resolve FlextCore.Models.BaseModel compatibility issues
 
 **Deliverables:**
 - ✅ Analyze flext-core BaseModel implementation
@@ -229,7 +229,7 @@ poetry run pytest --collect-only tests/unit/test_api.py
 - ✅ Implement missing unit tests for service methods
 - ✅ Add comprehensive error condition testing
 - ✅ Create edge case tests for configuration validation
-- ✅ Validate FlextResult patterns throughout
+- ✅ Validate FlextCore.Result patterns throughout
 
 **Success Criteria:**
 - Individual module coverage meets 95% threshold
@@ -386,15 +386,15 @@ poetry run pytest --collect-only tests/unit/test_api.py
 
 ### **Test Implementation Patterns**
 
-#### **FlextResult Testing Pattern**
+#### **FlextCore.Result Testing Pattern**
 ```python
 def test_operation_returns_flext_result():
-    """Test that operations return FlextResult instances."""
+    """Test that operations return FlextCore.Result instances."""
     service = FlextMeltanoService()
 
     result = service.discover_plugins()
 
-    assert isinstance(result, FlextResult)
+    assert isinstance(result, FlextCore.Result)
     assert result.is_success or result.is_failure
 
 def test_operation_success_path():
@@ -425,7 +425,7 @@ def test_operation_failure_path():
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter."""
     with patch('flext_meltano.adapters.FlextMeltanoAdapter') as mock:
-        mock.return_value.run_tap.return_value = FlextResult.ok({"status": "success"})
+        mock.return_value.run_tap.return_value = FlextCore.Result.ok({"status": "success"})
         yield mock
 
 def test_service_with_external_dependency(mock_meltano_adapter):

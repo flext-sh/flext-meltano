@@ -1,0 +1,260 @@
+@startuml FLEXT-Meltano System Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title FLEXT-Meltano - System Context Diagram
+
+Person(user, "Data Engineer/Developer", "Creates and manages ELT pipelines")
+Person(REDACTED_LDAP_BIND_PASSWORD, "Platform Administrator", "Manages Meltano infrastructure")
+
+System(flext_meltano, "FLEXT-Meltano", "Enterprise data integration platform providing Singer protocol, plugin development, and pipeline orchestration")
+
+System_Ext(meltano_core, "Meltano Core", "Data integration platform")
+System_Ext(singer_sdk, "Singer SDK", "Protocol implementation")
+System_Ext(dbt_core, "DBT Core", "Data transformation")
+System_Ext(flext_core, "FLEXT-Core", "Foundation patterns and services")
+
+System_Ext(flext_tap_star, "FLEXT-Tap-* Projects", "32+ Singer tap implementations")
+System_Ext(flext_target_star, "FLEXT-Target-* Projects", "Singer target implementations")
+System_Ext(flext_dbt_star, "FLEXT-DBT-* Projects", "Data transformation projects")
+
+System_Ext(data_sources, "Data Sources", "Databases, APIs, files, cloud services")
+System_Ext(data_destinations, "Data Destinations", "Data warehouses, lakes, applications")
+
+Rel(user, flext_meltano, "Uses", "Python API, CLI, configuration")
+Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, monitoring, security")
+
+Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
+Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
+Rel(flext_meltano, dbt_core, "Orchestrates", "Model execution, testing, documentation")
+Rel(flext_meltano, flext_core, "Built on", "FlextCore.Result[T], dependency injection, logging")
+
+Rel(flext_tap_star, flext_meltano, "Depends on", "Foundation library")
+Rel(flext_target_star, flext_meltano, "Depends on", "Foundation library")
+Rel(flext_dbt_star, flext_meltano, "Depends on", "Foundation library")
+
+Rel(flext_meltano, data_sources, "Extracts data from", "Singer protocol")
+Rel(flext_meltano, data_destinations, "Loads data to", "Singer protocol")
+@enduml
+
+@startuml FLEXT-Meltano Container Architecture
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title FLEXT-Meltano - Container Diagram
+
+Person(user, "Data Engineer", "Creates and orchestrates ELT pipelines")
+
+System_Boundary(flext_meltano, "FLEXT-Meltano Platform") {
+    Container(api, "API Layer", "Python/FastAPI", "REST API for pipeline management, plugin operations, monitoring")
+    Container(service, "Service Layer", "Python", "Business logic, orchestration, error handling")
+    Container(adapter, "Adapter Layer", "Python", "External system integration (Meltano, DBT, Singer)")
+    Container(model, "Domain Model", "Python/Pydantic", "Data models, validation, business entities")
+    Container(config, "Configuration", "Python/YAML", "Configuration management, environment settings")
+    ContainerDb(state_store, "State Store", "File System/SQLite", "Pipeline state, bookmarks, execution history")
+}
+
+System_Ext(meltano_cli, "Meltano CLI", "Command Line", "Data integration orchestration")
+System_Ext(dbt_cli, "DBT CLI", "Command Line", "Data transformation")
+System_Ext(data_sources, "Data Sources", "Various", "APIs, databases, files, cloud services")
+System_Ext(data_targets, "Data Targets", "Various", "Warehouses, databases, applications")
+
+Rel(user, api, "Uses", "HTTP/REST, Python API")
+
+Rel(api, service, "Orchestrates", "Method calls")
+Rel(service, adapter, "Integrates", "Method calls")
+Rel(service, model, "Validates", "Data binding")
+Rel(service, config, "Configures", "Configuration access")
+
+Rel(adapter, meltano_cli, "Executes", "Subprocess calls")
+Rel(adapter, dbt_cli, "Orchestrates", "Subprocess calls")
+Rel(adapter, state_store, "Persists", "File I/O, SQL")
+
+Rel(meltano_cli, data_sources, "Extracts", "Singer protocol")
+Rel(meltano_cli, data_targets, "Loads", "Singer protocol")
+Rel(dbt_cli, data_targets, "Transforms", "SQL")
+@enduml
+
+@startuml FLEXT-Meltano Service Components
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title FLEXT-Meltano - Service Layer Components
+
+Container_Boundary(service_layer, "Service Layer") {
+    Component(api_facade, "API Facade", "Python", "Unified public API for all operations")
+    Component(orchestrator, "Pipeline Orchestrator", "Python", "Pipeline execution and coordination")
+    Component(plugin_manager, "Plugin Manager", "Python", "Plugin discovery, installation, validation")
+    Component(singer_service, "Singer Service", "Python", "Singer protocol implementation")
+    Component(dbt_service, "DBT Service", "Python", "DBT model orchestration")
+}
+
+Component(config_manager, "Configuration Manager", "Python", "Configuration loading and validation")
+Component(state_manager, "State Manager", "Python", "Pipeline state and bookmark management")
+Component(error_handler, "Error Handler", "Python", "Railway-oriented error handling")
+
+Rel(api_facade, orchestrator, "Delegates to", "Method calls")
+Rel(api_facade, plugin_manager, "Uses", "Plugin operations")
+Rel(api_facade, config_manager, "Configures", "Configuration access")
+
+Rel(orchestrator, singer_service, "Coordinates", "Pipeline execution")
+Rel(orchestrator, dbt_service, "Orchestrates", "Model execution")
+Rel(orchestrator, state_manager, "Persists", "State updates")
+Rel(orchestrator, error_handler, "Handles errors", "FlextCore.Result[T]")
+
+Rel(plugin_manager, config_manager, "Validates", "Plugin configuration")
+Rel(singer_service, state_manager, "Updates", "Singer bookmarks")
+Rel(dbt_service, state_manager, "Tracks", "Model execution state")
+@enduml
+
+@startuml FLEXT-Meltano Data Flow
+title FLEXT-Meltano - Data Flow Architecture
+
+actor "Data Engineer" as user
+participant "API Layer" as api
+participant "Service Layer" as service
+participant "Singer Tap" as tap
+participant "Singer Target" as target
+participant "DBT Models" as dbt
+database "Source System" as source
+database "Target System" as destination
+
+user -> api: create_pipeline(tap, target)
+api -> service: execute_pipeline()
+service -> tap: discover_streams()
+tap -> source: connect & discover schema
+tap --> service: stream metadata
+service -> tap: run_tap(config, state)
+tap -> source: extract data
+tap --> target: stream data (JSONL)
+target -> destination: load data
+target --> service: state bookmarks
+service -> dbt: run_transformations()
+dbt -> destination: transform data
+dbt --> service: transformation results
+service --> api: pipeline complete
+api --> user: success result
+@enduml
+
+@startuml FLEXT-Meltano Security Architecture
+title FLEXT-Meltano - Security Architecture
+
+actor "User" as user
+actor "Admin" as REDACTED_LDAP_BIND_PASSWORD
+
+rectangle "Security Boundary" as boundary {
+    rectangle "API Layer" as api {
+        component "Authentication" as auth
+        component "Authorization" as authz
+        component "Input Validation" as validation
+    }
+
+    rectangle "Service Layer" as service {
+        component "Business Logic" as logic
+        component "Audit Logging" as audit
+    }
+
+    rectangle "Adapter Layer" as adapter {
+        component "External System Access" as external
+        component "Credential Management" as creds
+    }
+
+    database "State Store" as state
+}
+
+cloud "External Systems" as external_sys {
+    database "Data Sources" as sources
+    database "Data Targets" as targets
+    component "Meltano CLI" as meltano
+    component "DBT CLI" as dbt
+}
+
+user --> auth: authenticate
+auth --> authz: check permissions
+authz --> validation: validate input
+validation --> logic: process request
+logic --> audit: log operation
+logic --> adapter: execute operation
+adapter --> creds: get credentials
+creds --> external: access external system
+external --> meltano: CLI operations
+external --> dbt: transformation operations
+external --> sources: data extraction
+external --> targets: data loading
+adapter --> state: persist state
+state --> adapter: retrieve state
+
+REDACTED_LDAP_BIND_PASSWORD --> audit: review logs
+REDACTED_LDAP_BIND_PASSWORD --> authz: manage permissions
+@enduml
+
+@startuml FLEXT-Meltano Deployment Architecture
+title FLEXT-Meltano - Deployment Architecture
+
+node "Kubernetes Cluster" as k8s {
+    node "FLEXT Namespace" as namespace {
+        component "flext-meltano-api" as api [
+            API Service
+            FastAPI + Uvicorn
+            Port: 8000
+        ]
+
+        component "flext-meltano-worker" as worker [
+            Pipeline Worker
+            Background Tasks
+            Port: 8001
+        ]
+
+        database "PostgreSQL" as postgres [
+            State Store
+            Pipeline Metadata
+            Port: 5432
+        ]
+
+        component "Redis" as redis [
+            Cache & Queue
+            Background Jobs
+            Port: 6379
+        ]
+    }
+
+    storage "Persistent Volume" as pv [
+        Configuration Files
+        Pipeline State
+        Logs
+    ]
+}
+
+cloud "External Dependencies" as external {
+    component "Meltano CLI" as meltano
+    component "DBT CLI" as dbt
+    component "Singer SDK" as singer
+}
+
+actor "CI/CD Pipeline" as cicd
+
+cicd --> api: Deploy application
+cicd --> worker: Deploy workers
+cicd --> postgres: Database migrations
+cicd --> pv: Persistent storage
+
+api --> postgres: State persistence
+api --> redis: Cache operations
+api --> pv: File storage
+worker --> postgres: State updates
+worker --> redis: Job queue
+worker --> pv: Log storage
+
+api --> meltano: CLI execution
+api --> dbt: Model orchestration
+api --> singer: Protocol operations
+
+note right of api
+    Horizontal scaling
+    Load balancing
+    Health checks
+end note
+
+note right of worker
+    Auto-scaling
+    Background processing
+    Error recovery
+end note
+@enduml

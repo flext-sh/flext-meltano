@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextResult
+from flext_core import FlextCore
 
 from flext_meltano import (
     FlextMeltano,
@@ -34,9 +34,9 @@ class TestFlextMeltanoInitialization:
 
         # Create a concrete implementation for testing
         class ConcreteAPI(FlextMeltano):
-            def execute(self, command: str) -> FlextResult[str]:
+            def execute(self, command: str) -> FlextCore.Result[str]:
                 _ = command  # Intentionally unused in test implementation
-                return FlextResult[str].ok("test")
+                return FlextCore.Result[str].ok("test")
 
         api = ConcreteAPI()
         assert api is not None

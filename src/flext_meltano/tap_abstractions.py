@@ -2,7 +2,7 @@
 
 This module provides the FlextMeltanoTapAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
-- Railway-oriented programming with FlextResult
+- Railway-oriented programming with FlextCore.Result
 - Clean Architecture with domain separation
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -13,12 +13,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import (
-    FlextLogger,
-    FlextResult,
-    FlextService,
-    FlextTypes,
-)
+from flext_core import FlextCore
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
@@ -27,7 +22,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoTapAbstractions(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+    FlextCore.Service[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """UNIFIED Tap Abstractions class consolidating ALL tap functionality.
 
@@ -44,18 +39,18 @@ class FlextMeltanoTapAbstractions(
         """Initialize unified tap abstractions with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
     def discover_streams(
         self, tap_config: FlextMeltanoModels.TapConfig
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Discover available streams for a tap configuration.
 
         Args:
             tap_config: Tap configuration with discovery parameters
 
         Returns:
-            FlextResult containing discovered stream catalog
+            FlextCore.Result containing discovered stream catalog
 
         """
         try:
@@ -67,12 +62,12 @@ class FlextMeltanoTapAbstractions(
 
             # Validate tap configuration
             if not tap_config.tap_type:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     "Tap configuration must have name and type for discovery"
                 )
 
             # For now, return empty catalog - would integrate with actual Singer taps
-            catalog: FlextTypes.Dict = {
+            catalog: FlextCore.Types.Dict = {
                 "streams": [],
                 "tap_name": tap_config.tap_type,
                 "tap_type": tap_config.tap_type,
@@ -83,22 +78,24 @@ class FlextMeltanoTapAbstractions(
                 stream_count=len(catalog.get("streams", [])),
             )
 
-            return FlextResult[FlextTypes.Dict].ok(catalog)
+            return FlextCore.Result[FlextCore.Types.Dict].ok(catalog)
 
         except Exception as e:
             self.logger.exception("Stream discovery failed", error=str(e))
-            return FlextResult[FlextTypes.Dict].fail(f"Stream discovery failed: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(
+                f"Stream discovery failed: {e}"
+            )
 
     def validate_stream_schema(
         self, stream_def: FlextMeltanoModels.StreamDefinition
-    ) -> FlextResult[bool]:
+    ) -> FlextCore.Result[bool]:
         """Validate a stream definition's schema.
 
         Args:
             stream_def: Stream definition to validate
 
         Returns:
-            FlextResult containing validation result
+            FlextCore.Result containing validation result
 
         """
         try:
@@ -109,30 +106,32 @@ class FlextMeltanoTapAbstractions(
 
             # Basic schema validation
             if not stream_def.stream_schema:
-                return FlextResult[bool].fail("Stream schema cannot be empty")
+                return FlextCore.Result[bool].fail("Stream schema cannot be empty")
 
             schema = cast("dict", stream_def.stream_schema)
             if "properties" not in schema:
-                return FlextResult[bool].fail("Stream schema must contain properties")
+                return FlextCore.Result[bool].fail(
+                    "Stream schema must contain properties"
+                )
 
             # Additional validation logic would go here
             # For now, just return success
-            return FlextResult[bool].ok(True)
+            return FlextCore.Result[bool].ok(True)
 
         except Exception as e:
             self.logger.exception("Schema validation failed", error=str(e))
-            return FlextResult[bool].fail(f"Schema validation failed: {e}")
+            return FlextCore.Result[bool].fail(f"Schema validation failed: {e}")
 
     def create_tap_instance(
         self, tap_config: FlextMeltanoModels.TapConfig
-    ) -> FlextResult[FlextMeltanoModels.TapInstance]:
+    ) -> FlextCore.Result[FlextMeltanoModels.TapInstance]:
         """Create a tap instance from configuration.
 
         Args:
             tap_config: Tap configuration
 
         Returns:
-            FlextResult containing configured tap instance
+            FlextCore.Result containing configured tap instance
 
         """
         try:
@@ -154,18 +153,20 @@ class FlextMeltanoTapAbstractions(
                 tap_name=tap_instance.config.name,
             )
 
-            return FlextResult[FlextMeltanoModels.TapInstance].ok(tap_instance)
+            return FlextCore.Result[FlextMeltanoModels.TapInstance].ok(tap_instance)
 
         except Exception as e:
             self.logger.exception("Tap instance creation failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.TapInstance].fail(
+            return FlextCore.Result[FlextMeltanoModels.TapInstance].fail(
                 f"Tap instance creation failed: {e}"
             )
 
-    def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    def execute(
+        self,
+    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute tap abstraction operations (implements Domain.Service)."""
         # This would orchestrate the overall tap abstraction workflow
         # For now, return the current configuration
-        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+        return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
             self._config.model_dump()
         )

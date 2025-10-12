@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextConstants, FlextModels, FlextTypes
+from flext_core import FlextCore
 from pydantic import (
     ConfigDict,
     Field,
@@ -24,7 +24,7 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoModels(FlextModels):
+class FlextMeltanoModels(FlextCore.Models):
     """UNIFIED Meltano Models - Advanced Pydantic 2.11 Features with FLEXT Ecosystem Integration.
 
     Contains ALL Pydantic models and settings for the Meltano domain.
@@ -47,7 +47,7 @@ class FlextMeltanoModels(FlextModels):
     # CLI PARAMETER MODELS - For Singer SDK CLI Translation
     # ========================================================================
 
-    class TapRunParams(FlextModels.BaseModel):
+    class TapRunParams(FlextCore.Models.BaseModel):
         """CLI parameters for running Singer taps with automatic Singer SDK translation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -69,7 +69,7 @@ class FlextMeltanoModels(FlextModels):
             default=False, description="Run in discovery mode to output catalog"
         )
 
-    class TargetRunParams(FlextModels.BaseModel):
+    class TargetRunParams(FlextCore.Models.BaseModel):
         """CLI parameters for running Singer targets with automatic Singer SDK translation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -85,7 +85,7 @@ class FlextMeltanoModels(FlextModels):
             description="Path to Singer messages input file (default: stdin)",
         )
 
-    class PipelineRunParams(FlextModels.BaseModel):
+    class PipelineRunParams(FlextCore.Models.BaseModel):
         """CLI parameters for running complete Singer pipelines (tap → target)."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -106,7 +106,7 @@ class FlextMeltanoModels(FlextModels):
             default=None, description="Path to write final state"
         )
 
-    class DbtRunParams(FlextModels.BaseModel):
+    class DbtRunParams(FlextCore.Models.BaseModel):
         """CLI parameters for DBT operations."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -128,7 +128,7 @@ class FlextMeltanoModels(FlextModels):
             default=None, description="DBT variables as JSON string"
         )
 
-    class PluginInstallParams(FlextModels.BaseModel):
+    class PluginInstallParams(FlextCore.Models.BaseModel):
         """CLI parameters for plugin installation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -146,7 +146,7 @@ class FlextMeltanoModels(FlextModels):
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
-    class TapConfig(FlextModels.BaseModel):
+    class TapConfig(FlextCore.Models.BaseModel):
         """Pydantic model for tap configuration with advanced validation and composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -160,10 +160,10 @@ class FlextMeltanoModels(FlextModels):
         )
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
-        connection_config: FlextTypes.Dict = Field(
+        connection_config: FlextCore.Types.Dict = Field(
             description="Connection configuration",
         )
-        stream_config: FlextTypes.Dict = Field(
+        stream_config: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Stream-specific configuration",
         )
@@ -209,8 +209,8 @@ class FlextMeltanoModels(FlextModels):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextTypes.Dict
-        ) -> FlextTypes.Dict:
+            self, value: FlextCore.Types.Dict
+        ) -> FlextCore.Types.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret"}
@@ -235,8 +235,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextTypes.Dict,
-        ) -> FlextTypes.Dict:
+            v: FlextCore.Types.Dict,
+        ) -> FlextCore.Types.Dict:
             """Validate connection_config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -246,13 +246,13 @@ class FlextMeltanoModels(FlextModels):
                 raise TypeError(invalid_type_msg)
             return v
 
-    class StreamDefinition(FlextModels.Entity):
+    class StreamDefinition(FlextCore.Models.Entity):
         """Pydantic model for stream definition with advanced Pydantic 2.11 features."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
-        stream_schema: FlextTypes.Dict = Field(
+        stream_schema: FlextCore.Types.Dict = Field(
             description="JSON schema for the stream",
         )
         tap_type: str = Field(description="Type of tap this stream belongs to")
@@ -308,7 +308,9 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("stream_schema")
-        def serialize_stream_schema(self, value: FlextTypes.Dict) -> FlextTypes.Dict:
+        def serialize_stream_schema(
+            self, value: FlextCore.Types.Dict
+        ) -> FlextCore.Types.Dict:
             """Field serializer for stream schema normalization."""
             # Ensure consistent schema structure
             if "properties" not in value:
@@ -317,17 +319,17 @@ class FlextMeltanoModels(FlextModels):
                 value["type"] = "object"
             return value
 
-    class SinkDefinition(FlextModels.Entity):
+    class SinkDefinition(FlextCore.Models.Entity):
         """Pydantic model for sink definition with advanced Pydantic 2.11 features."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         sink_name: str = Field(description="Name of the sink")
         target_name: str = Field(description="Name of the target")
-        config: FlextTypes.Dict = Field(
+        config: FlextCore.Types.Dict = Field(
             default_factory=dict, description="Sink configuration"
         )
-        sink_schema: FlextTypes.Dict = Field(
+        sink_schema: FlextCore.Types.Dict = Field(
             default_factory=dict, description="Sink schema"
         )
         status: str = Field(default="initialized", description="Current status")
@@ -357,7 +359,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-    class TapInstance(FlextModels.Entity):
+    class TapInstance(FlextCore.Models.Entity):
         """Pydantic model for tap instance with comprehensive composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -377,7 +379,7 @@ class FlextMeltanoModels(FlextModels):
             default=False,
             description="Whether streams have been discovered",
         )
-        metadata: FlextTypes.Dict = Field(
+        metadata: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Additional metadata",
         )
@@ -426,7 +428,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-    class TargetInstance(FlextModels.Entity):
+    class TargetInstance(FlextCore.Models.Entity):
         """Pydantic model for target instance with comprehensive composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -474,7 +476,7 @@ class FlextMeltanoModels(FlextModels):
     # TARGET MODELS - Singer target configurations and instances
     # ========================================================================
 
-    class TargetConfig(FlextModels.Entity):
+    class TargetConfig(FlextCore.Models.Entity):
         """Pydantic model for target configuration with advanced field validation and composition."""
 
         model_config = ConfigDict(frozen=True, extra="allow")
@@ -488,15 +490,15 @@ class FlextMeltanoModels(FlextModels):
         )
 
         target_type: str = Field(description="Target type identifier")
-        connection_config: FlextTypes.Dict = Field(
+        connection_config: FlextCore.Types.Dict = Field(
             description="Connection configuration dictionary",
         )
         batch_size: int = Field(
-            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Batch size for record processing",
         )
         max_batches: int = Field(
-            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Maximum number of batches to process",
         )
 
@@ -540,8 +542,8 @@ class FlextMeltanoModels(FlextModels):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextTypes.Dict
-        ) -> FlextTypes.Dict:
+            self, value: FlextCore.Types.Dict
+        ) -> FlextCore.Types.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
@@ -566,8 +568,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextTypes.Dict,
-        ) -> FlextTypes.Dict:
+            v: FlextCore.Types.Dict,
+        ) -> FlextCore.Types.Dict:
             """Validate connection config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -595,13 +597,13 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class StreamInfo(FlextModels.BaseModel):
+    class StreamInfo(FlextCore.Models.BaseModel):
         """Pydantic model for stream information with advanced validation and computed fields."""
 
         model_config = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(description="Stream name identifier")
-        stream_schema: FlextTypes.Dict = Field(
+        stream_schema: FlextCore.Types.Dict = Field(
             description="Stream schema definition",
             alias="schema",
         )
@@ -671,8 +673,8 @@ class FlextMeltanoModels(FlextModels):
         @classmethod
         def validate_stream_schema(
             cls,
-            v: FlextTypes.Dict,
-        ) -> FlextTypes.Dict:
+            v: FlextCore.Types.Dict,
+        ) -> FlextCore.Types.Dict:
             """Validate stream schema contains properties."""
             if "properties" not in v:
                 msg = "Schema must contain properties"
@@ -683,7 +685,7 @@ class FlextMeltanoModels(FlextModels):
     # MELTANO PROJECT MODELS - Project configuration and validation
     # ========================================================================
 
-    class MeltanoProjectModel(FlextModels.Entity):
+    class MeltanoProjectModel(FlextCore.Models.Entity):
         """Pydantic model for Meltano project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -778,7 +780,7 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class PluginModel(FlextModels.Entity):
+    class PluginModel(FlextCore.Models.Entity):
         """Pydantic model for Meltano plugin configuration with advanced composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -791,7 +793,7 @@ class FlextMeltanoModels(FlextModels):
             default=FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
             description="Plugin variant",
         )
-        settings: FlextTypes.Dict = Field(
+        settings: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Plugin settings",
         )
@@ -866,7 +868,7 @@ class FlextMeltanoModels(FlextModels):
     # DBT MODELS - DBT project and execution models
     # ========================================================================
 
-    class DbtProjectModel(FlextModels.BaseModel):
+    class DbtProjectModel(FlextCore.Models.BaseModel):
         """Pydantic model for DBT project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -967,7 +969,7 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class DbtExecutionModel(FlextModels.Entity):
+    class DbtExecutionModel(FlextCore.Models.Entity):
         """Pydantic model for DBT execution configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -1068,7 +1070,7 @@ class FlextMeltanoModels(FlextModels):
     # EXECUTION RESULT MODELS - Pipeline execution and monitoring
     # ========================================================================
 
-    class ExecutionResult(FlextModels.TimestampedModel):
+    class ExecutionResult(FlextCore.Models.TimestampedModel):
         """Pydantic model for execution result tracking with advanced composition."""
 
         # Performance categorization thresholds (from FlextMeltanoConstants)
@@ -1106,7 +1108,7 @@ class FlextMeltanoModels(FlextModels):
             default=None,
             description="Error message if failed",
         )
-        metadata: FlextTypes.Dict = Field(
+        metadata: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Additional execution metadata",
         )
@@ -1185,7 +1187,7 @@ class FlextMeltanoModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class PipelineResult(FlextModels.TimestampedModel):
+    class PipelineResult(FlextCore.Models.TimestampedModel):
         """Pydantic model for pipeline execution result with comprehensive composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -1211,14 +1213,14 @@ class FlextMeltanoModels(FlextModels):
             default=0,
             description="Total records processed",
         )
-        pipeline_metadata: FlextTypes.Dict = Field(
+        pipeline_metadata: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Pipeline execution metadata",
         )
 
         @computed_field
         @property
-        def completed_stages(self) -> FlextTypes.StringList:
+        def completed_stages(self) -> FlextCore.Types.StringList:
             """Computed field for completed pipeline stages."""
             stages = []
             if self.tap_result and self.tap_result.is_completed:

@@ -59,13 +59,13 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ```python
 # Plugin operations
-discover_plugins() -> FlextResult[list[PluginInfo]]
-install_plugin(name: str, version: str | None) -> FlextResult[PluginInstallResult]
-execute_tap(name: str, config: dict) -> FlextResult[TapExecutionResult]
+discover_plugins() -> FlextCore.Result[list[PluginInfo]]
+install_plugin(name: str, version: str | None) -> FlextCore.Result[PluginInstallResult]
+execute_tap(name: str, config: dict) -> FlextCore.Result[TapExecutionResult]
 
 # Pipeline operations
-execute_pipeline(tap: str, target: str) -> FlextResult[PipelineResult]
-validate_configuration() -> FlextResult[bool]
+execute_pipeline(tap: str, target: str) -> FlextCore.Result[PipelineResult]
+validate_configuration() -> FlextCore.Result[bool]
 ```
 
 #### FlextMeltanoAdapter (CLI Integration)
@@ -100,23 +100,23 @@ validate_configuration() -> FlextResult[bool]
 **FlextSingerTap Architecture:**
 
 ```python
-class FlextSingerTap(FlextService):
+class FlextSingerTap(FlextCore.Service):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, config: dict[str, object], state: dict[str, object] | None = None)
-    async def discover(self) -> FlextResult[Catalog]
-    async def sync(self, streams: list[str] | None = None) -> FlextResult[SyncResult]
+    def __init__(self, tap_name: str, config: FlextCore.Types.Dict, state: FlextCore.Types.Dict | None = None)
+    async def discover(self) -> FlextCore.Result[Catalog]
+    async def sync(self, streams: FlextCore.Types.StringList | None = None) -> FlextCore.Result[SyncResult]
 ```
 
 **FlextSingerTarget Architecture:**
 
 ```python
-class FlextSingerTarget(FlextService):
+class FlextSingerTarget(FlextCore.Service):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, config: dict[str, object])
-    async def load_records(self, records: list[dict[str, object]]) -> FlextResult[LoadResult]
-    async def flush(self) -> FlextResult[FlushResult]
+    def __init__(self, target_name: str, config: FlextCore.Types.Dict)
+    async def load_records(self, records: list[FlextCore.Types.Dict]) -> FlextCore.Result[LoadResult]
+    async def flush(self) -> FlextCore.Result[FlushResult]
 ```
 
 ### Plugin Architecture
@@ -201,7 +201,7 @@ class FlextSingerTarget(FlextService):
 
 ```python
 # Foundation patterns
-from flext_core import FlextResult, FlextContainer, FlextService
+from flext_core import FlextCore
 
 # Service registration
 container.register_singleton(FlextMeltanoService, create_meltano_service)

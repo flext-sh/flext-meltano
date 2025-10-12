@@ -2,7 +2,7 @@
 
 This module provides the FlextMeltanoTargetAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
-- Railway-oriented programming with FlextResult
+- Railway-oriented programming with FlextCore.Result
 - Clean Architecture with domain separation
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -11,11 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import (
-    FlextLogger,
-    FlextResult,
-    FlextService,
-)
+from flext_core import FlextCore
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
@@ -24,7 +20,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoTargetAbstractions(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+    FlextCore.Service[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """UNIFIED Target Abstractions class consolidating ALL target functionality.
 
@@ -41,18 +37,18 @@ class FlextMeltanoTargetAbstractions(
         """Initialize unified target abstractions with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
     def configure_sink(
         self, target_config: FlextMeltanoModels.TargetConfig
-    ) -> FlextResult[FlextMeltanoModels.SinkDefinition]:
+    ) -> FlextCore.Result[FlextMeltanoModels.SinkDefinition]:
         """Configure a sink for a target.
 
         Args:
             target_config: Target configuration
 
         Returns:
-            FlextResult containing configured sink definition
+            FlextCore.Result containing configured sink definition
 
         """
         try:
@@ -75,24 +71,24 @@ class FlextMeltanoTargetAbstractions(
                 sink_name=sink_def.sink_name,
             )
 
-            return FlextResult[FlextMeltanoModels.SinkDefinition].ok(sink_def)
+            return FlextCore.Result[FlextMeltanoModels.SinkDefinition].ok(sink_def)
 
         except Exception as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.SinkDefinition].fail(
+            return FlextCore.Result[FlextMeltanoModels.SinkDefinition].fail(
                 f"Sink configuration failed: {e}"
             )
 
     def validate_target_config(
         self, target_config: FlextMeltanoModels.TargetConfig
-    ) -> FlextResult[bool]:
+    ) -> FlextCore.Result[bool]:
         """Validate a target configuration.
 
         Args:
             target_config: Target configuration to validate
 
         Returns:
-            FlextResult containing validation result
+            FlextCore.Result containing validation result
 
         """
         try:
@@ -103,32 +99,32 @@ class FlextMeltanoTargetAbstractions(
 
             # Basic validation
             if not target_config.target_type:
-                return FlextResult[bool].fail(
+                return FlextCore.Result[bool].fail(
                     "Target configuration must have name and type"
                 )
 
             # Additional validation logic would go here
             # For now, just return success
-            return FlextResult[bool].ok(True)
+            return FlextCore.Result[bool].ok(True)
 
         except Exception as e:
             self.logger.exception(
                 "Target configuration validation failed", error=str(e)
             )
-            return FlextResult[bool].fail(
+            return FlextCore.Result[bool].fail(
                 f"Target configuration validation failed: {e}"
             )
 
     def create_target_instance(
         self, target_config: FlextMeltanoModels.TargetConfig
-    ) -> FlextResult[FlextMeltanoModels.TargetInstance]:
+    ) -> FlextCore.Result[FlextMeltanoModels.TargetInstance]:
         """Create a target instance from configuration.
 
         Args:
             target_config: Target configuration
 
         Returns:
-            FlextResult containing configured target instance
+            FlextCore.Result containing configured target instance
 
         """
         try:
@@ -150,18 +146,22 @@ class FlextMeltanoTargetAbstractions(
                 target_name=target_instance.config.name,
             )
 
-            return FlextResult[FlextMeltanoModels.TargetInstance].ok(target_instance)
+            return FlextCore.Result[FlextMeltanoModels.TargetInstance].ok(
+                target_instance
+            )
 
         except Exception as e:
             self.logger.exception("Target instance creation failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.TargetInstance].fail(
+            return FlextCore.Result[FlextMeltanoModels.TargetInstance].fail(
                 f"Target instance creation failed: {e}"
             )
 
-    def execute(self) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    def execute(
+        self,
+    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute target abstraction operations (implements Domain.Service)."""
         # This would orchestrate the overall target abstraction workflow
         # For now, return the current configuration
-        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+        return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
             self._config.model_dump()
         )

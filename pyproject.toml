@@ -132,6 +132,7 @@
         "/home/marlonsc/.local/lib/python3.13/site-packages",
         "examples",
         "src",
+        "scripts",
         "tests",
     ]
 

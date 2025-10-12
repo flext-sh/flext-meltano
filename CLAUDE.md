@@ -37,7 +37,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **DBT Operations**: DBT model execution, testing, and documentation generation
 - ✅ **Plugin Development Framework**: Automated plugin scaffolding and validation tools
 - ✅ **Enterprise Pipeline Orchestration**: Advanced ELT pipeline management and monitoring
-- ✅ **FLEXT-Core Integration**: Railway-oriented programming with FlextResult[T] patterns
+- ✅ **FLEXT-Core Integration**: Railway-oriented programming with FlextCore.Result[T] patterns
 - ✅ **Type Safety**: Python 3.13+ with complete type annotations and Pyrefly validation
 
 **ECOSYSTEM INTEGRATION**:
@@ -65,7 +65,7 @@ from meltano.core.project import Project  # VIOLATION: Architecture breach
 from flext_meltano import FlextMeltano, FlextMeltanoService
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoExecutor
 from flext_meltano import FlextMeltanoStream, FlextMeltanoTap  # Singer wrappers
-from flext_core import FlextResult, FlextService, FlextLogger
+from flext_core import FlextCore
 ```
 
 #### 2. **CUSTOM ELT IMPLEMENTATIONS**
@@ -74,7 +74,7 @@ from flext_core import FlextResult, FlextService, FlextLogger
 - **FORBIDDEN**: Direct Meltano CLI subprocess calls - Use FlextMeltanoExecutor
 - **FORBIDDEN**: Custom DBT command execution - Use FlextMeltanoDbtService
 - **FORBIDDEN**: Manual YAML/JSON pipeline configuration - Use FlextMeltanoConfig
-- **FORBIDDEN**: Custom ELT error handling - Use FlextResult[T] railway pattern
+- **FORBIDDEN**: Custom ELT error handling - Use FlextCore.Result[T] railway pattern
 
 ### 📋 ENFORCEMENT STANDARDS
 
@@ -83,7 +83,7 @@ from flext_core import FlextResult, FlextService, FlextLogger
 3. **ALL DBT operations** through FlextMeltanoDbtService
 4. **ALL Meltano project management** via FlextMeltanoAdapter
 5. **ALL pipeline configurations** through FlextMeltanoConfig
-6. **ALL ELT error handling** with FlextResult[T] railway pattern
+6. **ALL ELT error handling** with FlextCore.Result[T] railway pattern
 
 ## 🏗️ ARCHITECTURE OVERVIEW
 
@@ -115,7 +115,7 @@ from flext_meltano import FlextMeltano
 # Initialize the main API
 api = FlextMeltano()
 
-# All operations return FlextResult[T] for composable error handling
+# All operations return FlextCore.Result[T] for composable error handling
 result = api.create_pipeline("tap-csv", "target-postgres")
 if result.is_success:
     pipeline = result.unwrap()
@@ -127,10 +127,10 @@ if result.is_success:
 ```python
 from flext_meltano import FlextMeltanoService
 
-# Extends FlextService with Meltano-specific functionality
+# Extends FlextCore.Service with Meltano-specific functionality
 service = FlextMeltanoService()
 
-# Railway-oriented programming with FlextResult[T]
+# Railway-oriented programming with FlextCore.Result[T]
 result = service.discover_plugins()
 ```
 
@@ -276,10 +276,10 @@ PYTHONPATH=src poetry run pytest --cov=flext_meltano.api --cov-report=term-missi
 
 #### Error Handling (MANDATORY)
 
-All operations return `FlextResult[T]` for composable error handling:
+All operations return `FlextCore.Result[T]` for composable error handling:
 
 ```python
-from flext_core import FlextResult
+from flext_core import FlextCore
 from flext_meltano import FlextMeltano
 
 api = FlextMeltano()
@@ -307,7 +307,7 @@ else:
 - ✅ **Meltano Integration**: Native project and plugin management with CLI operations
 - ✅ **DBT Operations**: Model execution, testing, and documentation generation
 - ✅ **Enterprise Pipeline Orchestration**: Advanced ELT pipeline management and monitoring
-- ✅ **FLEXT-Core Integration**: Railway-oriented programming with FlextResult[T] patterns
+- ✅ **FLEXT-Core Integration**: Railway-oriented programming with FlextCore.Result[T] patterns
 - ✅ **Type Safety**: Python 3.13+ with complete type annotations and Pyrefly validation
 - ✅ **Plugin Development Framework**: Automated scaffolding and validation tools
 
@@ -315,7 +315,7 @@ else:
 
 - ❌ **CRITICAL: Test Execution Blocked**: All tests fail at collection phase due to verified blockers
 - ❌ **VERIFIED: Missing flext-tests Dependency**: Confirmed `Path /home/marlonsc/flext/flext-tests for flext-tests does not exist`
-- ❌ **VERIFIED: BaseModel Inheritance Issue**: Confirmed `AttributeError: type object 'FlextModels' has no attribute 'BaseModel'`
+- ❌ **VERIFIED: BaseModel Inheritance Issue**: Confirmed `AttributeError: type object 'FlextCore.Models' has no attribute 'BaseModel'`
 - ⚠️ **Model Compatibility**: Requires flext-core v1.0.0 model structure analysis
 
 ### Development Priorities (UPDATED 2025-10-10)
@@ -331,11 +331,11 @@ else:
 
 ## 🚨 CRITICAL PATTERNS
 
-### MANDATORY: FlextResult Railway Pattern
+### MANDATORY: FlextCore.Result Railway Pattern
 
 ```python
-# ✅ CORRECT - ALL operations use FlextResult pattern
-from flext_core import FlextResult
+# ✅ CORRECT - ALL operations use FlextCore.Result pattern
+from flext_core import FlextCore
 from flext_meltano import FlextMeltanoService
 
 service = FlextMeltanoService()
@@ -354,7 +354,7 @@ else:
 
 # ❌ FORBIDDEN - Try/except for business logic
 try:
-    plugins = service.discover_plugins()  # Missing FlextResult handling
+    plugins = service.discover_plugins()  # Missing FlextCore.Result handling
 except Exception as e:
     print(f"Error: {e}")
 ```
@@ -365,7 +365,7 @@ except Exception as e:
 # ✅ CORRECT - Root module imports (MANDATORY)
 from flext_meltano import FlextMeltano, FlextMeltanoService
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoModels
-from flext_core import FlextResult, FlextService
+from flext_core import FlextCore
 
 # ❌ FORBIDDEN - Internal module imports (breaks ecosystem)
 from flext_meltano.api import FlextMeltano
@@ -391,7 +391,7 @@ from singer_sdk import Tap  # VIOLATION
 
 ### Core Dependencies
 
-- **flext-core>=0.9.9** - Foundation patterns and FlextResult[T]
+- **flext-core>=0.9.9** - Foundation patterns and FlextCore.Result[T]
 - **meltano>=3.0.0** - Meltano data integration platform
 - **singer-sdk>=0.44.0** - Singer protocol implementation
 - **dbt-core>=1.10.5** - Data transformation engine
@@ -413,7 +413,7 @@ from singer_sdk import Tap  # VIOLATION
 
 ### FLEXT-Core Compliance
 
-- [x] Operations return FlextResult[T] for error handling
+- [x] Operations return FlextCore.Result[T] for error handling
 - [x] Railway-oriented programming patterns
 - [x] Complete type annotations with Python 3.13+
 - [x] Clean Architecture with Domain-Driven Design

@@ -2,7 +2,7 @@
 
 import tempfile
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextCore
 from flext_tests import FlextTestsUtilities
 from pydantic_core import ValidationError
 
@@ -33,12 +33,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_tap_config_validation(self) -> None:
         """Test TapConfig Pydantic validation using flext_tests."""
         # Create test config with explicit typing
-        connection_config: FlextTypes.Dict = {
+        connection_config: FlextCore.Types.Dict = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: FlextTypes.Dict = {"users": {"selected": True}}
+        stream_config: FlextCore.Types.Dict = {"users": {"selected": True}}
 
         config = TapConfig(
             tap_type="tap-postgres",
@@ -66,7 +66,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_stream_definition_validation(self) -> None:
         """Test StreamDefinition Pydantic validation using flext_tests."""
         # Create test stream definition with explicit typing
-        stream_schema: FlextTypes.Dict = {
+        stream_schema: FlextCore.Types.Dict = {
             "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -168,8 +168,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.process(config)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             tap_instance = result.value
@@ -269,7 +269,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: FlextTypes.Dict = {
+        stream_config: FlextCore.Types.Dict = {
             "users": {"selected": True},
             "orders": {"selected": False},
         }
@@ -282,8 +282,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             tap_dict = result.value
@@ -317,14 +317,14 @@ class TestFlextMeltanoTapAbstractionsComplete:
             invalid_result = self.tap_abstractions.process(invalid_instance.config)
         except (ValidationError, ValueError):
             # Expected: validation fails at creation time
-            invalid_result = FlextResult.fail("Validation failed at creation")
+            invalid_result = FlextCore.Result.fail("Validation failed at creation")
 
         # Use the process method for valid instance
         valid_result = self.tap_abstractions.process(valid_instance.config)
 
         self.test_assertions.assert_true(
-            condition=isinstance(valid_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(valid_result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if valid_result.is_success:
             self.test_assertions.assert_true(
@@ -357,8 +357,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.discover_streams(tap_instance)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             streams = result.value
@@ -396,8 +396,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.discover_streams(tap_instance)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             streams = result.value
@@ -429,8 +429,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.discover_streams(tap_instance)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             streams = result.value
@@ -474,8 +474,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         # Then get specific stream
         stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")
         self.test_assertions.assert_true(
-            condition=isinstance(stream_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(stream_result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
 
         if stream_result.is_success:
@@ -520,8 +520,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.generate_catalog(tap_instance)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             catalog = result.value
@@ -567,8 +567,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions._create_catalog_entry_from_stream(stream)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             entry = result.value
@@ -615,8 +615,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.extract_records(stream)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             records = result.value
@@ -665,8 +665,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.extract_records(stream, limit=1)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             records = result.value
@@ -694,8 +694,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.extract_records(stream)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             records = result.value
@@ -745,8 +745,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             sync_stats = result.value
@@ -783,8 +783,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.sync_stream(tap_instance, "data")
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             sync_stats = result.value
@@ -881,8 +881,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = FlextMeltanoTapAbstractions.create_instance()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, FlextCore.Result),
+            message="Should return FlextCore.Result",
         )
         if result.is_success:
             instance = result.value
@@ -969,11 +969,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
         # Step 1: Create tap from config
-        connection_config: FlextTypes.Dict = {
+        connection_config: FlextCore.Types.Dict = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: FlextTypes.Dict = {"users": {"selected": True}}
+        stream_config: FlextCore.Types.Dict = {"users": {"selected": True}}
 
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",

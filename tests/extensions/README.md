@@ -140,10 +140,10 @@ def test_custom_tap_extension():
 def test_oracle_oic_extension():
     """Test Oracle Integration Cloud specialized extension."""
 
-from tests.extensions.oracle_oic import OracleOICExtension
+from tests.extensions.oracle_oic import OracleOicExtension
 
     # Test OIC-specific functionality
-    oic_extension = OracleOICExtension()
+    oic_extension = OracleOicExtension()
 
     # Validate OIC integration patterns
     assert oic_extension.supports_oic_protocols()
@@ -256,7 +256,7 @@ from flext_meltano.base import FlextMeltanoBase
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, config: FlextTypes.Dict) -> None:
+    def __init__(self, config: FlextCore.Types.Dict) -> None:
         """Initialize enterprise extension with configuration."""
         super().__init__(config)
         self.validate_enterprise_config()
@@ -267,7 +267,7 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
         pass
 
     @abstractmethod
-    def execute_enterprise_logic(self) -> FlextResult:
+    def execute_enterprise_logic(self) -> FlextCore.Result:
         """Execute enterprise-specific business logic."""
         pass
 

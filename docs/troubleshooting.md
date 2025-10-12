@@ -61,9 +61,9 @@ make type-check
 ```python
 # Ensure proper type hints
 from typing import Optional
-from flext_core import FlextResult
+from flext_core import FlextCore
 
-def process_data(data: dict) -> FlextResult[Optional[FlextTypes.Dict]]:
+def process_data(data: dict) -> FlextCore.Result[Optional[FlextCore.Types.Dict]]:
     # Implementation
     pass
 ```
@@ -137,7 +137,7 @@ open htmlcov/index.html
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
-2. **Error Handling**: Test FlextResult error paths
+2. **Error Handling**: Test FlextCore.Result error paths
 3. **Integration Points**: Test abstractions with real scenarios
 
 ### **Slow Tests**
@@ -196,9 +196,9 @@ bandit -r src/ -f json
 
 ## 🚫 Common Mistakes
 
-### **FlextResult Pattern Violations**
+### **FlextCore.Result Pattern Violations**
 
-**Problem**: Not using FlextResult for error handling
+**Problem**: Not using FlextCore.Result for error handling
 
 ```python
 # ❌ Incorrect
@@ -210,12 +210,12 @@ def risky_operation():
         return None  # Lost error information
 
 # ✅ Correct
-def safe_operation() -> FlextResult[FlextTypes.Dict]:
+def safe_operation() -> FlextCore.Result[FlextCore.Types.Dict]:
     try:
         # operation
-        return FlextResult.ok(data)
+        return FlextCore.Result.ok(data)
     except Exception as e:
-        return FlextResult.fail(f"Operation failed: {e}")
+        return FlextCore.Result.fail(f"Operation failed: {e}")
 ```
 
 ### **Service Pattern Violations**
@@ -230,10 +230,10 @@ class UtilityClass:
         pass
 
 # ✅ Correct
-from flext_core import FlextService
+from flext_core import FlextCore
 
-class FlextMeltanoUtilityService(FlextService):
-    def do_something(self) -> FlextResult[FlextTypes.Dict]:
+class FlextMeltanoUtilityService(FlextCore.Service):
+    def do_something(self) -> FlextCore.Result[FlextCore.Types.Dict]:
         # Implementation with proper error handling
         pass
 ```

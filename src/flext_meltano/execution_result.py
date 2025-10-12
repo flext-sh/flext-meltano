@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 
-from flext_core import FlextTypes, FlextUtilities
+from flext_core import FlextCore
 
 
 class FlextMeltanoExecutionResult:
@@ -19,7 +19,7 @@ class FlextMeltanoExecutionResult:
 
     def __init__(
         self,
-        command: FlextTypes.StringList,
+        command: FlextCore.Types.StringList,
         *,
         success: bool,
         exit_code: int,
@@ -35,11 +35,13 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(self) -> dict[str, str | int | float | bool | FlextTypes.StringList]:
+    def to_dict(
+        self,
+    ) -> dict[str, str | int | float | bool | FlextCore.Types.StringList]:
         """Convert to dictionary representation.
 
         Returns:
-            dict[str, str | int | float | bool | FlextTypes.StringList]: Dictionary representation of execution result.
+            dict[str, str | int | float | bool | FlextCore.Types.StringList]: Dictionary representation of execution result.
 
         """
         return {
@@ -49,7 +51,7 @@ class FlextMeltanoExecutionResult:
             "output": self.output,
             "error": self.error,
             "execution_time": self.execution_time,
-            "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+            "timestamp": FlextCore.Utilities.Generators.generate_iso_timestamp(),
         }
 
     def to_json(self) -> str:
