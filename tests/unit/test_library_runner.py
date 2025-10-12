@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextCore
 
 from flext_meltano import FlextMeltanoTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -45,7 +45,7 @@ class TestFlextDbtProgrammaticRunner:
                 mock_dbt_runner_class.return_value = mock_runner
 
                 # Test the transformation
-                result: FlextResult[
+                result: FlextCore.Result[
                     FlextMeltanoTypes.Processing.DbtTransformationResult
                 ] = dbt_runner.run_transformations_programmatic(
                     project_dir, models=["model1", "model2"]
@@ -87,7 +87,7 @@ class TestFlextSingerProtocolManager:
         mock_target.write_state.return_value = None
 
         # Test the pipeline execution
-        result: FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult] = (
+        result: FlextCore.Result[FlextMeltanoTypes.Processing.SingerExecutionResult] = (
             singer_manager.execute_singer_pipeline(mock_tap, mock_target)
         )
 
@@ -142,21 +142,21 @@ class TestFlextMeltanoLibraryRunner:
             project_dir = Path(temp_dir)
 
             # Type annotations to help type checker
-            extractor_config: dict[str, str | FlextTypes.StringDict] = {
+            extractor_config: dict[str, str | FlextCore.Types.StringDict] = {
                 "name": "test_extractor",
                 "config": {},
             }
-            loader_config: dict[str, str | FlextTypes.StringDict] = {
+            loader_config: dict[str, str | FlextCore.Types.StringDict] = {
                 "name": "test_loader",
                 "config": {},
             }
-            transformer_config: dict[str, str | FlextTypes.StringDict] = {
+            transformer_config: dict[str, str | FlextCore.Types.StringDict] = {
                 "name": "test_transformer",
                 "config": {},
             }
 
             # Test the complete pipeline
-            result: FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult] = (
+            result: FlextCore.Result[FlextMeltanoTypes.Processing.EltPipelineResult] = (
                 runner.execute_complete_elt_pipeline(
                     project_dir, extractor_config, loader_config, transformer_config
                 )

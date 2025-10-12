@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import FlextCore
 
 
 class FlextMeltanoBridge:
@@ -23,13 +23,13 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize the bridge."""
-        self.logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextCore.Logger = FlextCore.Logger(__name__)
 
     def execute_command(
         self,
         command: str,
-        args: dict[str, FlextTypes.JsonValue] | None = None,
-    ) -> FlextResult[FlextTypes.Dict]:
+        args: dict[str, FlextCore.Types.JsonValue] | None = None,
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -37,7 +37,7 @@ class FlextMeltanoBridge:
             args: JSON-serializable arguments
 
         Returns:
-            FlextResult with command execution results
+            FlextCore.Result with command execution results
 
         """
         try:
@@ -47,29 +47,35 @@ class FlextMeltanoBridge:
                 "command": command,
                 "args": args or {},
                 "status": "executed",
-                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+                "timestamp": FlextCore.Utilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
+            return FlextCore.Result[FlextCore.Types.Dict].ok(
+                cast("FlextCore.Types.Dict", result)
+            )
         except Exception as e:
-            return FlextResult[FlextTypes.Dict].fail(f"Bridge command failed: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(
+                f"Bridge command failed: {e}"
+            )
 
-    def get_version(self) -> FlextResult[str]:
+    def get_version(self) -> FlextCore.Result[str]:
         """Get bridge version information."""
         try:
             # Placeholder - real implementation would query Go bridge
-            return FlextResult[str].ok("1.0.0")
+            return FlextCore.Result[str].ok("1.0.0")
         except Exception as e:
-            return FlextResult[str].fail(f"Failed to get version: {e}")
+            return FlextCore.Result[str].fail(f"Failed to get version: {e}")
 
-    def validate_connection(self) -> FlextResult[bool]:
+    def validate_connection(self) -> FlextCore.Result[bool]:
         """Validate connection to Go bridge."""
         try:
             # Placeholder - real implementation would test Go bridge connectivity
-            return FlextResult[bool].ok(True)
+            return FlextCore.Result[bool].ok(True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
+            return FlextCore.Result[bool].fail(
+                f"Bridge connection validation failed: {e}"
+            )
 
-    def discover_plugins(self) -> FlextResult[FlextTypes.Dict]:
+    def discover_plugins(self) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
@@ -78,11 +84,15 @@ class FlextMeltanoBridge:
                 "loaders": ["target-csv", "target-postgres", "target-jsonl"],
                 "transformers": ["dbt-postgres", "dbt-snowflake"],
                 "status": "discovered",
-                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+                "timestamp": FlextCore.Utilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
+            return FlextCore.Result[FlextCore.Types.Dict].ok(
+                cast("FlextCore.Types.Dict", result)
+            )
         except Exception as e:
-            return FlextResult[FlextTypes.Dict].fail(f"Plugin discovery failed: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(
+                f"Plugin discovery failed: {e}"
+            )
 
 
 __all__ = ["FlextMeltanoBridge"]

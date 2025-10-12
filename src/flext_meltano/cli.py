@@ -14,7 +14,7 @@ from collections.abc import Callable
 from typing import cast
 
 from flext_cli import FlextCli, FlextCliModels
-from flext_core import FlextLogger, FlextResult, FlextTypes
+from flext_core import FlextCore
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.models import FlextMeltanoModels
@@ -39,7 +39,7 @@ class FlextMeltanoCLI:
         """Initialize CLI with flext-cli API and Meltano API."""
         super().__init__()
         self._cli = FlextCli()
-        self.logger: FlextLogger = FlextLogger(__name__)
+        self.logger: FlextCore.Logger = FlextCore.Logger(__name__)
         self._api = FlextMeltano()
         self._output = self._cli.output
 
@@ -47,7 +47,7 @@ class FlextMeltanoCLI:
     # MAIN CLI ENTRY POINT
     # =============================================================================
 
-    def main(self, args: FlextTypes.StringList | None = None) -> int:
+    def main(self, args: FlextCore.Types.StringList | None = None) -> int:
         """Main CLI entry point.
 
         Args:
@@ -70,7 +70,9 @@ class FlextMeltanoCLI:
         command = args[0]
         command_args = args[1:]
         # Map subcommands to handler functions
-        command_map: dict[str, Callable[[FlextTypes.StringList], FlextResult[None]]] = {
+        command_map: dict[
+            str, Callable[[FlextCore.Types.StringList], FlextCore.Result[None]]
+        ] = {
             "pipeline": self._handle_pipeline_command,
             "tap": self._handle_tap_command,
             "target": self._handle_target_command,
@@ -88,7 +90,7 @@ class FlextMeltanoCLI:
 
         try:
             # Handler is assured non-None here
-            result: FlextResult[None] = handler(command_args)
+            result: FlextCore.Result[None] = handler(command_args)
             return 0 if result.is_success else 1
         except Exception:
             self.logger.exception("Command failed")
@@ -100,12 +102,12 @@ class FlextMeltanoCLI:
     # =============================================================================
 
     def _handle_pipeline_command(
-        self, args: FlextTypes.StringList
-    ) -> FlextResult[None]:
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle pipeline subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_pipeline_help()
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -119,14 +121,16 @@ class FlextMeltanoCLI:
 
         self._output.print_error(f"Unknown pipeline subcommand: {subcommand}")
         self._show_pipeline_help()
-        return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
+        return FlextCore.Result[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _pipeline_create(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _pipeline_create(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Create a new pipeline."""
         # Parse arguments
         parsed = self._parse_pipeline_create_args(args)
         if not parsed:
-            return FlextResult[None].fail("Invalid arguments")
+            return FlextCore.Result[None].fail("Invalid arguments")
 
         name, tap, target, transform = parsed
 
@@ -147,12 +151,14 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Pipeline creation failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         self._output.print_success(f"Pipeline '{name}' created successfully")
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _pipeline_execute(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _pipeline_execute(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Execute a complete Singer pipeline (tap → target) using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to PipelineRunParams model,
@@ -160,7 +166,7 @@ class FlextMeltanoCLI:
         """
         if not args:
             self._output.print_error("Tap and target names required")
-            return FlextResult[None].fail("Missing pipeline arguments")
+            return FlextCore.Result[None].fail("Missing pipeline arguments")
 
         # Parse CLI arguments into dict format
         cli_args_dict = self._parse_pipeline_run_args(args)
@@ -174,7 +180,7 @@ class FlextMeltanoCLI:
             self._output.print_error(
                 f"Invalid pipeline parameters: {model_result.error}"
             )
-            return FlextResult[None].fail(model_result.error)
+            return FlextCore.Result[None].fail(model_result.error)
 
         pipeline_params = cast(
             "FlextMeltanoModels.PipelineRunParams", model_result.unwrap()
@@ -204,7 +210,7 @@ class FlextMeltanoCLI:
             self._output.print_error(
                 f"Failed to generate pipeline commands: {commands_result.error}"
             )
-            return FlextResult[None].fail(commands_result.error)
+            return FlextCore.Result[None].fail(commands_result.error)
 
         tap_command, target_command = commands_result.unwrap()
 
@@ -220,9 +226,11 @@ class FlextMeltanoCLI:
             + " | ".join([" ".join(tap_command), " ".join(target_command)])
         )
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _pipeline_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _pipeline_list(
+        self, _args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """List available pipelines."""
         self._output.print_message("Listing pipelines...")
 
@@ -231,28 +239,30 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Failed to list pipelines: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         pipelines = result.unwrap()
 
         if not pipelines:
             self._output.print_warning("No pipelines configured")
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         # Display pipelines in table format
         self._display_pipelines_table(pipelines)
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # TAP COMMANDS
     # =============================================================================
 
-    def _handle_tap_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _handle_tap_command(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle tap subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_tap_help()
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -266,9 +276,9 @@ class FlextMeltanoCLI:
 
         self._output.print_error(f"Unknown tap subcommand: {subcommand}")
         self._show_tap_help()
-        return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
+        return FlextCore.Result[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _tap_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _tap_run(self, args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Run a Singer tap using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to TapRunParams model,
@@ -276,7 +286,7 @@ class FlextMeltanoCLI:
         """
         if not args:
             self._output.print_error("Tap name required")
-            return FlextResult[None].fail("Missing tap name")
+            return FlextCore.Result[None].fail("Missing tap name")
 
         # Parse CLI arguments into dict format
         cli_args_dict = self._parse_tap_run_args(args)
@@ -288,7 +298,7 @@ class FlextMeltanoCLI:
 
         if model_result.is_failure:
             self._output.print_error(f"Invalid tap parameters: {model_result.error}")
-            return FlextResult[None].fail(model_result.error)
+            return FlextCore.Result[None].fail(model_result.error)
 
         tap_params = cast("FlextMeltanoModels.TapRunParams", model_result.unwrap())
 
@@ -310,7 +320,7 @@ class FlextMeltanoCLI:
             self._output.print_error(
                 f"Failed to generate Singer command: {command_result.error}"
             )
-            return FlextResult[None].fail(command_result.error)
+            return FlextCore.Result[None].fail(command_result.error)
 
         singer_command = command_result.unwrap()
 
@@ -321,7 +331,7 @@ class FlextMeltanoCLI:
 
         if execution_result.is_failure:
             self._output.print_error(f"Tap execution failed: {execution_result.error}")
-            return FlextResult[None].fail(execution_result.error)
+            return FlextCore.Result[None].fail(execution_result.error)
 
         tap_data = execution_result.unwrap()
         self._output.print_success(
@@ -332,9 +342,9 @@ class FlextMeltanoCLI:
         if tap_data.get("stdout"):
             self._output.print_message(f"Output: {len(tap_data['stdout'])} characters")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _tap_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _tap_list(self, _args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """List available taps."""
         self._output.print_message("Listing available taps...")
 
@@ -343,24 +353,24 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Failed to list taps: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         taps = result.unwrap()
 
         if not taps:
             self._output.print_warning("No taps installed")
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         # Display taps in table format
         self._display_plugins_table(taps, "Taps")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _tap_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _tap_install(self, args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Install a Singer tap."""
         if not args:
             self._output.print_error("Tap name required")
-            return FlextResult[None].fail("Missing tap name")
+            return FlextCore.Result[None].fail("Missing tap name")
 
         tap_name = args[0]
 
@@ -371,20 +381,22 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Tap installation failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         self._output.print_success(f"Tap '{tap_name}' installed successfully")
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # TARGET COMMANDS
     # =============================================================================
 
-    def _handle_target_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _handle_target_command(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle target subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_target_help()
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -398,9 +410,9 @@ class FlextMeltanoCLI:
 
         self._output.print_error(f"Unknown target subcommand: {subcommand}")
         self._show_target_help()
-        return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
+        return FlextCore.Result[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _target_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _target_run(self, args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Run a Singer target using model-driven approach.
 
         Uses CliModelConverter to convert CLI args to TargetRunParams model,
@@ -408,7 +420,7 @@ class FlextMeltanoCLI:
         """
         if not args:
             self._output.print_error("Target name required")
-            return FlextResult[None].fail("Missing target name")
+            return FlextCore.Result[None].fail("Missing target name")
 
         # Parse CLI arguments into dict format
         cli_args_dict = self._parse_target_run_args(args)
@@ -420,7 +432,7 @@ class FlextMeltanoCLI:
 
         if model_result.is_failure:
             self._output.print_error(f"Invalid target parameters: {model_result.error}")
-            return FlextResult[None].fail(model_result.error)
+            return FlextCore.Result[None].fail(model_result.error)
 
         target_params = cast(
             "FlextMeltanoModels.TargetRunParams", model_result.unwrap()
@@ -442,7 +454,7 @@ class FlextMeltanoCLI:
             self._output.print_error(
                 f"Failed to generate Singer command: {command_result.error}"
             )
-            return FlextResult[None].fail(command_result.error)
+            return FlextCore.Result[None].fail(command_result.error)
 
         singer_command = command_result.unwrap()
 
@@ -455,7 +467,7 @@ class FlextMeltanoCLI:
             self._output.print_error(
                 f"Target execution failed: {execution_result.error}"
             )
-            return FlextResult[None].fail(execution_result.error)
+            return FlextCore.Result[None].fail(execution_result.error)
 
         target_data = execution_result.unwrap()
         self._output.print_success(
@@ -468,9 +480,9 @@ class FlextMeltanoCLI:
                 f"Output: {len(target_data['stdout'])} characters"
             )
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _target_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _target_list(self, _args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """List available targets."""
         self._output.print_message("Listing available targets...")
 
@@ -479,24 +491,26 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Failed to list targets: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         targets = result.unwrap()
 
         if not targets:
             self._output.print_warning("No targets installed")
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         # Display targets in table format
         self._display_plugins_table(targets, "Targets")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _target_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _target_install(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Install a Singer target."""
         if not args:
             self._output.print_error("Target name required")
-            return FlextResult[None].fail("Missing target name")
+            return FlextCore.Result[None].fail("Missing target name")
 
         target_name = args[0]
 
@@ -507,20 +521,22 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Target installation failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         self._output.print_success(f"Target '{target_name}' installed successfully")
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # DBT COMMANDS
     # =============================================================================
 
-    def _handle_dbt_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _handle_dbt_command(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle DBT subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_dbt_help()
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -534,9 +550,9 @@ class FlextMeltanoCLI:
 
         self._output.print_error(f"Unknown dbt subcommand: {subcommand}")
         self._show_dbt_help()
-        return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
+        return FlextCore.Result[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _dbt_run(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _dbt_run(self, args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Run DBT models."""
         models = self._parse_models_arg(args)
 
@@ -549,7 +565,7 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"DBT run failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         dbt_data = result.unwrap()
         self._output.print_success("DBT models executed successfully")
@@ -557,9 +573,9 @@ class FlextMeltanoCLI:
         # Display DBT metrics
         self._display_dbt_metrics(dbt_data)
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _dbt_test(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _dbt_test(self, args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Test DBT models."""
         models = self._parse_models_arg(args)
 
@@ -572,7 +588,7 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"DBT test failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         test_data = result.unwrap()
         self._output.print_success("DBT tests completed successfully")
@@ -580,9 +596,9 @@ class FlextMeltanoCLI:
         # Display test results
         self._display_dbt_test_results(test_data)
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _dbt_docs(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _dbt_docs(self, _args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """Generate DBT documentation."""
         self._output.print_message("Generating DBT documentation...")
 
@@ -591,20 +607,22 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"DBT docs generation failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         self._output.print_success("DBT documentation generated successfully")
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # PLUGIN COMMANDS
     # =============================================================================
 
-    def _handle_plugin_command(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _handle_plugin_command(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle plugin subcommands."""
         if not args or args[0] in {"--help", "-h"}:
             self._show_plugin_help()
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -616,9 +634,9 @@ class FlextMeltanoCLI:
 
         self._output.print_error(f"Unknown plugin subcommand: {subcommand}")
         self._show_plugin_help()
-        return FlextResult[None].fail(f"Unknown subcommand: {subcommand}")
+        return FlextCore.Result[None].fail(f"Unknown subcommand: {subcommand}")
 
-    def _plugin_list(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _plugin_list(self, _args: FlextCore.Types.StringList) -> FlextCore.Result[None]:
         """List all installed plugins."""
         self._output.print_message("Listing all plugins...")
 
@@ -627,25 +645,27 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Failed to list plugins: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         plugins = result.unwrap()
 
         if not plugins:
             self._output.print_warning("No plugins installed")
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         # Display plugins in table format
         self._display_plugins_table(plugins, "Plugins")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def _plugin_install(self, args: FlextTypes.StringList) -> FlextResult[None]:
+    def _plugin_install(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Install a plugin."""
         min_args_required = 2
         if len(args) < min_args_required:
             self._output.print_error("Plugin type and name required")
-            return FlextResult[None].fail("Missing arguments")
+            return FlextCore.Result[None].fail("Missing arguments")
 
         plugin_type = args[0]
         plugin_name = args[1]
@@ -659,16 +679,18 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Plugin installation failed: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         self._output.print_success(f"Plugin '{plugin_name}' installed successfully")
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # STATUS COMMANDS
     # =============================================================================
 
-    def _handle_status_command(self, _args: FlextTypes.StringList) -> FlextResult[None]:
+    def _handle_status_command(
+        self, _args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle status command."""
         self._output.print_message("Checking Meltano service status...")
 
@@ -677,37 +699,37 @@ class FlextMeltanoCLI:
 
         if result.is_failure:
             self._output.print_error(f"Failed to get status: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         nested_result = result.unwrap()
         if nested_result.is_failure:
             self._output.print_error(f"Status check failed: {nested_result.error}")
-            return FlextResult[None].fail(nested_result.error)
+            return FlextCore.Result[None].fail(nested_result.error)
 
         status_data = nested_result.unwrap()
 
         # Display status information
         self._display_status(status_data)
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     def _handle_version_command(
-        self, _args: FlextTypes.StringList
-    ) -> FlextResult[None]:
+        self, _args: FlextCore.Types.StringList
+    ) -> FlextCore.Result[None]:
         """Handle version command."""
         # Get version info via API
         result = self._api.get_version_info()
 
         if result.is_failure:
             self._output.print_error(f"Failed to get version: {result.error}")
-            return FlextResult[None].fail(result.error)
+            return FlextCore.Result[None].fail(result.error)
 
         version_data = result.unwrap()
 
         # Display version information
         self._display_version(version_data)
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # DISPLAY METHODS (using flext-cli exclusively)
@@ -726,7 +748,7 @@ class FlextMeltanoCLI:
     ) -> None:
         """Display pipelines in table format."""
         self._output.format_table(
-            data=cast("list[dict[str, object]]", pipelines),
+            data=cast("list[FlextCore.Types.Dict]", pipelines),
             headers=["Name", "Tap", "Target", "Transform", "Status"],
             title="Configured Pipelines",
         )
@@ -768,7 +790,7 @@ class FlextMeltanoCLI:
     ) -> None:
         """Display plugins in table format."""
         self._output.format_table(
-            data=cast("list[dict[str, object]]", plugins),
+            data=cast("list[FlextCore.Types.Dict]", plugins),
             headers=["Name", "Type", "Version", "Status"],
             title=title,
         )
@@ -874,19 +896,19 @@ class FlextMeltanoCLI:
     # MODEL-DRIVEN CLI METHODS - Pydantic Models with Automatic Validation
     # =============================================================================
 
-    def cmd_tap_run_model_driven(self, **cli_args: object) -> FlextResult[None]:
+    def cmd_tap_run_model_driven(self, **cli_args: object) -> FlextCore.Result[None]:
         """Run Singer tap using TapRunParams model for automatic parameter validation.
 
         Demonstrates complete model-driven CLI workflow:
         1. Convert CLI args to validated Pydantic model
         2. Translate model to Singer SDK command
-        3. Execute with proper error handling via FlextResult
+        3. Execute with proper error handling via FlextCore.Result
 
         Args:
             **cli_args: CLI arguments automatically converted to TapRunParams
 
         Returns:
-            FlextResult indicating success or failure of tap execution
+            FlextCore.Result indicating success or failure of tap execution
 
         """
         # Convert CLI args to validated Pydantic model
@@ -896,7 +918,7 @@ class FlextMeltanoCLI:
 
         if params_result.is_failure:
             self.logger.error(f"Parameter validation failed: {params_result.error}")
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Invalid tap parameters: {params_result.error}"
             )
 
@@ -908,7 +930,7 @@ class FlextMeltanoCLI:
         # Translate Pydantic model to Singer CLI command
         command_result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
         if command_result.is_failure:
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Command translation failed: {command_result.error}"
             )
 
@@ -919,7 +941,7 @@ class FlextMeltanoCLI:
         exec_result = FlextMeltanoSingerCliTranslator.execute_singer_command(command)
         if exec_result.is_failure:
             self._output.print_error(f"Tap execution failed: {exec_result.error}")
-            return FlextResult[None].fail(exec_result.error)
+            return FlextCore.Result[None].fail(exec_result.error)
 
         output = exec_result.unwrap()
         self._output.print_success(f"Tap '{params.tap_name}' completed successfully")
@@ -928,16 +950,16 @@ class FlextMeltanoCLI:
         if output.get("stdout"):
             self._output.print_message(f"\nOutput:\n{output['stdout']}")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def cmd_target_run_model_driven(self, **cli_args: object) -> FlextResult[None]:
+    def cmd_target_run_model_driven(self, **cli_args: object) -> FlextCore.Result[None]:
         """Run Singer target using TargetRunParams model for automatic validation.
 
         Args:
             **cli_args: CLI arguments automatically converted to TargetRunParams
 
         Returns:
-            FlextResult indicating success or failure of target execution
+            FlextCore.Result indicating success or failure of target execution
 
         """
         # Convert CLI args to validated Pydantic model
@@ -947,7 +969,7 @@ class FlextMeltanoCLI:
 
         if params_result.is_failure:
             self.logger.error(f"Parameter validation failed: {params_result.error}")
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Invalid target parameters: {params_result.error}"
             )
 
@@ -959,7 +981,7 @@ class FlextMeltanoCLI:
         # Translate Pydantic model to Singer CLI command
         command_result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
         if command_result.is_failure:
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Command translation failed: {command_result.error}"
             )
 
@@ -970,7 +992,7 @@ class FlextMeltanoCLI:
         exec_result = FlextMeltanoSingerCliTranslator.execute_singer_command(command)
         if exec_result.is_failure:
             self._output.print_error(f"Target execution failed: {exec_result.error}")
-            return FlextResult[None].fail(exec_result.error)
+            return FlextCore.Result[None].fail(exec_result.error)
 
         output = exec_result.unwrap()
         self._output.print_success(
@@ -981,16 +1003,18 @@ class FlextMeltanoCLI:
         if output.get("stdout"):
             self._output.print_message(f"\nOutput:\n{output['stdout']}")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
-    def cmd_pipeline_run_model_driven(self, **cli_args: object) -> FlextResult[None]:
+    def cmd_pipeline_run_model_driven(
+        self, **cli_args: object
+    ) -> FlextCore.Result[None]:
         """Run complete ELT pipeline using PipelineRunParams model.
 
         Args:
             **cli_args: CLI arguments automatically converted to PipelineRunParams
 
         Returns:
-            FlextResult indicating success or failure of pipeline execution
+            FlextCore.Result indicating success or failure of pipeline execution
 
         """
         # Convert CLI args to validated Pydantic model
@@ -1000,7 +1024,7 @@ class FlextMeltanoCLI:
 
         if params_result.is_failure:
             self.logger.error(f"Parameter validation failed: {params_result.error}")
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Invalid pipeline parameters: {params_result.error}"
             )
 
@@ -1012,7 +1036,7 @@ class FlextMeltanoCLI:
         # Translate Pydantic model to tap and target commands
         commands_result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
         if commands_result.is_failure:
-            return FlextResult[None].fail(
+            return FlextCore.Result[None].fail(
                 f"Command translation failed: {commands_result.error}"
             )
 
@@ -1025,7 +1049,7 @@ class FlextMeltanoCLI:
         tap_result = FlextMeltanoSingerCliTranslator.execute_singer_command(tap_command)
         if tap_result.is_failure:
             self._output.print_error(f"Tap execution failed: {tap_result.error}")
-            return FlextResult[None].fail(tap_result.error)
+            return FlextCore.Result[None].fail(tap_result.error)
 
         tap_output = tap_result.unwrap()
 
@@ -1035,20 +1059,20 @@ class FlextMeltanoCLI:
         )
         if target_result.is_failure:
             self._output.print_error(f"Target execution failed: {target_result.error}")
-            return FlextResult[None].fail(target_result.error)
+            return FlextCore.Result[None].fail(target_result.error)
 
         self._output.print_success(
             f"Pipeline '{params.tap_name} → {params.target_name}' completed successfully"
         )
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # ARGUMENT PARSING HELPERS
     # =============================================================================
 
     def _parse_pipeline_create_args(
-        self, args: FlextTypes.StringList
+        self, args: FlextCore.Types.StringList
     ) -> tuple[str, str, str, str | None] | None:
         """Parse pipeline create arguments."""
         min_args_required = 3
@@ -1068,7 +1092,9 @@ class FlextMeltanoCLI:
 
         return name, tap, target, transform
 
-    def _parse_tap_run_args(self, args: FlextTypes.StringList) -> dict[str, object]:
+    def _parse_tap_run_args(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Types.Dict:
         """Parse tap run CLI arguments into dictionary format for TapRunParams model.
 
         Args:
@@ -1078,7 +1104,7 @@ class FlextMeltanoCLI:
             Dictionary with keys matching TapRunParams fields (underscores)
 
         """
-        cli_args: dict[str, object] = {
+        cli_args: FlextCore.Types.Dict = {
             "tap_name": args[0],  # Required first positional arg
             "discover": False,
             "config_file": None,
@@ -1112,7 +1138,9 @@ class FlextMeltanoCLI:
 
         return cli_args
 
-    def _parse_target_run_args(self, args: FlextTypes.StringList) -> dict[str, object]:
+    def _parse_target_run_args(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Types.Dict:
         """Parse target run CLI arguments into dictionary format for TargetRunParams model.
 
         Args:
@@ -1122,7 +1150,7 @@ class FlextMeltanoCLI:
             Dictionary with keys matching TargetRunParams fields (underscores)
 
         """
-        cli_args: dict[str, object] = {
+        cli_args: FlextCore.Types.Dict = {
             "target_name": args[0],  # Required first positional arg
             "config_file": None,
             "input_file": None,
@@ -1145,8 +1173,8 @@ class FlextMeltanoCLI:
         return cli_args
 
     def _parse_pipeline_run_args(
-        self, args: FlextTypes.StringList
-    ) -> dict[str, object]:
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Types.Dict:
         """Parse pipeline run CLI arguments into dictionary format for PipelineRunParams model.
 
         Args:
@@ -1161,7 +1189,7 @@ class FlextMeltanoCLI:
             # Return incomplete dict - will fail validation
             return {"tap_name": args[0] if args else None, "target_name": None}
 
-        cli_args: dict[str, object] = {
+        cli_args: FlextCore.Types.Dict = {
             "tap_name": args[0],  # Required first positional arg
             "target_name": args[1],  # Required second positional arg
             "tap_config": None,
@@ -1196,14 +1224,16 @@ class FlextMeltanoCLI:
 
         return cli_args
 
-    def _parse_config_arg(self, args: FlextTypes.StringList) -> str | None:
+    def _parse_config_arg(self, args: FlextCore.Types.StringList) -> str | None:
         """Parse config file argument."""
         for i, arg in enumerate(args):
             if arg in {"--config", "-c"} and i + 1 < len(args):
                 return args[i + 1]
         return None
 
-    def _parse_models_arg(self, args: FlextTypes.StringList) -> FlextTypes.StringList:
+    def _parse_models_arg(
+        self, args: FlextCore.Types.StringList
+    ) -> FlextCore.Types.StringList:
         """Parse models argument."""
         for i, arg in enumerate(args):
             if arg in {"--models", "-m"} and i + 1 < len(args):

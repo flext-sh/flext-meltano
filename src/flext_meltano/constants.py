@@ -9,15 +9,15 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final, Literal
 
-from flext_core import FlextConstants
+from flext_core import FlextCore
 
 
-class FlextMeltanoConstants(FlextConstants):
+class FlextMeltanoConstants(FlextCore.Constants):
     """Single unified meltano constants class following FLEXT standards.
 
     Contains all constants for meltano domain operations.
     Follows FLEXT pattern: one class per module with nested subclasses.
-    All constants are flat class attributes inheriting from FlextConstants.
+    All constants are flat class attributes inheriting from FlextCore.Constants.
     """
 
     # =========================================================================
@@ -63,17 +63,19 @@ class FlextMeltanoConstants(FlextConstants):
         # Default timeout constants
         MELTANO_DEFAULT_TIMEOUT: Final[int] = 300  # 5 minutes
 
-        # Timeout constants (using FlextConstants as base)
+        # Timeout constants (using FlextCore.Constants as base)
         DEFAULT_TIMEOUT: Final[int] = (
-            FlextConstants.Defaults.TIMEOUT * 10
+            FlextCore.Constants.Defaults.TIMEOUT * 10
         )  # 300 seconds
         DISCOVERY_TIMEOUT: Final[int] = (
-            FlextConstants.Defaults.TIMEOUT * 2
+            FlextCore.Constants.Defaults.TIMEOUT * 2
         )  # 60 seconds
         EXTRACT_TIMEOUT: Final[int] = (
-            FlextConstants.Defaults.TIMEOUT * 60
+            FlextCore.Constants.Defaults.TIMEOUT * 60
         )  # 1800 seconds
-        LOAD_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 60  # 1800 seconds
+        LOAD_TIMEOUT: Final[int] = (
+            FlextCore.Constants.Defaults.TIMEOUT * 60
+        )  # 1800 seconds
 
         # Database ports
         DEFAULT_POSTGRES_PORT: Final[int] = 5432
@@ -92,14 +94,22 @@ class FlextMeltanoConstants(FlextConstants):
         # Version requirements
         SDK_VERSION_REQUIRED: Final[str] = "0.48.0"
 
-        # Batch sizes (using FlextConstants as base)
-        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
-        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+        # Batch sizes (using FlextCore.Constants as base)
+        DEFAULT_BATCH_SIZE: Final[int] = (
+            FlextCore.Constants.Defaults.PAGE_SIZE * 10
+        )  # 1000
+        MAX_BATCH_SIZE: Final[int] = (
+            FlextCore.Constants.Defaults.PAGE_SIZE * 100
+        )  # 10000
         DEFAULT_BUFFER_SIZE: Final[int] = 8192
 
-        # Timeouts (using FlextConstants as base)
-        DEFAULT_CONNECTION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT  # 30
-        DEFAULT_REQUEST_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2  # 60
+        # Timeouts (using FlextCore.Constants as base)
+        DEFAULT_CONNECTION_TIMEOUT: Final[int] = (
+            FlextCore.Constants.Defaults.TIMEOUT
+        )  # 30
+        DEFAULT_REQUEST_TIMEOUT: Final[int] = (
+            FlextCore.Constants.Defaults.TIMEOUT * 2
+        )  # 60
         DEFAULT_MAX_PARALLEL_STREAMS: Final[int] = 4
 
     class Dbt:
@@ -119,10 +129,16 @@ class FlextMeltanoConstants(FlextConstants):
         # Version requirements
         VERSION_REQUIRED: Final[str] = "1.10.5"
 
-        # Batch processing (using FlextConstants as base)
-        DEFAULT_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 10  # 1000
-        LARGE_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 50  # 5000
-        MAX_BATCH_SIZE: Final[int] = FlextConstants.Defaults.PAGE_SIZE * 100  # 10000
+        # Batch processing (using FlextCore.Constants as base)
+        DEFAULT_BATCH_SIZE: Final[int] = (
+            FlextCore.Constants.Defaults.PAGE_SIZE * 10
+        )  # 1000
+        LARGE_BATCH_SIZE: Final[int] = (
+            FlextCore.Constants.Defaults.PAGE_SIZE * 50
+        )  # 5000
+        MAX_BATCH_SIZE: Final[int] = (
+            FlextCore.Constants.Defaults.PAGE_SIZE * 100
+        )  # 10000
 
         # Freshness timeouts (hours)
         FRESHNESS_ERROR_AFTER: Final[int] = 24
@@ -152,9 +168,9 @@ class FlextMeltanoConstants(FlextConstants):
         TYPE_TARGET: Final[str] = "loader"
         TYPE_DBT: Final[str] = "transformer"
 
-        # Installation timeout (using FlextConstants as base)
+        # Installation timeout (using FlextCore.Constants as base)
         INSTALLATION_TIMEOUT: Final[int] = (
-            FlextConstants.Defaults.TIMEOUT * 10
+            FlextCore.Constants.Defaults.TIMEOUT * 10
         )  # 300 seconds
 
         # Validation rules
@@ -256,14 +272,14 @@ class FlextMeltanoConstants(FlextConstants):
     class MeltanoLogging:
         """Meltano-specific logging configuration constants namespace."""
 
-        # Log levels (using FlextConstants as source)
-        DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
-        PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
-        EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
-        LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
-        TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
-        ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
-        PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
+        # Log levels (using FlextCore.Constants as source)
+        DEFAULT_LEVEL = FlextCore.Constants.Config.LogLevel.INFO
+        PIPELINE_LEVEL = FlextCore.Constants.Config.LogLevel.INFO
+        EXTRACT_LEVEL = FlextCore.Constants.Config.LogLevel.INFO
+        LOAD_LEVEL = FlextCore.Constants.Config.LogLevel.INFO
+        TRANSFORM_LEVEL = FlextCore.Constants.Config.LogLevel.INFO
+        ERROR_LEVEL = FlextCore.Constants.Config.LogLevel.ERROR
+        PERFORMANCE_LEVEL = FlextCore.Constants.Config.LogLevel.WARNING
 
         # Pipeline execution logging
         LOG_PIPELINE_START = True
@@ -303,7 +319,9 @@ class FlextMeltanoConstants(FlextConstants):
         MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000  # 10 seconds
         TRACK_RECORD_COUNTS = True
         TRACK_MEMORY_USAGE = True
-        HIGH_MEMORY_THRESHOLD = FlextConstants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
+        HIGH_MEMORY_THRESHOLD = (
+            FlextCore.Constants.Performance.HIGH_MEMORY_THRESHOLD_BYTES
+        )
 
         # Data quality logging
         LOG_DATA_QUALITY_ISSUES = True

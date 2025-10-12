@@ -96,10 +96,10 @@ transforms:
 
 ```python
 from flext_meltano import FlextMeltanoConfig
-from flext_core import FlextResult
+from flext_core import FlextCore
 
 config = FlextMeltanoConfig()
-validation_result: FlextResult[bool] = config.validate_meltano_config()
+validation_result: FlextCore.Result[bool] = config.validate_meltano_config()
 
 if validation_result.is_success:
     print("Meltano configuration is valid")
@@ -457,7 +457,7 @@ Due to compliance issues:
 1. **Use Abstractions**: Leverage existing FlextMeltanoConfig where possible
 2. **Monitor Progress**: Track abstraction layer implementation
 3. **Plan Migration**: Prepare for wrapper layer adoption
-4. **Validate Patterns**: Use FlextResult patterns consistently
+4. **Validate Patterns**: Use FlextCore.Result patterns consistently
 
 ---
 

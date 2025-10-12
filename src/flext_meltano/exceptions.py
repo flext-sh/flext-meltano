@@ -13,10 +13,10 @@ from __future__ import annotations
 from enum import Enum
 from typing import override
 
-from flext_core import FlextExceptions
+from flext_core import FlextCore
 
 
-class FlextMeltanoExceptions(FlextExceptions):
+class FlextMeltanoExceptions(FlextCore.Exceptions):
     """Single CONSOLIDATED class containing ALL Meltano/Singer/DBT exceptions."""
 
     class MeltanoErrorCodes(Enum):
@@ -40,12 +40,12 @@ class FlextMeltanoExceptions(FlextExceptions):
         CONFIG_BUILDER_ERROR = "CONFIG_BUILDER_ERROR"
 
     # Base Meltano exception classes as nested classes
-    class MeltanoBaseError(FlextExceptions.BaseError):
+    class MeltanoBaseError(FlextCore.Exceptions.BaseError):
         """Base exception for all Meltano domain errors."""
 
         def _extract_common_kwargs(
-            self, kwargs: dict[str, object]
-        ) -> tuple[dict[str, object], str | None, str | None]:
+            self, kwargs: FlextCore.Types.Dict
+        ) -> tuple[FlextCore.Types.Dict, str | None, str | None]:
             """Extract common kwargs for error initialization.
 
             Args:
@@ -70,14 +70,14 @@ class FlextMeltanoExceptions(FlextExceptions):
             from typing import cast
 
             return (
-                cast("dict[str, object]", base_context),
+                cast("FlextCore.Types.Dict", base_context),
                 str(correlation_id) if correlation_id is not None else None,
                 str(error_code) if error_code is not None else None,
             )
 
         def _build_context(
-            self, base_context: dict[str, object], **meltano_fields: object
-        ) -> dict[str, object]:
+            self, base_context: FlextCore.Types.Dict, **meltano_fields: object
+        ) -> FlextCore.Types.Dict:
             """Build context dictionary with Meltano-specific fields.
 
             Args:
@@ -801,11 +801,11 @@ FlextPipelineError = FlextMeltanoExceptions.PipelineError
 FlextPipelineExecutionError = FlextMeltanoExceptions.PipelineExecutionError
 FlextCatalogDiscoveryError = FlextMeltanoExceptions.CatalogDiscoveryError
 FlextMeltanoStreamValidationError = FlextMeltanoExceptions.StreamValidationError
-FlextConfigBuilderError = FlextMeltanoExceptions.ConfigBuilderError
+FlextCore.ConfigBuilderError = FlextMeltanoExceptions.ConfigBuilderError
 
 __all__ = [
     "FlextCatalogDiscoveryError",
-    "FlextConfigBuilderError",
+    "FlextCore.ConfigBuilderError",
     "FlextDbtCompilationError",
     "FlextDbtExecutionError",
     "FlextDbtModelError",

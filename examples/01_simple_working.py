@@ -7,7 +7,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-from flext_core import FlextLogger
+from flext_core import FlextCore
 
 # Import ONLY what actually exists
 from flext_meltano import (
@@ -16,7 +16,7 @@ from flext_meltano import (
     FlextMeltanoExecutor,
 )
 
-logger = FlextLogger(__name__)
+logger = FlextCore.Logger(__name__)
 
 
 def simple_bridge_example() -> None:

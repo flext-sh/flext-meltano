@@ -51,7 +51,7 @@ python -c "from flext_meltano import FlextMeltanoService; print('✅ Installatio
 
 ```python
 from flext_meltano import FlextMeltanoService
-from flext_core import FlextResult
+from flext_core import FlextCore
 
 # Initialize ELT service
 service = FlextMeltanoService()
@@ -72,18 +72,18 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")
 ```
 
-### **FlextResult Pattern**
+### **FlextCore.Result Pattern**
 
 ```python
-from flext_core import FlextResult
+from flext_core import FlextCore
 
-# All flext-meltano operations return FlextResult[T]
-def example_operation() -> FlextResult[str]:
+# All flext-meltano operations return FlextCore.Result[T]
+def example_operation() -> FlextCore.Result[str]:
     try:
         # Your operation logic
-        return FlextResult.ok("Operation successful")
+        return FlextCore.Result.ok("Operation successful")
     except Exception as e:
-        return FlextResult.fail(f"Operation failed: {e}")
+        return FlextCore.Result.fail(f"Operation failed: {e}")
 
 # Usage pattern
 result = example_operation()
@@ -139,7 +139,7 @@ make check-imports      # Validate import compliance
 ### **Architecture Compliance**
 
 - **Import Restrictions**: Only use root-level imports from `flext_meltano`
-- **Error Handling**: Always use `FlextResult[T]` pattern
+- **Error Handling**: Always use `FlextCore.Result[T]` pattern
 - **Service Pattern**: Follow flext-core domain service patterns
 
 ### **Current Status**

@@ -85,7 +85,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+            "flext_core.FlextCore.Utilities.Generators.generate_iso_timestamp"
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:00:00Z"
 
@@ -112,7 +112,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+            "flext_core.FlextCore.Utilities.Generators.generate_iso_timestamp"
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:01:00Z"
 
@@ -139,7 +139,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+            "flext_core.FlextCore.Utilities.Generators.generate_iso_timestamp"
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
 
@@ -167,7 +167,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+            "flext_core.FlextCore.Utilities.Generators.generate_iso_timestamp"
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
 
@@ -195,7 +195,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
+            "flext_core.FlextCore.Utilities.Generators.generate_iso_timestamp"
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
 

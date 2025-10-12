@@ -15,60 +15,56 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-from flext_core import (
-    FlextConstants,
-    FlextLogger,
-    FlextResult,
-    FlextTypes,
-    FlextUtilities,
-)
+from flext_core import FlextCore
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
-logger = FlextLogger(__name__)
+logger = FlextCore.Logger(__name__)
 
 
 class FlextMeltanoFileManagers:
     """DOMAIN-SPECIFIC Meltano file managers using flext-core as SOURCE OF TRUTH.
 
     Contains ONLY Meltano-specific file operations that cannot be generalized to flext-core.
-    ALL general file operations MUST use FlextUtilities from flext-core directly.
+    ALL general file operations MUST use FlextCore.Utilities from flext-core directly.
 
     ZERO DUPLICATION PRINCIPLE:
-    - FlextUtilities.Files is SOURCE OF TRUTH for general file operations
+    - FlextCore.Utilities.Files is SOURCE OF TRUTH for general file operations
     - Contains ONLY Meltano-specific operations (YAML configs, project structure)
-    - Uses tempfile standard library with FlextUtilities validation
+    - Uses tempfile standard library with FlextCore.Utilities validation
     """
 
     @classmethod
-    def create_temp_directory(cls, prefix: str = "flext_meltano_") -> FlextResult[Path]:
+    def create_temp_directory(
+        cls, prefix: str = "flext_meltano_"
+    ) -> FlextCore.Result[Path]:
         """Create temporary directory using direct tempfile implementation.
 
         Returns:
-            FlextResult containing the created temporary directory path.
+            FlextCore.Result containing the created temporary directory path.
 
         """
-        logger = FlextLogger(__name__)
+        logger = FlextCore.Logger(__name__)
         try:
             # Use direct tempfile.mkdtemp for temporary directory creation
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             logger.info(f"Created temporary directory: {temp_dir}")
-            return FlextResult[Path].ok(data=temp_dir)
+            return FlextCore.Result[Path].ok(data=temp_dir)
         except Exception as e:
             error_msg = f"Failed to create temp directory: {e}"
             logger.exception(error_msg)
-            return FlextResult[Path].fail(error_msg)
+            return FlextCore.Result[Path].fail(error_msg)
 
     @classmethod
     def save_yaml_config(
         cls, config: FlextMeltanoTypes.MeltanoCore.FileConfigDict, file_path: Path
-    ) -> FlextResult[bool]:
+    ) -> FlextCore.Result[bool]:
         """Save YAML config using direct implementation.
 
         Returns:
-            FlextResult indicating success or failure of the save operation.
+            FlextCore.Result indicating success or failure of the save operation.
 
         """
         try:
@@ -76,7 +72,7 @@ class FlextMeltanoFileManagers:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
             with file_path.open(
-                "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "w", encoding=FlextCore.Constants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.dump(
                     config,
@@ -85,111 +81,115 @@ class FlextMeltanoFileManagers:
                     default_flow_style=False,
                     sort_keys=False,
                 )
-            return FlextResult[bool].ok(data=True)
+            return FlextCore.Result[bool].ok(data=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Failed to save YAML config: {e}")
+            return FlextCore.Result[bool].fail(f"Failed to save YAML config: {e}")
 
     @classmethod
     def load_yaml_config(
         cls, file_path: Path
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict]:
-        """Load YAML config using FlextUtilities.Files validation + direct YAML.
+    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.FileConfigDict]:
+        """Load YAML config using FlextCore.Utilities.Files validation + direct YAML.
 
-        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
+        ZERO DUPLICATION: Uses FlextCore.Utilities.Files.is_valid_path for validation.
 
         Returns:
-            FlextResult containing the loaded YAML configuration.
+            FlextCore.Result containing the loaded YAML configuration.
 
         """
         try:
             # Basic path validation using flext-core utilities
-            if not FlextUtilities.TypeGuards.is_string_non_empty(str(file_path)):
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
+            if not FlextCore.Utilities.TypeGuards.is_string_non_empty(str(file_path)):
+                return FlextCore.Result[
+                    FlextMeltanoTypes.MeltanoCore.FileConfigDict
+                ].fail(
                     f"Invalid YAML file path: {file_path}",
                 )
 
             if not file_path.exists():
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
-                    f"YAML file not found: {file_path}"
-                )
+                return FlextCore.Result[
+                    FlextMeltanoTypes.MeltanoCore.FileConfigDict
+                ].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "r", encoding=FlextCore.Constants.Mixins.DEFAULT_ENCODING
             ) as f:
                 config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = (
                     yaml.safe_load(f)
                 )
 
             if config_data is None:
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
-                    data={}
-                )
+                return FlextCore.Result[
+                    FlextMeltanoTypes.MeltanoCore.FileConfigDict
+                ].ok(data={})
 
             if not isinstance(config_data, dict):
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
-                    "YAML content is not a dictionary"
-                )
+                return FlextCore.Result[
+                    FlextMeltanoTypes.MeltanoCore.FileConfigDict
+                ].fail("YAML content is not a dictionary")
 
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
+            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
                 data=cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data)
             )
         except Exception as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
+            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
                 f"Failed to load YAML config: {e}"
             )
 
     @classmethod
-    def validate_yaml_file(cls, file_path: Path) -> FlextResult[bool]:
-        """Validate YAML using FlextUtilities.Files + direct YAML parsing.
+    def validate_yaml_file(cls, file_path: Path) -> FlextCore.Result[bool]:
+        """Validate YAML using FlextCore.Utilities.Files + direct YAML parsing.
 
-        ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
+        ZERO DUPLICATION: Uses FlextCore.Utilities.Files.is_valid_path for validation.
 
         Returns:
-            FlextResult indicating whether the YAML file is valid.
+            FlextCore.Result indicating whether the YAML file is valid.
 
         """
         try:
             # Basic path validation using flext-core utilities
-            if not FlextUtilities.TypeGuards.is_string_non_empty(str(file_path)):
-                return FlextResult[bool].fail(f"Invalid YAML file path: {file_path}")
+            if not FlextCore.Utilities.TypeGuards.is_string_non_empty(str(file_path)):
+                return FlextCore.Result[bool].fail(
+                    f"Invalid YAML file path: {file_path}"
+                )
 
             if not file_path.exists():
-                return FlextResult[bool].fail(f"YAML file not found: {file_path}")
+                return FlextCore.Result[bool].fail(f"YAML file not found: {file_path}")
 
             with file_path.open(
-                "r", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
+                "r", encoding=FlextCore.Constants.Mixins.DEFAULT_ENCODING
             ) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
-            return FlextResult[bool].ok(data=True)
+            return FlextCore.Result[bool].ok(data=True)
         except yaml.YAMLError as e:
-            return FlextResult[bool].fail(f"Invalid YAML syntax: {e}")
+            return FlextCore.Result[bool].fail(f"Invalid YAML syntax: {e}")
         except Exception as e:
-            return FlextResult[bool].fail(f"Failed to validate YAML: {e}")
+            return FlextCore.Result[bool].fail(f"Failed to validate YAML: {e}")
 
     @classmethod
     def create_directory_structure(
         cls,
         base_path: Path,
-        directories: FlextTypes.StringList,
-    ) -> FlextResult[FlextTypes.StringDict]:
+        directories: FlextCore.Types.StringList,
+    ) -> FlextCore.Result[FlextCore.Types.StringDict]:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
-            FlextResult containing the created directory structure information.
+            FlextCore.Result containing the created directory structure information.
 
         """
         try:
-            created_paths: FlextTypes.StringDict = {}
+            created_paths: FlextCore.Types.StringDict = {}
 
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return FlextResult[FlextTypes.StringDict].ok(data=created_paths)
+            return FlextCore.Result[FlextCore.Types.StringDict].ok(data=created_paths)
         except Exception as e:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextCore.Result[FlextCore.Types.StringDict].fail(
                 f"Failed to create directories: {e}",
             )
 
@@ -198,11 +198,11 @@ class FlextMeltanoFileManagers:
         cls,
         project_root: Path,
         _project_name: str,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict]:
+    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.PathDict]:
         """Setup Meltano project structure using direct implementation.
 
         Returns:
-            FlextResult containing the project structure information.
+            FlextCore.Result containing the project structure information.
 
         """
         try:
@@ -256,35 +256,35 @@ class FlextMeltanoFileManagers:
 
             # Add project root
             created_paths["project_root"] = project_root
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].ok(
+            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.PathDict].ok(
                 data=created_paths
             )
         except Exception as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].fail(
+            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.PathDict].fail(
                 f"Failed to setup project structure: {e}"
             )
 
     @classmethod
-    def cleanup_temp_directory(cls, temp_path: Path) -> FlextResult[bool]:
+    def cleanup_temp_directory(cls, temp_path: Path) -> FlextCore.Result[bool]:
         """Cleanup temporary directory using direct implementation.
 
         Returns:
-            FlextResult indicating success or failure of the cleanup operation.
+            FlextCore.Result indicating success or failure of the cleanup operation.
 
         """
         try:
             if temp_path.exists() and temp_path.is_dir():
                 shutil.rmtree(temp_path)
-            return FlextResult[bool].ok(data=True)
+            return FlextCore.Result[bool].ok(data=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Failed to cleanup temp directory: {e}")
+            return FlextCore.Result[bool].fail(f"Failed to cleanup temp directory: {e}")
 
     @classmethod
-    def validate_project_structure(cls, project_root: Path) -> FlextResult[bool]:
+    def validate_project_structure(cls, project_root: Path) -> FlextCore.Result[bool]:
         """Validate Meltano project structure using centralized validator.
 
         Returns:
-            FlextResult indicating whether the project structure is valid.
+            FlextCore.Result indicating whether the project structure is valid.
 
         """
         # Use centralized validator to eliminate duplication
