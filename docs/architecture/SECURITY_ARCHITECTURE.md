@@ -105,12 +105,12 @@ end note
 
 ### Security Controls Matrix
 
-| Security Layer | Preventive | Detective | Corrective | Compensating |
-|---------------|------------|-----------|-------------|--------------|
-| **Application** | Input validation, auth, authz | Logging, monitoring | Error handling | Rate limiting |
-| **Data** | Encryption, masking | Access logging | Backup/recovery | Data classification |
-| **Infrastructure** | Firewalls, hardening | IDS/IPS, monitoring | Patching, updates | Segmentation |
-| **Network** | TLS, VPN, segmentation | Traffic monitoring | DDoS protection | Load balancing |
+| Security Layer     | Preventive                    | Detective           | Corrective        | Compensating        |
+| ------------------ | ----------------------------- | ------------------- | ----------------- | ------------------- |
+| **Application**    | Input validation, auth, authz | Logging, monitoring | Error handling    | Rate limiting       |
+| **Data**           | Encryption, masking           | Access logging      | Backup/recovery   | Data classification |
+| **Infrastructure** | Firewalls, hardening          | IDS/IPS, monitoring | Patching, updates | Segmentation        |
+| **Network**        | TLS, VPN, segmentation        | Traffic monitoring  | DDoS protection   | Load balancing      |
 
 ---
 
@@ -162,12 +162,12 @@ auth --> gateway: refreshed_tokens
 
 ### Authentication Methods
 
-| Method | Use Case | Security Level | Implementation |
-|--------|----------|----------------|----------------|
-| **API Keys** | Service-to-service | Medium | HMAC-SHA256 signatures |
-| **JWT Tokens** | User sessions | High | RS256 signing, expiration |
-| **OAuth 2.0** | Third-party integration | High | Authorization code flow |
-| **Client Certificates** | Machine identity | Very High | X.509 certificates |
+| Method                  | Use Case                | Security Level | Implementation            |
+| ----------------------- | ----------------------- | -------------- | ------------------------- |
+| **API Keys**            | Service-to-service      | Medium         | HMAC-SHA256 signatures    |
+| **JWT Tokens**          | User sessions           | High           | RS256 signing, expiration |
+| **OAuth 2.0**           | Third-party integration | High           | Authorization code flow   |
+| **Client Certificates** | Machine identity        | Very High      | X.509 certificates        |
 
 ### Authorization Model
 
@@ -613,7 +613,7 @@ metadata:
   namespace: flext-meltano
 spec:
   mtls:
-    mode: STRICT  # Require mutual TLS
+    mode: STRICT # Require mutual TLS
 
 ---
 apiVersion: security.istio.io/v1beta1
@@ -627,12 +627,13 @@ spec:
       app: flext-meltano-api
   action: ALLOW
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/flext-meltano/sa/api-service-account"]
-    to:
-    - operation:
-        methods: ["GET", "POST", "PUT", "DELETE"]
+    - from:
+        - source:
+            principals:
+              ["cluster.local/ns/flext-meltano/sa/api-service-account"]
+      to:
+        - operation:
+            methods: ["GET", "POST", "PUT", "DELETE"]
 ```
 
 ---
@@ -690,13 +691,13 @@ end note
 
 ### Security Event Types
 
-| Event Category | Event Types | Severity | Response |
-|----------------|-------------|----------|----------|
-| **Authentication** | Failed login, brute force, token abuse | High | Alert, lock account |
-| **Authorization** | Permission denied, privilege escalation | Critical | Alert, investigate |
-| **Data Access** | Unauthorized access, data exfiltration | Critical | Alert, block, investigate |
-| **Infrastructure** | Port scanning, DoS attempts | Medium | Alert, block IPs |
-| **Application** | SQL injection, XSS attempts | High | Alert, patch application |
+| Event Category     | Event Types                             | Severity | Response                  |
+| ------------------ | --------------------------------------- | -------- | ------------------------- |
+| **Authentication** | Failed login, brute force, token abuse  | High     | Alert, lock account       |
+| **Authorization**  | Permission denied, privilege escalation | Critical | Alert, investigate        |
+| **Data Access**    | Unauthorized access, data exfiltration  | Critical | Alert, block, investigate |
+| **Infrastructure** | Port scanning, DoS attempts             | Medium   | Alert, block IPs          |
+| **Application**    | SQL injection, XSS attempts             | High     | Alert, patch application  |
 
 ### Audit Logging Implementation
 
@@ -754,13 +755,13 @@ class SecurityAuditor:
 
 ### Compliance Requirements
 
-| Standard | Requirements | Implementation Status |
-|----------|--------------|----------------------|
-| **GDPR** | Data protection, consent, right to erasure | ✅ Implemented |
-| **CCPA** | Data portability, deletion rights | ✅ Implemented |
-| **SOC 2** | Security, availability, confidentiality | 🚧 In Progress |
-| **ISO 27001** | Information security management | ✅ Implemented |
-| **HIPAA** | PHI protection (if applicable) | ⚠️ Conditional |
+| Standard      | Requirements                               | Implementation Status |
+| ------------- | ------------------------------------------ | --------------------- |
+| **GDPR**      | Data protection, consent, right to erasure | ✅ Implemented        |
+| **CCPA**      | Data portability, deletion rights          | ✅ Implemented        |
+| **SOC 2**     | Security, availability, confidentiality    | 🚧 In Progress        |
+| **ISO 27001** | Information security management            | ✅ Implemented        |
+| **HIPAA**     | PHI protection (if applicable)             | ⚠️ Conditional        |
 
 ### Compliance Controls
 
@@ -867,24 +868,26 @@ class ComplianceReporter:
 
 ### STRIDE Threat Analysis
 
-| Category | Threats | Mitigations |
-|----------|---------|-------------|
-| **Spoofing** | Identity theft, session hijacking | Multi-factor auth, JWT tokens, session management |
-| **Tampering** | Data modification, man-in-middle | TLS encryption, data integrity checks, HMAC signatures |
-| **Repudiation** | Action denial, log manipulation | Comprehensive audit logging, tamper-proof logs |
-| **Information Disclosure** | Data leaks, unauthorized access | Encryption at rest, access controls, data masking |
-| **Denial of Service** | Resource exhaustion, service disruption | Rate limiting, circuit breakers, auto-scaling |
-| **Elevation of Privilege** | Permission escalation | RBAC, ABAC, principle of least privilege |
+| Category                   | Threats                                 | Mitigations                                            |
+| -------------------------- | --------------------------------------- | ------------------------------------------------------ |
+| **Spoofing**               | Identity theft, session hijacking       | Multi-factor auth, JWT tokens, session management      |
+| **Tampering**              | Data modification, man-in-middle        | TLS encryption, data integrity checks, HMAC signatures |
+| **Repudiation**            | Action denial, log manipulation         | Comprehensive audit logging, tamper-proof logs         |
+| **Information Disclosure** | Data leaks, unauthorized access         | Encryption at rest, access controls, data masking      |
+| **Denial of Service**      | Resource exhaustion, service disruption | Rate limiting, circuit breakers, auto-scaling          |
+| **Elevation of Privilege** | Permission escalation                   | RBAC, ABAC, principle of least privilege               |
 
 ### Attack Surface Analysis
 
 #### External Attack Surface
+
 - API endpoints (REST/GraphQL)
 - Web interfaces (if any)
 - Third-party integrations
 - Network ingress points
 
 #### Internal Attack Surface
+
 - Service-to-service communications
 - Database access patterns
 - Configuration management
@@ -892,14 +895,14 @@ class ComplianceReporter:
 
 ### Risk Assessment Matrix
 
-| Risk | Likelihood | Impact | Risk Level | Mitigation Status |
-|------|------------|--------|------------|-------------------|
-| **API Key Compromise** | Medium | High | High | ✅ MFA, rotation policies |
-| **Data Breach** | Low | Critical | Medium | ✅ Encryption, monitoring |
-| **DDoS Attack** | Medium | Medium | Medium | ✅ Rate limiting, WAF |
-| **Insider Threat** | Low | High | Medium | ✅ Access controls, auditing |
-| **Supply Chain Attack** | Low | Critical | Medium | ✅ Dependency scanning, SBOM |
-| **Configuration Error** | High | Medium | Medium | ✅ Validation, testing |
+| Risk                    | Likelihood | Impact   | Risk Level | Mitigation Status            |
+| ----------------------- | ---------- | -------- | ---------- | ---------------------------- |
+| **API Key Compromise**  | Medium     | High     | High       | ✅ MFA, rotation policies    |
+| **Data Breach**         | Low        | Critical | Medium     | ✅ Encryption, monitoring    |
+| **DDoS Attack**         | Medium     | Medium   | Medium     | ✅ Rate limiting, WAF        |
+| **Insider Threat**      | Low        | High     | Medium     | ✅ Access controls, auditing |
+| **Supply Chain Attack** | Low        | Critical | Medium     | ✅ Dependency scanning, SBOM |
+| **Configuration Error** | High       | Medium   | Medium     | ✅ Validation, testing       |
 
 ---
 
@@ -1088,13 +1091,13 @@ class IncidentRecovery:
 
 ### Key Security Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| **Mean Time to Detect (MTTD)** | < 15 minutes | 12 minutes | ✅ Good |
-| **Mean Time to Respond (MTTR)** | < 2 hours | 1.5 hours | ✅ Good |
-| **Security Incident Rate** | < 5/month | 2/month | ✅ Good |
-| **False Positive Rate** | < 10% | 8% | ✅ Good |
-| **Compliance Score** | > 95% | 97% | ✅ Excellent |
+| Metric                          | Target       | Current    | Status       |
+| ------------------------------- | ------------ | ---------- | ------------ |
+| **Mean Time to Detect (MTTD)**  | < 15 minutes | 12 minutes | ✅ Good      |
+| **Mean Time to Respond (MTTR)** | < 2 hours    | 1.5 hours  | ✅ Good      |
+| **Security Incident Rate**      | < 5/month    | 2/month    | ✅ Good      |
+| **False Positive Rate**         | < 10%        | 8%         | ✅ Good      |
+| **Compliance Score**            | > 95%        | 97%        | ✅ Excellent |
 
 ### Security Health Dashboard
 
@@ -1141,4 +1144,4 @@ class SecurityDashboard:
 ---
 
 **Security Architecture**: FLEXT-Meltano Enterprise Security Framework
-*Comprehensive security architecture with defense-in-depth, compliance, and incident response*
+_Comprehensive security architecture with defense-in-depth, compliance, and incident response_

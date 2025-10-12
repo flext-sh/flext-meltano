@@ -12,6 +12,7 @@ FLEXT-Meltano needs robust error handling for complex ELT operations involving m
 - Type safety needs to be maintained throughout error flows
 
 The system needs to handle:
+
 - Network failures when calling external CLIs
 - Configuration validation errors
 - Data transformation failures
@@ -32,9 +33,10 @@ Implement railway-oriented programming using `FlextCore.Result[T]` from flext-co
 
 ## Rationale
 
-### Why Railway-Oriented Programming?
+### Why Railway-Oriented Programming
 
 **Composability**: Operations can be chained safely without exception handling clutter
+
 ```python
 result = (
     service.discover_plugins()
@@ -44,6 +46,7 @@ result = (
 ```
 
 **Type Safety**: Error types are preserved through the entire flow
+
 ```python
 def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
@@ -52,7 +55,7 @@ def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
 
 **Clarity**: Error handling is explicit and visible in the code structure
 
-### Why FlextCore.Result[T] from flext-core?
+### Why FlextCore.Result[T] from flext-core
 
 **Consistency**: Aligns with FLEXT ecosystem patterns
 **Maturity**: Proven implementation with comprehensive features
@@ -61,6 +64,7 @@ def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
 ## Consequences
 
 ### Positive
+
 - **Improved Reliability**: Explicit error handling prevents silent failures
 - **Better Developer Experience**: Clear error types and messages
 - **Type Safety**: Compile-time error checking for error flows
@@ -69,17 +73,20 @@ def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
 - **Debugging**: Error context is preserved through operation chains
 
 ### Negative
+
 - **Learning Curve**: Developers need to understand railway patterns
 - **Boilerplate**: Additional code for result wrapping/unwrapping
 - **Migration Effort**: Converting existing exception-based code
 - **Performance**: Slight overhead from result object creation
 
 ### Risks
+
 - **Adoption Resistance**: Team may resist pattern change
 - **Inconsistent Usage**: Mix of result and exception handling
 - **Error Type Proliferation**: Too many specific error types
 
 ### Mitigation Strategies
+
 - **Training**: Comprehensive documentation and examples
 - **Gradual Adoption**: Migrate modules incrementally
 - **Code Generation**: Tools to automate result wrapping
@@ -88,21 +95,25 @@ def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
 ## Alternatives Considered
 
 ### 1. Traditional Exception Handling
+
 - **Pros**: Familiar, built-in language feature
 - **Cons**: Not composable, can cause silent failures, hard to test
 - **Rejected**: Doesn't meet requirements for complex pipeline error handling
 
 ### 2. Custom Result Type
+
 - **Pros**: Tailored to FLEXT-Meltano needs
 - **Cons**: Reinventing the wheel, ecosystem fragmentation
 - **Rejected**: Better to use proven flext-core implementation
 
 ### 3. Async Exception Handling
+
 - **Pros**: Modern Python patterns
 - **Cons**: Still not composable for complex flows
 - **Rejected**: Same issues as traditional exceptions
 
 ### 4. Callback-Based Error Handling
+
 - **Pros**: Explicit error paths
 - **Cons**: Callback hell, hard to follow control flow
 - **Rejected**: Poor readability and maintainability
@@ -110,6 +121,7 @@ def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
 ## Implementation Details
 
 ### Error Type Hierarchy
+
 ```python
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
@@ -125,6 +137,7 @@ class PipelineError(FlextMeltanoError):
 ```
 
 ### Railway Pattern Usage
+
 ```python
 def create_and_run_pipeline(config: PipelineConfig) -> FlextCore.Result[PipelineResult]:
     return (
@@ -138,6 +151,7 @@ def create_and_run_pipeline(config: PipelineConfig) -> FlextCore.Result[Pipeline
 ```
 
 ### Testing Error Scenarios
+
 ```python
 def test_pipeline_failure_handling():
     # Given
@@ -161,17 +175,20 @@ def test_pipeline_failure_handling():
 ## Notes
 
 **Migration Plan:**
+
 1. Phase 1: Core services (Completed)
 2. Phase 2: Adapter layer (Completed)
 3. Phase 3: API layer (Completed)
 4. Phase 4: Legacy code cleanup (In Progress)
 
 **Performance Impact:**
+
 - Minimal overhead for success paths
 - Error path performance acceptable for enterprise use cases
 - Memory usage within acceptable limits
 
 **Monitoring:**
+
 - Error rates tracked via application metrics
 - Common error patterns identified for improvement
 - Error context preserved for debugging

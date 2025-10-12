@@ -66,14 +66,14 @@ Rel(flext_meltano, data_destinations, "Loads data to", "Singer protocol")
 
 ### Key Relationships
 
-| Relationship | Description | Technology |
-|-------------|-------------|------------|
-| **Users → FLEXT-Meltano** | API usage, pipeline creation | Python, CLI, YAML |
-| **FLEXT-Meltano → Meltano** | CLI integration, project management | Subprocess, file system |
-| **FLEXT-Meltano → Singer SDK** | Protocol implementation | Python inheritance |
-| **FLEXT-Meltano → DBT** | Model orchestration | CLI, file system |
-| **FLEXT-Meltano → FLEXT-Core** | Foundation patterns | Python imports |
-| **FLEXT Ecosystem → FLEXT-Meltano** | 32+ dependent projects | Python dependencies |
+| Relationship                        | Description                         | Technology              |
+| ----------------------------------- | ----------------------------------- | ----------------------- |
+| **Users → FLEXT-Meltano**           | API usage, pipeline creation        | Python, CLI, YAML       |
+| **FLEXT-Meltano → Meltano**         | CLI integration, project management | Subprocess, file system |
+| **FLEXT-Meltano → Singer SDK**      | Protocol implementation             | Python inheritance      |
+| **FLEXT-Meltano → DBT**             | Model orchestration                 | CLI, file system        |
+| **FLEXT-Meltano → FLEXT-Core**      | Foundation patterns                 | Python imports          |
+| **FLEXT Ecosystem → FLEXT-Meltano** | 32+ dependent projects              | Python dependencies     |
 
 ---
 
@@ -125,14 +125,14 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 
 ### Container Responsibilities
 
-| Container | Technology | Purpose | Key Classes |
-|-----------|------------|---------|-------------|
-| **API Layer** | FastAPI/Python | External interface | `FlextMeltano`, `FlextMeltanoCLI` |
-| **Service Layer** | Python | Business logic | `FlextMeltanoService`, `FlextMeltanoExecutor` |
-| **Adapter Layer** | Python | External integration | `FlextMeltanoAdapter`, `FlextMeltanoDbtService` |
-| **Domain Model** | Pydantic/Python | Data validation | `FlextMeltanoModels`, `FlextMeltanoConfig` |
-| **Configuration** | YAML/Python | Settings management | `FlextMeltanoConfig`, environment variables |
-| **State Store** | File System/SQLite | Persistence | JSON files, SQLite database |
+| Container         | Technology         | Purpose              | Key Classes                                     |
+| ----------------- | ------------------ | -------------------- | ----------------------------------------------- |
+| **API Layer**     | FastAPI/Python     | External interface   | `FlextMeltano`, `FlextMeltanoCLI`               |
+| **Service Layer** | Python             | Business logic       | `FlextMeltanoService`, `FlextMeltanoExecutor`   |
+| **Adapter Layer** | Python             | External integration | `FlextMeltanoAdapter`, `FlextMeltanoDbtService` |
+| **Domain Model**  | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoConfig`      |
+| **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoConfig`, environment variables     |
+| **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
 
 ---
 
@@ -207,16 +207,16 @@ Rel(dbt_adapter, file_manager, "Manages", "DBT project structure")
 
 ### Component Interactions
 
-| Component | Responsibilities | Key Interactions |
-|-----------|------------------|------------------|
-| **API Facade** | Public interface unification | Service orchestration, configuration management |
-| **Pipeline Orchestrator** | ELT pipeline coordination | Singer service, DBT service, state management |
-| **Plugin Manager** | Plugin lifecycle management | Configuration validation, adapter integration |
-| **Singer Service** | Protocol implementation | State management, error handling |
-| **DBT Service** | Model orchestration | File management, process execution |
-| **Configuration Manager** | Settings management | All components for configuration access |
-| **State Manager** | Persistence layer | Pipeline execution tracking, bookmark storage |
-| **Error Handler** | Railway pattern implementation | All services for error propagation |
+| Component                 | Responsibilities               | Key Interactions                                |
+| ------------------------- | ------------------------------ | ----------------------------------------------- |
+| **API Facade**            | Public interface unification   | Service orchestration, configuration management |
+| **Pipeline Orchestrator** | ELT pipeline coordination      | Singer service, DBT service, state management   |
+| **Plugin Manager**        | Plugin lifecycle management    | Configuration validation, adapter integration   |
+| **Singer Service**        | Protocol implementation        | State management, error handling                |
+| **DBT Service**           | Model orchestration            | File management, process execution              |
+| **Configuration Manager** | Settings management            | All components for configuration access         |
+| **State Manager**         | Persistence layer              | Pipeline execution tracking, bookmark storage   |
+| **Error Handler**         | Railway pattern implementation | All services for error propagation              |
 
 ---
 
@@ -304,14 +304,14 @@ end note
 
 ### Key Classes and Interfaces
 
-| Class | Purpose | Key Methods | Dependencies |
-|-------|---------|-------------|--------------|
-| **FlextMeltano** | Main API facade | Unified public interface | All service classes |
-| **FlextMeltanoService** | Core business logic | Plugin management, pipeline execution | Adapters, models, config |
-| **FlextMeltanoAdapter** | Meltano integration | CLI operations, project management | Meltano CLI, file system |
-| **FlextMeltanoExecutor** | Pipeline orchestration | Tap/target execution, monitoring | Singer service, DBT service |
-| **FlextMeltanoModels** | Data validation | Pydantic models, type safety | Pydantic v2 |
-| **FlextMeltanoConfig** | Configuration management | Settings loading, validation | YAML, environment variables |
+| Class                    | Purpose                  | Key Methods                           | Dependencies                |
+| ------------------------ | ------------------------ | ------------------------------------- | --------------------------- |
+| **FlextMeltano**         | Main API facade          | Unified public interface              | All service classes         |
+| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, config    |
+| **FlextMeltanoAdapter**  | Meltano integration      | CLI operations, project management    | Meltano CLI, file system    |
+| **FlextMeltanoExecutor** | Pipeline orchestration   | Tap/target execution, monitoring      | Singer service, DBT service |
+| **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |
+| **FlextMeltanoConfig**   | Configuration management | Settings loading, validation          | YAML, environment variables |
 
 ---
 
@@ -322,12 +322,15 @@ end note
 **Status**: Accepted | **Date**: 2025-01-15
 
 #### Context
+
 FLEXT-Meltano needs robust error handling for complex ELT operations involving multiple external systems and potential failure points.
 
 #### Decision
+
 Implement railway-oriented programming using FlextCore.Result[T] from flext-core, ensuring composable error handling throughout the entire codebase.
 
 #### Consequences
+
 - ✅ **Positive**: Composable error handling, type safety, consistent error propagation
 - ⚠️ **Negative**: Learning curve for railway pattern, additional boilerplate
 - ✅ **Mitigation**: Comprehensive documentation and examples
@@ -337,16 +340,20 @@ Implement railway-oriented programming using FlextCore.Result[T] from flext-core
 **Status**: Accepted | **Date**: 2025-01-20
 
 #### Context
+
 The system needs to be maintainable, testable, and evolvable while integrating with complex external systems (Meltano, DBT, Singer).
 
 #### Decision
+
 Implement Clean Architecture with clear separation between:
+
 - API Layer (external interfaces)
 - Service Layer (business logic)
 - Adapter Layer (external system integration)
 - Domain Model (business entities and rules)
 
 #### Consequences
+
 - ✅ **Positive**: Testability, maintainability, clear boundaries
 - ⚠️ **Negative**: Additional abstraction layers
 - ✅ **Mitigation**: Consistent architectural patterns
@@ -356,12 +363,15 @@ Implement Clean Architecture with clear separation between:
 **Status**: Accepted | **Date**: 2025-02-01
 
 #### Context
+
 Direct Singer SDK usage would create tight coupling and prevent FLEXT ecosystem integration.
 
 #### Decision
+
 Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and error handling.
 
 #### Consequences
+
 - ✅ **Positive**: FLEXT ecosystem consistency, type safety, error handling
 - ⚠️ **Negative**: Additional complexity over direct SDK usage
 - ✅ **Mitigation**: Comprehensive documentation and examples
@@ -371,30 +381,35 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 ## 🏆 Quality Attributes
 
 ### Performance
+
 - **Response Time**: <100ms for API operations, <5s for pipeline startup
 - **Throughput**: Support for concurrent pipeline execution
 - **Scalability**: Horizontal scaling through stateless design
 - **Resource Usage**: Memory-efficient streaming for large datasets
 
 ### Reliability
+
 - **Availability**: 99.9% uptime target for core services
 - **Error Handling**: Railway pattern with comprehensive error recovery
 - **Data Consistency**: ACID compliance for state management
 - **Fault Tolerance**: Graceful degradation and automatic retry mechanisms
 
 ### Security
+
 - **Authentication**: Integration with FLEXT authentication systems
 - **Authorization**: Role-based access control for pipeline operations
 - **Data Protection**: Encryption at rest and in transit
 - **Audit Logging**: Comprehensive security event logging
 
 ### Maintainability
+
 - **Code Quality**: 100% type safety, zero linting violations
 - **Documentation**: Comprehensive API docs and architecture documentation
 - **Testing**: 95%+ code coverage with automated CI/CD
 - **Modularity**: Clear separation of concerns and dependency injection
 
 ### Usability
+
 - **API Design**: Consistent, intuitive public interfaces
 - **Error Messages**: Clear, actionable error reporting
 - **Configuration**: YAML-based configuration with validation
@@ -405,12 +420,14 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 ## 🔄 Evolution & Technical Debt
 
 ### Current Architecture Health
+
 - **Technical Debt**: Low - Clean architecture implemented from start
 - **Code Quality**: High - 100% type safety, comprehensive testing
 - **Documentation**: Excellent - C4 model, ADRs, comprehensive guides
 - **Maintainability**: High - Modular design with clear boundaries
 
 ### Future Evolution Considerations
+
 - **Microservices Migration**: Potential split into separate services
 - **Event-Driven Architecture**: Message-based pipeline coordination
 - **Cloud-Native Features**: Kubernetes operators, service mesh integration
@@ -419,4 +436,4 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 ---
 
 **C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
-*Comprehensive system documentation following industry-standard C4 modeling approach*
+_Comprehensive system documentation following industry-standard C4 modeling approach_

@@ -26,9 +26,10 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 
 ## Rationale
 
-### Why Abstraction Layer?
+### Why Abstraction Layer
 
 **FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT patterns
+
 ```python
 # FLEXT pattern - Railway-oriented, type-safe
 class MyCustomTap(FlextMeltanoTap):
@@ -37,6 +38,7 @@ class MyCustomTap(FlextMeltanoTap):
 ```
 
 **Error Handling**: Consistent error handling across all Singer operations
+
 ```python
 # Automatic error wrapping and context preservation
 result = tap.discover_streams()
@@ -46,6 +48,7 @@ if result.is_failure:
 ```
 
 **Testability**: Singer components can be tested in isolation
+
 ```python
 # Mock Singer SDK for unit testing
 @pytest.fixture
@@ -54,7 +57,7 @@ def mock_singer_sdk():
         yield
 ```
 
-### Why Not Direct SDK Usage?
+### Why Not Direct SDK Usage
 
 **Tight Coupling**: Direct Singer SDK usage creates external dependencies
 **Inconsistent Patterns**: SDK patterns don't align with FLEXT error handling
@@ -64,6 +67,7 @@ def mock_singer_sdk():
 ## Consequences
 
 ### Positive
+
 - **Consistency**: All Singer implementations follow FLEXT patterns
 - **Maintainability**: Changes to Singer SDK isolated to abstraction layer
 - **Testability**: Components can be tested without external dependencies
@@ -71,17 +75,20 @@ def mock_singer_sdk():
 - **Error Handling**: Consistent error patterns across all operations
 
 ### Negative
+
 - **Abstraction Overhead**: Additional layer between FLEXT and Singer
 - **Maintenance Burden**: Abstraction layer must be kept in sync with SDK
 - **Learning Curve**: Developers need to understand both layers
 - **Performance Impact**: Slight overhead from abstraction
 
 ### Risks
+
 - **SDK Changes**: Singer SDK evolution could break abstractions
 - **Feature Lag**: New SDK features take time to abstract
 - **Complexity**: Understanding both FLEXT and Singer patterns
 
 ### Mitigation Strategies
+
 - **Automated Testing**: Comprehensive tests for abstraction layer
 - **SDK Monitoring**: Track Singer SDK changes and releases
 - **Documentation**: Clear guidance on when to use abstractions
@@ -90,16 +97,19 @@ def mock_singer_sdk():
 ## Alternatives Considered
 
 ### 1. Direct Singer SDK Usage
+
 - **Pros**: No abstraction overhead, direct access to features
 - **Cons**: Tight coupling, inconsistent patterns, testing issues
 - **Rejected**: Violates FLEXT ecosystem consistency requirements
 
 ### 2. Thin Wrapper Only
+
 - **Pros**: Minimal overhead, close to direct usage
 - **Cons**: Still exposes SDK patterns, limited FLEXT integration
 - **Rejected**: Doesn't provide sufficient FLEXT ecosystem benefits
 
 ### 3. Complete Protocol Reimplementation
+
 - **Pros**: Full control, no external dependencies
 - **Cons**: Massive effort, protocol compliance risks
 - **Rejected**: Unnecessary complexity, maintenance burden too high
@@ -174,16 +184,19 @@ class FlextMeltanoStream:
 ## Notes
 
 **SDK Compatibility:**
+
 - Tested with Singer SDK v0.44.0
 - Compatibility layer for major version changes
 - Automated testing against multiple SDK versions
 
 **Performance Considerations:**
+
 - Minimal overhead for normal operations
 - Error paths optimized for fast failure
 - Memory usage within acceptable limits
 
 **Migration Path:**
+
 - Existing direct SDK usage migrated incrementally
 - New implementations use abstraction layer exclusively
 - Legacy code wrapped with compatibility adapters

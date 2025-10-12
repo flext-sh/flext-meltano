@@ -23,7 +23,7 @@ quality_thresholds:
 
   # Structure requirements
   required_sections:
-    - "##"  # At least one H2 heading
+    - "##" # At least one H2 heading
     - "###" # At least one H3 heading
 
 # File Patterns
@@ -49,8 +49,8 @@ rules:
   check_image_references: true
 
   # Style consistency
-  enforce_heading_case: "title"  # "title", "sentence", or false
-  enforce_list_style: "dash"     # "dash", "asterisk", or false
+  enforce_heading_case: "title" # "title", "sentence", or false
+  enforce_list_style: "dash" # "dash", "asterisk", or false
   enforce_code_language: true
 
   # Accessibility
@@ -69,10 +69,10 @@ reporting:
 
   # Severity thresholds for notifications
   severity_thresholds:
-    critical: 0  # Notify immediately
-    high: 5      # Notify if > 5 issues
-    medium: 10   # Notify if > 10 issues
-    low: 20      # Notify if > 20 issues
+    critical: 0 # Notify immediately
+    high: 5 # Notify if > 5 issues
+    medium: 10 # Notify if > 10 issues
+    low: 20 # Notify if > 20 issues
 
 # Automation Configuration
 automation:
@@ -83,9 +83,9 @@ automation:
 
   # Scheduled maintenance
   enable_scheduled_audits: true
-  audit_schedule: "weekly"  # "daily", "weekly", "monthly"
-  audit_day: "monday"       # For weekly audits
-  audit_time: "09:00"       # UTC time
+  audit_schedule: "weekly" # "daily", "weekly", "monthly"
+  audit_day: "monday" # For weekly audits
+  audit_time: "09:00" # UTC time
 
   # Automated fixes
   enable_autofix: false
@@ -186,4 +186,4 @@ emergency:
   emergency_contacts: []
 
   # Fallback procedures
-  fallback_mode: "report_only"  # "report_only", "fix_automatically", "halt"
+  fallback_mode: "report_only" # "report_only", "fix_automatically", "halt"

@@ -26,11 +26,12 @@
 
 ### Mission Statement
 
-*To provide the enterprise data integration foundation for the FLEXT ecosystem, enabling seamless ELT operations across 32+ projects while maintaining the highest standards of type safety, reliability, and architectural integrity.*
+_To provide the enterprise data integration foundation for the FLEXT ecosystem, enabling seamless ELT operations across 32+ projects while maintaining the highest standards of type safety, reliability, and architectural integrity._
 
 ### System Scope
 
 #### In Scope
+
 - ✅ Singer protocol implementation and abstraction
 - ✅ Meltano CLI integration and orchestration
 - ✅ DBT model execution and management
@@ -40,9 +41,10 @@
 - ✅ Type-safe API design and error handling
 
 #### Out of Scope
-- ❌ Direct data source implementations (handled by flext-tap-* projects)
-- ❌ Direct data target implementations (handled by flext-target-* projects)
-- ❌ Custom data transformation logic (handled by flext-dbt-* projects)
+
+- ❌ Direct data source implementations (handled by flext-tap-\* projects)
+- ❌ Direct data target implementations (handled by flext-target-\* projects)
+- ❌ Custom data transformation logic (handled by flext-dbt-\* projects)
 - ❌ User interface development (handled by flext-web/flext-cli)
 - ❌ Infrastructure provisioning (handled by deployment tooling)
 
@@ -107,37 +109,41 @@ external --> ecosystem_teams: Provides upstream features
 
 ### Stakeholder Requirements
 
-| Stakeholder | Primary Needs | Secondary Needs | Success Metrics |
-|-------------|----------------|-----------------|-----------------|
-| **Data Engineer** | Easy pipeline creation, reliable execution, good performance | Rich monitoring, error handling, debugging tools | Pipeline success rate, time-to-delivery |
-| **Platform Architect** | Clean APIs, extensible design, type safety | Documentation, testing, compliance | Architecture health, ecosystem adoption |
-| **DevOps Engineer** | Reliable deployment, monitoring, scalability | Automation, security, compliance | Uptime, incident response time |
-| **Security Officer** | Data protection, access controls, audit logging | Threat detection, compliance reporting | Security incidents, compliance scores |
-| **Compliance Officer** | Regulatory compliance, audit trails, data governance | Privacy controls, retention policies | Compliance audit results |
-| **Product Manager** | Feature velocity, user experience, reliability | Analytics, reporting, stakeholder management | User satisfaction, feature adoption |
-| **End User** | Reliable data access, performance, data quality | Self-service, documentation, support | Data availability, query performance |
+| Stakeholder            | Primary Needs                                                | Secondary Needs                                  | Success Metrics                         |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ | --------------------------------------- |
+| **Data Engineer**      | Easy pipeline creation, reliable execution, good performance | Rich monitoring, error handling, debugging tools | Pipeline success rate, time-to-delivery |
+| **Platform Architect** | Clean APIs, extensible design, type safety                   | Documentation, testing, compliance               | Architecture health, ecosystem adoption |
+| **DevOps Engineer**    | Reliable deployment, monitoring, scalability                 | Automation, security, compliance                 | Uptime, incident response time          |
+| **Security Officer**   | Data protection, access controls, audit logging              | Threat detection, compliance reporting           | Security incidents, compliance scores   |
+| **Compliance Officer** | Regulatory compliance, audit trails, data governance         | Privacy controls, retention policies             | Compliance audit results                |
+| **Product Manager**    | Feature velocity, user experience, reliability               | Analytics, reporting, stakeholder management     | User satisfaction, feature adoption     |
+| **End User**           | Reliable data access, performance, data quality              | Self-service, documentation, support             | Data availability, query performance    |
 
 ### Stakeholder Value Proposition
 
 #### For Data Engineers
+
 - **Unified API**: Single interface for all ELT operations
 - **Type Safety**: Compile-time error prevention
 - **Railway Pattern**: Predictable error handling
 - **Ecosystem Consistency**: Same patterns across all projects
 
 #### For Platform Architects
+
 - **Clean Architecture**: Layered design with clear boundaries
 - **Domain-Driven Design**: Business logic drives architecture
 - **Zero Custom ELT**: Prevents architectural drift
 - **Comprehensive Documentation**: Architecture decision records
 
 #### For DevOps Teams
+
 - **Container-Ready**: Docker and Kubernetes support
 - **Monitoring Integration**: Comprehensive observability
 - **Automated Deployment**: Infrastructure as code
 - **Security Hardening**: Enterprise security controls
 
 #### For Security Teams
+
 - **Defense in Depth**: Multiple security layers
 - **Audit Logging**: Comprehensive security events
 - **Compliance Framework**: GDPR, SOC2, HIPAA support
@@ -600,16 +606,19 @@ class FLEXTPluginRegistry:
 ### Functional Boundaries
 
 #### Data Integration Boundary
+
 - **Inside**: Singer protocol implementation, Meltano orchestration, DBT execution
 - **Outside**: Specific data source/target implementations (handled by domain projects)
 - **Interface**: Plugin API, configuration schemas, execution results
 
 #### Application Boundary
+
 - **Inside**: Business logic, validation, error handling, state management
 - **Outside**: User interfaces, external APIs, infrastructure concerns
 - **Interface**: REST APIs, CLI commands, plugin interfaces
 
 #### Infrastructure Boundary
+
 - **Inside**: Application code, business rules, data models
 - **Outside**: Operating system, network, storage, external services
 - **Interface**: Environment variables, configuration files, service contracts
@@ -675,12 +684,12 @@ end note
 
 ### Integration Boundaries
 
-| Boundary Type | Crossing Mechanism | Security Controls | Monitoring |
-|---------------|-------------------|-------------------|------------|
-| **API Boundary** | REST/HTTP calls | JWT authentication, rate limiting | Request logging, performance metrics |
-| **Plugin Boundary** | Plugin interfaces | Plugin validation, sandboxing | Plugin execution monitoring |
-| **Data Boundary** | Database connections | Connection encryption, access controls | Query logging, data access auditing |
-| **External System Boundary** | CLI subprocess calls | Command validation, timeout controls | Execution monitoring, error handling |
+| Boundary Type                | Crossing Mechanism   | Security Controls                      | Monitoring                           |
+| ---------------------------- | -------------------- | -------------------------------------- | ------------------------------------ |
+| **API Boundary**             | REST/HTTP calls      | JWT authentication, rate limiting      | Request logging, performance metrics |
+| **Plugin Boundary**          | Plugin interfaces    | Plugin validation, sandboxing          | Plugin execution monitoring          |
+| **Data Boundary**            | Database connections | Connection encryption, access controls | Query logging, data access auditing  |
+| **External System Boundary** | CLI subprocess calls | Command validation, timeout controls   | Execution monitoring, error handling |
 
 ---
 
@@ -1141,11 +1150,11 @@ end note
 
 ### Deployment Pattern Comparison
 
-| Context | Scale | Reliability | Security | Cost | Purpose |
-|---------|-------|-------------|----------|------|---------|
-| **Development** | Single instance | Basic | Minimal | Low | Feature development |
-| **Staging** | Multi-instance | Medium | Medium | Medium | Integration testing |
-| **Production** | Multi-AZ, auto-scaling | High | High | High | Live operations |
+| Context         | Scale                  | Reliability | Security | Cost   | Purpose             |
+| --------------- | ---------------------- | ----------- | -------- | ------ | ------------------- |
+| **Development** | Single instance        | Basic       | Minimal  | Low    | Feature development |
+| **Staging**     | Multi-instance         | Medium      | Medium   | Medium | Integration testing |
+| **Production**  | Multi-AZ, auto-scaling | High        | High     | High   | Live operations     |
 
 ---
 
@@ -1174,4 +1183,4 @@ end note
 ---
 
 **System Context**: FLEXT-Meltano Ecosystem Integration and Boundaries
-*Comprehensive system context documentation with stakeholder analysis, integration patterns, and deployment contexts*
+_Comprehensive system context documentation with stakeholder analysis, integration patterns, and deployment contexts_

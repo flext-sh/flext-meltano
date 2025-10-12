@@ -36,14 +36,14 @@ FLEXT-Meltano is designed with **six primary quality attributes** that drive arc
 
 ### Quality Attribute Scenarios
 
-| Quality Attribute | Scenario | Stimulus | Response | Measure |
-|-------------------|----------|----------|----------|---------|
-| **Performance** | Data pipeline execution | 1GB data load | < 5 minutes | 95th percentile latency |
-| **Scalability** | Concurrent users | 100 simultaneous pipelines | Auto-scale to 10 pods | Resource utilization < 80% |
-| **Reliability** | Network failure | External service timeout | Automatic retry with backoff | 99.9% success rate |
-| **Security** | Unauthorized access | Invalid API key | Immediate rejection | Zero unauthorized access |
-| **Maintainability** | New data source | Custom tap requirement | < 2 days implementation | Code coverage maintained |
-| **Usability** | API integration | First-time developer | Working pipeline in < 1 hour | Documentation completeness |
+| Quality Attribute   | Scenario                | Stimulus                   | Response                     | Measure                    |
+| ------------------- | ----------------------- | -------------------------- | ---------------------------- | -------------------------- |
+| **Performance**     | Data pipeline execution | 1GB data load              | < 5 minutes                  | 95th percentile latency    |
+| **Scalability**     | Concurrent users        | 100 simultaneous pipelines | Auto-scale to 10 pods        | Resource utilization < 80% |
+| **Reliability**     | Network failure         | External service timeout   | Automatic retry with backoff | 99.9% success rate         |
+| **Security**        | Unauthorized access     | Invalid API key            | Immediate rejection          | Zero unauthorized access   |
+| **Maintainability** | New data source         | Custom tap requirement     | < 2 days implementation      | Code coverage maintained   |
+| **Usability**       | API integration         | First-time developer       | Working pipeline in < 1 hour | Documentation completeness |
 
 ---
 
@@ -141,23 +141,23 @@ end note
 
 #### Response Time Targets
 
-| Operation Type | Target Response Time | Measurement |
-|----------------|---------------------|-------------|
-| **API Health Check** | < 100ms | 95th percentile |
-| **Pipeline Creation** | < 500ms | 95th percentile |
-| **Plugin Discovery** | < 2s | 95th percentile |
-| **Small Pipeline Execution** | < 30s | End-to-end |
-| **Large Pipeline Execution** | < 10min | End-to-end |
-| **Configuration Validation** | < 200ms | 95th percentile |
+| Operation Type               | Target Response Time | Measurement     |
+| ---------------------------- | -------------------- | --------------- |
+| **API Health Check**         | < 100ms              | 95th percentile |
+| **Pipeline Creation**        | < 500ms              | 95th percentile |
+| **Plugin Discovery**         | < 2s                 | 95th percentile |
+| **Small Pipeline Execution** | < 30s                | End-to-end      |
+| **Large Pipeline Execution** | < 10min              | End-to-end      |
+| **Configuration Validation** | < 200ms              | 95th percentile |
 
 #### Throughput Targets
 
-| Operation Type | Target Throughput | Measurement |
-|----------------|------------------|-------------|
-| **API Requests** | 1000 req/sec | Sustained load |
-| **Concurrent Pipelines** | 50 active pipelines | Peak concurrent |
-| **Data Processing** | 100 MB/sec | Streaming throughput |
-| **Plugin Operations** | 100 ops/sec | Batch operations |
+| Operation Type           | Target Throughput   | Measurement          |
+| ------------------------ | ------------------- | -------------------- |
+| **API Requests**         | 1000 req/sec        | Sustained load       |
+| **Concurrent Pipelines** | 50 active pipelines | Peak concurrent      |
+| **Data Processing**      | 100 MB/sec          | Streaming throughput |
+| **Plugin Operations**    | 100 ops/sec         | Batch operations     |
 
 ### Performance Optimization Strategies
 
@@ -1586,13 +1586,13 @@ end note
 
 ### Availability Targets
 
-| Service Level | Target | Measurement Period |
-|---------------|--------|-------------------|
-| **API Availability** | 99.9% | Monthly |
-| **Pipeline Execution** | 99.5% | Monthly |
-| **Data Durability** | 99.999% | Annual |
-| **RTO (Recovery Time Objective)** | < 4 hours | Per incident |
-| **RPO (Recovery Point Objective)** | < 15 minutes | Per incident |
+| Service Level                      | Target       | Measurement Period |
+| ---------------------------------- | ------------ | ------------------ |
+| **API Availability**               | 99.9%        | Monthly            |
+| **Pipeline Execution**             | 99.5%        | Monthly            |
+| **Data Durability**                | 99.999%      | Annual             |
+| **RTO (Recovery Time Objective)**  | < 4 hours    | Per incident       |
+| **RPO (Recovery Point Objective)** | < 15 minutes | Per incident       |
 
 ### High Availability Implementation
 
@@ -2229,13 +2229,13 @@ end note
 
 ### Maintainability Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| **Cyclomatic Complexity** | < 10 per function | 7.2 | ✅ Good |
-| **Code Coverage** | > 95% | 0% (blocked) | ❌ Blocked |
-| **Technical Debt Ratio** | < 5% | 2.1% | ✅ Excellent |
-| **Documentation Coverage** | > 90% | 97% | ✅ Excellent |
-| **Type Safety** | 100% | 100% | ✅ Perfect |
+| Metric                     | Target            | Current      | Status       |
+| -------------------------- | ----------------- | ------------ | ------------ |
+| **Cyclomatic Complexity**  | < 10 per function | 7.2          | ✅ Good      |
+| **Code Coverage**          | > 95%             | 0% (blocked) | ❌ Blocked   |
+| **Technical Debt Ratio**   | < 5%              | 2.1%         | ✅ Excellent |
+| **Documentation Coverage** | > 90%             | 97%          | ✅ Excellent |
+| **Type Safety**            | 100%              | 100%         | ✅ Perfect   |
 
 ### Code Quality Automation
 
@@ -2750,13 +2750,13 @@ end note
 
 ### Usability Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| **API Response Time** | < 500ms | ~200ms | ✅ Good |
-| **Error Message Clarity** | 95% actionable | ~90% | ⚠️ Needs improvement |
-| **Documentation Completeness** | 100% | 97% | ✅ Excellent |
-| **SDK Adoption Rate** | > 80% | N/A | 📊 To be measured |
-| **Support Ticket Volume** | < 5/month | ~2/month | ✅ Good |
+| Metric                         | Target         | Current  | Status               |
+| ------------------------------ | -------------- | -------- | -------------------- |
+| **API Response Time**          | < 500ms        | ~200ms   | ✅ Good              |
+| **Error Message Clarity**      | 95% actionable | ~90%     | ⚠️ Needs improvement |
+| **Documentation Completeness** | 100%           | 97%      | ✅ Excellent         |
+| **SDK Adoption Rate**          | > 80%          | N/A      | 📊 To be measured    |
+| **Support Ticket Volume**      | < 5/month      | ~2/month | ✅ Good              |
 
 ### User Experience Optimization
 
@@ -3484,13 +3484,13 @@ class ContractTests:
 
 ### Test Quality Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| **Line Coverage** | 95% | 0% (blocked) | ❌ Blocked |
-| **Branch Coverage** | 90% | N/A | 📊 Blocked |
-| **Mutation Score** | 85% | N/A | 📊 Blocked |
-| **Test Execution Time** | < 5 min | N/A | 📊 Blocked |
-| **Flaky Test Rate** | < 1% | N/A | 📊 Blocked |
+| Metric                  | Target  | Current      | Status     |
+| ----------------------- | ------- | ------------ | ---------- |
+| **Line Coverage**       | 95%     | 0% (blocked) | ❌ Blocked |
+| **Branch Coverage**     | 90%     | N/A          | 📊 Blocked |
+| **Mutation Score**      | 85%     | N/A          | 📊 Blocked |
+| **Test Execution Time** | < 5 min | N/A          | 📊 Blocked |
+| **Flaky Test Rate**     | < 1%    | N/A          | 📊 Blocked |
 
 ### Testing Automation
 
@@ -3502,9 +3502,9 @@ name: Testing Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -3514,45 +3514,45 @@ jobs:
         python-version: [3.13]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[test]
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
 
-    - name: Run linting
-      run: |
-        ruff check src/ tests/
-        ruff format --check src/ tests/
+      - name: Run linting
+        run: |
+          ruff check src/ tests/
+          ruff format --check src/ tests/
 
-    - name: Run type checking
-      run: pyrefly check src/
+      - name: Run type checking
+        run: pyrefly check src/
 
-    - name: Run security scanning
-      run: bandit -r src/
+      - name: Run security scanning
+        run: bandit -r src/
 
-    - name: Run unit tests
-      run: pytest tests/unit/ -v --cov=src/ --cov-report=xml
+      - name: Run unit tests
+        run: pytest tests/unit/ -v --cov=src/ --cov-report=xml
 
-    - name: Run integration tests
-      run: pytest tests/integration/ -v
+      - name: Run integration tests
+        run: pytest tests/integration/ -v
 
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
 
-    - name: Run performance tests
-      run: pytest tests/performance/ -v --benchmark-only
+      - name: Run performance tests
+        run: pytest tests/performance/ -v --benchmark-only
 
-    - name: Generate test report
-      run: pytest --html=reports/test-report.html --self-contained-html
+      - name: Generate test report
+        run: pytest --html=reports/test-report.html --self-contained-html
 ```
 
 #### 2. Test Data Management
@@ -4197,6 +4197,7 @@ end note
 ### Current Architecture Assessment
 
 #### Strengths
+
 - **Clean Architecture**: Well-structured layers with clear separation
 - **Type Safety**: 100% Pyrefly compliance
 - **Railway Pattern**: Predictable error handling
@@ -4205,35 +4206,39 @@ end note
 
 #### Areas for Evolution
 
-| Area | Current State | Evolution Path | Timeline |
-|------|---------------|----------------|----------|
-| **Microservices** | Monolithic | Service decomposition | 6-12 months |
-| **Event-Driven** | Synchronous | Event streaming | 3-6 months |
-| **Cloud-Native** | Containerized | Kubernetes operators | 6-9 months |
-| **AI/ML Integration** | Basic | Intelligent optimization | 9-12 months |
-| **Multi-Cloud** | Single cloud | Multi-cloud abstraction | 12-18 months |
+| Area                  | Current State | Evolution Path           | Timeline     |
+| --------------------- | ------------- | ------------------------ | ------------ |
+| **Microservices**     | Monolithic    | Service decomposition    | 6-12 months  |
+| **Event-Driven**      | Synchronous   | Event streaming          | 3-6 months   |
+| **Cloud-Native**      | Containerized | Kubernetes operators     | 6-9 months   |
+| **AI/ML Integration** | Basic         | Intelligent optimization | 9-12 months  |
+| **Multi-Cloud**       | Single cloud  | Multi-cloud abstraction  | 12-18 months |
 
 ### Architecture Roadmap
 
 #### Phase 1: Service Decomposition (3-6 months)
+
 - Identify service boundaries
 - Implement service mesh (Istio)
 - Create inter-service communication
 - Establish service contracts
 
 #### Phase 2: Event-Driven Architecture (6-9 months)
+
 - Implement event streaming (Kafka)
 - Create event-driven pipelines
 - Add event sourcing capabilities
 - Build real-time processing
 
 #### Phase 3: Cloud-Native Evolution (9-12 months)
+
 - Develop Kubernetes operators
 - Implement GitOps workflows
 - Add service mesh capabilities
 - Create multi-cloud abstraction
 
 #### Phase 4: AI/ML Integration (12-18 months)
+
 - Add intelligent pipeline optimization
 - Implement predictive scaling
 - Create automated issue resolution
@@ -4242,11 +4247,13 @@ end note
 ### Technical Debt Management
 
 #### Current Technical Debt
+
 - **Test Infrastructure**: Blocked by dependency issues
 - **Model Inheritance**: Compatibility issues with flext-core
 - **Code Coverage**: 0% due to test execution blocks
 
 #### Debt Reduction Strategy
+
 1. **Immediate (0-1 month)**: Resolve test infrastructure blockers
 2. **Short-term (1-3 months)**: Achieve 95% test coverage
 3. **Medium-term (3-6 months)**: Address architectural debt
@@ -4255,12 +4262,14 @@ end note
 ### Risk Mitigation
 
 #### Architectural Risks
+
 - **Vendor Lock-in**: Mitigated by abstraction layers
 - **Scalability Limits**: Monitored through performance metrics
 - **Complexity Creep**: Controlled through architecture reviews
 - **Technical Debt**: Managed through regular refactoring
 
 #### Operational Risks
+
 - **Single Points of Failure**: Identified through architecture analysis
 - **Performance Degradation**: Monitored through observability
 - **Security Vulnerabilities**: Addressed through regular updates
@@ -4269,4 +4278,4 @@ end note
 ---
 
 **Quality Attributes**: FLEXT-Meltano Architecture Quality Framework
-*Comprehensive quality attributes and cross-cutting concerns documentation*
+_Comprehensive quality attributes and cross-cutting concerns documentation_
