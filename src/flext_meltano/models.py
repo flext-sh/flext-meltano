@@ -12,6 +12,7 @@ from typing import cast
 
 from flext_core import FlextCore
 from pydantic import (
+    BaseModel,
     ConfigDict,
     Field,
     computed_field,
@@ -47,7 +48,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # CLI PARAMETER MODELS - For Singer SDK CLI Translation
     # ========================================================================
 
-    class TapRunParams(FlextCore.Models.BaseModel):
+    class TapRunParams(BaseModel):
         """CLI parameters for running Singer taps with automatic Singer SDK translation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -69,7 +70,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=False, description="Run in discovery mode to output catalog"
         )
 
-    class TargetRunParams(FlextCore.Models.BaseModel):
+    class TargetRunParams(BaseModel):
         """CLI parameters for running Singer targets with automatic Singer SDK translation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -85,7 +86,7 @@ class FlextMeltanoModels(FlextCore.Models):
             description="Path to Singer messages input file (default: stdin)",
         )
 
-    class PipelineRunParams(FlextCore.Models.BaseModel):
+    class PipelineRunParams(BaseModel):
         """CLI parameters for running complete Singer pipelines (tap → target)."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -106,7 +107,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=None, description="Path to write final state"
         )
 
-    class DbtRunParams(FlextCore.Models.BaseModel):
+    class DbtRunParams(BaseModel):
         """CLI parameters for DBT operations."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -128,7 +129,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=None, description="DBT variables as JSON string"
         )
 
-    class PluginInstallParams(FlextCore.Models.BaseModel):
+    class PluginInstallParams(BaseModel):
         """CLI parameters for plugin installation."""
 
         model_config = ConfigDict(validate_assignment=True)
@@ -146,7 +147,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
-    class TapConfig(FlextCore.Models.BaseModel):
+    class TapConfig(BaseModel):
         """Pydantic model for tap configuration with advanced validation and composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -597,7 +598,7 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class StreamInfo(FlextCore.Models.BaseModel):
+    class StreamInfo(BaseModel):
         """Pydantic model for stream information with advanced validation and computed fields."""
 
         model_config = ConfigDict(frozen=False, extra="allow")
@@ -868,7 +869,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # DBT MODELS - DBT project and execution models
     # ========================================================================
 
-    class DbtProjectModel(FlextCore.Models.BaseModel):
+    class DbtProjectModel(BaseModel):
         """Pydantic model for DBT project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")

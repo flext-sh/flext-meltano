@@ -47,54 +47,6 @@ class FlextMeltanoAdapter:
         self._current_project: object | None = None
 
     # =========================================================================
-    # NESTED HELPER CLASSES - FLEXT-core Unified Pattern
-    # =========================================================================
-
-    class _MeltanoProjectHelper:
-        """Nested helper for Meltano project operations - FLEXT pattern."""
-
-        @staticmethod
-        def create_minimal_config(
-            project_id: str | None = None,
-        ) -> FlextCore.Types.Dict:
-            """Create minimal meltano.yml configuration.
-
-            Returns:
-                FlextCore.Types.Dict: Minimal meltano.yml configuration dictionary.
-
-            """
-            return {
-                "version": 1,
-                "default_environment": "dev",
-                "project_id": project_id or "flext-meltano-project",
-                "environments": [
-                    {
-                        "name": "dev",
-                        "config": {
-                            "plugins": {
-                                "extractors": [],
-                                "loaders": [],
-                                "transformers": [],
-                            },
-                        },
-                    },
-                ],
-            }
-
-    class _MeltanoRunnerHelper:
-        """Nested helper for Meltano runner operations - FLEXT pattern."""
-
-        @staticmethod
-        def handle_runner_error(error: Exception) -> str:
-            """Convert runner error to standardized error message.
-
-            Returns:
-                str: Standardized error message string.
-
-            """
-            return f"Meltano runner failed: {error}"
-
-    # =========================================================================
     # PRIVATE HELPER METHODS - Using nested helpers
     # =========================================================================
 
@@ -121,10 +73,24 @@ class FlextMeltanoAdapter:
             temp_dir = tempfile.mkdtemp(prefix=prefix)
             temp_path = Path(temp_dir)
 
-            # Use nested helper for configuration - FLEXT pattern
-            meltano_config = self._MeltanoProjectHelper.create_minimal_config(
-                project_id,
-            )
+            # Create minimal meltano.yml configuration
+            meltano_config = {
+                "version": 1,
+                "default_environment": "dev",
+                "project_id": project_id or "flext-meltano-project",
+                "environments": [
+                    {
+                        "name": "dev",
+                        "config": {
+                            "plugins": {
+                                "extractors": [],
+                                "loaders": [],
+                                "transformers": [],
+                            },
+                        },
+                    },
+                ],
+            }
 
             # Add FLEXT metadata using flext-core patterns
             meltano_config["metadata"] = {

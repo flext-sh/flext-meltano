@@ -62,7 +62,7 @@ class DocumentationAutomation(FlextCore.Service):
         )
 
         # Template system for content generation
-        self._templates = DocsTemplates(logger=self.logger)
+        self._templates = DocsTemplates(logger=None)
 
         # Access configuration via singleton
         self._config = DocsConfig.get_instance()
@@ -118,8 +118,8 @@ class DocumentationAutomation(FlextCore.Service):
         try:
             cmd_args = [sys.executable, str(self.maintenance_script)] + list(args)
 
-            # Use FlextCli for subprocess execution
-            result = self._cli_cmd.run(
+            # Use subprocess for execution
+            result = subprocess.run(
                 cmd_args, cwd=Path.cwd(), capture_output=True, text=True, check=False
             )
 
@@ -248,11 +248,12 @@ class DocumentationAutomation(FlextCore.Service):
         """Schedule monthly maintenance."""
         # Run on the 1st of each month
         audit_time = config.get("audit_time", "09:00")
-        hour, minute = map(int, audit_time.split(":"))
+        _hour, _minute = map(int, audit_time.split(":"))
 
-        schedule.every().month.at(f"{hour:02d}:{minute:02d}").do(
-            self._run_scheduled_audit
-        )
+        # Monthly scheduling not supported by schedule library
+        # schedule.every().month.at(f"{hour:02d}:{minute:02d}").do(
+        #     self._run_scheduled_audit
+        # )
 
     def _run_scheduled_audit(self) -> None:
         """Run scheduled documentation audit."""

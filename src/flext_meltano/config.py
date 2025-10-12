@@ -76,9 +76,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
 
     # ALL ENUMS MUST COME FROM FlextCore.Constants or FlextMeltanoConstants - NO ALIASES
     PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
-    EnvironmentType: type = (
-        FlextCore.Constants.Environment.ConfigEnvironment
-    )  # Core constants
+    EnvironmentType: type = FlextCore.Constants.Environment  # Core constants
     LogLevel: type = FlextCore.Constants.Config.LogLevel  # Core constants
     OperationStatus: type = (
         FlextMeltanoConstants.OperationStatus
@@ -107,7 +105,11 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
 
     dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
 
-    # Environment and execution configuration - environment field inherited from FlextCore.Config
+    # Environment configuration
+    environment: str = Field(
+        default=FlextCore.Constants.Environment.DEVELOPMENT,
+        description="Deployment environment",
+    )
 
     log_level: str = Field(
         default=FlextCore.Constants.Config.LogLevel.INFO,  # SOURCE OF TRUTH
@@ -835,7 +837,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
         """
         # Validate environment using FlextCore.Constants
         try:
-            env_type = FlextCore.Constants.Environment.ConfigEnvironment(environment)
+            env_type = FlextCore.Constants.Environment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
@@ -915,7 +917,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
         return instance
 
     @classmethod
-    def set_global_instance(cls, instance: FlextCore.Config) -> None:
+    def set_global_instance(cls, instance: FlextMeltanoConfig) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
         This method delegates to FlextCore.Config.set_global_instance() since FlextCore.Config
@@ -1207,16 +1209,13 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
             FlextCore.Types.Dict: Configuration metadata dictionary.
 
         """
-        # Get base metadata from FlextCore.Config
-        base_metadata = super().get_metadata()
-
         # Return the metadata with proper typing
         return {
-            "app_name": base_metadata.get("app_name", "flext-meltano"),
-            "version": base_metadata.get("version", "0.9.0"),
-            "environment": base_metadata.get("environment", "development"),
-            "debug": base_metadata.get("debug", False),
-            "trace": base_metadata.get("trace", False),
+            "app_name": self.app_name,
+            "version": self.version,
+            "environment": self.environment,
+            "debug": self.debug,
+            "trace": self.trace,
         }
 
     # ============================================================================
