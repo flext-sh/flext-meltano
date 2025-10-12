@@ -32,9 +32,10 @@ Implement Clean Architecture with Domain-Driven Design, establishing clear bound
 
 ## Rationale
 
-### Why Clean Architecture?
+### Why Clean Architecture
 
 **Testability**: Business logic can be tested without external dependencies
+
 ```python
 # Domain logic testable in isolation
 def test_pipeline_validation():
@@ -44,6 +45,7 @@ def test_pipeline_validation():
 ```
 
 **Maintainability**: Changes to external systems don't affect business logic
+
 ```python
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
@@ -52,18 +54,21 @@ class MeltanoAdapter:
 ```
 
 **Evolvability**: System can evolve independently in each layer
+
 - Domain rules can change without affecting external integrations
 - External APIs can change without affecting business logic
 - New delivery mechanisms can be added without changing core logic
 
-### Why Domain-Driven Design?
+### Why Domain-Driven Design
 
 **Business Alignment**: Architecture reflects business domain structure
+
 - `Pipeline` as a domain concept
 - `Plugin` as a domain entity
 - `SingerProtocol` as a domain service
 
 **Ubiquitous Language**: Shared vocabulary between technical and business teams
+
 - "Tap" and "Target" as domain terms
 - "Pipeline execution" as a business process
 - "State management" as a domain concern
@@ -71,6 +76,7 @@ class MeltanoAdapter:
 ## Consequences
 
 ### Positive
+
 - **Separation of Concerns**: Clear boundaries between different aspects
 - **Testability**: High test coverage possible due to isolation
 - **Flexibility**: Easy to change external dependencies
@@ -79,6 +85,7 @@ class MeltanoAdapter:
 - **Business Focus**: Architecture reflects business domain
 
 ### Negative
+
 - **Complexity**: Additional abstraction layers and interfaces
 - **Indirection**: More classes and interfaces to navigate
 - **Learning Curve**: Understanding layered architecture patterns
@@ -86,12 +93,14 @@ class MeltanoAdapter:
 - **Communication Overhead**: Coordination between layers
 
 ### Risks
+
 - **Over-Engineering**: Creating unnecessary abstractions
 - **Layer Leaks**: Dependencies creeping through layer boundaries
 - **Performance Overhead**: Indirection affecting performance
 - **Team Resistance**: Pushback against additional complexity
 
 ### Mitigation Strategies
+
 - **Iterative Application**: Start with simpler structure, add layers as needed
 - **Clear Guidelines**: Document layer responsibilities and interaction patterns
 - **Automated Checks**: Linting rules to prevent layer violations
@@ -100,21 +109,25 @@ class MeltanoAdapter:
 ## Alternatives Considered
 
 ### 1. Traditional Layered Architecture
+
 - **Pros**: Simple, familiar, less abstraction
 - **Cons**: Business logic coupled to infrastructure, hard to test
 - **Rejected**: Doesn't provide sufficient isolation for complex integrations
 
 ### 2. Hexagonal Architecture (Ports & Adapters)
+
 - **Pros**: Very clean separation, excellent testability
 - **Cons**: Complex for this domain, overkill for current needs
 - **Rejected**: Clean Architecture provides similar benefits with less complexity
 
 ### 3. Microservices Architecture
+
 - **Pros**: Independent deployment, scalability
 - **Cons**: Operational complexity, distributed system challenges
 - **Rejected**: Single deployable unit better suits current requirements
 
 ### 4. Event-Driven Architecture
+
 - **Pros**: Loose coupling, scalability
 - **Cons**: Complexity for synchronous operations
 - **Rejected**: Request-response patterns dominate current use cases
@@ -137,6 +150,7 @@ src/flext_meltano/
 ### Layer Interaction Rules
 
 **API Layer → Application Layer**
+
 ```python
 # api.py
 def create_pipeline(config: dict) -> FlextCore.Result[Pipeline]:
@@ -144,6 +158,7 @@ def create_pipeline(config: dict) -> FlextCore.Result[Pipeline]:
 ```
 
 **Application Layer → Domain Layer**
+
 ```python
 # services.py
 def create_pipeline(self, config: dict) -> FlextCore.Result[Pipeline]:
@@ -152,6 +167,7 @@ def create_pipeline(self, config: dict) -> FlextCore.Result[Pipeline]:
 ```
 
 **Application Layer → Infrastructure Layer**
+
 ```python
 # services.py
 def execute_pipeline(self, pipeline: Pipeline) -> FlextCore.Result[ExecutionResult]:
@@ -186,17 +202,20 @@ class FlextMeltanoService:
 ## Notes
 
 **Evolution Considerations:**
+
 - Start with basic layered structure
 - Add complexity only when justified by use cases
 - Monitor for over-engineering and simplify when possible
 - Consider hexagonal architecture for future growth
 
 **Performance Impact:**
+
 - Minimal impact on normal operation paths
 - Test performance improved due to isolation
 - Development velocity improved due to clear boundaries
 
 **Team Adoption:**
+
 - Training provided on layered architecture concepts
 - Code reviews enforce layer boundary rules
 - Automated tools validate architectural compliance

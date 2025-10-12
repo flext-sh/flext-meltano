@@ -79,29 +79,32 @@ deactivate tap
 ### Data Flow Patterns
 
 #### 1. **Extract-Load-Transform (ELT) Pattern**
+
 ```
 Source System → Singer Tap → JSONL Stream → Singer Target → Raw Storage → DBT → Transformed Data
 ```
 
 #### 2. **Incremental Loading Pattern**
+
 ```
 State Store ← Bookmark Management ← Change Detection ← Source Query ← Filtered Extraction
 ```
 
 #### 3. **Batch Processing Pattern**
+
 ```
 Record Buffer ← Streaming Ingestion ← JSONL Parsing ← Schema Validation ← Batch Loading
 ```
 
 ### Data Transformation Stages
 
-| Stage | Input Format | Processing | Output Format | Purpose |
-|-------|--------------|------------|---------------|---------|
-| **Extraction** | Source Native | Singer Tap | JSONL Records | Schema discovery, incremental sync |
-| **Transportation** | JSONL Records | Singer Protocol | JSONL Stream | Standardized data transport |
-| **Loading** | JSONL Stream | Singer Target | Target Native | Raw data storage |
-| **Transformation** | Raw Tables | DBT Models | Analytics Tables | Business logic, cleansing |
-| **Orchestration** | Pipeline Config | FLEXT-Meltano | Execution State | Workflow coordination |
+| Stage              | Input Format    | Processing      | Output Format    | Purpose                            |
+| ------------------ | --------------- | --------------- | ---------------- | ---------------------------------- |
+| **Extraction**     | Source Native   | Singer Tap      | JSONL Records    | Schema discovery, incremental sync |
+| **Transportation** | JSONL Records   | Singer Protocol | JSONL Stream     | Standardized data transport        |
+| **Loading**        | JSONL Stream    | Singer Target   | Target Native    | Raw data storage                   |
+| **Transformation** | Raw Tables      | DBT Models      | Analytics Tables | Business logic, cleansing          |
+| **Orchestration**  | Pipeline Config | FLEXT-Meltano   | Execution State  | Workflow coordination              |
 
 ---
 
@@ -162,17 +165,18 @@ external --> intermediate: Data extraction
 
 ### Storage Technologies
 
-| Storage Type | Technology | Purpose | Retention | Access Pattern |
-|-------------|------------|---------|-----------|----------------|
-| **Pipeline State** | SQLite/PostgreSQL | Execution state, bookmarks | Indefinite | Read-heavy, frequent updates |
-| **Raw Data** | JSONL/Parquet | Extracted data staging | Configurable | Write-once, read-many |
-| **Transformed Data** | Data Warehouse | Analytics-ready data | Business rules | Complex queries, reporting |
-| **Configuration** | YAML/JSON | Pipeline definitions | Version controlled | Read-mostly |
-| **Logs & Metrics** | Structured logs | Observability | Configurable | Time-series queries |
+| Storage Type         | Technology        | Purpose                    | Retention          | Access Pattern               |
+| -------------------- | ----------------- | -------------------------- | ------------------ | ---------------------------- |
+| **Pipeline State**   | SQLite/PostgreSQL | Execution state, bookmarks | Indefinite         | Read-heavy, frequent updates |
+| **Raw Data**         | JSONL/Parquet     | Extracted data staging     | Configurable       | Write-once, read-many        |
+| **Transformed Data** | Data Warehouse    | Analytics-ready data       | Business rules     | Complex queries, reporting   |
+| **Configuration**    | YAML/JSON         | Pipeline definitions       | Version controlled | Read-mostly                  |
+| **Logs & Metrics**   | Structured logs   | Observability              | Configurable       | Time-series queries          |
 
 ### Data Persistence Patterns
 
 #### 1. **State Management**
+
 ```python
 class PipelineState:
     """Pipeline execution state with bookmarks."""
@@ -189,6 +193,7 @@ class PipelineState:
 ```
 
 #### 2. **Data Buffering**
+
 ```python
 class RecordBuffer:
     """In-memory buffer for batch processing."""
@@ -203,6 +208,7 @@ class RecordBuffer:
 ```
 
 #### 3. **Error Handling Storage**
+
 ```python
 class ErrorStore:
     """Storage for failed records and error context."""
@@ -224,6 +230,7 @@ class ErrorStore:
 ### Core Data Models
 
 #### Pipeline Configuration Model
+
 ```python
 @dataclass
 class PipelineConfig:
@@ -244,6 +251,7 @@ class PipelineConfig:
 ```
 
 #### Singer Message Schema
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -281,6 +289,7 @@ class PipelineConfig:
 ### Data Validation Rules
 
 #### Schema Validation
+
 ```python
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
@@ -359,24 +368,28 @@ stop
 ### Processing Stages
 
 #### 1. **Data Extraction Stage**
+
 - **Input**: Source system queries
 - **Processing**: Incremental filtering, type conversion
 - **Output**: Singer RECORD messages
 - **Error Handling**: Connection retries, partial failure recovery
 
 #### 2. **Data Transportation Stage**
+
 - **Input**: Singer RECORD stream
 - **Processing**: JSONL serialization, compression
 - **Output**: Transport-ready data stream
 - **Error Handling**: Stream integrity checks, reconnection logic
 
 #### 3. **Data Loading Stage**
+
 - **Input**: JSONL data stream
 - **Processing**: Batch optimization, duplicate handling
 - **Output**: Raw warehouse tables
 - **Error Handling**: Transaction rollbacks, dead letter queues
 
 #### 4. **Data Transformation Stage**
+
 - **Input**: Raw warehouse tables
 - **Processing**: Business logic, data cleansing, aggregation
 - **Output**: Analytics-ready tables
@@ -388,13 +401,13 @@ stop
 
 ### Quality Gates
 
-| Quality Gate | Validation Rules | Failure Action |
-|-------------|------------------|----------------|
-| **Schema Compliance** | JSON Schema validation | Reject record, log error |
-| **Data Type Consistency** | Type coercion rules | Transform or reject |
-| **Referential Integrity** | Foreign key validation | Conditional loading |
-| **Business Rules** | Custom validation logic | Reject or flag |
-| **Completeness** | Required field checks | Reject incomplete records |
+| Quality Gate              | Validation Rules        | Failure Action            |
+| ------------------------- | ----------------------- | ------------------------- |
+| **Schema Compliance**     | JSON Schema validation  | Reject record, log error  |
+| **Data Type Consistency** | Type coercion rules     | Transform or reject       |
+| **Referential Integrity** | Foreign key validation  | Conditional loading       |
+| **Business Rules**        | Custom validation logic | Reject or flag            |
+| **Completeness**          | Required field checks   | Reject incomplete records |
 
 ### Data Quality Metrics
 
@@ -424,18 +437,21 @@ class DataQualityMetrics:
 ### Error Handling Strategies
 
 #### 1. **Schema Validation Errors**
+
 - Log error details with record context
 - Continue processing other records
 - Aggregate error statistics
 - Optional: Store invalid records in error table
 
 #### 2. **Business Rule Violations**
+
 - Categorize violation types
 - Apply configurable actions (reject/warn/transform)
 - Maintain violation audit trail
 - Support rule configuration updates
 
 #### 3. **System Errors**
+
 - Implement retry logic with exponential backoff
 - Circuit breaker pattern for external systems
 - Graceful degradation strategies
@@ -474,13 +490,13 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 
 ### Data Classification and Security
 
-| Data Classification | Handling Requirements | Storage Requirements |
-|-------------------|----------------------|---------------------|
-| **Public** | No restrictions | Standard storage |
-| **Internal** | Access controls | Encrypted at rest |
-| **Confidential** | Role-based access | Encrypted + audited |
-| **Restricted** | Need-to-know only | Encrypted + masked |
-| **PHI/PII** | Compliance requirements | Tokenized + audited |
+| Data Classification | Handling Requirements   | Storage Requirements |
+| ------------------- | ----------------------- | -------------------- |
+| **Public**          | No restrictions         | Standard storage     |
+| **Internal**        | Access controls         | Encrypted at rest    |
+| **Confidential**    | Role-based access       | Encrypted + audited  |
+| **Restricted**      | Need-to-know only       | Encrypted + masked   |
+| **PHI/PII**         | Compliance requirements | Tokenized + audited  |
 
 ### Data Retention Policies
 
@@ -508,17 +524,18 @@ class RetentionPolicy:
 
 ### Performance Characteristics
 
-| Operation | Target Latency | Throughput | Scaling Strategy |
-|-----------|----------------|------------|------------------|
-| **Schema Discovery** | <30s | N/A | Parallel discovery |
-| **Data Extraction** | <5min | 1000 rec/sec | Horizontal scaling |
-| **Data Loading** | <10min | 5000 rec/sec | Batch optimization |
-| **DBT Transformation** | <15min | Variable | Query optimization |
-| **Pipeline Orchestration** | <1min | 10 concurrent | Load balancing |
+| Operation                  | Target Latency | Throughput    | Scaling Strategy   |
+| -------------------------- | -------------- | ------------- | ------------------ |
+| **Schema Discovery**       | <30s           | N/A           | Parallel discovery |
+| **Data Extraction**        | <5min          | 1000 rec/sec  | Horizontal scaling |
+| **Data Loading**           | <10min         | 5000 rec/sec  | Batch optimization |
+| **DBT Transformation**     | <15min         | Variable      | Query optimization |
+| **Pipeline Orchestration** | <1min          | 10 concurrent | Load balancing     |
 
 ### Scalability Patterns
 
 #### 1. **Horizontal Scaling**
+
 ```python
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
@@ -534,6 +551,7 @@ class PipelineScaler:
 ```
 
 #### 2. **Data Partitioning**
+
 ```python
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
@@ -550,6 +568,7 @@ class DataPartitioner:
 ```
 
 #### 3. **Caching Strategy**
+
 ```python
 class PipelineCache:
     """Multi-level caching for performance optimization."""
@@ -571,6 +590,7 @@ class PipelineCache:
 ### Monitoring and Observability
 
 #### Key Metrics
+
 - **Throughput**: Records processed per second
 - **Latency**: End-to-end pipeline execution time
 - **Error Rate**: Percentage of failed operations
@@ -578,6 +598,7 @@ class PipelineCache:
 - **Data Quality**: Validation success rate
 
 #### Alerting Rules
+
 ```python
 @dataclass
 class AlertRule:
@@ -601,12 +622,14 @@ class AlertRule:
 ## 📈 Architecture Evolution
 
 ### Current Limitations
+
 - Single-threaded processing for some operations
 - Memory-bound for very large datasets
 - Limited support for complex data transformations
 - Basic error recovery mechanisms
 
 ### Future Enhancements
+
 - **Streaming Architecture**: Real-time data processing
 - **Distributed Processing**: Cluster-based execution
 - **Advanced Caching**: Multi-level caching strategies
@@ -616,4 +639,4 @@ class AlertRule:
 ---
 
 **Data Architecture**: FLEXT-Meltano Enterprise Data Processing
-*Comprehensive data flow, storage, and processing architecture documentation*
+_Comprehensive data flow, storage, and processing architecture documentation_

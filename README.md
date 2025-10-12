@@ -317,7 +317,7 @@ make docs-setup
 make docs-view-report
 ```
 
-*See [Documentation Maintenance Guide](docs/MAINTENANCE_GUIDE.md) for details.*
+_See [Documentation Maintenance Guide](docs/MAINTENANCE_GUIDE.md) for details._
 
 ### **Test Categories**
 

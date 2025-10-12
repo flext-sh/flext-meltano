@@ -42,7 +42,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ECOSYSTEM INTEGRATION**:
 
-- **Foundation for 32+ FLEXT Projects**: All flext-tap-*, flext-target-*, flext-dbt-* projects depend on this library
+- **Foundation for 32+ FLEXT Projects**: All flext-tap-_, flext-target-_, flext-dbt-\* projects depend on this library
 - **Zero Custom ELT Code**: ABSOLUTE prohibition of custom Meltano/Singer/DBT implementations
 - **Enterprise Data Pipelines**: Production-ready ELT orchestration for batch and real-time processing
 - **client-a Integration**: Critical dependency for Oracle Unified Directory migration project
@@ -107,6 +107,7 @@ FLEXT-Meltano follows Clean Architecture principles with clear separation of con
 ### **Core Components**
 
 #### FlextMeltano (Main API)
+
 **Unified facade for all Meltano operations**
 
 ```python
@@ -122,6 +123,7 @@ if result.is_success:
 ```
 
 #### FlextMeltanoService
+
 **Core service implementing business logic with flext-core integration**
 
 ```python
@@ -135,6 +137,7 @@ result = service.discover_plugins()
 ```
 
 #### FlextMeltanoAdapter
+
 **Infrastructure layer providing Meltano CLI integration**
 
 ```python
@@ -196,18 +199,22 @@ class MyCustomStream(FlextMeltanoStream):
 ## 📚 DOCUMENTATION STATUS (UPDATED 2025-10-10)
 
 ### **Documentation Enhancement Summary**
+
 Successfully updated FLEXT-Meltano documentation to reflect current project status and implementation details:
 
 #### **New Documentation Files Created:**
+
 - ✅ **`docs/implementation_status.md`** - Comprehensive project status (88% complete)
 - ✅ **`docs/testing_plan.md`** - Detailed testing infrastructure plan (95% complete, execution blocked)
 - ✅ **`docs/phase_4_implementation_plan.md`** - Test infrastructure resolution roadmap
 
 #### **Updated Existing Documentation:**
+
 - ✅ **`docs/COVERAGE_IMPROVEMENT_PLAN.md`** - Updated with current blocked status and resolution plan
 - ✅ **`CLAUDE.md`** - Enhanced with current project status and completion metrics
 
 #### **Key Documentation Insights:**
+
 - **Project Completion**: 88% complete with enterprise-grade features implemented
 - **Test Infrastructure**: 95% complete but VERIFIED BLOCKED by two critical issues
 - **Production Readiness**: Core functionality ready for enterprise deployment (blocked by test validation)

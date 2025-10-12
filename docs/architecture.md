@@ -299,12 +299,12 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 
 ### **Architecture Compliance Status**
 
-| Component                 | Status  | Details                                            |
-| ------------------------- | ------- | -------------------------------------------------- |
-| **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations |
-| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with FlextCore.Result patterns  |
-| **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture       |
-| **External Abstractions** | 🟡 60%  | Direct imports in adapters.py need wrapping        |
+| Component                 | Status  | Details                                                |
+| ------------------------- | ------- | ------------------------------------------------------ |
+| **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations     |
+| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with FlextCore.Result patterns |
+| **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture           |
+| **External Abstractions** | 🟡 60%  | Direct imports in adapters.py need wrapping            |
 
 ### **Technical Debt**
 

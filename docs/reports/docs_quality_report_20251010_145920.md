@@ -22,13 +22,13 @@
 
 ## 📈 Quality Score Breakdown
 
-| Component | Score | Weight | Contribution |
-|-----------|-------|--------|--------------|
-| Content Freshness | 85.0 | 20% | 17.0 |
-| Link Health | 90.0 | 25% | 22.5 |
-| Structure | 88.0 | 25% | 22.0 |
-| Formatting | 92.0 | 15% | 13.8 |
-| Accessibility | 87.0 | 15% | 13.1 |
+| Component         | Score | Weight | Contribution |
+| ----------------- | ----- | ------ | ------------ |
+| Content Freshness | 85.0  | 20%    | 17.0         |
+| Link Health       | 90.0  | 25%    | 22.5         |
+| Structure         | 88.0  | 25%    | 22.0         |
+| Formatting        | 92.0  | 15%    | 13.8         |
+| Accessibility     | 87.0  | 15%    | 13.1         |
 
 ## ⚠️ Issues Summary
 
@@ -422,7 +422,7 @@
   💡 Fix or remove broken link
 
 - 🔴 **Broken Internal Link** (Line 1)
-  Broken internal link: flext_meltano/__init__.py
+  Broken internal link: flext_meltano/**init**.py
   💡 Fix or remove broken link
 
 - 🔴 **Broken Internal Link** (Line 1)
@@ -597,11 +597,13 @@
 ## 🎯 Recommendations
 
 ### 🔴 High Priority Actions
+
 - Fix broken internal links and missing images
 - Update stale content
 - Resolve structural issues
 
 ### 🔄 Continuous Improvement
+
 - Schedule regular documentation audits
 - Monitor link health and content freshness
 - Track quality metrics over time

@@ -40,12 +40,15 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 ## Consequences
 
 ### Positive
+
 - {List positive consequences}
 
 ### Negative
+
 - {List negative consequences}
 
 ### Risks
+
 - {List potential risks and mitigation strategies}
 
 ## Alternatives Considered
@@ -63,18 +66,18 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 
 ## Current ADRs
 
-| ADR | Title | Status | Date |
-|-----|-------|--------|------|
+| ADR                                            | Title                                                 | Status   | Date       |
+| ---------------------------------------------- | ----------------------------------------------------- | -------- | ---------- |
 | [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with FlextCore.Result[T] | Accepted | 2025-01-15 |
-| [ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design | Accepted | 2025-01-20 |
-| [ADR-003](003-singer-protocol-abstraction.md) | Singer Protocol Abstraction Layer | Accepted | 2025-02-01 |
-| [ADR-004](004-type-safety-first.md) | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 |
-| [ADR-005](005-plugin-centric-architecture.md) | Plugin-Centric Architecture | Accepted | 2025-02-10 |
-| [ADR-006](006-flext-core-integration.md) | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 |
-| [ADR-007](007-state-management-strategy.md) | State Management Strategy | Accepted | 2025-02-20 |
-| [ADR-008](008-error-handling-strategy.md) | Error Handling Strategy | Accepted | 2025-02-25 |
-| [ADR-009](009-api-design-principles.md) | API Design Principles | Accepted | 2025-03-01 |
-| [ADR-010](010-testing-strategy.md) | Testing Strategy and Infrastructure | Accepted | 2025-03-05 |
+| [ADR-002](002-clean-architecture-ddd.md)       | Clean Architecture with Domain-Driven Design          | Accepted | 2025-01-20 |
+| [ADR-003](003-singer-protocol-abstraction.md)  | Singer Protocol Abstraction Layer                     | Accepted | 2025-02-01 |
+| [ADR-004](004-type-safety-first.md)            | Type Safety First with Python 3.13+                   | Accepted | 2025-02-05 |
+| [ADR-005](005-plugin-centric-architecture.md)  | Plugin-Centric Architecture                           | Accepted | 2025-02-10 |
+| [ADR-006](006-flext-core-integration.md)       | FLEXT-Core Integration Pattern                        | Accepted | 2025-02-15 |
+| [ADR-007](007-state-management-strategy.md)    | State Management Strategy                             | Accepted | 2025-02-20 |
+| [ADR-008](008-error-handling-strategy.md)      | Error Handling Strategy                               | Accepted | 2025-02-25 |
+| [ADR-009](009-api-design-principles.md)        | API Design Principles                                 | Accepted | 2025-03-01 |
+| [ADR-010](010-testing-strategy.md)             | Testing Strategy and Infrastructure                   | Accepted | 2025-03-05 |
 
 ## ADR Status Definitions
 
@@ -107,6 +110,7 @@ ADRs are categorized by concern:
 ### Validation Rules
 
 ADRs must:
+
 - Follow the standard template
 - Include clear rationale and trade-offs
 - Be reviewed by at least two architects
