@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_core import FlextCore
+from flext_core.constants import FlextConstants
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -76,7 +77,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
 
     # ALL ENUMS MUST COME FROM FlextCore.Constants or FlextMeltanoConstants - NO ALIASES
     PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
-    EnvironmentType: type = FlextCore.Constants.Environment  # Core constants
+    EnvironmentType: type = FlextConstants.Config.Environment  # Core constants
     LogLevel: type = FlextCore.Constants.Config.LogLevel  # Core constants
     OperationStatus: type = (
         FlextMeltanoConstants.OperationStatus
@@ -107,7 +108,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextCore.Constants.Environment.DEVELOPMENT,
+        default=FlextConstants.Config.Environment.DEVELOPMENT,
         description="Deployment environment",
     )
 
@@ -837,7 +838,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
         """
         # Validate environment using FlextCore.Constants
         try:
-            env_type = FlextCore.Constants.Environment(environment)
+            env_type = FlextConstants.Config.Environment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
@@ -917,7 +918,7 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
         return instance
 
     @classmethod
-    def set_global_instance(cls, instance: FlextMeltanoConfig) -> None:
+    def set_global_instance(cls, instance: FlextCore.Config) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
         This method delegates to FlextCore.Config.set_global_instance() since FlextCore.Config
@@ -1081,9 +1082,9 @@ class FlextMeltanoConfig(FlextCore.Config, BaseSettings):
         # Create base environment variables from FlextCore.Config fields
         base_env_vars = {
             "FLEXT_APP_NAME": base_config.app_name,
-            "FLEXT_ENVIRONMENT": str(base_config.environment),
+            "FLEXT_ENVIRONMENT": self.environment,  # Use own environment
             "FLEXT_LOG_LEVEL": str(base_config.log_level).upper(),
-            "FLEXT_VERSION": "0.9.0",  # Use FlextCore.Constants.VERSION
+            "FLEXT_VERSION": base_config.version,
         }
 
         # Add Meltano-specific environment variables

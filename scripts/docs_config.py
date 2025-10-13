@@ -12,7 +12,7 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import yaml
 from flext_core import FlextCore
@@ -84,7 +84,7 @@ class DocsConfig(FlextCore.Config):
         config_result = container.get("DocsConfig")
 
         if config_result.is_success:
-            return config_result.unwrap()
+            return cast("DocsConfig", config_result.unwrap())
 
         # Create and register new instance
         instance = cls()
@@ -114,11 +114,8 @@ class DocsConfig(FlextCore.Config):
                 config_data = yaml.safe_load(f)
 
             if not isinstance(config_data, dict):
-                return FlextCore.Result.fail(
-                    ValueError(
-                        f"Invalid configuration format: expected dict, got {type(config_data)}"
-                    )
-                )
+                error_msg = f"Invalid configuration format: expected dict, got {type(config_data)}"
+                return FlextCore.Result.fail(error_msg)
 
             # Update instance with loaded values
             for key, value in config_data.items():
@@ -128,9 +125,8 @@ class DocsConfig(FlextCore.Config):
             return FlextCore.Result.ok(self)
 
         except Exception as e:
-            return FlextCore.Result.fail(
-                RuntimeError(f"Failed to load configuration from {file_path}: {e}")
-            )
+            error_msg = f"Failed to load configuration from {file_path}: {e}"
+            return FlextCore.Result.fail(error_msg)
 
     def get_schedule_config(self) -> dict[str, Any]:
         """Get scheduling configuration as dictionary for backward compatibility.
