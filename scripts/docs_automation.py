@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
+import subprocess  # noqa: S404
 import sys
 import time as time_module
 from datetime import UTC, datetime
@@ -29,6 +29,7 @@ from flext_cli import (
     FlextCliCmd,
 )
 from flext_core import FlextCore
+from flext_core.exceptions import FlextExceptions
 
 from .docs_config import DocsConfig
 from .docs_templates import DocsTemplates
@@ -120,7 +121,7 @@ class DocumentationAutomation(FlextCore.Service):
 
             # Use subprocess for execution
             result = subprocess.run(
-                cmd_args, cwd=Path.cwd(), capture_output=True, text=True, check=False
+                cmd_args, cwd=Path.cwd(), capture_output=True, text=True, check=False, shell=False
             )
 
             if result.returncode != 0:
@@ -266,6 +267,7 @@ class DocumentationAutomation(FlextCore.Service):
                 capture_output=True,
                 text=True,
                 cwd=Path.cwd(),
+                shell=False,
             )
 
             if result.returncode == 0:

@@ -48,7 +48,7 @@ class DocsTemplates:
             error_msg = f"Failed to generate CI workflow: {e}"
             if self._logger:
                 self._logger.exception("CI workflow generation failed", error=error_msg)
-            return FlextCore.Result.fail(RuntimeError(error_msg))
+            return FlextCore.Result.fail(error_msg)
 
     def generate_makefile_targets(self) -> FlextCore.Result[str]:
         """Generate Makefile targets using template pattern.
@@ -69,7 +69,7 @@ class DocsTemplates:
             error_msg = f"Failed to generate Makefile targets: {e}"
             if self._logger:
                 self._logger.exception("Makefile generation failed", error=error_msg)
-            return FlextCore.Result.fail(RuntimeError(error_msg))
+            return FlextCore.Result.fail(error_msg)
 
     def generate_git_hook(self) -> FlextCore.Result[str]:
         """Generate Git pre-commit hook using template pattern.
@@ -90,7 +90,7 @@ class DocsTemplates:
             error_msg = f"Failed to generate Git hook: {e}"
             if self._logger:
                 self._logger.exception("Git hook generation failed", error=error_msg)
-            return FlextCore.Result.fail(RuntimeError(error_msg))
+            return FlextCore.Result.fail(error_msg)
 
     def _get_cron_schedule(self, config: dict[str, Any]) -> str:
         """Convert audit schedule to cron format."""

@@ -20,7 +20,7 @@ import argparse
 import json
 import re
 import time
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -421,6 +421,7 @@ class LinkValidator:
     """Advanced link validation system."""
 
     def __init__(self, timeout: int | None = None, retries: int | None = None) -> None:
+        """Initialize link validator with timeout and retry configuration."""
         config = DocsConfig.get_instance()
         self.timeout = timeout or config.link_validation_timeout
         self.retries = retries or config.link_validation_retries
@@ -528,6 +529,7 @@ class QualityReporter:
     """Comprehensive quality reporting system."""
 
     def __init__(self, output_dir: str = "docs/reports") -> None:
+        """Initialize quality reporter with output directory."""
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
