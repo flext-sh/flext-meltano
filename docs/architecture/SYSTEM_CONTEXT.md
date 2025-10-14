@@ -741,7 +741,7 @@ class CircuitBreakerIntegration:
         self.last_failure_time = None
         self.state = CircuitState.CLOSED
 
-    def execute_with_circuit_breaker(self, operation: Callable) -> FlextCore.Result[Any]:
+    def execute_with_circuit_breaker(self, operation: Callable) -> FlextCore.Result[object]:
         """Execute operation with circuit breaker protection."""
 
         if self.state == CircuitState.OPEN:

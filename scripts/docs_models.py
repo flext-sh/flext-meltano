@@ -12,7 +12,6 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any
 
 from flext_core import FlextCore
 
@@ -49,7 +48,7 @@ class DocumentationMetrics(FlextCore.Models.Value):
     missing_images: int = 0
     code_blocks: int = 0
     headings: dict[int, int] = defaultdict(int)
-    issues: list[dict[str, Any]] = []
+    issues: list[dict[str, object]] = []
     quality_score: float = 0.0
 
 

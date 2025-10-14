@@ -23,7 +23,6 @@ import time
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
@@ -428,7 +427,7 @@ class LinkValidator:
         self.valid_cache: dict[str, bool] = {}
         self.checked_urls: set[str] = set()
 
-    def validate_all_links(self, root_path: str = ".") -> dict[str, Any]:
+    def validate_all_links(self, root_path: str = ".") -> dict[str, object]:
         """Validate all external links in documentation."""
         print("🔗 Validating external links...")
 
@@ -458,7 +457,7 @@ class LinkValidator:
         )
         return results
 
-    def _validate_file_links(self, file_path: Path) -> dict[str, Any]:
+    def _validate_file_links(self, file_path: Path) -> dict[str, object]:
         """Validate links in a single file."""
         results = {
             "total_links": 0,
@@ -537,7 +536,7 @@ class QualityReporter:
         self,
         metrics: DocumentationMetrics,
         issues: list[DocumentationIssue],
-        link_results: dict[str, Any],
+        link_results: dict[str, object],
     ) -> str:
         """Generate comprehensive quality report."""
         report_path = (
@@ -555,7 +554,7 @@ class QualityReporter:
         self,
         metrics: DocumentationMetrics,
         issues: list[DocumentationIssue],
-        link_results: dict[str, Any],
+        link_results: dict[str, object],
     ) -> str:
         """Generate report content."""
         report = f"""# Documentation Quality Report

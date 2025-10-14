@@ -181,11 +181,11 @@ external --> intermediate: Data extraction
 class PipelineState:
     """Pipeline execution state with bookmarks."""
     pipeline_id: str
-    bookmarks: Dict[str, Any]  # Singer bookmark format
+    bookmarks: Dict[str, object]  # Singer bookmark format
     last_updated: datetime
     version: int
 
-    def update_bookmark(self, stream: str, value: Any) -> None:
+    def update_bookmark(self, stream: str, value: object) -> None:
         """Update bookmark for incremental sync."""
         self.bookmarks[stream] = value
         self.last_updated = datetime.utcnow()

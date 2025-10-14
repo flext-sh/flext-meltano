@@ -12,7 +12,7 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, ClassVar, cast
+from typing import ClassVar, cast
 
 import yaml
 from flext_core import FlextCore
@@ -128,7 +128,7 @@ class DocsConfig(FlextCore.Config):
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return FlextCore.Result.fail(error_msg)
 
-    def get_schedule_config(self) -> dict[str, Any]:
+    def get_schedule_config(self) -> dict[str, object]:
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
@@ -142,7 +142,7 @@ class DocsConfig(FlextCore.Config):
             "audit_time": self.audit_time,
         }
 
-    def get_quality_thresholds(self) -> dict[str, Any]:
+    def get_quality_thresholds(self) -> dict[str, object]:
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
@@ -158,7 +158,7 @@ class DocsConfig(FlextCore.Config):
             "fail_on_critical_issues": self.fail_on_critical_issues,
         }
 
-    def get_reporting_config(self) -> dict[str, Any]:
+    def get_reporting_config(self) -> dict[str, object]:
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
@@ -169,7 +169,7 @@ class DocsConfig(FlextCore.Config):
             "output_directory": self.reports_output_dir,
         }
 
-    def get_link_validation_config(self) -> dict[str, Any]:
+    def get_link_validation_config(self) -> dict[str, object]:
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
@@ -181,7 +181,7 @@ class DocsConfig(FlextCore.Config):
             "retries": self.link_validation_retries,
         }
 
-    def get_audit_thresholds(self) -> dict[str, Any]:
+    def get_audit_thresholds(self) -> dict[str, object]:
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:

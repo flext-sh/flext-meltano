@@ -8,7 +8,7 @@ Provides PlantUML rendering, C4 model validation, and automated documentation up
 import argparse
 import ast
 import re
-import subprocess  # noqa: S404
+import subprocess
 import sys
 import time
 import urllib.request
@@ -126,7 +126,12 @@ class PlantUMLRenderer(FlextCore.Service):
 
             # Security: subprocess is used to execute PlantUML JAR with controlled arguments
             process = subprocess.run(
-                cmd, check=False, capture_output=True, text=True, shell=False, cwd=puml_file.parent
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                shell=False,
+                cwd=puml_file.parent,
             )
 
             if process.returncode == 0 and png_file.exists():

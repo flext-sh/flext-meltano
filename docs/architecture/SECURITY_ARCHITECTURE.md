@@ -217,7 +217,7 @@ class AccessRequest:
     subject: User
     action: str  # 'read', 'write', 'execute', 'delete'
     resource: str  # 'pipeline:123', 'source:github', etc.
-    context: Dict[str, Any]  # environment, time, location, etc.
+    context: Dict[str, object]  # environment, time, location, etc.
 
 class ABACPolicy:
     """Attribute-based access control policy."""
@@ -252,7 +252,7 @@ class SessionManager:
         self.redis = redis_client
         self.session_timeout = session_timeout
 
-    def create_session(self, user_id: str, metadata: Dict[str, Any]) -> str:
+    def create_session(self, user_id: str, metadata: Dict[str, object]) -> str:
         """Create new user session."""
         session_id = self._generate_secure_session_id()
         session_data = {
@@ -273,7 +273,7 @@ class SessionManager:
 
         return session_id
 
-    def validate_session(self, session_id: str, ip_address: str) -> Optional[Dict[str, Any]]:
+    def validate_session(self, session_id: str, ip_address: str) -> Optional[Dict[str, object]]:
         """Validate session and update activity."""
         session_key = f"session:{session_id}"
         session_data = self.redis.get(session_key)
@@ -443,7 +443,7 @@ class DataClassification:
     retention_period_days: int = 2555  # 7 years default
     audit_required: bool = False
 
-    def get_handling_requirements(self) -> Dict[str, Any]:
+    def get_handling_requirements(self) -> Dict[str, object]:
         """Get data handling requirements based on classification."""
         requirements = {
             'public': {
@@ -715,7 +715,7 @@ class SecurityAuditor:
             'security_incident': 'ERROR'
         }
 
-    def log_security_event(self, event_type: str, details: Dict[str, Any],
+    def log_security_event(self, event_type: str, details: Dict[str, object],
                           severity: str = 'INFO') -> None:
         """Log security event with structured data."""
 
@@ -800,7 +800,7 @@ class DataPrivacyController:
 
         return FlextCore.Result.fail(ValidationError("Invalid request type"))
 
-    def _collect_user_data(self, user_id: str) -> Dict[str, Any]:
+    def _collect_user_data(self, user_id: str) -> Dict[str, object]:
         """Collect all user data for export."""
         return {
             'personal_data': self.data_store.get_user_profile(user_id),
