@@ -52,7 +52,24 @@ class FlextMeltanoModels(FlextCore.Models):
     class TapRunParams(BaseModel):
         """CLI parameters for running Singer taps with automatic Singer SDK translation."""
 
-        model_config = ConfigDict(validate_assignment=True)
+        model_config = ConfigDict(
+            validate_assignment=True,
+            validate_return=True,
+            validate_default=True,
+            strict=True,
+            str_strip_whitespace=True,
+            use_enum_values=True,
+            arbitrary_types_allowed=True,
+            extra="forbid",
+            frozen=False,
+            ser_json_timedelta="iso8601",
+            ser_json_bytes="base64",
+            hide_input_in_errors=True,
+            json_schema_extra={
+                "title": "TapRunParams",
+                "description": "CLI parameters for running Singer taps",
+            },
+        )
 
         tap_name: str = Field(description="Name of the tap to run (e.g., tap-postgres)")
         config_file: str | None = Field(
@@ -74,7 +91,24 @@ class FlextMeltanoModels(FlextCore.Models):
     class TargetRunParams(BaseModel):
         """CLI parameters for running Singer targets with automatic Singer SDK translation."""
 
-        model_config = ConfigDict(validate_assignment=True)
+        model_config = ConfigDict(
+            validate_assignment=True,
+            validate_return=True,
+            validate_default=True,
+            strict=True,
+            str_strip_whitespace=True,
+            use_enum_values=True,
+            arbitrary_types_allowed=True,
+            extra="forbid",
+            frozen=False,
+            ser_json_timedelta="iso8601",
+            ser_json_bytes="base64",
+            hide_input_in_errors=True,
+            json_schema_extra={
+                "title": "TapRunParams",
+                "description": "CLI parameters for running Singer taps",
+            },
+        )
 
         target_name: str = Field(
             description="Name of the target to run (e.g., target-postgres)"
@@ -90,7 +124,24 @@ class FlextMeltanoModels(FlextCore.Models):
     class PipelineRunParams(BaseModel):
         """CLI parameters for running complete Singer pipelines (tap → target)."""
 
-        model_config = ConfigDict(validate_assignment=True)
+        model_config = ConfigDict(
+            validate_assignment=True,
+            validate_return=True,
+            validate_default=True,
+            strict=True,
+            str_strip_whitespace=True,
+            use_enum_values=True,
+            arbitrary_types_allowed=True,
+            extra="forbid",
+            frozen=False,
+            ser_json_timedelta="iso8601",
+            ser_json_bytes="base64",
+            hide_input_in_errors=True,
+            json_schema_extra={
+                "title": "TapRunParams",
+                "description": "CLI parameters for running Singer taps",
+            },
+        )
 
         tap_name: str = Field(description="Name of the tap")
         target_name: str = Field(description="Name of the target")
@@ -111,7 +162,24 @@ class FlextMeltanoModels(FlextCore.Models):
     class DbtRunParams(BaseModel):
         """CLI parameters for DBT operations."""
 
-        model_config = ConfigDict(validate_assignment=True)
+        model_config = ConfigDict(
+            validate_assignment=True,
+            validate_return=True,
+            validate_default=True,
+            strict=True,
+            str_strip_whitespace=True,
+            use_enum_values=True,
+            arbitrary_types_allowed=True,
+            extra="forbid",
+            frozen=False,
+            ser_json_timedelta="iso8601",
+            ser_json_bytes="base64",
+            hide_input_in_errors=True,
+            json_schema_extra={
+                "title": "TapRunParams",
+                "description": "CLI parameters for running Singer taps",
+            },
+        )
 
         project_dir: str = Field(description="DBT project directory")
         models: str | None = Field(
@@ -133,7 +201,24 @@ class FlextMeltanoModels(FlextCore.Models):
     class PluginInstallParams(BaseModel):
         """CLI parameters for plugin installation."""
 
-        model_config = ConfigDict(validate_assignment=True)
+        model_config = ConfigDict(
+            validate_assignment=True,
+            validate_return=True,
+            validate_default=True,
+            strict=True,
+            str_strip_whitespace=True,
+            use_enum_values=True,
+            arbitrary_types_allowed=True,
+            extra="forbid",
+            frozen=False,
+            ser_json_timedelta="iso8601",
+            ser_json_bytes="base64",
+            hide_input_in_errors=True,
+            json_schema_extra={
+                "title": "TapRunParams",
+                "description": "CLI parameters for running Singer taps",
+            },
+        )
 
         plugin_type: str = Field(
             description="Type of plugin (tap, target, transformer)"
