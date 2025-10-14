@@ -90,7 +90,7 @@ class FlextMeltanoProjectService(
             prefix: Temporary directory prefix for organization
 
         Returns:
-            FlextCore.Result containing project dict with standardized structure
+            FlextCore.Result containing project dict[str, object] with standardized structure
 
         """
         return (
@@ -126,7 +126,7 @@ class FlextMeltanoProjectService(
             project_root: Directory path containing meltano.yml
 
         Returns:
-            FlextCore.Result containing initialized project dict or validation error
+            FlextCore.Result containing initialized project dict[str, object] or validation error
 
         """
         return (
@@ -267,7 +267,7 @@ class FlextMeltanoProjectService(
     def _convert_to_project_dict(
         self, project: object
     ) -> FlextCore.Result[FlextMeltanoTypes.Dbt.Project]:
-        """Convert Meltano project object to FLEXT dict representation."""
+        """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
             project_dict: FlextMeltanoTypes.Dbt.Project = {
                 "name": str(getattr(project, "name", "meltano_project")),

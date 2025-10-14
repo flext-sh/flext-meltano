@@ -189,7 +189,7 @@ class MyCustomStream(FlextMeltanoStream):
     """Custom Singer stream with enterprise features."""
     name = "custom_stream"
 
-    def get_records(self, context: dict | None) -> Iterable[dict]:
+    def get_records(self, context: dict[str, object] | None) -> Iterable[dict]:
         # Stream implementation with FLEXT logging and error handling
         yield {"id": 1, "data": "example"}
 ```

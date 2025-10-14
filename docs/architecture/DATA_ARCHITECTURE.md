@@ -564,7 +564,7 @@ class DataPartitioner:
             key = record.get(partition_key, 'default')
             partitions[key].append(record)
 
-        return dict(partitions)
+        return dict[str, object](partitions)
 ```
 
 #### 3. **Caching Strategy**

@@ -162,7 +162,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         )
         FlextTestsMatchers.assert_result_success(result)
 
-        # Should return empty dict but succeed
+        # Should return empty dict[str, object] but succeed
         created_paths = result.value
         assert isinstance(created_paths, dict)
         assert len(created_paths) == 0

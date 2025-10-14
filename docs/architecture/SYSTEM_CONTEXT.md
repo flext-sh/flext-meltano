@@ -301,7 +301,7 @@ class MeltanoAdapter:
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
-    def __init__(self, config: dict = None, **kwargs):
+    def __init__(self, config: dict[str, object] = None, **kwargs):
         super().__init__(config, **kwargs)
         # FLEXT logging integration
         self.logger = FlextCore.Logger.get_logger(self.__class__.__name__)

@@ -257,13 +257,13 @@ class FlextMeltanoValidators:
             ...     print("Project configuration is valid")
 
         """
-        # Validate config is dict using direct validation
+        # Validate config is dict[str, object] using direct validation
         if not isinstance(config, dict):
             return FlextCore.Result[bool].fail(
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextCore.Types.Dict = dict(config)
+        config_dict: FlextCore.Types.Dict = dict[str, object](config)
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(FlextMeltanoModels.MeltanoProjectModel):
@@ -307,13 +307,13 @@ class FlextMeltanoValidators:
             ...     print("DBT configuration is valid")
 
         """
-        # Validate config is dict using direct validation
+        # Validate config is dict[str, object] using direct validation
         if not isinstance(config, dict):
             return FlextCore.Result[bool].fail(
                 "DBT config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextCore.Types.Dict = dict(config)
+        config_dict: FlextCore.Types.Dict = dict[str, object](config)
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(FlextMeltanoModels.DbtProjectModel):

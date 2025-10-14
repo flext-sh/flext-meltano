@@ -482,7 +482,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, dict),
-                message="Should return dict stream definition",
+                message="Should return dict[str, object] stream definition",
             )
             self.test_assertions.assert_equals(
                 actual=stream.get("name"),

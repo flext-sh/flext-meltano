@@ -488,7 +488,7 @@ class TestFlextSingerTypesComplete:
     def test_type_creation_error_coverage(self) -> None:
         """Test type creation error handling using flext_tests."""
         # The error branches (lines 60-61, 73-75, 84-86, 97-99, 110-112, 125-127, 140-142)
-        # are difficult to trigger directly since they only occur on exception during dict operations
+        # are difficult to trigger directly since they only occur on exception during dict[str, object] operations
         # But we can ensure the exception handling path is covered by the structure
 
         # Test that all type creation methods return FlextCore.Result and handle exceptions gracefully

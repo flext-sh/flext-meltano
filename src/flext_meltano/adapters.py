@@ -320,7 +320,7 @@ class FlextMeltanoAdapter:
                 project_root=str(getattr(project, "root", "unknown")),
             )
 
-            # Convert Meltano Project to dict representation
+            # Convert Meltano Project to dict[str, object] representation
             # ✅ TYPE SAFETY: ConfigValue supports dict[str, FlextCore.Types.JsonValue] per flext-core
             project_dict: FlextMeltanoTypes.Dbt.Project = {
                 "name": str(getattr(project, "name", "meltano_project")),
@@ -1350,7 +1350,7 @@ Thumbs.db
 
         """
         try:
-            adapted_plugin = dict(plugin_data)
+            adapted_plugin = dict[str, object](plugin_data)
 
             # Add name if missing
             if "name" not in adapted_plugin:

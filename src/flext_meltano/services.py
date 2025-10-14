@@ -87,7 +87,9 @@ class FlextMeltanoService(
         self._config = config or FlextMeltanoConfig()
 
         # Type-safe data preparation for service initialization
-        mutable_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = dict(data)
+        mutable_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = dict[
+            str, object
+        ](data)
 
         # Ensure required service configuration fields
         mutable_data.update({
@@ -1445,8 +1447,10 @@ class FlextMeltanoService(
                             f"Invalid property definition for {prop_name}",
                         )
 
-                # Convert nested dict to match return type using dict()
-                properties_flat: FlextCore.Types.Dict = dict(properties.items())
+                # Convert nested dict[str, object] to match return type using dict[str, object]()
+                properties_flat: FlextCore.Types.Dict = dict[str, object](
+                    properties.items()
+                )
                 return FlextCore.Result[FlextCore.Types.Dict].ok(data=properties_flat)
             except Exception as e:
                 return FlextCore.Result[FlextCore.Types.Dict].fail(
