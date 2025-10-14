@@ -17,12 +17,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess  # noqa: S404
+import subprocess
 import sys
 import time as time_module
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import schedule
 from flext_cli import (
@@ -121,7 +120,12 @@ class DocumentationAutomation(FlextCore.Service):
 
             # Use subprocess for execution
             result = subprocess.run(
-                cmd_args, cwd=Path.cwd(), capture_output=True, text=True, check=False, shell=False
+                cmd_args,
+                cwd=Path.cwd(),
+                capture_output=True,
+                text=True,
+                check=False,
+                shell=False,
             )
 
             if result.returncode != 0:
@@ -214,7 +218,7 @@ class DocumentationAutomation(FlextCore.Service):
 
         print("📅 Maintenance scheduling configured")
 
-    def _schedule_daily(self, config: dict[str, Any]) -> None:
+    def _schedule_daily(self, config: dict[str, object]) -> None:
         """Schedule daily maintenance."""
         audit_time = config.get("audit_time", "09:00")
         hour, minute = map(int, audit_time.split(":"))
@@ -223,7 +227,7 @@ class DocumentationAutomation(FlextCore.Service):
             self._run_scheduled_audit
         )
 
-    def _schedule_weekly(self, config: dict[str, Any]) -> None:
+    def _schedule_weekly(self, config: dict[str, object]) -> None:
         """Schedule weekly maintenance."""
         audit_day = config.get("audit_day", "monday").lower()
         audit_time = config.get("audit_time", "09:00")
@@ -245,7 +249,7 @@ class DocumentationAutomation(FlextCore.Service):
                 self._run_scheduled_audit
             )
 
-    def _schedule_monthly(self, config: dict[str, Any]) -> None:
+    def _schedule_monthly(self, config: dict[str, object]) -> None:
         """Schedule monthly maintenance."""
         # Run on the 1st of each month
         audit_time = config.get("audit_time", "09:00")

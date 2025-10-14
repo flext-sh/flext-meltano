@@ -172,7 +172,7 @@ class MultiLevelCache:
         self.local_cache = LRUCache(local_cache_size)
         self.cache_metrics = CacheMetrics()
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Optional[object]:
         """Get value with multi-level cache lookup."""
 
         # Check local cache first (fastest)
@@ -192,7 +192,7 @@ class MultiLevelCache:
         self.cache_metrics.miss()
         return None
 
-    def set(self, key: str, value: Any, ttl_seconds: int = 3600) -> None:
+    def set(self, key: str, value: object, ttl_seconds: int = 3600) -> None:
         """Set value in multi-level cache."""
 
         # Serialize for Redis
@@ -2420,7 +2420,7 @@ class QualityGate:
 class AutomatedCodeReview:
     """Automated code review system."""
 
-    def __init__(self, rules_config: Dict[str, Any]):
+    def __init__(self, rules_config: Dict[str, object]):
         self.rules = rules_config
         self.review_results = []
 
@@ -2766,8 +2766,8 @@ end note
 class APIResponse:
     """Consistent API response format."""
 
-    def __init__(self, data: Any = None, error: str = None,
-                 metadata: Dict[str, Any] = None):
+    def __init__(self, data: object = None, error: str = None,
+                 metadata: Dict[str, object] = None):
         self.success = error is None
         self.data = data
         self.error = error
@@ -2775,7 +2775,7 @@ class APIResponse:
         self.timestamp = datetime.utcnow().isoformat()
         self.request_id = self._generate_request_id()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, object]:
         """Convert response to dictionary format."""
 
         response = {
@@ -2849,13 +2849,13 @@ class APIResponse:
 class APIResource:
     """API resource with progressive disclosure."""
 
-    def __init__(self, resource_id: str, basic_fields: Dict[str, Any],
-                 detailed_fields: Dict[str, Any] = None):
+    def __init__(self, resource_id: str, basic_fields: Dict[str, object],
+                 detailed_fields: Dict[str, object] = None):
         self.id = resource_id
         self.basic_fields = basic_fields
         self.detailed_fields = detailed_fields or {}
 
-    def to_basic_representation(self) -> Dict[str, Any]:
+    def to_basic_representation(self) -> Dict[str, object]:
         """Return basic resource representation."""
         return {
             'id': self.id,
@@ -2864,7 +2864,7 @@ class APIResource:
             **self.basic_fields
         }
 
-    def to_detailed_representation(self) -> Dict[str, Any]:
+    def to_detailed_representation(self) -> Dict[str, object]:
         """Return detailed resource representation."""
         return {
             **self.to_basic_representation(),
@@ -2872,7 +2872,7 @@ class APIResource:
             **self.detailed_fields
         }
 
-    def to_minimal_representation(self) -> Dict[str, Any]:
+    def to_minimal_representation(self) -> Dict[str, object]:
         """Return minimal resource representation for lists."""
         return {
             'id': self.id,
@@ -2915,7 +2915,7 @@ class APIHelpSystem:
         self.help_content = self._load_help_content()
 
     def get_contextual_help(self, endpoint: str, method: str,
-                          error_code: str = None) -> Dict[str, Any]:
+                          error_code: str = None) -> Dict[str, object]:
         """Get contextual help for API endpoint."""
 
         help_info = {
@@ -2946,7 +2946,7 @@ class APIHelpSystem:
         key = f"{method} {endpoint}"
         return descriptions.get(key, f"API endpoint for {endpoint}")
 
-    def _get_parameter_help(self, endpoint: str, method: str) -> Dict[str, Any]:
+    def _get_parameter_help(self, endpoint: str, method: str) -> Dict[str, object]:
         """Get parameter documentation."""
 
         if 'pipelines' in endpoint:
@@ -2975,7 +2975,7 @@ class APIHelpSystem:
 
         return {}
 
-    def _get_usage_examples(self, endpoint: str, method: str) -> List[Dict[str, Any]]:
+    def _get_usage_examples(self, endpoint: str, method: str) -> List[Dict[str, object]]:
         """Get usage examples for the endpoint."""
 
         examples = []
@@ -3034,7 +3034,7 @@ class APIHelpSystem:
 
         return tips
 
-    def _get_error_help(self, error_code: str) -> Dict[str, Any]:
+    def _get_error_help(self, error_code: str) -> Dict[str, object]:
         """Get detailed help for specific error codes."""
 
         error_help = {
@@ -3233,7 +3233,7 @@ class TestDataBuilder:
         self.data['name'] = name
         return self
 
-    def with_config(self, config: Dict[str, Any]) -> 'TestDataBuilder':
+    def with_config(self, config: Dict[str, object]) -> 'TestDataBuilder':
         self.data['config'] = config
         return self
 
@@ -3289,7 +3289,7 @@ def authenticated_user():
 class TestContext:
     """Test context manager for complex setup."""
 
-    def __init__(self, setup_data: Dict[str, Any] = None):
+    def __init__(self, setup_data: Dict[str, object] = None):
         self.setup_data = setup_data or {}
 
     def __enter__(self):
@@ -3345,7 +3345,7 @@ class PropertyBasedTests:
             values=st.one_of(st.text(), st.integers(), st.booleans())
         )
     )
-    def test_pipeline_creation_properties(self, name: str, config: Dict[str, Any]):
+    def test_pipeline_creation_properties(self, name: str, config: Dict[str, object]):
         """Property-based test for pipeline creation."""
 
         # Given any valid name and config
@@ -3565,7 +3565,7 @@ class TestDataManager:
         self.base_path = base_path
         self.data_cache = {}
 
-    def get_test_data(self, dataset_name: str, scenario: str = 'default') -> Dict[str, Any]:
+    def get_test_data(self, dataset_name: str, scenario: str = 'default') -> Dict[str, object]:
         """Get test data for specific dataset and scenario."""
 
         cache_key = f"{dataset_name}:{scenario}"
@@ -3581,7 +3581,7 @@ class TestDataManager:
 
         return self.data_cache[cache_key]
 
-    def create_dynamic_test_data(self, template: str, overrides: Dict[str, Any] = None) -> Dict[str, Any]:
+    def create_dynamic_test_data(self, template: str, overrides: Dict[str, object] = None) -> Dict[str, object]:
         """Create dynamic test data from templates."""
 
         template_data = self.get_test_data('templates', template)
@@ -3597,7 +3597,7 @@ class TestDataManager:
 
         return result
 
-    def _deep_merge(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    def _deep_merge(self, base: Dict[str, object], override: Dict[str, object]) -> Dict[str, object]:
         """Deep merge dictionaries."""
         result = base.copy()
 

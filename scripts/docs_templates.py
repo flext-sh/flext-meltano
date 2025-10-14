@@ -7,7 +7,6 @@ using FLEXT architectural patterns.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any
 
 from flext_core import FlextCore
 
@@ -19,7 +18,7 @@ class DocsTemplates:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, Any]) -> FlextCore.Result[str]:
+    def generate_ci_workflow(self, config: dict[str, object]) -> FlextCore.Result[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
@@ -92,7 +91,7 @@ class DocsTemplates:
                 self._logger.exception("Git hook generation failed", error=error_msg)
             return FlextCore.Result.fail(error_msg)
 
-    def _get_cron_schedule(self, config: dict[str, Any]) -> str:
+    def _get_cron_schedule(self, config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""
         automation_config = config.get("automation", {})
         audit_day = automation_config.get("audit_day", "monday").lower()

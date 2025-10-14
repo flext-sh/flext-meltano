@@ -272,7 +272,7 @@ PYTHONPATH=src poetry run pytest --cov=flext_meltano.api --cov-report=term-missi
 #### Type Safety (ZERO TOLERANCE)
 
 - **Pyrefly strict mode** required for all `src/` code (successor to MyPy)
-- **100% type annotations** - no `Any` types allowed
+- **100% type annotations** - no `object` types allowed
 - **Complete type coverage** for all public APIs
 
 #### Code Quality (ZERO TOLERANCE)
