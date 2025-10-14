@@ -2,6 +2,7 @@
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
+
 """
 
 from __future__ import annotations
@@ -282,7 +283,9 @@ class FlextMeltanoModels(FlextCore.Models):
         @property
         def schema_properties_count(self) -> int:
             """Computed field for number of schema properties."""
-            return len(cast("dict", self.stream_schema.get("properties", {})))
+            return len(
+                cast("dict[str, object]", self.stream_schema.get("properties", {}))
+            )
 
         @model_validator(mode="after")
         def validate_stream_definition_consistency(

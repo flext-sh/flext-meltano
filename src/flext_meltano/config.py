@@ -5,6 +5,7 @@ following FLEXT architectural patterns with Pydantic validation.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
+
 """
 
 from __future__ import annotations
@@ -17,7 +18,6 @@ from flext_core.constants import FlextConstants
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
