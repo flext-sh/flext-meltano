@@ -168,7 +168,7 @@ class FlextMeltanoCLI:
             self._output.print_error("Tap and target names required")
             return FlextCore.Result[None].fail("Missing pipeline arguments")
 
-        # Parse CLI arguments into dict format
+        # Parse CLI arguments into dict[str, object] format
         cli_args_dict = self._parse_pipeline_run_args(args)
 
         # Convert CLI args to PipelineRunParams model using CliModelConverter
@@ -288,7 +288,7 @@ class FlextMeltanoCLI:
             self._output.print_error("Tap name required")
             return FlextCore.Result[None].fail("Missing tap name")
 
-        # Parse CLI arguments into dict format
+        # Parse CLI arguments into dict[str, object] format
         cli_args_dict = self._parse_tap_run_args(args)
 
         # Convert CLI args to TapRunParams model using CliModelConverter
@@ -422,7 +422,7 @@ class FlextMeltanoCLI:
             self._output.print_error("Target name required")
             return FlextCore.Result[None].fail("Missing target name")
 
-        # Parse CLI arguments into dict format
+        # Parse CLI arguments into dict[str, object] format
         cli_args_dict = self._parse_target_run_args(args)
 
         # Convert CLI args to TargetRunParams model using CliModelConverter
@@ -1186,7 +1186,7 @@ class FlextMeltanoCLI:
         """
         min_args = 2
         if len(args) < min_args:
-            # Return incomplete dict - will fail validation
+            # Return incomplete dict[str, object] - will fail validation
             return {"tap_name": args[0] if args else None, "target_name": None}
 
         cli_args: FlextCore.Types.Dict = {

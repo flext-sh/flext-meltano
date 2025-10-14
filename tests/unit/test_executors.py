@@ -618,7 +618,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_app is not None
 
         # Verify CLI interface is properly structured (lines 752-760)
-        # Accept both dict and UserDict (dict-like interface)
+        # Accept both dict[str, object] and UserDict (dict-like interface)
 
         assert isinstance(cli_app, MutableMapping), (
             "CLI should be dictionary interface after SOLID refactoring"
@@ -662,7 +662,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict before dictionary operations
+        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
         if isinstance(cli_app, dict):
             assert "name" in cli_app, "CLI should have name property"
             assert "executor" in cli_app, "CLI should have executor property"
@@ -690,7 +690,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict before dictionary operations
+        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance
@@ -766,7 +766,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict before dictionary operations
+        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance

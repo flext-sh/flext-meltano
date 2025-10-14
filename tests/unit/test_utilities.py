@@ -201,7 +201,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            # Pass invalid content (not dict or string)
+            # Pass invalid content (not dict[str, object] or string)
             result = utilities.create_project_file(
                 project_path / "test.yml",
                 123,  # Invalid content type

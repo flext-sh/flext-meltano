@@ -22,7 +22,7 @@ class TestCliModelConverterWithTapRunParams:
     """Test CliModelConverter integration with TapRunParams."""
 
     def test_converter_tap_run_params_minimal(self) -> None:
-        """Test converting minimal dict to TapRunParams model."""
+        """Test converting minimal dict[str, object] to TapRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "discover": False,
@@ -43,7 +43,7 @@ class TestCliModelConverterWithTapRunParams:
         assert model.config_file is None
 
     def test_converter_tap_run_params_with_config(self) -> None:
-        """Test converting dict with config to TapRunParams model."""
+        """Test converting dict[str, object] with config to TapRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
@@ -60,7 +60,7 @@ class TestCliModelConverterWithTapRunParams:
         assert model.config_file == "/path/to/config.json"
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
-        """Test converting dict with discover flag to TapRunParams model."""
+        """Test converting dict[str, object] with discover flag to TapRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "discover": True,
@@ -76,7 +76,7 @@ class TestCliModelConverterWithTapRunParams:
         assert model.discover is True
 
     def test_converter_tap_run_params_all_fields(self) -> None:
-        """Test converting dict with all fields to TapRunParams model."""
+        """Test converting dict[str, object] with all fields to TapRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "config_file": "/config.json",
@@ -133,7 +133,7 @@ class TestCliModelConverterWithTargetRunParams:
     """Test CliModelConverter integration with TargetRunParams."""
 
     def test_converter_target_run_params_minimal(self) -> None:
-        """Test converting minimal dict to TargetRunParams model."""
+        """Test converting minimal dict[str, object] to TargetRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "target_name": "target-postgres",
             "config_file": None,
@@ -151,7 +151,7 @@ class TestCliModelConverterWithTargetRunParams:
         assert model.input_file is None
 
     def test_converter_target_run_params_with_config(self) -> None:
-        """Test converting dict with config to TargetRunParams model."""
+        """Test converting dict[str, object] with config to TargetRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "target_name": "target-postgres",
             "config_file": "/path/to/config.json",
@@ -167,7 +167,7 @@ class TestCliModelConverterWithTargetRunParams:
         assert model.config_file == "/path/to/config.json"
 
     def test_converter_target_run_params_with_input(self) -> None:
-        """Test converting dict with input file to TargetRunParams model."""
+        """Test converting dict[str, object] with input file to TargetRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "target_name": "target-postgres",
             "input_file": "/path/to/input.jsonl",
@@ -183,7 +183,7 @@ class TestCliModelConverterWithTargetRunParams:
         assert model.input_file == "/path/to/input.jsonl"
 
     def test_converter_target_run_params_all_fields(self) -> None:
-        """Test converting dict with all fields to TargetRunParams model."""
+        """Test converting dict[str, object] with all fields to TargetRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "target_name": "target-postgres",
             "config_file": "/config.json",
@@ -220,7 +220,7 @@ class TestCliModelConverterWithPipelineRunParams:
     """Test CliModelConverter integration with PipelineRunParams."""
 
     def test_converter_pipeline_run_params_minimal(self) -> None:
-        """Test converting minimal dict to PipelineRunParams model."""
+        """Test converting minimal dict[str, object] to PipelineRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "target_name": "target-postgres",
@@ -236,7 +236,7 @@ class TestCliModelConverterWithPipelineRunParams:
         assert model.target_name == "target-postgres"
 
     def test_converter_pipeline_run_params_with_configs(self) -> None:
-        """Test converting dict with configs to PipelineRunParams model."""
+        """Test converting dict[str, object] with configs to PipelineRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "target_name": "target-postgres",
@@ -256,7 +256,7 @@ class TestCliModelConverterWithPipelineRunParams:
         assert model.target_config == "/target-config.json"
 
     def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
-        """Test converting dict with catalog/state to PipelineRunParams model."""
+        """Test converting dict[str, object] with catalog/state to PipelineRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "target_name": "target-postgres",
@@ -274,7 +274,7 @@ class TestCliModelConverterWithPipelineRunParams:
         assert model.state_file == "/state.json"
 
     def test_converter_pipeline_run_params_all_fields(self) -> None:
-        """Test converting dict with all fields to PipelineRunParams model."""
+        """Test converting dict[str, object] with all fields to PipelineRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "tap_name": "tap-postgres",
             "target_name": "target-postgres",
@@ -330,7 +330,7 @@ class TestCliModelConverterWithDbtRunParams:
     """Test CliModelConverter integration with DbtRunParams."""
 
     def test_converter_dbt_run_params_minimal(self) -> None:
-        """Test converting minimal dict to DbtRunParams model."""
+        """Test converting minimal dict[str, object] to DbtRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "project_dir": "/dbt/project",
         }
@@ -346,7 +346,7 @@ class TestCliModelConverterWithDbtRunParams:
         assert model.full_refresh is False
 
     def test_converter_dbt_run_params_with_models(self) -> None:
-        """Test converting dict with models to DbtRunParams model."""
+        """Test converting dict[str, object] with models to DbtRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "project_dir": "/dbt/project",
             "models": "users orders",
@@ -361,7 +361,7 @@ class TestCliModelConverterWithDbtRunParams:
         assert model.models == "users orders"
 
     def test_converter_dbt_run_params_with_select_exclude(self) -> None:
-        """Test converting dict with select/exclude to DbtRunParams model."""
+        """Test converting dict[str, object] with select/exclude to DbtRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "project_dir": "/dbt/project",
             "select": "tag:daily",
@@ -378,7 +378,7 @@ class TestCliModelConverterWithDbtRunParams:
         assert model.exclude == "tag:deprecated"
 
     def test_converter_dbt_run_params_with_full_refresh(self) -> None:
-        """Test converting dict with full_refresh to DbtRunParams model."""
+        """Test converting dict[str, object] with full_refresh to DbtRunParams model."""
         cli_args: FlextCore.Types.Dict = {
             "project_dir": "/dbt/project",
             "full_refresh": True,

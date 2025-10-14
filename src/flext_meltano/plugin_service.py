@@ -102,7 +102,7 @@ class FlextMeltanoPluginService(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
-                # For now, we'll work with dict - need to convert back to Project object
+                # For now, we'll work with dict[str, object] - need to convert back to Project object
                 # This is a simplification; in real implementation we'd maintain Project objects
                 working_project = temp_project_result.unwrap()
 

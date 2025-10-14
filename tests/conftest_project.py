@@ -124,7 +124,7 @@ def meltano_project(
     with meltano_yml.open("w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
 
-    # Return simple dict instead of missing MeltanoProject class
+    # Return simple dict[str, object] instead of missing MeltanoProject class
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,

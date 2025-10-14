@@ -88,7 +88,7 @@ class FlextMeltanoExceptions(FlextCore.Exceptions):
                 Complete context dictionary
 
             """
-            context = dict(base_context)
+            context = dict[str, object](base_context)
             context.update(meltano_fields)
             return context
 

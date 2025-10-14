@@ -693,8 +693,12 @@ class QualityReporter:
             },
             "issues": {
                 "total": len(issues),
-                "by_severity": dict(Counter(issue.severity for issue in issues)),
-                "by_type": dict(Counter(issue.issue_type for issue in issues)),
+                "by_severity": dict[str, object](
+                    Counter(issue.severity for issue in issues)
+                ),
+                "by_type": dict[str, object](
+                    Counter(issue.issue_type for issue in issues)
+                ),
             },
         }
 

@@ -547,7 +547,7 @@ class TestFlextMeltanoAdapterComplete:
 
         for config in configs:
             # Cast config to expected type - FlextCore.Types.StringDict to FlextCore.Types.Dict
-            config_dict: FlextCore.Types.Dict = dict(config)
+            config_dict: FlextCore.Types.Dict = dict[str, object](config)
             result = FlextMeltanoAdapter.adapt_plugin(config_dict)
             assert isinstance(result, FlextCore.Result)
             assert result.is_success
@@ -576,7 +576,9 @@ class TestFlextMeltanoAdapterComplete:
         }
 
         # Cast complex_config to expected type - Collection[str] to FlextCore.Types.Dict
-        complex_config_dict: FlextCore.Types.Dict = dict(complex_config.items())
+        complex_config_dict: FlextCore.Types.Dict = dict[str, object](
+            complex_config.items()
+        )
         result = FlextMeltanoAdapter.adapt_project_config(complex_config_dict)
 
         assert isinstance(result, FlextCore.Result)

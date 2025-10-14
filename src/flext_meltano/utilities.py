@@ -83,7 +83,7 @@ class FlextMeltanoUtilities(FlextCore.Utilities):
             }
             return FlextCore.Result[FlextCore.Types.Dict].ok(data=config_dict)
         except Exception as e:  # pragma: no cover
-            error_msg = f"Failed to create Meltano config dict: {e}"
+            error_msg = f"Failed to create Meltano config dict[str, object]: {e}"
             logger.exception(error_msg)
             return FlextCore.Result[FlextCore.Types.Dict].fail(error_msg)
 
@@ -193,7 +193,9 @@ class FlextMeltanoUtilities(FlextCore.Utilities):
                 )
 
             # MONADIC PATTERN: Safe YAML conversion with proper type casting
-            yaml_data: FlextCore.Types.Dict = dict(config)  # Type-safe conversion
+            yaml_data: FlextCore.Types.Dict = dict[str, object](
+                config
+            )  # Type-safe conversion
 
             # DOMAIN-SPECIFIC: YAML writing with Meltano formatting preferences
             yaml.dump(yaml_data, file_handle, default_flow_style=False, indent=2)
@@ -289,7 +291,9 @@ class FlextMeltanoUtilities(FlextCore.Utilities):
         ) -> FlextCore.Types.Dict:
             """Type-safe conversion from ConfigDict to FlextCore.Types.Dict."""
             # ConfigDict is compatible with dict["str", "JsonValue"] but MyPy needs explicit conversion
-            return dict(config_dict) if isinstance(config_dict, dict) else {}
+            return (
+                dict[str, object](config_dict) if isinstance(config_dict, dict) else {}
+            )
 
         return (
             FlextCore.Result[Path]
