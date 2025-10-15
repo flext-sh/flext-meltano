@@ -28,7 +28,6 @@ from flext_cli import (
     FlextCliCmd,
 )
 from flext_core import FlextCore
-from flext_core.exceptions import FlextExceptions
 
 from .docs_config import DocsConfig
 from .docs_templates import DocsTemplates
@@ -72,7 +71,7 @@ class DocumentationAutomation(FlextCore.Service):
         if not self.maintenance_script.exists():
             error_msg = f"Maintenance script not found: {self.maintenance_script}"
             self.logger.error("Maintenance script validation failed", error=error_msg)
-            raise FlextExceptions.ConfigurationError(error_msg)
+            raise FlextCore.Exceptions.ConfigurationError(error_msg)
 
     def run_ci_checks(self) -> FlextCore.Result[bool]:
         """Run documentation quality checks for CI/CD pipeline using FLEXT patterns.
@@ -134,14 +133,16 @@ class DocumentationAutomation(FlextCore.Service):
                 )
                 if result.stderr:
                     error_msg += f": {result.stderr.strip()}"
-                return FlextCore.Result.fail(FlextExceptions.OperationError(error_msg))
+                return FlextCore.Result.fail(
+                    FlextCore.Exceptions.OperationError(error_msg)
+                )
 
             return FlextCore.Result.ok(None)
 
         except Exception as e:
             error_msg = f"Failed to execute maintenance audit: {e}"
             self.logger.exception("Maintenance audit execution failed", error=error_msg)
-            return FlextCore.Result.fail(FlextExceptions.OperationError(error_msg))
+            return FlextCore.Result.fail(FlextCore.Exceptions.OperationError(error_msg))
 
     def _validate_quality_thresholds(self) -> FlextCore.Result[bool]:
         """Validate quality thresholds against generated summary.
@@ -173,7 +174,9 @@ class DocumentationAutomation(FlextCore.Service):
             if critical_count > 0 and fail_on_critical:
                 error_msg = f"Critical documentation issues found: {critical_count}"
                 self.logger.error("Critical issues detected", count=critical_count)
-                return FlextCore.Result.fail(FlextExceptions.ValidationError(error_msg))
+                return FlextCore.Result.fail(
+                    FlextCore.Exceptions.ValidationError(error_msg)
+                )
 
             # Check quality score threshold
             min_score = self._config.min_quality_score
@@ -185,7 +188,9 @@ class DocumentationAutomation(FlextCore.Service):
                     score=quality_score,
                     threshold=min_score,
                 )
-                return FlextCore.Result.fail(FlextExceptions.ValidationError(error_msg))
+                return FlextCore.Result.fail(
+                    FlextCore.Exceptions.ValidationError(error_msg)
+                )
 
             self.logger.info(
                 "Quality thresholds validated successfully",
@@ -197,7 +202,9 @@ class DocumentationAutomation(FlextCore.Service):
         except Exception as e:
             error_msg = f"Quality threshold validation failed: {e}"
             self.logger.exception("Quality validation failed", error=error_msg)
-            return FlextCore.Result.fail(FlextExceptions.ValidationError(error_msg))
+            return FlextCore.Result.fail(
+                FlextCore.Exceptions.ValidationError(error_msg)
+            )
 
     def schedule_maintenance(self) -> None:
         """Set up scheduled maintenance tasks."""
