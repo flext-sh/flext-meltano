@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_core import FlextCore
-from flext_core.constants import FlextConstants
+from flext_core.constants import FlextCore
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -77,7 +77,7 @@ class FlextMeltanoConfig(FlextCore.Config):
 
     # ALL ENUMS MUST COME FROM FlextCore.Constants or FlextMeltanoConstants - NO ALIASES
     PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
-    EnvironmentType: type = FlextConstants.Config.Environment  # Core constants
+    EnvironmentType: type = FlextCore.Constants.Config.Environment  # Core constants
     LogLevel: type = FlextCore.Constants.Config.LogLevel  # Core constants
     OperationStatus: type = (
         FlextMeltanoConstants.OperationStatus
@@ -108,7 +108,7 @@ class FlextMeltanoConfig(FlextCore.Config):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextConstants.Config.Environment.DEVELOPMENT,
+        default=FlextCore.Constants.Config.Environment.DEVELOPMENT,
         description="Deployment environment",
     )
 
@@ -838,7 +838,7 @@ class FlextMeltanoConfig(FlextCore.Config):
         """
         # Validate environment using FlextCore.Constants
         try:
-            env_type = FlextConstants.Config.Environment(environment)
+            env_type = FlextCore.Constants.Config.Environment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
