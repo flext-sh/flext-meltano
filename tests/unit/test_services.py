@@ -303,7 +303,7 @@ class TestServiceFactoryMethods:
         result = self.service.create_tap_service("tap-csv")
         assert isinstance(result, FlextResult)
         if result.is_success:
-            tap_service = result.data
+            tap_service = result.value
             assert isinstance(tap_service, FlextMeltanoService)
 
     def test_create_tap_service_with_config(self) -> None:
@@ -320,7 +320,7 @@ class TestServiceFactoryMethods:
         result = self.service.create_target_service("target-csv")
         assert isinstance(result, FlextResult)
         if result.is_success:
-            target_service = result.data
+            target_service = result.value
             assert isinstance(target_service, FlextMeltanoService)
 
     def test_create_target_service_with_config(self) -> None:
@@ -337,7 +337,7 @@ class TestServiceFactoryMethods:
         result = self.service.create_dbt_service("my_dbt_project")
         assert isinstance(result, FlextResult)
         if result.is_success:
-            dbt_service = result.data
+            dbt_service = result.value
             assert isinstance(dbt_service, FlextMeltanoService)
 
     def test_create_dbt_service_with_config(self) -> None:
@@ -415,7 +415,7 @@ class TestServiceIntegration:
         assert isinstance(tap_result, FlextResult)
 
         if tap_result.is_success:
-            tap_service = tap_result.data
+            tap_service = tap_result.value
             assert tap_service is not None
 
             # Test service validation
@@ -437,7 +437,7 @@ class TestServiceIntegration:
         assert isinstance(target_result, FlextResult)
 
         if target_result.is_success:
-            target_service = target_result.data
+            target_service = target_result.value
             assert target_service is not None
 
             # Test service validation
@@ -455,7 +455,7 @@ class TestServiceIntegration:
         assert isinstance(dbt_result, FlextResult)
 
         if dbt_result.is_success:
-            dbt_service = dbt_result.data
+            dbt_service = dbt_result.value
             assert dbt_service is not None
 
             # Test getting profiles config
@@ -479,9 +479,9 @@ class TestServiceIntegration:
 
         # Verify they are different service types
         if all(r.is_success for r in [tap_result, target_result, dbt_result]):
-            tap_service = tap_result.data
-            target_service = target_result.data
-            dbt_service = dbt_result.data
+            tap_service = tap_result.value
+            target_service = target_result.value
+            dbt_service = dbt_result.value
 
             # Check that service creation returns instances
             assert tap_service is not None
@@ -562,7 +562,7 @@ class TestServiceErrorHandling:
         tap_result = self.service.create_tap_service("tap-test")
 
         if tap_result.is_success:
-            tap_service = tap_result.data
+            tap_service = tap_result.value
             assert tap_service is not None
 
             # Test methods that might fail gracefully

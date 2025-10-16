@@ -570,7 +570,7 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Plugin and execution configuration
     max_concurrent_jobs: int = Field(
-        default=FlextConstants.Container.MAX_WORKERS,  # SOURCE OF TRUTH
+        default=FlextConstants.Container.DEFAULT_WORKERS,  # SOURCE OF TRUTH
         ge=1,
         le=16,
         description="Maximum number of concurrent jobs",

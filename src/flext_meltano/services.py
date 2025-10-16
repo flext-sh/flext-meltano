@@ -63,7 +63,6 @@ class FlextMeltanoService(
     # Define attributes with proper type annotations for PyRight
     service_name: str
     version: str
-    logger: FlextLogger
     _config: FlextMeltanoConfig
 
     @property
