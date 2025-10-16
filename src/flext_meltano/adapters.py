@@ -1071,13 +1071,11 @@ class FlextMeltanoAdapter:
 
             # Add execution result data if available
             if isinstance(execution_result, dict):
-                pipeline_result.update(
-                    {
-                        k: str(v)
-                        for k, v in execution_result.items()
-                        if isinstance(v, (str, int, bool))
-                    }
-                )
+                pipeline_result.update({
+                    k: str(v)
+                    for k, v in execution_result.items()
+                    if isinstance(v, (str, int, bool))
+                })
 
             self.logger.info(
                 "ELT pipeline executed successfully",

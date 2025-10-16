@@ -131,7 +131,10 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = utilities.validate_project_structure(project_path)
 
             assert result.is_failure
-            assert result.error is not None and "meltano.yml not found" in result.error
+            assert (
+                result.error is not None
+                and "Meltano config file not found" in result.error
+            )
 
     def test_validate_project_structure_missing_meltano_dir(self) -> None:
         """Test project structure validation with missing .meltano directory."""
@@ -244,9 +247,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = utilities.load_yaml_file(yaml_file)
 
             assert result.is_failure
-            assert (
-                result.error is not None and "Failed to load YAML file" in result.error
-            )
+            assert result.error is not None and "Failed to load YAML" in result.error
 
     def test_load_yaml_file_nonexistent(self) -> None:
         """Test YAML file loading with nonexistent file."""

@@ -8,7 +8,7 @@ Provides PlantUML rendering, C4 model validation, and automated documentation up
 import argparse
 import ast
 import re
-import subprocess  # noqa: S404 - Required for PlantUML execution
+import subprocess
 import sys
 import time
 import urllib.request
@@ -17,7 +17,8 @@ from typing import ClassVar
 
 from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, ConfigDict
-from scripts.docs_config import DocsConfig
+
+from flext_meltano.docs_config import DocsConfig
 
 
 class DiagramValidationResult(BaseModel):
@@ -84,7 +85,7 @@ class PlantUMLRenderer(FlextService):
         print(f"Downloading PlantUML from {url}...")
         try:
             # Security: URL is hardcoded and from trusted source (GitHub releases)
-            urllib.request.urlretrieve(url, jar_path)  # noqa: S310 - Hardcoded trusted GitHub URL
+            urllib.request.urlretrieve(url, jar_path)
             print(f"Downloaded PlantUML to {jar_path}")
             return jar_path
         except Exception as e:
@@ -191,17 +192,15 @@ class PlantUMLRenderer(FlextService):
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
                 stripped = line.strip()
-                if stripped and not stripped.startswith(
-                    (
-                        "'",
-                        "@",
-                        "title",
-                        "legend",
-                        "note",
-                        "end",
-                        "*",
-                    )
-                ):
+                if stripped and not stripped.startswith((
+                    "'",
+                    "@",
+                    "title",
+                    "legend",
+                    "note",
+                    "end",
+                    "*",
+                )):
                     # Basic validation for common PlantUML constructs
                     if "->" in stripped and not stripped.endswith(";"):
                         result.warnings.append(
@@ -795,15 +794,13 @@ Examples:
 
     args = parser.parse_args()
 
-    if not any(
-        [
-            args.validate,
-            args.generate_diagrams,
-            args.update_docs,
-            args.create_report,
-            args.comprehensive,
-        ]
-    ):
+    if not any([
+        args.validate,
+        args.generate_diagrams,
+        args.update_docs,
+        args.create_report,
+        args.comprehensive,
+    ]):
         parser.print_help()
         return
 

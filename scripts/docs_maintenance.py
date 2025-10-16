@@ -23,16 +23,18 @@ import time
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 from flext_core import (
-    FlextExceptions,
     FlextLogger,
     FlextResult,
     FlextService,
     FlextTypes,
 )
+
+from flext_meltano import FlextMeltanoTypes
 
 from .docs_config import DocsConfig
 from .docs_models import DocumentationIssue, DocumentationMetrics
@@ -95,7 +97,7 @@ class DocumentationAuditor(FlextService):
             # Calculate quality score
             self._calculate_quality_score()
 
-            self._logger.info(
+            self.logger.info(
                 "Documentation audit completed successfully",
                 quality_score=self.metrics.quality_score,
                 total_issues=len(self.issues),
@@ -162,7 +164,7 @@ class DocumentationAuditor(FlextService):
 
         except Exception as e:
             error_msg = f"Error reading file: {e!s}"
-            self._logger.warning(
+            self.logger.warning(
                 "File audit failed", file=str(file_path), error=error_msg
             )
 
@@ -372,12 +374,16 @@ class DocumentationAuditor(FlextService):
         fresh_files = sum(
             1 for issue in self.issues if issue.issue_type == "stale_content"
         )
-        freshness_score = max(0, 100 - (fresh_files / self.metrics.total_files) * 50)
+        freshness_score = max(
+            0.0, 100.0 - (fresh_files / self.metrics.total_files) * 50.0
+        )
         scores.append(("freshness", freshness_score, 20))
 
         # Link health (25%)
         broken_link_ratio = self.metrics.broken_links / max(1, self.metrics.total_links)
-        link_score = max(0, 100 - broken_link_ratio * 200)  # Penalty for broken links
+        link_score = max(
+            0.0, 100.0 - broken_link_ratio * 200.0
+        )  # Penalty for broken links
         scores.append(("links", link_score, 25))
 
         # Structure completeness (25%)
@@ -385,7 +391,7 @@ class DocumentationAuditor(FlextService):
             1 for issue in self.issues if issue.issue_type == "missing_structure"
         )
         structure_score = max(
-            0, 100 - (structured_files / self.metrics.total_files) * 30
+            0.0, 100.0 - (structured_files / self.metrics.total_files) * 30.0
         )
         scores.append(("structure", structure_score, 25))
 
@@ -396,7 +402,7 @@ class DocumentationAuditor(FlextService):
             if issue.issue_type in {"mixed_list_styles", "long_lines"}
         )
         formatting_score = max(
-            0, 100 - (formatting_issues_count / self.metrics.total_files) * 20
+            0.0, 100.0 - (formatting_issues_count / self.metrics.total_files) * 20.0
         )
         scores.append(("formatting", formatting_score, 15))
 
@@ -407,7 +413,7 @@ class DocumentationAuditor(FlextService):
             if issue.issue_type in {"missing_alt_text", "missing_image"}
         )
         accessibility_score = max(
-            0, 100 - (accessibility_issues / self.metrics.total_files) * 25
+            0.0, 100.0 - (accessibility_issues / self.metrics.total_files) * 25.0
         )
         scores.append(("accessibility", accessibility_score, 15))
 
@@ -429,12 +435,15 @@ class LinkValidator:
         self.valid_cache: dict[str, bool] = {}
         self.checked_urls: set[str] = set()
 
-    def validate_all_links(self, root_path: str = ".") -> dict[str, object]:
+    def validate_all_links(
+        self, root_path: str | Path = "."
+    ) -> FlextMeltanoTypes.MeltanoCore.ExecutionResultDict:
         """Validate all external links in documentation."""
         print("🔗 Validating external links...")
 
-        root_path = Path(root_path)
-        results = {
+        if isinstance(root_path, str):
+            root_path = Path(root_path)
+        results: FlextMeltanoTypes.MeltanoCore.ExecutionResultDict = {
             "total_links": 0,
             "valid_links": 0,
             "broken_links": [],
@@ -448,20 +457,36 @@ class LinkValidator:
 
         for file_path in md_files:
             file_results = self._validate_file_links(file_path)
-            results["total_links"] += file_results["total_links"]
-            results["valid_links"] += file_results["valid_links"]
-            results["broken_links"].extend(file_results["broken_links"])
-            results["timeout_links"].extend(file_results["timeout_links"])
-            results["checked_links"].extend(file_results["checked_links"])
+            total_links = cast("int", results["total_links"])
+            file_total = cast("int", file_results["total_links"])
+            results["total_links"] = total_links + file_total
+
+            valid_links = cast("int", results["valid_links"])
+            file_valid = cast("int", file_results["valid_links"])
+            results["valid_links"] = valid_links + file_valid
+
+            broken_links = cast("FlextTypes.List", results["broken_links"])
+            file_broken = cast("FlextTypes.List", file_results["broken_links"])
+            broken_links.extend(file_broken)
+
+            timeout_links = cast("FlextTypes.List", results["timeout_links"])
+            file_timeout = cast("FlextTypes.List", file_results["timeout_links"])
+            timeout_links.extend(file_timeout)
+
+            checked_links = cast("FlextTypes.List", results["checked_links"])
+            file_checked = cast("FlextTypes.List", file_results["checked_links"])
+            checked_links.extend(file_checked)
 
         print(
             f"✅ Link validation completed: {results['valid_links']}/{results['total_links']} links valid"
         )
         return results
 
-    def _validate_file_links(self, file_path: Path) -> dict[str, object]:
+    def _validate_file_links(
+        self, file_path: Path
+    ) -> FlextMeltanoTypes.MeltanoCore.ExecutionResultDict:
         """Validate links in a single file."""
-        results = {
+        results: FlextMeltanoTypes.MeltanoCore.ExecutionResultDict = {
             "total_links": 0,
             "valid_links": 0,
             "broken_links": [],
@@ -478,36 +503,37 @@ class LinkValidator:
             links = re.findall(link_pattern, content)
 
             for link_text, link_url in links:
-                results["total_links"] += 1
+                total_links = cast("int", results["total_links"])
+                results["total_links"] = total_links + 1
 
                 if link_url in self.checked_urls:
                     # Already checked this URL
                     if self.valid_cache.get(link_url, False):
-                        results["valid_links"] += 1
+                        valid_links = cast("int", results["valid_links"])
+                        results["valid_links"] = valid_links + 1
                     continue
 
-                results["checked_links"].append(
-                    {
-                        "file": str(file_path.relative_to(Path())),
-                        "text": link_text,
-                        "url": link_url,
-                    }
-                )
+                checked_links = cast("FlextTypes.List", results["checked_links"])
+                checked_links.append({
+                    "file": str(file_path.relative_to(Path())),
+                    "text": link_text,
+                    "url": link_url,
+                })
 
                 is_valid = self._validate_url(link_url)
 
                 if is_valid:
-                    results["valid_links"] += 1
+                    valid_links = cast("int", results["valid_links"])
+                    results["valid_links"] = valid_links + 1
                     self.valid_cache[link_url] = True
                 else:
-                    results["broken_links"].append(
-                        {
-                            "file": str(file_path.relative_to(Path())),
-                            "text": link_text,
-                            "url": link_url,
-                            "error": "Link validation failed",
-                        }
-                    )
+                    broken_links = cast("FlextTypes.List", results["broken_links"])
+                    broken_links.append({
+                        "file": str(file_path.relative_to(Path())),
+                        "text": link_text,
+                        "url": link_url,
+                        "error": "Link validation failed",
+                    })
 
                 self.checked_urls.add(link_url)
 
@@ -520,7 +546,7 @@ class LinkValidator:
         """Validate a single URL."""
         for attempt in range(self.retries + 1):
             try:
-                with urlopen(url, timeout=self.timeout) as response:  # noqa: S310 - URL validation for docs
+                with urlopen(url, timeout=self.timeout) as response:
                     return response.status == 200
             except (URLError, HTTPError, OSError):
                 if attempt == self.retries:
@@ -580,10 +606,10 @@ class QualityReporter:
 
 ## 🔗 Link Validation Results
 
-- **Links Checked**: {len(link_results.get("checked_links", []))}
-- **Valid Links**: {link_results.get("valid_links", 0)}
-- **Broken Links**: {len(link_results.get("broken_links", []))}
-- **Timeout Links**: {len(link_results.get("timeout_links", []))}
+- **Links Checked**: {len(cast("FlextTypes.List", link_results.get("checked_links", [])))}
+- **Valid Links**: {cast("int", link_results.get("valid_links", 0))}
+- **Broken Links**: {len(cast("FlextTypes.List", link_results.get("broken_links", [])))}
+- **Timeout Links**: {len(cast("FlextTypes.List", link_results.get("timeout_links", [])))}
 
 ## 📈 Quality Score Breakdown
 
@@ -625,7 +651,7 @@ class QualityReporter:
         report += "\n## 📋 Detailed Issues\n\n"
 
         # Group issues by file
-        issues_by_file = defaultdict(list)
+        issues_by_file: defaultdict[str, list[DocumentationIssue]] = defaultdict(list)
         for issue in issues:
             issues_by_file[issue.file_path].append(issue)
 
@@ -647,8 +673,9 @@ class QualityReporter:
 
         if link_results.get("broken_links"):
             report += "## 🔗 Broken Links\n\n"
-            for broken_link in link_results["broken_links"]:
-                report += f"- **{broken_link['file']}**: [{broken_link['text']}]({broken_link['url']})\n"
+            for broken_link in cast("FlextTypes.List", link_results["broken_links"]):
+                link_dict = cast("FlextTypes.Dict", broken_link)
+                report += f"- **{link_dict['file']}**: [{link_dict['text']}]({link_dict['url']})\n"
 
         report += "\n## 🎯 Recommendations\n\n"
 

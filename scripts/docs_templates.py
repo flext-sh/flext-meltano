@@ -7,8 +7,9 @@ using FLEXT architectural patterns.
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import cast
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 
 class DocsTemplates:
@@ -18,7 +19,7 @@ class DocsTemplates:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, object]) -> FlextResult[str]:
+    def generate_ci_workflow(self, config: FlextTypes.Dict) -> FlextResult[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
@@ -29,10 +30,11 @@ class DocsTemplates:
 
         """
         try:
+            automation = cast("FlextTypes.Dict", config.get("automation", {}))
             template_vars = {
                 "generated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
-                "audit_day": config.get("automation", {}).get("audit_day", "monday"),
-                "audit_time": config.get("automation", {}).get("audit_time", "09:00"),
+                "audit_day": cast("str", automation.get("audit_day", "monday")),
+                "audit_time": cast("str", automation.get("audit_time", "09:00")),
                 "cron_schedule": self._get_cron_schedule(config),
             }
 
@@ -91,11 +93,11 @@ class DocsTemplates:
                 self._logger.exception("Git hook generation failed", error=error_msg)
             return FlextResult.fail(error_msg)
 
-    def _get_cron_schedule(self, config: dict[str, object]) -> str:
+    def _get_cron_schedule(self, config: FlextTypes.Dict) -> str:
         """Convert audit schedule to cron format."""
-        automation_config = config.get("automation", {})
-        audit_day = automation_config.get("audit_day", "monday").lower()
-        audit_time = automation_config.get("audit_time", "09:00")
+        automation_config = cast("FlextTypes.Dict", config.get("automation", {}))
+        audit_day = cast("str", automation_config.get("audit_day", "monday")).lower()
+        audit_time = cast("str", automation_config.get("audit_time", "09:00"))
 
         hour, minute = map(int, audit_time.split(":"))
 

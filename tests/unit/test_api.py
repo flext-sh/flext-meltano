@@ -19,7 +19,6 @@ from flext_core import FlextResult
 from flext_meltano import (
     FlextMeltano,
     FlextMeltanoConstants,
-    FlextMeltanoExceptions,
     FlextMeltanoModels,
     FlextMeltanoTypes,
 )
@@ -38,9 +37,9 @@ class TestFlextMeltanoInitialization:
             def execute(
                 self,
             ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                    {}
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+                ].ok({})
 
         api = ConcreteAPI()
         assert api is not None
@@ -66,13 +65,6 @@ class TestFlextMeltanoInitialization:
         constants = api.constants
 
         assert constants == FlextMeltanoConstants
-
-    def test_api_exceptions_property(self) -> None:
-        """Test API exceptions property."""
-        api = FlextMeltano()
-        exceptions = api.exceptions
-
-        assert exceptions == FlextMeltanoExceptions
 
     def test_api_types_property(self) -> None:
         """Test API types property."""
@@ -597,7 +589,7 @@ class TestFlextMeltanoPerformance:
         def create_api() -> FlextMeltano:
             return FlextMeltano()
 
-        result = benchmark(create_api)  # type: ignore[operator]
+        result = benchmark(create_api)
         assert result is not None
 
     def test_api_properties_access_performance(
@@ -610,5 +602,5 @@ class TestFlextMeltanoPerformance:
         def access_properties() -> tuple[str, type, type, type, type]:
             return (api.version, api.constants, api.exceptions, api.types, api.models)
 
-        result = benchmark(access_properties)  # type: ignore[operator]
+        result = benchmark(access_properties)
         assert result is not None

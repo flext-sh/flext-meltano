@@ -14,12 +14,10 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import ClassVar
 
-from flext_core import FlextModels
-from pydantic import ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 
-class DocumentationMetrics(FlextModels.Value):
-    model_config = ConfigDict(frozen=False)
+class DocumentationMetrics(BaseModel):
     """Comprehensive documentation quality metrics using FlextModels.Value.
 
     Immutable value object containing all documentation quality measurements.
@@ -41,6 +39,8 @@ class DocumentationMetrics(FlextModels.Value):
 
     """
 
+    model_config = ConfigDict(frozen=False)
+
     total_files: int = 0
     total_words: int = 0
     total_links: int = 0
@@ -55,7 +55,7 @@ class DocumentationMetrics(FlextModels.Value):
     quality_score: float = 0.0
 
 
-class DocumentationIssue(FlextModels.Value):
+class DocumentationIssue(BaseModel):
     """Represents a documentation quality issue using FlextModels.Value.
 
     Immutable value object containing details about a specific documentation problem.
