@@ -22,7 +22,6 @@ from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.dbt_service import FlextMeltanoDbtService
-from flext_meltano.exceptions import FlextMeltanoExceptions
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.file_managers import FlextMeltanoFileManagers
@@ -51,7 +50,6 @@ __all__ = [
     "FlextMeltanoConfig",
     "FlextMeltanoConstants",
     "FlextMeltanoDbtService",
-    "FlextMeltanoExceptions",
     "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",

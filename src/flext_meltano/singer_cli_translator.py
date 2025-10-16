@@ -1,7 +1,7 @@
 """Singer CLI Translator - Pydantic Model to Singer SDK Command Translation.
 
 Converts Pydantic parameter models (TapRunParams, TargetRunParams, etc.) to
-Singer SDK CLI commands with automatic parameter validation through FlextCore.Result.
+Singer SDK CLI commands with automatic parameter validation through FlextResult.
 
 ## Three-Layer Architecture
 
@@ -73,10 +73,10 @@ if commands_result.is_success:
 
 ## Railway-Oriented Programming
 
-All methods return `FlextCore.Result[T]` for type-safe error handling:
+All methods return `FlextResult[T]` for type-safe error handling:
 
 ```python
-# Example: Chain operations with FlextCore.Result
+# Example: Chain operations with FlextResult
 result = (
     FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
     .flat_map(lambda cmd: FlextMeltanoSingerCliTranslator.execute_singer_command(cmd))
@@ -96,7 +96,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 
 from flext_meltano.models import FlextMeltanoModels
 
@@ -111,21 +111,21 @@ class FlextMeltanoSingerCliTranslator:
     @staticmethod
     def translate_tap_run(
         params: FlextMeltanoModels.TapRunParams,
-    ) -> FlextCore.Result[FlextCore.Types.StringList]:
+    ) -> FlextResult[FlextTypes.StringList]:
         """Convert TapRunParams to Singer SDK tap CLI command.
 
         Args:
             params: Validated TapRunParams model
 
         Returns:
-            FlextCore.Result containing list of CLI command arguments
+            FlextResult containing list of CLI command arguments
 
         """
-        command: FlextCore.Types.StringList = [params.tap_name]
+        command: FlextTypes.StringList = [params.tap_name]
 
         if params.discover:
             command.append("--discover")
-            return FlextCore.Result[FlextCore.Types.StringList].ok(command)
+            return FlextResult[FlextTypes.StringList].ok(command)
 
         if params.config_file:
             command.extend(["--config", params.config_file])
@@ -139,22 +139,22 @@ class FlextMeltanoSingerCliTranslator:
         if params.properties_file:
             command.extend(["--properties", params.properties_file])
 
-        return FlextCore.Result[FlextCore.Types.StringList].ok(command)
+        return FlextResult[FlextTypes.StringList].ok(command)
 
     @staticmethod
     def translate_target_run(
         params: FlextMeltanoModels.TargetRunParams,
-    ) -> FlextCore.Result[FlextCore.Types.StringList]:
+    ) -> FlextResult[FlextTypes.StringList]:
         """Convert TargetRunParams to Singer SDK target CLI command.
 
         Args:
             params: Validated TargetRunParams model
 
         Returns:
-            FlextCore.Result containing list of CLI command arguments
+            FlextResult containing list of CLI command arguments
 
         """
-        command: FlextCore.Types.StringList = [params.target_name]
+        command: FlextTypes.StringList = [params.target_name]
 
         if params.config_file:
             command.extend(["--config", params.config_file])
@@ -162,25 +162,23 @@ class FlextMeltanoSingerCliTranslator:
         if params.input_file:
             command.extend(["--input", params.input_file])
 
-        return FlextCore.Result[FlextCore.Types.StringList].ok(command)
+        return FlextResult[FlextTypes.StringList].ok(command)
 
     @staticmethod
     def translate_pipeline_run(
         params: FlextMeltanoModels.PipelineRunParams,
-    ) -> FlextCore.Result[
-        tuple[FlextCore.Types.StringList, FlextCore.Types.StringList]
-    ]:
+    ) -> FlextResult[tuple[FlextTypes.StringList, FlextTypes.StringList]]:
         """Convert PipelineRunParams to tap and target CLI commands.
 
         Args:
             params: Validated PipelineRunParams model
 
         Returns:
-            FlextCore.Result containing tuple of (tap_command, target_command)
+            FlextResult containing tuple of (tap_command, target_command)
 
         """
         # Build tap command
-        tap_command: FlextCore.Types.StringList = [params.tap_name]
+        tap_command: FlextTypes.StringList = [params.tap_name]
 
         if params.tap_config:
             tap_command.extend(["--config", params.tap_config])
@@ -192,32 +190,32 @@ class FlextMeltanoSingerCliTranslator:
             tap_command.extend(["--state", params.state_file])
 
         # Build target command
-        target_command: FlextCore.Types.StringList = [params.target_name]
+        target_command: FlextTypes.StringList = [params.target_name]
 
         if params.target_config:
             target_command.extend(["--config", params.target_config])
 
-        return FlextCore.Result[
-            tuple[FlextCore.Types.StringList, FlextCore.Types.StringList]
-        ].ok((
-            tap_command,
-            target_command,
-        ))
+        return FlextResult[tuple[FlextTypes.StringList, FlextTypes.StringList]].ok(
+            (
+                tap_command,
+                target_command,
+            )
+        )
 
     @staticmethod
     def translate_dbt_run(
         params: FlextMeltanoModels.DbtRunParams,
-    ) -> FlextCore.Result[FlextCore.Types.StringList]:
+    ) -> FlextResult[FlextTypes.StringList]:
         """Convert DbtRunParams to DBT CLI command.
 
         Args:
             params: Validated DbtRunParams model
 
         Returns:
-            FlextCore.Result containing list of DBT CLI command arguments
+            FlextResult containing list of DBT CLI command arguments
 
         """
-        command: FlextCore.Types.StringList = [
+        command: FlextTypes.StringList = [
             "dbt",
             "run",
             "--project-dir",
@@ -239,14 +237,14 @@ class FlextMeltanoSingerCliTranslator:
         if params.vars:
             command.extend(["--vars", params.vars])
 
-        return FlextCore.Result[FlextCore.Types.StringList].ok(command)
+        return FlextResult[FlextTypes.StringList].ok(command)
 
     @staticmethod
     def execute_singer_command(
-        command: FlextCore.Types.StringList,
+        command: FlextTypes.StringList,
         input_data: str | None = None,
         timeout: int = 300,
-    ) -> FlextCore.Result[FlextCore.Types.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -255,14 +253,14 @@ class FlextMeltanoSingerCliTranslator:
             timeout: Command timeout in seconds
 
         Returns:
-            FlextCore.Result containing execution results with stdout/stderr
+            FlextResult containing execution results with stdout/stderr
 
         """
-        # Use FlextCore.Utilities.run_external_command for standardized subprocess execution
+        # Use FlextUtilities.run_external_command for standardized subprocess execution
         process_input = input_data.encode() if input_data else None
 
-        # Execute command with FlextCore.Utilities (includes comprehensive error handling)
-        result = FlextCore.Utilities.run_external_command(
+        # Execute command with FlextUtilities (includes comprehensive error handling)
+        result = FlextUtilities.run_external_command(
             cmd=command,
             capture_output=True,
             check=False,  # Don't raise exception on non-zero exit
@@ -273,7 +271,7 @@ class FlextMeltanoSingerCliTranslator:
 
         # Handle execution failure
         if result.is_failure:
-            return FlextCore.Result[FlextCore.Types.Dict].fail(result.error)
+            return FlextResult[FlextTypes.Dict].fail(result.error)
 
         # Extract completed process
         completed_process = result.value
@@ -281,42 +279,42 @@ class FlextMeltanoSingerCliTranslator:
         # Check for non-zero exit code
         if completed_process.returncode != 0:
             error_msg = completed_process.stderr or "Unknown error"
-            return FlextCore.Result[FlextCore.Types.Dict].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Command failed with code {completed_process.returncode}: {error_msg}"
             )
 
         # Prepare output data with decoded strings
-        output_data: FlextCore.Types.Dict = {
+        output_data: FlextTypes.Dict = {
             "stdout": completed_process.stdout or "",
             "stderr": completed_process.stderr or "",
             "returncode": completed_process.returncode,
             "command": " ".join(command),
         }
 
-        return FlextCore.Result[FlextCore.Types.Dict].ok(output_data)
+        return FlextResult[FlextTypes.Dict].ok(output_data)
 
     @staticmethod
-    def validate_file_path(file_path: str | None) -> FlextCore.Result[Path | None]:
+    def validate_file_path(file_path: str | None) -> FlextResult[Path | None]:
         """Validate file path exists if provided.
 
         Args:
             file_path: Optional file path to validate
 
         Returns:
-            FlextCore.Result containing Path object or None if not provided
+            FlextResult containing Path object or None if not provided
 
         """
         if not file_path:
-            return FlextCore.Result[Path | None].ok(None)
+            return FlextResult[Path | None].ok(None)
 
         path = Path(file_path)
         if not path.exists():
-            return FlextCore.Result[Path | None].fail(f"File not found: {file_path}")
+            return FlextResult[Path | None].fail(f"File not found: {file_path}")
 
         if not path.is_file():
-            return FlextCore.Result[Path | None].fail(f"Not a file: {file_path}")
+            return FlextResult[Path | None].fail(f"Not a file: {file_path}")
 
-        return FlextCore.Result[Path | None].ok(path)
+        return FlextResult[Path | None].ok(path)
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

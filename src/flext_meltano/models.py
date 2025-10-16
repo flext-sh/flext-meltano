@@ -11,9 +11,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextCore
+from flext_core import FlextModels
 from pydantic import (
-    BaseModel,
     ConfigDict,
     Field,
     computed_field,
@@ -26,7 +25,7 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoModels(FlextCore.Models):
+class FlextMeltanoModels(FlextModels):
     """UNIFIED Meltano Models - Advanced Pydantic 2.11 Features with FLEXT Ecosystem Integration.
 
     Contains ALL Pydantic models and settings for the Meltano domain.
@@ -49,7 +48,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # CLI PARAMETER MODELS - For Singer SDK CLI Translation
     # ========================================================================
 
-    class TapRunParams(BaseModel):
+    class TapRunParams(FlextModels.ArbitraryTypesModel):
         """CLI parameters for running Singer taps with automatic Singer SDK translation."""
 
         model_config = ConfigDict(
@@ -88,7 +87,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=False, description="Run in discovery mode to output catalog"
         )
 
-    class TargetRunParams(BaseModel):
+    class TargetRunParams(FlextModels.ArbitraryTypesModel):
         """CLI parameters for running Singer targets with automatic Singer SDK translation."""
 
         model_config = ConfigDict(
@@ -121,7 +120,7 @@ class FlextMeltanoModels(FlextCore.Models):
             description="Path to Singer messages input file (default: stdin)",
         )
 
-    class PipelineRunParams(BaseModel):
+    class PipelineRunParams(FlextModels.ArbitraryTypesModel):
         """CLI parameters for running complete Singer pipelines (tap → target)."""
 
         model_config = ConfigDict(
@@ -159,7 +158,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=None, description="Path to write final state"
         )
 
-    class DbtRunParams(BaseModel):
+    class DbtRunParams(FlextModels.ArbitraryTypesModel):
         """CLI parameters for DBT operations."""
 
         model_config = ConfigDict(
@@ -198,7 +197,7 @@ class FlextMeltanoModels(FlextCore.Models):
             default=None, description="DBT variables as JSON string"
         )
 
-    class PluginInstallParams(BaseModel):
+    class PluginInstallParams(FlextModels.ArbitraryTypesModel):
         """CLI parameters for plugin installation."""
 
         model_config = ConfigDict(
@@ -233,7 +232,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # TAP MODELS - Singer tap configurations and instances
     # ========================================================================
 
-    class TapConfig(BaseModel):
+    class TapConfig(FlextModels.ArbitraryTypesModel):
         """Pydantic model for tap configuration with advanced validation and composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -247,29 +246,26 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         tap_type: str = Field(description="Type of the tap (e.g., tap-postgres)")
-        connection_config: FlextCore.Types.Dict = Field(
+        connection_config: FlextTypes.Dict = Field(
             description="Connection configuration",
         )
-        stream_config: FlextCore.Types.Dict = Field(
+        stream_config: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Stream-specific configuration",
         )
         version: str = Field(default="latest", description="Tap version")
 
         @computed_field
-        @property
         def tap_identifier(self) -> str:
             """Computed field for unique tap identifier."""
             return f"{self.tap_type}:{self.version}"
 
         @computed_field
-        @property
         def has_stream_config(self) -> bool:
             """Computed field indicating if stream configuration is present."""
             return bool(self.stream_config)
 
         @computed_field
-        @property
         def config_complexity(self) -> str:
             """Computed field for configuration complexity assessment."""
             total_configs = len(self.connection_config) + len(self.stream_config)
@@ -296,8 +292,8 @@ class FlextMeltanoModels(FlextCore.Models):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextCore.Types.Dict
-        ) -> FlextCore.Types.Dict:
+            self, value: FlextTypes.Dict
+        ) -> FlextTypes.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret"}
@@ -322,8 +318,8 @@ class FlextMeltanoModels(FlextCore.Models):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextCore.Types.Dict,
-        ) -> FlextCore.Types.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate connection_config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -333,13 +329,13 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise TypeError(invalid_type_msg)
             return v
 
-    class StreamDefinition(FlextCore.Models.Entity):
+    class StreamDefinition(FlextModels.Entity):
         """Pydantic model for stream definition with advanced Pydantic 2.11 features."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         stream_name: str = Field(description="Name of the stream")
-        stream_schema: FlextCore.Types.Dict = Field(
+        stream_schema: FlextTypes.Dict = Field(
             description="JSON schema for the stream",
         )
         tap_type: str = Field(description="Type of tap this stream belongs to")
@@ -353,19 +349,16 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         @computed_field
-        @property
         def is_active(self) -> bool:
             """Computed field indicating if stream is active."""
             return self.status in {"discovered", "selected", "extracting"}
 
         @computed_field
-        @property
         def has_data(self) -> bool:
             """Computed field indicating if stream has extracted data."""
             return self.records_extracted > 0
 
         @computed_field
-        @property
         def schema_properties_count(self) -> int:
             """Computed field for number of schema properties."""
             return len(
@@ -397,9 +390,7 @@ class FlextMeltanoModels(FlextCore.Models):
             return self
 
         @field_serializer("stream_schema")
-        def serialize_stream_schema(
-            self, value: FlextCore.Types.Dict
-        ) -> FlextCore.Types.Dict:
+        def serialize_stream_schema(self, value: FlextTypes.Dict) -> FlextTypes.Dict:
             """Field serializer for stream schema normalization."""
             # Ensure consistent schema structure
             if "properties" not in value:
@@ -408,23 +399,22 @@ class FlextMeltanoModels(FlextCore.Models):
                 value["type"] = "object"
             return value
 
-    class SinkDefinition(FlextCore.Models.Entity):
+    class SinkDefinition(FlextModels.Entity):
         """Pydantic model for sink definition with advanced Pydantic 2.11 features."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
 
         sink_name: str = Field(description="Name of the sink")
         target_name: str = Field(description="Name of the target")
-        config: FlextCore.Types.Dict = Field(
+        config: FlextTypes.Dict = Field(
             default_factory=dict, description="Sink configuration"
         )
-        sink_schema: FlextCore.Types.Dict = Field(
+        sink_schema: FlextTypes.Dict = Field(
             default_factory=dict, description="Sink schema"
         )
         status: str = Field(default="initialized", description="Current status")
 
         @computed_field
-        @property
         def config_keys_count(self) -> int:
             """Computed field for number of config keys."""
             return len(self.config)
@@ -448,7 +438,7 @@ class FlextMeltanoModels(FlextCore.Models):
 
             return self
 
-    class TapInstance(FlextCore.Models.Entity):
+    class TapInstance(FlextModels.Entity):
         """Pydantic model for tap instance with comprehensive composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -468,32 +458,28 @@ class FlextMeltanoModels(FlextCore.Models):
             default=False,
             description="Whether streams have been discovered",
         )
-        metadata: FlextCore.Types.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional metadata",
         )
         tap_id: str = Field(description="Unique tap identifier")
 
         @computed_field
-        @property
         def stream_count(self) -> int:
             """Computed field for number of discovered streams."""
             return len(self.streams)
 
         @computed_field
-        @property
         def active_streams_count(self) -> int:
             """Computed field for number of active streams."""
             return sum(1 for stream in self.streams.values() if stream.is_active)
 
         @computed_field
-        @property
         def total_records_extracted(self) -> int:
             """Computed field for total records extracted across all streams."""
             return sum(stream.records_extracted for stream in self.streams.values())
 
         @computed_field
-        @property
         def is_ready_for_extraction(self) -> bool:
             """Computed field indicating if tap is ready for data extraction."""
             return (
@@ -517,7 +503,7 @@ class FlextMeltanoModels(FlextCore.Models):
 
             return self
 
-    class TargetInstance(FlextCore.Models.Entity):
+    class TargetInstance(FlextModels.Entity):
         """Pydantic model for target instance with comprehensive composition."""
 
         model_config = ConfigDict(extra="allow", validate_assignment=True)
@@ -535,7 +521,6 @@ class FlextMeltanoModels(FlextCore.Models):
         sink_count: int = Field(default=0, description="Number of configured sinks")
 
         @computed_field
-        @property
         def is_ready(self) -> bool:
             """Computed field indicating if target is ready for processing."""
             return (
@@ -565,7 +550,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # TARGET MODELS - Singer target configurations and instances
     # ========================================================================
 
-    class TargetConfig(FlextCore.Models.Entity):
+    class TargetConfig(FlextModels.Entity):
         """Pydantic model for target configuration with advanced field validation and composition."""
 
         model_config = ConfigDict(frozen=True, extra="allow")
@@ -579,32 +564,29 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         target_type: str = Field(description="Target type identifier")
-        connection_config: FlextCore.Types.Dict = Field(
+        connection_config: FlextTypes.Dict = Field(
             description="Connection configuration dictionary",
         )
         batch_size: int = Field(
-            default=FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Batch size for record processing",
         )
         max_batches: int = Field(
-            default=FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Maximum number of batches to process",
         )
 
         @computed_field
-        @property
         def target_identifier(self) -> str:
             """Computed field for unique target identifier."""
             return f"{self.target_type}:batch_{self.batch_size}"
 
         @computed_field
-        @property
         def max_records_capacity(self) -> int:
             """Computed field for maximum records capacity."""
             return self.batch_size * self.max_batches
 
         @computed_field
-        @property
         def processing_efficiency(self) -> str:
             """Computed field for processing efficiency assessment."""
             if self.batch_size >= self._HIGH_EFFICIENCY_THRESHOLD:
@@ -631,8 +613,8 @@ class FlextMeltanoModels(FlextCore.Models):
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: FlextCore.Types.Dict
-        ) -> FlextCore.Types.Dict:
+            self, value: FlextTypes.Dict
+        ) -> FlextTypes.Dict:
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
@@ -657,8 +639,8 @@ class FlextMeltanoModels(FlextCore.Models):
         @classmethod
         def validate_connection_config(
             cls,
-            v: FlextCore.Types.Dict,
-        ) -> FlextCore.Types.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate connection config with basic validation."""
             if not v:
                 empty_config_msg = "Connection configuration cannot be empty"
@@ -686,13 +668,13 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class StreamInfo(BaseModel):
+    class StreamInfo(FlextModels.ArbitraryTypesModel):
         """Pydantic model for stream information with advanced validation and computed fields."""
 
         model_config = ConfigDict(frozen=False, extra="allow")
 
         stream_name: str = Field(description="Stream name identifier")
-        stream_schema: FlextCore.Types.Dict = Field(
+        stream_schema: FlextTypes.Dict = Field(
             description="Stream schema definition",
             alias="schema",
         )
@@ -708,13 +690,11 @@ class FlextMeltanoModels(FlextCore.Models):
         created_at: str = Field(description="Creation timestamp")
 
         @computed_field
-        @property
         def has_processed_data(self) -> bool:
             """Computed field indicating if stream has processed data."""
             return self.records_loaded > 0 or self.batches_processed > 0
 
         @computed_field
-        @property
         def average_records_per_batch(self) -> float:
             """Computed field for average records per batch."""
             if self.batches_processed == 0:
@@ -722,7 +702,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return self.records_loaded / self.batches_processed
 
         @computed_field
-        @property
         def processing_status(self) -> str:
             """Computed field for processing status assessment."""
             if self.status == "completed" and self.records_loaded > 0:
@@ -762,8 +741,8 @@ class FlextMeltanoModels(FlextCore.Models):
         @classmethod
         def validate_stream_schema(
             cls,
-            v: FlextCore.Types.Dict,
-        ) -> FlextCore.Types.Dict:
+            v: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             """Validate stream schema contains properties."""
             if "properties" not in v:
                 msg = "Schema must contain properties"
@@ -774,7 +753,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # MELTANO PROJECT MODELS - Project configuration and validation
     # ========================================================================
 
-    class MeltanoProjectModel(FlextCore.Models.Entity):
+    class MeltanoProjectModel(FlextModels.Entity):
         """Pydantic model for Meltano project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -808,20 +787,17 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         @computed_field
-        @property
         def environment_count(self) -> int:
             """Computed field for number of environments."""
             return len(self.environments)
 
         @computed_field
-        @property
         def has_production_environment(self) -> bool:
             """Computed field indicating if production environment exists."""
             prod_environments = {"prod", "production", "live"}
             return any(env.lower() in prod_environments for env in self.environments)
 
         @computed_field
-        @property
         def project_maturity(self) -> str:
             """Computed field for project maturity assessment."""
             if (
@@ -869,7 +845,7 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class PluginModel(FlextCore.Models.Entity):
+    class PluginModel(FlextModels.Entity):
         """Pydantic model for Meltano plugin configuration with advanced composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -882,31 +858,27 @@ class FlextMeltanoModels(FlextCore.Models):
             default=FlextMeltanoConstants.Plugin.DEFAULT_VARIANT,
             description="Plugin variant",
         )
-        settings: FlextCore.Types.Dict = Field(
+        settings: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Plugin settings",
         )
 
         @computed_field
-        @property
         def full_plugin_name(self) -> str:
             """Computed field for full plugin name with namespace."""
             return f"{self.namespace}.{self.name}"
 
         @computed_field
-        @property
         def has_custom_executable(self) -> bool:
             """Computed field indicating if plugin has custom executable."""
             return self.executable is not None
 
         @computed_field
-        @property
         def settings_count(self) -> int:
             """Computed field for number of plugin settings."""
             return len(self.settings)
 
         @computed_field
-        @property
         def plugin_complexity(self) -> str:
             """Computed field for plugin complexity assessment."""
             if (
@@ -957,7 +929,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # DBT MODELS - DBT project and execution models
     # ========================================================================
 
-    class DbtProjectModel(BaseModel):
+    class DbtProjectModel(FlextModels.ArbitraryTypesModel):
         """Pydantic model for DBT project configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -987,7 +959,6 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         @computed_field
-        @property
         def total_path_count(self) -> int:
             """Computed field for total number of configured paths."""
             return (
@@ -999,7 +970,6 @@ class FlextMeltanoModels(FlextCore.Models):
             )
 
         @computed_field
-        @property
         def has_custom_paths(self) -> bool:
             """Computed field indicating if project has custom paths."""
             default_paths = {"models", "analysis", "tests", "seeds", "macros"}
@@ -1013,7 +983,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return bool(all_paths - default_paths)
 
         @computed_field
-        @property
         def project_structure_complexity(self) -> str:
             """Computed field for project structure complexity."""
             if (
@@ -1058,7 +1027,7 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class DbtExecutionModel(FlextCore.Models.Entity):
+    class DbtExecutionModel(FlextModels.Entity):
         """Pydantic model for DBT execution configuration with advanced validation."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -1094,19 +1063,16 @@ class FlextMeltanoModels(FlextCore.Models):
         )
 
         @computed_field
-        @property
         def model_count(self) -> int:
             """Computed field for number of models to execute."""
             return len(self.models)
 
         @computed_field
-        @property
         def exclude_count(self) -> int:
             """Computed field for number of models to exclude."""
             return len(self.exclude)
 
         @computed_field
-        @property
         def execution_complexity(self) -> str:
             """Computed field for execution complexity assessment."""
             total_scope = self.model_count + self.exclude_count
@@ -1119,7 +1085,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return "complex"
 
         @computed_field
-        @property
         def is_parallel_execution(self) -> bool:
             """Computed field indicating if execution uses multiple threads."""
             return self.threads > 1
@@ -1159,7 +1124,7 @@ class FlextMeltanoModels(FlextCore.Models):
     # EXECUTION RESULT MODELS - Pipeline execution and monitoring
     # ========================================================================
 
-    class ExecutionResult(FlextCore.Models.TimestampedModel):
+    class ExecutionResult(FlextModels.TimestampedModel):
         """Pydantic model for execution result tracking with advanced composition."""
 
         # Performance categorization thresholds (from FlextMeltanoConstants)
@@ -1197,25 +1162,22 @@ class FlextMeltanoModels(FlextCore.Models):
             default=None,
             description="Error message if failed",
         )
-        metadata: FlextCore.Types.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional execution metadata",
         )
 
         @computed_field
-        @property
         def is_completed(self) -> bool:
             """Computed field indicating if execution is completed."""
             return self.end_time is not None
 
         @computed_field
-        @property
         def is_successful(self) -> bool:
             """Computed field indicating if execution was successful."""
             return self.status == "success" and self.error_message is None
 
         @computed_field
-        @property
         def execution_rate_per_second(self) -> float:
             """Computed field for execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
@@ -1223,7 +1185,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return self.records_processed / self.duration_seconds
 
         @computed_field
-        @property
         def performance_category(self) -> str:
             """Computed field for performance categorization."""
             rate = self.execution_rate_per_second
@@ -1276,7 +1237,7 @@ class FlextMeltanoModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class PipelineResult(FlextCore.Models.TimestampedModel):
+    class PipelineResult(FlextModels.TimestampedModel):
         """Pydantic model for pipeline execution result with comprehensive composition."""
 
         model_config = ConfigDict(validate_assignment=True, extra="allow")
@@ -1302,14 +1263,13 @@ class FlextMeltanoModels(FlextCore.Models):
             default=0,
             description="Total records processed",
         )
-        pipeline_metadata: FlextCore.Types.Dict = Field(
+        pipeline_metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Pipeline execution metadata",
         )
 
         @computed_field
-        @property
-        def completed_stages(self) -> FlextCore.Types.StringList:
+        def completed_stages(self) -> FlextTypes.StringList:
             """Computed field for completed pipeline stages."""
             stages = []
             if self.tap_result and self.tap_result.is_completed:
@@ -1321,7 +1281,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return stages
 
         @computed_field
-        @property
         def completion_percentage(self) -> float:
             """Computed field for pipeline completion percentage."""
             total_stages = 3  # tap, target, dbt
@@ -1329,7 +1288,6 @@ class FlextMeltanoModels(FlextCore.Models):
             return (completed / total_stages) * 100
 
         @computed_field
-        @property
         def is_fully_successful(self) -> bool:
             """Computed field indicating if all stages completed successfully."""
             return bool(
@@ -1342,7 +1300,6 @@ class FlextMeltanoModels(FlextCore.Models):
             )
 
         @computed_field
-        @property
         def total_duration_seconds(self) -> float:
             """Computed field for total pipeline duration."""
             total = 0.0

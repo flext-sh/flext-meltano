@@ -235,16 +235,16 @@ class TestFlextMeltanoTypes:
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         # Test that types are properly annotated
-        plugin_type = FlextMeltanoTypes.Plugin.PluginType
+        plugin_definition = FlextMeltanoTypes.Plugin.PluginDefinition
         self.test_assertions.assert_true(
-            condition=plugin_type is not None,
-            message="PluginType should be properly annotated",
+            condition=plugin_definition is not None,
+            message="PluginDefinition should be properly annotated",
         )
 
-        singer_record = FlextMeltanoTypes.Singer.Record
+        singer_catalog = FlextMeltanoTypes.Singer.CatalogEntry
         self.test_assertions.assert_true(
-            condition=singer_record is not None,
-            message="Singer Record should be properly annotated",
+            condition=singer_catalog is not None,
+            message="Singer CatalogEntry should be properly annotated",
         )
 
     def test_namespace_organization(self) -> None:
@@ -273,13 +273,17 @@ class TestFlextMeltanoTypes:
         """Test that types are compatible with their intended use."""
 
         # Test that types can be used in type annotations
-        def test_function(plugin_type: FlextMeltanoTypes.Plugin.PluginType) -> None:
+        def test_function(
+            plugin_def: FlextMeltanoTypes.Plugin.PluginDefinition,
+        ) -> None:
             pass
 
-        def test_singer_function(record: FlextMeltanoTypes.Singer.Record) -> None:
+        def test_singer_function(
+            catalog: FlextMeltanoTypes.Singer.CatalogEntry,
+        ) -> None:
             pass
 
-        def test_dbt_function(model: FlextMeltanoTypes.Dbt.Model) -> None:
+        def test_dbt_function(project: dict[str, object]) -> None:
             pass
 
         # If we get here without errors, the types are compatible
@@ -314,15 +318,15 @@ class TestFlextMeltanoTypes:
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
         # Test that similar types follow consistent patterns
-        plugin_type = FlextMeltanoTypes.Plugin.PluginType
-        singer_record = FlextMeltanoTypes.Singer.Record
+        plugin_definition = FlextMeltanoTypes.Plugin.PluginDefinition
+        singer_catalog = FlextMeltanoTypes.Singer.CatalogEntry
 
         # Both should be type annotations
         self.test_assertions.assert_true(
-            condition=plugin_type is not None,
-            message="PluginType should be a valid type",
+            condition=plugin_definition is not None,
+            message="PluginDefinition should be a valid type",
         )
         self.test_assertions.assert_true(
-            condition=singer_record is not None,
-            message="Singer Record should be a valid type",
+            condition=singer_catalog is not None,
+            message="Singer CatalogEntry should be a valid type",
         )

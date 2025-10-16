@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.config import FlextMeltanoConfig
@@ -23,7 +23,7 @@ from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
+class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
     """Unified executor architecture following flext-core patterns.
 
     Provides comprehensive Meltano command execution with proper error handling,
@@ -32,7 +32,7 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
 
     # Instance attributes for type checker
     _config: FlextMeltanoConfig
-    logger: FlextCore.Logger
+    logger: FlextLogger
     _bridge: FlextMeltanoBridge
 
     def __init__(
@@ -41,18 +41,18 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
         """Initialize executor with configuration."""
         super().__init__()
         self._config = FlextMeltanoConfig(**config) if config else FlextMeltanoConfig()
-        self.logger: FlextCore.Logger = FlextCore.Logger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
         self._bridge = FlextMeltanoBridge()
         # Type guard for mypy - logger is always initialized
         if self.logger is None:
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
-    def execute(self) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+    def execute(self) -> FlextResult[FlextTypes.JsonValue]:
         """Execute the Meltano executor service.
 
         Returns:
-            FlextCore.Result containing executor configuration and status.
+            FlextResult containing executor configuration and status.
 
         """
         try:
@@ -66,21 +66,21 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             }
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", config_data)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", config_data)
             )
 
         except Exception as e:
             error_msg = f"Executor execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(error_msg)
+            return FlextResult[FlextTypes.JsonValue].fail(error_msg)
 
     def execute_command(
         self,
-        command: FlextCore.Types.StringList,
+        command: FlextTypes.StringList,
         timeout: int = FlextMeltanoConstants.Meltano.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
-    ) -> FlextCore.Result[FlextMeltanoExecutionResult]:
+    ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
 
         Args:
@@ -89,7 +89,7 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             cwd: Working directory for execution
 
         Returns:
-            FlextCore.Result with execution result
+            FlextResult with execution result
 
         """
         try:
@@ -109,19 +109,19 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
                 execution_time=execution_time,
             )
 
-            return FlextCore.Result[FlextMeltanoExecutionResult].ok(result)
+            return FlextResult[FlextMeltanoExecutionResult].ok(result)
 
         except Exception as e:
             error_msg = f"Command execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[FlextMeltanoExecutionResult].fail(error_msg)
+            return FlextResult[FlextMeltanoExecutionResult].fail(error_msg)
 
     def execute_pipeline(
         self,
         tap_name: str,
         target_name: str,
         _config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoExecutionResult]:
+    ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a complete ELT pipeline.
 
         Args:
@@ -130,7 +130,7 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             config: Pipeline configuration
 
         Returns:
-            FlextCore.Result with pipeline execution result
+            FlextResult with pipeline execution result
 
         """
         try:
@@ -138,15 +138,15 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             return self.execute_command(command)
 
         except Exception as e:
-            return FlextCore.Result[FlextMeltanoExecutionResult].fail(
+            return FlextResult[FlextMeltanoExecutionResult].fail(
                 f"Pipeline execution failed: {e}"
             )
 
     def execute_dbt_command(
         self,
         dbt_command: str,
-        args: FlextCore.Types.StringList | None = None,
-    ) -> FlextCore.Result[FlextMeltanoExecutionResult]:
+        args: FlextTypes.StringList | None = None,
+    ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a DBT command.
 
         Args:
@@ -154,7 +154,7 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             args: Additional arguments
 
         Returns:
-            FlextCore.Result with DBT execution result
+            FlextResult with DBT execution result
 
         """
         try:
@@ -164,17 +164,17 @@ class FlextMeltanoExecutor(FlextCore.Service[FlextCore.Types.JsonValue]):
             return self.execute_command(command)
 
         except Exception as e:
-            return FlextCore.Result[FlextMeltanoExecutionResult].fail(
+            return FlextResult[FlextMeltanoExecutionResult].fail(
                 f"DBT command failed: {e}"
             )
 
-    def get_version(self) -> FlextCore.Result[str]:
+    def get_version(self) -> FlextResult[str]:
         """Get version information from Meltano/DBT."""
         try:
             # Placeholder - real implementation would get actual version
-            return FlextCore.Result[str].ok("3.0.0")
+            return FlextResult[str].ok("3.0.0")
         except Exception as e:
-            return FlextCore.Result[str].fail(f"Failed to get version: {e}")
+            return FlextResult[str].fail(f"Failed to get version: {e}")
 
 
 __all__ = ["FlextMeltanoExecutor"]

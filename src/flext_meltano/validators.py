@@ -10,14 +10,14 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-# Import for type hints only - avoid circular imports
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
+# Import for type hints only - avoid circular imports
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 
-logger = FlextCore.Logger(__name__)
+logger = FlextLogger(__name__)
 
 
 class FlextMeltanoValidators:
@@ -36,8 +36,8 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: FlextCore.Types.Dict = {"name": tap - csv, "namespace": "tap_csv"}
-        >>> result: FlextCore.Result[object] = (
+        >>> config: FlextTypes.Dict = {"name": tap - csv, "namespace": "tap_csv"}
+        >>> result: FlextResult[object] = (
         ...     validator.validate_meltano_plugin_business_rules(config)
         ... )
         >>> if result.is_success:
@@ -48,11 +48,11 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_meltano_plugin_business_rules(
         cls,
-        config: FlextCore.Types.JsonValue,
-    ) -> FlextCore.Result[bool]:
+        config: FlextTypes.JsonValue,
+    ) -> FlextResult[bool]:
         """Validate Meltano-specific plugin business rules using monadic error accumulation.
 
-        Uses FlextCore.Result.accumulate_errors() to collect all validation errors
+        Uses FlextResult.accumulate_errors() to collect all validation errors
         instead of stopping at the first failure, providing comprehensive
         validation feedback with composable validation rules.
 
@@ -60,10 +60,10 @@ class FlextMeltanoValidators:
             config: Plugin configuration dictionary to validate.
 
         Returns:
-            FlextCore.Result containing boolean validation result or accumulated error details.
+            FlextResult containing boolean validation result or accumulated error details.
 
         """
-        return FlextCore.Result.accumulate_errors(
+        return FlextResult.accumulate_errors(
             cls._validate_config_is_dict(config),
             cls._validate_plugin_name(config),
             cls._validate_plugin_namespace(config),
@@ -76,53 +76,49 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_config_is_dict(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         """Validate that config is a dictionary.
 
         Args:
             config: Configuration dictionary to validate.
 
         Returns:
-            FlextCore.Result indicating if config is a valid dictionary.
+            FlextResult indicating if config is a valid dictionary.
 
         """
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 "Plugin config validation failed: config must be a dictionary"
             )
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
-    def _validate_plugin_name(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+    def _validate_plugin_name(cls, config: FlextTypes.JsonValue) -> FlextResult[bool]:
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
-                "Config must be dictionary for name validation"
-            )
+            return FlextResult.fail("Config must be dictionary for name validation")
 
         name = config.get("name", "")
         if not isinstance(name, str):
-            return FlextCore.Result.fail("Plugin name must be a string")
+            return FlextResult.fail("Plugin name must be a string")
 
         if not name or not name.strip():
-            return FlextCore.Result.fail("Plugin name cannot be empty")
+            return FlextResult.fail("Plugin name cannot be empty")
 
         return cls._validate_meltano_name_business_rules(name.strip())
 
     @classmethod
-    def _validate_meltano_name_business_rules(cls, name: str) -> FlextCore.Result[bool]:
+    def _validate_meltano_name_business_rules(cls, name: str) -> FlextResult[bool]:
         """Validate Meltano-specific name business rules.
 
         Args:
             name: Plugin name to validate.
 
         Returns:
-            FlextCore.Result indicating business rule validation.
+            FlextResult indicating business rule validation.
 
         """
-        validation_errors: FlextCore.Types.StringList = []
+        validation_errors: FlextTypes.StringList = []
 
         # Meltano business rule: target plugin names
         if (
@@ -141,100 +137,98 @@ class FlextMeltanoValidators:
             validation_errors.append("Tap plugin names must be at least 5 characters")
 
         if validation_errors:
-            return FlextCore.Result.fail("; ".join(validation_errors))
+            return FlextResult.fail("; ".join(validation_errors))
 
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_namespace(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 "Config must be dictionary for namespace validation"
             )
 
         namespace = config.get("namespace")
         if namespace is None:
-            return FlextCore.Result.fail("Plugin namespace is required")
+            return FlextResult.fail("Plugin namespace is required")
 
         if not isinstance(namespace, str):
-            return FlextCore.Result.fail("Plugin namespace must be a string")
+            return FlextResult.fail("Plugin namespace must be a string")
 
         if not namespace.strip():
-            return FlextCore.Result.fail("Plugin namespace cannot be empty")
+            return FlextResult.fail("Plugin namespace cannot be empty")
 
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_pip_url(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
-                "Config must be dictionary for pip_url validation"
-            )
+            return FlextResult.fail("Config must be dictionary for pip_url validation")
 
         pip_url = config.get("pip_url")
         if pip_url is None:
-            return FlextCore.Result.fail("Plugin pip_url is required")
+            return FlextResult.fail("Plugin pip_url is required")
 
         if not isinstance(pip_url, str):
-            return FlextCore.Result.fail("Plugin pip_url must be a string")
+            return FlextResult.fail("Plugin pip_url must be a string")
 
         if not pip_url.strip():
-            return FlextCore.Result.fail("Plugin pip_url cannot be empty")
+            return FlextResult.fail("Plugin pip_url cannot be empty")
 
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_plugin_executable(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 "Config must be dictionary for executable validation"
             )
 
         executable = config.get("executable")
         if executable is None:
-            return FlextCore.Result.fail("Plugin executable is required")
+            return FlextResult.fail("Plugin executable is required")
 
         if not isinstance(executable, str):
-            return FlextCore.Result.fail("Plugin executable must be a string")
+            return FlextResult.fail("Plugin executable must be a string")
 
         if not executable.strip():
-            return FlextCore.Result.fail("Plugin executable cannot be empty")
+            return FlextResult.fail("Plugin executable cannot be empty")
 
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def _validate_meltano_specific_rules(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         """Validate additional Meltano-specific business rules.
 
         Args:
             config: Configuration dictionary.
 
         Returns:
-            FlextCore.Result indicating Meltano-specific validation result.
+            FlextResult indicating Meltano-specific validation result.
 
         """
         if not isinstance(config, dict):
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 "Config must be dictionary for Meltano rules validation"
             )
 
         # Additional Meltano-specific validations can be added here
         # For now, return success as placeholder
-        return FlextCore.Result.ok(data=True)
+        return FlextResult.ok(data=True)
 
     @classmethod
     def validate_meltano_project_business_rules(
         cls,
-        config: FlextCore.Types.JsonValue,
-    ) -> FlextCore.Result[bool]:
+        config: FlextTypes.JsonValue,
+    ) -> FlextResult[bool]:
         """Validate Meltano-specific project business rules.
 
         Validates Meltano project configuration including version requirements
@@ -244,10 +238,10 @@ class FlextMeltanoValidators:
             config: Project configuration dictionary to validate.
 
         Returns:
-            FlextCore.Result containing boolean validation result or error details.
+            FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextCore.Types.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -260,11 +254,11 @@ class FlextMeltanoValidators:
         """
         # Validate config is dict[str, object] using direct validation
         if not isinstance(config, dict):
-            return FlextCore.Result[bool].fail(
+            return FlextResult[bool].fail(
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextCore.Types.Dict = dict[str, object](config)
+        config_dict: FlextTypes.Dict = dict[str, object](config)
 
         # DOMAIN-SPECIFIC: Meltano project business rules
         class MeltanoProjectBusinessRules(FlextMeltanoModels.MeltanoProjectModel):
@@ -277,14 +271,14 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             MeltanoProjectBusinessRules.model_validate(config_dict)
-            return FlextCore.Result[bool].ok(data=True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
-            return FlextCore.Result[bool].fail(f"Project validation failed: {e}")
+            return FlextResult[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
     def validate_dbt_business_rules(
-        cls, config: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[bool]:
+        cls, config: FlextTypes.JsonValue
+    ) -> FlextResult[bool]:
         """Validate DBT-specific business rules.
 
         Validates DBT project configuration including project name format
@@ -294,14 +288,14 @@ class FlextMeltanoValidators:
             config: DBT configuration dictionary to validate.
 
         Returns:
-            FlextCore.Result containing boolean validation result or error details.
+            FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextCore.Types.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "name": "my_dbt_project",
             ...     "version": 1.0.0,
             ... }
-            >>> result: FlextCore.Result[object] = (
+            >>> result: FlextResult[object] = (
             ...     FlextMeltanoValidators.validate_dbt_business_rules(config)
             ... )
             >>> if result.is_success and result.unwrap():
@@ -310,11 +304,11 @@ class FlextMeltanoValidators:
         """
         # Validate config is dict[str, object] using direct validation
         if not isinstance(config, dict):
-            return FlextCore.Result[bool].fail(
+            return FlextResult[bool].fail(
                 "DBT config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextCore.Types.Dict = dict[str, object](config)
+        config_dict: FlextTypes.Dict = dict[str, object](config)
 
         # DOMAIN-SPECIFIC: DBT business rules
         class DbtBusinessRules(FlextMeltanoModels.DbtProjectModel):
@@ -327,15 +321,15 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             DbtBusinessRules.model_validate(config_dict)
-            return FlextCore.Result[bool].ok(data=True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
-            return FlextCore.Result[bool].fail(f"DBT validation failed: {e}")
+            return FlextResult[bool].fail(f"DBT validation failed: {e}")
 
     @classmethod
     def validate_meltano_project_structure(
         cls,
         project_path: Path,
-    ) -> FlextCore.Result[bool]:
+    ) -> FlextResult[bool]:
         """Validate Meltano project structure with domain-specific business rules.
 
         Performs comprehensive validation of the Meltano project directory
@@ -345,7 +339,7 @@ class FlextMeltanoValidators:
             project_path: Path to the Meltano project directory.
 
         Returns:
-            FlextCore.Result containing boolean validation result or error details.
+            FlextResult containing boolean validation result or error details.
 
         Example:
             >>> from pathlib import Path
@@ -360,19 +354,19 @@ class FlextMeltanoValidators:
         try:
             # Check if path exists and is directory
             if not project_path.exists():
-                return FlextCore.Result[bool].fail(
+                return FlextResult[bool].fail(
                     f"Project path does not exist: {project_path}",
                 )
 
             if not project_path.is_dir():
-                return FlextCore.Result[bool].fail(
+                return FlextResult[bool].fail(
                     f"Project path is not a directory: {project_path}",
                 )
 
             # Check for required Meltano files
             meltano_yml = project_path / "meltano.yml"
             if not meltano_yml.exists():
-                return FlextCore.Result[
+                return FlextResult[
                     bool
                 ].fail(
                     f"meltano.yml not found in {project_path}",  # Test expectation compliance
@@ -385,17 +379,17 @@ class FlextMeltanoValidators:
                 with contextlib.suppress(OSError):
                     transform_dir.mkdir(parents=True, exist_ok=True)
 
-            return FlextCore.Result[bool].ok(data=True)
+            return FlextResult[bool].ok(data=True)
         except Exception as e:
             error_msg = f"Failed to validate project structure: {e}"
             logger.exception(error_msg)
-            return FlextCore.Result[bool].fail(error_msg)
+            return FlextResult[bool].fail(error_msg)
 
     @classmethod
     def validate_connection_config(
         cls,
-        config: FlextCore.Types.Dict,
-    ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        config: FlextTypes.Dict,
+    ) -> FlextResult[FlextTypes.Dict]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for Meltano services,
@@ -405,40 +399,40 @@ class FlextMeltanoValidators:
             config: Connection configuration dictionary to validate.
 
         Returns:
-            FlextCore.Result containing validated configuration or error details.
+            FlextResult containing validated configuration or error details.
 
         Example:
-            >>> config: FlextCore.Types.Dict = {
+            >>> config: FlextTypes.Dict = {
             ...     "host": "localhost",
             ...     "port": 5432,
             ...     "database": "mydb",
             ... }
-            >>> result: FlextCore.Result[object] = (
+            >>> result: FlextResult[object] = (
             ...     FlextMeltanoValidators.validate_connection_config(config)
             ... )
             >>> if result.is_success:
-            ...     validated_config: FlextCore.Types.Dict = result.unwrap()
+            ...     validated_config: FlextTypes.Dict = result.unwrap()
             ...     print(f"Validated config: {validated_config}")
 
         """
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     "Connection configuration cannot be empty",
                 )
 
-            return FlextCore.Result[FlextCore.Types.Dict].ok(data=config)
+            return FlextResult[FlextTypes.Dict].ok(data=config)
         except Exception as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return FlextCore.Result[FlextCore.Types.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(
         cls,
-        config: FlextCore.Types.JsonValue,
-    ) -> FlextCore.Result[bool]:
+        config: FlextTypes.JsonValue,
+    ) -> FlextResult[bool]:
         """Validate plugin configuration with comprehensive business rules.
 
         Validates plugin configuration data for Meltano plugins,
@@ -448,7 +442,7 @@ class FlextMeltanoValidators:
             config: Plugin configuration to validate.
 
         Returns:
-            FlextCore.Result containing boolean validation result or error details.
+            FlextResult containing boolean validation result or error details.
 
         """
         return cls.validate_meltano_plugin_business_rules(config)

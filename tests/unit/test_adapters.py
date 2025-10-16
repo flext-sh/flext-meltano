@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsUtilities
 from meltano.core.plugin.base import PluginType
 
@@ -60,8 +60,8 @@ class TestFlextMeltanoAdapterComplete:
 
         # Use flext_tests result assertions
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
 
         if result.is_success:
@@ -114,8 +114,8 @@ class TestFlextMeltanoAdapterComplete:
 
         # Use flext_tests result assertions
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
 
         if result.is_success:
@@ -156,8 +156,8 @@ class TestFlextMeltanoAdapterComplete:
             result = self.adapter.initialize_project(test_path)
 
             self.test_assertions.assert_true(
-                condition=isinstance(result, FlextCore.Result),
-                message="Should return FlextCore.Result",
+                condition=isinstance(result, FlextResult),
+                message="Should return FlextResult",
             )
             if result.is_success:
                 project = result.value
@@ -187,8 +187,8 @@ class TestFlextMeltanoAdapterComplete:
             result = self.adapter.create_project(project_name, test_path)
 
             self.test_assertions.assert_true(
-                condition=isinstance(result, FlextCore.Result),
-                message="Should return FlextCore.Result",
+                condition=isinstance(result, FlextResult),
+                message="Should return FlextResult",
             )
             if result.is_success:
                 created_info = result.value
@@ -237,8 +237,8 @@ class TestFlextMeltanoAdapterComplete:
                 )
 
                 self.test_assertions.assert_true(
-                    condition=isinstance(plugin_result, FlextCore.Result),
-                    message="Should return FlextCore.Result",
+                    condition=isinstance(plugin_result, FlextResult),
+                    message="Should return FlextResult",
                 )
                 if plugin_result.is_success:
                     result_info = plugin_result.value
@@ -258,8 +258,8 @@ class TestFlextMeltanoAdapterComplete:
 
         # Use flext_tests assertions
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         if result.is_success:
             version_info = result.value
@@ -418,10 +418,10 @@ class TestFlextMeltanoAdapterComplete:
             result = self.adapter.initialize_project(project_root=non_existent_path)
 
             # Test should either fail (if validation occurs) or succeed (if it creates the path)
-            # Either way, the method should return a valid FlextCore.Result
+            # Either way, the method should return a valid FlextResult
             self.test_assertions.assert_true(
                 condition=result is not None,
-                message="Should return FlextCore.Result",
+                message="Should return FlextResult",
             )
             self.test_assertions.assert_true(
                 condition=hasattr(result, "is_failure"),
@@ -443,7 +443,7 @@ class TestFlextMeltanoAdapterComplete:
             PluginType.EXTRACTORS,
         )
 
-        # Should handle error gracefully using FlextCore.Result pattern
+        # Should handle error gracefully using FlextResult pattern
         if result.is_failure:
             self.test_assertions.assert_in(
                 item="not found",
@@ -483,8 +483,8 @@ class TestFlextMeltanoAdapterComplete:
             )
 
             self.test_assertions.assert_true(
-                condition=isinstance(result, FlextCore.Result),
-                message="Should return FlextCore.Result",
+                condition=isinstance(result, FlextResult),
+                message="Should return FlextResult",
             )
             if result.is_success:
                 project_info = result.value
@@ -547,10 +547,10 @@ class TestFlextMeltanoAdapterComplete:
         ]
 
         for config in configs:
-            # Cast config to expected type - FlextCore.Types.StringDict to FlextCore.Types.Dict
-            config_dict: FlextCore.Types.Dict = dict[str, object](config)
+            # Cast config to expected type - FlextTypes.StringDict to FlextTypes.Dict
+            config_dict: FlextTypes.Dict = dict[str, object](config)
             result = FlextMeltanoAdapter.adapt_plugin(config_dict)
-            assert isinstance(result, FlextCore.Result)
+            assert isinstance(result, FlextResult)
             assert result.is_success
 
             adapted = result.value
@@ -576,13 +576,11 @@ class TestFlextMeltanoAdapterComplete:
             },
         }
 
-        # Cast complex_config to expected type - Collection[str] to FlextCore.Types.Dict
-        complex_config_dict: FlextCore.Types.Dict = dict[str, object](
-            complex_config.items()
-        )
+        # Cast complex_config to expected type - Collection[str] to FlextTypes.Dict
+        complex_config_dict: FlextTypes.Dict = dict[str, object](complex_config.items())
         result = FlextMeltanoAdapter.adapt_project_config(complex_config_dict)
 
-        assert isinstance(result, FlextCore.Result)
+        assert isinstance(result, FlextResult)
         assert result.is_success
 
         adapted = result.value
@@ -597,7 +595,7 @@ class TestFlextMeltanoAdapterComplete:
         """Test plugin discovery for specific plugin types."""
         result = self.adapter.discover_plugins()
 
-        assert isinstance(result, FlextCore.Result)
+        assert isinstance(result, FlextResult)
         if result.is_success:
             plugins = result.value
             assert isinstance(plugins, list)
@@ -618,7 +616,7 @@ class TestFlextMeltanoAdapterComplete:
 
             result = self.adapter.initialize_project(project_path)
 
-            assert isinstance(result, FlextCore.Result)
+            assert isinstance(result, FlextResult)
             if result.is_success:
                 project = result.value
                 assert project is not None

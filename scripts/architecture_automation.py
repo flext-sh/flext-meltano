@@ -8,22 +8,20 @@ Provides PlantUML rendering, C4 model validation, and automated documentation up
 import argparse
 import ast
 import re
-import subprocess
+import subprocess  # noqa: S404 - Required for PlantUML execution
 import sys
 import time
 import urllib.request
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, ConfigDict
-
-# Import from scripts directory (works when run from project root)
 from scripts.docs_config import DocsConfig
 
 
 class DiagramValidationResult(BaseModel):
-    """Result of diagram validation using FlextCore.Models.Value."""
+    """Result of diagram validation using FlextModels.Value."""
 
     model_config = ConfigDict(frozen=False, validate_assignment=True)
 
@@ -35,7 +33,7 @@ class DiagramValidationResult(BaseModel):
 
 
 class ArchitectureValidationResult(BaseModel):
-    """Comprehensive architecture validation result using FlextCore.Models.Value."""
+    """Comprehensive architecture validation result using FlextModels.Value."""
 
     model_config = ConfigDict(frozen=False, validate_assignment=True)
 
@@ -47,12 +45,12 @@ class ArchitectureValidationResult(BaseModel):
     generated_files: ClassVar[list[str]] = []
 
 
-class PlantUMLRenderer(FlextCore.Service):
+class PlantUMLRenderer(FlextService):
     """PlantUML diagram rendering and validation using FLEXT patterns."""
 
     def __init__(
         self,
-        logger: FlextCore.Logger | None = None,
+        logger: FlextLogger | None = None,
         plantuml_jar: str | None = None,
     ) -> None:
         """Initialize PlantUML renderer with optional logger and JAR path."""
@@ -86,23 +84,21 @@ class PlantUMLRenderer(FlextCore.Service):
         print(f"Downloading PlantUML from {url}...")
         try:
             # Security: URL is hardcoded and from trusted source (GitHub releases)
-            urllib.request.urlretrieve(url, jar_path)
+            urllib.request.urlretrieve(url, jar_path)  # noqa: S310 - Hardcoded trusted GitHub URL
             print(f"Downloaded PlantUML to {jar_path}")
             return jar_path
         except Exception as e:
             print(f"Failed to download PlantUML: {e}")
             raise
 
-    def render_diagram(
-        self, puml_file: Path
-    ) -> FlextCore.Result[DiagramValidationResult]:
+    def render_diagram(self, puml_file: Path) -> FlextResult[DiagramValidationResult]:
         """Render a PlantUML diagram to image format using FLEXT patterns."""
         result = DiagramValidationResult(diagram_path=str(puml_file), is_valid=True)
 
         if not puml_file.exists():
             result.errors.append(f"Diagram file not found: {puml_file}")
             result.is_valid = False
-            return FlextCore.Result.ok(result)
+            return FlextResult.ok(result)
 
         try:
             # Validate PlantUML syntax
@@ -110,7 +106,7 @@ class PlantUMLRenderer(FlextCore.Service):
             if not syntax_result.is_valid:
                 result.errors.extend(syntax_result.errors)
                 result.is_valid = False
-                return FlextCore.Result.ok(result)
+                return FlextResult.ok(result)
 
             # Render to PNG
             png_file = self.output_dir / f"{puml_file.stem}.png"
@@ -157,7 +153,7 @@ class PlantUMLRenderer(FlextCore.Service):
             result.is_valid = False
             self.logger.exception("Diagram rendering failed", error=error_msg)
 
-        return FlextCore.Result.ok(result)
+        return FlextResult.ok(result)
 
     def validate_syntax(self, puml_file: Path) -> DiagramValidationResult:
         """Validate PlantUML syntax."""
@@ -195,15 +191,17 @@ class PlantUMLRenderer(FlextCore.Service):
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
                 stripped = line.strip()
-                if stripped and not stripped.startswith((
-                    "'",
-                    "@",
-                    "title",
-                    "legend",
-                    "note",
-                    "end",
-                    "*",
-                )):
+                if stripped and not stripped.startswith(
+                    (
+                        "'",
+                        "@",
+                        "title",
+                        "legend",
+                        "note",
+                        "end",
+                        "*",
+                    )
+                ):
                     # Basic validation for common PlantUML constructs
                     if "->" in stripped and not stripped.endswith(";"):
                         result.warnings.append(
@@ -225,7 +223,7 @@ class PlantUMLRenderer(FlextCore.Service):
 
     def render_all_diagrams(
         self, diagrams_dir: str | Path = "docs/architecture"
-    ) -> FlextCore.Result[list[DiagramValidationResult]]:
+    ) -> FlextResult[list[DiagramValidationResult]]:
         """Render all PlantUML diagrams in a directory using FLEXT patterns."""
         diagrams_dir = Path(diagrams_dir)
         puml_files = list(diagrams_dir.rglob("*.puml")) + list(
@@ -246,13 +244,13 @@ class PlantUMLRenderer(FlextCore.Service):
                 )
                 # Continue with other diagrams even if one fails
 
-        return FlextCore.Result.ok(results)
+        return FlextResult.ok(results)
 
 
-class C4ModelValidator(FlextCore.Service):
+class C4ModelValidator(FlextService):
     """C4 model validation and consistency checking using FLEXT patterns."""
 
-    def __init__(self, logger: FlextCore.Logger | None = None) -> None:
+    def __init__(self, logger: FlextLogger | None = None) -> None:
         """Initialize C4 model validator with optional logger."""
         super().__init__(logger=logger)
         self.c4_patterns = {
@@ -366,7 +364,7 @@ class ArchitectureDiagramGenerator:
     """Automated architecture diagram generation from code analysis."""
 
     def __init__(
-        self, source_dir: str = "src", logger: FlextCore.Logger | None = None
+        self, source_dir: str = "src", logger: FlextLogger | None = None
     ) -> None:
         """Initialize architecture diagram generator with source directory and logger."""
         self.source_dir = Path(source_dir)
@@ -797,13 +795,15 @@ Examples:
 
     args = parser.parse_args()
 
-    if not any([
-        args.validate,
-        args.generate_diagrams,
-        args.update_docs,
-        args.create_report,
-        args.comprehensive,
-    ]):
+    if not any(
+        [
+            args.validate,
+            args.generate_diagrams,
+            args.update_docs,
+            args.create_report,
+            args.comprehensive,
+        ]
+    ):
         parser.print_help()
         return
 

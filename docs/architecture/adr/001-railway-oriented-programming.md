@@ -1,4 +1,4 @@
-# ADR-001: Railway-Oriented Programming with FlextCore.Result[T]
+# ADR-001: Railway-Oriented Programming with FlextResult[T]
 
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture
 
@@ -21,11 +21,11 @@ The system needs to handle:
 
 ## Decision
 
-Implement railway-oriented programming using `FlextCore.Result[T]` from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using `FlextResult[T]` from flext-core, ensuring composable error handling throughout the entire codebase.
 
 **Key Implementation Points:**
 
-1. **All public APIs return `FlextCore.Result[T]`**
+1. **All public APIs return `FlextResult[T]`**
 2. **Internal methods may use exceptions for programming errors**
 3. **Error types are specific and actionable**
 4. **Railway pattern used for operation chaining**
@@ -48,14 +48,14 @@ result = (
 **Type Safety**: Error types are preserved through the entire flow
 
 ```python
-def process_pipeline(config: dict) -> FlextCore.Result[PipelineResult]:
+def process_pipeline(config: dict) -> FlextResult[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
-    return FlextCore.Result.ok(PipelineResult(...))
+    return FlextResult.ok(PipelineResult(...))
 ```
 
 **Clarity**: Error handling is explicit and visible in the code structure
 
-### Why FlextCore.Result[T] from flext-core
+### Why FlextResult[T] from flext-core
 
 **Consistency**: Aligns with FLEXT ecosystem patterns
 **Maturity**: Proven implementation with comprehensive features
@@ -139,7 +139,7 @@ class PipelineError(FlextMeltanoError):
 ### Railway Pattern Usage
 
 ```python
-def create_and_run_pipeline(config: PipelineConfig) -> FlextCore.Result[PipelineResult]:
+def create_and_run_pipeline(config: PipelineConfig) -> FlextResult[PipelineResult]:
     return (
         validate_config(config)
         .flat_map(lambda cfg: discover_plugins(cfg))

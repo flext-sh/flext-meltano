@@ -26,29 +26,35 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
-from flext_core import FlextCore
+from flext_core import (
+    FlextExceptions,
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 
 from .docs_config import DocsConfig
 from .docs_models import DocumentationIssue, DocumentationMetrics
 
 
-class DocumentationAuditor(FlextCore.Service):
+class DocumentationAuditor(FlextService):
     """Comprehensive documentation quality auditor using FLEXT ecosystem.
 
-    Extends FlextCore.Service with structured logging, error handling, and FLEXT patterns.
+    Extends FlextService with structured logging, error handling, and FLEXT patterns.
     Provides comprehensive documentation quality analysis with railway-oriented error handling.
     """
 
     def __init__(
         self,
         root_path: str = ".",
-        logger: FlextCore.Logger | None = None,
+        logger: FlextLogger | None = None,
     ) -> None:
         """Initialize DocumentationAuditor with FLEXT integration.
 
         Args:
             root_path: Root path for documentation analysis
-            logger: FlextCore.Logger instance (injected via container)
+            logger: FlextLogger instance (injected via container)
 
         """
         super().__init__(logger=logger)
@@ -60,14 +66,14 @@ class DocumentationAuditor(FlextCore.Service):
         # Access configuration via singleton
         self._config = DocsConfig.get_instance()
 
-    def audit_all_files(self) -> FlextCore.Result[DocumentationMetrics]:
+    def audit_all_files(self) -> FlextResult[DocumentationMetrics]:
         """Perform comprehensive audit of all documentation files using FLEXT patterns.
 
         Returns:
-            FlextCore.Result containing audit metrics or error information
+            FlextResult containing audit metrics or error information
 
         """
-        self._logger.info("Starting comprehensive documentation audit")
+        self.logger.info("Starting comprehensive documentation audit")
 
         try:
             # Find all markdown files
@@ -75,12 +81,12 @@ class DocumentationAuditor(FlextCore.Service):
             md_files.extend(self.root_path.rglob("*.mdx"))
 
             self.metrics.total_files = len(md_files)
-            self._logger.info("Documentation files discovered", count=len(md_files))
+            self.logger.info("Documentation files discovered", count=len(md_files))
 
             for file_path in md_files:
                 audit_result = self._audit_single_file(file_path)
                 if not audit_result.is_success:
-                    self._logger.warning(
+                    self.logger.warning(
                         "File audit failed",
                         file=str(file_path),
                         error=audit_result.error,
@@ -94,23 +100,21 @@ class DocumentationAuditor(FlextCore.Service):
                 quality_score=self.metrics.quality_score,
                 total_issues=len(self.issues),
             )
-            return FlextCore.Result.ok(self.metrics)
+            return FlextResult.ok(self.metrics)
 
         except Exception as e:
             error_msg = f"Documentation audit failed: {e}"
-            self._logger.exception("Documentation audit failed", error=error_msg)
-            return FlextCore.Result.fail(
-                FlextCore.Exceptions.FlextExecutionError(error_msg)
-            )
+            self.logger.exception("Documentation audit failed", error=error_msg)
+            return FlextResult.fail(error_msg)
 
-    def _audit_single_file(self, file_path: Path) -> FlextCore.Result[None]:
+    def _audit_single_file(self, file_path: Path) -> FlextResult[None]:
         """Audit a single documentation file using FLEXT error handling.
 
         Args:
             file_path: Path to the file to audit
 
         Returns:
-            FlextCore.Result indicating success or failure
+            FlextResult indicating success or failure
 
         """
         try:
@@ -154,7 +158,7 @@ class DocumentationAuditor(FlextCore.Service):
             # Check formatting and style
             self._analyze_formatting_and_style(file_path, content, lines)
 
-            return FlextCore.Result.ok(None)
+            return FlextResult.ok(None)
 
         except Exception as e:
             error_msg = f"Error reading file: {e!s}"
@@ -171,12 +175,10 @@ class DocumentationAuditor(FlextCore.Service):
                 "Check file permissions and encoding",
             )
 
-            return FlextCore.Result.fail(
-                FlextCore.Exceptions.FlextFileSystemError(error_msg)
-            )
+            return FlextResult.fail(error_msg)
 
     def _analyze_content_structure(
-        self, file_path: Path, content: str, lines: FlextCore.Types.StringList
+        self, file_path: Path, content: str, lines: FlextTypes.StringList
     ) -> None:
         """Analyze content structure and organization."""
         # Check for required headings
@@ -211,7 +213,7 @@ class DocumentationAuditor(FlextCore.Service):
             )
 
     def _analyze_links_and_references(
-        self, file_path: Path, content: str, _lines: FlextCore.Types.StringList
+        self, file_path: Path, content: str, _lines: FlextTypes.StringList
     ) -> None:
         """Analyze links and references in the document."""
         # Find all links
@@ -270,7 +272,7 @@ class DocumentationAuditor(FlextCore.Service):
                     )
 
     def _analyze_formatting_and_style(
-        self, file_path: Path, content: str, lines: FlextCore.Types.StringList
+        self, file_path: Path, content: str, lines: FlextTypes.StringList
     ) -> None:
         """Analyze formatting and style consistency."""
         # Check line lengths
@@ -484,11 +486,13 @@ class LinkValidator:
                         results["valid_links"] += 1
                     continue
 
-                results["checked_links"].append({
-                    "file": str(file_path.relative_to(Path())),
-                    "text": link_text,
-                    "url": link_url,
-                })
+                results["checked_links"].append(
+                    {
+                        "file": str(file_path.relative_to(Path())),
+                        "text": link_text,
+                        "url": link_url,
+                    }
+                )
 
                 is_valid = self._validate_url(link_url)
 
@@ -496,12 +500,14 @@ class LinkValidator:
                     results["valid_links"] += 1
                     self.valid_cache[link_url] = True
                 else:
-                    results["broken_links"].append({
-                        "file": str(file_path.relative_to(Path())),
-                        "text": link_text,
-                        "url": link_url,
-                        "error": "Link validation failed",
-                    })
+                    results["broken_links"].append(
+                        {
+                            "file": str(file_path.relative_to(Path())),
+                            "text": link_text,
+                            "url": link_url,
+                            "error": "Link validation failed",
+                        }
+                    )
 
                 self.checked_urls.add(link_url)
 
@@ -514,7 +520,7 @@ class LinkValidator:
         """Validate a single URL."""
         for attempt in range(self.retries + 1):
             try:
-                with urlopen(url, timeout=self.timeout) as response:
+                with urlopen(url, timeout=self.timeout) as response:  # noqa: S310 - URL validation for docs
                     return response.status == 200
             except (URLError, HTTPError, OSError):
                 if attempt == self.retries:

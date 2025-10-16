@@ -61,9 +61,28 @@ make type-check
 ```python
 # Ensure proper type hints
 from typing import Optional
-from flext_core import FlextCore
+from flext_core import FlextBus
+from flext_core import FlextConfig
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import FlextContext
+from flext_core import FlextDecorators
+from flext_core import FlextDispatcher
+from flext_core import FlextExceptions
+from flext_core import FlextHandlers
+from flext_core import FlextLogger
+from flext_core import FlextMixins
+from flext_core import FlextModels
+from flext_core import FlextProcessors
+from flext_core import FlextProtocols
+from flext_core import FlextRegistry
+from flext_core import FlextResult
+from flext_core import FlextRuntime
+from flext_core import FlextService
+from flext_core import FlextTypes
+from flext_core import FlextUtilities
 
-def process_data(data: dict) -> FlextCore.Result[Optional[FlextCore.Types.Dict]]:
+def process_data(data: dict) -> FlextResult[Optional[FlextTypes.Dict]]:
     # Implementation
     pass
 ```
@@ -137,7 +156,7 @@ open htmlcov/index.html
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
-2. **Error Handling**: Test FlextCore.Result error paths
+2. **Error Handling**: Test FlextResult error paths
 3. **Integration Points**: Test abstractions with real scenarios
 
 ### **Slow Tests**
@@ -196,9 +215,9 @@ bandit -r src/ -f json
 
 ## 🚫 Common Mistakes
 
-### **FlextCore.Result Pattern Violations**
+### **FlextResult Pattern Violations**
 
-**Problem**: Not using FlextCore.Result for error handling
+**Problem**: Not using FlextResult for error handling
 
 ```python
 # ❌ Incorrect
@@ -210,12 +229,12 @@ def risky_operation():
         return None  # Lost error information
 
 # ✅ Correct
-def safe_operation() -> FlextCore.Result[FlextCore.Types.Dict]:
+def safe_operation() -> FlextResult[FlextTypes.Dict]:
     try:
         # operation
-        return FlextCore.Result.ok(data)
+        return FlextResult.ok(data)
     except Exception as e:
-        return FlextCore.Result.fail(f"Operation failed: {e}")
+        return FlextResult.fail(f"Operation failed: {e}")
 ```
 
 ### **Service Pattern Violations**
@@ -230,10 +249,29 @@ class UtilityClass:
         pass
 
 # ✅ Correct
-from flext_core import FlextCore
+from flext_core import FlextBus
+from flext_core import FlextConfig
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import FlextContext
+from flext_core import FlextDecorators
+from flext_core import FlextDispatcher
+from flext_core import FlextExceptions
+from flext_core import FlextHandlers
+from flext_core import FlextLogger
+from flext_core import FlextMixins
+from flext_core import FlextModels
+from flext_core import FlextProcessors
+from flext_core import FlextProtocols
+from flext_core import FlextRegistry
+from flext_core import FlextResult
+from flext_core import FlextRuntime
+from flext_core import FlextService
+from flext_core import FlextTypes
+from flext_core import FlextUtilities
 
-class FlextMeltanoUtilityService(FlextCore.Service):
-    def do_something(self) -> FlextCore.Result[FlextCore.Types.Dict]:
+class FlextMeltanoUtilityService(FlextService):
+    def do_something(self) -> FlextResult[FlextTypes.Dict]:
         # Implementation with proper error handling
         pass
 ```

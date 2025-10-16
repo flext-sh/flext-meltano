@@ -49,7 +49,7 @@ def test_pipeline_validation():
 ```python
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
-    def run_tap(self, config) -> FlextCore.Result[TapResult]:
+    def run_tap(self, config) -> FlextResult[TapResult]:
         # Implementation can change without affecting callers
 ```
 
@@ -153,7 +153,7 @@ src/flext_meltano/
 
 ```python
 # api.py
-def create_pipeline(config: dict) -> FlextCore.Result[Pipeline]:
+def create_pipeline(config: dict) -> FlextResult[Pipeline]:
     return FlextMeltanoService().create_pipeline(config)
 ```
 
@@ -161,7 +161,7 @@ def create_pipeline(config: dict) -> FlextCore.Result[Pipeline]:
 
 ```python
 # services.py
-def create_pipeline(self, config: dict) -> FlextCore.Result[Pipeline]:
+def create_pipeline(self, config: dict) -> FlextResult[Pipeline]:
     validated_config = self.config_validator.validate(config)
     return validated_config.map(lambda cfg: Pipeline.create(cfg))
 ```
@@ -170,7 +170,7 @@ def create_pipeline(self, config: dict) -> FlextCore.Result[Pipeline]:
 
 ```python
 # services.py
-def execute_pipeline(self, pipeline: Pipeline) -> FlextCore.Result[ExecutionResult]:
+def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
     return self.meltano_adapter.run_pipeline(pipeline)
 ```
 
@@ -184,7 +184,7 @@ class FlextMeltanoService:
     meltano_adapter: MeltanoAdapter
     dbt_adapter: DbtAdapter
 
-    def execute_pipeline(self, pipeline: Pipeline) -> FlextCore.Result[ExecutionResult]:
+    def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
         # Use injected dependencies
         return (
             self.config_validator.validate(pipeline.config)

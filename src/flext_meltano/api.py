@@ -13,9 +13,20 @@ from __future__ import annotations
 import time
 from typing import cast
 
-# CLI functionality replaced with logger calls (use flext-cli when available)
-from flext_core import FlextCore
+from flext_core import (
+    FlextBus,
+    FlextContainer,
+    FlextContext,
+    FlextDispatcher,
+    FlextLogger,
+    FlextProcessors,
+    FlextRegistry,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 
+# CLI functionality replaced with logger calls (use flext-cli when available)
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.executor import FlextMeltanoExecutor
@@ -23,7 +34,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltano(
-    FlextCore.Service[FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]
+    FlextService[FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]
 ):
     """FLEXT Meltano API service with complete flext-core ecosystem integration.
 
@@ -35,15 +46,15 @@ class FlextMeltano(
     - Singer protocol integration and monitoring
 
     **Complete FLEXT-Core Integration:**
-    - **FlextCore.Bus**: Event emission for pipeline lifecycle events
-    - **FlextCore.Container**: Dependency injection for service components
-    - **FlextCore.Context**: Request context management for operations
-    - **FlextCore.Dispatcher**: Message routing for async operations
-    - **FlextCore.Processors**: Processing utilities for data transformation
-    - **FlextCore.Registry**: Component registration and discovery
-    - **FlextCore.Logger**: Structured logging with correlation IDs
+    - **FlextBus**: Event emission for pipeline lifecycle events
+    - **FlextContainer**: Dependency injection for service components
+    - **FlextContext**: Request context management for operations
+    - **FlextDispatcher**: Message routing for async operations
+    - **FlextProcessors**: Processing utilities for data transformation
+    - **FlextRegistry**: Component registration and discovery
+    - **FlextLogger**: Structured logging with correlation IDs
 
-    This API follows FLEXT patterns with railway-oriented programming using FlextCore.Result
+    This API follows FLEXT patterns with railway-oriented programming using FlextResult
     for all operations, ensuring type-safe error handling and comprehensive logging.
 
     The API supports both synchronous and asynchronous operations for different
@@ -51,7 +62,7 @@ class FlextMeltano(
 
     Implements FlextMeltanoProtocols.ServiceCallProtocol through structural subtyping:
     - call: Execute service operations with operation name and payload
-    - execute: Execute the main API service operation (required by FlextCore.Service)
+    - execute: Execute the main API service operation (required by FlextService)
 
     Attributes:
         service_name: Name of the API service instance
@@ -82,10 +93,10 @@ class FlextMeltano(
     # Instance attributes (declared for type checker)
     _config: FlextMeltanoConfig
     executor: FlextMeltanoExecutor
-    bus: FlextCore.Bus
-    dispatcher: FlextCore.Dispatcher
-    processors: FlextCore.Processors
-    registry: FlextCore.Registry
+    bus: FlextBus
+    dispatcher: FlextDispatcher
+    processors: FlextProcessors
+    registry: FlextRegistry
 
     @property
     def config(self) -> FlextMeltanoConfig:
@@ -116,34 +127,32 @@ class FlextMeltano(
         super().__init__(service_name=service_name, version=version, **data)
 
         # API-specific initialization (use object.__setattr__ to bypass Pydantic validation)
-        object.__setattr__(self, "logger", FlextCore.Logger(__name__))
+        object.__setattr__(self, "logger", FlextLogger(__name__))
         object.__setattr__(self, "executor", FlextMeltanoExecutor())
 
         # Complete FLEXT-core ecosystem integration
-        object.__setattr__(self, "container", FlextCore.Container.get_global())
-        object.__setattr__(self, "bus", FlextCore.Bus())
-        object.__setattr__(self, "context", FlextCore.Context())
-        object.__setattr__(self, "dispatcher", FlextCore.Dispatcher())
-        object.__setattr__(self, "processors", FlextCore.Processors())
-        object.__setattr__(
-            self, "registry", FlextCore.Registry(dispatcher=self.dispatcher)
-        )
+        object.__setattr__(self, "container", FlextContainer.get_global())
+        object.__setattr__(self, "bus", FlextBus())
+        object.__setattr__(self, "context", FlextContext())
+        object.__setattr__(self, "dispatcher", FlextDispatcher())
+        object.__setattr__(self, "processors", FlextProcessors())
+        object.__setattr__(self, "registry", FlextRegistry(dispatcher=self.dispatcher))
 
         self.logger.info(
             f"FlextMeltanoAPI '{service_name}' v{version} initialized with FlextMeltanoConfig integration"
         )
 
     def call(
-        self, operation: str, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-        """Execute service call with FlextCore.Result - implements ServiceCallProtocol.
+        self, operation: str, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
+        """Execute service call with FlextResult - implements ServiceCallProtocol.
 
         Args:
             operation: Operation name to execute
             payload: Operation payload data
 
         Returns:
-            FlextCore.Result containing operation result or error
+            FlextResult containing operation result or error
 
         """
         operation_registry = {
@@ -160,16 +169,14 @@ class FlextMeltano(
         if operation in operation_registry:
             return operation_registry[operation](payload)
 
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
-            f"Unknown operation: {operation}"
-        )
+        return FlextResult[FlextTypes.JsonValue].fail(f"Unknown operation: {operation}")
 
     def _handle_create_pipeline_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle create_pipeline operation call."""
         if not isinstance(payload, dict):
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Payload must be a dictionary"
             )
 
@@ -178,7 +185,7 @@ class FlextMeltano(
         config = payload.get("config")
 
         if not tap_name or not target_name:
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "tap_name and target_name are required"
             )
 
@@ -188,19 +195,19 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline creation failed"
         )
 
     def _handle_execute_pipeline_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle execute_pipeline operation call."""
         if not isinstance(payload, dict):
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Payload must be a dictionary"
             )
 
@@ -208,27 +215,25 @@ class FlextMeltano(
         config = payload.get("config")
 
         if not pipeline_id:
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
-                "pipeline_id is required"
-            )
+            return FlextResult[FlextTypes.JsonValue].fail("pipeline_id is required")
 
         result = self.execute_pipeline(
             str(pipeline_id), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline execution failed"
         )
 
     def _handle_install_plugin_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle install_plugin operation call."""
         if not isinstance(payload, dict):
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Payload must be a dictionary"
             )
 
@@ -237,7 +242,7 @@ class FlextMeltano(
         config = payload.get("config")
 
         if not plugin_type or not plugin_name:
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "plugin_type and plugin_name are required"
             )
 
@@ -247,16 +252,16 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin installation failed"
         )
 
     def _handle_list_plugins_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle list_plugins operation call."""
         plugin_type = None
         if isinstance(payload, dict):
@@ -264,19 +269,19 @@ class FlextMeltano(
 
         result = self.list_plugins(str(plugin_type) if plugin_type else None)
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                cast("FlextCore.Types.List", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.List", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin listing failed"
         )
 
     def _handle_configure_environment_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle configure_environment operation call."""
         if not isinstance(payload, dict):
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Payload must be a dictionary"
             )
 
@@ -284,7 +289,7 @@ class FlextMeltano(
         config = payload.get("config")
 
         if not environment_name:
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "environment_name is required"
             )
 
@@ -292,16 +297,16 @@ class FlextMeltano(
             str(environment_name), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Environment configuration failed"
         )
 
     def _handle_run_dbt_models_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle run_dbt_models operation call."""
         models = None
         config = None
@@ -314,16 +319,16 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models execution failed"
         )
 
     def _handle_test_dbt_models_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle test_dbt_models operation call."""
         models: FlextMeltanoTypes.MeltanoCore.DbtModelList | None = None
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None
@@ -337,19 +342,19 @@ class FlextMeltano(
 
         result = self.test_dbt_models(models, config)
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models testing failed"
         )
 
     def _handle_run_elt_pipeline_call(
-        self, payload: FlextCore.Types.JsonValue
-    ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
+        self, payload: FlextTypes.JsonValue
+    ) -> FlextResult[FlextTypes.JsonValue]:
         """Handle run_elt_pipeline operation call."""
         if not isinstance(payload, dict):
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "Payload must be a dictionary"
             )
 
@@ -366,7 +371,7 @@ class FlextMeltano(
             config = config_raw
 
         if not tap_name or not target_name:
-            return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+            return FlextResult[FlextTypes.JsonValue].fail(
                 "tap_name and target_name are required"
             )
 
@@ -374,22 +379,20 @@ class FlextMeltano(
             str(tap_name), str(target_name), dbt_models, config
         )
         if result.is_success:
-            return FlextCore.Result[FlextCore.Types.JsonValue].ok(
-                data=cast("FlextCore.Types.JsonValue", result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                data=cast("FlextTypes.JsonValue", result.value)
             )
-        return FlextCore.Result[FlextCore.Types.JsonValue].fail(
+        return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "ELT pipeline execution failed"
         )
 
     def execute(
         self,
-    ) -> FlextCore.Result[
-        FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-    ]:
+    ) -> FlextResult[FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
         """Execute the main API service operation - implements ServiceCallProtocol.
 
         Returns:
-            FlextCore.Result containing service execution status
+            FlextResult containing service execution status
 
         """
         return self.get_service_status()
@@ -399,7 +402,7 @@ class FlextMeltano(
         tap_name: str,
         target_name: str,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Create a new Meltano ELT pipeline with validation.
 
         Creates and configures a complete ELT pipeline including tap (extractor),
@@ -411,7 +414,7 @@ class FlextMeltano(
             config: Optional pipeline configuration dictionary
 
         Returns:
-            FlextCore.Result containing created pipeline configuration and metadata.
+            FlextResult containing created pipeline configuration and metadata.
             Success includes pipeline ID, configuration, and operational status.
             Failure includes validation errors and configuration issues.
 
@@ -425,20 +428,18 @@ class FlextMeltano(
         """
         # Input validation
         if not tap_name or not target_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Both tap_name and target_name are required for pipeline creation")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Both tap_name and target_name are required for pipeline creation"
+            )
 
         # Validate plugin names format
         if not tap_name.startswith("tap-"):
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(f"Invalid tap name format: {tap_name}. Must start with 'tap-'")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid tap name format: {tap_name}. Must start with 'tap-'"
+            )
 
         if not target_name.startswith("target-"):
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid target name format: {target_name}. Must start with 'target-'"
             )
 
@@ -448,7 +449,7 @@ class FlextMeltano(
             pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
 
             # Use configuration values for additional pipeline metadata
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -472,15 +473,15 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Pipeline creation failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def execute_pipeline(
         self,
         pipeline_id: str,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute an existing Meltano pipeline with monitoring.
 
         Executes a configured pipeline with comprehensive monitoring, logging,
@@ -491,7 +492,7 @@ class FlextMeltano(
             config: Optional execution configuration and parameters
 
         Returns:
-            FlextCore.Result containing pipeline execution results and metrics.
+            FlextResult containing pipeline execution results and metrics.
             Success includes execution status, timing, and output metadata.
             Failure includes detailed error information and troubleshooting data.
 
@@ -505,9 +506,9 @@ class FlextMeltano(
         """
         # Input validation
         if not pipeline_id:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Pipeline ID is required for execution")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Pipeline ID is required for execution"
+            )
 
         try:
             # Pipeline execution with comprehensive monitoring
@@ -518,7 +519,7 @@ class FlextMeltano(
             # interface with actual Meltano execution)
             execution_duration = time.time() - execution_start
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -534,16 +535,16 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def install_plugin(
         self,
         plugin_type: str,
         plugin_name: str,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Install a Meltano plugin with validation and configuration.
 
         Installs and configures Meltano plugins including taps, targets, and
@@ -555,7 +556,7 @@ class FlextMeltano(
             config: Optional plugin configuration
 
         Returns:
-            FlextCore.Result containing plugin installation status and metadata.
+            FlextResult containing plugin installation status and metadata.
             Success includes installation details and configuration.
             Failure includes installation errors and dependency issues.
 
@@ -569,16 +570,16 @@ class FlextMeltano(
         """
         # Input validation
         if not plugin_type or not plugin_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Plugin type and name are required")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Plugin type and name are required"
+            )
 
         # Validate plugin type
         valid_types = ["extractors", "loaders", "transformers", "orchestrators"]
         if plugin_type not in valid_types:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+            )
 
         # Plugin configuration validation
         plugin_config: FlextMeltanoTypes.MeltanoCore.JsonValue = {
@@ -591,11 +592,11 @@ class FlextMeltano(
         # Plugin installation validation (in real implementation, this would
         # perform actual plugin installation)
         if not plugin_name.startswith(("tap-", "target-", "dbt-")):
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(f"Invalid plugin name format: {plugin_name}")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid plugin name format: {plugin_name}"
+            )
 
-        return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
             data={
                 "plugin_name": plugin_name,
                 "plugin_type": plugin_type,
@@ -609,7 +610,7 @@ class FlextMeltano(
     def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> FlextCore.Result[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
+    ) -> FlextResult[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
         """List installed Meltano plugins with filtering capabilities.
 
         Retrieves list of installed plugins with optional filtering by plugin type
@@ -619,7 +620,7 @@ class FlextMeltano(
             plugin_type: Optional plugin type filter (extractors, loaders, etc.)
 
         Returns:
-            FlextCore.Result containing list of plugin information dictionaries.
+            FlextResult containing list of plugin information dictionaries.
             Success includes plugin details, configurations, and status.
             Failure includes listing errors and access issues.
 
@@ -651,14 +652,14 @@ class FlextMeltano(
                 {**plugin, "api_version": self.version} for plugin in filtered_plugins
             ]
 
-            return FlextCore.Result[
+            return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].ok(plugins_data)
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Plugin listing failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
+            return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].fail(error_msg)
 
@@ -666,7 +667,7 @@ class FlextMeltano(
         self,
         environment_name: str,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Configure Meltano environment with validation.
 
         Creates and configures Meltano environments for different deployment
@@ -677,7 +678,7 @@ class FlextMeltano(
             config: Optional environment configuration dictionary
 
         Returns:
-            FlextCore.Result containing environment configuration and status.
+            FlextResult containing environment configuration and status.
             Success includes environment details and deployment configuration.
             Failure includes validation errors and configuration issues.
 
@@ -692,15 +693,15 @@ class FlextMeltano(
         """
         # Input validation
         if not environment_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Environment name is required")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Environment name is required"
+            )
 
         try:
             # Validate environment name
             valid_environments = ["development", "staging", "production", "testing"]
             if environment_name not in valid_environments:
-                return FlextCore.Result[
+                return FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].fail(
                     f"Invalid environment: {environment_name}. Valid: {valid_environments}"
@@ -709,7 +710,7 @@ class FlextMeltano(
             # Environment configuration with defaults
             env_config = config or {}
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -725,15 +726,15 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Environment configuration failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def run_dbt_models(
         self,
         models: FlextMeltanoTypes.MeltanoCore.DbtModelList | None = None,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute DBT models with configuration and monitoring.
 
         Runs specified DBT models or all models with comprehensive monitoring,
@@ -744,7 +745,7 @@ class FlextMeltano(
             config: Optional DBT execution configuration
 
         Returns:
-            FlextCore.Result containing DBT execution results and model status.
+            FlextResult containing DBT execution results and model status.
             Success includes model execution details and compilation results.
             Failure includes model errors and compilation issues.
 
@@ -773,7 +774,7 @@ class FlextMeltano(
             )
 
             # Use configuration values for DBT execution
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -797,15 +798,15 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT models execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def test_dbt_models(
         self,
         models: FlextMeltanoTypes.MeltanoCore.DbtModelList | None = None,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute DBT model tests with comprehensive validation.
 
         Runs DBT tests for specified models or all models with detailed
@@ -816,7 +817,7 @@ class FlextMeltano(
             config: Optional DBT test configuration
 
         Returns:
-            FlextCore.Result containing DBT test results and validation status.
+            FlextResult containing DBT test results and validation status.
             Success includes test results, coverage, and data quality metrics.
             Failure includes test failures and validation errors.
 
@@ -844,7 +845,7 @@ class FlextMeltano(
                 f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s"
             )
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -862,9 +863,9 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT model testing failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def run_elt_pipeline(
         self,
@@ -872,7 +873,7 @@ class FlextMeltano(
         target_name: str,
         dbt_models: FlextMeltanoTypes.MeltanoCore.DbtModelList | None = None,
         config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute complete ELT pipeline with Extract, Load, and Transform.
 
         Runs a full ELT pipeline including data extraction, loading, and
@@ -885,7 +886,7 @@ class FlextMeltano(
             config: Optional pipeline configuration
 
         Returns:
-            FlextCore.Result containing complete ELT pipeline execution results.
+            FlextResult containing complete ELT pipeline execution results.
             Success includes extraction, loading, and transformation metrics.
             Failure includes detailed error information for each pipeline stage.
 
@@ -901,9 +902,9 @@ class FlextMeltano(
         """
         # Input validation
         if not tap_name or not target_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Both tap_name and target_name are required")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Both tap_name and target_name are required"
+            )
 
         try:
             # ELT pipeline execution with comprehensive monitoring
@@ -924,7 +925,7 @@ class FlextMeltano(
 
             total_duration = time.time() - execution_start
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data=cast(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
                     {
@@ -948,9 +949,9 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     @property
     def types(self) -> type[FlextMeltanoTypes]:
@@ -961,9 +962,7 @@ class FlextMeltano(
         self,
         *,
         _include_details: bool = False,
-    ) -> FlextCore.Result[
-        FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-    ]:
+    ) -> FlextResult[FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
         """Get comprehensive service status and health information.
 
         Retrieves current service status including health, version, capabilities,
@@ -973,7 +972,7 @@ class FlextMeltano(
             _include_details: Whether to include detailed service information (reserved for future use)
 
         Returns:
-            FlextCore.Result containing nested FlextCore.Result with service status.
+            FlextResult containing nested FlextResult with service status.
             Success includes service health, version, and operational metrics.
             Failure includes service errors and diagnostic information.
 
@@ -996,11 +995,11 @@ class FlextMeltano(
                 "status": "active",
             }
 
-            inner_result = FlextCore.Result[
+            inner_result = FlextResult[
                 FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
             ].ok(data=api_status)
-            return FlextCore.Result[
-                FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+            return FlextResult[
+                FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].ok(data=inner_result)
 
         except Exception as e:
@@ -1011,11 +1010,11 @@ class FlextMeltano(
                     "version": self.version,
                     "error": str(e),
                 }
-                inner_result = FlextCore.Result[
+                inner_result = FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].ok(data=version_info)
-                return FlextCore.Result[
-                    FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+                return FlextResult[
+                    FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
                 ].ok(data=inner_result)
             except Exception:
                 # Fallback error status
@@ -1025,31 +1024,31 @@ class FlextMeltano(
                     "health": "unhealthy",
                     "status": "error",
                 }
-                inner_result = FlextCore.Result[
+                inner_result = FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].ok(data=error_status)
-                return FlextCore.Result[
-                    FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+                return FlextResult[
+                    FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
                 ].ok(data=inner_result)
 
         # Error handling for service status failures
-        inner_result = FlextCore.Result[
+        inner_result = FlextResult[
             FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
         ].fail("Service status check failed")
-        return FlextCore.Result[
-            FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+        return FlextResult[
+            FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
         ].ok(data=inner_result)
 
     def get_version_info(
         self,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Get detailed version and build information.
 
         Retrieves comprehensive version information including API version,
         dependencies, build information, and compatibility details.
 
         Returns:
-            FlextCore.Result containing version information dictionary.
+            FlextResult containing version information dictionary.
             Success includes version details and dependency information.
             Failure includes version retrieval errors.
 
@@ -1070,31 +1069,31 @@ class FlextMeltano(
                     "service_name": self.service_name,
                     "meltano_version": version_result.unwrap(),
                 }
-                return FlextCore.Result[
-                    FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-                ].ok(data=version_info)
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+                    data=version_info
+                )
 
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Version information retrieval failed")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Version information retrieval failed"
+            )
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Version info retrieval failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def list_pipelines(
         self,
-    ) -> FlextCore.Result[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
+    ) -> FlextResult[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
         """List all configured pipelines with current status.
 
         Retrieves a comprehensive list of all configured Meltano pipelines
         including their current status, configuration, and execution history.
 
         Returns:
-            FlextCore.Result containing list of pipeline configuration dictionaries.
+            FlextResult containing list of pipeline configuration dictionaries.
             Success includes pipeline details with status and metadata.
             Failure includes listing errors and access issues.
 
@@ -1114,20 +1113,20 @@ class FlextMeltano(
                 # Placeholder for future pipeline listing implementation
             ]
 
-            return FlextCore.Result[
+            return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].ok(pipelines_data)
 
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Pipeline listing failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
+            return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].fail(error_msg)
 
     def run_tap(
         self, tap_name: str
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer tap for data extraction.
 
         Runs a specified Singer tap plugin to extract data from source systems
@@ -1137,7 +1136,7 @@ class FlextMeltano(
             tap_name: Name of the Singer tap plugin to execute
 
         Returns:
-            FlextCore.Result containing tap execution results and metadata.
+            FlextResult containing tap execution results and metadata.
             Success includes extraction statistics and data flow information.
             Failure includes tap execution errors and troubleshooting data.
 
@@ -1151,14 +1150,14 @@ class FlextMeltano(
         """
         # Input validation
         if not tap_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Tap name is required for execution")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Tap name is required for execution"
+            )
 
         try:
             # Validate tap name format
             if not tap_name.startswith("tap-"):
-                return FlextCore.Result[
+                return FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].fail(f"Invalid tap name format: {tap_name}. Must start with 'tap-'")
 
@@ -1169,7 +1168,7 @@ class FlextMeltano(
             # execute actual Singer tap with proper stream handling)
             execution_duration = time.time() - execution_start
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data={
                     "tap_name": tap_name,
                     "status": "completed",
@@ -1182,13 +1181,13 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Tap execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def run_target(
         self, target_name: str
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer target for data loading.
 
         Runs a specified Singer target plugin to load data into destination systems
@@ -1198,7 +1197,7 @@ class FlextMeltano(
             target_name: Name of the Singer target plugin to execute
 
         Returns:
-            FlextCore.Result containing target execution results and metadata.
+            FlextResult containing target execution results and metadata.
             Success includes loading statistics and data processing information.
             Failure includes target execution errors and troubleshooting data.
 
@@ -1212,14 +1211,14 @@ class FlextMeltano(
         """
         # Input validation
         if not target_name:
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail("Target name is required for execution")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                "Target name is required for execution"
+            )
 
         try:
             # Validate target name format
             if not target_name.startswith("target-"):
-                return FlextCore.Result[
+                return FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].fail(
                     f"Invalid target name format: {target_name}. Must start with 'target-'"
@@ -1232,7 +1231,7 @@ class FlextMeltano(
             # execute actual Singer target with proper record handling)
             execution_duration = time.time() - execution_start
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data={
                     "target_name": target_name,
                     "status": "completed",
@@ -1245,13 +1244,13 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"Target execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
     def generate_dbt_docs(
         self,
-    ) -> FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Generate DBT project documentation and lineage diagrams.
 
         Creates comprehensive DBT documentation including model lineage,
@@ -1259,7 +1258,7 @@ class FlextMeltano(
         comprehensive monitoring and error handling.
 
         Returns:
-            FlextCore.Result containing DBT documentation generation results.
+            FlextResult containing DBT documentation generation results.
             Success includes documentation paths and generation statistics.
             Failure includes documentation generation errors.
 
@@ -1279,7 +1278,7 @@ class FlextMeltano(
             # execute actual DBT docs generate command)
             execution_duration = time.time() - execution_start
 
-            return FlextCore.Result[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 data={
                     "status": "completed",
                     "execution_duration": execution_duration,
@@ -1293,9 +1292,9 @@ class FlextMeltano(
         except (ValueError, TypeError, AttributeError) as e:
             error_msg = f"DBT documentation generation failed: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
-                FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+                error_msg
+            )
 
 
 __all__ = [

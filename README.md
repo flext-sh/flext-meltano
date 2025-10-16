@@ -25,7 +25,7 @@ FLEXT-Meltano provides the **Meltano integration foundation** for the FLEXT data
 
 ### **Integration Points**
 
-- **[flext-core](../flext-core/README.md)** → Foundation patterns (FlextCore.Result, FlextCore.Container, FlextCore.Service)
+- **[flext-core](../flext-core/README.md)** → Foundation patterns (FlextResult, FlextContainer, FlextService)
 - **[flext-cli](../flext-cli/README.md)** → Pipeline execution and management commands
 - **Singer Protocol Projects** → Foundation for all flext-tap-_and flext-target-_ projects
 - **Enterprise Data Platform** → Data pipeline orchestration and management

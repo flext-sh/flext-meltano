@@ -110,7 +110,7 @@ make docs-architecture-comprehensive
 ### Core Principles
 
 1. **Clean Architecture** - Domain-driven design with clear layer separation
-2. **Railway-Oriented Programming** - Composable error handling with FlextCore.Result[T]
+2. **Railway-Oriented Programming** - Composable error handling with FlextResult[T]
 3. **Type Safety First** - 100% Pyrefly compliance and Pydantic validation
 4. **Ecosystem Foundation** - Foundation library for 32+ FLEXT projects
 

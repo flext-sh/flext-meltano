@@ -13,8 +13,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextCore
-from flext_core.constants import FlextCore
+from flext_core import (
+    FlextConfig,
+    FlextConstants,
+    FlextExceptions,
+    FlextResult,
+    FlextTypes,
+)
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -23,10 +28,10 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoConfig(FlextCore.Config):
+class FlextMeltanoConfig(FlextConfig):
     """Meltano ELT configuration management with enterprise-grade validation.
 
-    Extends FlextCore.Config to provide comprehensive Meltano-specific configuration
+    Extends FlextConfig to provide comprehensive Meltano-specific configuration
     with validation using flext-core patterns. This class serves as the single
     source of truth for all Meltano configuration across the application.
 
@@ -75,17 +80,17 @@ class FlextMeltanoConfig(FlextCore.Config):
     # ENUMS - All enumerated types as class enums
     # ============================================================================
 
-    # ALL ENUMS MUST COME FROM FlextCore.Constants or FlextMeltanoConstants - NO ALIASES
+    # ALL ENUMS MUST COME FROM FlextConstants or FlextMeltanoConstants - NO ALIASES
     PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
-    EnvironmentType: type = FlextCore.Constants.Config.Environment  # Core constants
-    LogLevel: type = FlextCore.Constants.Config.LogLevel  # Core constants
+    EnvironmentType: type = FlextConstants.Config.Environment  # Core constants
+    LogLevel: type = FlextConstants.Config.LogLevel  # Core constants
     OperationStatus: type = (
         FlextMeltanoConstants.OperationStatus
     )  # Domain-specific constants
     RunMode: type = FlextMeltanoConstants.RunMode  # Domain-specific constants
 
     # ============================================================================
-    # MELTANO-SPECIFIC CONFIGURATION FIELDS - Additional to FlextCore.Config
+    # MELTANO-SPECIFIC CONFIGURATION FIELDS - Additional to FlextConfig
     # ============================================================================
 
     # Core project configuration
@@ -108,20 +113,8 @@ class FlextMeltanoConfig(FlextCore.Config):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextCore.Constants.Config.Environment.DEVELOPMENT,
+        default=FlextConstants.Config.Environment.DEVELOPMENT,
         description="Deployment environment",
-    )
-
-    log_level: str = Field(
-        default=FlextCore.Constants.Config.LogLevel.INFO,  # SOURCE OF TRUTH
-        description="Logging level for operations",
-    )
-
-    timeout_seconds: int = Field(
-        default=FlextCore.Constants.Defaults.TIMEOUT,
-        ge=1,
-        le=3600,
-        description="Timeout for operations in seconds",
     )
 
     # Sensitive data using SecretStr for enhanced security
@@ -562,14 +555,14 @@ class FlextMeltanoConfig(FlextCore.Config):
     )
 
     retry_count: int = Field(
-        default=FlextCore.Constants.Reliability.MAX_RETRY_ATTEMPTS,  # SOURCE OF TRUTH
+        default=FlextConstants.Reliability.MAX_RETRY_ATTEMPTS,  # SOURCE OF TRUTH
         ge=0,
         le=10,
         description="Number of retries for failed operations",
     )
 
     batch_size: int = Field(
-        default=FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
+        default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         ge=1,
         le=10000,
         description="Batch size for data processing",
@@ -577,7 +570,7 @@ class FlextMeltanoConfig(FlextCore.Config):
 
     # Plugin and execution configuration
     max_concurrent_jobs: int = Field(
-        default=FlextCore.Constants.Container.MAX_WORKERS,  # SOURCE OF TRUTH
+        default=FlextConstants.Container.MAX_WORKERS,  # SOURCE OF TRUTH
         ge=1,
         le=16,
         description="Maximum number of concurrent jobs",
@@ -595,7 +588,7 @@ class FlextMeltanoConfig(FlextCore.Config):
     )
 
     logs_dir: Path = Field(
-        default_factory=lambda: Path(FlextCore.Constants.Platform.DIR_LOGS),
+        default_factory=lambda: Path(FlextConstants.Platform.DIR_LOGS),
         description="Logs directory",
     )
 
@@ -657,7 +650,7 @@ class FlextMeltanoConfig(FlextCore.Config):
         """
         if not v:
             error_msg = "Version must be non-empty string"
-            raise FlextCore.Exceptions.ValidationError(error_msg)
+            raise FlextExceptions.ValidationError(error_msg)
         return v.strip()
 
     @field_validator("meltano_database_uri", "meltano_api_key")
@@ -724,14 +717,14 @@ class FlextMeltanoConfig(FlextCore.Config):
             return self.venv_dir
         return self.project_root / self.venv_dir
 
-    def validate_project_structure(self) -> FlextCore.Result[bool]:
+    def validate_project_structure(self) -> FlextResult[bool]:
         """Validate Meltano project directory structure.
 
         Performs comprehensive validation of the Meltano project structure,
         checking for required directories, files, and configuration.
 
         Returns:
-            FlextCore.Result containing boolean validation result or error details.
+            FlextResult containing boolean validation result or error details.
 
         """
         # Use centralized validator to eliminate duplication
@@ -739,13 +732,13 @@ class FlextMeltanoConfig(FlextCore.Config):
             self.project_root,
         )
 
-    def get_environment_variables(self) -> FlextCore.Types.StringDict:
+    def get_environment_variables(self) -> FlextTypes.StringDict:
         """Get environment variables for Meltano operations.
 
-        This method uses FlextCore.Config as the base and adds Meltano-specific variables.
+        This method uses FlextConfig as the base and adds Meltano-specific variables.
 
         Returns:
-            FlextCore.Types.StringDict: Environment variables dictionary.
+            FlextTypes.StringDict: Environment variables dictionary.
 
         """
         return self.get_meltano_environment_variables()
@@ -784,7 +777,7 @@ class FlextMeltanoConfig(FlextCore.Config):
     def create_from_project_root(
         cls,
         project_root: str | Path,
-    ) -> FlextCore.Result[FlextMeltanoConfig]:
+    ) -> FlextResult[FlextMeltanoConfig]:
         """Create configuration from project root directory.
 
         Creates a new configuration instance from the specified project root
@@ -794,7 +787,7 @@ class FlextMeltanoConfig(FlextCore.Config):
             project_root: Path to the Meltano project root directory.
 
         Returns:
-            FlextCore.Result containing the created configuration or error details.
+            FlextResult containing the created configuration or error details.
 
         """
         try:
@@ -803,14 +796,14 @@ class FlextMeltanoConfig(FlextCore.Config):
             validation_result = config.validate_project_structure()
 
             if validation_result.is_failure:
-                return FlextCore.Result[FlextMeltanoConfig].fail(
+                return FlextResult[FlextMeltanoConfig].fail(
                     validation_result.error or "Project validation failed",
                 )
 
-            return FlextCore.Result[FlextMeltanoConfig].ok(config)
+            return FlextResult[FlextMeltanoConfig].ok(config)
 
         except Exception as e:  # pragma: no cover
-            return FlextCore.Result[FlextMeltanoConfig].fail(
+            return FlextResult[FlextMeltanoConfig].fail(
                 f"Config creation failed: {e}",
             )
 
@@ -836,21 +829,21 @@ class FlextMeltanoConfig(FlextCore.Config):
             FlextMeltanoConfig: The created configuration instance.
 
         """
-        # Validate environment using FlextCore.Constants
+        # Validate environment using FlextConstants
         try:
-            env_type = FlextCore.Constants.Config.Environment(environment)
+            env_type = FlextConstants.Config.Environment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
 
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
-        filtered_kwargs: FlextCore.Types.Dict = {
+        filtered_kwargs: FlextTypes.Dict = {
             k: v for k, v in kwargs.items() if k in valid_fields
         }
 
         # Create config data with environment
-        config_data: FlextCore.Types.Dict = {"environment": env_type.value}
+        config_data: FlextTypes.Dict = {"environment": env_type.value}
 
         # Handle debug/environment conflict: production cannot have debug=True
         if env_type.value == "production":
@@ -867,7 +860,7 @@ class FlextMeltanoConfig(FlextCore.Config):
                 config_data["project_root"] = Path()
 
         if "log_level" in filtered_kwargs:
-            config_data["log_level"] = FlextCore.Constants.Config.LogLevel(
+            config_data["log_level"] = FlextConstants.Config.LogLevel(
                 str(filtered_kwargs["log_level"]),
             )
 
@@ -889,7 +882,7 @@ class FlextMeltanoConfig(FlextCore.Config):
         return cls.model_validate(config_data)
 
     # ============================================================================
-    # SINGLETON METHODS - Global instance management using FlextCore.Config as SOURCE OF TRUTH
+    # SINGLETON METHODS - Global instance management using FlextConfig as SOURCE OF TRUTH
     # ============================================================================
 
     @classmethod
@@ -898,7 +891,7 @@ class FlextMeltanoConfig(FlextCore.Config):
 
         This method ensures a single source of truth for Meltano configuration across
         the entire application. It uses the enhanced singleton pattern with inverse
-        dependency injection from FlextCore.Config.
+        dependency injection from FlextConfig.
 
         Args:
             **overrides: Configuration overrides that will be applied with highest priority.
@@ -907,7 +900,7 @@ class FlextMeltanoConfig(FlextCore.Config):
             FlextMeltanoConfig: The global configuration instance (created if needed).
 
         """
-        # Use enhanced singleton pattern from FlextCore.Config - create directly and apply overrides
+        # Use enhanced singleton pattern from FlextConfig - create directly and apply overrides
         instance = cls()
         if overrides:
             # Apply overrides to the instance
@@ -918,10 +911,10 @@ class FlextMeltanoConfig(FlextCore.Config):
         return instance
 
     @classmethod
-    def set_global_instance(cls, instance: FlextCore.Config) -> None:
+    def set_global_instance(cls, instance: FlextConfig) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
-        This method delegates to FlextCore.Config.set_global_instance() since FlextCore.Config
+        This method delegates to FlextConfig.set_global_instance() since FlextConfig
         is the source of truth for all configuration.
 
         Args:
@@ -935,8 +928,8 @@ class FlextMeltanoConfig(FlextCore.Config):
             error_msg = "instance must be a FlextMeltanoConfig instance"
             raise TypeError(error_msg)
 
-        # Delegate to FlextCore.Config since it's the source of truth
-        FlextCore.Config.set_global_instance(instance)
+        # Delegate to FlextConfig since it's the source of truth
+        FlextConfig.set_global_instance(instance)
 
     @classmethod
     def get_version(cls: object) -> str:
@@ -951,12 +944,12 @@ class FlextMeltanoConfig(FlextCore.Config):
     @classmethod
     def get_default_timeout(cls: object) -> int:
         """Get the default timeout value."""
-        return FlextCore.Constants.Network.DEFAULT_TIMEOUT
+        return FlextConstants.Network.DEFAULT_TIMEOUT
 
     @classmethod
     def get_default_batch_size(cls: object) -> int:
         """Get the default batch size value."""
-        return FlextCore.Constants.Performance.BatchProcessing.DEFAULT_SIZE
+        return FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE
 
     @classmethod
     def get_supported_plugin_types(cls) -> FlextMeltanoTypes.MeltanoCore.PluginTypeList:
@@ -991,22 +984,22 @@ class FlextMeltanoConfig(FlextCore.Config):
         # Clear global instance for this class
         # Parent class doesn't have this method, so we implement it here
 
-    def apply_overrides(self, **overrides: object) -> FlextCore.Result[None]:
+    def apply_overrides(self, **overrides: object) -> FlextResult[None]:
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
-        following the same pattern as FlextCore.Config validation.
+        following the same pattern as FlextConfig validation.
 
         Args:
             **overrides: Configuration overrides to apply.
 
         Returns:
-            FlextCore.Result indicating success or failure.
+            FlextResult indicating success or failure.
 
         """
         # Check if configuration is sealed
         if self.is_sealed():
-            return FlextCore.Result[None].fail(
+            return FlextResult[None].fail(
                 "Cannot apply overrides to sealed configuration",
                 error_code="CONFIG_SEALED_ERROR",
             )
@@ -1036,26 +1029,26 @@ class FlextMeltanoConfig(FlextCore.Config):
             )
             self._metadata_extra["override_count"] = str(applied_count)
 
-            return FlextCore.Result[None].ok(data=None)
+            return FlextResult[None].ok(data=None)
 
         except Exception as error:
-            return FlextCore.Result[None].fail(
+            return FlextResult[None].fail(
                 f"Failed to apply configuration overrides: {error}",
                 error_code="OVERRIDE_APPLICATION_ERROR",
             )
 
-    def seal(self) -> FlextCore.Result[None]:
+    def seal(self) -> FlextResult[None]:
         """Seal the configuration to prevent further modifications.
 
         Once sealed, the configuration cannot be modified, ensuring
         immutability for production use.
 
         Returns:
-            FlextCore.Result indicating success or failure.
+            FlextResult indicating success or failure.
 
         """
         self._sealed = True
-        return FlextCore.Result[None].ok(data=None)
+        return FlextResult[None].ok(data=None)
 
     def is_sealed(self) -> bool:
         """Check if the configuration is sealed.
@@ -1066,20 +1059,20 @@ class FlextMeltanoConfig(FlextCore.Config):
         """
         return getattr(self, "_sealed", False)
 
-    def get_meltano_environment_variables(self) -> FlextCore.Types.StringDict:
+    def get_meltano_environment_variables(self) -> FlextTypes.StringDict:
         """Get Meltano-specific environment variables.
 
-        This method provides Meltano-specific environment variables using FlextCore.Config
+        This method provides Meltano-specific environment variables using FlextConfig
         as the source of truth for base configuration.
 
         Returns:
-            FlextCore.Types.StringDict: Environment variables dictionary.
+            FlextTypes.StringDict: Environment variables dictionary.
 
         """
-        # Get base configuration from FlextCore.Config singleton
-        base_config = FlextCore.Config.get_global_instance()
+        # Get base configuration from FlextConfig singleton
+        base_config = FlextConfig.get_global_instance()
 
-        # Create base environment variables from FlextCore.Config fields
+        # Create base environment variables from FlextConfig fields
         base_env_vars = {
             "FLEXT_APP_NAME": base_config.app_name,
             "FLEXT_ENVIRONMENT": self.environment,  # Use own environment
@@ -1112,11 +1105,11 @@ class FlextMeltanoConfig(FlextCore.Config):
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    def get_meltano_logging_config(self) -> FlextCore.Types.Dict:
+    def get_meltano_logging_config(self) -> FlextTypes.Dict:
         """Get Meltano-specific logging configuration dictionary.
 
         Returns:
-            FlextCore.Types.Dict: Dictionary containing Meltano logging configuration.
+            FlextTypes.Dict: Dictionary containing Meltano logging configuration.
 
         """
         return {
@@ -1203,11 +1196,11 @@ class FlextMeltanoConfig(FlextCore.Config):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> FlextCore.Types.Dict:
+    def get_metadata(self) -> FlextTypes.Dict:
         """Get configuration metadata including override tracking.
 
         Returns:
-            FlextCore.Types.Dict: Configuration metadata dictionary.
+            FlextTypes.Dict: Configuration metadata dictionary.
 
         """
         # Return the metadata with proper typing
@@ -1230,7 +1223,7 @@ class FlextMeltanoConfig(FlextCore.Config):
         def create_dbt_config(
             project_name: str,
             profile_name: str = "",
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create DBT project configuration.
 
             Args:
@@ -1238,12 +1231,12 @@ class FlextMeltanoConfig(FlextCore.Config):
                 profile_name: Optional profile name override
 
             Returns:
-                FlextCore.Result with DBT configuration dictionary
+                FlextResult with DBT configuration dictionary
 
             """
             try:
                 profile = profile_name or f"{project_name}_profile"
-                config: FlextCore.Types.Dict = {
+                config: FlextTypes.Dict = {
                     "name": project_name,
                     "version": "1.0.0",
                     "config-version": 2,
@@ -1255,9 +1248,9 @@ class FlextMeltanoConfig(FlextCore.Config):
                     "macro-paths": ["macros"],
                     "snapshot-paths": ["snapshots"],
                 }
-                return FlextCore.Result[FlextCore.Types.Dict].ok(config)
+                return FlextResult[FlextTypes.Dict].ok(config)
             except Exception as e:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Failed to create DBT config: {e}"
                 )
 
@@ -1266,7 +1259,7 @@ class FlextMeltanoConfig(FlextCore.Config):
             profile_name: str,
             target_name: str = "dev",
             db_type: str = "postgres",
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create DBT profile configuration.
 
             Args:
@@ -1275,11 +1268,11 @@ class FlextMeltanoConfig(FlextCore.Config):
                 db_type: Database type (postgres, snowflake, etc.)
 
             Returns:
-                FlextCore.Result with DBT profile configuration dictionary
+                FlextResult with DBT profile configuration dictionary
 
             """
             try:
-                profile_config: FlextCore.Types.Dict = {
+                profile_config: FlextTypes.Dict = {
                     profile_name: {
                         "target": target_name,
                         "outputs": {
@@ -1295,9 +1288,9 @@ class FlextMeltanoConfig(FlextCore.Config):
                         },
                     }
                 }
-                return FlextCore.Result[FlextCore.Types.Dict].ok(profile_config)
+                return FlextResult[FlextTypes.Dict].ok(profile_config)
             except Exception as e:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Failed to create DBT profile config: {e}"
                 )
 
@@ -1305,7 +1298,7 @@ class FlextMeltanoConfig(FlextCore.Config):
         def create_meltano_config(
             project_id: str,
             default_environment: str = "dev",
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Create basic Meltano project configuration.
 
             Args:
@@ -1313,11 +1306,11 @@ class FlextMeltanoConfig(FlextCore.Config):
                 default_environment: Default environment name
 
             Returns:
-                FlextCore.Result with Meltano configuration dictionary
+                FlextResult with Meltano configuration dictionary
 
             """
             try:
-                config: FlextCore.Types.Dict = {
+                config: FlextTypes.Dict = {
                     "version": 1,
                     "default_environment": default_environment,
                     "project_id": project_id,
@@ -1334,18 +1327,18 @@ class FlextMeltanoConfig(FlextCore.Config):
                         }
                     ],
                 }
-                return FlextCore.Result[FlextCore.Types.Dict].ok(config)
+                return FlextResult[FlextTypes.Dict].ok(config)
             except Exception as e:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Failed to create Meltano config: {e}"
                 )
 
         @staticmethod
-        def create_development_config() -> FlextCore.Result[FlextMeltanoConfig]:
+        def create_development_config() -> FlextResult[FlextMeltanoConfig]:
             """Create configuration optimized for development environment.
 
             Returns:
-                FlextCore.Result with development-optimized FlextMeltanoConfig
+                FlextResult with development-optimized FlextMeltanoConfig
 
             """
             try:
@@ -1356,23 +1349,23 @@ class FlextMeltanoConfig(FlextCore.Config):
                 config.log_level = "DEBUG"
                 config.timeout_seconds = 300
                 config.max_concurrent_jobs = 2
-                return FlextCore.Result[FlextMeltanoConfig].ok(config)
+                return FlextResult[FlextMeltanoConfig].ok(config)
             except Exception as e:
-                return FlextCore.Result[FlextMeltanoConfig].fail(
+                return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create dev config: {e}"
                 )
 
         @staticmethod
         def create_production_config(
             database_url: str,
-        ) -> FlextCore.Result[FlextMeltanoConfig]:
+        ) -> FlextResult[FlextMeltanoConfig]:
             """Create configuration optimized for production environment.
 
             Args:
                 database_url: Production database URL
 
             Returns:
-                FlextCore.Result with production-optimized FlextMeltanoConfig
+                FlextResult with production-optimized FlextMeltanoConfig
 
             """
             try:
@@ -1384,18 +1377,18 @@ class FlextMeltanoConfig(FlextCore.Config):
                 config.timeout_seconds = 600
                 config.max_concurrent_jobs = 10
                 config.meltano_database_uri = SecretStr(database_url)
-                return FlextCore.Result[FlextMeltanoConfig].ok(config)
+                return FlextResult[FlextMeltanoConfig].ok(config)
             except Exception as e:
-                return FlextCore.Result[FlextMeltanoConfig].fail(
+                return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create prod config: {e}"
                 )
 
         @staticmethod
-        def create_testing_config() -> FlextCore.Result[FlextMeltanoConfig]:
+        def create_testing_config() -> FlextResult[FlextMeltanoConfig]:
             """Create configuration optimized for testing environment.
 
             Returns:
-                FlextCore.Result with testing-optimized FlextMeltanoConfig
+                FlextResult with testing-optimized FlextMeltanoConfig
 
             """
             try:
@@ -1406,9 +1399,9 @@ class FlextMeltanoConfig(FlextCore.Config):
                 config.log_level = "DEBUG"
                 config.timeout_seconds = 60
                 config.max_concurrent_jobs = 1
-                return FlextCore.Result[FlextMeltanoConfig].ok(config)
+                return FlextResult[FlextMeltanoConfig].ok(config)
             except Exception as e:
-                return FlextCore.Result[FlextMeltanoConfig].fail(
+                return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create test config: {e}"
                 )
 

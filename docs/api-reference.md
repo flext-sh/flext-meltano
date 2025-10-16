@@ -46,7 +46,7 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 **Primary service for Meltano project management and plugin operations**
 
 ```python
-class FlextMeltanoService(FlextCore.Service):
+class FlextMeltanoService(FlextService):
     """Main orchestration service for Meltano project operations."""
 
     def __init__(
@@ -69,11 +69,11 @@ class FlextMeltanoService(FlextCore.Service):
 **Discover available Meltano plugins in the project**
 
 ```python
-def discover_plugins(self) -> FlextCore.Result[list[FlextMeltanoModels.PluginInfo]]:
+def discover_plugins(self) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
     """Discover all available plugins in the project.
 
     Returns:
-        FlextCore.Result containing list of discovered plugins or error
+        FlextResult containing list of discovered plugins or error
 
     Example:
         >>> service = FlextMeltanoService()
@@ -93,7 +93,7 @@ def install_plugin(
     self,
     plugin_name: str,
     version: str | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PluginInstallResult]:
+) -> FlextResult[FlextMeltanoModels.PluginInstallResult]:
     """Install a Meltano plugin.
 
     Args:
@@ -101,7 +101,7 @@ def install_plugin(
         version: Specific version to install (optional)
 
     Returns:
-        FlextCore.Result containing installation result or error
+        FlextResult containing installation result or error
     """
 ```
 
@@ -113,9 +113,9 @@ def install_plugin(
 def execute_tap(
     self,
     tap_name: str,
-    config: FlextCore.Types.Dict | None = None,
-    state: FlextCore.Types.Dict | None = None
-) -> FlextCore.Result[FlextMeltanoModels.TapExecutionResult]:
+    config: FlextTypes.Dict | None = None,
+    state: FlextTypes.Dict | None = None
+) -> FlextResult[FlextMeltanoModels.TapExecutionResult]:
     """Execute a Singer tap with configuration and state.
 
     Args:
@@ -124,7 +124,7 @@ def execute_tap(
         state: Tap state dictionary for incremental sync
 
     Returns:
-        FlextCore.Result containing execution result or error
+        FlextResult containing execution result or error
     """
 ```
 
@@ -136,9 +136,9 @@ def execute_tap(
 def execute_target(
     self,
     target_name: str,
-    records: list[FlextCore.Types.Dict],
-    config: FlextCore.Types.Dict | None = None
-) -> FlextCore.Result[FlextMeltanoModels.TargetExecutionResult]:
+    records: list[FlextTypes.Dict],
+    config: FlextTypes.Dict | None = None
+) -> FlextResult[FlextMeltanoModels.TargetExecutionResult]:
     """Execute a Singer target with records.
 
     Args:
@@ -147,7 +147,7 @@ def execute_target(
         config: Target configuration dictionary
 
     Returns:
-        FlextCore.Result containing execution result or error
+        FlextResult containing execution result or error
     """
 ```
 
@@ -156,7 +156,7 @@ def execute_target(
 **Meltano CLI integration and execution adapter**
 
 ```python
-class FlextMeltanoAdapter(FlextCore.Service):
+class FlextMeltanoAdapter(FlextService):
     """Adapter for Meltano CLI integration and execution."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
@@ -174,8 +174,8 @@ def run_pipeline(
     self,
     tap_name: str,
     target_name: str,
-    config: FlextCore.Types.Dict | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PipelineResult]:
+    config: FlextTypes.Dict | None = None
+) -> FlextResult[FlextMeltanoModels.PipelineResult]:
     """Execute complete ELT pipeline from tap to target.
 
     Args:
@@ -184,7 +184,7 @@ def run_pipeline(
         config: Pipeline configuration dictionary
 
     Returns:
-        FlextCore.Result containing pipeline execution result
+        FlextResult containing pipeline execution result
     """
 ```
 
@@ -193,11 +193,11 @@ def run_pipeline(
 **Validate Meltano project configuration**
 
 ```python
-def validate_project(self) -> FlextCore.Result[FlextMeltanoModels.ProjectValidation]:
+def validate_project(self) -> FlextResult[FlextMeltanoModels.ProjectValidation]:
     """Validate Meltano project configuration and structure.
 
     Returns:
-        FlextCore.Result containing validation result or error
+        FlextResult containing validation result or error
     """
 ```
 
@@ -209,14 +209,14 @@ def validate_project(self) -> FlextCore.Result[FlextMeltanoModels.ProjectValidat
 def list_plugins(
     self,
     plugin_type: str | None = None
-) -> FlextCore.Result[list[FlextMeltanoModels.PluginInfo]]:
+) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
     """List available Meltano plugins.
 
     Args:
         plugin_type: Filter by plugin type (tap, target, transformer)
 
     Returns:
-        FlextCore.Result containing list of plugins or error
+        FlextResult containing list of plugins or error
     """
 ```
 
@@ -225,7 +225,7 @@ def list_plugins(
 **Advanced pipeline execution engine**
 
 ```python
-class FlextMeltanoExecutor(FlextCore.Service):
+class FlextMeltanoExecutor(FlextService):
     """Advanced pipeline execution engine with orchestration."""
 ```
 
@@ -239,14 +239,14 @@ class FlextMeltanoExecutor(FlextCore.Service):
 def execute_pipeline_advanced(
     self,
     options: FlextMeltanoModels.PipelineOptions
-) -> FlextCore.Result[FlextMeltanoModels.PipelineResult]:
+) -> FlextResult[FlextMeltanoModels.PipelineResult]:
     """Execute pipeline with advanced configuration options.
 
     Args:
         options: Advanced pipeline execution options
 
     Returns:
-        FlextCore.Result containing execution result
+        FlextResult containing execution result
     """
 ```
 
@@ -258,14 +258,14 @@ def execute_pipeline_advanced(
 def execute_parallel_pipelines(
     self,
     pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> FlextCore.Result[list[FlextMeltanoModels.PipelineResult]]:
+) -> FlextResult[list[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
     Args:
         pipelines: List of pipeline configurations
 
     Returns:
-        FlextCore.Result containing list of execution results
+        FlextResult containing list of execution results
     """
 ```
 
@@ -278,14 +278,14 @@ def execute_parallel_pipelines(
 **Singer tap implementation with enterprise features**
 
 ```python
-class FlextSingerTap(FlextCore.Service):
+class FlextSingerTap(FlextService):
     """Singer tap implementation with discovery, sync, and state management."""
 
     def __init__(
         self,
         tap_name: str,
-        config: FlextCore.Types.Dict,
-        state: FlextCore.Types.Dict | None = None
+        config: FlextTypes.Dict,
+        state: FlextTypes.Dict | None = None
     ) -> None:
         """Initialize Singer tap.
 
@@ -303,11 +303,11 @@ class FlextSingerTap(FlextCore.Service):
 **Discover Singer catalog for the tap**
 
 ```python
-def discover(self) -> FlextCore.Result[FlextMeltanoModels.Catalog]:
+def discover(self) -> FlextResult[FlextMeltanoModels.Catalog]:
     """Discover Singer catalog for the tap.
 
     Returns:
-        FlextCore.Result containing catalog or error
+        FlextResult containing catalog or error
 
     Example:
         >>> tap = FlextSingerTap("tap-gitlab", {"api_url": "https://gitlab.com"})
@@ -325,9 +325,9 @@ def discover(self) -> FlextCore.Result[FlextMeltanoModels.Catalog]:
 ```python
 def sync(
     self,
-    streams: FlextCore.Types.StringList | None = None,
-    state: FlextCore.Types.Dict | None = None
-) -> FlextCore.Result[FlextMeltanoModels.SyncResult]:
+    streams: FlextTypes.StringList | None = None,
+    state: FlextTypes.Dict | None = None
+) -> FlextResult[FlextMeltanoModels.SyncResult]:
     """Execute tap synchronization.
 
     Args:
@@ -335,7 +335,7 @@ def sync(
         state: State dictionary for incremental sync
 
     Returns:
-        FlextCore.Result containing sync result or error
+        FlextResult containing sync result or error
     """
 ```
 
@@ -344,11 +344,11 @@ def sync(
 **Validate tap configuration**
 
 ```python
-def validate_config(self) -> FlextCore.Result[FlextMeltanoModels.ValidationResult]:
+def validate_config(self) -> FlextResult[FlextMeltanoModels.ValidationResult]:
     """Validate tap configuration.
 
     Returns:
-        FlextCore.Result containing validation result
+        FlextResult containing validation result
     """
 ```
 
@@ -357,13 +357,13 @@ def validate_config(self) -> FlextCore.Result[FlextMeltanoModels.ValidationResul
 **Singer target implementation with batch processing**
 
 ```python
-class FlextSingerTarget(FlextCore.Service):
+class FlextSingerTarget(FlextService):
     """Singer target implementation with batch processing and error handling."""
 
     def __init__(
         self,
         target_name: str,
-        config: FlextCore.Types.Dict
+        config: FlextTypes.Dict
     ) -> None:
         """Initialize Singer target."""
 ```
@@ -377,15 +377,15 @@ class FlextSingerTarget(FlextCore.Service):
 ```python
 def load_records(
     self,
-    records: list[FlextCore.Types.Dict]
-) -> FlextCore.Result[FlextMeltanoModels.LoadResult]:
+    records: list[FlextTypes.Dict]
+) -> FlextResult[FlextMeltanoModels.LoadResult]:
     """Load records into the target.
 
     Args:
         records: List of records to load
 
     Returns:
-        FlextCore.Result containing load result or error
+        FlextResult containing load result or error
     """
 ```
 
@@ -394,11 +394,11 @@ def load_records(
 **Flush any buffered records**
 
 ```python
-def flush(self) -> FlextCore.Result[FlextMeltanoModels.FlushResult]:
+def flush(self) -> FlextResult[FlextMeltanoModels.FlushResult]:
     """Flush any buffered records to the target.
 
     Returns:
-        FlextCore.Result containing flush result
+        FlextResult containing flush result
     """
 ```
 
@@ -407,11 +407,11 @@ def flush(self) -> FlextCore.Result[FlextMeltanoModels.FlushResult]:
 **Validate target configuration**
 
 ```python
-def validate_config(self) -> FlextCore.Result[FlextMeltanoModels.ValidationResult]:
+def validate_config(self) -> FlextResult[FlextMeltanoModels.ValidationResult]:
     """Validate target configuration.
 
     Returns:
-        FlextCore.Result containing validation result
+        FlextResult containing validation result
     """
 ```
 
@@ -424,7 +424,7 @@ def validate_config(self) -> FlextCore.Result[FlextMeltanoModels.ValidationResul
 **Plugin lifecycle management and operations**
 
 ```python
-class FlextPluginService(FlextCore.Service):
+class FlextPluginService(FlextService):
     """Service for plugin lifecycle management and operations."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
@@ -438,11 +438,11 @@ class FlextPluginService(FlextCore.Service):
 **Discover all plugins in the project**
 
 ```python
-def discover_plugins(self) -> FlextCore.Result[list[FlextMeltanoModels.PluginInfo]]:
+def discover_plugins(self) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
     """Discover all plugins in the project.
 
     Returns:
-        FlextCore.Result containing list of discovered plugins
+        FlextResult containing list of discovered plugins
     """
 ```
 
@@ -455,7 +455,7 @@ def install_plugin(
     self,
     plugin_name: str,
     version: str | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PluginInstallResult]:
+) -> FlextResult[FlextMeltanoModels.PluginInstallResult]:
     """Install a plugin.
 
     Args:
@@ -463,7 +463,7 @@ def install_plugin(
         version: Specific version to install
 
     Returns:
-        FlextCore.Result containing installation result
+        FlextResult containing installation result
     """
 ```
 
@@ -475,14 +475,14 @@ def install_plugin(
 def uninstall_plugin(
     self,
     plugin_name: str
-) -> FlextCore.Result[FlextMeltanoModels.PluginUninstallResult]:
+) -> FlextResult[FlextMeltanoModels.PluginUninstallResult]:
     """Uninstall a plugin.
 
     Args:
         plugin_name: Name of the plugin to uninstall
 
     Returns:
-        FlextCore.Result containing uninstall result
+        FlextResult containing uninstall result
     """
 ```
 
@@ -495,7 +495,7 @@ def update_plugin(
     self,
     plugin_name: str,
     version: str | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PluginUpdateResult]:
+) -> FlextResult[FlextMeltanoModels.PluginUpdateResult]:
     """Update a plugin.
 
     Args:
@@ -503,7 +503,7 @@ def update_plugin(
         version: Specific version to update to
 
     Returns:
-        FlextCore.Result containing update result
+        FlextResult containing update result
     """
 ```
 
@@ -512,7 +512,7 @@ def update_plugin(
 **Plugin registry and discovery system**
 
 ```python
-class FlextPluginRegistry(FlextCore.Service):
+class FlextPluginRegistry(FlextService):
     """Plugin registry for plugin discovery and management."""
 ```
 
@@ -526,14 +526,14 @@ class FlextPluginRegistry(FlextCore.Service):
 def register_plugin(
     self,
     plugin_info: FlextMeltanoModels.PluginInfo
-) -> FlextCore.Result[bool]:
+) -> FlextResult[bool]:
     """Register a plugin in the registry.
 
     Args:
         plugin_info: Plugin information to register
 
     Returns:
-        FlextCore.Result indicating success or failure
+        FlextResult indicating success or failure
     """
 ```
 
@@ -546,7 +546,7 @@ def find_plugin(
     self,
     plugin_name: str,
     plugin_type: str | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PluginInfo | None]:
+) -> FlextResult[FlextMeltanoModels.PluginInfo | None]:
     """Find a plugin by name and optional type.
 
     Args:
@@ -554,7 +554,7 @@ def find_plugin(
         plugin_type: Type of plugin (tap, target, transformer)
 
     Returns:
-        FlextCore.Result containing plugin info or None
+        FlextResult containing plugin info or None
     """
 ```
 
@@ -566,14 +566,14 @@ def find_plugin(
 def list_plugins_by_type(
     self,
     plugin_type: str
-) -> FlextCore.Result[list[FlextMeltanoModels.PluginInfo]]:
+) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
     """List plugins by type.
 
     Args:
         plugin_type: Type of plugins to list
 
     Returns:
-        FlextCore.Result containing list of plugins
+        FlextResult containing list of plugins
     """
 ```
 
@@ -586,7 +586,7 @@ def list_plugins_by_type(
 **Pipeline orchestration and execution service**
 
 ```python
-class FlextPipelineService(FlextCore.Service):
+class FlextPipelineService(FlextService):
     """Service for pipeline orchestration and execution."""
 ```
 
@@ -600,14 +600,14 @@ class FlextPipelineService(FlextCore.Service):
 def create_pipeline(
     self,
     config: FlextMeltanoModels.PipelineConfig
-) -> FlextCore.Result[FlextMeltanoModels.Pipeline]:
+) -> FlextResult[FlextMeltanoModels.Pipeline]:
     """Create a new pipeline configuration.
 
     Args:
         config: Pipeline configuration
 
     Returns:
-        FlextCore.Result containing created pipeline
+        FlextResult containing created pipeline
     """
 ```
 
@@ -620,7 +620,7 @@ def execute_pipeline(
     self,
     pipeline_name: str,
     options: FlextMeltanoModels.PipelineOptions | None = None
-) -> FlextCore.Result[FlextMeltanoModels.PipelineResult]:
+) -> FlextResult[FlextMeltanoModels.PipelineResult]:
     """Execute a configured pipeline.
 
     Args:
@@ -628,7 +628,7 @@ def execute_pipeline(
         options: Execution options
 
     Returns:
-        FlextCore.Result containing execution result
+        FlextResult containing execution result
     """
 ```
 
@@ -640,14 +640,14 @@ def execute_pipeline(
 def monitor_pipeline(
     self,
     pipeline_id: str
-) -> FlextCore.Result[FlextMeltanoModels.PipelineStatus]:
+) -> FlextResult[FlextMeltanoModels.PipelineStatus]:
     """Monitor pipeline execution status.
 
     Args:
         pipeline_id: ID of the pipeline to monitor
 
     Returns:
-        FlextCore.Result containing pipeline status
+        FlextResult containing pipeline status
     """
 ```
 
@@ -656,7 +656,7 @@ def monitor_pipeline(
 **Advanced pipeline execution engine**
 
 ```python
-class FlextPipelineExecutor(FlextCore.Service):
+class FlextPipelineExecutor(FlextService):
     """Advanced pipeline execution engine with orchestration."""
 ```
 
@@ -670,14 +670,14 @@ class FlextPipelineExecutor(FlextCore.Service):
 def execute_parallel_pipelines(
     self,
     pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> FlextCore.Result[list[FlextMeltanoModels.PipelineResult]]:
+) -> FlextResult[list[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
     Args:
         pipelines: List of pipeline configurations
 
     Returns:
-        FlextCore.Result containing list of execution results
+        FlextResult containing list of execution results
     """
 ```
 
@@ -690,7 +690,7 @@ def execute_conditional_pipeline(
     self,
     condition: FlextMeltanoModels.Condition,
     pipeline: FlextMeltanoModels.PipelineConfig
-) -> FlextCore.Result[FlextMeltanoModels.PipelineResult | None]:
+) -> FlextResult[FlextMeltanoModels.PipelineResult | None]:
     """Execute pipeline based on condition evaluation.
 
     Args:
@@ -698,7 +698,7 @@ def execute_conditional_pipeline(
         pipeline: Pipeline to execute if condition is met
 
     Returns:
-        FlextCore.Result containing execution result or None
+        FlextResult containing execution result or None
     """
 ```
 
@@ -711,7 +711,7 @@ def execute_conditional_pipeline(
 **Meltano project management service**
 
 ```python
-class FlextProjectService(FlextCore.Service):
+class FlextProjectService(FlextService):
     """Service for Meltano project management."""
 ```
 
@@ -725,14 +725,14 @@ class FlextProjectService(FlextCore.Service):
 def create_project(
     self,
     project_config: FlextMeltanoModels.ProjectConfig
-) -> FlextCore.Result[FlextMeltanoModels.Project]:
+) -> FlextResult[FlextMeltanoModels.Project]:
     """Create a new Meltano project.
 
     Args:
         project_config: Project configuration
 
     Returns:
-        FlextCore.Result containing created project
+        FlextResult containing created project
     """
 ```
 
@@ -744,14 +744,14 @@ def create_project(
 def validate_project(
     self,
     project_root: Path | str
-) -> FlextCore.Result[FlextMeltanoModels.ProjectValidation]:
+) -> FlextResult[FlextMeltanoModels.ProjectValidation]:
     """Validate Meltano project structure and configuration.
 
     Args:
         project_root: Path to project root directory
 
     Returns:
-        FlextCore.Result containing validation result
+        FlextResult containing validation result
     """
 ```
 
@@ -763,14 +763,14 @@ def validate_project(
 def get_project_info(
     self,
     project_root: Path | str
-) -> FlextCore.Result[FlextMeltanoModels.ProjectInfo]:
+) -> FlextResult[FlextMeltanoModels.ProjectInfo]:
     """Get project information and metadata.
 
     Args:
         project_root: Path to project root directory
 
     Returns:
-        FlextCore.Result containing project information
+        FlextResult containing project information
     """
 ```
 
@@ -824,7 +824,7 @@ def plugins(self) -> list[FlextMeltanoModels.PluginInfo]:
 **Meltano configuration management**
 
 ```python
-class FlextMeltanoConfig(FlextCore.Config):
+class FlextMeltanoConfig(FlextConfig):
     """Meltano-specific configuration management."""
 ```
 
@@ -846,7 +846,7 @@ def project_config(self) -> FlextMeltanoModels.ProjectConfig:
 
 ```python
 @property
-def plugin_configs(self) -> dict[str, FlextCore.Types.Dict]:
+def plugin_configs(self) -> dict[str, FlextTypes.Dict]:
     """Get plugin-specific configurations."""
 ```
 
@@ -894,7 +894,7 @@ class PluginInfo(FlextBaseModel):
     variant: str
     pip_url: str | None = None
     executable: str | None = None
-    config: FlextCore.Types.Dict | None = None
+    config: FlextTypes.Dict | None = None
     version: str | None = None
 ```
 
@@ -929,7 +929,7 @@ class TapExecutionResult(FlextBaseModel):
     records_extracted: int = 0
     streams_discovered: int = 0
     execution_time: float = 0.0
-    state: FlextCore.Types.Dict | None = None
+    state: FlextTypes.Dict | None = None
     error: str | None = None
 ```
 
@@ -958,7 +958,7 @@ class PipelineResult(FlextBaseModel):
     success: bool
     tap_result: TapExecutionResult | None = None
     target_result: TargetExecutionResult | None = None
-    transformer_result: FlextCore.Types.Dict | None = None
+    transformer_result: FlextTypes.Dict | None = None
     execution_time: float = 0.0
     error: str | None = None
 ```

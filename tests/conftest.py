@@ -18,7 +18,7 @@ from typing import Protocol
 
 import pytest
 import yaml
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 class CliRunnerProtocol(Protocol):
@@ -53,7 +53,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> FlextCore.Types.Dict:
+def meltano_yml_config() -> FlextTypes.Dict:
     """Sample meltano.yml configuration for testing."""
     return {
         "version": 1,
@@ -116,8 +116,8 @@ def meltano_yml_config() -> FlextCore.Types.Dict:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: FlextCore.Types.Dict,
-) -> FlextCore.Types.Dict:
+    meltano_yml_config: FlextTypes.Dict,
+) -> FlextTypes.Dict:
     """Meltano project for testing."""
     # Create meltano.yml
 
@@ -138,7 +138,7 @@ def meltano_project(
 
 # Plugin fixtures
 @pytest.fixture
-def tap_csv_config() -> FlextCore.Types.Dict:
+def tap_csv_config() -> FlextTypes.Dict:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -153,7 +153,7 @@ def tap_csv_config() -> FlextCore.Types.Dict:
 
 
 @pytest.fixture
-def target_csv_config() -> FlextCore.Types.Dict:
+def target_csv_config() -> FlextTypes.Dict:
     """Target CSV configuration for testing."""
     return {
         "destination_path": "output",
@@ -186,14 +186,14 @@ def meltano_cli_runner() -> CliRunnerProtocol:
 
 
 @pytest.fixture
-def meltano_invoke_args() -> FlextCore.Types.StringList:
+def meltano_invoke_args() -> FlextTypes.StringList:
     """Common Meltano invoke arguments."""
     return ["--log-level", "debug", "--environment", "test"]
 
 
 # Singer protocol fixtures
 @pytest.fixture
-def singer_schema() -> FlextCore.Types.Dict:
+def singer_schema() -> FlextTypes.Dict:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -212,7 +212,7 @@ def singer_schema() -> FlextCore.Types.Dict:
 
 
 @pytest.fixture
-def singer_records() -> list[FlextCore.Types.Dict]:
+def singer_records() -> list[FlextTypes.Dict]:
     """Sample Singer records for testing."""
     return [
         {
@@ -239,7 +239,7 @@ def singer_records() -> list[FlextCore.Types.Dict]:
 
 
 @pytest.fixture
-def singer_state() -> FlextCore.Types.Dict:
+def singer_state() -> FlextTypes.Dict:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -256,7 +256,7 @@ def singer_state() -> FlextCore.Types.Dict:
 
 # Pipeline execution fixtures
 @pytest.fixture
-def pipeline_execution_config() -> FlextCore.Types.Dict:
+def pipeline_execution_config() -> FlextTypes.Dict:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -270,7 +270,7 @@ def pipeline_execution_config() -> FlextCore.Types.Dict:
 
 # Environment fixtures
 @pytest.fixture
-def test_environment_config() -> FlextCore.Types.Dict:
+def test_environment_config() -> FlextTypes.Dict:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -286,7 +286,7 @@ def test_environment_config() -> FlextCore.Types.Dict:
 
 # Schedule fixtures
 @pytest.fixture
-def sample_schedule_config() -> FlextCore.Types.Dict:
+def sample_schedule_config() -> FlextTypes.Dict:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -300,7 +300,7 @@ def sample_schedule_config() -> FlextCore.Types.Dict:
 
 # Job fixtures
 @pytest.fixture
-def job_run_config() -> FlextCore.Types.Dict:
+def job_run_config() -> FlextTypes.Dict:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -332,22 +332,22 @@ def mock_meltano_service() -> object:
     class MockMeltanoService:
         def create_project(
             self,
-            _config: FlextCore.Types.Dict,
-        ) -> FlextCore.Types.Dict:
+            _config: FlextTypes.Dict,
+        ) -> FlextTypes.Dict:
             return {"project_id": "test-project", "status": "created"}
 
         def install_plugin(
             self,
             _plugin_type: str,
             plugin_name: str,
-        ) -> FlextCore.Types.Dict:
+        ) -> FlextTypes.Dict:
             return {"plugin": plugin_name, "status": "installed"}
 
         def run_pipeline(
             self,
             _extractor: str,
             _loader: str,
-        ) -> FlextCore.Types.Dict:
+        ) -> FlextTypes.Dict:
             return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()
@@ -358,14 +358,14 @@ def mock_singer_tap() -> type[object]:
     """Mock Singer tap for testing."""
 
     class MockSingerTap:
-        def __init__(self, config: FlextCore.Types.Dict) -> None:
+        def __init__(self, config: FlextTypes.Dict) -> None:
             """Initialize the instance."""
             self.config = config
 
-        def discover(self) -> FlextCore.Types.Dict:
+        def discover(self) -> FlextTypes.Dict:
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-        def extract(self) -> list[FlextCore.Types.Dict]:
+        def extract(self) -> list[FlextTypes.Dict]:
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
@@ -376,14 +376,14 @@ def mock_singer_target() -> object:
     """Mock Singer target for testing."""
 
     class MockSingerTarget:
-        def __init__(self, config: FlextCore.Types.Dict) -> None:
+        def __init__(self, config: FlextTypes.Dict) -> None:
             """Initialize the instance."""
             self.config = config
 
         def load(
             self,
-            records: list[FlextCore.Types.Dict],
-        ) -> FlextCore.Types.Dict:
+            records: list[FlextTypes.Dict],
+        ) -> FlextTypes.Dict:
             return {"records_loaded": len(records), "status": "success"}
 
     return MockSingerTarget
