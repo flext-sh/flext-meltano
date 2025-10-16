@@ -283,7 +283,7 @@ class TestDbtProjectModelEnhanced:
     def test_dbt_project_with_minimal_data(self) -> None:
         """Test DbtProjectModel with minimal required data."""
         dbt_project = FlextMeltanoModels.DbtProjectModel(
-            name="analytics", profile="default"
+            name="analytics", version="1.0.0", profile="default"
         )
 
         assert dbt_project.name == "analytics"

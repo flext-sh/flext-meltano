@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService, FlextTypes
 from meltano.core.project import Project
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -35,14 +35,12 @@ class FlextMeltanoPluginService(
 
     # Instance attributes for type checker
     _config: FlextMeltanoConfig
-    logger: FlextLogger
     _abstractions: FlextMeltanoAbstractions
 
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize plugin service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self._logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(

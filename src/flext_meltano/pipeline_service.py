@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService, FlextTypes
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
@@ -32,14 +32,12 @@ class FlextMeltanoPipelineService(
 
     # Instance attributes for type checker
     _config: FlextMeltanoConfig
-    logger: FlextLogger
     _abstractions: FlextMeltanoAbstractions
 
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize pipeline service with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute_pipeline(

@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService, FlextTypes
 
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.config import FlextMeltanoConfig
@@ -32,7 +32,6 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
 
     # Instance attributes for type checker
     _config: FlextMeltanoConfig
-    logger: FlextLogger
     _bridge: FlextMeltanoBridge
 
     def __init__(
@@ -41,7 +40,6 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Initialize executor with configuration."""
         super().__init__()
         self._config = FlextMeltanoConfig(**config) if config else FlextMeltanoConfig()
-        self.logger: FlextLogger = FlextLogger(__name__)
         self._bridge = FlextMeltanoBridge()
         # Type guard for mypy - logger is always initialized
         if self.logger is None:
