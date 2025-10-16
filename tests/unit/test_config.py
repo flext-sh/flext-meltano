@@ -16,7 +16,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextCore
+from flext_core import FlextConstants
 
 from flext_meltano import FlextMeltanoConfig
 
@@ -38,7 +38,7 @@ class TestFlextMeltanoConfig:
         assert config.project_root == Path("/test/project").resolve()
         assert config.config_dir.name == ".meltano"  # Path is resolved, check name
         assert config.logs_dir.name == "logs"  # Path is resolved, check name
-        assert config.log_level == "INFO"  # FlextCore.Config converts to uppercase
+        assert config.log_level == "INFO"  # FlextConfig converts to uppercase
         assert config.meltano_version == "3.9.1"
         assert config.singer_sdk_version == "0.48.0"
         assert config.dbt_version == "1.10.5"
@@ -52,7 +52,7 @@ class TestFlextMeltanoConfig:
         assert config.config_dir.name == ".meltano"
         assert config.logs_dir.name == "logs"
         assert config.environment == "development"
-        # FlextCore.Config converts to uppercase and may be affected by singleton state
+        # FlextConfig converts to uppercase and may be affected by singleton state
         assert config.log_level in {"INFO", "DEBUG"}  # Accept both possible values
 
     def test_path_validation_success(self) -> None:
@@ -177,9 +177,7 @@ class TestFlextMeltanoConfig:
         """Test all class methods return expected values."""
         assert FlextMeltanoConfig.get_version() == "0.9.0"
         assert FlextMeltanoConfig.get_name() == "flext-meltano"
-        assert (
-            FlextMeltanoConfig.get_default_timeout() == 30
-        )  # FlextCore.Constants default
+        assert FlextMeltanoConfig.get_default_timeout() == 30  # FlextConstants default
         assert FlextMeltanoConfig.get_default_batch_size() == 1000
 
     def test_get_supported_lists(self) -> None:
@@ -236,9 +234,7 @@ class TestFlextMeltanoConfig:
             )
 
             config = result
-            assert (
-                config.log_level == "WARNING"
-            )  # FlextCore.Config converts to uppercase
+            assert config.log_level == "WARNING"  # FlextConfig converts to uppercase
             assert config.project_root == Path(tmp_dir)
 
     def test_create_for_environment_with_validation_error(self) -> None:
@@ -251,12 +247,12 @@ class TestFlextMeltanoConfig:
 
 
 class TestFlextMeltanoConfigEnums:
-    """Test FlextMeltanoConfig uses FlextCore.Constants for enums."""
+    """Test FlextMeltanoConfig uses FlextConstants for enums."""
 
     def test_uses_flext_constants_for_enums(self) -> None:
-        """Test that FlextMeltanoConfig uses FlextCore.Constants for enum values."""
-        # Config uses FlextCore.Constants.Config.LogLevel, not nested LogLevel
-        assert hasattr(FlextCore.Constants.Config, "LogLevel")
+        """Test that FlextMeltanoConfig uses FlextConstants for enum values."""
+        # Config uses FlextConstants.Config.LogLevel, not nested LogLevel
+        assert hasattr(FlextConstants.Config, "LogLevel")
         # Environment types are string literals, not enums
         assert isinstance(FlextMeltanoConfig.model_fields["environment"].default, str)
 

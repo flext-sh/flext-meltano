@@ -1,16 +1,19 @@
-"""Test module for flext-meltano."""
+"""Test module for flext-meltano.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+
+"""
 
 import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 from flext_tests.matchers import FlextTestsMatchers
+from pydantic import ConfigDict
 
-from flext_meltano import ConfigDict, FlextMeltanoFileManagers
-
-# Copyright (c) 2025 FLEXT Team. All rights reserved.
-# SPDX-License-Identifier: MIT
+from flext_meltano import FlextMeltanoFileManagers
 
 
 class TestFlextMeltanoFileManagersComprehensive:
@@ -43,10 +46,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: (
-            dict[str, str | int, FlextCore.Types.StringList]
-            | dict[str, str | FlextCore.Types.StringList]
-        ) = {
+        config: dict[str, object] = {
             "test": "data",
         }
         invalid_path = Path("/nonexistent/directory/config.yml")
@@ -57,10 +57,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: (
-            dict[str, str | int, FlextCore.Types.StringList]
-            | dict[str, str | FlextCore.Types.StringList]
-        ) = {
+        config: dict[str, object] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -100,10 +97,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: (
-            dict[str, str | int, FlextCore.Types.StringList]
-            | dict[str, str | FlextCore.Types.StringList]
-        ) = {
+        config: dict[str, object] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -154,7 +148,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
         base_path = self.temp_dir / "empty_project"
-        empty_directories: FlextCore.Types.StringList = []
+        empty_directories: FlextTypes.StringList = []
 
         result = FlextMeltanoFileManagers.create_directory_structure(
             base_path,
@@ -173,7 +167,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
         result = FlextMeltanoFileManagers.setup_project_structure(
             project_root=project_root,
-            project_name="test-complete-project",
+            _project_name="test-complete-project",
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -192,7 +186,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
         result = FlextMeltanoFileManagers.setup_project_structure(
             project_root=project_root,
-            project_name="test-minimal-project",
+            _project_name="test-minimal-project",
         )
         FlextTestsMatchers.assert_result_success(result)
 
@@ -265,7 +259,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
         setup_result = FlextMeltanoFileManagers.setup_project_structure(
             project_root=project_root,
-            project_name="validation-test",
+            _project_name="validation-test",
         )
         FlextTestsMatchers.assert_result_success(setup_result)
 
@@ -305,15 +299,12 @@ class TestFlextMeltanoFileManagersComprehensive:
             project_root = temp_path / "integration_project"
             setup_result = FlextMeltanoFileManagers.setup_project_structure(
                 project_root=project_root,
-                project_name="integration-workflow-test",
+                _project_name="integration-workflow-test",
             )
             FlextTestsMatchers.assert_result_success(setup_result)
 
             # Create and save config
-            config: (
-                dict[str, str | int, FlextCore.Types.StringList]
-                | dict[str, str | FlextCore.Types.StringList]
-            ) = {
+            config: dict[str, object] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {

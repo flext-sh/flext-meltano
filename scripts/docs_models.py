@@ -1,10 +1,10 @@
 """FLEXT-Meltano Documentation Models.
 
-Domain models for documentation quality assurance using FlextCore.Models.
+Domain models for documentation quality assurance using FlextModels.
 Replaces dataclasses with proper domain-driven design patterns.
 
 ARCHITECTURAL INTEGRATION:
-- FlextCore.Models.Value: Immutable value objects for documentation metrics and issues
+- FlextModels.Value: Immutable value objects for documentation metrics and issues
 - Domain-Driven Design: Proper business entity modeling
 - Type Safety: Complete type annotations with Pydantic v2 validation
 """
@@ -12,12 +12,15 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import ClassVar
 
-from flext_core import FlextCore
+from flext_core import FlextModels
+from pydantic import ConfigDict
 
 
-class DocumentationMetrics(FlextCore.Models.Value):
-    """Comprehensive documentation quality metrics using FlextCore.Models.Value.
+class DocumentationMetrics(FlextModels.Value):
+    model_config = ConfigDict(frozen=False)
+    """Comprehensive documentation quality metrics using FlextModels.Value.
 
     Immutable value object containing all documentation quality measurements.
     Uses domain-driven design principles with proper validation.
@@ -47,13 +50,13 @@ class DocumentationMetrics(FlextCore.Models.Value):
     images: int = 0
     missing_images: int = 0
     code_blocks: int = 0
-    headings: dict[int, int] = defaultdict(int)
-    issues: list[dict[str, object]] = []
+    headings: ClassVar[dict[int, int]] = defaultdict(int)
+    issues: ClassVar[list[dict[str, object]]] = []
     quality_score: float = 0.0
 
 
-class DocumentationIssue(FlextCore.Models.Value):
-    """Represents a documentation quality issue using FlextCore.Models.Value.
+class DocumentationIssue(FlextModels.Value):
+    """Represents a documentation quality issue using FlextModels.Value.
 
     Immutable value object containing details about a specific documentation problem.
     Uses domain-driven design with proper validation and type safety.

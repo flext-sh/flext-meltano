@@ -1,12 +1,12 @@
 """FLEXT-Meltano Documentation Configuration Service.
 
-Centralized configuration management for documentation automation using FlextCore.Config.
+Centralized configuration management for documentation automation using FlextConfig.
 All hardcoded values and thresholds are centralized here for maintainability and consistency.
 
 ARCHITECTURAL INTEGRATION:
-- FlextCore.Config: Base configuration class with validation and environment variable support
-- FlextCore.Container: Singleton pattern for global configuration access
-- Railway Pattern: FlextCore.Result[T] for configuration loading and validation
+- FlextConfig: Base configuration class with validation and environment variable support
+- FlextContainer: Singleton pattern for global configuration access
+- Railway Pattern: FlextResult[T] for configuration loading and validation
 """
 
 from __future__ import annotations
@@ -15,13 +15,13 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 import yaml
-from flext_core import FlextCore
+from flext_core import FlextConfig, FlextContainer, FlextResult, FlextTypes
 
 
-class DocsConfig(FlextCore.Config):
+class DocsConfig(FlextConfig):
     """Centralized configuration for documentation automation.
 
-    Extends FlextCore.Config with documentation-specific settings.
+    Extends FlextConfig with documentation-specific settings.
     All hardcoded values from throughout the codebase are centralized here.
 
     Attributes:
@@ -75,12 +75,12 @@ class DocsConfig(FlextCore.Config):
     link_validation_retries: int = 2
 
     # Content Requirements
-    required_sections: ClassVar[FlextCore.Types.StringList] = ["##", "###"]
+    required_sections: ClassVar[FlextTypes.StringList] = ["##", "###"]
 
     @classmethod
     def get_instance(cls) -> DocsConfig:
-        """Get singleton instance through FlextCore.Container."""
-        container = FlextCore.Container.get_global()
+        """Get singleton instance through FlextContainer."""
+        container = FlextContainer.get_global()
         config_result = container.get("DocsConfig")
 
         if config_result.is_success:
@@ -93,21 +93,21 @@ class DocsConfig(FlextCore.Config):
 
     def load_from_file(
         self, config_path: str | Path | None = None
-    ) -> FlextCore.Result[DocsConfig]:
-        """Load configuration from YAML file using FlextCore.Config patterns.
+    ) -> FlextResult[DocsConfig]:
+        """Load configuration from YAML file using FlextConfig patterns.
 
         Args:
             config_path: Path to configuration file (uses self.config_path if None)
 
         Returns:
-            FlextCore.Result containing loaded configuration or error
+            FlextResult containing loaded configuration or error
 
         """
         file_path = Path(config_path or self.config_path)
 
         if not file_path.exists():
             # Return default configuration
-            return FlextCore.Result.ok(self)
+            return FlextResult.ok(self)
 
         try:
             with file_path.open(encoding="utf-8") as f:
@@ -115,18 +115,18 @@ class DocsConfig(FlextCore.Config):
 
             if not isinstance(config_data, dict):
                 error_msg = f"Invalid configuration format: expected dict, got {type(config_data)}"
-                return FlextCore.Result.fail(error_msg)
+                return FlextResult.fail(error_msg)
 
             # Update instance with loaded values
             for key, value in config_data.items():
                 if hasattr(self, key):
                     setattr(self, key, value)
 
-            return FlextCore.Result.ok(self)
+            return FlextResult.ok(self)
 
         except Exception as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
-            return FlextCore.Result.fail(error_msg)
+            return FlextResult.fail(error_msg)
 
     def get_schedule_config(self) -> dict[str, object]:
         """Get scheduling configuration as dictionary for backward compatibility.

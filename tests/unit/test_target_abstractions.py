@@ -2,13 +2,13 @@
 
 from typing import cast
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
 from flext_tests import FlextTestsUtilities
 from pydantic import ValidationError
 
 from flext_meltano import FlextMeltanoTargetAbstractions
 
-logger = FlextCore.Logger(__name__)
+logger = FlextLogger(__name__)
 
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT
@@ -139,7 +139,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_create_flext_target_config(self) -> None:
         """Test create_flext_target_config method using flext_tests."""
-        connection_config: FlextCore.Types.Dict = {"output_path": "test.jsonl"}
+        connection_config: FlextTypes.Dict = {"output_path": "test.jsonl"}
 
         result = self.target_abstractions.create_flext_target_config(
             target_type="jsonl",
@@ -149,8 +149,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         if result.is_success:
             config_data = result.value
@@ -168,7 +168,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_create_flext_target(self) -> None:
         """Test create_flext_target method using flext_tests."""
         # Create test config using flext_tests utilities
-        test_config: FlextCore.Types.Dict = {
+        test_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
             "batch_size": 100,
@@ -177,8 +177,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         result = self.target_abstractions.create_flext_target(test_config)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
 
     # =========================================================================
@@ -187,11 +187,11 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
-        # Test error handling with FlextCore.Result patterns
-        failure_result = FlextCore.Result[str].fail("Target error")
+        # Test error handling with FlextResult patterns
+        failure_result = FlextResult[str].fail("Target error")
 
         self.test_assertions.assert_true(
-            condition=isinstance(failure_result, FlextCore.Result),
+            condition=isinstance(failure_result, FlextResult),
             message="Should create failure result",
         )
         self.test_assertions.assert_true(
@@ -264,7 +264,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_workflow_integration(self) -> None:
         """Test complete target workflow using flext_tests."""
         # Create comprehensive test data
-        connection_config: FlextCore.Types.Dict = {"output_path": "flext_test.jsonl"}
+        connection_config: FlextTypes.Dict = {"output_path": "flext_test.jsonl"}
 
         # Test workflow: create config then create target
         config_result = self.target_abstractions.create_flext_target_config(
@@ -274,16 +274,16 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(config_result, FlextCore.Result),
-            message="Config creation should return FlextCore.Result",
+            condition=isinstance(config_result, FlextResult),
+            message="Config creation should return FlextResult",
         )
 
         if config_result.is_success:
             config_data = config_result.value
             target_result = self.target_abstractions.create_flext_target(config_data)
             self.test_assertions.assert_true(
-                condition=isinstance(target_result, FlextCore.Result),
-                message="Target creation should return FlextCore.Result",
+                condition=isinstance(target_result, FlextResult),
+                message="Target creation should return FlextResult",
             )
 
     # =========================================================================
@@ -331,7 +331,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_message_processing_comprehensive(self) -> None:
         """Test message processing methods to cover lines 249-366."""
         # Setup target
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -343,7 +343,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Test successful schema message processing (lines 249-289)
-        schema: FlextCore.Types.Dict = {
+        schema: FlextTypes.Dict = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -353,8 +353,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(schema_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(schema_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=schema_result.is_success,
@@ -362,7 +362,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test successful record message processing (lines 295-341)
-        record: FlextCore.Types.Dict = {"id": 1, "name": "John Doe"}
+        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "users",
@@ -370,8 +370,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(record_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(record_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=record_result.is_success,
@@ -379,15 +379,15 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test successful state message processing (lines 347-366)
-        state: FlextCore.Types.Dict = {
+        state: FlextTypes.Dict = {
             "stream_position": {"users": 100},
             "last_updated": "2025-01-01T10:00:00Z",
         }
         state_result = self.target_abstractions.process_state_message(target, state)
 
         self.test_assertions.assert_true(
-            condition=isinstance(state_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(state_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=state_result.is_success,
@@ -396,7 +396,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_message_processing_errors(self) -> None:
         """Test message processing error scenarios."""
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -404,7 +404,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Test record processing without schema (lines 315-317)
-        record: FlextCore.Types.Dict = {"id": 1, "name": "John Doe"}
+        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "unknown_stream",
@@ -412,8 +412,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(record_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(record_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=record_result.is_failure,
@@ -428,14 +428,14 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_data_loading_methods(self) -> None:
         """Test data loading methods to cover lines 376-482."""
         # Setup target with schema
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: FlextCore.Types.Dict = {
+        schema: FlextTypes.Dict = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -449,12 +449,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test load_record method (lines 376-383)
-        record: FlextCore.Types.Dict = {"id": 1, "name": "John Doe"}
+        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
         load_result = self.target_abstractions.load_record(target, "users", record)
 
         self.test_assertions.assert_true(
-            condition=isinstance(load_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(load_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=load_result.is_success,
@@ -462,7 +462,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test load_batch method (lines 389-441)
-        records: list[FlextCore.Types.Dict] = [
+        records: list[FlextTypes.Dict] = [
             {"id": 1, "name": "John"},
             {"id": 2, "name": "Jane"},
             {"id": 3, "name": "Bob"},
@@ -470,8 +470,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         batch_result = self.target_abstractions.load_batch(target, "users", records)
 
         self.test_assertions.assert_true(
-            condition=isinstance(batch_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(batch_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=batch_result.is_success,
@@ -489,8 +489,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         finalize_result = self.target_abstractions.finalize_stream(target, "users")
 
         self.test_assertions.assert_true(
-            condition=isinstance(finalize_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(finalize_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=finalize_result.is_success,
@@ -500,7 +500,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_finalization(self) -> None:
         """Test target finalization to cover lines 492-554."""
         # Setup complete target workflow
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -508,7 +508,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Add schema and data
-        schema: FlextCore.Types.Dict = {
+        schema: FlextTypes.Dict = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -522,7 +522,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Load some data
-        records: list[FlextCore.Types.Dict] = [
+        records: list[FlextTypes.Dict] = [
             {"id": 1, "name": "John"},
             {"id": 2, "name": "Jane"},
         ]
@@ -536,8 +536,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         finalization_result = self.target_abstractions.finalize(target)
 
         self.test_assertions.assert_true(
-            condition=isinstance(finalization_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(finalization_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=finalization_result.is_success,
@@ -562,14 +562,14 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_query_and_utility_methods(self) -> None:
         """Test query and utility methods to cover lines 564-625."""
         # Setup target with stream
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: FlextCore.Types.Dict = {
+        schema: FlextTypes.Dict = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -586,8 +586,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         stream_result = self.target_abstractions.get_stream_by_name(target, "users")
 
         self.test_assertions.assert_true(
-            condition=isinstance(stream_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(stream_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=stream_result.is_success,
@@ -601,8 +601,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(missing_stream_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(missing_stream_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=missing_stream_result.is_failure,
@@ -655,7 +655,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test utility helper methods using flext-core SOURCE OF TRUTH."""
         # Test timestamp generation using flext-core directly
 
-        timestamp = FlextCore.Utilities.Generators.generate_iso_timestamp()
+        timestamp = FlextUtilities.Generators.generate_iso_timestamp()
 
         self.test_assertions.assert_true(
             condition=isinstance(timestamp, str),
@@ -692,8 +692,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         instance_result = FlextMeltanoTargetAbstractions.create_instance()
 
         self.test_assertions.assert_true(
-            condition=isinstance(instance_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(instance_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=instance_result.is_success,
@@ -709,7 +709,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_error_handling_edge_cases(self) -> None:
         """Test error handling edge cases to cover exception branches."""
         # Test finalize_stream with non-existent stream (lines 456-458)
-        target_config: FlextCore.Types.Dict = {
+        target_config: FlextTypes.Dict = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -720,8 +720,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         result = self.target_abstractions.finalize_stream(target, "non_existent_stream")
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_failure,

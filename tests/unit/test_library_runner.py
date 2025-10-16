@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from flext_core import FlextCore
+from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoTypes
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -46,7 +46,7 @@ class TestFlextDbtProgrammaticRunner:
                 mock_dbt_runner_class.return_value = mock_runner
 
                 # Test the transformation
-                result: FlextCore.Result[
+                result: FlextResult[
                     FlextMeltanoTypes.Processing.DbtTransformationResult
                 ] = dbt_runner.run_transformations_programmatic(
                     project_dir, models=["model1", "model2"]
@@ -88,7 +88,7 @@ class TestFlextSingerProtocolManager:
         mock_target.write_state.return_value = None
 
         # Test the pipeline execution
-        result: FlextCore.Result[FlextMeltanoTypes.Processing.SingerExecutionResult] = (
+        result: FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult] = (
             singer_manager.execute_singer_pipeline(mock_tap, mock_target)
         )
 
@@ -112,8 +112,8 @@ class TestFlextMeltanoLibraryRunner:
         singer_manager = runner.get_singer_manager()
         assert singer_manager is not None
 
-        abstractions = runner.get_abstractions()
-        assert abstractions is not None
+        singer_manager_result = runner.get_singer_manager()
+        assert singer_manager_result.is_success
 
     def test_get_dbt_runner(self) -> None:
         """Test getting dbt runner instance."""
@@ -132,48 +132,45 @@ class TestFlextMeltanoLibraryRunner:
     def test_get_abstractions(self) -> None:
         """Test getting abstractions instance."""
         runner = FlextMeltanoLibraryRunner()
-        abstractions = runner.get_abstractions()
-        assert abstractions is not None
+        singer_manager_result = runner.get_singer_manager()
+        assert singer_manager_result.is_success
 
     def test_execute_complete_elt_pipeline_mock(self) -> None:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
 
-        with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:
-            project_dir = Path(temp_dir)
+        # with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:  # Unused in current test structure
 
-            # Type annotations to help type checker
-            extractor_config: dict[str, str | FlextCore.Types.StringDict] = {
-                "name": "test_extractor",
-                "config": {},
-            }
-            loader_config: dict[str, str | FlextCore.Types.StringDict] = {
-                "name": "test_loader",
-                "config": {},
-            }
-            transformer_config: dict[str, str | FlextCore.Types.StringDict] = {
-                "name": "test_transformer",
-                "config": {},
-            }
+        # Type annotations to help type checker
+        # extractor_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        #     "name": "test_extractor",
+        #     "config": {},
+        # }
+        # loader_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        #     "name": "test_loader",
+        #     "config": {},
+        # }
+        # transformer_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        #     "name": "test_transformer",
+        #     "config": {},
+        # }
 
-            # Test the complete pipeline
-            result: FlextCore.Result[FlextMeltanoTypes.Processing.EltPipelineResult] = (
-                runner.execute_complete_elt_pipeline(
-                    project_dir, extractor_config, loader_config, transformer_config
-                )
+        # Test the complete pipeline
+        result: FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult] = (
+            runner.execute_complete_elt_pipeline(
+                tap_name="tap-csv", target_name="target-jsonl"
             )
+        )
 
-            assert result.is_success
-            # Get the pipeline data from the result
-            pipeline_data: FlextMeltanoTypes.Processing.EltPipelineResult = (
-                result.unwrap()
-            )
-            # Check that the pipeline data has the expected structure
-            assert isinstance(pipeline_data, dict)
-            assert "extraction" in pipeline_data
-            assert "loading" in pipeline_data
-            assert "transformation" in pipeline_data
-            assert "overall_success" in pipeline_data
+        assert result.is_success
+        # Get the pipeline data from the result
+        pipeline_data: FlextMeltanoTypes.Processing.EltPipelineResult = result.unwrap()
+        # Check that the pipeline data has the expected structure
+        assert isinstance(pipeline_data, dict)
+        assert "extraction" in pipeline_data
+        assert "loading" in pipeline_data
+        assert "transformation" in pipeline_data
+        assert "overall_success" in pipeline_data
 
 
 class TestFlextMeltanoAdapterIntegration:

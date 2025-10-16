@@ -51,7 +51,26 @@ python -c "from flext_meltano import FlextMeltanoService; print('✅ Installatio
 
 ```python
 from flext_meltano import FlextMeltanoService
-from flext_core import FlextCore
+from flext_core import FlextBus
+from flext_core import FlextConfig
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import FlextContext
+from flext_core import FlextDecorators
+from flext_core import FlextDispatcher
+from flext_core import FlextExceptions
+from flext_core import FlextHandlers
+from flext_core import FlextLogger
+from flext_core import FlextMixins
+from flext_core import FlextModels
+from flext_core import FlextProcessors
+from flext_core import FlextProtocols
+from flext_core import FlextRegistry
+from flext_core import FlextResult
+from flext_core import FlextRuntime
+from flext_core import FlextService
+from flext_core import FlextTypes
+from flext_core import FlextUtilities
 
 # Initialize ELT service
 service = FlextMeltanoService()
@@ -72,18 +91,37 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")
 ```
 
-### **FlextCore.Result Pattern**
+### **FlextResult Pattern**
 
 ```python
-from flext_core import FlextCore
+from flext_core import FlextBus
+from flext_core import FlextConfig
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import FlextContext
+from flext_core import FlextDecorators
+from flext_core import FlextDispatcher
+from flext_core import FlextExceptions
+from flext_core import FlextHandlers
+from flext_core import FlextLogger
+from flext_core import FlextMixins
+from flext_core import FlextModels
+from flext_core import FlextProcessors
+from flext_core import FlextProtocols
+from flext_core import FlextRegistry
+from flext_core import FlextResult
+from flext_core import FlextRuntime
+from flext_core import FlextService
+from flext_core import FlextTypes
+from flext_core import FlextUtilities
 
-# All flext-meltano operations return FlextCore.Result[T]
-def example_operation() -> FlextCore.Result[str]:
+# All flext-meltano operations return FlextResult[T]
+def example_operation() -> FlextResult[str]:
     try:
         # Your operation logic
-        return FlextCore.Result.ok("Operation successful")
+        return FlextResult.ok("Operation successful")
     except Exception as e:
-        return FlextCore.Result.fail(f"Operation failed: {e}")
+        return FlextResult.fail(f"Operation failed: {e}")
 
 # Usage pattern
 result = example_operation()
@@ -139,7 +177,7 @@ make check-imports      # Validate import compliance
 ### **Architecture Compliance**
 
 - **Import Restrictions**: Only use root-level imports from `flext_meltano`
-- **Error Handling**: Always use `FlextCore.Result[T]` pattern
+- **Error Handling**: Always use `FlextResult[T]` pattern
 - **Service Pattern**: Follow flext-core domain service patterns
 
 ### **Current Status**

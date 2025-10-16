@@ -8,24 +8,24 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult
 
 
 class DocsTemplates:
     """Template-based content generation for documentation automation."""
 
-    def __init__(self, logger: FlextCore.Logger | None = None) -> None:
+    def __init__(self, logger: FlextLogger | None = None) -> None:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, object]) -> FlextCore.Result[str]:
+    def generate_ci_workflow(self, config: dict[str, object]) -> FlextResult[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
             config: Automation configuration dictionary
 
         Returns:
-            FlextCore.Result containing generated workflow YAML
+            FlextResult containing generated workflow YAML
 
         """
         try:
@@ -41,19 +41,19 @@ class DocsTemplates:
             if self._logger:
                 self._logger.info("CI workflow template generated", vars=template_vars)
 
-            return FlextCore.Result.ok(workflow_content)
+            return FlextResult.ok(workflow_content)
 
         except Exception as e:
             error_msg = f"Failed to generate CI workflow: {e}"
             if self._logger:
                 self._logger.exception("CI workflow generation failed", error=error_msg)
-            return FlextCore.Result.fail(error_msg)
+            return FlextResult.fail(error_msg)
 
-    def generate_makefile_targets(self) -> FlextCore.Result[str]:
+    def generate_makefile_targets(self) -> FlextResult[str]:
         """Generate Makefile targets using template pattern.
 
         Returns:
-            FlextCore.Result containing generated Makefile content
+            FlextResult containing generated Makefile content
 
         """
         try:
@@ -62,19 +62,19 @@ class DocsTemplates:
             if self._logger:
                 self._logger.info("Makefile targets template generated")
 
-            return FlextCore.Result.ok(makefile_content)
+            return FlextResult.ok(makefile_content)
 
         except Exception as e:
             error_msg = f"Failed to generate Makefile targets: {e}"
             if self._logger:
                 self._logger.exception("Makefile generation failed", error=error_msg)
-            return FlextCore.Result.fail(error_msg)
+            return FlextResult.fail(error_msg)
 
-    def generate_git_hook(self) -> FlextCore.Result[str]:
+    def generate_git_hook(self) -> FlextResult[str]:
         """Generate Git pre-commit hook using template pattern.
 
         Returns:
-            FlextCore.Result containing generated hook script
+            FlextResult containing generated hook script
 
         """
         try:
@@ -83,13 +83,13 @@ class DocsTemplates:
             if self._logger:
                 self._logger.info("Git hook template generated")
 
-            return FlextCore.Result.ok(hook_content)
+            return FlextResult.ok(hook_content)
 
         except Exception as e:
             error_msg = f"Failed to generate Git hook: {e}"
             if self._logger:
                 self._logger.exception("Git hook generation failed", error=error_msg)
-            return FlextCore.Result.fail(error_msg)
+            return FlextResult.fail(error_msg)
 
     def _get_cron_schedule(self, config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""

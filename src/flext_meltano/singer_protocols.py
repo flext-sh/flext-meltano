@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 class FlextMeltanoSingerProtocols:
@@ -25,15 +25,15 @@ class FlextMeltanoSingerProtocols:
     class SingerTap(Protocol):
         """Singer Tap protocol definition."""
 
-        streams: FlextCore.Types.StringList
+        streams: FlextTypes.StringList
         name: str
-        state: FlextCore.Types.Dict
+        state: FlextTypes.Dict
 
-        def get_records(self, stream_name: str) -> list[FlextCore.Types.Dict]:
+        def get_records(self, stream_name: str) -> list[FlextTypes.Dict]:
             """Get records for a specific stream."""
             ...
 
-        def get_state(self) -> FlextCore.Types.Dict:
+        def get_state(self) -> FlextTypes.Dict:
             """Get current state."""
             ...
 

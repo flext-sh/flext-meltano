@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import cast
 from unittest.mock import patch
 
-from flext_core import FlextCore
+from flext_core import FlextUtilities
 
 from flext_meltano.utilities import FlextMeltanoUtilities
 
@@ -20,9 +21,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
     """Enhanced tests for FlextMeltanoUtilities class."""
 
     def test_inheritance_from_flext_utilities(self) -> None:
-        """Test that FlextMeltanoUtilities inherits from FlextCore.Utilities."""
+        """Test that FlextMeltanoUtilities inherits from FlextUtilities."""
         utilities = FlextMeltanoUtilities()
-        assert isinstance(utilities, FlextCore.Utilities)
+        assert isinstance(utilities, FlextUtilities)
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""
@@ -91,7 +92,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
         # This should return a failure result due to invalid project_id type
         result = utilities.create_meltano_config_dict(
-            project_id=123,  # Invalid type - should be string
+            project_id=cast("str", 123),
+            project_name="test-project",
             version="1.0.0",
         )
 

@@ -256,7 +256,7 @@ from flext_meltano.base import FlextMeltanoBase
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, config: FlextCore.Types.Dict) -> None:
+    def __init__(self, config: FlextTypes.Dict) -> None:
         """Initialize enterprise extension with configuration."""
         super().__init__(config)
         self.validate_enterprise_config()
@@ -267,7 +267,7 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
         pass
 
     @abstractmethod
-    def execute_enterprise_logic(self) -> FlextCore.Result:
+    def execute_enterprise_logic(self) -> FlextResult:
         """Execute enterprise-specific business logic."""
         pass
 

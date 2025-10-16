@@ -352,7 +352,7 @@ class AsyncPipelineExecutor:
                 self.metrics.pipeline_failed()
                 return PipelineResult.failure(PipelineExecutionError(str(e)))
 
-    async def validate_pipeline_async(self, pipeline: Pipeline) -> FlextCore.Result[ValidatedPipeline]:
+    async def validate_pipeline_async(self, pipeline: Pipeline) -> FlextResult[ValidatedPipeline]:
         """Async pipeline validation."""
 
         # Run validation checks concurrently
@@ -367,9 +367,9 @@ class AsyncPipelineExecutor:
 
         if any(isinstance(r, Exception) for r in results):
             exceptions = [r for r in results if isinstance(r, Exception)]
-            return FlextCore.Result.fail(ValidationError(f"Validation failed: {exceptions}"))
+            return FlextResult.fail(ValidationError(f"Validation failed: {exceptions}"))
 
-        return FlextCore.Result.ok(ValidatedPipeline(pipeline, results))
+        return FlextResult.ok(ValidatedPipeline(pipeline, results))
 
     async def execute_extraction_async(self, pipeline: Pipeline) -> ExtractionResult:
         """Execute data extraction asynchronously."""
@@ -985,7 +985,7 @@ title FLEXT-Meltano - Reliability Architecture
 
 rectangle "Error Handling" as error_handling {
     component "Railway Pattern" as railway [
-        FlextCore.Result[T] pattern
+        FlextResult[T] pattern
         Error propagation
         Recovery strategies
     ]
@@ -1072,7 +1072,7 @@ end note
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
-    def execute_with_railway(self, operation: Operation) -> FlextCore.Result[OperationResult]:
+    def execute_with_railway(self, operation: Operation) -> FlextResult[OperationResult]:
         """Execute operation using railway pattern with full error handling."""
 
         return (
@@ -1085,33 +1085,33 @@ class RailwayExecutor:
             .map(lambda result: OperationResult.from_success(result))
         )
 
-    def validate_operation(self, operation: Operation) -> FlextCore.Result[ValidatedOperation]:
+    def validate_operation(self, operation: Operation) -> FlextResult[ValidatedOperation]:
         """Validate operation parameters and constraints."""
 
         # Schema validation
         schema_result = self.schema_validator.validate(operation.payload)
         if schema_result.is_failure:
-            return FlextCore.Result.fail(ValidationError(
+            return FlextResult.fail(ValidationError(
                 f"Schema validation failed: {schema_result.error}"
             ))
 
         # Business rule validation
         business_result = self.business_validator.validate(operation)
         if business_result.is_failure:
-            return FlextCore.Result.fail(BusinessRuleViolation(
+            return FlextResult.fail(BusinessRuleViolation(
                 f"Business rule violation: {business_result.error}"
             ))
 
         # Resource availability check
         resource_result = self.resource_checker.check_availability(operation)
         if resource_result.is_failure:
-            return FlextCore.Result.fail(ResourceUnavailableError(
+            return FlextResult.fail(ResourceUnavailableError(
                 f"Resources unavailable: {resource_result.error}"
             ))
 
-        return FlextCore.Result.ok(ValidatedOperation(operation, schema_result.unwrap()))
+        return FlextResult.ok(ValidatedOperation(operation, schema_result.unwrap()))
 
-    def execute_operation(self, operation: ValidatedOperation) -> FlextCore.Result[ExecutionResult]:
+    def execute_operation(self, operation: ValidatedOperation) -> FlextResult[ExecutionResult]:
         """Execute operation with comprehensive error handling."""
 
         try:
@@ -1120,7 +1120,7 @@ class RailwayExecutor:
 
                 # Execute with circuit breaker
                 if not self.circuit_breaker.allow_request():
-                    return FlextCore.Result.fail(CircuitBreakerOpenError(
+                    return FlextResult.fail(CircuitBreakerOpenError(
                         "Circuit breaker is open - service temporarily unavailable"
                     ))
 
@@ -1130,17 +1130,17 @@ class RailwayExecutor:
                 # Record success
                 self.circuit_breaker.record_success()
 
-                return FlextCore.Result.ok(result)
+                return FlextResult.ok(result)
 
         except TimeoutError:
             self.circuit_breaker.record_failure()
-            return FlextCore.Result.fail(OperationTimeoutError(
+            return FlextResult.fail(OperationTimeoutError(
                 f"Operation timed out after {operation.timeout_seconds} seconds"
             ))
 
         except ExternalServiceError as e:
             self.circuit_breaker.record_failure()
-            return FlextCore.Result.fail(ExternalServiceError(
+            return FlextResult.fail(ExternalServiceError(
                 f"External service error: {e.message}"
             ))
 
@@ -1159,7 +1159,7 @@ class RailwayExecutor:
                 }
             )
 
-            return FlextCore.Result.fail(OperationExecutionError(
+            return FlextResult.fail(OperationExecutionError(
                 f"Operation execution failed: {str(e)}"
             ))
 ```
@@ -1245,7 +1245,7 @@ class RetryExecutor:
         self.max_delay = max_delay
         self.backoff_factor = backoff_factor
 
-    def execute_with_retry(self, operation: Callable[[], T]) -> FlextCore.Result[T]:
+    def execute_with_retry(self, operation: Callable[[], T]) -> FlextResult[T]:
         """Execute operation with retry logic."""
 
         last_exception = None
@@ -1253,7 +1253,7 @@ class RetryExecutor:
         for attempt in range(self.max_attempts):
             try:
                 result = operation()
-                return FlextCore.Result.ok(result)
+                return FlextResult.ok(result)
 
             except self.retryable_exceptions as e:
                 last_exception = e
@@ -1273,10 +1273,10 @@ class RetryExecutor:
 
             except Exception as e:
                 # Non-retryable exception
-                return FlextCore.Result.fail(OperationError(f"Non-retryable error: {e}"))
+                return FlextResult.fail(OperationError(f"Non-retryable error: {e}"))
 
         # All retry attempts exhausted
-        return FlextCore.Result.fail(RetryExhaustedError(
+        return FlextResult.fail(RetryExhaustedError(
             f"Operation failed after {self.max_attempts} attempts. "
             f"Last error: {last_exception}"
         ))
@@ -1454,7 +1454,7 @@ class ReliabilityMonitor:
 
     def _generate_reliability_recommendations(self, error_rates: Dict[str, float],
                                             circuit_breaker_states: Dict[str, str],
-                                            mtbf: float) -> FlextCore.Types.StringList:
+                                            mtbf: float) -> FlextTypes.StringList:
         """Generate reliability improvement recommendations."""
 
         recommendations = []
@@ -1672,7 +1672,7 @@ class AvailabilityManager:
             current_primary_zone=self.current_primary_zone
         )
 
-    def _initiate_failover(self, service_name: str, available_zones: FlextCore.Types.StringList) -> None:
+    def _initiate_failover(self, service_name: str, available_zones: FlextTypes.StringList) -> None:
         """Initiate failover to healthy zone."""
 
         # Find healthiest available zone
@@ -1697,7 +1697,7 @@ class AvailabilityManager:
             else:
                 self._send_failover_failure_notification(service_name, failover_result.error)
 
-    def _configure_failover(self, service_name: str, zones: FlextCore.Types.StringList) -> None:
+    def _configure_failover(self, service_name: str, zones: FlextTypes.StringList) -> None:
         """Configure automatic failover policies."""
 
         failover_policy = {
@@ -1791,7 +1791,7 @@ class AvailabilityManager:
         return sla_compliance
 
     def _generate_availability_recommendations(self, uptime_metrics: Dict[str, float],
-                                             mttr_metrics: Dict[str, float]) -> FlextCore.Types.StringList:
+                                             mttr_metrics: Dict[str, float]) -> FlextTypes.StringList:
         """Generate availability improvement recommendations."""
 
         recommendations = []
@@ -1839,7 +1839,7 @@ class DisasterRecoveryManager:
         self.dr_plans = self._load_dr_plans()
 
     def execute_disaster_recovery(self, disaster_type: str,
-                                affected_components: FlextCore.Types.StringList) -> DRResult:
+                                affected_components: FlextTypes.StringList) -> DRResult:
         """Execute disaster recovery plan."""
 
         # Identify applicable DR plan
@@ -1885,7 +1885,7 @@ class DisasterRecoveryManager:
 
         return recovery_result
 
-    def _select_dr_plan(self, disaster_type: str, affected_components: FlextCore.Types.StringList) -> Optional[DRPlan]:
+    def _select_dr_plan(self, disaster_type: str, affected_components: FlextTypes.StringList) -> Optional[DRPlan]:
         """Select appropriate DR plan based on disaster characteristics."""
 
         # Find plans that match the disaster type
@@ -1902,7 +1902,7 @@ class DisasterRecoveryManager:
 
         return best_plan
 
-    def _execute_assessment_phase(self, dr_plan: DRPlan, affected_components: FlextCore.Types.StringList) -> AssessmentResult:
+    def _execute_assessment_phase(self, dr_plan: DRPlan, affected_components: FlextTypes.StringList) -> AssessmentResult:
         """Execute disaster assessment phase."""
 
         assessment_start = datetime.utcnow()
@@ -2091,7 +2091,7 @@ class DisasterRecoveryManager:
 
         return compliance
 
-    def _generate_dr_recommendations(self, dr_status, compliance_metrics, test_results) -> FlextCore.Types.StringList:
+    def _generate_dr_recommendations(self, dr_status, compliance_metrics, test_results) -> FlextTypes.StringList:
         """Generate disaster recovery improvement recommendations."""
 
         recommendations = []
@@ -2381,7 +2381,7 @@ class QualityGate:
 
         return result
 
-    def _check_file_documentation(self, file_path: Path) -> FlextCore.Types.StringList:
+    def _check_file_documentation(self, file_path: Path) -> FlextTypes.StringList:
         """Check documentation in a single file."""
 
         undocumented = []
@@ -2466,7 +2466,7 @@ class AutomatedCodeReview:
 
         return result
 
-    def _apply_review_rules(self, content: str, file_path: str) -> FlextCore.Types.StringList:
+    def _apply_review_rules(self, content: str, file_path: str) -> FlextTypes.StringList:
         """Apply code review rules to file content."""
 
         issues = []
@@ -2513,7 +2513,7 @@ class AutomatedCodeReview:
 
         return complexity
 
-    def _check_import_organization(self, content: str) -> FlextCore.Types.StringList:
+    def _check_import_organization(self, content: str) -> FlextTypes.StringList:
         """Check import organization and style."""
 
         issues = []
@@ -2546,7 +2546,7 @@ class AutomatedCodeReview:
 
         return issues
 
-    def _check_security_issues(self, content: str) -> FlextCore.Types.StringList:
+    def _check_security_issues(self, content: str) -> FlextTypes.StringList:
         """Check for common security issues."""
 
         issues = []
@@ -2573,7 +2573,7 @@ class AutomatedCodeReview:
 
         return issues
 
-    def _calculate_file_score(self, issues: FlextCore.Types.StringList) -> float:
+    def _calculate_file_score(self, issues: FlextTypes.StringList) -> float:
         """Calculate quality score for a file."""
 
         base_score = 100.0
@@ -2593,7 +2593,7 @@ class AutomatedCodeReview:
 
         return max(0, base_score)
 
-    def _generate_file_suggestions(self, issues: FlextCore.Types.StringList, file_path: str) -> FlextCore.Types.StringList:
+    def _generate_file_suggestions(self, issues: FlextTypes.StringList, file_path: str) -> FlextTypes.StringList:
         """Generate improvement suggestions for a file."""
 
         suggestions = []
@@ -2621,7 +2621,7 @@ class AutomatedCodeReview:
         total_score = sum(review.quality_score for review in file_reviews)
         return total_score / len(file_reviews)
 
-    def _generate_recommendations(self, file_reviews: List[FileReviewResult]) -> FlextCore.Types.StringList:
+    def _generate_recommendations(self, file_reviews: List[FileReviewResult]) -> FlextTypes.StringList:
         """Generate overall recommendations for the PR."""
 
         recommendations = []
@@ -2644,7 +2644,7 @@ class AutomatedCodeReview:
 
         return recommendations
 
-    def _identify_blocking_issues(self, file_reviews: List[FileReviewResult]) -> FlextCore.Types.StringList:
+    def _identify_blocking_issues(self, file_reviews: List[FileReviewResult]) -> FlextTypes.StringList:
         """Identify issues that should block the PR."""
 
         blocking = []
@@ -2818,7 +2818,7 @@ class APIResponse:
 
         return 'unknown_error'
 
-    def _get_error_suggestions(self, error: str) -> FlextCore.Types.StringList:
+    def _get_error_suggestions(self, error: str) -> FlextTypes.StringList:
         """Provide actionable suggestions for error resolution."""
 
         suggestions_map = {
@@ -3014,7 +3014,7 @@ class APIHelpSystem:
 
         return examples
 
-    def _get_troubleshooting_tips(self, endpoint: str, method: str) -> FlextCore.Types.StringList:
+    def _get_troubleshooting_tips(self, endpoint: str, method: str) -> FlextTypes.StringList:
         """Get troubleshooting tips for the endpoint."""
 
         tips = [
@@ -3697,7 +3697,7 @@ class TestResultAnalyzer:
 
         return failure_patterns
 
-    def _generate_test_recommendations(self, analysis: TestAnalysis) -> FlextCore.Types.StringList:
+    def _generate_test_recommendations(self, analysis: TestAnalysis) -> FlextTypes.StringList:
         """Generate recommendations based on test analysis."""
 
         recommendations = []

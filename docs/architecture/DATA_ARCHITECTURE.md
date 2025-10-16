@@ -241,7 +241,7 @@ class PipelineConfig:
     transforms: List[TransformConfig] = field(default_factory=list)
     schedule: Optional[str] = None
 
-    def validate(self) -> FlextCore.Result[ValidatedConfig]:
+    def validate(self) -> FlextResult[ValidatedConfig]:
         """Validate complete pipeline configuration."""
         return (
             self.tap.validate()
@@ -294,22 +294,22 @@ class PipelineConfig:
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
-    def validate_record(self, record: dict, schema: dict) -> FlextCore.Result[ValidatedRecord]:
+    def validate_record(self, record: dict, schema: dict) -> FlextResult[ValidatedRecord]:
         """Validate record against Singer schema."""
         try:
             # JSON Schema validation
             validate(instance=record, schema=schema)
-            return FlextCore.Result.ok(ValidatedRecord(record=record, schema=schema))
+            return FlextResult.ok(ValidatedRecord(record=record, schema=schema))
         except ValidationError as e:
-            return FlextCore.Result.fail(ValidationError(f"Schema validation failed: {e.message}"))
+            return FlextResult.fail(ValidationError(f"Schema validation failed: {e.message}"))
 
-    def validate_stream_schema(self, schema: dict) -> FlextCore.Result[ValidatedSchema]:
+    def validate_stream_schema(self, schema: dict) -> FlextResult[ValidatedSchema]:
         """Validate Singer stream schema."""
         required_fields = ['type', 'properties']
         if not all(field in schema for field in required_fields):
-            return FlextCore.Result.fail(SchemaError("Invalid Singer schema structure"))
+            return FlextResult.fail(SchemaError("Invalid Singer schema structure"))
 
-        return FlextCore.Result.ok(ValidatedSchema(schema=schema))
+        return FlextResult.ok(ValidatedSchema(schema=schema))
 ```
 
 ---
@@ -507,7 +507,7 @@ class RetentionPolicy:
     data_type: str
     retention_period_days: int
     archive_strategy: str  # 'delete', 'archive', 'anonymize'
-    compliance_requirements: FlextCore.Types.StringList
+    compliance_requirements: FlextTypes.StringList
 
     def should_retain(self, data_age_days: int) -> bool:
         """Determine if data should be retained."""

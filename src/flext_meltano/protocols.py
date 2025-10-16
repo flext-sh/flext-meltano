@@ -9,12 +9,12 @@ from __future__ import annotations
 
 from typing import Protocol, TypeVar, runtime_checkable
 
-from flext_core import FlextCore
+from flext_core import FlextProtocols, FlextResult, FlextTypes
 
 T_co = TypeVar("T_co", covariant=True)
 
 
-class FlextMeltanoProtocols(FlextCore.Protocols):
+class FlextMeltanoProtocols(FlextProtocols):
     """Unified Meltano protocols following FLEXT domain extension pattern.
 
     This class consolidates Meltano ELT pipeline protocols while explicitly
@@ -54,17 +54,17 @@ class FlextMeltanoProtocols(FlextCore.Protocols):
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: FlextCore.Types.Dict | None
+            variants: FlextTypes.Dict | None
 
-            def get_config(self) -> FlextCore.Types.Dict:
+            def get_config(self) -> FlextTypes.Dict:
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: FlextCore.Types.Dict) -> bool:
+            def validate_config(self, config: FlextTypes.Dict) -> bool:
                 """Validate plugin configuration."""
                 ...
 
-            def execute(self, *args: FlextCore.Types.JsonValue) -> T_co:
+            def execute(self, *args: FlextTypes.JsonValue) -> T_co:
                 """Execute plugin with given arguments."""
                 ...
 
@@ -74,85 +74,85 @@ class FlextMeltanoProtocols(FlextCore.Protocols):
 
             name: str
             tap_stream_id: str
-            schema: FlextCore.Types.JsonValue
+            schema: FlextTypes.JsonValue
 
-            def sync_records(self) -> FlextCore.Types.JsonValue:
+            def sync_records(self) -> FlextTypes.JsonValue:
                 """Sync records from the stream."""
                 ...
 
-            def get_records(self) -> FlextCore.Types.JsonValue:
+            def get_records(self) -> FlextTypes.JsonValue:
                 """Get records from the stream."""
                 ...
 
         @runtime_checkable
-        class TapProtocol(FlextCore.Protocols.Domain.Service, Protocol):
+        class TapProtocol(FlextProtocols.Service, Protocol):
             """Singer Tap protocol extending Domain.Service for ELT operations."""
 
-            def discover(self) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Discover catalog with FlextCore.Result."""
+            def discover(self) -> FlextResult[FlextTypes.JsonValue]:
+                """Discover catalog with FlextResult."""
                 ...
 
             def sync(
-                self, catalog: FlextCore.Types.JsonValue
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Sync data from source with FlextCore.Result."""
+                self, catalog: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Sync data from source with FlextResult."""
                 ...
 
-            def execute(self) -> FlextCore.Result[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute the tap extraction (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class TargetProtocol(FlextCore.Protocols.Domain.Service, Protocol):
+        class TargetProtocol(FlextProtocols.Service, Protocol):
             """Singer Target protocol extending Domain.Service for ELT operations."""
 
             def handle_record(
-                self, record: FlextCore.Types.JsonValue
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Handle a single record with FlextCore.Result."""
+                self, record: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Handle a single record with FlextResult."""
                 ...
 
             def handle_batch(
-                self, records: list[FlextCore.Types.JsonValue]
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Handle a batch of records with FlextCore.Result."""
+                self, records: list[FlextTypes.JsonValue]
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Handle a batch of records with FlextResult."""
                 ...
 
-            def execute(self) -> FlextCore.Result[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute the target loading (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(FlextCore.Protocols.Domain.Service, Protocol):
+        class DbtRunnerProtocol(FlextProtocols.Service, Protocol):
             """DBT Runner protocol extending Domain.Service for ELT operations."""
 
             def run(
-                self, models: FlextCore.Types.StringList
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Run DBT models with FlextCore.Result."""
+                self, models: FlextTypes.StringList
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Run DBT models with FlextResult."""
                 ...
 
             def test(
-                self, models: FlextCore.Types.StringList
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Test DBT models with FlextCore.Result."""
+                self, models: FlextTypes.StringList
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Test DBT models with FlextResult."""
                 ...
 
-            def execute(self) -> FlextCore.Result[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute DBT transformations (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(FlextCore.Protocols.Domain.Service, Protocol):
+        class ServiceCallProtocol(FlextProtocols.Service, Protocol):
             """Service call protocol extending Domain.Service."""
 
             def call(
-                self, operation: str, payload: FlextCore.Types.JsonValue
-            ) -> FlextCore.Result[FlextCore.Types.JsonValue]:
-                """Execute service call with FlextCore.Result."""
+                self, operation: str, payload: FlextTypes.JsonValue
+            ) -> FlextResult[FlextTypes.JsonValue]:
+                """Execute service call with FlextResult."""
                 ...
 
-            def execute(self) -> FlextCore.Result[object]:
+            def execute(self) -> FlextResult[object]:
                 """Execute service operation (implements Domain.Service)."""
                 ...
 

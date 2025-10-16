@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from meltano.core.elt_context import ELTContext
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.base import PluginType
@@ -33,12 +33,12 @@ class FlextMeltanoAbstractions:
 
     def __init__(self) -> None:
         """Initialize unified abstractions with FLEXT patterns."""
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
         self._project: Project | None = None
         self._hub_services: dict[str, MeltanoHubService] = {}
 
     # Project operations
-    def find_project(self, project_root: Path) -> FlextCore.Result[Project]:
+    def find_project(self, project_root: Path) -> FlextResult[Project]:
         """Find and load Meltano project using internal meltano.core API."""
         try:
             project = Project.find(project_root)
@@ -49,28 +49,28 @@ class FlextMeltanoAbstractions:
                 project_root=str(project_root),
             )
 
-            return FlextCore.Result[Project].ok(data=project)
+            return FlextResult[Project].ok(data=project)
 
         except Exception as e:
             error_msg = f"Failed to load Meltano project: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[Project].fail(error_msg)
+            return FlextResult[Project].fail(error_msg)
 
-    def get_project_root(self) -> FlextCore.Result[Path]:
+    def get_project_root(self) -> FlextResult[Path]:
         """Get the root directory of the current project."""
         if not self._project:
-            return FlextCore.Result[Path].fail("No project loaded")
+            return FlextResult[Path].fail("No project loaded")
 
         try:
             root_path = Path(self._project.root)
-            return FlextCore.Result[Path].ok(data=root_path)
+            return FlextResult[Path].ok(data=root_path)
         except Exception as e:
-            return FlextCore.Result[Path].fail(f"Failed to get project root: {e}")
+            return FlextResult[Path].fail(f"Failed to get project root: {e}")
 
     # Hub operations
     def get_plugins_of_type(
         self, project: Project, plugin_type: str
-    ) -> FlextCore.Result[FlextCore.Types.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Get plugins of specified type using MeltanoHubService."""
         try:
             project_id = str(id(project))
@@ -89,7 +89,7 @@ class FlextMeltanoAbstractions:
             elif plugin_type == "orchestrators":
                 plugins = hub_service.get_orchestrators()
             else:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Unknown plugin type: {plugin_type}"
                 )
 
@@ -99,17 +99,17 @@ class FlextMeltanoAbstractions:
                 count=len(plugins),
             )
 
-            return FlextCore.Result[FlextCore.Types.Dict].ok(data=plugins)
+            return FlextResult[FlextTypes.Dict].ok(data=plugins)
 
         except Exception as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[FlextCore.Types.Dict].fail(error_msg)
+            return FlextResult[FlextTypes.Dict].fail(error_msg)
 
     # Plugin operations
     def add_plugin(
         self, project: Project, plugin_type: str, plugin_name: str
-    ) -> FlextCore.Result[bool]:
+    ) -> FlextResult[bool]:
         """Add plugin to project using ProjectAddService."""
         try:
             # Map string plugin types to PluginType enum
@@ -128,17 +128,17 @@ class FlextMeltanoAbstractions:
                 plugin_name=plugin_name,
             )
 
-            return FlextCore.Result[bool].ok(data=True)
+            return FlextResult[bool].ok(data=True)
 
         except Exception as e:
             error_msg = f"Failed to add plugin {plugin_name}: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[bool].fail(error_msg)
+            return FlextResult[bool].fail(error_msg)
 
     # Runner operations
     def create_elt_context(
         self, project: Project, extractor_name: str, loader_name: str
-    ) -> FlextCore.Result[ELTContext]:
+    ) -> FlextResult[ELTContext]:
         """Create ELT context."""
         return self._runner_helper.create_elt_context(
             project, extractor_name, loader_name
@@ -149,7 +149,7 @@ class FlextMeltanoAbstractions:
         elt_context: ELTContext,
         extractor_plugin: ProjectPlugin,
         loader_plugin: ProjectPlugin,
-    ) -> FlextCore.Result[FlextCore.Types.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Execute Singer pipeline."""
         return self._runner_helper.execute_singer_pipeline(
             elt_context, extractor_plugin, loader_plugin

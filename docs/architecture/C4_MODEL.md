@@ -52,7 +52,7 @@ Rel(admin, flext_meltano, "Manages", "Infrastructure, monitoring, security")
 Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
 Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
 Rel(flext_meltano, dbt_core, "Orchestrates", "Model execution, testing, documentation")
-Rel(flext_meltano, flext_core, "Built on", "FlextCore.Result[T], dependency injection, logging")
+Rel(flext_meltano, flext_core, "Built on", "FlextResult[T], dependency injection, logging")
 
 Rel(flext_tap_star, flext_meltano, "Depends on", "Foundation library")
 Rel(flext_target_star, flext_meltano, "Depends on", "Foundation library")
@@ -165,7 +165,7 @@ Rel(api_facade, config_manager, "Configures", "Configuration access")
 Rel(orchestrator, singer_service, "Coordinates", "Pipeline execution")
 Rel(orchestrator, dbt_service, "Orchestrates", "Model execution")
 Rel(orchestrator, state_manager, "Persists", "State updates")
-Rel(orchestrator, error_handler, "Handles errors", "FlextCore.Result[T]")
+Rel(orchestrator, error_handler, "Handles errors", "FlextResult[T]")
 
 Rel(plugin_manager, config_manager, "Validates", "Plugin configuration")
 Rel(singer_service, state_manager, "Updates", "Singer bookmarks")
@@ -296,7 +296,7 @@ FlextMeltanoService --> FlextMeltanoConfig : configures
 
 note right of FlextMeltanoService
     Railway-oriented error handling
-    with FlextCore.Result[T] pattern
+    with FlextResult[T] pattern
 end note
 
 @enduml
@@ -317,7 +317,7 @@ end note
 
 ## 📋 Architecture Decision Records
 
-### ADR-001: Railway-Oriented Programming with FlextCore.Result[T]
+### ADR-001: Railway-Oriented Programming with FlextResult[T]
 
 **Status**: Accepted | **Date**: 2025-01-15
 
@@ -327,7 +327,7 @@ FLEXT-Meltano needs robust error handling for complex ELT operations involving m
 
 #### Decision
 
-Implement railway-oriented programming using FlextCore.Result[T] from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using FlextResult[T] from flext-core, ensuring composable error handling throughout the entire codebase.
 
 #### Consequences
 

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 
 # Import from specific modules to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
@@ -24,9 +24,7 @@ from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoSinger(
-    FlextCore.Service[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]):
     """UNIFIED Singer namespace class consolidating ALL Singer functionality.
 
     This single class provides:
@@ -41,12 +39,12 @@ class FlextMeltanoSinger(
         """Initialize unified Singer class with FLEXT configuration."""
         super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def execute_pipeline(
         self, tap_instance: object, target_instance: object
-    ) -> FlextCore.Result[
+    ) -> FlextResult[
         FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
     ]:
         """Execute Singer pipeline with advanced protocol management.
@@ -56,7 +54,7 @@ class FlextMeltanoSinger(
             target_instance: SingerTarget instance
 
         Returns:
-            FlextCore.Result containing pipeline execution results
+            FlextResult containing pipeline execution results
 
         """
         try:
@@ -69,14 +67,12 @@ class FlextMeltanoSinger(
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     singer_manager_result.error or "Failed to get Singer manager"
                 )
 
             # For now, just return success since singer_manager is just a dict
-            result = FlextCore.Result[FlextCore.Types.Dict].ok(
-                singer_manager_result.unwrap()
-            )
+            result = FlextResult[FlextTypes.Dict].ok(singer_manager_result.unwrap())
 
             if result.is_success:
                 self.logger.info(
@@ -94,7 +90,7 @@ class FlextMeltanoSinger(
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
+            return FlextResult[
                 FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.SingerExecutionResult
             ].fail(error_msg)
 
@@ -105,7 +101,7 @@ class FlextMeltanoSinger(
         loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
         transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
         | None = None,
-    ) -> FlextCore.Result[
+    ) -> FlextResult[
         FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
     ]:
         """Execute complete E-L-T pipeline using library APIs.
@@ -117,7 +113,7 @@ class FlextMeltanoSinger(
             transformer_config: Optional transformer configuration
 
         Returns:
-            FlextCore.Result containing complete pipeline results
+            FlextResult containing complete pipeline results
 
         """
         try:
@@ -155,6 +151,6 @@ class FlextMeltanoSinger(
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextCore.Result[
+            return FlextResult[
                 FlextMeltanoTypes.Processing.FlextMeltanoTypes.Processing.EltPipelineResult
             ].fail(error_msg)

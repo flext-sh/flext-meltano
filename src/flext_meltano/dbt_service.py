@@ -2,7 +2,7 @@
 
 This module provides the FlextMeltanoDbtService class following FLEXT patterns:
 - Single Responsibility Principle
-- Railway-oriented programming with FlextCore.Result
+- Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -15,7 +15,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextCore
+from flext_core import FlextResult, FlextService, FlextTypes
 
 # Import from specific modules to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
@@ -24,7 +24,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoDbtService(
-    FlextCore.Service[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """Service for Meltano DBT operations.
 
@@ -45,9 +45,9 @@ class FlextMeltanoDbtService(
     def run_transformations(
         self,
         project_dir: Path,
-        models: FlextCore.Types.StringList | None = None,
+        models: FlextTypes.StringList | None = None,
         **_options: object,
-    ) -> FlextCore.Result[FlextMeltanoTypes.Processing.DbtTransformationResult]:
+    ) -> FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult]:
         """Run dbt transformations using programmatic API.
 
         Args:
@@ -56,7 +56,7 @@ class FlextMeltanoDbtService(
             **options: Additional dbt options
 
         Returns:
-            FlextCore.Result containing transformation results
+            FlextResult containing transformation results
 
         """
         try:
@@ -69,12 +69,12 @@ class FlextMeltanoDbtService(
             # Use library runner for dbt operations
             dbt_runner_result = self._library_runner.get_dbt_runner()
             if dbt_runner_result.is_failure:
-                return FlextCore.Result[
+                return FlextResult[
                     FlextMeltanoTypes.Processing.DbtTransformationResult
                 ].fail(dbt_runner_result.error or "Failed to get DBT runner")
 
             # For now, just return success since dbt_runner is just a dict
-            result = FlextCore.Result[
+            result = FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].ok(
                 cast(
@@ -99,7 +99,7 @@ class FlextMeltanoDbtService(
         except Exception as e:
             error_msg = f"Failed to run dbt transformations: {e}"
             _ = self.logger.exception(error_msg)
-            return FlextCore.Result[
+            return FlextResult[
                 FlextMeltanoTypes.Processing.DbtTransformationResult
             ].fail(error_msg)
 

@@ -226,26 +226,26 @@ flext_meltano --> redis: Caching & queues
 ```python
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
-    FlextCore.Result,      # Railway-oriented error handling
-    FlextCore.Container,   # Dependency injection
-    FlextCore.Models,      # Base model classes
-    FlextCore.Logger,      # Structured logging
-    FlextCore.Service      # Base service class
+    FlextResult,      # Railway-oriented error handling
+    FlextContainer,   # Dependency injection
+    FlextModels,      # Base model classes
+    FlextLogger,      # Structured logging
+    FlextService      # Base service class
 )
 
-class FlextMeltanoService(FlextCore.Service):
+class FlextMeltanoService(FlextService):
     """FLEXT-Meltano service extending FLEXT-Core patterns."""
 
-    def discover_plugins(self) -> FlextCore.Result[List[PluginInfo]]:
+    def discover_plugins(self) -> FlextResult[List[PluginInfo]]:
         """Plugin discovery with FLEXT error handling."""
         try:
             plugins = self.adapter.list_plugins()
             validated_plugins = [
                 self.validate_plugin(plugin) for plugin in plugins
             ]
-            return FlextCore.Result.ok(validated_plugins)
+            return FlextResult.ok(validated_plugins)
         except Exception as e:
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 MeltanoError(f"Plugin discovery failed: {e}")
             )
 ```
@@ -256,7 +256,7 @@ class FlextMeltanoService(FlextCore.Service):
 class MeltanoAdapter:
     """Meltano CLI integration with proper error handling."""
 
-    def run_meltano_command(self, command: str, **kwargs) -> FlextCore.Result[MeltanoResult]:
+    def run_meltano_command(self, command: str, **kwargs) -> FlextResult[MeltanoResult]:
         """Execute Meltano CLI command safely."""
 
         # Build command with proper escaping
@@ -276,20 +276,20 @@ class MeltanoAdapter:
             )
 
             if result.returncode == 0:
-                return FlextCore.Result.ok(MeltanoResult(
+                return FlextResult.ok(MeltanoResult(
                     success=True,
                     output=result.stdout,
                     command=cmd
                 ))
             else:
-                return FlextCore.Result.fail(MeltanoExecutionError(
+                return FlextResult.fail(MeltanoExecutionError(
                     f"Meltano command failed: {result.stderr}",
                     command=cmd,
                     return_code=result.returncode
                 ))
 
         except subprocess.TimeoutExpired:
-            return FlextCore.Result.fail(MeltanoTimeoutError(
+            return FlextResult.fail(MeltanoTimeoutError(
                 f"Meltano command timed out after {self.command_timeout}s",
                 command=cmd
             ))
@@ -304,7 +304,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     def __init__(self, config: dict[str, object] = None, **kwargs):
         super().__init__(config, **kwargs)
         # FLEXT logging integration
-        self.logger = FlextCore.Logger.get_logger(self.__class__.__name__)
+        self.logger = FlextLogger.get_logger(self.__class__.__name__)
 
     def discover_streams(self) -> List[FlextMeltanoStream]:
         """Discover streams with FLEXT error handling."""
@@ -349,15 +349,15 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
 
-    def connect(self) -> FlextCore.Result[Connection]:
+    def connect(self) -> FlextResult[Connection]:
         """Establish connection to external system."""
         ...
 
-    def execute_operation(self, operation: Operation) -> FlextCore.Result[Result]:
+    def execute_operation(self, operation: Operation) -> FlextResult[Result]:
         """Execute operation on external system."""
         ...
 
-    def disconnect(self) -> FlextCore.Result[None]:
+    def disconnect(self) -> FlextResult[None]:
         """Clean up connection to external system."""
         ...
 
@@ -382,10 +382,10 @@ class PluginManager:
         self.plugin_registry: Dict[str, PluginInfo] = {}
         self.plugin_loaders: List[PluginLoader] = []
 
-    def register_plugin(self, plugin_info: PluginInfo) -> FlextCore.Result[None]:
+    def register_plugin(self, plugin_info: PluginInfo) -> FlextResult[None]:
         """Register a plugin in the ecosystem."""
         if plugin_info.name in self.plugin_registry:
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 PluginError(f"Plugin {plugin_info.name} already registered")
             )
 
@@ -396,12 +396,12 @@ class PluginManager:
 
         self.plugin_registry[plugin_info.name] = plugin_info
         self.logger.info(f"Registered plugin: {plugin_info.name}")
-        return FlextCore.Result.ok(None)
+        return FlextResult.ok(None)
 
-    def load_plugin(self, name: str) -> FlextCore.Result[Plugin]:
+    def load_plugin(self, name: str) -> FlextResult[Plugin]:
         """Load and initialize a plugin."""
         if name not in self.plugin_registry:
-            return FlextCore.Result.fail(
+            return FlextResult.fail(
                 PluginError(f"Plugin {name} not found in registry")
             )
 
@@ -412,7 +412,7 @@ class PluginManager:
             if loader.can_load(plugin_info):
                 return loader.load_plugin(plugin_info)
 
-        return FlextCore.Result.fail(
+        return FlextResult.fail(
             PluginError(f"No loader found for plugin {name}")
         )
 ```
@@ -431,7 +431,7 @@ cloud "FLEXT Ecosystem" as ecosystem {
     rectangle "Foundation Layer" as foundation {
         component "FLEXT-Core" as flext_core [
             Foundation Patterns
-            FlextCore.Result[T], FlextCore.Container
+            FlextResult[T], FlextContainer
             Type Safety, Error Handling
         ]
 
@@ -532,10 +532,29 @@ All FLEXT projects follow consistent integration patterns:
 
 ```python
 # Standard FLEXT project structure
-from flext_core import FlextCore
+from flext_core import FlextBus
+from flext_core import FlextConfig
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import FlextContext
+from flext_core import FlextDecorators
+from flext_core import FlextDispatcher
+from flext_core import FlextExceptions
+from flext_core import FlextHandlers
+from flext_core import FlextLogger
+from flext_core import FlextMixins
+from flext_core import FlextModels
+from flext_core import FlextProcessors
+from flext_core import FlextProtocols
+from flext_core import FlextRegistry
+from flext_core import FlextResult
+from flext_core import FlextRuntime
+from flext_core import FlextService
+from flext_core import FlextTypes
+from flext_core import FlextUtilities
 from flext_meltano import FlextMeltanoTap, FlextMeltanoTarget
 
-class MyFLEXTProject(FlextCore.Service):
+class MyFLEXTProject(FlextService):
     """FLEXT project extending foundation patterns."""
 
     def __init__(self):
@@ -544,7 +563,7 @@ class MyFLEXTProject(FlextCore.Service):
         self.tap = FlextMeltanoTap()
         self.target = FlextMeltanoTarget()
 
-    def execute_pipeline(self) -> FlextCore.Result[PipelineResult]:
+    def execute_pipeline(self) -> FlextResult[PipelineResult]:
         """Execute pipeline using FLEXT foundation."""
         return (
             self.tap.discover_streams()
@@ -564,7 +583,7 @@ class FLEXTPluginRegistry:
     def __init__(self):
         self.registered_plugins: Dict[str, PluginMetadata] = {}
 
-    def register_flext_plugin(self, plugin: FLEXTPlugin) -> FlextCore.Result[None]:
+    def register_flext_plugin(self, plugin: FLEXTPlugin) -> FlextResult[None]:
         """Register a FLEXT plugin in the ecosystem."""
 
         # Validate plugin compatibility
@@ -586,7 +605,7 @@ class FLEXTPluginRegistry:
             capabilities=plugin.capabilities
         )
 
-        return FlextCore.Result.ok(None)
+        return FlextResult.ok(None)
 
     def discover_compatible_plugins(self, requirements: PluginRequirements) -> List[PluginMetadata]:
         """Discover plugins that meet specific requirements."""
@@ -703,7 +722,7 @@ end note
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
-    def execute_sync_operation(self, request: OperationRequest) -> FlextCore.Result[OperationResponse]:
+    def execute_sync_operation(self, request: OperationRequest) -> FlextResult[OperationResponse]:
         """Execute synchronous operation with timeout and error handling."""
 
         # Validate request
@@ -715,15 +734,15 @@ class SynchronousIntegration:
         try:
             with self.timeout_context(self.operation_timeout):
                 response = self.external_system.execute_operation(request)
-                return FlextCore.Result.ok(self.adapt_response(response))
+                return FlextResult.ok(self.adapt_response(response))
 
         except TimeoutError:
-            return FlextCore.Result.fail(IntegrationTimeoutError(
+            return FlextResult.fail(IntegrationTimeoutError(
                 f"Operation timed out after {self.operation_timeout}s"
             ))
 
         except ExternalSystemError as e:
-            return FlextCore.Result.fail(IntegrationError(
+            return FlextResult.fail(IntegrationError(
                 f"External system error: {e.message}"
             ))
 ```
@@ -741,14 +760,14 @@ class CircuitBreakerIntegration:
         self.last_failure_time = None
         self.state = CircuitState.CLOSED
 
-    def execute_with_circuit_breaker(self, operation: Callable) -> FlextCore.Result[object]:
+    def execute_with_circuit_breaker(self, operation: Callable) -> FlextResult[object]:
         """Execute operation with circuit breaker protection."""
 
         if self.state == CircuitState.OPEN:
             if self._should_attempt_reset():
                 self.state = CircuitState.HALF_OPEN
             else:
-                return FlextCore.Result.fail(CircuitBreakerError("Circuit breaker is OPEN"))
+                return FlextResult.fail(CircuitBreakerError("Circuit breaker is OPEN"))
 
         try:
             result = operation()
@@ -760,7 +779,7 @@ class CircuitBreakerIntegration:
 
         except Exception as e:
             self._record_failure()
-            return FlextCore.Result.fail(IntegrationError(f"Operation failed: {e}"))
+            return FlextResult.fail(IntegrationError(f"Operation failed: {e}"))
 
     def _record_failure(self) -> None:
         """Record operation failure and update circuit state."""
@@ -791,7 +810,7 @@ class EventDrivenIntegration:
         self.event_queue = event_queue
         self.event_handlers = event_handlers
 
-    def publish_event(self, event: IntegrationEvent) -> FlextCore.Result[None]:
+    def publish_event(self, event: IntegrationEvent) -> FlextResult[None]:
         """Publish integration event to queue."""
 
         try:
@@ -806,10 +825,10 @@ class EventDrivenIntegration:
             # Log event
             self.logger.info(f"Published event: {event.event_type}")
 
-            return FlextCore.Result.ok(None)
+            return FlextResult.ok(None)
 
         except Exception as e:
-            return FlextCore.Result.fail(EventPublishingError(f"Failed to publish event: {e}"))
+            return FlextResult.fail(EventPublishingError(f"Failed to publish event: {e}"))
 
     def process_events(self) -> None:
         """Process incoming integration events."""
@@ -847,7 +866,7 @@ class MessageQueueIntegration:
         self.dead_letter_queue = dead_letter_queue
         self.max_retries = 3
 
-    def send_message(self, message: QueueMessage) -> FlextCore.Result[None]:
+    def send_message(self, message: QueueMessage) -> FlextResult[None]:
         """Send message to queue with reliability guarantees."""
 
         try:
@@ -862,10 +881,10 @@ class MessageQueueIntegration:
             )
 
             self.logger.info(f"Sent message: {message_id}")
-            return FlextCore.Result.ok(None)
+            return FlextResult.ok(None)
 
         except Exception as e:
-            return FlextCore.Result.fail(QueueError(f"Failed to send message: {e}"))
+            return FlextResult.fail(QueueError(f"Failed to send message: {e}"))
 
     def receive_and_process_messages(self, message_processor: Callable) -> None:
         """Receive and process messages from queue."""
@@ -1165,7 +1184,7 @@ end note
 1. **Ecosystem Foundation**: Central integration hub for 32+ FLEXT projects
 2. **Zero Custom ELT**: Absolute prohibition of custom Meltano/Singer/DBT implementations
 3. **Type Safety First**: 100% Pyrefly compliance across all integrations
-4. **Railway-Oriented**: Consistent error handling with FlextCore.Result[T] pattern
+4. **Railway-Oriented**: Consistent error handling with FlextResult[T] pattern
 5. **Clean Architecture**: Domain-Driven Design with clear layer separation
 
 ### System Qualities

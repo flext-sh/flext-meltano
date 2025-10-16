@@ -1,10 +1,13 @@
-"""Test module for flext-meltano."""
+"""Test module for flext-meltano.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+
+"""
 
 import math
 
-# Copyright (c) 2025 FLEXT Team. All rights reserved.
-# SPDX-License-Identifier: MIT
-from flext_core import FlextCore
+from flext_core import FlextResult, FlextTypes
 from flext_tests import FlextTestsUtilities
 
 from flext_meltano import FlextMeltanoTypes
@@ -52,8 +55,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_string_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -95,8 +98,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_integer_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -134,8 +137,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_number_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -155,8 +158,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_boolean_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -176,8 +179,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_datetime_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -202,8 +205,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_array_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -218,7 +221,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test array type with item type specification (line 121-122)
-        item_type: FlextCore.Types.Dict = {"type": "string"}
+        item_type: FlextTypes.Dict = {"type": "string"}
         result_with_items = self.singer_types.create_array_type(items=item_type)
 
         array_with_items = result_with_items.unwrap()
@@ -234,8 +237,8 @@ class TestFlextSingerTypesComplete:
         result = self.singer_types.create_object_type()
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_success,
@@ -250,7 +253,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test object type with properties specification (line 136-137)
-        properties: FlextCore.Types.Dict = {
+        properties: FlextTypes.Dict = {
             "id": {"type": "string"},
             "name": {"type": "string"},
         }
@@ -271,14 +274,14 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_string_type(self) -> None:
         """Test value validation for string type using flext_tests."""
-        string_type_def: FlextCore.Types.Dict = {"type": "string"}
+        string_type_def: FlextTypes.Dict = {"type": "string"}
 
         # Test valid string value (lines 171-184)
         valid_result = self.singer_types.validate_value("hello world", string_type_def)
 
         self.test_assertions.assert_true(
-            condition=isinstance(valid_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(valid_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=valid_result.is_success,
@@ -294,8 +297,8 @@ class TestFlextSingerTypesComplete:
         invalid_result = self.singer_types.validate_value(123, string_type_def)
 
         self.test_assertions.assert_true(
-            condition=isinstance(invalid_result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(invalid_result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=invalid_result.is_failure,
@@ -309,7 +312,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_integer_type(self) -> None:
         """Test value validation for integer type using flext_tests."""
-        integer_type_def: FlextCore.Types.Dict = {"type": "integer"}
+        integer_type_def: FlextTypes.Dict = {"type": "integer"}
 
         # Test valid integer value
         valid_result = self.singer_types.validate_value(42, integer_type_def)
@@ -342,7 +345,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_number_type(self) -> None:
         """Test value validation for number type using flext_tests."""
-        number_type_def: FlextCore.Types.Dict = {"type": "number"}
+        number_type_def: FlextTypes.Dict = {"type": "number"}
 
         # Test valid number values (lines 174-179 - tuple case)
         valid_int_result = self.singer_types.validate_value(42, number_type_def)
@@ -375,7 +378,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_boolean_type(self) -> None:
         """Test value validation for boolean type using flext_tests."""
-        boolean_type_def: FlextCore.Types.Dict = {"type": "boolean"}
+        boolean_type_def: FlextTypes.Dict = {"type": "boolean"}
 
         # Test valid boolean values
         valid_true_result = self.singer_types.validate_value(True, boolean_type_def)
@@ -400,7 +403,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_array_type(self) -> None:
         """Test value validation for array type using flext_tests."""
-        array_type_def: FlextCore.Types.Dict = {"type": "array"}
+        array_type_def: FlextTypes.Dict = {"type": "array"}
 
         # Test valid array value
         valid_result = self.singer_types.validate_value([1, 2, 3], array_type_def)
@@ -423,7 +426,7 @@ class TestFlextSingerTypesComplete:
 
     def test_validate_value_object_type(self) -> None:
         """Test value validation for object type using flext_tests."""
-        object_type_def: FlextCore.Types.Dict = {"type": "object"}
+        object_type_def: FlextTypes.Dict = {"type": "object"}
 
         # Test valid object value
         valid_result = self.singer_types.validate_value(
@@ -450,13 +453,13 @@ class TestFlextSingerTypesComplete:
     def test_validate_value_missing_type(self) -> None:
         """Test value validation with missing type definition using flext_tests."""
         # Test missing type field (lines 157-158)
-        missing_type_def: FlextCore.Types.Dict = {"description": "No type field"}
+        missing_type_def: FlextTypes.Dict = {"description": "No type field"}
 
         result = self.singer_types.validate_value("any_value", missing_type_def)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextCore.Result),
-            message="Should return FlextCore.Result",
+            condition=isinstance(result, FlextResult),
+            message="Should return FlextResult",
         )
         self.test_assertions.assert_true(
             condition=result.is_failure,
@@ -471,7 +474,7 @@ class TestFlextSingerTypesComplete:
     def test_validate_value_unknown_type(self) -> None:
         """Test value validation with unknown type using flext_tests."""
         # Test unknown type (not in validation_rules)
-        unknown_type_def: FlextCore.Types.Dict = {"type": "unknown_type"}
+        unknown_type_def: FlextTypes.Dict = {"type": "unknown_type"}
 
         result = self.singer_types.validate_value("any_value", unknown_type_def)
 
@@ -491,7 +494,7 @@ class TestFlextSingerTypesComplete:
         # are difficult to trigger directly since they only occur on exception during dict[str, object] operations
         # But we can ensure the exception handling path is covered by the structure
 
-        # Test that all type creation methods return FlextCore.Result and handle exceptions gracefully
+        # Test that all type creation methods return FlextResult and handle exceptions gracefully
         methods_to_test = [
             self.singer_types.create_string_type,
             self.singer_types.create_integer_type,
@@ -503,8 +506,8 @@ class TestFlextSingerTypesComplete:
         for method in methods_to_test:
             result = method()
             self.test_assertions.assert_true(
-                condition=isinstance(result, FlextCore.Result),
-                message=f"{method.__name__} should return FlextCore.Result",
+                condition=isinstance(result, FlextResult),
+                message=f"{method.__name__} should return FlextResult",
             )
             self.test_assertions.assert_true(
                 condition=result.is_success,
@@ -518,10 +521,10 @@ class TestFlextSingerTypesComplete:
 
         # Test with empty type_def to potentially trigger exception
         try:
-            empty_type_def: FlextCore.Types.Dict = {}
+            empty_type_def: FlextTypes.Dict = {}
             result = self.singer_types.validate_value("test", empty_type_def)
             # If we get here, result should be a failure
-            if isinstance(result, FlextCore.Result):
+            if isinstance(result, FlextResult):
                 self.test_assertions.assert_true(
                     condition=result.is_failure,
                     message="Should handle empty type_def gracefully",
@@ -557,7 +560,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Create object type with properties using created types
-        properties: FlextCore.Types.Dict = {
+        properties: FlextTypes.Dict = {
             "name": string_result.unwrap(),
             "age": integer_result.unwrap(),
             "active": boolean_result.unwrap(),
@@ -611,11 +614,11 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test nested object types
-        inner_object_props: FlextCore.Types.Dict = {"id": {"type": "integer"}}
+        inner_object_props: FlextTypes.Dict = {"id": {"type": "integer"}}
         inner_object = self.singer_types.create_object_type(
             properties=inner_object_props,
         ).unwrap()
-        outer_object_props: FlextCore.Types.Dict = {"nested": inner_object}
+        outer_object_props: FlextTypes.Dict = {"nested": inner_object}
         outer_object = self.singer_types.create_object_type(
             properties=outer_object_props,
         )
@@ -626,7 +629,7 @@ class TestFlextSingerTypesComplete:
         )
 
         # Test validation with edge values
-        edge_cases: list[tuple[object, FlextCore.Types.Dict]] = [
+        edge_cases: list[tuple[object, FlextTypes.Dict]] = [
             (0, {"type": "integer"}),
             (-1, {"type": "integer"}),
             (0.0, {"type": "number"}),

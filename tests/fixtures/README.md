@@ -294,7 +294,7 @@ from typing import Dict, Iterator
 import pytest
 
 @pytest.fixture
-def typed_fixture() -> FlextCore.Types.Dict:
+def typed_fixture() -> FlextTypes.Dict:
     """Properly typed fixture with clear return type."""
     return {
         "key": "value",

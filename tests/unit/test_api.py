@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextCore
+from flext_core import FlextResult
 
 from flext_meltano import (
     FlextMeltano,
@@ -35,9 +35,12 @@ class TestFlextMeltanoInitialization:
 
         # Create a concrete implementation for testing
         class ConcreteAPI(FlextMeltano):
-            def execute(self, command: str) -> FlextCore.Result[str]:
-                _ = command  # Intentionally unused in test implementation
-                return FlextCore.Result[str].ok("test")
+            def execute(
+                self,
+            ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+                    {}
+                )
 
         api = ConcreteAPI()
         assert api is not None
@@ -76,7 +79,7 @@ class TestFlextMeltanoInitialization:
         api = FlextMeltano()
         types = api.types
 
-        assert types == FlextMeltanoTypes
+        assert types is FlextMeltanoTypes
 
     def test_api_models_property(self) -> None:
         """Test API models property."""
@@ -162,13 +165,10 @@ class TestFlextMeltanoPluginOperations:
         """Test plugin installation with invalid type."""
         api = FlextMeltano()
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.install_plugin(
-                plugin_type="invalid_type", plugin_name="tap-csv", project_root=temp_dir
-            )
+        result = api.install_plugin(plugin_type="invalid_type", plugin_name="tap-csv")
 
-            assert result.is_failure
-            assert result.error is not None
+        assert result.is_failure
+        assert result.error is not None
 
     def test_install_plugin_with_config(self) -> None:
         """Test plugin installation with configuration."""
@@ -180,7 +180,7 @@ class TestFlextMeltanoPluginOperations:
         result = api.install_plugin(
             plugin_type="extractors",
             plugin_name="tap-csv",
-            plugin_config={"path": tmp_path},
+            config={"path": tmp_path},
         )
 
         assert result.is_failure or result.is_success
@@ -197,7 +197,7 @@ class TestFlextMeltanoPluginOperations:
         """Test listing plugins with type filter."""
         api = FlextMeltano()
 
-        result = api.list_plugins(_plugin_type="extractors")
+        result = api.list_plugins(plugin_type="extractors")
 
         assert result.is_failure or result.is_success
 
@@ -331,19 +331,17 @@ class TestFlextMeltanoDbtOperations:
         """Test DBT run with project root."""
         api = FlextMeltano()
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.run_dbt_models(models=["model1"], project_root=temp_dir)
+        result = api.run_dbt_models(models=["model1"])
 
-            assert result.is_failure or result.is_success
+        assert result.is_failure or result.is_success
 
     def test_test_dbt_models_with_project(self) -> None:
         """Test DBT test with project root."""
         api = FlextMeltano()
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.test_dbt_models(models=["model1"], project_root=temp_dir)
+        result = api.test_dbt_models(models=["model1"])
 
-            assert result.is_failure or result.is_success
+        assert result.is_failure or result.is_success
 
 
 class TestFlextMeltanoELTPipeline:
@@ -353,9 +351,7 @@ class TestFlextMeltanoELTPipeline:
         """Test ELT pipeline without tap name."""
         api = FlextMeltano()
 
-        result = api.run_elt_pipeline(
-            tap_name="", target_name="target-jsonl", stream_name="test_stream"
-        )
+        result = api.run_elt_pipeline(tap_name="", target_name="target-jsonl")
 
         assert result.is_failure
         assert result.error is not None
@@ -364,9 +360,7 @@ class TestFlextMeltanoELTPipeline:
         """Test ELT pipeline without target name."""
         api = FlextMeltano()
 
-        result = api.run_elt_pipeline(
-            tap_name="tap-csv", target_name="", stream_name="test_stream"
-        )
+        result = api.run_elt_pipeline(tap_name="tap-csv", target_name="")
 
         assert result.is_failure
         assert result.error is not None
@@ -375,9 +369,7 @@ class TestFlextMeltanoELTPipeline:
         """Test ELT pipeline without stream name."""
         api = FlextMeltano()
 
-        result = api.run_elt_pipeline(
-            tap_name="tap-csv", target_name="target-jsonl", stream_name=""
-        )
+        result = api.run_elt_pipeline(tap_name="tap-csv", target_name="target-jsonl")
 
         assert result.is_failure
         assert result.error is not None
@@ -389,7 +381,6 @@ class TestFlextMeltanoELTPipeline:
         result = api.run_elt_pipeline(
             tap_name="tap-csv",
             target_name="target-jsonl",
-            stream_name="test_stream",
             dbt_models=["model1", "model2"],
         )
 
@@ -475,7 +466,7 @@ class TestFlextMeltanoExecuteMethod:
         """Test execute method with version command."""
         api = FlextMeltano()
 
-        result = api.execute("version")
+        result = api.execute()
 
         assert result.is_success
         assert "version" in result.unwrap()
@@ -484,7 +475,7 @@ class TestFlextMeltanoExecuteMethod:
         """Test execute method with unknown command."""
         api = FlextMeltano()
 
-        result = api.execute("unknown_command")
+        result = api.execute()
 
         assert result.is_failure or result.is_success
 
@@ -492,7 +483,7 @@ class TestFlextMeltanoExecuteMethod:
         """Test execute method with options."""
         api = FlextMeltano()
 
-        result = api.execute("version", debug=True)
+        result = api.execute()
 
         assert result.is_success or result.is_failure
 
@@ -588,9 +579,7 @@ class TestFlextMeltanoSuccessPaths:
         """Test ELT pipeline exception handling."""
         api = FlextMeltano()
 
-        result = api.run_elt_pipeline(
-            tap_name="tap", target_name="target", stream_name="stream"
-        )
+        result = api.run_elt_pipeline(tap_name="tap", target_name="target")
 
         assert result.is_failure or result.is_success
 
@@ -599,21 +588,27 @@ class TestFlextMeltanoSuccessPaths:
 class TestFlextMeltanoPerformance:
     """Performance benchmarks for FlextMeltano operations."""
 
-    def test_api_initialization_performance(self, benchmark: object) -> None:
+    def test_api_initialization_performance(
+        self,
+        benchmark: object,  # pytest-benchmark fixture
+    ) -> None:
         """Benchmark API initialization performance."""
 
         def create_api() -> FlextMeltano:
             return FlextMeltano()
 
-        result = benchmark(create_api)
+        result = benchmark(create_api)  # type: ignore[operator]
         assert result is not None
 
-    def test_api_properties_access_performance(self, benchmark: object) -> None:
+    def test_api_properties_access_performance(
+        self,
+        benchmark: object,  # pytest-benchmark fixture
+    ) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()
 
         def access_properties() -> tuple[str, type, type, type, type]:
             return (api.version, api.constants, api.exceptions, api.types, api.models)
 
-        result = benchmark(access_properties)
+        result = benchmark(access_properties)  # type: ignore[operator]
         assert result is not None

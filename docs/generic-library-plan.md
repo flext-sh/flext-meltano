@@ -201,7 +201,7 @@ sync_result = tap.sync(selected_streams)
 def discover_plugins(
     plugin_type: str | None = None,
     source: PluginSource = PluginSource.AUTO
-) -> FlextCore.Result[list[PluginInfo]]:
+) -> FlextResult[list[PluginInfo]]:
     """Discover plugins from multiple sources.
 
     Args:
@@ -220,7 +220,7 @@ def install_plugin(
     plugin_name: str,
     version: str | None = None,
     source: str | None = None
-) -> FlextCore.Result[PluginInstallResult]:
+) -> FlextResult[PluginInstallResult]:
     """Install plugin from specified source.
 
     Args:
@@ -240,10 +240,10 @@ def install_plugin(
 ```python
 def execute_tap(
     tap_name: str,
-    config: FlextCore.Types.Dict,
-    state: FlextCore.Types.Dict | None = None,
-    streams: FlextCore.Types.StringList | None = None
-) -> FlextCore.Result[TapExecutionResult]:
+    config: FlextTypes.Dict,
+    state: FlextTypes.Dict | None = None,
+    streams: FlextTypes.StringList | None = None
+) -> FlextResult[TapExecutionResult]:
     """Execute Singer tap with configuration.
 
     Args:
@@ -262,9 +262,9 @@ def execute_tap(
 ```python
 def execute_target(
     target_name: str,
-    records: list[FlextCore.Types.Dict],
-    config: FlextCore.Types.Dict
-) -> FlextCore.Result[TargetExecutionResult]:
+    records: list[FlextTypes.Dict],
+    config: FlextTypes.Dict
+) -> FlextResult[TargetExecutionResult]:
     """Execute Singer target with records.
 
     Args:
@@ -284,7 +284,7 @@ def execute_target(
 ```python
 def create_pipeline(
     config: PipelineConfig
-) -> FlextCore.Result[Pipeline]:
+) -> FlextResult[Pipeline]:
     """Create pipeline configuration.
 
     Args:
@@ -301,7 +301,7 @@ def create_pipeline(
 def execute_pipeline(
     pipeline: Pipeline | str,
     options: PipelineOptions | None = None
-) -> FlextCore.Result[PipelineResult]:
+) -> FlextResult[PipelineResult]:
     """Execute configured pipeline.
 
     Args:
