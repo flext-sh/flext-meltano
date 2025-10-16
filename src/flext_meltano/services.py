@@ -93,14 +93,12 @@ class FlextMeltanoService(
         ](data)
 
         # Ensure required service configuration fields
-        mutable_data.update(
-            {
-                "service_name": service_name,
-                "version": version,
-                "service_type": "meltano_elt_service",
-                "logger": FlextLogger(__name__),
-            }
-        )
+        mutable_data.update({
+            "service_name": service_name,
+            "version": version,
+            "service_type": "meltano_elt_service",
+            "logger": FlextLogger(__name__),
+        })
 
         # Initialize parent service with validated configuration
         super().__init__(**mutable_data)
@@ -287,13 +285,11 @@ class FlextMeltanoService(
                 records_count = 100  # Simulated record count
                 total_records += records_count
 
-                extracted_streams.append(
-                    {
-                        "stream_id": stream_id,
-                        "records_extracted": records_count,
-                        "extraction_time": str(time.time()),
-                    }
-                )
+                extracted_streams.append({
+                    "stream_id": stream_id,
+                    "records_extracted": records_count,
+                    "extraction_time": str(time.time()),
+                })
 
             # Sync result with comprehensive metrics
             sync_result: FlextTypes.JsonValue = {

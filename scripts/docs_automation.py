@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess  # noqa: S404 - Required for documentation processing
+import subprocess
 import sys
 import time as time_module
 from datetime import UTC, datetime
@@ -202,7 +202,7 @@ class DocumentationAutomation(FlextService):
         except Exception as e:
             error_msg = f"Quality threshold validation failed: {e}"
             self.logger.exception("Quality validation failed", error=error_msg)
-            return FlextResult.fail(FlextExceptions.ValidationError(error_msg))
+            return FlextResult.fail(error_msg)
 
     def schedule_maintenance(self) -> None:
         """Set up scheduled maintenance tasks."""

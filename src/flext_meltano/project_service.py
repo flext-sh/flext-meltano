@@ -206,12 +206,10 @@ class FlextMeltanoProjectService(
         if not prefix or not prefix.strip():
             return FlextResult[dict[str, str]].fail("Project prefix cannot be empty")
 
-        return FlextResult[dict[str, str]].ok(
-            {
-                "project_id": project_id or "flext-meltano-project",
-                "prefix": prefix.strip(),
-            }
-        )
+        return FlextResult[dict[str, str]].ok({
+            "project_id": project_id or "flext-meltano-project",
+            "prefix": prefix.strip(),
+        })
 
     def _create_temp_directory(self, prefix: str) -> FlextResult[Path]:
         """Create temporary directory with FLEXT utilities."""
@@ -242,12 +240,10 @@ class FlextMeltanoProjectService(
                 }
             ],
         }
-        return FlextResult[FlextTypes.Dict].ok(
-            {
-                "path": temp_path,
-                "config": config,
-            }
-        )
+        return FlextResult[FlextTypes.Dict].ok({
+            "path": temp_path,
+            "config": config,
+        })
 
     def _write_meltano_config(
         self, project_path: Path, config: dict
@@ -327,12 +323,10 @@ class FlextMeltanoProjectService(
                 f"Parent directory not found: {project_dir}"
             )
 
-        return FlextResult[FlextTypes.Dict].ok(
-            {
-                "name": project_name.strip(),
-                "parent_dir": project_dir,
-            }
-        )
+        return FlextResult[FlextTypes.Dict].ok({
+            "name": project_name.strip(),
+            "parent_dir": project_dir,
+        })
 
     def _create_project_directory(
         self, project_name: str, parent_dir: Path

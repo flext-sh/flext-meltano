@@ -122,13 +122,15 @@ class TestStreamInfoEnhanced:
         stream = FlextMeltanoModels.StreamInfo(
             stream_name="users",
             schema={"type": "object", "properties": {"id": {"type": "integer"}}},
+            created_at="2025-01-01T00:00:00Z",
         )
 
         assert stream.stream_name == "users"
-        assert stream.schema["type"] == "object"
-        assert stream.key_properties == []
-        assert stream.replication_method == "INCREMENTAL"
-        assert stream.replication_key is None
+        assert stream.stream_schema["type"] == "object"
+        assert stream.status == "initialized"
+        assert stream.records_loaded == 0
+        assert stream.batches_processed == 0
+        assert stream.created_at == "2025-01-01T00:00:00Z"
 
     def test_stream_info_with_full_data(self) -> None:
         """Test StreamInfo with all fields populated."""

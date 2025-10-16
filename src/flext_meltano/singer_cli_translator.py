@@ -195,12 +195,10 @@ class FlextMeltanoSingerCliTranslator:
         if params.target_config:
             target_command.extend(["--config", params.target_config])
 
-        return FlextResult[tuple[FlextTypes.StringList, FlextTypes.StringList]].ok(
-            (
-                tap_command,
-                target_command,
-            )
-        )
+        return FlextResult[tuple[FlextTypes.StringList, FlextTypes.StringList]].ok((
+            tap_command,
+            target_command,
+        ))
 
     @staticmethod
     def translate_dbt_run(
