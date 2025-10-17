@@ -47,7 +47,7 @@ class TestTapService:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
         # Use factory method for tap services - unified architecture
-        self.create_tap_service = FlextMeltanoService.create_tap_service
+        self.create_tap_service = self.service.create_tap_service
 
     def test_tap_service_creation(self) -> None:
         """Test TapService creation and initialization."""

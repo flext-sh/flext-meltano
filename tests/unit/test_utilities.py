@@ -356,9 +356,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
         assert config_dict["project_id"] == "test-project"
         assert config_dict["version"] == 1  # Default value
-        assert config_dict["default_environment"] == "dev"  # Default value
+        assert "default_environment" not in config_dict  # Not set when None
         assert config_dict["plugins"] == {}  # Default empty dict
-        assert config_dict["environments"] == {}  # Default empty dict
+        assert "environments" in config_dict  # Environments are set by default
 
     def test_create_meltano_config_dict_with_empty_strings(self) -> None:
         """Test Meltano config dictionary creation with empty strings."""

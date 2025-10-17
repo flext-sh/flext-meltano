@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from typing import TypeVar, cast
+from typing import TypeVar
 
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 
@@ -63,6 +63,8 @@ class FlextMeltanoService(
     # Define attributes with proper type annotations for PyRight
     service_name: str
     version: str
+    service_type: str
+    tap_name: str | None
     _config: FlextMeltanoConfig
 
     @property
@@ -75,6 +77,7 @@ class FlextMeltanoService(
         config: FlextMeltanoConfig | None = None,
         service_name: str = "flext_meltano_service",
         version: str = "0.9.9",
+        tap_name: str | None = None,
         **data: object,
     ) -> None:
         """Initialize FLEXT Meltano service with configuration validation."""
@@ -86,26 +89,53 @@ class FlextMeltanoService(
         # Get or create configuration using FlextMeltanoConfig as source of truth
         self._config = config or FlextMeltanoConfig()
 
-        # Type-safe data preparation for service initialization
-        mutable_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = dict[
-            str, object
-        ](data)
+        # Prepare data for parent initialization (including required fields)
+        parent_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = dict(
+            (k, v) for k, v in data.items() if isinstance(k, str)
+        ) if isinstance(data, dict) else {}
 
-        # Ensure required service configuration fields
-        mutable_data.update({
+        # Add required service fields to parent data
+        parent_data.update({
             "service_name": service_name,
             "version": version,
             "service_type": "meltano_elt_service",
-            "logger": FlextLogger(__name__),
+            "tap_name": tap_name,
         })
 
         # Initialize parent service with validated configuration
-        super().__init__(**mutable_data)
+        super().__init__(**parent_data)
 
         # Log successful service initialization
         self.logger.info(
             f"FlextMeltanoService '{service_name}' initialized with FlextMeltanoConfig integration"
         )
+
+    def create_tap_service(
+        self,
+        tap_name: str,
+        **config: object,
+    ) -> FlextResult[FlextMeltanoService]:
+        """Create a tap service instance with the specified configuration.
+
+        Args:
+            tap_name: Name of the tap plugin
+            **config: Additional configuration parameters
+
+        Returns:
+            FlextResult containing the created tap service instance
+        """
+        try:
+            # Create a new service instance configured as a tap
+            tap_service = FlextMeltanoService(
+                service_name=f"{tap_name}_service",
+                tap_name=tap_name,
+                **config,
+            )
+            return FlextResult[FlextMeltanoService].ok(tap_service)
+        except Exception as e:
+            return FlextResult[FlextMeltanoService].fail(
+                f"Failed to create tap service '{tap_name}': {e}"
+            )
 
     def execute(
         self,
@@ -262,11 +292,14 @@ class FlextMeltanoService(
 
         try:
             # Extract selected streams from catalog
-            streams = cast("list", catalog.get("streams", []))
+            streams = catalog.get("streams", [])
+            if not isinstance(streams, list):
+                streams = []
+
             selected_streams = [
                 s
                 for s in streams
-                if cast("dict", s).get("metadata", {}).get("selected", False)
+                if isinstance(s, dict) and s.get("metadata", {}).get("selected", False)
             ]
 
             if not selected_streams:
@@ -279,7 +312,11 @@ class FlextMeltanoService(
             extracted_streams = []
 
             for stream in selected_streams:
-                stream_id = cast("dict", stream).get("tap_stream_id", "unknown")
+                stream_id = (
+                    stream.get("tap_stream_id", "unknown")
+                    if isinstance(stream, dict)
+                    else "unknown"
+                )
                 # Simulate extraction (would be actual data source interaction)
                 records_count = 100  # Simulated record count
                 total_records += records_count
@@ -367,10 +404,15 @@ class FlextMeltanoService(
                 return FlextResult[FlextTypes.JsonValue].fail("Record data is required")
 
             # Process the record (simulate loading to target)
+            record_id = (
+                record_data.get("id", "unknown")
+                if isinstance(record_data, dict)
+                else "unknown"
+            )
             processed_record: FlextTypes.JsonValue = {
                 "status": "processed",
                 "stream": stream_name,
-                "record_id": cast("dict", record_data).get("id", "unknown"),
+                "record_id": record_id,
                 "processing_timestamp": str(time.time()),
                 "service_name": self.service_name,
                 "validation_status": "passed",
@@ -436,7 +478,7 @@ class FlextMeltanoService(
             # Batch validation and processing
             processed_count = 0
             failed_count = 0
-            stream_counts = {}
+            stream_counts: dict[str, int] = {}
 
             for record in records:
                 try:
@@ -450,7 +492,10 @@ class FlextMeltanoService(
                         failed_count += 1
                         continue
 
-                    stream_name = record.get("stream", "unknown")
+                    stream_name_obj = record.get("stream", "unknown")
+                    stream_name: str = (
+                        stream_name_obj if isinstance(stream_name_obj, str) else str(stream_name_obj)
+                    )
                     stream_counts[stream_name] = stream_counts.get(stream_name, 0) + 1
                     processed_count += 1
 
@@ -566,10 +611,10 @@ class FlextMeltanoService(
                 "tap": tap_name,
                 "target": target_name,
                 "pipeline_name": f"{tap_name}_to_{target_name}",
-                "configuration": pipeline_config,
+                "config_data": str(pipeline_config) if pipeline_config else "",
                 "created_at": str(time.time()),
                 "service_name": self.service_name,
-                "timeout_seconds": self._config.timeout_seconds,
+                "timeout_seconds": str(self._config.timeout_seconds),
                 "log_level": self._config.log_level,
                 "environment": self._config.environment,
                 "project_root": str(self._config.project_root),
@@ -608,9 +653,10 @@ class FlextMeltanoService(
                 "Service name is required and must be a string"
             )
 
-        if len(service_name) < FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH:
+        min_length = FlextMeltanoConstants.Service.SERVICE_MIN_NAME_LENGTH
+        if len(service_name) < min_length:
             return FlextResult[None].fail(
-                f"Service name must be at least {FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH} characters"
+                f"Service name must be at least {min_length} characters"
             )
 
         return FlextResult[None].ok(None)
@@ -645,34 +691,49 @@ class FlextMeltanoService(
             instance_type = config.get("service_type", "unknown")
 
             if instance_type == "tap":
+                # Extract configuration if present to avoid type conflicts
+                config_copy = dict(config)
+                config_value = config_copy.pop("configuration", None)
                 tap_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
-                    **config,
+                    **config_copy,
                     "plugin_type": "extractors",
                     "singer_type": "tap",
                     "capabilities": ["discover", "properties", "catalog"],
                 }
+                if config_value is not None:
+                    tap_instance["config_data"] = str(config_value)
                 return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=tap_instance
                 )
 
             if instance_type == "target":
+                # Extract configuration if present to avoid type conflicts
+                config_copy = dict(config)
+                config_value = config_copy.pop("configuration", None)
                 target_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
-                    **config,
+                    **config_copy,
                     "plugin_type": "loaders",
                     "singer_type": "target",
                     "capabilities": ["stream", "record", "state"],
                 }
+                if config_value is not None:
+                    target_instance["config_data"] = str(config_value)
                 return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=target_instance
                 )
 
             if instance_type == "dbt":
+                # Extract configuration if present to avoid type conflicts
+                config_copy = dict(config)
+                config_value = config_copy.pop("configuration", None)
                 dbt_instance: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
-                    **config,
+                    **config_copy,
                     "plugin_type": "transformers",
                     "transformer_type": "dbt",
                     "capabilities": ["run", "test", "docs"],
                 }
+                if config_value is not None:
+                    dbt_instance["config_data"] = str(config_value)
                 return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     data=dbt_instance
                 )
@@ -711,7 +772,7 @@ class FlextMeltanoService(
                 "status": "created",
                 "service_name": self.service_name,
                 "created_at": str(time.time()),
-                "configuration": _config,
+                "config_data": str(_config),
             }
 
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
@@ -778,7 +839,7 @@ class FlextMeltanoService(
             if service_type == "target":
                 target_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                     "host": "localhost",
-                    "port": 5432,
+                    "port": "5432",
                     "database": "target_db",
                 }
                 return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
@@ -888,23 +949,25 @@ class FlextMeltanoService(
         """
         try:
             # DBT profiles configuration with environment support
+            # Convert nested targets dict to string to match MeltanoConfigDict type
+            targets_config = {
+                "dev": {
+                    "type": "postgres",
+                    "host": "localhost",
+                    "port": 5432,
+                    "database": "analytics_dev",
+                },
+                "prod": {
+                    "type": "postgres",
+                    "host": "prod-db.example.com",
+                    "port": 5432,
+                    "database": "analytics_prod",
+                },
+            }
             profiles_config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "profile_name": "flext_dbt_profile",
                 "target": "dev",
-                "targets": {
-                    "dev": {
-                        "type": "postgres",
-                        "host": "localhost",
-                        "port": 5432,
-                        "database": "analytics_dev",
-                    },
-                    "prod": {
-                        "type": "postgres",
-                        "host": "prod-db.example.com",
-                        "port": 5432,
-                        "database": "analytics_prod",
-                    },
-                },
+                "targets_data": str(targets_config),
             }
 
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
@@ -945,7 +1008,7 @@ class FlextMeltanoService(
             service_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": service_type,
                 "service_name": service_name,
-                "configuration": base_config,
+                "config_data": str(base_config) if base_config else "",
                 "created_at": str(time.time()),
             }
 
@@ -1021,25 +1084,29 @@ class FlextMeltanoService(
                 )
 
             # Service name validation
-            if len(service_name) < FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH:
+            min_name_length = FlextMeltanoConstants.Service.SERVICE_MIN_NAME_LENGTH
+            if len(service_name) < min_name_length:
                 return FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].fail(
-                    f"Service name must be at least {FlextMeltanoConstants.SERVICE_MIN_NAME_LENGTH} characters"
+                    f"Service name must be at least {min_name_length} characters"
                 )
 
             # Build typed kwargs with service-specific defaults
             base_config = config or {}
 
+            # Create metadata dict separately to convert to string
+            metadata = {
+                "created_at": str(time.time()),
+                "service_version": self.version,
+                "creator_service": self.service_name,
+            }
+
             typed_kwargs: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
                 "service_type": service_type,
                 "service_name": service_name,
-                "configuration": base_config,
-                "metadata": {
-                    "created_at": str(time.time()),
-                    "service_version": self.version,
-                    "creator_service": self.service_name,
-                },
+                "config_data": str(base_config) if base_config else "",
+                "metadata_str": str(metadata),
             }
 
             # Add service-type specific configurations
@@ -1439,8 +1506,8 @@ class FlextMeltanoService(
                             f"Invalid property definition for {prop_name}",
                         )
 
-                # Convert nested dict[str, object] to match return type using dict[str, object]()
-                properties_flat: FlextTypes.Dict = dict[str, object](properties.items())
+                # Convert nested dict to match return type
+                properties_flat: FlextTypes.Dict = dict(properties)
                 return FlextResult[FlextTypes.Dict].ok(data=properties_flat)
             except Exception as e:
                 return FlextResult[FlextTypes.Dict].fail(

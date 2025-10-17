@@ -123,7 +123,7 @@ class FlextMeltanoValidators:
         # Meltano business rule: target plugin names
         if (
             name.startswith("target-")
-            and len(name) < FlextMeltanoConstants.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
                 "Target plugin names must be at least 8 characters"
@@ -132,7 +132,7 @@ class FlextMeltanoValidators:
         # Meltano business rule: tap plugin names
         if (
             name.startswith("tap-")
-            and len(name) < FlextMeltanoConstants.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append("Tap plugin names must be at least 5 characters")
 

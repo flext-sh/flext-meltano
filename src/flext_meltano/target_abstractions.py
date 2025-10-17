@@ -34,11 +34,16 @@ class FlextMeltanoTargetAbstractions(
     Following FLEXT 'one class per module' pattern.
     """
 
+    # Instance attributes (declared for type checker)
+    _config: FlextMeltanoConfig
+    logger: FlextLogger
+
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize unified target abstractions with FLEXT configuration."""
-        super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
+
+        # Initialize with logger for FlextService
+        super().__init__(logger=FlextLogger(__name__))
 
     def configure_sink(
         self, target_config: FlextMeltanoModels.TargetConfig
@@ -144,7 +149,7 @@ class FlextMeltanoTargetAbstractions(
 
             self.logger.info(
                 "Target instance created successfully",
-                target_name=target_instance.config.name,
+                target_name=target_instance.config.target_type,
             )
 
             return FlextResult[FlextMeltanoModels.TargetInstance].ok(target_instance)
