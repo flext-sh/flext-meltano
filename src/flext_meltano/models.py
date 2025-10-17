@@ -297,7 +297,7 @@ class FlextMeltanoModels(FlextModels):
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret"}
-            serialized = {}
+            serialized: FlextTypes.Dict = {}
             for key, val in value.items():
                 if any(sensitive in key.lower() for sensitive in sensitive_keys):
                     serialized[key] = "[PROTECTED]"
@@ -472,7 +472,8 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def active_streams_count(self) -> int:
             """Computed field for number of active streams."""
-            return sum(1 for stream in self.streams.values() if stream.is_active)
+            active_statuses = {"discovered", "selected", "extracting"}
+            return sum(1 for stream in self.streams.values() if stream.status in active_statuses)
 
         @computed_field
         def total_records_extracted(self) -> int:
@@ -484,7 +485,7 @@ class FlextMeltanoModels(FlextModels):
             """Computed field indicating if tap is ready for data extraction."""
             return (
                 self.discovered
-                and self.stream_count > 0
+                and len(self.streams) > 0
                 and self.status == "configured"
             )
 
@@ -618,7 +619,7 @@ class FlextMeltanoModels(FlextModels):
             """Field serializer for connection config with sensitive data protection."""
             # Mask sensitive fields
             sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
-            serialized = {}
+            serialized: FlextTypes.Dict = {}
             for key, val in value.items():
                 if any(sensitive in key.lower() for sensitive in sensitive_keys):
                     serialized[key] = "[PROTECTED]"
@@ -800,14 +801,18 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def project_maturity(self) -> str:
             """Computed field for project maturity assessment."""
+            prod_environments = {"prod", "production", "live"}
+            has_prod = any(env.lower() in prod_environments for env in self.environments)
+            env_count = len(self.environments)
+
             if (
-                self.has_production_environment
-                and self.environment_count
+                has_prod
+                and env_count
                 >= FlextMeltanoConstants.Model.PROJECT_MATURITY_MATURE_ENV_COUNT
             ):
                 return "mature"
             if (
-                self.environment_count
+                env_count
                 >= FlextMeltanoConstants.Model.PROJECT_MATURITY_DEVELOPING_ENV_COUNT
             ):
                 return "developing"
@@ -881,18 +886,19 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def plugin_complexity(self) -> str:
             """Computed field for plugin complexity assessment."""
+            settings_count = len(self.settings)
             if (
-                self.settings_count
+                settings_count
                 == FlextMeltanoConstants.Model.COMPLEXITY_MINIMAL_SETTINGS
             ):
                 return "minimal"
             if (
-                self.settings_count
+                settings_count
                 <= FlextMeltanoConstants.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS
             ):
                 return "simple"
             if (
-                self.settings_count
+                settings_count
                 <= FlextMeltanoConstants.Model.COMPLEXITY_MODERATE_MAX_SETTINGS
             ):
                 return "moderate"
@@ -985,13 +991,20 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def project_structure_complexity(self) -> str:
             """Computed field for project structure complexity."""
+            total_path_count = (
+                len(self.model_paths)
+                + len(self.analysis_paths)
+                + len(self.test_paths)
+                + len(self.seed_paths)
+                + len(self.macro_paths)
+            )
             if (
-                self.total_path_count
+                total_path_count
                 <= FlextMeltanoConstants.Model.STRUCTURE_SIMPLE_MAX_PATHS
             ):
                 return "simple"
             if (
-                self.total_path_count
+                total_path_count
                 <= FlextMeltanoConstants.Model.STRUCTURE_MODERATE_MAX_PATHS
             ):
                 return "moderate"
@@ -1075,7 +1088,7 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def execution_complexity(self) -> str:
             """Computed field for execution complexity assessment."""
-            total_scope = self.model_count + self.exclude_count
+            total_scope = len(self.models) + len(self.exclude)
             if total_scope == 0:
                 return "full_project"
             if total_scope <= self._SIMPLE_EXECUTION_THRESHOLD:
@@ -1187,7 +1200,11 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def performance_category(self) -> str:
             """Computed field for performance categorization."""
-            rate = self.execution_rate_per_second
+            if not self.duration_seconds or self.duration_seconds <= 0:
+                rate = 0.0
+            else:
+                rate = self.records_processed / self.duration_seconds
+
             if rate >= self._HIGH_PERFORMANCE_THRESHOLD:
                 return "high_performance"
             if rate >= self._GOOD_PERFORMANCE_THRESHOLD:
@@ -1271,12 +1288,12 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def completed_stages(self) -> FlextTypes.StringList:
             """Computed field for completed pipeline stages."""
-            stages = []
-            if self.tap_result and self.tap_result.is_completed:
+            stages: FlextTypes.StringList = []
+            if self.tap_result and self.tap_result.end_time is not None:
                 stages.append("extraction")
-            if self.target_result and self.target_result.is_completed:
+            if self.target_result and self.target_result.end_time is not None:
                 stages.append("loading")
-            if self.dbt_result and self.dbt_result.is_completed:
+            if self.dbt_result and self.dbt_result.end_time is not None:
                 stages.append("transformation")
             return stages
 
@@ -1284,7 +1301,14 @@ class FlextMeltanoModels(FlextModels):
         def completion_percentage(self) -> float:
             """Computed field for pipeline completion percentage."""
             total_stages = 3  # tap, target, dbt
-            completed = len(self.completed_stages)
+            # Count completed stages directly without accessing computed field
+            completed = 0
+            if self.tap_result and self.tap_result.end_time is not None:
+                completed += 1
+            if self.target_result and self.target_result.end_time is not None:
+                completed += 1
+            if self.dbt_result and self.dbt_result.end_time is not None:
+                completed += 1
             return (completed / total_stages) * 100
 
         @computed_field
@@ -1292,11 +1316,14 @@ class FlextMeltanoModels(FlextModels):
             """Computed field indicating if all stages completed successfully."""
             return bool(
                 self.tap_result
-                and self.tap_result.is_successful
+                and self.tap_result.status == "success"
+                and self.tap_result.error_message is None
                 and self.target_result
-                and self.target_result.is_successful
+                and self.target_result.status == "success"
+                and self.target_result.error_message is None
                 and self.dbt_result
-                and self.dbt_result.is_successful
+                and self.dbt_result.status == "success"
+                and self.dbt_result.error_message is None
             )
 
         @computed_field
@@ -1330,8 +1357,19 @@ class FlextMeltanoModels(FlextModels):
                 msg = "Total records inconsistent with stage results"
                 raise ValueError(msg)
 
-            # Validate overall status
-            if self.is_fully_successful and self.overall_status != "success":
+            # Validate overall status - check if all stages were successful directly
+            all_successful = bool(
+                self.tap_result
+                and self.tap_result.status == "success"
+                and self.tap_result.error_message is None
+                and self.target_result
+                and self.target_result.status == "success"
+                and self.target_result.error_message is None
+                and self.dbt_result
+                and self.dbt_result.status == "success"
+                and self.dbt_result.error_message is None
+            )
+            if all_successful and self.overall_status != "success":
                 self.overall_status = "success"
 
             return self

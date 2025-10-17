@@ -36,11 +36,16 @@ class FlextMeltanoTapAbstractions(
     Following FLEXT 'one class per module' pattern.
     """
 
+    # Instance attributes (declared for type checker)
+    _config: FlextMeltanoConfig
+    logger: FlextLogger
+
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize unified tap abstractions with FLEXT configuration."""
-        super().__init__()
         self._config = config or FlextMeltanoConfig()
-        self.logger = FlextLogger(__name__)
+
+        # Initialize with logger for FlextService
+        super().__init__(logger=FlextLogger(__name__))
 
     def discover_streams(
         self, tap_config: FlextMeltanoModels.TapConfig
@@ -74,9 +79,11 @@ class FlextMeltanoTapAbstractions(
                 "tap_type": tap_config.tap_type,
             }
 
+            streams = catalog.get("streams", [])
+            stream_count = len(streams) if isinstance(streams, list) else 0
             self.logger.info(
                 "Stream discovery completed",
-                stream_count=len(catalog.get("streams", [])),
+                stream_count=stream_count,
             )
 
             return FlextResult[FlextTypes.Dict].ok(catalog)
@@ -107,8 +114,8 @@ class FlextMeltanoTapAbstractions(
             if not stream_def.stream_schema:
                 return FlextResult[bool].fail("Stream schema cannot be empty")
 
-            schema = cast("dict", stream_def.stream_schema)
-            if "properties" not in schema:
+            # Schema is already typed as FlextTypes.Dict in StreamDefinition
+            if "properties" not in stream_def.stream_schema:
                 return FlextResult[bool].fail("Stream schema must contain properties")
 
             # Additional validation logic would go here
@@ -138,16 +145,20 @@ class FlextMeltanoTapAbstractions(
                 tap_type=tap_config.tap_type,
             )
 
+            # Create unique tap identifier
+            tap_id = f"{tap_config.tap_type}:{tap_config.tap_identifier}"
+
             # Create tap instance
             tap_instance = FlextMeltanoModels.TapInstance(
                 tap_type=tap_config.tap_type,
                 config=tap_config,
                 status="configured",
+                tap_id=tap_id,
             )
 
             self.logger.info(
                 "Tap instance created successfully",
-                tap_name=tap_instance.config.name,
+                tap_name=tap_instance.config.tap_type,
             )
 
             return FlextResult[FlextMeltanoModels.TapInstance].ok(tap_instance)
@@ -156,6 +167,40 @@ class FlextMeltanoTapAbstractions(
             self.logger.exception("Tap instance creation failed", error=str(e))
             return FlextResult[FlextMeltanoModels.TapInstance].fail(
                 f"Tap instance creation failed: {e}"
+            )
+
+    def process(
+        self, tap_config: FlextMeltanoModels.TapConfig
+    ) -> FlextResult[bool]:
+        """Process a tap configuration for validation.
+
+        Args:
+            tap_config: Tap configuration to process
+
+        Returns:
+            FlextResult containing validation result
+
+        """
+        try:
+            self.logger.debug(
+                "Processing tap configuration",
+                tap_name=tap_config.tap_type,
+            )
+
+            # Basic validation
+            if not tap_config.tap_type:
+                return FlextResult[bool].fail("Tap configuration must have a type")
+
+            # Additional validation logic would go here
+            # For now, just return success
+            return FlextResult[bool].ok(True)
+
+        except Exception as e:
+            self.logger.exception(
+                "Tap configuration processing failed", error=str(e)
+            )
+            return FlextResult[bool].fail(
+                f"Tap configuration processing failed: {e}"
             )
 
     def execute(

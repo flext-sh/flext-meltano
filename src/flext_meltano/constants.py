@@ -50,6 +50,9 @@ class FlextMeltanoConstants(FlextConstants):
         LOGS_DIR: Final[str] = "logs"
         OUTPUT_DIR: Final[str] = "output"
 
+        # Alias for project_service compatibility
+        MELTANO_YML_FILENAME: Final[str] = "meltano.yml"
+
         # Command constants
         COMMAND_INSTALL: Final[str] = "install"
         COMMAND_RUN: Final[str] = "run"
@@ -166,11 +169,18 @@ class FlextMeltanoConstants(FlextConstants):
         )
         MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5  # "tap-" prefix + minimum 1 char
 
+        # Aliases for backward compatibility
+        PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
+        PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
+
     class Service:
         """Service management constants namespace."""
 
         # Validation rules
         MIN_NAME_LENGTH: Final[int] = 3  # Minimum service name length
+
+        # SERVICE_MIN_NAME_LENGTH alias for backward compatibility
+        SERVICE_MIN_NAME_LENGTH: Final[int] = 3
 
     class Model:
         """Model validation constants namespace."""
