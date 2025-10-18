@@ -142,15 +142,15 @@ class TestFlextMeltanoLibraryRunner:
         # with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:  # Unused in current test structure
 
         # Type annotations to help type checker
-        # extractor_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        # extractor_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
         #     "name": "test_extractor",
         #     "config": {},
         # }
-        # loader_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        # loader_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
         #     "name": "test_loader",
         #     "config": {},
         # }
-        # transformer_config: dict[str, str | FlextTypes.StringDict] = {  # Unused in current test structure
+        # transformer_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
         #     "name": "test_transformer",
         #     "config": {},
         # }

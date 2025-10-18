@@ -1,7 +1,7 @@
-"""FLEXT Meltano Abstractions - UNIFIED abstraction layer for meltano.core imports.
+"""FLEXT Pipeline Abstractions - UNIFIED abstraction layer for data pipeline operations.
 
-This module provides a SINGLE UNIFIED class with nested helpers for meltano.core functionality,
-eliminating direct imports and providing a clean interface for the FLEXT ecosystem.
+This module provides a SINGLE UNIFIED class with nested helpers for data pipeline functionality,
+eliminating direct domain imports and providing a clean interface for the FLEXT ecosystem.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -12,19 +12,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextTypes
-from meltano.core.elt_context import ELTContext
-from meltano.core.hub import MeltanoHubService
-from meltano.core.plugin.base import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
+from flext_core import FlextLogger, FlextResult
 
 
-class FlextMeltanoAbstractions:
-    """UNIFIED abstraction class providing Meltano functionality with nested helpers.
+class FlextPipelineAbstractions:
+    """UNIFIED abstraction class providing pipeline functionality with nested helpers.
 
-    This class consolidates all Meltano wrapper functionality into a single unified class
+    This class consolidates all pipeline wrapper functionality into a single unified class
     following FLEXT 'one class per module' pattern with nested helper classes.
     """
 
@@ -32,49 +26,50 @@ class FlextMeltanoAbstractions:
     # ========================================================================
 
     class _RunnerHelper:
-        """Helper class for Singer pipeline runner operations."""
+        """Helper class for data pipeline runner operations."""
 
         def __init__(self, logger: FlextLogger) -> None:
             """Initialize runner helper."""
             self.logger = logger
 
-        def create_elt_context(
-            self, project: Project, extractor_name: str, loader_name: str
-        ) -> FlextResult[ELTContext]:
-            """Create ELT context for Singer pipeline."""
+        def create_pipeline_context(
+            self, project_path: Path, source_name: str, sink_name: str
+        ) -> FlextResult[dict[str, object]]:
+            """Create pipeline context for data pipeline operations."""
             try:
-                elt_context = ELTContext(
-                    project=project,
-                    extractor=extractor_name,
-                    loader=loader_name,
-                )
-                return FlextResult[ELTContext].ok(data=elt_context)
+                pipeline_context = {
+                    "project_path": project_path,
+                    "source_name": source_name,
+                    "sink_name": sink_name,
+                    "status": "initialized",
+                }
+                return FlextResult[dict[str, object]].ok(pipeline_context)
             except Exception as e:
-                error_msg = f"Failed to create ELT context: {e}"
+                error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
-                return FlextResult[ELTContext].fail(error_msg)
+                return FlextResult[dict[str, object]].fail(error_msg)
 
-        def execute_singer_pipeline(
+        def execute_data_pipeline(
             self,
-            elt_context: ELTContext,
-            extractor_plugin: ProjectPlugin,
-            loader_plugin: ProjectPlugin,
-        ) -> FlextResult[FlextTypes.Dict]:
-            """Execute Singer pipeline with given context and plugins."""
+            _pipeline_context: dict[str, object],
+            source_config: dict[str, object],
+            sink_config: dict[str, object],
+        ) -> FlextResult[dict[str, object]]:
+            """Execute data pipeline with given context and configurations."""
             try:
                 # This is a simplified implementation
-                # In production, would orchestrate the actual Singer pipeline
-                result: FlextTypes.Dict = {
+                # In production, would orchestrate the actual data pipeline
+                result: dict[str, object] = {
                     "status": "completed",
-                    "extractor": extractor_plugin.name,
-                    "loader": loader_plugin.name,
+                    "source": source_config.get("name", "unknown"),
+                    "sink": sink_config.get("name", "unknown"),
                     "records_processed": 0,
                 }
-                return FlextResult[FlextTypes.Dict].ok(data=result)
+                return FlextResult[dict[str, object]].ok(data=result)
             except Exception as e:
-                error_msg = f"Failed to execute Singer pipeline: {e}"
+                error_msg = f"Failed to execute data pipeline: {e}"
                 self.logger.exception(error_msg)
-                return FlextResult[FlextTypes.Dict].fail(error_msg)
+                return FlextResult[dict[str, object]].fail(error_msg)
 
     # MAIN UNIFIED CLASS INTERFACE
     # ========================================================================
@@ -82,129 +77,95 @@ class FlextMeltanoAbstractions:
     def __init__(self) -> None:
         """Initialize unified abstractions with FLEXT patterns."""
         self.logger = FlextLogger(__name__)
-        self._project: Project | None = None
-        self._hub_services: dict[str, MeltanoHubService] = {}
+        self._project_path: Path | None = None
         self._runner_helper = self._RunnerHelper(self.logger)
 
     # Project operations
-    def find_project(self, project_root: Path) -> FlextResult[Project]:
-        """Find and load Meltano project using internal meltano.core API."""
+    def find_project(self, project_root: Path) -> FlextResult[Path]:
+        """Find and validate pipeline project directory."""
         try:
-            project = Project.find(project_root)
-            self._project = project
+            if not project_root.exists() or not project_root.is_dir():
+                return FlextResult[Path].fail(
+                    f"Project path is not a valid directory: {project_root}"
+                )
+
+            self._project_path = project_root
 
             self.logger.info(
-                "Meltano project loaded successfully",
+                "Pipeline project loaded successfully",
                 project_root=str(project_root),
             )
 
-            return FlextResult[Project].ok(data=project)
+            return FlextResult[Path].ok(data=project_root)
 
         except Exception as e:
-            error_msg = f"Failed to load Meltano project: {e}"
+            error_msg = f"Failed to load pipeline project: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[Project].fail(error_msg)
+            return FlextResult[Path].fail(error_msg)
 
     def get_project_root(self) -> FlextResult[Path]:
         """Get the root directory of the current project."""
-        if not self._project:
+        if not self._project_path:
             return FlextResult[Path].fail("No project loaded")
 
         try:
-            root_path = Path(self._project.root)
-            return FlextResult[Path].ok(data=root_path)
+            return FlextResult[Path].ok(data=self._project_path)
         except Exception as e:
             return FlextResult[Path].fail(f"Failed to get project root: {e}")
 
-    # Hub operations
-    def get_plugins_of_type(
-        self, project: Project, plugin_type: str
-    ) -> FlextResult[FlextTypes.Dict]:
-        """Get plugins of specified type using MeltanoHubService."""
+    # Component operations
+    def get_components_of_type(
+        self, component_type: str
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Get components of specified type."""
         try:
-            project_id = str(id(project))
-            if project_id not in self._hub_services:
-                self._hub_services[project_id] = MeltanoHubService(project)
+            # Generic component listing - would be implemented based on actual needs
+            components = [
+                {"name": "source-csv", "type": "sources", "status": "available"},
+                {"name": "sink-postgres", "type": "sinks", "status": "available"},
+                {
+                    "name": "transform-dbt",
+                    "type": "transformers",
+                    "status": "available",
+                },
+            ]
 
-            hub_service = self._hub_services[project_id]
-
-            # Valid plugin types for filtering
-            valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
-            if plugin_type not in valid_types:
-                return FlextResult[FlextTypes.Dict].fail(
-                    f"Unknown plugin type: {plugin_type}"
-                )
-
-            # Fetch all plugins from hub and filter by type
-            # MeltanoHubService provides access to hub definitions
-            plugins_result: FlextTypes.Dict = {}
-            plugin_count = 0
-
-            # In production, would call appropriate hub_service methods
-            # For now, return empty result as placeholder
-            self.logger.info(
-                f"Retrieved {plugin_count} {plugin_type} plugins",
-                plugin_type=plugin_type,
-                count=plugin_count,
-            )
-
-            return FlextResult[FlextTypes.Dict].ok(data=plugins_result)
+            filtered_components = [c for c in components if c["type"] == component_type]
+            return FlextResult[list[dict[str, object]]].ok(data=filtered_components)
 
         except Exception as e:
-            error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
+            error_msg = f"Failed to get components of type {component_type}: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextTypes.Dict].fail(error_msg)
-
-    # Plugin operations
-    def add_plugin(
-        self, project: Project, plugin_type: str, plugin_name: str
-    ) -> FlextResult[bool]:
-        """Add plugin to project using ProjectAddService."""
-        try:
-            # Map string plugin types to PluginType enum
-            plugin_type_enum = PluginType(plugin_type)
-
-            # Create add service and add plugin
-            add_service = ProjectAddService(project)
-            add_service.add(
-                plugin_type=plugin_type_enum,
-                plugin_name=plugin_name,
-            )
-
-            self.logger.info(
-                "Plugin added successfully",
-                plugin_type=plugin_type,
-                plugin_name=plugin_name,
-            )
-
-            return FlextResult[bool].ok(data=True)
-
-        except Exception as e:
-            error_msg = f"Failed to add plugin {plugin_name}: {e}"
-            self.logger.exception(error_msg)
-            return FlextResult[bool].fail(error_msg)
+            return FlextResult[list[dict[str, object]]].fail(error_msg)
 
     # Runner operations
-    def create_elt_context(
-        self, project: Project, extractor_name: str, loader_name: str
-    ) -> FlextResult[ELTContext]:
-        """Create ELT context."""
-        return self._runner_helper.create_elt_context(
-            project, extractor_name, loader_name
+    def create_pipeline_context(
+        self, source_name: str, sink_name: str
+    ) -> FlextResult[dict[str, object]]:
+        """Create pipeline context."""
+        if not self._project_path:
+            return FlextResult[dict[str, object]].fail("No project loaded")
+
+        return self._runner_helper.create_pipeline_context(
+            self._project_path, source_name, sink_name
         )
 
-    def execute_singer_pipeline(
+    def execute_data_pipeline(
         self,
-        elt_context: ELTContext,
-        extractor_plugin: ProjectPlugin,
-        loader_plugin: ProjectPlugin,
-    ) -> FlextResult[FlextTypes.Dict]:
-        """Execute Singer pipeline."""
-        return self._runner_helper.execute_singer_pipeline(
-            elt_context, extractor_plugin, loader_plugin
+        source_config: dict[str, object],
+        sink_config: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
+        """Execute data pipeline."""
+        pipeline_context = {
+            "project_path": self._project_path,
+            "status": "initialized",
+        }
+
+        return self._runner_helper.execute_data_pipeline(
+            pipeline_context, source_config, sink_config
         )
 
 
 __all__ = [
-    "FlextMeltanoAbstractions",
+    "FlextPipelineAbstractions",
 ]

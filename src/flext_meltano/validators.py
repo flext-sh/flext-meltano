@@ -1,4 +1,4 @@
-"""FLEXT Meltano Validators - Domain-specific business rule validators.
+"""FLEXT Pipeline Validators - Generic business rule validators.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -15,42 +15,44 @@ from flext_core import FlextLogger, FlextResult, FlextTypes
 # Import for type hints only - avoid circular imports
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import FlextPipelineModels
 
 logger = FlextLogger(__name__)
 
 
-class FlextMeltanoValidators:
-    """Domain-specific Meltano business rule validators using FlextValidations foundation.
+class FlextPipelineValidators:
+    """Generic pipeline business rule validators using FlextValidations foundation.
 
-    This class provides comprehensive validation for Meltano-specific business rules
+    This class provides comprehensive validation for pipeline-specific business rules
     while delegating generic validation operations to flext-core. It follows the
-    zero duplication principle by containing only Meltano/Singer/DBT specific
-    validation logic.
+    zero duplication principle by containing only pipeline specific validation logic.
 
     The validator supports validation for:
-    - Meltano plugin configurations
-    - Meltano project structures
-    - DBT project configurations
+    - Pipeline component configurations
+    - Pipeline project structures
+    - Transformation project configurations
     - Connection configurations
 
     Example:
-        >>> validator = FlextMeltanoValidators()
-        >>> config: FlextTypes.Dict = {"name": tap - csv, "namespace": "tap_csv"}
+        >>> validator = FlextPipelineValidators()
+        >>> config: dict[str, object] = {
+        ...     "name": source - csv,
+        ...     "namespace": "source_csv",
+        ... }
         >>> result: FlextResult[object] = (
-        ...     validator.validate_meltano_plugin_business_rules(config)
+        ...     validator.validate_pipeline_component_business_rules(config)
         ... )
         >>> if result.is_success:
-        ...     print("Plugin configuration is valid")
+        ...     print("Component configuration is valid")
 
     """
 
     @classmethod
-    def validate_meltano_plugin_business_rules(
+    def validate_pipeline_component_business_rules(
         cls,
         config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
-        """Validate Meltano-specific plugin business rules using monadic error accumulation.
+        """Validate pipeline component business rules using monadic error accumulation.
 
         Uses FlextResult.accumulate_errors() to collect all validation errors
         instead of stopping at the first failure, providing comprehensive
@@ -69,7 +71,7 @@ class FlextMeltanoValidators:
             cls._validate_plugin_namespace(config),
             cls._validate_plugin_pip_url(config),
             cls._validate_plugin_executable(config),
-            cls._validate_meltano_specific_rules(config),
+            cls._validate_pipeline_specific_rules(config),
         ).map(
             lambda _: True
         )  # Convert successful validations to boolean result  # Convert successful validations to boolean result
@@ -105,11 +107,11 @@ class FlextMeltanoValidators:
         if not name or not name.strip():
             return FlextResult.fail("Plugin name cannot be empty")
 
-        return cls._validate_meltano_name_business_rules(name.strip())
+        return cls._validate_pipeline_name_business_rules(name.strip())
 
     @classmethod
-    def _validate_meltano_name_business_rules(cls, name: str) -> FlextResult[bool]:
-        """Validate Meltano-specific name business rules.
+    def _validate_pipeline_name_business_rules(cls, name: str) -> FlextResult[bool]:
+        """Validate pipeline-specific name business rules.
 
         Args:
             name: Plugin name to validate.
@@ -118,23 +120,27 @@ class FlextMeltanoValidators:
             FlextResult indicating business rule validation.
 
         """
-        validation_errors: FlextTypes.StringList = []
+        validation_errors: list[str] = []
 
-        # Meltano business rule: target plugin names
+        # Pipeline business rule: sink component names
         if (
             name.startswith("target-")
-            and len(name) < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
+            and len(name)
+            < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
-                "Target plugin names must be at least 8 characters"
+                "Sink component names must be at least 8 characters"
             )
 
-        # Meltano business rule: tap plugin names
+        # Pipeline business rule: source component names
         if (
             name.startswith("tap-")
-            and len(name) < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
+            and len(name)
+            < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
         ):
-            validation_errors.append("Tap plugin names must be at least 5 characters")
+            validation_errors.append(
+                "Source component names must be at least 5 characters"
+            )
 
         if validation_errors:
             return FlextResult.fail("; ".join(validation_errors))
@@ -203,10 +209,10 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=True)
 
     @classmethod
-    def _validate_meltano_specific_rules(
+    def _validate_pipeline_specific_rules(
         cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
-        """Validate additional Meltano-specific business rules.
+        """Validate additional pipeline-specific business rules.
 
         Args:
             config: Configuration dictionary.
@@ -225,13 +231,13 @@ class FlextMeltanoValidators:
         return FlextResult.ok(data=True)
 
     @classmethod
-    def validate_meltano_project_business_rules(
+    def validate_pipeline_project_business_rules(
         cls,
         config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
-        """Validate Meltano-specific project business rules.
+        """Validate pipeline project business rules.
 
-        Validates Meltano project configuration including version requirements
+        Validates pipeline project configuration including version requirements
         and project ID format restrictions.
 
         Args:
@@ -241,7 +247,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextTypes.Dict = {
+            >>> config: dict[str, object] = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -258,11 +264,11 @@ class FlextMeltanoValidators:
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Dict = dict[str, object](config)
+        config_dict: dict[str, object] = dict[str, object](config)
 
-        # DOMAIN-SPECIFIC: Meltano project business rules
-        class MeltanoProjectBusinessRules(FlextMeltanoModels.MeltanoProjectModel):
-            """Meltano project business rules - uses unified FlextMeltanoModels.MeltanoProjectModel.
+        # DOMAIN-SPECIFIC: Pipeline project business rules
+        class PipelineProjectBusinessRules(FlextPipelineModels.PipelineProjectModel):
+            """Pipeline project business rules - uses unified FlextPipelineModels.PipelineProjectModel.
 
             This class extends the unified model for validation-specific functionality
             while maintaining the consolidated [Project]Models pattern.
@@ -270,49 +276,53 @@ class FlextMeltanoValidators:
 
         # Use Pydantic model validation directly
         try:
-            MeltanoProjectBusinessRules.model_validate(config_dict)
+            PipelineProjectBusinessRules.model_validate(config_dict)
             return FlextResult[bool].ok(data=True)
         except Exception as e:
             return FlextResult[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
-    def validate_dbt_business_rules(
+    def validate_transformation_business_rules(
         cls, config: FlextTypes.JsonValue
     ) -> FlextResult[bool]:
-        """Validate DBT-specific business rules.
+        """Validate transformation-specific business rules.
 
-        Validates DBT project configuration including project name format
+        Validates transformation project configuration including project name format
         requirements and version specifications.
 
         Args:
-            config: DBT configuration dictionary to validate.
+            config: Transformation configuration dictionary to validate.
 
         Returns:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: FlextTypes.Dict = {
-            ...     "name": "my_dbt_project",
+            >>> config: dict[str, object] = {
+            ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }
             >>> result: FlextResult[object] = (
-            ...     FlextMeltanoValidators.validate_dbt_business_rules(config)
+            ...     FlextPipelineValidators.validate_transformation_business_rules(
+            ...         config
+            ...     )
             ... )
             >>> if result.is_success and result.unwrap():
-            ...     print("DBT configuration is valid")
+            ...     print("Transformation configuration is valid")
 
         """
         # Validate config is dict[str, object] using direct validation
         if not isinstance(config, dict):
             return FlextResult[bool].fail(
-                "DBT config validation failed: config must be a dictionary",
+                "Transformation config validation failed: config must be a dictionary",
             )
 
-        config_dict: FlextTypes.Dict = dict[str, object](config)
+        config_dict: dict[str, object] = dict[str, object](config)
 
-        # DOMAIN-SPECIFIC: DBT business rules
-        class DbtBusinessRules(FlextMeltanoModels.DbtProjectModel):
-            """DBT project business rules - uses unified FlextMeltanoModels.DbtProjectModel.
+        # DOMAIN-SPECIFIC: Transformation business rules
+        class TransformationBusinessRules(
+            FlextPipelineModels.TransformationProjectModel
+        ):
+            """Transformation project business rules - uses unified FlextPipelineModels.TransformationProjectModel.
 
             This class extends the unified model for validation-specific functionality
             while maintaining the consolidated [Project]Models pattern.
@@ -320,31 +330,31 @@ class FlextMeltanoValidators:
 
         # Use Pydantic model validation directly
         try:
-            DbtBusinessRules.model_validate(config_dict)
+            TransformationBusinessRules.model_validate(config_dict)
             return FlextResult[bool].ok(data=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"DBT validation failed: {e}")
+            return FlextResult[bool].fail(f"Transformation validation failed: {e}")
 
     @classmethod
-    def validate_meltano_project_structure(
+    def validate_pipeline_project_structure(
         cls,
         project_path: Path,
     ) -> FlextResult[bool]:
-        """Validate Meltano project structure with domain-specific business rules.
+        """Validate pipeline project structure with domain-specific business rules.
 
-        Performs comprehensive validation of the Meltano project directory
+        Performs comprehensive validation of the pipeline project directory
         structure, checking for required files and directories.
 
         Args:
-            project_path: Path to the Meltano project directory.
+            project_path: Path to the pipeline project directory.
 
         Returns:
             FlextResult containing boolean validation result or error details.
 
         Example:
             >>> from pathlib import Path
-            >>> project_path = Path("/path/to/meltano/project")
-            >>> result = FlextMeltanoValidators.validate_meltano_project_structure(
+            >>> project_path = Path("/path/to/pipeline/project")
+            >>> result = FlextPipelineValidators.validate_pipeline_project_structure(
             ...     project_path
             ... )
             >>> if result.is_success and result.unwrap():
@@ -363,16 +373,16 @@ class FlextMeltanoValidators:
                     f"Project path is not a directory: {project_path}",
                 )
 
-            # Check for required Meltano files
-            meltano_yml = project_path / "meltano.yml"
-            if not meltano_yml.exists():
+            # Check for required pipeline files
+            pipeline_config = project_path / "pipeline.yml"
+            if not pipeline_config.exists():
                 return FlextResult[
                     bool
                 ].fail(
-                    f"meltano.yml not found in {project_path}",  # Test expectation compliance
+                    f"pipeline.yml not found in {project_path}",  # Test expectation compliance
                 )
 
-            # Check for transform directory (DBT) - optional for basic projects
+            # Check for transform directory (Transformation) - optional for basic projects
             transform_dir = project_path / "transform"
             if not transform_dir.exists():
                 # Create transform directory if it doesn't exist (optional)
@@ -388,11 +398,11 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_connection_config(
         cls,
-        config: FlextTypes.Dict,
-    ) -> FlextResult[FlextTypes.Dict]:
+        config: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
         """Validate connection configuration with domain-specific business rules.
 
-        Validates connection configuration data for Meltano services,
+        Validates connection configuration data for pipeline services,
         ensuring proper format and required fields.
 
         Args:
@@ -402,7 +412,7 @@ class FlextMeltanoValidators:
             FlextResult containing validated configuration or error details.
 
         Example:
-            >>> config: FlextTypes.Dict = {
+            >>> config: dict[str, object] = {
             ...     "host": "localhost",
             ...     "port": 5432,
             ...     "database": "mydb",
@@ -411,22 +421,22 @@ class FlextMeltanoValidators:
             ...     FlextMeltanoValidators.validate_connection_config(config)
             ... )
             >>> if result.is_success:
-            ...     validated_config: FlextTypes.Dict = result.unwrap()
+            ...     validated_config: dict[str, object] = result.unwrap()
             ...     print(f"Validated config: {validated_config}")
 
         """
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     "Connection configuration cannot be empty",
                 )
 
-            return FlextResult[FlextTypes.Dict].ok(data=config)
+            return FlextResult[dict[str, object]].ok(data=config)
         except Exception as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return FlextResult[FlextTypes.Dict].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(
@@ -445,9 +455,9 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         """
-        return cls.validate_meltano_plugin_business_rules(config)
+        return cls.validate_pipeline_component_business_rules(config)
 
 
 __all__ = [
-    "FlextMeltanoValidators",
+    "FlextPipelineValidators",
 ]

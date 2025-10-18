@@ -1,6 +1,6 @@
-"""FLEXT Meltano DBT Service - Single unified class for DBT operations.
+"""FLEXT Pipeline Transformation Service - Single unified class for transformation operations.
 
-This module provides the FlextMeltanoDbtService class following FLEXT patterns:
+This module provides the FlextPipelineTransformationService class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -13,47 +13,46 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService
 
 # Import from specific modules to avoid circular dependencies
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.config import FlextPipelineConfig
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoDbtService(
+class FlextPipelineTransformationService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
-    """Service for Meltano DBT operations.
+    """Service for data transformation operations.
 
-    Handles DBT transformation operations following FLEXT patterns
+    Handles transformation operations following FLEXT patterns
     with railway-oriented programming.
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoConfig
+    _config: FlextPipelineConfig
     _library_runner: FlextMeltanoLibraryRunner
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
-        """Initialize DBT service with FLEXT configuration."""
+    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
+        """Initialize transformation service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextPipelineConfig()
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def run_transformations(
         self,
         project_dir: Path,
-        models: FlextTypes.StringList | None = None,
+        models: list[str] | None = None,
         **_options: object,
-    ) -> FlextResult[FlextMeltanoTypes.Processing.DbtTransformationResult]:
-        """Run dbt transformations using programmatic API.
+    ) -> FlextResult[dict[str, object]]:
+        """Run transformations using programmatic API.
 
         Args:
-            project_dir: Path to dbt project directory
+            project_dir: Path to transformation project directory
             models: Optional list of specific models to run
-            **options: Additional dbt options
+            **options: Additional transformation options
 
         Returns:
             FlextResult containing transformation results
@@ -61,49 +60,43 @@ class FlextMeltanoDbtService(
         """
         try:
             _ = self.logger.info(
-                "Running dbt transformations using programmatic API",
+                "Running transformations using programmatic API",
                 project_dir=str(project_dir),
                 models=models or "all",
             )
 
-            # Use library runner for dbt operations
-            dbt_runner_result = self._library_runner.get_dbt_runner()
-            if dbt_runner_result.is_failure:
-                return FlextResult[
-                    FlextMeltanoTypes.Processing.DbtTransformationResult
-                ].fail(dbt_runner_result.error or "Failed to get DBT runner")
-
-            # For now, just return success since dbt_runner is just a dict
-            result = FlextResult[
-                FlextMeltanoTypes.Processing.DbtTransformationResult
-            ].ok(
-                cast(
-                    "FlextMeltanoTypes.Processing.DbtTransformationResult",
-                    dbt_runner_result.unwrap(),
+            # Use library runner for transformation operations
+            transformation_runner_result = self._library_runner.get_dbt_runner()
+            if transformation_runner_result.is_failure:
+                return FlextResult[dict[str, object]].fail(
+                    transformation_runner_result.error
+                    or "Failed to get transformation runner"
                 )
+
+            # For now, just return success since runner is just a dict
+            result = FlextResult[dict[str, object]].ok(
+                transformation_runner_result.unwrap()
             )
 
             if result.is_success:
                 _ = self.logger.info(
-                    "dbt transformations completed successfully",
+                    "transformations completed successfully",
                     models=models or "all",
                 )
             else:
                 _ = self.logger.error(
-                    "dbt transformations failed",
+                    "transformations failed",
                     error=result.error,
                 )
 
             return result
 
         except Exception as e:
-            error_msg = f"Failed to run dbt transformations: {e}"
+            error_msg = f"Failed to run transformations: {e}"
             _ = self.logger.exception(error_msg)
-            return FlextResult[
-                FlextMeltanoTypes.Processing.DbtTransformationResult
-            ].fail(error_msg)
+            return FlextResult[dict[str, object]].fail(error_msg)
 
 
 __all__ = [
-    "FlextMeltanoDbtService",
+    "FlextPipelineTransformationService",
 ]

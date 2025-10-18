@@ -1,6 +1,6 @@
-"""FLEXT Meltano Pipeline Service - Single unified class for pipeline operations.
+"""FLEXT Pipeline Orchestration Service - Single unified class for pipeline operations.
 
-This module provides the FlextMeltanoPipelineService class following FLEXT patterns:
+This module provides the FlextPipelineOrchestrationService class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -14,48 +14,52 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import (  # cast needed for other casts
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.abstractions import FlextPipelineAbstractions
+from flext_meltano.config import FlextPipelineConfig
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoPipelineService(
+class FlextPipelineOrchestrationService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
-    """Service for Meltano pipeline operations.
+    """Service for data pipeline operations.
 
-    Handles ELT pipeline execution, validation, and monitoring
+    Handles pipeline execution, validation, and monitoring
     following FLEXT patterns with railway-oriented programming.
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoConfig
-    _abstractions: FlextMeltanoAbstractions
+    _config: FlextPipelineConfig
+    _abstractions: FlextPipelineAbstractions
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
         """Initialize pipeline service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
-        self._abstractions = FlextMeltanoAbstractions()
+        self._config = config or FlextPipelineConfig()
+        self._abstractions = FlextPipelineAbstractions()
 
     def execute_pipeline(
         self,
-        project: FlextMeltanoTypes.Dbt.Project,
-        extractor_name: str,
-        loader_name: str,
-    ) -> FlextResult[FlextTypes.StringDict]:
-        """Execute ELT pipeline using railway-oriented programming.
+        project_path: str,
+        source_name: str,
+        sink_name: str,
+    ) -> FlextResult[dict[str, str]]:
+        """Execute data pipeline using railway-oriented programming.
 
-        Consolidates ELTCoordinator class functionality into unified service method
+        Consolidates pipeline coordinator functionality into unified service method
         using FlextResult railway patterns to eliminate nested error handling
         and provide composable pipeline execution.
 
         Args:
-            project: Meltano FlextMeltanoTypes.Dbt.Project instance
-            extractor_name: Name of the extractor plugin
-            loader_name: Name of the loader plugin
+            project_path: Path to pipeline project
+            source_name: Name of the source component
+            sink_name: Name of the sink component
 
         Returns:
             FlextResult containing pipeline execution results
@@ -67,13 +71,13 @@ class FlextMeltanoPipelineService(
         # Execute synchronous steps first
         start_result = self._log_pipeline_start(extractor_name, loader_name)
         if start_result.is_failure:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 start_result.error or "Pipeline start failed"
             )
 
         plugins_result = self._find_required_plugins()
         if plugins_result.is_failure:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 plugins_result.error or "Failed to find plugins"
             )
 
@@ -82,14 +86,14 @@ class FlextMeltanoPipelineService(
             project_obj, extractor_name, loader_name, plugins_result.unwrap()
         )
         if elt_context_result.is_failure:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 elt_context_result.error or "Failed to create ELT context"
             )
 
         # Execute singer runner
         runner_result = self._execute_singer_runner(elt_context_result.unwrap())
         if runner_result.is_failure:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 runner_result.error or "Failed to execute singer runner"
             )
 
@@ -97,12 +101,10 @@ class FlextMeltanoPipelineService(
         final_result = self._build_pipeline_result(
             extractor_name,
             loader_name,
-            cast(
-                "FlextMeltanoTypes.MeltanoCore.RunContextDict", runner_result.unwrap()
-            ),
+            runner_result.unwrap(),
         )
         return final_result.or_else_get(
-            lambda: FlextResult[FlextTypes.StringDict].fail(
+            lambda: FlextResult[dict[str, str]].fail(
                 f"Pipeline execution failed for {extractor_name} -> {loader_name}"
             )
         )
@@ -138,7 +140,7 @@ class FlextMeltanoPipelineService(
         try:
             # Use abstraction layer to create ELT context
             elt_context_result = self._abstractions.create_elt_context(
-                project, extractor_name, loader_name
+                cast("Project", project), extractor_name, loader_name
             )
 
             if elt_context_result.is_failure:
@@ -155,17 +157,17 @@ class FlextMeltanoPipelineService(
             # Execute singer pipeline
             execution_result = self._abstractions.execute_singer_pipeline(
                 elt_context_obj,
-                extractor_plugin_obj,
-                loader_plugin_obj,
+                cast("ProjectPlugin", extractor_plugin_obj),
+                cast("ProjectPlugin", loader_plugin_obj),
             )
 
             if execution_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
 
             if elt_context_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     elt_context_result.error or "Failed to create ELT context"
                 )
 
@@ -178,9 +180,9 @@ class FlextMeltanoPipelineService(
                 "loader_plugin": "loader_plugin",
             }
 
-            return FlextResult[FlextTypes.Dict].ok(data=context_data)
+            return FlextResult[dict[str, object]].ok(data=context_data)
         except Exception as e:
-            return FlextResult[FlextTypes.Dict].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Failed to create ELT context: {e}"
             )
 
@@ -210,9 +212,9 @@ class FlextMeltanoPipelineService(
 
             # Use abstraction layer to execute Singer pipeline
             execution_result = self._abstractions.execute_singer_pipeline(
-                cast("FlextMeltanoTypes.MeltanoCore.ELTContext", elt_context_obj),
-                cast("FlextMeltanoTypes.Plugin.ProjectPlugin", extractor_plugin_obj),
-                cast("FlextMeltanoTypes.Plugin.ProjectPlugin", loader_plugin_obj),
+                cast("ELTContext", elt_context_obj),
+                cast("ProjectPlugin", extractor_plugin_obj),
+                cast("ProjectPlugin", loader_plugin_obj),
             )
 
             if execution_result.is_failure:
@@ -224,9 +226,7 @@ class FlextMeltanoPipelineService(
             context_data["execution_completed"] = True
             context_data["execution_result"] = execution_result.unwrap()
 
-            return FlextResult[dict[str, FlextTypes.JsonValue]].ok(
-                cast("dict[str, FlextTypes.JsonValue]", context_data)
-            )
+            return FlextResult[dict[str, FlextTypes.JsonValue]].ok(context_data)
 
         except Exception as e:
             return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
@@ -238,7 +238,7 @@ class FlextMeltanoPipelineService(
         extractor_name: str,
         loader_name: str,
         context_data: FlextMeltanoTypes.MeltanoCore.RunContextDict,
-    ) -> FlextResult[FlextTypes.StringDict]:
+    ) -> FlextResult[dict[str, str]]:
         """Build successful pipeline result."""
         try:
             # Extract context data
@@ -247,7 +247,7 @@ class FlextMeltanoPipelineService(
             execution_result = context_data.get("execution_result", {})
 
             # Build pipeline result using available data
-            pipeline_result: FlextTypes.StringDict = {
+            pipeline_result: dict[str, str] = {
                 "success": "true",
                 "extractor": extractor_name,
                 "loader": loader_name,
@@ -270,13 +270,13 @@ class FlextMeltanoPipelineService(
                 loader=loader_name,
             )
 
-            return FlextResult[FlextTypes.StringDict].ok(pipeline_result)
+            return FlextResult[dict[str, str]].ok(pipeline_result)
         except Exception as e:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 f"Failed to build pipeline result: {e}"
             )
 
 
 __all__ = [
-    "FlextMeltanoPipelineService",
+    "FlextPipelineOrchestrationService",
 ]

@@ -20,7 +20,6 @@ from flext_core import (
     FlextConstants,
     FlextLogger,
     FlextResult,
-    FlextTypes,
     FlextUtilities,
 )
 
@@ -172,8 +171,8 @@ class FlextMeltanoFileManagers:
     def create_directory_structure(
         cls,
         base_path: Path,
-        directories: FlextTypes.StringList,
-    ) -> FlextResult[FlextTypes.StringDict]:
+        directories: list[str],
+    ) -> FlextResult[dict[str, str]]:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
@@ -181,16 +180,16 @@ class FlextMeltanoFileManagers:
 
         """
         try:
-            created_paths: FlextTypes.StringDict = {}
+            created_paths: dict[str, str] = {}
 
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return FlextResult[FlextTypes.StringDict].ok(data=created_paths)
+            return FlextResult[dict[str, str]].ok(data=created_paths)
         except Exception as e:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 f"Failed to create directories: {e}",
             )
 

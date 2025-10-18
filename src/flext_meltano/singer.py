@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 
 # Import from specific modules to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
@@ -65,22 +65,26 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
-                    singer_manager_result.error or "Failed to get Singer manager"
-                )
+                return FlextResult[
+                    FlextMeltanoTypes.Processing.SingerExecutionResult
+                ].fail(singer_manager_result.error or "Failed to get Singer manager")
 
             # For now, just return success since singer_manager is just a dict
             # Build SingerExecutionResult with known fields from get_singer_manager
             singer_data = singer_manager_result.unwrap()
             capabilities_obj = singer_data.get("capabilities", [])
-            capabilities: list[object] = list(capabilities_obj) if isinstance(capabilities_obj, list) else []
+            capabilities: list[object] = (
+                list(capabilities_obj) if isinstance(capabilities_obj, list) else []
+            )
             execution_result: FlextMeltanoTypes.Processing.SingerExecutionResult = {
                 "type": str(singer_data.get("type", "singer_manager")),
                 "status": str(singer_data.get("status", "available")),
                 "capabilities": capabilities,
                 "streams_processed": 0,  # Default value for now
             }
-            result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(execution_result)
+            result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
+                execution_result
+            )
 
             if result.is_success:
                 self._logger.info(
@@ -98,9 +102,9 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[
-                FlextMeltanoTypes.Processing.SingerExecutionResult
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
+                error_msg
+            )
 
     def execute_complete_elt_pipeline(
         self,
@@ -134,14 +138,19 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             tap_name = str(tap_name_obj) if tap_name_obj else ""
             target_name = str(target_name_obj) if target_name_obj else ""
 
-            dbt_models_obj = transformer_config.get("models") if transformer_config else None
+            dbt_models_obj = (
+                transformer_config.get("models") if transformer_config else None
+            )
             dbt_models: list[str] | None = None
             if dbt_models_obj is not None and isinstance(dbt_models_obj, list):
                 dbt_models = [str(m) for m in dbt_models_obj]
 
             # Use library runner for complete pipeline
             result = self._library_runner.execute_complete_elt_pipeline(
-                tap_name, target_name, dbt_models, None  # Pass None for config to match expected type
+                tap_name,
+                target_name,
+                dbt_models,
+                None,  # Pass None for config to match expected type
             )
 
             if result.is_success:
@@ -161,6 +170,6 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[
-                FlextMeltanoTypes.Processing.EltPipelineResult
-            ].fail(error_msg)
+            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
+                error_msg
+            )

@@ -2,9 +2,9 @@
 
 import tempfile
 
-from flext_core import FlextResult, FlextTypes
-from flext_tests import FlextTestsUtilities
+from flext_core import FlextResult
 from pydantic_core import ValidationError
+from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano import (
     FlextMeltanoModels,
@@ -36,12 +36,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_tap_config_validation(self) -> None:
         """Test FlextMeltanoModels.TapConfig Pydantic validation using flext_tests."""
         # Create test config with explicit typing
-        connection_config: FlextTypes.Dict = {
+        connection_config: dict[str, object] = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: FlextTypes.Dict = {"users": {"selected": True}}
+        stream_config: dict[str, object] = {"users": {"selected": True}}
 
         config = FlextMeltanoModels.TapConfig(
             tap_type="tap-postgres",
@@ -69,7 +69,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_stream_definition_validation(self) -> None:
         """Test FlextMeltanoModels.StreamDefinition Pydantic validation using flext_tests."""
         # Create test stream definition with explicit typing
-        stream_schema: FlextTypes.Dict = {
+        stream_schema: dict[str, object] = {
             "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -274,7 +274,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: FlextTypes.Dict = {
+        stream_config: dict[str, object] = {
             "users": {"selected": True},
             "orders": {"selected": False},
         }
@@ -982,11 +982,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
         # Step 1: Create tap from config
-        connection_config: FlextTypes.Dict = {
+        connection_config: dict[str, object] = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: FlextTypes.Dict = {"users": {"selected": True}}
+        stream_config: dict[str, object] = {"users": {"selected": True}}
 
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",

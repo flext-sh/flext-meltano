@@ -38,22 +38,22 @@ class FlextMeltanoTypes(FlextTypes):
 
         type PluginDefinition = dict[
             str,
-            str | FlextTypes.StringList | dict[str, FlextTypes.ConfigValue],
+            str | list[str] | dict[str, object],
         ]
-        type PluginConfiguration = dict[str, FlextTypes.ConfigValue | FlextTypes.Dict]
+        type PluginConfiguration = dict[str, object | dict[str, object]]
         type PluginCatalog = dict[str, list[PluginDefinition]]
         type PluginRegistry = dict[str, PluginDefinition | PluginConfiguration]
-        type PluginInstallation = dict[str, str | bool | FlextTypes.StringList]
+        type PluginInstallation = dict[str, str | bool | list[str]]
         type PluginExecution = dict[str, FlextTypes.JsonValue | bool]
-        type PluginInfo = dict[str, str | bool | int | FlextTypes.Dict]
+        type PluginInfo = dict[str, str | bool | int | dict[str, object]]
 
     class Singer:
         """Singer protocol complex types namespace."""
 
         type CatalogEntry = dict[str, str | dict[str, FlextTypes.JsonValue]]
         type StreamSchema = dict[str, dict[str, FlextTypes.JsonValue]]
-        type TapConfig = dict[str, FlextTypes.ConfigValue | FlextTypes.Dict]
-        type TargetConfig = dict[str, FlextTypes.ConfigValue | FlextTypes.Dict]
+        type TapConfig = dict[str, object | dict[str, object]]
+        type TargetConfig = dict[str, object | dict[str, object]]
         type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
 
@@ -91,24 +91,20 @@ class FlextMeltanoTypes(FlextTypes):
     class Dbt:
         """DBT transformation complex types namespace."""
 
-        type ModelConfiguration = dict[
-            str, FlextTypes.ConfigValue | FlextTypes.StringList
-        ]
-        type TestConfiguration = dict[
-            str, str | FlextTypes.StringList | FlextTypes.Dict
-        ]
+        type ModelConfiguration = dict[str, object | list[str]]
+        type TestConfiguration = dict[str, str | list[str] | dict[str, object]]
         type ProfileConfiguration = dict[str, FlextTypes.ConfigDict]
-        type ProjectConfiguration = dict[str, FlextTypes.ConfigValue | FlextTypes.Dict]
+        type ProjectConfiguration = dict[str, object | dict[str, object]]
         type RunResults = dict[str, list[dict[str, FlextTypes.JsonValue]]]
         type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
-        type Project = dict[str, str | bool | FlextTypes.Dict | FlextTypes.StringList]
+        type Project = dict[str, str | bool | dict[str, object] | list[str]]
 
-    class Project(FlextTypes.Project):
-        """Meltano-specific project types extending FlextTypes.Project."""
+    class Project(FlextTypes):
+        """Meltano-specific project types extending FlextTypes."""
 
         # Meltano-specific project types extending the generic ones
         type MeltanoProjectType = Literal[
-            # Generic types inherited from FlextTypes.Project
+            # Generic types inherited from FlextTypes
             "library",
             "application",
             "service",
@@ -128,52 +124,50 @@ class FlextMeltanoTypes(FlextTypes):
         ]
 
         # Meltano-specific project configurations
-        type MeltanoProjectConfig = dict[str, FlextTypes.ConfigValue | object]
-        type PipelineConfig = dict[str, str | int | bool | FlextTypes.StringList]
-        type SingerConfig = dict[str, bool | str | FlextTypes.Dict]
-        type DbtConfig = dict[str, FlextTypes.ConfigValue | object]
+        type MeltanoProjectConfig = dict[str, object]
+        type PipelineConfig = dict[str, str | int | bool | list[str]]
+        type SingerConfig = dict[str, bool | str | dict[str, object]]
+        type DbtConfig = dict[str, object]
 
     class Pipeline:
         """ELT pipeline complex types namespace."""
 
         type PipelineDefinition = list[dict[str, str | dict[str, FlextTypes.JsonValue]]]
-        type ExecutionContext = dict[str, FlextTypes.JsonValue | FlextTypes.Dict]
-        type RuntimeEnvironment = dict[str, str | dict[str, FlextTypes.ConfigValue]]
+        type ExecutionContext = dict[str, FlextTypes.JsonValue | dict[str, object]]
+        type RuntimeEnvironment = dict[str, str | dict[str, object]]
         type PipelineResults = dict[
-            str, FlextTypes.Processing.ProcessingStatus | FlextTypes.Dict
+            str, FlextTypes.ProcessingStatus | dict[str, object]
         ]
-        type WorkflowConfiguration = dict[
-            str, FlextTypes.Processing.WorkflowStatus | FlextTypes.StringList
-        ]
+        type WorkflowConfiguration = dict[str, FlextTypes.WorkflowStatus | list[str]]
 
     class Bridge:
         """Bridge operation complex types namespace."""
 
         type VersionInfo = dict[str, str | int]
         type ConnectionInfo = dict[str, str | int | bool]
-        type BridgeConfig = dict[str, FlextTypes.ConfigValue | object]
-        type BridgeStatus = dict[str, str | bool | FlextTypes.Dict]
+        type BridgeConfig = dict[str, object]
+        type BridgeStatus = dict[str, str | bool | dict[str, object]]
 
     class CLI:
         """CLI operation complex types namespace."""
 
-        type ProcessResult = dict[str, str | int | float | bool | FlextTypes.StringList]
+        type ProcessResult = dict[str, str | int | float | bool | list[str]]
         type CommandResult = dict[str, str | int | bool]
-        type ExecutionResult = dict[str, str | int | bool | FlextTypes.Dict]
+        type ExecutionResult = dict[str, str | int | bool | dict[str, object]]
         type CLIStatus = dict[str, str | bool]
 
     class ELT:
         """ELT pipeline complex types namespace."""
 
         type PipelineResult = dict[
-            str, str | int | float | bool | FlextTypes.Dict | FlextTypes.List
+            str, str | int | float | bool | dict[str, object] | list[object]
         ]
-        type ExtractionResult = dict[str, str | int | bool | FlextTypes.Dict]
-        type LoadingResult = dict[str, str | int | bool | FlextTypes.Dict]
-        type TransformationResult = dict[str, str | int | bool | FlextTypes.Dict]
+        type ExtractionResult = dict[str, str | int | bool | dict[str, object]]
+        type LoadingResult = dict[str, str | int | bool | dict[str, object]]
+        type TransformationResult = dict[str, str | int | bool | dict[str, object]]
 
-    class Processing(FlextTypes.Processing):
-        """Meltano-specific processing types extending FlextTypes.Processing."""
+    class Processing(FlextTypes):
+        """Meltano-specific processing types extending FlextTypes."""
 
         # Meltano-specific processing result types
         type DbtTransformationResult = dict[str, FlextTypes.JsonValue]
@@ -189,75 +183,72 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Meltano configuration and data types
         type MeltanoConfigDict = dict[str, FlextTypes.JsonValue]
-        type PluginConfigDict = FlextTypes.Dict
-        type EnvironmentDict = FlextTypes.StringDict
-        type VariablesDict = FlextTypes.StringDict
-        type SettingsDict = FlextTypes.Dict
-        type CommandDict = FlextTypes.Dict
-        type ScheduleDict = FlextTypes.Dict
-        type JobDict = FlextTypes.Dict
+        type PluginConfigDict = dict[str, object]
+        type EnvironmentDict = dict[str, str]
+        type VariablesDict = dict[str, str]
+        type SettingsDict = dict[str, object]
+        type CommandDict = dict[str, object]
+        type ScheduleDict = dict[str, object]
+        type JobDict = dict[str, object]
 
         # JsonValue type alias for compatibility
         JsonValue = FlextTypes.JsonValue
 
         # Type aliases for singer.py
-        RecordDict = FlextTypes.Dict
-        SchemaDict = FlextTypes.Dict
-        StateDict = FlextTypes.Dict
-        ResultDict = FlextTypes.Dict
+        RecordDict = dict[str, object]
+        SchemaDict = dict[str, object]
+        StateDict = dict[str, object]
+        ResultDict = dict[str, object]
 
         # Type aliases for protocols.py
         JsonObject = FlextTypes.JsonValue
 
         # Type aliases for file_managers.py
-        FileConfigDict = (
-            dict[str, str | int | FlextTypes.StringList]
-            | dict[str, str | FlextTypes.StringList]
-        )
+        FileConfigDict = dict[str, str | int | list[str]] | dict[str, str | list[str]]
         PathDict = dict[str, str | Path]
 
         # Plugin and execution types
-        type PluginList = FlextTypes.StringList
-        type PluginNameList = FlextTypes.StringList
-        type PluginTypeList = FlextTypes.StringList
-        type ExecutionResultDict = FlextTypes.Dict
-        type ExecutionStatusDict = FlextTypes.StringDict
-        type RuntimeConfigDict = FlextTypes.Dict
+        type PluginList = list[str]
+        type PluginNameList = list[str]
+        type PluginTypeList = list[str]
+        type ExecutionResultDict = dict[str, object]
+        type ExecutionStatusDict = dict[str, str]
+        type RuntimeConfigDict = dict[str, object]
 
         # Singer protocol types
-        type SingerRecordDict = FlextTypes.Dict
-        type SingerStateDict = FlextTypes.Dict
-        type SingerCatalogDict = FlextTypes.Dict
-        type SingerConfigDict = FlextTypes.Dict
-        type SingerSchemaDict = FlextTypes.Dict
-        type SingerMessageList = list[FlextTypes.Dict]
-        type StreamNameList = FlextTypes.StringList
+        type SingerRecordDict = dict[str, object]
+        type SingerStateDict = dict[str, object]
+        type SingerCatalogDict = dict[str, object]
+        type SingerConfigDict = dict[str, object]
+        type SingerSchemaDict = dict[str, object]
+        type SingerMessageList = list[dict[str, object]]
+        type StreamNameList = list[str]
 
         # DBT transformation types
-        type DbtModelDict = FlextTypes.Dict
-        type DbtProfileDict = FlextTypes.Dict
-        type DbtProjectDict = FlextTypes.Dict
-        type DbtManifestDict = FlextTypes.Dict
-        type DbtResultDict = FlextTypes.Dict
-        type DbtModelList = FlextTypes.StringList
-        type DbtTestList = FlextTypes.StringList
+        type DbtModelDict = dict[str, object]
+        type DbtProfileDict = dict[str, object]
+        type DbtProjectDict = dict[str, object]
+        type DbtManifestDict = dict[str, object]
+        type DbtResultDict = dict[str, object]
+        type DbtModelList = list[str]
+        type DbtTestList = list[str]
 
         # Pipeline and workflow types
-        type PipelineConfigDict = FlextTypes.Dict
-        type WorkflowDict = FlextTypes.Dict
-        type RunContextDict = FlextTypes.Dict
-        type ExecutionLogsDict = FlextTypes.Dict
+        type PipelineConfigDict = dict[str, object]
+        type WorkflowDict = dict[str, object]
+        type RunContextDict = dict[str, object]
+        type ExecutionLogsDict = dict[str, object]
         type MetricsDict = FlextTypes.FloatDict
-        type ErrorsDict = FlextTypes.StringDict
+        type ErrorsDict = dict[str, str]
 
         # Library and runner types
-        type LibraryDict = FlextTypes.Dict
-        type RunnerConfigDict = FlextTypes.Dict
-        type ProcessResultDict = FlextTypes.Dict
-        type OutputDict = FlextTypes.Dict
-        type LogsDict = FlextTypes.Dict
-        type MetadataDict = dict[str, str | int | bool | FlextTypes.Dict]
-        type ResponseDict = dict[str, str | int | bool | FlextTypes.Dict]
+        type LibraryDict = dict[str, object]
+        type RunnerConfigDict = dict[str, object]
+        type ProcessResultDict = dict[str, object]
+        type OutputDict = dict[str, object]
+        type LogsDict = dict[str, object]
+        type MetadataDict = dict[str, str | int | bool | dict[str, object]]
+        type ResponseDict = dict[str, str | int | bool | dict[str, object]]
 
 
 __all__ = [
