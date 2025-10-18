@@ -1,7 +1,7 @@
-"""FLEXT Meltano Project Service - Enterprise project management foundation.
+"""FLEXT Pipeline Project Service - Enterprise project management foundation.
 
-Handles Meltano project lifecycle operations following FLEXT Clean Architecture
-with railway-oriented programming and zero custom ELT implementations.
+Handles pipeline project lifecycle operations following FLEXT Clean Architecture
+with railway-oriented programming and zero custom pipeline implementations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import yaml
 from flext_core import (
@@ -19,44 +20,42 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextTypes,
     FlextUtilities,
 )
 
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.abstractions import FlextPipelineAbstractions
+from flext_meltano.config import FlextPipelineConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoProjectService(
+class FlextPipelineProjectService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
-    """Enterprise Meltano project service with railway-oriented programming.
+    """Enterprise pipeline project service with railway-oriented programming.
 
-    Manages complete Meltano project lifecycle using FLEXT ecosystem patterns:
+    Manages complete pipeline project lifecycle using FLEXT ecosystem patterns:
     - Project creation and initialization with FlextResult error handling
     - Railway-oriented validation chains for composable operations
     - Complete flext-core integration (Container, Logger, Utilities)
     - Zero try/except fallbacks - explicit FlextResult error handling
 
-    Extends flext-core foundation for enterprise ELT pipeline orchestration.
+    Extends flext-core foundation for enterprise data pipeline orchestration.
     """
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextPipelineConfig()
         self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
         self._utilities = FlextUtilities()
-        self._abstractions = FlextMeltanoAbstractions()
+        self._abstractions = FlextPipelineAbstractions()
 
     def execute(
         self,
     ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
-        """Execute the Meltano project service.
+        """Execute the pipeline project service.
 
         Returns:
             FlextResult containing project service configuration and status.
@@ -112,7 +111,8 @@ class FlextMeltanoProjectService(
             )
             .flat_map(
                 lambda config_data: self._write_meltano_config(
-                    config_data["path"], config_data["config"]
+                    cast("Path", config_data["path"]),
+                    cast("dict[str, object]", config_data["config"]),
                 )
             )
             .flat_map(self._initialize_project_instance)
@@ -163,7 +163,7 @@ class FlextMeltanoProjectService(
         self,
         project_name: str,
         project_dir: Path,
-    ) -> FlextResult[FlextTypes.StringDict]:
+    ) -> FlextResult[dict[str, str]]:
         """Create new Meltano project using railway-oriented file operations.
 
         Validates project name, creates directory structure, and initializes
@@ -181,7 +181,7 @@ class FlextMeltanoProjectService(
             self._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
-                    params["name"], params["parent_dir"]
+                    cast("str", params["name"]), cast("Path", params["parent_dir"])
                 )
             )
             .flat_map(self._create_project_structure)
@@ -221,7 +221,7 @@ class FlextMeltanoProjectService(
 
     def _generate_minimal_config(
         self, temp_path: Path, project_id: str
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Generate minimal meltano.yml configuration."""
         config = {
             "version": 1,
@@ -240,13 +240,13 @@ class FlextMeltanoProjectService(
                 }
             ],
         }
-        return FlextResult[FlextTypes.Dict].ok({
+        return FlextResult[dict[str, object]].ok({
             "path": temp_path,
             "config": config,
         })
 
     def _write_meltano_config(
-        self, project_path: Path, config: dict
+        self, project_path: Path, config: dict[str, object]
     ) -> FlextResult[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -266,7 +266,7 @@ class FlextMeltanoProjectService(
             return FlextResult[object].fail(
                 project_result.error or "Failed to initialize project"
             )
-        return project_result
+        return cast("FlextResult[object]", project_result)
 
     def _convert_to_project_dict(
         self, project: object
@@ -309,21 +309,21 @@ class FlextMeltanoProjectService(
             return FlextResult[object].fail(
                 project_result.error or "Failed to load Meltano project"
             )
-        return project_result
+        return cast("FlextResult[object]", project_result)
 
     def _validate_project_creation_params(
         self, project_name: str, project_dir: Path
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return FlextResult[FlextTypes.Dict].fail("Project name cannot be empty")
+            return FlextResult[dict[str, object]].fail("Project name cannot be empty")
 
         if not project_dir.exists():
-            return FlextResult[FlextTypes.Dict].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Parent directory not found: {project_dir}"
             )
 
-        return FlextResult[FlextTypes.Dict].ok({
+        return FlextResult[dict[str, object]].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })
@@ -382,16 +382,19 @@ environments:
 
     def _build_creation_result(
         self, project_name: str, project_path: Path
-    ) -> FlextResult[FlextTypes.StringDict]:
+    ) -> FlextResult[dict[str, str]]:
         """Build successful project creation result."""
         try:
-            result: FlextTypes.StringDict = {
+            result: dict[str, str] = {
                 "success": "true",
                 "project_name": project_name,
                 "project_path": str(project_path),
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
-                    (project_path / FlextMeltanoConstants.MELTANO_PROJECT_FILE).exists()
+                    (
+                        project_path
+                        / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+                    ).exists()
                 ),
             }
 
@@ -401,11 +404,11 @@ environments:
                 project_path=str(project_path),
             )
 
-            return FlextResult[FlextTypes.StringDict].ok(result)
+            return FlextResult[dict[str, str]].ok(result)
         except Exception as e:
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 f"Failed to build creation result: {e}"
             )
 
 
-__all__ = ["FlextMeltanoProjectService"]
+__all__ = ["FlextPipelineProjectService"]

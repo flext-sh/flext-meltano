@@ -1,6 +1,6 @@
-"""FLEXT Meltano Target Abstractions - Single unified class for target operations.
+"""FLEXT Pipeline Sink Abstractions - Single unified class for sink operations.
 
-This module provides the FlextMeltanoTargetAbstractions class following FLEXT patterns:
+This module provides the FlextPipelineSinkAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -16,17 +16,17 @@ from flext_core import FlextLogger, FlextResult, FlextService
 
 # Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import FlextPipelineModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextMeltanoTargetAbstractions(
+class FlextPipelineSinkAbstractions(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
-    """UNIFIED Target Abstractions class consolidating ALL target functionality.
+    """UNIFIED Sink Abstractions class consolidating ALL sink functionality.
 
     This single class provides:
-    - Complete Singer target protocol implementation
+    - Complete Singer sink protocol implementation
     - Sink management and batch processing
     - Configuration validation and processing
     - Railway-oriented error handling throughout
@@ -36,22 +36,21 @@ class FlextMeltanoTargetAbstractions(
 
     # Instance attributes (declared for type checker)
     _config: FlextMeltanoConfig
-    logger: FlextLogger
 
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
-        """Initialize unified target abstractions with FLEXT configuration."""
+        """Initialize unified sink abstractions with FLEXT configuration."""
         self._config = config or FlextMeltanoConfig()
 
         # Initialize with logger for FlextService
         super().__init__(logger=FlextLogger(__name__))
 
     def configure_sink(
-        self, target_config: FlextMeltanoModels.TargetConfig
-    ) -> FlextResult[FlextMeltanoModels.SinkDefinition]:
-        """Configure a sink for a target.
+        self, sink_config: FlextPipelineModels.DataSinkConfig
+    ) -> FlextResult[FlextPipelineModels.DataSinkDefinition]:
+        """Configure a sink for a sink configuration.
 
         Args:
-            target_config: Target configuration
+            sink_config: Sink configuration
 
         Returns:
             FlextResult containing configured sink definition
@@ -65,9 +64,9 @@ class FlextMeltanoTargetAbstractions(
             )
 
             # Create sink definition
-            sink_def = FlextMeltanoModels.SinkDefinition(
-                sink_name=f"{target_config.target_type}_sink",
-                target_name=target_config.target_type,
+            sink_def = FlextPipelineModels.DataSinkDefinition(
+                sink_name=f"{sink_config.sink_type}_sink",
+                sink_type=sink_config.sink_type,
                 config=target_config.model_dump(),
                 status="configured",
             )
@@ -77,21 +76,21 @@ class FlextMeltanoTargetAbstractions(
                 sink_name=sink_def.sink_name,
             )
 
-            return FlextResult[FlextMeltanoModels.SinkDefinition].ok(sink_def)
+            return FlextResult[FlextPipelineModels.DataSinkDefinition].ok(sink_def)
 
         except Exception as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.SinkDefinition].fail(
+            return FlextResult[FlextPipelineModels.DataSinkDefinition].fail(
                 f"Sink configuration failed: {e}"
             )
 
-    def validate_target_config(
-        self, target_config: FlextMeltanoModels.TargetConfig
+    def validate_sink_config(
+        self, sink_config: FlextPipelineModels.DataSinkConfig
     ) -> FlextResult[bool]:
-        """Validate a target configuration.
+        """Validate a sink configuration.
 
         Args:
-            target_config: Target configuration to validate
+            sink_config: Sink configuration to validate
 
         Returns:
             FlextResult containing validation result
@@ -121,50 +120,50 @@ class FlextMeltanoTargetAbstractions(
                 f"Target configuration validation failed: {e}"
             )
 
-    def create_target_instance(
-        self, target_config: FlextMeltanoModels.TargetConfig
-    ) -> FlextResult[FlextMeltanoModels.TargetInstance]:
-        """Create a target instance from configuration.
+    def create_sink_instance(
+        self, sink_config: FlextPipelineModels.DataSinkConfig
+    ) -> FlextResult[FlextPipelineModels.DataSinkInstance]:
+        """Create a sink instance from configuration.
 
         Args:
-            target_config: Target configuration
+            sink_config: Sink configuration
 
         Returns:
-            FlextResult containing configured target instance
+            FlextResult containing configured sink instance
 
         """
         try:
             self.logger.info(
-                "Creating target instance",
-                target_name=target_config.target_type,
-                target_type=target_config.target_type,
+                "Creating sink instance",
+                sink_name=sink_config.sink_type,
+                sink_type=sink_config.sink_type,
             )
 
-            # Create target instance
-            target_instance = FlextMeltanoModels.TargetInstance(
-                target_type=target_config.target_type,
-                config=target_config,
+            # Create sink instance
+            sink_instance = FlextPipelineModels.DataSinkInstance(
+                sink_type=sink_config.sink_type,
+                config=sink_config,
                 status="configured",
             )
 
             self.logger.info(
-                "Target instance created successfully",
-                target_name=target_instance.config.target_type,
+                "Sink instance created successfully",
+                sink_name=sink_instance.config.sink_type,
             )
 
-            return FlextResult[FlextMeltanoModels.TargetInstance].ok(target_instance)
+            return FlextResult[FlextPipelineModels.DataSinkInstance].ok(sink_instance)
 
         except Exception as e:
-            self.logger.exception("Target instance creation failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.TargetInstance].fail(
-                f"Target instance creation failed: {e}"
+            self.logger.exception("Sink instance creation failed", error=str(e))
+            return FlextResult[FlextPipelineModels.DataSinkInstance].fail(
+                f"Sink instance creation failed: {e}"
             )
 
     def execute(
         self,
     ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
-        """Execute target abstraction operations (implements Domain.Service)."""
-        # This would orchestrate the overall target abstraction workflow
+        """Execute sink abstraction operations (implements Domain.Service)."""
+        # This would orchestrate the overall sink abstraction workflow
         # For now, return the current configuration
         return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
             self._config.model_dump()

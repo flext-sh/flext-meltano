@@ -9,9 +9,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextTypes
-from flext_tests.matchers import FlextTestsMatchers
 from pydantic import ConfigDict
+from tests.flext_tests_compat import FlextTestsMatchers
 
 from flext_meltano import FlextMeltanoFileManagers
 
@@ -148,7 +147,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
         base_path = self.temp_dir / "empty_project"
-        empty_directories: FlextTypes.StringList = []
+        empty_directories: list[str] = []
 
         result = FlextMeltanoFileManagers.create_directory_structure(
             base_path,

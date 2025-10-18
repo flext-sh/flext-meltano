@@ -18,22 +18,20 @@ from flext_core import (
     FlextConstants,
     FlextExceptions,
     FlextResult,
-    FlextTypes,
 )
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoConfig(FlextConfig):
-    """Meltano ELT configuration management with enterprise-grade validation.
+class FlextPipelineConfig(FlextConfig):
+    """Pipeline configuration management with enterprise-grade validation.
 
-    Extends FlextConfig to provide comprehensive Meltano-specific configuration
+    Extends FlextConfig to provide comprehensive pipeline configuration
     with validation using flext-core patterns. This class serves as the single
-    source of truth for all Meltano configuration across the application.
+    source of truth for all pipeline configuration across the application.
 
     Features:
     - Uses Pydantic 2.11+ features (SettingsConfigDict, SecretStr for sensitive data)
@@ -82,11 +80,9 @@ class FlextMeltanoConfig(FlextConfig):
 
     # ALL ENUMS MUST COME FROM FlextConstants or FlextMeltanoConstants - NO ALIASES
     PluginType: type = FlextMeltanoConstants.PluginTypes  # Domain-specific constants
-    EnvironmentType: type = FlextConstants.Config.Environment  # Core constants
+    EnvironmentType: type = FlextMeltanoConstants.Environment  # Generic environment types
     LogLevel: type = FlextConstants.Config.LogLevel  # Core constants
-    OperationStatus: type = (
-        FlextMeltanoConstants.OperationStatus
-    )  # Domain-specific constants
+    OperationStatus: type = FlextMeltanoConstants.OperationStatus  # Domain-specific constants
     RunMode: type = FlextMeltanoConstants.RunMode  # Domain-specific constants
 
     # ============================================================================
@@ -113,7 +109,7 @@ class FlextMeltanoConfig(FlextConfig):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextConstants.Config.Environment.DEVELOPMENT,
+        default=FlextMeltanoConstants.Environment.DEVELOPMENT,
         description="Deployment environment",
     )
 
@@ -732,13 +728,13 @@ class FlextMeltanoConfig(FlextConfig):
             self.project_root,
         )
 
-    def get_environment_variables(self) -> FlextTypes.StringDict:
+    def get_environment_variables(self) -> dict[str, str]:
         """Get environment variables for Meltano operations.
 
         This method uses FlextConfig as the base and adds Meltano-specific variables.
 
         Returns:
-            FlextTypes.StringDict: Environment variables dictionary.
+            dict[str, str]: Environment variables dictionary.
 
         """
         return self.get_meltano_environment_variables()
@@ -829,21 +825,21 @@ class FlextMeltanoConfig(FlextConfig):
             FlextMeltanoConfig: The created configuration instance.
 
         """
-        # Validate environment using FlextConstants
+        # Validate environment using SingerConstants
         try:
-            env_type = FlextConstants.Config.Environment(environment)
+            env_type = FlextMeltanoConstants.Environment(environment)
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from e
 
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
-        filtered_kwargs: FlextTypes.Dict = {
+        filtered_kwargs: dict[str, object] = {
             k: v for k, v in kwargs.items() if k in valid_fields
         }
 
         # Create config data with environment
-        config_data: FlextTypes.Dict = {"environment": env_type.value}
+        config_data: dict[str, object] = {"environment": env_type.value}
 
         # Handle debug/environment conflict: production cannot have debug=True
         if env_type.value == "production":
@@ -1059,14 +1055,14 @@ class FlextMeltanoConfig(FlextConfig):
         """
         return getattr(self, "_sealed", False)
 
-    def get_meltano_environment_variables(self) -> FlextTypes.StringDict:
+    def get_meltano_environment_variables(self) -> dict[str, str]:
         """Get Meltano-specific environment variables.
 
         This method provides Meltano-specific environment variables using FlextConfig
         as the source of truth for base configuration.
 
         Returns:
-            FlextTypes.StringDict: Environment variables dictionary.
+            dict[str, str]: Environment variables dictionary.
 
         """
         # Get base configuration from FlextConfig singleton
@@ -1105,11 +1101,11 @@ class FlextMeltanoConfig(FlextConfig):
     # MODEL CONFIGURATION - Pydantic v2 model configuration
     # ============================================================================
 
-    def get_meltano_logging_config(self) -> FlextTypes.Dict:
+    def get_meltano_logging_config(self) -> dict[str, object]:
         """Get Meltano-specific logging configuration dictionary.
 
         Returns:
-            FlextTypes.Dict: Dictionary containing Meltano logging configuration.
+            dict[str, object]: Dictionary containing Meltano logging configuration.
 
         """
         return {
@@ -1196,11 +1192,11 @@ class FlextMeltanoConfig(FlextConfig):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-    def get_metadata(self) -> FlextTypes.Dict:
+    def get_metadata(self) -> dict[str, object]:
         """Get configuration metadata including override tracking.
 
         Returns:
-            FlextTypes.Dict: Configuration metadata dictionary.
+            dict[str, object]: Configuration metadata dictionary.
 
         """
         # Return the metadata with proper typing
@@ -1223,7 +1219,7 @@ class FlextMeltanoConfig(FlextConfig):
         def create_dbt_config(
             project_name: str,
             profile_name: str = "",
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Create DBT project configuration.
 
             Args:
@@ -1236,7 +1232,7 @@ class FlextMeltanoConfig(FlextConfig):
             """
             try:
                 profile = profile_name or f"{project_name}_profile"
-                config: FlextTypes.Dict = {
+                config: dict[str, object] = {
                     "name": project_name,
                     "version": "1.0.0",
                     "config-version": 2,
@@ -1248,9 +1244,9 @@ class FlextMeltanoConfig(FlextConfig):
                     "macro-paths": ["macros"],
                     "snapshot-paths": ["snapshots"],
                 }
-                return FlextResult[FlextTypes.Dict].ok(config)
+                return FlextResult[dict[str, object]].ok(config)
             except Exception as e:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"Failed to create DBT config: {e}"
                 )
 
@@ -1259,7 +1255,7 @@ class FlextMeltanoConfig(FlextConfig):
             profile_name: str,
             target_name: str = "dev",
             db_type: str = "postgres",
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Create DBT profile configuration.
 
             Args:
@@ -1272,7 +1268,7 @@ class FlextMeltanoConfig(FlextConfig):
 
             """
             try:
-                profile_config: FlextTypes.Dict = {
+                profile_config: dict[str, object] = {
                     profile_name: {
                         "target": target_name,
                         "outputs": {
@@ -1288,9 +1284,9 @@ class FlextMeltanoConfig(FlextConfig):
                         },
                     }
                 }
-                return FlextResult[FlextTypes.Dict].ok(profile_config)
+                return FlextResult[dict[str, object]].ok(profile_config)
             except Exception as e:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"Failed to create DBT profile config: {e}"
                 )
 
@@ -1298,7 +1294,7 @@ class FlextMeltanoConfig(FlextConfig):
         def create_meltano_config(
             project_id: str,
             default_environment: str = "dev",
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Create basic Meltano project configuration.
 
             Args:
@@ -1310,7 +1306,7 @@ class FlextMeltanoConfig(FlextConfig):
 
             """
             try:
-                config: FlextTypes.Dict = {
+                config: dict[str, object] = {
                     "version": 1,
                     "default_environment": default_environment,
                     "project_id": project_id,
@@ -1327,9 +1323,9 @@ class FlextMeltanoConfig(FlextConfig):
                         }
                     ],
                 }
-                return FlextResult[FlextTypes.Dict].ok(config)
+                return FlextResult[dict[str, object]].ok(config)
             except Exception as e:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"Failed to create Meltano config: {e}"
                 )
 

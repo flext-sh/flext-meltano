@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 import yaml
-from flext_core import FlextConfig, FlextContainer, FlextResult, FlextTypes
+from flext_core import FlextConfig, FlextContainer, FlextResult
 
 
 class DocsConfig(FlextConfig):
@@ -75,7 +75,7 @@ class DocsConfig(FlextConfig):
     link_validation_retries: int = 2
 
     # Content Requirements
-    required_sections: ClassVar[FlextTypes.StringList] = ["##", "###"]
+    required_sections: ClassVar[list[str]] = ["##", "###"]
 
     @classmethod
     def get_instance(cls) -> DocsConfig:

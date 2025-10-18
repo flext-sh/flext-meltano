@@ -2,9 +2,9 @@
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
-from flext_tests import FlextTestsUtilities
+from flext_core import FlextLogger, FlextResult, FlextUtilities
 from pydantic import ValidationError
+from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano import FlextMeltanoTargetAbstractions
 
@@ -139,7 +139,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_create_flext_target_config(self) -> None:
         """Test create_flext_target_config method using flext_tests."""
-        connection_config: FlextTypes.Dict = {"output_path": "test.jsonl"}
+        connection_config: dict[str, object] = {"output_path": "test.jsonl"}
 
         result = self.target_abstractions.create_flext_target_config(
             target_type="jsonl",
@@ -168,7 +168,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_create_flext_target(self) -> None:
         """Test create_flext_target method using flext_tests."""
         # Create test config using flext_tests utilities
-        test_config: FlextTypes.Dict = {
+        test_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
             "batch_size": 100,
@@ -264,7 +264,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_workflow_integration(self) -> None:
         """Test complete target workflow using flext_tests."""
         # Create comprehensive test data
-        connection_config: FlextTypes.Dict = {"output_path": "flext_test.jsonl"}
+        connection_config: dict[str, object] = {"output_path": "flext_test.jsonl"}
 
         # Test workflow: create config then create target
         config_result = self.target_abstractions.create_flext_target_config(
@@ -331,7 +331,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_message_processing_comprehensive(self) -> None:
         """Test message processing methods to cover lines 249-366."""
         # Setup target
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -343,7 +343,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Test successful schema message processing (lines 249-289)
-        schema: FlextTypes.Dict = {
+        schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -362,7 +362,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test successful record message processing (lines 295-341)
-        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "users",
@@ -379,7 +379,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test successful state message processing (lines 347-366)
-        state: FlextTypes.Dict = {
+        state: dict[str, object] = {
             "stream_position": {"users": 100},
             "last_updated": "2025-01-01T10:00:00Z",
         }
@@ -396,7 +396,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_message_processing_errors(self) -> None:
         """Test message processing error scenarios."""
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -404,7 +404,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Test record processing without schema (lines 315-317)
-        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         record_result = self.target_abstractions.process_record_message(
             target,
             "unknown_stream",
@@ -428,14 +428,14 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_data_loading_methods(self) -> None:
         """Test data loading methods to cover lines 376-482."""
         # Setup target with schema
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: FlextTypes.Dict = {
+        schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -449,7 +449,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test load_record method (lines 376-383)
-        record: FlextTypes.Dict = {"id": 1, "name": "John Doe"}
+        record: dict[str, object] = {"id": 1, "name": "John Doe"}
         load_result = self.target_abstractions.load_record(target, "users", record)
 
         self.test_assertions.assert_true(
@@ -462,7 +462,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Test load_batch method (lines 389-441)
-        records: list[FlextTypes.Dict] = [
+        records: list[dict[str, object]] = [
             {"id": 1, "name": "John"},
             {"id": 2, "name": "Jane"},
             {"id": 3, "name": "Bob"},
@@ -500,7 +500,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_finalization(self) -> None:
         """Test target finalization to cover lines 492-554."""
         # Setup complete target workflow
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
@@ -508,7 +508,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         target = target_result.unwrap()
 
         # Add schema and data
-        schema: FlextTypes.Dict = {
+        schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -522,7 +522,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         # Load some data
-        records: list[FlextTypes.Dict] = [
+        records: list[dict[str, object]] = [
             {"id": 1, "name": "John"},
             {"id": 2, "name": "Jane"},
         ]
@@ -562,14 +562,14 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_query_and_utility_methods(self) -> None:
         """Test query and utility methods to cover lines 564-625."""
         # Setup target with stream
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
         target = target_result.unwrap()
 
-        schema: FlextTypes.Dict = {
+        schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         schema_result = self.target_abstractions.process_schema_message(
@@ -709,7 +709,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_error_handling_edge_cases(self) -> None:
         """Test error handling edge cases to cover exception branches."""
         # Test finalize_stream with non-existent stream (lines 456-458)
-        target_config: FlextTypes.Dict = {
+        target_config: dict[str, object] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
         }

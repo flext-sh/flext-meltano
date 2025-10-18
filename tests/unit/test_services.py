@@ -7,7 +7,7 @@ from __future__ import annotations
 import tempfile
 
 import pytest
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService
 
 from flext_meltano import FlextMeltanoService
 
@@ -22,7 +22,8 @@ class TestFlextMeltanoServiceInitialization:
     def test_service_initialization(self) -> None:
         """Test proper service initialization."""
         assert isinstance(self.service, FlextMeltanoService)
-        assert hasattr(self.service, "_container")
+        assert self.service.service_name == "flext_meltano_service"
+        assert self.service.version == "0.9.9"
 
         # Test that service factory methods exist and are callable
         assert hasattr(self.service, "create_tap_service")
@@ -108,7 +109,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: FlextTypes.Dict = {"file_path": tmp_file.name}
+            config: dict[str, object] = {"file_path": tmp_file.name}
             result = tap_service.create_instance(config)
             assert isinstance(result, FlextResult)
 
@@ -118,7 +119,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: FlextTypes.Dict = {"file_path": tmp_file.name}
+            config: dict[str, object] = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
             assert isinstance(result, FlextResult)
 
@@ -146,7 +147,7 @@ class TestTargetService:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
         # Use factory method for target services - unified architecture
-        self.create_target_service = FlextMeltanoService.create_target_service
+        self.create_target_service = self.service.create_target_service
 
     def test_target_service_creation(self) -> None:
         """Test TargetService creation and initialization."""
@@ -198,7 +199,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: FlextTypes.Dict = {"output_path": tmp_file.name}
+            config: dict[str, object] = {"output_path": tmp_file.name}
             result = target_service.create_instance(config)
             assert isinstance(result, FlextResult)
 
@@ -208,7 +209,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.unwrap()
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: FlextTypes.Dict = {"output_path": tmp_file.name}
+            config: dict[str, object] = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
             assert isinstance(result, FlextResult)
 
@@ -236,7 +237,7 @@ class TestDbtService:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
         # Use factory method for DBT services - unified architecture
-        self.create_dbt_service = FlextMeltanoService.create_dbt_service
+        self.create_dbt_service = self.service.create_dbt_service
 
     def test_dbt_service_creation(self) -> None:
         """Test DbtService creation and initialization."""

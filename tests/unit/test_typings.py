@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext_tests import FlextTestsUtilities
+from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano.typings import FlextMeltanoTypes
 

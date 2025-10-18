@@ -54,13 +54,13 @@ class FlextMeltanoProtocols(FlextProtocols):
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: FlextTypes.Dict | None
+            variants: dict[str, object] | None
 
-            def get_config(self) -> FlextTypes.Dict:
+            def get_config(self) -> dict[str, object]:
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: FlextTypes.Dict) -> bool:
+            def validate_config(self, config: dict[str, object]) -> bool:
                 """Validate plugin configuration."""
                 ...
 
@@ -126,15 +126,11 @@ class FlextMeltanoProtocols(FlextProtocols):
         class DbtRunnerProtocol(FlextProtocols.Service[object], Protocol):
             """DBT Runner protocol extending Domain.Service for ELT operations."""
 
-            def run(
-                self, models: FlextTypes.StringList
-            ) -> FlextResult[FlextTypes.JsonValue]:
+            def run(self, models: list[str]) -> FlextResult[FlextTypes.JsonValue]:
                 """Run DBT models with FlextResult."""
                 ...
 
-            def test(
-                self, models: FlextTypes.StringList
-            ) -> FlextResult[FlextTypes.JsonValue]:
+            def test(self, models: list[str]) -> FlextResult[FlextTypes.JsonValue]:
                 """Test DBT models with FlextResult."""
                 ...
 

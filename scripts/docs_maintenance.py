@@ -31,7 +31,6 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextTypes,
 )
 
 from flext_meltano import FlextMeltanoTypes
@@ -180,7 +179,7 @@ class DocumentationAuditor(FlextService):
             return FlextResult.fail(error_msg)
 
     def _analyze_content_structure(
-        self, file_path: Path, content: str, lines: FlextTypes.StringList
+        self, file_path: Path, content: str, lines: list[str]
     ) -> None:
         """Analyze content structure and organization."""
         # Check for required headings
@@ -215,7 +214,7 @@ class DocumentationAuditor(FlextService):
             )
 
     def _analyze_links_and_references(
-        self, file_path: Path, content: str, _lines: FlextTypes.StringList
+        self, file_path: Path, content: str, _lines: list[str]
     ) -> None:
         """Analyze links and references in the document."""
         # Find all links
@@ -274,7 +273,7 @@ class DocumentationAuditor(FlextService):
                     )
 
     def _analyze_formatting_and_style(
-        self, file_path: Path, content: str, lines: FlextTypes.StringList
+        self, file_path: Path, content: str, lines: list[str]
     ) -> None:
         """Analyze formatting and style consistency."""
         # Check line lengths
@@ -465,16 +464,16 @@ class LinkValidator:
             file_valid = cast("int", file_results["valid_links"])
             results["valid_links"] = valid_links + file_valid
 
-            broken_links = cast("FlextTypes.List", results["broken_links"])
-            file_broken = cast("FlextTypes.List", file_results["broken_links"])
+            broken_links = cast("list[object]", results["broken_links"])
+            file_broken = cast("list[object]", file_results["broken_links"])
             broken_links.extend(file_broken)
 
-            timeout_links = cast("FlextTypes.List", results["timeout_links"])
-            file_timeout = cast("FlextTypes.List", file_results["timeout_links"])
+            timeout_links = cast("list[object]", results["timeout_links"])
+            file_timeout = cast("list[object]", file_results["timeout_links"])
             timeout_links.extend(file_timeout)
 
-            checked_links = cast("FlextTypes.List", results["checked_links"])
-            file_checked = cast("FlextTypes.List", file_results["checked_links"])
+            checked_links = cast("list[object]", results["checked_links"])
+            file_checked = cast("list[object]", file_results["checked_links"])
             checked_links.extend(file_checked)
 
         print(
@@ -513,7 +512,7 @@ class LinkValidator:
                         results["valid_links"] = valid_links + 1
                     continue
 
-                checked_links = cast("FlextTypes.List", results["checked_links"])
+                checked_links = cast("list[object]", results["checked_links"])
                 checked_links.append({
                     "file": str(file_path.relative_to(Path())),
                     "text": link_text,
@@ -527,7 +526,7 @@ class LinkValidator:
                     results["valid_links"] = valid_links + 1
                     self.valid_cache[link_url] = True
                 else:
-                    broken_links = cast("FlextTypes.List", results["broken_links"])
+                    broken_links = cast("list[object]", results["broken_links"])
                     broken_links.append({
                         "file": str(file_path.relative_to(Path())),
                         "text": link_text,
@@ -544,9 +543,10 @@ class LinkValidator:
 
     def _validate_url(self, url: str) -> bool:
         """Validate a single URL."""
+        # Note: This validates HTTP/HTTPS URLs from markdown links, which is safe
         for attempt in range(self.retries + 1):
             try:
-                with urlopen(url, timeout=self.timeout) as response:
+                with urlopen(url, timeout=self.timeout) as response:  # noqa: S310
                     return response.status == 200
             except (URLError, HTTPError, OSError):
                 if attempt == self.retries:
@@ -606,10 +606,10 @@ class QualityReporter:
 
 ## 🔗 Link Validation Results
 
-- **Links Checked**: {len(cast("FlextTypes.List", link_results.get("checked_links", [])))}
+- **Links Checked**: {len(cast("list[object]", link_results.get("checked_links", [])))}
 - **Valid Links**: {cast("int", link_results.get("valid_links", 0))}
-- **Broken Links**: {len(cast("FlextTypes.List", link_results.get("broken_links", [])))}
-- **Timeout Links**: {len(cast("FlextTypes.List", link_results.get("timeout_links", [])))}
+- **Broken Links**: {len(cast("list[object]", link_results.get("broken_links", [])))}
+- **Timeout Links**: {len(cast("list[object]", link_results.get("timeout_links", [])))}
 
 ## 📈 Quality Score Breakdown
 
@@ -673,8 +673,8 @@ class QualityReporter:
 
         if link_results.get("broken_links"):
             report += "## 🔗 Broken Links\n\n"
-            for broken_link in cast("FlextTypes.List", link_results["broken_links"]):
-                link_dict = cast("FlextTypes.Dict", broken_link)
+            for broken_link in cast("list[object]", link_results["broken_links"]):
+                link_dict = cast("dict[str, object]", broken_link)
                 report += f"- **{link_dict['file']}**: [{link_dict['text']}]({link_dict['url']})\n"
 
         report += "\n## 🎯 Recommendations\n\n"

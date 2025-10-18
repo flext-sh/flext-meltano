@@ -30,7 +30,7 @@ class FlextMeltanoBridge:
         self,
         command: str,
         args: dict[str, FlextTypes.JsonValue] | None = None,
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -50,9 +50,9 @@ class FlextMeltanoBridge:
                 "status": "executed",
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
+            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
         except Exception as e:
-            return FlextResult[FlextTypes.Dict].fail(f"Bridge command failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Bridge command failed: {e}")
 
     def get_version(self) -> FlextResult[str]:
         """Get bridge version information."""
@@ -70,7 +70,7 @@ class FlextMeltanoBridge:
         except Exception as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 
-    def discover_plugins(self) -> FlextResult[FlextTypes.Dict]:
+    def discover_plugins(self) -> FlextResult[dict[str, object]]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
@@ -81,9 +81,9 @@ class FlextMeltanoBridge:
                 "status": "discovered",
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[FlextTypes.Dict].ok(cast("FlextTypes.Dict", result))
+            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
         except Exception as e:
-            return FlextResult[FlextTypes.Dict].fail(f"Plugin discovery failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Plugin discovery failed: {e}")
 
 
 __all__ = ["FlextMeltanoBridge"]

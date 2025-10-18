@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 
-from flext_core import FlextTypes, FlextUtilities
+from flext_core import FlextUtilities
 
 
 class FlextMeltanoExecutionResult:
@@ -20,7 +20,7 @@ class FlextMeltanoExecutionResult:
 
     def __init__(
         self,
-        command: FlextTypes.StringList,
+        command: list[str],
         *,
         success: bool,
         exit_code: int,
@@ -38,11 +38,11 @@ class FlextMeltanoExecutionResult:
 
     def to_dict(
         self,
-    ) -> dict[str, str | int | float | bool | FlextTypes.StringList]:
+    ) -> dict[str, str | int | float | bool | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
-            dict[str, str | int | float | bool | FlextTypes.StringList]: Dictionary representation of execution result.
+            dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
 
         """
         return {

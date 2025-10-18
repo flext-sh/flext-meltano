@@ -39,7 +39,15 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
     ) -> None:
         """Initialize executor with configuration."""
         super().__init__()
-        self._config = FlextMeltanoConfig(**config) if config else FlextMeltanoConfig()
+        # Use model_validate to safely create config from dict with proper type handling
+        if config and isinstance(config, dict):
+            try:
+                self._config = FlextMeltanoConfig.model_validate(config)
+            except Exception:
+                # Fall back to default config if validation fails
+                self._config = FlextMeltanoConfig()
+        else:
+            self._config = FlextMeltanoConfig()
         self._bridge = FlextMeltanoBridge()
         # Type guard for mypy - logger is always initialized
         if self.logger is None:
@@ -75,7 +83,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
 
     def execute_command(
         self,
-        command: FlextTypes.StringList,
+        command: list[str],
         timeout: int = FlextMeltanoConstants.Meltano.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
@@ -143,7 +151,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
     def execute_dbt_command(
         self,
         dbt_command: str,
-        args: FlextTypes.StringList | None = None,
+        args: list[str] | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a DBT command.
 
