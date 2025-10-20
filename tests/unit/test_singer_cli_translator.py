@@ -18,7 +18,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_cli_translator import FlextMeltanoSingerCliTranslator
+from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 
 class TestFlextMeltanoSingerCliTranslatorTapRun:

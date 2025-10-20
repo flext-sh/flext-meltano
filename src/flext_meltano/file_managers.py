@@ -288,8 +288,7 @@ class FlextMeltanoFileManagers:
 
         """
         # Use centralized validator to eliminate duplication
-
-        return FlextMeltanoValidators.validate_meltano_project_structure(project_root)
+        return FlextMeltanoValidators.validate_pipeline_project_structure(project_root)
 
 
 __all__ = ["FlextMeltanoFileManagers"]

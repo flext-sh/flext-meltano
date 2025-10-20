@@ -1,6 +1,6 @@
 """FLEXT Pipeline Component Service - Single unified class for component operations.
 
-This module provides the FlextPipelineComponentService class following FLEXT patterns:
+This module provides the FlextMeltanoComponentService class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -16,13 +16,13 @@ from typing import cast
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano.abstractions import FlextPipelineAbstractions
-from flext_meltano.config import FlextPipelineConfig
+from flext_meltano.abstractions import FlextMeltanoAbstractions
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.project_service import FlextMeltanoProjectService
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextPipelineComponentService(
+class FlextMeltanoComponentService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """Service for pipeline component operations.
@@ -32,14 +32,14 @@ class FlextPipelineComponentService(
     """
 
     # Instance attributes for type checker
-    _config: FlextPipelineConfig
-    _abstractions: FlextPipelineAbstractions
+    _config: FlextMeltanoConfig
+    _abstractions: FlextMeltanoAbstractions
 
-    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextPipelineConfig()
-        self._abstractions = FlextPipelineAbstractions()
+        self._config = config or FlextMeltanoConfig()
+        self._abstractions = FlextMeltanoAbstractions()
 
     def execute(
         self,
@@ -107,7 +107,7 @@ class FlextPipelineComponentService(
 
             # Discover extractors using abstraction layer
             extractors_result = self._abstractions.get_plugins_of_type(
-                cast("Project", working_project), "extractors"
+                cast("object", working_project), "extractors"
             )
             if extractors_result.is_success:
                 extractors_dict = extractors_result.unwrap()
@@ -127,7 +127,7 @@ class FlextPipelineComponentService(
 
             # Discover loaders using abstraction layer
             loaders_result = self._abstractions.get_plugins_of_type(
-                cast("Project", working_project), "loaders"
+                cast("object", working_project), "loaders"
             )
             if loaders_result.is_success:
                 loaders_dict = loaders_result.unwrap()
@@ -215,7 +215,7 @@ class FlextPipelineComponentService(
 
             # Get plugins of type
             plugins_result = self._abstractions.get_plugins_of_type(
-                cast("Project", project_result.unwrap()), plugin_type
+                cast("object", project_result.unwrap()), plugin_type
             )
 
             if plugins_result.is_failure:
@@ -279,9 +279,12 @@ class FlextPipelineComponentService(
         """Execute the actual plugin addition using abstraction layer."""
         try:
             # Use abstraction layer for plugin addition
-            add_result = self._abstractions.add_plugin(
-                cast("Project", project), plugin_type_str, plugin_name
-            )
+            plugin_config = {
+                "project": project,
+                "type": plugin_type_str,
+                "name": plugin_name,
+            }
+            add_result = self._abstractions.add_plugin(plugin_config)
 
             if add_result.is_failure:
                 return FlextResult[bool].fail(
@@ -319,5 +322,5 @@ class FlextPipelineComponentService(
 # Import here to avoid circular import
 
 __all__ = [
-    "FlextPipelineComponentService",
+    "FlextMeltanoComponentService",
 ]

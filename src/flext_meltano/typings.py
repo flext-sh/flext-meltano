@@ -47,6 +47,9 @@ class FlextMeltanoTypes(FlextTypes):
         type PluginExecution = dict[str, FlextTypes.JsonValue | bool]
         type PluginInfo = dict[str, str | bool | int | dict[str, object]]
 
+        # Plugin type literals
+        PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
+
     class Singer:
         """Singer protocol complex types namespace."""
 
@@ -56,6 +59,10 @@ class FlextMeltanoTypes(FlextTypes):
         type TargetConfig = dict[str, object | dict[str, object]]
         type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
+
+        # Singer protocol Literal types
+        ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
+        SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
         # Singer SDK typing utilities (domain separation from singer_sdk.typing)
         class Typing:
@@ -180,6 +187,23 @@ class FlextMeltanoTypes(FlextTypes):
 
     class MeltanoCore:
         """Commonly used Meltano-specific type aliases extending FlextTypes."""
+
+        # =====================================================================
+        # NESTED JSON TYPES - Support deeply nested dictionary structures
+        # =====================================================================
+
+        # Recursive JSON type supporting nested dictionaries
+        type NestedJsonValue = (
+            bool
+            | float
+            | int
+            | str
+            | None
+            | list[object]
+            | dict[str, object]
+            | dict[str, bool | dict[str, object] | float | int | list[object] | str | None]
+        )
+        type NestedJsonDict = dict[str, NestedJsonValue]
 
         # Meltano configuration and data types
         type MeltanoConfigDict = dict[str, FlextTypes.JsonValue]

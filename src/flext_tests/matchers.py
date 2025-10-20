@@ -41,5 +41,9 @@ class FlextTestsMatcher:
         if self.match_type == "equals":
             return actual == self.value
         if self.match_type == "length":
-            return hasattr(actual, "__len__") and len(actual) == self.value
+            # Check if object has __len__ and cast to proper type for len()
+            return (
+                hasattr(actual, "__len__")
+                and len(actual) == self.value  # type: ignore[arg-type]
+            )
         return False

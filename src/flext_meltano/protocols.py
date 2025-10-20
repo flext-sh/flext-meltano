@@ -11,6 +11,12 @@ from typing import Protocol, TypeVar, runtime_checkable
 
 from flext_core import FlextProtocols, FlextResult, FlextTypes
 
+# Import Singer protocols from subdirectory
+from flext_meltano.singer.protocols import (
+    FlextMeltanoPluginProtocols,
+    FlextMeltanoSingerProtocols,
+)
+
 T_co = TypeVar("T_co", covariant=True)
 
 
@@ -166,5 +172,7 @@ class FlextMeltanoProtocols(FlextProtocols):
 
 
 __all__ = [
+    "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
+    "FlextMeltanoSingerProtocols",
 ]

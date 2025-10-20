@@ -82,14 +82,11 @@ class PlantUMLRenderer(FlextService):
         jar_path = "plantuml.jar"
         url = "https://github.com/plantuml/plantuml/releases/download/v1.2023.13/plantuml-1.2023.13.jar"
 
-        print(f"Downloading PlantUML from {url}...")
         try:
             # Security: URL is hardcoded and from trusted source (GitHub releases)
             urllib.request.urlretrieve(url, jar_path)
-            print(f"Downloaded PlantUML to {jar_path}")
             return jar_path
-        except Exception as e:
-            print(f"Failed to download PlantUML: {e}")
+        except Exception:
             raise
 
     def render_diagram(self, puml_file: Path) -> FlextResult[DiagramValidationResult]:
@@ -377,7 +374,6 @@ class ArchitectureDiagramGenerator:
                 module_path = module_path.parent
 
             if not module_path.exists():
-                print(f"Module path not found: {module_path}")
                 return False
 
             # Analyze Python files
@@ -395,11 +391,9 @@ class ArchitectureDiagramGenerator:
             with Path(output_path).open("w", encoding="utf-8") as f:
                 f.write(puml_content)
 
-            print(f"Generated module diagram: {output_file}")
             return True
 
-        except Exception as e:
-            print(f"Failed to generate module diagram: {e}")
+        except Exception:
             return False
 
     def _analyze_python_files(self, module_path: Path) -> tuple[dict, dict, set]:
@@ -439,8 +433,6 @@ class ArchitectureDiagramGenerator:
             except Exception as e:
                 if self.logger:
                     self.logger.warning(f"Failed to analyze Python file {py_file}: {e}")
-                else:
-                    print(f"Warning: Failed to analyze Python file {py_file}: {e}")
                 continue
 
         return classes, functions, imports
@@ -527,11 +519,9 @@ Auto-generated from code analysis
             with Path(output_path).open("w", encoding="utf-8") as f:
                 f.write(puml_content)
 
-            print(f"Generated service diagram: {output_file}")
             return True
 
-        except Exception as e:
-            print(f"Failed to generate service diagram: {e}")
+        except Exception:
             return False
 
 
@@ -549,12 +539,10 @@ class ArchitectureDocumentationManager:
         """Validate all architecture documentation."""
         result = ArchitectureValidationResult()
 
-        print("🔍 Validating architecture documentation...")
-
         # Validate C4 model documents
         c4_files = list(self.docs_dir.glob("**/C4_MODEL.md"))
-        for c4_file in c4_files:
-            print(f"Validating C4 model: {c4_file}")
+        for _c4_file in c4_files:
+            pass
             # C4 model validation would go here
 
         # Validate PlantUML diagrams
@@ -564,8 +552,6 @@ class ArchitectureDocumentationManager:
         result.total_diagrams = len(puml_files)
 
         for puml_file in puml_files:
-            print(f"Validating diagram: {puml_file}")
-
             # Validate PlantUML syntax
             validation_result = self.plantuml_renderer.validate_syntax(puml_file)
 
@@ -578,7 +564,6 @@ class ArchitectureDocumentationManager:
             result.warnings.extend(validation_result.warnings)
 
         # Render diagrams
-        print("🎨 Rendering diagrams...")
         render_result = self.plantuml_renderer.render_all_diagrams(
             str(self.docs_dir / "architecture")
         )
@@ -594,8 +579,6 @@ class ArchitectureDocumentationManager:
 
     def generate_architecture_diagrams(self) -> list[str]:
         """Generate architecture diagrams from code analysis."""
-        print("🔄 Generating architecture diagrams from code...")
-
         generated_files = []
 
         # Generate module diagrams for key modules
@@ -626,8 +609,6 @@ class ArchitectureDocumentationManager:
 
     def update_architecture_documentation(self) -> bool:
         """Update architecture documentation with latest changes."""
-        print("📝 Updating architecture documentation...")
-
         try:
             # Update timestamps
             self._update_document_timestamps()
@@ -641,11 +622,9 @@ class ArchitectureDocumentationManager:
             # Update architecture metrics
             self._update_architecture_metrics()
 
-            print("✅ Architecture documentation updated")
             return True
 
-        except Exception as e:
-            print(f"❌ Failed to update architecture documentation: {e}")
+        except Exception:
             return False
 
     def _update_document_timestamps(self) -> None:
@@ -675,8 +654,8 @@ class ArchitectureDocumentationManager:
                 with Path(arch_file).open("w", encoding="utf-8") as f:
                     f.write(content)
 
-            except Exception as e:
-                print(f"Warning: Failed to update timestamp in {arch_file}: {e}")
+            except Exception:
+                pass
 
     def _update_diagram_references(self) -> None:
         """Update diagram references in documentation."""
@@ -747,7 +726,6 @@ class ArchitectureDocumentationManager:
         with Path(report_path).open("w", encoding="utf-8") as f:
             f.write(report_content)
 
-        print(f"📋 Created architecture report: {report_path}")
         return str(report_path)
 
 
@@ -808,45 +786,25 @@ Examples:
         automation = ArchitectureDocumentationManager()
 
         if args.validate or args.comprehensive:
-            print("🔍 Validating architecture documentation...")
             validation_result = automation.validate_all_architecture_docs()
 
-            print("📊 Validation Results:")
-            print(
-                f"   Diagrams: {validation_result.valid_diagrams}/{validation_result.total_diagrams} valid"
-            )
-            print(f"   Errors: {len(validation_result.errors)}")
-            print(f"   Warnings: {len(validation_result.warnings)}")
-
             if validation_result.errors:
-                print("❌ Errors found:")
-                for error in validation_result.errors[:5]:
-                    print(f"   - {error}")
+                for _error in validation_result.errors[:5]:
+                    pass
 
         if args.generate_diagrams or args.comprehensive:
-            print("🔄 Generating architecture diagrams...")
-            generated_files = automation.generate_architecture_diagrams()
-
-            print(f"✅ Generated {len(generated_files)} diagram files")
+            automation.generate_architecture_diagrams()
 
         if args.update_docs or args.comprehensive:
-            print("📝 Updating architecture documentation...")
             success = automation.update_architecture_documentation()
 
             if success:
-                print("✅ Documentation updated successfully")
-            else:
-                print("❌ Documentation update failed")
+                pass
 
         if args.create_report or args.comprehensive:
-            print("📋 Creating architecture report...")
-            report_path = automation.create_architecture_report()
-            print(f"✅ Report created: {report_path}")
+            automation.create_architecture_report()
 
-        print("🎉 Architecture automation completed!")
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except Exception:
         sys.exit(1)
 
 

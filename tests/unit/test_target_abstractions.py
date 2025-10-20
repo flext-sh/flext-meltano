@@ -4,9 +4,9 @@ from typing import cast
 
 from flext_core import FlextLogger, FlextResult, FlextUtilities
 from pydantic import ValidationError
-from tests.flext_tests_compat import FlextTestsUtilities
 
-from flext_meltano import FlextMeltanoTargetAbstractions
+from flext_meltano import FlextMeltanoModels, FlextMeltanoTargetAbstractions
+from tests.flext_tests_compat import FlextTestsUtilities
 
 logger = FlextLogger(__name__)
 
@@ -40,7 +40,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "max_batches": 50,
         }
 
-        config = FlextMeltanoTargetAbstractions.FlextTargetConfig.model_validate(
+        config = FlextMeltanoModels.DataSinkConfig.model_validate(
             test_config_data,
         )
 

@@ -12,15 +12,13 @@ from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 
-# Import for type hints only - avoid circular imports
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextPipelineModels
+from flext_meltano.models import FlextMeltanoModels
 
 logger = FlextLogger(__name__)
 
 
-class FlextPipelineValidators:
+class FlextMeltanoValidators:
     """Generic pipeline business rule validators using FlextValidations foundation.
 
     This class provides comprehensive validation for pipeline-specific business rules
@@ -34,7 +32,7 @@ class FlextPipelineValidators:
     - Connection configurations
 
     Example:
-        >>> validator = FlextPipelineValidators()
+        >>> validator = FlextMeltanoValidators()
         >>> config: dict[str, object] = {
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
@@ -125,8 +123,7 @@ class FlextPipelineValidators:
         # Pipeline business rule: sink component names
         if (
             name.startswith("target-")
-            and len(name)
-            < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
                 "Sink component names must be at least 8 characters"
@@ -135,8 +132,7 @@ class FlextPipelineValidators:
         # Pipeline business rule: source component names
         if (
             name.startswith("tap-")
-            and len(name)
-            < FlextMeltanoConstants.Plugin.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
+            and len(name) < FlextMeltanoConstants.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
                 "Source component names must be at least 5 characters"
@@ -267,8 +263,8 @@ class FlextPipelineValidators:
         config_dict: dict[str, object] = dict[str, object](config)
 
         # DOMAIN-SPECIFIC: Pipeline project business rules
-        class PipelineProjectBusinessRules(FlextPipelineModels.PipelineProjectModel):
-            """Pipeline project business rules - uses unified FlextPipelineModels.PipelineProjectModel.
+        class PipelineProjectBusinessRules(FlextMeltanoModels.PipelineProjectModel):
+            """Pipeline project business rules - uses unified FlextMeltanoModels.PipelineProjectModel.
 
             This class extends the unified model for validation-specific functionality
             while maintaining the consolidated [Project]Models pattern.
@@ -302,7 +298,7 @@ class FlextPipelineValidators:
             ...     "version": 1.0.0,
             ... }
             >>> result: FlextResult[object] = (
-            ...     FlextPipelineValidators.validate_transformation_business_rules(
+            ...     FlextMeltanoValidators.validate_transformation_business_rules(
             ...         config
             ...     )
             ... )
@@ -320,9 +316,9 @@ class FlextPipelineValidators:
 
         # DOMAIN-SPECIFIC: Transformation business rules
         class TransformationBusinessRules(
-            FlextPipelineModels.TransformationProjectModel
+            FlextMeltanoModels.TransformationProjectModel
         ):
-            """Transformation project business rules - uses unified FlextPipelineModels.TransformationProjectModel.
+            """Transformation project business rules - uses unified FlextMeltanoModels.TransformationProjectModel.
 
             This class extends the unified model for validation-specific functionality
             while maintaining the consolidated [Project]Models pattern.
@@ -354,7 +350,7 @@ class FlextPipelineValidators:
         Example:
             >>> from pathlib import Path
             >>> project_path = Path("/path/to/pipeline/project")
-            >>> result = FlextPipelineValidators.validate_pipeline_project_structure(
+            >>> result = FlextMeltanoValidators.validate_pipeline_project_structure(
             ...     project_path
             ... )
             >>> if result.is_success and result.unwrap():
@@ -459,5 +455,5 @@ class FlextPipelineValidators:
 
 
 __all__ = [
-    "FlextPipelineValidators",
+    "FlextMeltanoValidators",
 ]

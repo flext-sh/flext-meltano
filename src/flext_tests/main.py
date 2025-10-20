@@ -6,11 +6,12 @@ dependency is available.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Container
 from typing import Any, TypeVar
 from unittest.mock import MagicMock
 
 T = TypeVar("T")
+ContainerT = TypeVar("ContainerT", bound=Container)
 
 
 class FlextTestsUtilities:
@@ -27,8 +28,16 @@ class FlextTestsUtilities:
         return FlextTestsAssertion()
 
     @staticmethod
-    def functional_service(service_name: str) -> Any:
-        """Get functional service mock."""
+    def functional_service(_service_name: str) -> object:
+        """Get functional service mock.
+
+        Args:
+            _service_name: Service name (reserved for future filtering)
+
+        Returns:
+            Mock service object for testing
+
+        """
         return MagicMock()
 
 
@@ -43,36 +52,40 @@ class FlextTestsAssertion:
         """Assert condition is false."""
         assert not condition, message
 
-    def assert_equal(self, actual: Any, expected: Any, message: str = "") -> None:
+    def assert_equal(self, actual: object, expected: object, message: str = "") -> None:
         """Assert values are equal."""
         assert actual == expected, message or f"Expected {expected}, got {actual}"
 
-    def assert_not_equal(self, actual: Any, expected: Any, message: str = "") -> None:
+    def assert_not_equal(self, actual: object, expected: object, message: str = "") -> None:
         """Assert values are not equal."""
         assert actual != expected, message or f"Values should not be equal: {actual}"
 
-    def assert_is_none(self, value: Any, message: str = "") -> None:
+    def assert_is_none(self, value: object, message: str = "") -> None:
         """Assert value is None."""
         assert value is None, message or f"Expected None, got {value}"
 
-    def assert_is_not_none(self, value: Any, message: str = "") -> None:
+    def assert_is_not_none(self, value: object, message: str = "") -> None:
         """Assert value is not None."""
         assert value is not None, message or f"Expected not None, got {value}"
 
-    def assert_in(self, item: Any, container: Any, message: str = "") -> None:
+    def assert_in(self, item: T, container: Container[T], message: str = "") -> None:
         """Assert item is in container."""
         assert item in container, message or f"{item} not in {container}"
 
-    def assert_not_in(self, item: Any, container: Any, message: str = "") -> None:
+    def assert_not_in(self, item: T, container: Container[T], message: str = "") -> None:
         """Assert item is not in container."""
         assert item not in container, message or f"{item} should not be in {container}"
 
-    def assert_is_instance(self, obj: Any, cls: type, message: str = "") -> None:
+    def assert_is_instance(self, obj: object, cls: type, message: str = "") -> None:
         """Assert object is instance of class."""
         assert isinstance(obj, cls), message or f"{obj} is not instance of {cls}"
 
     def assert_raises(
-        self, exception: type[Exception], callable_obj: Callable, *args, **kwargs
+        self,
+        exception: type[Exception],
+        callable_obj: Callable[..., Any],
+        *args: object,
+        **kwargs: object,
     ) -> None:
         """Assert that callable raises exception."""
         try:
@@ -83,4 +96,4 @@ class FlextTestsAssertion:
             pass
         except Exception as e:
             msg = f"Expected {exception.__name__}, got {type(e).__name__}"
-            raise AssertionError(msg)
+            raise AssertionError(msg) from None

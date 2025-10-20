@@ -121,7 +121,8 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.run([])
         assert isinstance(result, FlextResult)
         assert result.is_failure
-        assert result.error is not None and "cannot be empty" in result.error.lower()
+        assert result.error is not None
+        assert "cannot be empty" in result.error.lower()
 
     def test_health_method(self) -> None:
         """Test health check method."""
@@ -590,7 +591,8 @@ class TestFlextMeltanoExecutorComplete:
                 if not result.is_success:
                     # Exception should be caught and converted to error result
                     assert result.error
-                    assert result.error is not None and "CLI run failed" in result.error
+                    assert result.error is not None
+                    assert "CLI run failed" in result.error
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
             # Some scenarios may raise exceptions beyond our control
             pass

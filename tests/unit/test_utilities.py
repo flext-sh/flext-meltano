@@ -131,10 +131,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = utilities.validate_project_structure(project_path)
 
             assert result.is_failure
-            assert (
-                result.error is not None
-                and "Meltano config file not found" in result.error
-            )
+            assert result.error is not None
+            assert "Meltano config file not found" in result.error
 
     def test_validate_project_structure_missing_meltano_dir(self) -> None:
         """Test project structure validation with missing .meltano directory."""
@@ -159,9 +157,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         result = utilities.validate_project_structure(Path("/nonexistent/path"))
 
         assert result.is_failure
-        assert (
-            result.error is not None and "Project path does not exist" in result.error
-        )
+        assert result.error is not None
+        assert "Project path does not exist" in result.error
 
     def test_create_project_file_success(self) -> None:
         """Test successful project file creation."""
@@ -194,9 +191,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         result = utilities.create_project_file(file_path, content)
 
         assert result.is_failure
-        assert (
-            result.error is not None and "Failed to create project file" in result.error
-        )
+        assert result.error is not None
+        assert "Failed to create project file" in result.error
 
     def test_create_project_file_invalid_content_type(self) -> None:
         """Test project file creation with invalid content type."""
@@ -212,7 +208,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             )
 
             assert result.is_failure
-            assert result.error is not None and "Invalid content type" in result.error
+            assert result.error is not None
+            assert "Invalid content type" in result.error
 
     def test_load_yaml_file_success(self) -> None:
         """Test successful YAML file loading."""
@@ -245,7 +242,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = utilities.load_yaml_file(yaml_file)
 
             assert result.is_failure
-            assert result.error is not None and "Failed to load YAML" in result.error
+            assert result.error is not None
+            assert "Failed to load YAML" in result.error
 
     def test_load_yaml_file_nonexistent(self) -> None:
         """Test YAML file loading with nonexistent file."""
@@ -254,7 +252,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         result = utilities.load_yaml_file(Path("/nonexistent/file.yml"))
 
         assert result.is_failure
-        assert result.error is not None and "File does not exist" in result.error
+        assert result.error is not None
+        assert "File does not exist" in result.error
 
     def test_save_yaml_file_success(self) -> None:
         """Test successful YAML file saving."""
@@ -341,7 +340,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = utilities.directory_exists(Path("/restricted/path"))
 
             assert result.is_failure
-            assert result.error is not None and "Permission denied" in result.error
+            assert result.error is not None
+            assert "Permission denied" in result.error
 
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""

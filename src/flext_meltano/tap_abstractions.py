@@ -1,6 +1,6 @@
 """FLEXT Pipeline Source Abstractions - Single unified class for source operations.
 
-This module provides the FlextPipelineSourceAbstractions class following FLEXT patterns:
+This module provides the FlextMeltanoTapAbstractions class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -12,15 +12,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextResult, FlextService
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.models import FlextPipelineModels
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextPipelineSourceAbstractions(
+class FlextMeltanoTapAbstractions(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """UNIFIED Source Abstractions class consolidating ALL source functionality.
@@ -41,11 +40,11 @@ class FlextPipelineSourceAbstractions(
         """Initialize unified source abstractions with FLEXT configuration."""
         self._config = config or FlextMeltanoConfig()
 
-        # Initialize with logger for FlextService
-        super().__init__(logger=FlextLogger(__name__))
+        # Initialize FlextService parent class
+        super().__init__()
 
     def discover_streams(
-        self, source_config: FlextPipelineModels.DataSourceConfig
+        self, source_config: FlextMeltanoModels.DataSourceConfig
     ) -> FlextResult[dict[str, object]]:
         """Discover available streams for a source configuration.
 
@@ -90,7 +89,7 @@ class FlextPipelineSourceAbstractions(
             return FlextResult[dict[str, object]].fail(f"Stream discovery failed: {e}")
 
     def validate_stream_schema(
-        self, stream_def: FlextPipelineModels.StreamDefinition
+        self, stream_def: FlextMeltanoModels.StreamDefinition
     ) -> FlextResult[bool]:
         """Validate a stream definition's schema.
 
@@ -124,8 +123,8 @@ class FlextPipelineSourceAbstractions(
             return FlextResult[bool].fail(f"Schema validation failed: {e}")
 
     def create_source_instance(
-        self, source_config: FlextPipelineModels.DataSourceConfig
-    ) -> FlextResult[FlextPipelineModels.DataSourceInstance]:
+        self, source_config: FlextMeltanoModels.DataSourceConfig
+    ) -> FlextResult[FlextMeltanoModels.DataSourceInstance]:
         """Create a source instance from configuration.
 
         Args:
@@ -146,7 +145,7 @@ class FlextPipelineSourceAbstractions(
             source_id = f"{source_config.source_type}:{source_config.source_identifier}"
 
             # Create source instance
-            source_instance = FlextPipelineModels.DataSourceInstance(
+            source_instance = FlextMeltanoModels.DataSourceInstance(
                 source_type=source_config.source_type,
                 config=source_config,
                 status="configured",
@@ -158,18 +157,18 @@ class FlextPipelineSourceAbstractions(
                 source_name=source_instance.config.source_type,
             )
 
-            return FlextResult[FlextPipelineModels.DataSourceInstance].ok(
+            return FlextResult[FlextMeltanoModels.DataSourceInstance].ok(
                 source_instance
             )
 
         except Exception as e:
             self.logger.exception("Source instance creation failed", error=str(e))
-            return FlextResult[FlextPipelineModels.DataSourceInstance].fail(
+            return FlextResult[FlextMeltanoModels.DataSourceInstance].fail(
                 f"Source instance creation failed: {e}"
             )
 
     def process(
-        self, source_config: FlextPipelineModels.DataSourceConfig
+        self, source_config: FlextMeltanoModels.DataSourceConfig
     ) -> FlextResult[bool]:
         """Process a source configuration for validation.
 

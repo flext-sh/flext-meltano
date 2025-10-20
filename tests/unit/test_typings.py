@@ -8,9 +8,8 @@ SPDX-License-Identifier: MIT
 
 """
 
-from tests.flext_tests_compat import FlextTestsUtilities
-
 from flext_meltano.typings import FlextMeltanoTypes
+from tests.flext_tests_compat import FlextTestsUtilities
 
 
 class TestFlextMeltanoTypes:
@@ -196,21 +195,21 @@ class TestFlextMeltanoTypes:
         processing_types = FlextMeltanoTypes.Processing
         self.test_assertions.assert_true(
             condition=hasattr(
-                processing_types, "FlextMeltanoTypes.Processing.SingerExecutionResult"
+                processing_types, "SingerExecutionResult"
             ),
-            message="FlextMeltanoTypes.Processing.SingerExecutionResult should exist in Processing namespace",
+            message="SingerExecutionResult should exist in Processing namespace",
         )
         self.test_assertions.assert_true(
             condition=hasattr(
-                processing_types, "FlextMeltanoTypes.Processing.DbtTransformationResult"
+                processing_types, "DbtTransformationResult"
             ),
-            message="FlextMeltanoTypes.Processing.DbtTransformationResult should exist in Processing namespace",
+            message="DbtTransformationResult should exist in Processing namespace",
         )
         self.test_assertions.assert_true(
             condition=hasattr(
-                processing_types, "FlextMeltanoTypes.Processing.EltPipelineResult"
+                processing_types, "EltPipelineResult"
             ),
-            message="FlextMeltanoTypes.Processing.EltPipelineResult should exist in Processing namespace",
+            message="EltPipelineResult should exist in Processing namespace",
         )
 
     def test_meltano_core_namespace(self) -> None:
@@ -273,6 +272,7 @@ class TestFlextMeltanoTypes:
         """Test that types are compatible with their intended use."""
 
         # Test that types can be used in type annotations
+        # These functions are intentionally unused - they exist only for type checking
         def test_function(
             plugin_def: FlextMeltanoTypes.Plugin.PluginDefinition,
         ) -> None:

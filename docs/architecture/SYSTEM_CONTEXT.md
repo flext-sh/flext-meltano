@@ -365,10 +365,10 @@ class ExternalSystemAdapter(Protocol):
 class MeltanoAdapter(ExternalSystemAdapter):
     """Meltano CLI adapter."""
 
-class DbtAdapter(ExternalSystemAdapter):
+class FlextMeltanoAdapter.Dbt(ExternalSystemAdapter):
     """DBT adapter."""
 
-class SingerAdapter(ExternalSystemAdapter):
+class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
     """Singer protocol adapter."""
 ```
 

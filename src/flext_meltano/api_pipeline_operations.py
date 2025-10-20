@@ -74,15 +74,15 @@ class FlextMeltanoAPIPipelineOperations:
                 "status": "created",
                 "created_at": str(time.time()),
                 "api_version": self.api.version,
-                "timeout_seconds": self.api._config.timeout_seconds
-                if self.api._config
+                "timeout_seconds": self.api.config.timeout_seconds
+                if self.api.config
                 else 300,
-                "log_level": self.api._config.log_level if self.api._config else "INFO",
-                "environment": self.api._config.environment
-                if self.api._config
+                "log_level": self.api.config.log_level if self.api.config else "INFO",
+                "environment": self.api.config.environment
+                if self.api.config
                 else "dev",
-                "project_root": str(self.api._config.project_root)
-                if self.api._config and hasattr(self.api._config, "project_root")
+                "project_root": str(self.api.config.project_root)
+                if self.api.config and hasattr(self.api.config, "project_root")
                 else ".",
             }
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(

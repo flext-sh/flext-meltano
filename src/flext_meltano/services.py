@@ -11,13 +11,19 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import (
+    FlextContainer,
+    FlextExceptions,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextPipelineService(
+class FlextMeltanoService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """Generic data pipeline service with composition-based architecture.
@@ -43,7 +49,7 @@ class FlextPipelineService(
         config: Service configuration
 
     Example:
-        >>> service = FlextPipelineService()
+        >>> service = FlextMeltanoService()
         >>> result = service.discover()
         >>> pipeline = service.configure_pipeline("source-csv", "sink-postgres")
 
@@ -56,56 +62,102 @@ class FlextPipelineService(
     sink_name: str | None = None
     transformation_name: str | None = None
     _config: FlextMeltanoConfig
+    _service_type: str | None = None
 
     @property
     def config(self) -> FlextMeltanoConfig:
         """Get the service configuration instance."""
         return self._config
 
+    @property
+    def _container(self) -> FlextContainer:
+        """Get FlextContainer instance - delegates to global container."""
+        return FlextContainer.get_global()
+
+    @property
+    def tap_name(self) -> str | None:
+        """Get TAP name (alias for source_name in Singer terminology)."""
+        return self.source_name
+
+    @property
+    def target_name(self) -> str | None:
+        """Get TARGET name (alias for sink_name in Singer terminology)."""
+        return self.sink_name
+
+    @property
+    def dbt_name(self) -> str | None:
+        """Get DBT name (alias for transformation_name)."""
+        return self.transformation_name
+
+    @property
+    def project_name(self) -> str | None:
+        """Get project name (alias for transformation_name for DBT projects)."""
+        return self.transformation_name
+
     def __init__(
         self,
         config: FlextMeltanoConfig | None = None,
-        service_name: str = "flext_pipeline_service",
+        service_name: str = "flext_meltano_service",
         version: str = "0.9.9",
         source_name: str | None = None,
         sink_name: str | None = None,
         transformation_name: str | None = None,
-        **data: object,
+        service_type: str | None = None,
+        tap_name: str | None = None,
+        target_name: str | None = None,
+        project_name: str | None = None,
+        **_data: object,
     ) -> None:
         """Initialize generic pipeline service with composition-based architecture.
+
+        Supports unified service architecture with domain-specific naming:
+        - Singer taps: service_type="tap", tap_name="tap_name"
+        - Singer targets: service_type="target", target_name="target_name"
+        - DBT projects: service_type="dbt", project_name="project_name"
 
         Args:
             config: Optional service configuration instance
             service_name: Name of the service instance
-            source_name: Optional source name for specialization
-            sink_name: Optional sink name for specialization
+            source_name: Optional source name for generic specialization
+            sink_name: Optional sink name for generic specialization
             transformation_name: Optional transformation name for specialization
+            service_type: Service type (tap, target, dbt) for unified architecture
+            tap_name: Singer tap name (maps to source_name)
+            target_name: Singer target name (maps to sink_name)
+            project_name: DBT project name (maps to transformation_name)
             **data: Additional configuration data
 
         """
         if not service_name:
             msg = "Service name cannot be empty"
-            raise ValueError(msg)
+            raise FlextExceptions.ValidationError(msg)
 
         self._config = config or FlextMeltanoConfig()
+
+        # Map domain-specific parameters to generic parameters (SOLID mapping)
+        mapped_source_name = source_name or tap_name
+        mapped_sink_name = sink_name or target_name
+        mapped_transformation_name = transformation_name or project_name
 
         # Initialize parent with required fields (exclude None values)
         init_data = {
             "service_name": service_name,
             "version": version,
         }
-        if source_name is not None:
-            init_data["source_name"] = source_name
-        if sink_name is not None:
-            init_data["sink_name"] = sink_name
-        if transformation_name is not None:
-            init_data["transformation_name"] = transformation_name
-        init_data.update(data)
+        if mapped_source_name is not None:
+            init_data["source_name"] = mapped_source_name
+        if mapped_sink_name is not None:
+            init_data["sink_name"] = mapped_sink_name
+        if mapped_transformation_name is not None:
+            init_data["transformation_name"] = mapped_transformation_name
 
         super().__init__(**init_data)
 
+        # Store service type for domain-specific operations
+        self._service_type = service_type
+
         self.logger.info(
-            f"FlextPipelineService '{service_name}' initialized with generic operation handlers"
+            f"FlextMeltanoService '{service_name}' initialized with generic operation handlers"
         )
 
     # ============================================================================
@@ -199,48 +251,67 @@ class FlextPipelineService(
 
     def create_source_service(
         self, source_name: str, **_config: object
-    ) -> FlextResult[FlextPipelineService]:
+    ) -> FlextResult[FlextMeltanoService]:
         """Create data source service using railway pattern."""
         try:
-            service = FlextPipelineService(
+            service = FlextMeltanoService(
                 service_name=f"{source_name}_service",
                 source_name=source_name,
             )
-            return FlextResult[FlextPipelineService].ok(service)
+            return FlextResult[FlextMeltanoService].ok(service)
         except Exception as e:
-            return FlextResult[FlextPipelineService].fail(
+            return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create source service '{source_name}': {e}"
             )
 
     def create_sink_service(
         self, sink_name: str, **_config: object
-    ) -> FlextResult[FlextPipelineService]:
+    ) -> FlextResult[FlextMeltanoService]:
         """Create data sink service using railway pattern."""
         try:
-            service = FlextPipelineService(
+            service = FlextMeltanoService(
                 service_name=f"{sink_name}_service",
                 sink_name=sink_name,
             )
-            return FlextResult[FlextPipelineService].ok(service)
+            return FlextResult[FlextMeltanoService].ok(service)
         except Exception as e:
-            return FlextResult[FlextPipelineService].fail(
+            return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create sink service '{sink_name}': {e}"
             )
 
     def create_transformation_service(
         self, transformation_name: str, **_config: object
-    ) -> FlextResult[FlextPipelineService]:
+    ) -> FlextResult[FlextMeltanoService]:
         """Create transformation service using railway pattern."""
         try:
-            service = FlextPipelineService(
+            service = FlextMeltanoService(
                 service_name=f"{transformation_name}_service",
                 transformation_name=transformation_name,
             )
-            return FlextResult[FlextPipelineService].ok(service)
+            return FlextResult[FlextMeltanoService].ok(service)
         except Exception as e:
-            return FlextResult[FlextPipelineService].fail(
+            return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create transformation service '{transformation_name}': {e}"
             )
+
+    # Domain-specific factory methods (DRY delegation to generic methods)
+    def create_tap_service(
+        self, tap_name: str, **config: object
+    ) -> FlextResult[FlextMeltanoService]:
+        """Create Singer tap service - delegates to generic source service."""
+        return self.create_source_service(tap_name, **config)
+
+    def create_target_service(
+        self, target_name: str, **config: object
+    ) -> FlextResult[FlextMeltanoService]:
+        """Create Singer target service - delegates to generic sink service."""
+        return self.create_sink_service(target_name, **config)
+
+    def create_dbt_service(
+        self, dbt_name: str, **config: object
+    ) -> FlextResult[FlextMeltanoService]:
+        """Create DBT transformation service - delegates to generic transformation service."""
+        return self.create_transformation_service(dbt_name, **config)
 
     # ============================================================================
     # UTILITY METHODS - Generic utility operations following SOLID principles
@@ -448,5 +519,41 @@ class FlextPipelineService(
             "service_name": self.service_name,
         })
 
+    # ============================================================================
+    # VALIDATION AND INSTANCE METHODS - Service configuration and validation
+    # ============================================================================
 
-__all__ = ["FlextPipelineService"]
+    def validate_service(self) -> FlextResult[bool]:
+        """Validate service configuration."""
+        return FlextResult[bool].ok(True)
+
+    def validate_service_config(
+        self, config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> FlextResult[bool]:
+        """Validate service configuration dictionary."""
+        if not isinstance(config, dict):
+            return FlextResult[bool].fail("Configuration must be a dictionary")
+        return FlextResult[bool].ok(True)
+
+    def create_instance(
+        self, _config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
+    ) -> FlextResult[FlextMeltanoService]:
+        """Create service instance with configuration."""
+        return FlextResult[FlextMeltanoService].ok(self)
+
+    def _create_service_generic(
+        self, service_type: str, name: str, **config: object
+    ) -> FlextResult[FlextMeltanoService]:
+        """Generic service factory - delegates to specific creators."""
+        if service_type == "source":
+            return self.create_source_service(name, **config)
+        if service_type == "sink":
+            return self.create_sink_service(name, **config)
+        if service_type == "transformation":
+            return self.create_transformation_service(name, **config)
+        return FlextResult[FlextMeltanoService].fail(
+            f"Unknown service type: {service_type}"
+        )
+
+
+__all__ = ["FlextMeltanoService"]

@@ -438,8 +438,6 @@ class LinkValidator:
         self, root_path: str | Path = "."
     ) -> FlextMeltanoTypes.MeltanoCore.ExecutionResultDict:
         """Validate all external links in documentation."""
-        print("🔗 Validating external links...")
-
         if isinstance(root_path, str):
             root_path = Path(root_path)
         results: FlextMeltanoTypes.MeltanoCore.ExecutionResultDict = {
@@ -476,9 +474,6 @@ class LinkValidator:
             file_checked = cast("list[object]", file_results["checked_links"])
             checked_links.extend(file_checked)
 
-        print(
-            f"✅ Link validation completed: {results['valid_links']}/{results['total_links']} links valid"
-        )
         return results
 
     def _validate_file_links(
@@ -536,8 +531,8 @@ class LinkValidator:
 
                 self.checked_urls.add(link_url)
 
-        except Exception as e:
-            print(f"⚠️  Error processing {file_path}: {e}")
+        except Exception:
+            pass
 
         return results
 
@@ -546,7 +541,7 @@ class LinkValidator:
         # Note: This validates HTTP/HTTPS URLs from markdown links, which is safe
         for attempt in range(self.retries + 1):
             try:
-                with urlopen(url, timeout=self.timeout) as response:  # noqa: S310
+                with urlopen(url, timeout=self.timeout) as response:
                     return response.status == 200
             except (URLError, HTTPError, OSError):
                 if attempt == self.retries:
@@ -579,7 +574,6 @@ class QualityReporter:
         with Path(report_path).open("w", encoding="utf-8") as f:
             f.write(self._generate_report_content(metrics, issues, link_results))
 
-        print(f"📊 Report generated: {report_path}")
         return str(report_path)
 
     def _generate_report_content(
@@ -738,7 +732,6 @@ class QualityReporter:
         with Path(summary_path).open("w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2, ensure_ascii=False)
 
-        print(f"📋 Summary generated: {summary_path}")
         return str(summary_path)
 
 
@@ -790,43 +783,29 @@ Examples:
     link_results = None
 
     if args.audit or args.comprehensive:
-        print("🔍 Running documentation audit...")
         audit_result = auditor.audit_all_files()
         if audit_result.is_success:
             metrics = audit_result.unwrap()
-            print(f"📊 Quality Score: {metrics.quality_score:.1f}")
         else:
-            print(f"❌ Audit failed: {audit_result.error}")
             return
 
     if args.validate or args.comprehensive:
-        print("🔗 Validating external links...")
         link_results = validator.validate_all_links()
 
     if args.report or args.comprehensive:
-        print("📊 Generating quality reports...")
         if not metrics:
             audit_result = auditor.audit_all_files()
             if audit_result.is_success:
                 metrics = audit_result.unwrap()
             else:
-                print(f"❌ Audit failed: {audit_result.error}")
                 return
 
         if not link_results:
             link_results = validator.validate_all_links()
 
         # Generate reports
-        detailed_report = reporter.generate_comprehensive_report(
-            metrics, auditor.issues, link_results
-        )
-        summary_report = reporter.generate_summary_report(metrics, auditor.issues)
-
-        print("✅ Reports generated:")
-        print(f"   📄 Detailed: {detailed_report}")
-        print(f"   📋 Summary: {summary_report}")
-
-    print("🎉 Documentation maintenance completed!")
+        reporter.generate_comprehensive_report(metrics, auditor.issues, link_results)
+        reporter.generate_summary_report(metrics, auditor.issues)
 
 
 if __name__ == "__main__":

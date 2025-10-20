@@ -120,28 +120,7 @@
 [tool.ruff]
     extend = "../ruff-shared.toml"
 
-[tool.pyrefly]
-    python-version = "3.13"
-    search-path = [
-        "../flext-core/src",
-        "../flext-cli/src",
-        "../flext-api/src",
-        "../flext-observability/src",
-        "../flext-plugin/src",
-        "/home/marlonsc/.local/lib/python3.13/site-packages",
-        "examples",
-        "src",
-        "scripts",
-        "tests",
-    ]
 
-
-        # SubConfig: Disable unknown-name error for models.py
-        # This handles forward references to classes defined later in the same file
-        [[tool.pyrefly.sub-config]]
-            matches = "**/models.py"
-            [tool.pyrefly.sub-config.errors]
-                unknown-name = false
 [tool.pytest.ini_options]
     addopts = [
         "--maxfail=1",
@@ -164,39 +143,6 @@
     testpaths = [
         "tests",
     ]
-
-[tool.coverage.run]
-    branch = true
-    omit = [
-        "*/.venv/*",
-        "*/__pycache__/*",
-        "*/test_*",
-        "*/tests/*",
-        "*/venv/*",
-    ]
-    source = [
-        "src",
-    ]
-
-[tool.coverage.report]
-    exclude_lines = [
-        "@(abc\\.)?abstractmethod",
-        "class .*\\bProtocol\\):",
-        "def __repr__",
-        "if 0:",
-        "if __name__ == .__main__.:",
-        "if self.debug:",
-        "if settings.DEBUG",
-        "pragma: no cover",
-        "raise AssertionError",
-        "raise NotImplementedError",
-    ]
-
-[tool.coverage.html]
-    directory = "reports/coverage"
-
-[tool.coverage.xml]
-    output = "reports/coverage.xml"
 
     [tool.poetry.dependencies.flext-core]
         develop = true

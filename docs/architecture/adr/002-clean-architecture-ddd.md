@@ -182,7 +182,7 @@ def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
 class FlextMeltanoService:
     config_validator: ConfigValidator
     meltano_adapter: MeltanoAdapter
-    dbt_adapter: DbtAdapter
+    dbt_adapter: FlextMeltanoAdapter.Dbt
 
     def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
         # Use injected dependencies
