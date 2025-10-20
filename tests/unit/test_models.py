@@ -100,7 +100,7 @@ class TestTargetConfigEnhanced:
 
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(ValidationError, match="target_type cannot be empty"):
             FlextMeltanoModels.TargetConfig(
                 target_type="", connection_config={"host": "localhost"}
             )
@@ -121,7 +121,7 @@ class TestStreamInfoEnhanced:
         """Test StreamInfo with minimal required data."""
         stream = FlextMeltanoModels.StreamInfo(
             stream_name="users",
-            schema={"type": "object", "properties": {"id": {"type": "integer"}}},
+            stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             created_at="2025-01-01T00:00:00Z",
         )
 
@@ -136,7 +136,7 @@ class TestStreamInfoEnhanced:
         """Test StreamInfo with all fields populated."""
         stream = FlextMeltanoModels.StreamInfo(
             stream_name="orders",
-            schema={
+            stream_schema={
                 "type": "object",
                 "properties": {
                     "id": {"type": "integer"},
@@ -147,6 +147,7 @@ class TestStreamInfoEnhanced:
             key_properties=["id"],
             replication_method="FULL_TABLE",
             replication_key="order_date",
+            created_at="2025-01-01T00:00:00Z",
         )
 
         assert stream.stream_name == "orders"
@@ -156,15 +157,22 @@ class TestStreamInfoEnhanced:
 
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
-            FlextMeltanoModels.StreamInfo(stream_name="", schema={"type": "object"})
+        with pytest.raises(
+            ValidationError, match="String should have at least 1 character"
+        ):
+            FlextMeltanoModels.StreamInfo(
+                stream_name="",
+                stream_schema={"type": "object"},
+                created_at="2025-01-01T00:00:00Z",
+            )
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         """Test StreamInfo validation with invalid schema type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             FlextMeltanoModels.StreamInfo(
                 stream_name="users",
-                schema="invalid",  # Should be dict
+                stream_schema="invalid",  # Should be dict
+                created_at="2025-01-01T00:00:00Z",
             )
 
 
@@ -206,7 +214,7 @@ class TestMeltanoProjectModelEnhanced:
 
     def test_meltano_project_validation_empty_project_id(self) -> None:
         """Test MeltanoProjectModel validation with empty project_id."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(ValidationError, match="project_id cannot be empty"):
             FlextMeltanoModels.MeltanoProjectModel(project_id="")
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
@@ -223,15 +231,17 @@ class TestPluginModelEnhanced:
 
     def test_plugin_model_with_minimal_data(self) -> None:
         """Test PluginModel with minimal required data."""
-        plugin = FlextMeltanoModels.PluginModel(name="tap-postgres")
+        plugin = FlextMeltanoModels.PluginModel(
+            name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
+        )
 
         assert plugin.name == "tap-postgres"
-        assert plugin.namespace is None
-        assert plugin.variant is None
-        assert plugin.pip_url is None
+        assert plugin.namespace == "tap_postgres"
+        assert plugin.variant == "standard"
+        assert plugin.pip_url == "tap-postgres"
         assert plugin.executable is None
         assert plugin.capabilities == []
-        assert plugin.settings == []
+        assert plugin.settings == {}
         assert plugin.config_files == []
 
     def test_plugin_model_with_full_data(self) -> None:
@@ -243,14 +253,13 @@ class TestPluginModelEnhanced:
             pip_url="git+https://github.com/meltanolabs/tap-postgres.git",
             executable="tap-postgres",
             capabilities=["catalog", "discover", "sync"],
-            settings=[
-                {
-                    "name": "host",
+            settings={
+                "host": {
                     "kind": "string",
                     "label": "Host",
                     "description": "PostgreSQL host",
                 }
-            ],
+            },
             config_files=["config.json"],
         )
 
@@ -261,11 +270,13 @@ class TestPluginModelEnhanced:
         assert plugin.executable == "tap-postgres"
         assert "catalog" in plugin.capabilities
         assert len(plugin.settings) == 1
-        assert plugin.settings[0]["name"] == "host"
+        assert "host" in plugin.settings
 
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(
+            ValidationError, match="String should have at least 1 character"
+        ):
             FlextMeltanoModels.PluginModel(name="")
 
     def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
@@ -321,12 +332,12 @@ class TestDbtProjectModelEnhanced:
 
     def test_dbt_project_validation_empty_name(self) -> None:
         """Test DbtProjectModel validation with empty name."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(ValidationError, match="name cannot be empty"):
             FlextMeltanoModels.DbtProjectModel(name="", profile="default")
 
     def test_dbt_project_validation_empty_profile(self) -> None:
         """Test DbtProjectModel validation with empty profile."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(ValidationError, match="profile cannot be empty"):
             FlextMeltanoModels.DbtProjectModel(name="test-project", profile="")
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
@@ -363,7 +374,7 @@ class TestModelIntegration:
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
         plugin = FlextMeltanoModels.PluginModel(
-            name="tap-mysql", namespace="meltanolabs"
+            name="tap-mysql", namespace="meltanolabs", pip_url="tap-mysql"
         )
 
         project = FlextMeltanoModels.MeltanoProjectModel(
@@ -377,8 +388,9 @@ class TestModelIntegration:
         """Test StreamInfo integration with TapConfig."""
         stream = FlextMeltanoModels.StreamInfo(
             stream_name="users",
-            schema={"type": "object", "properties": {"id": {"type": "integer"}}},
+            stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             key_properties=["id"],
+            created_at="2025-01-01T00:00:00Z",
         )
 
         tap_config = FlextMeltanoModels.TapConfig(

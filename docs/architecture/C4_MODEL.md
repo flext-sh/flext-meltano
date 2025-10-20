@@ -274,7 +274,7 @@ Package "Domain Model" as models {
         +TapRunParams
         +TargetRunParams
         +PipelineConfig
-        +PluginConfig
+        +FlextPluginConfig
     }
 
     Class FlextMeltanoConfig {

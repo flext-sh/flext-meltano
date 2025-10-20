@@ -1,75 +1,130 @@
-"""Enterprise Pipeline integration library for FLEXT ecosystem.
+"""Enterprise ELT Pipeline Integration Library for FLEXT Ecosystem.
 
-This module provides a unified interface for data pipeline operations
-following flext-core architectural patterns. All external access should go
-through the FlextPipelineAPI class.
+This library provides deep integration with singer-sdk, meltano-sdk, and
+dbt-core with programmatic APIs, railway-oriented programming, and FLEXT
+ecosystem patterns.
+
+**NO CLI** - Pure programmatic APIs only.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
-from singer_sdk import Stream as FlextPipelineStream, Tap as FlextPipelineTap
-
+# =========================================================================
+# VERSION
+# =========================================================================
 from flext_meltano.__version__ import __version__, __version_info__
-from flext_meltano.abstractions import FlextPipelineAbstractions
+
+# =========================================================================
+# APPLICATION LAYER - Main API and configuration
+# =========================================================================
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.api import FlextPipeline
+from flext_meltano.api import FlextMeltano
 from flext_meltano.bridge import FlextMeltanoBridge
-from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.config import FlextPipelineConfig
+from flext_meltano.config import FlextMeltanoConfig
+
+# =========================================================================
+# FOUNDATION LAYER - Core patterns and definitions
+# =========================================================================
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.dbt_service import FlextPipelineTransformationService
-from flext_meltano.execution_result import FlextMeltanoExecutionResult
+
+# =========================================================================
+# DBT DOMAIN - Deep dbt-core integration (NO CLI)
+# ✅ Programmatic APIs only for DBT projects and transformations
+# =========================================================================
+from flext_meltano.dbt import (
+    FlextMeltanoDbtProjectManager,
+    FlextMeltanoDbtRunner,
+    FlextMeltanoDbtService,
+)
 from flext_meltano.executor import FlextMeltanoExecutor
+
+# =========================================================================
+# SUPPORT MODULES
+# =========================================================================
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-from flext_meltano.models import FlextPipelineModels
-from flext_meltano.pipeline_service import FlextPipelineOrchestrationService
-from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
-from flext_meltano.plugin_service import FlextPipelineComponentService
-from flext_meltano.project_service import FlextPipelineProjectService
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.services import FlextPipelineService
-from flext_meltano.singer import FlextMeltanoSinger
-from flext_meltano.singer_cli_translator import FlextPipelineSingerCliTranslator
-from flext_meltano.tap_abstractions import FlextPipelineSourceAbstractions
-from flext_meltano.target_abstractions import FlextPipelineSinkAbstractions
+
+# =========================================================================
+# MELTANO DOMAIN - Deep meltano-sdk integration (NO CLI)
+# ✅ Programmatic APIs only for Meltano projects and pipelines
+# =========================================================================
+from flext_meltano.meltano import (
+    FlextMeltanoMeltanoService,
+    FlextMeltanoProjectManager,
+)
+
+# =========================================================================
+# DOMAIN LAYER - Models and services
+# =========================================================================
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import (
+    FlextMeltanoPluginProtocols,
+    FlextMeltanoProtocols,
+    FlextMeltanoSingerProtocols,
+)
+from flext_meltano.services import FlextMeltanoService
+
+# =========================================================================
+# SINGER DOMAIN - Deep singer-sdk integration (NO CLI)
+# ✅ Programmatic APIs only for Singer taps and targets
+# =========================================================================
+from flext_meltano.singer import (
+    FlextMeltanoCatalogManager,
+    FlextMeltanoSingerService,
+    FlextMeltanoStateManager,
+    FlextMeltanoStream,
+    FlextMeltanoTap,
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTarget,
+    FlextMeltanoTargetAbstractions,
+)
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
-from flext_meltano.validators import FlextPipelineValidators
+from flext_meltano.validators import FlextMeltanoValidators
+
+# =========================================================================
+# PUBLIC API EXPORTS
+# =========================================================================
 
 __all__ = [
+    # Application
+    "FlextMeltano",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
-    "FlextMeltanoCLI",
+    "FlextMeltanoCatalogManager",
+    "FlextMeltanoConfig",
+    # Foundation
     "FlextMeltanoConstants",
-    "FlextMeltanoExecutionResult",
+    # DBT domain - Deep dbt-core integration (NO CLI)
+    "FlextMeltanoDbtProjectManager",
+    "FlextMeltanoDbtRunner",
+    "FlextMeltanoDbtService",
     "FlextMeltanoExecutor",
+    # Support modules
     "FlextMeltanoFileManagers",
-    "FlextMeltanoLibraryRunner",
+    "FlextMeltanoMeltanoService",
+    # Domain
+    "FlextMeltanoModels",
     "FlextMeltanoPluginProtocols",
+    # Meltano domain - Deep meltano-sdk integration (NO CLI)
+    "FlextMeltanoProjectManager",
     "FlextMeltanoProtocols",
-    "FlextMeltanoSinger",
+    "FlextMeltanoService",
+    "FlextMeltanoSingerProtocols",
+    "FlextMeltanoSingerService",
+    "FlextMeltanoStateManager",
+    # Singer domain - Deep singer-sdk integration (NO CLI)
+    "FlextMeltanoStream",
+    "FlextMeltanoTap",
+    "FlextMeltanoTapAbstractions",
+    "FlextMeltanoTarget",
+    "FlextMeltanoTargetAbstractions",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
-    "FlextPipeline",
-    "FlextPipelineAbstractions",
-    "FlextPipelineComponentService",
-    "FlextPipelineConfig",
-    "FlextPipelineModels",
-    "FlextPipelineOrchestrationService",
-    "FlextPipelineProjectService",
-    "FlextPipelineService",
-    "FlextPipelineSingerCliTranslator",
-    "FlextPipelineSinkAbstractions",
-    "FlextPipelineSourceAbstractions",
-    "FlextPipelineStream",
-    "FlextPipelineTap",
-    "FlextPipelineTransformationService",
-    "FlextPipelineValidators",
+    "FlextMeltanoValidators",
+    # Version
     "__version__",
     "__version_info__",
 ]

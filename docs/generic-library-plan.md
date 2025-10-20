@@ -329,7 +329,7 @@ def execute_pipeline(
 - `FlextMeltanoService` for generic operations
 - `FlextPluginService` for plugin management
 - `FlextSingerService` for protocol operations
-- `FlextPipelineService` for orchestration
+- `FlextMeltanoService` for orchestration
 
 ### Testing Strategy
 

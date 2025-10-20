@@ -23,13 +23,14 @@ from flext_core import (
     FlextUtilities,
 )
 
-from flext_meltano.abstractions import FlextPipelineAbstractions
-from flext_meltano.config import FlextPipelineConfig
+from flext_meltano.abstractions import FlextMeltanoAbstractions
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextPipelineProjectService(
+class FlextMeltanoProjectService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """Enterprise pipeline project service with railway-oriented programming.
@@ -43,14 +44,14 @@ class FlextPipelineProjectService(
     Extends flext-core foundation for enterprise data pipeline orchestration.
     """
 
-    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._config = config or FlextPipelineConfig()
+        self._config = config or FlextMeltanoConfig()
         self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
         self._utilities = FlextUtilities()
-        self._abstractions = FlextPipelineAbstractions()
+        self._abstractions = FlextMeltanoAbstractions()
 
     def execute(
         self,
@@ -157,7 +158,7 @@ class FlextPipelineProjectService(
             FlextResult containing True if valid, False with error details if invalid
 
         """
-        return FlextMeltanoValidators.validate_meltano_project_structure(project_path)
+        return FlextMeltanoValidators.validate_pipeline_project_structure(project_path)
 
     def create_project(
         self,
@@ -411,4 +412,4 @@ environments:
             )
 
 
-__all__ = ["FlextPipelineProjectService"]
+__all__ = ["FlextMeltanoProjectService"]

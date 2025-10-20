@@ -54,6 +54,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             )
 
     def test_tap_plugin_protocol_definition(self) -> None:
+        """Test TapPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TapPlugin
         assert protocol is not None
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation
@@ -66,11 +67,13 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_dbt_plugin_protocol_definition(self) -> None:
+        """Test DbtPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.DbtPlugin
         assert protocol is not None
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_tap_service_protocol_definition(self) -> None:
+        """Test TapServiceProtocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TapServiceProtocol
         assert protocol is not None
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation
@@ -83,6 +86,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation
 
     def test_dbt_service_protocol_definition(self) -> None:
+        """Test DbtServiceProtocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
         assert protocol is not None
         assert protocol == FlextTypes.JsonValue  # Placeholder implementation

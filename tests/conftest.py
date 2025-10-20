@@ -359,6 +359,7 @@ def mock_singer_tap() -> type[object]:
     class MockSingerTap:
         def __init__(self, config: dict[str, object]) -> None:
             """Initialize the instance."""
+            super().__init__()
             self.config = config
 
         def discover(self) -> dict[str, object]:
@@ -377,6 +378,7 @@ def mock_singer_target() -> object:
     class MockSingerTarget:
         def __init__(self, config: dict[str, object]) -> None:
             """Initialize the instance."""
+            super().__init__()
             self.config = config
 
         def load(

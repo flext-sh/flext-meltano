@@ -28,14 +28,14 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 
 ### **Core Modules**
 
-| Module                | Purpose                        | Key Classes                                     |
-| --------------------- | ------------------------------ | ----------------------------------------------- |
-| `services.py`         | Core service orchestration     | `FlextMeltanoService`, `FlextMeltanoExecutor`   |
-| `adapters.py`         | Meltano CLI integration        | `FlextMeltanoAdapter`, `FlextMeltanoBridge`     |
-| `singer.py`           | Singer protocol implementation | `FlextSingerTap`, `FlextSingerTarget`           |
-| `plugin_service.py`   | Plugin management              | `FlextPluginService`, `FlextPluginRegistry`     |
-| `pipeline_service.py` | Pipeline orchestration         | `FlextPipelineService`, `FlextPipelineExecutor` |
-| `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`    |
+| Module                | Purpose                        | Key Classes                                   |
+| --------------------- | ------------------------------ | --------------------------------------------- |
+| `services.py`         | Core service orchestration     | `FlextMeltanoService`, `FlextMeltanoExecutor` |
+| `adapters.py`         | Meltano CLI integration        | `FlextMeltanoAdapter`, `FlextMeltanoBridge`   |
+| `singer.py`           | Singer protocol implementation | `FlextSingerTap`, `FlextSingerTarget`         |
+| `plugin_service.py`   | Plugin management              | `FlextPluginService`, `FlextPluginRegistry`   |
+| `pipeline_service.py` | Pipeline orchestration         | `FlextMeltanoService`, `FlextMeltanoExecutor` |
+| `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`  |
 
 ---
 
@@ -581,12 +581,12 @@ def list_plugins_by_type(
 
 ## 🚀 Pipeline Services
 
-### FlextPipelineService
+### FlextMeltanoService
 
 **Pipeline orchestration and execution service**
 
 ```python
-class FlextPipelineService(FlextService):
+class FlextMeltanoService(FlextService):
     """Service for pipeline orchestration and execution."""
 ```
 
@@ -651,12 +651,12 @@ def monitor_pipeline(
     """
 ```
 
-### FlextPipelineExecutor
+### FlextMeltanoExecutor
 
 **Advanced pipeline execution engine**
 
 ```python
-class FlextPipelineExecutor(FlextService):
+class FlextMeltanoExecutor(FlextService):
     """Advanced pipeline execution engine with orchestration."""
 ```
 

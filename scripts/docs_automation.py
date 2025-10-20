@@ -20,7 +20,6 @@ import json
 import subprocess
 import sys
 import time as time_module
-from datetime import UTC, datetime
 from pathlib import Path
 
 import schedule
@@ -209,7 +208,6 @@ class DocumentationAutomation(FlextService):
         automation_config = self._config.get_schedule_config()
 
         if not automation_config.get("enable_scheduled_audits", False):
-            print("📅 Scheduled audits disabled in configuration")
             return
 
         schedule_type = automation_config.get("audit_schedule", "weekly")
@@ -220,8 +218,6 @@ class DocumentationAutomation(FlextService):
             self._schedule_weekly(automation_config)
         elif schedule_type == "monthly":
             self._schedule_monthly(automation_config)
-
-        print("📅 Maintenance scheduling configured")
 
     def _schedule_daily(self, config: dict[str, object]) -> None:
         """Schedule daily maintenance."""
@@ -267,8 +263,6 @@ class DocumentationAutomation(FlextService):
 
     def _run_scheduled_audit(self) -> None:
         """Run scheduled documentation audit."""
-        print(f"📅 Running scheduled documentation audit at {datetime.now(UTC)}")
-
         try:
             result = subprocess.run(
                 [sys.executable, str(self.maintenance_script), "--comprehensive"],
@@ -280,17 +274,13 @@ class DocumentationAutomation(FlextService):
             )
 
             if result.returncode == 0:
-                print("✅ Scheduled audit completed successfully")
-            else:
-                print(f"⚠️  Scheduled audit completed with warnings: {result.stderr}")
+                pass
 
-        except Exception as e:
-            print(f"❌ Scheduled audit failed: {e}")
+        except Exception:
+            pass
 
     def run_continuous_monitoring(self) -> None:
         """Run continuous monitoring loop."""
-        print("🔄 Starting continuous documentation monitoring...")
-
         self.schedule_maintenance()
 
         try:
@@ -298,7 +288,7 @@ class DocumentationAutomation(FlextService):
                 schedule.run_pending()
                 time_module.sleep(60)  # Check every minute
         except KeyboardInterrupt:
-            print("⏹️  Continuous monitoring stopped")
+            pass
 
     def generate_ci_workflow(self) -> FlextResult[str]:
         """Generate GitHub Actions workflow for documentation quality using templates.
@@ -322,7 +312,6 @@ class DocumentationAutomation(FlextService):
         """Set up Git hooks for documentation quality."""
         hooks_dir = Path(".git/hooks")
         if not hooks_dir.exists():
-            print("⚠️  Git hooks directory not found. Initialize git repository first.")
             return
 
         pre_commit_hook = hooks_dir / "pre-commit"
@@ -332,14 +321,12 @@ class DocumentationAutomation(FlextService):
             backup_hook = hooks_dir / "pre-commit.backup"
             if not backup_hook.exists():
                 pre_commit_hook.rename(backup_hook)
-                print(f"📋 Backed up existing pre-commit hook to {backup_hook}")
 
         # Create new hook using FLEXT templates
         hook_result = self.create_maintenance_hook()
         if not hook_result.is_success:
             error_msg = f"Failed to generate hook content: {hook_result.error}"
             self.logger.error("Hook generation failed", error=error_msg)
-            print(f"❌ {error_msg}")
             return
 
         hook_content = hook_result.unwrap()
@@ -347,7 +334,6 @@ class DocumentationAutomation(FlextService):
         pre_commit_hook.chmod(0o755)
 
         self.logger.info("Git hook installed successfully", path=str(pre_commit_hook))
-        print(f"✅ Documentation quality pre-commit hook installed: {pre_commit_hook}")
 
     def create_makefile_targets(self) -> FlextResult[str]:
         """Create Makefile targets for documentation maintenance using templates.
@@ -400,7 +386,6 @@ Examples:
                 success = result.unwrap()
                 sys.exit(0 if success else 1)
             else:
-                print(f"❌ CI check failed: {result.error}")
                 sys.exit(1)
 
         elif args.schedule:
@@ -412,24 +397,21 @@ Examples:
         elif args.generate_workflow:
             result = automation.generate_ci_workflow()
             if result.is_success:
-                print(result.unwrap())
+                pass
             else:
-                print(f"❌ Workflow generation failed: {result.error}")
                 sys.exit(1)
 
         elif args.generate_makefile:
             result = automation.create_makefile_targets()
             if result.is_success:
-                print(result.unwrap())
+                pass
             else:
-                print(f"❌ Makefile generation failed: {result.error}")
                 sys.exit(1)
 
         else:
             parser.print_help()
 
-    except Exception as e:
-        print(f"❌ Error: {e}")
+    except Exception:
         sys.exit(1)
 
 

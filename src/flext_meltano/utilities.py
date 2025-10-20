@@ -18,7 +18,6 @@ from flext_core import (
     FlextUtilities,
 )
 
-# Use specific module imports to avoid circular dependencies
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 
@@ -321,10 +320,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             return FlextResult.fail(f"YAML config file not found: {path}")
         if not path.is_file():
             return FlextResult.fail(f"Path is not a file: {path}")
-        if path.suffix.lower() not in {
-            FlextConstants.Platform.EXT_YML,
-            FlextConstants.Platform.EXT_YAML,
-        }:
+        if path.suffix.lower() not in {".yml", ".yaml"}:
             return FlextResult.fail(f"File is not a YAML file: {path}")
 
         return FlextResult.ok(data=path)

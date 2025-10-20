@@ -13,9 +13,9 @@ from pathlib import Path
 
 from flext_core import FlextResult
 from meltano.core.plugin.base import PluginType
-from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano import FlextMeltanoAdapter
+from tests.flext_tests_compat import FlextTestsUtilities
 
 
 class TestFlextMeltanoAdapterComplete:

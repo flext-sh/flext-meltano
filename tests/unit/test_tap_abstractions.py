@@ -4,12 +4,12 @@ import tempfile
 
 from flext_core import FlextResult
 from pydantic_core import ValidationError
-from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano import (
     FlextMeltanoModels,
     FlextMeltanoTapAbstractions,
 )
+from tests.flext_tests_compat import FlextTestsUtilities
 
 # Create convenient aliases for model classes
 StreamDefinition = FlextMeltanoModels.StreamDefinition
@@ -51,12 +51,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         # Use flext_tests assertions
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=config.tap_type,
             expected="tap-postgres",
             message="Tap type should match",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=config.version,
             expected="v1.2.0",
             message="Version should match",
@@ -83,17 +83,17 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         # Use flext_tests assertions
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=stream_def.stream_name,
             expected="users",
             message="Stream name should match",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=stream_def.tap_type,
             expected="tap-postgres",
             message="Tap type should match",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=stream_def.records_extracted,
             expected=42,
             message="Records extracted should match",
@@ -122,12 +122,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
             )
 
             # Use flext_tests assertions
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=tap_instance.tap_type,
                 expected="tap-csv",
                 message="Tap type should match",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=tap_instance.tap_id,
                 expected="tap_csv_123",
                 message="Tap ID should match",
@@ -149,7 +149,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             condition=tap_abs is not None,
             message="Tap abstractions should be initialized",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=tap_abs.service_name,
             expected="FlextMeltanoTapAbstractions",
             message="Service name should match",
@@ -180,12 +180,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(tap_instance, FlextMeltanoModels.TapInstance),
                 message="Should return FlextMeltanoModels.TapInstance",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=tap_instance.tap_type,
                 expected="tap-postgres",
                 message="Tap type should match",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=tap_instance.status,
                 expected="initialized",
                 message="Status should be initialized",
@@ -214,12 +214,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
             condition=isinstance(result, dict),
             message="Should return dict",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=result["tap_id"],
             expected="test_tap_123",
             message="Tap ID should match",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=result["correlation_id"],
             expected="test_corr_123",
             message="Correlation ID should match",
@@ -256,7 +256,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             condition=bool(orders_config["selected"]),
             message="Orders should not be selected",
         )
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=missing_config,
             expected={},
             message="Missing stream should return empty dict",
@@ -493,7 +493,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(stream, dict),
                 message="Should return dict[str, object] stream definition",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=stream.get("name"),
                 expected="users",
                 message="Stream name should match",
@@ -538,7 +538,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(catalog, dict),
                 message="Should return catalog dict",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=catalog["version"],
                 expected=1,
                 message="Should have version 1",
@@ -581,12 +581,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
         if result.is_success:
             entry = result.value
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=entry["tap_stream_id"],
                 expected="users",
                 message="Tap stream ID should match",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=entry["stream"],
                 expected="users",
                 message="Stream name should match",
@@ -679,7 +679,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
         if result.is_success:
             records = result.value
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=len(records),
                 expected=1,
                 message="Should respect limit",
@@ -759,12 +759,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
         if result.is_success:
             sync_stats = result.value
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=sync_stats["stream_name"],
                 expected="users",
                 message="Stream name should match",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=sync_stats["status"],
                 expected="completed",
                 message="Status should be completed",
@@ -799,7 +799,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
         if result.is_success:
             sync_stats = result.value
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=sync_stats["stream_name"],
                 expected="data",
                 message="Stream name should match",
@@ -855,7 +855,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         tap_type = self.tap_abstractions.get_tap_type(tap_instance)
-        self.test_assertions.assert_equals(
+        self.test_assertions.assert_equal(
             actual=tap_type,
             expected="tap-csv",
             message="Tap type should match",
@@ -903,7 +903,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(instance, FlextMeltanoTapAbstractions),
                 message="Should return FlextMeltanoTapAbstractions instance",
             )
-            self.test_assertions.assert_equals(
+            self.test_assertions.assert_equal(
                 actual=instance.service_name,
                 expected="FlextMeltanoTapAbstractions",
                 message="Service name should match",

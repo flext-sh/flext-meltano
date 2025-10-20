@@ -10,9 +10,9 @@ import tempfile
 from pathlib import Path
 
 from pydantic import ConfigDict
-from tests.flext_tests_compat import FlextTestsMatchers
 
 from flext_meltano import FlextMeltanoFileManagers
+from tests.flext_tests_compat import FlextTestsMatchers
 
 
 class TestFlextMeltanoFileManagersComprehensive:

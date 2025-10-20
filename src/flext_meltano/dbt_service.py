@@ -1,6 +1,6 @@
 """FLEXT Pipeline Transformation Service - Single unified class for transformation operations.
 
-This module provides the FlextPipelineTransformationService class following FLEXT patterns:
+This module provides the FlextMeltanoTransformationService class following FLEXT patterns:
 - Single Responsibility Principle
 - Railway-oriented programming with FlextResult
 - Clean Architecture with domain separation
@@ -17,12 +17,12 @@ from pathlib import Path
 from flext_core import FlextResult, FlextService
 
 # Import from specific modules to avoid circular dependencies
-from flext_meltano.config import FlextPipelineConfig
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.typings import FlextMeltanoTypes
 
 
-class FlextPipelineTransformationService(
+class FlextMeltanoTransformationService(
     FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
 ):
     """Service for data transformation operations.
@@ -32,13 +32,13 @@ class FlextPipelineTransformationService(
     """
 
     # Instance attributes for type checker
-    _config: FlextPipelineConfig
+    _config: FlextMeltanoConfig
     _library_runner: FlextMeltanoLibraryRunner
 
-    def __init__(self, config: FlextPipelineConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize transformation service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextPipelineConfig()
+        self._config = config or FlextMeltanoConfig()
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def run_transformations(
@@ -98,5 +98,5 @@ class FlextPipelineTransformationService(
 
 
 __all__ = [
-    "FlextPipelineTransformationService",
+    "FlextMeltanoTransformationService",
 ]

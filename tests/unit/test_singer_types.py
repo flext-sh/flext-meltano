@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 import math
 
 from flext_core import FlextResult
-from tests.flext_tests_compat import FlextTestsUtilities
 
 from flext_meltano import FlextMeltanoTypes
+from tests.flext_tests_compat import FlextTestsUtilities
 
 
 class TestFlextSingerTypesComplete:
