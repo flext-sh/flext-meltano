@@ -21,7 +21,7 @@ from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
 class FlextMeltanoDbtService(FlextService):
     """Orchestrates DBT transformations with deep SDK integration.
 
-    Provides comprehensive DBT orchestration including:
+    Provides complete DBT orchestration including:
     - Project lifecycle management
     - Manifest and model discovery
     - Model execution and testing
@@ -32,8 +32,8 @@ class FlextMeltanoDbtService(FlextService):
     programmatic API for complete transformation operations.
 
     Attributes:
-        project_manager: Manages DBT projects
-        runner: Executes DBT commands
+    project_manager: Manages DBT projects
+    runner: Executes DBT commands
 
     """
 
@@ -49,10 +49,10 @@ class FlextMeltanoDbtService(FlextService):
         """Load a DBT project.
 
         Args:
-            root: Root directory of DBT project
+        root: Root directory of DBT project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         try:
@@ -74,7 +74,7 @@ class FlextMeltanoDbtService(FlextService):
         """Get all models from the project.
 
         Returns:
-            FlextResult containing list of models
+        FlextResult containing list of models
 
         """
         try:
@@ -96,11 +96,11 @@ class FlextMeltanoDbtService(FlextService):
         """Run DBT models.
 
         Args:
-            models: Optional list of specific models to run
-            **kwargs: Additional dbt run arguments
+        models: Optional list of specific models to run
+        **kwargs: Additional dbt run arguments
 
         Returns:
-            FlextResult containing run result
+        FlextResult containing run result
 
         """
         try:
@@ -127,11 +127,11 @@ class FlextMeltanoDbtService(FlextService):
         """Run DBT tests.
 
         Args:
-            models: Optional list of specific models to test
-            **kwargs: Additional dbt test arguments
+        models: Optional list of specific models to test
+        **kwargs: Additional dbt test arguments
 
         Returns:
-            FlextResult containing test result
+        FlextResult containing test result
 
         """
         try:
@@ -154,10 +154,10 @@ class FlextMeltanoDbtService(FlextService):
         """Generate DBT documentation.
 
         Args:
-            **kwargs: Additional dbt docs arguments
+        **kwargs: Additional dbt docs arguments
 
         Returns:
-            FlextResult containing documentation result
+        FlextResult containing documentation result
 
         """
         try:

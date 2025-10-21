@@ -11,8 +11,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextLogger, FlextResult
+
 from flext_meltano.typings import FlextMeltanoTypes
 
 
@@ -45,11 +47,15 @@ class FlextMeltanoAbstractions:
                     "sink_name": sink_name,
                     "status": "initialized",
                 }
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].ok(pipeline_context)
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].ok(
+                    pipeline_context
+                )
             except Exception as e:
                 error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail(error_msg)
+                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail(
+                    error_msg
+                )
 
         def execute_data_pipeline(
             self,
@@ -147,7 +153,9 @@ class FlextMeltanoAbstractions:
     ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict]:
         """Create pipeline context."""
         if not self._project_path:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail("No project loaded")
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail(
+                "No project loaded"
+            )
 
         return self._runner_helper.create_pipeline_context(
             self._project_path, source_name, sink_name
@@ -165,7 +173,7 @@ class FlextMeltanoAbstractions:
         }
 
         return self._runner_helper.execute_data_pipeline(
-            pipeline_context, source_config, sink_config
+            cast("dict[str, object]", pipeline_context), source_config, sink_config
         )
 
     # ELT operations
@@ -203,7 +211,7 @@ class FlextMeltanoAbstractions:
                 "records_processed": 0,
                 "elt_context": elt_context,
             }
-            return FlextResult[dict[str, object]].ok(result)
+            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
         except Exception as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)

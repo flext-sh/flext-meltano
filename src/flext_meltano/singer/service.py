@@ -23,7 +23,7 @@ from flext_meltano.singer.state import FlextMeltanoStateManager
 class FlextMeltanoSingerService(FlextService):
     """Orchestrates Singer ELT pipelines (tap -> target) with deep SDK integration.
 
-    Provides comprehensive Singer protocol orchestration including:
+    Provides complete Singer protocol orchestration including:
     - Tap and target lifecycle management
     - Catalog discovery and schema management
     - State management for incremental syncs
@@ -34,8 +34,8 @@ class FlextMeltanoSingerService(FlextService):
     programmatic API for complete ELT operations.
 
     Attributes:
-        catalog_manager: Manages Singer catalogs
-        state_manager: Manages sync state and bookmarks
+    catalog_manager: Manages Singer catalogs
+    state_manager: Manages sync state and bookmarks
 
     """
 
@@ -75,10 +75,10 @@ class FlextMeltanoSingerService(FlextService):
         """Discover catalog from a tap instance.
 
         Args:
-            tap: Singer tap instance
+        tap: Singer tap instance
 
         Returns:
-            FlextResult containing discovered catalog
+        FlextResult containing discovered catalog
 
         """
         try:
@@ -101,13 +101,13 @@ class FlextMeltanoSingerService(FlextService):
         """Execute a complete Singer sync pipeline.
 
         Args:
-            tap: Singer tap instance
-            target: Singer target instance
-            catalog: Catalog dictionary
-            state: Optional state dictionary for incremental sync
+        tap: Singer tap instance
+        target: Singer target instance
+        catalog: Catalog dictionary
+        state: Optional state dictionary for incremental sync
 
         Returns:
-            FlextResult containing sync result with metrics
+        FlextResult containing sync result with metrics
 
         """
         try:
@@ -161,10 +161,10 @@ class FlextMeltanoSingerService(FlextService):
         """Load catalog from file.
 
         Args:
-            catalog_path: Path to catalog file
+        catalog_path: Path to catalog file
 
         Returns:
-            FlextResult containing loaded catalog
+        FlextResult containing loaded catalog
 
         """
         return self.catalog_manager.load_catalog(catalog_path)
@@ -177,11 +177,11 @@ class FlextMeltanoSingerService(FlextService):
         """Save catalog to file.
 
         Args:
-            catalog: Catalog dictionary
-            catalog_path: Path to save
+        catalog: Catalog dictionary
+        catalog_path: Path to save
 
         Returns:
-            FlextResult with success status
+        FlextResult with success status
 
         """
         self.catalog_manager.set_catalog(catalog)
@@ -193,10 +193,10 @@ class FlextMeltanoSingerService(FlextService):
         """Load state from file.
 
         Args:
-            state_path: Path to state file
+        state_path: Path to state file
 
         Returns:
-            FlextResult containing loaded state
+        FlextResult containing loaded state
 
         """
         return self.state_manager.load_state(state_path)
@@ -205,10 +205,10 @@ class FlextMeltanoSingerService(FlextService):
         """Save state to file.
 
         Args:
-            state_path: Path to save state
+        state_path: Path to save state
 
         Returns:
-            FlextResult with success status
+        FlextResult with success status
 
         """
         return self.state_manager.save_state(state_path)

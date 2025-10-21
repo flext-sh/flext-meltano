@@ -58,12 +58,12 @@ class FlextMeltanoOrchestrationService(
         and provide composable pipeline execution.
 
         Args:
-            project_path: Path to pipeline project
-            source_name: Name of the source component
-            sink_name: Name of the sink component
+        project_path: Path to pipeline project
+        source_name: Name of the source component
+        sink_name: Name of the sink component
 
         Returns:
-            FlextResult containing pipeline execution results
+        FlextResult containing pipeline execution results
 
         """
         # RAILWAY PATTERN: Chain all pipeline operations with automatic error handling

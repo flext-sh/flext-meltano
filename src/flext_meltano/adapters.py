@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import cast
 
 import meltano
 from flext_core import FlextLogger, FlextResult, FlextUtilities
@@ -58,7 +59,7 @@ class FlextMeltanoAdapter:
 
         def get_version(self) -> FlextResult[dict[str, object]]:
             """Get Meltano version information using native API."""
-            # FIXED: Removed ImportError fallback - meltano must be available (ZERO TOLERANCE)
+            # FIXED: Removed ImportError fallback - meltano must be available (Zero Tolerance)
             # Get Meltano version using native API
             getattr(meltano, "__version__", "3.9.1")
 
@@ -69,7 +70,9 @@ class FlextMeltanoAdapter:
                 "integration": "flext-core",
             }
 
-            return FlextResult[dict[str, object]].ok(version_info)
+            return FlextResult[dict[str, object]].ok(
+                cast("dict[str, object]", version_info)
+            )
 
         def initialize_project(
             self,
@@ -122,7 +125,9 @@ class FlextMeltanoAdapter:
                 if plugin_type:
                     plugins = [p for p in plugins if p.get("type") == plugin_type]
 
-                return FlextResult[list[dict[str, object]]].ok(plugins)
+                return FlextResult[list[dict[str, object]]].ok(
+                    cast("list[dict[str, object]]", plugins)
+                )
             except Exception as e:
                 return FlextResult[list[dict[str, object]]].fail(
                     f"Plugin discovery failed: {e}"
@@ -168,7 +173,9 @@ class FlextMeltanoAdapter:
                     },
                 }
 
-                return FlextResult[dict[str, object]].ok(execution_result)
+                return FlextResult[dict[str, object]].ok(
+                    cast("dict[str, object]", execution_result)
+                )
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Pipeline execution failed: {e}"
@@ -212,7 +219,9 @@ class FlextMeltanoAdapter:
                     ]
                 }
 
-                return FlextResult[dict[str, object]].ok(catalog)
+                return FlextResult[dict[str, object]].ok(
+                    cast("dict[str, object]", catalog)
+                )
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Catalog creation failed: {e}"
@@ -237,7 +246,9 @@ class FlextMeltanoAdapter:
                     "execution_time": 45.2,
                 }
 
-                return FlextResult[dict[str, object]].ok(dbt_result)
+                return FlextResult[dict[str, object]].ok(
+                    cast("dict[str, object]", dbt_result)
+                )
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(f"DBT operation failed: {e}")
 

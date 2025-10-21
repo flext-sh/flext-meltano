@@ -32,10 +32,10 @@ class FlextTestsUtilities:
         """Get functional service mock.
 
         Args:
-            _service_name: Service name (reserved for future filtering)
+        _service_name: Service name (reserved for future filtering)
 
         Returns:
-            Mock service object for testing
+        Mock service object for testing
 
         """
         return MagicMock()
@@ -56,7 +56,9 @@ class FlextTestsAssertion:
         """Assert values are equal."""
         assert actual == expected, message or f"Expected {expected}, got {actual}"
 
-    def assert_not_equal(self, actual: object, expected: object, message: str = "") -> None:
+    def assert_not_equal(
+        self, actual: object, expected: object, message: str = ""
+    ) -> None:
         """Assert values are not equal."""
         assert actual != expected, message or f"Values should not be equal: {actual}"
 
@@ -72,7 +74,9 @@ class FlextTestsAssertion:
         """Assert item is in container."""
         assert item in container, message or f"{item} not in {container}"
 
-    def assert_not_in(self, item: T, container: Container[T], message: str = "") -> None:
+    def assert_not_in(
+        self, item: T, container: Container[T], message: str = ""
+    ) -> None:
         """Assert item is not in container."""
         assert item not in container, message or f"{item} should not be in {container}"
 

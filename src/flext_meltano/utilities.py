@@ -105,11 +105,11 @@ class FlextMeltanoUtilities(FlextUtilities):
         DOMAIN-SPECIFIC: YAML writing (cannot be generalized to flext-core).
 
         Args:
-            config: Configuration dictionary to write.
-            target_path: Path where to write the YAML file.
+        config: Configuration dictionary to write.
+        target_path: Path where to write the YAML file.
 
         Returns:
-            FlextResult indicating write operation success.
+        FlextResult indicating write operation success.
 
         """
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
@@ -155,10 +155,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Open YAML file for writing with validation.
 
         Args:
-            target_path: Path to open for writing.
+        target_path: Path to open for writing.
 
         Returns:
-            FlextResult containing file handle or error.
+        FlextResult containing file handle or error.
 
         """
         try:
@@ -179,11 +179,11 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Write YAML content to file handle.
 
         Args:
-            file_handle: Open file handle for writing.
-            config: Configuration dictionary to write.
+        file_handle: Open file handle for writing.
+        config: Configuration dictionary to write.
 
         Returns:
-            FlextResult indicating write success.
+        FlextResult indicating write success.
 
         """
         try:
@@ -209,10 +209,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Close file handle safely.
 
         Args:
-            file_handle: File handle to close.
+        file_handle: File handle to close.
 
         Returns:
-            FlextResult indicating close operation result.
+        FlextResult indicating close operation result.
 
         """
         try:
@@ -224,7 +224,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             FlextLogger(__name__).warning(f"Error closing file handle: {e}")
             return FlextResult.ok(data=None)
 
-    # NOTE: create_temp_directory moved to FlextMeltanoFileManagers (proper domain responsibility)
+    # Note: create_temp_directory moved to FlextMeltanoFileManagers (proper domain responsibility)
 
     @classmethod
     def create_plugin_config_dict(
@@ -277,10 +277,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         ZERO DUPLICATION: Delegates to FlextMeltanoFileManagers as SOURCE OF TRUTH.
 
         Args:
-            path: Path to YAML configuration file.
+        path: Path to YAML configuration file.
 
         Returns:
-            FlextResult containing loaded configuration dictionary.
+        FlextResult containing loaded configuration dictionary.
 
         """
 
@@ -310,10 +310,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         """Validate YAML file path before loading.
 
         Args:
-            path: Path to validate.
+        path: Path to validate.
 
         Returns:
-            FlextResult containing validated path or error.
+        FlextResult containing validated path or error.
 
         """
         if not path.exists():

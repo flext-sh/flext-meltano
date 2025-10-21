@@ -1419,7 +1419,7 @@ class FlextMeltanoModels(FlextModels):
             return v
 
     class PipelineResult(FlextModels.TimestampedModel):
-        """Generic pipeline execution result with comprehensive validation."""
+        """Generic pipeline execution result with complete validation."""
 
         pipeline_id: str = Field(description="Pipeline identifier")
         source_result: FlextMeltanoModels.ExecutionResult | None = Field(

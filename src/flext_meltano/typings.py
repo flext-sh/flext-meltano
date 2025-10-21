@@ -24,10 +24,10 @@ from singer_sdk import typing as singer_sdk_typing
 class FlextMeltanoTypes(FlextTypes):
     """Meltano-specific type definitions extending FlextTypes.
 
-    Domain-specific type system for Meltano data integration operations.
-    Contains ONLY complex Meltano-specific types, no simple aliases.
-    Uses Python 3.13+ type syntax and patterns.
-    """
+ Domain-specific type system for Meltano data integration operations.
+ Contains ONLY complex Meltano-specific types, no simple aliases.
+ Uses Python 3.13+ type syntax and patterns.
+ """
 
     # =========================================================================
     # MELTANO DOMAIN NAMESPACES - Following FLEXT pattern
@@ -66,7 +66,7 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Singer SDK typing utilities (domain separation from singer_sdk.typing)
         class Typing:
-            """Singer SDK typing utilities wrapper (ZERO TOLERANCE for direct imports).
+            """Singer SDK typing utilities wrapper (Zero Tolerance for direct imports).
 
             This class provides access to all Singer SDK typing utilities through FLEXT
             domain separation pattern. ALL tap/target projects MUST use this instead of
@@ -81,33 +81,33 @@ class FlextMeltanoTypes(FlextTypes):
                 ).to_dict()
             """
 
-            ArrayType = singer_sdk_typing.ArrayType
-            BooleanType = singer_sdk_typing.BooleanType
-            CustomType = singer_sdk_typing.CustomType
-            DateTimeType = singer_sdk_typing.DateTimeType
-            DateType = singer_sdk_typing.DateType
-            DurationType = singer_sdk_typing.DurationType
-            IntegerType = singer_sdk_typing.IntegerType
-            NumberType = singer_sdk_typing.NumberType
-            ObjectType = singer_sdk_typing.ObjectType
-            PropertiesList = singer_sdk_typing.PropertiesList
-            Property = singer_sdk_typing.Property
-            StringType = singer_sdk_typing.StringType
-            TimeType = singer_sdk_typing.TimeType
+ ArrayType = singer_sdk_typing.ArrayType
+ BooleanType = singer_sdk_typing.BooleanType
+ CustomType = singer_sdk_typing.CustomType
+ DateTimeType = singer_sdk_typing.DateTimeType
+ DateType = singer_sdk_typing.DateType
+ DurationType = singer_sdk_typing.DurationType
+ IntegerType = singer_sdk_typing.IntegerType
+ NumberType = singer_sdk_typing.NumberType
+ ObjectType = singer_sdk_typing.ObjectType
+ PropertiesList = singer_sdk_typing.PropertiesList
+ Property = singer_sdk_typing.Property
+ StringType = singer_sdk_typing.StringType
+ TimeType = singer_sdk_typing.TimeType
 
-    class Dbt:
-        """DBT transformation complex types namespace."""
+ class Dbt:
+ """DBT transformation complex types namespace."""
 
-        type ModelConfiguration = dict[str, object | list[str]]
-        type TestConfiguration = dict[str, str | list[str] | dict[str, object]]
-        type ProfileConfiguration = dict[str, FlextTypes.ConfigDict]
-        type ProjectConfiguration = dict[str, object | dict[str, object]]
-        type RunResults = dict[str, list[dict[str, FlextTypes.JsonValue]]]
-        type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
-        type Project = dict[str, str | bool | dict[str, object] | list[str]]
+ type ModelConfiguration = dict[str, object | list[str]]
+ type TestConfiguration = dict[str, str | list[str] | dict[str, object]]
+ type ProfileConfiguration = dict[str, FlextTypes.ConfigDict]
+ type ProjectConfiguration = dict[str, object | dict[str, object]]
+ type RunResults = dict[str, list[dict[str, FlextTypes.JsonValue]]]
+ type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
+ type Project = dict[str, str | bool | dict[str, object] | list[str]]
 
-    class Project(FlextTypes):
-        """Meltano-specific project types extending FlextTypes."""
+ class Project(FlextTypes):
+ """Meltano-specific project types extending FlextTypes."""
 
         # Meltano-specific project types extending the generic ones
         type MeltanoProjectType = Literal[
@@ -198,10 +198,12 @@ class FlextMeltanoTypes(FlextTypes):
             | float
             | int
             | str
-            | None
             | list[object]
             | dict[str, object]
-            | dict[str, bool | dict[str, object] | float | int | list[object] | str | None]
+            | dict[
+                str, bool | dict[str, object] | float | int | list[object] | str | None
+            ]
+            | None
         )
         type NestedJsonDict = dict[str, NestedJsonValue]
 

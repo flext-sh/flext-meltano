@@ -47,10 +47,10 @@ class FlextMeltanoTapAbstractions(
         """Discover available streams for a source configuration.
 
         Args:
-            source_config: Source configuration with discovery parameters
+        source_config: Source configuration with discovery parameters
 
         Returns:
-            FlextResult containing discovered stream catalog
+        FlextResult containing discovered stream catalog
 
         """
         try:
@@ -92,10 +92,10 @@ class FlextMeltanoTapAbstractions(
         """Validate a stream definition's schema.
 
         Args:
-            stream_def: Stream definition to validate
+        stream_def: Stream definition to validate
 
         Returns:
-            FlextResult containing validation result
+        FlextResult containing validation result
 
         """
         try:
@@ -126,10 +126,10 @@ class FlextMeltanoTapAbstractions(
         """Create a source instance from configuration.
 
         Args:
-            source_config: Source configuration
+        source_config: Source configuration
 
         Returns:
-            FlextResult containing configured source instance
+        FlextResult containing configured source instance
 
         """
         try:
@@ -171,10 +171,10 @@ class FlextMeltanoTapAbstractions(
         """Process a source configuration for validation.
 
         Args:
-            source_config: Source configuration to process
+        source_config: Source configuration to process
 
         Returns:
-            FlextResult containing validation result
+        FlextResult containing validation result
 
         """
         try:

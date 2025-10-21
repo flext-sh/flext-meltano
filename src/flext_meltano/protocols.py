@@ -27,18 +27,18 @@ class FlextMeltanoProtocols(FlextProtocols):
     re-exporting foundation protocols for backward compatibility and clean access.
 
     Architecture:
-        - RE-EXPORTS: Foundation protocols from flext-core for unified access
-        - EXTENDS: Meltano/Singer/DBT-specific protocols in Meltano namespace
-        - MAINTAINS: Zero breaking changes through explicit re-export pattern
+    - RE-EXPORTS: Foundation protocols from flext-core for unified access
+    - EXTENDS: Meltano/Singer/DBT-specific protocols in Meltano namespace
+    - MAINTAINS: Zero breaking changes through explicit re-export pattern
 
     Usage:
-        from flext_meltano.protocols import FlextMeltanoProtocols
+    from flext_meltano.protocols import FlextMeltanoProtocols
 
-        # Foundation access (re-exported)
-        FlextMeltanoProtocols.Foundation.ResultProtocol
+    # Foundation access (re-exported)
+    FlextMeltanoProtocols.Foundation.ResultProtocol
 
-        # Meltano ELT-specific access
-        FlextMeltanoProtocols.Meltano.TapProtocol
+    # Meltano ELT-specific access
+    FlextMeltanoProtocols.Meltano.TapProtocol
     """
 
     # =========================================================================

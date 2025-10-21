@@ -39,10 +39,10 @@ class FlextMeltanoSingerProtocols:
             """Get records for a specific stream.
 
             Args:
-                stream_name: Name of the stream to extract records from
+            stream_name: Name of the stream to extract records from
 
             Returns:
-                List of record dictionaries for the stream
+            List of record dictionaries for the stream
 
             """
             ...
@@ -51,7 +51,7 @@ class FlextMeltanoSingerProtocols:
             """Get current state.
 
             Returns:
-                Dictionary containing the current sync state
+            Dictionary containing the current sync state
 
             """
             ...

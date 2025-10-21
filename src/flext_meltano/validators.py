@@ -21,7 +21,7 @@ logger = FlextLogger(__name__)
 class FlextMeltanoValidators:
     """Generic pipeline business rule validators using FlextValidations foundation.
 
-    This class provides comprehensive validation for pipeline-specific business rules
+    This class provides complete validation for pipeline-specific business rules
     while delegating generic validation operations to flext-core. It follows the
     zero duplication principle by containing only pipeline specific validation logic.
 
@@ -45,12 +45,12 @@ class FlextMeltanoValidators:
 
     """
 
-    @classmethod
-    def validate_pipeline_component_business_rules(
-        cls,
-        config: FlextTypes.JsonValue,
-    ) -> FlextResult[bool]:
-        """Validate pipeline component business rules using monadic error accumulation.
+ @classmethod
+ def validate_pipeline_component_business_rules(
+ cls,
+ config: FlextTypes.JsonValue,
+ ) -> FlextResult[bool]:
+ """Validate pipeline component business rules using monadic error accumulation.
 
         Uses FlextResult.accumulate_errors() to collect all validation errors
         instead of stopping at the first failure, providing comprehensive
@@ -63,22 +63,22 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or accumulated error details.
 
         """
-        return FlextResult.accumulate_errors(
-            cls._validate_config_is_dict(config),
-            cls._validate_plugin_name(config),
-            cls._validate_plugin_namespace(config),
-            cls._validate_plugin_pip_url(config),
-            cls._validate_plugin_executable(config),
-            cls._validate_pipeline_specific_rules(config),
-        ).map(
-            lambda _: True
-        )  # Convert successful validations to boolean result  # Convert successful validations to boolean result
+ return FlextResult.accumulate_errors(
+ cls._validate_config_is_dict(config),
+ cls._validate_plugin_name(config),
+ cls._validate_plugin_namespace(config),
+ cls._validate_plugin_pip_url(config),
+ cls._validate_plugin_executable(config),
+ cls._validate_pipeline_specific_rules(config),
+ ).map(
+ lambda _: True
+ ) # Convert successful validations to boolean result # Convert successful validations to boolean result
 
-    @classmethod
-    def _validate_config_is_dict(
-        cls, config: FlextTypes.JsonValue
-    ) -> FlextResult[bool]:
-        """Validate that config is a dictionary.
+ @classmethod
+ def _validate_config_is_dict(
+ cls, config: FlextTypes.JsonValue
+ ) -> FlextResult[bool]:
+ """Validate that config is a dictionary.
 
         Args:
             config: Configuration dictionary to validate.
@@ -111,13 +111,13 @@ class FlextMeltanoValidators:
     def _validate_pipeline_name_business_rules(cls, name: str) -> FlextResult[bool]:
         """Validate pipeline-specific name business rules.
 
-        Args:
-            name: Plugin name to validate.
+ Args:
+ name: Plugin name to validate.
 
-        Returns:
-            FlextResult indicating business rule validation.
+ Returns:
+ FlextResult indicating business rule validation.
 
-        """
+ """
         validation_errors: list[str] = []
 
         # Pipeline business rule: sink component names
@@ -210,13 +210,13 @@ class FlextMeltanoValidators:
     ) -> FlextResult[bool]:
         """Validate additional pipeline-specific business rules.
 
-        Args:
-            config: Configuration dictionary.
+ Args:
+ config: Configuration dictionary.
 
-        Returns:
-            FlextResult indicating Meltano-specific validation result.
+ Returns:
+ FlextResult indicating Meltano-specific validation result.
 
-        """
+ """
         if not isinstance(config, dict):
             return FlextResult.fail(
                 "Config must be dictionary for Meltano rules validation"
@@ -266,9 +266,9 @@ class FlextMeltanoValidators:
         class PipelineProjectBusinessRules(FlextMeltanoModels.PipelineProjectModel):
             """Pipeline project business rules - uses unified FlextMeltanoModels.PipelineProjectModel.
 
-            This class extends the unified model for validation-specific functionality
-            while maintaining the consolidated [Project]Models pattern.
-            """
+ This class extends the unified model for validation-specific functionality
+ while maintaining the consolidated [Project]Models pattern.
+ """
 
         # Use Pydantic model validation directly
         try:
@@ -320,9 +320,9 @@ class FlextMeltanoValidators:
         ):
             """Transformation project business rules - uses unified FlextMeltanoModels.TransformationProjectModel.
 
-            This class extends the unified model for validation-specific functionality
-            while maintaining the consolidated [Project]Models pattern.
-            """
+ This class extends the unified model for validation-specific functionality
+ while maintaining the consolidated [Project]Models pattern.
+ """
 
         # Use Pydantic model validation directly
         try:
@@ -338,7 +338,7 @@ class FlextMeltanoValidators:
     ) -> FlextResult[bool]:
         """Validate pipeline project structure with domain-specific business rules.
 
-        Performs comprehensive validation of the pipeline project directory
+        Performs complete validation of the pipeline project directory
         structure, checking for required files and directories.
 
         Args:
@@ -439,18 +439,18 @@ class FlextMeltanoValidators:
         cls,
         config: FlextTypes.JsonValue,
     ) -> FlextResult[bool]:
-        """Validate plugin configuration with comprehensive business rules.
+        """Validate plugin configuration with complete business rules.
 
-        Validates plugin configuration data for Meltano plugins,
-        ensuring proper format, required fields, and business rules.
+ Validates plugin configuration data for Meltano plugins,
+ ensuring proper format, required fields, and business rules.
 
-        Args:
-            config: Plugin configuration to validate.
+ Args:
+ config: Plugin configuration to validate.
 
-        Returns:
-            FlextResult containing boolean validation result or error details.
+ Returns:
+ FlextResult containing boolean validation result or error details.
 
-        """
+ """
         return cls.validate_pipeline_component_business_rules(config)
 
 

@@ -251,8 +251,8 @@ class TestFlextMeltanoConfigEnums:
 
     def test_uses_flext_constants_for_enums(self) -> None:
         """Test that FlextMeltanoConfig uses FlextConstants for enum values."""
-        # Config uses FlextConstants.Config.LogLevel, not nested LogLevel
-        assert hasattr(FlextConstants.Config, "LogLevel")
+        # Config uses FlextConstants.Configuration.LogLevel, not nested LogLevel
+        assert hasattr(FlextConstants.Configuration, "LogLevel")
         # Environment types are string literals, not enums
         assert isinstance(FlextMeltanoConfig.model_fields["environment"].default, str)
 

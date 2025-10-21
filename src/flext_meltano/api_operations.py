@@ -1,6 +1,6 @@
 """FLEXT Meltano API Operations - Railway-oriented API operations with flext-core patterns.
 
-This module provides focused API operations following flext-core advanced patterns
+This module provides focused API operations following flext-core patterns
 with railway-oriented programming and Python 3.13+ features.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -19,19 +19,19 @@ if TYPE_CHECKING:
 
 
 class FlextMeltanoAPIOperations:
-    """Advanced API operations with flext-core railway patterns.
+    """API operations with flext-core railway patterns.
 
-    Provides comprehensive API operation handling using advanced Python 3.13+
+    Provides complete API operation handling using Python 3.13+
     patterns and flext-core railway-oriented programming.
 
-    **Advanced Patterns Used:**
+    ** Patterns Used:**
     - Railway-oriented programming for all operations
     - Python 3.13+ type parameter syntax
     - Dispatch table pattern for operation routing
     - Composition over inheritance for SOLID compliance
 
     Attributes:
-        api: Reference to the parent API instance
+    api: Reference to the parent API instance
 
     """
 

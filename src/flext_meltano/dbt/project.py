@@ -26,8 +26,8 @@ class FlextMeltanoDbtProjectManager(FlextService):
     configurations through wrapped dbt-core APIs.
 
     Attributes:
-        project_root: Root directory of DBT project
-        manifest: Parsed DBT manifest
+    project_root: Root directory of DBT project
+    manifest: Parsed DBT manifest
 
     """
 
@@ -44,7 +44,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Initialize DBT project manager.
 
         Args:
-            root: Root directory of DBT project (optional)
+        root: Root directory of DBT project (optional)
 
         """
         super().__init__()
@@ -57,10 +57,10 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Load a DBT project.
 
         Args:
-            root: Root directory of the DBT project
+        root: Root directory of the DBT project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         try:
@@ -93,10 +93,10 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Load DBT manifest.
 
         Args:
-            manifest_path: Path to manifest file (optional)
+        manifest_path: Path to manifest file (optional)
 
         Returns:
-            FlextResult containing manifest dictionary
+        FlextResult containing manifest dictionary
 
         """
         try:
@@ -126,7 +126,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Get all models from manifest.
 
         Returns:
-            FlextResult containing list of models
+        FlextResult containing list of models
 
         """
         try:
@@ -158,7 +158,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Get all tests from manifest.
 
         Returns:
-            FlextResult containing list of tests
+        FlextResult containing list of tests
 
         """
         try:

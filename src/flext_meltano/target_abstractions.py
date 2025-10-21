@@ -49,10 +49,10 @@ class FlextMeltanoTargetAbstractions(
         """Configure a sink for a sink configuration.
 
         Args:
-            sink_config: Sink configuration
+        sink_config: Sink configuration
 
         Returns:
-            FlextResult containing configured sink definition
+        FlextResult containing configured sink definition
 
         """
         try:
@@ -89,10 +89,10 @@ class FlextMeltanoTargetAbstractions(
         """Validate a sink configuration.
 
         Args:
-            sink_config: Sink configuration to validate
+        sink_config: Sink configuration to validate
 
         Returns:
-            FlextResult containing validation result
+        FlextResult containing validation result
 
         """
         try:
@@ -125,10 +125,10 @@ class FlextMeltanoTargetAbstractions(
         """Create a sink instance from configuration.
 
         Args:
-            sink_config: Sink configuration
+        sink_config: Sink configuration
 
         Returns:
-            FlextResult containing configured sink instance
+        FlextResult containing configured sink instance
 
         """
         try:

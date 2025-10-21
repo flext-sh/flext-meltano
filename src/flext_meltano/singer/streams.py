@@ -44,14 +44,14 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
     def execute_pipeline(
         self, tap_instance: object, target_instance: object
     ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
-        """Execute Singer pipeline with advanced protocol management.
+        """Execute Singer pipeline with protocol management.
 
         Args:
-            tap_instance: SingerTap instance
-            target_instance: SingerTarget instance
+        tap_instance: SingerTap instance
+        target_instance: SingerTarget instance
 
         Returns:
-            FlextResult containing pipeline execution results
+        FlextResult containing pipeline execution results
 
         """
         try:
@@ -116,13 +116,13 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
-            project_dir: Path to Meltano project directory
-            extractor_config: Extractor configuration
-            loader_config: Loader configuration
-            transformer_config: Optional transformer configuration
+        project_dir: Path to Meltano project directory
+        extractor_config: Extractor configuration
+        loader_config: Loader configuration
+        transformer_config: Optional transformer configuration
 
         Returns:
-            FlextResult containing complete pipeline results
+        FlextResult containing complete pipeline results
 
         """
         try:

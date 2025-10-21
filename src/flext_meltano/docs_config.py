@@ -25,30 +25,30 @@ class DocsConfig(FlextConfig):
     All hardcoded values from throughout the codebase are centralized here.
 
     Attributes:
-        # File Paths
-        config_path: Default configuration file path
-        reports_output_dir: Directory for quality reports
+    # File Paths
+    config_path: Default configuration file path
+    reports_output_dir: Directory for quality reports
 
-        # Scheduling
-        enable_scheduled_audits: Whether to enable automated audits
-        audit_schedule: Schedule type ('daily', 'weekly', 'monthly')
-        audit_day: Day of week for weekly audits (monday, tuesday, etc.)
-        audit_time: Time for scheduled audits (HH:MM format)
+    # Scheduling
+    enable_scheduled_audits: Whether to enable automated audits
+    audit_schedule: Schedule type ('daily', 'weekly', 'monthly')
+    audit_day: Day of week for weekly audits (monday, tuesday, etc.)
+    audit_time: Time for scheduled audits (HH:MM format)
 
-        # Quality Thresholds
-        min_quality_score: Minimum acceptable quality score (0-100)
-        max_file_age_days: Maximum age in days before content is considered stale
-        min_words_per_file: Minimum word count required per file
-        max_broken_links_ratio: Maximum ratio of broken links (0.0-1.0)
-        max_line_length: Maximum characters per line
-        fail_on_critical_issues: Whether to fail CI on critical issues
+    # Quality Thresholds
+    min_quality_score: Minimum acceptable quality score (0-100)
+    max_file_age_days: Maximum age in days before content is considered stale
+    min_words_per_file: Minimum word count required per file
+    max_broken_links_ratio: Maximum ratio of broken links (0.0-1.0)
+    max_line_length: Maximum characters per line
+    fail_on_critical_issues: Whether to fail CI on critical issues
 
-        # Link Validation
-        link_validation_timeout: Timeout in seconds for link validation
-        link_validation_retries: Number of retries for failed link validation
+    # Link Validation
+    link_validation_timeout: Timeout in seconds for link validation
+    link_validation_retries: Number of retries for failed link validation
 
-        # Content Requirements
-        required_sections: List of required heading patterns
+    # Content Requirements
+    required_sections: List of required heading patterns
 
     """
 
@@ -97,10 +97,10 @@ class DocsConfig(FlextConfig):
         """Load configuration from YAML file using FlextConfig patterns.
 
         Args:
-            config_path: Path to configuration file (uses self.config_path if None)
+        config_path: Path to configuration file (uses self.config_path if None)
 
         Returns:
-            FlextResult containing loaded configuration or error
+        FlextResult containing loaded configuration or error
 
         """
         file_path = Path(config_path or self.config_path)
@@ -132,7 +132,7 @@ class DocsConfig(FlextConfig):
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
-            Dictionary with automation scheduling settings
+        Dictionary with automation scheduling settings
 
         """
         return {
@@ -146,7 +146,7 @@ class DocsConfig(FlextConfig):
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
-            Dictionary with quality threshold settings
+        Dictionary with quality threshold settings
 
         """
         return {
@@ -162,7 +162,7 @@ class DocsConfig(FlextConfig):
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
-            Dictionary with reporting settings
+        Dictionary with reporting settings
 
         """
         return {
@@ -173,7 +173,7 @@ class DocsConfig(FlextConfig):
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
-            Dictionary with link validation settings
+        Dictionary with link validation settings
 
         """
         return {
@@ -185,7 +185,7 @@ class DocsConfig(FlextConfig):
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:
-            Dictionary with audit threshold settings
+        Dictionary with audit threshold settings
 
         """
         return {

@@ -47,7 +47,7 @@ class FlextMeltanoFileManagers:
         """Create temporary directory using direct tempfile implementation.
 
         Returns:
-            FlextResult containing the created temporary directory path.
+        FlextResult containing the created temporary directory path.
 
         """
         logger = FlextLogger(__name__)
@@ -68,7 +68,7 @@ class FlextMeltanoFileManagers:
         """Save YAML config using direct implementation.
 
         Returns:
-            FlextResult indicating success or failure of the save operation.
+        FlextResult indicating success or failure of the save operation.
 
         """
         try:
@@ -98,7 +98,7 @@ class FlextMeltanoFileManagers:
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
 
         Returns:
-            FlextResult containing the loaded YAML configuration.
+        FlextResult containing the loaded YAML configuration.
 
         """
         try:
@@ -145,7 +145,7 @@ class FlextMeltanoFileManagers:
         ZERO DUPLICATION: Uses FlextUtilities.Files.is_valid_path for validation.
 
         Returns:
-            FlextResult indicating whether the YAML file is valid.
+        FlextResult indicating whether the YAML file is valid.
 
         """
         try:
@@ -176,7 +176,7 @@ class FlextMeltanoFileManagers:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
-            FlextResult containing the created directory structure information.
+        FlextResult containing the created directory structure information.
 
         """
         try:
@@ -202,7 +202,7 @@ class FlextMeltanoFileManagers:
         """Setup Meltano project structure using direct implementation.
 
         Returns:
-            FlextResult containing the project structure information.
+        FlextResult containing the project structure information.
 
         """
         try:
@@ -269,7 +269,7 @@ class FlextMeltanoFileManagers:
         """Cleanup temporary directory using direct implementation.
 
         Returns:
-            FlextResult indicating success or failure of the cleanup operation.
+        FlextResult indicating success or failure of the cleanup operation.
 
         """
         try:
@@ -284,7 +284,7 @@ class FlextMeltanoFileManagers:
         """Validate Meltano project structure using centralized validator.
 
         Returns:
-            FlextResult indicating whether the project structure is valid.
+        FlextResult indicating whether the project structure is valid.
 
         """
         # Use centralized validator to eliminate duplication

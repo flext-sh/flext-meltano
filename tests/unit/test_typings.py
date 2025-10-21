@@ -194,21 +194,15 @@ class TestFlextMeltanoTypes:
         # Test Processing types
         processing_types = FlextMeltanoTypes.Processing
         self.test_assertions.assert_true(
-            condition=hasattr(
-                processing_types, "SingerExecutionResult"
-            ),
+            condition=hasattr(processing_types, "SingerExecutionResult"),
             message="SingerExecutionResult should exist in Processing namespace",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(
-                processing_types, "DbtTransformationResult"
-            ),
+            condition=hasattr(processing_types, "DbtTransformationResult"),
             message="DbtTransformationResult should exist in Processing namespace",
         )
         self.test_assertions.assert_true(
-            condition=hasattr(
-                processing_types, "EltPipelineResult"
-            ),
+            condition=hasattr(processing_types, "EltPipelineResult"),
             message="EltPipelineResult should exist in Processing namespace",
         )
 

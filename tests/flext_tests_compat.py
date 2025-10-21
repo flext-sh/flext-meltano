@@ -100,7 +100,7 @@ class FlextTestsUtilities:
         }
 
     @classmethod
-    def utilities(cls) -> "FlextTestsUtilities":
+    def utilities(cls) -> FlextTestsUtilities:
         """Get utilities instance."""
         return cls()
 
@@ -110,7 +110,9 @@ class FlextTestsUtilities:
         return FlextTestsMatchers()
 
     @staticmethod
-    def functional_service(service_type: str = "api", **config: object) -> dict[str, object]:
+    def functional_service(
+        service_type: str = "api", **config: object
+    ) -> dict[str, object]:
         """Create a functional service configuration for testing."""
         base_config: dict[str, object] = {
             "type": service_type,
@@ -125,7 +127,9 @@ class FlextTestsUtilities:
         return base_config
 
     @staticmethod
-    def create_test_result(value: object | None = None, error: str | None = None) -> dict[str, object]:
+    def create_test_result(
+        value: object | None = None, error: str | None = None
+    ) -> dict[str, object]:
         """Create a test result dictionary."""
         return {
             "value": value,
@@ -134,6 +138,34 @@ class FlextTestsUtilities:
         }
 
     @staticmethod
-    def create_test_data(**data: object) -> dict[str, object]:
-        """Create test data dictionary."""
+    def create_test_data(
+        size: int | None = None,
+        prefix: str | None = None,
+        **data: object,
+    ) -> list[dict[str, object]] | dict[str, object]:
+        """Create test data dictionary or list of test data.
+
+        Args:
+            size: Number of test data items to create (returns list if set)
+            prefix: Prefix for generated test data names
+            **data: Additional data to include in test data
+
+        Returns:
+            List of test data dicts if size is specified, otherwise single dict
+
+        """
+        if size is not None:
+            # Generate list of test data items
+            items: list[dict[str, object]] = []
+            for i in range(size):
+                item: dict[str, object] = {
+                    "id": i + 1,
+                    "name": f"{prefix}_{i + 1}" if prefix else f"item_{i + 1}",
+                    "test_data": "default",
+                }
+                item.update(data)
+                items.append(item)
+            return items
+
+        # Single dict mode
         return dict(data) if data else {"test_data": "default"}
