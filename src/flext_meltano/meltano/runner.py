@@ -1,6 +1,6 @@
 """FLEXT Meltano Library Runner - Unified library runner for Meltano operations.
 
-This module provides the FlextMeltanoLibraryRunner class for comprehensive Meltano
+This module provides the FlextMeltanoLibraryRunner class for complete Meltano
 functionality including ELT pipelines and DBT transformations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -22,11 +22,11 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 
 class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
-    """Unified library runner providing comprehensive Meltano functionality.
+    """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer
     protocols, ELT pipelines) into a single, well-structured interface following
-    ZERO TOLERANCE architectural principles.
+    Zero Tolerance architectural principles.
     """
 
     def __init__(self) -> None:
@@ -45,12 +45,12 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
         """Run a complete ELT pipeline from tap to target.
 
         Args:
-            tap: Singer tap to extract data from
-            target: Singer target to load data into
-            config: Pipeline configuration
+        tap: Singer tap to extract data from
+        target: Singer target to load data into
+        config: Pipeline configuration
 
         Returns:
-            FlextResult with ELT pipeline execution results
+        FlextResult with ELT pipeline execution results
 
         """
         try:
@@ -97,11 +97,11 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
         """Run DBT transformations.
 
         Args:
-            models: List of models to run (None for all)
-            project_dir: DBT project directory
+        models: List of models to run (None for all)
+        project_dir: DBT project directory
 
         Returns:
-            FlextResult with DBT transformation results
+        FlextResult with DBT transformation results
 
         """
         try:
@@ -143,7 +143,7 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
             ].fail(error_msg)
 
     def get_dbt_runner(self) -> FlextResult[dict[str, object]]:
-        """Get DBT runner instance for advanced DBT operations."""
+        """Get DBT runner instance for DBT operations."""
         try:
             # Placeholder - real implementation would return DBT runner
             dbt_runner = {
@@ -158,7 +158,7 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
             return FlextResult[dict[str, object]].fail(f"Failed to get DBT runner: {e}")
 
     def get_singer_manager(self) -> FlextResult[dict[str, object]]:
-        """Get Singer manager instance for advanced Singer operations."""
+        """Get Singer manager instance for Singer operations."""
         try:
             # Placeholder - real implementation would return Singer manager
             singer_manager = {

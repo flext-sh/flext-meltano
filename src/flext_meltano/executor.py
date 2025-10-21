@@ -1,6 +1,6 @@
 """FLEXT Meltano Executor - Unified command execution service.
 
-This module provides the FlextMeltanoExecutor class for comprehensive Meltano
+This module provides the FlextMeltanoExecutor class for complete Meltano
 command execution with proper error handling, timeout management, and result processing.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -28,7 +28,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
     """Unified executor architecture following flext-core patterns.
 
-    Provides comprehensive Meltano command execution with proper error handling,
+    Provides complete Meltano command execution with proper error handling,
     timeout management, and result processing.
     """
 
@@ -62,7 +62,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute the Meltano executor service.
 
         Returns:
-            FlextResult containing executor configuration and status.
+        FlextResult containing executor configuration and status.
 
         """
         try:
@@ -94,12 +94,12 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute a Meltano command with timeout and error handling.
 
         Args:
-            command: Command to execute as string list
-            timeout: Timeout in seconds
-            cwd: Working directory for execution
+        command: Command to execute as string list
+        timeout: Timeout in seconds
+        cwd: Working directory for execution
 
         Returns:
-            FlextResult with execution result
+        FlextResult with execution result
 
         """
         try:
@@ -135,12 +135,12 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute a complete ELT pipeline.
 
         Args:
-            tap_name: Name of the tap to use
-            target_name: Name of the target to use
-            config: Pipeline configuration
+        tap_name: Name of the tap to use
+        target_name: Name of the target to use
+        config: Pipeline configuration
 
         Returns:
-            FlextResult with pipeline execution result
+        FlextResult with pipeline execution result
 
         """
         try:
@@ -160,11 +160,11 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute a DBT command.
 
         Args:
-            dbt_command: DBT subcommand (run, test, docs, etc.)
-            args: Additional arguments
+        dbt_command: DBT subcommand (run, test, docs, etc.)
+        args: Additional arguments
 
         Returns:
-            FlextResult with DBT execution result
+        FlextResult with DBT execution result
 
         """
         try:

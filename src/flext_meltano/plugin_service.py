@@ -47,7 +47,7 @@ class FlextMeltanoComponentService(
         """Execute the pipeline component service.
 
         Returns:
-            FlextResult containing plugin service configuration and status.
+        FlextResult containing plugin service configuration and status.
 
         """
         try:
@@ -78,10 +78,10 @@ class FlextMeltanoComponentService(
         """Discover plugins from Meltano Hub using native API.
 
         Args:
-            project: Optional Project instance (creates temporary if None)
+        project: Optional Project instance (creates temporary if None)
 
         Returns:
-            FlextResult containing list of discovered plugins with metadata
+        FlextResult containing list of discovered plugins with metadata
 
         """
         try:
@@ -165,12 +165,12 @@ class FlextMeltanoComponentService(
         with automatic error accumulation and early termination on failure.
 
         Args:
-            project: Meltano project instance
-            plugin_type: Type of plugin (extractors, loaders, transformers)
-            plugin_name: Name of the plugin to add
+        project: Meltano project instance
+        plugin_type: Type of plugin (extractors, loaders, transformers)
+        plugin_name: Name of the plugin to add
 
         Returns:
-            FlextResult containing plugin addition information
+        FlextResult containing plugin addition information
 
         """
         # RAILWAY PATTERN: Chain validations and operations
@@ -195,11 +195,11 @@ class FlextMeltanoComponentService(
         """Get detailed information about specific plugin.
 
         Args:
-            plugin_name: Name of the plugin
-            plugin_type: Type of the plugin
+        plugin_name: Name of the plugin
+        plugin_type: Type of the plugin
 
         Returns:
-            FlextResult containing plugin information
+        FlextResult containing plugin information
 
         """
         try:

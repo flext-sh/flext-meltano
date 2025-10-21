@@ -42,7 +42,7 @@ class FlextMeltanoExecutionResult:
         """Convert to dictionary representation.
 
         Returns:
-            dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
+        dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
 
         """
         return {
@@ -59,7 +59,7 @@ class FlextMeltanoExecutionResult:
         """Convert to JSON representation.
 
         Returns:
-            str: JSON string representation of execution result.
+        str: JSON string representation of execution result.
 
         """
         return json.dumps(self.to_dict())

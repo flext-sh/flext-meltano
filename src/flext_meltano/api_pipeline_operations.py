@@ -1,7 +1,7 @@
 """FLEXT Meltano API Pipeline Operations - Pipeline orchestration with flext-core patterns.
 
-This module provides comprehensive pipeline operations for the API following flext-core
-advanced patterns with railway-oriented programming and Python 3.13+ features.
+This module provides complete pipeline operations for the API following flext-core
+ patterns with railway-oriented programming and Python 3.13+ features.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -21,19 +21,19 @@ if TYPE_CHECKING:
 
 
 class FlextMeltanoAPIPipelineOperations:
-    """Advanced API pipeline operations with flext-core railway patterns.
+    """API pipeline operations with flext-core railway patterns.
 
-    Provides comprehensive pipeline operation orchestration using advanced Python 3.13+
+    Provides complete pipeline operation orchestration using Python 3.13+
     patterns and flext-core railway-oriented programming.
 
-    **Advanced Patterns Used:**
+    ** Patterns Used:**
     - Railway-oriented programming for all operations
     - Python 3.13+ type parameter syntax
     - Validation dispatch tables
     - Functional composition patterns
 
     Attributes:
-        api: Reference to the parent API instance
+    api: Reference to the parent API instance
 
     """
 

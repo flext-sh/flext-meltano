@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextResult, FlextService
 from singer_sdk import Target
 
 from flext_meltano.config import FlextMeltanoConfig
@@ -46,10 +46,10 @@ class FlextMeltanoTargetAbstractions(
         """Configure a sink for a sink configuration.
 
         Args:
-            sink_config: Sink configuration
+        sink_config: Sink configuration
 
         Returns:
-            FlextResult containing configured sink definition
+        FlextResult containing configured sink definition
 
         """
         try:
@@ -86,10 +86,10 @@ class FlextMeltanoTargetAbstractions(
         """Validate a sink configuration.
 
         Args:
-            sink_config: Sink configuration to validate
+        sink_config: Sink configuration to validate
 
         Returns:
-            FlextResult containing validation result
+        FlextResult containing validation result
 
         """
         try:
@@ -122,10 +122,10 @@ class FlextMeltanoTargetAbstractions(
         """Create a sink instance from configuration.
 
         Args:
-            sink_config: Sink configuration
+        sink_config: Sink configuration
 
         Returns:
-            FlextResult containing configured sink instance
+        FlextResult containing configured sink instance
 
         """
         try:

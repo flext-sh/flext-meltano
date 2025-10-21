@@ -43,7 +43,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
     operations with FlextResult error handling.
 
     Attributes:
-        project_root: Root directory of DBT project
+    project_root: Root directory of DBT project
 
     """
 
@@ -51,7 +51,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """Initialize DBT runner.
 
         Args:
-            project_root: Root directory of DBT project (optional)
+        project_root: Root directory of DBT project (optional)
 
         """
         super().__init__()
@@ -65,11 +65,11 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """Run DBT models.
 
         Args:
-            models: Optional list of models to run
-            **_kwargs: Additional dbt run arguments
+        models: Optional list of models to run
+        **_kwargs: Additional dbt run arguments
 
         Returns:
-            FlextResult containing run result
+        FlextResult containing run result
 
         """
         try:
@@ -103,11 +103,11 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """Run DBT tests.
 
         Args:
-            models: Optional list of models to test
-            **_kwargs: Additional dbt test arguments
+        models: Optional list of models to test
+        **_kwargs: Additional dbt test arguments
 
         Returns:
-            FlextResult containing test result
+        FlextResult containing test result
 
         """
         try:
@@ -137,10 +137,10 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """Generate DBT documentation.
 
         Args:
-            **_kwargs: Additional dbt docs arguments
+        **_kwargs: Additional dbt docs arguments
 
         Returns:
-            FlextResult containing documentation generation result
+        FlextResult containing documentation generation result
 
         """
         try:

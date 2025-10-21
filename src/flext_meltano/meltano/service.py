@@ -22,7 +22,7 @@ from flext_meltano.models import FlextMeltanoModels
 class FlextMeltanoMeltanoService(FlextService):
     """Orchestrates Meltano ELT operations with deep SDK integration.
 
-    Provides comprehensive Meltano orchestration including:
+    Provides complete Meltano orchestration including:
     - Project lifecycle management
     - Plugin discovery and management
     - Pipeline configuration and execution
@@ -33,7 +33,7 @@ class FlextMeltanoMeltanoService(FlextService):
     programmatic API for complete ELT operations.
 
     Attributes:
-        project_manager: Manages Meltano projects
+    project_manager: Manages Meltano projects
 
     """
 
@@ -66,10 +66,10 @@ class FlextMeltanoMeltanoService(FlextService):
         """Create a new Meltano project.
 
         Args:
-            root: Root directory for the project
+        root: Root directory for the project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         try:
@@ -90,10 +90,10 @@ class FlextMeltanoMeltanoService(FlextService):
         """Load an existing Meltano project.
 
         Args:
-            root: Root directory of the project
+        root: Root directory of the project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         try:
@@ -114,10 +114,10 @@ class FlextMeltanoMeltanoService(FlextService):
         """Discover plugins in the project.
 
         Args:
-            plugin_type: Optional plugin type to filter
+        plugin_type: Optional plugin type to filter
 
         Returns:
-            FlextResult containing list of plugins
+        FlextResult containing list of plugins
 
         """
         try:
@@ -139,10 +139,10 @@ class FlextMeltanoMeltanoService(FlextService):
         """Execute a Meltano pipeline.
 
         Args:
-            config: Pipeline configuration
+        config: Pipeline configuration
 
         Returns:
-            FlextResult containing pipeline result
+        FlextResult containing pipeline result
 
         """
         try:

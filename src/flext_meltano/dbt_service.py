@@ -50,12 +50,12 @@ class FlextMeltanoTransformationService(
         """Run transformations using programmatic API.
 
         Args:
-            project_dir: Path to transformation project directory
-            models: Optional list of specific models to run
-            **options: Additional transformation options
+        project_dir: Path to transformation project directory
+        models: Optional list of specific models to run
+        **options: Additional transformation options
 
         Returns:
-            FlextResult containing transformation results
+        FlextResult containing transformation results
 
         """
         try:

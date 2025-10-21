@@ -59,7 +59,7 @@ class FlextMeltanoProjectService(
         """Execute the pipeline project service.
 
         Returns:
-            FlextResult containing project service configuration and status.
+        FlextResult containing project service configuration and status.
 
         """
         try:
@@ -94,11 +94,11 @@ class FlextMeltanoProjectService(
         with automatic error propagation and resource management.
 
         Args:
-            project_id: Optional project identifier for uniqueness
-            prefix: Temporary directory prefix for organization
+        project_id: Optional project identifier for uniqueness
+        prefix: Temporary directory prefix for organization
 
         Returns:
-            FlextResult containing project dict[str, object] with standardized structure
+        FlextResult containing project dict[str, object] with standardized structure
 
         """
         return (
@@ -132,10 +132,10 @@ class FlextMeltanoProjectService(
         - Project loading and conversion
 
         Args:
-            project_root: Directory path containing meltano.yml
+        project_root: Directory path containing meltano.yml
 
         Returns:
-            FlextResult containing initialized project dict[str, object] or validation error
+        FlextResult containing initialized project dict[str, object] or validation error
 
         """
         return (
@@ -152,10 +152,10 @@ class FlextMeltanoProjectService(
         across the entire FLEXT ecosystem.
 
         Args:
-            project_path: Path to potential Meltano project directory
+        project_path: Path to potential Meltano project directory
 
         Returns:
-            FlextResult containing True if valid, False with error details if invalid
+        FlextResult containing True if valid, False with error details if invalid
 
         """
         return FlextMeltanoValidators.validate_pipeline_project_structure(project_path)
@@ -171,11 +171,11 @@ class FlextMeltanoProjectService(
         meltano.yml using composable FlextResult operations.
 
         Args:
-            project_name: Name for the new Meltano project
-            project_dir: Parent directory where project will be created
+        project_name: Name for the new Meltano project
+        project_dir: Parent directory where project will be created
 
         Returns:
-            FlextResult containing project creation metadata or validation error
+        FlextResult containing project creation metadata or validation error
 
         """
         return (

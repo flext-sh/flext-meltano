@@ -59,10 +59,10 @@ class FlextMeltanoStateManager(FlextService[dict[str, Any]]):
         """Load state from file or memory.
 
         Args:
-            state_file: Path to state file (optional)
+        state_file: Path to state file (optional)
 
         Returns:
-            FlextResult containing loaded state dictionary
+        FlextResult containing loaded state dictionary
 
         """
         try:
@@ -83,10 +83,10 @@ class FlextMeltanoStateManager(FlextService[dict[str, Any]]):
         """Save state to file.
 
         Args:
-            state_file: Path to save state file
+        state_file: Path to save state file
 
         Returns:
-            FlextResult with success status
+        FlextResult with success status
 
         """
         try:
@@ -111,12 +111,12 @@ class FlextMeltanoStateManager(FlextService[dict[str, Any]]):
         """Update bookmark for a stream.
 
         Args:
-            stream_name: Name of the stream
-            bookmark_key: Bookmark field name
-            bookmark_value: New bookmark value
+        stream_name: Name of the stream
+        bookmark_key: Bookmark field name
+        bookmark_value: New bookmark value
 
         Returns:
-            FlextResult with success status
+        FlextResult with success status
 
         """
         try:
@@ -140,11 +140,11 @@ class FlextMeltanoStateManager(FlextService[dict[str, Any]]):
         """Get current bookmark value.
 
         Args:
-            stream_name: Name of the stream
-            bookmark_key: Bookmark field name
+        stream_name: Name of the stream
+        bookmark_key: Bookmark field name
 
         Returns:
-            FlextResult containing bookmark value or None
+        FlextResult containing bookmark value or None
 
         """
         try:

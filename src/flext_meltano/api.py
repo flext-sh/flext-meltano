@@ -1,11 +1,11 @@
-"""FLEXT Meltano API - Advanced unified facade with flext-core patterns.
+"""FLEXT Meltano API - unified facade with flext-core patterns.
 
 This module provides a unified API facade for Meltano operations using flext-core
-advanced patterns with railway-oriented programming, composition, and Python 3.13+ features.
+ patterns with railway-oriented programming, composition, and Python 3.13+ features.
 
-**Advanced Patterns Used:**
+** Patterns Used:**
 - Railway-oriented programming for all operations
-- Python 3.13+ type parameter syntax for advanced generics
+- Python 3.13+ type parameter syntax for generics
 - Single class per module following SOLID principles
 - Direct flext-core integration without wrappers or aliases
 - Pydantic models for configuration and data validation
@@ -18,10 +18,12 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
+from pathlib import Path
 from typing import cast
 
 from flext_core import FlextExceptions, FlextResult, FlextService, FlextTypes
 
+from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
@@ -35,7 +37,7 @@ class FlextMeltano(
 ):
     """Advanced FLEXT Meltano API with direct flext-core integration.
 
-    Provides comprehensive Meltano integration using flext-core advanced patterns
+    Provides complete Meltano integration using flext-core advanced patterns
     with railway-oriented programming, Pydantic models, and SOLID principles.
 
     **Direct Flext-Core Integration:**
@@ -67,36 +69,36 @@ class FlextMeltano(
 
     """
 
-    # Core service attributes with proper typing
-    service_name: str
-    version: str = "0.9.9"
-    _config: FlextMeltanoConfig
+ # Core service attributes with proper typing
+ service_name: str
+ version: str = __version__
+ _config: FlextMeltanoConfig
 
-    @property
-    def config(self) -> FlextMeltanoConfig:
-        """Get Pydantic-based configuration instance."""
-        return self._config
+ @property
+ def config(self) -> FlextMeltanoConfig:
+ """Get Pydantic-based configuration instance."""
+ return self._config
 
-    @property
-    def constants(self) -> type[FlextMeltanoConstants]:
-        """Get FlextMeltanoConstants - delegates to foundation layer."""
-        return FlextMeltanoConstants
+ @property
+ def constants(self) -> type[FlextMeltanoConstants]:
+ """Get FlextMeltanoConstants - delegates to foundation layer."""
+ return FlextMeltanoConstants
 
-    @property
-    def types(self) -> type[FlextMeltanoTypes]:
-        """Get FlextMeltanoTypes - delegates to foundation layer."""
-        return FlextMeltanoTypes
+ @property
+ def types(self) -> type[FlextMeltanoTypes]:
+ """Get FlextMeltanoTypes - delegates to foundation layer."""
+ return FlextMeltanoTypes
 
-    @property
-    def models(self) -> type[FlextMeltanoModels]:
-        """Get FlextMeltanoModels - delegates to domain layer."""
+ @property
+ def models(self) -> type[FlextMeltanoModels]:
+ """Get FlextMeltanoModels - delegates to domain layer."""
         return FlextMeltanoModels
 
     def __init__(
         self,
         config: FlextMeltanoConfig | None = None,
         service_name: str = "flext_meltano_api",
-        version: str = "0.9.9",
+        version: str | None = None,
         project_root: str | None = None,
     ) -> None:
         """Initialize API with Pydantic configuration and flext-core patterns."""
@@ -105,6 +107,10 @@ class FlextMeltano(
             raise FlextExceptions.ValidationError(
                 msg, error_code="INVALID_SERVICE_NAME"
             )
+
+        # Use package version if not explicitly provided
+        if version is None:
+            version = __version__
 
         # Build config with project_root if provided - SOLID composition pattern
         if config is None:
@@ -154,11 +160,11 @@ class FlextMeltano(
     def call(
         self, operation: str, payload: FlextTypes.JsonValue
     ) -> FlextResult[FlextTypes.JsonValue]:
-        """Route operations using advanced dispatch table with flext-core patterns.
+        """Route operations using dispatch table with flext-core patterns.
 
-        Implements ServiceCallProtocol through structural subtyping with
-        railway-oriented operation routing and advanced Python 3.13+ patterns.
-        """
+ Implements ServiceCallProtocol through structural subtyping with
+ railway-oriented operation routing and Python 3.13+ patterns.
+ """
         # Dispatch table pattern using flext-core railway programming
         operation_dispatch: dict[
             str, Callable[[FlextTypes.JsonValue], FlextResult[FlextTypes.JsonValue]]
@@ -256,7 +262,10 @@ class FlextMeltano(
 
         validation_result = _validate_inputs()
         if validation_result.is_failure:
-            return validation_result
+            return cast(
+                "FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]",
+                validation_result,
+            )
 
         args = validation_result.unwrap()
         return _build_pipeline_config(*args)
@@ -667,19 +676,22 @@ class FlextMeltano(
         """Create Meltano project - delegates to adapter."""
         try:
             adapter = FlextMeltanoAdapter(self.config)
-            return adapter.project_adapter.create_project(
-                project_name=project_name,
-                project_dir=project_dir,
+            return cast(
+                "FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]",
+                adapter.project_adapter.create_project(
+                    project_name=project_name,
+                    project_dir=Path(project_dir) if project_dir else Path.cwd(),
+                ),
             )
         except Exception as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Failed to create project: {e}"
             )
 
-    def validate_project(self, project_path: str) -> FlextResult[bool]:
+    def validate_project(self, _project_path: str) -> FlextResult[bool]:
         """Validate Meltano project - delegates to config."""
         try:
-            return self.config.validate_project_structure(project_path)
+            return self.config.validate_project_structure()
         except Exception as e:
             return FlextResult[bool].fail(f"Failed to validate project: {e}")
 
@@ -695,7 +707,7 @@ class FlextMeltano(
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(self.config, source_name=source_name)
-            return service.extract(config or {})
+            return service.extract(cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", config or {}))
         except Exception as e:
             return FlextResult[FlextTypes.JsonValue].fail(
                 f"Failed to extract data: {e}"

@@ -32,10 +32,10 @@ class FlextMeltanoCatalogManager(FlextService):
         """Discover streams from a tap.
 
         Args:
-            tap: Singer tap instance with discover() method
+        tap: Singer tap instance with discover() method
 
         Returns:
-            FlextResult containing discovered catalog
+        FlextResult containing discovered catalog
 
         """
         try:
@@ -61,10 +61,10 @@ class FlextMeltanoCatalogManager(FlextService):
         """Load catalog from file.
 
         Args:
-            catalog_file: Path to catalog file
+        catalog_file: Path to catalog file
 
         Returns:
-            FlextResult containing loaded catalog
+        FlextResult containing loaded catalog
 
         """
         try:
@@ -91,7 +91,7 @@ class FlextMeltanoCatalogManager(FlextService):
         """Set catalog data directly.
 
         Args:
-            catalog: Catalog data to set
+        catalog: Catalog data to set
 
         """
         self._catalog = catalog
@@ -100,10 +100,10 @@ class FlextMeltanoCatalogManager(FlextService):
         """Save catalog to file.
 
         Args:
-            catalog_file: Path to save catalog
+        catalog_file: Path to save catalog
 
         Returns:
-            FlextResult with success status
+        FlextResult with success status
 
         """
         try:
@@ -124,10 +124,10 @@ class FlextMeltanoCatalogManager(FlextService):
         """Select specific streams from catalog.
 
         Args:
-            stream_names: List of stream names to select
+        stream_names: List of stream names to select
 
         Returns:
-            FlextResult containing filtered catalog
+        FlextResult containing filtered catalog
 
         """
         try:
@@ -149,10 +149,10 @@ class FlextMeltanoCatalogManager(FlextService):
         """Get schema for a specific stream.
 
         Args:
-            stream_name: Name of the stream
+        stream_name: Name of the stream
 
         Returns:
-            FlextResult containing stream schema or None
+        FlextResult containing stream schema or None
 
         """
         try:

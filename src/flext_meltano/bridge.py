@@ -34,11 +34,11 @@ class FlextMeltanoBridge:
         """Execute a bridge command with JSON arguments.
 
         Args:
-            command: Command name to execute
-            args: JSON-serializable arguments
+        command: Command name to execute
+        args: JSON-serializable arguments
 
         Returns:
-            FlextResult with command execution results
+        FlextResult with command execution results
 
         """
         try:

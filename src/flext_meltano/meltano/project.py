@@ -34,8 +34,8 @@ class FlextMeltanoProjectManager(FlextService):
     configurations through wrapped meltano-sdk APIs.
 
     Attributes:
-        project_root: Root directory of Meltano project
-        project: Wrapped meltano.core.project.Project instance
+    project_root: Root directory of Meltano project
+    project: Wrapped meltano.core.project.Project instance
 
     """
 
@@ -51,7 +51,7 @@ class FlextMeltanoProjectManager(FlextService):
         """Initialize Meltano project manager.
 
         Args:
-            root: Root directory of Meltano project (optional)
+        root: Root directory of Meltano project (optional)
 
         """
         super().__init__()
@@ -64,10 +64,10 @@ class FlextMeltanoProjectManager(FlextService):
         """Initialize a new Meltano project.
 
         Args:
-            root: Root directory for the project
+        root: Root directory for the project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         if not MELTANO_AVAILABLE:
@@ -101,10 +101,10 @@ class FlextMeltanoProjectManager(FlextService):
         """Load an existing Meltano project.
 
         Args:
-            root: Root directory of the project
+        root: Root directory of the project
 
         Returns:
-            FlextResult containing project information
+        FlextResult containing project information
 
         """
         if not MELTANO_AVAILABLE:
@@ -142,10 +142,10 @@ class FlextMeltanoProjectManager(FlextService):
         """Get plugins from the project.
 
         Args:
-            plugin_type: Optional plugin type to filter (tap, target, dbt, etc.)
+        plugin_type: Optional plugin type to filter (tap, target, dbt, etc.)
 
         Returns:
-            FlextResult containing list of plugins
+        FlextResult containing list of plugins
 
         """
         try:
@@ -177,10 +177,10 @@ class FlextMeltanoProjectManager(FlextService):
         """Install a plugin in the project.
 
         Args:
-            name: Name of the plugin to install
+        name: Name of the plugin to install
 
         Returns:
-            FlextResult containing plugin information
+        FlextResult containing plugin information
 
         """
         try:

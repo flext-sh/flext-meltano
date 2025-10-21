@@ -4,7 +4,7 @@ This library provides deep integration with singer-sdk, meltano-sdk, and
 dbt-core with programmatic APIs, railway-oriented programming, and FLEXT
 ecosystem patterns.
 
-**NO CLI** - Pure programmatic APIs only.
+NO CLI - Pure programmatic APIs only.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -32,7 +32,7 @@ from flext_meltano.constants import FlextMeltanoConstants
 
 # =========================================================================
 # DBT DOMAIN - Deep dbt-core integration (NO CLI)
-# ✅ Programmatic APIs only for DBT projects and transformations
+# Programmatic APIs only for DBT projects and transformations
 # =========================================================================
 from flext_meltano.dbt import (
     FlextMeltanoDbtProjectManager,
@@ -48,7 +48,7 @@ from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 # =========================================================================
 # MELTANO DOMAIN - Deep meltano-sdk integration (NO CLI)
-# ✅ Programmatic APIs only for Meltano projects and pipelines
+# Programmatic APIs only for Meltano projects and pipelines
 # =========================================================================
 from flext_meltano.meltano import (
     FlextMeltanoMeltanoService,
@@ -68,7 +68,7 @@ from flext_meltano.services import FlextMeltanoService
 
 # =========================================================================
 # SINGER DOMAIN - Deep singer-sdk integration (NO CLI)
-# ✅ Programmatic APIs only for Singer taps and targets
+# Programmatic APIs only for Singer taps and targets
 # =========================================================================
 from flext_meltano.singer import (
     FlextMeltanoCatalogManager,

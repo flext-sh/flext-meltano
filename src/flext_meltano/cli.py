@@ -1,7 +1,7 @@
 """FLEXT Meltano CLI - Professional Command-Line Interface.
 
-Comprehensive CLI for Meltano/Singer/DBT operations using flext-cli exclusively.
-ZERO TOLERANCE: NO direct click/rich/typer imports allowed.
+Complete CLI for Meltano/Singer/DBT operations using flext-cli exclusively.
+Zero Tolerance: NO direct click/rich/typer imports allowed.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

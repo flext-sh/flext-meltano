@@ -235,13 +235,13 @@ class FlextMeltanoConstants(FlextConstants):
         """Logging configuration constants namespace."""
 
         # Log levels - uses FlextConstants as source of truth
-        DEFAULT_LEVEL = FlextConstants.Config.LogLevel.INFO
-        PIPELINE_LEVEL = FlextConstants.Config.LogLevel.INFO
-        EXTRACT_LEVEL = FlextConstants.Config.LogLevel.INFO
-        LOAD_LEVEL = FlextConstants.Config.LogLevel.INFO
-        TRANSFORM_LEVEL = FlextConstants.Config.LogLevel.INFO
-        ERROR_LEVEL = FlextConstants.Config.LogLevel.ERROR
-        PERFORMANCE_LEVEL = FlextConstants.Config.LogLevel.WARNING
+        DEFAULT_LEVEL = FlextConstants.Configuration.LogLevel.INFO
+        PIPELINE_LEVEL = FlextConstants.Configuration.LogLevel.INFO
+        EXTRACT_LEVEL = FlextConstants.Configuration.LogLevel.INFO
+        LOAD_LEVEL = FlextConstants.Configuration.LogLevel.INFO
+        TRANSFORM_LEVEL = FlextConstants.Configuration.LogLevel.INFO
+        ERROR_LEVEL = FlextConstants.Configuration.LogLevel.ERROR
+        PERFORMANCE_LEVEL = FlextConstants.Configuration.LogLevel.WARNING
 
         # Pipeline execution logging - generic pipeline logging
         LOG_PIPELINE_START = True
@@ -318,6 +318,11 @@ class FlextMeltanoConstants(FlextConstants):
         LOADERS = "loaders"
         TRANSFORMS = "transforms"
         ORCHESTRATORS = "orchestrators"
+
+        @classmethod
+        def get_all_plugins(cls) -> list[dict[str, str]]:
+            """Get all available plugin types as plugin dictionaries."""
+            return [{"type": member.value, "name": member.value} for member in cls]
 
     class ReplicationMethods(StrEnum):
         """Singer replication methods enumeration."""
