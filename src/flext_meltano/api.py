@@ -69,29 +69,29 @@ class FlextMeltano(
 
     """
 
- # Core service attributes with proper typing
- service_name: str
- version: str = __version__
- _config: FlextMeltanoConfig
+    # Core service attributes with proper typing
+    service_name: str
+    version: str = __version__
+    _config: FlextMeltanoConfig
 
- @property
- def config(self) -> FlextMeltanoConfig:
- """Get Pydantic-based configuration instance."""
- return self._config
+    @property
+    def config(self) -> FlextMeltanoConfig:
+        """Get Pydantic-based configuration instance."""
+        return self._config
 
- @property
- def constants(self) -> type[FlextMeltanoConstants]:
- """Get FlextMeltanoConstants - delegates to foundation layer."""
- return FlextMeltanoConstants
+    @property
+    def constants(self) -> type[FlextMeltanoConstants]:
+        """Get FlextMeltanoConstants - delegates to foundation layer."""
+        return FlextMeltanoConstants
 
- @property
- def types(self) -> type[FlextMeltanoTypes]:
- """Get FlextMeltanoTypes - delegates to foundation layer."""
- return FlextMeltanoTypes
+    @property
+    def types(self) -> type[FlextMeltanoTypes]:
+        """Get FlextMeltanoTypes - delegates to foundation layer."""
+        return FlextMeltanoTypes
 
- @property
- def models(self) -> type[FlextMeltanoModels]:
- """Get FlextMeltanoModels - delegates to domain layer."""
+    @property
+    def models(self) -> type[FlextMeltanoModels]:
+        """Get FlextMeltanoModels - delegates to domain layer."""
         return FlextMeltanoModels
 
     def __init__(
@@ -162,9 +162,9 @@ class FlextMeltano(
     ) -> FlextResult[FlextTypes.JsonValue]:
         """Route operations using dispatch table with flext-core patterns.
 
- Implements ServiceCallProtocol through structural subtyping with
- railway-oriented operation routing and Python 3.13+ patterns.
- """
+        Implements ServiceCallProtocol through structural subtyping with
+        railway-oriented operation routing and Python 3.13+ patterns.
+        """
         # Dispatch table pattern using flext-core railway programming
         operation_dispatch: dict[
             str, Callable[[FlextTypes.JsonValue], FlextResult[FlextTypes.JsonValue]]
@@ -707,7 +707,9 @@ class FlextMeltano(
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(self.config, source_name=source_name)
-            return service.extract(cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", config or {}))
+            return service.extract(
+                cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", config or {})
+            )
         except Exception as e:
             return FlextResult[FlextTypes.JsonValue].fail(
                 f"Failed to extract data: {e}"

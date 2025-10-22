@@ -15,6 +15,62 @@ from flext_core import FlextResult
 T = TypeVar("T")
 
 
+class FunctionalServiceMock:
+    """Mock functional service with configuration support."""
+
+    def __init__(self, service_type: str, **config: object) -> None:
+        """Initialize functional service mock."""
+        self.service_type = service_type
+        self.config = config
+        self._configured_methods: dict[str, object] = {}
+
+    def configure_method(
+        self,
+        method_name: str,
+        return_value: object = None,
+        side_effect: object = None,
+        *,
+        should_fail: bool = False,
+        failure_message: str | None = None,
+    ) -> None:
+        """Configure a method with a return value or side effect.
+
+        Args:
+            method_name: Name of the method to configure
+            return_value: Return value for the method
+            side_effect: Side effect to execute
+            should_fail: Whether this method should fail
+            failure_message: Error message if should_fail is True
+
+        """
+        self._configured_methods[method_name] = {
+            "return_value": return_value,
+            "side_effect": side_effect,
+            "should_fail": should_fail,
+            "failure_message": failure_message or "Method configured to fail",
+        }
+
+    def get_configured_value(self, method_name: str) -> object:
+        """Get configured return value for a method."""
+        if method_name in self._configured_methods:
+            return self._configured_methods[method_name].get("return_value")
+        return None
+
+    def should_fail(self, method_name: str) -> bool:
+        """Check if a method is configured to fail."""
+        if method_name in self._configured_methods:
+            return self._configured_methods[method_name].get("should_fail", False)
+        return False
+
+    def get_failure_message(self, method_name: str) -> str:
+        """Get failure message for a method."""
+        if method_name in self._configured_methods:
+            return self._configured_methods[method_name].get(
+                "failure_message", "Method configured to fail"
+            )
+        return "Method configured to fail"
+
+
 class FlextTestsMatchers:
     """Test matchers for FlextResult assertions."""
 
@@ -112,7 +168,7 @@ class FlextTestsUtilities:
     @staticmethod
     def functional_service(
         service_type: str = "api", **config: object
-    ) -> dict[str, object]:
+    ) -> FunctionalServiceMock:
         """Create a functional service configuration for testing."""
         base_config: dict[str, object] = {
             "type": service_type,
@@ -124,7 +180,7 @@ class FlextTestsUtilities:
             "retries": 3,
         }
         base_config.update(config)
-        return base_config
+        return FunctionalServiceMock(service_type, **base_config)
 
     @staticmethod
     def create_test_result(

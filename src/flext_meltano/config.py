@@ -83,7 +83,7 @@ class FlextMeltanoConfig(FlextConfig):
     EnvironmentType: type = (
         FlextMeltanoConstants.Environment
     )  # Generic environment types
-    LogLevel: type = FlextConstants.Configuration.LogLevel  # Core constants
+    LogLevel: type = FlextConstants.Settings.LogLevel  # Core constants
     OperationStatus: type = (
         FlextMeltanoConstants.OperationStatus
     )  # Domain-specific constants
@@ -101,15 +101,21 @@ class FlextMeltanoConfig(FlextConfig):
 
     meltano_version: str = Field(
         default=MELTANO_VERSION,
+        min_length=1,
         description="Meltano version to use",
     )
 
     singer_sdk_version: str = Field(
         default=SINGER_SDK_VERSION,
+        min_length=1,
         description="Singer SDK version to use",
     )
 
-    dbt_version: str = Field(default=DBT_VERSION, description="DBT version to use")
+    dbt_version: str = Field(
+        default=DBT_VERSION,
+        min_length=1,
+        description="DBT version to use",
+    )
 
     # Environment configuration
     environment: str = Field(
@@ -334,7 +340,7 @@ class FlextMeltanoConfig(FlextConfig):
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
     @classmethod
     def validate_versions(cls, v: str) -> str:
-        """Validate version strings.
+        """Validate version strings (strip whitespace).
 
         Args:
         v: Version string to validate.
@@ -342,13 +348,7 @@ class FlextMeltanoConfig(FlextConfig):
         Returns:
         str: Validated and stripped version string.
 
-        Raises:
-        ValidationError: If version string is invalid.
-
         """
-        if not v:
-            error_msg = "Version must be non-empty string"
-            raise FlextExceptions.ValidationError(error_msg)
         return v.strip()
 
     @field_validator("meltano_database_uri", "meltano_api_key")
@@ -558,7 +558,7 @@ class FlextMeltanoConfig(FlextConfig):
                 config_data["project_root"] = Path()
 
         if "log_level" in filtered_kwargs:
-            config_data["log_level"] = FlextConstants.Configuration.LogLevel(
+            config_data["log_level"] = FlextConstants.Settings.LogLevel(
                 str(filtered_kwargs["log_level"]),
             )
 
