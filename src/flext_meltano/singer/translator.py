@@ -94,25 +94,23 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from flext_core import FlextResult, FlextUtilities
 
 from flext_meltano.models import FlextMeltanoModels
 
 
 class FlextMeltanoSingerCliTranslator:
- """Translates Pydantic models to Singer SDK CLI commands.
+    """Translates Pydantic models to Singer SDK CLI commands.
 
     Provides model-driven CLI command generation for Singer sources, sinks,
     and complete data pipelines with automatic parameter validation.
     """
 
- @staticmethod
- def translate_tap_run(
- params: FlextMeltanoModels.CliParameters.DataSourceParams,
- ) -> FlextResult[list[str]]:
- """Convert DataSourceParams to Singer SDK source CLI command.
+    @staticmethod
+    def translate_tap_run(
+        params: FlextMeltanoModels.CliParameters.DataSourceParams,
+    ) -> FlextResult[list[str]]:
+        """Convert DataSourceParams to Singer SDK source CLI command.
 
         Args:
             params: Validated DataSourceParams model
@@ -147,13 +145,13 @@ class FlextMeltanoSingerCliTranslator:
     ) -> FlextResult[list[str]]:
         """Convert DataSinkParams to Singer SDK sink CLI command.
 
- Args:
- params: Validated DataSinkParams model
+        Args:
+        params: Validated DataSinkParams model
 
- Returns:
- FlextResult containing list of CLI command arguments
+        Returns:
+        FlextResult containing list of CLI command arguments
 
- """
+        """
         command: list[str] = [params.target_name]
 
         if params.config_file:
@@ -170,13 +168,13 @@ class FlextMeltanoSingerCliTranslator:
     ) -> FlextResult[tuple[list[str], list[str]]]:
         """Convert PipelineParams to source and sink CLI commands.
 
- Args:
- params: Validated PipelineParams model
+        Args:
+        params: Validated PipelineParams model
 
- Returns:
- FlextResult containing tuple of (source_command, sink_command)
+        Returns:
+        FlextResult containing tuple of (source_command, sink_command)
 
- """
+        """
         # Build source command
         source_command: list[str] = [params.source_name]
 
@@ -206,13 +204,13 @@ class FlextMeltanoSingerCliTranslator:
     ) -> FlextResult[list[str]]:
         """Convert TransformationParams to transformation CLI command.
 
- Args:
- params: Validated TransformationParams model
+        Args:
+        params: Validated TransformationParams model
 
- Returns:
- FlextResult containing list of DBT CLI command arguments
+        Returns:
+        FlextResult containing list of DBT CLI command arguments
 
- """
+        """
         command: list[str] = [
             "dbt",
             "run",
@@ -245,15 +243,15 @@ class FlextMeltanoSingerCliTranslator:
     ) -> FlextResult[dict[str, object]]:
         """Execute Singer SDK command and capture output.
 
- Args:
- command: CLI command as list of arguments
- input_data: Optional input data for stdin (for targets)
- timeout: Command timeout in seconds
+        Args:
+        command: CLI command as list of arguments
+        input_data: Optional input data for stdin (for targets)
+        timeout: Command timeout in seconds
 
- Returns:
- FlextResult containing execution results with stdout/stderr
+        Returns:
+        FlextResult containing execution results with stdout/stderr
 
- """
+        """
         # Use FlextUtilities.run_external_command for standardized subprocess execution
         process_input = input_data.encode() if input_data else None
 
@@ -290,29 +288,6 @@ class FlextMeltanoSingerCliTranslator:
         }
 
         return FlextResult[dict[str, object]].ok(output_data)
-
-    @staticmethod
-    def validate_file_path(file_path: str | None) -> FlextResult[Path | None]:
-        """Validate file path exists if provided.
-
- Args:
- file_path: Optional file path to validate
-
- Returns:
- FlextResult containing Path object or None if not provided
-
- """
-        if not file_path:
-            return FlextResult[Path | None].ok(None)
-
-        path = Path(file_path)
-        if not path.exists():
-            return FlextResult[Path | None].fail(f"File not found: {file_path}")
-
-        if not path.is_file():
-            return FlextResult[Path | None].fail(f"Not a file: {file_path}")
-
-        return FlextResult[Path | None].ok(path)
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

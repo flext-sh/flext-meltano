@@ -235,13 +235,13 @@ class FlextMeltanoConstants(FlextConstants):
         """Logging configuration constants namespace."""
 
         # Log levels - uses FlextConstants as source of truth
-        DEFAULT_LEVEL = FlextConstants.Configuration.LogLevel.INFO
-        PIPELINE_LEVEL = FlextConstants.Configuration.LogLevel.INFO
-        EXTRACT_LEVEL = FlextConstants.Configuration.LogLevel.INFO
-        LOAD_LEVEL = FlextConstants.Configuration.LogLevel.INFO
-        TRANSFORM_LEVEL = FlextConstants.Configuration.LogLevel.INFO
-        ERROR_LEVEL = FlextConstants.Configuration.LogLevel.ERROR
-        PERFORMANCE_LEVEL = FlextConstants.Configuration.LogLevel.WARNING
+        DEFAULT_LEVEL = FlextConstants.Settings.LogLevel.INFO
+        PIPELINE_LEVEL = FlextConstants.Settings.LogLevel.INFO
+        EXTRACT_LEVEL = FlextConstants.Settings.LogLevel.INFO
+        LOAD_LEVEL = FlextConstants.Settings.LogLevel.INFO
+        TRANSFORM_LEVEL = FlextConstants.Settings.LogLevel.INFO
+        ERROR_LEVEL = FlextConstants.Settings.LogLevel.ERROR
+        PERFORMANCE_LEVEL = FlextConstants.Settings.LogLevel.WARNING
 
         # Pipeline execution logging - generic pipeline logging
         LOG_PIPELINE_START = True
