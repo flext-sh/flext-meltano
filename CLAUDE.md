@@ -217,7 +217,46 @@ class MyCustomStream(FlextMeltanoStream):
 
 ## 📚 DOCUMENTATION STATUS (UPDATED 2025-10-10)
 
-### **Documentation Enhancement Summary**
+### **Documentation Scripts Migration (UPDATED 2025-10-23)**
+
+**Status**: Ready for Removal
+**Decision**: MIGRATE to `flext-quality doc`
+
+#### Consolidated Scripts
+
+The following custom documentation scripts are now consolidated to `flext-quality doc comprehensive`:
+
+- ✅ `scripts/docs_models.py` → **MIGRATE** (Link Validation features)
+- ✅ `scripts/docs_config.py` → **MIGRATE** (Configuration management)
+- ✅ `scripts/docs_maintenance.py` → **MIGRATE** (Content audit, link validation, style validation)
+- ✅ `scripts/docs_templates.py` → **MIGRATE** (Documentation generation)
+
+#### Kept Script
+
+- ⚠️ `scripts/docs_automation.py` → **ENHANCE** (External scheduling coordination)
+
+#### How to Run Documentation Maintenance
+
+All documentation maintenance operations are now consolidated to:
+
+```bash
+# Comprehensive documentation check
+flext-quality doc comprehensive --project-root .
+
+# With specific profile
+flext-quality doc comprehensive --project-root . --profile advanced
+
+# With configuration file
+flext-quality doc comprehensive --project-root . --config docs-config.yaml
+```
+
+#### Migration Details
+
+**See**: [../MIGRATION_EXECUTION_PLAN.md](../MIGRATION_EXECUTION_PLAN.md) for complete ecosystem migration plan.
+
+---
+
+### **Previous Documentation Enhancement Summary**
 
 Successfully updated FLEXT-Meltano documentation to reflect current project status and implementation details:
 

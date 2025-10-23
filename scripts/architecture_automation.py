@@ -8,14 +8,13 @@ Provides PlantUML rendering, C4 model validation, and automated documentation up
 import argparse
 import ast
 import re
-import subprocess
 import sys
 import time
 import urllib.request
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService, FlextUtilities
 from pydantic import BaseModel, ConfigDict
 
 from flext_meltano.docs_config import DocsConfig
@@ -118,32 +117,43 @@ class PlantUMLRenderer(FlextService):
                 str(puml_file),
             ]
 
-            # Security: subprocess is used to execute PlantUML JAR with controlled arguments
-            process = subprocess.run(
+            # CONVERTED: Use FlextUtilities instead of subprocess.run()
+            # Security: command with controlled arguments
+            exec_result = FlextUtilities.run_external_command(
                 cmd,
                 check=False,
                 capture_output=True,
                 text=True,
                 shell=False,
-                cwd=puml_file.parent,
+                cwd=str(puml_file.parent),
             )
 
-            if process.returncode == 0 and png_file.exists():
-                result.is_valid = True
-                result.rendered_path = str(png_file)
-                self.logger.info(
-                    "Diagram rendered successfully",
-                    diagram=str(puml_file),
-                    output=str(png_file),
-                )
-            else:
-                result.errors.append(f"Rendering failed: {process.stderr}")
+            if exec_result.is_failure:
+                result.errors.append(f"Rendering failed: {exec_result.error}")
                 result.is_valid = False
                 self.logger.warning(
                     "Diagram rendering failed",
                     diagram=str(puml_file),
-                    error=process.stderr,
+                    error=exec_result.error,
                 )
+            else:
+                process = exec_result.unwrap()
+                if process.returncode == 0 and png_file.exists():
+                    result.is_valid = True
+                    result.rendered_path = str(png_file)
+                    self.logger.info(
+                        "Diagram rendered successfully",
+                        diagram=str(puml_file),
+                        output=str(png_file),
+                    )
+                else:
+                    result.errors.append(f"Rendering failed: {process.stderr}")
+                    result.is_valid = False
+                    self.logger.warning(
+                        "Diagram rendering failed",
+                        diagram=str(puml_file),
+                        error=process.stderr,
+                    )
 
         except Exception as e:
             error_msg = f"Rendering error: {e!s}"
