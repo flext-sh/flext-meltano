@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 import time as time_module
 from pathlib import Path
@@ -120,27 +119,32 @@ class DocumentationAutomation(FlextService):
 
         """
         try:
-            cmd_args = [sys.executable, str(self.maintenance_script)] + list(args)
+            # Import maintenance module directly instead of subprocess call
+            import importlib.util
 
-            # Use subprocess for execution
-            result = subprocess.run(
-                cmd_args,
-                cwd=Path.cwd(),
-                capture_output=True,
-                text=True,
-                check=False,
-                shell=False,
+            maintenance_spec = importlib.util.spec_from_file_location(
+                "maintenance_audit", self.maintenance_script
             )
-
-            if result.returncode != 0:
-                error_msg = (
-                    f"Maintenance audit failed with exit code {result.returncode}"
+            if not maintenance_spec or not maintenance_spec.loader:
+                return FlextResult.fail(
+                    f"Could not load maintenance script: {self.maintenance_script}"
                 )
-                if result.stderr:
-                    error_msg += f": {result.stderr.strip()}"
-                return FlextResult.fail(error_msg)
 
-            return FlextResult.ok(None)
+            maintenance_module = importlib.util.module_from_spec(maintenance_spec)
+            sys.modules["maintenance_audit"] = maintenance_module
+            maintenance_spec.loader.exec_module(maintenance_module)
+
+            # Call maintenance audit function directly
+            if hasattr(maintenance_module, "run_comprehensive_audit"):
+                result = maintenance_module.run_comprehensive_audit(*args)
+                if isinstance(result, dict):
+                    return FlextResult.ok(result)
+                if result:
+                    return FlextResult.ok(None)
+                return FlextResult.fail("Maintenance audit completed with warnings")
+            return FlextResult.fail(
+                f"No run_comprehensive_audit function found in {self.maintenance_script}"
+            )
 
         except Exception as e:
             error_msg = f"Failed to execute maintenance audit: {e}"
@@ -262,22 +266,37 @@ class DocumentationAutomation(FlextService):
         # )
 
     def _run_scheduled_audit(self) -> None:
-        """Run scheduled documentation audit."""
+        """Run scheduled documentation audit using direct module import."""
         try:
-            result = subprocess.run(
-                [sys.executable, str(self.maintenance_script), "--comprehensive"],
-                check=False,
-                capture_output=True,
-                text=True,
-                cwd=Path.cwd(),
-                shell=False,
+            # Import maintenance module directly instead of subprocess call
+            import importlib.util
+
+            maintenance_spec = importlib.util.spec_from_file_location(
+                "scheduled_audit", self.maintenance_script
             )
+            if not maintenance_spec or not maintenance_spec.loader:
+                self.logger.error(
+                    "maintenance_script_load_failed",
+                    path=str(self.maintenance_script),
+                )
+                return
 
-            if result.returncode == 0:
-                pass
+            maintenance_module = importlib.util.module_from_spec(maintenance_spec)
+            sys.modules["scheduled_audit"] = maintenance_module
+            maintenance_spec.loader.exec_module(maintenance_module)
 
-        except Exception:
-            pass
+            # Call comprehensive audit function directly
+            if hasattr(maintenance_module, "run_comprehensive_audit"):
+                maintenance_module.run_comprehensive_audit("--comprehensive")
+            else:
+                self.logger.warning(
+                    "maintenance_function_not_found",
+                    function="run_comprehensive_audit",
+                    script=str(self.maintenance_script),
+                )
+
+        except Exception as e:
+            self.logger.exception("scheduled_audit_execution_failed", error=str(e))
 
     def run_continuous_monitoring(self) -> None:
         """Run continuous monitoring loop."""
