@@ -74,7 +74,7 @@ class FlextMeltanoAPIDBTOperations:
                 if self.api.config and hasattr(self.api.config, "project_root")
                 else ".",
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT models execution failed: {e}"
             )
@@ -107,7 +107,7 @@ class FlextMeltanoAPIDBTOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT model testing failed: {e}"
             )
@@ -128,7 +128,7 @@ class FlextMeltanoAPIDBTOperations:
                 "docs_generated": True,
                 "docs_path": "./target/docs/index.html",
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT documentation generation failed: {e}"
             )

@@ -76,7 +76,7 @@ class FlextMeltanoProjectService(
                 data=config_data
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Project service execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
@@ -217,7 +217,7 @@ class FlextMeltanoProjectService(
         try:
             temp_dir = tempfile.mkdtemp(prefix=prefix)
             return FlextResult[Path].ok(Path(temp_dir))
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[Path].fail(f"Failed to create temp directory: {e}")
 
     def _generate_minimal_config(
@@ -257,7 +257,7 @@ class FlextMeltanoProjectService(
             with config_file.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False)
             return FlextResult[Path].ok(project_path)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[Path].fail(f"Failed to write meltano.yml: {e}")
 
     def _initialize_project_instance(self, project_path: Path) -> FlextResult[object]:
@@ -281,7 +281,7 @@ class FlextMeltanoProjectService(
                 "meltano_version": str(getattr(project, "meltano_version", "")),
             }
             return FlextResult[FlextMeltanoTypes.Dbt.Project].ok(project_dict)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.Dbt.Project].fail(
                 f"Failed to convert project object: {e}"
             )
@@ -337,7 +337,7 @@ class FlextMeltanoProjectService(
             project_path = parent_dir / project_name
             project_path.mkdir(parents=True, exist_ok=True)
             return FlextResult[Path].ok(project_path)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[Path].fail(f"Failed to create project directory: {e}")
 
     def _create_project_structure(self, project_path: Path) -> FlextResult[Path]:
@@ -358,7 +358,7 @@ class FlextMeltanoProjectService(
                 (project_path / directory / ".gitkeep").touch()
 
             return FlextResult[Path].ok(project_path)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[Path].fail(f"Failed to create project structure: {e}")
 
     def _initialize_project_config(
@@ -378,7 +378,7 @@ environments:
             config_file = project_path / "meltano.yml"
             config_file.write_text(config_content, encoding="utf-8")
             return FlextResult[Path].ok(project_path)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[Path].fail(f"Failed to initialize meltano.yml: {e}")
 
     def _build_creation_result(
@@ -406,7 +406,7 @@ environments:
             )
 
             return FlextResult[dict[str, str]].ok(result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, str]].fail(
                 f"Failed to build creation result: {e}"
             )

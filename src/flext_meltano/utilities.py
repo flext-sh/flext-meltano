@@ -87,7 +87,13 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "flext_version": FlextMeltanoConstants.Meltano.FLEXT_MELTANO_VERSION,
             }
             return FlextResult[dict[str, object]].ok(data=config_dict)
-        except Exception as e:  # pragma: no cover
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:  # pragma: no cover
             error_msg = f"Failed to create Meltano config dict[str, object]: {e}"
             logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)
@@ -127,7 +133,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             try:
                 if hasattr(file_handle, "close"):
                     file_handle.close()
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 FlextLogger(__name__).warning(f"Error closing file handle: {e}")
 
         def resource_factory() -> TextIO:
@@ -169,7 +175,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "w", encoding=FlextConstants.Mixins.DEFAULT_ENCODING
             )
             return FlextResult[TextIO].ok(data=file_handle)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[TextIO].fail(f"Failed to open file for writing: {e}")
 
     @classmethod
@@ -201,7 +207,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             # DOMAIN-SPECIFIC: YAML writing with Meltano formatting preferences
             yaml.dump(yaml_data, file_handle, default_flow_style=False, indent=2)
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to write YAML content: {e}")
 
     @classmethod
@@ -219,7 +225,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             if hasattr(file_handle, "close"):
                 file_handle.close()
             return FlextResult.ok(data=None)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             # Log but don't fail on close errors
             FlextLogger(__name__).warning(f"Error closing file handle: {e}")
             return FlextResult.ok(data=None)
@@ -263,7 +269,13 @@ class FlextMeltanoUtilities(FlextUtilities):
                 },
             }
             return FlextResult[dict[str, object]].ok(data=config_dict)
-        except Exception as e:  # pragma: no cover
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:  # pragma: no cover
             error_msg = f"Failed to create plugin config: {e}"
             FlextLogger(__name__).exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)

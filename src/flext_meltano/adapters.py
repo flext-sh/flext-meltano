@@ -100,7 +100,7 @@ class FlextMeltanoAdapter:
                     "status": "created",
                     "created_at": str(time.time()),
                 })
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Project creation failed: {e}"
                 )
@@ -128,7 +128,7 @@ class FlextMeltanoAdapter:
                 return FlextResult[list[dict[str, object]]].ok(
                     cast("list[dict[str, object]]", plugins)
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[list[dict[str, object]]].fail(
                     f"Plugin discovery failed: {e}"
                 )
@@ -176,7 +176,7 @@ class FlextMeltanoAdapter:
                 return FlextResult[dict[str, object]].ok(
                     cast("dict[str, object]", execution_result)
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Pipeline execution failed: {e}"
                 )
@@ -222,7 +222,7 @@ class FlextMeltanoAdapter:
                 return FlextResult[dict[str, object]].ok(
                     cast("dict[str, object]", catalog)
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Catalog creation failed: {e}"
                 )
@@ -249,7 +249,7 @@ class FlextMeltanoAdapter:
                 return FlextResult[dict[str, object]].ok(
                     cast("dict[str, object]", dbt_result)
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(f"DBT operation failed: {e}")
 
 

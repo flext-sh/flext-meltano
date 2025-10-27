@@ -124,7 +124,7 @@ class DocsConfig(FlextConfig):
 
             return FlextResult.ok(self)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return FlextResult.fail(error_msg)
 

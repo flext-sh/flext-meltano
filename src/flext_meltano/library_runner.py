@@ -81,7 +81,7 @@ class FlextMeltanoLibraryRunner:
                 elt_result
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
@@ -134,7 +134,7 @@ class FlextMeltanoLibraryRunner:
                 dbt_result
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"DBT transformation failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[
@@ -153,7 +153,7 @@ class FlextMeltanoLibraryRunner:
             return FlextResult[dict[str, object]].ok(
                 cast("dict[str, object]", dbt_runner)
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(f"Failed to get DBT runner: {e}")
 
     def get_singer_manager(self) -> FlextResult[dict[str, object]]:
@@ -168,7 +168,7 @@ class FlextMeltanoLibraryRunner:
             return FlextResult[dict[str, object]].ok(
                 cast("dict[str, object]", singer_manager)
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(
                 f"Failed to get Singer manager: {e}"
             )
@@ -223,7 +223,7 @@ class FlextMeltanoLibraryRunner:
                 elt_result
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(

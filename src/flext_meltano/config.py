@@ -500,7 +500,13 @@ class FlextMeltanoConfig(FlextConfig):
 
             return FlextResult[FlextMeltanoConfig].ok(config)
 
-        except Exception as e:  # pragma: no cover
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:  # pragma: no cover
             return FlextResult[FlextMeltanoConfig].fail(
                 f"Config creation failed: {e}",
             )
@@ -711,7 +717,7 @@ class FlextMeltanoConfig(FlextConfig):
                 and self.debug
             ):
                 # Force debug=False when switching to production
-                setattr(self, "debug", False)
+                self.debug = False
 
             applied_count = 0
             for key, value in overrides.items():
@@ -729,7 +735,7 @@ class FlextMeltanoConfig(FlextConfig):
 
             return FlextResult[None].ok(data=None)
 
-        except Exception as error:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
             return FlextResult[None].fail(
                 f"Failed to apply configuration overrides: {error}",
                 error_code="OVERRIDE_APPLICATION_ERROR",
@@ -900,7 +906,7 @@ class FlextMeltanoConfig(FlextConfig):
                     "snapshot-paths": ["snapshots"],
                 }
                 return FlextResult[dict[str, object]].ok(config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Failed to create DBT config: {e}"
                 )
@@ -940,7 +946,7 @@ class FlextMeltanoConfig(FlextConfig):
                     }
                 }
                 return FlextResult[dict[str, object]].ok(profile_config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Failed to create DBT profile config: {e}"
                 )
@@ -979,7 +985,7 @@ class FlextMeltanoConfig(FlextConfig):
                     ],
                 }
                 return FlextResult[dict[str, object]].ok(config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[dict[str, object]].fail(
                     f"Failed to create Meltano config: {e}"
                 )
@@ -1001,7 +1007,7 @@ class FlextMeltanoConfig(FlextConfig):
                 config.timeout_seconds = 300
                 config.max_concurrent_jobs = 2
                 return FlextResult[FlextMeltanoConfig].ok(config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create dev config: {e}"
                 )
@@ -1029,7 +1035,7 @@ class FlextMeltanoConfig(FlextConfig):
                 config.max_concurrent_jobs = 10
                 config.meltano_database_uri = SecretStr(database_url)
                 return FlextResult[FlextMeltanoConfig].ok(config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create prod config: {e}"
                 )
@@ -1051,7 +1057,7 @@ class FlextMeltanoConfig(FlextConfig):
                 config.timeout_seconds = 60
                 config.max_concurrent_jobs = 1
                 return FlextResult[FlextMeltanoConfig].ok(config)
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[FlextMeltanoConfig].fail(
                     f"Failed to create test config: {e}"
                 )

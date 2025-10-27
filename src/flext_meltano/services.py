@@ -259,7 +259,7 @@ class FlextMeltanoService(
                 source_name=source_name,
             )
             return FlextResult[FlextMeltanoService].ok(service)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create source service '{source_name}': {e}"
             )
@@ -274,7 +274,7 @@ class FlextMeltanoService(
                 sink_name=sink_name,
             )
             return FlextResult[FlextMeltanoService].ok(service)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create sink service '{sink_name}': {e}"
             )
@@ -289,7 +289,7 @@ class FlextMeltanoService(
                 transformation_name=transformation_name,
             )
             return FlextResult[FlextMeltanoService].ok(service)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoService].fail(
                 f"Failed to create transformation service '{transformation_name}': {e}"
             )

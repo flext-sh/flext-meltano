@@ -51,7 +51,7 @@ class FlextMeltanoBridge:
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
             return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(f"Bridge command failed: {e}")
 
     def get_version(self) -> FlextResult[str]:
@@ -59,7 +59,7 @@ class FlextMeltanoBridge:
         try:
             # Placeholder - real implementation would query Go bridge
             return FlextResult[str].ok("1.0.0")
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[str].fail(f"Failed to get version: {e}")
 
     def validate_connection(self) -> FlextResult[bool]:
@@ -67,7 +67,7 @@ class FlextMeltanoBridge:
         try:
             # Placeholder - real implementation would test Go bridge connectivity
             return FlextResult[bool].ok(True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 
     def discover_plugins(self) -> FlextResult[dict[str, object]]:
@@ -82,7 +82,7 @@ class FlextMeltanoBridge:
                 "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
             }
             return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(f"Plugin discovery failed: {e}")
 
 
