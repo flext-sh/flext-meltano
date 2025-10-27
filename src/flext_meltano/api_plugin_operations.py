@@ -79,7 +79,7 @@ class FlextMeltanoAPIPluginOperations:
                 "installed_at": str(__import__("time").time()),
                 "api_version": self.api.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Plugin installation failed: {e}"
             )
@@ -108,7 +108,7 @@ class FlextMeltanoAPIPluginOperations:
             return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].ok(plugins_data)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].fail(f"Plugin listing failed: {e}")

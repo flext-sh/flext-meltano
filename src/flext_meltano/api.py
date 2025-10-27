@@ -255,7 +255,7 @@ class FlextMeltano(
                         pipeline_config,
                     )
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return FlextResult[
                     FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict
                 ].fail(f"Pipeline creation failed: {e}")
@@ -298,7 +298,7 @@ class FlextMeltano(
                     "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", execution_result
                 )
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline execution failed: {e}"
             )
@@ -343,7 +343,7 @@ class FlextMeltano(
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", elt_result)
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"ELT pipeline execution failed: {e}"
             )
@@ -379,7 +379,7 @@ class FlextMeltano(
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Tap execution failed: {e}"
             )
@@ -409,7 +409,7 @@ class FlextMeltano(
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}"
             )
@@ -462,7 +462,7 @@ class FlextMeltano(
                     },
                 )
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Plugin installation failed: {e}"
             )
@@ -495,7 +495,7 @@ class FlextMeltano(
                     plugins_data,
                 )
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[
                 list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
             ].fail(f"Plugin listing failed: {e}")
@@ -542,7 +542,7 @@ class FlextMeltano(
                     },
                 )
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT models execution failed: {e}"
             )
@@ -580,7 +580,7 @@ class FlextMeltano(
                     },
                 )
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT model testing failed: {e}"
             )
@@ -601,7 +601,7 @@ class FlextMeltano(
                 "docs_generated": True,
                 "docs_path": "./target/docs/index.html",
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT documentation generation failed: {e}"
             )
@@ -683,7 +683,7 @@ class FlextMeltano(
                     project_dir=Path(project_dir) if project_dir else Path.cwd(),
                 ),
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Failed to create project: {e}"
             )
@@ -692,7 +692,7 @@ class FlextMeltano(
         """Validate Meltano project - delegates to config."""
         try:
             return self.config.validate_project_structure()
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to validate project: {e}")
 
     # ============================================================================
@@ -710,7 +710,7 @@ class FlextMeltano(
             return service.extract(
                 cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", config or {})
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextTypes.JsonValue].fail(
                 f"Failed to extract data: {e}"
             )
@@ -724,7 +724,7 @@ class FlextMeltano(
             if records:
                 return service.load_batch(records)
             return FlextResult[FlextTypes.JsonValue].ok({"status": "initialized"})
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextTypes.JsonValue].fail(f"Failed to load data: {e}")
 
     def discover_catalog(self, source_name: str) -> FlextResult[FlextTypes.JsonValue]:
@@ -732,7 +732,7 @@ class FlextMeltano(
         try:
             service = FlextMeltanoService(self.config, source_name=source_name)
             return service.discover()
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextTypes.JsonValue].fail(
                 f"Failed to discover catalog: {e}"
             )

@@ -64,7 +64,7 @@ class FlextMeltanoComponentService(
                 data=config_data
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
@@ -148,7 +148,7 @@ class FlextMeltanoComponentService(
             self.logger.info(f"Discovered {len(plugins)} plugins")
             return FlextResult[list[dict[str, str]]].ok(data=plugins)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
             return FlextResult[list[dict[str, str]]].fail(error_msg)
@@ -246,7 +246,7 @@ class FlextMeltanoComponentService(
 
             return FlextResult[dict[str, str]].ok(data=plugin_info)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
             return FlextResult[dict[str, str]].fail(error_msg)
@@ -292,7 +292,7 @@ class FlextMeltanoComponentService(
                 )
 
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Plugin addition failed: {e}")
 
     def _build_plugin_addition_result(

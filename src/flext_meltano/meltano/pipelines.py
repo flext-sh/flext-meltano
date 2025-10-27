@@ -182,7 +182,7 @@ class FlextMeltanoOrchestrationService(
             }
 
             return FlextResult[dict[str, object]].ok(data=context_data)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(
                 f"Failed to create ELT context: {e}"
             )
@@ -231,7 +231,7 @@ class FlextMeltanoOrchestrationService(
                 cast("dict[str, FlextTypes.JsonValue]", context_data)
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                 f"Unexpected error in ELT pipeline: {e}"
             )
@@ -274,7 +274,7 @@ class FlextMeltanoOrchestrationService(
             )
 
             return FlextResult[dict[str, str]].ok(pipeline_result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, str]].fail(
                 f"Failed to build pipeline result: {e}"
             )

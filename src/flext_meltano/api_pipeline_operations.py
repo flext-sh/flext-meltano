@@ -88,7 +88,7 @@ class FlextMeltanoAPIPipelineOperations:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 pipeline_config
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline creation failed: {e}"
             )
@@ -119,7 +119,7 @@ class FlextMeltanoAPIPipelineOperations:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 execution_result
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline execution failed: {e}"
             )
@@ -164,7 +164,7 @@ class FlextMeltanoAPIPipelineOperations:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                 elt_result
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"ELT pipeline execution failed: {e}"
             )
@@ -200,7 +200,7 @@ class FlextMeltanoAPIPipelineOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Tap execution failed: {e}"
             )
@@ -230,7 +230,7 @@ class FlextMeltanoAPIPipelineOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}"
             )

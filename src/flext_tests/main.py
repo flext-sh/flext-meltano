@@ -98,6 +98,6 @@ class FlextTestsAssertion:
             raise AssertionError(msg)
         except exception:
             pass
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             msg = f"Expected {exception.__name__}, got {type(e).__name__}"
             raise AssertionError(msg) from None

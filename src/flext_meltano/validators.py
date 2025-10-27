@@ -272,7 +272,7 @@ class FlextMeltanoValidators:
         try:
             PipelineProjectBusinessRules.model_validate(config_dict)
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
@@ -326,7 +326,7 @@ class FlextMeltanoValidators:
         try:
             TransformationBusinessRules.model_validate(config_dict)
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Transformation validation failed: {e}")
 
     @classmethod
@@ -384,7 +384,7 @@ class FlextMeltanoValidators:
                     transform_dir.mkdir(parents=True, exist_ok=True)
 
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
             logger.exception(error_msg)
             return FlextResult[bool].fail(error_msg)
@@ -427,7 +427,7 @@ class FlextMeltanoValidators:
                 )
 
             return FlextResult[dict[str, object]].ok(data=config)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)

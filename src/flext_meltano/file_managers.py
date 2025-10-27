@@ -56,7 +56,7 @@ class FlextMeltanoFileManagers:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             logger.info(f"Created temporary directory: {temp_dir}")
             return FlextResult[Path].ok(data=temp_dir)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to create temp directory: {e}"
             logger.exception(error_msg)
             return FlextResult[Path].fail(error_msg)
@@ -86,7 +86,7 @@ class FlextMeltanoFileManagers:
                     sort_keys=False,
                 )
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to save YAML config: {e}")
 
     @classmethod
@@ -133,7 +133,7 @@ class FlextMeltanoFileManagers:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].ok(
                 data=cast("FlextMeltanoTypes.MeltanoCore.FileConfigDict", config_data)
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.FileConfigDict].fail(
                 f"Failed to load YAML config: {e}"
             )
@@ -164,7 +164,7 @@ class FlextMeltanoFileManagers:
             return FlextResult[bool].ok(data=True)
         except yaml.YAMLError as e:
             return FlextResult[bool].fail(f"Invalid YAML syntax: {e}")
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to validate YAML: {e}")
 
     @classmethod
@@ -188,7 +188,7 @@ class FlextMeltanoFileManagers:
                 created_paths[directory] = str(dir_path)
 
             return FlextResult[dict[str, str]].ok(data=created_paths)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, str]].fail(
                 f"Failed to create directories: {e}",
             )
@@ -259,7 +259,7 @@ class FlextMeltanoFileManagers:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].ok(
                 data=created_paths
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.PathDict].fail(
                 f"Failed to setup project structure: {e}"
             )
@@ -276,7 +276,7 @@ class FlextMeltanoFileManagers:
             if temp_path.exists() and temp_path.is_dir():
                 shutil.rmtree(temp_path)
             return FlextResult[bool].ok(data=True)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to cleanup temp directory: {e}")
 
     @classmethod

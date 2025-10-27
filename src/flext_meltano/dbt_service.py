@@ -91,7 +91,7 @@ class FlextMeltanoTransformationService(
 
             return result
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to run transformations: {e}"
             _ = self.logger.exception(error_msg)
             return FlextResult[dict[str, object]].fail(error_msg)

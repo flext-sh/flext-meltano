@@ -46,7 +46,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         if config and isinstance(config, dict):
             try:
                 self._config = FlextMeltanoConfig.model_validate(config)
-            except Exception:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError):
                 # Fall back to default config if validation fails
                 self._config = FlextMeltanoConfig()
         else:
@@ -80,7 +80,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
                 data=cast("FlextTypes.JsonValue", config_data)
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Executor execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextTypes.JsonValue].fail(error_msg)
@@ -94,12 +94,11 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute a Meltano command with timeout and error handling.
 
         Args:
-        command: Command to execute as string list
-        timeout: Timeout in seconds
-        cwd: Working directory for execution
+            command: Command to execute as string list
+            timeout: Timeout in seconds
 
         Returns:
-        FlextResult with execution result
+            FlextResult with execution result
 
         """
         try:
@@ -121,7 +120,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
 
             return FlextResult[FlextMeltanoExecutionResult].ok(result)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Command execution failed: {e}"
             self.logger.exception(error_msg)
             return FlextResult[FlextMeltanoExecutionResult].fail(error_msg)
@@ -135,19 +134,18 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         """Execute a complete ELT pipeline.
 
         Args:
-        tap_name: Name of the tap to use
-        target_name: Name of the target to use
-        config: Pipeline configuration
+            tap_name: Name of the tap to use
+            target_name: Name of the target to use
 
         Returns:
-        FlextResult with pipeline execution result
+            FlextResult with pipeline execution result
 
         """
         try:
             command = ["meltano", "run", tap_name, target_name]
             return self.execute_command(command)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoExecutionResult].fail(
                 f"Pipeline execution failed: {e}"
             )
@@ -173,7 +171,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
                 command.extend(args)
             return self.execute_command(command)
 
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoExecutionResult].fail(
                 f"DBT command failed: {e}"
             )
@@ -183,7 +181,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         try:
             # Placeholder - real implementation would get actual version
             return FlextResult[str].ok("3.0.0")
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[str].fail(f"Failed to get version: {e}")
 
     # ========================================================================
@@ -272,7 +270,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         try:
             # Return empty list - full implementation delegates to adapter
             return FlextResult[list[dict[str, object]]].ok([])
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[list[dict[str, object]]].fail(
                 f"Failed to list plugins: {e}"
             )
@@ -296,7 +294,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
         try:
             cli = FlextMeltanoCLI()
             return FlextResult[object].ok(cli)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[object].fail(f"Failed to create CLI: {e}")
 
     @staticmethod
@@ -313,7 +311,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
                     "args": args,
                 })
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(
                 f"Failed to create CLI runner: {e}"
             )
@@ -377,7 +375,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
                 "args": args,
                 "status": "executed",
             })
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[dict[str, object]].fail(f"Action failed: {e}")
 
     def _route_command(
