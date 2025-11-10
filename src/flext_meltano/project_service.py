@@ -252,7 +252,7 @@ class FlextMeltanoProjectService(
         """Write meltano.yml configuration file."""
         try:
             config_file = (
-                project_path / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+                project_path / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
             )
             with config_file.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False)
@@ -296,7 +296,7 @@ class FlextMeltanoProjectService(
 
     def _validate_meltano_config_exists(self, project_root: Path) -> FlextResult[Path]:
         """Validate meltano.yml exists in project directory."""
-        meltano_yml = project_root / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+        meltano_yml = project_root / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
             return FlextResult[Path].fail(
                 f"Not a Meltano project: meltano.yml not found in {project_root}"
@@ -393,8 +393,7 @@ environments:
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
                     (
-                        project_path
-                        / FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE
+                        project_path / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
                     ).exists()
                 ),
             }
