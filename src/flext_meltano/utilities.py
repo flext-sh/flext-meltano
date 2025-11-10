@@ -66,7 +66,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             else:
                 config_dict["environments"] = [
                     {"name": env}
-                    for env in FlextMeltanoConstants.Meltano.METADATA_DEFAULT_ENVIRONMENTS
+                    for env in FlextMeltanoConstants.Metadata.DEFAULT_ENVIRONMENTS
                 ]
 
             # Add plugins if provided, otherwise use defaults
@@ -82,9 +82,9 @@ class FlextMeltanoUtilities(FlextUtilities):
 
             # Add metadata
             config_dict["metadata"] = {
-                "created_by": FlextMeltanoConstants.Meltano.METADATA_CREATED_BY,
+                "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
                 "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
-                "flext_version": FlextMeltanoConstants.Meltano.FLEXT_MELTANO_VERSION,
+                "flext_version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
             }
             return FlextResult[dict[str, object]].ok(data=config_dict)
         except (
@@ -152,7 +152,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 cleanup_file_handle,
             )
             .with_context(
-                lambda error: f"Writing {FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE}: {error}"
+                lambda error: f"Writing {FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE}: {error}"
             )
         )
 
@@ -264,7 +264,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "settings": {},
                 "config": {},
                 "metadata": {
-                    "created_by": FlextMeltanoConstants.Meltano.METADATA_CREATED_BY,
+                    "created_by": FlextMeltanoConstants.Metadata.CREATED_BY,
                     "created_at": FlextUtilities.Generators.generate_iso_timestamp(),  # NO DUPLICATION
                 },
             }

@@ -226,7 +226,7 @@ class FlextMeltanoFileManagers:
 
             # Create essential config files
             configs = {
-                FlextMeltanoConstants.Meltano.MELTANO_PROJECT_FILE: {
+                FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
                     "project_name": "project_name",

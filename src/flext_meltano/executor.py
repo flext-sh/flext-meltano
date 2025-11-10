@@ -88,7 +88,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
     def execute_command(
         self,
         command: list[str],
-        timeout: int = FlextMeltanoConstants.Meltano.MELTANO_DEFAULT_TIMEOUT,
+        timeout: int = FlextMeltanoConstants.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> FlextResult[FlextMeltanoExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
@@ -340,7 +340,7 @@ class FlextMeltanoExecutor(FlextService[FlextTypes.JsonValue]):
             "command": "version",
             "command_type": "version",
             "status": "success",
-            "version": FlextMeltanoConstants.Meltano.FLEXT_MELTANO_VERSION,
+            "version": FlextMeltanoConstants.FLEXT_MELTANO_VERSION,
             "success": True,
             "cli_type": "flext_meltano",
         })
