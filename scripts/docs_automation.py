@@ -16,6 +16,7 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 import time as time_module
@@ -120,8 +121,6 @@ class DocumentationAutomation(FlextService):
         """
         try:
             # Import maintenance module directly instead of subprocess call
-            import importlib.util
-
             maintenance_spec = importlib.util.spec_from_file_location(
                 "maintenance_audit", self.maintenance_script
             )
@@ -269,8 +268,6 @@ class DocumentationAutomation(FlextService):
         """Run scheduled documentation audit using direct module import."""
         try:
             # Import maintenance module directly instead of subprocess call
-            import importlib.util
-
             maintenance_spec = importlib.util.spec_from_file_location(
                 "scheduled_audit", self.maintenance_script
             )
