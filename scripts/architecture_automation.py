@@ -81,12 +81,9 @@ class PlantUMLRenderer(FlextService):
         jar_path = "plantuml.jar"
         url = "https://github.com/plantuml/plantuml/releases/download/v1.2023.13/plantuml-1.2023.13.jar"
 
-        try:
-            # Security: URL is hardcoded and from trusted source (GitHub releases)
-            urllib.request.urlretrieve(url, jar_path)
-            return jar_path
-        except Exception:
-            raise
+        # Security: URL is hardcoded and from trusted source (GitHub releases)
+        urllib.request.urlretrieve(url, jar_path)
+        return jar_path
 
     def render_diagram(self, puml_file: Path) -> FlextResult[DiagramValidationResult]:
         """Render a PlantUML diagram to image format using FLEXT patterns."""
@@ -119,13 +116,15 @@ class PlantUMLRenderer(FlextService):
 
             # CONVERTED: Use FlextUtilities instead of subprocess.run()
             # Security: command with controlled arguments
-            exec_result = FlextUtilities.run_external_command(
-                cmd,
-                check=False,
-                capture_output=True,
-                text=True,
-                shell=False,
-                cwd=str(puml_file.parent),
+            exec_result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    cmd,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    shell=False,
+                    cwd=str(puml_file.parent),
+                )
             )
 
             if exec_result.is_failure:
@@ -163,6 +162,65 @@ class PlantUMLRenderer(FlextService):
 
         return FlextResult.ok(result)
 
+    def _validate_basic_syntax(
+        self, content: str, result: DiagramValidationResult
+    ) -> bool:
+        """Perform basic syntax validation checks."""
+        # Check for empty file
+        if not content.strip():
+            result.errors.append("Diagram file is empty")
+            result.is_valid = False
+            return False
+
+        # Check for required PlantUML markers
+        if not content.startswith("@startuml"):
+            result.errors.append("Diagram must start with @startuml")
+            result.is_valid = False
+            return False
+
+        if "@enduml" not in content:
+            result.errors.append("Diagram must end with @enduml")
+            result.is_valid = False
+            return False
+
+        return True
+
+    def _validate_bracket_balance(
+        self, content: str, result: DiagramValidationResult
+    ) -> None:
+        """Check for unbalanced brackets and braces."""
+        if content.count("{") != content.count("}"):
+            result.warnings.append("Unbalanced curly braces detected")
+
+        if content.count("[") != content.count("]"):
+            result.warnings.append("Unbalanced square brackets detected")
+
+    def _validate_line_syntax(
+        self, lines: list[str], result: DiagramValidationResult
+    ) -> None:
+        """Validate syntax on a line-by-line basis."""
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            if stripped and not stripped.startswith((
+                "'",
+                "@",
+                "title",
+                "legend",
+                "note",
+                "end",
+                "*",
+            )):
+                # Basic validation for common PlantUML constructs
+                if "->" in stripped and not stripped.endswith(";"):
+                    result.warnings.append(
+                        f"Line {i}: Arrow relationship may be missing semicolon"
+                    )
+                elif "=" in stripped and not any(
+                    keyword in stripped for keyword in ["skinparam", "set"]
+                ):
+                    # Variable assignments should be valid
+                    pass
+
     def validate_syntax(self, puml_file: Path) -> DiagramValidationResult:
         """Validate PlantUML syntax."""
         result = DiagramValidationResult(diagram_path=str(puml_file), is_valid=True)
@@ -171,53 +229,16 @@ class PlantUMLRenderer(FlextService):
             with Path(puml_file).open(encoding="utf-8") as f:
                 content = f.read()
 
-            # Basic syntax checks
-            if not content.strip():
-                result.errors.append("Diagram file is empty")
-                result.is_valid = False
+            # Basic syntax validation
+            if not self._validate_basic_syntax(content, result):
                 return result
 
-            # Check for required PlantUML markers
-            if not content.startswith("@startuml"):
-                result.errors.append("Diagram must start with @startuml")
-                result.is_valid = False
-                return result
+            # Bracket and brace balance validation
+            self._validate_bracket_balance(content, result)
 
-            if "@enduml" not in content:
-                result.errors.append("Diagram must end with @enduml")
-                result.is_valid = False
-                return result
-
-            # Check for unbalanced braces/brackets
-            if content.count("{") != content.count("}"):
-                result.warnings.append("Unbalanced curly braces detected")
-
-            if content.count("[") != content.count("]"):
-                result.warnings.append("Unbalanced square brackets detected")
-
-            # Check for common syntax errors
+            # Line-by-line syntax validation
             lines = content.split("\n")
-            for i, line in enumerate(lines, 1):
-                stripped = line.strip()
-                if stripped and not stripped.startswith((
-                    "'",
-                    "@",
-                    "title",
-                    "legend",
-                    "note",
-                    "end",
-                    "*",
-                )):
-                    # Basic validation for common PlantUML constructs
-                    if "->" in stripped and not stripped.endswith(";"):
-                        result.warnings.append(
-                            f"Line {i}: Arrow relationship may be missing semicolon"
-                        )
-                    elif "=" in stripped and not any(
-                        keyword in stripped for keyword in ["skinparam", "set"]
-                    ):
-                        # Variable assignments should be valid
-                        pass
+            self._validate_line_syntax(lines, result)
 
             result.is_valid = len(result.errors) == 0
 
@@ -664,8 +685,8 @@ class ArchitectureDocumentationManager:
                 with Path(arch_file).open("w", encoding="utf-8") as f:
                     f.write(content)
 
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.warning(f"Failed to update timestamps in {arch_file}: {e}")
 
     def _update_diagram_references(self) -> None:
         """Update diagram references in documentation."""

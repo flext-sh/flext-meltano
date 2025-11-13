@@ -125,7 +125,7 @@ from flext_core import FlextTypes
 from flext_core import FlextUtilities
 
 # Mock external dependencies
-@patch('flext_meltano.execution.FlextUtilities.run_external_command')
+@patch('flext_meltano.execution.FlextUtilities.FlextUtilities.CommandExecution.run_external_command')
 def test_execution_with_mock(mock_subprocess):
     mock_subprocess.return_value.returncode = 0
     mock_subprocess.return_value.stdout = "test output"

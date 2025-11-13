@@ -252,11 +252,11 @@ class FlextMeltanoSingerCliTranslator:
         FlextResult containing execution results with stdout/stderr
 
         """
-        # Use FlextUtilities.run_external_command for standardized subprocess execution
+        # Use FlextUtilities.FlextUtilities.CommandExecution.run_external_command for standardized subprocess execution
         process_input = input_data.encode() if input_data else None
 
         # Execute command with FlextUtilities (includes complete error handling)
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             cmd=command,
             capture_output=True,
             check=False,  # Don't raise exception on non-zero exit

@@ -19,7 +19,7 @@ logger = FlextLogger(__name__)
 
 
 class FlextMeltanoValidators:
-    """Generic pipeline business rule validators using FlextValidations foundation.
+    """Generic pipeline business rule validators using FlextUtilities.Validation foundation.
 
     This class provides complete validation for pipeline-specific business rules
     while delegating generic validation operations to flext-core. It follows the
