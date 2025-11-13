@@ -16,11 +16,8 @@ Version: 1.0.0
 
 from __future__ import annotations
 
-import argparse
-import json
 import re
 import time
-from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
@@ -531,8 +528,8 @@ class LinkValidator:
 
                 self.checked_urls.add(link_url)
 
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.warning(f"Failed to validate URL {url}: {e}")
 
         return results
 
@@ -576,14 +573,9 @@ class QualityReporter:
 
         return str(report_path)
 
-    def _generate_report_content(
-        self,
-        metrics: DocumentationMetrics,
-        issues: list[DocumentationIssue],
-        link_results: dict[str, object],
-    ) -> str:
-        """Generate report content."""
-        report = f"""# Documentation Quality Report
+    def _generate_report_header(self, metrics: DocumentationMetrics) -> str:
+        """Generate the report header section."""
+        return f"""# Documentation Quality Report
 
 **Generated**: {datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")}
 **Quality Score**: {metrics.quality_score}/100
@@ -598,90 +590,63 @@ class QualityReporter:
 - **Images**: {metrics.images}
 - **Code Blocks**: {metrics.code_blocks}
 
-## 🔗 Link Validation Results
+"""
+
+    def _generate_link_validation_section(self, link_results: dict[str, object]) -> str:
+        """Generate the link validation results section."""
+        return f"""## 🔗 Link Validation Results
 
 - **Links Checked**: {len(cast("list[object]", link_results.get("checked_links", [])))}
 - **Valid Links**: {cast("int", link_results.get("valid_links", 0))}
-- **Broken Links**: {len(cast("list[object]", link_results.get("broken_links", [])))}
-- **Timeout Links**: {len(cast("list[object]", link_results.get("timeout_links", [])))}
+- **Broken Links**: {cast("int", link_results.get("broken_links", 0))}
+- **Link Health**: {cast("float", link_results.get("link_health_percentage", 0)):.1f}%
 
-## 📈 Quality Score Breakdown
-
-| Component | Score | Weight | Contribution |
-|-----------|-------|--------|--------------|
 """
 
-        # Calculate component scores (simplified version)
-        components = [
-            ("Content Freshness", 85.0, 20),
-            ("Link Health", 90.0, 25),
-            ("Structure", 88.0, 25),
-            ("Formatting", 92.0, 15),
-            ("Accessibility", 87.0, 15),
-        ]
-
-        for component, score, weight in components:
-            contribution = score * weight / 100
-            report += (
-                f"| {component} | {score:.1f} | {weight}% | {contribution:.1f} |\n"
-            )
-
-        report += "\n## ⚠️ Issues Summary\n\n"
-
-        # Group issues by severity
-        severity_counts = Counter(issue.severity for issue in issues)
-        for severity in ["critical", "high", "medium", "low", "info"]:
-            count = severity_counts.get(severity, 0)
-            if count > 0:
-                severity_emoji = {
-                    "critical": "🚨",
-                    "high": "🔴",
-                    "medium": "🟡",
-                    "low": "🔵",
-                    "info": "ℹ️",
-                }[severity]
-                report += f"- {severity_emoji} **{severity.title()}**: {count} issues\n"
-
-        report += "\n## 📋 Detailed Issues\n\n"
-
-        # Group issues by file
-        issues_by_file: defaultdict[str, list[DocumentationIssue]] = defaultdict(list)
+    def _generate_issues_section(self, issues: list[DocumentationIssue]) -> str:
+        """Generate the issues summary section."""
+        severity_counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
         for issue in issues:
-            issues_by_file[issue.file_path].append(issue)
+            severity_counts[issue.severity] += 1
 
-        for file_path, file_issues in sorted(issues_by_file.items()):
-            report += f"### {file_path}\n\n"
-            for issue in file_issues:
-                severity_emoji = {
-                    "critical": "🚨",
-                    "high": "🔴",
+        report = "## ⚠️ Issues Summary\n\n"
+        report += f"- **Total Issues**: {len(issues)}\n"
+        report += f"- **Critical**: {severity_counts['critical']}\n"
+        report += f"- **High**: {severity_counts['high']}\n"
+        report += f"- **Medium**: {severity_counts['medium']}\n"
+        report += f"- **Low**: {severity_counts['low']}\n\n"
+
+        # Show top issues
+        if issues:
+            report += "### Top Issues\n\n"
+            for issue in issues[:5]:
+                severity_icon = {
+                    "critical": "🔴",
+                    "high": "🟠",
                     "medium": "🟡",
-                    "low": "🔵",
-                    "info": "ℹ️",
-                }[issue.severity]
-                report += f"- {severity_emoji} **{issue.issue_type.replace('_', ' ').title()}** (Line {issue.line_number})\n"
-                report += f"  {issue.description}\n"
-                if issue.suggestion:
-                    report += f"  💡 {issue.suggestion}\n"
+                    "low": "🟢",
+                }.get(issue.severity, "⚪")
+                report += f"{severity_icon} **{issue.type}**: {issue.message}\n"
+                if issue.file_path:
+                    report += f"   *File*: {issue.file_path}\n"
                 report += "\n"
 
-        if link_results.get("broken_links"):
-            report += "## 🔗 Broken Links\n\n"
-            for broken_link in cast("list[object]", link_results["broken_links"]):
-                link_dict = cast("dict[str, object]", broken_link)
-                report += f"- **{link_dict['file']}**: [{link_dict['text']}]({link_dict['url']})\n"
+        return report
 
-        report += "\n## 🎯 Recommendations\n\n"
+    def _generate_recommendations_section(
+        self, metrics: DocumentationMetrics, severity_counts: dict[str, int]
+    ) -> str:
+        """Generate the recommendations section."""
+        report = "## 💡 Recommendations\n\n"
 
-        # Generate recommendations based on issues
         if severity_counts.get("critical", 0) > 0:
-            report += "### 🚨 Critical Actions Required\n"
+            report += "### 🔴 Critical Actions Required\n"
             report += "- Address all critical issues immediately\n"
-            report += "- Review file permissions and accessibility\n"
-            report += "- Fix broken critical functionality\n\n"
+            report += "- Fix broken links and missing content\n"
+            report += "- Review content accuracy and completeness\n\n"
 
         if severity_counts.get("high", 0) > 0:
-            report += "### 🔴 High Priority Actions\n"
+            report += "### 🟠 High Priority Actions\n"
             report += "- Fix broken internal links and missing images\n"
             report += "- Update stale content\n"
             report += "- Resolve structural issues\n\n"
@@ -700,58 +665,33 @@ class QualityReporter:
 
         return report
 
-    def generate_summary_report(
-        self, metrics: DocumentationMetrics, issues: list[DocumentationIssue]
+    def _generate_report_content(
+        self,
+        metrics: DocumentationMetrics,
+        issues: list[DocumentationIssue],
+        link_results: dict[str, object],
     ) -> str:
-        """Generate summary report for quick overview."""
-        summary_path = self.output_dir / "docs_quality_summary.json"
+        """Generate report content."""
+        # Calculate severity counts for use in multiple sections
+        severity_counts = {"low": 0, "medium": 0, "high": 0, "critical": 0}
+        for issue in issues:
+            severity_counts[issue.severity] += 1
 
-        summary = {
-            "timestamp": datetime.now(UTC).isoformat(),
-            "quality_score": metrics.quality_score,
-            "metrics": {
-                "total_files": metrics.total_files,
-                "total_words": metrics.total_words,
-                "total_links": metrics.total_links,
-                "broken_links": metrics.broken_links,
-                "images": metrics.images,
-                "missing_images": metrics.missing_images,
-                "code_blocks": metrics.code_blocks,
-            },
-            "issues": {
-                "total": len(issues),
-                "by_severity": dict[str, object](
-                    Counter(issue.severity for issue in issues)
-                ),
-                "by_type": dict[str, object](
-                    Counter(issue.issue_type for issue in issues)
-                ),
-            },
-        }
+        # Build report from sections
+        report = self._generate_report_header(metrics)
+        report += self._generate_link_validation_section(link_results)
+        report += self._generate_issues_section(issues)
+        report += self._generate_recommendations_section(metrics, severity_counts)
 
-        with Path(summary_path).open("w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2, ensure_ascii=False)
-
-        return str(summary_path)
+        return report
 
 
 def main() -> None:
     """Main entry point for documentation maintenance."""
     parser = argparse.ArgumentParser(
-        description="FLEXT-Meltano Documentation Maintenance Framework",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python scripts/docs_maintenance.py --audit
-  python scripts/docs_maintenance.py --validate
-  python scripts/docs_maintenance.py --report
-  python scripts/docs_maintenance.py --comprehensive
-        """,
+        description="Documentation Maintenance and Quality Assurance"
     )
-
-    parser.add_argument(
-        "--audit", action="store_true", help="Perform comprehensive documentation audit"
-    )
+    parser.add_argument("--audit", action="store_true", help="Run documentation audit")
     parser.add_argument(
         "--validate", action="store_true", help="Validate external links"
     )
