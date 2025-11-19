@@ -16,13 +16,38 @@ from typing import ClassVar, cast
 
 import yaml
 from flext_core import FlextConfig, FlextContainer, FlextResult
+from pydantic_settings import SettingsConfigDict
 
 
-class DocsConfig(FlextConfig):
-    """Centralized configuration for documentation automation.
+@FlextConfig.auto_register("meltano_docs")
+class DocsConfig(FlextConfig.AutoConfig):
+    """Centralized configuration for documentation automation using AutoConfig pattern.
+
+    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
+
+    This class uses FlextConfig.AutoConfig for automatic:
+    - Singleton pattern (thread-safe)
+    - Namespace registration (accessible via config.meltano_docs)
+    - Environment variable loading from FLEXT_MELTANO_DOCS_* variables
+    - .env file loading (production/development)
+    - Automatic type conversion and validation via Pydantic v2
 
     Extends FlextConfig with documentation-specific settings.
     All hardcoded values from throughout the codebase are centralized here.
+    """
+
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_DOCS_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+        validate_assignment=True,
+        str_strip_whitespace=True,
+        validate_default=True,
+        frozen=False,
+        strict=False,
+    )
 
     Attributes:
     # File Paths
@@ -77,19 +102,7 @@ class DocsConfig(FlextConfig):
     # Content Requirements
     required_sections: ClassVar[list[str]] = ["##", "###"]
 
-    @classmethod
-    def get_instance(cls) -> DocsConfig:
-        """Get singleton instance through FlextContainer."""
-        container = FlextContainer.get_global()
-        config_result = container.get("DocsConfig")
-
-        if config_result.is_success:
-            return cast("DocsConfig", config_result.unwrap())
-
-        # Create and register new instance
-        instance = cls()
-        container.register("DocsConfig", instance)
-        return instance
+    # AutoConfig provides get_instance() automatically - no need to override
 
     def load_from_file(
         self, config_path: str | Path | None = None

@@ -28,8 +28,18 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 
-class FlextMeltanoConfig(FlextConfig):
-    """Pipeline configuration management with validation.
+@FlextConfig.auto_register("meltano")
+class FlextMeltanoConfig(FlextConfig.AutoConfig):
+    """Pipeline configuration management with validation using AutoConfig pattern.
+
+    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
+
+    This class uses FlextConfig.AutoConfig for automatic:
+    - Singleton pattern (thread-safe)
+    - Namespace registration (accessible via config.meltano)
+    - Environment variable loading from FLEXT_MELTANO_* variables
+    - .env file loading (production/development)
+    - Automatic type conversion and validation via Pydantic v2
 
     Extends FlextConfig to provide complete pipeline configuration
     with validation using flext-core patterns. This class serves as the single
@@ -37,7 +47,6 @@ class FlextMeltanoConfig(FlextConfig):
 
     Features:
     - Uses Pydantic 2.11+ features (SettingsConfigDict, SecretStr for sensitive data)
-    - Enhanced singleton pattern with get_or_create_shared_instance()
     - Complete type annotations with Python 3.13+ syntax
     - Environment-specific factory methods for different deployment contexts
 
@@ -46,6 +55,8 @@ class FlextMeltanoConfig(FlextConfig):
     # Model configuration using Pydantic 2.11+ SettingsConfigDict
     model_config = SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_",
+        env_file=".env",
+        env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
         str_strip_whitespace=True,
@@ -53,6 +64,8 @@ class FlextMeltanoConfig(FlextConfig):
         arbitrary_types_allowed=True,
         use_enum_values=True,
         frozen=False,
+        validate_default=True,
+        strict=False,
     )
 
     # ============================================================================
