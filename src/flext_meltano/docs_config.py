@@ -12,10 +12,10 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 
 import yaml
-from flext_core import FlextConfig, FlextContainer, FlextResult
+from flext_core import FlextConfig, FlextResult
 from pydantic_settings import SettingsConfigDict
 
 
@@ -34,20 +34,6 @@ class DocsConfig(FlextConfig.AutoConfig):
 
     Extends FlextConfig with documentation-specific settings.
     All hardcoded values from throughout the codebase are centralized here.
-    """
-
-    model_config = SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_DOCS_",
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore",
-        validate_assignment=True,
-        str_strip_whitespace=True,
-        validate_default=True,
-        frozen=False,
-        strict=False,
-    )
 
     Attributes:
     # File Paths
@@ -76,6 +62,19 @@ class DocsConfig(FlextConfig.AutoConfig):
     required_sections: List of required heading patterns
 
     """
+
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_DOCS_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+        validate_assignment=True,
+        str_strip_whitespace=True,
+        validate_default=True,
+        frozen=False,
+        strict=False,
+    )
 
     # File Paths
     config_path: str = "docs/.maintenance_config.yaml"
