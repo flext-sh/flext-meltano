@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
@@ -18,6 +19,9 @@ from typing import Protocol
 
 import pytest
 import yaml
+
+# Add tests directory to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
 
 
 class CliRunnerProtocol(Protocol):
@@ -310,6 +314,49 @@ def job_run_config() -> dict[str, object]:
     }
 
 
+# Docker fixtures for containerized testing
+# Import Docker manager conditionally
+from helpers.docker_test_manager import FlextTestDocker
+
+
+@pytest.fixture(scope="session")
+def docker_manager() -> FlextTestDocker:
+    """Session-scoped Docker manager fixture."""
+    return FlextTestDocker(keep_running=True)
+    # Cleanup will happen via atexit
+
+
+@pytest.fixture
+def docker_services(docker_manager: object) -> object:
+    """Function-scoped Docker services fixture."""
+    with docker_manager.service_context():
+        yield docker_manager
+
+
+@pytest.fixture
+def postgres_service(docker_manager: object) -> str | None:
+    """PostgreSQL service fixture."""
+    with docker_manager.service_context(["postgres"]):
+        url = docker_manager.get_service_url("postgres", 5432)
+        yield url
+
+
+@pytest.fixture
+def redis_service(docker_manager) -> str | None:
+    """Redis service fixture."""
+    with docker_manager.service_context(["redis"]):
+        url = docker_manager.get_service_url("redis", 6379)
+        yield url
+
+
+@pytest.fixture
+def meltano_service(docker_manager) -> str | None:
+    """Meltano service fixture."""
+    with docker_manager.service_context(["meltano"]):
+        url = docker_manager.get_service_url("meltano", 3000)
+        yield url
+
+
 # Pytest markers for test categorization
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest markers."""
@@ -321,6 +368,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "pipeline: Pipeline execution tests")
     config.addinivalue_line("markers", "cli: CLI command tests")
     config.addinivalue_line("markers", "slow: Slow tests")
+    config.addinivalue_line("markers", "docker: Docker-based tests")
 
 
 # Mock services

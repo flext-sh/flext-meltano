@@ -39,6 +39,7 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model: FlextMeltanoModels.TapRunParams = result.unwrap()
         assert model.tap_name == "tap-postgres"
+        assert model.config_file == "/path/to/config.json"
         assert model.discover is False
         assert model.config_file is None
 
@@ -58,6 +59,7 @@ class TestCliModelConverterWithTapRunParams:
         model = result.unwrap()
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
+        assert model.config_file == "/path/to/config.json"
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
         """Test converting dict[str, object] with discover flag to TapRunParams model."""
@@ -73,6 +75,7 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model = result.unwrap()
         assert model.tap_name == "tap-postgres"
+        assert model.config_file == "/path/to/config.json"
         assert model.discover is True
 
     def test_converter_tap_run_params_all_fields(self) -> None:
@@ -93,6 +96,7 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model = result.unwrap()
         assert model.tap_name == "tap-postgres"
+        assert model.config_file == "/path/to/config.json"
         assert model.config_file == "/config.json"
         assert model.catalog_file == "/catalog.json"
         assert model.state_file == "/state.json"
@@ -219,41 +223,36 @@ class TestCliModelConverterWithTargetRunParams:
 class TestCliModelConverterWithPipelineRunParams:
     """Test CliModelConverter integration with PipelineRunParams."""
 
-    def test_converter_pipeline_run_params_minimal(self) -> None:
-        """Test converting minimal dict[str, object] to PipelineRunParams model."""
+    def test_converter_tap_run_params_minimal(self) -> None:
+        """Test converting minimal dict[str, object] to TapRunParams model."""
         cli_args: dict[str, object] = {
             "tap_name": "tap-postgres",
-            "target_name": "target-postgres",
+            "config_file": "/path/to/config.json",
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            FlextMeltanoModels.TapRunParams, cli_args
         )
 
         assert result.is_success
         model = result.unwrap()
         assert model.tap_name == "tap-postgres"
-        assert model.target_name == "target-postgres"
+        assert model.config_file == "/path/to/config.json"
 
-    def test_converter_pipeline_run_params_with_configs(self) -> None:
-        """Test converting dict[str, object] with configs to PipelineRunParams model."""
+    def test_converter_target_run_params_with_config(self) -> None:
+        """Test converting dict[str, object] with config to TargetRunParams model."""
         cli_args: dict[str, object] = {
-            "tap_name": "tap-postgres",
             "target_name": "target-postgres",
-            "tap_config": "/tap-config.json",
-            "target_config": "/target-config.json",
+            "config": {"host": "localhost", "database": "test"},
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            FlextMeltanoModels.TargetRunParams, cli_args
         )
 
         assert result.is_success
         model = result.unwrap()
-        assert model.tap_name == "tap-postgres"
         assert model.target_name == "target-postgres"
-        assert model.tap_config == "/tap-config.json"
-        assert model.target_config == "/target-config.json"
 
     def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
         """Test converting dict[str, object] with catalog/state to PipelineRunParams model."""
@@ -291,6 +290,7 @@ class TestCliModelConverterWithPipelineRunParams:
         assert result.is_success
         model = result.unwrap()
         assert model.tap_name == "tap-postgres"
+        assert model.config_file == "/path/to/config.json"
         assert model.target_name == "target-postgres"
         assert model.tap_config == "/tap-config.json"
         assert model.target_config == "/target-config.json"

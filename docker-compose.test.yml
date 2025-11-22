@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: flext-test-postgres
+    environment:
+      POSTGRES_DB: flext_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d flext_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flext-test
+
+  redis:
+    image: redis:7-alpine
+    container_name: flext-test-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_test_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flext-test
+
+  meltano:
+    image: meltano/meltano:latest
+    container_name: flext-test-meltano
+    environment:
+      MELTANO_PROJECT_ROOT: /project
+      MELTANO_ENVIRONMENT: test
+    volumes:
+      - ./:/project
+      - meltano_cache:/root/.meltano/cache
+    working_dir: /project
+    ports:
+      - "3389:3000"  # Meltano UI port
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - flext-test
+
+volumes:
+  postgres_test_data:
+  redis_test_data:
+  meltano_cache:
+
+networks:
+  flext-test:
+    driver: bridge

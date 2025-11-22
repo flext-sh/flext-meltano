@@ -277,13 +277,14 @@ class TestPluginModelEnhanced:
         with pytest.raises(
             ValidationError, match="String should have at least 1 character"
         ):
-            FlextMeltanoModels.PluginModel(name="")
+            FlextMeltanoModels.PluginModel(name="", namespace="")
 
     def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
         """Test PluginModel validation with invalid capabilities type."""
         with pytest.raises(ValidationError, match="Input should be a valid list"):
             FlextMeltanoModels.PluginModel(
                 name="tap-postgres",
+                namespace="tap-postgres",
                 capabilities="invalid",  # Should be list
             )
 

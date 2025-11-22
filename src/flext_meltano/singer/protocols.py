@@ -76,14 +76,14 @@ class FlextMeltanoPluginProtocols:
     """
 
     # Core plugin types (JSON-based for external Meltano plugins)
-    TapPlugin: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
-    TargetPlugin: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
-    DbtPlugin: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
+    TapPlugin = FlextTypes.JsonValue
+    TargetPlugin = FlextTypes.JsonValue
+    DbtPlugin = FlextTypes.JsonValue
 
     # Service protocols (JSON-based for service integration)
-    TapServiceProtocol: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
-    TargetServiceProtocol: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
-    DbtServiceProtocol: type[FlextTypes.JsonValue] = FlextTypes.JsonValue
+    TapServiceProtocol = FlextTypes.JsonValue
+    TargetServiceProtocol = FlextTypes.JsonValue
+    DbtServiceProtocol = FlextTypes.JsonValue
 
 
 __all__ = [

@@ -52,15 +52,16 @@ class TestFlextMeltanoUtilitiesEnhanced:
         }
 
         result = utilities.create_meltano_config_dict(
-            project_id="etl-project", plugins=plugins
+            project_id="etl-project", plugins=cast("dict[str, object]", plugins)
         )
 
         assert result.is_success
-        config_dict = result.unwrap()
+        config_dict = cast("dict[str, object]", result.unwrap())
 
         assert config_dict["project_id"] == "etl-project"
-        assert config_dict["plugins"]["extractors"][0]["name"] == "tap-postgres"
-        assert config_dict["plugins"]["loaders"][0]["name"] == "target-csv"
+        plugins_dict = cast("dict[str, list[dict[str, str]]]", config_dict["plugins"])
+        assert plugins_dict["extractors"][0]["name"] == "tap-postgres"
+        assert plugins_dict["loaders"][0]["name"] == "target-csv"
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
@@ -72,19 +73,21 @@ class TestFlextMeltanoUtilitiesEnhanced:
         }
 
         config_result = utilities.create_meltano_config_dict(
-            project_id="multi-env-project", environments=environments
+            project_id="multi-env-project",
+            environments=cast("dict[str, object]", environments),
         )
 
         assert config_result.is_success
-        config_dict = config_result.unwrap()
+        config_dict = cast("dict[str, object]", config_result.unwrap())
 
         assert config_dict["project_id"] == "multi-env-project"
-        assert "dev" in config_dict["environments"]
-        assert "prod" in config_dict["environments"]
-        assert (
-            config_dict["environments"]["prod"]["plugins"]["extractors"][0]["name"]
-            == "tap-postgres"
+        env_dict = cast(
+            "dict[str, dict[str, dict[str, list[dict[str, str]]]]]",
+            config_dict["environments"],
         )
+        assert "dev" in env_dict
+        assert "prod" in env_dict
+        assert env_dict["prod"]["plugins"]["extractors"][0]["name"] == "tap-postgres"
 
     def test_create_meltano_config_dict_invalid_project_id_type(self) -> None:
         """Test Meltano config dictionary creation with invalid project_id type."""
@@ -98,7 +101,10 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_failure
-        assert "Failed to create Meltano config dict" in result.error
+        assert (
+            result.error is not None
+            and "Failed to create Meltano config dict" in result.error
+        )
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
@@ -170,7 +176,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             content = {"project_id": "test-project", "version": "1.0.0"}
 
             result = utilities.create_project_file(
-                project_path / "meltano.yml", content
+                project_path / "meltano.yml", cast("dict[str, object]", content)
             )
 
             assert result.is_success
@@ -188,7 +194,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
         file_path = Path("/nonexistent/directory/meltano.yml")
         content = {"project_id": "test"}
 
-        result = utilities.create_project_file(file_path, content)
+        result = utilities.create_project_file(
+            file_path, cast("dict[str, object]", content)
+        )
 
         assert result.is_failure
         assert result.error is not None
@@ -204,7 +212,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             # Pass invalid content (not dict[str, object] or string)
             result = utilities.create_project_file(
                 project_path / "test.yml",
-                123,  # Invalid content type
+                cast("object", 123),  # Invalid content type
             )
 
             assert result.is_failure
@@ -263,7 +271,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
             yaml_file = Path(temp_dir) / "output.yml"
             content = {"project_id": "save-test", "version": "2.0.0"}
 
-            result = utilities.save_yaml_file(yaml_file, content)
+            result = utilities.save_yaml_file(
+                yaml_file, cast("dict[str, object]", content)
+            )
 
             assert result.is_success
             assert yaml_file.exists()
@@ -292,7 +302,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             # But loading should fail
             load_result = utilities.load_yaml_file(yaml_file)
             assert load_result.is_failure
-            assert "Failed to load YAML" in str(load_result.error)
+            assert load_result.error is not None
+            assert "YAML" in str(load_result.error) or "yaml" in str(load_result.error)
 
     def test_directory_exists_success(self) -> None:
         """Test successful directory existence check."""

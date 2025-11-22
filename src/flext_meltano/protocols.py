@@ -104,7 +104,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Sync data from source with FlextResult."""
                 ...
 
-            def execute(self) -> FlextResult[object]:
+            def execute(self) -> FlextProtocols.ResultProtocol[object]:
                 """Execute the tap extraction (implements Domain.Service)."""
                 ...
 
@@ -124,7 +124,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Handle a batch of records with FlextResult."""
                 ...
 
-            def execute(self) -> FlextResult[object]:
+            def execute(self) -> FlextProtocols.ResultProtocol[object]:
                 """Execute the target loading (implements Domain.Service)."""
                 ...
 
@@ -140,7 +140,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Test DBT models with FlextResult."""
                 ...
 
-            def execute(self) -> FlextResult[object]:
+            def execute(self) -> FlextProtocols.ResultProtocol[object]:
                 """Execute DBT transformations (implements Domain.Service)."""
                 ...
 
@@ -154,7 +154,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Execute service call with FlextResult."""
                 ...
 
-            def execute(self) -> FlextResult[object]:
+            def execute(self) -> FlextProtocols.ResultProtocol[object]:
                 """Execute service operation (implements Domain.Service)."""
                 ...
 

@@ -71,10 +71,12 @@ class FlextMeltanoDbtProjectManager(FlextService):
 
             self.project_root = root
 
-            info = FlextMeltanoDbtProjectManager.ProjectInfo(
-                root=root,
-                name=root.name,
-            )
+            # Create ProjectInfo instance - avoid mypy confusion with built-in ProjectInfo
+            info_dict = {
+                "root": root,
+                "name": str(root.name),
+            }
+            info = FlextMeltanoDbtProjectManager.ProjectInfo(**info_dict)
 
             self.logger.info(
                 "DBT project loaded",
@@ -117,7 +119,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 "DBT manifest loaded",
                 file=str(manifest_path),
             )
-            return FlextResult[dict[str, Any]].ok(self.manifest)
+            return FlextResult[dict[str, Any]].ok(self.manifest or {})
         except Exception as e:
             self.logger.exception("Failed to load manifest", error=str(e))
             return FlextResult[dict[str, Any]].fail(f"Failed to load manifest: {e}")
@@ -133,9 +135,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, Any]]].fail(manifest_result.error)
+                    return FlextResult[list[dict[str, Any]]].fail(
+                        manifest_result.error or "Unknown error"
+                    )
 
-            models = []
+            models: list[dict[str, Any]] = []
             if self.manifest and "nodes" in self.manifest:
                 models.extend(
                     {
@@ -165,9 +169,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, Any]]].fail(manifest_result.error)
+                    return FlextResult[list[dict[str, Any]]].fail(
+                        manifest_result.error or "Unknown error"
+                    )
 
-            tests = []
+            tests: list[dict[str, Any]] = []
             if self.manifest and "nodes" in self.manifest:
                 tests.extend(
                     {
@@ -186,7 +192,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
             self.logger.exception("Failed to get tests", error=str(e))
             return FlextResult[list[dict[str, Any]]].fail(f"Failed to get tests: {e}")
 
-    def execute(self) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
         if self.project_root:
             msg = f"DBT project: {self.project_root}"

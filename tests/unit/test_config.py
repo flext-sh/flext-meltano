@@ -109,8 +109,10 @@ class TestFlextMeltanoConfig:
             project_root=Path("/test/project"),
             config_dir=Path(".meltano"),
         )
-        config_dir = config.get_absolute_config_dir()
+        result = config.get_absolute_config_dir()
 
+        assert result.is_success
+        config_dir = result.unwrap()
         assert isinstance(config_dir, Path)
         # Since config_dir gets resolved by validator, check if it's absolute
         assert config_dir.is_absolute()

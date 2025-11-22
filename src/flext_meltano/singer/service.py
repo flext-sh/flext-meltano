@@ -137,13 +137,15 @@ class FlextMeltanoSingerService(FlextService):
             if hasattr(target, "consume"):
                 target.consume(None)
 
-            result = FlextMeltanoSingerService.SyncResult(
-                records_processed=records_processed,
-                records_written=records_written,
-                errors=errors,
-                state=state_dict,
-                duration_seconds=0.0,
-            )
+            # Create SyncResult instance - avoid mypy confusion with built-in types
+            result_dict = {
+                "records_processed": records_processed,
+                "records_written": records_written,
+                "errors": errors,
+                "state": state_dict,
+                "duration_seconds": 0.0,
+            }
+            result = FlextMeltanoSingerService.SyncResult(**result_dict)
 
             self.logger.info(
                 "Singer sync completed",
@@ -213,7 +215,7 @@ class FlextMeltanoSingerService(FlextService):
         """
         return self.state_manager.save_state(state_path)
 
-    def execute(self) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
         msg = "Singer service initialized"
         return FlextResult[str].ok(msg)

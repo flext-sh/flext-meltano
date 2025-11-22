@@ -119,7 +119,7 @@ class FlextMeltanoSingerCliTranslator:
             FlextResult containing list of CLI command arguments
 
         """
-        command: list[str] = [params.tap_name]
+        command: list[str] = [params.source_name]
 
         if params.discover:
             command.append("--discover")
@@ -134,8 +134,8 @@ class FlextMeltanoSingerCliTranslator:
         if params.state_file:
             command.extend(["--state", params.state_file])
 
-        if params.properties_file:
-            command.extend(["--properties", params.properties_file])
+        if params.catalog_file:
+            command.extend(["--properties", params.catalog_file])
 
         return FlextResult[list[str]].ok(command)
 
@@ -152,7 +152,7 @@ class FlextMeltanoSingerCliTranslator:
         FlextResult containing list of CLI command arguments
 
         """
-        command: list[str] = [params.target_name]
+        command: list[str] = [params.sink_name]
 
         if params.config_file:
             command.extend(["--config", params.config_file])
@@ -230,8 +230,7 @@ class FlextMeltanoSingerCliTranslator:
         if params.full_refresh:
             command.append("--full-refresh")
 
-        if params.vars:
-            command.extend(["--vars", params.vars])
+        # Note: vars parameter not currently supported in TransformationParams
 
         return FlextResult[list[str]].ok(command)
 
@@ -256,7 +255,7 @@ class FlextMeltanoSingerCliTranslator:
         process_input = input_data.encode() if input_data else None
 
         # Execute command with FlextUtilities (includes complete error handling)
-        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result = FlextUtilities.CommandExecution.run_external_command(
             cmd=command,
             capture_output=True,
             check=False,  # Don't raise exception on non-zero exit
@@ -267,7 +266,9 @@ class FlextMeltanoSingerCliTranslator:
 
         # Handle execution failure
         if result.is_failure:
-            return FlextResult[dict[str, object]].fail(result.error)
+            return FlextResult[dict[str, object]].fail(
+                result.error or "Command execution failed"
+            )
 
         # Extract completed process
         completed_process = result.value

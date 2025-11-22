@@ -34,8 +34,8 @@ from flext_core import (
     FlextService,
 )
 
-from .docs_config import DocsConfig
-from .docs_templates import DocsTemplates
+from flext_meltano.docs_config import DocsConfig
+from flext_meltano.docs_templates import DocsTemplates
 
 
 class DocumentationAutomation(FlextService):
@@ -91,7 +91,7 @@ class DocumentationAutomation(FlextService):
         audit_result = self._run_maintenance_audit("--comprehensive")
         if not audit_result.is_success:
             self.logger.error("Documentation audit failed", error=audit_result.error)
-            return FlextResult.fail(audit_result.error)
+            return FlextResult.fail(audit_result.error or "Documentation audit failed")
 
         # Check quality thresholds
         quality_check_result = self._validate_quality_thresholds()
@@ -99,7 +99,9 @@ class DocumentationAutomation(FlextService):
             self.logger.error(
                 "Quality threshold validation failed", error=quality_check_result.error
             )
-            return FlextResult.fail(quality_check_result.error)
+            return FlextResult.fail(
+                quality_check_result.error or "Quality threshold validation failed"
+            )
 
         success_status = quality_check_result.unwrap()
         if success_status:
@@ -136,8 +138,8 @@ class DocumentationAutomation(FlextService):
             # Call maintenance audit function directly
             if hasattr(maintenance_module, "run_comprehensive_audit"):
                 result = maintenance_module.run_comprehensive_audit(*args)
-                if isinstance(result, dict):
-                    return FlextResult.ok(result)
+                if isinstance(result, dict) and result.get("success", False):
+                    return FlextResult.ok(None)
                 if result:
                     return FlextResult.ok(None)
                 return FlextResult.fail("Maintenance audit completed with warnings")
@@ -224,6 +226,10 @@ class DocumentationAutomation(FlextService):
 
     def _schedule_daily(self, config: dict[str, object]) -> None:
         """Schedule daily maintenance."""
+        if schedule is None:
+            self.logger.warning("Schedule library not available, skipping scheduling")
+            return
+
         audit_time = str(config.get("audit_time", "09:00"))
         hour, minute = map(int, audit_time.split(":"))
 
@@ -233,6 +239,10 @@ class DocumentationAutomation(FlextService):
 
     def _schedule_weekly(self, config: dict[str, object]) -> None:
         """Schedule weekly maintenance."""
+        if schedule is None:
+            self.logger.warning("Schedule library not available, skipping scheduling")
+            return
+
         audit_day = str(config.get("audit_day", "monday")).lower()
         audit_time = str(config.get("audit_time", "09:00"))
         hour, minute = map(int, audit_time.split(":"))
@@ -297,6 +307,12 @@ class DocumentationAutomation(FlextService):
 
     def run_continuous_monitoring(self) -> None:
         """Run continuous monitoring loop."""
+        if schedule is None:
+            self.logger.warning(
+                "Schedule library not available, cannot run continuous monitoring"
+            )
+            return
+
         self.schedule_maintenance()
 
         try:
