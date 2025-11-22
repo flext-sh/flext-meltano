@@ -258,6 +258,7 @@ class _MeltanoCompatibility:
     DEFAULT_ORACLE_PORT: Final[int] = FlextMeltanoConstants.DatabasePorts.ORACLE
 
 
+# Add compatibility namespace as class attribute
 FlextMeltanoConstants.Meltano = _MeltanoCompatibility
 
 

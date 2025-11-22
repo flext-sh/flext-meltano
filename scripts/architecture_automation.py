@@ -116,15 +116,12 @@ class PlantUMLRenderer(FlextService):
 
             # CONVERTED: Use FlextUtilities instead of subprocess.run()
             # Security: command with controlled arguments
-            exec_result = (
-                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                    cmd,
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    shell=False,
-                    cwd=str(puml_file.parent),
-                )
+            exec_result = FlextUtilities.CommandExecution.run_external_command(
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                cwd=str(puml_file.parent),
             )
 
             if exec_result.is_failure:
@@ -562,6 +559,7 @@ class ArchitectureDocumentationManager:
     def __init__(self, docs_dir: str = "docs") -> None:
         """Initialize architecture documentation manager with docs directory."""
         self.docs_dir = Path(docs_dir)
+        self.logger = FlextLogger(__name__)
         self.plantuml_renderer = PlantUMLRenderer()
         self.c4_validator = C4ModelValidator()
         self.diagram_generator = ArchitectureDiagramGenerator()

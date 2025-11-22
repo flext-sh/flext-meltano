@@ -30,7 +30,7 @@ class FlextMeltanoAdapter:
 
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize legacy adapter with focused adapters."""
-        self._config = config or FlextMeltanoConfig()
+        self._config = config if config is not None else FlextMeltanoConfig()
         self.project_adapter = self.Project(config)
         self.plugin_adapter = self.Plugin(config)
         self.pipeline_adapter = self.Pipeline(config)
@@ -52,7 +52,7 @@ class FlextMeltanoAdapter:
 
         def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
             """Initialize Project with flext-core patterns."""
-            self._config = config or FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._utilities = FlextUtilities()
             self._current_project: object | None = None
@@ -110,7 +110,7 @@ class FlextMeltanoAdapter:
 
         def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
             """Initialize Plugin with flext-core patterns."""
-            self._config = config or FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._utilities = FlextUtilities()
 
@@ -121,7 +121,7 @@ class FlextMeltanoAdapter:
             """Discover available plugins of specified type."""
             try:
                 # Use FlextMeltanoConstants for plugin discovery
-                plugins = FlextMeltanoConstants.PluginTypes.get_all_plugins()
+                plugins = FlextMeltanoConstants.Plugin.get_all_plugins()
                 if plugin_type:
                     plugins = [p for p in plugins if p.get("type") == plugin_type]
 
@@ -138,7 +138,7 @@ class FlextMeltanoAdapter:
 
         def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
             """Initialize Pipeline with flext-core patterns."""
-            self._config = config or FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._utilities = FlextUtilities()
 
@@ -186,7 +186,7 @@ class FlextMeltanoAdapter:
 
         def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
             """Initialize Singer with flext-core patterns."""
-            self._config = config or FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._utilities = FlextUtilities()
 
@@ -232,7 +232,7 @@ class FlextMeltanoAdapter:
 
         def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
             """Initialize Dbt with flext-core patterns."""
-            self._config = config or FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._utilities = FlextUtilities()
 

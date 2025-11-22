@@ -63,7 +63,9 @@ class FlextMeltanoAPIOperations:
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline creation failed"
         )
@@ -87,7 +89,9 @@ class FlextMeltanoAPIOperations:
             str(pipeline_id), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline execution failed"
         )
@@ -116,7 +120,9 @@ class FlextMeltanoAPIOperations:
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin installation failed"
         )
@@ -131,7 +137,9 @@ class FlextMeltanoAPIOperations:
 
         result = self.api.list_plugins(str(plugin_type) if plugin_type else None)
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin listing failed"
         )
@@ -157,7 +165,9 @@ class FlextMeltanoAPIOperations:
             str(environment_name), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Environment configuration failed"
         )
@@ -177,7 +187,9 @@ class FlextMeltanoAPIOperations:
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models execution failed"
         )
@@ -198,7 +210,9 @@ class FlextMeltanoAPIOperations:
 
         result = self.api.test_dbt_models(models, config)
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models testing failed"
         )
@@ -233,7 +247,9 @@ class FlextMeltanoAPIOperations:
             str(tap_name), str(target_name), dbt_models, config
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "ELT pipeline execution failed"
         )

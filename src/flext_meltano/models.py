@@ -285,7 +285,6 @@ class FlextMeltanoModels(FlextModels):
         )
 
         @computed_field
-        @property
         def pipeline_dict(self) -> dict[str, bool]:
             """Pipeline logging as dictionary."""
             return {
@@ -301,7 +300,6 @@ class FlextMeltanoModels(FlextModels):
             }
 
         @computed_field
-        @property
         def extract_dict(self) -> dict[str, bool]:
             """Extract logging as dictionary."""
             return {
@@ -316,7 +314,6 @@ class FlextMeltanoModels(FlextModels):
             }
 
         @computed_field
-        @property
         def load_dict(self) -> dict[str, bool]:
             """Load logging as dictionary."""
             return {
@@ -331,7 +328,6 @@ class FlextMeltanoModels(FlextModels):
             }
 
         @computed_field
-        @property
         def transform_dict(self) -> dict[str, bool]:
             """Transform logging as dictionary."""
             return {

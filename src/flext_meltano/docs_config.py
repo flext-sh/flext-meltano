@@ -12,69 +12,45 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, cast
 
 import yaml
-from flext_core import FlextConfig, FlextResult
-from pydantic_settings import SettingsConfigDict
+from flext_core import FlextConfig, FlextContainer, FlextResult
 
 
-@FlextConfig.auto_register("meltano_docs")
-class DocsConfig(FlextConfig.AutoConfig):
-    """Centralized configuration for documentation automation using AutoConfig pattern.
-
-    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
-
-    This class uses FlextConfig.AutoConfig for automatic:
-    - Singleton pattern (thread-safe)
-    - Namespace registration (accessible via config.meltano_docs)
-    - Environment variable loading from FLEXT_MELTANO_DOCS_* variables
-    - .env file loading (production/development)
-    - Automatic type conversion and validation via Pydantic v2
+class DocsConfig(FlextConfig):
+    """Centralized configuration for documentation automation.
 
     Extends FlextConfig with documentation-specific settings.
     All hardcoded values from throughout the codebase are centralized here.
 
     Attributes:
-    # File Paths
-    config_path: Default configuration file path
-    reports_output_dir: Directory for quality reports
+        # File Paths
+        config_path: Default configuration file path
+        reports_output_dir: Directory for quality reports
 
-    # Scheduling
-    enable_scheduled_audits: Whether to enable automated audits
-    audit_schedule: Schedule type ('daily', 'weekly', 'monthly')
-    audit_day: Day of week for weekly audits (monday, tuesday, etc.)
-    audit_time: Time for scheduled audits (HH:MM format)
+        # Scheduling
+        enable_scheduled_audits: Whether to enable automated audits
+        audit_schedule: Schedule type ('daily', 'weekly', 'monthly')
+        audit_day: Day of week for weekly audits (monday, tuesday, etc.)
+        audit_time: Time for scheduled audits (HH:MM format)
 
-    # Quality Thresholds
-    min_quality_score: Minimum acceptable quality score (0-100)
-    max_file_age_days: Maximum age in days before content is considered stale
-    min_words_per_file: Minimum word count required per file
-    max_broken_links_ratio: Maximum ratio of broken links (0.0-1.0)
-    max_line_length: Maximum characters per line
-    fail_on_critical_issues: Whether to fail CI on critical issues
+        # Quality Thresholds
+        min_quality_score: Minimum acceptable quality score (0-100)
+        max_file_age_days: Maximum age in days before content is considered stale
+        min_words_per_file: Minimum word count required per file
+        max_broken_links_ratio: Maximum ratio of broken links (0.0-1.0)
+        max_line_length: Maximum characters per line
+        fail_on_critical_issues: Whether to fail CI on critical issues
 
-    # Link Validation
-    link_validation_timeout: Timeout in seconds for link validation
-    link_validation_retries: Number of retries for failed link validation
+        # Link Validation
+        link_validation_timeout: Timeout in seconds for link validation
+        link_validation_retries: Number of retries for failed link validation
 
-    # Content Requirements
-    required_sections: List of required heading patterns
+        # Content Requirements
+        required_sections: List of required heading patterns
 
     """
-
-    model_config = SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_DOCS_",
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore",
-        validate_assignment=True,
-        str_strip_whitespace=True,
-        validate_default=True,
-        frozen=False,
-        strict=False,
-    )
 
     # File Paths
     config_path: str = "docs/.maintenance_config.yaml"
@@ -101,7 +77,19 @@ class DocsConfig(FlextConfig.AutoConfig):
     # Content Requirements
     required_sections: ClassVar[list[str]] = ["##", "###"]
 
-    # AutoConfig provides get_instance() automatically - no need to override
+    @classmethod
+    def get_instance(cls) -> DocsConfig:
+        """Get singleton instance through FlextContainer."""
+        container = FlextContainer.get_global()
+        config_result = container.get("DocsConfig")
+
+        if config_result.is_success:
+            return cast("DocsConfig", config_result.unwrap())
+
+        # Create and register new instance
+        instance = cls()
+        container.register_service("DocsConfig", instance)
+        return instance
 
     def load_from_file(
         self, config_path: str | Path | None = None
@@ -109,10 +97,10 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Load configuration from YAML file using FlextConfig patterns.
 
         Args:
-        config_path: Path to configuration file (uses self.config_path if None)
+            config_path: Path to configuration file (uses self.config_path if None)
 
         Returns:
-        FlextResult containing loaded configuration or error
+            FlextResult containing loaded configuration or error
 
         """
         file_path = Path(config_path or self.config_path)
@@ -136,7 +124,7 @@ class DocsConfig(FlextConfig.AutoConfig):
 
             return FlextResult.ok(self)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except Exception as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return FlextResult.fail(error_msg)
 
@@ -144,7 +132,7 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
-        Dictionary with automation scheduling settings
+            Dictionary with automation scheduling settings
 
         """
         return {
@@ -158,7 +146,7 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
-        Dictionary with quality threshold settings
+            Dictionary with quality threshold settings
 
         """
         return {
@@ -174,7 +162,7 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
-        Dictionary with reporting settings
+            Dictionary with reporting settings
 
         """
         return {
@@ -185,7 +173,7 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
-        Dictionary with link validation settings
+            Dictionary with link validation settings
 
         """
         return {
@@ -197,7 +185,7 @@ class DocsConfig(FlextConfig.AutoConfig):
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:
-        Dictionary with audit threshold settings
+            Dictionary with audit threshold settings
 
         """
         return {

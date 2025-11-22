@@ -100,7 +100,7 @@ class FlextMeltanoTypes(FlextTypes):
 
         type ModelConfiguration = dict[str, object | list[str]]
         type TestConfiguration = dict[str, str | list[str] | dict[str, object]]
-        type ProfileConfiguration = dict[str, FlextTypes.ConfigDict]
+        type ProfileConfiguration = dict[str, dict[str, object]]
         type ProjectConfiguration = dict[str, object | dict[str, object]]
         type RunResults = dict[str, list[dict[str, FlextTypes.JsonValue]]]
         type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
@@ -142,10 +142,8 @@ class FlextMeltanoTypes(FlextTypes):
         type PipelineDefinition = list[dict[str, str | dict[str, FlextTypes.JsonValue]]]
         type ExecutionContext = dict[str, FlextTypes.JsonValue | dict[str, object]]
         type RuntimeEnvironment = dict[str, str | dict[str, object]]
-        type PipelineResults = dict[
-            str, FlextTypes.ProcessingStatus | dict[str, object]
-        ]
-        type WorkflowConfiguration = dict[str, FlextTypes.WorkflowStatus | list[str]]
+        type PipelineResults = dict[str, str | dict[str, object]]
+        type WorkflowConfiguration = dict[str, str | list[str]]
 
     class Bridge:
         """Bridge operation complex types namespace."""
@@ -264,7 +262,7 @@ class FlextMeltanoTypes(FlextTypes):
         type WorkflowDict = dict[str, object]
         type RunContextDict = dict[str, object]
         type ExecutionLogsDict = dict[str, object]
-        type MetricsDict = FlextTypes.FloatDict
+        type MetricsDict = dict[str, float]
         type ErrorsDict = dict[str, str]
 
         # Library and runner types

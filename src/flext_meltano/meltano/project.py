@@ -13,18 +13,10 @@ from pathlib import Path
 from typing import Any
 
 from flext_core import FlextResult, FlextService
+from meltano.core.project import Project as MeltanoProject
 from pydantic import Field
 
 from flext_meltano.models import FlextMeltanoModels
-
-# Optional meltano import with graceful fallback
-try:
-    from meltano.core.project import Project as MeltanoProject
-
-    MELTANO_AVAILABLE = True
-except ImportError:
-    MeltanoProject = None
-    MELTANO_AVAILABLE = False
 
 
 class FlextMeltanoProjectManager(FlextService):
@@ -55,8 +47,8 @@ class FlextMeltanoProjectManager(FlextService):
 
         """
         super().__init__()
-        self.project_root = root
-        self.project = None
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
 
     def initialize_project(
         self, root: Path
@@ -70,19 +62,18 @@ class FlextMeltanoProjectManager(FlextService):
         FlextResult containing project information
 
         """
-        if not MELTANO_AVAILABLE:
-            return FlextResult.fail("Meltano SDK not available")
-
         try:
             root.mkdir(parents=True, exist_ok=True)
             self.project = MeltanoProject(root)
             self.project_root = root
 
-            info = FlextMeltanoProjectManager.ProjectInfo(
-                root=root,
-                name=root.name,
-                state="initialized",
-            )
+            # Create ProjectInfo instance - avoid mypy confusion with built-in ProjectInfo
+            info_dict = {
+                "root": root,
+                "name": str(root.name),
+                "state": "initialized",
+            }
+            info = FlextMeltanoProjectManager.ProjectInfo(**info_dict)
 
             self.logger.info(
                 "Meltano project initialized",
@@ -107,9 +98,6 @@ class FlextMeltanoProjectManager(FlextService):
         FlextResult containing project information
 
         """
-        if not MELTANO_AVAILABLE:
-            return FlextResult.fail("Meltano SDK not available")
-
         try:
             if not root.exists():
                 return FlextResult[FlextMeltanoProjectManager.ProjectInfo].fail(
@@ -119,11 +107,13 @@ class FlextMeltanoProjectManager(FlextService):
             self.project = MeltanoProject(root)
             self.project_root = root
 
-            info = FlextMeltanoProjectManager.ProjectInfo(
-                root=root,
-                name=root.name,
-                state="loaded",
-            )
+            # Create ProjectInfo instance - avoid mypy confusion with built-in ProjectInfo
+            info_dict = {
+                "root": root,
+                "name": str(root.name),
+                "state": "loaded",
+            }
+            info = FlextMeltanoProjectManager.ProjectInfo(**info_dict)
 
             self.logger.info(
                 "Meltano project loaded",
@@ -153,7 +143,9 @@ class FlextMeltanoProjectManager(FlextService):
                 return FlextResult[list[dict[str, Any]]].fail("No project loaded")
 
             plugins = []
-            if hasattr(self.project, "plugins"):
+            if hasattr(self.project, "plugins") and hasattr(
+                self.project.plugins, "__iter__"
+            ):
                 for plugin in self.project.plugins:
                     plugin_dict = {
                         "name": plugin.name,
@@ -199,7 +191,7 @@ class FlextMeltanoProjectManager(FlextService):
             self.logger.exception("Failed to install plugin", error=str(e))
             return FlextResult[dict[str, Any]].fail(f"Failed to install plugin: {e}")
 
-    def execute(self) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
         if self.project_root:
             msg = f"Meltano project: {self.project_root}"

@@ -166,7 +166,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
                 f"Documentation generation failed: {e}"
             )
 
-    def execute(self) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
         if self.project_root:
             msg = f"DBT runner: {self.project_root}"

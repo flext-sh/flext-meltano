@@ -40,7 +40,7 @@ def simple_bridge_example() -> None:
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
     # Create executor with proper config dict
-    executor = FlextMeltanoExecutor({})
+    executor = FlextMeltanoExecutor(config={})
 
     # Execute with required command parameter (list of strings)
     result = executor.execute_command(["meltano", "version"])

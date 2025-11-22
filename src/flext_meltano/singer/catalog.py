@@ -171,7 +171,7 @@ class FlextMeltanoCatalogManager(FlextService):
             self.logger.exception("Failed to get stream schema", error=str(e))
             return FlextResult[dict[str, Any] | None].fail(f"Failed to get schema: {e}")
 
-    def execute(self) -> FlextResult[dict[str, Any]]:
+    def execute(self, **_kwargs: object) -> FlextResult[dict[str, Any]]:
         """Execute (implements Domain.Service pattern)."""
         return FlextResult[dict[str, Any]].ok(self._catalog)
 

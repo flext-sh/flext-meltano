@@ -75,11 +75,6 @@ class FlextMeltano(
     _config: FlextMeltanoConfig
 
     @property
-    def config(self) -> FlextMeltanoConfig:
-        """Get Pydantic-based configuration instance."""
-        return self._config
-
-    @property
     def constants(self) -> type[FlextMeltanoConstants]:
         """Get FlextMeltanoConstants - delegates to foundation layer."""
         return FlextMeltanoConstants
@@ -139,7 +134,7 @@ class FlextMeltano(
     # ============================================================================
 
     def execute(
-        self,
+        self, **_kwargs: object
     ) -> FlextResult[FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
         """Execute service lifecycle using flext-core railway patterns."""
         return FlextResult[
@@ -240,14 +235,10 @@ class FlextMeltano(
                     "status": "created",
                     "created_at": str(time.time()),
                     "api_version": self.version,
-                    "timeout_seconds": self._config.timeout_seconds
-                    if self._config
-                    else 300,
-                    "log_level": self._config.log_level if self._config else "INFO",
-                    "environment": self._config.environment if self._config else "dev",
-                    "project_root": str(self._config.project_root)
-                    if self._config and hasattr(self._config, "project_root")
-                    else ".",
+                    "timeout_seconds": getattr(self._config, "timeout_seconds", 300),
+                    "log_level": getattr(self._config, "log_level", "INFO"),
+                    "environment": getattr(self._config, "environment", "dev"),
+                    "project_root": str(getattr(self._config, "project_root", ".")),
                 }
                 return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
                     cast(
@@ -532,13 +523,11 @@ class FlextMeltano(
                         "configuration": config or {},
                         "executed_at": str(time.time()),
                         "api_version": self.version,
-                        "timeout_seconds": self._config.timeout_seconds
-                        if self._config
-                        else 300,
-                        "log_level": self._config.log_level if self._config else "INFO",
-                        "project_root": str(self._config.project_root)
-                        if self._config and hasattr(self._config, "project_root")
-                        else ".",
+                        "timeout_seconds": getattr(
+                            self._config, "timeout_seconds", 300
+                        ),
+                        "log_level": getattr(self._config, "log_level", "INFO"),
+                        "project_root": str(getattr(self._config, "project_root", ".")),
                     },
                 )
             )
@@ -675,7 +664,7 @@ class FlextMeltano(
     ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
-            adapter = FlextMeltanoAdapter(self.config)
+            adapter = FlextMeltanoAdapter(self._config)
             return cast(
                 "FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]",
                 adapter.project_adapter.create_project(
@@ -691,7 +680,7 @@ class FlextMeltano(
     def validate_project(self, _project_path: str) -> FlextResult[bool]:
         """Validate Meltano project - delegates to config."""
         try:
-            return self.config.validate_project_structure()
+            return self._config.validate_project_structure()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Failed to validate project: {e}")
 
@@ -706,10 +695,8 @@ class FlextMeltano(
     ) -> FlextResult[FlextTypes.JsonValue]:
         """Extract data from source - delegates to service."""
         try:
-            service = FlextMeltanoService(self.config, source_name=source_name)
-            return service.extract(
-                cast("FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict", config or {})
-            )
+            service = FlextMeltanoService(config=self._config, source_name=source_name)
+            return service.extract(cast("dict[str, object]", config or {}))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextTypes.JsonValue].fail(
                 f"Failed to extract data: {e}"
@@ -720,7 +707,7 @@ class FlextMeltano(
     ) -> FlextResult[FlextTypes.JsonValue]:
         """Load data to sink - delegates to service."""
         try:
-            service = FlextMeltanoService(self.config, sink_name=sink_name)
+            service = FlextMeltanoService(config=self._config, sink_name=sink_name)
             if records:
                 return service.load_batch(records)
             return FlextResult[FlextTypes.JsonValue].ok({"status": "initialized"})
@@ -730,7 +717,7 @@ class FlextMeltano(
     def discover_catalog(self, source_name: str) -> FlextResult[FlextTypes.JsonValue]:
         """Discover source schema - delegates to service."""
         try:
-            service = FlextMeltanoService(self.config, source_name=source_name)
+            service = FlextMeltanoService(config=self._config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextTypes.JsonValue].fail(
@@ -765,7 +752,9 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline creation failed"
         )
@@ -789,7 +778,9 @@ class FlextMeltano(
             str(pipeline_id), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Pipeline execution failed"
         )
@@ -818,7 +809,9 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin installation failed"
         )
@@ -833,7 +826,9 @@ class FlextMeltano(
 
         result = self.list_plugins(str(plugin_type) if plugin_type else None)
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Plugin listing failed"
         )
@@ -859,7 +854,9 @@ class FlextMeltano(
             str(environment_name), config if isinstance(config, dict) else None
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "Environment configuration failed"
         )
@@ -879,7 +876,9 @@ class FlextMeltano(
             config if isinstance(config, dict) else None,
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models execution failed"
         )
@@ -900,7 +899,9 @@ class FlextMeltano(
 
         result = self.test_dbt_models(models, config)
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "DBT models testing failed"
         )
@@ -935,7 +936,9 @@ class FlextMeltano(
             str(tap_name), str(target_name), dbt_models, config
         )
         if result.is_success:
-            return FlextResult[FlextTypes.JsonValue].ok(result.value)
+            return FlextResult[FlextTypes.JsonValue].ok(
+                cast("FlextTypes.JsonValue", result.value)
+            )
         return FlextResult[FlextTypes.JsonValue].fail(
             result.error or "ELT pipeline execution failed"
         )

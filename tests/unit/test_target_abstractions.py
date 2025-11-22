@@ -6,7 +6,8 @@ from flext_core import FlextLogger, FlextResult, FlextUtilities
 from pydantic import ValidationError
 
 from flext_meltano import FlextMeltanoModels, FlextMeltanoTargetAbstractions
-from tests.flext_tests_compat import FlextTestsUtilities
+
+from ..flext_tests_compat import FlextTestsUtilities
 
 logger = FlextLogger(__name__)
 

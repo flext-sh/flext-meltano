@@ -22,7 +22,7 @@ class FunctionalServiceMock:
         """Initialize functional service mock."""
         self.service_type = service_type
         self.config = config
-        self._configured_methods: dict[str, object] = {}
+        self._configured_methods: dict[str, dict[str, object]] = {}
 
     def configure_method(
         self,
@@ -43,12 +43,14 @@ class FunctionalServiceMock:
             failure_message: Error message if should_fail is True
 
         """
-        self._configured_methods[method_name] = {
-            "return_value": return_value,
-            "side_effect": side_effect,
-            "should_fail": should_fail,
-            "failure_message": failure_message or "Method configured to fail",
-        }
+        # Use create_entry for consistent data structure
+        self._configured_methods[method_name] = FlextTestsUtilities.create_entry(
+            "method_config",
+            return_value=return_value,
+            side_effect=side_effect,
+            should_fail=should_fail,
+            failure_message=failure_message or "Method configured to fail",
+        )
 
     def get_configured_value(self, method_name: str) -> object:
         """Get configured return value for a method."""
@@ -59,14 +61,16 @@ class FunctionalServiceMock:
     def should_fail(self, method_name: str) -> bool:
         """Check if a method is configured to fail."""
         if method_name in self._configured_methods:
-            return self._configured_methods[method_name].get("should_fail", False)
+            return bool(self._configured_methods[method_name].get("should_fail", False))
         return False
 
     def get_failure_message(self, method_name: str) -> str:
         """Get failure message for a method."""
         if method_name in self._configured_methods:
-            return self._configured_methods[method_name].get(
-                "failure_message", "Method configured to fail"
+            return str(
+                self._configured_methods[method_name].get(
+                    "failure_message", "Method configured to fail"
+                )
             )
         return "Method configured to fail"
 
@@ -147,13 +151,52 @@ class FlextTestsUtilities:
         }
 
     @staticmethod
-    def create_mock_service() -> dict[str, object]:
-        """Create a mock service configuration."""
-        return {
-            "service_name": "test_service",
-            "version": "1.0.0",
-            "status": "active",
+    def create_entry(entry_type: str, **overrides: object) -> dict[str, object]:
+        """Create a generalized entry with defaults and overrides.
+
+        Args:
+            entry_type: Type of entry to create ('service', 'result', 'data', etc.)
+            **overrides: Key-value pairs to override defaults
+
+        Returns:
+            Dictionary with entry data
+
+        """
+        defaults: dict[str, dict[str, object]] = {
+            "service": {
+                "service_name": "test_service",
+                "version": "1.0.0",
+                "status": "active",
+            },
+            "result": {
+                "value": None,
+                "error": None,
+                "status": "success",
+            },
+            "data": {
+                "items": [],
+                "count": 0,
+                "metadata": {},
+            },
+            "method_config": {
+                "return_value": None,
+                "side_effect": None,
+                "should_fail": False,
+                "failure_message": "Method configured to fail",
+            },
         }
+
+        if entry_type not in defaults:
+            raise ValueError(f"Unknown entry type: {entry_type}")
+
+        entry = defaults[entry_type].copy()
+        entry.update(overrides)
+
+        # Auto-update status for result entries
+        if entry_type == "result" and entry.get("error") is not None:
+            entry["status"] = "error"
+
+        return entry
 
     @classmethod
     def utilities(cls) -> FlextTestsUtilities:
@@ -183,45 +226,38 @@ class FlextTestsUtilities:
         return FunctionalServiceMock(service_type, **base_config)
 
     @staticmethod
-    def create_test_result(
-        value: object | None = None, error: str | None = None
-    ) -> dict[str, object]:
-        """Create a test result dictionary."""
-        return {
-            "value": value,
-            "error": error,
-            "status": "success" if error is None else "error",
-        }
-
-    @staticmethod
-    def create_test_data(
+    def create_entries(
+        entry_type: str,
         size: int | None = None,
         prefix: str | None = None,
-        **data: object,
+        **overrides: object,
     ) -> list[dict[str, object]] | dict[str, object]:
-        """Create test data dictionary or list of test data.
+        """Create multiple entries or a single entry with generation logic.
 
         Args:
-            size: Number of test data items to create (returns list if set)
-            prefix: Prefix for generated test data names
-            **data: Additional data to include in test data
+            entry_type: Type of entry to create
+            size: Number of entries to create (returns list if set)
+            prefix: Prefix for generated names
+            **overrides: Key-value pairs to override defaults
 
         Returns:
-            List of test data dicts if size is specified, otherwise single dict
+            List of entries if size is specified, otherwise single entry
 
         """
         if size is not None:
-            # Generate list of test data items
+            # Generate list of entries
             items: list[dict[str, object]] = []
             for i in range(size):
-                item: dict[str, object] = {
+                item_overrides = overrides.copy()
+                item_overrides.update({
                     "id": i + 1,
                     "name": f"{prefix}_{i + 1}" if prefix else f"item_{i + 1}",
-                    "test_data": "default",
-                }
-                item.update(data)
+                })
+                item = FlextTestsUtilities.create_entry(entry_type, **item_overrides)
                 items.append(item)
             return items
-
-        # Single dict mode
-        return dict(data) if data else {"test_data": "default"}
+        # Generate single entry
+        item_overrides = overrides.copy()
+        if prefix:
+            item_overrides["name"] = f"{prefix}_1"
+        return FlextTestsUtilities.create_entry(entry_type, **item_overrides)

@@ -9,7 +9,8 @@ SPDX-License-Identifier: MIT
 """
 
 from flext_meltano.constants import FlextMeltanoConstants
-from tests.flext_tests_compat import FlextTestsUtilities
+
+from ..flext_tests_compat import FlextTestsUtilities
 
 
 class TestFlextMeltanoConstants:
@@ -57,11 +58,11 @@ class TestFlextMeltanoConstants:
 
         # Test protocol constants
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.MESSAGE_TYPE_SCHEMA, str),
+            condition=isinstance(FlextMeltanoConstants.Singer.MESSAGE_TYPE_SCHEMA, str),
             message="Schema message type should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.MESSAGE_TYPE_RECORD, str),
+            condition=isinstance(FlextMeltanoConstants.Singer.MESSAGE_TYPE_RECORD, str),
             message="Record message type should be a string",
         )
 
