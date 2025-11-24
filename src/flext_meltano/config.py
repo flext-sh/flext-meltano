@@ -816,10 +816,12 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         }
 
         # Add Meltano-specific environment variables
+        # Get log_level from global FlextConfig since FlextMeltanoConfig doesn't have it
+        global_config = FlextConfig.get_global_instance()
         meltano_env_vars = {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
             self.MELTANO_ENVIRONMENT_ENV: str(self.environment),
-            self.MELTANO_LOG_LEVEL_ENV: str(self.log_level).upper(),
+            self.MELTANO_LOG_LEVEL_ENV: str(global_config.log_level).upper(),
         }
 
         # Add sensitive environment variables safely

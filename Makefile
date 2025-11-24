@@ -96,15 +96,15 @@ fix: ## Auto-fix issues
 
 .PHONY: test
 test: ## Run tests with 100% coverage (MANDATORY)
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov=$(COV_DIR) --cov-report=term-missing:skip-covered --cov-fail-under=$(MIN_COVERAGE)
+	PYTHONPATH=$(SRC_DIR):../flext-core/src:$(TESTS_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov=$(COV_DIR) --cov-report=term-missing:skip-covered --cov-fail-under=$(MIN_COVERAGE)
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -m "not integration" -v
+	PYTHONPATH=$(SRC_DIR):../flext-core/src:$(TESTS_DIR) $(POETRY) run pytest -m "not integration" -v
 
 .PHONY: test-integration
 test-integration: ## Run integration tests with Docker
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -m integration -v
+	PYTHONPATH=$(SRC_DIR):../flext-core/src:$(TESTS_DIR) $(POETRY) run pytest -m integration -v
 
 .PHONY: test-meltano
 test-meltano: ## Run Meltano specific tests

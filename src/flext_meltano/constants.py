@@ -17,6 +17,10 @@ class FlextMeltanoConstants(FlextConstants):
     PROJECT_PREFIX: Final[str] = "flext-meltano"
     PROJECT_NAME: Final[str] = "FLEXT Meltano"
     FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"
+    PROJECT_FILE_DBT: Final[str] = "dbt_project.yml"
+    COMMAND_RUN_DBT: Final[str] = "dbt run"
+    COMMAND_TEST: Final[str] = "dbt test"
+    DEFAULT_VARIANT: Final[str] = "meltano"
 
     class Metadata:
         """Metadata describing the Meltano distribution."""
@@ -218,6 +222,32 @@ class FlextMeltanoConstants(FlextConstants):
             TESTING = "testing"
             LOCAL = "local"
 
+    class Logging:
+        """Logging configuration constants."""
+
+        DEFAULT_LEVEL: Final[str] = "INFO"
+        INCLUDE_TRANSFORM_NAME: Final[bool] = True
+        INCLUDE_RECORD_COUNT: Final[bool] = True
+        LOG_FORMAT: Final[str] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
+        MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
+
+    class Model:
+        """Model maturity and validation constants."""
+
+        MATURITY_MATURE_ENV_COUNT: Final[int] = 3
+        MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 1
+        MATURITY_PROTOTYPE_ENV_COUNT: Final[int] = 0
+        COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 5
+        COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 20
+
+    class Service:
+        """Service validation constants."""
+
+        MIN_NAME_LENGTH: Final[int] = 3
+        MAX_NAME_LENGTH: Final[int] = 50
+        VALID_NAME_PATTERN: Final[str] = r"^[a-zA-Z0-9_-]+$"
+
     # Compatibility aliases for enums
     PluginTypes = Enums.PluginType
     ReplicationMethods = Enums.ReplicationMethod
@@ -250,6 +280,8 @@ class _MeltanoCompatibility:
     COMMAND_PIPELINE: Final[str] = FlextMeltanoConstants.Commands.PIPELINE
     VERSION_REQUIRED: Final[str] = FlextMeltanoConstants.Versions.MELTANO_REQUIRED
     FLEXT_MELTANO_VERSION: Final[str] = FlextMeltanoConstants.FLEXT_MELTANO_VERSION
+    DEFAULT_VARIANT: Final[str] = "meltano"
+    PROJECT_FILE_DBT: Final[str] = "dbt_project.yml"
     MELTANO_DEFAULT_TIMEOUT: Final[int] = (
         FlextMeltanoConstants.Network.MELTANO_DEFAULT_TIMEOUT
     )

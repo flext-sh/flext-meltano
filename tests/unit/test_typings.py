@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from flext_meltano.typings import FlextMeltanoTypes
 
-from ..flext_tests_compat import FlextTestsUtilities
+from ..flext_tests_compat import FlextTestsMatchers
 
 
 class TestFlextMeltanoTypes:
@@ -18,7 +18,7 @@ class TestFlextMeltanoTypes:
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
-        self.test_assertions = FlextTestsUtilities.assertion()
+        self.test_assertions = FlextTestsMatchers()
 
     def test_plugin_namespace(self) -> None:
         """Test Plugin namespace types."""

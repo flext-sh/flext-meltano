@@ -257,13 +257,24 @@ class FlextMeltanoTypes(FlextTypes):
         type DbtModelList = list[str]
         type DbtTestList = list[str]
 
-        # Pipeline and workflow types
-        type PipelineConfigDict = dict[str, object]
+    class Pipeline:
+        """Pipeline execution complex types namespace."""
+
+        type PipelineConfig = dict[str, object]
+        type PipelineStatus = dict[str, str | int | bool]
         type WorkflowDict = dict[str, object]
         type RunContextDict = dict[str, object]
         type ExecutionLogsDict = dict[str, object]
         type MetricsDict = dict[str, float]
         type ErrorsDict = dict[str, str]
+
+    class Bridge:
+        """FLEXT-Go bridge complex types namespace."""
+
+        type BridgeMessage = dict[str, object]
+        type BridgeResponse = dict[str, object]
+        type BridgeConfig = dict[str, str | int | bool]
+        type BridgeStatus = dict[str, str | int | bool]
 
         # Library and runner types
         type LibraryDict = dict[str, object]
