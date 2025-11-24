@@ -313,7 +313,7 @@ class TestFlextMeltanoFileManagersComprehensive:
                 },
                 "environments": ["dev", "prod"],
             }
-            config_path = project_root / "meltano.yml"
+            config_path = project_root / "pipeline.yml"
             save_result = FlextMeltanoFileManagers.save_yaml_config(config, config_path)
             FlextTestsMatchers.assert_result_success(save_result, True)
 

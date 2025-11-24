@@ -24,32 +24,33 @@ class TestFlextMeltanoAdapter:
     def setup_method(self) -> None:
         """Setup for each test."""
         self.adapter = FlextMeltanoAdapter()
+        self.test_matchers = FlextTestsMatchers()
 
     def test_adapter_initialization(self) -> None:
         """Test adapter initialization."""
         adapter = FlextMeltanoAdapter()
 
         # Test basic initialization
-        FlextTestsMatchers.assert_is_not_none(
+        self.test_matchers.assert_is_not_none(
             adapter, message="Adapter should be initialized"
         )
-        FlextTestsMatchers.assert_true(
+        self.test_matchers.assert_true(
             condition=hasattr(adapter, "project_adapter"),
             message="Should have project_adapter",
         )
-        FlextTestsMatchers.assert_true(
+        self.test_matchers.assert_true(
             condition=hasattr(adapter, "plugin_adapter"),
             message="Should have plugin_adapter",
         )
-        FlextTestsMatchers.assert_true(
+        self.test_matchers.assert_true(
             condition=hasattr(adapter, "pipeline_adapter"),
             message="Should have pipeline_adapter",
         )
-        FlextTestsMatchers.assert_true(
+        self.test_matchers.assert_true(
             condition=hasattr(adapter, "singer_adapter"),
             message="Should have singer_adapter",
         )
-        FlextTestsMatchers.assert_true(
+        self.test_matchers.assert_true(
             condition=hasattr(adapter, "dbt_adapter"), message="Should have dbt_adapter"
         )
 
@@ -63,7 +64,7 @@ class TestFlextMeltanoAdapter:
             )
 
             # Verify result type
-            FlextTestsMatchers.assert_true(
+            self.test_matchers.assert_true(
                 condition=isinstance(result, FlextResult),
                 message="Should return FlextResult",
             )

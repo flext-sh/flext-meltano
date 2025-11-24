@@ -66,7 +66,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test FlextTargetConfig validation errors using flext_tests."""
         # Test invalid target_type using flext_tests error patterns
         try:
-            FlextMeltanoTargetAbstractions.FlextTargetConfig(
+            FlextMeltanoModels.TargetConfig(
                 target_type="",
                 connection_config={"test": "config"},
                 batch_size=100,
@@ -295,7 +295,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test field validation errors to cover lines 105-106, 113-114."""
         # Test FlextMeltanoStreamInfo stream_name validation error (line 105-106)
         try:
-            FlextMeltanoTargetAbstractions.FlextMeltanoStreamInfo(
+            FlextMeltanoModels.StreamInfo(
                 stream_name="",  # Empty string should fail
                 schema={"properties": {"id": {"type": "integer"}}},
                 created_at="2025-01-01T10:00:00Z",

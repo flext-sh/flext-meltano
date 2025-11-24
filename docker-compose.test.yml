@@ -47,7 +47,7 @@ services:
       - meltano_cache:/root/.meltano/cache
     working_dir: /project
     ports:
-      - "3389:3000"  # Meltano UI port
+      - "3389:3000" # Meltano UI port
     depends_on:
       postgres:
         condition: service_healthy

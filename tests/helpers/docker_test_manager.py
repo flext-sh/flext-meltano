@@ -13,6 +13,7 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -104,6 +105,7 @@ class FlextTestDocker(ContainerManager):
         self,
         compose_file: str = "docker-compose.test.yml",
         project_name: str = "flext-test",
+        *,
         keep_running: bool = True,
     ) -> None:
         """Initialize Docker test manager.
@@ -166,7 +168,7 @@ class FlextTestDocker(ContainerManager):
         except Exception as e:
             return FlextResult[bool].fail(f"Error starting Docker services: {e}")
 
-    def stop_services(self, remove_volumes: bool = False) -> FlextResult[bool]:
+    def stop_services(self, *, remove_volumes: bool = False) -> FlextResult[bool]:
         """Stop Docker services.
 
         Args:
@@ -306,10 +308,12 @@ class FlextTestDocker(ContainerManager):
                     timeout=30,
                 )
 
-                if result.returncode == 0 and result.stdout.strip():
-                    # Containers are running, do basic health checks
-                    if self._check_service_health():
-                        return True
+                if (
+                    result.returncode == 0
+                    and result.stdout.strip()
+                    and self._check_service_health()
+                ):
+                    return True
 
             except Exception as e:
                 self.logger.warning(f"Error checking service health: {e}")
@@ -352,11 +356,11 @@ class FlextTestDocker(ContainerManager):
         if self.containers_started and not self.keep_running:
             try:
                 self.stop_services(remove_volumes=True)
-            except Exception as e:
-                self.logger.exception(f"Failed to cleanup containers: {e}")
+            except Exception:
+                self.logger.exception("Failed to cleanup containers")
 
     @contextmanager
-    def service_context(self, services: list[str] | None = None):
+    def service_context(self, services: list[str] | None = None) -> Generator[None]:
         """Context manager for service lifecycle.
 
         Args:
@@ -373,14 +377,14 @@ class FlextTestDocker(ContainerManager):
 
 # Pytest fixtures for Docker testing
 @pytest.fixture(scope="session")
-def docker_manager():
+def docker_manager() -> FlextTestDocker:
     """Session-scoped Docker manager fixture."""
     return FlextTestDocker(keep_running=True)  # Keep running for faster tests
     # Cleanup will happen via atexit
 
 
 @pytest.fixture
-def docker_services(docker_manager):
+def docker_services(docker_manager: object) -> object:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager

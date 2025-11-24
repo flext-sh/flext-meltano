@@ -12,6 +12,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.config import FlextMeltanoConfig
@@ -380,6 +382,49 @@ class FlextMeltanoTargetAbstractions(
             self.logger.exception("Record insert processing failed", error=str(e))
             return FlextResult[dict[str, object]].fail(
                 f"Record insert processing failed: {e}"
+            )
+
+    def create_flext_target_config(
+        self,
+        target_type: str,
+        connection_config: dict[str, object],
+        batch_size: int = 1000,
+        max_batches: int = 10,
+    ) -> FlextResult[dict[str, object]]:
+        """Create target configuration for flext-target usage."""
+        try:
+            config = {
+                "target_type": target_type,
+                "connection_config": connection_config,
+                "batch_size": batch_size,
+                "max_batches": max_batches,
+            }
+            return FlextResult[dict[str, object]].ok(config)
+        except Exception as e:
+            return FlextResult[dict[str, object]].fail(
+                f"Failed to create target config: {e}"
+            )
+
+    def create_flext_target(
+        self,
+        config: dict[str, object],
+    ) -> FlextResult[FlextMeltanoModels.DataSinkDefinition]:
+        """Create flext target instance from configuration."""
+        try:
+            # Create sink definition from config
+            sink_def = FlextMeltanoModels.DataSinkDefinition(
+                sink_type=cast("str", config.get("target_type", "jsonl")),
+                config=FlextMeltanoModels.DataSinkConfig(
+                    connection_config=cast(
+                        "dict[str, object]", config.get("connection_config", {})
+                    ),
+                    batch_size=cast("int", config.get("batch_size", 1000)),
+                ),
+            )
+            return FlextResult[FlextMeltanoModels.DataSinkDefinition].ok(sink_def)
+        except Exception as e:
+            return FlextResult[FlextMeltanoModels.DataSinkDefinition].fail(
+                f"Failed to create target: {e}"
             )
 
     def execute(

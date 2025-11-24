@@ -59,7 +59,7 @@ class FlextMeltanoAPIDBTOperations:
                 f"DBT models executed successfully in {execution_duration:.2f}s"
             )
 
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok({
+            result_dict = {
                 "models": models_to_run,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -67,13 +67,19 @@ class FlextMeltanoAPIDBTOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
                 "timeout_seconds": self.api.config.timeout_seconds
-                if self.api.config
+                if self.api.config is not None
                 else 300,
-                "log_level": self.api.config.log_level if self.api.config else "INFO",
+                "log_level": self.api.config.log_level
+                if self.api.config is not None
+                else "INFO",
                 "project_root": str(self.api.config.project_root)
-                if self.api.config and hasattr(self.api.config, "project_root")
+                if self.api.config is not None
+                and hasattr(self.api.config, "project_root")
                 else ".",
-            })
+            }
+            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
+                result_dict
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT models execution failed: {e}"

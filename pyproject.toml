@@ -150,19 +150,19 @@
         develop = true
         path    = "../flext-core"
 
-                                [tool.poetry.dependencies.flext-cli]
+                                    [tool.poetry.dependencies.flext-cli]
         develop = true
         path    = "../flext-cli"
 
-                                                            [tool.poetry.dependencies.flext-api]
+                                                                    [tool.poetry.dependencies.flext-api]
         develop = true
         path    = "../flext-api"
 
-                                                                                        [tool.poetry.dependencies.flext-observability]
+                                                                                                    [tool.poetry.dependencies.flext-observability]
         develop = true
         path    = "../flext-observability"
 
-                                                                                                                    [tool.poetry.dependencies.flext-plugin]
+                                                                                                                                    [tool.poetry.dependencies.flext-plugin]
         develop = true
         path    = "../flext-plugin"
 
@@ -187,6 +187,7 @@
         ruff           = ">=0.12.3"
         schedule       = ">=1.2.0"
         vulture        = ">=2.13"
+    beartype = "^0.22.6"
 
     [tool.poetry.group.test.dependencies]
         

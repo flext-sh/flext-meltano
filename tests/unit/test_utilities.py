@@ -114,7 +114,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             project_path = Path(temp_dir)
 
             # Create required project structure
-            (project_path / "meltano.yml").write_text("project_id: test")
+            (project_path / "pipeline.yml").write_text("project_id: test")
             (project_path / ".meltano").mkdir()
             (project_path / ".meltano" / "config").mkdir()
             (project_path / ".meltano" / "logs").mkdir()
@@ -124,8 +124,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             assert result.is_success
             assert result.value is not None
 
-    def test_validate_project_structure_missing_meltano_yml(self) -> None:
-        """Test project structure validation with missing meltano.yml."""
+    def test_validate_project_structure_missing_pipeline_yml(self) -> None:
+        """Test project structure validation with missing pipeline.yml."""
         utilities = FlextMeltanoUtilities()
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -147,12 +147,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            # Create meltano.yml but not .meltano directory
-            (project_path / "meltano.yml").write_text("project_id: test")
+            # Create pipeline.yml but not .meltano directory
+            (project_path / "pipeline.yml").write_text("project_id: test")
 
             result = utilities.validate_project_structure(project_path)
 
-            # Current implementation only checks for meltano.yml existence
+            # Current implementation only checks for pipeline.yml existence
             assert result.is_success
             assert result.value is True
 
@@ -176,14 +176,14 @@ class TestFlextMeltanoUtilitiesEnhanced:
             content = {"project_id": "test-project", "version": "1.0.0"}
 
             result = utilities.create_project_file(
-                project_path / "meltano.yml", cast("dict[str, object]", content)
+                project_path / "pipeline.yml", cast("dict[str, object]", content)
             )
 
             assert result.is_success
-            assert (project_path / "meltano.yml").exists()
+            assert (project_path / "pipeline.yml").exists()
 
             # Verify content was written correctly
-            written_content = (project_path / "meltano.yml").read_text()
+            written_content = (project_path / "pipeline.yml").read_text()
             assert "project_id: test-project" in written_content
 
     def test_create_project_file_directory_not_exists(self) -> None:
@@ -191,7 +191,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         utilities = FlextMeltanoUtilities()
 
         # Try to create file in non-existent directory
-        file_path = Path("/nonexistent/directory/meltano.yml")
+        file_path = Path("/nonexistent/directory/pipeline.yml")
         content = {"project_id": "test"}
 
         result = utilities.create_project_file(
@@ -394,7 +394,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             project_path = Path(temp_dir)
 
             # Create full project structure
-            (project_path / "meltano.yml").write_text("project_id: test")
+            (project_path / "pipeline.yml").write_text("project_id: test")
             (project_path / ".meltano").mkdir()
             (project_path / ".meltano" / "config").mkdir()
             (project_path / ".meltano" / "logs").mkdir()

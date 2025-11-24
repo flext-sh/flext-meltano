@@ -23,6 +23,8 @@ import yaml
 # Add tests directory to path for local imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+from helpers.docker_test_manager import FlextTestDocker
+
 
 class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
@@ -57,7 +59,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 @pytest.fixture
 def meltano_yml_config() -> dict[str, object]:
-    """Sample meltano.yml configuration for testing."""
+    """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
         "default_environment": "test",
@@ -122,9 +124,9 @@ def meltano_project(
     meltano_yml_config: dict[str, object],
 ) -> dict[str, object]:
     """Meltano project for testing."""
-    # Create meltano.yml
+    # Create pipeline.yml
 
-    meltano_yml = test_meltano_project_dir / "meltano.yml"
+    meltano_yml = test_meltano_project_dir / "pipeline.yml"
     with meltano_yml.open("w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
 
@@ -132,7 +134,7 @@ def meltano_project(
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,
-        "config_path": test_meltano_project_dir / "meltano.yml",
+        "config_path": test_meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
         "version": "1",
         "config": meltano_yml_config,
@@ -315,8 +317,6 @@ def job_run_config() -> dict[str, object]:
 
 
 # Docker fixtures for containerized testing
-# Import Docker manager conditionally
-from helpers.docker_test_manager import FlextTestDocker
 
 
 @pytest.fixture(scope="session")
@@ -342,7 +342,7 @@ def postgres_service(docker_manager: object) -> str | None:
 
 
 @pytest.fixture
-def redis_service(docker_manager) -> str | None:
+def redis_service(docker_manager: object) -> str | None:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
         url = docker_manager.get_service_url("redis", 6379)
@@ -350,7 +350,7 @@ def redis_service(docker_manager) -> str | None:
 
 
 @pytest.fixture
-def meltano_service(docker_manager) -> str | None:
+def meltano_service(docker_manager: object) -> str | None:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
         url = docker_manager.get_service_url("meltano", 3000)

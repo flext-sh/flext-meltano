@@ -398,6 +398,26 @@ class FlextMeltanoModels(FlextModels):
                 default=None, description="Path to write final state"
             )
 
+    class PipelineRunParams(FlextModels.ArbitraryTypesModel):
+        """Parameters for pipeline run operations."""
+
+        tap_name: str = Field(description="Name of the tap to run")
+        target_name: str = Field(description="Name of the target to run")
+        catalog_file: str | None = Field(
+            default=None, description="Path to catalog file"
+        )
+        state_file: str | None = Field(default=None, description="Path to state file")
+        state_output_file: str | None = Field(
+            default=None, description="Path to write final state"
+        )
+        tap_config: str | None = Field(
+            default=None, description="Path to tap configuration file"
+        )
+        target_config: str | None = Field(
+            default=None, description="Path to target configuration file"
+        )
+        full_refresh: bool = Field(default=False, description="Run with full refresh")
+
         class TransformationParams(FlextModels.ArbitraryTypesModel):
             """Generic parameters for transformation operations."""
 

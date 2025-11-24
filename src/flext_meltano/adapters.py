@@ -14,6 +14,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+
 import time
 from pathlib import Path
 from typing import cast
@@ -31,11 +36,22 @@ class FlextMeltanoAdapter:
     def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
         """Initialize legacy adapter with focused adapters."""
         self._config = config if config is not None else FlextMeltanoConfig()
+        self._library_runner_instance: FlextMeltanoLibraryRunner | None = None
         self.project_adapter = self.Project(config)
         self.plugin_adapter = self.Plugin(config)
         self.pipeline_adapter = self.Pipeline(config)
         self.singer_adapter = self.Singer(config)
         self.dbt_adapter = self.Dbt(config)
+
+    @property
+    def _library_runner(self) -> FlextMeltanoLibraryRunner:
+        """Lazy-loaded library runner to avoid circular imports."""
+        if self._library_runner_instance is None:
+            # Import here to avoid circular dependency
+            from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+
+            self._library_runner_instance = FlextMeltanoLibraryRunner()
+        return self._library_runner_instance
 
     def __getattr__(self, name: str) -> object:
         """Delegate method calls to appropriate focused adapter."""
