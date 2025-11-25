@@ -254,7 +254,7 @@ class FlextMeltanoComponentService(
     # Private helper methods
 
     def _log_plugin_addition_start(
-        self, plugin_name: str, plugin_type: str
+        self, _plugin_name: str, plugin_type: str
     ) -> FlextResult[None]:
         """Log plugin addition start."""
         self.logger.info(
@@ -274,7 +274,7 @@ class FlextMeltanoComponentService(
         return FlextResult[str].ok(data=plugin_type)
 
     def _execute_plugin_addition(
-        self, project: object, plugin_type_str: str, plugin_name: str
+        self, project: object, plugin_type_str: str, _plugin_name: str
     ) -> FlextResult[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         try:
