@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 
@@ -70,7 +69,7 @@ class FlextMeltanoDbtService(FlextService):
 
     def get_project_models(
         self,
-    ) -> FlextResult[list[dict[str, Any]]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Get all models from the project.
 
         Returns:
@@ -86,7 +85,9 @@ class FlextMeltanoDbtService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return FlextResult[list[dict[str, Any]]].fail(f"Failed to get models: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"Failed to get models: {e}"
+            )
 
     def run_models(
         self,
@@ -150,7 +151,7 @@ class FlextMeltanoDbtService(FlextService):
                 f"DBT tests failed: {e}"
             )
 
-    def generate_docs(self, **kwargs: object) -> FlextResult[dict[str, Any]]:
+    def generate_docs(self, **kwargs: object) -> FlextResult[dict[str, object]]:
         """Generate DBT documentation.
 
         Args:
@@ -168,7 +169,7 @@ class FlextMeltanoDbtService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return FlextResult[dict[str, Any]].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Documentation generation failed: {e}"
             )
 

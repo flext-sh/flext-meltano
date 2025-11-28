@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 
@@ -133,7 +132,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             self.logger.exception("DBT tests failed", error=str(e))
             return FlextResult[DbtTestResult].fail(f"DBT tests failed: {e}")
 
-    def docs_generate(self, **_kwargs: object) -> FlextResult[dict[str, Any]]:
+    def docs_generate(self, **_kwargs: object) -> FlextResult[dict[str, object]]:
         """Generate DBT documentation.
 
         Args:
@@ -145,7 +144,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """
         try:
             if not self.project_root:
-                return FlextResult[dict[str, Any]].fail("No project root set")
+                return FlextResult[dict[str, object]].fail("No project root set")
 
             self.logger.info(
                 "Generating DBT documentation",
@@ -159,10 +158,10 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             }
 
             self.logger.info("DBT documentation generated")
-            return FlextResult[dict[str, Any]].ok(result)
+            return FlextResult[dict[str, object]].ok(result)
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return FlextResult[dict[str, Any]].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Documentation generation failed: {e}"
             )
 

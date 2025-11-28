@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 from pydantic import Field
@@ -91,7 +90,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
 
     def load_manifest(
         self, manifest_path: Path | None = None
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Load DBT manifest.
 
         Args:
@@ -104,11 +103,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
         try:
             if manifest_path is None:
                 if self.project_root is None:
-                    return FlextResult[dict[str, Any]].fail("No project loaded")
+                    return FlextResult[dict[str, object]].fail("No project loaded")
                 manifest_path = self.project_root / "target" / "manifest.json"
 
             if not manifest_path.exists():
-                return FlextResult[dict[str, Any]].fail(
+                return FlextResult[dict[str, object]].fail(
                     f"Manifest not found: {manifest_path}"
                 )
 
@@ -119,12 +118,12 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 "DBT manifest loaded",
                 file=str(manifest_path),
             )
-            return FlextResult[dict[str, Any]].ok(self.manifest or {})
+            return FlextResult[dict[str, object]].ok(self.manifest or {})
         except Exception as e:
             self.logger.exception("Failed to load manifest", error=str(e))
-            return FlextResult[dict[str, Any]].fail(f"Failed to load manifest: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to load manifest: {e}")
 
-    def get_models(self) -> FlextResult[list[dict[str, Any]]]:
+    def get_models(self) -> FlextResult[list[dict[str, object]]]:
         """Get all models from manifest.
 
         Returns:
@@ -135,11 +134,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, Any]]].fail(
+                    return FlextResult[list[dict[str, object]]].fail(
                         manifest_result.error or "Unknown error"
                     )
 
-            models: list[dict[str, Any]] = []
+            models: list[dict[str, object]] = []
             if self.manifest and "nodes" in self.manifest:
                 models.extend(
                     {
@@ -153,12 +152,14 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 )
 
             self.logger.info("Models retrieved", count=len(models))
-            return FlextResult[list[dict[str, Any]]].ok(models)
+            return FlextResult[list[dict[str, object]]].ok(models)
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return FlextResult[list[dict[str, Any]]].fail(f"Failed to get models: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"Failed to get models: {e}"
+            )
 
-    def get_tests(self) -> FlextResult[list[dict[str, Any]]]:
+    def get_tests(self) -> FlextResult[list[dict[str, object]]]:
         """Get all tests from manifest.
 
         Returns:
@@ -169,11 +170,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, Any]]].fail(
+                    return FlextResult[list[dict[str, object]]].fail(
                         manifest_result.error or "Unknown error"
                     )
 
-            tests: list[dict[str, Any]] = []
+            tests: list[dict[str, object]] = []
             if self.manifest and "nodes" in self.manifest:
                 tests.extend(
                     {
@@ -187,10 +188,12 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 )
 
             self.logger.info("Tests retrieved", count=len(tests))
-            return FlextResult[list[dict[str, Any]]].ok(tests)
+            return FlextResult[list[dict[str, object]]].ok(tests)
         except Exception as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return FlextResult[list[dict[str, Any]]].fail(f"Failed to get tests: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"Failed to get tests: {e}"
+            )
 
     def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""

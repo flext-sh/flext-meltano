@@ -78,15 +78,6 @@ class FlextMeltanoConstants(FlextConstants):
         MYSQL: Final[int] = 3306
         ORACLE: Final[int] = 1521
 
-    class Logging:
-        """Logging configuration defaults."""
-
-        DEFAULT_LEVEL = FlextConstants.Settings.LogLevel.INFO
-        PIPELINE_LEVEL = FlextConstants.Settings.LogLevel.INFO
-        EXTRACT_LEVEL = FlextConstants.Settings.LogLevel.INFO
-        LOAD_LEVEL = FlextConstants.Settings.LogLevel.INFO
-        TRANSFORM_LEVEL = FlextConstants.Settings.LogLevel.INFO
-        ERROR_LEVEL = FlextConstants.Settings.LogLevel.ERROR
         PERFORMANCE_LEVEL = FlextConstants.Settings.LogLevel.WARNING
         MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5_000
         MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10_000

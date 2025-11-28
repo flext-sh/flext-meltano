@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 from meltano.core.project import Project as MeltanoProject
@@ -128,7 +127,7 @@ class FlextMeltanoProjectManager(FlextService):
 
     def get_plugins(
         self, plugin_type: str | None = None
-    ) -> FlextResult[list[dict[str, Any]]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Get plugins from the project.
 
         Args:
@@ -140,7 +139,7 @@ class FlextMeltanoProjectManager(FlextService):
         """
         try:
             if not self.project:
-                return FlextResult[list[dict[str, Any]]].fail("No project loaded")
+                return FlextResult[list[dict[str, object]]].fail("No project loaded")
 
             plugins = []
             if hasattr(self.project, "plugins") and hasattr(
@@ -160,12 +159,14 @@ class FlextMeltanoProjectManager(FlextService):
                 count=len(plugins),
                 type=plugin_type,
             )
-            return FlextResult[list[dict[str, Any]]].ok(plugins)
+            return FlextResult[list[dict[str, object]]].ok(plugins)
         except Exception as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return FlextResult[list[dict[str, Any]]].fail(f"Failed to get plugins: {e}")
+            return FlextResult[list[dict[str, object]]].fail(
+                f"Failed to get plugins: {e}"
+            )
 
-    def install_plugin(self, name: str) -> FlextResult[dict[str, Any]]:
+    def install_plugin(self, name: str) -> FlextResult[dict[str, object]]:
         """Install a plugin in the project.
 
         Args:
@@ -186,10 +187,10 @@ class FlextMeltanoProjectManager(FlextService):
             }
 
             self.logger.info("Plugin installed", name=name)
-            return FlextResult[dict[str, Any]].ok(plugin_info)
+            return FlextResult[dict[str, object]].ok(plugin_info)
         except Exception as e:
             self.logger.exception("Failed to install plugin", error=str(e))
-            return FlextResult[dict[str, Any]].fail(f"Failed to install plugin: {e}")
+            return FlextResult[dict[str, object]].fail(f"Failed to install plugin: {e}")
 
     def execute(self, **_kwargs: object) -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
