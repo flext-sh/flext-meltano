@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 from pydantic import Field
@@ -62,7 +61,7 @@ class FlextMeltanoSingerService(FlextService):
         records_processed: int = Field(description="Number of records processed")
         records_written: int = Field(description="Number of records written")
         errors: int = Field(description="Number of errors")
-        state: dict[str, Any] | None = Field(default=None, description="Final state")
+        state: dict[str, object] | None = Field(default=None, description="Final state")
         duration_seconds: float = Field(description="Execution duration")
 
     def __init__(self) -> None:
@@ -71,7 +70,7 @@ class FlextMeltanoSingerService(FlextService):
         self.catalog_manager = FlextMeltanoCatalogManager()
         self.state_manager = FlextMeltanoStateManager()
 
-    def discover_tap_catalog(self, tap: object) -> FlextResult[dict[str, Any]]:
+    def discover_tap_catalog(self, tap: object) -> FlextResult[dict[str, object]]:
         """Discover catalog from a tap instance.
 
         Args:
@@ -89,14 +88,14 @@ class FlextMeltanoSingerService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("Tap discovery failed", error=str(e))
-            return FlextResult[dict[str, Any]].fail(f"Tap discovery failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Tap discovery failed: {e}")
 
     def execute_sync(
         self,
         tap: object,
         target: object,
-        catalog: dict[str, Any],
-        state: dict[str, Any] | None = None,
+        catalog: dict[str, object],
+        state: dict[str, object] | None = None,
     ) -> FlextResult[FlextMeltanoSingerService.SyncResult]:
         """Execute a complete Singer sync pipeline.
 
@@ -159,7 +158,9 @@ class FlextMeltanoSingerService(FlextService):
                 f"Singer sync failed: {e}"
             )
 
-    def load_catalog_from_file(self, catalog_path: Path) -> FlextResult[dict[str, Any]]:
+    def load_catalog_from_file(
+        self, catalog_path: Path
+    ) -> FlextResult[dict[str, object]]:
         """Load catalog from file.
 
         Args:
@@ -173,7 +174,7 @@ class FlextMeltanoSingerService(FlextService):
 
     def save_catalog_to_file(
         self,
-        catalog: dict[str, Any],
+        catalog: dict[str, object],
         catalog_path: Path,
     ) -> FlextResult[None]:
         """Save catalog to file.
@@ -191,7 +192,7 @@ class FlextMeltanoSingerService(FlextService):
 
     def load_state_from_file(
         self, state_path: Path | None = None
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Load state from file.
 
         Args:

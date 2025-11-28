@@ -136,15 +136,6 @@ class FlextMeltanoTypes(FlextTypes):
         type SingerConfig = dict[str, bool | str | dict[str, object]]
         type DbtConfig = dict[str, object]
 
-    class Pipeline:
-        """ELT pipeline complex types namespace."""
-
-        type PipelineDefinition = list[dict[str, str | dict[str, FlextTypes.JsonValue]]]
-        type ExecutionContext = dict[str, FlextTypes.JsonValue | dict[str, object]]
-        type RuntimeEnvironment = dict[str, str | dict[str, object]]
-        type PipelineResults = dict[str, str | dict[str, object]]
-        type WorkflowConfiguration = dict[str, str | list[str]]
-
     class Bridge:
         """Bridge operation complex types namespace."""
 
@@ -267,23 +258,6 @@ class FlextMeltanoTypes(FlextTypes):
         type ExecutionLogsDict = dict[str, object]
         type MetricsDict = dict[str, float]
         type ErrorsDict = dict[str, str]
-
-    class Bridge:
-        """FLEXT-Go bridge complex types namespace."""
-
-        type BridgeMessage = dict[str, object]
-        type BridgeResponse = dict[str, object]
-        type BridgeConfig = dict[str, str | int | bool]
-        type BridgeStatus = dict[str, str | int | bool]
-
-        # Library and runner types
-        type LibraryDict = dict[str, object]
-        type RunnerConfigDict = dict[str, object]
-        type ProcessResultDict = dict[str, object]
-        type OutputDict = dict[str, object]
-        type LogsDict = dict[str, object]
-        type MetadataDict = dict[str, str | int | bool | dict[str, object]]
-        type ResponseDict = dict[str, str | int | bool | dict[str, object]]
 
 
 __all__ = [

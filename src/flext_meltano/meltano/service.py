@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult, FlextService
 from pydantic import Field
@@ -110,7 +109,7 @@ class FlextMeltanoMeltanoService(FlextService):
 
     def discover_plugins(
         self, plugin_type: str | None = None
-    ) -> FlextResult[list[dict[str, Any]]]:
+    ) -> FlextResult[list[dict[str, object]]]:
         """Discover plugins in the project.
 
         Args:
@@ -129,7 +128,7 @@ class FlextMeltanoMeltanoService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
-            return FlextResult[list[dict[str, Any]]].fail(
+            return FlextResult[list[dict[str, object]]].fail(
                 f"Failed to discover plugins: {e}"
             )
 
