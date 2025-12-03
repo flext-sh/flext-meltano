@@ -13,6 +13,7 @@
 **Python**: 3.13+
 
 **CURRENT CAPABILITIES**:
+
 - ✅ Complete Singer Protocol Implementation
 - ✅ Meltano Integration
 - ✅ DBT Operations
@@ -21,7 +22,8 @@
 - ✅ FLEXT-Core Integration
 
 **ECOSYSTEM INTEGRATION**:
-- Foundation for 32+ FLEXT Projects (all flext-tap-_, flext-target-_, flext-dbt-* projects)
+
+- Foundation for 32+ FLEXT Projects (all flext-tap-_, flext-target-_, flext-dbt-\* projects)
 - Zero Custom ELT Code - ABSOLUTE prohibition of custom Meltano/Singer/DBT implementations
 - Enterprise Data Pipelines - Production-ready ELT orchestration
 
@@ -82,12 +84,14 @@ if result.is_success:
 ### ZERO TOLERANCE Policies
 
 **ABSOLUTELY FORBIDDEN**:
+
 - ❌ Custom Meltano/Singer/DBT implementations
 - ❌ Direct Singer SDK imports outside flext-meltano
 - ❌ Exception-based error handling (use FlextResult)
 - ❌ Type ignores or `Any` types
 
 **MANDATORY**:
+
 - ✅ Use `FlextResult[T]` for all operations
 - ✅ Complete type annotations
 - ✅ Zero Ruff violations

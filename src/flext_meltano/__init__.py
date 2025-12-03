@@ -13,6 +13,18 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 # =========================================================================
+# IMPORT ALIASES FOR SIMPLIFIED USAGE
+# =========================================================================
+from flext_core import (
+    FlextDecorators,
+    FlextExceptions,
+    FlextHandlers,
+    FlextMixins,
+    FlextResult,
+    FlextService,
+)
+
+# =========================================================================
 # VERSION
 # =========================================================================
 from flext_meltano.__version__ import __version__, __version_info__
@@ -28,7 +40,11 @@ from flext_meltano.config import FlextMeltanoConfig
 # =========================================================================
 # FOUNDATION LAYER - Core patterns and definitions
 # =========================================================================
-from flext_meltano.constants import FlextMeltanoConstants
+# Domain-specific aliases
+from flext_meltano.constants import (
+    FlextMeltanoConstants,
+    FlextMeltanoConstants as c,
+)
 
 # =========================================================================
 # DBT DOMAIN - Deep dbt-core integration (NO CLI)
@@ -58,10 +74,14 @@ from flext_meltano.meltano import (
 # =========================================================================
 # DOMAIN LAYER - Models and services
 # =========================================================================
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import (
+    FlextMeltanoModels,
+    FlextMeltanoModels as m,
+)
 from flext_meltano.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoProtocols,
+    FlextMeltanoProtocols as p,
     FlextMeltanoSingerProtocols,
 )
 from flext_meltano.services import FlextMeltanoService
@@ -80,9 +100,23 @@ from flext_meltano.singer import (
     FlextMeltanoTarget,
     FlextMeltanoTargetAbstractions,
 )
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import FlextMeltanoUtilities
+from flext_meltano.typings import (
+    FlextMeltanoTypes,
+    FlextMeltanoTypes as t,
+)
+from flext_meltano.utilities import (
+    FlextMeltanoUtilities,
+    FlextMeltanoUtilities as u,
+)
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Core aliases
+r = FlextResult
+e = FlextExceptions
+d = FlextDecorators
+s = FlextService
+x = FlextMixins
+h = FlextHandlers
 
 # =========================================================================
 # PUBLIC API EXPORTS
@@ -127,4 +161,16 @@ __all__ = [
     # Version
     "__version__",
     "__version_info__",
+    # Short aliases for simplified usage
+    "c",  # FlextMeltanoConstants
+    "d",  # FlextDecorators
+    "e",  # FlextExceptions
+    "h",  # FlextHandlers
+    "m",  # FlextMeltanoModels
+    "p",  # FlextMeltanoProtocols
+    "r",  # FlextResult
+    "s",  # FlextService
+    "t",  # FlextMeltanoTypes
+    "u",  # FlextMeltanoUtilities
+    "x",  # x
 ]

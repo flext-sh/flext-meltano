@@ -180,7 +180,8 @@ class TestDockerIntegration:
             r.set("test_key", "test_value")
             value = r.get("test_key")
 
-            assert value is not None and value.decode() == "test_value"
+            assert value is not None
+            assert value.decode() == "test_value"
 
             # Test list operations
             r.lpush("test_list", "item1")

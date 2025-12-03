@@ -12,7 +12,20 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, FlextUtilities
+from flext_core import FlextLogger, FlextResult, FlextTypes, u
+
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+r = FlextResult
+t_base = FlextTypes
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoBridge:
@@ -26,11 +39,11 @@ class FlextMeltanoBridge:
         """Initialize the bridge."""
         self.logger: FlextLogger = FlextLogger(__name__)
 
+    @staticmethod
     def execute_command(
-        self,
         command: str,
-        args: dict[str, FlextTypes.JsonValue] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+        args: dict[str, t_base.JsonValue] | None = None,
+    ) -> r[dict[str, object]]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -48,29 +61,32 @@ class FlextMeltanoBridge:
                 "command": command,
                 "args": args or {},
                 "status": "executed",
-                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+                "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[dict[str, object]].ok(cast("dict[str, object]", result))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[dict[str, object]].fail(f"Bridge command failed: {e}")
+            return r[dict[str, object]].fail(f"Bridge command failed: {e}")
 
-    def get_version(self) -> FlextResult[str]:
+    @staticmethod
+    def get_version() -> r[str]:
         """Get bridge version information."""
         try:
             # Placeholder - real implementation would query Go bridge
-            return FlextResult[str].ok("1.0.0")
+            return r[str].ok("1.0.0")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[str].fail(f"Failed to get version: {e}")
+            return r[str].fail(f"Failed to get version: {e}")
 
-    def validate_connection(self) -> FlextResult[bool]:
+    @staticmethod
+    def validate_connection() -> r[bool]:
         """Validate connection to Go bridge."""
         try:
             # Placeholder - real implementation would test Go bridge connectivity
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
+            return r[bool].fail(f"Bridge connection validation failed: {e}")
 
-    def discover_plugins(self) -> FlextResult[dict[str, object]]:
+    @staticmethod
+    def discover_plugins() -> r[dict[str, object]]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
@@ -79,11 +95,11 @@ class FlextMeltanoBridge:
                 "loaders": ["target-csv", "target-postgres", "target-jsonl"],
                 "transformers": ["dbt-postgres", "dbt-snowflake"],
                 "status": "discovered",
-                "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+                "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[dict[str, object]].ok(cast("dict[str, object]", result))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[dict[str, object]].fail(f"Plugin discovery failed: {e}")
+            return r[dict[str, object]].fail(f"Plugin discovery failed: {e}")
 
 
 __all__ = ["FlextMeltanoBridge"]

@@ -16,7 +16,17 @@ from pathlib import Path
 from flext_core import FlextResult, FlextService
 from pydantic import Field, model_validator
 
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for simplified usage
+# u is already imported from flext_core
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+r = FlextResult
+s = FlextService
 
 
 class FlextMeltanoStateManager(FlextService[dict[str, object]]):
@@ -26,7 +36,7 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
     syncs with proper error handling and FlextResult patterns.
     """
 
-    class StateEntry(FlextMeltanoModels):
+    class StateEntry(m):
         """Singer state entry for a stream."""
 
         stream_name: str = Field(description="Name of the stream")
@@ -54,9 +64,7 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
         super().__init__()
         self._state: dict[str, object] = {}
 
-    def load_state(
-        self, state_file: Path | None = None
-    ) -> FlextResult[dict[str, object]]:
+    def load_state(self, state_file: Path | None = None) -> r[dict[str, object]]:
         """Load state from file or memory.
 
         Args:
@@ -75,12 +83,12 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
                     file=str(state_file),
                     entries=len(self._state),
                 )
-            return FlextResult[dict[str, object]].ok(self._state)
+            return r[dict[str, object]].ok(self._state)
         except Exception as e:
             self.logger.exception("Failed to load state", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Failed to load state: {e}")
+            return r[dict[str, object]].fail(f"Failed to load state: {e}")
 
-    def save_state(self, state_file: Path) -> FlextResult[None]:
+    def save_state(self, state_file: Path) -> r[None]:
         """Save state to file.
 
         Args:
@@ -98,17 +106,17 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
                 "State saved to file",
                 file=str(state_file),
             )
-            return FlextResult[None].ok(None)
+            return r[None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to save state", error=str(e))
-            return FlextResult[None].fail(f"Failed to save state: {e}")
+            return r[None].fail(f"Failed to save state: {e}")
 
     def update_bookmark(
         self,
         stream_name: str,
         bookmark_key: str,
         bookmark_value: str,
-    ) -> FlextResult[None]:
+    ) -> r[None]:
         """Update bookmark for a stream.
 
         Args:
@@ -130,14 +138,12 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
                 stream=stream_name,
                 key=bookmark_key,
             )
-            return FlextResult[None].ok(None)
+            return r[None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to update bookmark", error=str(e))
-            return FlextResult[None].fail(f"Failed to update bookmark: {e}")
+            return r[None].fail(f"Failed to update bookmark: {e}")
 
-    def get_bookmark(
-        self, stream_name: str, bookmark_key: str
-    ) -> FlextResult[str | None]:
+    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str | None]:
         """Get current bookmark value.
 
         Args:
@@ -151,15 +157,15 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
         try:
             if stream_name in self._state:
                 value = self._state[stream_name].get(bookmark_key)
-                return FlextResult[str | None].ok(value)
-            return FlextResult[str | None].ok(None)
+                return r[str | None].ok(value)
+            return r[str | None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
-            return FlextResult[str | None].fail(f"Failed to get bookmark: {e}")
+            return r[str | None].fail(f"Failed to get bookmark: {e}")
 
-    def execute(self, **_kwargs: object) -> FlextResult[dict[str, object]]:
+    def execute(self, **_kwargs: object) -> r[dict[str, object]]:
         """Execute (implements Domain.Service pattern)."""
-        return FlextResult[dict[str, object]].ok(self._state)
+        return r[dict[str, object]].ok(self._state)
 
 
 __all__ = [

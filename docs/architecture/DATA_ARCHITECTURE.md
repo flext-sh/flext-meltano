@@ -507,7 +507,7 @@ class RetentionPolicy:
     data_type: str
     retention_period_days: int
     archive_strategy: str  # 'delete', 'archive', 'anonymize'
-    compliance_requirements: FlextTypes.StringList
+    compliance_requirements: t.StringList
 
     def should_retain(self, data_age_days: int) -> bool:
         """Determine if data should be retained."""

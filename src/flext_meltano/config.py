@@ -18,6 +18,7 @@ from flext_core import (
     FlextConstants,
     FlextExceptions,
     FlextResult,
+    u,
 )
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -26,6 +27,15 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Import aliases for simplified usage
+# u is already imported from flext_core
+c_base = FlextConstants
+t = FlextMeltanoTypes
+m = FlextMeltanoModels
+r = FlextResult
+e = FlextExceptions
+c = FlextMeltanoConstants
 
 
 @FlextConfig.auto_register("meltano")
@@ -98,9 +108,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     EnvironmentType: ClassVar[type[FlextMeltanoConstants.Environment]] = (
         FlextMeltanoConstants.Environment
     )
-    LogLevel: ClassVar[type[FlextConstants.Settings.LogLevel]] = (
-        FlextConstants.Settings.LogLevel
-    )
+    LogLevel: ClassVar[type[c.Settings.LogLevel]] = c.Settings.LogLevel
     OperationStatus: ClassVar[type[FlextMeltanoConstants.OperationStatus]] = (
         FlextMeltanoConstants.OperationStatus
     )
@@ -154,8 +162,8 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     )
 
     # Consolidated logging configuration
-    logging: FlextMeltanoModels.LoggingConfig = Field(
-        default_factory=FlextMeltanoModels.LoggingConfig,
+    logging: m.LoggingConfig = Field(
+        default_factory=m.LoggingConfig,
         description="Complete logging configuration for all pipeline operations",
     )
 
@@ -254,7 +262,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     )
 
     audit_log_level: str = Field(
-        default=str(FlextConstants.Settings.LogLevel.INFO.value),
+        default=str(c.Settings.LogLevel.INFO.value),
         description="Audit log level",
     )
 
@@ -271,21 +279,21 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
     # Network timeout configuration
     network_timeout: int = Field(
-        default=FlextConstants.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
+        default=c.Network.DEFAULT_TIMEOUT,  # SOURCE OF TRUTH
         ge=1,
         le=3600,
         description="Timeout for operations in seconds",
     )
 
     retry_count: int = Field(
-        default=FlextConstants.Reliability.MAX_RETRY_ATTEMPTS,  # SOURCE OF TRUTH
+        default=c.Reliability.MAX_RETRY_ATTEMPTS,  # SOURCE OF TRUTH
         ge=0,
         le=10,
         description="Number of retries for failed operations",
     )
 
     batch_size: int = Field(
-        default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
+        default=c.Performance.BatchProcessing.DEFAULT_SIZE,  # SOURCE OF TRUTH
         ge=1,
         le=10000,
         description="Batch size for data processing",
@@ -293,7 +301,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
     # Plugin and execution configuration
     max_concurrent_jobs: int = Field(
-        default=FlextConstants.Container.DEFAULT_WORKERS,  # SOURCE OF TRUTH
+        default=c.Container.DEFAULT_WORKERS,  # SOURCE OF TRUTH
         ge=1,
         le=16,
         description="Maximum number of concurrent jobs",
@@ -311,7 +319,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     )
 
     logs_dir: Path = Field(
-        default_factory=lambda: Path(FlextConstants.Platform.DIR_LOGS),
+        default_factory=lambda: Path(c.Platform.DIR_LOGS),
         description="Logs directory",
     )
 
@@ -392,7 +400,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     # CONFIGURATION METHODS - Business logic methods
     # ============================================================================
 
-    def get_project_file(self) -> FlextResult[Path]:
+    def get_project_file(self) -> r[Path]:
         """Get full path to meltano project file using railway pattern.
 
         Returns:
@@ -400,11 +408,11 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
         """
         try:
-            return FlextResult[Path].ok(self.project_root / self.PROJECT_FILE)
+            return r[Path].ok(self.project_root / self.PROJECT_FILE)
         except (ValueError, TypeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to get project file path: {e}")
+            return r[Path].fail(f"Failed to get project file path: {e}")
 
-    def get_absolute_config_dir(self) -> FlextResult[Path]:
+    def get_absolute_config_dir(self) -> r[Path]:
         """Get absolute path to config directory using railway pattern.
 
         Returns:
@@ -413,12 +421,12 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         """
         try:
             if self.config_dir.is_absolute():
-                return FlextResult[Path].ok(self.config_dir)
-            return FlextResult[Path].ok(self.project_root / self.config_dir)
+                return r[Path].ok(self.config_dir)
+            return r[Path].ok(self.project_root / self.config_dir)
         except (ValueError, TypeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to get config directory path: {e}")
+            return r[Path].fail(f"Failed to get config directory path: {e}")
 
-    def get_absolute_logs_dir(self) -> FlextResult[Path]:
+    def get_absolute_logs_dir(self) -> r[Path]:
         """Get absolute path to logs directory using railway pattern.
 
         Returns:
@@ -427,10 +435,10 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         """
         try:
             if self.logs_dir.is_absolute():
-                return FlextResult[Path].ok(self.logs_dir)
-            return FlextResult[Path].ok(self.project_root / self.logs_dir)
+                return r[Path].ok(self.logs_dir)
+            return r[Path].ok(self.project_root / self.logs_dir)
         except (ValueError, TypeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to get logs directory path: {e}")
+            return r[Path].fail(f"Failed to get logs directory path: {e}")
 
     def get_absolute_venv_dir(self) -> Path:
         """Get absolute path to virtual environment directory.
@@ -443,7 +451,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             return self.venv_dir
         return self.project_root / self.venv_dir
 
-    def validate_project_structure(self) -> FlextResult[bool]:
+    def validate_project_structure(self) -> r[bool]:
         """Validate Meltano project directory structure.
 
         Performs complete validation of the Meltano project structure,
@@ -503,7 +511,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     def create_from_project_root(
         cls,
         project_root: str | Path,
-    ) -> FlextResult[FlextMeltanoConfig]:
+    ) -> r[FlextMeltanoConfig]:
         """Create configuration from project root directory.
 
         Creates a new configuration instance from the specified project root
@@ -522,11 +530,11 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             validation_result = config.validate_project_structure()
 
             if validation_result.is_failure:
-                return FlextResult[FlextMeltanoConfig].fail(
+                return r[FlextMeltanoConfig].fail(
                     validation_result.error or "Project validation failed",
                 )
 
-            return FlextResult[FlextMeltanoConfig].ok(config)
+            return r[FlextMeltanoConfig].ok(config)
 
         except (
             ValueError,
@@ -535,7 +543,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             AttributeError,
             OSError,
         ) as e:  # pragma: no cover
-            return FlextResult[FlextMeltanoConfig].fail(
+            return r[FlextMeltanoConfig].fail(
                 f"Config creation failed: {e}",
             )
 
@@ -565,13 +573,14 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             env_type = FlextMeltanoConstants.Environment(environment.lower())
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
-            raise FlextExceptions.ValidationError(msg) from e
+            raise e.ValidationError(msg) from e
 
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
-        filtered_kwargs: dict[str, object] = {
-            k: v for k, v in kwargs.items() if k in valid_fields
-        }
+        filtered_kwargs_dict = u.filter(kwargs, lambda k, _v: k in valid_fields)
+        filtered_kwargs = (
+            filtered_kwargs_dict if isinstance(filtered_kwargs_dict, dict) else {}
+        )
 
         # Create config data with environment
         config_data: dict[str, object] = {"environment": env_type.value}
@@ -592,23 +601,23 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
         if "log_level" in filtered_kwargs:
             log_level_raw = str(filtered_kwargs["log_level"]).upper()
-            log_level_enum = FlextConstants.Settings.LogLevel(log_level_raw)
+            log_level_enum = c.Settings.LogLevel(log_level_raw)
             config_data["log_level"] = str(log_level_enum.value)
 
         if "run_mode" in filtered_kwargs:
             run_mode_raw = str(filtered_kwargs["run_mode"]).lower()
-            run_mode_enum = FlextMeltanoConstants.RunMode(run_mode_raw)
+            run_mode_enum = c.RunMode(run_mode_raw)
             config_data["run_mode"] = run_mode_enum.value
 
         # Apply all other valid kwargs with proper type handling
         excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
-        config_data.update(
-            {
-                key: value
-                for key, value in filtered_kwargs.items()
-                if key not in excluded_keys
-            },
+        filtered_update_dict = u.filter(
+            filtered_kwargs, lambda k, _v: k not in excluded_keys
         )
+        filtered_update = (
+            filtered_update_dict if isinstance(filtered_update_dict, dict) else {}
+        )
+        config_data.update(filtered_update)
 
         return cls.model_validate(config_data)
 
@@ -657,7 +666,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         """
         if not isinstance(instance, FlextMeltanoConfig):
             error_msg = "instance must be a FlextMeltanoConfig instance"
-            raise FlextExceptions.ValidationError(error_msg)
+            raise e.ValidationError(error_msg)
 
         # Delegate to FlextConfig since it's the source of truth
         FlextConfig.set_global_instance(instance)
@@ -675,20 +684,20 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     @classmethod
     def get_default_timeout(cls: object) -> int:
         """Get the default timeout value."""
-        return FlextConstants.Network.DEFAULT_TIMEOUT
+        return c.Network.DEFAULT_TIMEOUT
 
     @classmethod
     def get_default_batch_size(cls: object) -> int:
         """Get the default batch size value."""
-        return FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE
+        return c.Performance.BatchProcessing.DEFAULT_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls) -> FlextMeltanoTypes.MeltanoCore.PluginTypeList:
+    def get_supported_plugin_types(cls) -> t.MeltanoCore.PluginTypeList:
         """Get list of supported plugin types."""
         return FlextMeltanoConstants.Plugin.supported_types()
 
     @classmethod
-    def get_supported_environments(cls) -> FlextMeltanoTypes.MeltanoCore.PluginNameList:
+    def get_supported_environments(cls) -> t.MeltanoCore.PluginNameList:
         """Get list of supported environments."""
         return [
             FlextMeltanoConstants.Environment.DEVELOPMENT.value,
@@ -698,14 +707,14 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         ]
 
     @classmethod
-    def get_supported_log_levels(cls) -> FlextMeltanoTypes.MeltanoCore.PluginNameList:
+    def get_supported_log_levels(cls) -> t.MeltanoCore.PluginNameList:
         """Get list of supported log levels."""
         return [
-            str(FlextConstants.Settings.LogLevel.DEBUG.value),
-            str(FlextConstants.Settings.LogLevel.INFO.value),
-            str(FlextConstants.Settings.LogLevel.WARNING.value),
-            str(FlextConstants.Settings.LogLevel.ERROR.value),
-            str(FlextConstants.Settings.LogLevel.CRITICAL.value),
+            str(c.Settings.LogLevel.DEBUG.value),
+            str(c.Settings.LogLevel.INFO.value),
+            str(c.Settings.LogLevel.WARNING.value),
+            str(c.Settings.LogLevel.ERROR.value),
+            str(c.Settings.LogLevel.CRITICAL.value),
         ]
 
     @classmethod
@@ -719,7 +728,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         # Clear global instance for this class
         # Parent class doesn't have this method, so we implement it here
 
-    def apply_overrides(self, **overrides: object) -> FlextResult[None]:
+    def apply_overrides(self, **overrides: object) -> r[None]:
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
@@ -734,7 +743,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         """
         # Check if configuration is sealed
         if self.is_sealed():
-            return FlextResult[None].fail(
+            return r[None].fail(
                 "Cannot apply overrides to sealed configuration",
                 error_code="CONFIG_SEALED_ERROR",
             )
@@ -764,15 +773,15 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             )
             self._metadata_extra["override_count"] = str(applied_count)
 
-            return FlextResult[None].ok(data=None)
+            return r[None].ok(None)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
-            return FlextResult[None].fail(
+            return r[None].fail(
                 f"Failed to apply configuration overrides: {error}",
                 error_code="OVERRIDE_APPLICATION_ERROR",
             )
 
-    def seal(self) -> FlextResult[None]:
+    def seal(self) -> r[None]:
         """Seal the configuration to prevent further modifications.
 
         Once sealed, the configuration cannot be modified, ensuring
@@ -783,7 +792,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
         """
         self._sealed = True
-        return FlextResult[None].ok(data=None)
+        return r[None].ok(None)
 
     def is_sealed(self) -> bool:
         """Check if the configuration is sealed.
@@ -844,7 +853,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
     def get_meltano_logging_config(
         self,
-    ) -> FlextMeltanoTypes.MeltanoCore.SettingsDict:
+    ) -> t.MeltanoCore.SettingsDict:
         """Get Meltano-specific logging configuration dictionary.
 
         Delegates to consolidated logging model for maintainability.
@@ -887,9 +896,9 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         }
 
         merged_config = {**config_dict, **additional_config}
-        return cast("FlextMeltanoTypes.MeltanoCore.SettingsDict", merged_config)
+        return cast("t.MeltanoCore.SettingsDict", merged_config)
 
-    def get_metadata(self) -> FlextMeltanoTypes.MeltanoCore.MetadataDict:
+    def get_metadata(self) -> t.MeltanoCore.MetadataDict:
         """Get configuration metadata including override tracking.
 
         Returns:
@@ -916,7 +925,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         def create_dbt_config(
             project_name: str,
             profile_name: str = "",
-        ) -> FlextResult[FlextMeltanoTypes.Dbt.ProjectConfiguration]:
+        ) -> r[t.Dbt.ProjectConfiguration]:
             """Create DBT project configuration.
 
             Args:
@@ -929,7 +938,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             """
             try:
                 profile = profile_name or f"{project_name}_profile"
-                config: FlextMeltanoTypes.Dbt.ProjectConfiguration = {
+                config: t.Dbt.ProjectConfiguration = {
                     "name": project_name,
                     "version": "1.0.0",
                     "config-version": 2,
@@ -941,20 +950,16 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                     "macro-paths": ["macros"],
                     "snapshot-paths": ["snapshots"],
                 }
-                return FlextResult[FlextMeltanoTypes.Dbt.ProjectConfiguration].ok(
-                    config
-                )
+                return r[t.Dbt.ProjectConfiguration].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
-                    f"Failed to create DBT config: {e}"
-                )
+                return r[dict[str, object]].fail(f"Failed to create DBT config: {e}")
 
         @staticmethod
         def create_dbt_profile_config(
             profile_name: str,
             target_name: str = "dev",
             db_type: str = "postgres",
-        ) -> FlextResult[FlextMeltanoTypes.Dbt.ProfileConfiguration]:
+        ) -> r[t.Dbt.ProfileConfiguration]:
             """Create DBT profile configuration.
 
             Args:
@@ -967,7 +972,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
             """
             try:
-                profile_config: FlextMeltanoTypes.Dbt.ProfileConfiguration = {
+                profile_config: t.Dbt.ProfileConfiguration = {
                     profile_name: {
                         "target": target_name,
                         "outputs": {
@@ -983,11 +988,9 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                         },
                     }
                 }
-                return FlextResult[FlextMeltanoTypes.Dbt.ProfileConfiguration].ok(
-                    profile_config
-                )
+                return r[t.Dbt.ProfileConfiguration].ok(profile_config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Failed to create DBT profile config: {e}"
                 )
 
@@ -995,7 +998,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         def create_meltano_config(
             project_id: str,
             default_environment: str = "dev",
-        ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+        ) -> r[t.MeltanoCore.MeltanoConfigDict]:
             """Create basic Meltano project configuration.
 
             Args:
@@ -1007,7 +1010,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
             """
             try:
-                config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
+                config: t.MeltanoCore.MeltanoConfigDict = {
                     "version": 1,
                     "default_environment": default_environment,
                     "project_id": project_id,
@@ -1024,16 +1027,14 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                         }
                     ],
                 }
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                    config
-                )
+                return r[t.MeltanoCore.MeltanoConfigDict].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Failed to create Meltano config: {e}"
                 )
 
         @staticmethod
-        def create_development_config() -> FlextResult[FlextMeltanoConfig]:
+        def create_development_config() -> r[FlextMeltanoConfig]:
             """Create configuration optimized for development environment.
 
             Returns:
@@ -1046,20 +1047,18 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                 config.environment = FlextMeltanoConstants.Environment.DEVELOPMENT.value
                 config.debug = True
                 config.log_level = str(
-                    FlextConstants.Settings.LogLevel.DEBUG.value,
+                    c.Settings.LogLevel.DEBUG.value,
                 )
                 config.network_timeout = 300
                 config.max_concurrent_jobs = 2
-                return FlextResult[FlextMeltanoConfig].ok(config)
+                return r[FlextMeltanoConfig].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[FlextMeltanoConfig].fail(
-                    f"Failed to create dev config: {e}"
-                )
+                return r[FlextMeltanoConfig].fail(f"Failed to create dev config: {e}")
 
         @staticmethod
         def create_production_config(
             database_url: str,
-        ) -> FlextResult[FlextMeltanoConfig]:
+        ) -> r[FlextMeltanoConfig]:
             """Create configuration optimized for production environment.
 
             Args:
@@ -1075,19 +1074,17 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                 config.environment = FlextMeltanoConstants.Environment.PRODUCTION.value
                 config.debug = False
                 config.log_level = str(
-                    FlextConstants.Settings.LogLevel.WARNING.value,
+                    c.Settings.LogLevel.WARNING.value,
                 )
                 config.network_timeout = 600
                 config.max_concurrent_jobs = 10
                 config.meltano_database_uri = SecretStr(database_url)
-                return FlextResult[FlextMeltanoConfig].ok(config)
+                return r[FlextMeltanoConfig].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[FlextMeltanoConfig].fail(
-                    f"Failed to create prod config: {e}"
-                )
+                return r[FlextMeltanoConfig].fail(f"Failed to create prod config: {e}")
 
         @staticmethod
-        def create_testing_config() -> FlextResult[FlextMeltanoConfig]:
+        def create_testing_config() -> r[FlextMeltanoConfig]:
             """Create configuration optimized for testing environment.
 
             Returns:
@@ -1100,15 +1097,13 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                 config.environment = FlextMeltanoConstants.Environment.TESTING.value
                 config.debug = True
                 config.log_level = str(
-                    FlextConstants.Settings.LogLevel.DEBUG.value,
+                    c.Settings.LogLevel.DEBUG.value,
                 )
                 config.network_timeout = 60
                 config.max_concurrent_jobs = 1
-                return FlextResult[FlextMeltanoConfig].ok(config)
+                return r[FlextMeltanoConfig].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[FlextMeltanoConfig].fail(
-                    f"Failed to create test config: {e}"
-                )
+                return r[FlextMeltanoConfig].fail(f"Failed to create test config: {e}")
 
 
 __all__ = [

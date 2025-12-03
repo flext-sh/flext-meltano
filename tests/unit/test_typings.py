@@ -1,6 +1,6 @@
 """FLEXT Meltano Typings Unit Tests - Enterprise ELT testing patterns.
 
-This module provides comprehensive unit tests for FlextMeltanoTypes following
+This module provides comprehensive unit tests for t following
 FLEXT testing patterns and namespace organization.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -8,13 +8,12 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import t
+from tests.flext_tests_compat import FlextTestsMatchers
 
-from ..flext_tests_compat import FlextTestsMatchers
 
-
-class TestFlextMeltanoTypes:
-    """Unit test suite for FlextMeltanoTypes."""
+class Testt:
+    """Unit test suite for t."""
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
@@ -24,12 +23,12 @@ class TestFlextMeltanoTypes:
         """Test Plugin namespace types."""
         # Test that Plugin namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Plugin"),
+            condition=hasattr(t, "Plugin"),
             message="Plugin namespace should exist",
         )
 
         # Test Plugin types
-        plugin_types = FlextMeltanoTypes.Plugin
+        plugin_types = t.Plugin
         self.test_assertions.assert_true(
             condition=hasattr(plugin_types, "PluginType"),
             message="PluginType should exist in Plugin namespace",
@@ -43,12 +42,12 @@ class TestFlextMeltanoTypes:
         """Test Singer namespace types."""
         # Test that Singer namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Singer"),
+            condition=hasattr(t, "Singer"),
             message="Singer namespace should exist",
         )
 
         # Test Singer types
-        singer_types = FlextMeltanoTypes.Singer
+        singer_types = t.Singer
         self.test_assertions.assert_true(
             condition=hasattr(singer_types, "Record"),
             message="Record should exist in Singer namespace",
@@ -66,12 +65,12 @@ class TestFlextMeltanoTypes:
         """Test DBT namespace types."""
         # Test that DBT namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Dbt"),
+            condition=hasattr(t, "Dbt"),
             message="DBT namespace should exist",
         )
 
         # Test DBT types
-        dbt_types = FlextMeltanoTypes.Dbt
+        dbt_types = t.Dbt
         self.test_assertions.assert_true(
             condition=hasattr(dbt_types, "Model"),
             message="Model should exist in DBT namespace",
@@ -89,12 +88,12 @@ class TestFlextMeltanoTypes:
         """Test Project namespace types."""
         # Test that Project namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Project"),
+            condition=hasattr(t, "Project"),
             message="Project namespace should exist",
         )
 
         # Test Project types
-        project_types = FlextMeltanoTypes.Project
+        project_types = t.Project
         self.test_assertions.assert_true(
             condition=hasattr(project_types, "ProjectConfig"),
             message="ProjectConfig should exist in Project namespace",
@@ -108,12 +107,12 @@ class TestFlextMeltanoTypes:
         """Test Pipeline namespace types."""
         # Test that Pipeline namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Pipeline"),
+            condition=hasattr(t, "Pipeline"),
             message="Pipeline namespace should exist",
         )
 
         # Test Pipeline types
-        pipeline_types = FlextMeltanoTypes.Pipeline
+        pipeline_types = t.Pipeline
         self.test_assertions.assert_true(
             condition=hasattr(pipeline_types, "PipelineConfig"),
             message="PipelineConfig should exist in Pipeline namespace",
@@ -127,12 +126,12 @@ class TestFlextMeltanoTypes:
         """Test Bridge namespace types."""
         # Test that Bridge namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Bridge"),
+            condition=hasattr(t, "Bridge"),
             message="Bridge namespace should exist",
         )
 
         # Test Bridge types
-        bridge_types = FlextMeltanoTypes.Bridge
+        bridge_types = t.Bridge
         self.test_assertions.assert_true(
             condition=hasattr(bridge_types, "BridgeMessage"),
             message="BridgeMessage should exist in Bridge namespace",
@@ -146,12 +145,12 @@ class TestFlextMeltanoTypes:
         """Test CLI namespace types."""
         # Test that CLI namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "CLI"),
+            condition=hasattr(t, "CLI"),
             message="CLI namespace should exist",
         )
 
         # Test CLI types
-        cli_types = FlextMeltanoTypes.CLI
+        cli_types = t.CLI
         self.test_assertions.assert_true(
             condition=hasattr(cli_types, "Command"),
             message="Command should exist in CLI namespace",
@@ -165,12 +164,12 @@ class TestFlextMeltanoTypes:
         """Test ELT namespace types."""
         # Test that ELT namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "ELT"),
+            condition=hasattr(t, "ELT"),
             message="ELT namespace should exist",
         )
 
         # Test ELT types
-        elt_types = FlextMeltanoTypes.ELT
+        elt_types = t.ELT
         self.test_assertions.assert_true(
             condition=hasattr(elt_types, "ExtractConfig"),
             message="ExtractConfig should exist in ELT namespace",
@@ -188,12 +187,12 @@ class TestFlextMeltanoTypes:
         """Test Processing namespace types."""
         # Test that Processing namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "Processing"),
+            condition=hasattr(t, "Processing"),
             message="Processing namespace should exist",
         )
 
         # Test Processing types
-        processing_types = FlextMeltanoTypes.Processing
+        processing_types = t.Processing
         self.test_assertions.assert_true(
             condition=hasattr(processing_types, "SingerExecutionResult"),
             message="SingerExecutionResult should exist in Processing namespace",
@@ -211,12 +210,12 @@ class TestFlextMeltanoTypes:
         """Test MeltanoCore namespace types."""
         # Test that MeltanoCore namespace exists
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoTypes, "MeltanoCore"),
+            condition=hasattr(t, "MeltanoCore"),
             message="MeltanoCore namespace should exist",
         )
 
         # Test MeltanoCore types
-        meltano_core_types = FlextMeltanoTypes.MeltanoCore
+        meltano_core_types = t.MeltanoCore
         self.test_assertions.assert_true(
             condition=hasattr(meltano_core_types, "MeltanoConfigDict"),
             message="MeltanoConfigDict should exist in MeltanoCore namespace",
@@ -229,13 +228,13 @@ class TestFlextMeltanoTypes:
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         # Test that types are properly annotated
-        plugin_definition = FlextMeltanoTypes.Plugin.PluginDefinition
+        plugin_definition = t.Plugin.PluginDefinition
         self.test_assertions.assert_true(
             condition=plugin_definition is not None,
             message="PluginDefinition should be properly annotated",
         )
 
-        singer_catalog = FlextMeltanoTypes.Singer.CatalogEntry
+        singer_catalog = t.Singer.CatalogEntry
         self.test_assertions.assert_true(
             condition=singer_catalog is not None,
             message="Singer CatalogEntry should be properly annotated",
@@ -259,7 +258,7 @@ class TestFlextMeltanoTypes:
 
         for namespace in expected_namespaces:
             self.test_assertions.assert_true(
-                condition=hasattr(FlextMeltanoTypes, namespace),
+                condition=hasattr(t, namespace),
                 message=f"Types should have {namespace} namespace",
             )
 
@@ -269,12 +268,12 @@ class TestFlextMeltanoTypes:
         # Test that types can be used in type annotations
         # These functions are intentionally unused - they exist only for type checking
         def test_function(
-            plugin_def: FlextMeltanoTypes.Plugin.PluginDefinition,
+            plugin_def: t.Plugin.PluginDefinition,
         ) -> None:
             pass
 
         def test_singer_function(
-            catalog: FlextMeltanoTypes.Singer.CatalogEntry,
+            catalog: t.Singer.CatalogEntry,
         ) -> None:
             pass
 
@@ -289,22 +288,22 @@ class TestFlextMeltanoTypes:
 
     def test_export_completeness(self) -> None:
         """Test that all necessary types are exported."""
-        # Test that FlextMeltanoTypes is exported
+        # Test that t is exported
         self.test_assertions.assert_true(
-            condition=FlextMeltanoTypes is not None,
-            message="FlextMeltanoTypes should be exported",
+            condition=t is not None,
+            message="t should be exported",
         )
 
     def test_type_hierarchy(self) -> None:
         """Test that type hierarchy is properly structured."""
         # Test that namespaces are properly nested
-        plugin_namespace = FlextMeltanoTypes.Plugin
+        plugin_namespace = t.Plugin
         self.test_assertions.assert_true(
             condition=hasattr(plugin_namespace, "PluginType"),
             message="Plugin namespace should contain PluginType",
         )
 
-        singer_namespace = FlextMeltanoTypes.Singer
+        singer_namespace = t.Singer
         self.test_assertions.assert_true(
             condition=hasattr(singer_namespace, "Record"),
             message="Singer namespace should contain Record",
@@ -313,8 +312,8 @@ class TestFlextMeltanoTypes:
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
         # Test that similar types follow consistent patterns
-        plugin_definition = FlextMeltanoTypes.Plugin.PluginDefinition
-        singer_catalog = FlextMeltanoTypes.Singer.CatalogEntry
+        plugin_definition = t.Plugin.PluginDefinition
+        singer_catalog = t.Singer.CatalogEntry
 
         # Both should be type annotations
         self.test_assertions.assert_true(

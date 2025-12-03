@@ -103,9 +103,9 @@ validate_configuration() -> FlextResult[bool]
 class FlextSingerTap(FlextService):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, config: FlextTypes.Dict, state: FlextTypes.Dict | None = None)
+    def __init__(self, tap_name: str, config: t.Dict, state: t.Dict | None = None)
     async def discover(self) -> FlextResult[Catalog]
-    async def sync(self, streams: FlextTypes.StringList | None = None) -> FlextResult[SyncResult]
+    async def sync(self, streams: t.StringList | None = None) -> FlextResult[SyncResult]
 ```
 
 **FlextSingerTarget Architecture:**
@@ -114,8 +114,8 @@ class FlextSingerTap(FlextService):
 class FlextSingerTarget(FlextService):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, config: FlextTypes.Dict)
-    async def load_records(self, records: list[FlextTypes.Dict]) -> FlextResult[LoadResult]
+    def __init__(self, target_name: str, config: t.Dict)
+    async def load_records(self, records: list[t.Dict]) -> FlextResult[LoadResult]
     async def flush(self) -> FlextResult[FlushResult]
 ```
 
@@ -209,18 +209,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 
 # Service registration
 container.register_singleton(FlextMeltanoService, create_meltano_service)

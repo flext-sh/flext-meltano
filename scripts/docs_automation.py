@@ -5,7 +5,7 @@ Automated scheduling, CI/CD integration, and continuous maintenance
 for documentation quality assurance using complete FLEXT ecosystem integration.
 
 ARCHITECTURAL INTEGRATION:
-- FlextResult[T]: Railway pattern error handling
+- r[T]: Railway pattern error handling
 - FlextConfig: Centralized configuration management
 - FlextLogger: Structured logging with correlation
 - FlextService: Service base class with dependency injection
@@ -20,6 +20,7 @@ import importlib.util
 import json
 import sys
 import time as time_module
+from collections.abc import Callable
 from pathlib import Path
 
 import schedule
@@ -28,17 +29,17 @@ from flext_cli import (
 )
 from flext_core import (
     FlextContainer,
-    FlextExceptions,
     FlextLogger,
-    FlextResult,
-    FlextService,
+    e,
+    r,
+    s,
 )
 
 from flext_meltano.docs_config import DocsConfig
 from flext_meltano.docs_templates import DocsTemplates
 
 
-class DocumentationAutomation(FlextService):
+class DocumentationAutomation(s):
     """Automated documentation maintenance and CI/CD integration using FLEXT ecosystem.
 
     Extends FlextService with dependency injection and railway pattern error handling.
@@ -72,17 +73,17 @@ class DocumentationAutomation(FlextService):
         self._config = DocsConfig.get_instance()
         self.maintenance_script = Path("scripts/docs_maintenance.py")
 
-        # Validate maintenance script exists using FlextResult pattern
+        # Validate maintenance script exists using r pattern
         if not self.maintenance_script.exists():
             error_msg = f"Maintenance script not found: {self.maintenance_script}"
             self.logger.error("Maintenance script validation failed", error=error_msg)
-            raise FlextExceptions.ConfigurationError(error_msg)
+            raise e.ConfigurationError(error_msg)
 
-    def run_ci_checks(self) -> FlextResult[bool]:
+    def run_ci_checks(self) -> r[bool]:
         """Run documentation quality checks for CI/CD pipeline using FLEXT patterns.
 
         Returns:
-            FlextResult containing success status with detailed error information
+            r containing success status with detailed error information
 
         """
         self.logger.info("Starting CI documentation quality checks")
@@ -91,7 +92,7 @@ class DocumentationAutomation(FlextService):
         audit_result = self._run_maintenance_audit("--comprehensive")
         if not audit_result.is_success:
             self.logger.error("Documentation audit failed", error=audit_result.error)
-            return FlextResult.fail(audit_result.error or "Documentation audit failed")
+            return r.fail(audit_result.error or "Documentation audit failed")
 
         # Check quality thresholds
         quality_check_result = self._validate_quality_thresholds()
@@ -99,7 +100,7 @@ class DocumentationAutomation(FlextService):
             self.logger.error(
                 "Quality threshold validation failed", error=quality_check_result.error
             )
-            return FlextResult.fail(
+            return r.fail(
                 quality_check_result.error or "Quality threshold validation failed"
             )
 
@@ -109,16 +110,16 @@ class DocumentationAutomation(FlextService):
         else:
             self.logger.warning("CI documentation quality checks failed")
 
-        return FlextResult.ok(success_status)
+        return r.ok(success_status)
 
-    def _run_maintenance_audit(self, *args: str) -> FlextResult[None]:
+    def _run_maintenance_audit(self, *args: str) -> r[None]:
         """Run maintenance audit using FlextCli.
 
         Args:
             *args: Command line arguments for the maintenance script
 
         Returns:
-            FlextResult indicating success or failure
+            r indicating success or failure
 
         """
         try:
@@ -127,7 +128,7 @@ class DocumentationAutomation(FlextService):
                 "maintenance_audit", self.maintenance_script
             )
             if not maintenance_spec or not maintenance_spec.loader:
-                return FlextResult.fail(
+                return r.fail(
                     f"Could not load maintenance script: {self.maintenance_script}"
                 )
 
@@ -139,24 +140,24 @@ class DocumentationAutomation(FlextService):
             if hasattr(maintenance_module, "run_comprehensive_audit"):
                 result = maintenance_module.run_comprehensive_audit(*args)
                 if isinstance(result, dict) and result.get("success", False):
-                    return FlextResult.ok(None)
+                    return r.ok(None)
                 if result:
-                    return FlextResult.ok(None)
-                return FlextResult.fail("Maintenance audit completed with warnings")
-            return FlextResult.fail(
+                    return r.ok(None)
+                return r.fail("Maintenance audit completed with warnings")
+            return r.fail(
                 f"No run_comprehensive_audit function found in {self.maintenance_script}"
             )
 
         except Exception as e:
             error_msg = f"Failed to execute maintenance audit: {e}"
             self.logger.exception("Maintenance audit execution failed", error=error_msg)
-            return FlextResult.fail(error_msg)
+            return r.fail(error_msg)
 
-    def _validate_quality_thresholds(self) -> FlextResult[bool]:
+    def _validate_quality_thresholds(self) -> r[bool]:
         """Validate quality thresholds against generated summary.
 
         Returns:
-            FlextResult containing validation result
+            r containing validation result
 
         """
         try:
@@ -167,7 +168,7 @@ class DocumentationAutomation(FlextService):
             if not summary_path.exists():
                 error_msg = f"Quality summary not found at {summary_path}"
                 self.logger.warning("Quality summary missing", path=str(summary_path))
-                return FlextResult.ok(False)  # Not a failure, just no data
+                return r.ok(False)  # Not a failure, just no data
 
             with Path(summary_path).open(encoding="utf-8") as f:
                 summary = json.load(f)
@@ -182,7 +183,7 @@ class DocumentationAutomation(FlextService):
             if critical_count > 0 and fail_on_critical:
                 error_msg = f"Critical documentation issues found: {critical_count}"
                 self.logger.error("Critical issues detected", count=critical_count)
-                return FlextResult.fail(error_msg)
+                return r.fail(error_msg)
 
             # Check quality score threshold
             min_score = self._config.min_quality_score
@@ -194,19 +195,19 @@ class DocumentationAutomation(FlextService):
                     score=quality_score,
                     threshold=min_score,
                 )
-                return FlextResult.fail(error_msg)
+                return r.fail(error_msg)
 
             self.logger.info(
                 "Quality thresholds validated successfully",
                 score=quality_score,
                 critical_issues=critical_count,
             )
-            return FlextResult.ok(True)
+            return r.ok(True)
 
         except Exception as e:
             error_msg = f"Quality threshold validation failed: {e}"
             self.logger.exception("Quality validation failed", error=error_msg)
-            return FlextResult.fail(error_msg)
+            return r.fail(error_msg)
 
     def schedule_maintenance(self) -> None:
         """Set up scheduled maintenance tasks."""
@@ -263,7 +264,8 @@ class DocumentationAutomation(FlextService):
                 self._run_scheduled_audit
             )
 
-    def _schedule_monthly(self, config: dict[str, object]) -> None:
+    @staticmethod
+    def _schedule_monthly(config: dict[str, object]) -> None:
         """Schedule monthly maintenance."""
         # Run on the 1st of each month
         audit_time = str(config.get("audit_time", "09:00"))
@@ -322,20 +324,20 @@ class DocumentationAutomation(FlextService):
         except KeyboardInterrupt:
             pass
 
-    def generate_ci_workflow(self) -> FlextResult[str]:
+    def generate_ci_workflow(self) -> r[str]:
         """Generate GitHub Actions workflow for documentation quality using templates.
 
         Returns:
-            FlextResult containing the generated workflow YAML
+            r containing the generated workflow YAML
 
         """
         return self._templates.generate_ci_workflow(self._config.get_schedule_config())
 
-    def create_maintenance_hook(self) -> FlextResult[str]:
+    def create_maintenance_hook(self) -> r[str]:
         """Create Git pre-commit hook for documentation quality using templates.
 
         Returns:
-            FlextResult containing the generated hook script
+            r containing the generated hook script
 
         """
         return self._templates.generate_git_hook()
@@ -367,14 +369,35 @@ class DocumentationAutomation(FlextService):
 
         self.logger.info("Git hook installed successfully", path=str(pre_commit_hook))
 
-    def create_makefile_targets(self) -> FlextResult[str]:
+    def create_makefile_targets(self) -> r[str]:
         """Create Makefile targets for documentation maintenance using templates.
 
         Returns:
-            FlextResult containing the generated Makefile content
+            r containing the generated Makefile content
 
         """
         return self._templates.generate_makefile_targets()
+
+
+def _handle_ci_check(automation: DocumentationAutomation) -> int:
+    """Handle CI check command."""
+    result = automation.run_ci_checks()
+    if result.is_success:
+        success = result.unwrap()
+        return 0 if success else 1
+    return 1
+
+
+def _handle_generate_workflow(automation: DocumentationAutomation) -> int:
+    """Handle generate workflow command."""
+    result = automation.generate_ci_workflow()
+    return 0 if result.is_success else 1
+
+
+def _handle_generate_makefile(automation: DocumentationAutomation) -> int:
+    """Handle generate makefile command."""
+    result = automation.create_makefile_targets()
+    return 0 if result.is_success else 1
 
 
 def main() -> None:
@@ -412,36 +435,22 @@ Examples:
     try:
         automation = DocumentationAutomation()
 
-        if args.ci_check:
-            result = automation.run_ci_checks()
-            if result.is_success:
-                success = result.unwrap()
-                sys.exit(0 if success else 1)
-            else:
-                sys.exit(1)
+        command_handlers: dict[str, Callable[[DocumentationAutomation], int | None]] = {
+            "ci_check": _handle_ci_check,
+            "schedule": lambda a: (a.run_continuous_monitoring(), None)[1],
+            "setup_hooks": lambda a: (a.setup_git_hooks(), None)[1],
+            "generate_workflow": _handle_generate_workflow,
+            "generate_makefile": _handle_generate_makefile,
+        }
 
-        elif args.schedule:
-            automation.run_continuous_monitoring()
+        for arg_name, handler in command_handlers.items():
+            if getattr(args, arg_name, False):
+                exit_code = handler(automation)
+                if exit_code is not None:
+                    sys.exit(exit_code)
+                return
 
-        elif args.setup_hooks:
-            automation.setup_git_hooks()
-
-        elif args.generate_workflow:
-            result = automation.generate_ci_workflow()
-            if result.is_success:
-                pass
-            else:
-                sys.exit(1)
-
-        elif args.generate_makefile:
-            result = automation.create_makefile_targets()
-            if result.is_success:
-                pass
-            else:
-                sys.exit(1)
-
-        else:
-            parser.print_help()
+        parser.print_help()
 
     except Exception:
         sys.exit(1)

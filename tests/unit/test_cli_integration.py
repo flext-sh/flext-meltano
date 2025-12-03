@@ -15,8 +15,6 @@ from __future__ import annotations
 
 from flext_cli import FlextCliModels
 
-from flext_meltano.models import FlextMeltanoModels
-
 
 class TestCliModelConverterWithTapRunParams:
     """Test CliModelConverter integration with TapRunParams."""
@@ -33,11 +31,11 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_success
-        model: FlextMeltanoModels.TapRunParams = result.unwrap()
+        model: m.TapRunParams = result.unwrap()
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.discover is False
@@ -52,7 +50,7 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_success
@@ -69,7 +67,7 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_success
@@ -90,7 +88,7 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_success
@@ -111,7 +109,7 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_failure
@@ -126,7 +124,7 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_failure
@@ -145,7 +143,7 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_success
@@ -162,7 +160,7 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_success
@@ -178,7 +176,7 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_success
@@ -195,7 +193,7 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_success
@@ -212,7 +210,7 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_failure
@@ -231,7 +229,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TapRunParams, cli_args
+            m.TapRunParams, cli_args
         )
 
         assert result.is_success
@@ -247,7 +245,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.TargetRunParams, cli_args
+            m.TargetRunParams, cli_args
         )
 
         assert result.is_success
@@ -264,7 +262,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            m.PipelineRunParams, cli_args
         )
 
         assert result.is_success
@@ -284,7 +282,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            m.PipelineRunParams, cli_args
         )
 
         assert result.is_success
@@ -305,7 +303,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            m.PipelineRunParams, cli_args
         )
 
         assert result.is_failure
@@ -319,7 +317,7 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.PipelineRunParams, cli_args
+            m.PipelineRunParams, cli_args
         )
 
         assert result.is_failure
@@ -336,7 +334,7 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.DbtRunParams, cli_args
+            m.DbtRunParams, cli_args
         )
 
         assert result.is_success
@@ -353,7 +351,7 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.DbtRunParams, cli_args
+            m.DbtRunParams, cli_args
         )
 
         assert result.is_success
@@ -369,7 +367,7 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.DbtRunParams, cli_args
+            m.DbtRunParams, cli_args
         )
 
         assert result.is_success
@@ -385,7 +383,7 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.DbtRunParams, cli_args
+            m.DbtRunParams, cli_args
         )
 
         assert result.is_success
@@ -400,7 +398,7 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            FlextMeltanoModels.DbtRunParams, cli_args
+            m.DbtRunParams, cli_args
         )
 
         assert result.is_failure

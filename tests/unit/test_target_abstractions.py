@@ -2,12 +2,11 @@
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextUtilities
+from flext_core import FlextLogger, u
 from pydantic import ValidationError
 
-from flext_meltano import FlextMeltanoModels, FlextMeltanoTargetAbstractions
-
-from ..flext_tests_compat import FlextTestsUtilities
+from flext_meltano import FlextMeltanoTargetAbstractions, m, r
+from tests.flext_tests_compat import FlextTestsUtilities
 
 logger = FlextLogger(__name__)
 
@@ -41,7 +40,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "max_batches": 50,
         }
 
-        config = FlextMeltanoModels.DataSinkConfig.model_validate(
+        config = m.DataSinkConfig.model_validate(
             test_config_data,
         )
 
@@ -66,7 +65,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test FlextTargetConfig validation errors using flext_tests."""
         # Test invalid target_type using flext_tests error patterns
         try:
-            FlextMeltanoModels.TargetConfig(
+            m.TargetConfig(
                 target_type="",
                 connection_config={"test": "config"},
                 batch_size=100,
@@ -150,8 +149,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, r),
+            message="Should return r",
         )
         if result.is_success:
             config_data = result.value
@@ -178,8 +177,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         result = self.target_abstractions.create_flext_target(test_config)
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, r),
+            message="Should return r",
         )
 
     # =========================================================================
@@ -188,11 +187,11 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling using flext_tests error simulation."""
-        # Test error handling with FlextResult patterns
-        failure_result = FlextResult[str].fail("Target error")
+        # Test error handling with r patterns
+        failure_result = r[str].fail("Target error")
 
         self.test_assertions.assert_true(
-            condition=isinstance(failure_result, FlextResult),
+            condition=isinstance(failure_result, r),
             message="Should create failure result",
         )
         self.test_assertions.assert_true(
@@ -275,16 +274,16 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(config_result, FlextResult),
-            message="Config creation should return FlextResult",
+            condition=isinstance(config_result, r),
+            message="Config creation should return r",
         )
 
         if config_result.is_success:
             config_data = config_result.value
             target_result = self.target_abstractions.create_flext_target(config_data)
             self.test_assertions.assert_true(
-                condition=isinstance(target_result, FlextResult),
-                message="Target creation should return FlextResult",
+                condition=isinstance(target_result, r),
+                message="Target creation should return r",
             )
 
     # =========================================================================
@@ -295,7 +294,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test field validation errors to cover lines 105-106, 113-114."""
         # Test FlextMeltanoStreamInfo stream_name validation error (line 105-106)
         try:
-            FlextMeltanoModels.StreamInfo(
+            m.StreamInfo(
                 stream_name="",  # Empty string should fail
                 schema={"properties": {"id": {"type": "integer"}}},
                 created_at="2025-01-01T10:00:00Z",
@@ -354,8 +353,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(schema_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(schema_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=schema_result.is_success,
@@ -371,8 +370,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(record_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(record_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=record_result.is_success,
@@ -387,8 +386,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         state_result = self.target_abstractions.process_state_message(target, state)
 
         self.test_assertions.assert_true(
-            condition=isinstance(state_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(state_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=state_result.is_success,
@@ -413,8 +412,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(record_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(record_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=record_result.is_failure,
@@ -454,8 +453,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         load_result = self.target_abstractions.load_record(target, "users", record)
 
         self.test_assertions.assert_true(
-            condition=isinstance(load_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(load_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=load_result.is_success,
@@ -471,8 +470,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         batch_result = self.target_abstractions.load_batch(target, "users", records)
 
         self.test_assertions.assert_true(
-            condition=isinstance(batch_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(batch_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=batch_result.is_success,
@@ -490,8 +489,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         finalize_result = self.target_abstractions.finalize_stream(target, "users")
 
         self.test_assertions.assert_true(
-            condition=isinstance(finalize_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(finalize_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=finalize_result.is_success,
@@ -537,8 +536,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         finalization_result = self.target_abstractions.finalize(target)
 
         self.test_assertions.assert_true(
-            condition=isinstance(finalization_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(finalization_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=finalization_result.is_success,
@@ -587,8 +586,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         stream_result = self.target_abstractions.get_stream_by_name(target, "users")
 
         self.test_assertions.assert_true(
-            condition=isinstance(stream_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(stream_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=stream_result.is_success,
@@ -602,8 +601,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
         self.test_assertions.assert_true(
-            condition=isinstance(missing_stream_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(missing_stream_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=missing_stream_result.is_failure,
@@ -656,7 +655,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test utility helper methods using flext-core SOURCE OF TRUTH."""
         # Test timestamp generation using flext-core directly
 
-        timestamp = FlextUtilities.Generators.generate_iso_timestamp()
+        timestamp = u.Generators.generate_iso_timestamp()
 
         self.test_assertions.assert_true(
             condition=isinstance(timestamp, str),
@@ -693,8 +692,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         instance_result = FlextMeltanoTargetAbstractions.create_instance()
 
         self.test_assertions.assert_true(
-            condition=isinstance(instance_result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(instance_result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=instance_result.is_success,
@@ -721,8 +720,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         result = self.target_abstractions.finalize_stream(target, "non_existent_stream")
 
         self.test_assertions.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
+            condition=isinstance(result, r),
+            message="Should return r",
         )
         self.test_assertions.assert_true(
             condition=result.is_failure,

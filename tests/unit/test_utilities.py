@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
-from flext_core import FlextUtilities
+from flext_core import u
 
 from flext_meltano.utilities import FlextMeltanoUtilities
 
@@ -21,9 +21,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
     """Enhanced tests for FlextMeltanoUtilities class."""
 
     def test_inheritance_from_flext_utilities(self) -> None:
-        """Test that FlextMeltanoUtilities inherits from FlextUtilities."""
+        """Test that FlextMeltanoUtilities inherits from u."""
         utilities = FlextMeltanoUtilities()
-        assert isinstance(utilities, FlextUtilities)
+        assert isinstance(utilities, u)
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""

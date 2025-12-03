@@ -14,9 +14,10 @@ import urllib.request
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextUtilities
+from flext_core import FlextLogger, u
 from pydantic import BaseModel, ConfigDict
 
+from flext_meltano import r, s
 from flext_meltano.docs_config import DocsConfig
 
 
@@ -45,7 +46,7 @@ class ArchitectureValidationResult(BaseModel):
     generated_files: ClassVar[list[str]] = []
 
 
-class PlantUMLRenderer(FlextService):
+class PlantUMLRenderer(s):
     """PlantUML diagram rendering and validation using FLEXT patterns."""
 
     def __init__(
@@ -76,23 +77,24 @@ class PlantUMLRenderer(FlextService):
         # Try to download if not found
         return self._download_plantuml()
 
-    def _download_plantuml(self) -> str:
+    @staticmethod
+    def _download_plantuml() -> str:
         """Download PlantUML JAR file."""
         jar_path = "plantuml.jar"
         url = "https://github.com/plantuml/plantuml/releases/download/v1.2023.13/plantuml-1.2023.13.jar"
 
         # Security: URL is hardcoded and from trusted source (GitHub releases)
-        urllib.request.urlretrieve(url, jar_path)
+        urllib.request.urlretrieve(url, jar_path)  # noqa: S310
         return jar_path
 
-    def render_diagram(self, puml_file: Path) -> FlextResult[DiagramValidationResult]:
+    def render_diagram(self, puml_file: Path) -> r[DiagramValidationResult]:
         """Render a PlantUML diagram to image format using FLEXT patterns."""
         result = DiagramValidationResult(diagram_path=str(puml_file), is_valid=True)
 
         if not puml_file.exists():
             result.errors.append(f"Diagram file not found: {puml_file}")
             result.is_valid = False
-            return FlextResult.ok(result)
+            return r.ok(result)
 
         try:
             # Validate PlantUML syntax
@@ -100,7 +102,7 @@ class PlantUMLRenderer(FlextService):
             if not syntax_result.is_valid:
                 result.errors.extend(syntax_result.errors)
                 result.is_valid = False
-                return FlextResult.ok(result)
+                return r.ok(result)
 
             # Render to PNG
             png_file = self.output_dir / f"{puml_file.stem}.png"
@@ -114,9 +116,9 @@ class PlantUMLRenderer(FlextService):
                 str(puml_file),
             ]
 
-            # CONVERTED: Use FlextUtilities instead of subprocess.run()
+            # CONVERTED: Use u.subprocess.run()
             # Security: command with controlled arguments
-            exec_result = FlextUtilities.CommandExecution.run_external_command(
+            exec_result = u.subprocess.run_external_command(
                 cmd,
                 check=False,
                 capture_output=True,
@@ -157,11 +159,10 @@ class PlantUMLRenderer(FlextService):
             result.is_valid = False
             self.logger.exception("Diagram rendering failed", error=error_msg)
 
-        return FlextResult.ok(result)
+        return r.ok(result)
 
-    def _validate_basic_syntax(
-        self, content: str, result: DiagramValidationResult
-    ) -> bool:
+    @staticmethod
+    def _validate_basic_syntax(content: str, result: DiagramValidationResult) -> bool:
         """Perform basic syntax validation checks."""
         # Check for empty file
         if not content.strip():
@@ -182,8 +183,9 @@ class PlantUMLRenderer(FlextService):
 
         return True
 
+    @staticmethod
     def _validate_bracket_balance(
-        self, content: str, result: DiagramValidationResult
+        content: str, result: DiagramValidationResult
     ) -> None:
         """Check for unbalanced brackets and braces."""
         if content.count("{") != content.count("}"):
@@ -192,8 +194,9 @@ class PlantUMLRenderer(FlextService):
         if content.count("[") != content.count("]"):
             result.warnings.append("Unbalanced square brackets detected")
 
+    @staticmethod
     def _validate_line_syntax(
-        self, lines: list[str], result: DiagramValidationResult
+        lines: list[str], result: DiagramValidationResult
     ) -> None:
         """Validate syntax on a line-by-line basis."""
         for i, line in enumerate(lines, 1):
@@ -247,7 +250,7 @@ class PlantUMLRenderer(FlextService):
 
     def render_all_diagrams(
         self, diagrams_dir: str | Path = "docs/architecture"
-    ) -> FlextResult[list[DiagramValidationResult]]:
+    ) -> r[list[DiagramValidationResult]]:
         """Render all PlantUML diagrams in a directory using FLEXT patterns."""
         diagrams_dir = Path(diagrams_dir)
         puml_files = list(diagrams_dir.rglob("*.puml")) + list(
@@ -268,10 +271,10 @@ class PlantUMLRenderer(FlextService):
                 )
                 # Continue with other diagrams even if one fails
 
-        return FlextResult.ok(results)
+        return r.ok(results)
 
 
-class C4ModelValidator(FlextService):
+class C4ModelValidator(s):
     """C4 model validation and consistency checking using FLEXT patterns."""
 
     def __init__(self, logger: FlextLogger | None = None) -> None:
@@ -333,7 +336,8 @@ class C4ModelValidator(FlextService):
                 return level
         return None
 
-    def _validate_c4_level(self, content: str, level: str) -> DiagramValidationResult:
+    @staticmethod
+    def _validate_c4_level(content: str, level: str) -> DiagramValidationResult:
         """Validate level-specific C4 model requirements."""
         result = DiagramValidationResult(diagram_path="", is_valid=True)
 
@@ -344,7 +348,7 @@ class C4ModelValidator(FlextService):
 
         elif level == "container":
             # Container diagrams should show technology choices
-            tech_patterns = ["Python", "FastAPI", "PostgreSQL", "Redis"]
+            tech_patterns = {"Python", "FastAPI", "PostgreSQL", "Redis"}
             found_tech = any(tech in content for tech in tech_patterns)
             if not found_tech:
                 result.warnings.append(
@@ -361,9 +365,8 @@ class C4ModelValidator(FlextService):
 
         return result
 
-    def _validate_c4_structure(
-        self, content: str, _level: str
-    ) -> DiagramValidationResult:
+    @staticmethod
+    def _validate_c4_structure(content: str, _level: str) -> DiagramValidationResult:
         """Validate overall C4 model structure."""
         result = DiagramValidationResult(diagram_path="", is_valid=True)
 
@@ -405,7 +408,9 @@ class ArchitectureDiagramGenerator:
                 return False
 
             # Analyze Python files
-            classes, functions, imports = self._analyze_python_files(module_path)
+            classes, functions, imports = (
+                ArchitectureDiagramGenerator._analyze_python_files(module_path)
+            )
 
             # Generate PlantUML
             puml_content = self._generate_module_puml(
@@ -424,7 +429,8 @@ class ArchitectureDiagramGenerator:
         except Exception:
             return False
 
-    def _analyze_python_files(self, module_path: Path) -> tuple[dict, dict, set]:
+    @staticmethod
+    def _analyze_python_files(module_path: Path) -> tuple[dict, dict, set]:
         """Analyze Python files for classes, functions, and imports."""
         classes = {}
         functions = {}
@@ -440,9 +446,8 @@ class ArchitectureDiagramGenerator:
                 for node in ast.walk(tree):
                     if isinstance(node, ast.ClassDef):
                         class_name = node.name
-                        methods = [
-                            n.name for n in node.body if isinstance(n, ast.FunctionDef)
-                        ]
+                        method_nodes = u.filter(node.body, lambda n: isinstance(n, ast.FunctionDef))
+                        methods = u.map(method_nodes, lambda n: n.name)
                         classes[class_name] = methods
 
                     elif isinstance(node, ast.FunctionDef) and not any(
@@ -453,22 +458,28 @@ class ArchitectureDiagramGenerator:
                         functions[node.name] = []
 
                     elif isinstance(node, ast.Import):
-                        imports.update(alias.name for alias in node.names)
+                        import_names = u.map(node.names, lambda alias: alias.name)
+                        imports.update(import_names)
                     elif isinstance(node, ast.ImportFrom):
                         if node.module:
                             imports.add(node.module)
 
             except Exception as e:
-                if self.logger:
-                    self.logger.warning(f"Failed to analyze Python file {py_file}: {e}")
+                logger = FlextLogger(__name__)
+                logger.warning(f"Failed to analyze Python file {py_file}: {e}")
                 continue
 
         return classes, functions, imports
 
+    @staticmethod
     def _generate_module_puml(
-        self, module_name: str, classes: dict, functions: dict, imports: set
+        module_name: str, classes: dict, functions: dict, imports: set
     ) -> str:
         """Generate PlantUML content for module diagram."""
+        max_methods_display = 5
+        max_imports_display = 10
+        max_relationships_display = 5
+
         puml = f"""@startuml {module_name.replace(".", "_")}_module
 title {module_name} - Module Structure
 
@@ -479,11 +490,11 @@ package "{module_name}" as module {{
         for class_name, methods in classes.items():
             puml += f"""    class {class_name} {{
 """
-            for method in methods[:5]:  # Limit methods to keep diagram readable
+            for method in methods[:max_methods_display]:  # Limit methods to keep diagram readable
                 puml += f"""        +{method}()
 """
-            if len(methods) > 5:
-                puml += f"""        ... and {len(methods) - 5} more methods
+            if len(methods) > max_methods_display:
+                puml += f"""        ... and {len(methods) - max_methods_display} more methods
 """
             puml += """    }
 """
@@ -500,23 +511,24 @@ package "{module_name}" as module {{
             puml += """
 package "External Dependencies" as external {
 """
-            for imp in sorted(imports)[:10]:  # Limit imports
+            for imp in sorted(imports)[:max_imports_display]:  # Limit imports
                 puml += f"""    [{imp}]
 """
-            if len(imports) > 10:
-                puml += f"""    ... and {len(imports) - 10} more
+            if len(imports) > max_imports_display:
+                puml += f"""    ... and {len(imports) - max_imports_display} more
 """
             puml += "}\n"
 
             # Add relationships
-            for imp in sorted(imports)[:5]:
+            for imp in sorted(imports)[:max_relationships_display]:
                 puml += f"""module --> external.[{imp}] : uses
 """
 
         puml += "@enduml"
         return puml
 
-    def generate_service_diagram(self, service_name: str, output_file: str) -> bool:
+    @staticmethod
+    def generate_service_diagram(service_name: str, output_file: str) -> bool:
         """Generate service interaction diagram."""
         try:
             # This would analyze service interactions from logs, code, etc.

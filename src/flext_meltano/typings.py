@@ -1,11 +1,11 @@
 """FLEXT Meltano Types - Domain-specific Meltano type definitions.
 
-This module provides Meltano-specific type definitions extending FlextTypes.
+This module provides Meltano-specific type definitions extending t.
 Follows FLEXT standards:
 - Domain-specific complex types only
 - No simple aliases to primitive types
 - Python 3.13+ syntax
-- Extends FlextTypes properly
+- Extends t properly
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -17,12 +17,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from flext_core import FlextTypes
+from flext_core import t as FlextTypes  # noqa: N812
 from singer_sdk import typing as singer_sdk_typing
+
+# Import aliases for simplified usage
+t_base = FlextTypes
 
 
 class FlextMeltanoTypes(FlextTypes):
-    """Meltano-specific type definitions extending FlextTypes.
+    """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
     Contains ONLY complex Meltano-specific types, no simple aliases.
@@ -44,7 +47,7 @@ class FlextMeltanoTypes(FlextTypes):
         type PluginCatalog = dict[str, list[PluginDefinition]]
         type PluginRegistry = dict[str, PluginDefinition | PluginConfiguration]
         type PluginInstallation = dict[str, str | bool | list[str]]
-        type PluginExecution = dict[str, FlextTypes.JsonValue | bool]
+        type PluginExecution = dict[str, t_base.JsonValue | bool]
         type PluginInfo = dict[str, str | bool | int | dict[str, object]]
 
         # Plugin type literals
@@ -53,11 +56,11 @@ class FlextMeltanoTypes(FlextTypes):
     class Singer:
         """Singer protocol complex types namespace."""
 
-        type CatalogEntry = dict[str, str | dict[str, FlextTypes.JsonValue]]
-        type StreamSchema = dict[str, dict[str, FlextTypes.JsonValue]]
+        type CatalogEntry = dict[str, str | dict[str, t_base.JsonValue]]
+        type StreamSchema = dict[str, dict[str, t_base.JsonValue]]
         type TapConfig = dict[str, object | dict[str, object]]
         type TargetConfig = dict[str, object | dict[str, object]]
-        type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
+        type MessageBatch = list[dict[str, t_base.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
 
         # Singer protocol Literal types
@@ -102,16 +105,16 @@ class FlextMeltanoTypes(FlextTypes):
         type TestConfiguration = dict[str, str | list[str] | dict[str, object]]
         type ProfileConfiguration = dict[str, dict[str, object]]
         type ProjectConfiguration = dict[str, object | dict[str, object]]
-        type RunResults = dict[str, list[dict[str, FlextTypes.JsonValue]]]
-        type ManifestData = dict[str, dict[str, FlextTypes.JsonValue]]
+        type RunResults = dict[str, list[dict[str, t_base.JsonValue]]]
+        type ManifestData = dict[str, dict[str, t_base.JsonValue]]
         type Project = dict[str, str | bool | dict[str, object] | list[str]]
 
-    class Project(FlextTypes):
-        """Meltano-specific project types extending FlextTypes."""
+    class Project(t_base):
+        """Meltano-specific project types extending t."""
 
         # Meltano-specific project types extending the generic ones
         type MeltanoProjectType = Literal[
-            # Generic types inherited from FlextTypes
+            # Generic types inherited from t
             "library",
             "application",
             "service",
@@ -162,20 +165,20 @@ class FlextMeltanoTypes(FlextTypes):
         type LoadingResult = dict[str, str | int | bool | dict[str, object]]
         type TransformationResult = dict[str, str | int | bool | dict[str, object]]
 
-    class Processing(FlextTypes):
-        """Meltano-specific processing types extending FlextTypes."""
+    class Processing(t_base):
+        """Meltano-specific processing types extending t."""
 
         # Meltano-specific processing result types
-        type DbtTransformationResult = dict[str, FlextTypes.JsonValue]
-        type SingerProcessingResult = dict[str, FlextTypes.JsonValue]
-        type SingerExecutionResult = dict[str, FlextTypes.JsonValue]
-        type EltPipelineResult = dict[str, FlextTypes.JsonValue]
+        type DbtTransformationResult = dict[str, t_base.JsonValue]
+        type SingerProcessingResult = dict[str, t_base.JsonValue]
+        type SingerExecutionResult = dict[str, t_base.JsonValue]
+        type EltPipelineResult = dict[str, t_base.JsonValue]
 
         # HTTP and network types
         type Headers = dict[str, str]  # HTTP headers mapping
 
     class MeltanoCore:
-        """Commonly used Meltano-specific type aliases extending FlextTypes."""
+        """Commonly used Meltano-specific type aliases extending t."""
 
         # =====================================================================
         # NESTED JSON TYPES - Support deeply nested dictionary structures
@@ -197,7 +200,7 @@ class FlextMeltanoTypes(FlextTypes):
         type NestedJsonDict = dict[str, NestedJsonValue]
 
         # Meltano configuration and data types
-        type MeltanoConfigDict = dict[str, FlextTypes.JsonValue]
+        type MeltanoConfigDict = dict[str, t_base.JsonValue]
         type PluginConfigDict = dict[str, object]
         type EnvironmentDict = dict[str, str]
         type VariablesDict = dict[str, str]
@@ -207,7 +210,7 @@ class FlextMeltanoTypes(FlextTypes):
         type JobDict = dict[str, object]
 
         # JsonValue type alias for compatibility
-        JsonValue = FlextTypes.JsonValue
+        JsonValue = t_base.JsonValue
 
         # Type aliases for singer.py
         RecordDict = dict[str, object]
@@ -216,7 +219,7 @@ class FlextMeltanoTypes(FlextTypes):
         ResultDict = dict[str, object]
 
         # Type aliases for protocols.py
-        JsonObject = FlextTypes.JsonValue
+        JsonObject = t_base.JsonValue
 
         # Type aliases for file_managers.py
         FileConfigDict = dict[str, str | int | list[str]] | dict[str, str | list[str]]

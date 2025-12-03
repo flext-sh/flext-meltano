@@ -96,9 +96,7 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.2,
         )
 
-        with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
-        ) as mock_timestamp:
+        with patch("flext_core.u.Generators.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:00:00Z"
 
             result_dict = result.to_dict()
@@ -125,9 +123,7 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.1,
         )
 
-        with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
-        ) as mock_timestamp:
+        with patch("flext_core.u.Generators.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:01:00Z"
 
             result_dict = result.to_dict()
@@ -154,9 +150,7 @@ class TestFlextMeltanoExecutionResult:
             execution_time=2.0,
         )
 
-        with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
-        ) as mock_timestamp:
+        with patch("flext_core.u.Generators.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
 
             json_str = result.to_json()
@@ -184,9 +178,7 @@ class TestFlextMeltanoExecutionResult:
             execution_time=0.3,
         )
 
-        with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
-        ) as mock_timestamp:
+        with patch("flext_core.u.Generators.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
 
             json_str = result.to_json()
@@ -214,9 +206,7 @@ class TestFlextMeltanoExecutionResult:
             execution_time=5.5,
         )
 
-        with patch(
-            "flext_core.FlextUtilities.Generators.generate_iso_timestamp"
-        ) as mock_timestamp:
+        with patch("flext_core.u.Generators.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
 
             json_str = result.to_json()

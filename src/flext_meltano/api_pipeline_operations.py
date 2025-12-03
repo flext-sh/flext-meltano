@@ -12,12 +12,22 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextUtilities
 
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 if TYPE_CHECKING:
     from flext_meltano.api import FlextMeltano
+
+# Import aliases for concise usage
+u = FlextUtilities
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoAPIPipelineOperations:
@@ -169,9 +179,10 @@ class FlextMeltanoAPIPipelineOperations:
                 f"ELT pipeline execution failed: {e}"
             )
 
-    def list_pipelines(
-        self,
-    ) -> FlextResult[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]]:
+    @staticmethod
+    def list_pipelines() -> FlextResult[
+        list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
+    ]:
         """List all configured pipelines with current status."""
         return FlextResult[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]].ok([])
 

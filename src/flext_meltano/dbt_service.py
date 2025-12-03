@@ -14,17 +14,26 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, FlextUtilities
 
-# Import from specific modules to avoid circular dependencies
 from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
+# Import aliases for concise usage
+u = FlextUtilities
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+r = FlextResult
+s = FlextService
 
-class FlextMeltanoTransformationService(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+
+class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Service for data transformation operations.
 
     Handles transformation operations following FLEXT patterns
@@ -46,7 +55,7 @@ class FlextMeltanoTransformationService(
         project_dir: Path,
         models: list[str] | None = None,
         **_options: object,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Run transformations using programmatic API.
 
         Args:
@@ -68,15 +77,13 @@ class FlextMeltanoTransformationService(
             # Use library runner for transformation operations
             transformation_runner_result = self._library_runner.get_dbt_runner()
             if transformation_runner_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     transformation_runner_result.error
                     or "Failed to get transformation runner"
                 )
 
             # For now, just return success since runner is just a dict
-            result = FlextResult[dict[str, object]].ok(
-                transformation_runner_result.unwrap()
-            )
+            result = r[dict[str, object]].ok(transformation_runner_result.unwrap())
 
             if result.is_success:
                 _ = self.logger.info(
@@ -94,7 +101,7 @@ class FlextMeltanoTransformationService(
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to run transformations: {e}"
             _ = self.logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return r[dict[str, object]].fail(error_msg)
 
 
 __all__ = [

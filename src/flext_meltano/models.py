@@ -15,7 +15,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextConstants, FlextModels
+from flext_core import (
+    FlextConstants,
+    FlextExceptions,
+    FlextModels,
+    FlextResult,
+    u,
+)
 from pydantic import (
     Field,
     computed_field,
@@ -24,13 +30,31 @@ from pydantic import (
     model_validator,
 )
 
+# Import aliases for simplified usage
+# u is already imported from flext_core
+m_base = FlextModels
+r = FlextResult
+e = FlextExceptions
+c_base = FlextConstants
 
-class FlextMeltanoModels(FlextModels):
+
+class FlextMeltanoModels(m_base):
     """Generic pipeline models following SOLID principles.
 
     Each inner class has a single responsibility and can be used independently.
     All models are domain-agnostic and reusable across different pipeline types.
     """
+
+    @staticmethod
+    def _protect_sensitive_config(value: dict[str, object]) -> dict[str, object]:
+        """Protect sensitive keys in configuration dict."""
+        sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
+        return u.map(
+            value,
+            lambda k, v: "[PROTECTED]"
+            if any(s in u.normalize(k, case="lower") for s in sensitive_keys)
+            else v,
+        )
 
     # Constants for magic values used throughout the models
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
@@ -49,7 +73,7 @@ class FlextMeltanoModels(FlextModels):
     # LOGGING CONFIGURATION - Consolidated logging settings
     # ========================================================================
 
-    class LoggingConfig(FlextModels):
+    class LoggingConfig(m_base):
         """Consolidated logging configuration for all pipeline operations.
 
         Organizes 62+ logging boolean fields into coherent categories:
@@ -524,18 +548,15 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("connection_config")
-        def serialize_connection_config(
+        def serialize_connection_config(  # noqa: PLR6301
             self, value: dict[str, object]
         ) -> dict[str, object]:
             """Serialize connection config with sensitive data protection."""
-            sensitive_keys = {"password", "token", "api_key", "secret"}
-            serialized: dict[str, object] = {}
-            for key, val in value.items():
-                if any(sensitive in key.lower() for sensitive in sensitive_keys):
-                    serialized[key] = "[PROTECTED]"
-                else:
-                    serialized[key] = val
-            return serialized
+            return (
+                FlextMeltanoModels._protect_sensitive_config(value)
+                if isinstance(value, dict)
+                else value
+            )
 
     class TargetConfig(FlextModels.ArbitraryTypesModel):
         """Generic target configuration for data loading."""
@@ -578,18 +599,15 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("connection_config")
-        def serialize_connection_config(
+        def serialize_connection_config(  # noqa: PLR6301
             self, value: dict[str, object]
         ) -> dict[str, object]:
             """Serialize connection config with sensitive data protection."""
-            sensitive_keys = {"password", "token", "api_key", "secret"}
-            serialized: dict[str, object] = {}
-            for key, val in value.items():
-                if any(sensitive in key.lower() for sensitive in sensitive_keys):
-                    serialized[key] = "[PROTECTED]"
-                else:
-                    serialized[key] = val
-            return serialized
+            return (
+                FlextMeltanoModels._protect_sensitive_config(value)
+                if isinstance(value, dict)
+                else value
+            )
 
     class DataSourceConfig(FlextModels.ArbitraryTypesModel):
         """Generic data source configuration with validation."""
@@ -633,18 +651,15 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("connection_config")
-        def serialize_connection_config(
+        def serialize_connection_config(  # noqa: PLR6301
             self, value: dict[str, object]
         ) -> dict[str, object]:
             """Serialize connection config with sensitive data protection."""
-            sensitive_keys = {"password", "token", "api_key", "secret"}
-            serialized: dict[str, object] = {}
-            for key, val in value.items():
-                if any(sensitive in key.lower() for sensitive in sensitive_keys):
-                    serialized[key] = "[PROTECTED]"
-                else:
-                    serialized[key] = val
-            return serialized
+            return (
+                FlextMeltanoModels._protect_sensitive_config(value)
+                if isinstance(value, dict)
+                else value
+            )
 
     class StreamDefinition(FlextModels.Entity):
         """Generic stream definition for data pipeline operations."""
@@ -701,15 +716,16 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("stream_schema")
-        def serialize_stream_schema(
+        def serialize_stream_schema(  # noqa: PLR6301
             self, value: dict[str, object]
         ) -> dict[str, object]:
             """Normalize stream schema structure."""
-            if "properties" not in value:
-                value["properties"] = {}
-            if "type" not in value:
-                value["type"] = "object"
-            return value
+            result = dict(value)
+            if "properties" not in result:
+                result["properties"] = {}
+            if "type" not in result:
+                result["type"] = "object"
+            return result
 
     class DataSinkDefinition(FlextModels.Entity):
         """Generic data sink definition for pipeline operations."""
@@ -910,18 +926,15 @@ class FlextMeltanoModels(FlextModels):
             return self
 
         @field_serializer("connection_config")
-        def serialize_connection_config(
+        def serialize_connection_config(  # noqa: PLR6301
             self, value: dict[str, object]
         ) -> dict[str, object]:
             """Serialize connection config with sensitive data protection."""
-            sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
-            serialized: dict[str, object] = {}
-            for key, val in value.items():
-                if any(sensitive in key.lower() for sensitive in sensitive_keys):
-                    serialized[key] = "[PROTECTED]"
-                else:
-                    serialized[key] = val
-            return serialized
+            return (
+                FlextMeltanoModels._protect_sensitive_config(value)
+                if isinstance(value, dict)
+                else value
+            )
 
     class StreamInfo(FlextModels.ArbitraryTypesModel):
         """Generic stream information for data pipeline operations."""

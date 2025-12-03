@@ -1,6 +1,6 @@
 """FLEXT Meltano Constants Unit Tests - Enterprise ELT testing patterns.
 
-This module provides comprehensive unit tests for FlextMeltanoConstants following
+This module provides comprehensive unit tests for c following
 FLEXT testing patterns and namespace organization.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -8,13 +8,12 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano import c
+from tests.flext_tests_compat import FlextTestsUtilities
 
-from ..flext_tests_compat import FlextTestsUtilities
 
-
-class TestFlextMeltanoConstants:
-    """Unit test suite for FlextMeltanoConstants.Meltano."""
+class Testc:
+    """Unit test suite for c.Meltano."""
 
     def setup_method(self) -> None:
         """Setup for each test using flext_tests patterns."""
@@ -24,27 +23,27 @@ class TestFlextMeltanoConstants:
         """Test Meltano namespace constants."""
         # Test version constants
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Meltano.VERSION, str),
+            condition=isinstance(c.Meltano.VERSION, str),
             message="Meltano version should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Meltano.APPLICATION_NAME, str),
+            condition=isinstance(c.Meltano.APPLICATION_NAME, str),
             message="Application name should be a string",
         )
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Meltano.APPLICATION_DESCRIPTION, str
+                c.Meltano.APPLICATION_DESCRIPTION, str
             ),
             message="Application description should be a string",
         )
 
         # Test file constants
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Meltano.PROJECT_FILE, str),
+            condition=isinstance(c.Meltano.PROJECT_FILE, str),
             message="Project file should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Meltano.STATE_DIR, str),
+            condition=isinstance(c.Meltano.STATE_DIR, str),
             message="State directory should be a string",
         )
 
@@ -52,17 +51,17 @@ class TestFlextMeltanoConstants:
         """Test Singer protocol constants."""
         # Test SDK version requirement - Singer constants are flat attributes
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.SDK_VERSION_REQUIRED, str),
+            condition=isinstance(c.SDK_VERSION_REQUIRED, str),
             message="Singer SDK version should be a string",
         )
 
         # Test protocol constants
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Singer.MESSAGE_TYPE_SCHEMA, str),
+            condition=isinstance(c.Singer.MESSAGE_TYPE_SCHEMA, str),
             message="Schema message type should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Singer.MESSAGE_TYPE_RECORD, str),
+            condition=isinstance(c.Singer.MESSAGE_TYPE_RECORD, str),
             message="Record message type should be a string",
         )
 
@@ -70,17 +69,17 @@ class TestFlextMeltanoConstants:
         """Test DBT constants."""
         # Test project file constants - DBT constants are flat attributes
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.PROJECT_FILE_DBT, str),
+            condition=isinstance(c.PROJECT_FILE_DBT, str),
             message="DBT project file should be a string",
         )
 
         # Test command constants
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.COMMAND_RUN_DBT, str),
+            condition=isinstance(c.COMMAND_RUN_DBT, str),
             message="DBT run command should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.COMMAND_TEST, str),
+            condition=isinstance(c.COMMAND_TEST, str),
             message="DBT test command should be a string",
         )
 
@@ -88,21 +87,21 @@ class TestFlextMeltanoConstants:
         """Test Plugin constants."""
         # Test plugin types enum
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.PluginTypes.EXTRACTORS, str),
+            condition=isinstance(c.PluginTypes.EXTRACTORS, str),
             message="Extractor type should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.PluginTypes.LOADERS, str),
+            condition=isinstance(c.PluginTypes.LOADERS, str),
             message="Loader type should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.PluginTypes.TRANSFORMS, str),
+            condition=isinstance(c.PluginTypes.TRANSFORMS, str),
             message="Transformer type should be a string",
         )
 
         # Test plugin settings - flat attributes
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.DEFAULT_VARIANT, str),
+            condition=isinstance(c.DEFAULT_VARIANT, str),
             message="Default variant should be a string",
         )
 
@@ -110,7 +109,7 @@ class TestFlextMeltanoConstants:
         """Test Service namespace constants."""
         # Test service validation rules
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Service.MIN_NAME_LENGTH, int),
+            condition=isinstance(c.Service.MIN_NAME_LENGTH, int),
             message="Service min name length should be an integer",
         )
 
@@ -119,13 +118,13 @@ class TestFlextMeltanoConstants:
         # Test maturity constants
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Model.MATURITY_MATURE_ENV_COUNT, int
+                c.Model.MATURITY_MATURE_ENV_COUNT, int
             ),
             message="Mature environment count should be an integer",
         )
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Model.MATURITY_DEVELOPING_ENV_COUNT, int
+                c.Model.MATURITY_DEVELOPING_ENV_COUNT, int
             ),
             message="Developing environment count should be an integer",
         )
@@ -133,13 +132,13 @@ class TestFlextMeltanoConstants:
         # Test complexity constants
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Model.COMPLEXITY_MINIMAL_SETTINGS, int
+                c.Model.COMPLEXITY_MINIMAL_SETTINGS, int
             ),
             message="Minimal settings count should be an integer",
         )
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int
+                c.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int
             ),
             message="Simple max settings count should be an integer",
         )
@@ -148,20 +147,20 @@ class TestFlextMeltanoConstants:
         """Test Logging namespace constants."""
         # Test log levels from Logging namespace
         self.test_assertions.assert_true(
-            condition=isinstance(FlextMeltanoConstants.Logging.DEFAULT_LEVEL, str),
+            condition=isinstance(c.Logging.DEFAULT_LEVEL, str),
             message="Default log level should be a string",
         )
 
         # Test log settings from Logging namespace
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Logging.INCLUDE_TRANSFORM_NAME, bool
+                c.Logging.INCLUDE_TRANSFORM_NAME, bool
             ),
             message="Include transform name should be a boolean",
         )
         self.test_assertions.assert_true(
             condition=isinstance(
-                FlextMeltanoConstants.Logging.INCLUDE_RECORD_COUNT, bool
+                c.Logging.INCLUDE_RECORD_COUNT, bool
             ),
             message="Include record count should be a boolean",
         )
@@ -169,7 +168,7 @@ class TestFlextMeltanoConstants:
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
         # Get the PluginTypes enum from constants
-        plugin_types = FlextMeltanoConstants.PluginTypes
+        plugin_types = c.PluginTypes
 
         # Test enum values
         self.test_assertions.assert_true(
@@ -221,7 +220,7 @@ class TestFlextMeltanoConstants:
 
         for namespace in expected_namespaces:
             self.test_assertions.assert_true(
-                condition=hasattr(FlextMeltanoConstants, namespace),
+                condition=hasattr(c, namespace),
                 message=f"Constants should have {namespace} namespace",
             )
 
@@ -229,12 +228,12 @@ class TestFlextMeltanoConstants:
         """Test that all necessary constants are exported."""
         # Test that PluginTypes is accessible from constants
         self.test_assertions.assert_true(
-            condition=hasattr(FlextMeltanoConstants, "PluginTypes"),
-            message="PluginTypes should be accessible from FlextMeltanoConstants",
+            condition=hasattr(c, "PluginTypes"),
+            message="PluginTypes should be accessible from c",
         )
 
         # Test that PluginTypes is the correct enum
-        plugin_types = FlextMeltanoConstants.PluginTypes
+        plugin_types = c.PluginTypes
         self.test_assertions.assert_true(
             condition=hasattr(plugin_types, "EXTRACTORS"),
             message="PluginTypes should have EXTRACTORS member",

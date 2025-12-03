@@ -295,7 +295,7 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
         # Log level validation is handled by FlextConfig
-        from flext_core import FlextConfig
+        from flext_core import FlextConfig  # noqa: PLC0415
 
         global_config = FlextConfig.get_global_instance()
         # Test that global config has log_level

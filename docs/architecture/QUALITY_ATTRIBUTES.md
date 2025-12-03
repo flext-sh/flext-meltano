@@ -1454,7 +1454,7 @@ class ReliabilityMonitor:
 
     def _generate_reliability_recommendations(self, error_rates: Dict[str, float],
                                             circuit_breaker_states: Dict[str, str],
-                                            mtbf: float) -> FlextTypes.StringList:
+                                            mtbf: float) -> t.StringList:
         """Generate reliability improvement recommendations."""
 
         recommendations = []
@@ -1672,7 +1672,7 @@ class AvailabilityManager:
             current_primary_zone=self.current_primary_zone
         )
 
-    def _initiate_failover(self, service_name: str, available_zones: FlextTypes.StringList) -> None:
+    def _initiate_failover(self, service_name: str, available_zones: t.StringList) -> None:
         """Initiate failover to healthy zone."""
 
         # Find healthiest available zone
@@ -1697,7 +1697,7 @@ class AvailabilityManager:
             else:
                 self._send_failover_failure_notification(service_name, failover_result.error)
 
-    def _configure_failover(self, service_name: str, zones: FlextTypes.StringList) -> None:
+    def _configure_failover(self, service_name: str, zones: t.StringList) -> None:
         """Configure automatic failover policies."""
 
         failover_policy = {
@@ -1791,7 +1791,7 @@ class AvailabilityManager:
         return sla_compliance
 
     def _generate_availability_recommendations(self, uptime_metrics: Dict[str, float],
-                                             mttr_metrics: Dict[str, float]) -> FlextTypes.StringList:
+                                             mttr_metrics: Dict[str, float]) -> t.StringList:
         """Generate availability improvement recommendations."""
 
         recommendations = []
@@ -1839,7 +1839,7 @@ class DisasterRecoveryManager:
         self.dr_plans = self._load_dr_plans()
 
     def execute_disaster_recovery(self, disaster_type: str,
-                                affected_components: FlextTypes.StringList) -> DRResult:
+                                affected_components: t.StringList) -> DRResult:
         """Execute disaster recovery plan."""
 
         # Identify applicable DR plan
@@ -1885,7 +1885,7 @@ class DisasterRecoveryManager:
 
         return recovery_result
 
-    def _select_dr_plan(self, disaster_type: str, affected_components: FlextTypes.StringList) -> Optional[DRPlan]:
+    def _select_dr_plan(self, disaster_type: str, affected_components: t.StringList) -> Optional[DRPlan]:
         """Select appropriate DR plan based on disaster characteristics."""
 
         # Find plans that match the disaster type
@@ -1902,7 +1902,7 @@ class DisasterRecoveryManager:
 
         return best_plan
 
-    def _execute_assessment_phase(self, dr_plan: DRPlan, affected_components: FlextTypes.StringList) -> AssessmentResult:
+    def _execute_assessment_phase(self, dr_plan: DRPlan, affected_components: t.StringList) -> AssessmentResult:
         """Execute disaster assessment phase."""
 
         assessment_start = datetime.utcnow()
@@ -2091,7 +2091,7 @@ class DisasterRecoveryManager:
 
         return compliance
 
-    def _generate_dr_recommendations(self, dr_status, compliance_metrics, test_results) -> FlextTypes.StringList:
+    def _generate_dr_recommendations(self, dr_status, compliance_metrics, test_results) -> t.StringList:
         """Generate disaster recovery improvement recommendations."""
 
         recommendations = []
@@ -2381,7 +2381,7 @@ class QualityGate:
 
         return result
 
-    def _check_file_documentation(self, file_path: Path) -> FlextTypes.StringList:
+    def _check_file_documentation(self, file_path: Path) -> t.StringList:
         """Check documentation in a single file."""
 
         undocumented = []
@@ -2466,7 +2466,7 @@ class AutomatedCodeReview:
 
         return result
 
-    def _apply_review_rules(self, content: str, file_path: str) -> FlextTypes.StringList:
+    def _apply_review_rules(self, content: str, file_path: str) -> t.StringList:
         """Apply code review rules to file content."""
 
         issues = []
@@ -2513,7 +2513,7 @@ class AutomatedCodeReview:
 
         return complexity
 
-    def _check_import_organization(self, content: str) -> FlextTypes.StringList:
+    def _check_import_organization(self, content: str) -> t.StringList:
         """Check import organization and style."""
 
         issues = []
@@ -2546,7 +2546,7 @@ class AutomatedCodeReview:
 
         return issues
 
-    def _check_security_issues(self, content: str) -> FlextTypes.StringList:
+    def _check_security_issues(self, content: str) -> t.StringList:
         """Check for common security issues."""
 
         issues = []
@@ -2573,7 +2573,7 @@ class AutomatedCodeReview:
 
         return issues
 
-    def _calculate_file_score(self, issues: FlextTypes.StringList) -> float:
+    def _calculate_file_score(self, issues: t.StringList) -> float:
         """Calculate quality score for a file."""
 
         base_score = 100.0
@@ -2593,7 +2593,7 @@ class AutomatedCodeReview:
 
         return max(0, base_score)
 
-    def _generate_file_suggestions(self, issues: FlextTypes.StringList, file_path: str) -> FlextTypes.StringList:
+    def _generate_file_suggestions(self, issues: t.StringList, file_path: str) -> t.StringList:
         """Generate improvement suggestions for a file."""
 
         suggestions = []
@@ -2621,7 +2621,7 @@ class AutomatedCodeReview:
         total_score = sum(review.quality_score for review in file_reviews)
         return total_score / len(file_reviews)
 
-    def _generate_recommendations(self, file_reviews: List[FileReviewResult]) -> FlextTypes.StringList:
+    def _generate_recommendations(self, file_reviews: List[FileReviewResult]) -> t.StringList:
         """Generate overall recommendations for the PR."""
 
         recommendations = []
@@ -2644,7 +2644,7 @@ class AutomatedCodeReview:
 
         return recommendations
 
-    def _identify_blocking_issues(self, file_reviews: List[FileReviewResult]) -> FlextTypes.StringList:
+    def _identify_blocking_issues(self, file_reviews: List[FileReviewResult]) -> t.StringList:
         """Identify issues that should block the PR."""
 
         blocking = []
@@ -2818,7 +2818,7 @@ class APIResponse:
 
         return 'unknown_error'
 
-    def _get_error_suggestions(self, error: str) -> FlextTypes.StringList:
+    def _get_error_suggestions(self, error: str) -> t.StringList:
         """Provide actionable suggestions for error resolution."""
 
         suggestions_map = {
@@ -3014,7 +3014,7 @@ class APIHelpSystem:
 
         return examples
 
-    def _get_troubleshooting_tips(self, endpoint: str, method: str) -> FlextTypes.StringList:
+    def _get_troubleshooting_tips(self, endpoint: str, method: str) -> t.StringList:
         """Get troubleshooting tips for the endpoint."""
 
         tips = [
@@ -3697,7 +3697,7 @@ class TestResultAnalyzer:
 
         return failure_patterns
 
-    def _generate_test_recommendations(self, analysis: TestAnalysis) -> FlextTypes.StringList:
+    def _generate_test_recommendations(self, analysis: TestAnalysis) -> t.StringList:
         """Generate recommendations based on test analysis."""
 
         recommendations = []

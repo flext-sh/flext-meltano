@@ -12,10 +12,20 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, u
 from pydantic import Field
 
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+r = FlextResult
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoDbtProjectManager(FlextService):
@@ -50,9 +60,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         self.project_root = root
         self.manifest = None
 
-    def load_project(
-        self, root: Path
-    ) -> FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo]:
+    def load_project(self, root: Path) -> r[FlextMeltanoDbtProjectManager.ProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -64,7 +72,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """
         try:
             if not root.exists():
-                return FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
+                return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
                     f"DBT project directory not found: {root}"
                 )
 
@@ -81,16 +89,14 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 "DBT project loaded",
                 root=str(root),
             )
-            return FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo].ok(info)
+            return r[FlextMeltanoDbtProjectManager.ProjectInfo].ok(info)
         except Exception as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
+            return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
                 f"Failed to load DBT project: {e}"
             )
 
-    def load_manifest(
-        self, manifest_path: Path | None = None
-    ) -> FlextResult[dict[str, object]]:
+    def load_manifest(self, manifest_path: Path | None = None) -> r[dict[str, object]]:
         """Load DBT manifest.
 
         Args:
@@ -103,13 +109,11 @@ class FlextMeltanoDbtProjectManager(FlextService):
         try:
             if manifest_path is None:
                 if self.project_root is None:
-                    return FlextResult[dict[str, object]].fail("No project loaded")
+                    return r[dict[str, object]].fail("No project loaded")
                 manifest_path = self.project_root / "target" / "manifest.json"
 
             if not manifest_path.exists():
-                return FlextResult[dict[str, object]].fail(
-                    f"Manifest not found: {manifest_path}"
-                )
+                return r[dict[str, object]].fail(f"Manifest not found: {manifest_path}")
 
             with manifest_path.open() as f:
                 self.manifest = json.load(f)
@@ -118,12 +122,12 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 "DBT manifest loaded",
                 file=str(manifest_path),
             )
-            return FlextResult[dict[str, object]].ok(self.manifest or {})
+            return r[dict[str, object]].ok(self.manifest or {})
         except Exception as e:
             self.logger.exception("Failed to load manifest", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Failed to load manifest: {e}")
+            return r[dict[str, object]].fail(f"Failed to load manifest: {e}")
 
-    def get_models(self) -> FlextResult[list[dict[str, object]]]:
+    def get_models(self) -> r[list[dict[str, object]]]:
         """Get all models from manifest.
 
         Returns:
@@ -134,32 +138,40 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, object]]].fail(
+                    return r[list[dict[str, object]]].fail(
                         manifest_result.error or "Unknown error"
                     )
 
             models: list[dict[str, object]] = []
-            if self.manifest and "nodes" in self.manifest:
-                models.extend(
-                    {
-                        "name": node.get("name"),
-                        "path": node.get("path"),
-                        "description": node.get("description"),
-                        "fqn": ".".join(node.get("fqn", [])),
-                    }
-                    for node in self.manifest["nodes"].values()
-                    if node.get("resource_type") == "model"
+            if self.manifest:
+                nodes_raw = u.get(self.manifest, "nodes", default={})
+                nodes = nodes_raw if isinstance(nodes_raw, dict) else {}
+                nodes_list = list(nodes.values()) if nodes else []
+                model_nodes = u.filter(
+                    nodes_list,
+                    lambda node: u.get(node, "resource_type", default="") == "model",
+                )
+                models = u.map(
+                    model_nodes,
+                    lambda node: {
+                        "name": u.get(node, "name"),
+                        "path": u.get(node, "path"),
+                        "description": u.get(node, "description"),
+                        "fqn": ".".join(
+                            u.get(node, "fqn", default=[])
+                            if isinstance(u.get(node, "fqn", default=[]), list)
+                            else []
+                        ),
+                    },
                 )
 
             self.logger.info("Models retrieved", count=len(models))
-            return FlextResult[list[dict[str, object]]].ok(models)
+            return r[list[dict[str, object]]].ok(models)
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return FlextResult[list[dict[str, object]]].fail(
-                f"Failed to get models: {e}"
-            )
+            return r[list[dict[str, object]]].fail(f"Failed to get models: {e}")
 
-    def get_tests(self) -> FlextResult[list[dict[str, object]]]:
+    def get_tests(self) -> r[list[dict[str, object]]]:
         """Get all tests from manifest.
 
         Returns:
@@ -170,37 +182,45 @@ class FlextMeltanoDbtProjectManager(FlextService):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return FlextResult[list[dict[str, object]]].fail(
+                    return r[list[dict[str, object]]].fail(
                         manifest_result.error or "Unknown error"
                     )
 
             tests: list[dict[str, object]] = []
-            if self.manifest and "nodes" in self.manifest:
-                tests.extend(
-                    {
-                        "name": node.get("name"),
-                        "path": node.get("path"),
-                        "description": node.get("description"),
-                        "fqn": ".".join(node.get("fqn", [])),
-                    }
-                    for node in self.manifest["nodes"].values()
-                    if node.get("resource_type") == "test"
+            if self.manifest:
+                nodes_raw = u.get(self.manifest, "nodes", default={})
+                nodes = nodes_raw if isinstance(nodes_raw, dict) else {}
+                nodes_list = list(nodes.values()) if nodes else []
+                test_nodes = u.filter(
+                    nodes_list,
+                    lambda node: u.get(node, "resource_type", default="") == "test",
+                )
+                tests = u.map(
+                    test_nodes,
+                    lambda node: {
+                        "name": u.get(node, "name"),
+                        "path": u.get(node, "path"),
+                        "description": u.get(node, "description"),
+                        "fqn": ".".join(
+                            u.get(node, "fqn", default=[])
+                            if isinstance(u.get(node, "fqn", default=[]), list)
+                            else []
+                        ),
+                    },
                 )
 
             self.logger.info("Tests retrieved", count=len(tests))
-            return FlextResult[list[dict[str, object]]].ok(tests)
+            return r[list[dict[str, object]]].ok(tests)
         except Exception as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return FlextResult[list[dict[str, object]]].fail(
-                f"Failed to get tests: {e}"
-            )
+            return r[list[dict[str, object]]].fail(f"Failed to get tests: {e}")
 
-    def execute(self, **_kwargs: object) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> r[str]:
         """Execute (implements Domain.Service pattern)."""
         if self.project_root:
             msg = f"DBT project: {self.project_root}"
-            return FlextResult[str].ok(msg)
-        return FlextResult[str].fail("No project loaded")
+            return r[str].ok(msg)
+        return r[str].fail("No project loaded")
 
 
 __all__ = [

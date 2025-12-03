@@ -13,8 +13,19 @@ from pathlib import Path
 
 from flext_core import FlextResult, FlextService
 
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for simplified usage
+# u is already imported from flext_core
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoDbtService(FlextService):
@@ -173,7 +184,8 @@ class FlextMeltanoDbtService(FlextService):
                 f"Documentation generation failed: {e}"
             )
 
-    def execute(self) -> FlextResult[str]:
+    @staticmethod
+    def execute() -> FlextResult[str]:
         """Execute (implements Domain.Service pattern)."""
         msg = "DBT service initialized"
         return FlextResult[str].ok(msg)

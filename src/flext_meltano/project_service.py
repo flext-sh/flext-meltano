@@ -20,26 +20,34 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextUtilities,
+    u,
 )
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
+# Import aliases for concise usage
+r = FlextResult
+s = FlextService
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
-class FlextMeltanoProjectService(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+
+class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Enterprise pipeline project service with railway-oriented programming.
 
     Manages complete pipeline project lifecycle using FLEXT ecosystem patterns:
-    - Project creation and initialization with FlextResult error handling
+    - Project creation and initialization with r error handling
     - Railway-oriented validation chains for composable operations
     - Complete flext-core integration (Container, Logger, Utilities)
-    - Zero try/except fallbacks - explicit FlextResult error handling
+    - Zero try/except fallbacks - explicit r error handling
 
     Extends flext-core foundation for enterprise data pipeline orchestration.
     """
@@ -50,20 +58,19 @@ class FlextMeltanoProjectService(
         self._config = config or FlextMeltanoConfig()
         self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
-        self._utilities = FlextUtilities()
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(
         self,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute the pipeline project service.
 
         Returns:
-        FlextResult containing project service configuration and status.
+        r containing project service configuration and status.
 
         """
         try:
-            config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
+            config_data: t.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_project_service",
                 "status": "ready",
                 "config": self._config.model_dump()
@@ -72,25 +79,21 @@ class FlextMeltanoProjectService(
             }
 
             self.logger.info("FlextMeltanoProjectService executed successfully")
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                data=config_data
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Project service execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                error_msg
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
 
     def create_temporary_project(
         self,
         project_id: str | None = None,
         prefix: str = "flext_meltano_",
-    ) -> FlextResult[FlextMeltanoTypes.Dbt.Project]:
+    ) -> r[t.Dbt.Project]:
         """Create temporary Meltano project with railway-oriented validation.
 
-        Uses FlextResult.flat_map chains for composable project creation
+        Uses r.flat_map chains for composable project creation
         with automatic error propagation and resource management.
 
         Args:
@@ -98,7 +101,7 @@ class FlextMeltanoProjectService(
         prefix: Temporary directory prefix for organization
 
         Returns:
-        FlextResult containing project dict[str, object] with standardized structure
+        r containing project dict[str, object] with standardized structure
 
         """
         return (
@@ -123,7 +126,7 @@ class FlextMeltanoProjectService(
     def initialize_project(
         self,
         project_root: Path,
-    ) -> FlextResult[FlextMeltanoTypes.Dbt.Project]:
+    ) -> r[t.Dbt.Project]:
         """Initialize Meltano project using railway pattern validation chain.
 
         Chains initialization steps with automatic error handling:
@@ -135,7 +138,7 @@ class FlextMeltanoProjectService(
         project_root: Directory path containing meltano.yml
 
         Returns:
-        FlextResult containing initialized project dict[str, object] or validation error
+        r containing initialized project dict[str, object] or validation error
 
         """
         return (
@@ -145,7 +148,8 @@ class FlextMeltanoProjectService(
             .flat_map(self._convert_to_project_dict)
         )
 
-    def validate_project(self, project_path: Path) -> FlextResult[bool]:
+    @staticmethod
+    def validate_project(project_path: Path) -> r[bool]:
         """Validate Meltano project structure using dedicated validators.
 
         Delegates to FlextMeltanoValidators for consistent validation
@@ -155,7 +159,7 @@ class FlextMeltanoProjectService(
         project_path: Path to potential Meltano project directory
 
         Returns:
-        FlextResult containing True if valid, False with error details if invalid
+        r containing True if valid, False with error details if invalid
 
         """
         return FlextMeltanoValidators.validate_pipeline_project_structure(project_path)
@@ -164,18 +168,18 @@ class FlextMeltanoProjectService(
         self,
         project_name: str,
         project_dir: Path,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Create new Meltano project using railway-oriented file operations.
 
         Validates project name, creates directory structure, and initializes
-        meltano.yml using composable FlextResult operations.
+        meltano.yml using composable r operations.
 
         Args:
         project_name: Name for the new Meltano project
         project_dir: Parent directory where project will be created
 
         Returns:
-        FlextResult containing project creation metadata or validation error
+        r containing project creation metadata or validation error
 
         """
         return (
@@ -200,29 +204,32 @@ class FlextMeltanoProjectService(
 
     # Railway-oriented helper methods
 
+    @staticmethod
     def _validate_project_parameters(
-        self, project_id: str | None, prefix: str
-    ) -> FlextResult[dict[str, str]]:
+        project_id: str | None, prefix: str
+    ) -> r[dict[str, str]]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
-            return FlextResult[dict[str, str]].fail("Project prefix cannot be empty")
+            return r[dict[str, str]].fail("Project prefix cannot be empty")
 
-        return FlextResult[dict[str, str]].ok({
+        return r[dict[str, str]].ok({
             "project_id": project_id or "flext-meltano-project",
             "prefix": prefix.strip(),
         })
 
-    def _create_temp_directory(self, prefix: str) -> FlextResult[Path]:
+    @staticmethod
+    def _create_temp_directory(prefix: str) -> r[Path]:
         """Create temporary directory with FLEXT utilities."""
         try:
             temp_dir = tempfile.mkdtemp(prefix=prefix)
-            return FlextResult[Path].ok(Path(temp_dir))
+            return r[Path].ok(Path(temp_dir))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to create temp directory: {e}")
+            return r[Path].fail(f"Failed to create temp directory: {e}")
 
+    @staticmethod
     def _generate_minimal_config(
-        self, temp_path: Path, project_id: str
-    ) -> FlextResult[dict[str, object]]:
+        temp_path: Path, project_id: str
+    ) -> r[dict[str, object]]:
         """Generate minimal meltano.yml configuration."""
         config = {
             "version": 1,
@@ -241,106 +248,109 @@ class FlextMeltanoProjectService(
                 }
             ],
         }
-        return FlextResult[dict[str, object]].ok({
+        return r[dict[str, object]].ok({
             "path": temp_path,
             "config": config,
         })
 
+    @staticmethod
     def _write_meltano_config(
-        self, project_path: Path, config: dict[str, object]
-    ) -> FlextResult[Path]:
+        project_path: Path, config: dict[str, object]
+    ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
-            config_file = (
-                project_path / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
-            )
+            config_file = project_path / c.Paths.MELTANO_PROJECT_FILE
             with config_file.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False)
-            return FlextResult[Path].ok(project_path)
+            return r[Path].ok(project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to write meltano.yml: {e}")
+            return r[Path].fail(f"Failed to write meltano.yml: {e}")
 
-    def _initialize_project_instance(self, project_path: Path) -> FlextResult[object]:
+    def _initialize_project_instance(self, project_path: Path) -> r[object]:
         """Initialize Meltano project instance using abstractions."""
         project_result = self._abstractions.find_project(project_path)
         if project_result.is_failure:
-            return FlextResult[object].fail(
+            return r[object].fail(
                 project_result.error or "Failed to initialize project"
             )
-        return cast("FlextResult[object]", project_result)
+        return cast("r[object]", project_result)
 
-    def _convert_to_project_dict(
-        self, project: object
-    ) -> FlextResult[FlextMeltanoTypes.Dbt.Project]:
+    @staticmethod
+    def _convert_to_project_dict(project: object) -> r[t.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
-            project_dict: FlextMeltanoTypes.Dbt.Project = {
-                "name": str(getattr(project, "name", "meltano_project")),
-                "root": str(getattr(project, "root", "unknown")),
-                "settings": str(getattr(project, "settings", "")),
-                "meltano_version": str(getattr(project, "meltano_version", "")),
+            project_dict: t.Dbt.Project = {
+                "name": u.ensure_str(u.get(project, "name", "meltano_project")),
+                "root": u.ensure_str(u.get(project, "root", "unknown")),
+                "settings": u.ensure_str(u.get(project, "settings", "")),
+                "meltano_version": u.ensure_str(u.get(project, "meltano_version", "")),
             }
-            return FlextResult[FlextMeltanoTypes.Dbt.Project].ok(project_dict)
+            return r[t.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.Dbt.Project].fail(
+            return r[t.Dbt.Project].fail(
                 f"Failed to convert project object: {e}"
             )
 
-    def _validate_project_path(self, project_root: Path) -> FlextResult[Path]:
+    @staticmethod
+    def _validate_project_path(project_root: Path) -> r[Path]:
         """Validate project directory exists."""
         if not project_root.exists():
-            return FlextResult[Path].fail(
+            return r[Path].fail(
                 f"Project directory not found: {project_root}"
             )
-        return FlextResult[Path].ok(project_root)
+        return r[Path].ok(project_root)
 
-    def _validate_meltano_config_exists(self, project_root: Path) -> FlextResult[Path]:
+    @staticmethod
+    def _validate_meltano_config_exists(project_root: Path) -> r[Path]:
         """Validate meltano.yml exists in project directory."""
-        meltano_yml = project_root / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
+        meltano_yml = project_root / c.Paths.MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
-            return FlextResult[Path].fail(
+            return r[Path].fail(
                 f"Not a Meltano project: meltano.yml not found in {project_root}"
             )
-        return FlextResult[Path].ok(project_root)
+        return r[Path].ok(project_root)
 
-    def _load_project_from_path(self, project_root: Path) -> FlextResult[object]:
+    def _load_project_from_path(self, project_root: Path) -> r[object]:
         """Load Meltano project from validated path."""
         project_result = self._abstractions.find_project(project_root)
         if project_result.is_failure:
-            return FlextResult[object].fail(
+            return r[object].fail(
                 project_result.error or "Failed to load Meltano project"
             )
-        return cast("FlextResult[object]", project_result)
+        return cast("r[object]", project_result)
 
+    @staticmethod
     def _validate_project_creation_params(
-        self, project_name: str, project_dir: Path
-    ) -> FlextResult[dict[str, object]]:
+        project_name: str, project_dir: Path
+    ) -> r[dict[str, object]]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return FlextResult[dict[str, object]].fail("Project name cannot be empty")
+            return r[dict[str, object]].fail("Project name cannot be empty")
 
         if not project_dir.exists():
-            return FlextResult[dict[str, object]].fail(
+            return r[dict[str, object]].fail(
                 f"Parent directory not found: {project_dir}"
             )
 
-        return FlextResult[dict[str, object]].ok({
+        return r[dict[str, object]].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })
 
+    @staticmethod
     def _create_project_directory(
-        self, project_name: str, parent_dir: Path
-    ) -> FlextResult[Path]:
+        project_name: str, parent_dir: Path
+    ) -> r[Path]:
         """Create project directory structure."""
         try:
             project_path = parent_dir / project_name
             project_path.mkdir(parents=True, exist_ok=True)
-            return FlextResult[Path].ok(project_path)
+            return r[Path].ok(project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to create project directory: {e}")
+            return r[Path].fail(f"Failed to create project directory: {e}")
 
-    def _create_project_structure(self, project_path: Path) -> FlextResult[Path]:
+    @staticmethod
+    def _create_project_structure(project_path: Path) -> r[Path]:
         """Create standard Meltano project directory structure."""
         try:
             directories = [
@@ -357,13 +367,14 @@ class FlextMeltanoProjectService(
                 (project_path / directory).mkdir(exist_ok=True)
                 (project_path / directory / ".gitkeep").touch()
 
-            return FlextResult[Path].ok(project_path)
+            return r[Path].ok(project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to create project structure: {e}")
+            return r[Path].fail(f"Failed to create project structure: {e}")
 
+    @staticmethod
     def _initialize_project_config(
-        self, project_path: Path, project_name: str
-    ) -> FlextResult[Path]:
+        project_path: Path, project_name: str
+    ) -> r[Path]:
         """Initialize meltano.yml configuration file."""
         try:
             config_content = f"""version: 1
@@ -377,13 +388,13 @@ environments:
 
             config_file = project_path / "meltano.yml"
             config_file.write_text(config_content, encoding="utf-8")
-            return FlextResult[Path].ok(project_path)
+            return r[Path].ok(project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to initialize meltano.yml: {e}")
+            return r[Path].fail(f"Failed to initialize meltano.yml: {e}")
 
     def _build_creation_result(
         self, project_name: str, project_path: Path
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Build successful project creation result."""
         try:
             result: dict[str, str] = {
@@ -392,9 +403,7 @@ environments:
                 "project_path": str(project_path),
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
-                    (
-                        project_path / FlextMeltanoConstants.Paths.MELTANO_PROJECT_FILE
-                    ).exists()
+                    (project_path / c.Paths.MELTANO_PROJECT_FILE).exists()
                 ),
             }
 
@@ -404,9 +413,9 @@ environments:
                 project_path=str(project_path),
             )
 
-            return FlextResult[dict[str, str]].ok(result)
+            return r[dict[str, str]].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[dict[str, str]].fail(
+            return r[dict[str, str]].fail(
                 f"Failed to build creation result: {e}"
             )
 

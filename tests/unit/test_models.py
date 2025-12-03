@@ -1,4 +1,4 @@
-"""Enhanced comprehensive tests for FlextMeltanoModels module.
+"""Enhanced comprehensive tests for m module.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano import m
 
 
 class TestTapConfigEnhanced:
@@ -18,7 +18,7 @@ class TestTapConfigEnhanced:
 
     def test_tap_config_with_minimal_data(self) -> None:
         """Test TapConfig with minimal required data."""
-        config = FlextMeltanoModels.TapConfig(
+        config = m.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
 
@@ -29,7 +29,7 @@ class TestTapConfigEnhanced:
 
     def test_tap_config_with_full_data(self) -> None:
         """Test TapConfig with all fields populated."""
-        config = FlextMeltanoModels.TapConfig(
+        config = m.TapConfig(
             tap_type="tap-mysql",
             connection_config={
                 "host": "db.example.com",
@@ -53,14 +53,14 @@ class TestTapConfigEnhanced:
     def test_tap_config_validation_empty_tap_type(self) -> None:
         """Test TapConfig validation with empty tap_type."""
         with pytest.raises(ValidationError, match="tap_type cannot be empty"):
-            FlextMeltanoModels.TapConfig(
+            m.TapConfig(
                 tap_type="", connection_config={"host": "localhost"}
             )
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         """Test TapConfig validation with invalid connection_config type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            FlextMeltanoModels.TapConfig(
+            m.TapConfig(
                 tap_type="tap-postgres",
                 connection_config="invalid",  # Should be dict
             )
@@ -71,7 +71,7 @@ class TestTargetConfigEnhanced:
 
     def test_target_config_with_minimal_data(self) -> None:
         """Test TargetConfig with minimal required data."""
-        config = FlextMeltanoModels.TargetConfig(target_type="target-csv")
+        config = m.TargetConfig(target_type="target-csv")
 
         assert config.target_type == "target-csv"
         assert config.connection_config == {}
@@ -80,7 +80,7 @@ class TestTargetConfigEnhanced:
 
     def test_target_config_with_full_data(self) -> None:
         """Test TargetConfig with all fields populated."""
-        config = FlextMeltanoModels.TargetConfig(
+        config = m.TargetConfig(
             target_type="target-postgres",
             connection_config={
                 "host": "localhost",
@@ -101,14 +101,14 @@ class TestTargetConfigEnhanced:
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
-            FlextMeltanoModels.TargetConfig(
+            m.TargetConfig(
                 target_type="", connection_config={"host": "localhost"}
             )
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""
         with pytest.raises(ValidationError, match="Input should be a valid integer"):
-            FlextMeltanoModels.TargetConfig(
+            m.TargetConfig(
                 target_type="target-csv",
                 batch_size="invalid",  # Should be int
             )
@@ -119,7 +119,7 @@ class TestStreamInfoEnhanced:
 
     def test_stream_info_with_minimal_data(self) -> None:
         """Test StreamInfo with minimal required data."""
-        stream = FlextMeltanoModels.StreamInfo(
+        stream = m.StreamInfo(
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             created_at="2025-01-01T00:00:00Z",
@@ -134,7 +134,7 @@ class TestStreamInfoEnhanced:
 
     def test_stream_info_with_full_data(self) -> None:
         """Test StreamInfo with all fields populated."""
-        stream = FlextMeltanoModels.StreamInfo(
+        stream = m.StreamInfo(
             stream_name="orders",
             stream_schema={
                 "type": "object",
@@ -160,7 +160,7 @@ class TestStreamInfoEnhanced:
         with pytest.raises(
             ValidationError, match="String should have at least 1 character"
         ):
-            FlextMeltanoModels.StreamInfo(
+            m.StreamInfo(
                 stream_name="",
                 stream_schema={"type": "object"},
                 created_at="2025-01-01T00:00:00Z",
@@ -169,7 +169,7 @@ class TestStreamInfoEnhanced:
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         """Test StreamInfo validation with invalid schema type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            FlextMeltanoModels.StreamInfo(
+            m.StreamInfo(
                 stream_name="users",
                 stream_schema="invalid",  # Should be dict
                 created_at="2025-01-01T00:00:00Z",
@@ -181,7 +181,7 @@ class TestMeltanoProjectModelEnhanced:
 
     def test_meltano_project_with_minimal_data(self) -> None:
         """Test MeltanoProjectModel with minimal required data."""
-        project = FlextMeltanoModels.MeltanoProjectModel(project_id="test-project")
+        project = m.MeltanoProjectModel(project_id="test-project")
 
         assert project.project_id == "test-project"
         assert project.version == "1"
@@ -191,7 +191,7 @@ class TestMeltanoProjectModelEnhanced:
 
     def test_meltano_project_with_full_data(self) -> None:
         """Test MeltanoProjectModel with all fields populated."""
-        project = FlextMeltanoModels.MeltanoProjectModel(
+        project = m.MeltanoProjectModel(
             project_id="analytics-project",
             version="2.0",
             default_environment="production",
@@ -215,12 +215,12 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_validation_empty_project_id(self) -> None:
         """Test MeltanoProjectModel validation with empty project_id."""
         with pytest.raises(ValidationError, match="project_id cannot be empty"):
-            FlextMeltanoModels.MeltanoProjectModel(project_id="")
+            m.MeltanoProjectModel(project_id="")
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         """Test MeltanoProjectModel validation with invalid plugins type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            FlextMeltanoModels.MeltanoProjectModel(
+            m.MeltanoProjectModel(
                 project_id="test-project",
                 plugins="invalid",  # Should be dict
             )
@@ -231,7 +231,7 @@ class TestPluginModelEnhanced:
 
     def test_plugin_model_with_minimal_data(self) -> None:
         """Test PluginModel with minimal required data."""
-        plugin = FlextMeltanoModels.PluginModel(
+        plugin = m.PluginModel(
             name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
         )
 
@@ -246,7 +246,7 @@ class TestPluginModelEnhanced:
 
     def test_plugin_model_with_full_data(self) -> None:
         """Test PluginModel with all fields populated."""
-        plugin = FlextMeltanoModels.PluginModel(
+        plugin = m.PluginModel(
             name="tap-postgres",
             namespace="meltanolabs",
             variant="meltanolabs",
@@ -277,12 +277,12 @@ class TestPluginModelEnhanced:
         with pytest.raises(
             ValidationError, match="String should have at least 1 character"
         ):
-            FlextMeltanoModels.PluginModel(name="", namespace="")
+            m.PluginModel(name="", namespace="")
 
     def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
         """Test PluginModel validation with invalid capabilities type."""
         with pytest.raises(ValidationError, match="Input should be a valid list"):
-            FlextMeltanoModels.PluginModel(
+            m.PluginModel(
                 name="tap-postgres",
                 namespace="tap-postgres",
                 capabilities="invalid",  # Should be list
@@ -294,7 +294,7 @@ class TestDbtProjectModelEnhanced:
 
     def test_dbt_project_with_minimal_data(self) -> None:
         """Test DbtProjectModel with minimal required data."""
-        dbt_project = FlextMeltanoModels.DbtProjectModel(
+        dbt_project = m.DbtProjectModel(
             name="analytics", version="1.0.0", profile="default"
         )
 
@@ -308,7 +308,7 @@ class TestDbtProjectModelEnhanced:
 
     def test_dbt_project_with_full_data(self) -> None:
         """Test DbtProjectModel with all fields populated."""
-        dbt_project = FlextMeltanoModels.DbtProjectModel(
+        dbt_project = m.DbtProjectModel(
             name="data-warehouse",
             profile="postgres",
             version="2.1.0",
@@ -334,17 +334,17 @@ class TestDbtProjectModelEnhanced:
     def test_dbt_project_validation_empty_name(self) -> None:
         """Test DbtProjectModel validation with empty name."""
         with pytest.raises(ValidationError, match="name cannot be empty"):
-            FlextMeltanoModels.DbtProjectModel(name="", profile="default")
+            m.DbtProjectModel(name="", profile="default")
 
     def test_dbt_project_validation_empty_profile(self) -> None:
         """Test DbtProjectModel validation with empty profile."""
         with pytest.raises(ValidationError, match="profile cannot be empty"):
-            FlextMeltanoModels.DbtProjectModel(name="test-project", profile="")
+            m.DbtProjectModel(name="test-project", profile="")
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
         """Test DbtProjectModel validation with invalid config type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            FlextMeltanoModels.DbtProjectModel(
+            m.DbtProjectModel(
                 name="test-project",
                 profile="default",
                 config="invalid",  # Should be dict
@@ -356,12 +356,12 @@ class TestModelIntegration:
 
     def test_tap_and_target_config_integration(self) -> None:
         """Test integration between TapConfig and TargetConfig."""
-        tap_config = FlextMeltanoModels.TapConfig(
+        tap_config = m.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "source.db.com", "port": 5432},
         )
 
-        target_config = FlextMeltanoModels.TargetConfig(
+        target_config = m.TargetConfig(
             target_type="target-postgres",
             connection_config={"host": "target.db.com", "port": 5432},
         )
@@ -374,11 +374,11 @@ class TestModelIntegration:
 
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
-        plugin = FlextMeltanoModels.PluginModel(
+        plugin = m.PluginModel(
             name="tap-mysql", namespace="meltanolabs", pip_url="tap-mysql"
         )
 
-        project = FlextMeltanoModels.MeltanoProjectModel(
+        project = m.MeltanoProjectModel(
             project_id="mysql-etl", plugins={"extractors": [{"name": "tap-mysql"}]}
         )
 
@@ -387,14 +387,14 @@ class TestModelIntegration:
 
     def test_stream_info_with_tap_config_integration(self) -> None:
         """Test StreamInfo integration with TapConfig."""
-        stream = FlextMeltanoModels.StreamInfo(
+        stream = m.StreamInfo(
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             key_properties=["id"],
             created_at="2025-01-01T00:00:00Z",
         )
 
-        tap_config = FlextMeltanoModels.TapConfig(
+        tap_config = m.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
             stream_config={"users": {"schema": "public"}},

@@ -122,6 +122,8 @@
 [tool.ruff]
     extend = "../ruff-shared.toml"
 
+[tool.ruff.lint.per-file-ignores]
+    "src/flext_meltano/config.py" = ["PLR0904"]  # Pydantic validators require many public methods
 
 [tool.pytest.ini_options]
     addopts = [

@@ -35,18 +35,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 from flext_meltano import FlextMeltanoTapAbstractions, StreamDefinition
 
 class FlextOracleTapService(FlextService):
@@ -79,18 +79,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 from flext_meltano import FlextMeltanoTargetAbstractions
 
 class FlextOracleTargetService(FlextService):
@@ -100,7 +100,7 @@ class FlextOracleTargetService(FlextService):
         super().__init__()
         self._target_abstractions = FlextMeltanoTargetAbstractions()
 
-    def load_to_oracle(self, records: list, config: dict) -> FlextResult[FlextTypes.Dict]:
+    def load_to_oracle(self, records: list, config: dict) -> FlextResult[t.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
         return self._target_abstractions.load_data("target-oracle", records)
 ```
@@ -123,18 +123,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 from flext_meltano import FlextMeltanoDbtService
 
 class FlextOracleDbtService(FlextService):
@@ -144,7 +144,7 @@ class FlextOracleDbtService(FlextService):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    def run_oracle_models(self, models: FlextTypes.StringList) -> FlextResult[FlextTypes.Dict]:
+    def run_oracle_models(self, models: t.StringList) -> FlextResult[t.Dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -169,18 +169,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
 
 class EnterpriseELTService(FlextService):
@@ -195,8 +195,8 @@ class EnterpriseELTService(FlextService):
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: FlextTypes.StringList = None
-    ) -> FlextResult[FlextTypes.Dict]:
+        dbt_models: t.StringList = None
+    ) -> FlextResult[t.Dict]:
         """Execute complete ELT pipeline."""
 
         # 1. Extract and Load using Meltano
@@ -211,7 +211,7 @@ class EnterpriseELTService(FlextService):
             if transform_result.is_failure:
                 return transform_result
 
-        return FlextResult[FlextTypes.Dict].ok({
+        return FlextResult[t.Dict].ok({
             "pipeline": pipeline_result.unwrap(),
             "models_executed": dbt_models or []
         })
@@ -379,18 +379,18 @@ from flext_core import FlextContext
 from flext_core import FlextDecorators
 from flext_core import FlextDispatcher
 from flext_core import FlextExceptions
-from flext_core import FlextHandlers
+from flext_core import h
 from flext_core import FlextLogger
-from flext_core import FlextMixins
+from flext_core import x
 from flext_core import FlextModels
 from flext_core import FlextProcessors
-from flext_core import FlextProtocols
+from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import FlextResult
 from flext_core import FlextRuntime
 from flext_core import FlextService
-from flext_core import FlextTypes
-from flext_core import FlextUtilities
+from flext_core import t
+from flext_core import u
 from flext_meltano import FlextMeltanoTapAbstractions
 
 # Register services for ecosystem consumption
@@ -414,7 +414,7 @@ config = builder.build_pipeline_config(tap_settings, target_settings)
 # Consistent FlextResult patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.is_failure:
-    return FlextResult[FlextTypes.Dict].fail(f"Integration failed: {result.error}")
+    return FlextResult[t.Dict].fail(f"Integration failed: {result.error}")
 ```
 
 ### Quality Standards

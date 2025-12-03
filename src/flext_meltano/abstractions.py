@@ -13,9 +13,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, u
 
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+r = FlextResult
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoAbstractions:
@@ -38,46 +48,42 @@ class FlextMeltanoAbstractions:
 
         def create_pipeline_context(
             self, project_path: Path, source_name: str, sink_name: str
-        ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict]:
+        ) -> r[t.MeltanoCore.NestedJsonDict]:
             """Create pipeline context for data pipeline operations."""
             try:
-                pipeline_context: FlextMeltanoTypes.MeltanoCore.NestedJsonDict = {
+                pipeline_context: t.MeltanoCore.NestedJsonDict = {
                     "project_path": str(project_path),
                     "source_name": source_name,
                     "sink_name": sink_name,
                     "status": "initialized",
                 }
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].ok(
-                    pipeline_context
-                )
+                return r[t.MeltanoCore.NestedJsonDict].ok(pipeline_context)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
-                return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail(
-                    error_msg
-                )
+                return r[t.MeltanoCore.NestedJsonDict].fail(error_msg)
 
         def execute_data_pipeline(
             self,
             _pipeline_context: dict[str, object],
             source_config: dict[str, object],
             sink_config: dict[str, object],
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Execute data pipeline with given context and configurations."""
             try:
                 # This is a simplified implementation
                 # In production, would orchestrate the actual data pipeline
                 result: dict[str, object] = {
                     "status": "completed",
-                    "source": source_config.get("name", "unknown"),
-                    "sink": sink_config.get("name", "unknown"),
+                    "source": u.get(source_config, "name", default="unknown"),
+                    "sink": u.get(sink_config, "name", default="unknown"),
                     "records_processed": 0,
                 }
-                return FlextResult[dict[str, object]].ok(data=result)
+                return r[dict[str, object]].ok(result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to execute data pipeline: {e}"
                 self.logger.exception(error_msg)
-                return FlextResult[dict[str, object]].fail(error_msg)
+                return r[dict[str, object]].fail(error_msg)
 
     # MAIN UNIFIED CLASS INTERFACE
     # ========================================================================
@@ -90,11 +96,11 @@ class FlextMeltanoAbstractions:
         self._runner_helper = self._RunnerHelper(self.logger)
 
     # Project operations
-    def find_project(self, project_root: Path) -> FlextResult[Path]:
+    def find_project(self, project_root: Path) -> r[Path]:
         """Find and validate pipeline project directory."""
         try:
             if not project_root.exists() or not project_root.is_dir():
-                return FlextResult[Path].fail(
+                return r[Path].fail(
                     f"Project path is not a valid directory: {project_root}"
                 )
 
@@ -105,27 +111,25 @@ class FlextMeltanoAbstractions:
                 project_root=str(project_root),
             )
 
-            return FlextResult[Path].ok(project_root)
+            return r[Path].ok(project_root)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to load pipeline project: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[Path].fail(error_msg)
+            return r[Path].fail(error_msg)
 
-    def get_project_root(self) -> FlextResult[Path]:
+    def get_project_root(self) -> r[Path]:
         """Get the root directory of the current project."""
         if not self._project_path:
-            return FlextResult[Path].fail("No project loaded")
+            return r[Path].fail("No project loaded")
 
         try:
-            return FlextResult[Path].ok(self._project_path)
+            return r[Path].ok(self._project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[Path].fail(f"Failed to get project root: {e}")
+            return r[Path].fail(f"Failed to get project root: {e}")
 
     # Component operations
-    def get_components_of_type(
-        self, component_type: str
-    ) -> FlextResult[list[dict[str, object]]]:
+    def get_components_of_type(self, component_type: str) -> r[list[dict[str, object]]]:
         """Get components of specified type."""
         try:
             # Generic component listing - would be implemented based on actual needs
@@ -139,23 +143,24 @@ class FlextMeltanoAbstractions:
                 },
             ]
 
-            filtered_components = [c for c in components if c["type"] == component_type]
-            return FlextResult[list[dict[str, object]]].ok(filtered_components)
+            filtered_components = u.filter(
+                components,
+                lambda comp: u.get(comp, "type", default="") == component_type,
+            )
+            return r[list[dict[str, object]]].ok(filtered_components)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[list[dict[str, object]]].fail(error_msg)
+            return r[list[dict[str, object]]].fail(error_msg)
 
     # Runner operations
     def create_pipeline_context(
         self, source_name: str, sink_name: str
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict]:
+    ) -> r[t.MeltanoCore.NestedJsonDict]:
         """Create pipeline context."""
         if not self._project_path:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.NestedJsonDict].fail(
-                "No project loaded"
-            )
+            return r[t.MeltanoCore.NestedJsonDict].fail("No project loaded")
 
         return self._runner_helper.create_pipeline_context(
             self._project_path, source_name, sink_name
@@ -165,7 +170,7 @@ class FlextMeltanoAbstractions:
         self,
         source_config: dict[str, object],
         sink_config: dict[str, object],
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Execute data pipeline."""
         pipeline_context = {
             "project_path": self._project_path,
@@ -182,7 +187,7 @@ class FlextMeltanoAbstractions:
         project: object,
         extractor_name: str,
         loader_name: str,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Create ELT context for pipeline execution."""
         try:
             elt_context = {
@@ -191,18 +196,18 @@ class FlextMeltanoAbstractions:
                 "loader_name": loader_name,
                 "status": "initialized",
             }
-            return FlextResult[dict[str, object]].ok(elt_context)
+            return r[dict[str, object]].ok(elt_context)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to create ELT context: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return r[dict[str, object]].fail(error_msg)
 
     def execute_singer_pipeline(
         self,
         elt_context: dict[str, object],
         _extractor_plugin: object,
         _loader_plugin: object,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Execute singer pipeline."""
         try:
             # Simplified implementation - in production would orchestrate actual singer pipeline
@@ -211,16 +216,16 @@ class FlextMeltanoAbstractions:
                 "records_processed": 0,
                 "elt_context": elt_context,
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[dict[str, object]].ok(cast("dict[str, object]", result))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return r[dict[str, object]].fail(error_msg)
 
     # Plugin operations
     def get_plugins_of_type(
         self, _project: object, plugin_type: str
-    ) -> FlextResult[dict[str, dict[str, object]]]:
+    ) -> r[dict[str, dict[str, object]]]:
         """Get plugins of specified type."""
         try:
             # Simplified implementation - would need actual plugin discovery
@@ -237,26 +242,27 @@ class FlextMeltanoAbstractions:
                 },
             }
 
-            filtered_plugins = {
-                k: v for k, v in plugins.items() if v["type"] == plugin_type
-            }
-            return FlextResult[dict[str, dict[str, object]]].ok(filtered_plugins)
+            filtered_plugins = u.filter(
+                plugins,
+                lambda _k, v: u.get(v, "type", default="") == plugin_type,
+            )
+            return r[dict[str, dict[str, object]]].ok(filtered_plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[dict[str, dict[str, object]]].fail(error_msg)
+            return r[dict[str, dict[str, object]]].fail(error_msg)
 
-    def add_plugin(self, plugin_config: dict[str, object]) -> FlextResult[bool]:
+    def add_plugin(self, plugin_config: dict[str, object]) -> r[bool]:
         """Add a plugin."""
         try:
             # Simplified implementation - would validate and add plugin
             self.logger.info("Adding plugin", plugin_config=plugin_config)
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[bool].fail(error_msg)
+            return r[bool].fail(error_msg)
 
 
 __all__ = [
