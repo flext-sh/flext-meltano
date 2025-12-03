@@ -49,12 +49,22 @@ class FlextMeltanoModels(m_base):
     def _protect_sensitive_config(value: dict[str, object]) -> dict[str, object]:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
-        return u.map(
-            value,
-            lambda k, v: "[PROTECTED]"
-            if any(s in u.normalize(k, case="lower") for s in sensitive_keys)
-            else v,
-        )
+
+        # DSL: Helper to count dict keys
+        def dict_count(d: dict[str, object] | list[object] | tuple[object, ...]) -> int:
+            if isinstance(d, dict):
+                return u.count(list(d.keys()))
+            return u.count(d)
+
+        # DSL: Use process + any_ for unified checking
+        def is_sensitive(k: str) -> bool:
+            normalized = cast("str", u.normalize(k, case="lower"))
+            checks_result = u.process(sensitive_keys, lambda s: cast("str", s) in normalized)
+            if checks_result.is_success and isinstance(checks_result.value, list):
+                return u.any_(*checks_result.value)
+            return False
+
+        return u.map(value, lambda k, v: "[PROTECTED]" if is_sensitive(k) else v)
 
     # Constants for magic values used throughout the models
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
@@ -372,7 +382,7 @@ class FlextMeltanoModels(m_base):
     class CliParameters(FlextModels):
         """Base class for all CLI parameter models."""
 
-        class DataSourceParams(FlextModels.ArbitraryTypesModel):
+        class DataSourceParams(FlextModels.Entity):
             """Generic parameters for data source operations."""
 
             source_name: str = Field(description="Name of the data source")
@@ -389,7 +399,7 @@ class FlextMeltanoModels(m_base):
                 default=False, description="Run in discovery mode to output schema"
             )
 
-        class DataSinkParams(FlextModels.ArbitraryTypesModel):
+        class DataSinkParams(FlextModels.Entity):
             """Generic parameters for data sink operations."""
 
             sink_name: str = Field(description="Name of the data sink")
@@ -401,7 +411,7 @@ class FlextMeltanoModels(m_base):
                 description="Path to input data file (default: stdin)",
             )
 
-        class PipelineParams(FlextModels.ArbitraryTypesModel):
+        class PipelineParams(FlextModels.Entity):
             """Generic parameters for pipeline operations."""
 
             source_name: str = Field(description="Name of the data source")
@@ -422,7 +432,7 @@ class FlextMeltanoModels(m_base):
                 default=None, description="Path to write final state"
             )
 
-    class PipelineRunParams(FlextModels.ArbitraryTypesModel):
+    class PipelineRunParams(FlextModels.Entity):
         """Parameters for pipeline run operations."""
 
         tap_name: str = Field(description="Name of the tap to run")
@@ -442,7 +452,7 @@ class FlextMeltanoModels(m_base):
         )
         full_refresh: bool = Field(default=False, description="Run with full refresh")
 
-        class TransformationParams(FlextModels.ArbitraryTypesModel):
+        class TransformationParams(FlextModels.Entity):
             """Generic parameters for transformation operations."""
 
             project_dir: str = Field(description="Transformation project directory")
@@ -459,7 +469,7 @@ class FlextMeltanoModels(m_base):
                 default=False, description="Run with full refresh"
             )
 
-        class PluginInstallParams(FlextModels.ArbitraryTypesModel):
+        class PluginInstallParams(FlextModels.Entity):
             """Generic parameters for plugin installation."""
 
             plugin_type: str = Field(
@@ -474,7 +484,17 @@ class FlextMeltanoModels(m_base):
     # DATA SOURCE MODELS - Generic data source configurations and instances
     # ========================================================================
 
-    class TapRunParams(FlextModels.ArbitraryTypesModel):
+    class DbtRunParams(FlextModels.Entity):
+        """Generic parameters for dbt run operations."""
+
+        project_dir: str = Field(description="dbt project directory")
+        models: str | None = Field(default=None, description="Models to run")
+        select: str | None = Field(default=None, description="Selection syntax")
+        exclude: str | None = Field(default=None, description="Exclusion syntax")
+        full_refresh: bool = Field(default=False, description="Full refresh flag")
+        vars: dict[str, object] | None = Field(default=None, description="dbt variables")
+
+    class TapRunParams(FlextModels.Entity):
         """Generic parameters for tap run operations."""
 
         tap_name: str = Field(description="Name of the tap to run")
@@ -492,7 +512,7 @@ class FlextMeltanoModels(m_base):
             default=None, description="Path to Singer properties file"
         )
 
-    class TargetRunParams(FlextModels.ArbitraryTypesModel):
+    class TargetRunParams(FlextModels.Entity):
         """Generic parameters for target run operations."""
 
         target_name: str = Field(description="Name of the target to run")
@@ -506,7 +526,7 @@ class FlextMeltanoModels(m_base):
             default=None, description="Batch size for target operations"
         )
 
-    class TapConfig(FlextModels.ArbitraryTypesModel):
+    class TapConfig(FlextModels.Entity):
         """Generic tap configuration for data extraction."""
 
         tap_type: str = Field(description="Type of the tap")
@@ -532,7 +552,10 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def config_size(self) -> int:
             """Total number of configuration parameters."""
-            return len(self.connection_config) + len(self.stream_config)
+            # DSL: Count dict keys using list conversion
+            conn_keys = list(self.connection_config.keys()) if isinstance(self.connection_config, dict) else []
+            stream_keys = list(self.stream_config.keys()) if isinstance(self.stream_config, dict) else []
+            return u.count(conn_keys) + u.count(stream_keys)
 
         @model_validator(mode="after")
         def validate_tap_config(self) -> FlextMeltanoModels.TapConfig:
@@ -558,7 +581,7 @@ class FlextMeltanoModels(m_base):
                 else value
             )
 
-    class TargetConfig(FlextModels.ArbitraryTypesModel):
+    class TargetConfig(FlextModels.Entity):
         """Generic target configuration for data loading."""
 
         target_type: str = Field(description="Type of the target")
@@ -609,7 +632,7 @@ class FlextMeltanoModels(m_base):
                 else value
             )
 
-    class DataSourceConfig(FlextModels.ArbitraryTypesModel):
+    class DataSourceConfig(FlextModels.Entity):
         """Generic data source configuration with validation."""
 
         source_type: str = Field(description="Type of the data source")
@@ -635,7 +658,10 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def config_size(self) -> int:
             """Total number of configuration parameters."""
-            return len(self.connection_config) + len(self.stream_config)
+            # DSL: Count dict keys using list conversion
+            conn_keys = list(self.connection_config.keys()) if isinstance(self.connection_config, dict) else []
+            stream_keys = list(self.stream_config.keys()) if isinstance(self.stream_config, dict) else []
+            return u.count(conn_keys) + u.count(stream_keys)
 
         @model_validator(mode="after")
         def validate_source_config(self) -> FlextMeltanoModels.DataSourceConfig:
@@ -743,7 +769,8 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def config_keys_count(self) -> int:
             """Number of config keys."""
-            return len(self.config)
+            keys = list(self.config.keys()) if isinstance(self.config, dict) else []
+            return u.count(keys)
 
         @model_validator(mode="after")
         def validate_sink_definition(self) -> FlextMeltanoModels.DataSinkDefinition:
@@ -781,10 +808,9 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def active_streams(self) -> list[FlextMeltanoModels.StreamInfo]:
             """Active streams for extraction."""
-            return u.filter(
-                self.streams,
-                lambda s: s.status in {"discovered", "selected"},
-            )
+            # DSL: Convert dict values to list for filtering
+            streams_list = list(self.streams.values()) if isinstance(self.streams, dict) else []
+            return u.filter(streams_list, lambda s: s.status in {"discovered", "selected"})
 
     class DataSourceInstance(FlextModels.Entity):
         """Generic data source instance for pipeline operations."""
@@ -830,14 +856,18 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
-            return sum(stream.records_extracted for stream in self.streams.values())
+            # DSL: Use agg for unified aggregation
+            streams_list = list(self.streams.values()) if isinstance(self.streams, dict) else []
+            result = u.agg(streams_list, "records_extracted", fn=sum)
+            return cast("int", result) if isinstance(result, int) else 0
 
         @computed_field
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
+            streams_list = list(self.streams.values()) if isinstance(self.streams, dict) else []
             return (
                 self.discovered
-                and len(self.streams) > 0
+                and u.count(streams_list) > 0
                 and self.status == "configured"
             )
 
@@ -939,7 +969,7 @@ class FlextMeltanoModels(m_base):
                 else value
             )
 
-    class StreamInfo(FlextModels.ArbitraryTypesModel):
+    class StreamInfo(FlextModels.Entity):
         """Generic stream information for data pipeline operations."""
 
         stream_name: str = Field(min_length=1, description="Stream name identifier")
@@ -1010,7 +1040,7 @@ class FlextMeltanoModels(m_base):
     # PROJECT MODELS - Generic project configuration and validation
     # ========================================================================
 
-    class MeltanoProjectModel(FlextModels.ArbitraryTypesModel):
+    class MeltanoProjectModel(FlextModels.Entity):
         """Generic Meltano project configuration with validation."""
 
         project_id: str = Field(description="Unique project identifier")
@@ -1060,22 +1090,26 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def environment_count(self) -> int:
             """Number of environments."""
-            return len(self.environments)
+            return u.count(self.environments)
 
         @computed_field
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
             prod_environments = {"prod", "production", "live"}
-            return any(env.lower() in prod_environments for env in self.environments)
+            # DSL: Use process + any_ for unified checking
+            normalized_envs_result = u.process(self.environments, lambda e: u.normalize(e, case="lower"))
+            normalized_envs = normalized_envs_result.value if normalized_envs_result.is_success and isinstance(normalized_envs_result.value, list) else []
+            return u.any_(*[u.in_(env, cast("list[object]", prod_environments)) for env in normalized_envs])
 
         @computed_field
         def project_maturity(self) -> str:
             """Project maturity assessment."""
-            has_prod = any(
-                env.lower() in {"prod", "production", "live"}
-                for env in self.environments
-            )
-            env_count = len(self.environments)
+            prod_envs = {"prod", "production", "live"}
+            # DSL: Use process + any_ for unified checking
+            normalized_envs_result = u.process(self.environments, lambda e: u.normalize(e, case="lower"))
+            normalized_envs = normalized_envs_result.value if normalized_envs_result.is_success and isinstance(normalized_envs_result.value, list) else []
+            has_prod = u.any_(*[u.in_(env, cast("list[object]", prod_envs)) for env in normalized_envs])
+            env_count = u.count(self.environments)
 
             if (
                 has_prod
@@ -1141,12 +1175,13 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def settings_count(self) -> int:
             """Number of plugin settings."""
-            return len(self.settings)
+            keys = list(self.settings.keys()) if isinstance(self.settings, dict) else []
+            return u.count(keys)
 
         @computed_field
         def plugin_complexity(self) -> str:
             """Plugin complexity assessment."""
-            settings_count = len(self.settings)
+            settings_count = u.count(self.settings)
             if settings_count == 0:
                 return "minimal"
             if (
@@ -1178,7 +1213,7 @@ class FlextMeltanoModels(m_base):
     # TRANSFORMATION MODELS - Generic transformation project and execution models
     # ========================================================================
 
-    class DbtProjectModel(FlextModels.ArbitraryTypesModel):
+    class DbtProjectModel(FlextModels.Entity):
         """Generic DBT project configuration with validation."""
 
         name: str = Field(description="DBT project name")
@@ -1210,7 +1245,7 @@ class FlextMeltanoModels(m_base):
 
             return self
 
-    class TransformationProjectModel(FlextModels.ArbitraryTypesModel):
+    class TransformationProjectModel(FlextModels.Entity):
         """Generic transformation project configuration with validation."""
 
         name: str = Field(min_length=1, description="Project name")
@@ -1240,12 +1275,13 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def total_path_count(self) -> int:
             """Total number of configured paths."""
+            # Use u.count() for unified counting (DSL pattern)
             return (
-                len(self.model_paths)
-                + len(self.analysis_paths)
-                + len(self.test_paths)
-                + len(self.seed_paths)
-                + len(self.macro_paths)
+                u.count(self.model_paths)
+                + u.count(self.analysis_paths)
+                + u.count(self.test_paths)
+                + u.count(self.seed_paths)
+                + u.count(self.macro_paths)
             )
 
         @computed_field
@@ -1264,12 +1300,13 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def project_structure_complexity(self) -> str:
             """Project structure complexity."""
+            # Use u.count() for unified counting (DSL pattern)
             total_path_count = (
-                len(self.model_paths)
-                + len(self.analysis_paths)
-                + len(self.test_paths)
-                + len(self.seed_paths)
-                + len(self.macro_paths)
+                u.count(self.model_paths)
+                + u.count(self.analysis_paths)
+                + u.count(self.test_paths)
+                + u.count(self.seed_paths)
+                + u.count(self.macro_paths)
             )
             if total_path_count <= FlextMeltanoModels.TRANSFORMATION_SIMPLE_MAX_PATHS:
                 return "simple"

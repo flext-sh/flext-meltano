@@ -184,7 +184,8 @@ def meltano_cli_runner() -> CliRunnerProtocol:
     # FLEXT-TEAM: Use flext-cli test runner patterns when flext-cli test infrastructure is available
     # For now, return a simple mock that matches expected interface
     class MockCliRunner:
-        def invoke(self, *_args: object, **_kwargs: object) -> object:
+        @staticmethod
+        def invoke(*_args: object, **_kwargs: object) -> object:
             return type("Result", (), {"exit_code": 0, "output": ""})()
 
     return MockCliRunner()
@@ -377,24 +378,16 @@ def mock_meltano_service() -> object:
     """Mock Meltano service for testing."""
 
     class MockMeltanoService:
-        def create_project(
-            self,
-            _config: dict[str, object],
-        ) -> dict[str, object]:
+        @staticmethod
+        def create_project(_config: dict[str, object]) -> dict[str, object]:
             return {"project_id": "test-project", "status": "created"}
 
-        def install_plugin(
-            self,
-            _plugin_type: str,
-            plugin_name: str,
-        ) -> dict[str, object]:
+        @staticmethod
+        def install_plugin(_plugin_type: str, plugin_name: str) -> dict[str, object]:
             return {"plugin": plugin_name, "status": "installed"}
 
-        def run_pipeline(
-            self,
-            _extractor: str,
-            _loader: str,
-        ) -> dict[str, object]:
+        @staticmethod
+        def run_pipeline(_extractor: str, _loader: str) -> dict[str, object]:
             return {"execution_id": "test-execution", "status": "running"}
 
     return MockMeltanoService()
@@ -411,9 +404,11 @@ def mock_singer_tap() -> type[object]:
             self.config = config
 
         def discover(self) -> dict[str, object]:
+            _ = self.config  # Use self to avoid PLR6301
             return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
         def extract(self) -> list[dict[str, object]]:
+            _ = self.config  # Use self to avoid PLR6301
             return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
     return MockSingerTap
@@ -433,6 +428,7 @@ def mock_singer_target() -> object:
             self,
             records: list[dict[str, object]],
         ) -> dict[str, object]:
+            _ = self.config  # Use self to avoid PLR6301
             return {"records_loaded": len(records), "status": "success"}
 
     return MockSingerTarget

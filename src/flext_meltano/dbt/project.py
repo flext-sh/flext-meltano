@@ -165,7 +165,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                     },
                 )
 
-            self.logger.info("Models retrieved", count=len(models))
+            self.logger.info("Models retrieved", count=u.count(models))
             return r[list[dict[str, object]]].ok(models)
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
@@ -209,7 +209,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                     },
                 )
 
-            self.logger.info("Tests retrieved", count=len(tests))
+            self.logger.info("Tests retrieved", count=u.count(tests))
             return r[list[dict[str, object]]].ok(tests)
         except Exception as e:
             self.logger.exception("Failed to get tests", error=str(e))

@@ -567,7 +567,8 @@ class FlextMeltano(  # noqa: PLR0904
 
             tests_count = u.mul(u.count(models_to_test), 3)
             self.logger.info(
-                f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s"
+                f"DBT tests completed successfully: {tests_count} tests passed "
+                f"in {execution_duration:.2f}s"
             )
 
             return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -724,7 +725,7 @@ class FlextMeltano(  # noqa: PLR0904
         try:
             service = FlextMeltanoService(config=self._config, sink_name=sink_name)
             # Use u.empty() for conditional check (DSL pattern)
-            if u.not_(value=u.empty(records)):
+            if u.not_(u.empty(records)):
                 return service.load_batch(records)
             return r[t.MeltanoCore.JsonValue].ok({"status": "initialized"})
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -751,7 +752,8 @@ class FlextMeltano(  # noqa: PLR0904
         if u.empty(payload_guard):
             return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
 
-        # Use u.fields() for multiple field extraction (DSL pattern - reduces 3 lines to 1)
+        # Use u.fields() for multiple field extraction (DSL pattern - reduces
+        # 3 lines to 1)
         fields_result = u.fields(
             payload_guard,
             {
@@ -882,14 +884,13 @@ class FlextMeltano(  # noqa: PLR0904
     ) -> r[t.MeltanoCore.JsonValue]:
         """Handle run_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
-            # Use u.when() for conditional extraction (DSL pattern)
-            # Use u.when() for conditional extraction (DSL pattern)
-            models_raw = (
-                u.get(payload_guard, "models") if payload_guard else None
-            )
-            config_raw = (
-                u.get(payload_guard, "config") if payload_guard else None
-            )
+        # Use u.when() for conditional extraction (DSL pattern)
+        models_raw = (
+            u.get(payload_guard, "models") if payload_guard else None
+        )
+        config_raw = (
+            u.get(payload_guard, "config") if payload_guard else None
+        )
         models = u.guard(models_raw, list, return_value=True)
         config = u.guard(config_raw, dict, return_value=True)
 

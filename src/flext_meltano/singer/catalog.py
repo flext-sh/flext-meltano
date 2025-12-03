@@ -59,7 +59,7 @@ class FlextMeltanoCatalogManager(FlextService):
             )
 
             streams_raw = u.get(self._catalog, "streams", default=[])
-            stream_count = len(streams_raw) if isinstance(streams_raw, list) else 0
+            stream_count = u.count(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Streams discovered",
                 stream_count=stream_count,
@@ -89,7 +89,7 @@ class FlextMeltanoCatalogManager(FlextService):
                 self._catalog = json.load(f)
 
             streams_raw = u.get(self._catalog, "streams", default=[])
-            stream_count = len(streams_raw) if isinstance(streams_raw, list) else 0
+            stream_count = u.count(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Catalog loaded from file",
                 file=str(catalog_file),
@@ -151,8 +151,8 @@ class FlextMeltanoCatalogManager(FlextService):
             filtered_catalog = {"streams": selected}
             self.logger.info(
                 "Streams selected",
-                total=len(streams),
-                selected=len(selected),
+                total=u.count(streams),
+                selected=u.count(selected),
             )
             return r[dict[str, object]].ok(filtered_catalog)
         except Exception as e:
