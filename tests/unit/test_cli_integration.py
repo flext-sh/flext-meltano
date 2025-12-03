@@ -15,6 +15,8 @@ from __future__ import annotations
 
 from flext_cli import FlextCliModels
 
+from flext_meltano import m
+
 
 class TestCliModelConverterWithTapRunParams:
     """Test CliModelConverter integration with TapRunParams."""

@@ -477,7 +477,7 @@ class FlextMeltanoService(  # noqa: PLR0904
                 {
                     "models": models_to_test,
                     "status": "passed",
-                    "tests_executed": len(models_to_test) * 3,
+                    "tests_executed": u.mul(u.count(models_to_test), 3),
                     "configuration": config or {},
                 },
             )

@@ -7,9 +7,8 @@ using FLEXT architectural patterns.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import cast
 
-from flext_core import FlextLogger, FlextResult, FlextUtilities
+from flext_core import FlextLogger, FlextResult, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -17,11 +16,11 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
+r = FlextResult
 
 
 class DocsTemplates:
@@ -31,43 +30,48 @@ class DocsTemplates:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, object]) -> FlextResult[str]:
+    def generate_ci_workflow(self, config: dict[str, object]) -> r[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
             config: Automation configuration dictionary
 
         Returns:
-            FlextResult containing generated workflow YAML
+            r containing generated workflow YAML
 
         """
         try:
-            automation = cast("dict[str, object]", config.get("automation", {}))
-            template_vars = {
-                "generated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
-                "audit_day": cast("str", automation.get("audit_day", "monday")),
-                "audit_time": cast("str", automation.get("audit_time", "09:00")),
-                "cron_schedule": self._get_cron_schedule(config),
-            }
+            # DSL mnemonic pattern: extract automation fields and construct template vars
+            automation_raw = u.extract(config, "automation", default={})
+            automation = u.guard(automation_raw, dict, default={}, return_value=True)
+            template_vars = u.construct(
+                {
+                    "generated_at": {"value": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")},
+                    "audit_day": {"field": "audit_day", "default": "monday", "ops": {"ensure": "str"}},
+                    "audit_time": {"field": "audit_time", "default": "09:00", "ops": {"ensure": "str"}},
+                    "cron_schedule": {"value": self._get_cron_schedule(config)},
+                },
+                source=automation,
+            )
 
             workflow_content = self._ci_workflow_template.format(**template_vars)
 
             if self._logger:
                 self._logger.info("CI workflow template generated", vars=template_vars)
 
-            return FlextResult.ok(workflow_content)
+            return r.ok(workflow_content)
 
         except Exception as e:
             error_msg = f"Failed to generate CI workflow: {e}"
             if self._logger:
                 self._logger.exception("CI workflow generation failed", error=error_msg)
-            return FlextResult.fail(error_msg)
+            return r.fail(error_msg)
 
-    def generate_makefile_targets(self) -> FlextResult[str]:
+    def generate_makefile_targets(self) -> r[str]:
         """Generate Makefile targets using template pattern.
 
         Returns:
-            FlextResult containing generated Makefile content
+            r containing generated Makefile content
 
         """
         try:
@@ -76,19 +80,19 @@ class DocsTemplates:
             if self._logger:
                 self._logger.info("Makefile targets template generated")
 
-            return FlextResult.ok(makefile_content)
+            return r.ok(makefile_content)
 
         except Exception as e:
             error_msg = f"Failed to generate Makefile targets: {e}"
             if self._logger:
                 self._logger.exception("Makefile generation failed", error=error_msg)
-            return FlextResult.fail(error_msg)
+            return r.fail(error_msg)
 
-    def generate_git_hook(self) -> FlextResult[str]:
+    def generate_git_hook(self) -> r[str]:
         """Generate Git pre-commit hook using template pattern.
 
         Returns:
-            FlextResult containing generated hook script
+            r containing generated hook script
 
         """
         try:
@@ -97,20 +101,21 @@ class DocsTemplates:
             if self._logger:
                 self._logger.info("Git hook template generated")
 
-            return FlextResult.ok(hook_content)
+            return r.ok(hook_content)
 
         except Exception as e:
             error_msg = f"Failed to generate Git hook: {e}"
             if self._logger:
                 self._logger.exception("Git hook generation failed", error=error_msg)
-            return FlextResult.fail(error_msg)
+            return r.fail(error_msg)
 
     @staticmethod
     def _get_cron_schedule(config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""
-        automation_config = cast("dict[str, object]", config.get("automation", {}))
-        audit_day = cast("str", automation_config.get("audit_day", "monday")).lower()
-        audit_time = cast("str", automation_config.get("audit_time", "09:00"))
+        automation_raw = u.extract(config, "automation", default={})
+        automation_config = u.guard(automation_raw, dict, default={}, return_value=True)
+        audit_day = u.normalize(str(u.extract(automation_config, "audit_day", default="monday")), case="lower")
+        audit_time = str(u.extract(automation_config, "audit_time", default="09:00"))
 
         hour, minute = map(int, audit_time.split(":"))
 
@@ -125,7 +130,7 @@ class DocsTemplates:
             "saturday": 6,
         }
 
-        day_num = day_map.get(audit_day, 1)  # Default to Monday
+        day_num = u.get(day_map, audit_day, default=1)  # Default to Monday
 
         return f"{minute} {hour} * * {day_num}"
 

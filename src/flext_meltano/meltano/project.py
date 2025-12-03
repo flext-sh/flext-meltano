@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService, FlextUtilities
+from flext_core import FlextResult, FlextService
 from meltano.core.project import Project as MeltanoProject
 from pydantic import Field
 
@@ -21,7 +21,6 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -166,7 +165,7 @@ class FlextMeltanoProjectManager(FlextService):
 
             self.logger.info(
                 "Plugins retrieved",
-                count=len(plugins),
+                count=u.count(plugins),
                 type=plugin_type,
             )
             return FlextResult[list[dict[str, object]]].ok(plugins)

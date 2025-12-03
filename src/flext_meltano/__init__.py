@@ -61,6 +61,7 @@ from flext_meltano.executor import FlextMeltanoExecutor
 # SUPPORT MODULES
 # =========================================================================
 from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
 # =========================================================================
 # MELTANO DOMAIN - Deep meltano-sdk integration (NO CLI)
@@ -138,6 +139,7 @@ __all__ = [
     "FlextMeltanoExecutor",
     # Support modules
     "FlextMeltanoFileManagers",
+    "FlextMeltanoLibraryRunner",
     "FlextMeltanoMeltanoService",
     # Domain
     "FlextMeltanoModels",

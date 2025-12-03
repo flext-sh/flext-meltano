@@ -9,9 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, FlextUtilities
+from flext_core import FlextResult, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -22,11 +22,11 @@ if TYPE_CHECKING:
     from flext_meltano.api import FlextMeltano
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
+r = FlextResult
 
 
 class FlextMeltanoAPIOperations:
@@ -52,186 +52,205 @@ class FlextMeltanoAPIOperations:
 
     def handle_create_pipeline_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle create_pipeline operation call with railway pattern."""
-        if not isinstance(payload, dict):
-            return FlextResult[t.JsonValue].fail("Payload must be a dictionary")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        tap_name = payload.get("tap_name", "")
-        target_name = payload.get("target_name", "")
-        config = payload.get("config")
-
-        if not tap_name or not target_name:
-            return FlextResult[t.JsonValue].fail(
-                "tap_name and target_name are required"
-            )
-
-        result = self.api.create_pipeline(
-            str(tap_name),
-            str(target_name),
-            config if isinstance(config, dict) else None,
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "tap_name": {"default": "", "ops": {"ensure": "str"}},
+                "target_name": {"default": "", "ops": {"ensure": "str"}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(result.error or "Pipeline creation failed")
+
+        tap_name = u.get(fields_dict, "tap_name", default="")
+        target_name = u.get(fields_dict, "target_name", default="")
+        config = u.get(fields_dict, "config", default={})
+
+        if u.none_(tap_name, target_name):
+            return r[t.JsonValue].fail("tap_name and target_name are required")
+
+        result = self.api.create_pipeline(tap_name, target_name, config)
+        return u.cast(result, default_error="Pipeline creation failed")
 
     def handle_execute_pipeline_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle execute_pipeline operation call."""
-        if not isinstance(payload, dict):
-            return FlextResult[t.JsonValue].fail("Payload must be a dictionary")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        pipeline_id = payload.get("pipeline_id", "")
-        config = payload.get("config")
-
-        if not pipeline_id:
-            return FlextResult[t.JsonValue].fail("pipeline_id is required")
-
-        result = self.api.execute_pipeline(
-            str(pipeline_id), config if isinstance(config, dict) else None
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "pipeline_id": {"default": "", "ops": {"ensure": "str"}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "Pipeline execution failed"
-        )
+
+        pipeline_id = u.get(fields_dict, "pipeline_id", default="")
+        config = u.get(fields_dict, "config", default={})
+
+        if u.none_(pipeline_id):
+            return r[t.JsonValue].fail("pipeline_id is required")
+
+        result = self.api.execute_pipeline(pipeline_id, config)
+        return u.cast(result, default_error="Pipeline execution failed")
 
     def handle_install_plugin_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle install_plugin operation call."""
-        if not isinstance(payload, dict):
-            return FlextResult[t.JsonValue].fail("Payload must be a dictionary")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        plugin_type = payload.get("plugin_type", "")
-        plugin_name = payload.get("plugin_name", "")
-        config = payload.get("config")
-
-        if not plugin_type or not plugin_name:
-            return FlextResult[t.JsonValue].fail(
-                "plugin_type and plugin_name are required"
-            )
-
-        result = self.api.install_plugin(
-            str(plugin_type),
-            str(plugin_name),
-            config if isinstance(config, dict) else None,
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "plugin_type": {"default": "", "ops": {"ensure": "str"}},
+                "plugin_name": {"default": "", "ops": {"ensure": "str"}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "Plugin installation failed"
-        )
+
+        plugin_type = u.get(fields_dict, "plugin_type", default="")
+        plugin_name = u.get(fields_dict, "plugin_name", default="")
+        config = u.get(fields_dict, "config", default={})
+
+        if u.none_(plugin_type, plugin_name):
+            return r[t.JsonValue].fail("plugin_type and plugin_name are required")
+
+        result = self.api.install_plugin(plugin_type, plugin_name, config)
+        return u.cast(result, default_error="Plugin installation failed")
 
     def handle_list_plugins_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle list_plugins operation call."""
-        plugin_type = None
-        if isinstance(payload, dict):
-            plugin_type = payload.get("plugin_type")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        plugin_type_raw = u.extract(payload_guard, "plugin_type") if payload_guard else None
+        plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
-        result = self.api.list_plugins(str(plugin_type) if plugin_type else None)
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(result.error or "Plugin listing failed")
+        result = self.api.list_plugins(plugin_type)
+        return u.cast(result, default_error="Plugin listing failed")
 
     def handle_configure_environment_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle configure_environment operation call."""
-        if not isinstance(payload, dict):
-            return FlextResult[t.JsonValue].fail("Payload must be a dictionary")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        environment_name = payload.get("environment_name", "")
-        config = payload.get("config")
-
-        if not environment_name:
-            return FlextResult[t.JsonValue].fail("environment_name is required")
-
-        result = self.api.configure_environment(
-            str(environment_name), config if isinstance(config, dict) else None
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "environment_name": {"default": "", "ops": {"ensure": "str"}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "Environment configuration failed"
-        )
+
+        environment_name = u.get(fields_dict, "environment_name", default="")
+        config = u.get(fields_dict, "config", default={})
+
+        if u.none_(environment_name):
+            return r[t.JsonValue].fail("environment_name is required")
+
+        result = self.api.configure_environment(environment_name, config)
+        return u.cast(result, default_error="Environment configuration failed")
 
     def handle_run_dbt_models_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle run_dbt_models operation call."""
-        models = None
-        config = None
-        if isinstance(payload, dict):
-            models = payload.get("models")
-            config = payload.get("config")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        result = self.api.run_dbt_models(
-            models if isinstance(models, list) else None,
-            config if isinstance(config, dict) else None,
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "DBT models execution failed"
-        )
+
+        models = u.get(fields_dict, "models", default=[])
+        config = u.get(fields_dict, "config", default={})
+
+        result = self.api.run_dbt_models(models, config)
+        return u.cast(result, default_error="DBT models execution failed")
 
     def handle_test_dbt_models_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle test_dbt_models operation call."""
-        models: t.MeltanoCore.DbtModelList | None = None
-        config: t.MeltanoCore.MeltanoConfigDict | None = None
-        if isinstance(payload, dict):
-            models_raw = payload.get("models")
-            config_raw = payload.get("config")
-            if models_raw is not None and isinstance(models_raw, list):
-                models = models_raw
-            if config_raw is not None and isinstance(config_raw, dict):
-                config = config_raw
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
+
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
+        )
+
+        models = u.get(fields_dict, "models", default=[])
+        config = u.get(fields_dict, "config", default={})
 
         result = self.api.test_dbt_models(models, config)
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "DBT models testing failed"
-        )
+        return u.cast(result, default_error="DBT models testing failed")
 
     def handle_run_elt_pipeline_call(
         self, payload: t.JsonValue
-    ) -> FlextResult[t.JsonValue]:
+    ) -> r[t.JsonValue]:
         """Handle run_elt_pipeline operation call."""
-        if not isinstance(payload, dict):
-            return FlextResult[t.JsonValue].fail("Payload must be a dictionary")
+        payload_guard = u.guard(payload, dict, return_value=True)
+        if u.empty(payload_guard):
+            return r[t.JsonValue].fail("Payload must be a dictionary")
 
-        tap_name = payload.get("tap_name", "")
-        target_name = payload.get("target_name", "")
-        dbt_models_raw = payload.get("dbt_models")
-        config_raw = payload.get("config")
-
-        dbt_models: t.MeltanoCore.DbtModelList | None = None
-        config: t.MeltanoCore.MeltanoConfigDict | None = None
-        if dbt_models_raw is not None and isinstance(dbt_models_raw, list):
-            dbt_models = dbt_models_raw
-        if config_raw is not None and isinstance(config_raw, dict):
-            config = config_raw
-
-        if not tap_name or not target_name:
-            return FlextResult[t.JsonValue].fail(
-                "tap_name and target_name are required"
-            )
-
-        result = self.api.run_elt_pipeline(
-            str(tap_name), str(target_name), dbt_models, config
+        # DSL mnemonic pattern: extract and validate fields
+        fields_dict = u.fields(
+            payload_guard,
+            {
+                "tap_name": {"default": "", "ops": {"ensure": "str"}},
+                "target_name": {"default": "", "ops": {"ensure": "str"}},
+                "dbt_models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
+                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+            },
+            on_error="stop",
         )
-        if result.is_success:
-            return FlextResult[t.JsonValue].ok(cast("t.JsonValue", result.value))
-        return FlextResult[t.JsonValue].fail(
-            result.error or "ELT pipeline execution failed"
-        )
+
+        tap_name = u.get(fields_dict, "tap_name", default="")
+        target_name = u.get(fields_dict, "target_name", default="")
+        dbt_models = u.get(fields_dict, "dbt_models", default=[])
+        config = u.get(fields_dict, "config", default={})
+
+        if u.none_(tap_name, target_name):
+            return r[t.JsonValue].fail("tap_name and target_name are required")
+
+        result = self.api.run_elt_pipeline(tap_name, target_name, dbt_models, config)
+        return u.cast(result, default_error="ELT pipeline execution failed")
 
 
 __all__ = ["FlextMeltanoAPIOperations"]

@@ -278,10 +278,10 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
             project_dict: t.Dbt.Project = {
-                "name": u.ensure_str(u.get(project, "name", "meltano_project")),
-                "root": u.ensure_str(u.get(project, "root", "unknown")),
-                "settings": u.ensure_str(u.get(project, "settings", "")),
-                "meltano_version": u.ensure_str(u.get(project, "meltano_version", "")),
+                "name": u.get(project, "name", default="meltano_project"),
+                "root": u.get(project, "root", default="unknown"),
+                "settings": u.get(project, "settings", default=""),
+                "meltano_version": u.get(project, "meltano_version", default=""),
             }
             return r[t.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
