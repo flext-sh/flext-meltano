@@ -446,7 +446,9 @@ class ArchitectureDiagramGenerator:
                 for node in ast.walk(tree):
                     if isinstance(node, ast.ClassDef):
                         class_name = node.name
-                        method_nodes = u.filter(node.body, lambda n: isinstance(n, ast.FunctionDef))
+                        method_nodes = u.filter(
+                            node.body, lambda n: isinstance(n, ast.FunctionDef)
+                        )
                         methods = u.map(method_nodes, lambda n: n.name)
                         classes[class_name] = methods
 
@@ -490,7 +492,9 @@ package "{module_name}" as module {{
         for class_name, methods in classes.items():
             puml += f"""    class {class_name} {{
 """
-            for method in methods[:max_methods_display]:  # Limit methods to keep diagram readable
+            for method in methods[
+                :max_methods_display
+            ]:  # Limit methods to keep diagram readable
                 puml += f"""        +{method}()
 """
             if len(methods) > max_methods_display:

@@ -190,9 +190,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
         # Create test m.TapInstance
-        config = m.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
-        )
+        config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = m.TapInstance(
             tap_type="tap-csv",
             config=config,
@@ -296,9 +294,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_validate_tap_instance(self) -> None:
         """Test tap instance validation using process method and flext_tests."""
         # Create valid tap instance
-        config = m.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
-        )
+        config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         valid_instance = m.TapInstance(
             tap_type="tap-csv",
             config=config,
@@ -389,9 +385,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_discover_streams_csv(self) -> None:
         """Test discover_streams with CSV strategy using flext_tests."""
-        config = m.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
-        )
+        config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = m.TapInstance(
             tap_type="tap-csv",
             config=config,
@@ -778,9 +772,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_sync_stream_without_target(self) -> None:
         """Test sync_stream without target using flext_tests."""
-        config = m.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
-        )
+        config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = m.TapInstance(
             tap_type="tap-csv",
             config=config,
@@ -841,9 +833,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
-        config = m.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
-        )
+        config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = m.TapInstance(
             tap_type="tap-csv",
             config=config,

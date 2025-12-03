@@ -43,10 +43,10 @@ class TestFlextDbtProgrammaticRunner:
                 mock_dbt_runner_class.return_value = mock_runner
 
                 # Test the transformation
-                result: r[
-                    t.Processing.DbtTransformationResult
-                ] = dbt_runner.run_transformations_programmatic(
-                    project_dir, models=["model1", "model2"]
+                result: r[t.Processing.DbtTransformationResult] = (
+                    dbt_runner.run_transformations_programmatic(
+                        project_dir, models=["model1", "model2"]
+                    )
                 )
 
                 # Type annotation to help type checker

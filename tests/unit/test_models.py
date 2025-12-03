@@ -53,9 +53,7 @@ class TestTapConfigEnhanced:
     def test_tap_config_validation_empty_tap_type(self) -> None:
         """Test TapConfig validation with empty tap_type."""
         with pytest.raises(ValidationError, match="tap_type cannot be empty"):
-            m.TapConfig(
-                tap_type="", connection_config={"host": "localhost"}
-            )
+            m.TapConfig(tap_type="", connection_config={"host": "localhost"})
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         """Test TapConfig validation with invalid connection_config type."""
@@ -101,9 +99,7 @@ class TestTargetConfigEnhanced:
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
-            m.TargetConfig(
-                target_type="", connection_config={"host": "localhost"}
-            )
+            m.TargetConfig(target_type="", connection_config={"host": "localhost"})
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""

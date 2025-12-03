@@ -99,9 +99,7 @@ class FlextMeltanoAdapter:
                 "integration": "flext-core",
             }
 
-            return r[dict[str, object]].ok(
-                cast("dict[str, object]", version_info)
-            )
+            return r[dict[str, object]].ok(cast("dict[str, object]", version_info))
 
         def initialize_project(
             self,
@@ -130,9 +128,7 @@ class FlextMeltanoAdapter:
                     "created_at": str(time.time()),
                 })
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(
-                    f"Project creation failed: {e}"
-                )
+                return r[dict[str, object]].fail(f"Project creation failed: {e}")
 
     class Plugin:
         """Focused adapter for Meltano plugin management following SOLID principles."""
@@ -160,9 +156,7 @@ class FlextMeltanoAdapter:
                     cast("list[dict[str, object]]", plugins)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[list[dict[str, object]]].fail(
-                    f"Plugin discovery failed: {e}"
-                )
+                return r[list[dict[str, object]]].fail(f"Plugin discovery failed: {e}")
 
     class Pipeline:
         """Focused adapter for Meltano pipeline execution following SOLID principles."""
@@ -207,9 +201,7 @@ class FlextMeltanoAdapter:
                     cast("dict[str, object]", execution_result)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(
-                    f"Pipeline execution failed: {e}"
-                )
+                return r[dict[str, object]].fail(f"Pipeline execution failed: {e}")
 
     class Singer:
         """Focused adapter for Singer protocol operations following SOLID principles."""
@@ -249,13 +241,9 @@ class FlextMeltanoAdapter:
                     ]
                 }
 
-                return r[dict[str, object]].ok(
-                    cast("dict[str, object]", catalog)
-                )
+                return r[dict[str, object]].ok(cast("dict[str, object]", catalog))
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(
-                    f"Catalog creation failed: {e}"
-                )
+                return r[dict[str, object]].fail(f"Catalog creation failed: {e}")
 
     class Dbt:
         """Focused adapter for DBT operations following SOLID principles."""
@@ -276,9 +264,7 @@ class FlextMeltanoAdapter:
                     "execution_time": 45.2,
                 }
 
-                return r[dict[str, object]].ok(
-                    cast("dict[str, object]", dbt_result)
-                )
+                return r[dict[str, object]].ok(cast("dict[str, object]", dbt_result))
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[dict[str, object]].fail(f"DBT operation failed: {e}")
 
