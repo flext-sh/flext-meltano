@@ -85,7 +85,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             streams_raw = u.get(catalog, "streams", default=[])
             streams = streams_raw if isinstance(streams_raw, list) else []
-            stream_count = len(streams)
+            stream_count = u.count(streams)
             self.logger.info(
                 "Stream discovery completed",
                 stream_count=stream_count,
@@ -215,7 +215,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             self.logger.info(
                 "Building Singer catalog",
-                stream_count=len(streams),
+                stream_count=u.count(streams),
             )
 
             # Validate stream definitions
@@ -245,7 +245,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             self.logger.info(
                 "Singer catalog built successfully",
-                stream_count=len(catalog_streams),
+                stream_count=u.count(catalog_streams),
             )
 
             return r[dict[str, object]].ok(catalog)
@@ -394,7 +394,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             self.logger.debug(
                 "Batching records",
-                record_count=len(records),
+                record_count=u.count(records),
                 batch_size=batch_size,
             )
 
@@ -409,14 +409,12 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # Create batches
-            batches: list[list[dict[str, object]]] = [
-                records[i : i + batch_size] for i in range(0, len(records), batch_size)
-            ]
+            batches: list[list[dict[str, object]]] = u.chunk(records, batch_size)
 
             self.logger.info(
                 "Records batched successfully",
-                record_count=len(records),
-                batch_count=len(batches),
+                record_count=u.count(records),
+                batch_count=u.count(batches),
                 batch_size=batch_size,
             )
 

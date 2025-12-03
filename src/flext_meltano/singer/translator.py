@@ -94,7 +94,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextUtilities
+from flext_core import FlextResult, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -102,7 +102,6 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels

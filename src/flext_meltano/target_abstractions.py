@@ -259,7 +259,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             self.logger.debug(
                 "Batching records for insert",
-                record_count=len(records),
+                record_count=u.count(records),
                 batch_size=batch_size,
             )
 
@@ -274,14 +274,12 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # Create batches
-            batches: list[list[dict[str, object]]] = [
-                records[i : i + batch_size] for i in range(0, len(records), batch_size)
-            ]
+            batches: list[list[dict[str, object]]] = u.chunk(records, batch_size)
 
             self.logger.info(
                 "Records batched for insert successfully",
-                record_count=len(records),
-                batch_count=len(batches),
+                record_count=u.count(records),
+                batch_count=u.count(batches),
                 batch_size=batch_size,
             )
 

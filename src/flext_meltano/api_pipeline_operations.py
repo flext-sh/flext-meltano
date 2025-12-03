@@ -12,7 +12,7 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, FlextUtilities
+from flext_core import FlextResult, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -23,11 +23,11 @@ if TYPE_CHECKING:
     from flext_meltano.api import FlextMeltano
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
+r = FlextResult
 
 
 class FlextMeltanoAPIPipelineOperations:
@@ -55,64 +55,53 @@ class FlextMeltanoAPIPipelineOperations:
         self,
         tap_name: str,
         target_name: str,
-        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create a new Meltano ELT pipeline with validation and railway pattern."""
-        if not tap_name or not target_name:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+        if u.none_(tap_name, target_name):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Both tap_name and target_name are required for pipeline creation"
             )
 
-        if not tap_name.startswith("tap-"):
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+        if u.not_(u.starts(tap_name, "tap-")):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid tap name format: {tap_name}. Must start with 'tap-'"
             )
 
-        if not target_name.startswith("target-"):
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+        if u.not_(u.starts(target_name, "target-")):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid target name format: {target_name}. Must start with 'target-'"
             )
 
         try:
             pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
+            config_obj = u.when(u.has(self.api, "config"), getattr(self.api, "config", None), None) or None
             pipeline_config = {
                 "pipeline_id": pipeline_id,
                 "tap": tap_name,
                 "target": target_name,
                 "pipeline_name": f"{tap_name}_to_{target_name}",
-                "configuration": config or {},
+                "configuration": u.or_(config, {}),
                 "status": "created",
                 "created_at": str(time.time()),
                 "api_version": self.api.version,
-                "timeout_seconds": self.api.config.timeout_seconds
-                if self.api.config
-                else 300,
-                "log_level": self.api.config.log_level if self.api.config else "INFO",
-                "environment": self.api.config.environment
-                if self.api.config
-                else "dev",
-                "project_root": str(self.api.config.project_root)
-                if self.api.config and hasattr(self.api.config, "project_root")
-                else ".",
+                "timeout_seconds": u.from_(config_obj, "timeout_seconds", as_type=int, default=300),
+                "log_level": u.from_(config_obj, "log_level", as_type=str, default="INFO"),
+                "environment": u.from_(config_obj, "environment", as_type=str, default="dev"),
+                "project_root": str(u.from_(config_obj, "project_root", as_type=str, default=".")),
             }
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                pipeline_config
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(pipeline_config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                f"Pipeline creation failed: {e}"
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Pipeline creation failed: {e}")
 
     def execute_pipeline(
         self,
         pipeline_id: str,
-        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute an existing Meltano pipeline with monitoring."""
-        if not pipeline_id:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                "Pipeline ID is required for execution"
-            )
+        if u.none_(pipeline_id):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Pipeline ID is required for execution")
 
         try:
             execution_start = time.time()
@@ -123,27 +112,23 @@ class FlextMeltanoAPIPipelineOperations:
                 "status": "completed",
                 "execution_duration": execution_duration,
                 "executed_at": str(time.time()),
-                "configuration": config or {},
+                "configuration": u.or_(config, {}),
                 "api_version": self.api.version,
             }
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                execution_result
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(execution_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                f"Pipeline execution failed: {e}"
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Pipeline execution failed: {e}")
 
     def run_elt_pipeline(
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: FlextMeltanoTypes.MeltanoCore.DbtModelList | None = None,
-        config: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+        dbt_models: t.MeltanoCore.DbtModelList | None = None,
+        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute complete ELT pipeline with Extract, Load, and Transform."""
-        if not tap_name or not target_name:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+        if u.none_(tap_name, target_name):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Both tap_name and target_name are required"
             )
 
@@ -153,13 +138,13 @@ class FlextMeltanoAPIPipelineOperations:
             # Simulate ELT execution stages
             extract_duration = 0.5
             load_duration = 0.3
-            transform_duration = 0.7 if dbt_models else 0.0
+            transform_duration = u.when(bool(dbt_models), 0.7, 0.0) or 0.0
             total_duration = time.time() - execution_start
 
             elt_result = {
                 "tap": tap_name,
                 "target": target_name,
-                "dbt_models": dbt_models or [],
+                "dbt_models": u.or_(dbt_models, []),
                 "status": "completed",
                 "stages": {
                     "extract_duration": extract_duration,
@@ -167,44 +152,34 @@ class FlextMeltanoAPIPipelineOperations:
                     "transform_duration": transform_duration,
                 },
                 "total_duration": total_duration,
-                "configuration": config or {},
+                "configuration": u.or_(config, {}),
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             }
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                elt_result
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                f"ELT pipeline execution failed: {e}"
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"ELT pipeline execution failed: {e}")
 
     @staticmethod
-    def list_pipelines() -> FlextResult[
-        list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-    ]:
+    def list_pipelines() -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
         """List all configured pipelines with current status."""
-        return FlextResult[list[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]].ok([])
+        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok([])
 
     def run_tap(
         self, tap_name: str
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer tap for data extraction."""
-        if not tap_name:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                "Tap name is required for execution"
-            )
+        if u.none_(tap_name):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Tap name is required for execution")
 
-        if not tap_name.startswith("tap-"):
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid tap name format: {tap_name}"
-            )
+        if u.not_(u.starts(tap_name, "tap-")):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid tap name format: {tap_name}")
 
         try:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok({
+            return r[t.MeltanoCore.MeltanoConfigDict].ok({
                 "tap_name": tap_name,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -212,29 +187,25 @@ class FlextMeltanoAPIPipelineOperations:
                 "api_version": self.api.version,
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Tap execution failed: {e}"
             )
 
     def run_target(
         self, target_name: str
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer target for data loading."""
-        if not target_name:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                "Target name is required for execution"
-            )
+        if u.none_(target_name):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Target name is required for execution")
 
-        if not target_name.startswith("target-"):
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid target name format: {target_name}"
-            )
+        if u.not_(u.starts(target_name, "target-")):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid target name format: {target_name}")
 
         try:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok({
+            return r[t.MeltanoCore.MeltanoConfigDict].ok({
                 "target_name": target_name,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -242,7 +213,7 @@ class FlextMeltanoAPIPipelineOperations:
                 "api_version": self.api.version,
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}"
             )
 

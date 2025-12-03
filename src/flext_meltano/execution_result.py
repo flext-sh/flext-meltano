@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 
-from flext_core import FlextUtilities
+from flext_core import u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -20,7 +20,6 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels

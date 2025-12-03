@@ -781,7 +781,10 @@ class FlextMeltanoModels(m_base):
         @computed_field
         def active_streams(self) -> list[FlextMeltanoModels.StreamInfo]:
             """Active streams for extraction."""
-            return [s for s in self.streams if s.status in {"discovered", "selected"}]
+            return u.filter(
+                self.streams,
+                lambda s: s.status in {"discovered", "selected"},
+            )
 
     class DataSourceInstance(FlextModels.Entity):
         """Generic data source instance for pipeline operations."""
@@ -1089,7 +1092,10 @@ class FlextMeltanoModels(m_base):
         ) -> FlextMeltanoModels.PipelineProjectModel:
             """Validate project consistency."""
             if self.default_environment not in self.environments:
-                msg = f"Default environment '{self.default_environment}' not in environments list"
+                msg = (
+                    f"Default environment '{self.default_environment}' "
+                    f"not in environments list"
+                )
                 raise ValueError(msg)
 
             if not self.project_root.exists():

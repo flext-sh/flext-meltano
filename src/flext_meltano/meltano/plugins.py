@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult, FlextService, FlextUtilities
+from flext_core import FlextResult, FlextService, u
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
@@ -25,14 +25,15 @@ from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-u = FlextUtilities
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
+r = FlextResult
+s = FlextService
 
 
-class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]):
+class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -51,7 +52,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
 
     def execute(
         self,
-    ) -> FlextResult[t.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute the pipeline component service.
 
         Returns:
@@ -68,17 +69,17 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
             }
 
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return FlextResult[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
 
     def discover_plugins(
         self,
         project: object | None = None,
-    ) -> FlextResult[list[dict[str, str]]]:
+    ) -> r[list[dict[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -99,7 +100,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
                     FlextMeltanoProjectService().create_temporary_project()
                 )
                 if temp_project_result.is_failure:
-                    return FlextResult[list[dict[str, str]]].fail(
+                    return r[list[dict[str, str]]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
@@ -109,60 +110,67 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
 
             plugins = []
 
-            # Discover extractors using abstraction layer
+            # DSL Builder Pattern: Process plugins using u.construct() mnemonic pattern
+            def build_plugin_info(plugin_name: str, indexed_plugin: object, plugin_type: str) -> dict[str, str]:
+                """Builder function using u.construct() mnemonic pattern for object construction."""
+                variants_obj = u.get(indexed_plugin, "variants")
+                variants_dict = u.guard(variants_obj, dict, return_value=True)
+                variants_str = u.join(u.map(variants_dict, str), sep=",") if variants_dict else ""
+                return u.construct(
+                    {
+                        "name": {"value": plugin_name},
+                        "type": {"value": plugin_type},
+                        "default_variant": {"field": "default_variant", "default": "", "ops": {"ensure": "str"}},
+                        "variants": {"value": variants_str},
+                        "logo_url": {"field": "logo_url", "default": "", "ops": {"ensure": "str"}},
+                    },
+                    source=indexed_plugin,
+                )
+
+            # Process extractors using u.process() with limit via filter_keys
             extractors_result = self._abstractions.get_plugins_of_type(
                 cast("object", working_project), "extractors"
             )
             if extractors_result.is_success:
                 extractors_dict = extractors_result.unwrap()
-                for plugin_name, indexed_plugin in list(extractors_dict.items())[:10]:
-                    default_var = getattr(indexed_plugin, "default_variant", None)
-                    variants_obj = getattr(indexed_plugin, "variants", None)
-                    plugin_info = {
-                        "name": plugin_name,
-                        "type": "extractor",
-                        "default_variant": str(default_var) if default_var else "",
-                        "variants": ",".join(list(variants_obj.keys()))
-                        if isinstance(variants_obj, dict)
-                        else "",
-                        "logo_url": getattr(indexed_plugin, "logo_url", ""),
-                    }
-                    plugins.append(plugin_info)
+                extractors_keys = u.take(extractors_dict, 10)
+                extractors_plugins_result = u.process(
+                    extractors_dict,
+                    lambda k, v: build_plugin_info(k, v, "extractor"),
+                    filter_keys=set(extractors_keys.keys()),
+                )
+                if extractors_plugins_result.is_success:
+                    plugins.extend(u.vals(extractors_plugins_result))
 
-            # Discover loaders using abstraction layer
+            # Process loaders using u.process() with limit via filter_keys
             loaders_result = self._abstractions.get_plugins_of_type(
                 cast("object", working_project), "loaders"
             )
             if loaders_result.is_success:
                 loaders_dict = loaders_result.unwrap()
-                for plugin_name, indexed_plugin in list(loaders_dict.items())[:5]:
-                    default_var = getattr(indexed_plugin, "default_variant", None)
-                    variants_obj = getattr(indexed_plugin, "variants", None)
-                    plugin_info = {
-                        "name": plugin_name,
-                        "type": "loader",
-                        "default_variant": str(default_var) if default_var else "",
-                        "variants": ",".join(list(variants_obj.keys()))
-                        if isinstance(variants_obj, dict)
-                        else "",
-                        "logo_url": getattr(indexed_plugin, "logo_url", ""),
-                    }
-                    plugins.append(plugin_info)
+                loaders_keys = u.take(loaders_dict, 5)
+                loaders_plugins_result = u.process(
+                    loaders_dict,
+                    lambda k, v: build_plugin_info(k, v, "loader"),
+                    filter_keys=set(loaders_keys.keys()),
+                )
+                if loaders_plugins_result.is_success:
+                    plugins.extend(u.vals(loaders_plugins_result))
 
-            self.logger.info(f"Discovered {len(plugins)} plugins")
-            return FlextResult[list[dict[str, str]]].ok(plugins)
+            self.logger.info(f"Discovered {u.count(plugins)} plugins")
+            return r[list[dict[str, str]]].ok(plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult[list[dict[str, str]]].fail(error_msg)
+            return r[list[dict[str, str]]].fail(error_msg)
 
     def add_plugin(
         self,
         project: object,
         plugin_type: str,
         plugin_name: str,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
         Uses FlextResult.chain_validations() to compose plugin addition steps
@@ -195,7 +203,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
         self,
         plugin_name: str,
         plugin_type: str,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Get detailed information about specific plugin.
 
         Args:
@@ -213,7 +221,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
                 prefix="flext_plugin_info_",
             )
             if project_result.is_failure:
-                return FlextResult[dict[str, str]].fail(
+                return r[dict[str, str]].fail(
                     f"Failed to create temp project: {project_result.error}",
                 )
 
@@ -223,64 +231,82 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
             )
 
             if plugins_result.is_failure:
-                return FlextResult[dict[str, str]].fail(
+                return r[dict[str, str]].fail(
                     f"Failed to get plugins of type {plugin_type}: {plugins_result.error}"
                 )
 
             plugins_dict = plugins_result.unwrap()
 
-            if plugin_name not in plugins_dict:
-                return FlextResult[dict[str, str]].fail(
+            # Use u.not_() + u.in_() for membership check (DSL pattern)
+            if u.not_(u.in_(plugin_name, plugins_dict)):
+                return r[dict[str, str]].fail(
                     f"Plugin '{plugin_name}' not found in {plugin_type}",
                 )
 
-            indexed_plugin = plugins_dict[plugin_name]
-            default_var = getattr(indexed_plugin, "default_variant", None)
-            variants_obj = getattr(indexed_plugin, "variants", None)
+            indexed_plugin = u.get(plugins_dict, plugin_name)
+            if u.empty(indexed_plugin):
+                return r[dict[str, str]].fail(f"Plugin '{plugin_name}' not found in {plugin_type}")
+
+            # Use u.fields() for multiple field extraction (DSL pattern - reduces 6 lines to 1)
+            fields_result = u.fields(
+                indexed_plugin,
+                {
+                    "default_variant": "",
+                    "variants": {},
+                    "description": "",
+                    "logo_url": "",
+                },
+            )
+            if isinstance(fields_result, r):
+                return u.cast(fields_result, default_error="Field extraction failed")
+            default_var = u.get(fields_result, "default_variant", default="")
+            variants_dict = u.guard(u.get(fields_result, "variants"), dict, return_value=True) or {}
+            variants_str = u.join(u.map(variants_dict, str), sep=",") if variants_dict else ""
+            description = u.get(fields_result, "description", default="")
+            logo_url = u.get(fields_result, "logo_url", default="")
             plugin_info = {
                 "name": plugin_name,
                 "type": plugin_type,
                 "default_variant": str(default_var) if default_var else "",
-                "variants": ",".join(list(variants_obj.keys()))
-                if isinstance(variants_obj, dict)
-                else "",
-                "description": getattr(indexed_plugin, "description", ""),
-                "logo_url": getattr(indexed_plugin, "logo_url", ""),
+                "variants": variants_str,
+                "description": str(description),
+                "logo_url": str(logo_url),
             }
 
-            return FlextResult[dict[str, str]].ok(plugin_info)
+            return r[dict[str, str]].ok(plugin_info)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[dict[str, str]].fail(error_msg)
+            return r[dict[str, str]].fail(error_msg)
 
     # Private helper methods
 
     def _log_plugin_addition_start(
         self, plugin_name: str, plugin_type: str
-    ) -> FlextResult[None]:
+    ) -> r[None]:
         """Log plugin addition start."""
         self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return FlextResult.ok(None)
+        return r.ok(None)
 
     @staticmethod
-    def _validate_plugin_type(plugin_type: str) -> FlextResult[str]:
+    def _validate_plugin_type(plugin_type: str) -> r[str]:
         """Validate plugin type."""
         valid_types = ["extractors", "loaders", "transformers"]
-        if plugin_type not in valid_types:
-            return FlextResult[str].fail(
+        # Use u.not_() + u.in_() for membership check (DSL pattern)
+        if u.not_(u.in_(plugin_type, valid_types)):
+            return r[str].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
             )
-        return FlextResult[str].ok(plugin_type)
+        return r[str].ok(plugin_type)
 
     def _execute_plugin_addition(
         self, project: object, plugin_type_str: str, plugin_name: str
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         try:
             # Use abstraction layer for plugin addition
@@ -292,13 +318,13 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
             add_result = self._abstractions.add_plugin(plugin_config)
 
             if add_result.is_failure:
-                return FlextResult[bool].fail(
-                    add_result.error or "Plugin addition failed"
+                return r[bool].fail(
+                    u.err(add_result, default="Plugin addition failed")
                 )
 
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[bool].fail(f"Plugin addition failed: {e}")
+            return r[bool].fail(f"Plugin addition failed: {e}")
 
     def _build_plugin_addition_result(
         self,
@@ -306,7 +332,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
         plugin_type: str,
         *,
         addition_success: bool,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Build successful plugin addition result."""
         plugin_result: dict[str, str] = {
             "success": "true" if addition_success else "false",
@@ -321,7 +347,7 @@ class FlextMeltanoComponentService(FlextService[t.MeltanoCore.MeltanoConfigDict]
             plugin_type=plugin_type,
         )
 
-        return FlextResult[dict[str, str]].ok(plugin_result)
+        return r[dict[str, str]].ok(plugin_result)
 
 
 # Import here to avoid circular import
