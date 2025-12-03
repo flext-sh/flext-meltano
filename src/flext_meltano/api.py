@@ -374,7 +374,9 @@ class FlextMeltano(  # noqa: PLR0904
                 "Tap name is required for execution"
             )
         if u.not_(u.starts(tap_name, "tap-")):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid tap name format: {tap_name}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid tap name format: {tap_name}"
+            )
 
         try:
             execution_start = time.time()
@@ -881,6 +883,7 @@ class FlextMeltano(  # noqa: PLR0904
         """Handle run_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
             # Use u.when() for conditional extraction (DSL pattern)
+            # Use u.when() for conditional extraction (DSL pattern)
             models_raw = (
                 u.get(payload_guard, "models") if payload_guard else None
             )
@@ -927,7 +930,8 @@ class FlextMeltano(  # noqa: PLR0904
         dbt_models = u.guard(dbt_models_raw, list, return_value=True)
         config = u.guard(config_raw, dict, return_value=True)
 
-        if not tap_name or not target_name:
+        # Use u.none_() for validation (DSL pattern)
+        if u.none_(tap_name, target_name):
             return r[t.MeltanoCore.JsonValue].fail(
                 "tap_name and target_name are required"
             )
