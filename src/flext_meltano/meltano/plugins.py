@@ -204,7 +204,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         plugin_name: str,
         plugin_type: str,
     ) -> r[dict[str, str]]:
-        """Get detailed information about specific plugin.
+        """Get detailed information about specific plugin using monadic composition.
 
         Args:
         plugin_name: Name of the plugin
@@ -214,67 +214,48 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         FlextResult containing plugin information
 
         """
-        try:
-            # Use consolidated temporary project creation method
-            project_result = FlextMeltanoProjectService().create_temporary_project(
-                project_id="temp-info-project",
-                prefix="flext_plugin_info_",
-            )
-            if project_result.is_failure:
-                return r[dict[str, str]].fail(
-                    f"Failed to create temp project: {project_result.error}",
-                )
-
-            # Get plugins of type
-            plugins_result = self._abstractions.get_plugins_of_type(
-                cast("object", project_result.unwrap()), plugin_type
-            )
-
-            if plugins_result.is_failure:
-                return r[dict[str, str]].fail(
-                    f"Failed to get plugins of type {plugin_type}: {plugins_result.error}"
-                )
-
-            plugins_dict = plugins_result.unwrap()
-
+        # Use monadic composition to reduce returns (DSL pattern)
+        def extract_plugin_info(plugins_dict: dict[str, object]) -> r[dict[str, str]]:
+            """Extract plugin info from plugins dict."""
             # Use u.not_() + u.in_() for membership check (DSL pattern)
-            if u.not_(u.in_(plugin_name, plugins_dict)):
-                return r[dict[str, str]].fail(
-                    f"Plugin '{plugin_name}' not found in {plugin_type}",
-                )
-
-            indexed_plugin = u.get(plugins_dict, plugin_name)
-            if u.empty(indexed_plugin):
+            if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(u.get(plugins_dict, plugin_name)):
                 return r[dict[str, str]].fail(f"Plugin '{plugin_name}' not found in {plugin_type}")
 
-            # Use u.fields() for multiple field extraction (DSL pattern - reduces 6 lines to 1)
-            fields_result = u.fields(
-                indexed_plugin,
-                {
-                    "default_variant": "",
-                    "variants": {},
-                    "description": "",
-                    "logo_url": "",
-                },
-            )
+            indexed_plugin = u.get(plugins_dict, plugin_name)
+            # Use u.fields() + u.build() for unified extraction and transformation (DSL pattern)
+            fields_spec = {"default_variant": "", "variants": {}, "description": "", "logo_url": ""}
+            fields_result = u.fields(indexed_plugin, fields_spec)
             if isinstance(fields_result, r):
                 return u.cast(fields_result, default_error="Field extraction failed")
-            default_var = u.get(fields_result, "default_variant", default="")
-            variants_dict = u.guard(u.get(fields_result, "variants"), dict, return_value=True) or {}
-            variants_str = u.join(u.map(variants_dict, str), sep=",") if variants_dict else ""
-            description = u.get(fields_result, "description", default="")
-            logo_url = u.get(fields_result, "logo_url", default="")
-            plugin_info = {
-                "name": plugin_name,
-                "type": plugin_type,
-                "default_variant": str(default_var) if default_var else "",
-                "variants": variants_str,
-                "description": str(description),
-                "logo_url": str(logo_url),
-            }
 
-            return r[dict[str, str]].ok(plugin_info)
+            # Use u.build() for unified transformation (DSL pattern)
+            def transform_variants(v: dict[str, object]) -> str:
+                """Transform variants dict to string."""
+                return u.join(u.map(v, str), sep=",") if v else ""
 
+            plugin_info_raw = u.build(
+                fields_result,
+                ops={
+                    "map": lambda d: {
+                        "name": plugin_name,
+                        "type": plugin_type,
+                        "default_variant": str(u.get(d, "default_variant", default="")),
+                        "variants": transform_variants(u.guard(u.get(d, "variants"), dict, return_value=True) or {}),
+                        "description": str(u.get(d, "description", default="")),
+                        "logo_url": str(u.get(d, "logo_url", default="")),
+                    }
+                },
+            )
+            return r[dict[str, str]].ok(cast("dict[str, str]", plugin_info_raw))
+
+        try:
+            # Use monadic composition to chain operations (DSL pattern)
+            return (
+                FlextMeltanoProjectService()
+                .create_temporary_project(project_id="temp-info-project", prefix="flext_plugin_info_")
+                .flat_map(lambda p: self._abstractions.get_plugins_of_type(cast("object", p), plugin_type))
+                .flat_map(extract_plugin_info)
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)

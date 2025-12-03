@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, u
 from meltano.core.project import Project as MeltanoProject
 from pydantic import Field
 

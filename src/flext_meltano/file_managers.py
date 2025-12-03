@@ -134,7 +134,7 @@ class FlextMeltanoFileManagers:
             return r[t.MeltanoCore.FileConfigDict].ok(
                 cast("t.MeltanoCore.FileConfigDict", config_data)
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except (yaml.YAMLError, ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.FileConfigDict].fail(
                 f"Failed to load YAML config: {e}"
             )

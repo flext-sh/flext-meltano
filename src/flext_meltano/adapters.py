@@ -88,7 +88,8 @@ class FlextMeltanoAdapter:
         @staticmethod
         def get_version() -> r[dict[str, object]]:
             """Get Meltano version information using native API."""
-            # FIXED: Removed ImportError fallback - meltano must be available (Zero Tolerance)
+            # FIXED: Removed ImportError fallback - meltano must be available
+            # (Zero Tolerance)
             # Get Meltano version using native API
             getattr(meltano, "__version__", "3.9.1")
 

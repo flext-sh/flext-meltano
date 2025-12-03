@@ -1,7 +1,8 @@
 """FLEXT Pipeline Abstractions - UNIFIED abstraction layer for data pipeline operations.
 
-This module provides a SINGLE UNIFIED class with nested helpers for data pipeline functionality,
-eliminating direct domain imports and providing a clean interface for the FLEXT ecosystem.
+This module provides a SINGLE UNIFIED class with nested helpers for data pipeline
+functionality, eliminating direct domain imports and providing a clean interface
+for the FLEXT ecosystem.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -14,6 +15,7 @@ from pathlib import Path
 from typing import cast
 
 from flext_core import FlextLogger, FlextResult, u
+from flext_core.typings import t as t_core
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -31,8 +33,8 @@ p = FlextMeltanoProtocols
 class FlextMeltanoAbstractions:
     """UNIFIED abstraction class providing pipeline functionality with nested helpers.
 
-    This class consolidates all pipeline wrapper functionality into a single unified class
-    following FLEXT 'one class per module' pattern with nested helper classes.
+    This class consolidates all pipeline wrapper functionality into a single unified
+    class following FLEXT 'one class per module' pattern with nested helper classes.
     """
 
     # NESTED RUNNER HELPER CLASS
@@ -143,11 +145,17 @@ class FlextMeltanoAbstractions:
                 },
             ]
 
+            # DSL: Use filter for unified filtering
             filtered_components = u.filter(
                 components,
                 lambda comp: u.get(comp, "type", default="") == component_type,
             )
-            return r[list[dict[str, object]]].ok(filtered_components)
+            # Type narrowing: ensure list[dict[str, object]]
+            if isinstance(filtered_components, (list, tuple)):
+                return r[list[dict[str, object]]].ok(
+                    cast("list[dict[str, object]]", list(filtered_components))
+                )
+            return r[list[dict[str, object]]].ok([])
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"
@@ -210,13 +218,14 @@ class FlextMeltanoAbstractions:
     ) -> r[dict[str, object]]:
         """Execute singer pipeline."""
         try:
-            # Simplified implementation - in production would orchestrate actual singer pipeline
+            # Simplified implementation - in production would orchestrate actual
+            # singer pipeline
             result = {
                 "status": "completed",
                 "records_processed": 0,
                 "elt_context": elt_context,
             }
-            return r[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[dict[str, object]].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)
@@ -242,11 +251,17 @@ class FlextMeltanoAbstractions:
                 },
             }
 
+            # DSL: Use filter for unified filtering
             filtered_plugins = u.filter(
                 plugins,
                 lambda _k, v: u.get(v, "type", default="") == plugin_type,
             )
-            return r[dict[str, dict[str, object]]].ok(filtered_plugins)
+            # Type narrowing: ensure dict[str, dict[str, object]]
+            if isinstance(filtered_plugins, dict):
+                return r[dict[str, dict[str, object]]].ok(
+                    cast("dict[str, dict[str, object]]", filtered_plugins)
+                )
+            return r[dict[str, dict[str, object]]].ok({})
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
@@ -257,7 +272,10 @@ class FlextMeltanoAbstractions:
         """Add a plugin."""
         try:
             # Simplified implementation - would validate and add plugin
-            self.logger.info("Adding plugin", plugin_config=plugin_config)
+            self.logger.info(
+            "Adding plugin",
+            plugin_config=cast("t_core.GeneralValueType", plugin_config),
+        )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"

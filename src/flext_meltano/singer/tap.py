@@ -83,7 +83,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             streams_raw = u.get(catalog, "streams", default=[])
             streams = streams_raw if isinstance(streams_raw, list) else []
-            stream_count = len(streams)
+            stream_count = u.count(streams)
             self.logger.info(
                 "Stream discovery completed",
                 stream_count=stream_count,
