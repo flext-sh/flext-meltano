@@ -18,13 +18,23 @@ from flext_core import FlextResult, FlextService
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.project_service import FlextMeltanoProjectService
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
+# Import aliases for simplified usage
+r = FlextResult
+# u is already imported from flext_core
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+s = FlextService
 
-class FlextMeltanoComponentService(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+
+class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -43,7 +53,7 @@ class FlextMeltanoComponentService(
 
     def execute(
         self,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute the pipeline component service.
 
         Returns:
@@ -60,21 +70,17 @@ class FlextMeltanoComponentService(
             }
 
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-                data=config_data
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].fail(
-                error_msg
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
 
     def discover_plugins(
         self,
         project: object | None = None,
-    ) -> FlextResult[list[dict[str, str]]]:
+    ) -> r[list[dict[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -95,7 +101,7 @@ class FlextMeltanoComponentService(
                     FlextMeltanoProjectService().create_temporary_project()
                 )
                 if temp_project_result.is_failure:
-                    return FlextResult[list[dict[str, str]]].fail(
+                    return r[list[dict[str, str]]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
@@ -146,19 +152,19 @@ class FlextMeltanoComponentService(
                     plugins.append(plugin_info)
 
             self.logger.info(f"Discovered {len(plugins)} plugins")
-            return FlextResult[list[dict[str, str]]].ok(data=plugins)
+            return r[list[dict[str, str]]].ok(plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return FlextResult[list[dict[str, str]]].fail(error_msg)
+            return r[list[dict[str, str]]].fail(error_msg)
 
     def add_plugin(
         self,
         project: object,
         plugin_type: str,
         plugin_name: str,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
         Uses FlextResult.chain_validations() to compose plugin addition steps
@@ -191,7 +197,7 @@ class FlextMeltanoComponentService(
         self,
         plugin_name: str,
         plugin_type: str,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Get detailed information about specific plugin.
 
         Args:
@@ -209,7 +215,7 @@ class FlextMeltanoComponentService(
                 prefix="flext_plugin_info_",
             )
             if project_result.is_failure:
-                return FlextResult[dict[str, str]].fail(
+                return r[dict[str, str]].fail(
                     f"Failed to create temp project: {project_result.error}",
                 )
 
@@ -219,14 +225,14 @@ class FlextMeltanoComponentService(
             )
 
             if plugins_result.is_failure:
-                return FlextResult[dict[str, str]].fail(
+                return r[dict[str, str]].fail(
                     f"Failed to get plugins of type {plugin_type}: {plugins_result.error}"
                 )
 
             plugins_dict = plugins_result.unwrap()
 
             if plugin_name not in plugins_dict:
-                return FlextResult[dict[str, str]].fail(
+                return r[dict[str, str]].fail(
                     f"Plugin '{plugin_name}' not found in {plugin_type}",
                 )
 
@@ -244,38 +250,37 @@ class FlextMeltanoComponentService(
                 "logo_url": getattr(indexed_plugin, "logo_url", ""),
             }
 
-            return FlextResult[dict[str, str]].ok(data=plugin_info)
+            return r[dict[str, str]].ok(plugin_info)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
-            return FlextResult[dict[str, str]].fail(error_msg)
+            return r[dict[str, str]].fail(error_msg)
 
     # Private helper methods
 
-    def _log_plugin_addition_start(
-        self, plugin_name: str, plugin_type: str
-    ) -> FlextResult[None]:
+    def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
         """Log plugin addition start."""
         self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return FlextResult.ok(data=None)
+        return FlextResult.ok(None)
 
-    def _validate_plugin_type(self, plugin_type: str) -> FlextResult[str]:
+    @staticmethod
+    def _validate_plugin_type(plugin_type: str) -> r[str]:
         """Validate plugin type."""
         valid_types = ["extractors", "loaders", "transformers"]
         if plugin_type not in valid_types:
-            return FlextResult[str].fail(
+            return r[str].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
             )
-        return FlextResult[str].ok(data=plugin_type)
+        return r[str].ok(plugin_type)
 
     def _execute_plugin_addition(
         self, project: object, plugin_type_str: str, plugin_name: str
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         try:
             # Use abstraction layer for plugin addition
@@ -287,13 +292,11 @@ class FlextMeltanoComponentService(
             add_result = self._abstractions.add_plugin(plugin_config)
 
             if add_result.is_failure:
-                return FlextResult[bool].fail(
-                    add_result.error or "Plugin addition failed"
-                )
+                return r[bool].fail(add_result.error or "Plugin addition failed")
 
-            return FlextResult[bool].ok(data=True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[bool].fail(f"Plugin addition failed: {e}")
+            return r[bool].fail(f"Plugin addition failed: {e}")
 
     def _build_plugin_addition_result(
         self,
@@ -301,7 +304,7 @@ class FlextMeltanoComponentService(
         plugin_type: str,
         *,
         addition_success: bool,
-    ) -> FlextResult[dict[str, str]]:
+    ) -> r[dict[str, str]]:
         """Build successful plugin addition result."""
         plugin_result: dict[str, str] = {
             "success": "true" if addition_success else "false",
@@ -316,7 +319,7 @@ class FlextMeltanoComponentService(
             plugin_type=plugin_type,
         )
 
-        return FlextResult[dict[str, str]].ok(data=plugin_result)
+        return r[dict[str, str]].ok(plugin_result)
 
 
 # Import here to avoid circular import

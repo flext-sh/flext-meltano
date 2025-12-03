@@ -12,11 +12,9 @@ SPDX-License-Identifier: MIT
 from typing import cast
 
 import pytest
-from flext_core import FlextResult, FlextTypes
 
-from flext_meltano import FlextMeltanoValidators
-
-from ..flext_tests_compat import FlextTestsMatchers
+from flext_meltano import FlextMeltanoValidators, r, t
+from tests.flext_tests_compat import FlextTestsMatchers
 
 
 class TestFlextMeltanoValidatorsComprehensive:
@@ -31,7 +29,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
@@ -39,9 +37,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         config: dict[str, object] = {"name": "tap-csv"}
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_plugin_config_empty_fields(self) -> None:
         config: dict[str, object] = {
@@ -52,9 +50,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_plugin_config_invalid_types(self) -> None:
         config: dict[str, object] = {
@@ -65,25 +63,25 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
         result = FlextMeltanoValidators.validate_plugin_config("not a dict")
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin config validation with None input."""
         result = FlextMeltanoValidators.validate_plugin_config(None)
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_meltano_config_valid(self) -> None:
         config: dict[str, object] = {"version": 1, "project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
@@ -91,9 +89,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         config: dict[str, object] = {"project_id": "test-project"}
 
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         config: dict[str, object] = {
@@ -102,9 +100,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
@@ -120,7 +118,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            cast("FlextTypes.JsonValue", dbt_config)
+            cast("t.JsonValue", dbt_config)
         )
         FlextTestsMatchers.assert_result_success(result, True)
 
@@ -128,9 +126,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         dbt_config: dict[str, object] = {"name": "analytics"}
 
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            cast("FlextTypes.JsonValue", dbt_config)
+            cast("t.JsonValue", dbt_config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     @pytest.mark.parametrize(
         "invalid_config",
@@ -141,9 +139,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         invalid_config: object,
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", invalid_config)
+            cast("t.JsonValue", invalid_config)
         )
-        FlextTestsMatchers.assert_result_failure(cast("FlextResult[object]", result))
+        FlextTestsMatchers.assert_result_failure(cast("r[object]", result))
 
     def test_complex_validation_scenario(self) -> None:
         meltano_config: dict[str, object] = {
@@ -173,17 +171,17 @@ class TestFlextMeltanoValidatorsComprehensive:
 
         meltano_result = (
             FlextMeltanoValidators.validate_pipeline_project_business_rules(
-                cast("FlextTypes.JsonValue", meltano_config)
+                cast("t.JsonValue", meltano_config)
             )
         )
         dbt_result = FlextMeltanoValidators.validate_transformation_business_rules(
-            cast("FlextTypes.JsonValue", dbt_config)
+            cast("t.JsonValue", dbt_config)
         )
         tap_result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", tap_config)
+            cast("t.JsonValue", tap_config)
         )
         target_result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", target_config)
+            cast("t.JsonValue", target_config)
         )
 
         FlextTestsMatchers.assert_result_success(meltano_result, True)
@@ -208,7 +206,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert result.is_success
 
@@ -220,7 +218,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -235,7 +233,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -250,7 +248,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -265,7 +263,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert not result.is_success
         assert result.error is not None
@@ -280,7 +278,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert result.is_success
 
@@ -292,6 +290,6 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("FlextTypes.JsonValue", config)
+            cast("t.JsonValue", config)
         )
         assert result.is_success

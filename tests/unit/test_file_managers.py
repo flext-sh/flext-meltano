@@ -12,8 +12,7 @@ from pathlib import Path
 from pydantic import ConfigDict
 
 from flext_meltano import FlextMeltanoFileManagers
-
-from ..flext_tests_compat import FlextTestsMatchers
+from tests.flext_tests_compat import FlextTestsMatchers
 
 
 class TestFlextMeltanoFileManagersComprehensive:

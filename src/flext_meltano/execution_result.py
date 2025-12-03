@@ -14,11 +14,23 @@ import json
 
 from flext_core import FlextUtilities
 
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+u = FlextUtilities
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+
 
 class FlextMeltanoExecutionResult:
     """Execution result model for Meltano command operations following flext-core patterns."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         command: list[str],
         *,
@@ -52,7 +64,7 @@ class FlextMeltanoExecutionResult:
             "output": self.output,
             "error": self.error,
             "execution_time": self.execution_time,
-            "timestamp": FlextUtilities.Generators.generate_iso_timestamp(),
+            "timestamp": u.Generators.generate_iso_timestamp(),
         }
 
     def to_json(self) -> str:

@@ -73,7 +73,7 @@ if commands_result.is_success:
 
 ## Railway-Oriented Programming
 
-All methods return `FlextResult[T]` for type-safe error handling:
+All methods return `r[T]` for type-safe error handling:
 
 ```python
 # Example: Chain operations with FlextResult
@@ -96,7 +96,18 @@ from __future__ import annotations
 
 from flext_core import FlextResult, FlextUtilities
 
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+u = FlextUtilities
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+r = FlextResult
 
 
 class FlextMeltanoSingerCliTranslator:
@@ -109,21 +120,21 @@ class FlextMeltanoSingerCliTranslator:
     @staticmethod
     def translate_tap_run(
         params: FlextMeltanoModels.CliParameters.DataSourceParams,
-    ) -> FlextResult[list[str]]:
+    ) -> r[list[str]]:
         """Convert DataSourceParams to Singer SDK source CLI command.
 
         Args:
             params: Validated DataSourceParams model
 
         Returns:
-            FlextResult containing list of CLI command arguments
+            r containing list of CLI command arguments
 
         """
         command: list[str] = [params.source_name]
 
         if params.discover:
             command.append("--discover")
-            return FlextResult[list[str]].ok(command)
+            return r[list[str]].ok(command)
 
         if params.config_file:
             command.extend(["--config", params.config_file])
@@ -137,19 +148,19 @@ class FlextMeltanoSingerCliTranslator:
         if params.catalog_file:
             command.extend(["--properties", params.catalog_file])
 
-        return FlextResult[list[str]].ok(command)
+        return r[list[str]].ok(command)
 
     @staticmethod
     def translate_target_run(
         params: FlextMeltanoModels.CliParameters.DataSinkParams,
-    ) -> FlextResult[list[str]]:
+    ) -> r[list[str]]:
         """Convert DataSinkParams to Singer SDK sink CLI command.
 
         Args:
         params: Validated DataSinkParams model
 
         Returns:
-        FlextResult containing list of CLI command arguments
+        r containing list of CLI command arguments
 
         """
         command: list[str] = [params.sink_name]
@@ -160,19 +171,19 @@ class FlextMeltanoSingerCliTranslator:
         if params.input_file:
             command.extend(["--input", params.input_file])
 
-        return FlextResult[list[str]].ok(command)
+        return r[list[str]].ok(command)
 
     @staticmethod
     def translate_pipeline_run(
         params: FlextMeltanoModels.CliParameters.PipelineParams,
-    ) -> FlextResult[tuple[list[str], list[str]]]:
+    ) -> r[tuple[list[str], list[str]]]:
         """Convert PipelineParams to source and sink CLI commands.
 
         Args:
         params: Validated PipelineParams model
 
         Returns:
-        FlextResult containing tuple of (source_command, sink_command)
+        r containing tuple of (source_command, sink_command)
 
         """
         # Build source command
@@ -193,7 +204,7 @@ class FlextMeltanoSingerCliTranslator:
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
 
-        return FlextResult[tuple[list[str], list[str]]].ok((
+        return r[tuple[list[str], list[str]]].ok((
             source_command,
             sink_command,
         ))
@@ -201,14 +212,14 @@ class FlextMeltanoSingerCliTranslator:
     @staticmethod
     def translate_dbt_run(
         params: FlextMeltanoModels.CliParameters.TransformationParams,
-    ) -> FlextResult[list[str]]:
+    ) -> r[list[str]]:
         """Convert TransformationParams to transformation CLI command.
 
         Args:
         params: Validated TransformationParams model
 
         Returns:
-        FlextResult containing list of DBT CLI command arguments
+        r containing list of DBT CLI command arguments
 
         """
         command: list[str] = [
@@ -232,14 +243,14 @@ class FlextMeltanoSingerCliTranslator:
 
         # Note: vars parameter not currently supported in TransformationParams
 
-        return FlextResult[list[str]].ok(command)
+        return r[list[str]].ok(command)
 
     @staticmethod
     def execute_singer_command(
         command: list[str],
         input_data: str | None = None,
         timeout: int = 300,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -248,14 +259,14 @@ class FlextMeltanoSingerCliTranslator:
         timeout: Command timeout in seconds
 
         Returns:
-        FlextResult containing execution results with stdout/stderr
+        r containing execution results with stdout/stderr
 
         """
-        # Use FlextUtilities.FlextUtilities.CommandExecution.run_external_command for standardized subprocess execution
+        # Use u.CommandExecution.run_external_command for standardized subprocess execution
         process_input = input_data.encode() if input_data else None
 
-        # Execute command with FlextUtilities (includes complete error handling)
-        result = FlextUtilities.CommandExecution.run_external_command(
+        # Execute command with u (includes complete error handling)
+        result = u.CommandExecution.run_external_command(
             cmd=command,
             capture_output=True,
             check=False,  # Don't raise exception on non-zero exit
@@ -266,9 +277,7 @@ class FlextMeltanoSingerCliTranslator:
 
         # Handle execution failure
         if result.is_failure:
-            return FlextResult[dict[str, object]].fail(
-                result.error or "Command execution failed"
-            )
+            return r[dict[str, object]].fail(result.error or "Command execution failed")
 
         # Extract completed process
         completed_process = result.value
@@ -276,7 +285,7 @@ class FlextMeltanoSingerCliTranslator:
         # Check for non-zero exit code
         if completed_process.returncode != 0:
             error_msg = completed_process.stderr or "Unknown error"
-            return FlextResult[dict[str, object]].fail(
+            return r[dict[str, object]].fail(
                 f"Command failed with code {completed_process.returncode}: {error_msg}"
             )
 
@@ -288,7 +297,7 @@ class FlextMeltanoSingerCliTranslator:
             "command": " ".join(command),
         }
 
-        return FlextResult[dict[str, object]].ok(output_data)
+        return r[dict[str, object]].ok(output_data)
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

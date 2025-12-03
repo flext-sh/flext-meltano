@@ -12,7 +12,18 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, u
+
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for simplified usage
+r = FlextResult
+# u is already imported from flext_core
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
 
 
 class FlextMeltanoCatalogManager(FlextService):
@@ -27,7 +38,7 @@ class FlextMeltanoCatalogManager(FlextService):
         super().__init__()
         self._catalog: dict[str, object] = {"streams": []}
 
-    def discover_streams(self, tap: object) -> FlextResult[dict[str, object]]:
+    def discover_streams(self, tap: object) -> r[dict[str, object]]:
         """Discover streams from a tap.
 
         Args:
@@ -39,24 +50,26 @@ class FlextMeltanoCatalogManager(FlextService):
         """
         try:
             if not hasattr(tap, "discover"):
-                return FlextResult[dict[str, object]].fail(
-                    "Tap must have discover() method"
-                )
+                return r[dict[str, object]].fail("Tap must have discover() method")
 
             catalog = tap.discover()
-            self._catalog = catalog if isinstance(catalog, dict) else {"streams": []}
+            catalog_guard = u.guard(catalog, dict, return_value=True)
+            self._catalog = (
+                catalog_guard if catalog_guard is not None else {"streams": []}
+            )
 
-            stream_count = len(self._catalog.get("streams", []))
+            streams_raw = u.get(self._catalog, "streams", default=[])
+            stream_count = len(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Streams discovered",
                 stream_count=stream_count,
             )
-            return FlextResult[dict[str, object]].ok(self._catalog)
+            return r[dict[str, object]].ok(self._catalog)
         except Exception as e:
             self.logger.exception("Failed to discover streams", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Failed to discover: {e}")
+            return r[dict[str, object]].fail(f"Failed to discover: {e}")
 
-    def load_catalog(self, catalog_file: Path) -> FlextResult[dict[str, object]]:
+    def load_catalog(self, catalog_file: Path) -> r[dict[str, object]]:
         """Load catalog from file.
 
         Args:
@@ -68,23 +81,24 @@ class FlextMeltanoCatalogManager(FlextService):
         """
         try:
             if not catalog_file.exists():
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Catalog file not found: {catalog_file}"
                 )
 
             with catalog_file.open(encoding="utf-8") as f:
                 self._catalog = json.load(f)
 
-            stream_count = len(self._catalog.get("streams", []))
+            streams_raw = u.get(self._catalog, "streams", default=[])
+            stream_count = len(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Catalog loaded from file",
                 file=str(catalog_file),
                 stream_count=stream_count,
             )
-            return FlextResult[dict[str, object]].ok(self._catalog)
+            return r[dict[str, object]].ok(self._catalog)
         except Exception as e:
             self.logger.exception("Failed to load catalog", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Failed to load catalog: {e}")
+            return r[dict[str, object]].fail(f"Failed to load catalog: {e}")
 
     def set_catalog(self, catalog: dict[str, object]) -> None:
         """Set catalog data directly.
@@ -95,7 +109,7 @@ class FlextMeltanoCatalogManager(FlextService):
         """
         self._catalog = catalog
 
-    def save_catalog(self, catalog_file: Path) -> FlextResult[None]:
+    def save_catalog(self, catalog_file: Path) -> r[None]:
         """Save catalog to file.
 
         Args:
@@ -114,12 +128,12 @@ class FlextMeltanoCatalogManager(FlextService):
                 "Catalog saved to file",
                 file=str(catalog_file),
             )
-            return FlextResult[None].ok(None)
+            return r[None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to save catalog", error=str(e))
-            return FlextResult[None].fail(f"Failed to save catalog: {e}")
+            return r[None].fail(f"Failed to save catalog: {e}")
 
-    def select_streams(self, stream_names: list[str]) -> FlextResult[dict[str, object]]:
+    def select_streams(self, stream_names: list[str]) -> r[dict[str, object]]:
         """Select specific streams from catalog.
 
         Args:
@@ -130,8 +144,9 @@ class FlextMeltanoCatalogManager(FlextService):
 
         """
         try:
-            streams = self._catalog.get("streams", [])
-            selected = [s for s in streams if s.get("name") in stream_names]
+            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams = streams_raw if isinstance(streams_raw, list) else []
+            selected = u.filter(streams, lambda s: u.get(s, "name") in stream_names)
 
             filtered_catalog = {"streams": selected}
             self.logger.info(
@@ -139,14 +154,12 @@ class FlextMeltanoCatalogManager(FlextService):
                 total=len(streams),
                 selected=len(selected),
             )
-            return FlextResult[dict[str, object]].ok(filtered_catalog)
+            return r[dict[str, object]].ok(filtered_catalog)
         except Exception as e:
             self.logger.exception("Failed to select streams", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Failed to select: {e}")
+            return r[dict[str, object]].fail(f"Failed to select: {e}")
 
-    def get_stream_schema(
-        self, stream_name: str
-    ) -> FlextResult[dict[str, object] | None]:
+    def get_stream_schema(self, stream_name: str) -> r[dict[str, object] | None]:
         """Get schema for a specific stream.
 
         Args:
@@ -157,26 +170,26 @@ class FlextMeltanoCatalogManager(FlextService):
 
         """
         try:
-            streams = self._catalog.get("streams", [])
-            for stream in streams:
-                if stream.get("name") == stream_name:
-                    schema = stream.get("schema", {})
-                    self.logger.debug(
-                        "Stream schema retrieved",
-                        stream=stream_name,
-                    )
-                    return FlextResult[dict[str, object] | None].ok(schema)
+            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams = streams_raw if isinstance(streams_raw, list) else []
+            found_stream = u.find(streams, lambda s: u.get(s, "name") == stream_name)
+            if found_stream is not None:
+                schema_raw = u.get(found_stream, "schema", default={})
+                schema = schema_raw if isinstance(schema_raw, dict) else {}
+                self.logger.debug(
+                    "Stream schema retrieved",
+                    stream=stream_name,
+                )
+                return r[dict[str, object] | None].ok(schema)
 
-            return FlextResult[dict[str, object] | None].ok(None)
+            return r[dict[str, object] | None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
-            return FlextResult[dict[str, object] | None].fail(
-                f"Failed to get schema: {e}"
-            )
+            return r[dict[str, object] | None].fail(f"Failed to get schema: {e}")
 
-    def execute(self, **_kwargs: object) -> FlextResult[dict[str, object]]:
+    def execute(self, **_kwargs: object) -> r[dict[str, object]]:
         """Execute (implements Domain.Service pattern)."""
-        return FlextResult[dict[str, object]].ok(self._catalog)
+        return r[dict[str, object]].ok(self._catalog)
 
 
 __all__ = [

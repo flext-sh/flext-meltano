@@ -6,7 +6,7 @@ All hardcoded values and thresholds are centralized here for maintainability and
 ARCHITECTURAL INTEGRATION:
 - FlextConfig: Base configuration class with validation and environment variable support
 - FlextContainer: Singleton pattern for global configuration access
-- Railway Pattern: FlextResult[T] for configuration loading and validation
+- Railway Pattern: r[T] for configuration loading and validation
 """
 
 from __future__ import annotations
@@ -15,7 +15,19 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 import yaml
-from flext_core import FlextConfig, FlextContainer, FlextResult
+from flext_core import FlextConfig, FlextContainer, FlextResult, u
+
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for simplified usage
+r = FlextResult
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class DocsConfig(FlextConfig):
@@ -91,42 +103,42 @@ class DocsConfig(FlextConfig):
         container.register_service("DocsConfig", instance)
         return instance
 
-    def load_from_file(
-        self, config_path: str | Path | None = None
-    ) -> FlextResult[DocsConfig]:
+    def load_from_file(self, config_path: str | Path | None = None) -> r[DocsConfig]:
         """Load configuration from YAML file using FlextConfig patterns.
 
         Args:
             config_path: Path to configuration file (uses self.config_path if None)
 
         Returns:
-            FlextResult containing loaded configuration or error
+            r containing loaded configuration or error
 
         """
         file_path = Path(config_path or self.config_path)
 
         if not file_path.exists():
             # Return default configuration
-            return FlextResult.ok(self)
+            return r.ok(self)
 
         try:
             with file_path.open(encoding="utf-8") as f:
                 config_data = yaml.safe_load(f)
 
-            if not isinstance(config_data, dict):
+            config_guard = u.guard(config_data, dict, return_value=True)
+            if config_guard is None:
                 error_msg = f"Invalid configuration format: expected dict, got {type(config_data)}"
-                return FlextResult.fail(error_msg)
+                return r[DocsConfig].fail(error_msg)
+            config_data = config_guard
 
             # Update instance with loaded values
             for key, value in config_data.items():
                 if hasattr(self, key):
                     setattr(self, key, value)
 
-            return FlextResult.ok(self)
+            return r.ok(self)
 
         except Exception as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
-            return FlextResult.fail(error_msg)
+            return r[DocsConfig].fail(error_msg)
 
     def get_schedule_config(self) -> dict[str, object]:
         """Get scheduling configuration as dictionary for backward compatibility.

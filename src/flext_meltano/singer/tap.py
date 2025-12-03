@@ -9,17 +9,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, u
 from singer_sdk import Stream, Tap
 
-from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
+# Import aliases for simplified usage
+r = FlextResult
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+s = FlextService
 
-class FlextMeltanoTapAbstractions(
-    FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-):
+
+class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     """UNIFIED Source Abstractions class consolidating ALL source functionality.
 
     This single class provides:
@@ -32,18 +37,21 @@ class FlextMeltanoTapAbstractions(
     """
 
     # Instance attributes (declared for type checker)
-    _config: FlextMeltanoConfig
+    _config: object
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: object | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
+        # Lazy import to avoid circular dependency
+        from flext_meltano.config import FlextMeltanoConfig  # noqa: PLC0415
+
         self._config = config or FlextMeltanoConfig()
 
         # Initialize FlextService parent class
         super().__init__()
 
     def discover_streams(
-        self, source_config: FlextMeltanoModels.DataSourceConfig
-    ) -> FlextResult[dict[str, object]]:
+        self, source_config: m.DataSourceConfig
+    ) -> r[dict[str, object]]:
         """Discover available streams for a source configuration.
 
         Args:
@@ -62,7 +70,7 @@ class FlextMeltanoTapAbstractions(
 
             # Validate source configuration
             if not source_config.source_type:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     "Source configuration must have name and type for discovery"
                 )
 
@@ -73,22 +81,21 @@ class FlextMeltanoTapAbstractions(
                 "source_type": source_config.source_type,
             }
 
-            streams = catalog.get("streams", [])
-            stream_count = len(streams) if isinstance(streams, list) else 0
+            streams_raw = u.get(catalog, "streams", default=[])
+            streams = streams_raw if isinstance(streams_raw, list) else []
+            stream_count = len(streams)
             self.logger.info(
                 "Stream discovery completed",
                 stream_count=stream_count,
             )
 
-            return FlextResult[dict[str, object]].ok(catalog)
+            return r[dict[str, object]].ok(catalog)
 
         except Exception as e:
             self.logger.exception("Stream discovery failed", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Stream discovery failed: {e}")
+            return r[dict[str, object]].fail(f"Stream discovery failed: {e}")
 
-    def validate_stream_schema(
-        self, stream_def: FlextMeltanoModels.StreamDefinition
-    ) -> FlextResult[bool]:
+    def validate_stream_schema(self, stream_def: m.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.
 
         Args:
@@ -106,23 +113,23 @@ class FlextMeltanoTapAbstractions(
 
             # Basic schema validation
             if not stream_def.stream_schema:
-                return FlextResult[bool].fail("Stream schema cannot be empty")
+                return r[bool].fail("Stream schema cannot be empty")
 
             # Schema is already typed as dict[str, object] in StreamDefinition
             if "properties" not in stream_def.stream_schema:
-                return FlextResult[bool].fail("Stream schema must contain properties")
+                return r[bool].fail("Stream schema must contain properties")
 
             # Additional validation logic would go here
             # For now, just return success
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
 
         except Exception as e:
             self.logger.exception("Schema validation failed", error=str(e))
-            return FlextResult[bool].fail(f"Schema validation failed: {e}")
+            return r[bool].fail(f"Schema validation failed: {e}")
 
     def create_source_instance(
-        self, source_config: FlextMeltanoModels.DataSourceConfig
-    ) -> FlextResult[FlextMeltanoModels.DataSourceInstance]:
+        self, source_config: m.DataSourceConfig
+    ) -> r[m.DataSourceInstance]:
         """Create a source instance from configuration.
 
         Args:
@@ -143,7 +150,7 @@ class FlextMeltanoTapAbstractions(
             source_id = f"{source_config.source_type}:{source_config.source_identifier}"
 
             # Create source instance
-            source_instance = FlextMeltanoModels.DataSourceInstance(
+            source_instance = m.DataSourceInstance(
                 source_type=source_config.source_type,
                 config=source_config,
                 status="configured",
@@ -155,19 +162,13 @@ class FlextMeltanoTapAbstractions(
                 source_name=source_instance.config.source_type,
             )
 
-            return FlextResult[FlextMeltanoModels.DataSourceInstance].ok(
-                source_instance
-            )
+            return r[m.DataSourceInstance].ok(source_instance)
 
         except Exception as e:
             self.logger.exception("Source instance creation failed", error=str(e))
-            return FlextResult[FlextMeltanoModels.DataSourceInstance].fail(
-                f"Source instance creation failed: {e}"
-            )
+            return r[m.DataSourceInstance].fail(f"Source instance creation failed: {e}")
 
-    def process(
-        self, source_config: FlextMeltanoModels.DataSourceConfig
-    ) -> FlextResult[bool]:
+    def process(self, source_config: m.DataSourceConfig) -> r[bool]:
         """Process a source configuration for validation.
 
         Args:
@@ -185,29 +186,25 @@ class FlextMeltanoTapAbstractions(
 
             # Basic validation
             if not source_config.source_type:
-                return FlextResult[bool].fail("Source configuration must have a type")
+                return r[bool].fail("Source configuration must have a type")
 
             # Additional validation logic would go here
             # For now, just return success
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
 
         except Exception as e:
             self.logger.exception(
                 "Source configuration processing failed", error=str(e)
             )
-            return FlextResult[bool].fail(
-                f"Source configuration processing failed: {e}"
-            )
+            return r[bool].fail(f"Source configuration processing failed: {e}")
 
     def execute(
         self,
-    ) -> FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute source abstraction operations (implements Domain.Service)."""
         # This would orchestrate the overall source abstraction workflow
         # For now, return the current configuration
-        return FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-            self._config.model_dump()
-        )
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._config.model_dump())
 
 
 # Export Singer SDK types with FLEXT naming

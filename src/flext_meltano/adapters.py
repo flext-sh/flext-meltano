@@ -24,10 +24,21 @@ from pathlib import Path
 from typing import cast
 
 import meltano
-from flext_core import FlextLogger, FlextResult, FlextUtilities
+from flext_core import FlextLogger, FlextResult, u
 
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+# u is already imported from flext_core
+r = FlextResult
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class FlextMeltanoAdapter:
@@ -48,7 +59,9 @@ class FlextMeltanoAdapter:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
             # Import here to avoid circular dependency
-            from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+            from flext_meltano.library_runner import (  # noqa: PLC0415
+                FlextMeltanoLibraryRunner,
+            )
 
             self._library_runner_instance = FlextMeltanoLibraryRunner()
         return self._library_runner_instance
@@ -70,10 +83,10 @@ class FlextMeltanoAdapter:
             """Initialize Project with flext-core patterns."""
             self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
-            self._utilities = FlextUtilities()
             self._current_project: object | None = None
 
-        def get_version(self) -> FlextResult[dict[str, object]]:
+        @staticmethod
+        def get_version() -> r[dict[str, object]]:
             """Get Meltano version information using native API."""
             # FIXED: Removed ImportError fallback - meltano must be available (Zero Tolerance)
             # Get Meltano version using native API
@@ -86,38 +99,38 @@ class FlextMeltanoAdapter:
                 "integration": "flext-core",
             }
 
-            return FlextResult[dict[str, object]].ok(
+            return r[dict[str, object]].ok(
                 cast("dict[str, object]", version_info)
             )
 
         def initialize_project(
             self,
             project_root: Path,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Initialize Meltano project using railway pattern for composable steps."""
             return self.create_project(
                 project_name=project_root.name,
                 project_dir=project_root,
             )
 
+        @staticmethod
         def create_project(
-            self,
             project_name: str,
             project_dir: Path,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Create new Meltano project with SOLID delegation."""
             try:
                 project_path = Path(project_dir) / project_name
                 project_path.mkdir(parents=True, exist_ok=True)
 
-                return FlextResult[dict[str, object]].ok({
+                return r[dict[str, object]].ok({
                     "project_name": project_name,
                     "project_path": str(project_path),
                     "status": "created",
                     "created_at": str(time.time()),
                 })
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Project creation failed: {e}"
                 )
 
@@ -128,24 +141,26 @@ class FlextMeltanoAdapter:
             """Initialize Plugin with flext-core patterns."""
             self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
-            self._utilities = FlextUtilities()
 
+        @staticmethod
         def discover_plugins(
-            self,
             plugin_type: str | None = None,
-        ) -> FlextResult[list[dict[str, object]]]:
+        ) -> r[list[dict[str, object]]]:
             """Discover available plugins of specified type."""
             try:
                 # Use FlextMeltanoConstants for plugin discovery
                 plugins = FlextMeltanoConstants.Plugin.get_all_plugins()
                 if plugin_type:
-                    plugins = [p for p in plugins if p.get("type") == plugin_type]
+                    plugins = u.filter(
+                        plugins,
+                        lambda p: u.get(p, "type") == plugin_type,
+                    )
 
-                return FlextResult[list[dict[str, object]]].ok(
+                return r[list[dict[str, object]]].ok(
                     cast("list[dict[str, object]]", plugins)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[list[dict[str, object]]].fail(
+                return r[list[dict[str, object]]].fail(
                     f"Plugin discovery failed: {e}"
                 )
 
@@ -156,23 +171,22 @@ class FlextMeltanoAdapter:
             """Initialize Pipeline with flext-core patterns."""
             self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
-            self._utilities = FlextUtilities()
 
+        @staticmethod
         def execute_pipeline(
-            self,
             tap_name: str,
             target_name: str,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Execute ELT pipeline using Meltano."""
             try:
                 # Validate plugin names
                 if not tap_name.startswith("tap-"):
-                    return FlextResult[dict[str, object]].fail(
+                    return r[dict[str, object]].fail(
                         f"Invalid tap name format: {tap_name}"
                     )
 
                 if not target_name.startswith("target-"):
-                    return FlextResult[dict[str, object]].fail(
+                    return r[dict[str, object]].fail(
                         f"Invalid target name format: {target_name}"
                     )
 
@@ -189,11 +203,11 @@ class FlextMeltanoAdapter:
                     },
                 }
 
-                return FlextResult[dict[str, object]].ok(
+                return r[dict[str, object]].ok(
                     cast("dict[str, object]", execution_result)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Pipeline execution failed: {e}"
                 )
 
@@ -204,9 +218,9 @@ class FlextMeltanoAdapter:
             """Initialize Singer with flext-core patterns."""
             self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
-            self._utilities = FlextUtilities()
 
-        def create_tap_stream_catalog(self) -> FlextResult[dict[str, object]]:
+        @staticmethod
+        def create_tap_stream_catalog() -> r[dict[str, object]]:
             """Create Singer tap stream catalog."""
             try:
                 catalog = {
@@ -235,11 +249,11 @@ class FlextMeltanoAdapter:
                     ]
                 }
 
-                return FlextResult[dict[str, object]].ok(
+                return r[dict[str, object]].ok(
                     cast("dict[str, object]", catalog)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, object]].fail(
                     f"Catalog creation failed: {e}"
                 )
 
@@ -250,9 +264,9 @@ class FlextMeltanoAdapter:
             """Initialize Dbt with flext-core patterns."""
             self._config = config if config is not None else FlextMeltanoConfig()
             self.logger: FlextLogger = FlextLogger(__name__)
-            self._utilities = FlextUtilities()
 
-        def execute_dbt_operation(self) -> FlextResult[dict[str, object]]:
+        @staticmethod
+        def execute_dbt_operation() -> r[dict[str, object]]:
             """Execute DBT operation."""
             try:
                 dbt_result = {
@@ -262,11 +276,11 @@ class FlextMeltanoAdapter:
                     "execution_time": 45.2,
                 }
 
-                return FlextResult[dict[str, object]].ok(
+                return r[dict[str, object]].ok(
                     cast("dict[str, object]", dbt_result)
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return FlextResult[dict[str, object]].fail(f"DBT operation failed: {e}")
+                return r[dict[str, object]].fail(f"DBT operation failed: {e}")
 
 
 __all__ = [

@@ -16,14 +16,25 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService, u
 
 from flext_meltano.config import FlextMeltanoConfig
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
+# Import aliases for concise usage
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+r = FlextResult
+s = FlextService
 
-class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]):
+
+class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
     """UNIFIED Singer namespace class consolidating ALL Singer functionality.
 
     This single class provides:
@@ -43,7 +54,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
     def execute_pipeline(
         self, tap_instance: object, target_instance: object
-    ) -> FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult]:
+    ) -> r[t.Processing.SingerExecutionResult]:
         """Execute Singer pipeline with protocol management.
 
         Args:
@@ -64,31 +75,35 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return FlextResult[
-                    FlextMeltanoTypes.Processing.SingerExecutionResult
-                ].fail(singer_manager_result.error or "Failed to get Singer manager")
+                return r[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
+                    singer_manager_result.error or "Failed to get Singer manager"
+                )
 
             # For now, just return success since singer_manager is just a dict
             # Build SingerExecutionResult with known fields from get_singer_manager
             singer_data = singer_manager_result.unwrap()
-            capabilities_obj = singer_data.get("capabilities", [])
-            capabilities: list[object] = (
-                list(capabilities_obj) if isinstance(capabilities_obj, list) else []
+            capabilities_raw = u.get(singer_data, "capabilities", default=[])
+            capabilities = (
+                capabilities_raw if isinstance(capabilities_raw, list) else []
             )
+            type_raw = u.get(singer_data, "type", default="singer_manager")
+            status_raw = u.get(singer_data, "status", default="available")
             execution_result: FlextMeltanoTypes.Processing.SingerExecutionResult = {
-                "type": str(singer_data.get("type", "singer_manager")),
-                "status": str(singer_data.get("status", "available")),
+                "type": str(type_raw),
+                "status": str(status_raw),
                 "capabilities": capabilities,
                 "streams_processed": 0,  # Default value for now
             }
-            result = FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].ok(
-                execution_result
-            )
+            result = r[t.Processing.SingerExecutionResult].ok(execution_result)
 
             if result.is_success:
+                execution_result_data = result.unwrap()
+                streams_processed = u.get(
+                    execution_result_data, "streams_processed", default=0
+                )
                 self._logger.info(
                     "Singer pipeline executed successfully",
-                    streams_processed=result.unwrap().get("streams_processed", 0),
+                    streams_processed=streams_processed,
                 )
             else:
                 self._logger.error(
@@ -101,9 +116,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute Singer pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
-                error_msg
-            )
+            return r[t.Processing.SingerExecutionResult].fail(error_msg)
 
     def execute_complete_elt_pipeline(
         self,
@@ -112,7 +125,7 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
         transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
         | None = None,
-    ) -> FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult]:
+    ) -> r[t.Processing.EltPipelineResult]:
         """Execute complete E-L-T pipeline using library APIs.
 
         Args:
@@ -132,17 +145,18 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
             )
 
             # Extract tap and target names from configs with type narrowing
-            tap_name_obj = extractor_config.get("name", "")
-            target_name_obj = loader_config.get("name", "")
-            tap_name = str(tap_name_obj) if tap_name_obj else ""
-            target_name = str(target_name_obj) if target_name_obj else ""
+            tap_name_raw = u.get(extractor_config, "name", default="")
+            target_name_raw = u.get(loader_config, "name", default="")
+            tap_name = str(tap_name_raw) if tap_name_raw else ""
+            target_name = str(target_name_raw) if target_name_raw else ""
 
-            dbt_models_obj = (
-                transformer_config.get("models") if transformer_config else None
+            dbt_models_raw = (
+                u.get(transformer_config, "models") if transformer_config else None
             )
             dbt_models: list[str] | None = None
-            if dbt_models_obj is not None and isinstance(dbt_models_obj, list):
-                dbt_models = [str(m) for m in dbt_models_obj]
+            if dbt_models_raw is not None and isinstance(dbt_models_raw, list):
+                mapped_result = u.map(dbt_models_raw, str)
+                dbt_models = mapped_result if isinstance(mapped_result, list) else None
 
             # Use library runner for complete pipeline
             result = self._library_runner.execute_complete_elt_pipeline(
@@ -154,9 +168,10 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
 
             if result.is_success:
                 pipeline_data = result.unwrap()
+                overall_success = u.get(pipeline_data, "overall_success", default=False)
                 self._logger.info(
                     "Complete E-L-T pipeline executed successfully",
-                    overall_success=pipeline_data.get("overall_success", False),
+                    overall_success=overall_success,
                 )
             else:
                 self._logger.error(
@@ -169,6 +184,4 @@ class FlextMeltanoSinger(FlextService[FlextMeltanoTypes.MeltanoCore.MeltanoConfi
         except Exception as e:
             error_msg = f"Failed to execute complete E-L-T pipeline: {e}"
             self._logger.exception(error_msg)
-            return FlextResult[FlextMeltanoTypes.Processing.EltPipelineResult].fail(
-                error_msg
-            )
+            return r[t.Processing.EltPipelineResult].fail(error_msg)

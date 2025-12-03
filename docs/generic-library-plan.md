@@ -240,9 +240,9 @@ def install_plugin(
 ```python
 def execute_tap(
     tap_name: str,
-    config: FlextTypes.Dict,
-    state: FlextTypes.Dict | None = None,
-    streams: FlextTypes.StringList | None = None
+    config: t.Dict,
+    state: t.Dict | None = None,
+    streams: t.StringList | None = None
 ) -> FlextResult[TapExecutionResult]:
     """Execute Singer tap with configuration.
 
@@ -262,8 +262,8 @@ def execute_tap(
 ```python
 def execute_target(
     target_name: str,
-    records: list[FlextTypes.Dict],
-    config: FlextTypes.Dict
+    records: list[t.Dict],
+    config: t.Dict
 ) -> FlextResult[TargetExecutionResult]:
     """Execute Singer target with records.
 

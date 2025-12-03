@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
+from flext_core import t
 
 
 class FlextMeltanoPluginProtocols:
@@ -20,14 +20,14 @@ class FlextMeltanoPluginProtocols:
     """
 
     # Core plugin types (JSON-based for external Meltano plugins)
-    TapPlugin = FlextTypes.JsonValue
-    TargetPlugin = FlextTypes.JsonValue
-    DbtPlugin = FlextTypes.JsonValue
+    TapPlugin = t.JsonValue
+    TargetPlugin = t.JsonValue
+    DbtPlugin = t.JsonValue
 
     # Service protocols (JSON-based for service integration)
-    TapServiceProtocol = FlextTypes.JsonValue
-    TargetServiceProtocol = FlextTypes.JsonValue
-    DbtServiceProtocol = FlextTypes.JsonValue
+    TapServiceProtocol = t.JsonValue
+    TargetServiceProtocol = t.JsonValue
+    DbtServiceProtocol = t.JsonValue
 
 
 __all__ = [

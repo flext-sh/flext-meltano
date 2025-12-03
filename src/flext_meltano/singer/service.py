@@ -14,12 +14,22 @@ from pathlib import Path
 from flext_core import FlextResult, FlextService
 from pydantic import Field
 
+from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
 from flext_meltano.singer.state import FlextMeltanoStateManager
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for simplified usage
+# u is already imported from flext_core
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+r = FlextResult
+s = FlextService
 
 
-class FlextMeltanoSingerService(FlextService):
+class FlextMeltanoSingerService(s):
     """Orchestrates Singer ELT pipelines (tap -> target) with deep SDK integration.
 
     Provides complete Singer protocol orchestration including:
@@ -27,7 +37,7 @@ class FlextMeltanoSingerService(FlextService):
     - Catalog discovery and schema management
     - State management for incremental syncs
     - Stream record processing and mapping
-    - Error handling with FlextResult[T]
+    - Error handling with r[T]
 
     This service integrates directly with singer-sdk, providing a
     programmatic API for complete ELT operations.
@@ -70,7 +80,7 @@ class FlextMeltanoSingerService(FlextService):
         self.catalog_manager = FlextMeltanoCatalogManager()
         self.state_manager = FlextMeltanoStateManager()
 
-    def discover_tap_catalog(self, tap: object) -> FlextResult[dict[str, object]]:
+    def discover_tap_catalog(self, tap: object) -> r[dict[str, object]]:
         """Discover catalog from a tap instance.
 
         Args:
@@ -88,7 +98,7 @@ class FlextMeltanoSingerService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("Tap discovery failed", error=str(e))
-            return FlextResult[dict[str, object]].fail(f"Tap discovery failed: {e}")
+            return r[dict[str, object]].fail(f"Tap discovery failed: {e}")
 
     def execute_sync(
         self,
@@ -96,7 +106,7 @@ class FlextMeltanoSingerService(FlextService):
         target: object,
         catalog: dict[str, object],
         state: dict[str, object] | None = None,
-    ) -> FlextResult[FlextMeltanoSingerService.SyncResult]:
+    ) -> r[FlextMeltanoSingerService.SyncResult]:
         """Execute a complete Singer sync pipeline.
 
         Args:
@@ -111,11 +121,11 @@ class FlextMeltanoSingerService(FlextService):
         """
         try:
             if not hasattr(tap, "sync"):
-                return FlextResult[FlextMeltanoSingerService.SyncResult].fail(
+                return r[FlextMeltanoSingerService.SyncResult].fail(
                     "Tap must have sync() method"
                 )
             if not hasattr(target, "consume"):
-                return FlextResult[FlextMeltanoSingerService.SyncResult].fail(
+                return r[FlextMeltanoSingerService.SyncResult].fail(
                     "Target must have consume() method"
                 )
 
@@ -151,16 +161,14 @@ class FlextMeltanoSingerService(FlextService):
                 records=records_processed,
                 written=records_written,
             )
-            return FlextResult[FlextMeltanoSingerService.SyncResult].ok(result)
+            return r[FlextMeltanoSingerService.SyncResult].ok(result)
         except Exception as e:
             self.logger.exception("Singer sync failed", error=str(e))
-            return FlextResult[FlextMeltanoSingerService.SyncResult].fail(
+            return r[FlextMeltanoSingerService.SyncResult].fail(
                 f"Singer sync failed: {e}"
             )
 
-    def load_catalog_from_file(
-        self, catalog_path: Path
-    ) -> FlextResult[dict[str, object]]:
+    def load_catalog_from_file(self, catalog_path: Path) -> r[dict[str, object]]:
         """Load catalog from file.
 
         Args:
@@ -176,7 +184,7 @@ class FlextMeltanoSingerService(FlextService):
         self,
         catalog: dict[str, object],
         catalog_path: Path,
-    ) -> FlextResult[None]:
+    ) -> r[None]:
         """Save catalog to file.
 
         Args:
@@ -192,7 +200,7 @@ class FlextMeltanoSingerService(FlextService):
 
     def load_state_from_file(
         self, state_path: Path | None = None
-    ) -> FlextResult[dict[str, object]]:
+    ) -> r[dict[str, object]]:
         """Load state from file.
 
         Args:
@@ -204,7 +212,7 @@ class FlextMeltanoSingerService(FlextService):
         """
         return self.state_manager.load_state(state_path)
 
-    def save_state_to_file(self, state_path: Path) -> FlextResult[None]:
+    def save_state_to_file(self, state_path: Path) -> r[None]:
         """Save state to file.
 
         Args:
@@ -216,10 +224,11 @@ class FlextMeltanoSingerService(FlextService):
         """
         return self.state_manager.save_state(state_path)
 
-    def execute(self, **_kwargs: object) -> FlextResult[str]:
+    @staticmethod
+    def execute(**_kwargs: object) -> r[str]:
         """Execute (implements Domain.Service pattern)."""
         msg = "Singer service initialized"
-        return FlextResult[str].ok(msg)
+        return r[str].ok(msg)
 
 
 __all__ = [

@@ -9,7 +9,19 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextUtilities
+
+from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases for concise usage
+u = FlextUtilities
+t = FlextMeltanoTypes
+c = FlextMeltanoConstants
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 
 
 class DocsTemplates:
@@ -93,7 +105,8 @@ class DocsTemplates:
                 self._logger.exception("Git hook generation failed", error=error_msg)
             return FlextResult.fail(error_msg)
 
-    def _get_cron_schedule(self, config: dict[str, object]) -> str:
+    @staticmethod
+    def _get_cron_schedule(config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""
         automation_config = cast("dict[str, object]", config.get("automation", {}))
         audit_day = cast("str", automation_config.get("audit_day", "monday")).lower()

@@ -14,13 +14,13 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextResult
 
 from flext_meltano import (
     FlextMeltano,
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoTypes,
+    c,
+    m,
+    r,
+    t,
 )
 
 pytestmark = pytest.mark.unit
@@ -36,13 +36,9 @@ class TestFlextMeltanoInitialization:
         class ConcreteAPI(FlextMeltano):
             def execute(
                 self, **kwargs: object
-            ) -> FlextResult[
-                FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-            ]:
-                return FlextResult[
-                    FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict]
-                ].ok(
-                    FlextResult[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok({})
+            ) -> r[r[t.MeltanoCore.MeltanoConfigDict]]:
+                return r[r[t.MeltanoCore.MeltanoConfigDict]].ok(
+                    r[t.MeltanoCore.MeltanoConfigDict].ok({})
                 )
 
         api = ConcreteAPI(service_name="test-api")
@@ -61,28 +57,28 @@ class TestFlextMeltanoInitialization:
         api = FlextMeltano()
         version = api.version
 
-        assert version == FlextMeltanoConstants.FLEXT_MELTANO_VERSION
+        assert version == c.FLEXT_MELTANO_VERSION
 
     def test_api_constants_property(self) -> None:
         """Test API constants property."""
         api = FlextMeltano()
         constants = api.constants
 
-        assert constants == FlextMeltanoConstants
+        assert constants == c
 
     def test_api_types_property(self) -> None:
         """Test API types property."""
         api = FlextMeltano()
         types = api.types
 
-        assert types is FlextMeltanoTypes
+        assert types is t
 
     def test_api_models_property(self) -> None:
         """Test API models property."""
         api = FlextMeltano()
         models = api.models
 
-        assert models == FlextMeltanoModels
+        assert models == m
 
 
 class TestFlextMeltanoProjectOperations:

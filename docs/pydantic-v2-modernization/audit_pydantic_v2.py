@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextTypes
+from flext_core import t
 
 
 @dataclass
@@ -47,7 +47,7 @@ class AuditResult:
     high: list[AuditViolation] = field(default_factory=list)
     medium: list[AuditViolation] = field(default_factory=list)
     recommendations: list[str] = field(default_factory=list)
-    stats: dict[str, FlextTypes.JsonValue] = field(default_factory=dict)
+    stats: dict[str, t.JsonValue] = field(default_factory=dict)
 
     @property
     def total_violations(self) -> int:
@@ -247,8 +247,8 @@ class PydanticV2Auditor:
                     )
                 )
 
+    @staticmethod
     def _find_pattern(
-        self,
         pattern: str,
         lines: list[str],
     ) -> list[int]:
@@ -279,8 +279,6 @@ def main() -> int:
 
     auditor = PydanticV2Auditor(args.project)
     result = auditor.audit()
-
-    print(result)
 
     # Return exit code based on status
     return 1 if result.status == "FAIL" else 0
