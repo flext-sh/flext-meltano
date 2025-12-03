@@ -53,9 +53,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         # Initialize FlextService parent class
         super().__init__()
 
-    def configure_sink(
-        self, sink_config: m.DataSinkConfig
-    ) -> r[m.DataSinkDefinition]:
+    def configure_sink(self, sink_config: m.DataSinkConfig) -> r[m.DataSinkDefinition]:
         """Configure a sink for a sink configuration.
 
         Args:
@@ -89,9 +87,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return r[m.DataSinkDefinition].fail(
-                f"Sink configuration failed: {e}"
-            )
+            return r[m.DataSinkDefinition].fail(f"Sink configuration failed: {e}")
 
     def validate_sink_config(self, sink_config: m.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration.
@@ -111,9 +107,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Basic validation
             if not sink_config.sink_type:
-                return r[bool].fail(
-                    "Target configuration must have name and type"
-                )
+                return r[bool].fail("Target configuration must have name and type")
 
             # Additional validation logic would go here
             # For now, just return success
@@ -123,9 +117,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception(
                 "Target configuration validation failed", error=str(e)
             )
-            return r[bool].fail(
-                f"Target configuration validation failed: {e}"
-            )
+            return r[bool].fail(f"Target configuration validation failed: {e}")
 
     def create_sink_instance(
         self, sink_config: m.DataSinkConfig
@@ -162,9 +154,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
-            return r[m.DataSinkInstance].fail(
-                f"Sink instance creation failed: {e}"
-            )
+            return r[m.DataSinkInstance].fail(f"Sink instance creation failed: {e}")
 
     def handle_schema_message(self, schema: dict[str, object]) -> r[bool]:
         """Handle Singer SCHEMA message for target.
@@ -299,9 +289,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception("Record batching failed", error=str(e))
-            return r[list[list[dict[str, object]]]].fail(
-                f"Record batching failed: {e}"
-            )
+            return r[list[list[dict[str, object]]]].fail(f"Record batching failed: {e}")
 
     def process_record_as_upsert(
         self, record: dict[str, object], unique_keys: list[str]
@@ -350,9 +338,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception("Record upsert processing failed", error=str(e))
-            return r[dict[str, object]].fail(
-                f"Record upsert processing failed: {e}"
-            )
+            return r[dict[str, object]].fail(f"Record upsert processing failed: {e}")
 
     def process_record_as_insert(
         self, record: dict[str, object]
@@ -386,9 +372,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception("Record insert processing failed", error=str(e))
-            return r[dict[str, object]].fail(
-                f"Record insert processing failed: {e}"
-            )
+            return r[dict[str, object]].fail(f"Record insert processing failed: {e}")
 
     @staticmethod
     def create_flext_target_config(
@@ -407,9 +391,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             }
             return r[dict[str, object]].ok(config)
         except Exception as e:
-            return r[dict[str, object]].fail(
-                f"Failed to create target config: {e}"
-            )
+            return r[dict[str, object]].fail(f"Failed to create target config: {e}")
 
     @staticmethod
     def create_flext_target(
@@ -429,9 +411,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             return r[m.DataSinkDefinition].ok(sink_def)
         except Exception as e:
-            return r[m.DataSinkDefinition].fail(
-                f"Failed to create target: {e}"
-            )
+            return r[m.DataSinkDefinition].fail(f"Failed to create target: {e}")
 
     def execute(
         self,

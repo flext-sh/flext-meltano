@@ -101,10 +101,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_failure
-        assert (
-            result.error is not None
-            and "Failed to create Meltano config dict" in result.error
-        )
+        assert result.error is not None
+        assert "Failed to create Meltano config dict" in result.error
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""

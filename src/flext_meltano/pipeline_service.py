@@ -90,9 +90,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         # Execute synchronous steps first
         start_result = self._log_pipeline_start(source_name, sink_name)
         if start_result.is_failure:
-            return r[dict[str, str]].fail(
-                start_result.error or "Pipeline start failed"
-            )
+            return r[dict[str, str]].fail(start_result.error or "Pipeline start failed")
 
         plugins_result = FlextMeltanoOrchestrationService._find_required_plugins()
         if plugins_result.is_failure:
@@ -132,9 +130,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
     # Private helper methods (extracted from adapters.py)
 
-    def _log_pipeline_start(
-        self, extractor_name: str, loader_name: str
-    ) -> r[None]:
+    def _log_pipeline_start(self, extractor_name: str, loader_name: str) -> r[None]:
         """Log pipeline execution start."""
         self.logger.info(
             "Executing ELT pipeline",
@@ -193,9 +189,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
             return r[dict[str, object]].ok(context_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(
-                f"Failed to create ELT context: {e}"
-            )
+            return r[dict[str, object]].fail(f"Failed to create ELT context: {e}")
 
     @staticmethod
     def _execute_singer_runner(
@@ -229,9 +223,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             return r[dict[str, object]].ok(context_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(
-                f"Unexpected error in ELT pipeline: {e}"
-            )
+            return r[dict[str, object]].fail(f"Unexpected error in ELT pipeline: {e}")
 
     def _build_pipeline_result(
         self,
@@ -245,7 +237,9 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             elt_context_obj = context_data["elt_context"]
             project_obj = context_data["project"]
             execution_result_raw = u.get(context_data, "execution_result", default={})
-            execution_result = execution_result_raw if isinstance(execution_result_raw, dict) else {}
+            execution_result = (
+                execution_result_raw if isinstance(execution_result_raw, dict) else {}
+            )
 
             # Build pipeline result using available data
             pipeline_result: dict[str, str] = {
@@ -273,9 +267,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
             return r[dict[str, str]].ok(pipeline_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, str]].fail(
-                f"Failed to build pipeline result: {e}"
-            )
+            return r[dict[str, str]].fail(f"Failed to build pipeline result: {e}")
 
 
 __all__ = [

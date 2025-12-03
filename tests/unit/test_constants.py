@@ -31,9 +31,7 @@ class Testc:
             message="Application name should be a string",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Meltano.APPLICATION_DESCRIPTION, str
-            ),
+            condition=isinstance(c.Meltano.APPLICATION_DESCRIPTION, str),
             message="Application description should be a string",
         )
 
@@ -117,29 +115,21 @@ class Testc:
         """Test Model namespace constants."""
         # Test maturity constants
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Model.MATURITY_MATURE_ENV_COUNT, int
-            ),
+            condition=isinstance(c.Model.MATURITY_MATURE_ENV_COUNT, int),
             message="Mature environment count should be an integer",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Model.MATURITY_DEVELOPING_ENV_COUNT, int
-            ),
+            condition=isinstance(c.Model.MATURITY_DEVELOPING_ENV_COUNT, int),
             message="Developing environment count should be an integer",
         )
 
         # Test complexity constants
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Model.COMPLEXITY_MINIMAL_SETTINGS, int
-            ),
+            condition=isinstance(c.Model.COMPLEXITY_MINIMAL_SETTINGS, int),
             message="Minimal settings count should be an integer",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int
-            ),
+            condition=isinstance(c.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int),
             message="Simple max settings count should be an integer",
         )
 
@@ -153,15 +143,11 @@ class Testc:
 
         # Test log settings from Logging namespace
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Logging.INCLUDE_TRANSFORM_NAME, bool
-            ),
+            condition=isinstance(c.Logging.INCLUDE_TRANSFORM_NAME, bool),
             message="Include transform name should be a boolean",
         )
         self.test_assertions.assert_true(
-            condition=isinstance(
-                c.Logging.INCLUDE_RECORD_COUNT, bool
-            ),
+            condition=isinstance(c.Logging.INCLUDE_RECORD_COUNT, bool),
             message="Include record count should be a boolean",
         )
 

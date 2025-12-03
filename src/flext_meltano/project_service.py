@@ -254,9 +254,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         })
 
     @staticmethod
-    def _write_meltano_config(
-        project_path: Path, config: dict[str, object]
-    ) -> r[Path]:
+    def _write_meltano_config(project_path: Path, config: dict[str, object]) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
             config_file = project_path / c.Paths.MELTANO_PROJECT_FILE
@@ -287,17 +285,13 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
             return r[t.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Dbt.Project].fail(
-                f"Failed to convert project object: {e}"
-            )
+            return r[t.Dbt.Project].fail(f"Failed to convert project object: {e}")
 
     @staticmethod
     def _validate_project_path(project_root: Path) -> r[Path]:
         """Validate project directory exists."""
         if not project_root.exists():
-            return r[Path].fail(
-                f"Project directory not found: {project_root}"
-            )
+            return r[Path].fail(f"Project directory not found: {project_root}")
         return r[Path].ok(project_root)
 
     @staticmethod
@@ -338,9 +332,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         })
 
     @staticmethod
-    def _create_project_directory(
-        project_name: str, parent_dir: Path
-    ) -> r[Path]:
+    def _create_project_directory(project_name: str, parent_dir: Path) -> r[Path]:
         """Create project directory structure."""
         try:
             project_path = parent_dir / project_name
@@ -372,9 +364,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[Path].fail(f"Failed to create project structure: {e}")
 
     @staticmethod
-    def _initialize_project_config(
-        project_path: Path, project_name: str
-    ) -> r[Path]:
+    def _initialize_project_config(project_path: Path, project_name: str) -> r[Path]:
         """Initialize meltano.yml configuration file."""
         try:
             config_content = f"""version: 1
@@ -415,9 +405,7 @@ environments:
 
             return r[dict[str, str]].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, str]].fail(
-                f"Failed to build creation result: {e}"
-            )
+            return r[dict[str, str]].fail(f"Failed to build creation result: {e}")
 
 
 __all__ = ["FlextMeltanoProjectService"]
