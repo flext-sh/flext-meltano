@@ -59,7 +59,7 @@ class FlextMeltanoCLI:
     def show_pipeline_help(self) -> None:
         """Show pipeline help."""
         self.output.print_message(
-            "Pipeline commands: create, run, list, status, stop, delete"
+            "Pipeline commands: create, run, list, status, stop, delete",
         )
 
     def show_tap_help(self) -> None:

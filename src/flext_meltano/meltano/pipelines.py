@@ -18,7 +18,7 @@ from typing import cast
 from flext_core import (
     FlextResult,
     FlextService,
-    t as FlextTypes,  # noqa: N812
+    t as t_core,
     u,
 )
 
@@ -33,8 +33,8 @@ from flext_meltano.typings import FlextMeltanoTypes
 # u is already imported from flext_core
 r = FlextResult
 s = FlextService
+t_base = t_core
 t = FlextMeltanoTypes
-t_base = FlextTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
@@ -89,23 +89,26 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         plugins_result = self._find_required_plugins()
         if plugins_result.is_failure:
             return r[dict[str, str]].fail(
-                plugins_result.error or "Failed to find plugins"
+                plugins_result.error or "Failed to find plugins",
             )
 
         # Execute ELT context creation
         elt_context_result = self._create_elt_context(
-            project_obj, source_name, sink_name, plugins_result.unwrap()
+            project_obj,
+            source_name,
+            sink_name,
+            plugins_result.unwrap(),
         )
         if elt_context_result.is_failure:
             return r[dict[str, str]].fail(
-                elt_context_result.error or "Failed to create ELT context"
+                elt_context_result.error or "Failed to create ELT context",
             )
 
         # Execute singer runner
         runner_result = self._execute_singer_runner(elt_context_result.unwrap())
         if runner_result.is_failure:
             return r[dict[str, str]].fail(
-                runner_result.error or "Failed to execute singer runner"
+                runner_result.error or "Failed to execute singer runner",
             )
 
         # Execute final synchronous step
@@ -116,8 +119,8 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         )
         return final_result.or_else_get(
             lambda: r[dict[str, str]].fail(
-                f"Pipeline execution failed for {source_name} -> {sink_name}"
-            )
+                f"Pipeline execution failed for {source_name} -> {sink_name}",
+            ),
         )
 
     # Private helper methods (extracted from adapters.py)
@@ -148,12 +151,14 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             # Use abstraction layer to create ELT context
             elt_context_result = self._abstractions.create_elt_context(
-                cast("object", project_path), extractor_name, loader_name
+                cast("object", project_path),
+                extractor_name,
+                loader_name,
             )
 
             if elt_context_result.is_failure:
                 return r[t.MeltanoCore.ExecutionResultDict].fail(
-                    f"Failed to create ELT context: {elt_context_result.error}"
+                    f"Failed to create ELT context: {elt_context_result.error}",
                 )
 
             elt_context_obj = elt_context_result.unwrap()
@@ -171,12 +176,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             if execution_result.is_failure:
                 return r[dict[str, object]].fail(
-                    execution_result.error or "Pipeline execution failed"
+                    execution_result.error or "Pipeline execution failed",
                 )
 
             if elt_context_result.is_failure:
                 return r[dict[str, object]].fail(
-                    elt_context_result.error or "Failed to create ELT context"
+                    elt_context_result.error or "Failed to create ELT context",
                 )
 
             elt_context_result.unwrap()
@@ -193,8 +198,9 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[dict[str, object]].fail(f"Failed to create ELT context: {e}")
 
     def _execute_singer_runner(
-        self, context_data: t.MeltanoCore.RunContextDict
-    ) -> r[dict[str, FlextTypes.JsonValue]]:
+        self,
+        context_data: t.MeltanoCore.RunContextDict,
+    ) -> r[dict[str, t_core.JsonValue]]:
         """Execute Singer runner with context data."""
         try:
             # Extract context data
@@ -204,16 +210,18 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Use duck typing for plugin validation
             if not hasattr(extractor_plugin_obj, "name") or not hasattr(
-                extractor_plugin_obj, "type"
+                extractor_plugin_obj,
+                "type",
             ):
-                return r[dict[str, FlextTypes.JsonValue]].fail(
-                    "Invalid extractor plugin: missing required attributes"
+                return r[dict[str, t_core.JsonValue]].fail(
+                    "Invalid extractor plugin: missing required attributes",
                 )
             if not hasattr(loader_plugin_obj, "name") or not hasattr(
-                loader_plugin_obj, "type"
+                loader_plugin_obj,
+                "type",
             ):
-                return r[dict[str, FlextTypes.JsonValue]].fail(
-                    "Invalid loader plugin: missing required attributes"
+                return r[dict[str, t_core.JsonValue]].fail(
+                    "Invalid loader plugin: missing required attributes",
                 )
 
             # Use abstraction layer to execute Singer pipeline
@@ -224,21 +232,21 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if execution_result.is_failure:
-                return r[dict[str, FlextTypes.JsonValue]].fail(
-                    execution_result.error or "Pipeline execution failed"
+                return r[dict[str, t_core.JsonValue]].fail(
+                    execution_result.error or "Pipeline execution failed",
                 )
 
             # Add execution results to context
             context_data["execution_completed"] = True
             context_data["execution_result"] = execution_result.unwrap()
 
-            return r[dict[str, FlextTypes.JsonValue]].ok(
-                cast("dict[str, FlextTypes.JsonValue]", context_data)
+            return r[dict[str, t_core.JsonValue]].ok(
+                cast("dict[str, t_core.JsonValue]", context_data),
             )
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, FlextTypes.JsonValue]].fail(
-                f"Unexpected error in ELT pipeline: {e}"
+            return r[dict[str, t_core.JsonValue]].fail(
+                f"Unexpected error in ELT pipeline: {e}",
             )
 
     def _build_pipeline_result(

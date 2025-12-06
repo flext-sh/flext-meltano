@@ -89,7 +89,8 @@ class FlextMeltanoCommandRouter:
 
     @staticmethod
     def _execute_command(
-        handler: Callable[[list[str]], r[None]], args: list[str]
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
     ) -> r[None]:
         """Execute command handler."""
         return handler(args)
@@ -126,7 +127,8 @@ class FlextMeltanoPipelineManager:
         return self._execute_pipeline_operation(handler, subcommand_args)
 
     def _get_pipeline_handler(
-        self, subcommand: str
+        self,
+        subcommand: str,
     ) -> r[Callable[[list[str]], r[None]]]:
         """Get pipeline operation handler."""
         operation_map: dict[str, Callable[[list[str]], r[None]]] = {
@@ -141,14 +143,15 @@ class FlextMeltanoPipelineManager:
         handler = u.get(operation_map, subcommand)
         if handler is None:
             return r[Callable[[list[str]], r[None]]].fail(
-                f"Unknown pipeline command: {subcommand}"
+                f"Unknown pipeline command: {subcommand}",
             )
 
         return r[Callable[[list[str]], r[None]]].ok(handler)
 
     @staticmethod
     def _execute_pipeline_operation(
-        handler: Callable[[list[str]], r[None]], args: list[str]
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
     ) -> r[None]:
         """Execute pipeline operation."""
         return handler(args)
@@ -222,7 +225,8 @@ class FlextMeltanoSingerManager:
     ) -> r[None]:
         """Execute tap operation."""
         self.logger.info(
-            f"Tap operation '{operation}' not implemented in this refactor"
+            "Tap operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None].ok(None)
 
@@ -233,7 +237,8 @@ class FlextMeltanoSingerManager:
     ) -> r[None]:
         """Execute target operation."""
         self.logger.info(
-            f"Target operation '{operation}' not implemented in this refactor"
+            "Target operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None].ok(None)
 
@@ -267,7 +272,8 @@ class FlextMeltanoDbtManager:
     ) -> r[None]:
         """Execute DBT operation."""
         self.logger.info(
-            f"DBT operation '{operation}' not implemented in this refactor"
+            "DBT operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None].ok(None)
 
@@ -301,7 +307,8 @@ class FlextMeltanoPluginManager:
     ) -> r[None]:
         """Execute plugin operation."""
         self.logger.info(
-            f"Plugin operation '{operation}' not implemented in this refactor"
+            "Plugin operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None].ok(None)
 
@@ -340,7 +347,8 @@ class FlextMeltanoStatusManager:
     ) -> r[None]:
         """Execute status operation."""
         self.logger.info(
-            f"Status operation '{operation}' not implemented in this refactor"
+            "Status operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None].ok(None)
 

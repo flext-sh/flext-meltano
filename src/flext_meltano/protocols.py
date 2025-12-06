@@ -12,7 +12,7 @@ from typing import Protocol, TypeVar, runtime_checkable
 from flext_core import (
     FlextProtocols,
     FlextResult,
-    t as FlextTypes,  # noqa: N812
+    t as t_core,
 )
 
 # Import Singer protocols from subdirectory
@@ -26,7 +26,7 @@ T_co = TypeVar("T_co", covariant=True)
 # Import aliases for simplified usage
 p_base = FlextProtocols
 r = FlextResult
-t_base = FlextTypes
+t_base = t_core
 
 
 class FlextMeltanoProtocols(p_base):
@@ -124,7 +124,8 @@ class FlextMeltanoProtocols(p_base):
                 ...
 
             def handle_batch(
-                self, records: list[t_base.JsonValue]
+                self,
+                records: list[t_base.JsonValue],
             ) -> r[t_base.JsonValue]:
                 """Handle a batch of records with FlextResult."""
                 ...
@@ -154,7 +155,9 @@ class FlextMeltanoProtocols(p_base):
             """Service call protocol extending Domain.Service."""
 
             def call(
-                self, operation: str, payload: t_base.JsonValue
+                self,
+                operation: str,
+                payload: t_base.JsonValue,
             ) -> r[t_base.JsonValue]:
                 """Execute service call with FlextResult."""
                 ...
@@ -168,12 +171,29 @@ class FlextMeltanoProtocols(p_base):
     # =========================================================================
     # Maintain existing attribute names for zero breaking changes.
 
-    MeltanoPluginProtocol = Meltano.PluginProtocol
-    SingerStreamProtocol = Meltano.StreamProtocol
-    SingerTapProtocol = Meltano.TapProtocol
-    SingerTargetProtocol = Meltano.TargetProtocol
-    DbtRunnerProtocol = Meltano.DbtRunnerProtocol
-    ServiceCallProtocol = Meltano.ServiceCallProtocol
+    @runtime_checkable
+    class MeltanoPluginProtocol(Meltano.PluginProtocol):
+        """MeltanoPluginProtocol - real inheritance."""
+
+    @runtime_checkable
+    class SingerStreamProtocol(Meltano.StreamProtocol):
+        """SingerStreamProtocol - real inheritance."""
+
+    @runtime_checkable
+    class SingerTapProtocol(Meltano.TapProtocol):
+        """SingerTapProtocol - real inheritance."""
+
+    @runtime_checkable
+    class SingerTargetProtocol(Meltano.TargetProtocol):
+        """SingerTargetProtocol - real inheritance."""
+
+    @runtime_checkable
+    class DbtRunnerProtocol(Meltano.DbtRunnerProtocol):
+        """DbtRunnerProtocol - real inheritance."""
+
+    @runtime_checkable
+    class ServiceCallProtocol(Meltano.ServiceCallProtocol):
+        """ServiceCallProtocol - real inheritance."""
 
 
 __all__ = [

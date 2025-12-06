@@ -73,7 +73,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         try:
             if not root.exists():
                 return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
-                    f"DBT project directory not found: {root}"
+                    f"DBT project directory not found: {root}",
                 )
 
             self.project_root = root
@@ -93,7 +93,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         except Exception as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
-                f"Failed to load DBT project: {e}"
+                f"Failed to load DBT project: {e}",
             )
 
     def load_manifest(self, manifest_path: Path | None = None) -> r[dict[str, object]]:
@@ -139,7 +139,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
                     return r[list[dict[str, object]]].fail(
-                        manifest_result.error or "Unknown error"
+                        manifest_result.error or "Unknown error",
                     )
 
             models: list[dict[str, object]] = []
@@ -160,7 +160,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                         "fqn": ".".join(
                             u.get(node, "fqn", default=[])
                             if isinstance(u.get(node, "fqn", default=[]), list)
-                            else []
+                            else [],
                         ),
                     },
                 )
@@ -183,7 +183,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
                     return r[list[dict[str, object]]].fail(
-                        manifest_result.error or "Unknown error"
+                        manifest_result.error or "Unknown error",
                     )
 
             tests: list[dict[str, object]] = []
@@ -204,7 +204,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
                         "fqn": ".".join(
                             u.get(node, "fqn", default=[])
                             if isinstance(u.get(node, "fqn", default=[]), list)
-                            else []
+                            else [],
                         ),
                     },
                 )

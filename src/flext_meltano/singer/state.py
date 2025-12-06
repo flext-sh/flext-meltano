@@ -41,10 +41,12 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
 
         stream_name: str = Field(description="Name of the stream")
         bookmark_key: str | None = Field(
-            default=None, description="Bookmark field for incremental"
+            default=None,
+            description="Bookmark field for incremental",
         )
         bookmark_value: str | None = Field(
-            default=None, description="Current bookmark value"
+            default=None,
+            description="Current bookmark value",
         )
         updated_at: datetime = Field(
             default_factory=datetime.now,

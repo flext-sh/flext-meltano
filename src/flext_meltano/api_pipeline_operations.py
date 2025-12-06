@@ -60,22 +60,26 @@ class FlextMeltanoAPIPipelineOperations:
         """Create a new Meltano ELT pipeline with validation and railway pattern."""
         if u.none_(tap_name, target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Both tap_name and target_name are required for pipeline creation"
+                "Both tap_name and target_name are required for pipeline creation",
             )
 
         if u.not_(u.starts(tap_name, "tap-")):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid tap name format: {tap_name}. Must start with 'tap-'"
+                f"Invalid tap name format: {tap_name}. Must start with 'tap-'",
             )
 
         if u.not_(u.starts(target_name, "target-")):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid target name format: {target_name}. Must start with 'target-'"
+                f"Invalid target name format: {target_name}. Must start with 'target-'",
             )
 
         try:
             pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
-            config_obj = u.when(u.has(self.api, "config"), getattr(self.api, "config", None), None) or None
+            config_obj = (
+                getattr(self.api, "config", None)
+                if hasattr(self.api, "config")
+                else None
+            )
             pipeline_config = {
                 "pipeline_id": pipeline_id,
                 "tap": tap_name,
@@ -85,14 +89,33 @@ class FlextMeltanoAPIPipelineOperations:
                 "status": "created",
                 "created_at": str(time.time()),
                 "api_version": self.api.version,
-                "timeout_seconds": u.from_(config_obj, "timeout_seconds", as_type=int, default=300),
-                "log_level": u.from_(config_obj, "log_level", as_type=str, default="INFO"),
-                "environment": u.from_(config_obj, "environment", as_type=str, default="dev"),
-                "project_root": str(u.from_(config_obj, "project_root", as_type=str, default=".")),
+                "timeout_seconds": u.from_(
+                    config_obj,
+                    "timeout_seconds",
+                    as_type=int,
+                    default=300,
+                ),
+                "log_level": u.from_(
+                    config_obj,
+                    "log_level",
+                    as_type=str,
+                    default="INFO",
+                ),
+                "environment": u.from_(
+                    config_obj,
+                    "environment",
+                    as_type=str,
+                    default="dev",
+                ),
+                "project_root": str(
+                    u.from_(config_obj, "project_root", as_type=str, default="."),
+                ),
             }
             return r[t.MeltanoCore.MeltanoConfigDict].ok(pipeline_config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Pipeline creation failed: {e}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Pipeline creation failed: {e}",
+            )
 
     def execute_pipeline(
         self,
@@ -101,7 +124,9 @@ class FlextMeltanoAPIPipelineOperations:
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute an existing Meltano pipeline with monitoring."""
         if u.none_(pipeline_id):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail("Pipeline ID is required for execution")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                "Pipeline ID is required for execution",
+            )
 
         try:
             execution_start = time.time()
@@ -117,7 +142,9 @@ class FlextMeltanoAPIPipelineOperations:
             }
             return r[t.MeltanoCore.MeltanoConfigDict].ok(execution_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Pipeline execution failed: {e}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Pipeline execution failed: {e}",
+            )
 
     def run_elt_pipeline(
         self,
@@ -129,7 +156,7 @@ class FlextMeltanoAPIPipelineOperations:
         """Execute complete ELT pipeline with Extract, Load, and Transform."""
         if u.none_(tap_name, target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Both tap_name and target_name are required"
+                "Both tap_name and target_name are required",
             )
 
         try:
@@ -138,7 +165,7 @@ class FlextMeltanoAPIPipelineOperations:
             # Simulate ELT execution stages
             extract_duration = 0.5
             load_duration = 0.3
-            transform_duration = u.when(bool(dbt_models), 0.7, 0.0) or 0.0
+            transform_duration = 0.7 if bool(dbt_models) else 0.0
             total_duration = time.time() - execution_start
 
             elt_result = {
@@ -158,22 +185,26 @@ class FlextMeltanoAPIPipelineOperations:
             }
             return r[t.MeltanoCore.MeltanoConfigDict].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"ELT pipeline execution failed: {e}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"ELT pipeline execution failed: {e}",
+            )
 
     @staticmethod
     def list_pipelines() -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
         """List all configured pipelines with current status."""
         return r[list[t.MeltanoCore.MeltanoConfigDict]].ok([])
 
-    def run_tap(
-        self, tap_name: str
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    def run_tap(self, tap_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer tap for data extraction."""
         if u.none_(tap_name):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail("Tap name is required for execution")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                "Tap name is required for execution",
+            )
 
         if u.not_(u.starts(tap_name, "tap-")):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid tap name format: {tap_name}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid tap name format: {tap_name}",
+            )
 
         try:
             execution_start = time.time()
@@ -187,19 +218,19 @@ class FlextMeltanoAPIPipelineOperations:
                 "api_version": self.api.version,
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Tap execution failed: {e}"
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
 
-    def run_target(
-        self, target_name: str
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    def run_target(self, target_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute a Singer target for data loading."""
         if u.none_(target_name):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail("Target name is required for execution")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                "Target name is required for execution",
+            )
 
         if u.not_(u.starts(target_name, "target-")):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid target name format: {target_name}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid target name format: {target_name}",
+            )
 
         try:
             execution_start = time.time()
@@ -214,7 +245,7 @@ class FlextMeltanoAPIPipelineOperations:
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Target execution failed: {e}"
+                f"Target execution failed: {e}",
             )
 
 

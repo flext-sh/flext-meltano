@@ -30,7 +30,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
         utilities = FlextMeltanoUtilities()
 
         result = utilities.create_meltano_config_dict(
-            project_id="test-project", version="1.0.0", default_environment="dev"
+            project_id="test-project",
+            version="1.0.0",
+            default_environment="dev",
         )
 
         assert result.is_success
@@ -52,7 +54,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         }
 
         result = utilities.create_meltano_config_dict(
-            project_id="etl-project", plugins=cast("dict[str, object]", plugins)
+            project_id="etl-project",
+            plugins=cast("dict[str, object]", plugins),
         )
 
         assert result.is_success
@@ -174,7 +177,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             content = {"project_id": "test-project", "version": "1.0.0"}
 
             result = utilities.create_project_file(
-                project_path / "pipeline.yml", cast("dict[str, object]", content)
+                project_path / "pipeline.yml",
+                cast("dict[str, object]", content),
             )
 
             assert result.is_success
@@ -193,7 +197,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         content = {"project_id": "test"}
 
         result = utilities.create_project_file(
-            file_path, cast("dict[str, object]", content)
+            file_path,
+            cast("dict[str, object]", content),
         )
 
         assert result.is_failure
@@ -270,7 +275,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             content = {"project_id": "save-test", "version": "2.0.0"}
 
             result = utilities.save_yaml_file(
-                yaml_file, cast("dict[str, object]", content)
+                yaml_file,
+                cast("dict[str, object]", content),
             )
 
             assert result.is_success
@@ -357,7 +363,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         utilities = FlextMeltanoUtilities()
 
         result = utilities.create_meltano_config_dict(
-            project_id="test-project", project_name="Test Project"
+            project_id="test-project",
+            project_name="Test Project",
         )
 
         assert result.is_success
@@ -374,7 +381,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         utilities = FlextMeltanoUtilities()
 
         result = utilities.create_meltano_config_dict(
-            project_id="test-project", project_name=""
+            project_id="test-project",
+            project_name="",
         )
 
         assert result.is_success

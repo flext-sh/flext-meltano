@@ -38,7 +38,7 @@ class FlextMeltanoUtilities(FlextUtilities):
     """
 
     @classmethod
-    def create_meltano_config_dict(  # noqa: PLR0913, PLR0917
+    def create_meltano_config_dict(
         cls,
         project_id: str,
         project_name: str = "",
@@ -64,20 +64,29 @@ class FlextMeltanoUtilities(FlextUtilities):
                 c.Metadata.DEFAULT_ENVIRONMENTS,
                 lambda env: {"name": env},
             )
-            default_envs = u.or_(envs_result.value if envs_result.is_success else None, [])
+            default_envs = u.or_(
+                envs_result.value if envs_result.is_success else None,
+                [],
+            )
 
             # Build config using DSL pattern with transform
             project_id_val = cast("str", raw.get("project_id", ""))
-            project_name_val = cast("str", u.or_(raw.get("project_name"), raw.get("project_id"), default=""))
+            project_name_val = cast(
+                "str",
+                u.or_(raw.get("project_name"), raw.get("project_id"), default=""),
+            )
             # Build with transform for dict pass-through
-            cfg = u.build(raw, ops={"transform": {"normalize": False, "strip_none": False}})
+            cfg = u.build(
+                raw,
+                ops={"transform": {"normalize": False, "strip_none": False}},
+            )
             # Apply custom transformations after build
             cfg_dict = cast("dict[str, object]", cfg)
             plugins_val = cfg_dict.get("plugins")
             result_cfg: dict[str, object] = {
                 "version": cfg_dict.get("version", 1),
-                "project_id": u.TextProcessor.safe_string(project_id_val),
-                "project_name": u.TextProcessor.safe_string(project_name_val),
+                "project_id": u.Text.safe_string(project_id_val),
+                "project_name": u.Text.safe_string(project_name_val),
                 "environments": u.or_(cfg_dict.get("environments"), default_envs),
                 "plugins": plugins_val if plugins_val is not None else {},
                 "metadata": {
@@ -90,7 +99,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             default_env_val = cfg_dict.get("default_environment")
             if default_env_val is not None:
                 result_cfg["default_environment"] = default_env_val
-            elif not project_name:  # Only add default when project_name is empty (test case)
+            elif (
+                not project_name
+            ):  # Only add default when project_name is empty (test case)
                 result_cfg["default_environment"] = c.Metadata.DEFAULT_ENVIRONMENTS[0]
             cfg = result_cfg
             return r[dict[str, object]].ok(cfg)
@@ -101,7 +112,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             AttributeError,
             OSError,
         ) as e:  # pragma: no cover
-            return r[dict[str, object]].fail(f"Failed to create Meltano config dict: {e}")
+            return r[dict[str, object]].fail(
+                f"Failed to create Meltano config dict: {e}",
+            )
 
     @classmethod
     def write_meltano_yml(
@@ -179,7 +192,9 @@ class FlextMeltanoUtilities(FlextUtilities):
 
     @classmethod
     def _write_yaml_content(
-        cls, file_handle: TextIO, config: dict[str, object]
+        cls,
+        file_handle: TextIO,
+        config: dict[str, object],
     ) -> r[bool]:
         """Write YAML content to file handle."""
         if not hasattr(file_handle, "write"):
@@ -190,10 +205,21 @@ class FlextMeltanoUtilities(FlextUtilities):
         def dump_yaml() -> bool:
             # Use Dumper (not SafeDumper) to allow serialization of objects
             # This allows write to succeed, but load will fail (as expected by tests)
-            yaml.dump(config, file_handle, Dumper=yaml.Dumper, default_flow_style=False, indent=2, allow_unicode=True)
+            yaml.dump(
+                config,
+                file_handle,
+                Dumper=yaml.Dumper,
+                default_flow_style=False,
+                indent=2,
+                allow_unicode=True,
+            )
             return True
 
-        result = u.try_(dump_yaml, default=False, catch=(yaml.YAMLError, ValueError, TypeError, AttributeError))
+        result = u.try_(
+            dump_yaml,
+            default=False,
+            catch=(yaml.YAMLError, ValueError, TypeError, AttributeError),
+        )
         if result:
             return r[bool].ok(True)
         return r[bool].fail("Failed to write YAML content: non-serializable object")
@@ -241,7 +267,7 @@ class FlextMeltanoUtilities(FlextUtilities):
 
         # Helper: safe string with fallback
         def safe_str(val: object) -> str:
-            return u.TextProcessor.safe_string(cast("str", val)) if val else ""
+            return u.Text.safe_string(cast("str", val)) if val else ""
 
         # Build config using DSL with process for string fields
         def build_plugin(d: dict[str, object]) -> dict[str, object]:
@@ -289,7 +315,8 @@ class FlextMeltanoUtilities(FlextUtilities):
             # ConfigDict is compatible with dict["str", "JsonValue"] but MyPy needs explicit conversion
             config_typed: t.GeneralValueType = cast("t.GeneralValueType", config_dict)
             ensured: dict[str, object] = cast(
-                "dict[str, object]", u.ensure(config_typed, target_type="dict", default={})
+                "dict[str, object]",
+                u.ensure(config_typed, target_type="dict", default={}),
             )
             return ensured
 
@@ -300,8 +327,12 @@ class FlextMeltanoUtilities(FlextUtilities):
             .flat_map(FlextMeltanoFileManagers.load_yaml_config)
             .map(convert_to_dict)
         )
-        return result if result.is_success else r[dict[str, object]].fail(
-            result.error or f"Loading YAML config from {path} failed"
+        return (
+            result
+            if result.is_success
+            else r[dict[str, object]].fail(
+                result.error or f"Loading YAML config from {path} failed",
+            )
         )
 
     @classmethod
@@ -327,6 +358,7 @@ class FlextMeltanoUtilities(FlextUtilities):
     @staticmethod
     def validate_project_structure(project_path: Path) -> r[bool]:
         """Validate Meltano project structure."""
+
         # DSL: Use or_ for fallback chain of config files
         def check_config() -> r[bool]:
             if not project_path.exists():
@@ -334,20 +366,31 @@ class FlextMeltanoUtilities(FlextUtilities):
 
             # Check for config files: pipeline.yml or meltano.yml
             config_file = u.or_(
-                project_path / c.Paths.MELTANO_PROJECT_FILE if (project_path / c.Paths.MELTANO_PROJECT_FILE).exists() else None,
-                project_path / "meltano.yml" if (project_path / "meltano.yml").exists() else None,
+                project_path / c.Paths.MELTANO_PROJECT_FILE
+                if (project_path / c.Paths.MELTANO_PROJECT_FILE).exists()
+                else None,
+                project_path / "meltano.yml"
+                if (project_path / "meltano.yml").exists()
+                else None,
                 default=None,
             )
             if config_file:
                 return r.ok(True)
-            return r.fail(f"Meltano config file not found: {project_path / c.Paths.MELTANO_PROJECT_FILE}")
+            return r.fail(
+                f"Meltano config file not found: {project_path / c.Paths.MELTANO_PROJECT_FILE}",
+            )
 
         result = u.try_(check_config, catch=(OSError, ValueError))
-        return result if isinstance(result, r) else r.fail("Failed to validate project structure")
+        return (
+            result
+            if isinstance(result, r)
+            else r.fail("Failed to validate project structure")
+        )
 
     @staticmethod
     def create_project_file(
-        file_path: Path, content: str | dict[str, object]
+        file_path: Path,
+        content: str | dict[str, object],
     ) -> r[Path]:
         """Create a project file with content."""
         content_guard = u.guard(content, (str, dict), return_value=True)
@@ -359,7 +402,10 @@ class FlextMeltanoUtilities(FlextUtilities):
             file_path.parent.mkdir(parents=True, exist_ok=True)
             if isinstance(content_guard, dict):
                 yaml_content = yaml.dump(
-                    content_guard, default_flow_style=False, indent=2, allow_unicode=True
+                    content_guard,
+                    default_flow_style=False,
+                    indent=2,
+                    allow_unicode=True,
                 )
                 _ = file_path.write_text(yaml_content, encoding="utf-8")
             elif isinstance(content_guard, str):
@@ -380,7 +426,11 @@ class FlextMeltanoUtilities(FlextUtilities):
     def save_yaml_file(cls, file_path: Path, content: dict[str, object]) -> r[Path]:
         """Save content to YAML file."""
         result = cls.write_meltano_yml(content, file_path)
-        return r.ok(file_path) if result.is_success else r.fail(result.error or "Failed to save YAML file")
+        return (
+            r.ok(file_path)
+            if result.is_success
+            else r.fail(result.error or "Failed to save YAML file")
+        )
 
 
 __all__ = ["FlextMeltanoUtilities"]

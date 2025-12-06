@@ -12,6 +12,7 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService, u
 from singer_sdk import Stream, Tap
 
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -41,16 +42,14 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def __init__(self, config: object | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
-        # Lazy import to avoid circular dependency
-        from flext_meltano.config import FlextMeltanoConfig  # noqa: PLC0415
-
         self._config = config or FlextMeltanoConfig()
 
         # Initialize FlextService parent class
         super().__init__()
 
     def discover_streams(
-        self, source_config: m.DataSourceConfig
+        self,
+        source_config: m.DataSourceConfig,
     ) -> r[dict[str, object]]:
         """Discover available streams for a source configuration.
 
@@ -71,7 +70,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             # Validate source configuration
             if not source_config.source_type:
                 return r[dict[str, object]].fail(
-                    "Source configuration must have name and type for discovery"
+                    "Source configuration must have name and type for discovery",
                 )
 
             # For now, return empty catalog - would integrate with actual Singer taps
@@ -128,7 +127,8 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail(f"Schema validation failed: {e}")
 
     def create_source_instance(
-        self, source_config: m.DataSourceConfig
+        self,
+        source_config: m.DataSourceConfig,
     ) -> r[m.DataSourceInstance]:
         """Create a source instance from configuration.
 
@@ -194,7 +194,8 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception(
-                "Source configuration processing failed", error=str(e)
+                "Source configuration processing failed",
+                error=str(e),
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 

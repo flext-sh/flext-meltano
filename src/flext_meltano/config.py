@@ -612,7 +612,8 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
         # Apply all other valid kwargs with proper type handling
         excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
         filtered_update_dict = u.filter(
-            filtered_kwargs, lambda k, _v: k not in excluded_keys
+            filtered_kwargs,
+            lambda k, _v: k not in excluded_keys,
         )
         filtered_update = (
             filtered_update_dict if isinstance(filtered_update_dict, dict) else {}
@@ -984,14 +985,14 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                                 "database": "{{ env_var('DBT_DATABASE') }}",
                                 "schema": "{{ env_var('DBT_SCHEMA') }}",
                                 "threads": 4,
-                            }
+                            },
                         },
-                    }
+                    },
                 }
                 return r[t.Dbt.ProfileConfiguration].ok(profile_config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[dict[str, object]].fail(
-                    f"Failed to create DBT profile config: {e}"
+                    f"Failed to create DBT profile config: {e}",
                 )
 
         @staticmethod
@@ -1022,15 +1023,15 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
                                     "extractors": [],
                                     "loaders": [],
                                     "transformers": [],
-                                }
+                                },
                             },
-                        }
+                        },
                     ],
                 }
                 return r[t.MeltanoCore.MeltanoConfigDict].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[dict[str, object]].fail(
-                    f"Failed to create Meltano config: {e}"
+                    f"Failed to create Meltano config: {e}",
                 )
 
         @staticmethod

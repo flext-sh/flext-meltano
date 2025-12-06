@@ -63,7 +63,7 @@ class DocumentationAutomation(s):
         # Dependency injection setup
         self._container = FlextContainer.get_global()
         self._cli_cmd = cli_cmd or self._container.get("FlextCliCmd").unwrap_or(
-            FlextCliCmd()
+            FlextCliCmd(),
         )
 
         # Template system for content generation
@@ -98,10 +98,11 @@ class DocumentationAutomation(s):
         quality_check_result = self._validate_quality_thresholds()
         if not quality_check_result.is_success:
             self.logger.error(
-                "Quality threshold validation failed", error=quality_check_result.error
+                "Quality threshold validation failed",
+                error=quality_check_result.error,
             )
             return r.fail(
-                quality_check_result.error or "Quality threshold validation failed"
+                quality_check_result.error or "Quality threshold validation failed",
             )
 
         success_status = quality_check_result.unwrap()
@@ -125,11 +126,12 @@ class DocumentationAutomation(s):
         try:
             # Import maintenance module directly instead of subprocess call
             maintenance_spec = importlib.util.spec_from_file_location(
-                "maintenance_audit", self.maintenance_script
+                "maintenance_audit",
+                self.maintenance_script,
             )
             if not maintenance_spec or not maintenance_spec.loader:
                 return r.fail(
-                    f"Could not load maintenance script: {self.maintenance_script}"
+                    f"Could not load maintenance script: {self.maintenance_script}",
                 )
 
             maintenance_module = importlib.util.module_from_spec(maintenance_spec)
@@ -145,7 +147,7 @@ class DocumentationAutomation(s):
                     return r.ok(None)
                 return r.fail("Maintenance audit completed with warnings")
             return r.fail(
-                f"No run_comprehensive_audit function found in {self.maintenance_script}"
+                f"No run_comprehensive_audit function found in {self.maintenance_script}",
             )
 
         except Exception as e:
@@ -235,7 +237,7 @@ class DocumentationAutomation(s):
         hour, minute = map(int, audit_time.split(":"))
 
         schedule.every().day.at(f"{hour:02d}:{minute:02d}").do(
-            self._run_scheduled_audit
+            self._run_scheduled_audit,
         )
 
     def _schedule_weekly(self, config: dict[str, object]) -> None:
@@ -261,7 +263,7 @@ class DocumentationAutomation(s):
 
         if audit_day in day_methods:
             day_methods[audit_day].at(f"{hour:02d}:{minute:02d}").do(
-                self._run_scheduled_audit
+                self._run_scheduled_audit,
             )
 
     @staticmethod
@@ -281,7 +283,8 @@ class DocumentationAutomation(s):
         try:
             # Import maintenance module directly instead of subprocess call
             maintenance_spec = importlib.util.spec_from_file_location(
-                "scheduled_audit", self.maintenance_script
+                "scheduled_audit",
+                self.maintenance_script,
             )
             if not maintenance_spec or not maintenance_spec.loader:
                 self.logger.error(
@@ -311,7 +314,7 @@ class DocumentationAutomation(s):
         """Run continuous monitoring loop."""
         if schedule is None:
             self.logger.warning(
-                "Schedule library not available, cannot run continuous monitoring"
+                "Schedule library not available, cannot run continuous monitoring",
             )
             return
 
@@ -416,10 +419,14 @@ Examples:
 
     parser.add_argument("--ci-check", action="store_true", help="Run CI quality checks")
     parser.add_argument(
-        "--schedule", action="store_true", help="Start scheduled maintenance monitoring"
+        "--schedule",
+        action="store_true",
+        help="Start scheduled maintenance monitoring",
     )
     parser.add_argument(
-        "--setup-hooks", action="store_true", help="Set up Git hooks for quality checks"
+        "--setup-hooks",
+        action="store_true",
+        help="Set up Git hooks for quality checks",
     )
     parser.add_argument(
         "--generate-workflow",
@@ -427,7 +434,9 @@ Examples:
         help="Generate GitHub Actions workflow",
     )
     parser.add_argument(
-        "--generate-makefile", action="store_true", help="Generate Makefile targets"
+        "--generate-makefile",
+        action="store_true",
+        help="Generate Makefile targets",
     )
 
     args = parser.parse_args()

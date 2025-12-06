@@ -115,12 +115,14 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception(
-                "Target configuration validation failed", error=str(e)
+                "Target configuration validation failed",
+                error=str(e),
             )
             return r[bool].fail(f"Target configuration validation failed: {e}")
 
     def create_sink_instance(
-        self, sink_config: m.DataSinkConfig
+        self,
+        sink_config: m.DataSinkConfig,
     ) -> r[m.DataSinkInstance]:
         """Create a sink instance from configuration.
 
@@ -244,7 +246,9 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail(f"State message handling failed: {e}")
 
     def batch_records_for_insert(
-        self, records: list[dict[str, object]], batch_size: int = 500
+        self,
+        records: list[dict[str, object]],
+        batch_size: int = 500,
     ) -> r[list[list[dict[str, object]]]]:
         """Batch records for efficient insert operations.
 
@@ -265,12 +269,12 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             if not records:
                 return r[list[list[dict[str, object]]]].fail(
-                    "Record list cannot be empty"
+                    "Record list cannot be empty",
                 )
 
             if batch_size <= 0:
                 return r[list[list[dict[str, object]]]].fail(
-                    "Batch size must be positive"
+                    "Batch size must be positive",
                 )
 
             # Create batches
@@ -290,7 +294,9 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[list[list[dict[str, object]]]].fail(f"Record batching failed: {e}")
 
     def process_record_as_upsert(
-        self, record: dict[str, object], unique_keys: list[str]
+        self,
+        record: dict[str, object],
+        unique_keys: list[str],
     ) -> r[dict[str, object]]:
         """Prepare record for upsert operation.
 
@@ -313,14 +319,14 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             if not unique_keys:
                 return r[dict[str, object]].fail(
-                    "Unique keys cannot be empty for upsert"
+                    "Unique keys cannot be empty for upsert",
                 )
 
             # Validate all unique keys exist in record
             missing_keys = u.filter(unique_keys, lambda key: key not in record)
             if missing_keys:
                 return r[dict[str, object]].fail(
-                    f"Record missing unique keys: {missing_keys}"
+                    f"Record missing unique keys: {missing_keys}",
                 )
 
             # Add upsert operation metadata
@@ -339,7 +345,8 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[dict[str, object]].fail(f"Record upsert processing failed: {e}")
 
     def process_record_as_insert(
-        self, record: dict[str, object]
+        self,
+        record: dict[str, object],
     ) -> r[dict[str, object]]:
         """Prepare record for insert operation.
 
@@ -402,7 +409,8 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 sink_type=cast("str", config.get("target_type", "jsonl")),
                 config=m.DataSinkConfig(
                     connection_config=cast(
-                        "dict[str, object]", config.get("connection_config", {})
+                        "dict[str, object]",
+                        config.get("connection_config", {}),
                     ),
                     batch_size=cast("int", config.get("batch_size", 1000)),
                 ),
@@ -418,5 +426,5 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         # This would orchestrate the overall sink abstraction workflow
         # For now, return the current configuration
         return r[FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict].ok(
-            self._config.model_dump()
+            self._config.model_dump(),
         )

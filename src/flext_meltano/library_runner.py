@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, t as FlextTypes  # noqa: N812
+from flext_core import FlextLogger, FlextResult, t as t_core
 
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import FlextMeltanoConstants
@@ -25,7 +25,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 r = FlextResult
-t_base = FlextTypes
+t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -65,7 +65,9 @@ class FlextMeltanoLibraryRunner:
         """
         try:
             self.logger.info(
-                "Starting ELT pipeline", tap_name=tap.name, target_name=target.name
+                "Starting ELT pipeline",
+                tap_name=tap.name,
+                target_name=target.name,
             )
 
             # Execute the pipeline using the executor
@@ -73,7 +75,7 @@ class FlextMeltanoLibraryRunner:
 
             if result.is_failure:
                 return r[t.Processing.EltPipelineResult].fail(
-                    result.error or "Pipeline execution failed"
+                    result.error or "Pipeline execution failed",
                 )
 
             # Convert execution result to ELT pipeline result
@@ -119,7 +121,7 @@ class FlextMeltanoLibraryRunner:
 
             if result.is_failure:
                 return r[t.Processing.DbtTransformationResult].fail(
-                    result.error or "DBT transformation failed"
+                    result.error or "DBT transformation failed",
                 )
 
             execution_result = result.unwrap()
@@ -192,7 +194,7 @@ class FlextMeltanoLibraryRunner:
             result = self._executor.execute_pipeline(tap_name, target_name, config)
             if result.is_failure:
                 return r[t.Processing.EltPipelineResult].fail(
-                    result.error or "EL pipeline execution failed"
+                    result.error or "EL pipeline execution failed",
                 )
 
             execution_result = result.unwrap()
@@ -215,7 +217,7 @@ class FlextMeltanoLibraryRunner:
                 else:
                     elt_result["dbt_success"] = True
                     elt_result["dbt_models_run"] = list(
-                        dbt_models
+                        dbt_models,
                     )  # Convert to list[object]
 
             return r[t.Processing.EltPipelineResult].ok(elt_result)

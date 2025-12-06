@@ -82,7 +82,7 @@ class FlextMeltanoCatalogManager(FlextService):
         try:
             if not catalog_file.exists():
                 return r[dict[str, object]].fail(
-                    f"Catalog file not found: {catalog_file}"
+                    f"Catalog file not found: {catalog_file}",
                 )
 
             with catalog_file.open(encoding="utf-8") as f:

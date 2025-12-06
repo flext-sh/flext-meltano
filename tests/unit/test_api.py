@@ -35,10 +35,11 @@ class TestFlextMeltanoInitialization:
         # Create a concrete implementation for testing
         class ConcreteAPI(FlextMeltano):
             def execute(
-                self, **kwargs: object
+                self,
+                **kwargs: object,
             ) -> r[r[t.MeltanoCore.MeltanoConfigDict]]:
                 return r[r[t.MeltanoCore.MeltanoConfigDict]].ok(
-                    r[t.MeltanoCore.MeltanoConfigDict].ok({})
+                    r[t.MeltanoCore.MeltanoConfigDict].ok({}),
                 )
 
         api = ConcreteAPI(service_name="test-api")
@@ -250,7 +251,9 @@ class TestFlextMeltanoDataOperations:
         api = FlextMeltano()
 
         result = api.load_data(
-            target_name="target-jsonl", stream_name="test_stream", records=[]
+            target_name="target-jsonl",
+            stream_name="test_stream",
+            records=[],
         )
 
         assert result.is_failure or result.is_success
@@ -260,7 +263,9 @@ class TestFlextMeltanoDataOperations:
         api = FlextMeltano()
 
         result = api.extract_data(
-            tap_name="tap-csv", stream_name="test_stream", limit=100
+            tap_name="tap-csv",
+            stream_name="test_stream",
+            limit=100,
         )
 
         assert result.is_failure or result.is_success
@@ -271,7 +276,9 @@ class TestFlextMeltanoDataOperations:
 
         records = [{"id": 1, "name": "test"}]
         result = api.load_data(
-            target_name="target-jsonl", stream_name="test_stream", records=records
+            target_name="target-jsonl",
+            stream_name="test_stream",
+            records=records,
         )
 
         assert result.is_failure or result.is_success
@@ -384,7 +391,8 @@ class TestFlextMeltanoErrorHandling:
         api = FlextMeltano()
 
         result = api.create_project(
-            project_name="test", project_root="/invalid/path/that/does/not/exist"
+            project_name="test",
+            project_root="/invalid/path/that/does/not/exist",
         )
 
         assert result.is_failure or result.is_success
@@ -410,7 +418,8 @@ class TestFlextMeltanoIntegration:
             project_path = Path(temp_dir) / "integration_test"
 
             create_result = api.create_project(
-                project_name="integration_test", project_root=str(project_path.parent)
+                project_name="integration_test",
+                project_root=str(project_path.parent),
             )
 
             assert create_result.is_success or "already exists" in (
@@ -497,7 +506,8 @@ class TestFlextMeltanoSuccessPaths:
         api = FlextMeltano()
 
         result = api.install_plugin(
-            plugin_type="invalid", plugin_name="nonexistent-plugin"
+            plugin_type="invalid",
+            plugin_name="nonexistent-plugin",
         )
 
         assert result.is_failure
@@ -523,7 +533,8 @@ class TestFlextMeltanoSuccessPaths:
         api = FlextMeltano()
 
         result = api.extract_data(
-            tap_name="nonexistent-tap", stream_name="nonexistent-stream"
+            tap_name="nonexistent-tap",
+            stream_name="nonexistent-stream",
         )
 
         assert result.is_failure or result.is_success
@@ -533,7 +544,9 @@ class TestFlextMeltanoSuccessPaths:
         api = FlextMeltano()
 
         result = api.load_data(
-            target_name="nonexistent-target", stream_name="test", records=[]
+            target_name="nonexistent-target",
+            stream_name="test",
+            records=[],
         )
 
         assert result.is_failure or result.is_success

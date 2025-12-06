@@ -52,17 +52,21 @@ class FlextMeltanoSingerService(s):
         """Configuration for a Singer pipeline."""
 
         tap_config_path: Path | None = Field(
-            default=None, description="Path to tap configuration"
+            default=None,
+            description="Path to tap configuration",
         )
         target_config_path: Path | None = Field(
-            default=None, description="Path to target configuration"
+            default=None,
+            description="Path to target configuration",
         )
         catalog_path: Path | None = Field(
-            default=None, description="Path to catalog file"
+            default=None,
+            description="Path to catalog file",
         )
         state_path: Path | None = Field(default=None, description="Path to state file")
         selected_streams: list[str] | None = Field(
-            default=None, description="Specific streams to sync"
+            default=None,
+            description="Specific streams to sync",
         )
 
     class SyncResult(FlextMeltanoModels):
@@ -122,11 +126,11 @@ class FlextMeltanoSingerService(s):
         try:
             if not hasattr(tap, "sync"):
                 return r[FlextMeltanoSingerService.SyncResult].fail(
-                    "Tap must have sync() method"
+                    "Tap must have sync() method",
                 )
             if not hasattr(target, "consume"):
                 return r[FlextMeltanoSingerService.SyncResult].fail(
-                    "Target must have consume() method"
+                    "Target must have consume() method",
                 )
 
             self.logger.info("Starting Singer sync")
@@ -165,7 +169,7 @@ class FlextMeltanoSingerService(s):
         except Exception as e:
             self.logger.exception("Singer sync failed", error=str(e))
             return r[FlextMeltanoSingerService.SyncResult].fail(
-                f"Singer sync failed: {e}"
+                f"Singer sync failed: {e}",
             )
 
     def load_catalog_from_file(self, catalog_path: Path) -> r[dict[str, object]]:
@@ -199,7 +203,8 @@ class FlextMeltanoSingerService(s):
         return self.catalog_manager.save_catalog(catalog_path)
 
     def load_state_from_file(
-        self, state_path: Path | None = None
+        self,
+        state_path: Path | None = None,
     ) -> r[dict[str, object]]:
         """Load state from file.
 

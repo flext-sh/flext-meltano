@@ -37,9 +37,7 @@ e = FlextExceptions
 s = FlextService
 
 
-class FlextMeltanoService(  # noqa: PLR0904
-    s[t.MeltanoCore.MeltanoConfigDict]
-):
+class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Generic data pipeline service with composition-based architecture.
 
     Provides complete pipeline orchestration using flext-core patterns
@@ -108,7 +106,7 @@ class FlextMeltanoService(  # noqa: PLR0904
         """Get project name (alias for transformation_name for DBT projects)."""
         return self.transformation_name
 
-    def __init__(  # noqa: PLR0913, PLR0917
+    def __init__(
         self,
         config: FlextMeltanoConfig | None = None,
         service_name: str = "flext_meltano_service",
@@ -171,7 +169,8 @@ class FlextMeltanoService(  # noqa: PLR0904
         self._service_type = service_type
 
         self.logger.info(
-            f"FlextMeltanoService '{service_name}' initialized with generic operation handlers"
+            "FlextMeltanoService '%s' initialized with generic operation handlers",
+            service_name,
         )
 
     # ============================================================================
@@ -265,7 +264,8 @@ class FlextMeltanoService(  # noqa: PLR0904
 
     @staticmethod
     def create_source_service(
-        source_name: str, **_config: object
+        source_name: str,
+        **_config: object,
     ) -> r[FlextMeltanoService]:
         """Create data source service using railway pattern."""
         try:
@@ -276,12 +276,13 @@ class FlextMeltanoService(  # noqa: PLR0904
             return r[FlextMeltanoService].ok(service)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[FlextMeltanoService].fail(
-                f"Failed to create source service '{source_name}': {e}"
+                f"Failed to create source service '{source_name}': {e}",
             )
 
     @staticmethod
     def create_sink_service(
-        sink_name: str, **_config: object
+        sink_name: str,
+        **_config: object,
     ) -> r[FlextMeltanoService]:
         """Create data sink service using railway pattern."""
         try:
@@ -292,12 +293,13 @@ class FlextMeltanoService(  # noqa: PLR0904
             return r[FlextMeltanoService].ok(service)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[FlextMeltanoService].fail(
-                f"Failed to create sink service '{sink_name}': {e}"
+                f"Failed to create sink service '{sink_name}': {e}",
             )
 
     @staticmethod
     def create_transformation_service(
-        transformation_name: str, **_config: object
+        transformation_name: str,
+        **_config: object,
     ) -> r[FlextMeltanoService]:
         """Create transformation service using railway pattern."""
         try:
@@ -308,7 +310,7 @@ class FlextMeltanoService(  # noqa: PLR0904
             return r[FlextMeltanoService].ok(service)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[FlextMeltanoService].fail(
-                f"Failed to create transformation service '{transformation_name}': {e}"
+                f"Failed to create transformation service '{transformation_name}': {e}",
             )
 
     # Domain-specific factory methods (DRY delegation to generic methods)
@@ -319,7 +321,8 @@ class FlextMeltanoService(  # noqa: PLR0904
 
     @staticmethod
     def create_target_service(
-        target_name: str, **config: object
+        target_name: str,
+        **config: object,
     ) -> r[FlextMeltanoService]:
         """Create Singer target service - delegates to generic sink service."""
         return FlextMeltanoService.create_sink_service(target_name, **config)
@@ -377,11 +380,12 @@ class FlextMeltanoService(  # noqa: PLR0904
 
         if component_type:
             components = u.filter(
-                components, lambda c: u.get(c, "type") == component_type
+                components,
+                lambda c: u.get(c, "type") == component_type,
             )
 
         return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
-            cast("list[t.MeltanoCore.MeltanoConfigDict]", components)
+            cast("list[t.MeltanoCore.MeltanoConfigDict]", components),
         )
 
     @staticmethod
@@ -393,7 +397,7 @@ class FlextMeltanoService(  # noqa: PLR0904
         """Install pipeline component with validation."""
         if not component_type or not component_name:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Component type and name are required"
+                "Component type and name are required",
             )
 
         if component_type not in {
@@ -403,7 +407,7 @@ class FlextMeltanoService(  # noqa: PLR0904
             "orchestrators",
         }:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid component type: {component_type}"
+                f"Invalid component type: {component_type}",
             )
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -415,7 +419,7 @@ class FlextMeltanoService(  # noqa: PLR0904
                     "status": "installed",
                     "configuration": config or {},
                 },
-            )
+            ),
         )
 
     @staticmethod
@@ -426,13 +430,13 @@ class FlextMeltanoService(  # noqa: PLR0904
         """Configure environment."""
         if not environment_name:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Environment name is required"
+                "Environment name is required",
             )
 
         valid_environments = {"development", "staging", "production", "testing"}
         if environment_name not in valid_environments:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {valid_environments}"
+                f"Invalid environment: {environment_name}. Valid: {valid_environments}",
             )
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -443,7 +447,7 @@ class FlextMeltanoService(  # noqa: PLR0904
                     "configuration": config or {},
                     "status": "configured",
                 },
-            )
+            ),
         )
 
     @staticmethod
@@ -461,7 +465,7 @@ class FlextMeltanoService(  # noqa: PLR0904
                     "status": "completed",
                     "configuration": config or {},
                 },
-            )
+            ),
         )
 
     @staticmethod
@@ -480,7 +484,7 @@ class FlextMeltanoService(  # noqa: PLR0904
                     "tests_executed": u.mul(u.count(models_to_test), 3),
                     "configuration": config or {},
                 },
-            )
+            ),
         )
 
     @staticmethod
@@ -546,14 +550,17 @@ class FlextMeltanoService(  # noqa: PLR0904
         return r[bool].ok(True)
 
     def create_instance(
-        self, _config: t.MeltanoCore.MeltanoConfigDict
+        self,
+        _config: t.MeltanoCore.MeltanoConfigDict,
     ) -> r[FlextMeltanoService]:
         """Create service instance with configuration."""
         return r[FlextMeltanoService].ok(self)
 
     @staticmethod
     def _create_service_generic(
-        service_type: str, name: str, **config: object
+        service_type: str,
+        name: str,
+        **config: object,
     ) -> r[FlextMeltanoService]:
         """Generic service factory - delegates to specific creators."""
         service_map: dict[str, Callable[[str], r[FlextMeltanoService]]] = {

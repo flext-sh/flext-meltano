@@ -27,6 +27,7 @@ from flext_core import (
     FlextService,
     u,
 )
+from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -48,9 +49,7 @@ e = FlextExceptions
 s = FlextService
 
 
-class FlextMeltano(  # noqa: PLR0904
-    s[r[t.MeltanoCore.MeltanoConfigDict]]
-):
+class FlextMeltano(s[r[t_core.JsonValue]]):
     """Advanced FLEXT Meltano API with direct flext-core integration.
 
     Provides complete Meltano integration using flext-core advanced patterns
@@ -87,7 +86,7 @@ class FlextMeltano(  # noqa: PLR0904
 
     # Core service attributes with proper typing
     service_name: str
-    version: str = __version__
+    version: str = cast("str", __version__)
     _config: FlextMeltanoConfig
 
     @property
@@ -117,34 +116,26 @@ class FlextMeltano(  # noqa: PLR0904
             msg = "API service name cannot be empty"
             raise e.ValidationError(msg, error_code="INVALID_SERVICE_NAME")
 
-        # Use package version if not explicitly provided (DSL pattern with u.when)
-        version = u.when(
-            condition=version is not None,
-            then_value=version,
-            else_value=__version__,
-        )
+        # DSL: Use conditional value
+        version = version if version is not None else cast("str", __version__)
 
-        # Build config with project_root if provided - SOLID composition pattern
-        # Use u.when() for nested conditional (DSL pattern)
-        config = u.when(
-            condition=config is not None,
-            then_value=config,
-            else_value=u.when(
-                condition=project_root is not None,
-                then_value=FlextMeltanoConfig.model_validate(
-                    {"project_root": project_root}
-                ),
-                else_value=None,
-            ),
-        )
-        if u.empty(config):
+        # DSL: Build config with project_root if provided
+        if config is None:
+            if project_root is not None:
+                config = FlextMeltanoConfig.model_validate({
+                    "project_root": project_root,
+                })
+            else:
+                config = None
+        if config is None:
             if project_root:
                 # Use Pydantic model_validate for type-safe initialization
                 self._config = FlextMeltanoConfig.model_validate({
-                    "project_root": project_root
+                    "project_root": project_root,
                 })
             else:
-                self._config = FlextMeltanoConfig()
+                # DSL: Create config instance - AutoConfig pattern handles initialization
+                self._config = FlextMeltanoConfig.model_validate({})
         else:
             self._config = config
 
@@ -155,32 +146,31 @@ class FlextMeltano(  # noqa: PLR0904
         )
 
         self.logger.info(
-            f"FlextMeltano API '{service_name}' v{version} "
-            f"initialized with flext-core patterns"
+            "FlextMeltano API '%s' v%s initialized with flext-core patterns",
+            service_name,
+            version,
         )
 
     # ============================================================================
     # SERVICE LIFECYCLE - FlextService protocol implementation
     # ============================================================================
 
-    def execute(self, **_kwargs: object) -> r[r[t.MeltanoCore.MeltanoConfigDict]]:
+    def execute(self, **_kwargs: object) -> r[r[t_core.JsonValue]]:
         """Execute service lifecycle using flext-core railway patterns."""
-        return r[r[t.MeltanoCore.MeltanoConfigDict]].ok(
-            r[t.MeltanoCore.MeltanoConfigDict].ok({
+        return r[r[t_core.JsonValue]].ok(
+            r[t_core.JsonValue].ok({
                 "service_name": self.service_name,
                 "version": self.version,
                 "status": "active",
                 "operations": ["pipeline", "plugin", "dbt", "environment"],
-            })
+            }),
         )
 
     # ============================================================================
     # OPERATION DISPATCH - Advanced pattern matching with flext-core
     # ============================================================================
 
-    def call(
-        self, operation: str, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+    def call(self, operation: str, payload: t_core.JsonValue) -> r[t_core.JsonValue]:
         """Route operations using dispatch table with flext-core patterns.
 
         Implements ServiceCallProtocol through structural subtyping with
@@ -188,7 +178,8 @@ class FlextMeltano(  # noqa: PLR0904
         """
         # Dispatch table pattern using flext-core railway programming
         operation_dispatch: dict[
-            str, Callable[[t.MeltanoCore.JsonValue], r[t.MeltanoCore.JsonValue]]
+            str,
+            Callable[[t_core.JsonValue], r[t_core.JsonValue]],
         ] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
@@ -205,7 +196,7 @@ class FlextMeltano(  # noqa: PLR0904
             handler = operation_dispatch[operation]
             return handler(payload)
 
-        return r[t.MeltanoCore.JsonValue].fail(f"Unknown operation: {operation}")
+        return r[t_core.JsonValue].fail(f"Unknown operation: {operation}")
 
     # ============================================================================
     # PIPELINE OPERATIONS - Railway-oriented with flext-core patterns
@@ -222,18 +213,19 @@ class FlextMeltano(  # noqa: PLR0904
         def _validate_inputs() -> r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]]:
             if u.none_(tap_name, target_name):
                 return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].fail(
-                    "Both tap_name and target_name are required for pipeline creation"
+                    "Both tap_name and target_name are required for pipeline creation",
                 )
 
-            if u.not_(u.starts(tap_name, "tap-")):
+            # DSL: Use u.starts for prefix checking
+            if not u.starts(tap_name, "tap-"):
                 return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].fail(
-                    f"Invalid tap name format: {tap_name}. Must start with 'tap-'"
+                    f"Invalid tap name format: {tap_name}. Must start with 'tap-'",
                 )
 
-            if u.not_(u.starts(target_name, "target-")):
+            if not u.starts(target_name, "target-"):
                 return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].fail(
                     f"Invalid target name format: {target_name}. "
-                    f"Must start with 'target-'"
+                    f"Must start with 'target-'",
                 )
 
             return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].ok((
@@ -247,8 +239,10 @@ class FlextMeltano(  # noqa: PLR0904
             target_name: str,
             config: t.MeltanoCore.MeltanoConfigDict,
         ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-            try:
+            # DSL: Use u.try_ for unified error handling
+            def _build() -> r[t.MeltanoCore.MeltanoConfigDict]:
                 pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
+                # DSL: Use u.get() for safe attribute access
                 pipeline_config = {
                     "pipeline_id": pipeline_id,
                     "tap": tap_name,
@@ -264,15 +258,19 @@ class FlextMeltano(  # noqa: PLR0904
                     "project_root": str(getattr(self._config, "project_root", ".")),
                 }
                 return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                    cast(
-                        "t.MeltanoCore.MeltanoConfigDict",
-                        pipeline_config,
-                    )
+                    cast("t.MeltanoCore.MeltanoConfigDict", pipeline_config),
                 )
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+
+            result = u.try_(
+                _build,
+                catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+                default=None,
+            )
+            if result is None:
                 return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                    f"Pipeline creation failed: {e}"
+                    "Pipeline creation failed",
                 )
+            return result
 
         validation_result = _validate_inputs()
         if validation_result.is_failure:
@@ -292,10 +290,11 @@ class FlextMeltano(  # noqa: PLR0904
         """Execute pipeline using flext-core railway patterns."""
         if u.none_(pipeline_id):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Pipeline ID is required for execution"
+                "Pipeline ID is required for execution",
             )
 
-        try:
+        # DSL: Use u.try_ for unified error handling
+        def _execute() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
@@ -308,12 +307,17 @@ class FlextMeltano(  # noqa: PLR0904
                 "api_version": self.version,
             }
             return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast("t.MeltanoCore.MeltanoConfigDict", execution_result)
+                cast("t.MeltanoCore.MeltanoConfigDict", execution_result),
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Pipeline execution failed: {e}"
-            )
+
+        result = u.try_(
+            _execute,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            default=None,
+        )
+        if result is None:
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Pipeline execution failed")
+        return result
 
     def run_elt_pipeline(
         self,
@@ -326,16 +330,18 @@ class FlextMeltano(  # noqa: PLR0904
         # Use u.none_() for validation (DSL pattern)
         if u.none_(tap_name, target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Both tap_name and target_name are required"
+                "Both tap_name and target_name are required",
             )
 
-        try:
+        # DSL: Use u.try_ for unified error handling
+        def _execute_elt() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
 
-            # Simulate ELT execution stages
             extract_duration = 0.5
             load_duration = 0.3
-            transform_duration = 0.7 if dbt_models else 0.0
+            transform_duration = (
+                0.7 if dbt_models is not None and len(dbt_models) > 0 else 0.0
+            )
             total_duration = time.time() - execution_start
 
             elt_result = {
@@ -354,12 +360,19 @@ class FlextMeltano(  # noqa: PLR0904
                 "api_version": self.version,
             }
             return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast("t.MeltanoCore.MeltanoConfigDict", elt_result)
+                cast("t.MeltanoCore.MeltanoConfigDict", elt_result),
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+
+        result = u.try_(
+            _execute_elt,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            default=None,
+        )
+        if result is None:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"ELT pipeline execution failed: {e}"
+                "ELT pipeline execution failed",
             )
+        return result
 
     @staticmethod
     def list_pipelines() -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
@@ -371,14 +384,16 @@ class FlextMeltano(  # noqa: PLR0904
         # Use u.when() for validation (DSL pattern)
         if u.none_(tap_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Tap name is required for execution"
+                "Tap name is required for execution",
             )
-        if u.not_(u.starts(tap_name, "tap-")):
+        # DSL: Use u.starts for prefix checking
+        if not u.starts(tap_name, "tap-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid tap name format: {tap_name}"
+                f"Invalid tap name format: {tap_name}",
             )
 
-        try:
+        # DSL: Use u.try_ for unified error handling
+        def _execute_tap() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
@@ -389,22 +404,31 @@ class FlextMeltano(  # noqa: PLR0904
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
+
+        result = u.try_(
+            _execute_tap,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            default=None,
+        )
+        if result is None:
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Tap execution failed")
+        return result
 
     def run_target(self, target_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute Singer target using flext-core patterns."""
         if u.none_(target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Target name is required for execution"
+                "Target name is required for execution",
             )
 
-        if u.not_(u.starts(target_name, "target-")):
+        # DSL: Use u.starts for prefix checking
+        if not u.starts(target_name, "target-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid target name format: {target_name}"
+                f"Invalid target name format: {target_name}",
             )
 
-        try:
+        # DSL: Use u.try_ for unified error handling
+        def _execute_target() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
@@ -415,10 +439,15 @@ class FlextMeltano(  # noqa: PLR0904
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Target execution failed: {e}"
-            )
+
+        result = u.try_(
+            _execute_target,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            default=None,
+        )
+        if result is None:
+            return r[t.MeltanoCore.MeltanoConfigDict].fail("Target execution failed")
+        return result
 
     # ============================================================================
     # PLUGIN OPERATIONS - Railway-oriented with flext-core patterns
@@ -434,18 +463,20 @@ class FlextMeltano(  # noqa: PLR0904
         # Use u.none_() for validation (DSL pattern)
         if u.none_(plugin_type, plugin_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Plugin type and name are required"
+                "Plugin type and name are required",
             )
 
+        # DSL: Use u.in_ for membership checking
         valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
-        if u.not_(u.in_(plugin_type, valid_types)):
+        if not u.in_(plugin_type, cast("list[object]", list(valid_types))):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
 
-        if u.not_(u.starts(plugin_name, "tap-", "target-", "dbt-")):
+        # DSL: Use u.starts for multiple prefix checking
+        if not u.starts(plugin_name, "tap-", "target-", "dbt-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid plugin name format: {plugin_name}"
+                f"Invalid plugin name format: {plugin_name}",
             )
 
         try:
@@ -467,15 +498,16 @@ class FlextMeltano(  # noqa: PLR0904
                         "installed_at": str(time.time()),
                         "api_version": self.version,
                     },
-                )
+                ),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Plugin installation failed: {e}"
+                f"Plugin installation failed: {e}",
             )
 
     def list_plugins(
-        self, plugin_type: str | None = None
+        self,
+        plugin_type: str | None = None,
     ) -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
         """List installed plugins using flext-core patterns."""
         try:
@@ -491,19 +523,28 @@ class FlextMeltano(  # noqa: PLR0904
                 else all_plugins
             )
 
+            # DSL: Use u.map for unified mapping
+            plugins_list = (
+                list(filtered_plugins.values())
+                if isinstance(filtered_plugins, dict)
+                else list(filtered_plugins)
+                if isinstance(filtered_plugins, (list, tuple))
+                else []
+            )
             plugins_data = u.map(
-                filtered_plugins, lambda p: {**p, "api_version": self.version}
+                plugins_list,
+                lambda p: {**cast("dict[str, object]", p), "api_version": self.version},
             )
 
             return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
                 cast(
                     "list[t.MeltanoCore.MeltanoConfigDict]",
                     plugins_data,
-                )
+                ),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
-                f"Plugin listing failed: {e}"
+                f"Plugin listing failed: {e}",
             )
 
     # ============================================================================
@@ -525,7 +566,7 @@ class FlextMeltano(  # noqa: PLR0904
             execution_duration = time.time() - execution_start
 
             self.logger.info(
-                f"DBT models executed successfully in {execution_duration:.2f}s"
+                f"DBT models executed successfully in {execution_duration:.2f}s",
             )
 
             return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -539,16 +580,18 @@ class FlextMeltano(  # noqa: PLR0904
                         "executed_at": str(time.time()),
                         "api_version": self.version,
                         "timeout_seconds": getattr(
-                            self._config, "timeout_seconds", 300
+                            self._config,
+                            "timeout_seconds",
+                            300,
                         ),
                         "log_level": getattr(self._config, "log_level", "INFO"),
                         "project_root": str(getattr(self._config, "project_root", ".")),
                     },
-                )
+                ),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"DBT models execution failed: {e}"
+                f"DBT models execution failed: {e}",
             )
 
     def test_dbt_models(
@@ -568,7 +611,7 @@ class FlextMeltano(  # noqa: PLR0904
             tests_count = u.mul(u.count(models_to_test), 3)
             self.logger.info(
                 f"DBT tests completed successfully: {tests_count} tests passed "
-                f"in {execution_duration:.2f}s"
+                f"in {execution_duration:.2f}s",
             )
 
             return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -583,11 +626,11 @@ class FlextMeltano(  # noqa: PLR0904
                         "executed_at": str(time.time()),
                         "api_version": self.version,
                     },
-                )
+                ),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"DBT model testing failed: {e}"
+                f"DBT model testing failed: {e}",
             )
 
     def generate_dbt_docs(
@@ -608,7 +651,7 @@ class FlextMeltano(  # noqa: PLR0904
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"DBT documentation generation failed: {e}"
+                f"DBT documentation generation failed: {e}",
             )
 
     # ============================================================================
@@ -624,14 +667,14 @@ class FlextMeltano(  # noqa: PLR0904
         # Use u.empty() for validation (DSL pattern)
         if u.empty(environment_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Environment name is required"
+                "Environment name is required",
             )
 
+        # DSL: Use u.in_ for membership checking
         valid_environments = {"development", "staging", "production", "testing"}
-        # Use u.not_() + u.in_() for membership check (DSL pattern)
-        if u.not_(u.in_(environment_name, valid_environments)):
+        if not u.in_(environment_name, cast("list[object]", list(valid_environments))):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {valid_environments}"
+                f"Invalid environment: {environment_name}. Valid: {valid_environments}",
             )
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
@@ -642,7 +685,7 @@ class FlextMeltano(  # noqa: PLR0904
                     "configuration": config or {},
                     "status": "configured",
                 },
-            )
+            ),
         )
 
     # ============================================================================
@@ -678,7 +721,9 @@ class FlextMeltano(  # noqa: PLR0904
     # ============================================================================
 
     def create_project(
-        self, project_name: str, project_dir: str | None = None
+        self,
+        project_name: str,
+        project_dir: str | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
@@ -692,7 +737,7 @@ class FlextMeltano(  # noqa: PLR0904
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Failed to create project: {e}"
+                f"Failed to create project: {e}",
             )
 
     def validate_project(self, _project_path: str) -> r[bool]:
@@ -710,50 +755,56 @@ class FlextMeltano(  # noqa: PLR0904
         self,
         source_name: str,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
-    ) -> r[t.MeltanoCore.JsonValue]:
+    ) -> r[t_core.JsonValue]:
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self._config, source_name=source_name)
             return service.extract(cast("dict[str, object]", config or {}))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.JsonValue].fail(f"Failed to extract data: {e}")
+            return r[t_core.JsonValue].fail(f"Failed to extract data: {e}")
 
     def load_data(
-        self, sink_name: str, records: list[t.MeltanoCore.JsonValue] | None = None
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        sink_name: str,
+        records: list[t_core.JsonValue] | None = None,
+    ) -> r[t_core.JsonValue]:
         """Load data to sink - delegates to service."""
         try:
             service = FlextMeltanoService(config=self._config, sink_name=sink_name)
-            # Use u.empty() for conditional check (DSL pattern)
-            if u.not_(u.empty(records)):
-                return service.load_batch(records)
-            return r[t.MeltanoCore.JsonValue].ok({"status": "initialized"})
+            # DSL: Use u.empty for conditional check
+            if records is not None and not u.empty(records):
+                return service.load_batch(cast("list[dict[str, object]]", records))
+            return r[t_core.JsonValue].ok({"status": "initialized"})
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.JsonValue].fail(f"Failed to load data: {e}")
+            return r[t_core.JsonValue].fail(f"Failed to load data: {e}")
 
-    def discover_catalog(self, source_name: str) -> r[t.MeltanoCore.JsonValue]:
+    def discover_catalog(self, source_name: str) -> r[t_core.JsonValue]:
         """Discover source schema - delegates to service."""
         try:
             service = FlextMeltanoService(config=self._config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.JsonValue].fail(f"Failed to discover catalog: {e}")
+            return r[t_core.JsonValue].fail(f"Failed to discover catalog: {e}")
 
     # ============================================================================
     # PRIVATE OPERATION HANDLERS - Railway-oriented call implementations
     # ============================================================================
 
     def _handle_create_pipeline_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle create_pipeline operation call with railway patterns."""
-        # Use u.guard() + u.when() for validation (DSL pattern)
-        payload_guard = u.guard(payload, dict, return_value=True)
-        if u.empty(payload_guard):
-            return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
+        # DSL: Use u.guard for validation
+        payload_guard_result = u.guard(payload, dict, return_value=True)
+        if payload_guard_result is None or not isinstance(payload_guard_result, dict):
+            return r[t_core.JsonValue].fail("Payload must be a dictionary")
+        payload_guard: dict[str, object] = cast(
+            "dict[str, object]",
+            payload_guard_result,
+        )
 
-        # Use u.fields() for multiple field extraction (DSL pattern - reduces
-        # 3 lines to 1)
+        # DSL: Use u.fields for multiple field extraction
         fields_result = u.fields(
             payload_guard,
             {
@@ -762,33 +813,54 @@ class FlextMeltano(  # noqa: PLR0904
                 "config": {},
             },
         )
+        # DSL: Handle fields_result - can be dict or r
+        # DSL: Handle fields_result - can be dict or r
+        fields_dict: dict[str, object]
         if isinstance(fields_result, r):
-            return u.cast(fields_result, default_error="Field extraction failed")
-        tap_name = u.get(fields_result, "tap_name", default="")
-        target_name = u.get(fields_result, "target_name", default="")
-        config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
+            if fields_result.is_failure:
+                return r[t_core.JsonValue].fail(
+                    fields_result.error or "Field extraction failed",
+                )
+            fields_dict = cast("dict[str, object]", fields_result.value)
+        elif isinstance(fields_result, dict):
+            fields_dict = fields_result
+        else:
+            return r[t_core.JsonValue].fail("Field extraction failed")
+
+        tap_name = u.get(fields_dict, "tap_name", default="")
+        target_name = u.get(fields_dict, "target_name", default="")
+        config_val = u.get(fields_dict, "config", default={})
+        config_guard_result: object = u.guard(config_val, dict, return_value=True)
+        config = (
+            cast("dict[str, object]", config_guard_result)
+            if isinstance(config_guard_result, dict)
+            else {}
+        )
 
         if u.none_(tap_name, target_name):
-            return r[t.MeltanoCore.JsonValue].fail(
-                "tap_name and target_name are required"
-            )
+            return r[t_core.JsonValue].fail("tap_name and target_name are required")
 
-        result = self.create_pipeline(
+        return self.create_pipeline(
             tap_name,
             target_name,
             config,
         )
-        return u.cast(result, default_error="Pipeline creation failed")
 
     def _handle_execute_pipeline_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle execute_pipeline operation call."""
-        payload_guard = u.guard(payload, dict, return_value=True)
-        if u.empty(payload_guard):
-            return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
+        # DSL: Use u.guard for validation
+        payload_guard_result = u.guard(payload, dict, return_value=True)
+        if payload_guard_result is None or not isinstance(payload_guard_result, dict):
+            return r[t_core.JsonValue].fail("Payload must be a dictionary")
+        payload_guard: dict[str, object] = cast(
+            "dict[str, object]",
+            payload_guard_result,
+        )
 
-        # Use u.fields() for multiple field extraction (DSL pattern - reduces lines)
+        # DSL: Use u.fields for multiple field extraction
         fields_result = u.fields(
             payload_guard,
             {
@@ -797,23 +869,38 @@ class FlextMeltano(  # noqa: PLR0904
             },
         )
         if isinstance(fields_result, r):
-            return u.cast(fields_result, default_error="Field extraction failed")
-        pipeline_id = u.get(fields_result, "pipeline_id", default="")
-        config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
+            if fields_result.is_failure:
+                return r[t_core.JsonValue].fail(
+                    fields_result.error or "Field extraction failed",
+                )
+            fields_dict = cast("dict[str, object]", fields_result.value)
+        elif isinstance(fields_result, dict):
+            fields_dict = fields_result
+        else:
+            return r[t_core.JsonValue].fail("Field extraction failed")
+
+        pipeline_id = cast("str", u.get(fields_dict, "pipeline_id", default=""))
+        config_val = u.get(fields_dict, "config", default={})
+        config_guard_result: object = u.guard(config_val, dict, return_value=True)
+        config = (
+            cast("dict[str, object]", config_guard_result)
+            if isinstance(config_guard_result, dict)
+            else {}
+        )
 
         if u.none_(pipeline_id):
-            return r[t.MeltanoCore.JsonValue].fail("pipeline_id is required")
+            return r[t_core.JsonValue].fail("pipeline_id is required")
 
-        result = self.execute_pipeline(pipeline_id, config)
-        return u.cast(result, default_error="Pipeline execution failed")
+        return self.execute_pipeline(pipeline_id, config)
 
     def _handle_install_plugin_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle install_plugin operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
-            return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
+            return r[t_core.JsonValue].fail("Payload must be a dictionary")
 
         # Use u.fields() for multiple field extraction (DSL pattern - reduces lines)
         fields_result = u.fields(
@@ -831,34 +918,32 @@ class FlextMeltano(  # noqa: PLR0904
         config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
 
         if u.none_(plugin_type, plugin_name):
-            return r[t.MeltanoCore.JsonValue].fail(
-                "plugin_type and plugin_name are required"
-            )
+            return r[t_core.JsonValue].fail("plugin_type and plugin_name are required")
 
         result = self.install_plugin(plugin_type, plugin_name, config)
         return u.cast(result, default_error="Plugin installation failed")
 
     def _handle_list_plugins_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle list_plugins operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         # Use u.when() for conditional extraction (DSL pattern)
-        plugin_type_raw = (
-            u.get(payload_guard, "plugin_type") if payload_guard else None
-        )
+        plugin_type_raw = u.get(payload_guard, "plugin_type") if payload_guard else None
         plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
         result = self.list_plugins(plugin_type)
         return u.cast(result, default_error="Plugin listing failed")
 
     def _handle_configure_environment_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle configure_environment operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
-            return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
+            return r[t_core.JsonValue].fail("Payload must be a dictionary")
 
         # Use u.fields() for multiple field extraction (DSL pattern - reduces lines)
         fields_result = u.fields(
@@ -874,23 +959,20 @@ class FlextMeltano(  # noqa: PLR0904
         config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
 
         if u.empty(environment_name):
-            return r[t.MeltanoCore.JsonValue].fail("environment_name is required")
+            return r[t_core.JsonValue].fail("environment_name is required")
 
         result = self.configure_environment(environment_name, config)
         return u.cast(result, default_error="Environment configuration failed")
 
     def _handle_run_dbt_models_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle run_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         # Use u.when() for conditional extraction (DSL pattern)
-        models_raw = (
-            u.get(payload_guard, "models") if payload_guard else None
-        )
-        config_raw = (
-            u.get(payload_guard, "config") if payload_guard else None
-        )
+        models_raw = u.get(payload_guard, "models") if payload_guard else None
+        config_raw = u.get(payload_guard, "config") if payload_guard else None
         models = u.guard(models_raw, list, return_value=True)
         config = u.guard(config_raw, dict, return_value=True)
 
@@ -898,8 +980,9 @@ class FlextMeltano(  # noqa: PLR0904
         return u.cast(result, default_error="DBT models execution failed")
 
     def _handle_test_dbt_models_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle test_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         models: t.MeltanoCore.DbtModelList | None = None
@@ -914,12 +997,13 @@ class FlextMeltano(  # noqa: PLR0904
         return u.cast(result, default_error="DBT models testing failed")
 
     def _handle_run_elt_pipeline_call(
-        self, payload: t.MeltanoCore.JsonValue
-    ) -> r[t.MeltanoCore.JsonValue]:
+        self,
+        payload: t_core.JsonValue,
+    ) -> r[t_core.JsonValue]:
         """Handle run_elt_pipeline operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
-            return r[t.MeltanoCore.JsonValue].fail("Payload must be a dictionary")
+            return r[t_core.JsonValue].fail("Payload must be a dictionary")
 
         tap_name = u.get(payload_guard, "tap_name", default="")
         target_name = u.get(payload_guard, "target_name", default="")
@@ -933,9 +1017,7 @@ class FlextMeltano(  # noqa: PLR0904
 
         # Use u.none_() for validation (DSL pattern)
         if u.none_(tap_name, target_name):
-            return r[t.MeltanoCore.JsonValue].fail(
-                "tap_name and target_name are required"
-            )
+            return r[t_core.JsonValue].fail("tap_name and target_name are required")
 
         result = self.run_elt_pipeline(tap_name, target_name, dbt_models, config)
         return u.cast(result, default_error="ELT pipeline execution failed")

@@ -49,7 +49,10 @@ class FlextMeltanoAbstractions:
             self.logger = logger
 
         def create_pipeline_context(
-            self, project_path: Path, source_name: str, sink_name: str
+            self,
+            project_path: Path,
+            source_name: str,
+            sink_name: str,
         ) -> r[t.MeltanoCore.NestedJsonDict]:
             """Create pipeline context for data pipeline operations."""
             try:
@@ -103,7 +106,7 @@ class FlextMeltanoAbstractions:
         try:
             if not project_root.exists() or not project_root.is_dir():
                 return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}"
+                    f"Project path is not a valid directory: {project_root}",
                 )
 
             self._project_path = project_root
@@ -153,7 +156,7 @@ class FlextMeltanoAbstractions:
             # Type narrowing: ensure list[dict[str, object]]
             if isinstance(filtered_components, (list, tuple)):
                 return r[list[dict[str, object]]].ok(
-                    cast("list[dict[str, object]]", list(filtered_components))
+                    cast("list[dict[str, object]]", list(filtered_components)),
                 )
             return r[list[dict[str, object]]].ok([])
 
@@ -164,14 +167,18 @@ class FlextMeltanoAbstractions:
 
     # Runner operations
     def create_pipeline_context(
-        self, source_name: str, sink_name: str
+        self,
+        source_name: str,
+        sink_name: str,
     ) -> r[t.MeltanoCore.NestedJsonDict]:
         """Create pipeline context."""
         if not self._project_path:
             return r[t.MeltanoCore.NestedJsonDict].fail("No project loaded")
 
         return self._runner_helper.create_pipeline_context(
-            self._project_path, source_name, sink_name
+            self._project_path,
+            source_name,
+            sink_name,
         )
 
     def execute_data_pipeline(
@@ -186,7 +193,9 @@ class FlextMeltanoAbstractions:
         }
 
         return self._runner_helper.execute_data_pipeline(
-            cast("dict[str, object]", pipeline_context), source_config, sink_config
+            cast("dict[str, object]", pipeline_context),
+            source_config,
+            sink_config,
         )
 
     # ELT operations
@@ -233,7 +242,9 @@ class FlextMeltanoAbstractions:
 
     # Plugin operations
     def get_plugins_of_type(
-        self, _project: object, plugin_type: str
+        self,
+        _project: object,
+        plugin_type: str,
     ) -> r[dict[str, dict[str, object]]]:
         """Get plugins of specified type."""
         try:
@@ -259,7 +270,7 @@ class FlextMeltanoAbstractions:
             # Type narrowing: ensure dict[str, dict[str, object]]
             if isinstance(filtered_plugins, dict):
                 return r[dict[str, dict[str, object]]].ok(
-                    cast("dict[str, dict[str, object]]", filtered_plugins)
+                    cast("dict[str, dict[str, object]]", filtered_plugins),
                 )
             return r[dict[str, dict[str, object]]].ok({})
 
@@ -273,9 +284,9 @@ class FlextMeltanoAbstractions:
         try:
             # Simplified implementation - would validate and add plugin
             self.logger.info(
-            "Adding plugin",
-            plugin_config=cast("t_core.GeneralValueType", plugin_config),
-        )
+                "Adding plugin",
+                plugin_config=cast("t_core.GeneralValueType", plugin_config),
+            )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"

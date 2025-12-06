@@ -94,7 +94,7 @@ class FlextMeltanoValidators:
         """
         if not isinstance(config, dict):
             return FlextResult.fail(
-                "Plugin config validation failed: config must be a dictionary"
+                "Plugin config validation failed: config must be a dictionary",
             )
         return FlextResult.ok(True)
 
@@ -131,13 +131,13 @@ class FlextMeltanoValidators:
             and len(name) < c.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
-                "Sink component names must be at least 8 characters"
+                "Sink component names must be at least 8 characters",
             )
 
         # Pipeline business rule: source component names
         if name.startswith("tap-") and len(name) < c.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH:
             validation_errors.append(
-                "Source component names must be at least 5 characters"
+                "Source component names must be at least 5 characters",
             )
 
         if validation_errors:
@@ -149,7 +149,7 @@ class FlextMeltanoValidators:
     def _validate_plugin_namespace(cls, config: t.JsonValue) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
-                "Config must be dictionary for namespace validation"
+                "Config must be dictionary for namespace validation",
             )
 
         namespace = config.get("namespace")
@@ -185,7 +185,7 @@ class FlextMeltanoValidators:
     def _validate_plugin_executable(cls, config: t.JsonValue) -> FlextResult[bool]:
         if not isinstance(config, dict):
             return FlextResult.fail(
-                "Config must be dictionary for executable validation"
+                "Config must be dictionary for executable validation",
             )
 
         executable = config.get("executable")
@@ -202,7 +202,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def _validate_pipeline_specific_rules(
-        cls, config: t.JsonValue
+        cls,
+        config: t.JsonValue,
     ) -> FlextResult[bool]:
         """Validate additional pipeline-specific business rules.
 
@@ -215,7 +216,7 @@ class FlextMeltanoValidators:
         """
         if not isinstance(config, dict):
             return FlextResult.fail(
-                "Config must be dictionary for Meltano rules validation"
+                "Config must be dictionary for Meltano rules validation",
             )
 
         # Additional Meltano-specific validations can be added here
@@ -275,7 +276,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_transformation_business_rules(
-        cls, config: t.JsonValue
+        cls,
+        config: t.JsonValue,
     ) -> FlextResult[bool]:
         """Validate transformation-specific business rules.
 

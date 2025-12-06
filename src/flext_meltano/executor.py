@@ -87,7 +87,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
             return r[t.MeltanoCore.JsonValue].ok(
-                data=cast("t.MeltanoCore.JsonValue", config_data)
+                data=cast("t.MeltanoCore.JsonValue", config_data),
             )
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -157,7 +157,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[FlextMeltanoExecutionResult].fail(
-                f"Pipeline execution failed: {e}"
+                f"Pipeline execution failed: {e}",
             )
 
     def execute_dbt_command(
@@ -274,7 +274,8 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         return r[dict[str, object]].ok({
             "commands": commands_list,
             "available_commands": u.filter(
-                commands_list, lambda c: c in {"version", "help", "health"}
+                commands_list,
+                lambda c: c in {"version", "help", "health"},
             ),
         })
 
@@ -296,7 +297,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
                 "command": f"{tap_name} -> {target_name}",
                 "exit_code": r.exit_code,
                 "output": r.output,
-            }
+            },
         )
 
     @staticmethod

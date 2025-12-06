@@ -241,6 +241,7 @@ class FlextMeltanoConstants(FlextConstants):
         VALID_NAME_PATTERN: Final[str] = r"^[a-zA-Z0-9_-]+$"
 
     # Compatibility aliases for enums
+    # Note: StrEnum cannot be inherited (it's final), so we use aliases
     PluginTypes = Enums.PluginType
     ReplicationMethods = Enums.ReplicationMethod
     OperationStatus = Enums.OperationStatus

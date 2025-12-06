@@ -17,14 +17,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from flext_core import t as FlextTypes  # noqa: N812
+from flext_core import t as t_core
 from singer_sdk import typing as singer_sdk_typing
 
 # Import aliases for simplified usage
-t_base = FlextTypes
+t_base = t_core
 
 
-class FlextMeltanoTypes(FlextTypes):
+class FlextMeltanoTypes(t_core):
     """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
@@ -159,7 +159,8 @@ class FlextMeltanoTypes(FlextTypes):
         """ELT pipeline complex types namespace."""
 
         type PipelineResult = dict[
-            str, str | int | float | bool | dict[str, object] | list[object]
+            str,
+            str | int | float | bool | dict[str, object] | list[object],
         ]
         type ExtractionResult = dict[str, str | int | bool | dict[str, object]]
         type LoadingResult = dict[str, str | int | bool | dict[str, object]]
@@ -193,7 +194,8 @@ class FlextMeltanoTypes(FlextTypes):
             | list[object]
             | dict[str, object]
             | dict[
-                str, bool | dict[str, object] | float | int | list[object] | str | None
+                str,
+                bool | dict[str, object] | float | int | list[object] | str | None,
             ]
             | None
         )

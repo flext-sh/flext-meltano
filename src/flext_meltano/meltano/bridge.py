@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextLogger, FlextResult, t as FlextTypes, u  # noqa: N812
+from flext_core import FlextLogger, FlextResult, t as t_core, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -21,12 +21,12 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 # u is already imported from flext_core
-# t_base (FlextTypes) is already imported from flext_core as t
+r = FlextResult
+t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 p = FlextMeltanoProtocols
-t_base = FlextTypes
 
 
 class FlextMeltanoBridge:

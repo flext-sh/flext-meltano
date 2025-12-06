@@ -59,7 +59,8 @@ class FlextMeltanoProjectManager(FlextService):
         self.project: MeltanoProject | None = None
 
     def initialize_project(
-        self, root: Path
+        self,
+        root: Path,
     ) -> FlextResult[FlextMeltanoProjectManager.ProjectInfo]:
         """Initialize a new Meltano project.
 
@@ -91,11 +92,12 @@ class FlextMeltanoProjectManager(FlextService):
         except Exception as e:
             self.logger.exception("Failed to initialize project")
             return FlextResult[FlextMeltanoProjectManager.ProjectInfo].fail(
-                f"Failed to initialize project: {e}"
+                f"Failed to initialize project: {e}",
             )
 
     def load_project(
-        self, root: Path
+        self,
+        root: Path,
     ) -> FlextResult[FlextMeltanoProjectManager.ProjectInfo]:
         """Load an existing Meltano project.
 
@@ -109,7 +111,7 @@ class FlextMeltanoProjectManager(FlextService):
         try:
             if not root.exists():
                 return FlextResult[FlextMeltanoProjectManager.ProjectInfo].fail(
-                    f"Project directory not found: {root}"
+                    f"Project directory not found: {root}",
                 )
 
             self.project = MeltanoProject(root)
@@ -131,11 +133,12 @@ class FlextMeltanoProjectManager(FlextService):
         except Exception as e:
             self.logger.exception("Failed to load project", error=str(e))
             return FlextResult[FlextMeltanoProjectManager.ProjectInfo].fail(
-                f"Failed to load project: {e}"
+                f"Failed to load project: {e}",
             )
 
     def get_plugins(
-        self, plugin_type: str | None = None
+        self,
+        plugin_type: str | None = None,
     ) -> FlextResult[list[dict[str, object]]]:
         """Get plugins from the project.
 
@@ -152,7 +155,8 @@ class FlextMeltanoProjectManager(FlextService):
 
             plugins = []
             if hasattr(self.project, "plugins") and hasattr(
-                self.project.plugins, "__iter__"
+                self.project.plugins,
+                "__iter__",
             ):
                 for plugin in self.project.plugins:
                     plugin_dict = {
@@ -172,7 +176,7 @@ class FlextMeltanoProjectManager(FlextService):
         except Exception as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return FlextResult[list[dict[str, object]]].fail(
-                f"Failed to get plugins: {e}"
+                f"Failed to get plugins: {e}",
             )
 
     def install_plugin(self, name: str) -> FlextResult[dict[str, object]]:

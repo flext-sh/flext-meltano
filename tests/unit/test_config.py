@@ -16,7 +16,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextConstants
+from flext_core import FlextConfig, FlextConstants
 
 from flext_meltano import FlextMeltanoConfig
 
@@ -295,8 +295,6 @@ class TestFlextMeltanoConfigEdgeCases:
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
         # Log level validation is handled by FlextConfig
-        from flext_core import FlextConfig  # noqa: PLC0415
-
         global_config = FlextConfig.get_global_instance()
         # Test that global config has log_level
         assert hasattr(global_config, "log_level")

@@ -285,7 +285,7 @@ class FlextMeltanoSingerCliTranslator:
         if completed_process.returncode != 0:
             error_msg = completed_process.stderr or "Unknown error"
             return r[dict[str, object]].fail(
-                f"Command failed with code {completed_process.returncode}: {error_msg}"
+                f"Command failed with code {completed_process.returncode}: {error_msg}",
             )
 
         # Prepare output data with decoded strings
