@@ -14,14 +14,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-
 import time
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import meltano
 from flext_core import FlextLogger, FlextResult, u
@@ -31,6 +26,9 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
+
+if TYPE_CHECKING:
+    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
 # Import aliases for concise usage
 # u is already imported from flext_core
@@ -58,7 +56,7 @@ class FlextMeltanoAdapter:
     def _library_runner(self) -> FlextMeltanoLibraryRunner:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
-            # Import here to avoid circular dependency
+            # Import here to avoid circular dependency - runtime import needed
             from flext_meltano.library_runner import (  # noqa: PLC0415
                 FlextMeltanoLibraryRunner,
             )
@@ -154,7 +152,7 @@ class FlextMeltanoAdapter:
                     )
 
                 return r[list[dict[str, object]]].ok(
-                    cast("list[dict[str, object]]", plugins)
+                    cast("list[dict[str, object]]", plugins),
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[list[dict[str, object]]].fail(f"Plugin discovery failed: {e}")
@@ -177,12 +175,12 @@ class FlextMeltanoAdapter:
                 # Validate plugin names
                 if not tap_name.startswith("tap-"):
                     return r[dict[str, object]].fail(
-                        f"Invalid tap name format: {tap_name}"
+                        f"Invalid tap name format: {tap_name}",
                     )
 
                 if not target_name.startswith("target-"):
                     return r[dict[str, object]].fail(
-                        f"Invalid target name format: {target_name}"
+                        f"Invalid target name format: {target_name}",
                     )
 
                 # Create execution result
@@ -199,7 +197,7 @@ class FlextMeltanoAdapter:
                 }
 
                 return r[dict[str, object]].ok(
-                    cast("dict[str, object]", execution_result)
+                    cast("dict[str, object]", execution_result),
                 )
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[dict[str, object]].fail(f"Pipeline execution failed: {e}")
@@ -236,10 +234,10 @@ class FlextMeltanoAdapter:
                                         "forced-replication-method": "INCREMENTAL",
                                         "valid-replication-keys": ["updated_at"],
                                     },
-                                }
+                                },
                             ],
-                        }
-                    ]
+                        },
+                    ],
                 }
 
                 return r[dict[str, object]].ok(cast("dict[str, object]", catalog))

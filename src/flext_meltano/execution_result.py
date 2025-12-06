@@ -29,7 +29,7 @@ p = FlextMeltanoProtocols
 class FlextMeltanoExecutionResult:
     """Execution result model for Meltano command operations following flext-core patterns."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         command: list[str],
         *,

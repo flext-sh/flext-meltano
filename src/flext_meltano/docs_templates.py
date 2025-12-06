@@ -46,9 +46,19 @@ class DocsTemplates:
             automation = u.guard(automation_raw, dict, default={}, return_value=True)
             template_vars = u.construct(
                 {
-                    "generated_at": {"value": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")},
-                    "audit_day": {"field": "audit_day", "default": "monday", "ops": {"ensure": "str"}},
-                    "audit_time": {"field": "audit_time", "default": "09:00", "ops": {"ensure": "str"}},
+                    "generated_at": {
+                        "value": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                    },
+                    "audit_day": {
+                        "field": "audit_day",
+                        "default": "monday",
+                        "ops": {"ensure": "str"},
+                    },
+                    "audit_time": {
+                        "field": "audit_time",
+                        "default": "09:00",
+                        "ops": {"ensure": "str"},
+                    },
                     "cron_schedule": {"value": self._get_cron_schedule(config)},
                 },
                 source=automation,
@@ -114,7 +124,10 @@ class DocsTemplates:
         """Convert audit schedule to cron format."""
         automation_raw = u.extract(config, "automation", default={})
         automation_config = u.guard(automation_raw, dict, default={}, return_value=True)
-        audit_day = u.normalize(str(u.extract(automation_config, "audit_day", default="monday")), case="lower")
+        audit_day = u.normalize(
+            str(u.extract(automation_config, "audit_day", default="monday")),
+            case="lower",
+        )
         audit_time = str(u.extract(automation_config, "audit_time", default="09:00"))
 
         hour, minute = map(int, audit_time.split(":"))

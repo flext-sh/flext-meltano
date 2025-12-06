@@ -378,7 +378,8 @@ class TestServiceGenericMethods:
         """Test generic service creation with additional configuration."""
         # Test that service can be created with additional parameters
         service = FlextMeltanoService(
-            service_name="test-config-service", source_name="tap-postgres"
+            service_name="test-config-service",
+            source_name="tap-postgres",
         )
         assert service is not None
         assert service.service_name == "test-config-service"

@@ -31,7 +31,8 @@ class TestFlextMeltanoAdapter:
 
         # Test basic initialization
         self.test_matchers.assert_is_not_none(
-            adapter, message="Adapter should be initialized"
+            adapter,
+            message="Adapter should be initialized",
         )
         self.test_matchers.assert_true(
             condition=hasattr(adapter, "project_adapter"),
@@ -50,7 +51,8 @@ class TestFlextMeltanoAdapter:
             message="Should have singer_adapter",
         )
         self.test_matchers.assert_true(
-            condition=hasattr(adapter, "dbt_adapter"), message="Should have dbt_adapter"
+            condition=hasattr(adapter, "dbt_adapter"),
+            message="Should have dbt_adapter",
         )
 
     def test_adapter_project_operations(self) -> None:
@@ -59,7 +61,8 @@ class TestFlextMeltanoAdapter:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir) / "test_project"
             result = self.adapter.project_adapter.create_project(
-                "test-project", project_path
+                "test-project",
+                project_path,
             )
 
             # Verify result type
@@ -83,7 +86,8 @@ class TestFlextMeltanoAdapter:
         """Test adapter pipeline operations."""
         # Test pipeline execution
         result = self.adapter.pipeline_adapter.execute_pipeline(
-            "tap-csv", "target-jsonl"
+            "tap-csv",
+            "target-jsonl",
         )
 
         # Verify result type
@@ -105,8 +109,10 @@ class TestFlextMeltanoAdapter:
         )
         # Note: Current implementation may not fail, so we'll just test the structure
         FlextTestsMatchers.assert_true(
-            condition=hasattr(result, "is_success"), message="Should have is_success"
+            condition=hasattr(result, "is_success"),
+            message="Should have is_success",
         )
         FlextTestsMatchers.assert_true(
-            condition=hasattr(result, "error"), message="Should have error"
+            condition=hasattr(result, "error"),
+            message="Should have error",
         )

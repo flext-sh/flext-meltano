@@ -33,7 +33,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -52,7 +53,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -69,7 +71,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -90,7 +93,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -111,7 +115,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_failure
@@ -126,7 +131,8 @@ class TestCliModelConverterWithTapRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_failure
@@ -145,7 +151,8 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -162,7 +169,8 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -178,7 +186,8 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -195,7 +204,8 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -212,7 +222,8 @@ class TestCliModelConverterWithTargetRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_failure
@@ -231,7 +242,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TapRunParams, cli_args
+            m.TapRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -247,7 +259,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.TargetRunParams, cli_args
+            m.TargetRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -264,7 +277,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.PipelineRunParams, cli_args
+            m.PipelineRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -284,7 +298,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.PipelineRunParams, cli_args
+            m.PipelineRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -305,7 +320,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.PipelineRunParams, cli_args
+            m.PipelineRunParams,
+            cli_args,
         )
 
         assert result.is_failure
@@ -319,7 +335,8 @@ class TestCliModelConverterWithPipelineRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.PipelineRunParams, cli_args
+            m.PipelineRunParams,
+            cli_args,
         )
 
         assert result.is_failure
@@ -336,7 +353,8 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.DbtRunParams, cli_args
+            m.DbtRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -353,7 +371,8 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.DbtRunParams, cli_args
+            m.DbtRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -369,7 +388,8 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.DbtRunParams, cli_args
+            m.DbtRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -385,7 +405,8 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.DbtRunParams, cli_args
+            m.DbtRunParams,
+            cli_args,
         )
 
         assert result.is_success
@@ -400,7 +421,8 @@ class TestCliModelConverterWithDbtRunParams:
         }
 
         result = FlextCliModels.CliModelConverter.cli_args_to_model(
-            m.DbtRunParams, cli_args
+            m.DbtRunParams,
+            cli_args,
         )
 
         assert result.is_failure

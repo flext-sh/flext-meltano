@@ -54,7 +54,8 @@ class FlextMeltanoDbtService(FlextService):
         self.runner = FlextMeltanoDbtRunner()
 
     def load_project(
-        self, root: Path
+        self,
+        root: Path,
     ) -> FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo]:
         """Load a DBT project.
 
@@ -75,7 +76,7 @@ class FlextMeltanoDbtService(FlextService):
         except Exception as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
-                f"Failed to load DBT project: {e}"
+                f"Failed to load DBT project: {e}",
             )
 
     def get_project_models(
@@ -97,7 +98,7 @@ class FlextMeltanoDbtService(FlextService):
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
             return FlextResult[list[dict[str, object]]].fail(
-                f"Failed to get models: {e}"
+                f"Failed to get models: {e}",
             )
 
     def run_models(
@@ -128,7 +129,7 @@ class FlextMeltanoDbtService(FlextService):
         except Exception as e:
             self.logger.exception("DBT run failed", error=str(e))
             return FlextResult[FlextMeltanoDbtRunner.RunResult].fail(
-                f"DBT run failed: {e}"
+                f"DBT run failed: {e}",
             )
 
     def run_tests(
@@ -159,7 +160,7 @@ class FlextMeltanoDbtService(FlextService):
         except Exception as e:
             self.logger.exception("DBT tests failed", error=str(e))
             return FlextResult[FlextMeltanoDbtRunner.TestResult].fail(
-                f"DBT tests failed: {e}"
+                f"DBT tests failed: {e}",
             )
 
     def generate_docs(self, **kwargs: object) -> FlextResult[dict[str, object]]:
@@ -181,7 +182,7 @@ class FlextMeltanoDbtService(FlextService):
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return FlextResult[dict[str, object]].fail(
-                f"Documentation generation failed: {e}"
+                f"Documentation generation failed: {e}",
             )
 
     @staticmethod

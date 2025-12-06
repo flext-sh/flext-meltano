@@ -60,18 +60,20 @@ class FlextMeltanoAPIPluginOperations:
         # Use u.none_() for validation (DSL pattern)
         if u.none_(plugin_type, plugin_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Plugin type and name are required"
+                "Plugin type and name are required",
             )
 
         valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
         # Use u.not_() + u.in_() for membership check (DSL pattern)
         if u.not_(u.in_(plugin_type, valid_types)):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
 
         if u.not_(u.starts(plugin_name, "tap-", "target-", "dbt-")):
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Invalid plugin name format: {plugin_name}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Invalid plugin name format: {plugin_name}",
+            )
 
         try:
             plugin_config = {
@@ -90,10 +92,13 @@ class FlextMeltanoAPIPluginOperations:
                 "api_version": self.api.version,
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Plugin installation failed: {e}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Plugin installation failed: {e}",
+            )
 
     def list_plugins(
-        self, plugin_type: str | None = None
+        self,
+        plugin_type: str | None = None,
     ) -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
         """List installed Meltano plugins with filtering."""
         try:
@@ -116,7 +121,9 @@ class FlextMeltanoAPIPluginOperations:
 
             return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(f"Plugin listing failed: {e}")
+            return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
+                f"Plugin listing failed: {e}",
+            )
 
 
 __all__ = ["FlextMeltanoAPIPluginOperations"]

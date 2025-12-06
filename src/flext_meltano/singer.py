@@ -53,7 +53,9 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
         self._library_runner = FlextMeltanoLibraryRunner()
 
     def execute_pipeline(
-        self, tap_instance: object, target_instance: object
+        self,
+        tap_instance: object,
+        target_instance: object,
     ) -> r[t.Processing.SingerExecutionResult]:
         """Execute Singer pipeline with protocol management.
 
@@ -76,7 +78,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
                 return r[t.Processing.SingerExecutionResult].fail(
-                    singer_manager_result.error or "Failed to get Singer manager"
+                    singer_manager_result.error or "Failed to get Singer manager",
                 )
 
             # For now, just return success since singer_manager is just a dict

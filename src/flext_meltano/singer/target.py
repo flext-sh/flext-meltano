@@ -12,6 +12,7 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService
 from singer_sdk import Target
 
+from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -41,9 +42,6 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def __init__(self, config: object | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        # Lazy import to avoid circular dependency
-        from flext_meltano.config import FlextMeltanoConfig  # noqa: PLC0415
-
         self._config = config or FlextMeltanoConfig()
         # Initialize FlextService base - logger comes from FlextMixins
         super().__init__()
@@ -110,12 +108,14 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception(
-                "Target configuration validation failed", error=str(e)
+                "Target configuration validation failed",
+                error=str(e),
             )
             return r[bool].fail(f"Target configuration validation failed: {e}")
 
     def create_sink_instance(
-        self, sink_config: m.DataSinkConfig
+        self,
+        sink_config: m.DataSinkConfig,
     ) -> r[m.DataSinkInstance]:
         """Create a sink instance from configuration.
 

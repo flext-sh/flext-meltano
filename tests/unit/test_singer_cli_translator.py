@@ -508,7 +508,8 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
 
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
-            ["target-postgres"], input_data=input_data
+            ["target-postgres"],
+            input_data=input_data,
         )
 
         assert result.is_success
@@ -527,7 +528,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         )
 
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres"
+            "tap-postgres",
         ])
 
         assert result.is_failure
@@ -540,7 +541,8 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         mock_run.side_effect = subprocess.TimeoutExpired("tap-postgres", 10)
 
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
-            ["tap-postgres"], timeout=10
+            ["tap-postgres"],
+            timeout=10,
         )
 
         assert result.is_failure
@@ -552,7 +554,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         mock_run.side_effect = FileNotFoundError("tap-nonexistent not found")
 
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-nonexistent"
+            "tap-nonexistent",
         ])
 
         assert result.is_failure
@@ -560,13 +562,14 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
 
     @patch("flext_core.utilities.ucurnal_command")
     def test_execute_singer_command_generic_exception(
-        self, mock_run: MagicMock
+        self,
+        mock_run: MagicMock,
     ) -> None:
         """Test generic exception handling."""
         mock_run.side_effect = RuntimeError("Unexpected error")
 
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres"
+            "tap-postgres",
         ])
 
         assert result.is_failure
@@ -605,7 +608,7 @@ class TestFlextMeltanoSingerCliTranslatorFileValidation:
     def test_validate_file_path_not_found(self) -> None:
         """Test file path validation with non-existent file."""
         result = FlextMeltanoSingerCliTranslator.validate_file_path(
-            "/path/to/nonexistent.json"
+            "/path/to/nonexistent.json",
         )
 
         assert result.is_failure

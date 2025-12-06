@@ -112,7 +112,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 status="initialized",
                 discovered=True,
                 streams=[
-                    {"name": "test_stream", "schema": {}}
+                    {"name": "test_stream", "schema": {}},
                 ],  # Discovered taps must have streams
                 metadata={"created_at": "2025-01-01T00:00:00Z"},
             )

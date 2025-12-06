@@ -54,7 +54,7 @@ def simple_config_example() -> None:
     config = FlextMeltanoConfig()
 
     # Use actual existing method from FlextMeltanoConfig
-    logger.info(f"Config created: {config}")
+    logger.info("Config created: %s", config)
 
     # Show environment value
     if config is not None:

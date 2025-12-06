@@ -19,7 +19,8 @@ class TestTapConfigEnhanced:
     def test_tap_config_with_minimal_data(self) -> None:
         """Test TapConfig with minimal required data."""
         config = m.TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"}
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
 
         assert config.tap_type == "tap-postgres"
@@ -154,7 +155,8 @@ class TestStreamInfoEnhanced:
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
         with pytest.raises(
-            ValidationError, match="String should have at least 1 character"
+            ValidationError,
+            match="String should have at least 1 character",
         ):
             m.StreamInfo(
                 stream_name="",
@@ -228,7 +230,9 @@ class TestPluginModelEnhanced:
     def test_plugin_model_with_minimal_data(self) -> None:
         """Test PluginModel with minimal required data."""
         plugin = m.PluginModel(
-            name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
+            name="tap-postgres",
+            namespace="tap_postgres",
+            pip_url="tap-postgres",
         )
 
         assert plugin.name == "tap-postgres"
@@ -254,7 +258,7 @@ class TestPluginModelEnhanced:
                     "kind": "string",
                     "label": "Host",
                     "description": "PostgreSQL host",
-                }
+                },
             },
             config_files=["config.json"],
         )
@@ -271,7 +275,8 @@ class TestPluginModelEnhanced:
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
         with pytest.raises(
-            ValidationError, match="String should have at least 1 character"
+            ValidationError,
+            match="String should have at least 1 character",
         ):
             m.PluginModel(name="", namespace="")
 
@@ -291,7 +296,9 @@ class TestDbtProjectModelEnhanced:
     def test_dbt_project_with_minimal_data(self) -> None:
         """Test DbtProjectModel with minimal required data."""
         dbt_project = m.DbtProjectModel(
-            name="analytics", version="1.0.0", profile="default"
+            name="analytics",
+            version="1.0.0",
+            profile="default",
         )
 
         assert dbt_project.name == "analytics"
@@ -313,7 +320,7 @@ class TestDbtProjectModelEnhanced:
                 "staging": {
                     "materialized": "view",
                     "models": ["stg_users", "stg_orders"],
-                }
+                },
             },
             sources={"raw_data": {"tables": ["users", "orders"]}},
             tests={"unit": {"models": ["test_user_validity"]}},
@@ -371,11 +378,14 @@ class TestModelIntegration:
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
         plugin = m.PluginModel(
-            name="tap-mysql", namespace="meltanolabs", pip_url="tap-mysql"
+            name="tap-mysql",
+            namespace="meltanolabs",
+            pip_url="tap-mysql",
         )
 
         project = m.MeltanoProjectModel(
-            project_id="mysql-etl", plugins={"extractors": [{"name": "tap-mysql"}]}
+            project_id="mysql-etl",
+            plugins={"extractors": [{"name": "tap-mysql"}]},
         )
 
         assert plugin.name in str(project.plugins)

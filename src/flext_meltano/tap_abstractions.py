@@ -52,7 +52,8 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         super().__init__()
 
     def discover_streams(
-        self, source_config: m.DataSourceConfig
+        self,
+        source_config: m.DataSourceConfig,
     ) -> r[dict[str, object]]:
         """Discover available streams for a source configuration.
 
@@ -73,7 +74,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             # Validate source configuration
             if not source_config.source_type:
                 return r[dict[str, object]].fail(
-                    "Source configuration must have name and type for discovery"
+                    "Source configuration must have name and type for discovery",
                 )
 
             # For now, return empty catalog - would integrate with actual Singer taps
@@ -130,7 +131,8 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail(f"Schema validation failed: {e}")
 
     def create_source_instance(
-        self, source_config: m.DataSourceConfig
+        self,
+        source_config: m.DataSourceConfig,
     ) -> r[m.DataSourceInstance]:
         """Create a source instance from configuration.
 
@@ -196,12 +198,14 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
         except Exception as e:
             self.logger.exception(
-                "Source configuration processing failed", error=str(e)
+                "Source configuration processing failed",
+                error=str(e),
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
     def build_singer_catalog(
-        self, streams: list[m.StreamDefinition]
+        self,
+        streams: list[m.StreamDefinition],
     ) -> r[dict[str, object]]:
         """Build a Singer catalog from stream definitions.
 
@@ -221,7 +225,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             # Validate stream definitions
             if not streams:
                 return r[dict[str, object]].fail(
-                    "Stream list cannot be empty for catalog building"
+                    "Stream list cannot be empty for catalog building",
                 )
 
             # Build catalog structure
@@ -255,7 +259,10 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[dict[str, object]].fail(f"Catalog building failed: {e}")
 
     def create_stream_from_schema(
-        self, name: str, schema: dict[str, object], source_type: str | None = None
+        self,
+        name: str,
+        schema: dict[str, object],
+        source_type: str | None = None,
     ) -> r[m.StreamDefinition]:
         """Create a Singer stream definition from name and schema.
 
@@ -283,7 +290,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             if "properties" not in schema:
                 return r[m.StreamDefinition].fail(
-                    "Stream schema must contain properties"
+                    "Stream schema must contain properties",
                 )
 
             # Create stream definition
@@ -341,7 +348,9 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[dict[str, object]].fail(f"State loading failed: {e}")
 
     def save_replication_state(
-        self, state: dict[str, object], state_file: str
+        self,
+        state: dict[str, object],
+        state_file: str,
     ) -> r[bool]:
         """Save Singer replication state to file.
 
@@ -379,7 +388,9 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail(f"State saving failed: {e}")
 
     def batch_records(
-        self, records: list[dict[str, object]], batch_size: int = 1000
+        self,
+        records: list[dict[str, object]],
+        batch_size: int = 1000,
     ) -> r[list[list[dict[str, object]]]]:
         """Batch records for efficient processing.
 
@@ -400,12 +411,12 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             if not records:
                 return r[list[list[dict[str, object]]]].fail(
-                    "Record list cannot be empty"
+                    "Record list cannot be empty",
                 )
 
             if batch_size <= 0:
                 return r[list[list[dict[str, object]]]].fail(
-                    "Batch size must be positive"
+                    "Batch size must be positive",
                 )
 
             # Create batches

@@ -185,7 +185,8 @@ class PlantUMLRenderer(s):
 
     @staticmethod
     def _validate_bracket_balance(
-        content: str, result: DiagramValidationResult
+        content: str,
+        result: DiagramValidationResult,
     ) -> None:
         """Check for unbalanced brackets and braces."""
         if content.count("{") != content.count("}"):
@@ -196,7 +197,8 @@ class PlantUMLRenderer(s):
 
     @staticmethod
     def _validate_line_syntax(
-        lines: list[str], result: DiagramValidationResult
+        lines: list[str],
+        result: DiagramValidationResult,
     ) -> None:
         """Validate syntax on a line-by-line basis."""
         for i, line in enumerate(lines, 1):
@@ -213,7 +215,7 @@ class PlantUMLRenderer(s):
                 # Basic validation for common PlantUML constructs
                 if "->" in stripped and not stripped.endswith(";"):
                     result.warnings.append(
-                        f"Line {i}: Arrow relationship may be missing semicolon"
+                        f"Line {i}: Arrow relationship may be missing semicolon",
                     )
                 elif "=" in stripped and not any(
                     keyword in stripped for keyword in ["skinparam", "set"]
@@ -249,12 +251,13 @@ class PlantUMLRenderer(s):
         return result
 
     def render_all_diagrams(
-        self, diagrams_dir: str | Path = "docs/architecture"
+        self,
+        diagrams_dir: str | Path = "docs/architecture",
     ) -> r[list[DiagramValidationResult]]:
         """Render all PlantUML diagrams in a directory using FLEXT patterns."""
         diagrams_dir = Path(diagrams_dir)
         puml_files = list(diagrams_dir.rglob("*.puml")) + list(
-            diagrams_dir.rglob("*.plantuml")
+            diagrams_dir.rglob("*.plantuml"),
         )
 
         results = []
@@ -282,16 +285,16 @@ class C4ModelValidator(s):
         super().__init__(logger=logger)
         self.c4_patterns = {
             "context": re.compile(
-                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Context\.puml"
+                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Context\.puml",
             ),
             "container": re.compile(
-                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Container\.puml"
+                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Container\.puml",
             ),
             "component": re.compile(
-                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Component\.puml"
+                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Component\.puml",
             ),
             "code": re.compile(
-                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Component\.puml"
+                r"!include https://raw\.githubusercontent\.com/plantuml-stdlib/C4-PlantUML/master/C4_Component\.puml",
             ),
         }
 
@@ -352,7 +355,7 @@ class C4ModelValidator(s):
             found_tech = any(tech in content for tech in tech_patterns)
             if not found_tech:
                 result.warnings.append(
-                    "Container diagram should specify technology choices"
+                    "Container diagram should specify technology choices",
                 )
 
         elif (
@@ -391,7 +394,9 @@ class ArchitectureDiagramGenerator:
     """Automated architecture diagram generation from code analysis."""
 
     def __init__(
-        self, source_dir: str = "src", logger: FlextLogger | None = None
+        self,
+        source_dir: str = "src",
+        logger: FlextLogger | None = None,
     ) -> None:
         """Initialize architecture diagram generator with source directory and logger."""
         self.source_dir = Path(source_dir)
@@ -414,7 +419,10 @@ class ArchitectureDiagramGenerator:
 
             # Generate PlantUML
             puml_content = self._generate_module_puml(
-                module_name, classes, functions, imports
+                module_name,
+                classes,
+                functions,
+                imports,
             )
 
             # Write to file
@@ -447,7 +455,8 @@ class ArchitectureDiagramGenerator:
                     if isinstance(node, ast.ClassDef):
                         class_name = node.name
                         method_nodes = u.filter(
-                            node.body, lambda n: isinstance(n, ast.FunctionDef)
+                            node.body,
+                            lambda n: isinstance(n, ast.FunctionDef),
                         )
                         methods = u.map(method_nodes, lambda n: n.name)
                         classes[class_name] = methods
@@ -468,14 +477,17 @@ class ArchitectureDiagramGenerator:
 
             except Exception as e:
                 logger = FlextLogger(__name__)
-                logger.warning(f"Failed to analyze Python file {py_file}: {e}")
+                logger.warning("Failed to analyze Python file %s: %s", py_file, e)
                 continue
 
         return classes, functions, imports
 
     @staticmethod
     def _generate_module_puml(
-        module_name: str, classes: dict, functions: dict, imports: set
+        module_name: str,
+        classes: dict,
+        functions: dict,
+        imports: set,
     ) -> str:
         """Generate PlantUML content for module diagram."""
         max_methods_display = 5
@@ -592,7 +604,7 @@ class ArchitectureDocumentationManager:
 
         # Validate PlantUML diagrams
         puml_files = list(self.docs_dir.rglob("*.puml")) + list(
-            self.docs_dir.rglob("*.plantuml")
+            self.docs_dir.rglob("*.plantuml"),
         )
         result.total_diagrams = len(puml_files)
 
@@ -610,7 +622,7 @@ class ArchitectureDocumentationManager:
 
         # Render diagrams
         render_result = self.plantuml_renderer.render_all_diagrams(
-            str(self.docs_dir / "architecture")
+            str(self.docs_dir / "architecture"),
         )
 
         if render_result.is_success:
@@ -700,7 +712,9 @@ class ArchitectureDocumentationManager:
                     f.write(content)
 
             except Exception as e:
-                self.logger.warning(f"Failed to update timestamps in {arch_file}: {e}")
+                self.logger.warning(
+                    "Failed to update timestamps in %s: %s", arch_file, e
+                )
 
     def _update_diagram_references(self) -> None:
         """Update diagram references in documentation."""

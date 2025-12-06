@@ -121,7 +121,11 @@ class PipelineEnvironment(StrEnum):
 PipelinePluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
 PipelineReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
 PipelineEnvironmentType = Literal[
-    "development", "staging", "production", "testing", "local"
+    "development",
+    "staging",
+    "production",
+    "testing",
+    "local",
 ]
 
 

@@ -216,7 +216,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             # Pydantic validation error is expected
             # This demonstrates proper validation of invalid target configurations
             # Log the exception for debugging purposes
-            logger.debug(f"Expected Pydantic validation error: {e}")
+            logger.debug("Expected Pydantic validation error: %s", e)
             assert True  # Explicit assertion instead of pass
 
     def test_invalid_target_creation(self) -> None:

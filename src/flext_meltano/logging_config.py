@@ -27,27 +27,34 @@ class FlextMeltanoLoggingConfig(FlextModels):
 
     # Pipeline Operations Logging (9 fields)
     pipeline_execution: bool = Field(
-        default=True, description="Log pipeline execution details"
+        default=True,
+        description="Log pipeline execution details",
     )
     pipeline_stages: bool = Field(
-        default=True, description="Log pipeline stage transitions"
+        default=True,
+        description="Log pipeline stage transitions",
     )
     pipeline_progress: bool = Field(
-        default=True, description="Log pipeline progress updates"
+        default=True,
+        description="Log pipeline progress updates",
     )
     pipeline_errors: bool = Field(
-        default=True, description="Log pipeline errors and failures"
+        default=True,
+        description="Log pipeline errors and failures",
     )
     pipeline_warnings: bool = Field(default=True, description="Log pipeline warnings")
     pipeline_performance: bool = Field(
-        default=True, description="Log pipeline performance metrics"
+        default=True,
+        description="Log pipeline performance metrics",
     )
     pipeline_timing: bool = Field(
-        default=True, description="Log pipeline timing information"
+        default=True,
+        description="Log pipeline timing information",
     )
     pipeline_memory: bool = Field(default=True, description="Log pipeline memory usage")
     pipeline_throughput: bool = Field(
-        default=True, description="Log pipeline throughput metrics"
+        default=True,
+        description="Log pipeline throughput metrics",
     )
 
     # Extract/Source Operations Logging (8 fields)
@@ -56,14 +63,17 @@ class FlextMeltanoLoggingConfig(FlextModels):
     extract_results: bool = Field(default=True, description="Log extract results")
     extract_errors: bool = Field(default=True, description="Log extract errors")
     extract_performance: bool = Field(
-        default=True, description="Log extract performance metrics"
+        default=True,
+        description="Log extract performance metrics",
     )
     extract_timing: bool = Field(
-        default=True, description="Log extract timing information"
+        default=True,
+        description="Log extract timing information",
     )
     extract_memory: bool = Field(default=True, description="Log extract memory usage")
     extract_throughput: bool = Field(
-        default=True, description="Log extract throughput metrics"
+        default=True,
+        description="Log extract throughput metrics",
     )
 
     # Load/Sink Operations Logging (8 fields)
@@ -72,32 +82,39 @@ class FlextMeltanoLoggingConfig(FlextModels):
     load_results: bool = Field(default=True, description="Log load results")
     load_errors: bool = Field(default=True, description="Log load errors")
     load_performance: bool = Field(
-        default=True, description="Log load performance metrics"
+        default=True,
+        description="Log load performance metrics",
     )
     load_timing: bool = Field(default=True, description="Log load timing information")
     load_memory: bool = Field(default=True, description="Log load memory usage")
     load_throughput: bool = Field(
-        default=True, description="Log load throughput metrics"
+        default=True,
+        description="Log load throughput metrics",
     )
 
     # Transform/DBT Operations Logging (8 fields)
     transform_operations: bool = Field(
-        default=True, description="Log transform operations"
+        default=True,
+        description="Log transform operations",
     )
     transform_sql: bool = Field(default=True, description="Log transform SQL queries")
     transform_results: bool = Field(default=True, description="Log transform results")
     transform_errors: bool = Field(default=True, description="Log transform errors")
     transform_performance: bool = Field(
-        default=True, description="Log transform performance metrics"
+        default=True,
+        description="Log transform performance metrics",
     )
     transform_timing: bool = Field(
-        default=True, description="Log transform timing information"
+        default=True,
+        description="Log transform timing information",
     )
     transform_memory: bool = Field(
-        default=True, description="Log transform memory usage"
+        default=True,
+        description="Log transform memory usage",
     )
     transform_lineage: bool = Field(
-        default=True, description="Log transform lineage tracking"
+        default=True,
+        description="Log transform lineage tracking",
     )
 
     # DBT Specific Logging (6 fields)
@@ -111,39 +128,49 @@ class FlextMeltanoLoggingConfig(FlextModels):
     # Data Quality Logging (8 fields)
     data_quality: bool = Field(default=True, description="Log data quality checks")
     data_quality_checks: bool = Field(
-        default=True, description="Log data quality check results"
+        default=True,
+        description="Log data quality check results",
     )
     data_quality_errors: bool = Field(
-        default=True, description="Log data quality errors"
+        default=True,
+        description="Log data quality errors",
     )
     data_quality_warnings: bool = Field(
-        default=True, description="Log data quality warnings"
+        default=True,
+        description="Log data quality warnings",
     )
     data_quality_metrics: bool = Field(
-        default=True, description="Log data quality metrics"
+        default=True,
+        description="Log data quality metrics",
     )
     data_quality_timing: bool = Field(
-        default=True, description="Log data quality timing information"
+        default=True,
+        description="Log data quality timing information",
     )
     data_quality_memory: bool = Field(
-        default=True, description="Log data quality memory usage"
+        default=True,
+        description="Log data quality memory usage",
     )
     data_quality_throughput: bool = Field(
-        default=True, description="Log data quality throughput metrics"
+        default=True,
+        description="Log data quality throughput metrics",
     )
 
     # Plugin Logging (6 fields)
     plugin_operations: bool = Field(default=True, description="Log plugin operations")
     plugin_errors: bool = Field(default=True, description="Log plugin errors")
     plugin_performance: bool = Field(
-        default=True, description="Log plugin performance metrics"
+        default=True,
+        description="Log plugin performance metrics",
     )
     plugin_timing: bool = Field(
-        default=True, description="Log plugin timing information"
+        default=True,
+        description="Log plugin timing information",
     )
     plugin_memory: bool = Field(default=True, description="Log plugin memory usage")
     plugin_throughput: bool = Field(
-        default=True, description="Log plugin throughput metrics"
+        default=True,
+        description="Log plugin throughput metrics",
     )
 
     # Source and Target Logging (14 fields)
@@ -152,46 +179,58 @@ class FlextMeltanoLoggingConfig(FlextModels):
     source_errors: bool = Field(default=True, description="Log source errors")
     target_errors: bool = Field(default=True, description="Log target errors")
     source_performance: bool = Field(
-        default=True, description="Log source performance metrics"
+        default=True,
+        description="Log source performance metrics",
     )
     target_performance: bool = Field(
-        default=True, description="Log target performance metrics"
+        default=True,
+        description="Log target performance metrics",
     )
     source_timing: bool = Field(
-        default=True, description="Log source timing information"
+        default=True,
+        description="Log source timing information",
     )
     target_timing: bool = Field(
-        default=True, description="Log target timing information"
+        default=True,
+        description="Log target timing information",
     )
     source_memory: bool = Field(default=True, description="Log source memory usage")
     target_memory: bool = Field(default=True, description="Log target memory usage")
     source_throughput: bool = Field(
-        default=True, description="Log source throughput metrics"
+        default=True,
+        description="Log source throughput metrics",
     )
     target_throughput: bool = Field(
-        default=True, description="Log target throughput metrics"
+        default=True,
+        description="Log target throughput metrics",
     )
 
     # Meltano Performance Tracking (1 field)
     track_meltano_performance: bool = Field(
-        default=True, description="Track Meltano performance metrics"
+        default=True,
+        description="Track Meltano performance metrics",
     )
 
     # Orchestration Logging (5 fields)
     orchestration_scheduling: bool = Field(
-        default=True, description="Log orchestration scheduling events"
+        default=True,
+        description="Log orchestration scheduling events",
     )
     orchestration_execution: bool = Field(
-        default=True, description="Log orchestration execution"
+        default=True,
+        description="Log orchestration execution",
     )
     orchestration_state: bool = Field(
-        default=True, description="Log orchestration state changes"
+        default=True,
+        description="Log orchestration state changes",
     )
     orchestration_hooks: bool = Field(
-        default=True, description="Log orchestration hook execution"
+        default=True,
+        description="Log orchestration hook execution",
     )
     orchestration_dependencies: bool = Field(
-        default=True, description="Log dependency resolution"
+        default=True,
+        description="Log dependency resolution",
     )
 
     # Monitoring and Observability Logging (5 fields)
@@ -200,24 +239,30 @@ class FlextMeltanoLoggingConfig(FlextModels):
     monitoring_health: bool = Field(default=True, description="Log health checks")
     monitoring_traces: bool = Field(default=True, description="Log distributed traces")
     monitoring_events: bool = Field(
-        default=True, description="Log observability events"
+        default=True,
+        description="Log observability events",
     )
 
     # Debugging and Diagnostics Logging (5 fields)
     debug_verbose: bool = Field(
-        default=False, description="Enable verbose debug logging"
+        default=False,
+        description="Enable verbose debug logging",
     )
     debug_trace_calls: bool = Field(
-        default=False, description="Log function call traces"
+        default=False,
+        description="Log function call traces",
     )
     debug_variable_state: bool = Field(
-        default=False, description="Log variable state changes"
+        default=False,
+        description="Log variable state changes",
     )
     debug_configuration: bool = Field(
-        default=False, description="Log configuration details"
+        default=False,
+        description="Log configuration details",
     )
     debug_performance_profile: bool = Field(
-        default=False, description="Log performance profiling data"
+        default=False,
+        description="Log performance profiling data",
     )
 
     @computed_field

@@ -78,7 +78,7 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
             if transformation_runner_result.is_failure:
                 return r[dict[str, object]].fail(
                     transformation_runner_result.error
-                    or "Failed to get transformation runner"
+                    or "Failed to get transformation runner",
                 )
 
             # For now, just return success since runner is just a dict

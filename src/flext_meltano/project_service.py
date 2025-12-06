@@ -109,15 +109,16 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             .flat_map(
                 lambda params: self._create_temp_directory(params["prefix"]).flat_map(
                     lambda temp_path: self._generate_minimal_config(
-                        temp_path, params["project_id"]
-                    )
-                )
+                        temp_path,
+                        params["project_id"],
+                    ),
+                ),
             )
             .flat_map(
                 lambda config_data: self._write_meltano_config(
                     cast("Path", config_data["path"]),
                     cast("dict[str, object]", config_data["config"]),
-                )
+                ),
             )
             .flat_map(self._initialize_project_instance)
             .flat_map(self._convert_to_project_dict)
@@ -186,19 +187,22 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             self._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
-                    cast("str", params["name"]), cast("Path", params["parent_dir"])
-                )
+                    cast("str", params["name"]),
+                    cast("Path", params["parent_dir"]),
+                ),
             )
             .flat_map(self._create_project_structure)
             .flat_map(
                 lambda project_path: self._initialize_project_config(
-                    project_path, project_name
-                )
+                    project_path,
+                    project_name,
+                ),
             )
             .flat_map(
                 lambda project_path: self._build_creation_result(
-                    project_name, project_path
-                )
+                    project_name,
+                    project_path,
+                ),
             )
         )
 
@@ -206,7 +210,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def _validate_project_parameters(
-        project_id: str | None, prefix: str
+        project_id: str | None,
+        prefix: str,
     ) -> r[dict[str, str]]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
@@ -228,7 +233,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def _generate_minimal_config(
-        temp_path: Path, project_id: str
+        temp_path: Path,
+        project_id: str,
     ) -> r[dict[str, object]]:
         """Generate minimal meltano.yml configuration."""
         config = {
@@ -243,9 +249,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                             "extractors": [],
                             "loaders": [],
                             "transformers": [],
-                        }
+                        },
                     },
-                }
+                },
             ],
         }
         return r[dict[str, object]].ok({
@@ -269,7 +275,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_result = self._abstractions.find_project(project_path)
         if project_result.is_failure:
             return r[object].fail(
-                project_result.error or "Failed to initialize project"
+                project_result.error or "Failed to initialize project",
             )
         return cast("r[object]", project_result)
 
@@ -300,7 +306,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         meltano_yml = project_root / c.Paths.MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
             return r[Path].fail(
-                f"Not a Meltano project: meltano.yml not found in {project_root}"
+                f"Not a Meltano project: meltano.yml not found in {project_root}",
             )
         return r[Path].ok(project_root)
 
@@ -309,13 +315,14 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_result = self._abstractions.find_project(project_root)
         if project_result.is_failure:
             return r[object].fail(
-                project_result.error or "Failed to load Meltano project"
+                project_result.error or "Failed to load Meltano project",
             )
         return cast("r[object]", project_result)
 
     @staticmethod
     def _validate_project_creation_params(
-        project_name: str, project_dir: Path
+        project_name: str,
+        project_dir: Path,
     ) -> r[dict[str, object]]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
@@ -323,7 +330,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         if not project_dir.exists():
             return r[dict[str, object]].fail(
-                f"Parent directory not found: {project_dir}"
+                f"Parent directory not found: {project_dir}",
             )
 
         return r[dict[str, object]].ok({
@@ -383,7 +390,9 @@ environments:
             return r[Path].fail(f"Failed to initialize meltano.yml: {e}")
 
     def _build_creation_result(
-        self, project_name: str, project_path: Path
+        self,
+        project_name: str,
+        project_path: Path,
     ) -> r[dict[str, str]]:
         """Build successful project creation result."""
         try:
@@ -393,7 +402,7 @@ environments:
                 "project_path": str(project_path),
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
-                    (project_path / c.Paths.MELTANO_PROJECT_FILE).exists()
+                    (project_path / c.Paths.MELTANO_PROJECT_FILE).exists(),
                 ),
             }
 

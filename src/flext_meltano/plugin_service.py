@@ -113,7 +113,8 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Discover extractors using abstraction layer
             extractors_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project), "extractors"
+                cast("object", working_project),
+                "extractors",
             )
             if extractors_result.is_success:
                 extractors_dict = extractors_result.unwrap()
@@ -133,7 +134,8 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Discover loaders using abstraction layer
             loaders_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project), "loaders"
+                cast("object", working_project),
+                "loaders",
             )
             if loaders_result.is_success:
                 loaders_dict = loaders_result.unwrap()
@@ -184,12 +186,14 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             self._log_plugin_addition_start(plugin_name, plugin_type)
             .flat_map(lambda _: self._validate_plugin_type(plugin_type))
             .flat_map(
-                lambda pt: self._execute_plugin_addition(project, pt, plugin_name)
+                lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
-                    plugin_name, plugin_type, addition_success=result
-                )
+                    plugin_name,
+                    plugin_type,
+                    addition_success=result,
+                ),
             )
         )
 
@@ -221,12 +225,13 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Get plugins of type
             plugins_result = self._abstractions.get_plugins_of_type(
-                cast("object", project_result.unwrap()), plugin_type
+                cast("object", project_result.unwrap()),
+                plugin_type,
             )
 
             if plugins_result.is_failure:
                 return r[dict[str, str]].fail(
-                    f"Failed to get plugins of type {plugin_type}: {plugins_result.error}"
+                    f"Failed to get plugins of type {plugin_type}: {plugins_result.error}",
                 )
 
             plugins_dict = plugins_result.unwrap()
@@ -274,12 +279,15 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         valid_types = ["extractors", "loaders", "transformers"]
         if plugin_type not in valid_types:
             return r[str].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
         return r[str].ok(plugin_type)
 
     def _execute_plugin_addition(
-        self, project: object, plugin_type_str: str, plugin_name: str
+        self,
+        project: object,
+        plugin_type_str: str,
+        plugin_name: str,
     ) -> r[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         try:

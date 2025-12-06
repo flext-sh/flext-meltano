@@ -23,7 +23,7 @@ import yaml
 # Add tests directory to path for local imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from helpers.docker_test_manager import FlextTestDocker
+from helpers.docker_test_manager import FlextTestsDocker
 
 
 class CliRunnerProtocol(Protocol):
@@ -321,9 +321,9 @@ def job_run_config() -> dict[str, object]:
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> FlextTestDocker:
+def docker_manager() -> FlextTestsDocker:
     """Session-scoped Docker manager fixture."""
-    return FlextTestDocker(keep_running=True)
+    return FlextTestsDocker(keep_running=True)
     # Cleanup will happen via atexit
 
 

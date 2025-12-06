@@ -459,7 +459,7 @@ class TestFlextMeltanoExecutorComplete:
                 # Some scenarios may raise exceptions, which is acceptable for edge cases
                 # This is expected behavior for invalid commands
                 # Log the exception for debugging purposes
-                logger.debug(f"Expected exception during command execution: {e}")
+                logger.debug("Expected exception during command execution: %s", e)
                 assert True  # Explicit assertion instead of pass
 
     def test_click_cli_infrastructure_invocation(self) -> None:
@@ -514,7 +514,8 @@ class TestFlextMeltanoExecutorComplete:
                 # This is expected behavior for invalid commands
                 # Log the exception for debugging purposes
                 logger.debug(
-                    f"Expected exception during edge case command execution: {e}",
+                    "Expected exception during edge case command execution: %s",
+                    e,
                 )
                 assert True  # Explicit assertion instead of pass
 
@@ -539,7 +540,7 @@ class TestFlextMeltanoExecutorComplete:
                 # Some scenarios may raise exceptions
                 # This is expected behavior for invalid pipeline configurations
                 # Log the exception for debugging purposes
-                logger.debug(f"Expected exception during pipeline execution: {e}")
+                logger.debug("Expected exception during pipeline execution: %s", e)
                 assert True  # Explicit assertion instead of pass
 
     def test_internal_method_direct_invocation(self) -> None:
@@ -561,7 +562,7 @@ class TestFlextMeltanoExecutorComplete:
                 # Some combinations may raise exceptions
                 # This is expected behavior for invalid command arguments
                 # Log the exception for debugging purposes
-                logger.debug(f"Expected exception during run command execution: {e}")
+                logger.debug("Expected exception during run command execution: %s", e)
                 assert True  # Explicit assertion instead of pass
 
         # Test _print_help method (should not return anything)
@@ -572,7 +573,7 @@ class TestFlextMeltanoExecutorComplete:
             # May fail in some environments
             # This is acceptable behavior for help method
             # Log the exception for debugging purposes
-            logger.debug(f"Expected exception during help method execution: {e}")
+            logger.debug("Expected exception during help method execution: %s", e)
             assert True  # Explicit assertion instead of pass
 
     def test_cli_execution_exception_handling(self) -> None:

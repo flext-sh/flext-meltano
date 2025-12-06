@@ -50,9 +50,7 @@ class FlextMeltanoAPIOperations:
         """Initialize API operations with API reference."""
         self.api = api
 
-    def handle_create_pipeline_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_create_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle create_pipeline operation call with railway pattern."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -64,7 +62,10 @@ class FlextMeltanoAPIOperations:
             {
                 "tap_name": {"default": "", "ops": {"ensure": "str"}},
                 "target_name": {"default": "", "ops": {"ensure": "str"}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -79,9 +80,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.create_pipeline(tap_name, target_name, config)
         return u.cast(result, default_error="Pipeline creation failed")
 
-    def handle_execute_pipeline_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle execute_pipeline operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -92,7 +91,10 @@ class FlextMeltanoAPIOperations:
             payload_guard,
             {
                 "pipeline_id": {"default": "", "ops": {"ensure": "str"}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -106,9 +108,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.execute_pipeline(pipeline_id, config)
         return u.cast(result, default_error="Pipeline execution failed")
 
-    def handle_install_plugin_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle install_plugin operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -120,7 +120,10 @@ class FlextMeltanoAPIOperations:
             {
                 "plugin_type": {"default": "", "ops": {"ensure": "str"}},
                 "plugin_name": {"default": "", "ops": {"ensure": "str"}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -135,20 +138,18 @@ class FlextMeltanoAPIOperations:
         result = self.api.install_plugin(plugin_type, plugin_name, config)
         return u.cast(result, default_error="Plugin installation failed")
 
-    def handle_list_plugins_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle list_plugins operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
-        plugin_type_raw = u.extract(payload_guard, "plugin_type") if payload_guard else None
+        plugin_type_raw = (
+            u.extract(payload_guard, "plugin_type") if payload_guard else None
+        )
         plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
         result = self.api.list_plugins(plugin_type)
         return u.cast(result, default_error="Plugin listing failed")
 
-    def handle_configure_environment_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_configure_environment_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle configure_environment operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -159,7 +160,10 @@ class FlextMeltanoAPIOperations:
             payload_guard,
             {
                 "environment_name": {"default": "", "ops": {"ensure": "str"}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -173,9 +177,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.configure_environment(environment_name, config)
         return u.cast(result, default_error="Environment configuration failed")
 
-    def handle_run_dbt_models_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle run_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -185,8 +187,14 @@ class FlextMeltanoAPIOperations:
         fields_dict = u.fields(
             payload_guard,
             {
-                "models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "models": {
+                    "default": [],
+                    "ops": {"ensure": "list", "ensure_default": []},
+                },
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -197,9 +205,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.run_dbt_models(models, config)
         return u.cast(result, default_error="DBT models execution failed")
 
-    def handle_test_dbt_models_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle test_dbt_models operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -209,8 +215,14 @@ class FlextMeltanoAPIOperations:
         fields_dict = u.fields(
             payload_guard,
             {
-                "models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "models": {
+                    "default": [],
+                    "ops": {"ensure": "list", "ensure_default": []},
+                },
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )
@@ -221,9 +233,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.test_dbt_models(models, config)
         return u.cast(result, default_error="DBT models testing failed")
 
-    def handle_run_elt_pipeline_call(
-        self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    def handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle run_elt_pipeline operation call."""
         payload_guard = u.guard(payload, dict, return_value=True)
         if u.empty(payload_guard):
@@ -235,8 +245,14 @@ class FlextMeltanoAPIOperations:
             {
                 "tap_name": {"default": "", "ops": {"ensure": "str"}},
                 "target_name": {"default": "", "ops": {"ensure": "str"}},
-                "dbt_models": {"default": [], "ops": {"ensure": "list", "ensure_default": []}},
-                "config": {"default": {}, "ops": {"ensure": "dict", "ensure_default": {}}},
+                "dbt_models": {
+                    "default": [],
+                    "ops": {"ensure": "list", "ensure_default": []},
+                },
+                "config": {
+                    "default": {},
+                    "ops": {"ensure": "dict", "ensure_default": {}},
+                },
             },
             on_error="stop",
         )

@@ -140,12 +140,14 @@ class TestDockerIntegration:
 
                 # Insert test data
                 cursor.execute(
-                    "INSERT INTO test_table (name) VALUES (%s)", ("test_record",)
+                    "INSERT INTO test_table (name) VALUES (%s)",
+                    ("test_record",),
                 )
 
                 # Query data back
                 cursor.execute(
-                    "SELECT id, name FROM test_table WHERE name = %s", ("test_record",)
+                    "SELECT id, name FROM test_table WHERE name = %s",
+                    ("test_record",),
                 )
                 result = cursor.fetchone()
 

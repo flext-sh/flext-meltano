@@ -174,7 +174,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return FlextResult[dict[str, object]].fail(
-                f"Documentation generation failed: {e}"
+                f"Documentation generation failed: {e}",
             )
 
     def execute(self, **_kwargs: object) -> FlextResult[str]:

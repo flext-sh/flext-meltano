@@ -33,7 +33,7 @@ class TestFlextDbtProgrammaticRunner:
 
             # Mock the DbtRunner and its methods
             with patch(
-                "flext_meltano.library_runner.DbtRunner"
+                "flext_meltano.library_runner.DbtRunner",
             ) as mock_dbt_runner_class:
                 mock_runner = Mock()
                 mock_result = Mock()
@@ -45,7 +45,8 @@ class TestFlextDbtProgrammaticRunner:
                 # Test the transformation
                 result: r[t.Processing.DbtTransformationResult] = (
                     dbt_runner.run_transformations_programmatic(
-                        project_dir, models=["model1", "model2"]
+                        project_dir,
+                        models=["model1", "model2"],
                     )
                 )
 
@@ -155,7 +156,8 @@ class TestFlextMeltanoLibraryRunner:
         # Test the complete pipeline
         result: r[t.Processing.EltPipelineResult] = (
             runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv", target_name="target-jsonl"
+                tap_name="tap-csv",
+                target_name="target-jsonl",
             )
         )
 

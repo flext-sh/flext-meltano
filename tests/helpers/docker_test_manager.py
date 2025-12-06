@@ -1,6 +1,6 @@
 """FLEXT Test Docker Manager - Enterprise Docker testing infrastructure.
 
-This module provides FlextTestDocker class for comprehensive containerized testing
+This module provides FlextTestsDocker class for comprehensive containerized testing
 of FLEXT Meltano components with automatic lifecycle management, health checks,
 and resource cleanup.
 
@@ -71,22 +71,22 @@ class ContainerManager:
 
             if result.returncode != 0:
                 return FlextResult[subprocess.CompletedProcess[str]].fail(
-                    f"Command failed: {' '.join(full_command)}\n{result.stderr}"
+                    f"Command failed: {' '.join(full_command)}\n{result.stderr}",
                 )
 
             return FlextResult[subprocess.CompletedProcess[str]].ok(result)
 
         except subprocess.TimeoutExpired:
             return FlextResult[subprocess.CompletedProcess[str]].fail(
-                f"Command timed out: {' '.join(command)}"
+                f"Command timed out: {' '.join(command)}",
             )
         except Exception as e:
             return FlextResult[subprocess.CompletedProcess[str]].fail(
-                f"Command error: {e}"
+                f"Command error: {e}",
             )
 
 
-class FlextTestDocker(ContainerManager):
+class FlextTestsDocker(ContainerManager):
     """Enterprise Docker testing infrastructure for FLEXT Meltano.
 
     Provides comprehensive container lifecycle management with automatic cleanup,
@@ -142,7 +142,7 @@ class FlextTestDocker(ContainerManager):
         try:
             if not self.compose_file.exists():
                 return FlextResult[bool].fail(
-                    f"Docker compose file not found: {self.compose_file}"
+                    f"Docker compose file not found: {self.compose_file}",
                 )
 
             # Start services
@@ -153,7 +153,7 @@ class FlextTestDocker(ContainerManager):
             result = self.run_compose_command(cmd, timeout=300)
             if result.is_failure:
                 return FlextResult[bool].fail(
-                    f"Failed to start Docker services: {result.error}"
+                    f"Failed to start Docker services: {result.error}",
                 )
 
             self.containers_started = True
@@ -190,7 +190,7 @@ class FlextTestDocker(ContainerManager):
             if result.is_failure:
                 self.logger.warning(f"Failed to stop Docker services: {result.error}")
                 return FlextResult[bool].fail(
-                    f"Failed to stop Docker services: {result.error}"
+                    f"Failed to stop Docker services: {result.error}",
                 )
 
             self.containers_started = False
@@ -223,7 +223,7 @@ class FlextTestDocker(ContainerManager):
                     return f"localhost:{host_port[1]}"
 
         except Exception as e:
-            self.logger.warning(f"Failed to get service URL for {service_name}: {e}")
+            self.logger.warning("Failed to get service URL for %s: %s", service_name, e)
 
         return None
 
@@ -316,7 +316,7 @@ class FlextTestDocker(ContainerManager):
                     return True
 
             except Exception as e:
-                self.logger.warning(f"Error checking service health: {e}")
+                self.logger.warning("Error checking service health: %s", e)
 
             time.sleep(2)
 
@@ -341,14 +341,14 @@ class FlextTestDocker(ContainerManager):
                 url = self.get_service_url(service, port)
                 if url:
                     # Try to connect (basic connectivity check)
-                    self.logger.debug(f"Service {service} available at {url}")
+                    self.logger.debug("Service %s available at %s", service, url)
                 else:
-                    self.logger.warning(f"Service {service} not accessible")
+                    self.logger.warning("Service %s not accessible", service)
 
             return True
 
         except Exception as e:
-            self.logger.warning(f"Health check failed: {e}")
+            self.logger.warning("Health check failed: %s", e)
             return False
 
     def _cleanup_containers(self) -> None:
@@ -377,9 +377,9 @@ class FlextTestDocker(ContainerManager):
 
 # Pytest fixtures for Docker testing
 @pytest.fixture(scope="session")
-def docker_manager() -> FlextTestDocker:
+def docker_manager() -> FlextTestsDocker:
     """Session-scoped Docker manager fixture."""
-    return FlextTestDocker(keep_running=True)  # Keep running for faster tests
+    return FlextTestsDocker(keep_running=True)  # Keep running for faster tests
     # Cleanup will happen via atexit
 
 
