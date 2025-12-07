@@ -6,10 +6,15 @@ to maintain backwards compatibility with existing test code.
 
 from __future__ import annotations
 
-from flext_tests.matchers import FlextTestsMatchers
-from flext_tests.utilities import FlextTestsUtilities
+from flext_tests import tm, u
+
+# Backward compatibility aliases
+FlextTestsMatchers = tm
+FlextTestsUtilities = u
 
 __all__ = [
     "FlextTestsMatchers",
     "FlextTestsUtilities",
+    "tm",
+    "u",
 ]

@@ -84,7 +84,7 @@ class PlantUMLRenderer(s):
         url = "https://github.com/plantuml/plantuml/releases/download/v1.2023.13/plantuml-1.2023.13.jar"
 
         # Security: URL is hardcoded and from trusted source (GitHub releases)
-        urllib.request.urlretrieve(url, jar_path)  # noqa: S310
+        urllib.request.urlretrieve(url, jar_path)
         return jar_path
 
     def render_diagram(self, puml_file: Path) -> r[DiagramValidationResult]:

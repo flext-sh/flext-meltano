@@ -57,7 +57,7 @@ class FlextMeltanoAdapter:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
             # Import here to avoid circular dependency - runtime import needed
-            from flext_meltano.library_runner import (  # noqa: PLC0415
+            from flext_meltano.library_runner import (
                 FlextMeltanoLibraryRunner,
             )
 
