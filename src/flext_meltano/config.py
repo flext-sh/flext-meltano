@@ -83,13 +83,15 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     # ============================================================================
 
     # Use FlextMeltanoConstants for all version constants (SOURCE OF TRUTH)
-    MELTANO_VERSION: ClassVar[str] = FlextMeltanoConstants.Versions.MELTANO_REQUIRED
+    MELTANO_VERSION: ClassVar[str] = (
+        FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
+    )
     SINGER_SDK_VERSION: ClassVar[str] = FlextMeltanoConstants.SDK_VERSION_REQUIRED
     DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.VERSION_REQUIRED_DBT
 
     # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
-    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Paths.PROJECT_FILE
-    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Paths.STATE_DIR
+    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.PROJECT_FILE
+    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
 
     # Meltano environment variables (Meltano-specific)
@@ -102,18 +104,18 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     # ============================================================================
 
     # ALL ENUMS MUST COME FROM FlextConstants or FlextMeltanoConstants - NO ALIASES
-    PluginType: ClassVar[type[FlextMeltanoConstants.PluginTypes]] = (
-        FlextMeltanoConstants.PluginTypes
+    PluginType: ClassVar[type[FlextMeltanoConstants.Meltano.PluginTypes]] = (
+        FlextMeltanoConstants.Meltano.PluginTypes
     )
-    EnvironmentType: ClassVar[type[FlextMeltanoConstants.Environment]] = (
-        FlextMeltanoConstants.Environment
+    EnvironmentType: ClassVar[type[FlextMeltanoConstants.Meltano.Environment]] = (
+        FlextMeltanoConstants.Meltano.Environment
     )
     LogLevel: ClassVar[type[c.Settings.LogLevel]] = c.Settings.LogLevel
-    OperationStatus: ClassVar[type[FlextMeltanoConstants.OperationStatus]] = (
-        FlextMeltanoConstants.OperationStatus
+    OperationStatus: ClassVar[type[FlextMeltanoConstants.Meltano.OperationStatus]] = (
+        FlextMeltanoConstants.Meltano.OperationStatus
     )
-    RunMode: ClassVar[type[FlextMeltanoConstants.RunMode]] = (
-        FlextMeltanoConstants.RunMode
+    RunMode: ClassVar[type[FlextMeltanoConstants.Meltano.RunMode]] = (
+        FlextMeltanoConstants.Meltano.RunMode
     )
 
     # ============================================================================
@@ -146,7 +148,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextMeltanoConstants.Environment.DEVELOPMENT.value,
+        default=FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value,
         description="Deployment environment",
     )
 
@@ -168,12 +170,12 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     )
 
     meltano_performance_threshold_warning: float = Field(
-        default=FlextMeltanoConstants.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING,
+        default=FlextMeltanoConstants.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING,
         description="Meltano performance warning threshold in milliseconds",
     )
 
     meltano_performance_threshold_critical: float = Field(
-        default=FlextMeltanoConstants.Logging.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL,
+        default=FlextMeltanoConstants.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL,
         description="Meltano performance critical threshold in milliseconds",
     )
 
@@ -308,7 +310,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     )
 
     run_mode: str = Field(
-        default=FlextMeltanoConstants.RunMode.FULL.value,
+        default=FlextMeltanoConstants.Meltano.RunMode.FULL.value,
         description="Execution mode for operations",
     )
 
@@ -570,7 +572,7 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
 
         """
         try:
-            env_type = FlextMeltanoConstants.Environment(environment.lower())
+            env_type = FlextMeltanoConstants.Meltano.Environment(environment.lower())
         except ValueError as e:
             msg = f"Invalid environment: {environment}"
             raise e.ValidationError(msg) from e
@@ -695,16 +697,16 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     @classmethod
     def get_supported_plugin_types(cls) -> t.MeltanoCore.PluginTypeList:
         """Get list of supported plugin types."""
-        return FlextMeltanoConstants.Plugin.supported_types()
+        return FlextMeltanoConstants.Meltano.Plugin.supported_types()
 
     @classmethod
     def get_supported_environments(cls) -> t.MeltanoCore.PluginNameList:
         """Get list of supported environments."""
         return [
-            FlextMeltanoConstants.Environment.DEVELOPMENT.value,
-            FlextMeltanoConstants.Environment.STAGING.value,
-            FlextMeltanoConstants.Environment.PRODUCTION.value,
-            FlextMeltanoConstants.Environment.TESTING.value,
+            FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value,
+            FlextMeltanoConstants.Meltano.Environment.STAGING.value,
+            FlextMeltanoConstants.Meltano.Environment.PRODUCTION.value,
+            FlextMeltanoConstants.Meltano.Environment.TESTING.value,
         ]
 
     @classmethod
@@ -1045,7 +1047,9 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             try:
                 config = FlextMeltanoConfig()
                 # Apply development-specific settings
-                config.environment = FlextMeltanoConstants.Environment.DEVELOPMENT.value
+                config.environment = (
+                    FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value
+                )
                 config.debug = True
                 config.log_level = str(
                     c.Settings.LogLevel.DEBUG.value,
@@ -1072,7 +1076,9 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             try:
                 config = FlextMeltanoConfig()
                 # Apply production-specific settings
-                config.environment = FlextMeltanoConstants.Environment.PRODUCTION.value
+                config.environment = (
+                    FlextMeltanoConstants.Meltano.Environment.PRODUCTION.value
+                )
                 config.debug = False
                 config.log_level = str(
                     c.Settings.LogLevel.WARNING.value,
@@ -1095,7 +1101,9 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
             try:
                 config = FlextMeltanoConfig()
                 # Apply testing-specific settings
-                config.environment = FlextMeltanoConstants.Environment.TESTING.value
+                config.environment = (
+                    FlextMeltanoConstants.Meltano.Environment.TESTING.value
+                )
                 config.debug = True
                 config.log_level = str(
                     c.Settings.LogLevel.DEBUG.value,

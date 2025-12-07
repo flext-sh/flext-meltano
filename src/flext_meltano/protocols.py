@@ -7,47 +7,38 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-from flext_core import (
-    FlextProtocols,
-    FlextResult,
-    t as t_core,
-)
+from flext_core import T_co, t
+from flext_core.protocols import FlextProtocols
 
-# Import Singer protocols from subdirectory
 from flext_meltano.singer.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoSingerProtocols,
 )
 
-T_co = TypeVar("T_co", covariant=True)
 
-# Import aliases for simplified usage
-p_base = FlextProtocols
-r = FlextResult
-t_base = t_core
+class FlextMeltanoProtocols(FlextProtocols):
+    """Unified Meltano protocols extending p.
 
-
-class FlextMeltanoProtocols(p_base):
-    """Unified Meltano protocols following FLEXT domain extension pattern.
-
-    This class consolidates Meltano ELT pipeline protocols while explicitly
-    re-exporting foundation protocols for backward compatibility and clean access.
+    Extends p to inherit all foundation protocols (Result, Service, etc.)
+    and adds Meltano/Singer/DBT-specific protocols in the Meltano namespace.
 
     Architecture:
-    - RE-EXPORTS: Foundation protocols from flext-core for unified access
-    - EXTENDS: Meltano/Singer/DBT-specific protocols in Meltano namespace
-    - MAINTAINS: Zero breaking changes through explicit re-export pattern
+    - EXTENDS: p (inherits Foundation, Domain, Application, etc.)
+    - ADDS: Meltano/Singer/DBT-specific protocols in Meltano namespace
+    - PROVIDES: Root-level alias `p` for convenient access
 
     Usage:
-    from flext_meltano.protocols import FlextMeltanoProtocols
+    from flext_meltano.protocols import p
 
-    # Foundation access (re-exported)
-    FlextMeltanoProtocols.Foundation.ResultProtocol
+    # Foundation protocols (inherited)
+    result: p.Result[str]
+    service: p.Service[str]
 
-    # Meltano ELT-specific access
-    FlextMeltanoProtocols.Meltano.TapProtocol
+    # Meltano-specific protocols
+    tap: p.Meltano.TapProtocol
+    target: p.Meltano.TargetProtocol
     """
 
     # =========================================================================
@@ -79,7 +70,7 @@ class FlextMeltanoProtocols(p_base):
                 """Validate plugin configuration."""
                 ...
 
-            def execute(self, *args: t_base.JsonValue) -> T_co:
+            def execute(self, *args: t.JsonValue) -> T_co:
                 """Execute plugin with given arguments."""
                 ...
 
@@ -89,115 +80,92 @@ class FlextMeltanoProtocols(p_base):
 
             name: str
             tap_stream_id: str
-            schema: t_base.JsonValue
+            schema: t.JsonValue
 
-            def sync_records(self) -> t_base.JsonValue:
+            def sync_records(self) -> t.JsonValue:
                 """Sync records from the stream."""
                 ...
 
-            def get_records(self) -> t_base.JsonValue:
+            def get_records(self) -> t.JsonValue:
                 """Get records from the stream."""
                 ...
 
         @runtime_checkable
-        class TapProtocol(p_base.Service, Protocol):
+        class TapProtocol(FlextProtocols.Domain.Service, Protocol):
             """Singer Tap protocol extending Domain.Service for ELT operations."""
 
-            def discover(self) -> r[t_base.JsonValue]:
-                """Discover catalog with FlextResult."""
+            def discover(self) -> FlextProtocols.Result[t.JsonValue]:
+                """Discover catalog with r."""
                 ...
 
-            def sync(self, catalog: t_base.JsonValue) -> r[t_base.JsonValue]:
-                """Sync data from source with FlextResult."""
+            def sync(self, catalog: t.JsonValue) -> FlextProtocols.Result[t.JsonValue]:
+                """Sync data from source with r."""
                 ...
 
-            def execute(self) -> p_base.ResultProtocol[object]:
+            def execute(self) -> FlextProtocols.Result[object]:
                 """Execute the tap extraction (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class TargetProtocol(p_base.Service, Protocol):
+        class TargetProtocol(FlextProtocols.Domain.Service, Protocol):
             """Singer Target protocol extending Domain.Service for ELT operations."""
 
-            def handle_record(self, record: t_base.JsonValue) -> r[t_base.JsonValue]:
-                """Handle a single record with FlextResult."""
+            def handle_record(
+                self, record: t.JsonValue
+            ) -> FlextProtocols.Result[t.JsonValue]:
+                """Handle a single record with r."""
                 ...
 
             def handle_batch(
                 self,
-                records: list[t_base.JsonValue],
-            ) -> r[t_base.JsonValue]:
-                """Handle a batch of records with FlextResult."""
+                records: list[t.JsonValue],
+            ) -> FlextProtocols.Result[t.JsonValue]:
+                """Handle a batch of records with r."""
                 ...
 
-            def execute(self) -> p_base.ResultProtocol[object]:
+            def execute(self) -> FlextProtocols.Result[object]:
                 """Execute the target loading (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(p_base.Service, Protocol):
+        class DbtRunnerProtocol(FlextProtocols.Domain.Service, Protocol):
             """DBT Runner protocol extending Domain.Service for ELT operations."""
 
-            def run(self, models: list[str]) -> r[t_base.JsonValue]:
-                """Run DBT models with FlextResult."""
+            def run(self, models: list[str]) -> FlextProtocols.Result[t.JsonValue]:
+                """Run DBT models with r."""
                 ...
 
-            def test(self, models: list[str]) -> r[t_base.JsonValue]:
-                """Test DBT models with FlextResult."""
+            def test(self, models: list[str]) -> FlextProtocols.Result[t.JsonValue]:
+                """Test DBT models with r."""
                 ...
 
-            def execute(self) -> p_base.ResultProtocol[object]:
+            def execute(self) -> FlextProtocols.Result[object]:
                 """Execute DBT transformations (implements Domain.Service)."""
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(p_base.Service, Protocol):
+        class ServiceCallProtocol(FlextProtocols.Domain.Service, Protocol):
             """Service call protocol extending Domain.Service."""
 
             def call(
                 self,
                 operation: str,
-                payload: t_base.JsonValue,
-            ) -> r[t_base.JsonValue]:
-                """Execute service call with FlextResult."""
+                payload: t.JsonValue,
+            ) -> FlextProtocols.Result[t.JsonValue]:
+                """Execute service call with r."""
                 ...
 
-            def execute(self) -> p_base.ResultProtocol[object]:
+            def execute(self) -> FlextProtocols.Result[object]:
                 """Execute service operation (implements Domain.Service)."""
                 ...
 
-    # =========================================================================
-    # BACKWARD COMPATIBILITY ALIASES
-    # =========================================================================
-    # Maintain existing attribute names for zero breaking changes.
 
-    @runtime_checkable
-    class MeltanoPluginProtocol(Meltano.PluginProtocol):
-        """MeltanoPluginProtocol - real inheritance."""
-
-    @runtime_checkable
-    class SingerStreamProtocol(Meltano.StreamProtocol):
-        """SingerStreamProtocol - real inheritance."""
-
-    @runtime_checkable
-    class SingerTapProtocol(Meltano.TapProtocol):
-        """SingerTapProtocol - real inheritance."""
-
-    @runtime_checkable
-    class SingerTargetProtocol(Meltano.TargetProtocol):
-        """SingerTargetProtocol - real inheritance."""
-
-    @runtime_checkable
-    class DbtRunnerProtocol(Meltano.DbtRunnerProtocol):
-        """DbtRunnerProtocol - real inheritance."""
-
-    @runtime_checkable
-    class ServiceCallProtocol(Meltano.ServiceCallProtocol):
-        """ServiceCallProtocol - real inheritance."""
-
+# Runtime alias for simplified usage
+p = FlextMeltanoProtocols
 
 __all__ = [
     "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
     "FlextMeltanoSingerProtocols",
+    "p",
 ]

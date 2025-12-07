@@ -144,7 +144,7 @@ class FlextMeltanoAdapter:
             """Discover available plugins of specified type."""
             try:
                 # Use FlextMeltanoConstants for plugin discovery
-                plugins = FlextMeltanoConstants.Plugin.get_all_plugins()
+                plugins = FlextMeltanoConstants.Meltano.Plugin.get_all_plugins()
                 if plugin_type:
                     plugins = u.filter(
                         plugins,
