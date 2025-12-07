@@ -785,7 +785,7 @@ class FlextMeltanoProject:
 
 #### Project Properties
 
-####r
+#### r
 
 **Project root directory path**
 

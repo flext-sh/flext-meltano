@@ -23,7 +23,7 @@ class TestFlextMeltanoAdapter:
     def setup_method(self) -> None:
         """Setup for each test."""
         self.adapter = FlextMeltanoAdapter()
-        self.test_matchers = FlextTestsMatchers()
+        # tm is static, no need to instantiate
 
     def test_adapter_initialization(self) -> None:
         """Test adapter initialization."""
