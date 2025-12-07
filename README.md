@@ -25,8 +25,8 @@ FLEXT-Meltano provides the **Meltano integration foundation** for the FLEXT data
 
 ### **Integration Points**
 
-- **[flext-core](../flext-core/README.md)** → Foundation patterns (FlextResult, FlextContainer, FlextService)
-- **[flext-cli](../flext-cli/README.md)** → Pipeline execution and management commands
+- **[flext-core](https://github.com/organization/flext/tree/main/flext-core/README.md)** → Foundation patterns (FlextResult, FlextContainer, FlextService)
+- **[flext-cli](https://github.com/organization/flext/tree/main/flext-cli/README.md)** → Pipeline execution and management commands
 - **Singer Protocol Projects** → Foundation for all flext-tap-_and flext-target-_ projects
 - **Enterprise Data Platform** → Data pipeline orchestration and management
 
@@ -317,7 +317,6 @@ make docs-setup
 make docs-view-report
 ```
 
-_See [Documentation Maintenance Guide](docs/MAINTENANCE_GUIDE.md) for details._
 
 ### **Test Categories**
 
@@ -384,7 +383,7 @@ Complete documentation available in the `docs/` directory:
 - **[Configuration Guide](docs/configuration.md)** - Configuration management
 - **[Development Guide](docs/development.md)** - Development workflow
 - **[Getting Started](docs/getting-started.md)** - Quick start guide
-- **[Integration Guide](docs/integration.md)** - Integration patterns
+- **[Integration Guide](docs/guides/integration.md)** - Integration patterns
 - **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
 ---

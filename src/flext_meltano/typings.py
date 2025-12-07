@@ -17,11 +17,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from flext_core import FlextTypes, t as t_core
+from flext_core import FlextTypes
 from singer_sdk import typing as singer_sdk_typing
 
 
-class FlextMeltanoTypes(t_core):
+class FlextMeltanoTypes(FlextTypes):
     """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
@@ -276,15 +276,7 @@ class FlextMeltanoTypes(t_core):
         """
 
 
-# Alias for simplified usage
 t = FlextMeltanoTypes
-
-# Namespace composition via class inheritance
-# Meltano namespace provides access to nested classes through inheritance
-# Access patterns:
-# - t.Meltano.* for Meltano-specific types
-# - t.Project.* for project types
-# - t.Core.* for core types (inherited from parent)
 
 __all__ = [
     "FlextMeltanoTypes",

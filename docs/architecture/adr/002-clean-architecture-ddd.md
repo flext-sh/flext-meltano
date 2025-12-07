@@ -197,7 +197,6 @@ class FlextMeltanoService:
 
 - [ADR-001](001-railway-oriented-programming.md) - Error handling patterns
 - [ADR-003](003-singer-protocol-abstraction.md) - Protocol abstraction layer
-- [ADR-006](006-flext-core-integration.md) - Foundation integration patterns
 
 ## Notes
 

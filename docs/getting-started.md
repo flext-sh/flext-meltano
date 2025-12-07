@@ -168,7 +168,7 @@ make check-imports      # Validate import compliance
 - **[Architecture](architecture.md)** - Understand the design patterns
 - **[API Reference](api-reference.md)** - Complete API documentation
 - **[Development](development.md)** - Contributing guidelines
-- **[Integration](integration.md)** - Ecosystem integration patterns
+- **[Integration](guides/integration.md)** - Ecosystem integration patterns
 
 ---
 
