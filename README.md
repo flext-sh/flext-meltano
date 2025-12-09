@@ -317,7 +317,6 @@ make docs-setup
 make docs-view-report
 ```
 
-
 ### **Test Categories**
 
 - **Unit Tests** - Individual component testing

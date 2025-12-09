@@ -203,15 +203,17 @@ class PlantUMLRenderer(s):
         """Validate syntax on a line-by-line basis."""
         for i, line in enumerate(lines, 1):
             stripped = line.strip()
-            if stripped and not stripped.startswith((
-                "'",
-                "@",
-                "title",
-                "legend",
-                "note",
-                "end",
-                "*",
-            )):
+            if stripped and not stripped.startswith(
+                (
+                    "'",
+                    "@",
+                    "title",
+                    "legend",
+                    "note",
+                    "end",
+                    "*",
+                )
+            ):
                 # Basic validation for common PlantUML constructs
                 if "->" in stripped and not stripped.endswith(";"):
                     result.warnings.append(
@@ -831,13 +833,15 @@ Examples:
 
     args = parser.parse_args()
 
-    if not any([
-        args.validate,
-        args.generate_diagrams,
-        args.update_docs,
-        args.create_report,
-        args.comprehensive,
-    ]):
+    if not any(
+        [
+            args.validate,
+            args.generate_diagrams,
+            args.update_docs,
+            args.create_report,
+            args.comprehensive,
+        ]
+    ):
         parser.print_help()
         return
 

@@ -119,17 +119,21 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         # DSL: Build config with project_root if provided
         if config is None:
             if project_root is not None:
-                config = FlextMeltanoConfig.model_validate({
-                    "project_root": project_root,
-                })
+                config = FlextMeltanoConfig.model_validate(
+                    {
+                        "project_root": project_root,
+                    }
+                )
             else:
                 config = None
         if config is None:
             if project_root:
                 # Use Pydantic model_validate for type-safe initialization
-                self._config = FlextMeltanoConfig.model_validate({
-                    "project_root": project_root,
-                })
+                self._config = FlextMeltanoConfig.model_validate(
+                    {
+                        "project_root": project_root,
+                    }
+                )
             else:
                 # DSL: Create config instance - AutoConfig pattern handles initialization
                 self._config = FlextMeltanoConfig.model_validate({})
@@ -155,12 +159,14 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     def execute(self, **_kwargs: object) -> r[r[t_core.JsonValue]]:
         """Execute service lifecycle using flext-core railway patterns."""
         return r[r[t_core.JsonValue]].ok(
-            r[t_core.JsonValue].ok({
-                "service_name": self.service_name,
-                "version": self.version,
-                "status": "active",
-                "operations": ["pipeline", "plugin", "dbt", "environment"],
-            }),
+            r[t_core.JsonValue].ok(
+                {
+                    "service_name": self.service_name,
+                    "version": self.version,
+                    "status": "active",
+                    "operations": ["pipeline", "plugin", "dbt", "environment"],
+                }
+            ),
         )
 
     # ============================================================================
@@ -225,11 +231,13 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
                     f"Must start with 'target-'",
                 )
 
-            return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].ok((
-                tap_name,
-                target_name,
-                config or {},
-            ))
+            return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].ok(
+                (
+                    tap_name,
+                    target_name,
+                    config or {},
+                )
+            )
 
         def _build_pipeline_config(
             tap_name: str,
@@ -394,13 +402,15 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "tap_name": tap_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "tap_name": tap_name,
+                    "status": "completed",
+                    "execution_duration": execution_duration,
+                    "executed_at": str(time.time()),
+                    "api_version": self.version,
+                }
+            )
 
         result = u.try_(
             _execute_tap,
@@ -429,13 +439,15 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "target_name": target_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "target_name": target_name,
+                    "status": "completed",
+                    "execution_duration": execution_duration,
+                    "executed_at": str(time.time()),
+                    "api_version": self.version,
+                }
+            )
 
         result = u.try_(
             _execute_target,
@@ -638,14 +650,16 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.version,
-                "docs_generated": True,
-                "docs_path": "./target/docs/index.html",
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "status": "completed",
+                    "execution_duration": execution_duration,
+                    "executed_at": str(time.time()),
+                    "api_version": self.version,
+                    "docs_generated": True,
+                    "docs_path": "./target/docs/index.html",
+                }
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT documentation generation failed: {e}",
@@ -699,19 +713,23 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Get version information using flext-core patterns."""
-        return r[t.MeltanoCore.MeltanoConfigDict].ok({
-            "api_version": self.version,
-            "service_name": self.service_name,
-        })
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(
+            {
+                "api_version": self.version,
+                "service_name": self.service_name,
+            }
+        )
 
     def get_info(self) -> r[t.Plugin.PluginInfo]:
         """Get API information using flext-core patterns."""
-        return r[t.Plugin.PluginInfo].ok({
-            "name": self.service_name,
-            "version": self.version,
-            "type": "meltano_api_service",
-            "description": "FLEXT Meltano API Service",
-        })
+        return r[t.Plugin.PluginInfo].ok(
+            {
+                "name": self.service_name,
+                "version": self.version,
+                "type": "meltano_api_service",
+                "description": "FLEXT Meltano API Service",
+            }
+        )
 
     # ============================================================================
     # PROJECT OPERATIONS - Generic project management (delegates to service)

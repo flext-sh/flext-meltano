@@ -118,15 +118,17 @@ class FlextMeltanoAPIDBTOperations:
                 f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s",
             )
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "models": models_to_test,
-                "status": "passed",
-                "tests_executed": tests_count,
-                "execution_duration": execution_duration,
-                "configuration": u.or_(config, {}),
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "models": models_to_test,
+                    "status": "passed",
+                    "tests_executed": tests_count,
+                    "execution_duration": execution_duration,
+                    "configuration": u.or_(config, {}),
+                    "executed_at": str(time.time()),
+                    "api_version": self.api.version,
+                }
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT model testing failed: {e}",
@@ -138,14 +140,16 @@ class FlextMeltanoAPIDBTOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-                "docs_generated": True,
-                "docs_path": "./target/docs/index.html",
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "status": "completed",
+                    "execution_duration": execution_duration,
+                    "executed_at": str(time.time()),
+                    "api_version": self.api.version,
+                    "docs_generated": True,
+                    "docs_path": "./target/docs/index.html",
+                }
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT documentation generation failed: {e}",

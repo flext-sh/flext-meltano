@@ -102,8 +102,8 @@ name: Architecture Documentation
 on:
   push:
     paths:
-      - 'docs/architecture/**'
-      - 'scripts/architecture_automation.py'
+      - "docs/architecture/**"
+      - "scripts/architecture_automation.py"
 
 jobs:
   validate:
@@ -198,12 +198,15 @@ Rel(service, external, "[Interaction]")
 ## Consequences
 
 ### Positive
+
 - {List positive consequences}
 
 ### Negative
+
 - {List negative consequences}
 
 ### Risks
+
 - {List potential risks and mitigation strategies}
 
 ## Alternatives Considered
@@ -288,13 +291,13 @@ Before committing architecture changes:
 
 ### Quality Metrics
 
-| Metric | Target | Validation |
-|--------|--------|------------|
-| **Diagram Syntax** | 100% valid | Automated PlantUML validation |
-| **C4 Model Completeness** | All levels documented | Manual review |
-| **ADR Quality** | Clear rationale | Peer review |
-| **Cross-References** | 100% valid | Automated link checking |
-| **Documentation Freshness** | < 90 days | Automated timestamp checking |
+| Metric                      | Target                | Validation                    |
+| --------------------------- | --------------------- | ----------------------------- |
+| **Diagram Syntax**          | 100% valid            | Automated PlantUML validation |
+| **C4 Model Completeness**   | All levels documented | Manual review                 |
+| **ADR Quality**             | Clear rationale       | Peer review                   |
+| **Cross-References**        | 100% valid            | Automated link checking       |
+| **Documentation Freshness** | < 90 days             | Automated timestamp checking  |
 
 ## 🚀 Advanced Features
 
@@ -351,13 +354,13 @@ class CustomArchitectureValidator(ArchitectureValidator):
 
 ### Roles and Responsibilities
 
-| Role | Responsibilities |
-|------|------------------|
+| Role                 | Responsibilities                                           |
+| -------------------- | ---------------------------------------------------------- |
 | **System Architect** | Overall architecture vision, major decisions, ADR approval |
-| **Technical Lead** | Component design, implementation guidance, code reviews |
-| **Developer** | Implementation following architectural guidelines |
-| **DevOps Engineer** | Infrastructure architecture, deployment patterns |
-| **QA Engineer** | Quality attributes validation, testing architecture |
+| **Technical Lead**   | Component design, implementation guidance, code reviews    |
+| **Developer**        | Implementation following architectural guidelines          |
+| **DevOps Engineer**  | Infrastructure architecture, deployment patterns           |
+| **QA Engineer**      | Quality attributes validation, testing architecture        |
 
 ### Review Process
 
@@ -403,6 +406,7 @@ make docs-architecture-report
 ### Common Issues
 
 #### PlantUML Rendering Failures
+
 ```bash
 # Check syntax
 python scripts/architecture_automation.py --validate
@@ -412,6 +416,7 @@ java -jar plantuml.jar docs/architecture/diagrams.puml
 ```
 
 #### Cross-Reference Errors
+
 ```bash
 # Validate all links
 make docs-architecture-validate
@@ -421,6 +426,7 @@ grep -r "broken link" docs/architecture/
 ```
 
 #### ADR Template Issues
+
 ```bash
 # Validate ADR format
 python scripts/adr_validator.py docs/architecture/adr/
@@ -482,4 +488,4 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 ---
 
 **Architecture Documentation Guide**: FLEXT-Meltano Architecture Framework
-*Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation*
+_Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation_
