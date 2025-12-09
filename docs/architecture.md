@@ -37,7 +37,7 @@ src/flext_meltano/
 
 ### **Service Layer**
 
-**Business Logic and Domain Services**
+**Business Logic and Services**
 
 ```python
 ├── services.py                    # FlextMeltanoService (core orchestration)
@@ -342,5 +342,21 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 ---
 
 **Architecture Summary**: flext-meltano provides a robust, type-safe foundation for ELT operations within the FLEXT ecosystem, with clear separation of concerns, comprehensive error handling, and strong integration patterns. The current architecture debt primarily involves abstracting direct library dependencies behind FLEXT-compatible interfaces.
+
+## Related Documentation
+
+**Within Project**:
+- [Getting Started](getting-started.md) - Installation and basic usage
+- [API Reference](api-reference.md) - Complete API documentation
+- [Examples](../examples/) - Working code examples
+
+**Across Projects**:
+- [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
+- [flext-plugin Architecture](https://github.com/organization/flext/tree/main/flext-plugin/docs/architecture.md) - Plugin architecture patterns
+- [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/CLAUDE.md) - Quality analysis and automation
+
+**External Resources**:
+- [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
+- [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
 **Design Authority**: This architecture follows FLEXT ecosystem standards and Clean Architecture principles, ensuring maintainability, testability, and integration capability across the 32-project FLEXT ecosystem.

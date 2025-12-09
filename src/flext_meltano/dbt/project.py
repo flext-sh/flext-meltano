@@ -12,23 +12,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService, u
+from flext_core import r, s
 from pydantic import Field
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
-
-# Import aliases for concise usage
-r = FlextResult
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-p = FlextMeltanoProtocols
+from flext_meltano import u
+from flext_meltano.models import m
 
 
-class FlextMeltanoDbtProjectManager(FlextService):
+class FlextMeltanoDbtProjectManager(s):
     """Manages DBT projects with deep SDK integration.
 
     Provides programmatic access to DBT projects, manifests, and
@@ -40,7 +31,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
 
     """
 
-    class ProjectInfo(FlextMeltanoModels):
+    class ProjectInfo(m):
         """Information about a DBT project."""
 
         root: Path = Field(description="Project root directory")
@@ -67,7 +58,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         root: Root directory of the DBT project
 
         Returns:
-        FlextResult containing project information
+        r containing project information
 
         """
         try:
@@ -103,7 +94,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         manifest_path: Path to manifest file (optional)
 
         Returns:
-        FlextResult containing manifest dictionary
+        r containing manifest dictionary
 
         """
         try:
@@ -131,7 +122,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Get all models from manifest.
 
         Returns:
-        FlextResult containing list of models
+        r containing list of models
 
         """
         try:
@@ -175,7 +166,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
         """Get all tests from manifest.
 
         Returns:
-        FlextResult containing list of tests
+        r containing list of tests
 
         """
         try:
@@ -216,7 +207,7 @@ class FlextMeltanoDbtProjectManager(FlextService):
             return r[list[dict[str, object]]].fail(f"Failed to get tests: {e}")
 
     def execute(self, **_kwargs: object) -> r[str]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         if self.project_root:
             msg = f"DBT project: {self.project_root}"
             return r[str].ok(msg)

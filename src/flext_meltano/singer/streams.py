@@ -16,20 +16,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextService, u
+from flext_core import FlextLogger, FlextResult, FlextService
 
+from flext_meltano import u
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import t
 
 # Import aliases for concise usage
-t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 s = FlextService
 
@@ -77,7 +75,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             # Use library runner for Singer operations
             singer_manager_result = self._library_runner.get_singer_manager()
             if singer_manager_result.is_failure:
-                return r[FlextMeltanoTypes.Processing.SingerExecutionResult].fail(
+                return r[t.Processing.SingerExecutionResult].fail(
                     singer_manager_result.error or "Failed to get Singer manager",
                 )
 
@@ -90,7 +88,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             type_raw = u.get(singer_data, "type", default="singer_manager")
             status_raw = u.get(singer_data, "status", default="available")
-            execution_result: FlextMeltanoTypes.Processing.SingerExecutionResult = {
+            execution_result: t.Processing.SingerExecutionResult = {
                 "type": str(type_raw),
                 "status": str(status_raw),
                 "capabilities": capabilities,
@@ -125,10 +123,9 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
     def execute_complete_elt_pipeline(
         self,
         project_dir: Path,
-        extractor_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
-        loader_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict,
-        transformer_config: FlextMeltanoTypes.MeltanoCore.PluginConfigDict
-        | None = None,
+        extractor_config: t.MeltanoCore.PluginConfigDict,
+        loader_config: t.MeltanoCore.PluginConfigDict,
+        transformer_config: t.MeltanoCore.PluginConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Execute complete E-L-T pipeline using library APIs.
 

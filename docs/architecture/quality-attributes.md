@@ -3760,7 +3760,7 @@ rectangle "Application Logging" as app_logging {
     ]
 }
 
-rectangle "Infrastructure Logging" as infra_logging {
+rectangle "Logging" as infra_logging {
     component "System Metrics" as metrics [
         CPU, Memory, Disk
         Network I/O

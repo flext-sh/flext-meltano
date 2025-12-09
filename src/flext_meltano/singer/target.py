@@ -154,7 +154,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def execute(
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute sink abstraction operations (implements Domain.Service)."""
+        """Execute sink abstraction operations (implements Service)."""
         # This would orchestrate the overall sink abstraction workflow
         # For now, return the current configuration
         return r[t.MeltanoCore.MeltanoConfigDict].ok(self._config.model_dump())

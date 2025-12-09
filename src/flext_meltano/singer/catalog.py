@@ -12,8 +12,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService, u
+from flext_core import FlextResult, FlextService
 
+from flext_meltano import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -188,7 +189,7 @@ class FlextMeltanoCatalogManager(FlextService):
             return r[dict[str, object] | None].fail(f"Failed to get schema: {e}")
 
     def execute(self, **_kwargs: object) -> r[dict[str, object]]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         return r[dict[str, object]].ok(self._catalog)
 
 

@@ -26,7 +26,6 @@ from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -37,7 +36,6 @@ t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):

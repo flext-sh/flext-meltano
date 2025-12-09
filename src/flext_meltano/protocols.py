@@ -91,8 +91,8 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class TapProtocol(FlextProtocols.Domain.Service, Protocol):
-            """Singer Tap protocol extending Domain.Service for ELT operations."""
+        class TapProtocol(FlextProtocols.Service, Protocol):
+            """Singer Tap protocol extending Service for ELT operations."""
 
             def discover(self) -> FlextProtocols.Result[t.JsonValue]:
                 """Discover catalog with r."""
@@ -103,12 +103,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             def execute(self) -> FlextProtocols.Result[object]:
-                """Execute the tap extraction (implements Domain.Service)."""
+                """Execute the tap extraction (implements Service)."""
                 ...
 
         @runtime_checkable
-        class TargetProtocol(FlextProtocols.Domain.Service, Protocol):
-            """Singer Target protocol extending Domain.Service for ELT operations."""
+        class TargetProtocol(FlextProtocols.Service, Protocol):
+            """Singer Target protocol extending Service for ELT operations."""
 
             def handle_record(
                 self, record: t.JsonValue
@@ -124,12 +124,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             def execute(self) -> FlextProtocols.Result[object]:
-                """Execute the target loading (implements Domain.Service)."""
+                """Execute the target loading (implements Service)."""
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(FlextProtocols.Domain.Service, Protocol):
-            """DBT Runner protocol extending Domain.Service for ELT operations."""
+        class DbtRunnerProtocol(FlextProtocols.Service, Protocol):
+            """DBT Runner protocol extending Service for ELT operations."""
 
             def run(self, models: list[str]) -> FlextProtocols.Result[t.JsonValue]:
                 """Run DBT models with r."""
@@ -140,12 +140,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             def execute(self) -> FlextProtocols.Result[object]:
-                """Execute DBT transformations (implements Domain.Service)."""
+                """Execute DBT transformations (implements Service)."""
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(FlextProtocols.Domain.Service, Protocol):
-            """Service call protocol extending Domain.Service."""
+        class ServiceCallProtocol(FlextProtocols.Service, Protocol):
+            """Service call protocol extending Service."""
 
             def call(
                 self,
@@ -156,7 +156,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             def execute(self) -> FlextProtocols.Result[object]:
-                """Execute service operation (implements Domain.Service)."""
+                """Execute service operation (implements Service)."""
                 ...
 
 

@@ -11,20 +11,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService, u
+from flext_core import FlextResult, FlextService
 from pydantic import Field
 
+from flext_meltano import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.meltano.project import FlextMeltanoProjectManager
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 s = FlextService
 
@@ -183,7 +182,7 @@ class FlextMeltanoMeltanoService(s):
 
     @staticmethod
     def execute() -> r[str]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         msg = "Meltano service initialized"
         return u.ok(msg)
 

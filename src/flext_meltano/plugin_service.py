@@ -2,7 +2,7 @@
 
 This module provides the FlextMeltanoComponentService class following FLEXT patterns:
 - Single Responsibility Principle
-- Railway-oriented programming with FlextResult
+- Railway-oriented programming with r
 - Clean Architecture with domain separation
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -14,24 +14,12 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.project_service import FlextMeltanoProjectService
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
-
-# Import aliases for simplified usage
-r = FlextResult
-# u is already imported from flext_core
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-p = FlextMeltanoProtocols
-s = FlextService
+from flext_meltano.typings import t
 
 
 class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -57,11 +45,11 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Execute the pipeline component service.
 
         Returns:
-        FlextResult containing plugin service configuration and status.
+        r containing plugin service configuration and status.
 
         """
         try:
-            config_data: FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict = {
+            config_data: t.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
                 "config": self._config.model_dump()
@@ -87,7 +75,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         project: Optional Project instance (creates temporary if None)
 
         Returns:
-        FlextResult containing list of discovered plugins with metadata
+        r containing list of discovered plugins with metadata
 
         """
         try:
@@ -169,7 +157,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[dict[str, str]]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
-        Uses FlextResult.chain_validations() to compose plugin addition steps
+        Uses r.chain_validations() to compose plugin addition steps
         with automatic error accumulation and early termination on failure.
 
         Args:
@@ -178,7 +166,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         plugin_name: Name of the plugin to add
 
         Returns:
-        FlextResult containing plugin addition information
+        r containing plugin addition information
 
         """
         # RAILWAY PATTERN: Chain validations and operations
@@ -209,7 +197,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         plugin_type: Type of the plugin
 
         Returns:
-        FlextResult containing plugin information
+        r containing plugin information
 
         """
         try:
@@ -271,7 +259,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return FlextResult.ok(None)
+        return r.ok(None)
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:

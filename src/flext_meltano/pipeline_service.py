@@ -22,16 +22,12 @@ from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 r = FlextResult
 s = FlextService
-t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class FlextMeltanoOrchestrationService(s[dict[str, str]]):
@@ -53,7 +49,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
     @staticmethod
     def execute() -> r[dict[str, str]]:
-        """Execute the main domain operation (Domain.Service protocol).
+        """Execute the main domain operation (Service protocol).
 
         Returns:
         r[dict[str, str]]: Pipeline execution results or failure with error
@@ -144,7 +140,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
     @staticmethod
     def _find_required_plugins() -> r[tuple[object, object]]:
-        """Find required plugins in FlextMeltanoTypes.Dbt.Project."""
+        """Find required plugins in t.Dbt.Project."""
         # Simplified implementation - would need actual plugin discovery
         return r[tuple[object, object]].ok((object(), object()))
 
