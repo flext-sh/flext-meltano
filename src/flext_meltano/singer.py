@@ -16,20 +16,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextService, u
+from flext_core import FlextLogger, FlextResult, FlextService
 
+from flext_meltano import u
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 s = FlextService
 

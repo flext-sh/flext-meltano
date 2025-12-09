@@ -19,7 +19,6 @@ from flext_core import FlextConfig, FlextContainer, FlextResult, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -27,7 +26,6 @@ r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class DocsConfig(FlextConfig):

@@ -166,7 +166,7 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
             return r[str | None].fail(f"Failed to get bookmark: {e}")
 
     def execute(self, **_kwargs: object) -> r[dict[str, object]]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         return r[dict[str, object]].ok(self._state)
 
 

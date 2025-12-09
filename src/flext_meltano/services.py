@@ -23,7 +23,6 @@ from flext_core import (
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -31,7 +30,6 @@ from flext_meltano.typings import FlextMeltanoTypes
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 e = FlextExceptions
 s = FlextService

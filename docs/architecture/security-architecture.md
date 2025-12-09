@@ -649,7 +649,7 @@ title FLEXT-Meltano - Security Monitoring Architecture
 actor "Security Team" as sec_team
 participant "SIEM System" as siem
 participant "Application Logs" as app_logs
-participant "Infrastructure Logs" as infra_logs
+participant "Logs" as infra_logs
 participant "Network Logs" as network_logs
 participant "Alert Engine" as alerts
 

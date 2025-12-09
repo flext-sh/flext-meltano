@@ -18,8 +18,8 @@ from typing import cast
 from flext_core import (
     FlextConstants,
     FlextModels,
-    u,
 )
+from flext_core.utilities import u as flext_u
 from pydantic import (
     Field,
     computed_field,
@@ -28,6 +28,8 @@ from pydantic import (
     model_validator,
 )
 
+from flext_meltano import u
+
 
 class FlextMeltanoModels(FlextModels):
     """Generic pipeline models following SOLID principles.
@@ -35,6 +37,14 @@ class FlextMeltanoModels(FlextModels):
     Each inner class has a single responsibility and can be used independently.
     All models are domain-agnostic and reusable across different pipeline types.
     """
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        """Warn when FlextMeltanoModels is subclassed directly."""
+        super().__init_subclass__(**kwargs)
+        flext_u.Deprecation.warn_once(
+            f"subclass:{cls.__name__}",
+            "Subclassing FlextMeltanoModels is deprecated. Use FlextModels directly with composition instead.",
+        )
 
     @staticmethod
     def _protect_sensitive_config(value: dict[str, object]) -> dict[str, object]:
@@ -1767,6 +1777,11 @@ class FlextMeltanoModels(FlextModels):
             return v
 
 
+m = FlextMeltanoModels
+m_meltano = FlextMeltanoModels
+
 __all__ = [
     "FlextMeltanoModels",
+    "m",
+    "m_meltano",
 ]

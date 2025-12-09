@@ -63,9 +63,10 @@ class FlextMeltanoConfig(FlextConfig.AutoConfig):
     """
 
     # Model configuration using Pydantic 2.11+ SettingsConfigDict
+    # Use FlextConfig.resolve_env_file() to ensure all FLEXT configs use same .env
     model_config = SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_",
-        env_file=".env",
+        env_file=FlextConfig.resolve_env_file(),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",

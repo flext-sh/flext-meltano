@@ -10,7 +10,7 @@ This directory contains comprehensive architecture documentation for FLEXT-Melta
 
 ### C4 Model Architecture
 
-- **[C4_MODEL.md](C4_MODEL.md)** - Complete C4 model documentation (Context, Containers, Components, Code)
+- **[c4-model.md](c4-model.md)** - Complete C4 model documentation (Context, Containers, Components, Code)
 - **Context Diagram** - System purpose and external interactions
 - **Container Diagram** - Technology choices and deployment architecture
 - **Component Diagram** - Internal system structure and relationships
@@ -35,28 +35,28 @@ This directory contains comprehensive architecture documentation for FLEXT-Melta
 
 ### System Context & Integration
 
-- **[SYSTEM_CONTEXT.md](SYSTEM_CONTEXT.md)** - System purpose, stakeholders, external integrations
+- **[system-context.md](system-context.md)** - System purpose, stakeholders, external integrations
 - **Ecosystem Architecture** - FLEXT project relationships and dependencies
 - **Integration Patterns** - Communication protocols and data exchange
 - **Deployment Contexts** - Development, staging, production environments
 
 ### Data Architecture
 
-- **[DATA_ARCHITECTURE.md](DATA_ARCHITECTURE.md)** - Data flow, storage, processing architecture
+- **[data-architecture.md](data-architecture.md)** - Data flow, storage, processing architecture
 - **Data Pipeline Flow** - ELT process and data transformation stages
 - **Storage Strategy** - Database design and data persistence patterns
 - **Data Quality** - Validation, cleansing, and governance frameworks
 
 ### Security Architecture
 
-- **[SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md)** - Security controls, compliance, threat model
+- **[security-architecture.md](security-architecture.md)** - Security controls, compliance, threat model
 - **Authentication & Authorization** - Identity management and access control
 - **Data Protection** - Encryption, masking, and secure data handling
 - **Compliance Framework** - GDPR, SOC2, HIPAA compliance patterns
 
 ### Quality Attributes
 
-- **[QUALITY_ATTRIBUTES.md](QUALITY_ATTRIBUTES.md)** - Performance, scalability, reliability, maintainability
+- **[quality-attributes.md](quality-attributes.md)** - Performance, scalability, reliability, maintainability
 - **Cross-Cutting Concerns** - Logging, monitoring, caching, internationalization
 - **Performance Characteristics** - Response times, throughput, resource usage
 - **Scalability Patterns** - Horizontal/vertical scaling, data partitioning
@@ -150,10 +150,10 @@ make docs-architecture-comprehensive
 
 ## 📚 Related Documentation
 
-- **[../MAINTENANCE_GUIDE.md](../MAINTENANCE_GUIDE.md)** - Documentation maintenance procedures
+- **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Documentation maintenance procedures
 - **[../../README.md](../../README.md)** - Project overview and getting started
 - **[../../CLAUDE.md](../../CLAUDE.md)** - Development guidelines and standards
-- **[../../docs/MAINTENANCE_GUIDE.md](../../docs/MAINTENANCE_GUIDE.md)** - Quality assurance processes
+- **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Quality assurance processes
 
 ## 🎯 Architecture Evolution
 

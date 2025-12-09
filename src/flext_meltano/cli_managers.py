@@ -11,24 +11,20 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING
 
-from flext_core import FlextLogger, FlextResult, u
+from flext_core import FlextLogger, FlextResult
 
+from flext_meltano import u
+from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
-
-if TYPE_CHECKING:
-    from flext_meltano.cli import FlextMeltanoCLI
 
 # Import aliases for concise usage
 r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class FlextMeltanoCommandRouter:

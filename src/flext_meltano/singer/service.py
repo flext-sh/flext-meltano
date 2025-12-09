@@ -231,7 +231,7 @@ class FlextMeltanoSingerService(s):
 
     @staticmethod
     def execute(**_kwargs: object) -> r[str]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         msg = "Singer service initialized"
         return r[str].ok(msg)
 

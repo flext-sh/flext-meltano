@@ -17,7 +17,7 @@
 ### **Development**
 
 - **[Development Guide](development.md)** - Contributing and workflows
-- **[Integration Patterns](integration.md)** - Ecosystem integration
+- **[Integration Patterns](guides/integration.md)** - Ecosystem integration
 - **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
 
 ### **Examples**
@@ -74,7 +74,7 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 
 ### **Advanced Topics**
 
-- **[Integration Patterns](integration.md)** - Ecosystem integration with other FLEXT projects
+- **[Integration Patterns](guides/integration.md)** - Ecosystem integration with other FLEXT projects
 - **[Examples](examples/)** - Working code examples and usage patterns
 
 ---
@@ -106,7 +106,7 @@ make test               # Test suite execution
 ### **Development Support**
 
 - **Architecture Questions**: Review [architecture.md](architecture.md)
-- **Integration Support**: Check [integration.md](integration.md)
+- **Integration Support**: Check [Integration Guide](guides/integration.md)
 - **Development Issues**: See [troubleshooting.md](troubleshooting.md)
 
 ### **FLEXT Ecosystem Links**

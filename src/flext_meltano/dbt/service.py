@@ -17,7 +17,6 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -25,7 +24,6 @@ from flext_meltano.typings import FlextMeltanoTypes
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class FlextMeltanoDbtService(FlextService):
@@ -187,7 +185,7 @@ class FlextMeltanoDbtService(FlextService):
 
     @staticmethod
     def execute() -> FlextResult[str]:
-        """Execute (implements Domain.Service pattern)."""
+        """Execute (implements Service pattern)."""
         msg = "DBT service initialized"
         return FlextResult[str].ok(msg)
 

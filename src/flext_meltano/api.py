@@ -34,16 +34,13 @@ from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.services import FlextMeltanoService
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import t
 
 # Import aliases for simplified usage
 # u is already imported from flext_core
-t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 e = FlextExceptions
 s = FlextService
@@ -679,7 +676,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
             cast(
-                "FlextMeltanoTypes.MeltanoCore.MeltanoConfigDict",
+                "t.MeltanoCore.MeltanoConfigDict",
                 {
                     "environment": environment_name,
                     "configuration": config or {},

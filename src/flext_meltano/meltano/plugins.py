@@ -14,21 +14,20 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult, FlextService, u
+from flext_core import FlextResult, FlextService
 
+from flext_meltano import u
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.project_service import FlextMeltanoProjectService
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 r = FlextResult
 s = FlextService
 

@@ -9,9 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService, u
+from flext_core import FlextResult, FlextService
 from singer_sdk import Stream, Tap
 
+from flext_meltano import u
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -202,7 +203,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def execute(
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute source abstraction operations (implements Domain.Service)."""
+        """Execute source abstraction operations (implements Service)."""
         # This would orchestrate the overall source abstraction workflow
         # For now, return the current configuration
         return r[t.MeltanoCore.MeltanoConfigDict].ok(self._config.model_dump())

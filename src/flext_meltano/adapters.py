@@ -16,19 +16,17 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import meltano
-from flext_core import FlextLogger, FlextResult, u
+from flext_core import FlextLogger, FlextResult
 
+from flext_meltano import u
 from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
-
-if TYPE_CHECKING:
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
 # Import aliases for concise usage
 # u is already imported from flext_core
@@ -36,7 +34,6 @@ r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-p = FlextMeltanoProtocols
 
 
 class FlextMeltanoAdapter:
