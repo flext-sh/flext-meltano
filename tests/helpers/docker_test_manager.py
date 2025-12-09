@@ -264,14 +264,12 @@ class FlextTestsDocker(ContainerManager):
                 timeout=timeout,
             )
 
-            return FlextResult[dict[str, Any]].ok(
-                {
-                    "returncode": result.returncode,
-                    "stdout": result.stdout,
-                    "stderr": result.stderr,
-                    "success": result.returncode == 0,
-                }
-            )
+            return FlextResult[dict[str, Any]].ok({
+                "returncode": result.returncode,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "success": result.returncode == 0,
+            })
 
         except subprocess.TimeoutExpired:
             return FlextResult[dict[str, Any]].fail("Command execution timed out")

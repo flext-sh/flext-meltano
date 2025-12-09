@@ -154,14 +154,12 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         """Create ELT context for pipeline execution."""
         try:
             # Create a simple ELT context for now (placeholder implementation)
-            elt_context_result = r[dict[str, object]].ok(
-                {
-                    "project": project,
-                    "extractor": extractor_name,
-                    "loader": loader_name,
-                    "plugins": plugins,
-                }
-            )
+            elt_context_result = r[dict[str, object]].ok({
+                "project": project,
+                "extractor": extractor_name,
+                "loader": loader_name,
+                "plugins": plugins,
+            })
             elt_context_obj = elt_context_result.unwrap()
 
             # Create plugin objects from the plugins tuple
@@ -169,13 +167,11 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             loader_plugin_obj = plugins[1]
 
             # Create a simple execution result for now (placeholder implementation)
-            execution_result = r[dict[str, object]].ok(
-                {
-                    "status": "completed",
-                    "extractor": extractor_name,
-                    "loader": loader_name,
-                }
-            )
+            execution_result = r[dict[str, object]].ok({
+                "status": "completed",
+                "extractor": extractor_name,
+                "loader": loader_name,
+            })
 
             if execution_result.is_failure:
                 return r[dict[str, object]].fail(
@@ -258,13 +254,11 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
             # Add execution result data if available
             if execution_result:
-                pipeline_result.update(
-                    {
-                        k: str(v)
-                        for k, v in execution_result.items()
-                        if isinstance(v, (str, int, bool))
-                    }
-                )
+                pipeline_result.update({
+                    k: str(v)
+                    for k, v in execution_result.items()
+                    if isinstance(v, (str, int, bool))
+                })
 
             self.logger.info(
                 "ELT pipeline executed successfully",

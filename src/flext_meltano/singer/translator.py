@@ -202,12 +202,10 @@ class FlextMeltanoSingerCliTranslator:
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
 
-        return r[tuple[list[str], list[str]]].ok(
-            (
-                source_command,
-                sink_command,
-            )
-        )
+        return r[tuple[list[str], list[str]]].ok((
+            source_command,
+            sink_command,
+        ))
 
     @staticmethod
     def translate_dbt_run(

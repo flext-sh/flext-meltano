@@ -117,14 +117,12 @@ class FlextMeltanoAdapter:
                 project_path = Path(project_dir) / project_name
                 project_path.mkdir(parents=True, exist_ok=True)
 
-                return r[dict[str, object]].ok(
-                    {
-                        "project_name": project_name,
-                        "project_path": str(project_path),
-                        "status": "created",
-                        "created_at": str(time.time()),
-                    }
-                )
+                return r[dict[str, object]].ok({
+                    "project_name": project_name,
+                    "project_path": str(project_path),
+                    "status": "created",
+                    "created_at": str(time.time()),
+                })
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[dict[str, object]].fail(f"Project creation failed: {e}")
 
