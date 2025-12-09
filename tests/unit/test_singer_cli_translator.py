@@ -482,11 +482,13 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
             stderr="",
         )
 
-        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres",
-            "--config",
-            "config.json",
-        ])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
+            [
+                "tap-postgres",
+                "--config",
+                "config.json",
+            ]
+        )
 
         assert result.is_success
         output = result.unwrap()
@@ -527,9 +529,11 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
             stderr="Error: Connection failed",
         )
 
-        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres",
-        ])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
+            [
+                "tap-postgres",
+            ]
+        )
 
         assert result.is_failure
         assert "Command failed with code 1" in result.error
@@ -553,9 +557,11 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         """Test command not found error."""
         mock_run.side_effect = FileNotFoundError("tap-nonexistent not found")
 
-        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-nonexistent",
-        ])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
+            [
+                "tap-nonexistent",
+            ]
+        )
 
         assert result.is_failure
         assert "Command not found: tap-nonexistent" in result.error
@@ -568,9 +574,11 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         """Test generic exception handling."""
         mock_run.side_effect = RuntimeError("Unexpected error")
 
-        result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres",
-        ])
+        result = FlextMeltanoSingerCliTranslator.execute_singer_command(
+            [
+                "tap-postgres",
+            ]
+        )
 
         assert result.is_failure
         assert "Unexpected error running command" in result.error

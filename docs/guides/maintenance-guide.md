@@ -66,13 +66,13 @@ make docs-workflow
 
 Calculated from weighted components:
 
-| Component | Weight | Description |
-|-----------|--------|-------------|
-| **Content Freshness** | 20% | File age and update frequency |
-| **Link Health** | 25% | Broken link detection and validation |
-| **Structure** | 25% | Heading hierarchy and organization |
-| **Formatting** | 15% | Style consistency and readability |
-| **Accessibility** | 15% | Alt text, semantic markup |
+| Component             | Weight | Description                          |
+| --------------------- | ------ | ------------------------------------ |
+| **Content Freshness** | 20%    | File age and update frequency        |
+| **Link Health**       | 25%    | Broken link detection and validation |
+| **Structure**         | 25%    | Heading hierarchy and organization   |
+| **Formatting**        | 15%    | Style consistency and readability    |
+| **Accessibility**     | 15%    | Alt text, semantic markup            |
 
 ### Issue Classification
 
@@ -161,6 +161,7 @@ rules:
 **Symptoms**: `[text](relative/path.md)` points to non-existent file
 
 **Solution**:
+
 ```bash
 # Find broken links in reports
 grep "broken_internal_link" docs/reports/docs_quality_report_*.md
@@ -175,8 +176,10 @@ make docs-comprehensive
 **Symptoms**: Files lack proper heading hierarchy
 
 **Solution**:
+
 ```markdown
 # Good Structure
+
 # H1: Main Title
 
 ## H2: Section
@@ -191,6 +194,7 @@ make docs-comprehensive
 **Symptoms**: Lines exceed 120 characters
 
 **Solution**:
+
 ```bash
 # Auto-format with Prettier or similar
 # Or manually break long lines
@@ -201,8 +205,10 @@ make docs-comprehensive
 **Symptoms**: `TODO` or `FIXME` found in documentation
 
 **Solution**:
+
 ```markdown
 <!-- Convert TODOs to actionable items -->
+
 - [ ] Complete API documentation
 - [x] Add installation guide
 ```
@@ -216,14 +222,14 @@ Edit `docs/.maintenance_config.yaml` to customize:
 ```yaml
 # Quality thresholds
 quality_thresholds:
-  max_file_age_days: 90  # Flag files older than this
+  max_file_age_days: 90 # Flag files older than this
 
 # Automation settings
 automation:
   enable_scheduled_audits: true
-  audit_schedule: "weekly"  # daily, weekly, monthly
+  audit_schedule: "weekly" # daily, weekly, monthly
   audit_day: "monday"
-  audit_time: "09:00"  # UTC
+  audit_time: "09:00" # UTC
 
 # Reporting preferences
 reporting:
@@ -312,6 +318,7 @@ Key metrics to monitor:
 **Issue**: `docs_maintenance.py --audit` fails
 
 **Solutions**:
+
 ```bash
 # Check Python environment
 python --version  # Should be 3.13+
@@ -331,6 +338,7 @@ file docs/some_file.md  # Should be UTF-8
 **Issue**: External link validation fails
 
 **Solutions**:
+
 ```bash
 # Check network connectivity
 curl -I https://example.com
@@ -349,6 +357,7 @@ echo "https://problematic-link.com" >> docs/.link_skip_list.txt
 **Issue**: Pre-commit hooks not working
 
 **Solutions**:
+
 ```bash
 # Check hook installation
 ls -la .git/hooks/pre-commit
@@ -447,4 +456,4 @@ auditor.generate_custom_report("api_quality.md")
 ---
 
 **Documentation Maintenance Framework v1.0.0**
-*Ensuring FLEXT-Meltano documentation excellence through automated quality assurance.*
+_Ensuring FLEXT-Meltano documentation excellence through automated quality assurance._

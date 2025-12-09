@@ -78,14 +78,16 @@ class FlextMeltanoAPIPluginOperations:
                 "settings": config or {},
             }
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "plugin_name": plugin_name,
-                "plugin_type": plugin_type,
-                "status": "installed",
-                "configuration": plugin_config,
-                "installed_at": str(__import__("time").time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                {
+                    "plugin_name": plugin_name,
+                    "plugin_type": plugin_type,
+                    "status": "installed",
+                    "configuration": plugin_config,
+                    "installed_at": str(__import__("time").time()),
+                    "api_version": self.api.version,
+                }
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Plugin installation failed: {e}",

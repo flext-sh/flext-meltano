@@ -191,8 +191,8 @@ All examples are validated through:
 Examples are integrated with the comprehensive documentation system:
 
 - **[Main Documentation](../docs/README.md)** - Complete navigation system
-- **API Documentation** - API reference with examples (*Documentation coming soon*)
-- **Development Guide** - Development workflows (*Documentation coming soon*)
+- **API Documentation** - API reference with examples (_Documentation coming soon_)
+- **Development Guide** - Development workflows (_Documentation coming soon_)
 - **[Getting Started](../docs/getting-started.md)** - First-time setup
 
 ### Example Categories in Documentation

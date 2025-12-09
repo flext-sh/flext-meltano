@@ -1082,15 +1082,18 @@ available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]
 ## Related Documentation
 
 **Within Project**:
+
 - [Getting Started](getting-started.md) - Installation and basic usage
 - [Architecture](architecture.md) - Architecture and design patterns
 - [Examples](../examples/) - Working code examples
 
 **Across Projects**:
+
 - [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/api-reference/foundation.md) - Core APIs and patterns
 - [flext-plugin API](https://github.com/organization/flext/tree/main/flext-plugin/docs/api-reference.md) - Plugin API reference
 - [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/CLAUDE.md) - Quality analysis and automation
 
 **External Resources**:
+
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)

@@ -237,11 +237,13 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     def run_cli(self, args: list[str] | None) -> r[dict[str, object]]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
-            return r[dict[str, object]].ok({
-                "status": "ready",
-                "command_type": "cli",
-                "message": "CLI ready for commands",
-            })
+            return r[dict[str, object]].ok(
+                {
+                    "status": "ready",
+                    "command_type": "cli",
+                    "message": "CLI ready for commands",
+                }
+            )
         return self.run(args)
 
     def version(self) -> r[dict[str, object]]:
@@ -270,13 +272,15 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             "invoke",
             "select",
         ]
-        return r[dict[str, object]].ok({
-            "commands": commands_list,
-            "available_commands": u.filter(
-                commands_list,
-                lambda c: c in {"version", "help", "health"},
-            ),
-        })
+        return r[dict[str, object]].ok(
+            {
+                "commands": commands_list,
+                "available_commands": u.filter(
+                    commands_list,
+                    lambda c: c in {"version", "help", "health"},
+                ),
+            }
+        )
 
     @staticmethod
     def list_plugins() -> r[list[dict[str, object]]]:
@@ -316,11 +320,13 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             return (
                 executor.run(args)
                 if args
-                else r[dict[str, object]].ok({
-                    "status": "ready",
-                    "command_type": "cli_runner",
-                    "args": args,
-                })
+                else r[dict[str, object]].ok(
+                    {
+                        "status": "ready",
+                        "command_type": "cli_runner",
+                        "args": args,
+                    }
+                )
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[dict[str, object]].fail(f"Failed to create CLI runner: {e}")
@@ -344,46 +350,54 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     @staticmethod
     def _execute_version_command() -> r[dict[str, object]]:
         """Execute version command - returns version info."""
-        return r[dict[str, object]].ok({
-            "command": "version",
-            "command_type": "version",
-            "status": "success",
-            "version": c.FLEXT_MELTANO_VERSION,
-            "success": True,
-            "cli_type": "flext_meltano",
-        })
+        return r[dict[str, object]].ok(
+            {
+                "command": "version",
+                "command_type": "version",
+                "status": "success",
+                "version": c.FLEXT_MELTANO_VERSION,
+                "success": True,
+                "cli_type": "flext_meltano",
+            }
+        )
 
     @staticmethod
     def _execute_help_command() -> r[dict[str, object]]:
         """Execute help command - returns help info."""
-        return r[dict[str, object]].ok({
-            "command": "help",
-            "command_type": "help",
-            "status": "success",
-            "help": "FLEXT Meltano CLI - Data integration framework",
-        })
+        return r[dict[str, object]].ok(
+            {
+                "command": "help",
+                "command_type": "help",
+                "status": "success",
+                "help": "FLEXT Meltano CLI - Data integration framework",
+            }
+        )
 
     @staticmethod
     def _execute_health_command() -> r[dict[str, object]]:
         """Execute health command - delegates to adapter."""
-        return r[dict[str, object]].ok({
-            "command": "health",
-            "command_type": "health",
-            "status": "healthy",
-            "health": "OK",
-            "components": ["bridge", "adapter", "executor"],
-        })
+        return r[dict[str, object]].ok(
+            {
+                "command": "health",
+                "command_type": "health",
+                "status": "healthy",
+                "health": "OK",
+                "components": ["bridge", "adapter", "executor"],
+            }
+        )
 
     @staticmethod
     def _execute_action_command(action: str, args: list[str]) -> r[dict[str, object]]:
         """Execute action command - delegates to appropriate handler."""
         try:
-            return r[dict[str, object]].ok({
-                "command": action,
-                "action": action,
-                "args": args,
-                "status": "executed",
-            })
+            return r[dict[str, object]].ok(
+                {
+                    "command": action,
+                    "action": action,
+                    "args": args,
+                    "status": "executed",
+                }
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[dict[str, object]].fail(f"Action failed: {e}")
 
@@ -402,11 +416,13 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     @staticmethod
     def _handle_cli_no_args() -> r[dict[str, object]]:
         """Handle CLI with no arguments - delegates to ready state."""
-        return r[dict[str, object]].ok({
-            "status": "ready",
-            "command_type": "cli",
-            "message": "No arguments provided - ready for commands",
-        })
+        return r[dict[str, object]].ok(
+            {
+                "status": "ready",
+                "command_type": "cli",
+                "message": "No arguments provided - ready for commands",
+            }
+        )
 
     def _handle_cli_version_args(self) -> r[dict[str, object]]:
         """Handle CLI version arguments - delegates to version handler."""
@@ -419,11 +435,13 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     def _handle_cli_other_args(self, args: list[str]) -> r[dict[str, object]]:
         """Handle CLI other arguments - delegates to action executor."""
         if not args:
-            return r[dict[str, object]].ok({
-                "status": "ready",
-                "command_type": "cli",
-                "message": "Ready for commands",
-            })
+            return r[dict[str, object]].ok(
+                {
+                    "status": "ready",
+                    "command_type": "cli",
+                    "message": "Ready for commands",
+                }
+            )
         command = args[0]
         return self._route_command(command, args[1:])
 
