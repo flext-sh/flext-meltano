@@ -206,15 +206,13 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                {
-                    "tap_name": tap_name,
-                    "status": "completed",
-                    "execution_duration": execution_duration,
-                    "executed_at": str(time.time()),
-                    "api_version": self.api.version,
-                }
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok({
+                "tap_name": tap_name,
+                "status": "completed",
+                "execution_duration": execution_duration,
+                "executed_at": str(time.time()),
+                "api_version": self.api.version,
+            })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
 
@@ -234,15 +232,13 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                {
-                    "target_name": target_name,
-                    "status": "completed",
-                    "execution_duration": execution_duration,
-                    "executed_at": str(time.time()),
-                    "api_version": self.api.version,
-                }
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok({
+                "target_name": target_name,
+                "status": "completed",
+                "execution_duration": execution_duration,
+                "executed_at": str(time.time()),
+                "api_version": self.api.version,
+            })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}",

@@ -1236,12 +1236,10 @@ class FlextMeltanoModels(FlextModels):
                 and isinstance(normalized_envs_result.value, list)
                 else []
             )
-            return u.any_(
-                *[
-                    u.in_(env, cast("list[object]", prod_environments))
-                    for env in normalized_envs
-                ]
-            )
+            return u.any_(*[
+                u.in_(env, cast("list[object]", prod_environments))
+                for env in normalized_envs
+            ])
 
         @computed_field
         def project_maturity(self) -> str:
@@ -1258,12 +1256,9 @@ class FlextMeltanoModels(FlextModels):
                 and isinstance(normalized_envs_result.value, list)
                 else []
             )
-            has_prod = u.any_(
-                *[
-                    u.in_(env, cast("list[object]", prod_envs))
-                    for env in normalized_envs
-                ]
-            )
+            has_prod = u.any_(*[
+                u.in_(env, cast("list[object]", prod_envs)) for env in normalized_envs
+            ])
             env_count = u.count(self.environments)
 
             if (
