@@ -53,11 +53,6 @@ class FlextMeltanoAdapter:
     def _library_runner(self) -> FlextMeltanoLibraryRunner:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
-            # Import here to avoid circular dependency - runtime import needed
-            from flext_meltano.library_runner import (
-                FlextMeltanoLibraryRunner,
-            )
-
             self._library_runner_instance = FlextMeltanoLibraryRunner()
         return self._library_runner_instance
 
