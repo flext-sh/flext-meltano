@@ -35,7 +35,7 @@ from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
-from flext_meltano.typings import t
+from flext_meltano.typings import FlextMeltanoTypes, t
 
 # Import aliases for simplified usage
 # u is already imported from flext_core
