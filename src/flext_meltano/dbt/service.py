@@ -90,7 +90,7 @@ class FlextMeltanoDbtService(FlextService):
             self.logger.info("Retrieving DBT models")
             result = self.project_manager.get_models()
             if result.is_success:
-                models = result.unwrap()
+                models = result.value
                 self.logger.info("DBT models retrieved", count=len(models))
             return result
         except Exception as e:
@@ -118,7 +118,7 @@ class FlextMeltanoDbtService(FlextService):
             self.logger.info("Running DBT models", models=models)
             result = self.runner.run_models(models, **kwargs)
             if result.is_success:
-                run_result = result.unwrap()
+                run_result = result.value
                 self.logger.info(
                     "DBT run completed",
                     models_run=run_result.models_run,
@@ -149,7 +149,7 @@ class FlextMeltanoDbtService(FlextService):
             self.logger.info("Running DBT tests", models=models)
             result = self.runner.run_tests(models, **kwargs)
             if result.is_success:
-                test_result = result.unwrap()
+                test_result = result.value
                 self.logger.info(
                     "DBT tests completed",
                     tests_run=test_result.tests_run,

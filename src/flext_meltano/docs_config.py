@@ -94,7 +94,7 @@ class DocsConfig(FlextConfig):
         config_result = container.get("DocsConfig")
 
         if config_result.is_success:
-            return cast("DocsConfig", config_result.unwrap())
+            return cast("DocsConfig", config_result.value)
 
         # Create and register new instance
         instance = cls()

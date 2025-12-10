@@ -80,7 +80,7 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # For now, just return success since runner is just a dict
-            result = r[dict[str, object]].ok(transformation_runner_result.unwrap())
+            result = r[dict[str, object]].ok(transformation_runner_result.value)
 
             if result.is_success:
                 _ = self.logger.info(

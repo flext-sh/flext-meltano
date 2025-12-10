@@ -218,7 +218,7 @@ class FlextTestsDocker(ContainerManager):
             result = self.run_compose_command(cmd, timeout=30)
             if result.is_success:
                 # Parse output like "0.0.0.0:5433"
-                host_port = result.unwrap().stdout.strip().split(":")
+                host_port = result.value.stdout.strip().split(":")
                 if len(host_port) == 2:
                     return f"localhost:{host_port[1]}"
 

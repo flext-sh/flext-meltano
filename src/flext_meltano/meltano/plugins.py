@@ -105,7 +105,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     )
                 # For now, we'll work with dict[str, object] - need to convert back to Project object
                 # This is a simplification; in real implementation we'd maintain Project objects
-                working_project = temp_project_result.unwrap()
+                working_project = temp_project_result.value
 
             plugins = []
 
@@ -146,7 +146,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "extractors",
             )
             if extractors_result.is_success:
-                extractors_dict = extractors_result.unwrap()
+                extractors_dict = extractors_result.value
                 extractors_keys = u.take(extractors_dict, 10)
                 extractors_plugins_result = u.process(
                     extractors_dict,
@@ -162,7 +162,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "loaders",
             )
             if loaders_result.is_success:
-                loaders_dict = loaders_result.unwrap()
+                loaders_dict = loaders_result.value
                 loaders_keys = u.take(loaders_dict, 5)
                 loaders_plugins_result = u.process(
                     loaders_dict,

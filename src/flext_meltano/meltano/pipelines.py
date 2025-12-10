@@ -95,7 +95,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             project_obj,
             source_name,
             sink_name,
-            plugins_result.unwrap(),
+            plugins_result.value,
         )
         if elt_context_result.is_failure:
             return r[dict[str, str]].fail(
@@ -103,7 +103,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
         # Execute singer runner
-        runner_result = self._execute_singer_runner(elt_context_result.unwrap())
+        runner_result = self._execute_singer_runner(elt_context_result.value)
         if runner_result.is_failure:
             return r[dict[str, str]].fail(
                 runner_result.error or "Failed to execute singer runner",
@@ -113,7 +113,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         final_result = self._build_pipeline_result(
             source_name,
             sink_name,
-            runner_result.unwrap(),
+            runner_result.value,
         )
         return final_result.or_else_get(
             lambda: r[dict[str, str]].fail(
@@ -159,7 +159,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     f"Failed to create ELT context: {elt_context_result.error}",
                 )
 
-            elt_context_obj = elt_context_result.unwrap()
+            elt_context_obj = elt_context_result.value
 
             # Create plugin objects from the plugins tuple
             extractor_plugin_obj = plugins[0]
@@ -182,7 +182,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     elt_context_result.error or "Failed to create ELT context",
                 )
 
-            elt_context_result.unwrap()
+            elt_context_result.value
 
             context_data: t.MeltanoCore.RunContextDict = {
                 "t.Dbt.Project": "t.Dbt.Project",
@@ -236,7 +236,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Add execution results to context
             context_data["execution_completed"] = True
-            context_data["execution_result"] = execution_result.unwrap()
+            context_data["execution_result"] = execution_result.value
 
             return r[dict[str, t_core.JsonValue]].ok(
                 cast("dict[str, t_core.JsonValue]", context_data),

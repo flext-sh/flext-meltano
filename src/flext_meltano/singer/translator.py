@@ -38,7 +38,7 @@ source_params = FlextMeltanoModels.CliParameters.DataSourceParams(
 # Translate to Singer SDK command
 command_result = FlextMeltanoSingerCliTranslator.translate_tap_run(source_params)
 if command_result.is_success:
-    singer_command = command_result.unwrap()
+    singer_command = command_result.value
     # singer_command = ["tap-postgres", "--config", "config/tap-config.json", ...]
 
     # Execute Singer SDK command
@@ -46,7 +46,7 @@ if command_result.is_success:
         singer_command
     )
     if execution_result.is_success:
-        output = execution_result.unwrap()
+        output = execution_result.value
         print(f"Source executed: {output['stdout']}")
 ```
 
@@ -67,7 +67,7 @@ commands_result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(
     pipeline_params
 )
 if commands_result.is_success:
-    tap_command, target_command = commands_result.unwrap()
+    tap_command, target_command = commands_result.value
     # Execute as pipeline: tap_command | target_command
 ```
 

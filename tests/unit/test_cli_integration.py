@@ -38,7 +38,7 @@ class TestCliModelConverterWithTapRunParams:
         )
 
         assert result.is_success
-        model: m.TapRunParams = result.unwrap()
+        model: m.TapRunParams = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.discover is False
@@ -58,7 +58,7 @@ class TestCliModelConverterWithTapRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.config_file == "/path/to/config.json"
@@ -76,7 +76,7 @@ class TestCliModelConverterWithTapRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.discover is True
@@ -98,7 +98,7 @@ class TestCliModelConverterWithTapRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.config_file == "/config.json"
@@ -156,7 +156,7 @@ class TestCliModelConverterWithTargetRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.target_name == "target-postgres"
         assert model.config_file is None
         assert model.input_file is None
@@ -174,7 +174,7 @@ class TestCliModelConverterWithTargetRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.target_name == "target-postgres"
         assert model.config_file == "/path/to/config.json"
 
@@ -191,7 +191,7 @@ class TestCliModelConverterWithTargetRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.target_name == "target-postgres"
         assert model.input_file == "/path/to/input.jsonl"
 
@@ -209,7 +209,7 @@ class TestCliModelConverterWithTargetRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.target_name == "target-postgres"
         assert model.config_file == "/config.json"
         assert model.input_file == "/input.jsonl"
@@ -247,7 +247,7 @@ class TestCliModelConverterWithPipelineRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
 
@@ -264,7 +264,7 @@ class TestCliModelConverterWithPipelineRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.target_name == "target-postgres"
 
     def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
@@ -282,7 +282,7 @@ class TestCliModelConverterWithPipelineRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.catalog_file == "/catalog.json"
         assert model.state_file == "/state.json"
 
@@ -303,7 +303,7 @@ class TestCliModelConverterWithPipelineRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.tap_name == "tap-postgres"
         assert model.config_file == "/path/to/config.json"
         assert model.target_name == "target-postgres"
@@ -358,7 +358,7 @@ class TestCliModelConverterWithDbtRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.project_dir == "/dbt/project"
         assert model.models is None
         assert model.full_refresh is False
@@ -376,7 +376,7 @@ class TestCliModelConverterWithDbtRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.models == "users orders"
 
     def test_converter_dbt_run_params_with_select_exclude(self) -> None:
@@ -393,7 +393,7 @@ class TestCliModelConverterWithDbtRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.select == "tag:daily"
         assert model.exclude == "tag:deprecated"
 
@@ -410,7 +410,7 @@ class TestCliModelConverterWithDbtRunParams:
         )
 
         assert result.is_success
-        model = result.unwrap()
+        model = result.value
         assert model.full_refresh is True
 
     def test_converter_dbt_run_params_missing_required(self) -> None:

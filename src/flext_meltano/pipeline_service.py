@@ -99,7 +99,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             project_obj,
             source_name,
             sink_name,
-            plugins_result.unwrap(),
+            plugins_result.value,
         )
         if elt_context_result.is_failure:
             return r[dict[str, str]].fail(
@@ -108,7 +108,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
 
         # Execute singer runner
         runner_result = FlextMeltanoOrchestrationService._execute_singer_runner(
-            elt_context_result.unwrap(),
+            elt_context_result.value,
         )
         if runner_result.is_failure:
             return r[dict[str, str]].fail(
@@ -119,7 +119,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         final_result = self._build_pipeline_result(
             source_name,
             sink_name,
-            runner_result.unwrap(),
+            runner_result.value,
         )
         return final_result.or_else_get(
             lambda: r[dict[str, str]].fail(
@@ -160,7 +160,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                 "loader": loader_name,
                 "plugins": plugins,
             })
-            elt_context_obj = elt_context_result.unwrap()
+            elt_context_obj = elt_context_result.value
 
             # Create plugin objects from the plugins tuple
             extractor_plugin_obj = plugins[0]
@@ -183,7 +183,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                 "elt_context": elt_context_obj,
                 "extractor_plugin": extractor_plugin_obj,
                 "loader_plugin": loader_plugin_obj,
-                "execution_result": execution_result.unwrap(),
+                "execution_result": execution_result.value,
             }
 
             return r[dict[str, object]].ok(context_data)

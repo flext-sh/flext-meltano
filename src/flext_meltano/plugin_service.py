@@ -95,7 +95,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     )
                 # For now, we'll work with dict[str, object] - need to convert back to Project object
                 # This is a simplification; in real implementation we'd maintain Project objects
-                working_project = temp_project_result.unwrap()
+                working_project = temp_project_result.value
 
             plugins = []
 
@@ -105,7 +105,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "extractors",
             )
             if extractors_result.is_success:
-                extractors_dict = extractors_result.unwrap()
+                extractors_dict = extractors_result.value
                 for plugin_name, indexed_plugin in list(extractors_dict.items())[:10]:
                     default_var = getattr(indexed_plugin, "default_variant", None)
                     variants_obj = getattr(indexed_plugin, "variants", None)
@@ -126,7 +126,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "loaders",
             )
             if loaders_result.is_success:
-                loaders_dict = loaders_result.unwrap()
+                loaders_dict = loaders_result.value
                 for plugin_name, indexed_plugin in list(loaders_dict.items())[:5]:
                     default_var = getattr(indexed_plugin, "default_variant", None)
                     variants_obj = getattr(indexed_plugin, "variants", None)
@@ -213,7 +213,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Get plugins of type
             plugins_result = self._abstractions.get_plugins_of_type(
-                cast("object", project_result.unwrap()),
+                cast("object", project_result.value),
                 plugin_type,
             )
 
@@ -222,7 +222,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     f"Failed to get plugins of type {plugin_type}: {plugins_result.error}",
                 )
 
-            plugins_dict = plugins_result.unwrap()
+            plugins_dict = plugins_result.value
 
             if plugin_name not in plugins_dict:
                 return r[dict[str, str]].fail(

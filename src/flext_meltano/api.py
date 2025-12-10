@@ -77,7 +77,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         >>> api = FlextMeltano()
         >>> result = api.create_pipeline("tap-csv", "target-postgres")
         >>> if result.is_success:
-        ...     pipeline = result.unwrap()
+        ...     pipeline = result.value
 
     """
 
@@ -276,7 +276,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
                 validation_result,
             )
 
-        args = validation_result.unwrap()
+        args = validation_result.value
         return _build_pipeline_config(*args)
 
     def execute_pipeline(

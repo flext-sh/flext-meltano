@@ -82,7 +82,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # For now, just return success since singer_manager is just a dict
             # Build SingerExecutionResult with known fields from get_singer_manager
-            singer_data = singer_manager_result.unwrap()
+            singer_data = singer_manager_result.value
             capabilities_obj = singer_data.get("capabilities", [])
             capabilities: list[object] = (
                 list(capabilities_obj) if isinstance(capabilities_obj, list) else []
@@ -98,7 +98,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             if result.is_success:
                 self._logger.info(
                     "Singer pipeline executed successfully",
-                    streams_processed=result.unwrap().get("streams_processed", 0),
+                    streams_processed=result.value.get("streams_processed", 0),
                 )
             else:
                 self._logger.error(
@@ -161,7 +161,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if result.is_success:
-                pipeline_data = result.unwrap()
+                pipeline_data = result.value
                 self._logger.info(
                     "Complete E-L-T pipeline executed successfully",
                     overall_success=pipeline_data.get("overall_success", False),
